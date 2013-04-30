@@ -20,6 +20,7 @@
 
 #include <memory>
 
+#include "Application.h"
 
 double TVPCPUClock = 0; // CPU clock, in MHz
 tTVPCPUClockAccuracy TVPCPUClockAccuracy = ccaNotSet;
@@ -149,7 +150,7 @@ void tTVPEmergencyExitThread::Execute(void)
 			{
 				// force suicide
 				DWORD pid;
-				GetWindowThreadProcessId(Application->Handle, &pid);
+				GetWindowThreadProcessId(Application->GetHandle(), &pid);
 				HANDLE hp=OpenProcess(PROCESS_TERMINATE, FALSE, pid);
 				if(hp)
 				{
@@ -171,9 +172,9 @@ void tTVPEmergencyExitThread::Execute(void)
 		else
 			Event.WaitFor(500);
 
-		if(TVPMainFormAlive && Application != NULL && Application->Handle != NULL)
+		if(TVPMainFormAlive && Application != NULL && Application->GetHandle ()!= NULL)
 		{
-			PostMessage(Application->Handle, WM_USER+0x35/*WM_KEEPALIVE*/, 0, 0);
+			PostMessage(Application->GetHandle(), WM_USER+0x35/*WM_KEEPALIVE*/, 0, 0);
 			// Send wakeup message to the main window.
 			// VCL sometimes waits message that never come (so hangs up).
 			// This message will wake the VCL up.

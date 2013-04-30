@@ -39,17 +39,17 @@ const tjs_char TJS_SKIP_CODE = (tjs_char)~((tjs_char)0);
 //---------------------------------------------------------------------------
 static bool inline TJS_iswspace(tjs_char ch)
 {
-	if(ch&0xff00) return false; else return isspace(ch);
+	if(ch&0xff00) return false; else return 0!=isspace(ch);
 }
 //---------------------------------------------------------------------------
 static bool inline TJS_iswdigit(tjs_char ch)
 {
-	if(ch&0xff00) return false; else return isdigit(ch);
+	if(ch&0xff00) return false; else return 0!=isdigit(ch);
 }
 //---------------------------------------------------------------------------
 static bool inline TJS_iswalpha(tjs_char ch)
 {
-	if(ch&0xff00) return true; else return isalpha(ch);
+	if(ch&0xff00) return true; else return 0!=isalpha(ch);
 }
 //---------------------------------------------------------------------------
 
@@ -902,7 +902,7 @@ static bool TJSParseRegExp(tTJSVariant &pat, const tjs_char **ptr)
 				flag += *(*ptr);
 				if(!TJSNext(ptr)) break;
 			}
-			str = TJS_W("/""/")+ flag + TJS_W("/") + str;
+			str = TJS_W("/")TJS_W("/")+ flag + TJS_W("/") + str;
 			ok = true;
 			break;
 		}

@@ -501,7 +501,7 @@ bool tTJSCustomObject::CallGetMissing(const tjs_char *name, tTJSVariant &result)
 			}
 			else
 			{
-				res = (bool)(tjs_int)funcresult;
+				res = 0!=(tjs_int)funcresult;
 				result = val;
 			}
 		}
@@ -548,7 +548,7 @@ bool tTJSCustomObject::CallSetMissing(const tjs_char *name, const tTJSVariant &v
 			}
 			else
 			{
-				res = (bool)(tjs_int)funcresult;
+				res = 0!=(tjs_int)funcresult;
 			}
 		}
 		catch(...)
@@ -776,7 +776,7 @@ void tTJSCustomObject::RebuildHash( tjs_int requestcount )
 	try
 	{
 		memset(newsymbols, 0, sizeof(tTJSSymbolData) * newhashsize);
-		tjs_int i;
+		//tjs_int i;
 		tTJSSymbolData * lv1 = Symbols;
 		tTJSSymbolData * lv1lim = lv1 + HashSize;
 		for(; lv1 < lv1lim; lv1++)
@@ -1201,7 +1201,7 @@ bool tTJSCustomObject::CallEnumCallbackForData(
 	tTJSVariant res;
 	if(TJS_FAILED(callback.FuncCall(NULL, NULL, NULL, &res,
 		(flags & TJS_ENUM_NO_VALUE) ? 2 : 3, params, NULL))) return false;
-	return (bool)(tjs_int)(res);
+	return 0!=(tjs_int)(res);
 }
 //---------------------------------------------------------------------------
 void tTJSCustomObject::InternalEnumMembers(tjs_uint32 flags,

@@ -105,7 +105,7 @@ private:
 			tjs_uint32 *hint, tTJSVariant *result, tjs_int numparams,
 			tTJSVariant **param, iTJSDispatch2 *objthis);
 	};
-	friend class tDictionaryEnumCallback;
+	friend struct tDictionaryEnumCallback;
 
 public:
 	void SaveStructuredData(std::vector<iTJSDispatch2 *> &stack,

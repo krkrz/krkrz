@@ -21,6 +21,7 @@
 #include "tjsDebug.h"
 #endif // ENABLE_DEBUGGER
 
+#include "Application.h"
 //---------------------------------------------------------------------------
 // global variables
 //---------------------------------------------------------------------------
@@ -146,14 +147,14 @@ void tTVPLogStreamHolder::Open(const tjs_nchar *mode)
 			}
 
 #ifdef TJS_TEXT_OUT_CRLF
-			ttstr separator(TJS_W("\r\n\r\n\r\n"
-"==============================================================================\r\n"
-"==============================================================================\r\n"
+			ttstr separator(TJS_W("\r\n\r\n\r\n")
+TJS_W("==============================================================================\r\n")
+TJS_W("==============================================================================\r\n"
 				));
 #else
-			ttstr separator(TJS_W("\n\n\n"
-"==============================================================================\n"
-"==============================================================================\n"
+			ttstr separator(TJS_W("\n\n\n")
+TJS_W("==============================================================================\n")
+TJS_W("==============================================================================\n"
 				));
 #endif
 			Log(separator);
@@ -289,7 +290,20 @@ void TVPAddLog(const ttstr &line, bool appendtoimportant)
 	if(TVPOnLog) TVPOnLog(buf);
 #ifdef ENABLE_DEBUGGER
 	if( TJSEnableDebugMode ) TJSDebuggerLog(buf,appendtoimportant);
+	OutputDebugStringW( buf.c_str() );
+	OutputDebugStringW( L"\n" );
 #endif	// ENABLE_DEBUGGER
+#ifdef TVP_LOG_TO_COMMANDLINE_CONSOLE
+	if( Application->IsAttachConsole() ) {
+		wprintf( buf.c_str() );
+		wprintf( L"\n" );
+		/*
+		HANDLE hStdOutput = ::GetStdHandle(STD_OUTPUT_HANDLE);
+		DWORD len;
+		::WriteConsoleW( hStdOutput, buf.c_str(), buf.length(), &len, NULL );
+		*/
+	}
+#endif
 	if(TVPLoggingToFile) TVPLogStreamHolder.Log(buf);
 }
 //---------------------------------------------------------------------------
@@ -384,12 +398,12 @@ void TVPStartLogToFile(bool clear)
 	TVPLogStreamHolder.Log(*TVPImportantLogs);
 
 #ifdef TJS_TEXT_OUT_CRLF
-	ttstr separator(TJS_W("\r\n"
-"------------------------------------------------------------------------------\r\n"
+	ttstr separator(TJS_W("\r\n")
+TJS_W("------------------------------------------------------------------------------\r\n"
 				));
 #else
-	ttstr separator(TJS_W("\n"
-"------------------------------------------------------------------------------\n"
+	ttstr separator(TJS_W("\n")
+TJS_W("------------------------------------------------------------------------------\n"
 				));
 #endif
 
@@ -432,7 +446,7 @@ void TVPSetLogLocation(const ttstr &loc)
 	}
 	else
 	{
-		TJS_nstrcpy(TVPNativeLogLocation, native.AsAnsiString().c_str());
+		TJS_nstrcpy(TVPNativeLogLocation, native.AsStdString().c_str());
 		if(TVPNativeLogLocation[TJS_nstrlen(TVPNativeLogLocation)-1] != '\\')
 			TJS_nstrcat(TVPNativeLogLocation, "\\");
 	}
@@ -546,7 +560,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/startLogToFile)
 	bool clear = false;
 
 	if(numparams >= 1)
-		clear = *param[0];
+		clear = param[0]->operator bool();
 
 	TVPStartLogToFile(clear);
 

@@ -271,7 +271,7 @@ private:
 		tjs_int Object;
 		tjs_int Counter;
 	};
-
+	
 	// for Bytecode
 	struct tProperty {
 		const tjs_char* Name;

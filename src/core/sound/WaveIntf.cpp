@@ -92,7 +92,8 @@ void TVP_CDECL def__Z32RisaPCMConvertLoopInt16ToFloat32PvPKvj(void * dest, const
 void TVP_CDECL sse__Z32RisaPCMConvertLoopFloat32ToInt16PvPKvj(void * dest, const void * src, size_t numsamples);
 void TVP_CDECL def__Z32RisaPCMConvertLoopFloat32ToInt16PvPKvj(void * dest, const void * src, size_t numsamples);
 }
-extern tjs_uint32 TVPCPUType;
+//extern tjs_uint32 TVPCPUType;
+#include "DetectCPU.h"
 #include "tvpgl_ia32_intf.h"
 
 
@@ -1105,7 +1106,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/setPos) // not setPosition
 	y = (*param[1]);
 	z = (*param[2]);
 
-	_this->SetPos(x, y, z);
+	_this->SetPos( static_cast<D3DVALUE>(x), static_cast<D3DVALUE>(y), static_cast<D3DVALUE>(z) );
 
 	return TJS_S_OK;
 }
@@ -1377,7 +1378,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(posX)
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_WaveSoundBuffer);
 
-		_this->SetPosX((tTVReal)*param);
+		_this->SetPosX( static_cast<D3DVALUE>( (tTVReal)*param ));
 
 		return TJS_S_OK;
 	}
@@ -1401,7 +1402,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(posY)
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_WaveSoundBuffer);
 
-		_this->SetPosY((tTVReal)*param);
+		_this->SetPosY( static_cast<D3DVALUE>( (tTVReal)*param ) );
 
 		return TJS_S_OK;
 	}
@@ -1425,7 +1426,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(posZ)
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_WaveSoundBuffer);
 
-		_this->SetPosZ((tTVReal)*param);
+		_this->SetPosZ( static_cast<D3DVALUE>((tTVReal)*param) );
 
 		return TJS_S_OK;
 	}

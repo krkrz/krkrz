@@ -377,6 +377,7 @@ void TJS_INTF_METHOD tTVPDrawDevice::WindowReleaseCapture(iTVPLayerManager * man
 
 
 //---------------------------------------------------------------------------
+#ifdef USE_OBSOLETE_FUNCTIONS
 void TJS_INTF_METHOD tTVPDrawDevice::SetHintText(iTVPLayerManager * manager, const ttstr & text)
 {
 	iTVPLayerManager * primary_manager = GetLayerManagerAt(PrimaryLayerManagerIndex);
@@ -386,6 +387,7 @@ void TJS_INTF_METHOD tTVPDrawDevice::SetHintText(iTVPLayerManager * manager, con
 		Window->SetHintText(text);
 	}
 }
+#endif
 //---------------------------------------------------------------------------
 
 

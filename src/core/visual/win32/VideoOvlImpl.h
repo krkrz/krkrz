@@ -195,7 +195,8 @@ public:
 	void DetachVideoOverlay();
 
 private:
-	void __fastcall WndProc(Messages::TMessage &Msg);
+	//void __fastcall WndProc(Messages::TMessage &Msg);
+	LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 		// UtilWindow's window procedure
 	void ClearWndProcMessages(); // clear WndProc's message queue
 

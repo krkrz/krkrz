@@ -344,7 +344,7 @@ bool tTVPBaseBitmap::FillColor(tTVPRect rect, tjs_uint32 color, tjs_int opa)
         tjs_int h = rect.bottom - rect.top;
         tjs_int w = rect.right - rect.left;
 
-        tjs_int taskNum = GetAdaptiveThreadNum(w * h, opa == 255 ? 115 : 55);
+        tjs_int taskNum = GetAdaptiveThreadNum(w * h, opa == 255 ? 115.f : 55.f);
         TVPBeginThreadTask(taskNum);
         PartialFillColorParam params[TVPMaxThreadNum];
         for (tjs_int i = 0; i < taskNum; i++) {
@@ -442,7 +442,7 @@ bool tTVPBaseBitmap::BlendColor(tTVPRect rect, tjs_uint32 color, tjs_int opa,
           factor = 25;
         else
           factor = 147;
-        tjs_int taskNum = GetAdaptiveThreadNum(w * h, factor);
+        tjs_int taskNum = GetAdaptiveThreadNum(w * h, static_cast<float>(factor) );
         TVPBeginThreadTask(taskNum);
         PartialBlendColorParam params[TVPMaxThreadNum];
         for (tjs_int i = 0; i < taskNum; i++) {
@@ -546,7 +546,7 @@ bool tTVPBaseBitmap::RemoveConstOpacity(tTVPRect rect, tjs_int level)
         tjs_int h = rect.bottom - rect.top;
         tjs_int w = rect.right - rect.left;
 
-        tjs_int taskNum = GetAdaptiveThreadNum(w * h, level == 255 ? 83 : 50);
+        tjs_int taskNum = GetAdaptiveThreadNum(w * h, level == 255 ? 83.f : 50.f);
         TVPBeginThreadTask(taskNum);
         PartialRemoveConstOpacityParam params[TVPMaxThreadNum];
         for (tjs_int i = 0; i < taskNum; i++) {
@@ -771,7 +771,7 @@ bool tTVPBaseBitmap::CopyRect(tjs_int x, tjs_int y, const tTVPBaseBitmap *ref,
           param->dy = rect.top + y0;
           param->w = w;
           param->h = y1 - y0;
-          param->src = src;
+          param->src = reinterpret_cast<const tjs_int8*>(src);
           param->spitch = spitch;
           param->sx = refrect.left;
           param->sy = refrect.top + y0;
@@ -812,7 +812,7 @@ void tTVPBaseBitmap::PartialCopyRect(const PartialCopyRectParam *param)
 			refrect.left*pixelsize;
 #endif
 		tjs_uint8 * dest = param->dest + dpitch * (param->dy + param->h - 1) + param->dx * pixelsize;
-		const tjs_uint8 * src = param->src + spitch * (param->sy + param->h - 1) + param->sx * pixelsize;
+		const tjs_uint8 * src = reinterpret_cast<const tjs_uint8*>(param->src + spitch * (param->sy + param->h - 1) + param->sx * pixelsize);
 
 		switch(plane)
 		{
@@ -852,7 +852,7 @@ void tTVPBaseBitmap::PartialCopyRect(const PartialCopyRectParam *param)
 			refrect.left*pixelsize;
 #endif
 		tjs_uint8 * dest = param->dest + dpitch * (param->dy) + param->dx * pixelsize;
-		const tjs_uint8 * src = param->src + spitch * (param->sy) + param->sx * pixelsize;
+		const tjs_uint8 * src = reinterpret_cast<const tjs_uint8*>(param->src + spitch * (param->sy) + param->sx * pixelsize);
 
 		switch(plane)
 		{
@@ -985,7 +985,7 @@ bool tTVPBaseBitmap::Blt(tjs_int x, tjs_int y, const tTVPBaseBitmap *ref,
           param->dy = rect.top + y0;
           param->w = w;
           param->h = y1 - y0;
-          param->src = src;
+          param->src = reinterpret_cast<const tjs_int8*>(src);
           param->spitch = spitch;
           param->sx = refrect.left;
           param->sy = refrect.top + y0;
@@ -1021,7 +1021,7 @@ void tTVPBaseBitmap::PartialBlt(const PartialBltParam *param)
   dy = param->dy;
   w = param->w;
   h = param->h;
-  src = param->src;
+  src = reinterpret_cast<const tjs_uint8*>(param->src);
   spitch = param->spitch;
   sx = param->sx;
   sy = param->sy;
@@ -1325,7 +1325,6 @@ typedef TVP_GL_FUNC_PTR_DECL(void, tTVPBilinearStretchFunction,
 typedef TVP_GL_FUNC_PTR_DECL(void, tTVPBilinearStretchWithOpacityFunction,
 	(tjs_uint32 *dest, tjs_int destlen, const tjs_uint32 *src1, const tjs_uint32 *src2,
 	tjs_int blend_y, tjs_int srcstart, tjs_int srcstep, tjs_int opa));
-
 
 //---------------------------------------------------------------------------
 
@@ -2065,7 +2064,6 @@ bool tTVPBaseBitmap::StretchBlt(tTVPRect cliprect,
 //---------------------------------------------------------------------------
 // template function for affine loop
 //---------------------------------------------------------------------------
-
 // define function pointer types for transforming line
 typedef TVP_GL_FUNC_PTR_DECL(void, tTVPAffineFunction,
 	(tjs_uint32 *dest, tjs_int len, const tjs_uint32 *src,
@@ -2529,7 +2527,7 @@ int tTVPBaseBitmap::InternalAffineBlt(tTVPRect destrect, const tTVPBaseBitmap *r
 	// create point list in fixed point real format
 	tTVPPoint points[3];
 	for(tjs_int i = 0; i < 3; i++)
-		points[i].x = points_in[i].x * 65536, points[i].y = points_in[i].y * 65536;
+		points[i].x = static_cast<tjs_int>(points_in[i].x * 65536), points[i].y = static_cast<tjs_int>(points_in[i].y * 65536);
 
 	// check destination rectangle
 	if(destrect.left < 0) destrect.left = 0;

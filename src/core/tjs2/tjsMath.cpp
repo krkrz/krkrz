@@ -11,12 +11,16 @@
 #include "tjsCommHead.h"
 
 #include "tjsMath.h"
+#define _USE_MATH_DEFINES
 #include "math.h"
 #include "time.h"
 
 #ifdef __WIN32__
 #ifndef TJS_NO_MASK_MATHERR
-	#include "float.h"
+	#include <float.h>
+#endif
+#ifdef _MSC_VER
+#define _USERENTRY
 #endif
 #endif
 
@@ -53,7 +57,7 @@ tTJSNC_Math::tTJSNC_Math() :
 	// constructor
 	time_t time_num;
 	time(&time_num);
-	srand(time_num);
+	srand((unsigned int)time_num);
 
 	/*
 		TJS2 cannot promise that the sequence of generated random numbers are

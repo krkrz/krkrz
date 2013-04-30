@@ -14,7 +14,7 @@
 #include "WindowIntf.h"
 #include "ScriptMgnImpl.h"
 #include "MsgIntf.h"
-#include "PadFormUnit.h"
+//#include "PadFormUnit.h"
 #include "tjsScriptBlock.h"
 #include "EventIntf.h"
 #include "SysInitImpl.h"
@@ -23,7 +23,7 @@
 #include "StorageImpl.h"
 #include "tjsDebug.h"
 
-
+#include "Application.h"
 //---------------------------------------------------------------------------
 
 /*
@@ -152,7 +152,7 @@ void TVPStartObjectHashMapLog(void)
 		BOOL ret =
 			CreateProcess(
 				NULL,
-				(ParamStr(0) + " -@processohmlog").c_str(),
+				const_cast<LPSTR>((ParamStr(0) + " -@processohmlog").c_str()),
 				NULL,
 				NULL,
 				TRUE,
@@ -197,11 +197,13 @@ static tTVPAtExit TVPReportUnfreedObjectsAtExit
 bool TVPCheckProcessLog()
 {
 	// process object hash map log
+	int argc = Application->ArgC;
+	char** argv = Application->ArgV;
 
 	tjs_int i;
-	for(i=1; i<_argc; i++)
+	for(i=1; i<argc; i++)
 	{
-		if(!strcmp(_argv[i], "-@processohmlog")) // this does not refer TVPGetCommandLine
+		if(!strcmp(argv[i], "-@processohmlog")) // this does not refer TVPGetCommandLine
 		{
 			// create object hash map
 			TJSAddRefObjectHashMap();
@@ -264,10 +266,11 @@ void TVPShowScriptException(eTJS &e)
 
 	if(!TVPSystemUninitCalled)
 	{
-		if(TVPMainForm) TVPMainForm->Visible = true;
+		if(TVPMainForm) TVPMainForm->SetVisible( true );
 		ttstr errstr = (ttstr(TVPScriptExceptionRaised) + TJS_W("\n") + e.GetMessage());
 		TVPAddLog(ttstr(TVPScriptExceptionRaised) + TJS_W("\n") + e.GetMessage());
-		MessageDlg(errstr.AsAnsiString(), mtError, TMsgDlgButtons() << mbOK, 0);
+		//MessageDlg(errstr.AsStdString(), mtError, TMsgDlgButtons() << mbOK, 0);
+		MessageDlg(errstr.AsStdString(), mtError, MB_OK, 0);
 	}
 //	throw EAbort("Script Error Abortion");
 }
@@ -280,7 +283,9 @@ void TVPShowScriptException(eTJSScriptError &e)
 	if(!TVPSystemUninitCalled)
 	{
 
-		if(TVPMainForm) TVPMainForm->Visible = true;
+		if(TVPMainForm) TVPMainForm->SetVisible( true );
+#pragma message( __LOC__ "TODO PadƒNƒ‰ƒX–³Œø‰»" )
+#if 0 // Not use pad class
 		TTVPPadForm *pad = new TTVPPadForm(Application);
 		pad->FreeOnTerminate = true;
 		pad->ExecButtonEnabled = false;
@@ -289,15 +294,15 @@ void TVPShowScriptException(eTJSScriptError &e)
 			- e.GetBlockNoAddRef()->GetLineOffset());
 		pad->ReadOnly = true;
 		pad->StatusText = e.GetMessage();
-		pad->Caption = ttstr(TVPExceptionCDPName).AsAnsiString();
+		pad->Caption = ttstr(TVPExceptionCDPName).AsStdString();
 		pad->Visible = true;
-
+#endif
 		ttstr errstr = (ttstr(TVPScriptExceptionRaised) + TJS_W("\n") + e.GetMessage());
 		TVPAddLog(ttstr(TVPScriptExceptionRaised) + TJS_W("\n") + e.GetMessage());
 		if(e.GetTrace().GetLen() != 0)
 			TVPAddLog(ttstr(TJS_W("trace : ")) + e.GetTrace());
-		Application->MessageBox(errstr.AsAnsiString().c_str(),
-			Application->Title.c_str(), MB_OK|MB_ICONSTOP);
+		//Application->MessageBox( errstr.AsStdString().c_str(), Application->GetTitle().c_str(), MB_OK|MB_ICONSTOP );
+		::MessageBox( NULL, errstr.AsStdString().c_str(), Application->GetTitle().c_str(), MB_OK|MB_ICONSTOP );
 		//	throw EAbort("Script Error Abortion");
 	}
 }
@@ -313,7 +318,7 @@ void TVPInitializeStartupScript()
 	TVPStartObjectHashMap();
 
 	TVPExecuteStartupScript();
-	if(TVPTerminateOnNoWindowStartup && TVPGetWindowCount() == 0 && (TVPMainForm && !TVPMainForm->Visible))
+	if(TVPTerminateOnNoWindowStartup && TVPGetWindowCount() == 0 && (TVPMainForm && !TVPMainForm->GetVisible()))
 	{
 		// no window is created and main window is invisible
 		Application->Terminate();

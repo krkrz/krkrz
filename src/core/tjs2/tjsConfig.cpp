@@ -17,7 +17,7 @@
 #endif
 
 #ifdef __WIN32__
-#include "float.h"
+#include <float.h>
 #endif
 
 namespace TJS
@@ -409,8 +409,12 @@ void TJSSetFPUE()
 	{
 		TJSFPUInit = true;
 		TJSDefaultFPUCW = _control87(0, 0);
-
+		
+#ifdef _MSC_VER
+		TJSNewFPUCW = _control87(MCW_EM, MCW_EM);
+#else
 		_default87 = TJSNewFPUCW = _control87(MCW_EM, MCW_EM);
+#endif
 #ifdef TJS_SUPPORT_VCL
 		Default8087CW = TJSNewFPUCW;
 #endif

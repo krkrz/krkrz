@@ -101,7 +101,7 @@ int _yyerror(const tjs_char * msg, void *pm, tjs_int pos)
 	sb->CompileErrorCount++;
 
 	tjs_char buf[43];
-	TJS_sprintf(buf, TJS_W(" at line %d"), 1+sb->SrcPosToLine(errpos));
+	TJS_snprintf(buf, sizeof(buf)/sizeof(tjs_char), TJS_W(" at line %d"), 1+sb->SrcPosToLine(errpos));
 	str += buf;
 
 	sb->GetTJS()->OutputToConsole(str.c_str());
@@ -566,7 +566,7 @@ void tTJSInterCodeContext::OutputWarning(const tjs_char *msg, tjs_int pos)
 	str += Block->GetName();
 
 	tjs_char buf[43];
-	TJS_sprintf(buf, TJS_W(" line %d"), 1+Block->SrcPosToLine(errpos));
+	TJS_snprintf(buf, sizeof(buf)/sizeof(tjs_char), TJS_W(" line %d"), 1+Block->SrcPosToLine(errpos));
 	str += buf;
 
 	Block->GetTJS()->OutputToConsole(str.c_str());
@@ -2253,7 +2253,7 @@ tjs_int tTJSInterCodeContext::GenNodeCode(tjs_int & frame, tTJSExprNode *node,
 	  {
 		// refer super class
 
-		tjs_int dp;
+		//tjs_int dp;
 		tTJSExprNode * node;
 		if(Parent && Parent->ContextType == ctProperty)
 		{
@@ -3465,7 +3465,7 @@ void tTJSInterCodeContext::CreateExtendsExprCode(tTJSExprNode *node, bool hold)
 {
 	// process class extender
 
-	tjs_int num;
+	//tjs_int num;
 
 	tjs_int fr = FrameBase;
 	tjs_int resaddr = GenNodeCode(fr, node, TJS_RT_NEEDED, 0, tSubParam());

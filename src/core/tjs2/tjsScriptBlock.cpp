@@ -189,7 +189,7 @@ ttstr tTJSScriptBlock::GetLineDescriptionString(tjs_int pos) const
 	else
 	{
 		tjs_char ptr[128];
-		TJS_sprintf(ptr, TJS_W("0x%p"), this);
+		TJS_snprintf(ptr, sizeof(ptr)/sizeof(tjs_char), TJS_W("0x%p"), this);
 		name = ttstr(TJS_W("anonymous@")) + ptr;
 	}
 
@@ -495,7 +495,7 @@ void tTJSScriptBlock::Dump() const
 	{
 		ConsoleOutput(TJS_W(""), (void*)this);
 		tjs_char ptr[256];
-		TJS_sprintf(ptr, TJS_W(" 0x%p"), (*i));
+		TJS_snprintf(ptr, sizeof(ptr)/sizeof(tjs_char), TJS_W(" 0x%p"), (*i));
 		ConsoleOutput((ttstr(TJS_W("(")) + ttstr((*i)->GetContextTypeName()) +
 			TJS_W(") ") + ttstr((*i)->GetName()) + ptr).c_str(), (void*)this);
 		(*i)->Disassemble(ConsoleOutput, (void*)this);

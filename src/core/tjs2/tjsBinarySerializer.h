@@ -19,11 +19,11 @@
 namespace TJS
 {
 /**
- * ƒoƒCƒiƒŠŒ`®‚Åƒf[ƒ^‚ğƒXƒgƒŠ[ƒ€‘‚«o‚µ‚·‚é‚½‚ß‚ÌƒNƒ‰ƒX
- * Œ`®‚ÍAMessagePack ‚É‹ß‚¢‚à‚Ì‚Å×•”TJS2—p‚É’²®‚µ‚Ä‚¢‚é
- * •¶š—ñ‚ÍAUTF-16‚Ì‚Ü‚ÜŠi”[
- * ƒGƒ“ƒfƒBƒAƒ“‚ÍƒŠƒgƒ‹ƒGƒ“ƒfƒBƒAƒ“‚É‚È‚Á‚Ä‚¢‚é
- * ƒwƒbƒ_[‚à’Ç‰Á‚³‚ê‚é
+ * ãƒã‚¤ãƒŠãƒªå½¢å¼ã§ãƒ‡ãƒ¼ã‚¿ã‚’ã‚¹ãƒˆãƒªãƒ¼ãƒ æ›¸ãå‡ºã—ã™ã‚‹ãŸã‚ã®ã‚¯ãƒ©ã‚¹
+ * å½¢å¼ã¯ã€MessagePack ã«è¿‘ã„ã‚‚ã®ã§ç´°éƒ¨TJS2ç”¨ã«èª¿æ•´ã—ã¦ã„ã‚‹
+ * æ–‡å­—åˆ—ã¯ã€UTF-16ã®ã¾ã¾æ ¼ç´
+ * ã‚¨ãƒ³ãƒ‡ã‚£ã‚¢ãƒ³ã¯ãƒªãƒˆãƒ«ã‚¨ãƒ³ãƒ‡ã‚£ã‚¢ãƒ³ã«ãªã£ã¦ã„ã‚‹
+ * ãƒ˜ãƒƒãƒ€ãƒ¼ã‚‚è¿½åŠ ã•ã‚Œã‚‹
  */
 class tTJSBinarySerializer {
 public:
@@ -55,7 +55,7 @@ public:
 		
 		TYPE_FIX_RAW_MIN = 0xD4,
 		TYPE_FIX_RAW_MAX = 0xD9,
-		TYPE_FIX_RAW_LEN = TYPE_FIX_RAW_MAX - TYPE_FIX_RAW_MIN, // 5byte‚Ü‚Å‚¾‚©‚çŒø‰Ê­‚È‚¢‚ªA•¶š‚Ì•û‚ª•p“x‚‚¢‚Ì‚Å•¶š‚ÉRAWƒGƒŠƒA‚ğŠ„‚è“–‚Ä‚é
+		TYPE_FIX_RAW_LEN = TYPE_FIX_RAW_MAX - TYPE_FIX_RAW_MIN, // 5byteã¾ã§ã ã‹ã‚‰åŠ¹æœå°‘ãªã„ãŒã€æ–‡å­—ã®æ–¹ãŒé »åº¦é«˜ã„ã®ã§æ–‡å­—ã«RAWã‚¨ãƒªã‚¢ã‚’å‰²ã‚Šå½“ã¦ã‚‹
 
 		TYPE_RAW16 = 0xDA,
 		TYPE_RAW32 = 0xDB,
@@ -77,6 +77,41 @@ public:
 	static const tjs_int HEADER_LENGTH = 8;
 	static const tjs_uint8 HEADER[HEADER_LENGTH];
 	static bool IsBinary( const tjs_uint8 header[HEADER_LENGTH] );
+
+	/*
+	struct BinaryPack {
+		static const tjs_int DATA_CAPACITY = 0x4000; // 16KB
+
+		tjs_uint8* Data; // ãƒ‡ãƒ¼ã‚¿å®Ÿä½“
+		tjs_int32 Size; // ç¾åœ¨åŸ‹ã¾ã£ã¦ã„ã‚‹ä½ç½®
+		tjs_int32 Capacity; // ãƒ‡ãƒ¼ã‚¿å®Ÿä½“æœ€å¤§ã‚µã‚¤ã‚º
+
+		BinaryPack() : Size(0), Capacity(DATA_CAPACITY) {
+			Data = new tjs_uint8[DATA_CAPACITY];
+		}
+		~BinaryPack() {
+			delete[] Data;
+		}
+		inline bool Put( tjs_uint8 b ) {
+			if( Size < Capacity ) {
+				Data[Size] = b;
+				Size++;
+			} else {
+				return false;
+			}
+		}
+	};
+	std::vector<BinaryPack*> OutputData;
+	tjs_int32 OutputIndex;
+
+	inline void Put( tjs_uint8 b ) {
+		if( OutputData[OutputIndex].Put( b ) == false ) {
+			OutputData.push_back( new BinaryPack() );
+			OuputIndex++;
+			OutputData[OutputIndex].Put( b );
+		}
+	}
+	*/
 
 	static inline void PutInteger( tTJSBinaryStream* stream, tjs_int64 b ) {
 		if( b < 0 ) {
@@ -208,7 +243,7 @@ public:
 #endif
 	}
 	/**
-	 * •‚“®¬”“_’l‚ğŠi”[‚·‚é
+	 * æµ®å‹•å°æ•°ç‚¹å€¤ã‚’æ ¼ç´ã™ã‚‹
 	 */
 	static inline void PutDouble( tTJSBinaryStream* stream, double b ) {
 		tjs_uint64 v = *(tjs_uint64*)&b;
@@ -251,7 +286,7 @@ public:
 		stream->Write( val, len );
 	}
 	/**
-	 * ƒIƒNƒeƒbƒgŒ^‚Ì’l‚ğŠi”[‚·‚é
+	 * ã‚ªã‚¯ãƒ†ãƒƒãƒˆå‹ã®å€¤ã‚’æ ¼ç´ã™ã‚‹
 	 */
 	static inline void PutOctet( tTJSBinaryStream* stream, tTJSVariantOctet* val ) {
 		tjs_uint len = 0;
@@ -264,7 +299,7 @@ public:
 	}
 
 	/**
-	 * •¶š—ñ‚ğŠi”[‚·‚é
+	 * æ–‡å­—åˆ—ã‚’æ ¼ç´ã™ã‚‹
 	 */
 	static inline void PutString( tTJSBinaryStream* stream, const tTJSVariantString* val ) {
 		const tjs_char* data = NULL;
@@ -354,21 +389,34 @@ public:
 		index+=sizeof(tjs_uint64);
 		return ret;
 	}
-	static inline tTJSVariantString* ReadString( const tjs_uint8* buff, tjs_uint len, tjs_uint& index ) {
-		tTJSVariantString* ret = NULL;
+	static inline tjs_char* ReadChars( const tjs_uint8* buff, tjs_uint len, tjs_uint& index ) {
 		if( len > 0 ) {
-			tjs_char* str = new tjs_char[len+1];
+			tjs_char* str = new tjs_char[len];
 			for( tjs_uint i = 0; i < len; i++ ) {
 				str[i] = buff[index];
 				index++;
 				str[i] |= buff[index] << 8;
 				index++;
 			}
-			str[len] = 0;
+			return str;
+		} else {
+			return NULL;
+		}
+	}
+	static inline tTJSVariantString* ReadString( const tjs_uint8* buff, tjs_uint len, tjs_uint& index ) {
+		tTJSVariantString* ret = NULL;
+		if( len > 0 ) {
+			tjs_char* str = new tjs_char[len];
+			for( tjs_uint i = 0; i < len; i++ ) {
+				str[i] = buff[index];
+				index++;
+				str[i] |= buff[index] << 8;
+				index++;
+			}
 			ret = TJSAllocVariantString( str, len );
 			delete str;
 		} else {
-			ret = TJSAllocVariantString( TJS_W("") );
+			ret = TJSAllocVariantStringBuffer(0);
 		}
 		return ret;
 	}
@@ -376,22 +424,21 @@ public:
 		tTJSVariantString* ret = ReadString( buff, len, index );
 		tTJSVariant* var = new tTJSVariant();
 		*var = ret;
+		//ret->Release();
 		return var;
 	}
 	static inline tTJSVariant* ReadOctetVarint( const tjs_uint8* buff, tjs_uint len, tjs_uint& index ) {
-		tTJSVariant* var = NULL;
-		if( len > 0 ) {
-			var = new tTJSVariant(&buff[index], len);
-		} else {
-        	var = new tTJSVariant( (const tjs_uint8*)NULL, 0 );
-        }
+		tTJSVariantOctet* oct = TJSAllocVariantOctet( &buff[index], len );
 		index+=len;
+		tTJSVariant* var = new tTJSVariant();
+		*var = oct;
+		oct->Release();
 		return var;
 	}
 
 	/**
-	 * ƒoƒCƒAƒ“ƒg’l‚ğŠi”[‚·‚é
-	 * ƒIƒuƒWƒFƒNƒgŒ^‚Í–³‹‚µ‚Ä‚¢‚é
+	 * ãƒã‚¤ã‚¢ãƒ³ãƒˆå€¤ã‚’æ ¼ç´ã™ã‚‹
+	 * ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå‹ã¯ç„¡è¦–ã—ã¦ã„ã‚‹
 	 */
 	static void PutVariant( tTJSBinaryStream* stream, tTJSVariant& v );
 	

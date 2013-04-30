@@ -26,7 +26,7 @@
 //---------------------------------------------------------------------------
 // TVPInitWideNativeFunctions
 //---------------------------------------------------------------------------
-static void TVPInitWideNativeFunctions()
+void TVPInitWideNativeFunctions()
 {
 #ifdef TVP_USE_WIDE_NATIVE_FUNCS
 	// retrieve function pointer from each module
@@ -50,4 +50,4 @@ static void TVPInitWideNativeFunctions()
 #endif
 }
 //---------------------------------------------------------------------------
-#pragma startup TVPInitWideNativeFunctions 64
+//#pragma startup TVPInitWideNativeFunctions 64

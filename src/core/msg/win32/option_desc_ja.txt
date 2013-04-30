@@ -37,7 +37,6 @@
 グラフィック:アンチエイリアス文字描画方式;アンチエイリアス文字描画方法の設定です。[cr][cr]設定を変えると、文字が表示されない、文字が崩れるなどの問題が改善される場合があります。[cr][cr]リサンプリング(4×4) は リサンプリング(8×8) よりも高速ですが、精度は低くなります。|aamethod|select,*auto;自動,res8;リサンプリング(8×8),res4;リサンプリング(4×4),api;Windows API
 グラフィック:JPEG画像デコード精度;JPEG画像のデコード(展開)の精度の設定です。[cr][cr]「高い」を選択すると精度は高くなりますが、デコードは低速になります。[cr][cr]「低い」を選択すると精度は低くなりますが、デコードは高速になります。|jpegdec|select,high;高い,*normal;標準,low;低い
 グラフィック:描画スレッド数;描画処理時に、使用するスレッドの数の設定です。[cr][cr]描画スレッドを複数設定することで、マルチコア環境での描画パフォーマンスを向上させられる可能性がありますが、逆にパフォーマンスが低下する場合もあります。|drawthread|select,auto;自動(プロセッサ数に等しいスレッド),*1;1スレッド,2;2スレッド,4;4スレッド,8;8スレッド
-グラフィック:フォントキャラセット;フォントを生成する際に指定されるキャラセットの設定です。[cr][cr]デフォルトではSHIFTJIS_CHARSETが設定されています。ラテン文字のフォントが正常に表示されない場合など、DEFAULT_CHARSETに設定を切り替えることで表示が可能になることがあります。|fontcharset|select,0;ANSI_CHARSET,1;DEFAULT_CHARSET,2;SYMBOL_CHARSET,77;MAC_CHARSET,*128;SHIFTJIS_CHARSET,129;HANGEUL_CHARSET,130;JOHAB_CHARSET,134;GB2313_CHARSET,136;CHINESEBIG5_CHARSET,161;GREEK_CHARSET,162;TURKISH_CHARSET,177;HEBREW_CHARSET,178;ARABIC _CHARSET,186;BALTIC_CHARSET,204;RUSSIAN_CHARSET,222;THAI_CHARSET,238;EE_CHARSET,255;OEM_CHARSET
 CPU 機能:MMX;CPU 認識トラブルが起こったときに調整してください。|cpummx|select,*yes;使用可能であれば使用する,no;使用可能であっても使用しない,force;強制的に使用する
 CPU 機能:3DNow!;CPU 認識トラブルが起こったときに調整してください。|cpu3dn|select,*yes;使用可能であれば使用する,no;使用可能であっても使用しない,force;強制的に使用する
 CPU 機能:SSE;CPU 認識トラブルが起こったときに調整してください。|cpusse|select,*yes;使用可能であれば使用する,no;使用可能であっても使用しない,force;強制的に使用する

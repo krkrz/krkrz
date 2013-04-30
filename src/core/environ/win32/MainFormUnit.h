@@ -11,68 +11,11 @@
 #ifndef MainFormUnitH
 #define MainFormUnitH
 //---------------------------------------------------------------------------
-#include <Classes.hpp>
-#include <Controls.hpp>
-#include <StdCtrls.hpp>
-#include <Forms.hpp>
-#include <ComCtrls.hpp>
-#include <ImgList.hpp>
-#include <ToolWin.hpp>
-#include <ExtCtrls.hpp>
-#include <Buttons.hpp>
-#include <Menus.hpp>
-#include <Dialogs.hpp>
+#include <windows.h>
+#include <string>
 //---------------------------------------------------------------------------
-class TTVPMainForm : public TForm
+class TTVPMainForm
 {
-__published:	// IDE 管理のコンポーネント
-	TImageList *VerySmallIconImageList;
-	TImageList *SmallIconImageList;
-	TToolBar *ToolBar;
-	TToolButton *ShowScriptEditorButton;
-	TToolButton *ShowConsoleButton;
-	TToolButton *ToolButton3;
-	TToolButton *ExitButton;
-	TToolButton *EventButton;
-	TPopupMenu *PopupMenu;
-	TMenuItem *ShowScriptEditorMenuItem;
-	TMenuItem *ShowConsoleMenuItem;
-	TMenuItem *N1;
-	TMenuItem *EnableEventMenuItem;
-	TMenuItem *N2;
-	TMenuItem *ExitMenuItem;
-	TMenuItem *ShowAboutMenuItem;
-	TMenuItem *N3;
-	TMenuItem *DumpMenuItem;
-	TToolButton *ToolButton1;
-	TToolButton *ShowWatchButton;
-	TMenuItem *ShowWatchMenuItem;
-	TTimer *SystemWatchTimer;
-	TMenuItem *CopyImportantLogMenuItem;
-	TMenuItem *CreateMessageMapFileMenuItem;
-	TSaveDialog *MessageMapFileSaveDialog;
-	TMenuItem *ShowOnTopMenuItem;
-	TMenuItem *N4;
-	TMenuItem *ShowControllerMenuItem;
-	TMenuItem *RestartScriptEngineMenuItem;
-	void __fastcall ShowScriptEditorButtonClick(TObject *Sender);
-	void __fastcall ExitButtonClick(TObject *Sender);
-	void __fastcall ShowConsoleButtonClick(TObject *Sender);
-	void __fastcall PopupMenuPopup(TObject *Sender);
-	void __fastcall EnableEventMenuItemClick(TObject *Sender);
-	void __fastcall ShowAboutMenuItemClick(TObject *Sender);
-	void __fastcall DumpMenuItemClick(TObject *Sender);
-	void __fastcall EventButtonClick(TObject *Sender);
-	void __fastcall ShowWatchButtonClick(TObject *Sender);
-	void __fastcall SystemWatchTimerTimer(TObject *Sender);
-	void __fastcall FormDestroy(TObject *Sender);
-	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
-	void __fastcall CopyImportantLogMenuItemClick(TObject *Sender);
-	void __fastcall CreateMessageMapFileMenuItemClick(TObject *Sender);
-	void __fastcall ShowOnTopMenuItemClick(TObject *Sender);
-	void __fastcall ShowControllerMenuItemClick(TObject *Sender);
-	void __fastcall RestartScriptEngineMenuItemClick(TObject *Sender);
-
 private:	// ユーザー宣言
 	bool ContinuousEventCalling;
 	bool AutoShowConsoleOnError;
@@ -80,54 +23,8 @@ private:	// ユーザー宣言
 	bool ApplicationActivating;
 	bool ApplicationNotMinimizing;
 
-public:		// ユーザー宣言
-	__fastcall TTVPMainForm(TComponent* Owner);
+	bool EventEnable;
 
-	static TShortCut GetHotKeyFromOption(TShortCut def, const tjs_char * optname);
-	static void SetHotKey(TMenuItem *item, const tjs_char * optname);
-
-	bool CanHideAnyWindow();
-
-	void SetConsoleVisible(bool b);
-	bool GetConsoleVisible();
-	void NotifyConsoleHiding();
-
-	bool GetScriptEditorVisible();
-	void NotifyScriptEditorHiding();
-
-	bool GetWatchVisible();
-	void NotifyWatchHiding();
-
-	void SetAutoShowConsoleOnError(bool b) { AutoShowConsoleOnError = true; }
-	bool GetAutoShowConsoleOnError() const { return AutoShowConsoleOnError; }
-
-	void ShowController();
-	void InvokeEvents();
-	void CallDeliverAllEventsOnIdle();
-
-	void BeginContinuousEvent();
-	void EndContinuousEvent();
-
-	void NotifyCloseClicked();
-	void NotifyEventDelivered();
-	void NotifyHaltWarnFormClosed();
-
-	void NotifySystemError();
-
-	void SetApplicationStayOnTop(bool b);
-	bool GetApplicationStayOnTop() const { return ApplicationStayOnTop; }
-
-	bool GetApplicationActivating() const { return ApplicationActivating; }
-	bool GetApplicationNotMinimizing() const { return ApplicationNotMinimizing; }
-
-protected:
-BEGIN_MESSAGE_MAP
-	VCL_MESSAGE_HANDLER( WM_USER+0x30, TMessage, WMInvokeEvents)
-	VCL_MESSAGE_HANDLER( WM_USER+0x32, TMessage, WMRearrangeModalWindows)
-END_MESSAGE_MAP(TForm)
-	void __fastcall WMInvokeEvents(TMessage &Msg);
-	void __fastcall WMRearrangeModalWindows(TMessage &Msg);
-private:
 	DWORD LastCompactedTick;
 	DWORD LastContinuousTick;
 	DWORD LastCloseClickedTick;
@@ -135,48 +32,65 @@ private:
 	DWORD LastRehashedTick;
 
 	DWORD MixedIdleTick;
-
-	void DeliverEvents();
-
-	void __fastcall ApplicationIdle(TObject *Sender, bool &Done);
-	void __fastcall ApplicationActivate(TObject *Sender);
-	void __fastcall ApplicationDeactivate(TObject *Sender);
-	void __fastcall ApplicationMinimize(TObject *Sender);
-	void __fastcall ApplicationRestore(TObject *Sender);
-
-public: // hotkey management
-	TShortCut ShowUpdateRectShortCut;
-	TShortCut DumpLayerStructureShortCut;
-
-};
-//---------------------------------------------------------------------------
-extern PACKAGE TTVPMainForm *TVPMainForm;
-extern bool TVPMainFormAlive;
-//---------------------------------------------------------------------------
-
-
-
-//---------------------------------------------------------------------------
-// Environment Profiling Support
-//---------------------------------------------------------------------------
-#include "inifiles.hpp"
-class tTVPProfileHolder : public TMemIniFile
-{
 public:
-	__fastcall tTVPProfileHolder(const AnsiString &fn) : TMemIniFile(fn) {};
-	__fastcall ~tTVPProfileHolder() {};
+	TTVPMainForm();
 
-	void __fastcall WriteStrings(const AnsiString &section, const AnsiString &ident,
-		TStrings * strings);
-	void __fastcall ReadStrings(const AnsiString &section, const AnsiString &ident,
-		TStrings * strings);
+	void InvokeEvents();
+	void CallDeliverAllEventsOnIdle();
+
+	void BeginContinuousEvent();
+	void EndContinuousEvent();
+
+	void NotifyEventDelivered();
+
+	void SetVisible( bool b );
+	bool GetVisible() const;
+
+	void SetEventButtonDown( bool b ) {
+		EventEnable = b;
+	}
+	bool GetEventButtonDown() const { return EventEnable; }
+
+	bool GetApplicationStayOnTop();
+	void SetApplicationStayOnTop( bool );
+
+	void NotifySystemError();
+
+	bool GetConsoleVisible();
+	void SetConsoleVisible( bool );
+	
+	bool GetApplicationActivating() const { return ApplicationActivating; }
+	bool GetApplicationNotMinimizing() const { return ApplicationNotMinimizing; }
+
+	HWND GetHandle() { return NULL; }
+
+	bool ApplicationIdel();
+private:
+	void DeliverEvents();
 };
-extern void TVPWriteEnvironProfile();
-extern void TVPEnvironProfileAddRef();
-extern void TVPEnvironProfileRelease();
-extern tTVPProfileHolder *TVPGetEnvironProfile();
-//---------------------------------------------------------------------------
+enum {
+  mtWarning = MB_ICONWARNING,
+  mtError = MB_ICONERROR,
+  mtInformation = MB_ICONINFORMATION,
+  mtConfirmation = MB_ICONQUESTION,
+  mtCustom = 0
+};
+/*
+MB_ABORTRETRYIGNORE	メッセージボックスに［中止］、［再試行］、［無視］の各プッシュボタンを表示します。
+MB_CANCELTRYCONTINUE	Windows 2000：メッセージボックスに［キャンセル］、［再実行］、［続行］の各プッシュボタンを表示します。MB_ABORTRETRYIGNORE の代わりに、このメッセージボックスタイプを使ってください。
+MB_HELP	Windows 95/98、Windows NT 4.0 以降：メッセージボックスに［ヘルプ］ボタンを追加します。ユーザーが［ヘルプ］ボタンをクリックするか F1 キーを押すと、システムはオーナーへ メッセージを送信します。
+MB_OK	メッセージボックスに［OK］プッシュボタンだけを表示します。これは既定のメッセージボックスタイプです。
+MB_OKCANCEL	メッセージボックスに［OK］、［キャンセル］の各プッシュボタンを表示します。
+MB_RETRYCANCEL	メッセージボックスに［再試行］、［キャンセル］の各プッシュボタンを表示します。
+MB_YESNO	メッセージボックスに［はい］、［いいえ］の各プッシュボタンを表示します。
+MB_YESNOCANCEL	メッセージボックスに［はい］、［いいえ］、［キャンセル］の各プッシュボタンを表示します。
+*/
+inline int MessageDlg( const std::string& string, int type, int buttons, void* helpCtx ) {
+	return ::MessageBox( NULL, string.c_str(), "", type | buttons );
+}
 
+extern TTVPMainForm *TVPMainForm;
 
+extern bool TVPMainFormAlive;
 
 #endif

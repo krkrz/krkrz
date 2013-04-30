@@ -28,7 +28,7 @@ namespace TJS
 //---------------------------------------------------------------------------
 #define TJS_VS_SHORT_LEN 21
 /*]*/
-struct tTJSVariantString;
+class tTJSVariantString;
 extern tjs_int TJSGetShorterStrLen(const tjs_char *str, tjs_int max);
 extern tTJSVariantString * TJSAllocStringHeap(void);
 extern void TJSDeallocStringHeap(tTJSVariantString * vs);

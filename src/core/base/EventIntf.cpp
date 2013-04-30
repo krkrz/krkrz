@@ -1135,7 +1135,7 @@ void TVPRemoveCompactEventHook(tTVPCompactEventCallbackIntf *cb)
 void TVPDeliverCompactEvent(tjs_int level)
 {
 	// must be called by each platforms's implementation
-	std::vector<tTVPCompactEventCallbackIntf *>::iterator i;
+	//std::vector<tTVPCompactEventCallbackIntf *>::iterator i;
 	if(TVPCompactEventVector.size())
 	{
 		bool emptyflag = false;
@@ -1159,6 +1159,7 @@ void TVPDeliverCompactEvent(tjs_int level)
 			// the array has empty cell
 
 			// eliminate empty
+			std::vector<tTVPCompactEventCallbackIntf *>::iterator i;
 			for(i = TVPCompactEventVector.begin();
 				i !=TVPCompactEventVector.end();)
 			{

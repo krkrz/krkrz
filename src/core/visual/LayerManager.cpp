@@ -256,6 +256,7 @@ void tTVPLayerManager::SetCursorPos(tjs_int x, tjs_int y)
 	Window->GetDrawDevice()->SetCursorPos(this, x, y);
 }
 //---------------------------------------------------------------------------
+#ifdef USE_OBSOLETE_FUNCTIONS
 void tTVPLayerManager::NotifyHintChange(tTJSNI_BaseLayer *layer, const ttstr & hint)
 {
 	if(InNotifyingHintOrCursorChange) return;
@@ -287,6 +288,7 @@ void tTVPLayerManager::SetHint(const ttstr &hint)
 	if(!Window) return;
 	Window->GetDrawDevice()->SetHintText(this, hint);
 }
+#endif
 //---------------------------------------------------------------------------
 void tTVPLayerManager::NotifyLayerResize()
 {
@@ -376,8 +378,10 @@ void tTVPLayerManager::PrimaryMouseDown(tjs_int x, tjs_int y, tTVPMouseButton mb
 				if(CaptureOwner->Owner) CaptureOwner->Owner->AddRef(); // addref TJS object
 			}
 		}
-
+		
+#ifdef USE_OBSOLETE_FUNCTIONS
 		SetHint(ttstr());
+#endif
 	}
 	else
 	{
@@ -475,7 +479,9 @@ void tTVPLayerManager::PrimaryMouseMove(tjs_int x, tjs_int y, tjs_uint32 flags)
 		if(!l)
 		{
 			SetMouseCursor(0);
+#ifdef USE_OBSOLETE_FUNCTIONS
 			SetHint(ttstr());
+#endif
 		}
 	}
 

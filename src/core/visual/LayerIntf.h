@@ -520,11 +520,12 @@ private:
 	void SetCurrentHintToWindow(); // set current hint to the window
 
 public:
+#ifdef USE_OBSOLETE_FUNCTIONS
 	const ttstr & GetHint() const { return Hint; }
 	void SetHint(const ttstr & hint);
+#endif
 	bool GetShowParentHint() const { return ShowParentHint; }
 	void SetShowParentHint(bool b) { ShowParentHint = b; }
-
 
 public:
 	tjs_int GetAttentionLeft() const { return AttentionLeft; }
@@ -532,7 +533,7 @@ public:
 	tjs_int GetAttentionTop() const { return AttentionTop; }
 	void SetAttentionTop(tjs_int t);
 	void SetAttentionPoint(tjs_int l, tjs_int t);
-	bool GetUseAttention() const { return UseAttention; }
+	bool GetUseAttention() const { return 0!=UseAttention; }
 	void SetUseAttention(bool b);
 
 private:
@@ -979,7 +980,7 @@ private:
 			const tTVPRect &cliprect,
 			tTVPLayerType type, tjs_int opacity);
 	} TransDrawable;
-	friend class tTransDrawable;
+	friend struct tTransDrawable;
 
 	struct tTransIdleCallback : public tTVPContinuousEventCallbackIntf
 	{
@@ -988,7 +989,7 @@ private:
 			{ Owner->InvokeTransition(tick); }
 		// from tTVPIdleEventCallbackIntf
 	} TransIdleCallback;
-	friend class tTransIdleCallback;
+	friend struct tTransIdleCallback;
 
 	tjs_uint64 GetTransTick();
 

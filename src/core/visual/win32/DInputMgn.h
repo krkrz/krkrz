@@ -43,7 +43,7 @@ enum tTVPPadKeyFlag {
 };
 #define TVP_NUM_PAD_KEY (4 + 10)
 		// count of supported pad buttions (including cross keys)
-extern const TVPPadVirtualKeyMap[TVP_NUM_PAD_KEY];
+extern const int TVPPadVirtualKeyMap[TVP_NUM_PAD_KEY];
 extern tTVPWheelDetectionType TVPWheelDetectionType; // = wdtDirectInput;
 extern tTVPJoyPadDetectionType TVPJoyPadDetectionType; // = jdtDirectInput;
 
@@ -93,7 +93,7 @@ public:
 //---------------------------------------------------------------------------
 // tTVPDirectInputDevice : A base class for managing DirectInput device
 //---------------------------------------------------------------------------
-class IDirectInputDevice2;
+struct IDirectInputDevice2;
 class tTVPDirectInputDevice
 {
 protected:

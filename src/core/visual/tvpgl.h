@@ -48,10 +48,12 @@ typedef struct
 #ifdef _WIN32
 #define TVP_GL_FUNC_DECL(rettype, funcname, arg)  rettype __cdecl funcname arg
 #define TVP_GL_FUNC_EXTERN_DECL(rettype, funcname, arg)  extern rettype __cdecl funcname arg
-#define TVP_GL_FUNC_PTR_DECL(rettype, funcname, arg) rettype __cdecl (*funcname) arg
-#define TVP_GL_FUNC_PTR_EXTERN_DECL_(rettype, funcname, arg) extern rettype __cdecl (*funcname) arg
+#define TVP_GL_FUNC_PTR_DECL(rettype, funcname, arg) rettype (__cdecl * funcname) arg
+//#define TVP_GL_FUNC_PTR_EXTERN_DECL_(rettype, funcname, arg) extern rettype (*__cdecl funcname) arg
+#define TVP_GL_FUNC_PTR_EXTERN_DECL_(rettype, funcname, arg) extern rettype (__cdecl * funcname) arg
 #define TVP_GL_FUNC_PTR_EXTERN_DECL TVP_GL_FUNC_PTR_EXTERN_DECL_
 #endif
+
 
 extern unsigned char TVPDivTable[256*256];
 extern unsigned char TVP252DitherPalette[3][256];
@@ -63,7 +65,7 @@ extern unsigned char TVP252DitherPalette[3][256];
 
 
 /* add here compiler specific inline directives */
-#ifdef __BORLANDC__
+#if defined( __BORLANDC__ ) || ( _MSC_VER )
 	#define TVP_INLINE_FUNC __inline
 #else
 	#define TVP_INLINE_FUNC 
@@ -476,6 +478,5 @@ TVP_GL_FUNC_EXTERN_DECL(void, TVPUninitTVPGL, ());
 #define TVP_RGBA2COLOR(r,g,b,a) \
 	(((a)<<24) +  (((r)<<16) + ((g)<<8) + (b)))
 /*]*/
-
 #endif
 /* end of the file */

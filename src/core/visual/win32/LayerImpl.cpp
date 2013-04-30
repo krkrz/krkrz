@@ -13,6 +13,8 @@
 #include "LayerImpl.h"
 #include "MsgIntf.h"
 
+#include "TColor.h"
+
 //---------------------------------------------------------------------------
 //  convert color identifier or TVP system color to/from actual color
 //---------------------------------------------------------------------------
@@ -20,7 +22,7 @@ tjs_uint32 TVPToActualColor(tjs_uint32 color)
 {
 	if(color & 0xff000000)
 	{
-		color = ColorToRGB((TColor)color); // VCL color to RGB
+		color = ColorToRGB( color ); // system color to RGB
 		// convert byte order to 0xRRGGBB since ColorToRGB's return value is in
 		// a format of 0xBBGGRR.
 		return ((color&0xff)<<16) + (color&0xff00) + ((color&0xff0000)>>16);

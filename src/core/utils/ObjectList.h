@@ -21,11 +21,14 @@ using namespace TJS;
 */
 //---------------------------------------------------------------------------
 #define TOBJECTLIST_INC_COUNT 64
+template <typename ObjT>
 class tVoidObjectList
 {
 private:
-	void * * Objects; // array of the object
-	void * * BackupedObjects; // backuped objects
+	ObjT** Objects;
+	ObjT** BackupedObjects;
+	//void * * Objects; // array of the object
+	//void * * BackupedObjects; // backuped objects
 	tjs_int BackupedCount; // item count in BackupedObjects
 	tjs_int Capacity; // capacity of the array
 	tjs_int Count; // actual count
@@ -38,8 +41,9 @@ private:
 		// only "Objects" ( not "BackupedObjects" ) is copied.
 		if(ref.Count)
 		{
-			Objects = (void **)TJS_malloc(ref.Count * sizeof(void *) );
-			memcpy(Objects, ref.Objects, ref.Count * sizeof(void *) );
+			//Objects = (void **)TJS_malloc(ref.Count * sizeof(void *) );
+			Objects = new ObjT*[ref.Count];
+			memcpy(Objects, ref.Objects, ref.Count * sizeof(ObjT *) );
 		}
 		else
 		{
@@ -53,8 +57,9 @@ private:
 		// backup current "Objects" to "BackupedObjects"
 		if(Count)
 		{
-			BackupedObjects = (void**)TJS_malloc(Count * sizeof(void *) );
-			memcpy(BackupedObjects, Objects, Count * sizeof(void *) );
+			//BackupedObjects = (void**)TJS_malloc(Count * sizeof(void *) );
+			BackupedObjects = new ObjT*[Count];
+			memcpy(BackupedObjects, Objects, Count * sizeof(ObjT *) );
 		}
 		else
 		{
@@ -95,8 +100,8 @@ public:
 
 	~tVoidObjectList()
 	{
-		if(Objects) TJS_free(Objects);
-		if(BackupedObjects) TJS_free(BackupedObjects);
+		if(Objects) delete[] Objects;
+		if(BackupedObjects) delete[] BackupedObjects;
 	}
 
 	void operator =(const tVoidObjectList & ref)
@@ -108,7 +113,7 @@ public:
 	{
 		// note that this function does not change any safe locking
 		// effects ( locking count is not changed )
-		if(Objects) TJS_free(Objects);
+		if(Objects) delete[] Objects;
 		InternalAssign(ref);
 	}
 
@@ -135,7 +140,7 @@ public:
 		return Count;
 	}
 
-	void * GetSafeLockedObjectAt(tjs_int index) const
+	ObjT * GetSafeLockedObjectAt(tjs_int index) const
 	{
 		// this migight contain null pointer
 		if(Backuped)
@@ -174,10 +179,16 @@ public:
 		if(Capacity < count)
 		{
 			Capacity = count + TOBJECTLIST_INC_COUNT;
-			if(Capacity)
-				Objects = (void**)TJS_realloc(Objects, Capacity * sizeof(void *));
-			else
-				if(Objects) TJS_free(Objects), Objects = NULL;
+			if(Capacity) {
+				ObjT** tmp = new ObjT*[Capacity];
+				if( Count > 0 ) {
+ 					memcpy( tmp, Objects, Count * sizeof(ObjT *) );
+				}
+				delete[] Objects;
+				Objects = tmp;
+				//Objects = (void**)TJS_realloc(Objects, Capacity * sizeof(void *));
+			}else
+				if(Objects) delete[] Objects, Objects = NULL;
 		}
 	}
 
@@ -185,7 +196,7 @@ public:
 	{
 		// this eliminates NULL pointer from the array
 		if(SafeLockCount && !Backuped) Backup();
-		void **s, **d, **slim;
+		ObjT **s, **d, **slim;
 		slim = Objects + Count;
 		s = d = Objects;
 		while(s < slim)
@@ -200,32 +211,36 @@ public:
 		}
 		Count = d - Objects;
 		Capacity = Count;
-		if(Count)
-			Objects = (void**)TJS_realloc(Objects, Count * sizeof(void *));
-		else
-			if(Objects) TJS_free(Objects), Objects = NULL;
+		if(Count) {
+			//Objects = (void**)TJS_realloc(Objects, Count * sizeof(void *));
+			ObjT** tmp = new ObjT*[Count];
+			memcpy( tmp, Objects, Count * sizeof(ObjT *) );
+			delete[] Objects;
+			Objects = tmp;
+		}else
+			if(Objects) delete[] Objects, Objects = NULL;
 	}
 
-	void * & operator [] (tjs_int index)
+	ObjT * &operator [] (tjs_int index)
 	{
 		// this might return a null pointer
 		if(SafeLockCount && !Backuped) Backup();
 		return Objects[index];
 	}
 
-	void * & const operator [] (tjs_int index) const
+	ObjT * const &operator [] (tjs_int index) const
 	{
 		// this might return a null pointer
 		return Objects[index];
 	}
 
-	tjs_int Find(void * object) const
+	tjs_int Find(ObjT * object) const
 	{
 		// find "object" from array
 		// return -1 if "object" does not exist
 		if(!object) return -1; // null cannot be finded
-		void * const *  s = Objects;
-		void * const *  slim = Objects + Count;
+		ObjT * const *  s = Objects;
+		ObjT * const *  slim = Objects + Count;
 		while(s < slim)
 		{
 			if(*s == object) return s - Objects;
@@ -234,7 +249,7 @@ public:
 		return -1;
 	}
 
-	bool Add(void * object)
+	bool Add(ObjT * object)
 	{
 		// add "object" to array
 		// this does not allow duplicates
@@ -250,7 +265,7 @@ public:
 		return false;
 	}
 
-	bool Remove(void * object)
+	bool Remove(ObjT * object)
 	{
 		// remove object from array
 		// (this only set the pointer to null)
@@ -269,7 +284,7 @@ public:
 		if(Backuped && object)
 		{
 			// remove also from BackupedObjects
-			void * * s = BackupedObjects,
+			ObjT * * s = BackupedObjects,
 				* * slim = BackupedObjects + BackupedCount;
 			while(s < slim)
 			{
@@ -287,12 +302,12 @@ public:
 	void Remove(tjs_int index)
 	{
 		if(SafeLockCount && !Backuped) Backup();
-		void * object = Objects[index];
+		ObjT * object = Objects[index];
 		Objects[index] = NULL;
 		if(Backuped && object)
 		{
 			// remove also from BackupedObjects
-			void ** s = BackupedObjects,
+			ObjT ** s = BackupedObjects,
 				** slim = BackupedObjects + BackupedCount;
 			while(s < slim)
 			{
@@ -312,7 +327,7 @@ template <typename ObjT>
 class tObjectList
 {
 private:
-	tVoidObjectList List;
+	tVoidObjectList<ObjT> List;
 
 public:
 	tObjectList() : List()
@@ -354,7 +369,7 @@ public:
 
 	ObjT * GetSafeLockedObjectAt(tjs_int index) const
 	{
-		return static_cast<ObjT*>(List.GetSafeLockedObjectAt(index));
+		return List.GetSafeLockedObjectAt(index);
 	}
 
 	tjs_int GetCount() const
@@ -381,30 +396,30 @@ public:
 	{
 		List.Compact();
 	}
-
+	
 	ObjT * & operator [] (tjs_int index)
 	{
-		return static_cast<ObjT*>(List.operator[](index));
+		return List[index];
 	}
 
-	void * & const operator [] (tjs_int index) const
+	ObjT * const & operator [] (tjs_int index) const
 	{
-		return static_cast<ObjT*>(List.operator [] const (index));
+		return List[index];
 	}
 
 	tjs_int Find(ObjT * object) const
 	{
-		return List.Find(static_cast<void*>(object));
+		return List.Find( object );
 	}
 
 	bool Add(ObjT * object)
 	{
-		return List.Add(static_cast<void*>(object));
+		return List.Add( object );
 	}
 
 	bool Remove(ObjT * object)
 	{
-		return List.Remove(static_cast<void*>(object));
+		return List.Remove( object );
 	}
 
 	void Remove(tjs_int index)
@@ -413,12 +428,13 @@ public:
 	}
 };
 //---------------------------------------------------------------------------
+template <typename ObjT>
 class tVoidObjectListSafeLockHolder
 {
 private:
-	tVoidObjectList & List;
+	tVoidObjectList<ObjT> & List;
 public:
-	tVoidObjectListSafeLockHolder(tVoidObjectList &list) : List(list)
+	tVoidObjectListSafeLockHolder(tVoidObjectList<ObjT> &list) : List(list)
 	{
 		List.SafeLock();
 	}

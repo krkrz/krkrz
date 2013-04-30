@@ -46,7 +46,13 @@ const tjs_int TJSVersionRelease = 28;
 const tjs_int TJSVersionHex =
 	TJSVersionMajor * 0x1000000 + TJSVersionMinor * 0x10000 + TJSVersionRelease;
 
+#ifdef _MSC_VER
+ #define WIDEN2(x) L ## x
+ #define WIDEN(x) WIDEN2(x)
+tjs_char TJSCompiledDate[] = WIDEN(__DATE__) WIDEN(" ") WIDEN(__TIME__);
+#else
 tjs_char TJSCompiledDate[] = TJS_W("" __DATE__ " " __TIME__);
+#endif
 	// first empty literal string is to avoid a compile error with bcc which can not
 	// process directly L __DATE__ as a pre-processer wide literal string.
 //---------------------------------------------------------------------------
@@ -358,7 +364,7 @@ void tTJS::Dump(tjs_uint width) const
 {
 	// dumps all existing script block
 	tjs_char version[100];
-	TJS_sprintf(version, TJS_W("TJS version %d.%d.%d (%s)"), TJSVersionMajor,
+	TJS_snprintf(version, sizeof(version)/sizeof(tjs_char), TJS_W("TJS version %d.%d.%d (%s)"), TJSVersionMajor,
 		TJSVersionMinor, TJSVersionRelease, TJSCompiledDate);
 
 	OutputToConsoleSeparator(TJS_W("#"), width);
@@ -372,7 +378,7 @@ void tTJS::Dump(tjs_uint width) const
 		std::vector<tTJSScriptBlock*>::const_iterator i;
 
 		tjs_char buf[1024];
-		TJS_sprintf(buf, TJS_W("Total %d script block(s)"), ScriptBlocks.size());
+		TJS_snprintf(buf, sizeof(buf)/sizeof(tjs_char), TJS_W("Total %d script block(s)"), ScriptBlocks.size());
 		OutputToConsole(buf);
 		OutputToConsole(TJS_W(""));
 
@@ -392,7 +398,7 @@ void tTJS::Dump(tjs_uint width) const
 				title = TJS_W("(no-named script block)");
 
 			tjs_char ptr[256];
-			TJS_sprintf(ptr, TJS_W(" 0x%p"), (*i));
+			TJS_snprintf(ptr, sizeof(ptr)/sizeof(tjs_char), TJS_W(" 0x%p"), (*i));
 
 			title += ptr;
 
@@ -400,27 +406,27 @@ void tTJS::Dump(tjs_uint width) const
 
 			n = (*i)->GetContextCount();
 			totalcontexts += n;
-			TJS_sprintf(buf, TJS_W("\tCount of contexts      : %d"), n);
+			TJS_snprintf(buf, sizeof(buf)/sizeof(tjs_char), TJS_W("\tCount of contexts      : %d"), n);
 			OutputToConsole(buf);
 
 			n = (*i)->GetTotalVMCodeSize();
 			totalcodesize += n;
-			TJS_sprintf(buf, TJS_W("\tVM code area size      : %d words"), n);
+			TJS_snprintf(buf, sizeof(buf)/sizeof(tjs_char), TJS_W("\tVM code area size      : %d words"), n);
 			OutputToConsole(buf);
 
 			n = (*i)->GetTotalVMDataSize();
 			totaldatasize += n;
-			TJS_sprintf(buf, TJS_W("\tVM constant data count : %d"), n);
+			TJS_snprintf(buf, sizeof(buf)/sizeof(tjs_char), TJS_W("\tVM constant data count : %d"), n);
 			OutputToConsole(buf);
 
 			OutputToConsole(TJS_W(""));
 		}
 
-		TJS_sprintf(buf, TJS_W("Total count of contexts      : %d"), totalcontexts);
+		TJS_snprintf(buf, sizeof(buf)/sizeof(tjs_char), TJS_W("Total count of contexts      : %d"), totalcontexts);
 		OutputToConsole(buf);
-		TJS_sprintf(buf, TJS_W("Total VM code area size      : %d words"), totalcodesize);
+		TJS_snprintf(buf, sizeof(buf)/sizeof(tjs_char), TJS_W("Total VM code area size      : %d words"), totalcodesize);
 		OutputToConsole(buf);
-		TJS_sprintf(buf, TJS_W("Total VM constant data count : %d"), totaldatasize);
+		TJS_snprintf(buf, sizeof(buf)/sizeof(tjs_char), TJS_W("Total VM constant data count : %d"), totaldatasize);
 		OutputToConsole(buf);
 
 		OutputToConsole(TJS_W(""));
@@ -439,7 +445,7 @@ void tTJS::Dump(tjs_uint width) const
 				title = TJS_W("(no-named script block)");
 
 			tjs_char ptr[256];
-			TJS_sprintf(ptr, TJS_W(" 0x%p"), (*i));
+			TJS_snprintf(ptr, sizeof(ptr)/sizeof(tjs_char), TJS_W(" 0x%p"), (*i));
 
 			title += ptr;
 
@@ -532,9 +538,9 @@ bool tTJS::LoadByteCode( class tTJSBinaryStream* stream, tTJSVariant *result,
 			stream->Read( header, tTJSScriptBlock::BYTECODE_FILE_TAG_SIZE );
 			if( tTJSByteCodeLoader::IsTJS2ByteCode( header ) ) {
 				stream->Seek( 0, TJS_BS_SEEK_SET );
-				buff = new tjs_uint8[streamlen];
-				stream->Read( buff, streamlen );
-				LoadByteCode( buff, streamlen, result, context, name );
+				buff = new tjs_uint8[static_cast<unsigned int>(streamlen)];
+				stream->Read( buff, static_cast<tjs_uint>(streamlen) );
+				LoadByteCode( buff, static_cast<size_t>(streamlen), result, context, name );
 				ret = true;
 			} else {
 				assert( tTJSScriptBlock::BYTECODE_FILE_TAG_SIZE == tTJSBinarySerializer::HEADER_LENGTH );
@@ -542,9 +548,9 @@ bool tTJS::LoadByteCode( class tTJSBinaryStream* stream, tTJSVariant *result,
 					tTJSBinarySerializer binload;
 					tTJSVariant* var = binload.Read( stream );;
 					if( var ) {
-						*result = *var;
-						delete var;
-						ret = true;
+					*result = *var;
+					delete var;
+				ret = true;
 					}
 				}
 			}

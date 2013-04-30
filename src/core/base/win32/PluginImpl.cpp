@@ -15,7 +15,11 @@
 #include "ScriptMgnIntf.h"
 #include "PluginImpl.h"
 #include "StorageImpl.h"
-#include "GraphicsLoaderImpl.cpp"
+#include "GraphicsLoaderImpl.h"
+
+#include "MsgImpl.h"
+#include "SysInitIntf.h"
+
 #include "tjsHashSearch.h"
 #include "EventIntf.h"
 #include "TransIntf.h"
@@ -38,7 +42,8 @@
 	#include "kmp_pi.h"
 #endif
 
-
+#include "FileCtrl.h"
+#include "Application.h"
 
 
 //---------------------------------------------------------------------------
@@ -110,7 +115,7 @@ bool TJS_INTF_METHOD tTVPFunctionExporter::QueryFunctionsByNarrowString(
 	return ret;
 }
 //---------------------------------------------------------------------------
-extern "C" iTVPFunctionExporter * _export __stdcall TVPGetFunctionExporter()
+extern "C" __declspec(dllexport) iTVPFunctionExporter * __stdcall TVPGetFunctionExporter()
 {
 	// for external applications
 	TVPInitExportFuncs();
@@ -271,7 +276,7 @@ tTVPPlugin::tTVPPlugin(const ttstr & name, ITSSStorageProvider *storageprovider)
 
 	// load DLL
 	Holder = new tTVPPluginHolder(name);
-	Instance = LoadLibrary(Holder->GetLocalName().AsAnsiString().c_str());
+	Instance = LoadLibrary(Holder->GetLocalName().AsStdString().c_str());
 	if(!Instance)
 	{
 		delete Holder;
@@ -328,7 +333,7 @@ tTVPPlugin::tTVPPlugin(const ttstr & name, ITSSStorageProvider *storageprovider)
 		if(GetModuleInstance)
 		{
 			HRESULT hr = GetModuleInstance(&TSSModule, storageprovider,
-				 NULL, Application->Handle);
+				 NULL, Application->GetHandle());
 			if(FAILED(hr) || TSSModule == NULL)
 				TVPThrowExceptionMessage(TVPCannotLoadPlugin, name);
 
@@ -496,12 +501,12 @@ bool TVPUnloadPlugin(const ttstr & name)
 //---------------------------------------------------------------------------
 struct tTVPFoundPlugin
 {
-	AnsiString Path;
-	AnsiString Name;
+	std::string Path;
+	std::string Name;
 	bool operator < (const tTVPFoundPlugin &rhs) const { return Name < rhs.Name; }
 };
 static tjs_int TVPAutoLoadPluginCount = 0;
-static void TVPSearchPluginsAt(std::vector<tTVPFoundPlugin> &list, AnsiString folder)
+static void TVPSearchPluginsAt(std::vector<tTVPFoundPlugin> &list, std::string folder)
 {
 	WIN32_FIND_DATA ffd;
 	HANDLE handle = FindFirstFile((folder + "*.tpm").c_str(), &ffd);
@@ -535,7 +540,7 @@ void TVPLoadPluigins(void)
 	// search plugins from path: (exepath), (exepath)\system, (exepath)\plugin
 	std::vector<tTVPFoundPlugin> list;
 
-	AnsiString exepath =
+	std::string exepath =
 		IncludeTrailingBackslash(ExtractFileDir(ParamStr(0)));
 
 	TVPSearchPluginsAt(list, exepath);
@@ -785,7 +790,7 @@ void TVP_md5_finish(TVP_md5_state_t *pms, tjs_uint8 *digest)
 //---------------------------------------------------------------------------
 HWND TVPGetApplicationWindowHandle()
 {
-	return Application->Handle;
+	return Application->GetHandle();
 }
 //---------------------------------------------------------------------------
 void TVPProcessApplicationMessages()

@@ -91,7 +91,7 @@ void tTVPWaveSegmentQueue::Enqueue(const std::deque<tTVPWaveLabel> & Labels)
 		i != Labels.end(); i++)
 	{
 		tTVPWaveLabel one_Label(*i);
-		one_Label.Offset += Label_offset; // offset ÇÃèCê≥
+		one_Label.Offset += static_cast<tjs_int>(Label_offset); // offset ÇÃèCê≥
 		Enqueue(one_Label);
 	}
 }
@@ -158,7 +158,7 @@ void tTVPWaveSegmentQueue::Dequeue(tTVPWaveSegmentQueue & dest, tjs_int64 length
 		else
 		{
 			// *i ÇÃÉIÉtÉZÉbÉgÇèCê≥
-			i->Offset = newoffset;
+			i->Offset = static_cast<tjs_int>(newoffset);
 		}
 	}
 
@@ -227,7 +227,7 @@ void tTVPWaveSegmentQueue::Scale(tjs_int64 new_total_filtered_length)
 	for(std::deque<tTVPWaveLabel>::iterator i = Labels.begin();
 		i != Labels.end(); i++)
 	{
-		i->Offset = static_cast<tjs_int64>(i->Offset * ratio);
+		i->Offset = static_cast<tjs_int>(i->Offset * ratio);
 	}
 }
 //---------------------------------------------------------------------------

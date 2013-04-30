@@ -39,13 +39,13 @@ static tjs_int32 ClassID_Array;
 static bool inline TJS_iswspace(tjs_char ch)
 {
 	// the standard iswspace misses when non-zero page code
-	if(ch&0xff00) return false; else return isspace(ch);
+	if(ch&0xff00) return false; else return 0!=isspace(ch);
 }
 //---------------------------------------------------------------------------
 static bool inline TJS_iswdigit(tjs_char ch)
 {
 	// the standard iswdigit misses when non-zero page code
-	if(ch&0xff00) return false; else return isdigit(ch);
+	if(ch&0xff00) return false; else return 0!=isdigit(ch);
 }
 //---------------------------------------------------------------------------
 // Utility Function(s)
@@ -134,7 +134,8 @@ class tTJSArraySortCompare_NormalAscending :
 public:
 	result_type operator () (first_argument_type lhs, second_argument_type rhs) const
 	{
-		return lhs < rhs;
+		//return lhs < rhs;
+		return lhs.operator <(rhs);
 	}
 };
 class tTJSArraySortCompare_NormalDescending :
@@ -143,7 +144,8 @@ class tTJSArraySortCompare_NormalDescending :
 public:
 	result_type operator () (first_argument_type lhs, second_argument_type rhs) const
 	{
-		return lhs > rhs;
+		//return lhs > rhs;
+		return lhs.operator > (rhs);
 	}
 };
 class tTJSArraySortCompare_NumericAscending :
@@ -157,9 +159,11 @@ public:
 			tTJSVariant ltmp(lhs), rtmp(rhs);
 			ltmp.tonumber();
 			rtmp.tonumber();
-			return ltmp < rtmp;
+			//return ltmp < rtmp;
+			return ltmp.operator <(rtmp);
 		}
-		return lhs < rhs;
+		//return lhs < rhs;
+		return lhs.operator < (rhs);
 	}
 };
 class tTJSArraySortCompare_NumericDescending :
@@ -173,9 +177,11 @@ public:
 			tTJSVariant ltmp(lhs), rtmp(rhs);
 			ltmp.tonumber();
 			rtmp.tonumber();
-			return ltmp > rtmp;
+			//return ltmp > rtmp;
+			return ltmp.operator > ( rtmp );
 		}
-		return lhs > rhs;
+		//return lhs > rhs;
+		return lhs.operator > (rhs);
 	}
 };
 class tTJSArraySortCompare_StringAscending :
@@ -185,7 +191,8 @@ public:
 	result_type operator () (first_argument_type lhs, second_argument_type rhs) const
 	{
 		if(lhs.Type() == tvtString && rhs.Type() == tvtString)
-			return lhs < rhs;
+			//return lhs < rhs;
+			return lhs.operator < ( rhs );
 		return (ttstr)lhs < (ttstr)rhs;
 	}
 };
@@ -196,7 +203,8 @@ public:
 	result_type operator () (first_argument_type lhs, second_argument_type rhs) const
 	{
 		if(lhs.Type() == tvtString && rhs.Type() == tvtString)
-			return lhs > rhs;
+			//return lhs > rhs;
+			return lhs.operator > (rhs);
 		return (ttstr)lhs > (ttstr)rhs;
 	}
 };
@@ -431,19 +439,19 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/* func. name */saveStruct)
 		}
 		delete stream;
 	} else {
-	iTJSTextWriteStream * stream = TJSCreateTextStreamForWrite(name, mode);
-	try
-	{
-		std::vector<iTJSDispatch2 *> stack;
-		stack.push_back(objthis);
-		ni->SaveStructuredData(stack, *stream, TJS_W(""));
-	}
-	catch(...)
-	{
+		iTJSTextWriteStream * stream = TJSCreateTextStreamForWrite(name, mode);
+		try
+		{
+			std::vector<iTJSDispatch2 *> stack;
+			stack.push_back(objthis);
+			ni->SaveStructuredData(stack, *stream, TJS_W(""));
+		}
+		catch(...)
+		{
+			stream->Destruct();
+			throw;
+		}
 		stream->Destruct();
-		throw;
-	}
-	stream->Destruct();
 	}
 
 	if(result) *result = tTJSVariant(objthis, objthis);

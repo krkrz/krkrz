@@ -101,7 +101,7 @@ private:
 			tjs_uint32 *hint, tTJSVariant *result, tjs_int numparams,
 			tTJSVariant **param, iTJSDispatch2 *objthis);
 	};
-	friend class tSaveStructCallback;
+	friend struct tSaveStructCallback;
 
 	struct tSaveStructBinayCallback : public tTJSDispatch {
 		std::vector<iTJSDispatch2 *> * Stack;
@@ -112,7 +112,7 @@ private:
 			tjs_uint32 *hint, tTJSVariant *result, tjs_int numparams,
 			tTJSVariant **param, iTJSDispatch2 *objthis);
 	};
-	friend class tSaveStructBinayCallback;
+	friend struct tSaveStructBinayCallback;
 
 	struct tSaveMemberCountCallback : public tTJSDispatch {
 		tjs_uint Count;
@@ -123,7 +123,7 @@ private:
 			tjs_uint32 *hint, tTJSVariant *result, tjs_int numparams,
 			tTJSVariant **param, iTJSDispatch2 *objthis);
 	};
-	friend class tSaveMemberCountCallback;
+	friend struct tSaveMemberCountCallback;
 
 public:
 	void AssignStructure(iTJSDispatch2 * dsp, std::vector<iTJSDispatch2 *> &stack);
@@ -138,7 +138,7 @@ public:
 			tjs_uint32 *hint, tTJSVariant *result, tjs_int numparams,
 			tTJSVariant **param, iTJSDispatch2 *objthis);
 	};
-	friend class tAssignStructCallback;
+	friend struct tAssignStructCallback;
 };
 //---------------------------------------------------------------------------
 class tTJSDictionaryObject : public tTJSCustomObject

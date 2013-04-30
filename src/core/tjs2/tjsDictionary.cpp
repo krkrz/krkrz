@@ -85,19 +85,19 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func.name*/saveStruct)
 		}
 		delete stream;
 	} else {
-	iTJSTextWriteStream * stream = TJSCreateTextStreamForWrite(name, mode);
-	try
-	{
-		std::vector<iTJSDispatch2 *> stack;
-		stack.push_back(objthis);
-		ni->SaveStructuredData(stack, *stream, TJS_W(""));
-	}
-	catch(...)
-	{
+		iTJSTextWriteStream * stream = TJSCreateTextStreamForWrite(name, mode);
+		try
+		{
+			std::vector<iTJSDispatch2 *> stack;
+			stack.push_back(objthis);
+			ni->SaveStructuredData(stack, *stream, TJS_W(""));
+		}
+		catch(...)
+		{
+			stream->Destruct();
+			throw;
+		}
 		stream->Destruct();
-		throw;
-	}
-	stream->Destruct();
 	}
 
 	if(result) *result = tTJSVariant(objthis, objthis);
@@ -115,7 +115,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func.name*/assign)
 
 	bool clear = true;
 	if(numparams >= 2 && param[1]->Type() != tvtVoid)
-		clear = (tjs_int)*param[1];
+		clear = 0!=(tjs_int)*param[1];
 
 	tTJSVariantClosure clo = param[0]->AsObjectClosureNoAddRef();
 	if(clo.ObjThis)
@@ -289,7 +289,7 @@ void tTJSDictionaryNI::Assign(iTJSDispatch2 * dsp, bool clear)
 	{
 		// otherwise
 		if(clear) Owner->Clear();
-
+		
 		tSaveMemberCountCallback countCallback;
 		dsp->EnumMembers(TJS_IGNOREPROP, &tTJSVariantClosure(&countCallback, NULL), dsp);
 		tjs_int reqcount = countCallback.Count + Owner->Count;
@@ -482,7 +482,7 @@ void tTJSDictionaryNI::AssignStructure(iTJSDispatch2 * dsp,
 		try
 		{
 			Owner->Clear();
-
+			
 			// reserve area
 			tSaveMemberCountCallback countCallback;
 			dsp->EnumMembers(TJS_IGNOREPROP, &tTJSVariantClosure(&countCallback, NULL), dsp);

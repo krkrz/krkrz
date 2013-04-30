@@ -159,12 +159,12 @@ ttstr TVPGetAboutString(void)
 {
 	TVPGetVersion();
 	tjs_char verstr[100];
-	TJS_sprintf(verstr, TJS_W("%d.%d.%d.%d"),
+	TJS_snprintf(verstr, sizeof(verstr), TJS_W("%d.%d.%d.%d"),
 		TVPVersionMajor, TVPVersionMinor,
 		TVPVersionRelease, TVPVersionBuild);
 
 	tjs_char tjsverstr[100];
-	TJS_sprintf(tjsverstr, TJS_W("%d.%d.%d"),
+	TJS_snprintf(tjsverstr, sizeof(tjsverstr), TJS_W("%d.%d.%d"),
 		TJSVersionMajor, TJSVersionMinor, TJSVersionRelease);
 
 	return TVPFormatMessage(TVPAboutString, verstr, tjsverstr) +
@@ -175,12 +175,12 @@ ttstr TVPGetVersionInformation(void)
 {
 	TVPGetVersion();
 	tjs_char verstr[100];
-	TJS_sprintf(verstr, TJS_W("%d.%d.%d.%d"),
+	TJS_snprintf(verstr, sizeof(verstr)/sizeof(tjs_char), TJS_W("%d.%d.%d.%d"),
 		TVPVersionMajor, TVPVersionMinor,
 		TVPVersionRelease, TVPVersionBuild);
 
 	tjs_char tjsverstr[100];
-	TJS_sprintf(tjsverstr, TJS_W("%d.%d.%d"),
+	TJS_snprintf(tjsverstr, sizeof(tjsverstr)/sizeof(tjs_char), TJS_W("%d.%d.%d"),
 		TJSVersionMajor, TJSVersionMinor, TJSVersionRelease);
 
 	return TVPFormatMessage(TVPVersionInformation, verstr, tjsverstr);
@@ -190,7 +190,7 @@ ttstr TVPGetVersionString()
 {
 	TVPGetVersion();
 	tjs_char verstr[100];
-	TJS_sprintf(verstr, TJS_W("%d.%d.%d.%d"),
+	TJS_snprintf(verstr, sizeof(verstr)/sizeof(tjs_char), TJS_W("%d.%d.%d.%d"),
 		TVPVersionMajor, TVPVersionMinor,
 		TVPVersionRelease, TVPVersionBuild);
 	return ttstr(verstr);

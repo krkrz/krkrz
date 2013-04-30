@@ -1,0 +1,384 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{0DA37E3E-48F9-4853-AB2A-76D79042203C}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>tvpwin32</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);__WIN32__;NO_STRICT;TJS_TEXT_OUT_CRLF;TJS_JP_LOCALIZED;TJS_DEBUG_DUMP_STRING;_CRT_SECURE_NO_WARNING;ENABLE_DEBUGGER;TVP_LOG_TO_COMMANDLINE_CONSOLE;</PreprocessorDefinitions>
+      <SDLCheck>false</SDLCheck>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <AdditionalIncludeDirectories>../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../external/include;../external/include/zlib;</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>./lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;zlib_d.lib;libjpeg_d.lib;libpng_d.lib;onig_s_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);__WIN32__;NO_STRICT;TJS_TEXT_OUT_CRLF;TJS_JP_LOCALIZED;TJS_DEBUG_DUMP_STRING;TVP_LOG_TO_COMMANDLINE_CONSOLE;</PreprocessorDefinitions>
+      <SDLCheck>false</SDLCheck>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalIncludeDirectories>../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../external/include;../external/include/zlib;</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>./lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;zlib.lib;libjpeg.lib;libpng.lib;onig_s.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImageHasSafeExceptionHandlers>true</ImageHasSafeExceptionHandlers>
+    </Link>
+    <ResourceCompile>
+      <Culture>0x0411</Culture>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\base\BinaryStream.h" />
+    <ClInclude Include="..\base\CharacterSet.h" />
+    <ClInclude Include="..\base\common.h" />
+    <ClInclude Include="..\base\EventIntf.h" />
+    <ClInclude Include="..\base\PluginIntf.h" />
+    <ClInclude Include="..\base\ScriptMgnIntf.h" />
+    <ClInclude Include="..\base\StorageIntf.h" />
+    <ClInclude Include="..\base\SysInitIntf.h" />
+    <ClInclude Include="..\base\SystemIntf.h" />
+    <ClInclude Include="..\base\TextStream.h" />
+    <ClInclude Include="..\base\UtilStreams.h" />
+    <ClInclude Include="..\base\win32\EventImpl.h" />
+    <ClInclude Include="..\base\win32\FileSelector.h" />
+    <ClInclude Include="..\base\win32\FuncStubs.h" />
+    <ClInclude Include="..\base\win32\PluginImpl.h" />
+    <ClInclude Include="..\base\win32\ScriptMgnImpl.h" />
+    <ClInclude Include="..\base\win32\StorageImpl.h" />
+    <ClInclude Include="..\base\win32\SusieArchive.h" />
+    <ClInclude Include="..\base\win32\SysInitImpl.h" />
+    <ClInclude Include="..\base\win32\SystemImpl.h" />
+    <ClInclude Include="..\base\XP3Archive.h" />
+    <ClInclude Include="..\environ\win32\Application.h" />
+    <ClInclude Include="..\environ\win32\Clipbrd.h" />
+    <ClInclude Include="..\environ\win32\DetectCPU.h" />
+    <ClInclude Include="..\environ\win32\EmergencyExit.h" />
+    <ClInclude Include="..\environ\win32\Exception.h" />
+    <ClInclude Include="..\environ\win32\FileCtrl.h" />
+    <ClInclude Include="..\environ\win32\FileStream.h" />
+    <ClInclude Include="..\environ\win32\InputStringForm.h" />
+    <ClInclude Include="..\environ\win32\MainFormUnit.h" />
+    <ClInclude Include="..\environ\win32\MenuContainerForm.h" />
+    <ClInclude Include="..\environ\win32\MouseCursor.h" />
+    <ClInclude Include="..\environ\win32\Screen.h" />
+    <ClInclude Include="..\environ\win32\StringUtil.h" />
+    <ClInclude Include="..\environ\win32\TColor.h" />
+    <ClInclude Include="..\environ\win32\TFont.h" />
+    <ClInclude Include="..\environ\win32\Timer.h" />
+    <ClInclude Include="..\environ\win32\TMLWindow.h" />
+    <ClInclude Include="..\environ\win32\VersionFormUnit.h" />
+    <ClInclude Include="..\environ\win32\WideNativeFuncs.h" />
+    <ClInclude Include="..\environ\win32\WindowFormUnit.h" />
+    <ClInclude Include="..\environ\win32\WindowMenu.h" />
+    <ClInclude Include="..\msg\MsgIntf.h" />
+    <ClInclude Include="..\msg\svn_revision.h" />
+    <ClInclude Include="..\msg\win32\MsgImpl.h" />
+    <ClInclude Include="..\msg\win32\OptionsDesc.h" />
+    <ClInclude Include="..\sound\PhaseVocoderDSP.h" />
+    <ClInclude Include="..\sound\PhaseVocoderFilter.h" />
+    <ClInclude Include="..\sound\RingBuffer.h" />
+    <ClInclude Include="..\sound\SoundBufferBaseIntf.h" />
+    <ClInclude Include="..\sound\WaveIntf.h" />
+    <ClInclude Include="..\sound\WaveLoopManager.h" />
+    <ClInclude Include="..\sound\WaveSegmentQueue.h" />
+    <ClInclude Include="..\sound\win32\kmp_pi.h" />
+    <ClInclude Include="..\sound\win32\oldwaveunpacker.h" />
+    <ClInclude Include="..\sound\win32\SoundBufferBaseImpl.h" />
+    <ClInclude Include="..\sound\win32\tvpsnd.h" />
+    <ClInclude Include="..\sound\win32\WaveImpl.h" />
+    <ClInclude Include="..\tjs2\tjs.h" />
+    <ClInclude Include="..\tjs2\tjs.tab.h" />
+    <ClInclude Include="..\tjs2\tjsArray.h" />
+    <ClInclude Include="..\tjs2\tjsBinarySerializer.h" />
+    <ClInclude Include="..\tjs2\tjsByteCodeLoader.h" />
+    <ClInclude Include="..\tjs2\tjsCommHead.h" />
+    <ClInclude Include="..\tjs2\tjsCompileControl.h" />
+    <ClInclude Include="..\tjs2\tjsConfig.h" />
+    <ClInclude Include="..\tjs2\tjsConstArrayData.h" />
+    <ClInclude Include="..\tjs2\tjsDate.h" />
+    <ClInclude Include="..\tjs2\tjsdate.tab.h" />
+    <ClInclude Include="..\tjs2\tjsDateParser.h" />
+    <ClInclude Include="..\tjs2\tjsDebug.h" />
+    <ClInclude Include="..\tjs2\tjsDictionary.h" />
+    <ClInclude Include="..\tjs2\tjsError.h" />
+    <ClInclude Include="..\tjs2\tjsErrorDefs.h" />
+    <ClInclude Include="..\tjs2\tjsError_jp.h" />
+    <ClInclude Include="..\tjs2\tjsException.h" />
+    <ClInclude Include="..\tjs2\tjsGlobalStringMap.h" />
+    <ClInclude Include="..\tjs2\tjsHashSearch.h" />
+    <ClInclude Include="..\tjs2\tjsInterCodeExec.h" />
+    <ClInclude Include="..\tjs2\tjsInterCodeGen.h" />
+    <ClInclude Include="..\tjs2\tjsInterface.h" />
+    <ClInclude Include="..\tjs2\tjsLex.h" />
+    <ClInclude Include="..\tjs2\tjsMath.h" />
+    <ClInclude Include="..\tjs2\tjsMessage.h" />
+    <ClInclude Include="..\tjs2\tjsMT19937ar-cok.h" />
+    <ClInclude Include="..\tjs2\tjsNamespace.h" />
+    <ClInclude Include="..\tjs2\tjsNative.h" />
+    <ClInclude Include="..\tjs2\tjsObject.h" />
+    <ClInclude Include="..\tjs2\tjspp.tab.h" />
+    <ClInclude Include="..\tjs2\tjsRandomGenerator.h" />
+    <ClInclude Include="..\tjs2\tjsRegExp.h" />
+    <ClInclude Include="..\tjs2\tjsScriptBlock.h" />
+    <ClInclude Include="..\tjs2\tjsScriptCache.h" />
+    <ClInclude Include="..\tjs2\tjsString.h" />
+    <ClInclude Include="..\tjs2\tjsTypes.h" />
+    <ClInclude Include="..\tjs2\tjsUtils.h" />
+    <ClInclude Include="..\tjs2\tjsVariant.h" />
+    <ClInclude Include="..\tjs2\tjsVariantString.h" />
+    <ClInclude Include="..\utils\ClipboardIntf.h" />
+    <ClInclude Include="..\utils\Debugger.h" />
+    <ClInclude Include="..\utils\DebugIntf.h" />
+    <ClInclude Include="..\utils\KAGParser.h" />
+    <ClInclude Include="..\utils\md5.h" />
+    <ClInclude Include="..\utils\ObjectList.h" />
+    <ClInclude Include="..\utils\Random.h" />
+    <ClInclude Include="..\utils\ThreadIntf.h" />
+    <ClInclude Include="..\utils\TimerIntf.h" />
+    <ClInclude Include="..\utils\win32\ClipboardImpl.h" />
+    <ClInclude Include="..\utils\win32\DebugImpl.h" />
+    <ClInclude Include="..\utils\win32\ThreadImpl.h" />
+    <ClInclude Include="..\utils\win32\TickCount.h" />
+    <ClInclude Include="..\utils\win32\TimerImpl.h" />
+    <ClInclude Include="..\visual\argb.h" />
+    <ClInclude Include="..\visual\ComplexRect.h" />
+    <ClInclude Include="..\visual\drawable.h" />
+    <ClInclude Include="..\visual\GraphicsLoaderIntf.h" />
+    <ClInclude Include="..\visual\IA32\tvpgl_ia32_intf.h" />
+    <ClInclude Include="..\visual\LayerBitmapIntf.h" />
+    <ClInclude Include="..\visual\LayerIntf.h" />
+    <ClInclude Include="..\visual\LayerManager.h" />
+    <ClInclude Include="..\visual\LoadTLG.h" />
+    <ClInclude Include="..\visual\Resampler.h" />
+    <ClInclude Include="..\visual\transhandler.h" />
+    <ClInclude Include="..\visual\TransIntf.h" />
+    <ClInclude Include="..\visual\tvpfontstruc.h" />
+    <ClInclude Include="..\visual\tvpgl.h" />
+    <ClInclude Include="..\visual\tvpinputdefs.h" />
+    <ClInclude Include="..\visual\VideoOvlIntf.h" />
+    <ClInclude Include="..\visual\voMode.h" />
+    <ClInclude Include="..\visual\win32\DInputMgn.h" />
+    <ClInclude Include="..\visual\win32\DrawDevice.h" />
+    <ClInclude Include="..\visual\win32\GraphicsLoaderImpl.h" />
+    <ClInclude Include="..\visual\win32\krmovie.h" />
+    <ClInclude Include="..\visual\win32\LayerBitmapImpl.h" />
+    <ClInclude Include="..\visual\win32\LayerImpl.h" />
+    <ClInclude Include="..\visual\win32\PassThroughDrawDevice.h" />
+    <ClInclude Include="..\visual\win32\TransImpl.h" />
+    <ClInclude Include="..\visual\win32\VideoOvlImpl.h" />
+    <ClInclude Include="..\visual\win32\WindowImpl.h" />
+    <ClInclude Include="..\visual\WindowIntf.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="tvpwin32.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\base\BinaryStream.cpp" />
+    <ClCompile Include="..\base\CharacterSet.cpp" />
+    <ClCompile Include="..\base\EventIntf.cpp" />
+    <ClCompile Include="..\base\PluginIntf.cpp" />
+    <ClCompile Include="..\base\ScriptMgnIntf.cpp" />
+    <ClCompile Include="..\base\StorageIntf.cpp" />
+    <ClCompile Include="..\base\SysInitIntf.cpp" />
+    <ClCompile Include="..\base\SystemIntf.cpp" />
+    <ClCompile Include="..\base\TextStream.cpp" />
+    <ClCompile Include="..\base\UtilStreams.cpp" />
+    <ClCompile Include="..\base\win32\EventImpl.cpp" />
+    <ClCompile Include="..\base\win32\FileSelector.cpp" />
+    <ClCompile Include="..\base\win32\FuncStubs.cpp" />
+    <ClCompile Include="..\base\win32\PluginImpl.cpp" />
+    <ClCompile Include="..\base\win32\ScriptMgnImpl.cpp" />
+    <ClCompile Include="..\base\win32\StorageImpl.cpp" />
+    <ClCompile Include="..\base\win32\SusieArchive.cpp" />
+    <ClCompile Include="..\base\win32\SysInitImpl.cpp" />
+    <ClCompile Include="..\base\win32\SystemImpl.cpp" />
+    <ClCompile Include="..\base\XP3Archive.cpp" />
+    <ClCompile Include="..\environ\win32\Application.cpp" />
+    <ClCompile Include="..\environ\win32\Clipbrd.cpp" />
+    <ClCompile Include="..\environ\win32\DetectCPU.cpp" />
+    <ClCompile Include="..\environ\win32\EmergencyExit.cpp" />
+    <ClCompile Include="..\environ\win32\InputStringForm.cpp" />
+    <ClCompile Include="..\environ\win32\MainFormUnit.cpp" />
+    <ClCompile Include="..\environ\win32\MouseCursor.cpp" />
+    <ClCompile Include="..\environ\win32\Screen.cpp" />
+    <ClCompile Include="..\environ\win32\TMLWindow.cpp" />
+    <ClCompile Include="..\environ\win32\VersionFormUnit.cpp" />
+    <ClCompile Include="..\environ\win32\WideNativeFuncs.cpp" />
+    <ClCompile Include="..\environ\win32\WindowFormUnit.cpp" />
+    <ClCompile Include="..\environ\win32\WindowMenu.cpp" />
+    <ClCompile Include="..\msg\MsgIntf.cpp" />
+    <ClCompile Include="..\msg\win32\MsgImpl.cpp" />
+    <ClCompile Include="..\msg\win32\OptionsDesc.cpp" />
+    <ClCompile Include="..\sound\PhaseVocoderDSP.cpp" />
+    <ClCompile Include="..\sound\PhaseVocoderFilter.cpp" />
+    <ClCompile Include="..\sound\SoundBufferBaseIntf.cpp" />
+    <ClCompile Include="..\sound\WaveIntf.cpp" />
+    <ClCompile Include="..\sound\WaveLoopManager.cpp" />
+    <ClCompile Include="..\sound\WaveSegmentQueue.cpp" />
+    <ClCompile Include="..\sound\win32\SoundBufferBaseImpl.cpp" />
+    <ClCompile Include="..\sound\win32\tvpsnd.c" />
+    <ClCompile Include="..\sound\win32\WaveImpl.cpp" />
+    <ClCompile Include="..\tjs2\tjs.cpp" />
+    <ClCompile Include="..\tjs2\tjs.tab.cpp" />
+    <ClCompile Include="..\tjs2\tjsArray.cpp" />
+    <ClCompile Include="..\tjs2\tjsBinarySerializer.cpp" />
+    <ClCompile Include="..\tjs2\tjsByteCodeLoader.cpp" />
+    <ClCompile Include="..\tjs2\tjsCompileControl.cpp" />
+    <ClCompile Include="..\tjs2\tjsConfig.cpp" />
+    <ClCompile Include="..\tjs2\tjsConstArrayData.cpp" />
+    <ClCompile Include="..\tjs2\tjsDate.cpp" />
+    <ClCompile Include="..\tjs2\tjsdate.tab.cpp" />
+    <ClCompile Include="..\tjs2\tjsDateParser.cpp" />
+    <ClCompile Include="..\tjs2\tjsDebug.cpp" />
+    <ClCompile Include="..\tjs2\tjsDictionary.cpp" />
+    <ClCompile Include="..\tjs2\tjsDisassemble.cpp" />
+    <ClCompile Include="..\tjs2\tjsError.cpp" />
+    <ClCompile Include="..\tjs2\tjsException.cpp" />
+    <ClCompile Include="..\tjs2\tjsGlobalStringMap.cpp" />
+    <ClCompile Include="..\tjs2\tjsInterCodeExec.cpp" />
+    <ClCompile Include="..\tjs2\tjsInterCodeGen.cpp" />
+    <ClCompile Include="..\tjs2\tjsInterface.cpp" />
+    <ClCompile Include="..\tjs2\tjsLex.cpp" />
+    <ClCompile Include="..\tjs2\tjsMath.cpp" />
+    <ClCompile Include="..\tjs2\tjsMessage.cpp" />
+    <ClCompile Include="..\tjs2\tjsMT19937ar-cok.cpp" />
+    <ClCompile Include="..\tjs2\tjsNamespace.cpp" />
+    <ClCompile Include="..\tjs2\tjsNative.cpp" />
+    <ClCompile Include="..\tjs2\tjsObject.cpp" />
+    <ClCompile Include="..\tjs2\tjspp.tab.cpp" />
+    <ClCompile Include="..\tjs2\tjsRandomGenerator.cpp" />
+    <ClCompile Include="..\tjs2\tjsRegExp.cpp" />
+    <ClCompile Include="..\tjs2\tjsScriptBlock.cpp" />
+    <ClCompile Include="..\tjs2\tjsScriptCache.cpp" />
+    <ClCompile Include="..\tjs2\tjsString.cpp" />
+    <ClCompile Include="..\tjs2\tjsUtils.cpp" />
+    <ClCompile Include="..\tjs2\tjsVariant.cpp" />
+    <ClCompile Include="..\tjs2\tjsVariantString.cpp" />
+    <ClCompile Include="..\utils\ClipboardIntf.cpp" />
+    <ClCompile Include="..\utils\DebugIntf.cpp" />
+    <ClCompile Include="..\utils\KAGParser.cpp" />
+    <ClCompile Include="..\utils\md5.c" />
+    <ClCompile Include="..\utils\Random.cpp" />
+    <ClCompile Include="..\utils\ThreadIntf.cpp" />
+    <ClCompile Include="..\utils\TimerIntf.cpp" />
+    <ClCompile Include="..\utils\win32\ClipboardImpl.cpp" />
+    <ClCompile Include="..\utils\win32\DebugImpl.cpp" />
+    <ClCompile Include="..\utils\win32\ThreadImpl.cpp" />
+    <ClCompile Include="..\utils\win32\TickCount.cpp" />
+    <ClCompile Include="..\utils\win32\TimerImpl.cpp" />
+    <ClCompile Include="..\visual\ComplexRect.cpp" />
+    <ClCompile Include="..\visual\GraphicsLoaderIntf.cpp" />
+    <ClCompile Include="..\visual\IA32\tvpgl_ia32_intf.c" />
+    <ClCompile Include="..\visual\LayerBitmapIntf.cpp" />
+    <ClCompile Include="..\visual\LayerIntf.cpp" />
+    <ClCompile Include="..\visual\LayerManager.cpp" />
+    <ClCompile Include="..\visual\LoadJPEG.cpp" />
+    <ClCompile Include="..\visual\LoadPNG.cpp" />
+    <ClCompile Include="..\visual\LoadTLG.cpp" />
+    <ClCompile Include="..\visual\Resampler.cpp" />
+    <ClCompile Include="..\visual\TransIntf.cpp" />
+    <ClCompile Include="..\visual\tvpgl.c" />
+    <ClCompile Include="..\visual\VideoOvlIntf.cpp" />
+    <ClCompile Include="..\visual\win32\DInputMgn.cpp" />
+    <ClCompile Include="..\visual\win32\DrawDevice.cpp" />
+    <ClCompile Include="..\visual\win32\GraphicsLoaderImpl.cpp" />
+    <ClCompile Include="..\visual\win32\LayerBitmapImpl.cpp" />
+    <ClCompile Include="..\visual\win32\LayerImpl.cpp" />
+    <ClCompile Include="..\visual\win32\PassThroughDrawDevice.cpp" />
+    <ClCompile Include="..\visual\win32\TransImpl.cpp" />
+    <ClCompile Include="..\visual\win32\VideoOvlImpl.cpp" />
+    <ClCompile Include="..\visual\win32\WindowImpl.cpp" />
+    <ClCompile Include="..\visual\WindowIntf.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="tvpwin32.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="tvpwin32.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="small.ico" />
+    <Image Include="tvpwin32.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\movetab.cur" />
+    <None Include="res\nodrop.cur" />
+    <None Include="res\nomovetab.cur" />
+    <None Include="res\splith.cur" />
+    <None Include="res\splitv.cur" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

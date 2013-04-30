@@ -20,14 +20,14 @@
 class tTVPSusiePlugin
 {
 protected:
-	int PASCAL (*GetPluginInfo)(int infono, LPSTR buf,int buflen);
-	int PASCAL (*IsSupported)(LPSTR filename, DWORD dw);
-	int PASCAL (*GetPicture)(LPSTR buf, long len, unsigned int flag,
+	int (PASCAL * GetPluginInfo)(int infono, LPSTR buf,int buflen);
+	int (PASCAL * IsSupported)(LPSTR filename, DWORD dw);
+	int (PASCAL * GetPicture)(LPSTR buf, long len, unsigned int flag,
 			  HANDLE *pHBInfo, HANDLE *pHBm,
 			  FARPROC lpPrgressCallback, long lData);
-	int PASCAL (*GetArchiveInfo)(LPSTR buf,long len,
+	int (PASCAL * GetArchiveInfo)(LPSTR buf,long len,
 			unsigned int flag, HLOCAL *lphInf);
-	int PASCAL (*GetFile)(LPSTR src,long len, LPSTR dest,unsigned int flag,
+	int (PASCAL * GetFile)(LPSTR src,long len, LPSTR dest,unsigned int flag,
 				FARPROC prgressCallback, long lData);
 
 	HINSTANCE ModuleInstance;

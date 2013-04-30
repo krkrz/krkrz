@@ -21,6 +21,8 @@
 #include <mmsystem.h>
 #include <ddraw.h>
 
+#include "Application.h"
+
 
 //---------------------------------------------------------------------------
 // TVPInvokeEvents
@@ -105,13 +107,13 @@ bool TVPGetBreathing()
 //---------------------------------------------------------------------------
 void TVPSetSystemEventDisabledState(bool en)
 {
-	TVPMainForm->EventButton->Down = !en;
+	TVPMainForm->SetEventButtonDown( !en );
 	if(!en) TVPDeliverAllEvents();
 }
 //---------------------------------------------------------------------------
 bool TVPGetSystemEventDisabledState()
 {
-	return !TVPMainForm->EventButton->Down;
+	return !TVPMainForm->GetEventButtonDown();
 }
 //---------------------------------------------------------------------------
 
@@ -139,10 +141,12 @@ public:
 protected:
 	void Execute();
 
-	void __fastcall UtilWndProc(Messages::TMessage &Msg)
+	//void __fastcall UtilWndProc(Messages::TMessage &Msg)
+	LRESULT CALLBACK UtilWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
-		Msg.Result =  DefWindowProc(UtilWindow, Msg.Msg, Msg.WParam, Msg.LParam);
-		return;
+		//Msg.Result =  DefWindowProc(UtilWindow, Msg.Msg, Msg.WParam, Msg.LParam);
+		//return;
+		return DefWindowProc( UtilWindow, message, wParam, lParam);
 	}
 
 public:
@@ -161,7 +165,8 @@ tTVPContinuousHandlerCallLimitThread::tTVPContinuousHandlerCallLimitThread()
 	NextEventTick = 0;
 	Interval = (1<<TVP_SUBMILLI_FRAC_BITS)*1000/60; // default 60Hz
 	Enabled = false;
-	UtilWindow = AllocateHWnd(UtilWndProc);
+#pragma message( __LOC__ "TODO メッセージハンドラをなんとかする" )
+//	UtilWindow = AllocateHWnd(UtilWndProc);
 	Resume();
 }
 //---------------------------------------------------------------------------
@@ -174,7 +179,8 @@ tTVPContinuousHandlerCallLimitThread::~tTVPContinuousHandlerCallLimitThread()
 	Resume();
 	Event.Set();
 	WaitFor();
-	DeallocateHWnd(UtilWindow);
+#pragma message( __LOC__ "TODO メッセージハンドラをなんとかする" )
+	//DeallocateHWnd(UtilWindow);
 }
 //---------------------------------------------------------------------------
 
@@ -369,7 +375,8 @@ public:
 protected:
 	void Execute();
 
-	void __fastcall UtilWndProc(Messages::TMessage &Msg);
+	//void __fastcall UtilWndProc(Messages::TMessage &Msg);
+	LRESULT CALLBACK UtilWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 public:
 	void MeasureVSyncInterval(); // VSyncInterval を計測する
@@ -385,7 +392,8 @@ tTVPVSyncTimingThread::tTVPVSyncTimingThread()
 	LastVBlankTick = 0;
 	VSyncInterval = 16; // 初期値。
 	Enabled = false;
-	UtilWindow = AllocateHWnd(UtilWndProc);
+#pragma message( __LOC__ "TODO メッセージハンドラをなんとかする" )
+//	UtilWindow = AllocateHWnd(&tTVPVSyncTimingThread::UtilWndProc);
 	MeasureVSyncInterval();
 	Resume();
 }
@@ -399,7 +407,8 @@ tTVPVSyncTimingThread::~tTVPVSyncTimingThread()
 	Resume();
 	Event.Set();
 	WaitFor();
-	DeallocateHWnd(UtilWindow);
+#pragma message( __LOC__ "TODO メッセージハンドラをなんとかする" )
+	//DeallocateHWnd(UtilWindow);
 }
 //---------------------------------------------------------------------------
 
@@ -450,12 +459,13 @@ void tTVPVSyncTimingThread::Execute()
 
 
 //---------------------------------------------------------------------------
-void __fastcall tTVPVSyncTimingThread::UtilWndProc(Messages::TMessage &Msg)
+//void __fastcall tTVPVSyncTimingThread::UtilWndProc(Messages::TMessage &Msg)
+LRESULT CALLBACK tTVPVSyncTimingThread::UtilWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	if(Msg.Msg != WM_APP+2)
+	if(message != WM_APP+2)
 	{
-		Msg.Result =  DefWindowProc(UtilWindow, Msg.Msg, Msg.WParam, Msg.LParam);
-		return;
+		return DefWindowProc(UtilWindow, message, wParam, lParam);
+		//return;
 	}
 
 	// tTVPVSyncTimingThread から投げられたメッセージ
@@ -560,6 +570,7 @@ if(timeGetTime() > last_report_tick + 5000)
 	TVPAddLog(TJS_W("VSync wait time : ") + ttstr((int)(vblank_wait_end - vblank_wait_start)));
 }
 */
+	return 0;
 }
 //---------------------------------------------------------------------------
 

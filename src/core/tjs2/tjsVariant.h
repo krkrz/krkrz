@@ -897,11 +897,13 @@ public:
 		switch(vt)
 		{
 		case tvtVoid:		return false;
-		case tvtObject:		return (bool)Object.Object;
-		case tvtString:		return (bool)AsInteger();
-		case tvtOctet:		return (bool)Octet;
-		case tvtInteger:	return (bool)Integer;
-		case tvtReal:		TJSSetFPUE(); return (bool)Real;
+		//case tvtObject:		return (bool)Object.Object;
+		case tvtObject:		return Object.Object != NULL;
+		//case tvtString:		return (bool)AsInteger();
+		case tvtString:		return AsInteger() != 0;
+		case tvtOctet:		return 0!=Octet;
+		case tvtInteger:	return 0!=Integer;
+		case tvtReal:		TJSSetFPUE(); return 0!=Real;
 		}
 		return false;
 	}

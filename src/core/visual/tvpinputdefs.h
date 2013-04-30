@@ -21,7 +21,9 @@ enum tTVPMouseButton
 {
 	mbLeft,
 	mbRight,
-	mbMiddle
+	mbMiddle,
+	mbX1,
+	mbX2
 };
 
 

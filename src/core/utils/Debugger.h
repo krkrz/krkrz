@@ -15,6 +15,7 @@
 
 #include <map>
 #include <string>
+#include <assert.h>
 
 enum tTJSDBGHOOKType {
 	DBGHOOK_PREV_EXE_LINE,	//!< ƒ‰ƒCƒ“ŽÀsŽž
