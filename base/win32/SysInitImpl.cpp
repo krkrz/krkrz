@@ -10,8 +10,8 @@
 //---------------------------------------------------------------------------
 #include "tjsCommHead.h"
 
-#include <dir.h>
-#include <FileCtrl.hpp>
+//#include <dir.h>
+#include "FileCtrl.h"
 #include <delayimp.h>
 #include <mmsystem.h>
 #include <objbase.h>
@@ -29,7 +29,7 @@
 #include "DetectCPU.h"
 #include "OptionsDesc.h"
 #include "XP3Archive.h"
-#include "ConfSettingsUnit.h"
+//#include "ConfSettingsUnit.h"
 #include "ScriptMgnIntf.h"
 #include "XP3Archive.h"
 #include "VersionFormUnit.h"
@@ -37,14 +37,19 @@
 
 #include "tvpgl_ia32_intf.h"
 
+#include "Application.h"
+#include "Exception.h"
+#include "ConfMainFrameUnit.h"
+#include "FileStream.h"
+
 #define TVP_NEED_UI_VERSION (((0x0001)<<16)+ 4) // needed development UI DLL version
 
 
 //---------------------------------------------------------------------------
 // global data
 //---------------------------------------------------------------------------
-AnsiString TVPNativeProjectDir;
-AnsiString TVPNativeDataPath;
+std::string TVPNativeProjectDir;
+std::string TVPNativeDataPath;
 bool TVPProjectDirSelected = false;
 bool TVPSystemIsBasedOnNT = false; // is system NT based ?
 //---------------------------------------------------------------------------
@@ -100,6 +105,7 @@ note:
 	command line or embeded options area.
 */
 //---------------------------------------------------------------------------
+#if 0
 static HMODULE _inmm = NULL;
 static FARPROC WINAPI DllLoadHook(dliNotification dliNotify,  DelayLoadInfo * pdli)
 {
@@ -142,7 +148,7 @@ static void RegisterDllLoadHook(void)
 	if(flag) __pfnDliNotifyHook = DllLoadHook;
 }
 //---------------------------------------------------------------------------
-
+#endif
 
 
 
@@ -784,10 +790,12 @@ void TVPInitializeBaseSystems()
 
 	// set default current directory
 	{
-		char drive[MAXDRIVE];
-		char dir[MAXDIR];
-		fnsplit(_argv[0], drive, dir, NULL, NULL);
-		ttstr curdir(ttstr(drive)  + ttstr(dir));
+		//char drive[MAXDRIVE];
+		//char dir[MAXDIR];
+		//fnsplit(_argv[0], drive, dir, NULL, NULL);
+		//ttstr curdir(ttstr(drive)  + ttstr(dir));
+		std::string path = ( std::string(_argv[0]) );
+		ttstr curdir(path);
 		if(curdir.GetLastChar() != TJS_W('\\')) curdir += TJS_W('\\');
 		TVPSetCurrentDirectory(curdir);
 	}
@@ -813,7 +821,7 @@ static tjs_uint TVPTotalPhysMemory = 0;
 static void TVPInitProgramArgumentsAndDataPath(bool stop_after_datapath_got);
 void TVPBeforeSystemInit()
 {
-	RegisterDllLoadHook();
+	//RegisterDllLoadHook();
 		// register DLL delayed import hook to support _inmm.dll
 
 	TVPInitProgramArgumentsAndDataPath(false); // ensure command line
@@ -823,10 +831,10 @@ void TVPBeforeSystemInit()
 		// register hook function for hardware exceptions
 #endif
 
-	Application->HintHidePause = 24*60*60*1000;
+	Application->SetHintHidePause( 24*60*60*1000 );
 		// not to hide tool tip hint immediately
-	Application->ShowHint = false;
-	Application->ShowHint = true;
+	Application->SetShowHint( false );
+	Application->SetShowHint( true );
 		// to ensure assigning new HintWindow Class defined in HintWindow.cpp 
 
 
@@ -1022,7 +1030,7 @@ void TVPBeforeSystemInit()
 		HMODULE krdevui = LoadLibrary("krdevui.dll");
 		if(!krdevui)
 		{
-			AnsiString toolspath = (IncludeTrailingBackslash(
+			std::string toolspath = (IncludeTrailingBackslash(
 					ExtractFilePath(ParamStr(0))) + "tools\\krdevui.dll");
 			krdevui = LoadLibrary(toolspath.c_str());
 		}
@@ -1031,11 +1039,11 @@ void TVPBeforeSystemInit()
 		{
 			// cannot locate the dll
 			throw Exception(
-				ttstr(TVPCannnotLocateUIDLLForFolderSelection).AsAnsiString());
+				ttstr(TVPCannnotLocateUIDLLForFolderSelection).AsStdString());
 		}
 
-		typedef int PASCAL (*UIShowFolderSelectorForm_t)(void *reserved, char *buf);
-		typedef void PASCAL (*UIGetVersion_t)(DWORD *hi, DWORD *low);
+		typedef int (PASCAL *UIShowFolderSelectorForm_t)(void *reserved, char *buf);
+		typedef void (PASCAL *UIGetVersion_t)(DWORD *hi, DWORD *low);
 
 		UIShowFolderSelectorForm_t	UIShowFolderSelectorForm;
 		UIGetVersion_t				UIGetVersion;
@@ -1048,7 +1056,7 @@ void TVPBeforeSystemInit()
 		if(!UIShowFolderSelectorForm || !UIGetVersion)
 		{
 			FreeLibrary(krdevui);
-			throw Exception(ttstr(TVPInvalidUIDLL).AsAnsiString());
+			throw Exception(ttstr(TVPInvalidUIDLL).AsStdString());
 		}
 
 		DWORD h, l;
@@ -1056,11 +1064,11 @@ void TVPBeforeSystemInit()
 		if(h != TVP_NEED_UI_VERSION)
 		{
 			FreeLibrary(krdevui);
-			throw Exception(ttstr(TVPInvalidUIDLL).AsAnsiString());
+			throw Exception(ttstr(TVPInvalidUIDLL).AsStdString());
 		}
 
 
-		int result = UIShowFolderSelectorForm(Application->Handle, buf);
+		int result = UIShowFolderSelectorForm(Application->GetHandle(), buf);
 
 //		FreeLibrary(krdevui);
 		// FIXME: the library should be freed as soon as finishing to use it.
@@ -1086,13 +1094,13 @@ void TVPBeforeSystemInit()
 	// check project dir and store some environmental variables
 	if(TVPProjectDirSelected)
 	{
-		Application->ShowMainForm=false;
+		Application->SetShowMainForm( false );
 	}
 
 	tjs_int buflen = strlen(buf);
 	if(buflen >= 1)
 	{
-		if(buf[buflen-1] != '\\') buf[buflen] = TVPArchiveDelimiter, buf[buflen+1] = 0;
+		if(buf[buflen-1] != '\\') buf[buflen] = static_cast<char>(TVPArchiveDelimiter), buf[buflen+1] = 0; // TODO ここのキャストはあまり好ましくないな
 	}
 
 	TVPProjectDir = TVPNormalizeStorageName(buf);
@@ -1225,7 +1233,7 @@ void TVPAfterSystemInit()
 	TVPGL_IA32_Init();
 
 	// load HBeam cursor
-	Screen->Cursors[1] = LoadCursor(HInstance, "HBEAM");
+	// Screen->Cursors[1] = LoadCursor(GetHInstance(), "HBEAM");
 
 	// timer precision
 	UINT prectick = 1;
@@ -1300,12 +1308,12 @@ void TVPTerminateAsync(int code)
 
 	// posting dummy message will prevent "missing WM_QUIT bug" in DirectDraw framework.
 	if(TVPMainForm)
-		::PostMessage(TVPMainForm->Handle, WM_USER+0x31/*dummy msg*/, 0, 0);
+		::PostMessage(TVPMainForm->GetHandle(), WM_USER+0x31/*dummy msg*/, 0, 0);
 
 	Application->Terminate();
 
 	if(TVPMainForm)
-		::PostMessage(TVPMainForm->Handle, WM_USER+0x31/*dummy msg*/, 0, 0);
+		::PostMessage(TVPMainForm->GetHandle(), WM_USER+0x31/*dummy msg*/, 0, 0);
 }
 //---------------------------------------------------------------------------
 void TVPTerminateSync(int code)
@@ -1318,7 +1326,7 @@ void TVPTerminateSync(int code)
 void TVPMainWindowClosed()
 {
 	// called from WindowIntf.cpp, caused by closing all window.
-	if(TVPMainForm && !TVPMainForm->Visible && TVPTerminateOnWindowClose) TVPTerminateAsync();
+	if(TVPMainForm && !TVPMainForm->GetVisible() && TVPTerminateOnWindowClose) TVPTerminateAsync();
 }
 //---------------------------------------------------------------------------
 
@@ -1331,23 +1339,24 @@ void TVPMainWindowClosed()
 //---------------------------------------------------------------------------
 // GetCommandLine
 //---------------------------------------------------------------------------
+#if 0 // 実行ファイル内のオプションは対応しない
 #define TVP_FIND_OPTION_MIN_OFS 512*1024  // min 512KB
 #define TVP_FIND_OPTION_MAX_OFS 5*1024*1024 // max 5MB
 //---------------------------------------------------------------------------
-static TStringList * TVPGetEmbeddedOptions()
+static std::vector<std::string> * TVPGetEmbeddedOptions()
 {
-	AnsiString filename = ParamStr(0);
-	TStream *stream = new TFileStream(filename, fmOpenRead|fmShareDenyWrite);
+	std::string filename = ParamStr(0);
+	//TStream *stream = new TFileStream(filename, fmOpenRead|fmShareDenyWrite);
 
 	char *buf = NULL;
-	TStringList *ret = NULL;
+	std::vector<std::string> *ret = NULL;
 
 	const char * errmsg = NULL;
 
 	tjs_uint offset;
 	try
 	{
-		ret = new TStringList();
+		ret = new std::vector<std::string>();
 		unsigned int size = stream->Size;
 		if(size < TVP_FIND_OPTION_MIN_OFS)
 			errmsg = "too small executable size."; // too small
@@ -1400,24 +1409,25 @@ static TStringList * TVPGetEmbeddedOptions()
 		TVPAddImportantLog("(info) Loading executable embedded options succeeded.");
 	return ret;
 }
+#endif
 //---------------------------------------------------------------------------
-static TStringList * TVPGetConfigFileOptions(AnsiString filename)
+static std::vector<std::string> * TVPGetConfigFileOptions(const std::string& filename)
 {
 	// load .cf file
-	AnsiString errmsg;
+	std::string errmsg;
 	if(!FileExists(filename))
 		errmsg = "file not found.";
 
-	TStringList * ret = new TStringList();
+	std::vector<std::string> * ret = NULL; // new std::vector<std::string>();
 	if(errmsg == "")
 	{
 		try
 		{
-			ret->LoadFromFile(filename);
+			ret = LoadLinesFromFile(filename);
 		}
 		catch(Exception & e)
 		{
-			errmsg = e.Message;
+			errmsg = e.what();
 		}
 		catch(...)
 		{
@@ -1530,14 +1540,14 @@ static void PushAllCommandlineArguments()
 	}
 }
 //---------------------------------------------------------------------------
-static void PushConfigFileOptions(TStringList * options)
+static void PushConfigFileOptions(const std::vector<std::string> * options)
 {
 	if(!options) return;
-	for(int j = 0; j < options->Count; j++)
+	for(unsigned int j = 0; j < options->size(); j++)
 	{
-		if(options->Strings[j].c_str()[0] != ';') // unless comment
+		if( (*options)[j].c_str()[0] != ';') // unless comment
 			TVPProgramArguments.push_back(
-				TVPParseCommandLineOne(TJS_W("-") + ttstr(options->Strings[j])));
+				TVPParseCommandLineOne(TJS_W("-") + ttstr((*options)[j])));
 	}
 }
 //---------------------------------------------------------------------------
@@ -1550,12 +1560,12 @@ static void TVPInitProgramArgumentsAndDataPath(bool stop_after_datapath_got)
 
 		// find options from self executable image
 		const int num_option_layers = 3;
-		TStringList * options[num_option_layers];
+		std::vector<std::string> * options[num_option_layers];
 		for(int i = 0; i < num_option_layers; i++) options[i] = NULL;
 		try
 		{
 			// read embedded options and default configuration file
-			options[0] = TVPGetEmbeddedOptions();
+			options[0] = NULL; // TVPGetEmbeddedOptions();
 			options[1] = TVPGetConfigFileOptions(TConfMainFrame::GetConfigFileName(ParamStr(0)));
 
 			// at this point, we need to push all exsting known options
@@ -1566,9 +1576,9 @@ static void TVPInitProgramArgumentsAndDataPath(bool stop_after_datapath_got)
 
 			// read datapath
 			tTJSVariant val;
-			AnsiString config_datapath;
+			std::string config_datapath;
 			if(TVPGetCommandLine(TJS_W("-datapath"), &val))
-				config_datapath = ((ttstr)val).AsAnsiString();
+				config_datapath = ((ttstr)val).AsStdString();
 			TVPNativeDataPath = TConfMainFrame::GetDataPathDirectory(config_datapath, ParamStr(0));
 
 			if(stop_after_datapath_got) return;
@@ -1584,12 +1594,13 @@ static void TVPInitProgramArgumentsAndDataPath(bool stop_after_datapath_got)
 			PushConfigFileOptions(options[2]); // has more priority
 			PushConfigFileOptions(options[1]); // has more priority
 			PushConfigFileOptions(options[0]); // has lesser priority
-		}
-		__finally
-		{
+		} catch(...) {
 			for(int i = 0; i < num_option_layers; i++)
 				if(options[i]) delete options[i];
+			throw;
 		}
+		for(int i = 0; i < num_option_layers; i++)
+			if(options[i]) delete options[i];
 
 
 		// set data path
@@ -1716,8 +1727,8 @@ bool TVPCheckCmdDescription(void)
 	{
 		if(!strcmp(_argv[i], "-@cmddesc")) // this does not refer TVPGetCommandLine
 		{
-			AnsiString fn = _argv[i+2];
-			TStream * stream = new TFileStream(fn, fmCreate|fmShareDenyWrite);
+			std::string fn = _argv[i+2];
+			TFileStream* stream = new TFileStream(fn, fmCreate|fmShareDenyWrite);
 			try
 			{
 				ttstr str = TVPGetCommandDesc();
@@ -1755,7 +1766,7 @@ bool TVPCheckAbout(void)
 	{
 		Sleep(600);
 		tjs_char msg[80];
-		TJS_sprintf(msg, TJS_W("(info) CPU clock (roughly) : %dMHz"), (int)TVPCPUClock);
+		TJS_snprintf(msg, sizeof(msg)/sizeof(tjs_char), TJS_W("(info) CPU clock (roughly) : %dMHz"), (int)TVPCPUClock);
 		TVPAddImportantLog(msg);
 
 		TVPShowVersionForm();
@@ -1772,7 +1783,7 @@ bool TVPCheckAbout(void)
 //---------------------------------------------------------------------------
 // TVPExecuteAsync
 //---------------------------------------------------------------------------
-static void TVPExecuteAsync(AnsiString progname)
+static void TVPExecuteAsync( const std::string& progname)
 {
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
@@ -1784,7 +1795,7 @@ static void TVPExecuteAsync(AnsiString progname)
 	BOOL ret =
 		CreateProcess(
 			NULL,
-			progname.c_str(),
+			const_cast<LPSTR>(progname.c_str()),
 			NULL,
 			NULL,
 			FALSE,
@@ -1801,7 +1812,7 @@ static void TVPExecuteAsync(AnsiString progname)
 		return;
 	}
 
-	throw Exception(ttstr(TVPExecutionFail).AsAnsiString());
+	throw Exception(ttstr(TVPExecutionFail).AsStdString());
 }
 //---------------------------------------------------------------------------
 
@@ -1812,7 +1823,7 @@ static void TVPExecuteAsync(AnsiString progname)
 //---------------------------------------------------------------------------
 // TVPWaitWritePermit
 //---------------------------------------------------------------------------
-static bool TVPWaitWritePermit(AnsiString fn)
+static bool TVPWaitWritePermit(const std::string& fn)
 {
 	tjs_int timeout = 10; // 10/1 = 5 seconds
 	while(true)
@@ -1833,22 +1844,21 @@ static bool TVPWaitWritePermit(AnsiString fn)
 //---------------------------------------------------------------------------
 
 
-
+#if 0
 //---------------------------------------------------------------------------
 // TVPShowUserConfig
 //---------------------------------------------------------------------------
-static void TVPShowUserConfig(AnsiString orgexe)
+static void TVPShowUserConfig(std::string orgexe)
 {
 	TVPEnsureDataPathDirectory();
 
-	Application->Title = ChangeFileExt(ExtractFileName(orgexe), "");
+	Application->SetTitle( ChangeFileExt(ExtractFileName(orgexe), "") );
 	TConfSettingsForm *form = new TConfSettingsForm(Application, true);
 	form->InitializeConfig(orgexe);
 	form->ShowModal();
 	delete form;
 }
 //---------------------------------------------------------------------------
-
 
 
 //---------------------------------------------------------------------------
@@ -1875,6 +1885,7 @@ bool TVPExecuteUserConfig()
 	return true;
 }
 //---------------------------------------------------------------------------
+#endif
 
 
 

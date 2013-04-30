@@ -91,6 +91,7 @@ public:
 	tTJSString(const AnsiString &str) { Ptr = TJSAllocVariantString(str.c_str()); }
 	tTJSString(const WideString &str) { Ptr = TJSAllocVariantString(str.c_bstr()); }
 #endif
+	tTJSString(const std::string &str) { Ptr = TJSAllocVariantString(str.c_str()); }
 
 	//--------------------------------------------------------- destructor --
 	TJS_METHOD_DEF(TJS_METHOD_RET_EMPTY, ~tTJSString, ()) { if(Ptr) Ptr->Release(); }

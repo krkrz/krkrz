@@ -546,7 +546,7 @@ tjs_error TJS_INTF_METHOD tTVPCrossFadeTransHandler::
 	}
 
 	// compute phase ( 0 thru 255 )
-	Phase = (tick - StartTick)  * PhaseMax / Time;
+	Phase = static_cast<tjs_int>( (tick - StartTick)  * PhaseMax / Time );
 	if(Phase >= PhaseMax) Phase = PhaseMax;
 
 #ifdef TVP_TRANS_SHOW_FPS
@@ -788,7 +788,7 @@ public:
 		try
 		{
 			ret =  (iTVPBaseTransHandler *)
-				(new tTVPUniversalTransHandler(options, layertype, time, vague,
+				(new tTVPUniversalTransHandler(options, layertype, time, static_cast<tjs_int>(vague),
 					scpro));
 		}
 		catch(...)

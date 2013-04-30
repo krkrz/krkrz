@@ -2621,7 +2621,7 @@ void tTJSInterCodeContext::ProcessStringFunction(const tjs_char *member,
 			if(pstr) pstr->Release();
 			return;
 		}
-		tjs_char *p;
+		const tjs_char *p;
 		p = wcsstr(s + start, (const tjs_char*)*pstr);
 		if(!p)
 		{
@@ -2831,7 +2831,7 @@ void tTJSInterCodeContext::ProcessStringFunction(const tjs_char *member,
 			return;
 		}
 
-		const destLength = s_len * count;
+		const int destLength = s_len * count;
 		tTJSString new_str = tTJSString(tTJSStringBufferLength(destLength));
 		tjs_char * dest = new_str.Independ();
 		while(count--)
@@ -2937,7 +2937,7 @@ void tTJSInterCodeContext::CharacterCodeOf(tTJSVariant &val)
 void tTJSInterCodeContext::CharacterCodeFrom(tTJSVariant &val)
 {
 	tjs_char ch[2];
-	ch[0] = val.AsInteger();
+	ch[0] = static_cast<tjs_char>(val.AsInteger());
 	ch[1] = 0;
 	val = ch;
 }
@@ -3354,7 +3354,7 @@ tjs_error TJS_INTF_METHOD
 		}
 	}
 
-	tjs_error hr;
+	//tjs_error hr;
 
 	if(membername != NULL && ContextType == ctClass && SuperClassGetter)
 	{

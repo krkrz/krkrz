@@ -20,6 +20,7 @@
 #include <map>
 #include <list>
 #include "Debugger.h"
+#include "Application.h"
 extern HWND TVPGetApplicationWindowHandle();
 #endif // ENABLE_DEBUGGER
 
@@ -250,7 +251,7 @@ public:
 			// warn running code on deleting-in-progress object
 			ttstr warn(TJSWarning);
 			tjs_char tmp[64];
-			TJS_sprintf(tmp, TJS_W("0x%p"), object);
+			TJS_snprintf(tmp, sizeof(tmp)/sizeof(tjs_char), TJS_W("0x%p"), object);
 
 			ttstr info(TJSWarnRunningCodeOnDeletingObject);
 			info.Replace(TJS_W("%1"), tmp);
@@ -275,7 +276,7 @@ public:
 		for(i = Hash.GetFirst(); !i.IsNull(); i++)
 		{
 			tjs_char addr[65];
-			TJS_sprintf(addr, TJS_W("0x%p"), i.GetKey());
+			TJS_snprintf(addr, sizeof(addr)/sizeof(tjs_char), TJS_W("0x%p"), i.GetKey());
 			ttstr info = (const tjs_char *)TJSObjectWasNotFreed;
 			info.Replace(TJS_W("%1"), addr);
 			info.Replace(TJS_W("%2"), i.GetValue().Type);
@@ -304,7 +305,7 @@ public:
 					(i == items.end() || history != i->History || type != i->Type))
 				{
 					tjs_char tmp[64];
-					TJS_sprintf(tmp, TJS_W("%6d"), (int)count);
+					TJS_snprintf(tmp, sizeof(tmp)/sizeof(tjs_char), TJS_W("%6d"), (int)count);
 					ttstr info = (const tjs_char *)TJSObjectCountingMessageGroupByObjectTypeAndHistory;
 					info.Replace(TJS_W("%1"), tmp);
 					info.Replace(TJS_W("%2"), type);
@@ -339,7 +340,7 @@ public:
 					(i == items.end() || type != i->Type))
 				{
 					tjs_char tmp[64];
-					TJS_sprintf(tmp, TJS_W("%6d"), (int)count);
+					TJS_snprintf(tmp, sizeof(tmp)/sizeof(tjs_char), TJS_W("%6d"), (int)count);
 					ttstr info = (const tjs_char *)TJSObjectCountingMessageTJSGroupByObjectType;
 					info.Replace(TJS_W("%1"), tmp);
 					info.Replace(TJS_W("%2"), type);
@@ -950,7 +951,7 @@ private:
 	}
 
 	HWND GetSelfWindowHandle() {
-		return Application->MainForm->Handle;
+		return Application->GetHandle();
 	}
 	//! ƒuƒŒ[ƒN”­¶
 	void BreakOccur( tTJSInterCodeContext* ctx ) {
@@ -1127,7 +1128,7 @@ public:
 		return index;
 	}
 	const std::wstring* GetName( int id ) const {
-		if( id < Names.size() ) {
+		if( id < static_cast<int>(Names.size()) ) {
 			return Names[id];
 		}
 		return NULL;

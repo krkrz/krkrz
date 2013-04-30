@@ -19,7 +19,7 @@
 #include "SysInitIntf.h"
 #include "DebugIntf.h"
 
-
+#include "Screen.h"
 
 
 //---------------------------------------------------------------------------
@@ -39,13 +39,13 @@ static UINT APIENTRY TVPOFNHookProc(HWND hdlg, UINT uiMsg, WPARAM wParam,
 		int left, top;
 		HWND parent = GetParent(hdlg);
 		if((TVPLastOFNLeft == -30000 && TVPLastOFNTop == -30000) ||
-			TVPLastScreenWidth != Screen->Width || TVPLastScreenHeight != Screen->Height)
+			TVPLastScreenWidth != Screen->GetWidth() || TVPLastScreenHeight != Screen->GetHeight() )
 		{
 			// center the window
 			RECT rect;
 			GetWindowRect(parent, &rect);
-			left = ((Screen->Width - rect.right + rect.left) / 2);
-			top = ((Screen->Height - rect.bottom + rect.top) / 3);
+			left = ((Screen->GetWidth() - rect.right + rect.left) / 2);
+			top = ((Screen->GetHeight() - rect.bottom + rect.top) / 3);
 		}
 		else
 		{
@@ -54,8 +54,8 @@ static UINT APIENTRY TVPOFNHookProc(HWND hdlg, UINT uiMsg, WPARAM wParam,
 			top = TVPLastOFNTop;
 		}
 
-		TVPLastScreenWidth = Screen->Width;
-		TVPLastScreenHeight = Screen->Height;
+		TVPLastScreenWidth = Screen->GetWidth();
+		TVPLastScreenHeight = Screen->GetHeight();
 
 		SetWindowPos(parent, 0,
 			left,
@@ -74,13 +74,14 @@ static UINT APIENTRY TVPOFNHookProc(HWND hdlg, UINT uiMsg, WPARAM wParam,
 	return 0;
 }
 //---------------------------------------------------------------------------
-static void TVPPushFilterPair(std::vector<AnsiString> &filters, AnsiString filter)
+static void TVPPushFilterPair(std::vector<std::string> &filters, std::string filter)
 {
-	int vpos = filter.AnsiPos("|");
+	int vpos = filter.find_first_of("|");
 	if(vpos)
 	{
-		AnsiString name = filter.SubString(1, vpos - 1);
-		AnsiString wild = filter.c_str() + vpos;
+		//AnsiString name = filter.SubString(1, vpos - 1);
+		std::string name = filter.substr(0, vpos);
+		std::string wild = filter.c_str() + vpos;
 		filters.push_back(name);
 		filters.push_back(wild);
 	}
@@ -98,9 +99,9 @@ bool TVPSelectFile(iTJSDispatch2 *params)
 	tTJSVariant val;
 	char * filter = NULL;
 	char * filename = NULL;
-	AnsiString initialdir;
-	AnsiString title;
-	AnsiString defaultext;
+	std::string initialdir;
+	std::string title;
+	std::string defaultext;
 	BOOL result;
 
 	try
@@ -122,10 +123,10 @@ bool TVPSelectFile(iTJSDispatch2 *params)
 		if(TJS_SUCCEEDED(params->PropGet(TJS_MEMBERMUSTEXIST, TJS_W("filter"), 0,
 			&val, params)))
 		{
-			std::vector<AnsiString> filterlist;
+			std::vector<std::string> filterlist;
 			if(val.Type() != tvtObject)
 			{
-				TVPPushFilterPair(filterlist, ttstr(val).AsAnsiString());
+				TVPPushFilterPair(filterlist, ttstr(val).AsStdString());
 			}
 			else
 			{
@@ -143,27 +144,27 @@ bool TVPSelectFile(iTJSDispatch2 *params)
 					if(TJS_SUCCEEDED(array->PropGetByNum(TJS_MEMBERMUSTEXIST,
 						i, &tmp, array)))
 					{
-						TVPPushFilterPair(filterlist, ttstr(tmp).AsAnsiString());
+						TVPPushFilterPair(filterlist, ttstr(tmp).AsStdString());
 					}
 				}
 			}
 
 			// create filter buffer
 			tjs_int bufsize = 2;
-			for(std::vector<AnsiString>::iterator i = filterlist.begin();
+			for(std::vector<std::string>::iterator i = filterlist.begin();
 				i != filterlist.end(); i++)
 			{
-				bufsize += i->Length() + 1;
+				bufsize += i->length() + 1;
 			}
 
 			filter = new char[bufsize];
 
 			char *p = filter;
-			for(std::vector<AnsiString>::iterator i = filterlist.begin();
+			for(std::vector<std::string>::iterator i = filterlist.begin();
 				i != filterlist.end(); i++)
 			{
 				strcpy(p, i->c_str());
-				p += i->Length() + 1;
+				p += i->length() + 1;
 			}
 			*(p++) = 0;
 			*(p++) = 0;
@@ -192,7 +193,7 @@ bool TVPSelectFile(iTJSDispatch2 *params)
 			{
 				lname = TVPNormalizeStorageName(lname);
 				TVPGetLocalName(lname);
-				AnsiString name = lname.AsAnsiString();
+				std::string name = lname.AsStdString();
 				strncpy(filename, name.c_str(), MAX_PATH);
 				filename[MAX_PATH] = 0;
 			}
@@ -213,7 +214,7 @@ bool TVPSelectFile(iTJSDispatch2 *params)
 			{
 				lname = TVPNormalizeStorageName(lname);
 				TVPGetLocalName(lname);
-				initialdir = lname.AsAnsiString();
+				initialdir = lname.AsStdString();
 				ofn.lpstrInitialDir = initialdir.c_str();
 			}
 		}
@@ -222,7 +223,7 @@ bool TVPSelectFile(iTJSDispatch2 *params)
 		if(TJS_SUCCEEDED(params->PropGet(TJS_MEMBERMUSTEXIST, TJS_W("title"), 0,
 			&val, params)))
 		{
-			title = ttstr(val).AsAnsiString();
+			title = ttstr(val).AsStdString();
 			ofn.lpstrTitle = title.c_str();
 		}
 		else
@@ -249,7 +250,7 @@ bool TVPSelectFile(iTJSDispatch2 *params)
 		if(TJS_SUCCEEDED(params->PropGet(TJS_MEMBERMUSTEXIST, TJS_W("defaultExt"), 0,
 			&val, params)))
 		{
-			defaultext = ttstr(val).AsAnsiString();
+			defaultext = ttstr(val).AsStdString();
 			ofn.lpstrDefExt = defaultext.c_str();
 		}
 		else
@@ -304,7 +305,7 @@ bool TVPSelectFile(iTJSDispatch2 *params)
 	delete [] filter;
 	delete [] filename;
 
-	return (bool)result;
+	return 0!=result;
 }
 //---------------------------------------------------------------------------
 

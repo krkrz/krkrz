@@ -21,6 +21,8 @@
 #include "DInputMgn.h"
 
 #include "DebugIntf.h"
+#include "Application.h"
+#include "Screen.h"
 
 //---------------------------------------------------------------------------
 // DirectInput management
@@ -124,7 +126,7 @@ static tjs_uint32 __fastcall PadState();
 //---------------------------------------------------------------------------
 // pad virtual key code map
 //---------------------------------------------------------------------------
-const TVPPadVirtualKeyMap[TVP_NUM_PAD_KEY] = // tTVPPadKeyFlag to VK
+const int TVPPadVirtualKeyMap[TVP_NUM_PAD_KEY] = // tTVPPadKeyFlag to VK
 {
 	VK_PADLEFT,
 	VK_PADRIGHT,
@@ -276,7 +278,7 @@ IDirectInput * TVPAddRefDirectInput()
 		return NULL;
 	}
 
-	HRESULT hr = procDirectInputCreateA(HInstance, DIRECTINPUT_VERSION,
+	HRESULT hr = procDirectInputCreateA(GetHInstance(), DIRECTINPUT_VERSION,
 		&TVPDirectInput, NULL);
 	if(FAILED(hr))
 	{
@@ -714,11 +716,11 @@ bool tTVPPadDirectInputDevice::GetAsyncState(tjs_uint keycode, bool getcurrent)
 
 	if(getcurrent)
 	{
-		return GetGlobalPadState() & bit;
+		return 0!=(GetGlobalPadState() & bit);
 	}
 	else
 	{
-		bool ret = GlobalPadPushedFlag  & bit;
+		bool ret = 0!=(GlobalPadPushedFlag  & bit);
 		GlobalPadPushedFlag &= ~bit;
 		return ret;
 	}
@@ -732,16 +734,18 @@ bool tTVPPadDirectInputDevice::GetAsyncState(tjs_uint keycode, bool getcurrent)
 static void TVPUninitDirectInput()
 {
 	// release all devices
+#if 0 // TODO 
 	for(tjs_int i = 0; i < Screen->FormCount; i++)
 	{
 		TForm *tform = Screen->Forms[i];
 
-		if(AnsiString(tform->ClassName()) == "TTVPWindowForm")
+		if(std::string(tform->ClassName()) == "TTVPWindowForm")
 		{
 			TTVPWindowForm * form = (TTVPWindowForm * )tform;
 			form->FreeDirectInputDevice();
 		}
 	}
+#endif
 }
 //---------------------------------------------------------------------------
 static tTVPAtExit

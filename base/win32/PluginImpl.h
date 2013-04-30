@@ -40,36 +40,35 @@ struct iTVPFunctionExporter
 
 
 //---------------------------------------------------------------------------
-class ITSSModule;
-class IWaveUnpacker;
-class ITSSStorageProvider;
+struct ITSSModule;
+struct IWaveUnpacker;
+struct ITSSStorageProvider;
 extern "C"
 {
-	iTVPFunctionExporter * __stdcall TVPGetFunctionExporter();
+	__declspec(dllexport) iTVPFunctionExporter * __stdcall TVPGetFunctionExporter();
 
 	// V2 plug-in
-	typedef HRESULT _stdcall (*tTVPV2LinkProc)(iTVPFunctionExporter *);
-	typedef HRESULT _stdcall (*tTVPV2UnlinkProc)();
+	typedef HRESULT (_stdcall * tTVPV2LinkProc)(iTVPFunctionExporter *);
+	typedef HRESULT (_stdcall * tTVPV2UnlinkProc)();
 
 	// TSS
-	typedef HRESULT _stdcall (*tTVPGetModuleInstanceProc)(ITSSModule **out,
+	typedef HRESULT (_stdcall * tTVPGetModuleInstanceProc)(ITSSModule **out,
 		ITSSStorageProvider *provider, IStream * config, HWND mainwin);
-	typedef ULONG _stdcall (*tTVPGetModuleThreadModelProc)(void);
-	typedef HRESULT _stdcall (*tTVPShowConfigWindowProc)(HWND parentwin,
+	typedef ULONG (_stdcall * tTVPGetModuleThreadModelProc)(void);
+	typedef HRESULT (_stdcall * tTVPShowConfigWindowProc)(HWND parentwin,
 		IStream * storage );
-	typedef ULONG _stdcall (*tTVPCanUnloadNowProc)(void);
+	typedef ULONG (_stdcall * tTVPCanUnloadNowProc)(void);
 
 #ifdef TVP_SUPPORT_OLD_WAVEUNPACKER
 	// WaveUnpacker
-	typedef HRESULT _stdcall (*tTVPCreateWaveUnpackerProc)(IStream *storage,long size,
+	typedef HRESULT (_stdcall * tTVPCreateWaveUnpackerProc)(IStream *storage,long size,
 		char *name,IWaveUnpacker **out); // old WaveUnpacker stuff
 #endif
-
 }
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-class ITSSWaveDecoder;
+struct ITSSWaveDecoder;
 extern ITSSWaveDecoder * TVPSearchAvailTSSWaveDecoder(const ttstr & storage, const ttstr & extension);
 #ifdef TVP_SUPPORT_OLD_WAVEUNPACKER
 class IWaveUnpacker;

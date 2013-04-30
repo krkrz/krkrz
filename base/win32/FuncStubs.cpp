@@ -1536,11 +1536,13 @@ static IDirectSound * __stdcall TVP_Stub_c1b52e8f3578d11f369552a887e13c5b()
 {
 	return TVPGetDirectSound();
 }
+/*
 #include "MIDIImpl.h"
 static void __stdcall TVP_Stub_dcd6ba3960e3e2cf6dbe585b1f67b0ac(const tjs_uint8 * data , int len)
 {
 	return TVPMIDIOutData(data, len);
 }
+*/
 #include "GraphicsLoaderIntf.h"
 static void __stdcall TVP_Stub_5b1fa785e397e643dd09cb43c2f2f4db()
 {
@@ -3345,7 +3347,7 @@ static void * func_ptrs[] = {
 	TVP_Stub_003f9d3de568fcd71dd532f33d38839c,
 	TVP_Stub_5da29a19bbe279a89be00e16c59d7641,
 	TVP_Stub_c1b52e8f3578d11f369552a887e13c5b,
-	TVP_Stub_dcd6ba3960e3e2cf6dbe585b1f67b0ac,
+//	TVP_Stub_dcd6ba3960e3e2cf6dbe585b1f67b0ac,
 	TVP_Stub_5b1fa785e397e643dd09cb43c2f2f4db,
 	TVP_Stub_29af78765c764c566e6adc77e0ea7041,
 	TVP_Stub_9e0df54e4c24ee28d5517c1743faa3a3,

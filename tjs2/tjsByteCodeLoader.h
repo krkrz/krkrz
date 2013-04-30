@@ -18,7 +18,7 @@
 namespace TJS
 {
 /**
- * TJS2 バイトコードを読み込んで、ScriptBlock を返す
+ * TJS2 繝舌う繝医さ繝ｼ繝峨ｒ隱ｭ縺ｿ霎ｼ繧薙〒縲ヾcriptBlock 繧定ｿ斐☆
  *
  */
 class tTJSByteCodeLoader {
@@ -39,7 +39,7 @@ private:
 		}
 	};
 	/**
-	 * InterCodeObject へ置換するために一時的に覚えておくクラス
+	 * InterCodeObject 縺ｸ鄂ｮ謠帙☆繧九◆繧√↓荳譎ら噪縺ｫ隕壹∴縺ｦ縺翫￥繧ｯ繝ｩ繧ｹ
 	 */
 	struct VariantRepalace {
 		tTJSVariant* Work;
@@ -107,7 +107,7 @@ public:
 	tTJSScriptBlock* ReadByteCode( tTJS* owner, const tjs_char* name, const tjs_uint8* buf, size_t size );
 
 	/**
-	 * @param buff : 8バイト以上のサイズ
+	 * @param buff : 8繝舌う繝井ｻ･荳翫�ｮ繧ｵ繧､繧ｺ
 	 */
 	static bool IsTJS2ByteCode( const tjs_uint8* buff );
 

@@ -32,6 +32,7 @@
 
 #include "tjsCommHead.h"
 
+#define _USE_MATH_DEFINES
 #include <math.h>
 #include "PhaseVocoderDSP.h"
 #include <string.h>
@@ -39,7 +40,8 @@
 #include "tjsUtils.h"
 
 #include "tvpgl_ia32_intf.h"
-extern tjs_uint32 TVPCPUType;
+//extern tjs_uint32 TVPCPUType;
+#include "DetectCPU.h"
 
 extern "C"
 {
@@ -444,7 +446,7 @@ tRisaPhaseVocoderDSP::tStatus tRisaPhaseVocoderDSP::Process()
 			for(unsigned int i = 0; i < framesize_d2; i++)
 			{
 				long int n = static_cast<long int>(LastSynthPhase[ch][i] / (2.0*M_PI));
-				LastSynthPhase[ch][i] -= n * (2.0*M_PI);
+				LastSynthPhase[ch][i] -= static_cast<float>(n * (2.0*M_PI));
 			}
 		}
 	}

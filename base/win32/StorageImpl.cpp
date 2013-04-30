@@ -29,6 +29,9 @@
 
 #include <time.h>
 
+#include "Application.h"
+#include "StringUtil.h"
+#include "FileCtrl.h"
 
 //---------------------------------------------------------------------------
 // tTVPFileMedia
@@ -152,7 +155,7 @@ void TJS_INTF_METHOD tTVPFileMedia::GetListAt(const ttstr &_name, iTVPStorageLis
 	{
 		// perform ANSI operation
 		WIN32_FIND_DATA ffd;
-		HANDLE handle = FindFirstFile(name.AsAnsiString().c_str(), &ffd);
+		HANDLE handle = FindFirstFile(name.AsStdString().c_str(), &ffd);
 		if(handle != INVALID_HANDLE_VALUE)
 		{
 			BOOL cont;
@@ -329,7 +332,7 @@ ttstr TVPGetTemporaryName()
 	unsigned char buf[16];
 	TVPGetRandomBits128(buf);
 	tjs_char random[128];
-	TJS_sprintf(random, TJS_W("%02x%02x%02x%02x%02x%02x"),
+	TJS_snprintf(random, sizeof(random)/sizeof(tjs_char), TJS_W("%02x%02x%02x%02x%02x%02x"),
 		buf[0], buf[1], buf[2], buf[3],
 		buf[4], buf[5]);
 
@@ -351,11 +354,11 @@ bool TVPRemoveFile(const ttstr &name)
 	if(!procDeleteFileW)
 	{
 		tTJSNarrowStringHolder holder(name.c_str());
-		return DeleteFileA(holder);
+		return 0!=DeleteFileA(holder);
 	}
 	else
 	{
-		return DeleteFileW(name.c_str());
+		return 0!=DeleteFileW(name.c_str());
 	}
 }
 //---------------------------------------------------------------------------
@@ -370,11 +373,11 @@ bool TVPRemoveFolder(const ttstr &name)
 	if(!procRemoveDirectoryW)
 	{
 		tTJSNarrowStringHolder holder(name.c_str());
-		return RemoveDirectoryA(holder);
+		return 0!=RemoveDirectoryA(holder);
 	}
 	else
 	{
-		return RemoveDirectoryW(name.c_str());
+		return 0!=RemoveDirectoryW(name.c_str());
 	}
 }
 //---------------------------------------------------------------------------
@@ -427,7 +430,7 @@ bool TVPCheckExistentLocalFile(const ttstr &name)
 	if(procGetFileAttributesW)
 		attrib = procGetFileAttributesW(name.c_str());
 	else
-		attrib = GetFileAttributesA(name.AsAnsiString().c_str());
+		attrib = GetFileAttributesA(name.AsStdString().c_str());
 
 	if(attrib == 0xffffffff || (attrib & FILE_ATTRIBUTE_DIRECTORY))
 		return false; // not a file
@@ -448,7 +451,7 @@ bool TVPCheckExistentLocalFolder(const ttstr &name)
 	if(procGetFileAttributesW)
 		attrib = procGetFileAttributesW(name.c_str());
 	else
-		attrib = GetFileAttributesA(name.AsAnsiString().c_str());
+		attrib = GetFileAttributesA(name.AsStdString().c_str());
 
 	if(attrib != 0xffffffff && (attrib & FILE_ATTRIBUTE_DIRECTORY))
 		return true; // a folder
@@ -537,7 +540,7 @@ static bool _TVPCreateFolders(const ttstr &folder)
 		res = CreateDirectoryA(holder, NULL);
 	}
 
-	return res;
+	return 0!=res;
 }
 
 bool TVPCreateFolders(const ttstr &folder)
@@ -699,6 +702,7 @@ tjs_uint64 TJS_INTF_METHOD tTVPLocalFileStream::GetSize()
 
 
 
+#ifdef TJS_SUPPORT_VCL
 //---------------------------------------------------------------------------
 // TTVPStreamAdapter
 //---------------------------------------------------------------------------
@@ -736,7 +740,7 @@ int __fastcall TTVPStreamAdapter::Write(const void *Buffer,int Count)
 	return (int)Stream->Write(Buffer, Count);
 }
 //---------------------------------------------------------------------------
-
+#endif
 
 
 
@@ -1176,7 +1180,7 @@ ttstr TVPSearchCD(const ttstr & name)
 	// search CD which has specified volume label name.
 	// return drive letter ( such as 'A' or 'B' )
 	// return empty string if not found.
-	AnsiString narrow_name = name.AsAnsiString();
+	std::string narrow_name = name.AsStdString();
 
 	char dr[4];
 	for(dr[0]='A',dr[1]=':',dr[2]='\\',dr[3]=0;dr[0]<='Z';dr[0]++)
@@ -1187,7 +1191,8 @@ ttstr TVPSearchCD(const ttstr & name)
 			char fs[256];
 			DWORD mcl = 0,sfs = 0;
 			GetVolumeInformation(dr, vlabel, 255, NULL, &mcl, &sfs, fs, 255);
-			if(AnsiString(vlabel).AnsiCompareIC(narrow_name)==0)
+			if( icomp(std::string(vlabel),narrow_name) )
+			//if(std::string(vlabel).AnsiCompareIC(narrow_name)==0)
 				return ttstr((tjs_char)dr[0]);
 		}
 	}

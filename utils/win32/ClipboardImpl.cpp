@@ -12,8 +12,9 @@
 
 #include "ClipboardImpl.h"
 
-#include <Clipbrd.hpp>
-#include "TLogViewer.h"
+#include "Clipbrd.h"
+//#include "TLogViewer.h"
+#include "Application.h"
 
 //---------------------------------------------------------------------------
 // clipboard related functions
@@ -23,8 +24,8 @@ bool TVPClipboardHasFormat(tTVPClipboardFormat format)
 	switch(format)
 	{
 	case cbfText:
-		return Clipboard()->HasFormat(CF_TEXT) ||
-			Clipboard()->HasFormat(CF_UNICODETEXT); // ANSI text or UNICODE text
+		return GetClipboard()->HasFormat(CF_TEXT) ||
+			GetClipboard()->HasFormat(CF_UNICODETEXT); // ANSI text or UNICODE text
 	default:
 		return false;
 	}
@@ -38,7 +39,7 @@ void TVPClipboardSetText(const ttstr & text)
 //---------------------------------------------------------------------------
 bool TVPClipboardGetText(ttstr & text)
 {
-	if(!OpenClipboard(Application->Handle)) return false;
+	if(!OpenClipboard(Application->GetHandle())) return false;
 
 	bool result = false;
 	try

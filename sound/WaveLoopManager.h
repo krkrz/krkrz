@@ -169,7 +169,7 @@ bool inline operator < (const tTVPWaveLoopLink & lhs, const tTVPWaveLoopLink & r
 // tTVPSampleAndLabelSource : source interface for sound sample and its label info
 //---------------------------------------------------------------------------
 class tTVPWaveDecoder;
-class tTVPWaveFormat;
+struct tTVPWaveFormat;
 class tTVPSampleAndLabelSource
 {
 public:

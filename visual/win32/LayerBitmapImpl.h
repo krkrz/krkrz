@@ -97,7 +97,7 @@ public:
 class tTVPBitmap;
 class tTVPComplexRect;
 class tTVPCharacterData;
-class tTVPDrawTextData;
+struct tTVPDrawTextData;
 class tTVPPrerenderedFont;
 class tTVPNativeBaseBitmap
 {
@@ -164,7 +164,8 @@ private:
 public:
 	HDC GetFontDC();
 	HDC GetNonBoldFontDC();
-	TCanvas * GetFontCanvas();
+	//class TCanvas * GetFontCanvas();
+	class TFont * GetFontCanvas();
 
 public:
 	void SetFont(const tTVPFont &font);

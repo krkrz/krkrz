@@ -95,8 +95,8 @@ extern void TJSWriteAllUnfreedObjectsToLog();
 extern void TJSWarnIfObjectIsDeleting(iTJSConsoleOutput * output, void * object);
 extern void TJSReplayObjectHashMapLog();
 static inline bool TJSObjectHashMapEnabled() { return TJSObjectHashMap || TJSObjectHashMapLog; }
-extern inline bool TJSObjectTypeInfoEnabled() { return TJSObjectHashMap; }
-extern inline bool TJSObjectFlagEnabled() { return TJSObjectHashMap; }
+extern inline bool TJSObjectTypeInfoEnabled() { return 0!=TJSObjectHashMap; }
+extern inline bool TJSObjectFlagEnabled() { return 0!=TJSObjectHashMap; }
 extern ttstr TJSGetObjectTypeInfo(void * object);
 extern tjs_uint32 TJSGetObjectHashCheckFlag(void * object);
 //---------------------------------------------------------------------------
@@ -113,7 +113,7 @@ extern void TJSStackTracerPush(tTJSInterCodeContext *context, bool in_try);
 extern void TJSStackTracerSetCodePointer(const tjs_int32 * codebase, tjs_int32 * const * codeptr);
 extern void TJSStackTracerPop();
 extern ttstr TJSGetStackTraceString(tjs_int limit = 0, const tjs_char *delimiter = NULL);
-static inline bool TJSStackTracerEnabled() { return TJSStackTracer; }
+static inline bool TJSStackTracerEnabled() { return 0!=TJSStackTracer; }
 //---------------------------------------------------------------------------
 
 #ifdef ENABLE_DEBUGGER

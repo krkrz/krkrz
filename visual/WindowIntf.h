@@ -96,9 +96,11 @@ public:
 	//!				マウスのキャプチャを開放すること。
 	virtual void TJS_INTF_METHOD WindowReleaseCapture() = 0;
 
+#ifdef USE_OBSOLETE_FUNCTIONS
 	//! @brief		ツールチップヒントを設定する
 	//! @param		text		ヒントテキスト(空文字列の場合はヒントの表示をキャンセルする)
 	virtual void TJS_INTF_METHOD SetHintText(const ttstr & text) = 0;
+#endif
 
 	//! @brief		注視ポイントの設定
 	//! @param		layer		フォント情報の含まれるレイヤ
@@ -248,7 +250,7 @@ public:
 private:
 	iTJSDispatch2 * MenuItemObject;
 public:
-	iTJSDispatch2 * GetMenuItemObjectNoAddRef();
+	//iTJSDispatch2 * GetMenuItemObjectNoAddRef();
 
 	//----- interface to video overlay object
 protected:

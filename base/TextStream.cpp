@@ -187,7 +187,7 @@ public:
 		{
 			if(sizeof(tjs_char) == 2)
 			{
-				if(size == 0) size = Stream->GetSize() - Stream->GetPosition();
+				if(size == 0) size = static_cast<tjs_uint>(Stream->GetSize() - Stream->GetPosition());
 				if(!size)
 				{
 					targ.Clear();
@@ -231,7 +231,7 @@ public:
 			{
 				// sizeof(tjs_char) is 4
 				// FIXME: NOT TESTED CODE
-				if(size == 0) size = Stream->GetSize() - Stream->GetPosition();
+				if(size == 0) size = static_cast<tjs_uint>(Stream->GetSize() - Stream->GetPosition());
 				tjs_uint16 *buf = new tjs_uint16[size / 2];
 				tjs_uint read;
 				try
@@ -414,11 +414,11 @@ public:
 
 			ZStream->next_in = NULL;
 			ZStream->avail_in = 0;
-			ZStream->next_out = CompressionBuffer;
+			ZStream->next_out = reinterpret_cast<Bytef*>( CompressionBuffer );
 			ZStream->avail_out = COMPRESSION_BUFFER_SIZE;
 
 			// Compression Size (write dummy)
-			CompressionSizePosition = Stream->GetPosition();
+			CompressionSizePosition = static_cast<tjs_uint>(Stream->GetPosition());
 			WriteI64LE((tjs_uint64)0);
 			WriteI64LE((tjs_uint64)0);
 		}
@@ -440,7 +440,7 @@ public:
 							TVPThrowExceptionMessage(TVPCompressionFailed);
 						}
 						Stream->WriteBuffer(CompressionBuffer, COMPRESSION_BUFFER_SIZE - ZStream->avail_out);
-						ZStream->next_out = CompressionBuffer;
+						ZStream->next_out = reinterpret_cast<Bytef*>( CompressionBuffer );
 						ZStream->avail_out = COMPRESSION_BUFFER_SIZE;
 					} while (result != Z_STREAM_END);
 
@@ -586,7 +586,7 @@ public:
 				}
 				if (ZStream->avail_out == 0) {
 					Stream->WriteBuffer(CompressionBuffer, COMPRESSION_BUFFER_SIZE);
-					ZStream->next_out = CompressionBuffer;
+					ZStream->next_out = reinterpret_cast<Bytef*>( CompressionBuffer );
 					ZStream->avail_out = COMPRESSION_BUFFER_SIZE;
 				}
 			}

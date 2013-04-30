@@ -152,6 +152,7 @@ static void TJSUninitStringHeap(void)
 	if(!TJSStringHeapList) return;
 	if(!TJSStringHeapList->empty())
 	{
+#if 0
 		std::vector<tTJSVariantString*>::iterator c;
 		for(c = TJSStringHeapList->end()-1; c >= TJSStringHeapList->begin(); c--)
 		{
@@ -166,8 +167,20 @@ static void TJSUninitStringHeap(void)
 			}
 			delete [] h;
 		}
+#else
+		std::vector<tTJSVariantString*>::reverse_iterator c;
+		for( c = TJSStringHeapList->rbegin(); c != TJSStringHeapList->rend(); c++ ) {
+			tTJSVariantString *h = *c;
+			for(tjs_int i = 0; i < HEAP_CAPACITY_INC; i++) {
+				if(h[i].HeapFlag & HEAP_FLAG_USING) {
+					// using cell
+					if(h[i].LongString) TJSVS_free(h[i].LongString);
+				}
+			}
+			delete [] h;
+		}
+#endif
 	}
-
 	delete TJSStringHeapCS;
 	TJSStringHeapCS = NULL;
 
@@ -886,7 +899,7 @@ tTJSVariantString * TJSFormatString(const tjs_char *format, tjs_uint numparams,
 			// integers
 			if(width+prec > 900) goto error;// too long
 			tjs_char buf[1024];
-			tjs_char *p;
+			//tjs_char *p;
 			tjs_char fmt[70];
 			tjs_uint fmtlen = f - fst;
 			if(fmtlen > 67) goto error;  // too long
@@ -899,7 +912,7 @@ tTJSVariantString * TJSFormatString(const tjs_char *format, tjs_uint numparams,
 			{
 				if(in>=numparams) TJS_eTJSVariantError(TJSBadParamCount);
 				tTVInteger integer = (params[in++])->AsInteger();
-				TJS_sprintf(buf, fmt, integer);
+				TJS_snprintf(buf, sizeof(buf)/sizeof(tjs_char), fmt, integer);
 			}
 			else if((!width_ind && prec_ind) || (width_ind && !prec_ind))
 			{
@@ -909,7 +922,7 @@ tTJSVariantString * TJSFormatString(const tjs_char *format, tjs_uint numparams,
 				if(prec_ind && ind[0] + width > 900) goto error;
 				if(in>=numparams) TJS_eTJSVariantError(TJSBadParamCount);
 				tTVInteger integer = (params[in++])->AsInteger();
-				TJS_sprintf(buf, fmt, ind[0], integer);
+				TJS_snprintf(buf, sizeof(buf)/sizeof(tjs_char), fmt, ind[0], integer);
 			}
 			else
 			{
@@ -920,7 +933,7 @@ tTJSVariantString * TJSFormatString(const tjs_char *format, tjs_uint numparams,
 				if(ind[0] + ind[1] > 900) goto error;
 				if(in>=numparams) TJS_eTJSVariantError(TJSBadParamCount);
 				tTVInteger integer = (params[in++])->AsInteger();
-				TJS_sprintf(buf, fmt, ind[0], ind[1], integer);
+				TJS_snprintf(buf, sizeof(buf)/sizeof(tjs_char), fmt, ind[0], ind[1], integer);
 			}
 
 			tjs_uint size = TJS_strlen(buf);
@@ -955,7 +968,7 @@ tTJSVariantString * TJSFormatString(const tjs_char *format, tjs_uint numparams,
 			{
 				if(in>=numparams) TJS_eTJSVariantError(TJSBadParamCount);
 				tTVReal real = (params[in++])->AsReal();
-				TJS_sprintf(buf, fmt, real);
+				TJS_snprintf(buf, sizeof(buf)/sizeof(tjs_char), fmt, real);
 			}
 			else if((!width_ind && prec_ind) || (width_ind && !prec_ind))
 			{
@@ -965,7 +978,7 @@ tTJSVariantString * TJSFormatString(const tjs_char *format, tjs_uint numparams,
 				if(prec_ind && ind[0] + width > 900) goto error;
 				if(in>=numparams) TJS_eTJSVariantError(TJSBadParamCount);
 				tTVReal real = (params[in++])->AsReal();
-				TJS_sprintf(buf, fmt, ind[0], real);
+				TJS_snprintf(buf, sizeof(buf)/sizeof(tjs_char), fmt, ind[0], real);
 			}
 			else
 			{
@@ -976,7 +989,7 @@ tTJSVariantString * TJSFormatString(const tjs_char *format, tjs_uint numparams,
 				if(ind[0] + ind[1] > 900) goto error;
 				if(in>=numparams) TJS_eTJSVariantError(TJSBadParamCount);
 				tTVReal real = (params[in++])->AsReal();
-				TJS_sprintf(buf, fmt, ind[0], ind[1], real);
+				TJS_snprintf(buf, sizeof(buf)/sizeof(tjs_char), fmt, ind[0], ind[1], real);
 			}
 
 			tjs_uint size = TJS_strlen(buf);

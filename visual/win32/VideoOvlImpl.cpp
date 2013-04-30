@@ -26,6 +26,8 @@
 #include "PluginImpl.h"
 #include "WaveImpl.h"  // for DirectSound attenuate <-> TVP volume
 #include <evcode.h>
+
+#include "Application.h"
 //---------------------------------------------------------------------------
 class tTVPVideoModule
 {
@@ -69,7 +71,7 @@ static void TVPUnloadKrMovie();
 tTVPVideoModule::tTVPVideoModule(const ttstr &name)
 {
 	Holder = new tTVPPluginHolder(name);
-	Handle = LoadLibrary(Holder->GetLocalName().AsAnsiString().c_str());
+	Handle = LoadLibrary(Holder->GetLocalName().AsStdString().c_str());
 	if(!Handle)
 	{
 		delete Holder;
@@ -185,7 +187,8 @@ tTJSNI_VideoOverlay::tTJSNI_VideoOverlay()
 	OwnerWindow = NULL;
 	LocalTempStorageHolder = NULL;
 
-	UtilWindow = AllocateHWnd(WndProc);
+#pragma message( __LOC__ "TODO メッセージハンドラをなんとかする" )
+	//UtilWindow = AllocateHWnd(WndProc);
 
 	Layer1 = NULL;
 	Layer2 = NULL;
@@ -218,7 +221,8 @@ void TJS_INTF_METHOD tTJSNI_VideoOverlay::Invalidate()
 
 	Close();
 
-	if(UtilWindow) DeallocateHWnd(UtilWindow);
+#pragma message( __LOC__ "TODO メッセージハンドラをなんとかする" )
+//	if(UtilWindow) DeallocateHWnd(UtilWindow);
 }
 //---------------------------------------------------------------------------
 void tTJSNI_VideoOverlay::Open(const ttstr &_name)
@@ -639,19 +643,20 @@ void tTJSNI_VideoOverlay::SetRectOffset(tjs_int ofsx, tjs_int ofsy)
 	}
 }
 //---------------------------------------------------------------------------
-void __fastcall tTJSNI_VideoOverlay::WndProc(Messages::TMessage &Msg)
+//void __fastcall tTJSNI_VideoOverlay::WndProc(Messages::TMessage &Msg)
+LRESULT CALLBACK tTJSNI_VideoOverlay::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	// UtilWindow's message procedure
 	if(VideoOverlay)
 	{
-		if(Msg.Msg == WM_GRAPHNOTIFY)
+		if(message == WM_GRAPHNOTIFY)
 		{
 			long evcode, p1, p2;
 			bool got;
 			do {
 				VideoOverlay->GetEvent(&evcode, &p1, &p2, &got);
 				if( got == false)
-					return;
+					return 0;
 
 				switch( evcode )
 				{
@@ -681,7 +686,7 @@ void __fastcall tTJSNI_VideoOverlay::WndProc(Messages::TMessage &Msg)
 						{
 							int		curFrame = p1;
 							if( Layer1 == NULL && Layer2 == NULL )	// nothing to do.
-								return;
+								return 0;
 
 							// 2フレーム以上差があるときはGetFrame() を現在のフレームとする
 							int frame = GetFrame();
@@ -691,7 +696,7 @@ void __fastcall tTJSNI_VideoOverlay::WndProc(Messages::TMessage &Msg)
 							if( (!IsPrepare) && (SegLoopEndFrame > 0) && (frame >= SegLoopEndFrame) ) {
 								SetFrame( SegLoopStartFrame > 0 ? SegLoopStartFrame : 0 );
 								FirePeriodEvent(perSegLoop); // fire period event by segment loop rewind
-								return; // Updateを行わない
+								return 0; // Updateを行わない
 							}
 
 							// get video image size
@@ -756,7 +761,7 @@ void __fastcall tTJSNI_VideoOverlay::WndProc(Messages::TMessage &Msg)
 							if( (!IsPrepare) && (SegLoopEndFrame > 0) && (frame >= SegLoopEndFrame) ) {
 								SetFrame( SegLoopStartFrame > 0 ? SegLoopStartFrame : 0 );
 								FirePeriodEvent(perSegLoop); // fire period event by segment loop rewind
-								return;
+								return 0;
 							}
 							VideoOverlay->PresentVideoImage();
 							FireFrameUpdateEvent( frame );
@@ -771,18 +776,18 @@ void __fastcall tTJSNI_VideoOverlay::WndProc(Messages::TMessage &Msg)
 				}
 				VideoOverlay->FreeEventParams( evcode, p1, p2 );
 			} while( got );
-			return;
+			return 0;
 		}
-		else if(Msg.Msg == WM_CALLBACKCMD)
+		else if(message == WM_CALLBACKCMD)
 		{
 			// wparam : command
 			// lparam : argument
-			FireCallbackCommand((tjs_char*)Msg.WParam, (tjs_char*)Msg.LParam);
-			return;
+			FireCallbackCommand((tjs_char*)wParam, (tjs_char*)lParam);
+			return 0;
 		}
 	}
 
-	Msg.Result =  DefWindowProc(UtilWindow, Msg.Msg, Msg.WParam, Msg.LParam);
+	return DefWindowProc(UtilWindow, message, wParam, lParam);
 }
 //---------------------------------------------------------------------------
 // Start:	Add:	T.Imoto
@@ -1140,7 +1145,7 @@ void tTJSNI_VideoOverlay::SetContrast( tjs_real v )
 {
 	if(VideoOverlay)
 	{
-		VideoOverlay->SetContrast( v );
+		VideoOverlay->SetContrast( static_cast<float>(v) );
 	}
 }
 tjs_real tTJSNI_VideoOverlay::GetBrightnessRangeMin()
@@ -1192,7 +1197,7 @@ void tTJSNI_VideoOverlay::SetBrightness( tjs_real v )
 {
 	if(VideoOverlay)
 	{
-		VideoOverlay->SetBrightness( v );
+		VideoOverlay->SetBrightness( static_cast<float>(v) );
 	}
 }
 
@@ -1245,7 +1250,7 @@ void tTJSNI_VideoOverlay::SetHue( tjs_real v )
 {
 	if(VideoOverlay)
 	{
-		VideoOverlay->SetHue( v );
+		VideoOverlay->SetHue( static_cast<float>(v) );
 	}
 }
 
@@ -1298,7 +1303,7 @@ void tTJSNI_VideoOverlay::SetSaturation( tjs_real v )
 {
 	if(VideoOverlay)
 	{
-		VideoOverlay->SetSaturation( v );
+		VideoOverlay->SetSaturation( static_cast<float>(v) );
 	}
 }
 // End:		Add:	T.Imoto

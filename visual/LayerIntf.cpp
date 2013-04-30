@@ -25,6 +25,7 @@
 #include "DebugIntf.h"
 #include "LayerManager.h"
 
+#include "TColor.h"
 
 //---------------------------------------------------------------------------
 // global flags
@@ -1277,9 +1278,9 @@ void tTJSNI_BaseLayer::DumpStructure(int level)
 		ttstr name = Name;
 		if(name.IsEmpty()) name = TJS_W("<noname>");
 		tjs_char ptr[80];
-		TJS_sprintf(ptr, TJS_W(" (object 0x%p)"), Owner);
+		TJS_snprintf(ptr, sizeof(ptr)/sizeof(tjs_char), TJS_W(" (object 0x%p)"), Owner);
 		tjs_char ptr2[80];
-		TJS_sprintf(ptr2, TJS_W(" (native 0x%p)"), this);
+		TJS_snprintf(ptr2, sizeof(ptr2)/sizeof(tjs_char), TJS_W(" (native 0x%p)"), this);
 
 		TVPAddLog(ttstr(indent) + name +
 			ttstr(ptr) + ttstr(ptr2) +
@@ -2703,10 +2704,13 @@ void tTJSNI_BaseLayer::SetCurrentHintToWindow()
 			p = p->Parent;
 		}
 
+#ifdef USE_OBSOLETE_FUNCTIONS
 		Manager->SetHint(p->Hint);
+#endif
 	}
 }
 //---------------------------------------------------------------------------
+#ifdef USE_OBSOLETE_FUNCTIONS
 void tTJSNI_BaseLayer::SetHint(const ttstr & hint)
 {
 	ShowParentHint = false;
@@ -2714,6 +2718,7 @@ void tTJSNI_BaseLayer::SetHint(const ttstr & hint)
 	if(Manager)
 		Manager->NotifyHintChange(this, hint);
 }
+#endif
 //---------------------------------------------------------------------------
 void tTJSNI_BaseLayer::SetAttentionLeft(tjs_int l)
 {
@@ -4752,7 +4757,7 @@ tjs_int tTJSNI_BaseLayer::GetFontAngle() const
 //---------------------------------------------------------------------------
 void tTJSNI_BaseLayer::SetFontBold(bool b)
 {
-	if((bool)(Font.Flags & TVP_TF_BOLD) != b)
+	if( (0!=(Font.Flags & TVP_TF_BOLD)) != b)
 	{
 		Font.Flags &= ~TVP_TF_BOLD;
 		if(b) Font.Flags |= TVP_TF_BOLD;
@@ -4762,12 +4767,12 @@ void tTJSNI_BaseLayer::SetFontBold(bool b)
 //---------------------------------------------------------------------------
 bool tTJSNI_BaseLayer::GetFontBold() const
 {
-	return Font.Flags & TVP_TF_BOLD;
+	return 0!=(Font.Flags & TVP_TF_BOLD);
 }
 //---------------------------------------------------------------------------
 void tTJSNI_BaseLayer::SetFontItalic(bool b)
 {
-	if((bool)(Font.Flags & TVP_TF_ITALIC) != b)
+	if( (0!=(Font.Flags & TVP_TF_ITALIC)) != b)
 	{
 		Font.Flags &= ~TVP_TF_ITALIC;
 		if(b) Font.Flags |= TVP_TF_ITALIC;
@@ -4782,7 +4787,7 @@ bool tTJSNI_BaseLayer::GetFontItalic() const
 //---------------------------------------------------------------------------
 void tTJSNI_BaseLayer::SetFontStrikeout(bool b)
 {
-	if((bool)(Font.Flags & TVP_TF_STRIKEOUT) != b)
+	if( (0!=(Font.Flags & TVP_TF_STRIKEOUT)) != b)
 	{
 		Font.Flags &= ~TVP_TF_STRIKEOUT;
 		if(b) Font.Flags |= TVP_TF_STRIKEOUT;
@@ -4792,12 +4797,12 @@ void tTJSNI_BaseLayer::SetFontStrikeout(bool b)
 //---------------------------------------------------------------------------
 bool tTJSNI_BaseLayer::GetFontStrikeout() const
 {
-	return Font.Flags & TVP_TF_STRIKEOUT;
+	return 0!=(Font.Flags & TVP_TF_STRIKEOUT);
 }
 //---------------------------------------------------------------------------
 void tTJSNI_BaseLayer::SetFontUnderline(bool b)
 {
-	if((bool)(Font.Flags & TVP_TF_UNDERLINE) != b)
+	if( (0!=(Font.Flags & TVP_TF_UNDERLINE)) != b)
 	{
 		Font.Flags &= ~TVP_TF_UNDERLINE;
 		if(b) Font.Flags |= TVP_TF_UNDERLINE;
@@ -4807,7 +4812,7 @@ void tTJSNI_BaseLayer::SetFontUnderline(bool b)
 //---------------------------------------------------------------------------
 bool tTJSNI_BaseLayer::GetFontUnderline() const
 {
-	return Font.Flags & TVP_TF_UNDERLINE;
+	return 0!=(Font.Flags & TVP_TF_UNDERLINE);
 }
 //---------------------------------------------------------------------------
 tjs_int tTJSNI_BaseLayer::GetTextWidth(const ttstr & text)
@@ -6044,7 +6049,7 @@ void tTJSNI_BaseLayer::InternalComplete2(tTVPComplexRect & updateregion,
 	// split the region to some stripes to utilize the CPU's memory
 	// caching.
 
-	tjs_int i;
+	//tjs_int i;
 	tTVPComplexRect::tIterator it = updateregion.GetIterator();
 	while(it.Step())
 	{
@@ -6309,7 +6314,7 @@ void tTJSNI_BaseLayer::StartTransition(const ttstr &name, bool withchildren,
 			selfupdate_name.GetHint(), &var, NULL)))
 		{
 			if(var.Type() != tvtVoid)
-				TransSelfUpdate = (bool)(tjs_int)var;
+				TransSelfUpdate = 0!=(tjs_int)var;
 					// selfupdate member found
 		}
 
@@ -6903,7 +6908,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/loadImages)
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
 	if(numparams < 1) return TJS_E_BADPARAMCOUNT;
 	ttstr name(*param[0]);
-	tjs_uint32 key = clNone;
+	tjs_uint32 key = clNone; // TODO Intf‚È‚Ì‚ÉŒÅ—L’l‚ª
 	if(numparams >=2 && param[1]->Type() != tvtVoid)
 		key = (tjs_uint32)param[1]->AsInteger();
 	iTJSDispatch2 * metainfo = _this->LoadImages(name, key);
@@ -7126,7 +7131,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/fillRect)
 	x = *param[0];
 	y = *param[1];
 	_this->FillRect(tTVPRect(x, y, x+(tjs_int)*param[2], y+(tjs_int)*param[3]),
-		(tjs_int64)*param[4]);
+		static_cast<tjs_uint32>((tjs_int64)*param[4]));
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/fillRect)
@@ -7139,7 +7144,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/colorRect)
 	x = *param[0];
 	y = *param[1];
 	_this->ColorRect(tTVPRect(x, y, x+(tjs_int)*param[2], y+(tjs_int)*param[3]),
-		(tjs_int64)*param[4],
+		static_cast<tjs_uint32>((tjs_int64)*param[4]),
 		(numparams>=6 && param[5]->Type() != tvtVoid)? (tjs_int) *param[5] : 255);
 	return TJS_S_OK;
 }
@@ -7153,7 +7158,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/drawText)
 		*param[0],
 		*param[1],
 		*param[2],
-		(tjs_int64)*param[3],
+		static_cast<tjs_uint32>((tjs_int64)*param[3]),
 		(numparams >= 5 && param[4]->Type() != tvtVoid)?(tjs_int)*param[4] : (tjs_int)255,
 		(numparams >= 6 && param[5]->Type() != tvtVoid)? param[5]->operator bool() : true,
 		(numparams >= 7 && param[6]->Type() != tvtVoid)? (tjs_int)*param[6] : 0,
@@ -7516,7 +7521,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/affineCopy)
 	bool clear = false;
 
 	if(numparams >= 14 && param[13]->Type() != tvtVoid)
-		clear = (tjs_int)*param[13];
+		clear = 0!=(tjs_int)*param[13];
 
 	if(param[5]->operator bool())
 	{
@@ -7770,19 +7775,19 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/adjustGamma)
 	memcpy(&data, &TVPIntactGammaAdjustData, sizeof(data));
 
 	if(numparams >= 1 && param[0]->Type() != tvtVoid)
-		data.RGamma = (double)*param[0];
+		data.RGamma = static_cast<float>((double)*param[0]);
 	if(numparams >= 2 && param[1]->Type() != tvtVoid)
 		data.RFloor = *param[1];
 	if(numparams >= 3 && param[2]->Type() != tvtVoid)
 		data.RCeil  = *param[2];
 	if(numparams >= 4 && param[3]->Type() != tvtVoid)
-		data.GGamma = (double)*param[3];
+		data.GGamma = static_cast<float>((double)*param[3]);
 	if(numparams >= 5 && param[4]->Type() != tvtVoid)
 		data.GFloor = *param[4];
 	if(numparams >= 6 && param[5]->Type() != tvtVoid)
 		data.GCeil  = *param[5];
 	if(numparams >= 7 && param[6]->Type() != tvtVoid)
-		data.BGamma = (double)*param[6];
+		data.BGamma = static_cast<float>((double)*param[6]);
 	if(numparams >= 8 && param[7]->Type() != tvtVoid)
 		data.BFloor = *param[7];
 	if(numparams >= 9 && param[8]->Type() != tvtVoid)
@@ -8788,7 +8793,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(width)
 	TJS_BEGIN_NATIVE_PROP_SETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
-		_this->SetWidth((tjs_int64)*param);
+		_this->SetWidth(static_cast<tjs_uint>((tjs_int64)*param));
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_SETTER
@@ -8808,7 +8813,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(height)
 	TJS_BEGIN_NATIVE_PROP_SETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
-		_this->SetHeight((tjs_int64)*param);
+		_this->SetHeight(static_cast<tjs_uint>((tjs_int64)*param));
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_SETTER
@@ -8828,7 +8833,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(imageLeft)
 	TJS_BEGIN_NATIVE_PROP_SETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
-		_this->SetImageLeft((tjs_int64)*param);
+		_this->SetImageLeft(static_cast<tjs_int>((tjs_int64)*param));
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_SETTER
@@ -8848,7 +8853,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(imageTop)
 	TJS_BEGIN_NATIVE_PROP_SETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
-		_this->SetImageTop((tjs_int64)*param);
+		_this->SetImageTop(static_cast<tjs_int>((tjs_int64)*param));
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_SETTER
@@ -8868,7 +8873,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(imageWidth)
 	TJS_BEGIN_NATIVE_PROP_SETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
-		_this->SetImageWidth((tjs_int64)*param);
+		_this->SetImageWidth(static_cast<tjs_uint>((tjs_int64)*param));
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_SETTER
@@ -8888,7 +8893,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(imageHeight)
 	TJS_BEGIN_NATIVE_PROP_SETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
-		_this->SetImageHeight((tjs_int64)*param);
+		_this->SetImageHeight(static_cast<tjs_uint>((tjs_int64)*param));
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_SETTER
@@ -8948,7 +8953,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(holdAlpha)
 	TJS_BEGIN_NATIVE_PROP_SETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
-		_this->SetHoldAlpha((bool)(tjs_int)*param);
+		_this->SetHoldAlpha(0!=(tjs_int)*param);
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_SETTER
@@ -8968,7 +8973,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(clipLeft)
 	TJS_BEGIN_NATIVE_PROP_SETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
-		_this->SetClipLeft((tjs_int64)*param);
+		_this->SetClipLeft(static_cast<tjs_int>((tjs_int64)*param));
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_SETTER
@@ -8988,7 +8993,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(clipTop)
 	TJS_BEGIN_NATIVE_PROP_SETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
-		_this->SetClipTop((tjs_int64)*param);
+		_this->SetClipTop(static_cast<tjs_int>((tjs_int64)*param));
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_SETTER
@@ -9008,7 +9013,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(clipWidth)
 	TJS_BEGIN_NATIVE_PROP_SETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
-		_this->SetClipWidth((tjs_int64)*param);
+		_this->SetClipWidth(static_cast<tjs_int>((tjs_int64)*param));
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_SETTER
@@ -9028,7 +9033,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(clipHeight)
 	TJS_BEGIN_NATIVE_PROP_SETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
-		_this->SetClipHeight((tjs_int64)*param);
+		_this->SetClipHeight(static_cast<tjs_int>((tjs_int64)*param));
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_SETTER
@@ -9158,6 +9163,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(cursorY)
 }
 TJS_END_NATIVE_PROP_DECL(cursorY)
 //----------------------------------------------------------------------
+#ifdef USE_OBSOLETE_FUNCTIONS
 TJS_BEGIN_NATIVE_PROP_DECL(hint)
 {
 	TJS_BEGIN_NATIVE_PROP_GETTER
@@ -9177,6 +9183,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(hint)
 	TJS_END_NATIVE_PROP_SETTER
 }
 TJS_END_NATIVE_PROP_DECL(hint)
+#endif
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_PROP_DECL(showParentHint)
 {
@@ -9494,7 +9501,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(neutralColor)
 	TJS_BEGIN_NATIVE_PROP_SETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
-		_this->SetNeutralColor((tjs_int64)*param);
+		_this->SetNeutralColor(static_cast<tjs_uint32>((tjs_int64)*param));
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_SETTER
@@ -9746,7 +9753,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/doUserSelect)
 
 	if(numparams < 4) return TJS_E_BADPARAMCOUNT;
 
-	tjs_uint32 flags = (tjs_int64)*param[0];
+	tjs_uint32 flags = static_cast<tjs_uint32>((tjs_int64)*param[0]);
 	ttstr caption = *param[1];
 	ttstr prompt = *param[2];
 	ttstr samplestring = *param[3];
@@ -9766,7 +9773,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/getList)
 
 	if(numparams < 1) return TJS_E_BADPARAMCOUNT;
 
-	tjs_uint32 flags = (tjs_int64)*param[0];
+	tjs_uint32 flags = static_cast<tjs_uint32>((tjs_int64)*param[0]);
 
 	std::vector<ttstr> list;
 	_this->GetLayer()->GetFontList(flags, list);

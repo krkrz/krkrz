@@ -27,7 +27,8 @@
 #include "MainFormUnit.h"
 #include "DInputMgn.h"
 
-
+#include "Application.h"
+#include "Screen.h"
 
 //---------------------------------------------------------------------------
 static ttstr TVPAppTitle;
@@ -43,30 +44,30 @@ static bool TVPAppTitleInit = false;
 static void TVPShowSimpleMessageBox(const ttstr & text, const ttstr & caption)
 {
 	::MessageBox(TVPGetModalWindowOwnerHandle(),
-		text.AsAnsiString().c_str(),
-		caption.AsAnsiString().c_str(), MB_OK|MB_ICONINFORMATION);
+		text.AsStdString().c_str(),
+		caption.AsStdString().c_str(), MB_OK|MB_ICONINFORMATION);
 }
 //---------------------------------------------------------------------------
 
 
 
 
-
+#if 0
 //---------------------------------------------------------------------------
 // TVPInputQuery
 //---------------------------------------------------------------------------
 bool TVPInputQuery(const ttstr & caption, const ttstr &prompt,
 	ttstr &value)
 {
-	AnsiString v = value.AsAnsiString();
-	bool res = InputQuery(caption.AsAnsiString(), prompt.AsAnsiString(),
+	std::string v = value.AsStdString();
+	bool res = InputQuery(caption.AsStdString(), prompt.AsStdString(),
 		v);
 	if(res)
 		value = v.c_str();
 	return res;
 }
 //---------------------------------------------------------------------------
-
+#endif
 
 
 
@@ -102,9 +103,7 @@ bool TVPGetAsyncKeyState(tjs_uint keycode, bool getcurrent)
 		}
 	}
 
-	return
-		(bool)(GetAsyncKeyState(keycode)
-			 & ( getcurrent?0x8000:0x0001) ) ;
+	return 0!=( GetAsyncKeyState(keycode) & ( getcurrent?0x8000:0x0001) );
 }
 //---------------------------------------------------------------------------
 
@@ -158,7 +157,7 @@ ttstr TVPGetOSName()
 		osname = TJS_W("Unknown"); break;
 	}
 
-	TJS_sprintf(buf, TJS_W("%ls %d.%d.%d "), osname, ovi.dwMajorVersion,
+	TJS_snprintf(buf, sizeof(buf)/sizeof(tjs_char), TJS_W("%ls %d.%d.%d "), osname, ovi.dwMajorVersion,
 		ovi.dwMinorVersion, ovi.dwBuildNumber&0xfff);
 
 	ttstr str(buf);
@@ -197,10 +196,10 @@ static bool TVPShellExecute(const ttstr &target, const ttstr &param)
 	}
 	else
 	{
-		AnsiString a_target(target.AsAnsiString());
-		AnsiString a_param(param.AsAnsiString());
+		std::string a_target(target.AsStdString());
+		std::string a_param(param.AsStdString());
 		if(ShellExecute(NULL, NULL,
-			target.AsAnsiString().c_str(),
+			target.AsStdString().c_str(),
 			param.IsEmpty() ? NULL : a_param.c_str(),
 			"",
 			SW_SHOWNORMAL)
@@ -286,7 +285,7 @@ static void TVPReadRegValue(tTJSVariant &result, const ttstr & key)
 	if(procRegOpenKeyExW)
 		res = procRegOpenKeyExW(root, keyname.c_str(), 0, KEY_READ, &handle);
 	else
-		res = RegOpenKeyExA(root, keyname.AsAnsiString().c_str(), 0, KEY_READ, &handle);
+		res = RegOpenKeyExA(root, keyname.AsStdString().c_str(), 0, KEY_READ, &handle);
 	if(res != ERROR_SUCCESS) { result.Clear(); return; }
 
 	// try query value size and read key
@@ -294,10 +293,10 @@ static void TVPReadRegValue(tTJSVariant &result, const ttstr & key)
 	DWORD type;
 
 
-	AnsiString a_valuename;
+	std::string a_valuename;
 
 	if(!procRegQueryValueExW)
-		a_valuename = valuename.AsAnsiString();
+		a_valuename = valuename.AsStdString();
 
 	// query size
 	if(procRegQueryValueExW)
@@ -506,7 +505,7 @@ bool TVPCreateAppLock(const ttstr &lockname)
 	}
 	else
 	{
-		AnsiString a_lockname(lockname.AsAnsiString());
+		std::string a_lockname(lockname.AsStdString());
 		CreateMutexA(NULL, TRUE, a_lockname.c_str());
 	}
 
@@ -650,7 +649,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/getKeyState)
 	tjs_uint code = (tjs_int)*param[0];
 
 	bool getcurrent = true;
-	if(numparams >= 2) getcurrent = *param[1];
+	if(numparams >= 2) getcurrent = 0!=(tjs_int)*param[1];
 
 	bool res = TVPGetAsyncKeyState(code, getcurrent);
 
@@ -683,7 +682,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/system)
 
 	ttstr target = *param[0];
 
-	int ret = system(target.AsAnsiString().c_str());
+	int ret = system(target.AsStdString().c_str());
 
 	TVPDeliverCompactEvent(TVP_COMPACT_LEVEL_MAX); // this should clear all caches
 
@@ -843,7 +842,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(title)
 		if(!TVPAppTitleInit)
 		{
 			TVPAppTitleInit = true;
-			TVPAppTitle = Application->Title;
+			TVPAppTitle = Application->GetTitle();
 		}
 		*result = TVPAppTitle;
 		return TJS_S_OK;
@@ -853,7 +852,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(title)
 	TJS_BEGIN_NATIVE_PROP_SETTER
 	{
 		TVPAppTitle = *param;
-		Application->Title = TVPAppTitle.AsAnsiString();
+		Application->SetTitle( TVPAppTitle.AsStdString() );
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_SETTER
@@ -864,7 +863,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(screenWidth)
 {
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
-		*result = Screen->Width;
+		*result = Screen->GetWidth();
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_GETTER
@@ -877,7 +876,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(screenHeight)
 {
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
-		*result = Screen->Height;
+		*result = Screen->GetHeight();
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_GETTER
@@ -957,7 +956,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(stayOnTop)
 
 	TJS_BEGIN_NATIVE_PROP_SETTER
 	{
-		TVPMainForm->SetApplicationStayOnTop(*param);
+		TVPMainForm->SetApplicationStayOnTop(0!=(tjs_int)*param);
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_SETTER

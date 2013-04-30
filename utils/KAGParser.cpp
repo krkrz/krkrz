@@ -725,7 +725,7 @@ void tTJSNI_KAGParser::Restore(iTJSDispatch2 *dic)
 {
 	// restore status from "dic"
 	tTJSVariant val;
-	tjs_error er;
+//	tjs_error er;
 
 	// restore macros
 	{
@@ -825,7 +825,7 @@ void tTJSNI_KAGParser::Restore(iTJSDispatch2 *dic)
 				dic.PropGet(0, TJS_W("pos"), NULL, &val, NULL);
 				Pos = val;
 				dic.PropGet(0, TJS_W("lineBufferUsing"), NULL, &val, NULL);
-				LineBufferUsing = val;
+				LineBufferUsing = 0!=(tjs_int)val;
 				dic.PropGet(0, TJS_W("macroArgStackBase"), NULL, &val, NULL);
 				MacroArgStackBase = (tjs_int)val;
 				dic.PropGet(0, TJS_W("macroArgStackDepth"), NULL, &val, NULL);
@@ -957,8 +957,8 @@ void tTJSNI_KAGParser::LoadScenario(const ttstr & name)
 		if(DebugLevel >= tkdlSimple)
 		{
 			static ttstr hr(TJS_W(
-				"========================================"
-				"========================================"));
+				"========================================")
+				TJS_W("========================================"));
 			TVPAddLog(hr);
 			TVPAddLog(TJS_W("Scenario loaded : ") + name);
 		}
@@ -1054,8 +1054,8 @@ void tTJSNI_KAGParser::GoToLabel(const ttstr &name)
 	if(DebugLevel >= tkdlSimple)
 	{
 		static ttstr hr(TJS_W(
-			"- - - - - - - - - - - - - - - - - - - - "
-			"- - - - - - - - - - - - - - - - - - - - "));
+			"- - - - - - - - - - - - - - - - - - - - ")
+			TJS_W("- - - - - - - - - - - - - - - - - - - - "));
 		TVPAddLog(hr);
 		TVPAddLog(StorageShortName + TJS_W(" : jumped to : ") + name);
 	}
@@ -1100,7 +1100,7 @@ bool tTJSNI_KAGParser::SkipCommentOrLabel()
 			if(RecordingMacro)
 				TVPThrowExceptionMessage(TVPLabelOrScriptInMacro);
 
-			tjs_char * vl = TJS_strchr(p, TJS_W('|'));
+			tjs_char * vl = TJS_strchr(const_cast<tjs_char*>(p), TJS_W('|'));
 			bool pagename;
 			if(vl)
 			{
@@ -2195,7 +2195,7 @@ parse_start:
 					iTJSDispatch2 *args = GetMacroTopNoAddRef();
 					if(args)
 					{
-						tjs_char *vp = TJS_strchr(value.c_str(), TJS_W('|'));
+						tjs_char *vp = TJS_strchr(const_cast<tjs_char*>(value.c_str()), TJS_W('|'));
 
 						if(vp)
 						{

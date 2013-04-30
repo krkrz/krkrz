@@ -12,6 +12,7 @@
 #define MsgImplH
 
 #include "tjsMessage.h"
+#include "MsgIntf.h"
 
 #ifndef TVP_MSG_DECL
 	#define TVP_MSG_DECL(name, msg) extern tTJSMessageHolder name;

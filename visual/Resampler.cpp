@@ -74,7 +74,7 @@ static int calc_x_contrib(CLIST *contribX, real_t xscale, real_t fwidth, int dst
 	int srcwidth, real_t (*filterf)(real_t), int i)
 {
 	real_t width;
-	real_t fscale;
+//	real_t fscale;
 	real_t center, left, right;
 	real_t weight;
 	int j, k, n;
@@ -117,7 +117,7 @@ static int calc_x_contrib(CLIST *contribX, real_t xscale, real_t fwidth, int dst
 
 		if(w_sum != 0.0)
 		{
-			w_sum = 1.0 / w_sum;
+			w_sum = static_cast<real_t>(1.0 / w_sum);
 			for(j = 0; j < contribX->n; j ++)
 				contribX->p[j].weight *= w_sum;
 		}
@@ -206,7 +206,7 @@ static int ib_resample(tTVPBaseBitmap *dst,
 	{
 		real_t weight;
 		width = fwidth / yscale;
-		fscale = 1.0 / yscale;
+		fscale = static_cast<real_t>(1.0 / yscale);
 		for(i = 0; i < destheight; ++i)
 		{
 			real_t w_sum = 0;
@@ -249,7 +249,7 @@ static int ib_resample(tTVPBaseBitmap *dst,
 
 			if(w_sum != 0.0)
 			{
-				w_sum = 1.0 / w_sum;
+				w_sum = static_cast<real_t>(1.0 / w_sum);
 				for(j = 0; j < contribY[i].n; j ++)
 					contribY[i].p[j].weight *= w_sum;
 			}
@@ -335,17 +335,20 @@ static int ib_resample(tTVPBaseBitmap *dst,
 					weight.b += pel2.b * c->weight;
 					weight.a += pel2.a * c->weight;
 				}
-				weight.r = bPelDelta.r ? roundcloser(weight.r) : pel.r;
-				weight.g = bPelDelta.g ? roundcloser(weight.g) : pel.g;
-				weight.b = bPelDelta.b ? roundcloser(weight.b) : pel.b;
-				weight.a = bPelDelta.a ? roundcloser(weight.a) : pel.a;
+				weight.r = static_cast<real_t>(bPelDelta.r ? roundcloser(weight.r) : pel.r);
+				weight.g = static_cast<real_t>(bPelDelta.g ? roundcloser(weight.g) : pel.g);
+				weight.b = static_cast<real_t>(bPelDelta.b ? roundcloser(weight.b) : pel.b);
+				weight.a = static_cast<real_t>(bPelDelta.a ? roundcloser(weight.a) : pel.a);
 
-				tmp[k].r = (unsigned char)CLAMP(weight.r, 0, 255);
-				tmp[k].g = (unsigned char)CLAMP(weight.g, 0, 255);
-				tmp[k].b = (unsigned char)CLAMP(weight.b, 0, 255);
-				tmp[k].a = (unsigned char)CLAMP(weight.a, 0, 255);
-
-				(tjs_uint8*)(line) += srcpitchbytes;
+				tmp[k].r = (unsigned char)CLAMP(static_cast<int>(weight.r), 0, 255);
+				tmp[k].g = (unsigned char)CLAMP(static_cast<int>(weight.g), 0, 255);
+				tmp[k].b = (unsigned char)CLAMP(static_cast<int>(weight.b), 0, 255);
+				tmp[k].a = (unsigned char)CLAMP(static_cast<int>(weight.a), 0, 255);
+				
+				//(tjs_uint8*)(line) += srcpitchbytes;
+				const tjs_uint8* b = reinterpret_cast<const tjs_uint8*>(line);
+				b += srcpitchbytes;
+				line = reinterpret_cast<const pixel_t*>(b);
 			} /* next row in temp column */
 		}
 
@@ -375,16 +378,19 @@ static int ib_resample(tTVPBaseBitmap *dst,
 					weight.b += pel2.b * c->weight;
 					weight.a += pel2.a * c->weight;
 				}
-				weight.r = bPelDelta.r ? roundcloser(weight.r) : pel.r;
-				weight.g = bPelDelta.g ? roundcloser(weight.g) : pel.g;
-				weight.b = bPelDelta.b ? roundcloser(weight.b) : pel.b;
-				weight.a = bPelDelta.a ? roundcloser(weight.a) : pel.a;
-				line[xx].r = (unsigned char)CLAMP(weight.r, 0, 255);
-				line[xx].g = (unsigned char)CLAMP(weight.g, 0, 255);
-				line[xx].b = (unsigned char)CLAMP(weight.b, 0, 255);
-				line[xx].a = (unsigned char)CLAMP(weight.a, 0, 255);
+				weight.r = static_cast<real_t>(bPelDelta.r ? roundcloser(weight.r) : pel.r);
+				weight.g = static_cast<real_t>(bPelDelta.g ? roundcloser(weight.g) : pel.g);
+				weight.b = static_cast<real_t>(bPelDelta.b ? roundcloser(weight.b) : pel.b);
+				weight.a = static_cast<real_t>(bPelDelta.a ? roundcloser(weight.a) : pel.a);
+				line[xx].r = (unsigned char)CLAMP(static_cast<int>(weight.r), 0, 255);
+				line[xx].g = (unsigned char)CLAMP(static_cast<int>(weight.g), 0, 255);
+				line[xx].b = (unsigned char)CLAMP(static_cast<int>(weight.b), 0, 255);
+				line[xx].a = (unsigned char)CLAMP(static_cast<int>(weight.a), 0, 255);
 
- 				(tjs_uint8*)(line) += destpitchbytes;
+				const tjs_uint8* b = reinterpret_cast<const tjs_uint8*>(line);
+				b += destpitchbytes;
+				line = const_cast<pixel_t*>(reinterpret_cast<const pixel_t*>(b));
+ 				//(const tjs_uint8*)(line) += destpitchbytes;
 			} /* next dst row */
 		}
 	} /* next dst column */
@@ -407,7 +413,7 @@ filter(real_t t)
 {
 	/* f(t) = 2|t|^3 - 3|t|^2 + 1, -1 <= t <= 1 */
 	if(t < 0.0) t = -t;
-	if(t < 1.0) return((2.0 * t - 3.0) * t * t + 1.0);
+	if(t < 1.0) return static_cast<real_t>((2.0 * t - 3.0) * t * t + 1.0);
 	return(0.0);
 }
 
@@ -425,7 +431,7 @@ static real_t
 triangle_filter(real_t t)
 {
 	if(t < 0.0) t = -t;
-	if(t < 1.0) return(1.0 - t);
+	if(t < 1.0) return static_cast<real_t>(1.0 - t);
 	return(0.0);
 }
 
@@ -434,10 +440,10 @@ static real_t
 bell_filter(real_t t)		/* box (*) box (*) box */
 {
 	if(t < 0) t = -t;
-	if(t < 0.5) return(0.75 - (t * t));
+	if(t < 0.5) return static_cast<real_t>(0.75 - (t * t));
 	if(t < 1.5) {
-		t = (t - 1.5);
-		return(0.5 * (t * t));
+		t = static_cast<real_t>(t - 1.5);
+		return static_cast<real_t>(0.5 * (t * t));
 	}
 	return(0.0);
 }

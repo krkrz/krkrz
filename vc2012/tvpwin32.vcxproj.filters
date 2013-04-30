@@ -1,0 +1,882 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ソース ファイル">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="ヘッダー ファイル">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="リソース ファイル">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="tjs2">
+      <UniqueIdentifier>{14d361e1-672f-46fb-8957-73b463e79098}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="base">
+      <UniqueIdentifier>{b5204020-999e-42e7-8d23-a1398d6089b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="base\win32">
+      <UniqueIdentifier>{56ed4675-6013-4f28-9dd5-23042f380028}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="msg">
+      <UniqueIdentifier>{26cd588a-a51b-48c5-a64b-21f06cc5002e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="msg\win32">
+      <UniqueIdentifier>{ef79cd2f-97fc-4df4-90ae-ca148cd2fc41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sound">
+      <UniqueIdentifier>{67ef89fe-e039-4f84-89e7-3bca0cca5342}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utils">
+      <UniqueIdentifier>{b8afb2aa-4bdf-4d0f-9f2b-d23e296dde4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="visual">
+      <UniqueIdentifier>{634ec8df-3321-4603-b14b-d73aae5d0ba5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="environ">
+      <UniqueIdentifier>{c56cf55b-eac5-48e6-b7bf-0ae0b550bbd7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="environ\win32">
+      <UniqueIdentifier>{2184ad15-607e-4f99-8514-7d0ba3070a3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="visual\IA32">
+      <UniqueIdentifier>{35a4c55f-9390-4ba3-b6ab-717623af0a8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="visual\win32">
+      <UniqueIdentifier>{b7ad612b-e26d-47e8-9866-64be4f36d385}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utils\win32">
+      <UniqueIdentifier>{fa307ad0-cb14-477d-a77f-f16f9067d20a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sound\win32">
+      <UniqueIdentifier>{e116b75c-ed4d-47a5-9a92-ff38c939c0e5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="tvpwin32.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjs.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjs.tab.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsArray.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsBinarySerializer.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsByteCodeLoader.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsCommHead.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsCompileControl.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsConfig.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsConstArrayData.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsDate.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsdate.tab.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsDateParser.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsDebug.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsDictionary.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsError.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsError_jp.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsErrorDefs.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsException.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsGlobalStringMap.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsHashSearch.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsInterCodeExec.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsInterCodeGen.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsInterface.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsLex.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsMath.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsMessage.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsMT19937ar-cok.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsNamespace.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsNative.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsObject.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjspp.tab.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsRandomGenerator.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsScriptBlock.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsScriptCache.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsString.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsTypes.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsUtils.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsVariant.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsVariantString.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\base\win32\EventImpl.h">
+      <Filter>base\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\base\win32\FileSelector.h">
+      <Filter>base\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\base\win32\FuncStubs.h">
+      <Filter>base\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\base\win32\PluginImpl.h">
+      <Filter>base\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\base\win32\ScriptMgnImpl.h">
+      <Filter>base\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\base\win32\StorageImpl.h">
+      <Filter>base\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\base\win32\SusieArchive.h">
+      <Filter>base\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\base\win32\SysInitImpl.h">
+      <Filter>base\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\base\win32\SystemImpl.h">
+      <Filter>base\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\base\BinaryStream.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\base\CharacterSet.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\base\common.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\base\EventIntf.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\base\PluginIntf.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\base\ScriptMgnIntf.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\base\StorageIntf.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\base\SysInitIntf.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\base\SystemIntf.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\base\TextStream.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\base\UtilStreams.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\base\XP3Archive.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\msg\win32\MsgImpl.h">
+      <Filter>msg\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\msg\win32\OptionsDesc.h">
+      <Filter>msg\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\msg\MsgIntf.h">
+      <Filter>msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\msg\svn_revision.h">
+      <Filter>msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\environ\win32\MainFormUnit.h">
+      <Filter>environ\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\environ\win32\WideNativeFuncs.h">
+      <Filter>environ\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\environ\win32\WindowFormUnit.h">
+      <Filter>environ\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\environ\win32\Application.h">
+      <Filter>environ\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\environ\win32\Clipbrd.h">
+      <Filter>environ\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\environ\win32\VersionFormUnit.h">
+      <Filter>environ\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\environ\win32\Timer.h">
+      <Filter>environ\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\environ\win32\EmergencyExit.h">
+      <Filter>environ\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\environ\win32\FileCtrl.h">
+      <Filter>environ\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\environ\win32\FileStream.h">
+      <Filter>environ\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\environ\win32\StringUtil.h">
+      <Filter>environ\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\environ\win32\TColor.h">
+      <Filter>environ\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\environ\win32\Exception.h">
+      <Filter>environ\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\environ\win32\Screen.h">
+      <Filter>environ\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\environ\win32\TMLWindow.h">
+      <Filter>environ\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\environ\win32\InputStringForm.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="..\environ\win32\DetectCPU.h">
+      <Filter>environ\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\IA32\tvpgl_ia32_intf.h">
+      <Filter>visual\IA32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\environ\win32\TFont.h">
+      <Filter>environ\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\environ\win32\MouseCursor.h">
+      <Filter>environ\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\environ\win32\MenuContainerForm.h">
+      <Filter>environ\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\environ\win32\WindowMenu.h">
+      <Filter>environ\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsRegExp.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\win32\DInputMgn.h">
+      <Filter>visual\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\win32\DrawDevice.h">
+      <Filter>visual\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\win32\GraphicsLoaderImpl.h">
+      <Filter>visual\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\win32\krmovie.h">
+      <Filter>visual\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\win32\LayerBitmapImpl.h">
+      <Filter>visual\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\win32\LayerImpl.h">
+      <Filter>visual\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\win32\PassThroughDrawDevice.h">
+      <Filter>visual\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\win32\TransImpl.h">
+      <Filter>visual\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\win32\VideoOvlImpl.h">
+      <Filter>visual\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\win32\WindowImpl.h">
+      <Filter>visual\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\argb.h">
+      <Filter>visual</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\ComplexRect.h">
+      <Filter>visual</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\drawable.h">
+      <Filter>visual</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\GraphicsLoaderIntf.h">
+      <Filter>visual</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\LayerBitmapIntf.h">
+      <Filter>visual</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\LayerIntf.h">
+      <Filter>visual</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\LayerManager.h">
+      <Filter>visual</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\LoadTLG.h">
+      <Filter>visual</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\Resampler.h">
+      <Filter>visual</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\transhandler.h">
+      <Filter>visual</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\TransIntf.h">
+      <Filter>visual</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\tvpfontstruc.h">
+      <Filter>visual</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\tvpgl.h">
+      <Filter>visual</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\tvpinputdefs.h">
+      <Filter>visual</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\VideoOvlIntf.h">
+      <Filter>visual</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\voMode.h">
+      <Filter>visual</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\WindowIntf.h">
+      <Filter>visual</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utils\win32\ClipboardImpl.h">
+      <Filter>utils\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utils\win32\DebugImpl.h">
+      <Filter>utils\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utils\win32\ThreadImpl.h">
+      <Filter>utils\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utils\win32\TickCount.h">
+      <Filter>utils\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utils\win32\TimerImpl.h">
+      <Filter>utils\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utils\ClipboardIntf.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utils\Debugger.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utils\DebugIntf.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utils\KAGParser.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utils\md5.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utils\ObjectList.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utils\Random.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utils\ThreadIntf.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utils\TimerIntf.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sound\win32\kmp_pi.h">
+      <Filter>sound\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sound\win32\oldwaveunpacker.h">
+      <Filter>sound\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sound\win32\SoundBufferBaseImpl.h">
+      <Filter>sound\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sound\win32\tvpsnd.h">
+      <Filter>sound\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sound\win32\WaveImpl.h">
+      <Filter>sound\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sound\PhaseVocoderDSP.h">
+      <Filter>sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sound\PhaseVocoderFilter.h">
+      <Filter>sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sound\RingBuffer.h">
+      <Filter>sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sound\SoundBufferBaseIntf.h">
+      <Filter>sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sound\WaveIntf.h">
+      <Filter>sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sound\WaveLoopManager.h">
+      <Filter>sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sound\WaveSegmentQueue.h">
+      <Filter>sound</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="tvpwin32.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjs.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjs.tab.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjsArray.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjsBinarySerializer.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjsByteCodeLoader.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjsCompileControl.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjsConfig.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjsConstArrayData.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjsDate.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjsdate.tab.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjsDateParser.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjsDebug.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjsDictionary.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjsDisassemble.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjsError.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjsException.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjsGlobalStringMap.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjsInterCodeExec.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjsInterCodeGen.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjsInterface.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjsLex.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjsMath.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjsMessage.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjsMT19937ar-cok.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjsNamespace.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjsNative.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjsObject.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjspp.tab.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjsRandomGenerator.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjsScriptBlock.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjsScriptCache.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjsString.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjsUtils.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjsVariant.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjsVariantString.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\base\win32\EventImpl.cpp">
+      <Filter>base\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\base\win32\FileSelector.cpp">
+      <Filter>base\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\base\win32\FuncStubs.cpp">
+      <Filter>base\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\base\win32\PluginImpl.cpp">
+      <Filter>base\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\base\win32\ScriptMgnImpl.cpp">
+      <Filter>base\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\base\win32\StorageImpl.cpp">
+      <Filter>base\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\base\win32\SusieArchive.cpp">
+      <Filter>base\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\base\win32\SysInitImpl.cpp">
+      <Filter>base\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\base\win32\SystemImpl.cpp">
+      <Filter>base\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\base\BinaryStream.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\base\CharacterSet.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\base\EventIntf.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\base\PluginIntf.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\base\ScriptMgnIntf.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\base\StorageIntf.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\base\SysInitIntf.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\base\SystemIntf.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\base\TextStream.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\base\UtilStreams.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\base\XP3Archive.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\msg\win32\MsgImpl.cpp">
+      <Filter>msg\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\msg\win32\OptionsDesc.cpp">
+      <Filter>msg\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\msg\MsgIntf.cpp">
+      <Filter>msg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\environ\win32\MainFormUnit.cpp">
+      <Filter>environ\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\environ\win32\WideNativeFuncs.cpp">
+      <Filter>environ\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\environ\win32\EmergencyExit.cpp">
+      <Filter>environ\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\environ\win32\Application.cpp">
+      <Filter>environ\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\environ\win32\Screen.cpp">
+      <Filter>environ\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\environ\win32\TMLWindow.cpp">
+      <Filter>environ\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\environ\win32\InputStringForm.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="..\environ\win32\DetectCPU.cpp">
+      <Filter>environ\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\environ\win32\WindowFormUnit.cpp">
+      <Filter>environ\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\environ\win32\VersionFormUnit.cpp">
+      <Filter>environ\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\IA32\tvpgl_ia32_intf.c">
+      <Filter>visual\IA32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\environ\win32\Clipbrd.cpp">
+      <Filter>environ\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\environ\win32\MouseCursor.cpp">
+      <Filter>environ\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\environ\win32\WindowMenu.cpp">
+      <Filter>environ\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjsRegExp.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\win32\DInputMgn.cpp">
+      <Filter>visual\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\win32\DrawDevice.cpp">
+      <Filter>visual\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\win32\GraphicsLoaderImpl.cpp">
+      <Filter>visual\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\win32\LayerBitmapImpl.cpp">
+      <Filter>visual\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\win32\LayerImpl.cpp">
+      <Filter>visual\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\win32\PassThroughDrawDevice.cpp">
+      <Filter>visual\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\win32\TransImpl.cpp">
+      <Filter>visual\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\win32\VideoOvlImpl.cpp">
+      <Filter>visual\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\win32\WindowImpl.cpp">
+      <Filter>visual\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\ComplexRect.cpp">
+      <Filter>visual</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\GraphicsLoaderIntf.cpp">
+      <Filter>visual</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\LayerBitmapIntf.cpp">
+      <Filter>visual</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\LayerIntf.cpp">
+      <Filter>visual</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\LayerManager.cpp">
+      <Filter>visual</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\LoadJPEG.cpp">
+      <Filter>visual</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\LoadPNG.cpp">
+      <Filter>visual</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\LoadTLG.cpp">
+      <Filter>visual</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\Resampler.cpp">
+      <Filter>visual</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\TransIntf.cpp">
+      <Filter>visual</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\tvpgl.c">
+      <Filter>visual</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\VideoOvlIntf.cpp">
+      <Filter>visual</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\WindowIntf.cpp">
+      <Filter>visual</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utils\win32\ClipboardImpl.cpp">
+      <Filter>utils\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utils\win32\DebugImpl.cpp">
+      <Filter>utils\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utils\win32\ThreadImpl.cpp">
+      <Filter>utils\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utils\win32\TickCount.cpp">
+      <Filter>utils\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utils\win32\TimerImpl.cpp">
+      <Filter>utils\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utils\ClipboardIntf.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utils\DebugIntf.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utils\KAGParser.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utils\md5.c">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utils\Random.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utils\ThreadIntf.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utils\TimerIntf.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sound\win32\SoundBufferBaseImpl.cpp">
+      <Filter>sound\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sound\win32\tvpsnd.c">
+      <Filter>sound\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sound\win32\WaveImpl.cpp">
+      <Filter>sound\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sound\PhaseVocoderDSP.cpp">
+      <Filter>sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sound\PhaseVocoderFilter.cpp">
+      <Filter>sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sound\SoundBufferBaseIntf.cpp">
+      <Filter>sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sound\WaveIntf.cpp">
+      <Filter>sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sound\WaveLoopManager.cpp">
+      <Filter>sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sound\WaveSegmentQueue.cpp">
+      <Filter>sound</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="tvpwin32.rc">
+      <Filter>リソース ファイル</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="small.ico">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="tvpwin32.ico">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\movetab.cur">
+      <Filter>リソース ファイル</Filter>
+    </None>
+    <None Include="res\nodrop.cur">
+      <Filter>リソース ファイル</Filter>
+    </None>
+    <None Include="res\splith.cur">
+      <Filter>リソース ファイル</Filter>
+    </None>
+    <None Include="res\splitv.cur">
+      <Filter>リソース ファイル</Filter>
+    </None>
+    <None Include="res\nomovetab.cur">
+      <Filter>リソース ファイル</Filter>
+    </None>
+  </ItemGroup>
+</Project>

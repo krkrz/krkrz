@@ -188,9 +188,9 @@ struct tTVPScreenModeCandidate : tTVPScreenMode
 	}
 };
 
-class IDirectDraw2;
-class IDirectDrawSurface;
-class IDirectDrawClipper;
+struct IDirectDraw2;
+struct IDirectDrawSurface;
+struct IDirectDrawClipper;
 extern void TVPTestDisplayMode(tjs_int w, tjs_int h, tjs_int & bpp);
 extern void TVPSwitchToFullScreen(HWND window, tjs_int w, tjs_int h);
 extern void TVPRevertFromFullScreen(HWND window);
@@ -273,7 +273,11 @@ public:
 	void TJS_INTF_METHOD GetCursorPos(tjs_int &x, tjs_int &y);
 	void TJS_INTF_METHOD SetCursorPos(tjs_int x, tjs_int y);
 	void TJS_INTF_METHOD WindowReleaseCapture();
+
+#ifdef USE_OBSOLETE_FUNCTIONS
 	void TJS_INTF_METHOD SetHintText(const ttstr & text);
+#endif
+
 	void TJS_INTF_METHOD SetAttentionPoint(tTJSNI_BaseLayer *layer,
 		tjs_int l, tjs_int t);
 	void TJS_INTF_METHOD DisableAttentionPoint();
@@ -287,7 +291,7 @@ public:
 	void EndUpdate();
 
 //-- interface to MenuItem object
-	TMenuItem *  GetRootMenuItem();
+	class TMenuItem *  GetRootMenuItem();
 	void SetMenuBarVisible(bool b);
 	bool GetMenuBarVisible() const;
 	HWND GetMenuOwnerWindowHandle();
@@ -312,11 +316,17 @@ public:
 //-- methods
 	void Close();
 	void OnCloseQueryCalled(bool b);
-
+	
+#ifdef USE_OBSOLETE_FUNCTIONS
 	void BeginMove();
+#endif
+
 	void BringToFront();
 	void Update(tTVPUpdateType);
+
+#ifdef USE_OBSOLETE_FUNCTIONS
 	void ShowModal();
+#endif
 
 	void HideMouseCursor();
 
@@ -351,15 +361,16 @@ public:
 	tjs_int GetTop() const;
 	void SetPosition(tjs_int l, tjs_int t);
 
+#ifdef USE_OBSOLETE_FUNCTIONS
 	void SetLayerLeft(tjs_int l);
 	tjs_int GetLayerLeft() const;
 	void SetLayerTop(tjs_int t);
 	tjs_int GetLayerTop() const;
 	void SetLayerPosition(tjs_int l, tjs_int t);
 
-
 	void SetInnerSunken(bool b);
 	bool GetInnerSunken() const;
+#endif
 
 	void SetInnerWidth(tjs_int w);
 	tjs_int GetInnerWidth() const;
@@ -374,8 +385,10 @@ public:
 	void SetStayOnTop(bool b);
 	bool GetStayOnTop() const;
 
+#ifdef USE_OBSOLETE_FUNCTIONS
 	void SetShowScrollBars(bool b);
 	bool GetShowScrollBars() const;
+#endif
 
 	void SetFullScreen(bool b);
 	bool GetFullScreen() const;
@@ -385,15 +398,19 @@ public:
 
 	void SetTrapKey(bool b);
 	bool GetTrapKey() const;
-
+	
+#ifdef USE_OBSOLETE_FUNCTIONS
 	void SetMaskRegion(tjs_int threshold);
 	void RemoveMaskRegion();
+#endif
 
 	void SetMouseCursorState(tTVPMouseCursorState mcs);
     tTVPMouseCursorState GetMouseCursorState() const;
-
+	
+#ifdef USE_OBSOLETE_FUNCTIONS
 	void SetFocusable(bool b);
 	bool GetFocusable();
+#endif
 
 	void SetZoom(tjs_int numer, tjs_int denom);
 	void SetZoomNumer(tjs_int n);

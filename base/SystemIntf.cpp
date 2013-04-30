@@ -121,6 +121,8 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/exit)
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_STATIC_METHOD_DECL(/*func. name*/exit)
+#pragma message( __LOC__ "TODO inputString –³Œø‰»‚·‚é" )
+#if 0
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/inputString)
 {
@@ -140,6 +142,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/inputString)
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_STATIC_METHOD_DECL(/*func. name*/inputString)
+#endif
 //---------------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/addContinuousHandler)
 {
@@ -243,7 +246,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/createUUID)
 	uuid[6] |= 0x40; // override version
 
 	tjs_char buf[40];
-	TJS_sprintf(buf,
+	TJS_snprintf(buf, sizeof(buf)/sizeof(tjs_char),
 TJS_W("%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x"),
 		uuid[ 0], uuid[ 1], uuid[ 2], uuid[ 3],
 		uuid[ 4], uuid[ 5], uuid[ 6], uuid[ 7],
@@ -391,7 +394,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(exitOnWindowClose)
 
 	TJS_BEGIN_NATIVE_PROP_SETTER
 	{
-		TVPTerminateOnWindowClose = (tjs_int)*param;
+		TVPTerminateOnWindowClose = 0!=(tjs_int)*param;
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_SETTER
@@ -437,7 +440,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(exitOnNoWindowStartup)
 	TJS_END_NATIVE_PROP_GETTER
 	TJS_BEGIN_NATIVE_PROP_SETTER
 	{
-		TVPTerminateOnNoWindowStartup = (tjs_int)*param;
+		TVPTerminateOnNoWindowStartup = 0!=(tjs_int)*param;
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_SETTER

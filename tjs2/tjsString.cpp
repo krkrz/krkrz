@@ -223,7 +223,7 @@ tTJSString tTJSString::EscapeC() const
 						*p >= TJS_W('0') && *p <= TJS_W('9') )
 				{
 					tjs_char buf[20];
-					TJS_sprintf(buf, TJS_W("\\x%02x"), (int)*p);
+					TJS_snprintf(buf, sizeof(buf)/sizeof(tjs_char), TJS_W("\\x%02x"), (int)*p);
 					hexflag = true;
 					ret += buf;
 					continue;
@@ -233,7 +233,7 @@ tTJSString tTJSString::EscapeC() const
 			if(*p < 0x20)
 			{
 				tjs_char buf[20];
-				TJS_sprintf(buf, TJS_W("\\x%02x"), (int)*p);
+				TJS_snprintf(buf, sizeof(buf)/sizeof(tjs_char), TJS_W("\\x%02x"), (int)*p);
 				hexflag = true;
 				ret += buf;
 			}

@@ -8,55 +8,65 @@
 //---------------------------------------------------------------------------
 // Version information dialog box
 //---------------------------------------------------------------------------
+
+#include "stdafx.h"
+#include "Resource.h"
+
 #include "tjsCommHead.h"
 
 #include "MsgIntf.h"
 #include "VersionFormUnit.h"
-#include "ConsoleFormUnit.h"
 #include "MainFormUnit.h"
 #include "WindowImpl.h"
-//---------------------------------------------------------------------------
-#pragma package(smart_init)
-#pragma resource "*.dfm"
-TTVPVersionForm *TVPVersionForm;
-//---------------------------------------------------------------------------
-__fastcall TTVPVersionForm::TTVPVersionForm(TComponent* Owner)
-    : TForm(Owner)
-{
-}
-//---------------------------------------------------------------------------
-void __fastcall TTVPVersionForm::PopupMenuPopup(TObject *Sender)
-{
-	CopyMenuItem->Enabled = Memo->SelLength != 0;
-}
-//---------------------------------------------------------------------------
-void __fastcall TTVPVersionForm::CopyMenuItemClick(TObject *Sender)
-{
-	Memo->CopyToClipboard();
-}
-//---------------------------------------------------------------------------
-void __fastcall TTVPVersionForm::CopyEnvInfoButtonClick(TObject *Sender)
-{
-	TVPCopyImportantLogToClipboard();
-}
-//---------------------------------------------------------------------------
 
+#include "VersionFormUnit.h"
+#include "DebugIntf.h"
+#include "Clipbrd.h"
+
+//---------------------------------------------------------------------------
+// TVPCopyImportantLogToClipboard
+//---------------------------------------------------------------------------
+void TVPCopyImportantLogToClipboard()
+{
+	// get DirectDraw driver information
+	TVPEnsureDirectDrawObject();
+	TVPDumpDirectDrawDriverInformation();
+
+	// copy
+	TVPCopyToClipboard(TVPGetImportantLog());
+}
+
+static LRESULT WINAPI DlgProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam ) {
+	switch( msg ) {
+	case WM_INITDIALOG: {
+		::SetDlgItemText( hWnd, IDC_INFOMATION_EDIT, TVPGetAboutString().AsStdString().c_str() );
+		return TRUE;
+	}
+	case WM_COMMAND:
+		if(LOWORD(wParam) == IDOK) {
+			//OKƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚½‚Æ‚«‚Ìˆ—
+			::EndDialog(hWnd, IDOK);
+			return TRUE;
+		} else if(LOWORD(wParam) == IDC_COPY_INFO_BUTTON) {
+			TVPCopyImportantLogToClipboard();
+			return TRUE;
+		}
+		break;
+	case WM_CLOSE:
+		EndDialog(hWnd, 0);
+		return TRUE;
+	default:
+		break;
+	}
+	return ::DefWindowProc(hWnd,msg,wParam,lParam);
+}
 //---------------------------------------------------------------------------
 void TVPShowVersionForm()
 {
 	// get DirectDraw driver information
 	TVPEnsureDirectDrawObject();
 	TVPDumpDirectDrawDriverInformation();
-
-	// show version information
-	TTVPVersionForm *form = new TTVPVersionForm(Application);
-	TStringList *list = new TStringList();
-	list->Text = TVPGetAboutString().AsAnsiString();
-	form->Memo->Lines->Assign(list);
-	form->Memo->SelStart = 0;
-	delete list;
-	form->ShowModal();
-	delete form;
+	::DialogBox( NULL, MAKEINTRESOURCE(IDD_INPUT_STRING), NULL, (DLGPROC)DlgProc );
 }
 //---------------------------------------------------------------------------
 

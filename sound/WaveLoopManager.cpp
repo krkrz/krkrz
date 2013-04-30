@@ -16,6 +16,7 @@
 #include "tjsCommHead.h"
 
 #include <algorithm>
+#include <string.h>
 #include "tjsTypes.h"
 #include "WaveLoopManager.h"
 #include "CharacterSet.h"
@@ -30,6 +31,11 @@
 #ifdef __BORLANDC__
 	#define strcasecmp strcmpi
 	#define strncasecmp strncmpi
+#endif
+
+#ifdef _MSC_VER
+	#define strcasecmp _stricmp
+	#define strncasecmp _strnicmp
 #endif
 
 //---------------------------------------------------------------------------
@@ -344,7 +350,7 @@ void tTVPWaveLoopManager::Decode(void *dest, tjs_uint samples, tjs_uint &written
 					// or crossfade must already start
 					next_event_pos = link.From;
 					// adjust before_count
-					before_count = link.From - Position;
+					before_count = static_cast<tjs_int>(link.From - Position);
 					// adjust after count
 					tjs_int after_count = ShortCrossFadeHalfSamples;
 					if(Format->TotalSamples - link.From < after_count)
@@ -676,7 +682,7 @@ void tTVPWaveLoopManager::DoCrossFade(void *dest, void *src1,
 		const float *s1 = (const float *)src1;
 		const float *s2 = (const float *)src2;
 		float *out = (float *)dest;
-		float ratio = ratiostart / 100.0;
+		float ratio = static_cast<float>(ratiostart / 100.0);
 		for(tjs_int i = 0; i < samples; i++)
 		{
 			for(tjs_int j = Format->Channels - 1; j >= 0; j--)

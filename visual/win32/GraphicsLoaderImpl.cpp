@@ -160,7 +160,7 @@ void tTVPSusiePicturePlugin::Load(void *callbackdata,
 
 	try
 	{
-		src->ReadBuffer(source, size);
+		src->ReadBuffer(source, static_cast<tjs_uint>(size) );
 
 		// call GetPicture
 		int r = GetPicture((LPSTR)source, (long)size, 0x01, &info, &bitmap,

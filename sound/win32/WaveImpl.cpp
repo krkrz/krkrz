@@ -12,7 +12,7 @@
 
 #include <mmsystem.h>
 #include <mmreg.h>
-#include <syncobjs.hpp>
+//#include <syncobjs.hpp>
 #include <math.h>
 #include <algorithm>
 #include "MainFormUnit.h"
@@ -38,6 +38,9 @@
 #ifdef TVP_SUPPORT_KPI
 	#include "kmp_pi.h"
 #endif
+
+#include "Timer.h"
+#include "Application.h"
 
 //---------------------------------------------------------------------------
 // Options management
@@ -248,7 +251,7 @@ public:
 		format.BytesPerSample = format.BitsPerSample / 8;
 		format.TotalSamples = f.ui64TotalSamples;
 		format.TotalTime = f.dwTotalTime;
-		format.Seekable = f.dwSeekable;
+		format.Seekable = 0!=f.dwSeekable;
 		format.SpeakerConfig = 0;
 	}
 
@@ -260,7 +263,7 @@ public:
 		hr = Decoder->Render(buf, bufsamplelen, &rend, &st);
 		rendered = rend; // count of rendered samples
 		if(FAILED(hr)) return false;
-		return (bool)st;
+		return 0!=st;
 	}
 
 	bool SetPosition(tjs_uint64 samplepos)
@@ -531,7 +534,7 @@ static void TVPInitLogTable()
 	TVPLogTable[0] = -10000;
 	for(i = 1; i <= 100; i++)
 	{
-		TVPLogTable[i] = log10((double)i/100.0)*TVPVolumeLogFactor;
+		TVPLogTable[i] = static_cast<tjs_int>( log10((double)i/100.0)*TVPVolumeLogFactor );
 	}
 }
 //---------------------------------------------------------------------------
@@ -594,7 +597,7 @@ static void TVPEnsurePrimaryBufferPlay()
 	if(TVPPrimaryBuffer)
 	{
 		if(TVPPrimaryDelayedStopperTimer)
-			TVPPrimaryDelayedStopperTimer->Enabled = false;
+			TVPPrimaryDelayedStopperTimer->SetEnabled( false );
 		if(!TVPPrimaryBufferPlayingByProgram)
 		{
 			TVPPrimaryBuffer->Play(0, 0, DSBPLAY_LOOPING);
@@ -612,8 +615,8 @@ static void TVPStopPrimaryBuffer()
 	{
 		if(TVPPrimaryDelayedStopperTimer)
 		{
-			TVPPrimaryDelayedStopperTimer->Enabled = false; // once disable the timer
-			TVPPrimaryDelayedStopperTimer->Enabled = true;
+			TVPPrimaryDelayedStopperTimer->SetEnabled( false ); // once disable the timer
+			TVPPrimaryDelayedStopperTimer->SetEnabled( true );
 		}
 	}
 }
@@ -621,10 +624,10 @@ static void TVPStopPrimaryBuffer()
 class tTVPPrimaryDelayedStopper
 {
 public:
-	void __fastcall OnTimer(TObject *Sender)
+	void OnTimer()
 	{
 		if(TVPPrimaryDelayedStopperTimer)
-			TVPPrimaryDelayedStopperTimer->Enabled = false;
+			TVPPrimaryDelayedStopperTimer->SetEnabled( false );
 		if(TVPPrimaryBuffer)
 		{
 			if(TVPPrimaryBufferPlayingByProgram)
@@ -694,13 +697,13 @@ static BOOL CALLBACK DSoundEnumCallback( GUID* pGUID, const char * strDesc,
 
 		char driverpath[1024];
 		char *driverpath_filename = NULL;
-		bool success = SearchPath(NULL, strDrvName, NULL, 1023, driverpath, &driverpath_filename);
+		bool success = 0!=SearchPath(NULL, strDrvName, NULL, 1023, driverpath, &driverpath_filename);
 		if(!success)
 		{
 			char syspath[1024];
 			GetSystemDirectory(syspath, 1023);
 			strcat(syspath, "\\drivers"); // SystemDir\drivers
-			success = SearchPath(syspath, strDrvName, NULL, 1023, driverpath, &driverpath_filename);
+			success = 0!=SearchPath(syspath, strDrvName, NULL, 1023, driverpath, &driverpath_filename);
 		}
 
 		if(!success)
@@ -708,7 +711,7 @@ static BOOL CALLBACK DSoundEnumCallback( GUID* pGUID, const char * strDesc,
 			char syspath[1024];
 			GetWindowsDirectory(syspath, 1023);
 			strcat(syspath, "\\system32"); // WinDir\system32
-			success = SearchPath(syspath, strDrvName, NULL, 1023, driverpath, &driverpath_filename);
+			success = 0!=SearchPath(syspath, strDrvName, NULL, 1023, driverpath, &driverpath_filename);
 		}
 
 		if(!success)
@@ -716,7 +719,7 @@ static BOOL CALLBACK DSoundEnumCallback( GUID* pGUID, const char * strDesc,
 			char syspath[1024];
 			GetWindowsDirectory(syspath, 1023);
 			strcat(syspath, "\\system32\\drivers"); // WinDir\system32\drivers
-			success = SearchPath(syspath, strDrvName, NULL, 1023, driverpath, &driverpath_filename);
+			success = 0!=SearchPath(syspath, strDrvName, NULL, 1023, driverpath, &driverpath_filename);
 		}
 
 		if(success)
@@ -768,8 +771,8 @@ static void TVPInitDirectSound()
 		// Enum DirectSound devices
 		try
 		{
-			HRESULT WINAPI (*DirectSoundEnumerateA)(LPDSENUMCALLBACKA, LPVOID);
-			DirectSoundEnumerateA = (HRESULT WINAPI (*)
+			HRESULT (WINAPI *DirectSoundEnumerateA)(LPDSENUMCALLBACKA, LPVOID);
+			DirectSoundEnumerateA = (HRESULT (WINAPI *)
 				(LPDSENUMCALLBACKA, LPVOID)) GetProcAddress(TVPDirectSoundDLL, "DirectSoundEnumerateA");
 			if(DirectSoundEnumerateA)
 				DirectSoundEnumerateA(DSoundEnumCallback, NULL);
@@ -788,16 +791,16 @@ static void TVPInitDirectSound()
 			{
 				// create timer to stop primary buffer playing at delayed timing
 				TVPPrimaryDelayedStopperTimer = new TTimer(Application);
-				TVPPrimaryDelayedStopperTimer->Interval = 4000;
-				TVPPrimaryDelayedStopperTimer->Enabled = false;
-				TVPPrimaryDelayedStopperTimer->OnTimer =
-					TVPPrimaryDelayedStopper.OnTimer;
+				TVPPrimaryDelayedStopperTimer->SetInterval( 4000 );
+				TVPPrimaryDelayedStopperTimer->SetEnabled( false );
+#pragma message( __LOC__ "TODO イベントハンドラをなんとかする" )
+//				TVPPrimaryDelayedStopperTimer->SetOnTimer( TVPPrimaryDelayedStopper.OnTimer );
 			}
 		}
 
 		// get procDirectSoundCreate's address
-		HRESULT WINAPI (*procDirectSoundCreate)(LPGUID, LPDIRECTSOUND *, LPUNKNOWN);
-		procDirectSoundCreate = (HRESULT (WINAPI*)(_GUID *,IDirectSound **,IUnknown*))
+		HRESULT (WINAPI *procDirectSoundCreate)(LPGUID, LPDIRECTSOUND *, LPUNKNOWN);
+		procDirectSoundCreate = (HRESULT (WINAPI *)(_GUID *,IDirectSound **,IUnknown*))
 			GetProcAddress(TVPDirectSoundDLL, "DirectSoundCreate");
 		if(!procDirectSoundCreate)
 		{
@@ -816,7 +819,7 @@ static void TVPInitDirectSound()
 		}
 
 		// set cooperative level
-		hr = TVPDirectSound->SetCooperativeLevel(Application->Handle,
+		hr = TVPDirectSound->SetCooperativeLevel(Application->GetHandle(),
 			DSSCL_PRIORITY);
 		if(FAILED(hr))
 		{
@@ -845,8 +848,8 @@ static void TVPInitDirectSound()
 		{
 			// cannot create DirectSound primary buffer.
 			// try to not set 3D mode
-			TVPAddLog(TJS_W("Warning: Cannot create DirectSound primary buffer with 3D sound mode. "
-				"Force not to use it."));
+			TVPAddLog(TJS_W("Warning: Cannot create DirectSound primary buffer with 3D sound mode. ")
+				TJS_W("Force not to use it."));
 			dsbd.dwFlags &= ~DSBCAPS_CTRL3D;
 			hr = TVPDirectSound->CreateSoundBuffer(&dsbd, &TVPPrimaryBuffer, NULL);
 			if(SUCCEEDED(hr)) TVPDirectSoundUse3D = false;
@@ -857,18 +860,18 @@ static void TVPInitDirectSound()
 			// cannot create DirectSound primary buffer.
 			// try to set cooperative level to DSSCL_NORMAL.
 			TVPPrimaryBuffer = NULL;
-			hr = TVPDirectSound->SetCooperativeLevel(Application->Handle,
+			hr = TVPDirectSound->SetCooperativeLevel(Application->GetHandle(),
 				DSSCL_NORMAL);
 			if(FAILED(hr))
 			{
 				// failed... here assumes this a failure.
 				TVPThrowExceptionMessage(TVPCannotInitDirectSound,
-					ttstr(TJS_W("IDirectSound::SetCooperativeLevel failed. "
-						"(after creation of primary buffer failed)/HR="))+
+					ttstr(TJS_W("IDirectSound::SetCooperativeLevel failed. ")
+						TJS_W("(after creation of primary buffer failed)/HR="))+
 					TJSInt32ToHex((tjs_uint32)hr));
 			}
-			TVPAddLog(TJS_W("Warning: Cannot create DirectSound primary buffer. "
-				"Force not to use it."));
+			TVPAddLog(TJS_W("Warning: Cannot create DirectSound primary buffer. ")
+				TJS_W("Force not to use it."));
 			pri_normal = true;
 		}
 
@@ -984,13 +987,13 @@ static void TVPInitDirectSound()
 			if(FAILED(hr))
 			{
 				// specified parameter is denied
-				TVPAddImportantLog(ttstr(TJS_W("Warning: IDirectSoundBuffer::SetFormat failed. "
-						"(") + ttstr(TVPPriamrySBFrequency) + TJS_W("Hz, ") +
+				TVPAddImportantLog(ttstr(TJS_W("Warning: IDirectSoundBuffer::SetFormat failed. ")
+						TJS_W("(") + ttstr(TVPPriamrySBFrequency) + TJS_W("Hz, ") +
 						ttstr(TVPPrimarySBBits) + TJS_W("bits, ") +
 						ttstr((tjs_int)wfx.Format.nChannels) + TJS_W("channels)/HR="))+
 						TJSInt32ToHex((tjs_uint32)hr));
-				TVPAddImportantLog(TJS_W("Retrying with 44100Hz, "
-						"16bits, 2channels"));
+				TVPAddImportantLog(TJS_W("Retrying with 44100Hz, ")
+						TJS_W("16bits, 2channels"));
 
 		level0:
 				// fourth very basic buffer format
@@ -1460,7 +1463,9 @@ public:
 	~tTVPWaveSoundBufferThread();
 
 private:
-	void __fastcall UtilWndProc(Messages::TMessage &Msg);
+	//void __fastcall UtilWndProc(Messages::TMessage &Msg);
+	LRESULT CALLBACK UtilWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+
 public:
 	void ReschedulePendingLabelEvent(tjs_int tick);
 
@@ -1477,7 +1482,8 @@ public:
 tTVPWaveSoundBufferThread::tTVPWaveSoundBufferThread()
 	: tTVPThread(true)
 {
-	UtilWindow = AllocateHWnd(UtilWndProc);
+#pragma message( __LOC__ "TODO メッセージハンドラをなんとかする" )
+//	UtilWindow = AllocateHWnd(UtilWndProc);
 	PendingLabelEventExists = false;
 	NextLabelEventTick = 0;
 	LastFilledTick = 0;
@@ -1493,13 +1499,16 @@ tTVPWaveSoundBufferThread::~tTVPWaveSoundBufferThread()
 	Resume();
 	Event.Set();
 	WaitFor();
-	DeallocateHWnd(UtilWindow);
+#pragma message( __LOC__ "TODO メッセージハンドラをなんとかする" )
+	//DeallocateHWnd(UtilWindow);
 }
 //---------------------------------------------------------------------------
-void __fastcall tTVPWaveSoundBufferThread::UtilWndProc(Messages::TMessage &Msg)
+//void __fastcall tTVPWaveSoundBufferThread::UtilWndProc(Messages::TMessage &Msg)
+LRESULT CALLBACK tTVPWaveSoundBufferThread::UtilWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	LRESULT result = 0;
 	// Window procedure of UtilWindow
-	if(Msg.Msg == WM_USER + 1 && !GetTerminated())
+	if(message == WM_USER + 1 && !GetTerminated())
 	{
 		// pending events occur
 		tTJSCriticalSectionHolder holder(TVPWaveSoundBufferVectorCS); // protect the object
@@ -1535,8 +1544,9 @@ void __fastcall tTVPWaveSoundBufferThread::UtilWndProc(Messages::TMessage &Msg)
 	}
 	else
 	{
-		Msg.Result =  DefWindowProc(UtilWindow, Msg.Msg, Msg.WParam, Msg.LParam);
+		result =  DefWindowProc(UtilWindow, message, wParam, lParam);
 	}
+	return result;
 }
 //---------------------------------------------------------------------------
 void tTVPWaveSoundBufferThread::ReschedulePendingLabelEvent(tjs_int tick)
@@ -2065,8 +2075,8 @@ void tTJSNI_WaveSoundBuffer::TryCreateSoundBuffer(bool use3d)
 		delete [] Level2Buffer;
 		Level2Buffer = NULL;
 		ThrowSoundBufferException(
-			ttstr(TJS_W("IDirectSound::CreateSoundBuffer "
-				"(on to create a secondary buffer) failed./HR=") +
+			ttstr(TJS_W("IDirectSound::CreateSoundBuffer ")
+				TJS_W("(on to create a secondary buffer) failed./HR=") +
 				TJSInt32ToHex(hr)));
 	}
 }
@@ -2673,7 +2683,7 @@ bool tTJSNI_WaveSoundBuffer::FillBuffer(bool firstwrite, bool allowpause)
 		{
 			LabelEventQueue.push_back(
 				tTVPWaveLabel(i->Position,
-						i->Name, i->Offset + DecodePos));
+						i->Name, static_cast<tjs_int>(i->Offset + DecodePos)));
 		}
 
 		// sort
@@ -2944,7 +2954,7 @@ void tTJSNI_WaveSoundBuffer::Open(const ttstr & storagename)
 		tTVPStreamHolder slistream(sliname);
 		char *buffer;
 		tjs_uint size;
-		buffer = new char [ (size = slistream->GetSize()) +1];
+		buffer = new char [ (size = static_cast<tjs_uint>(slistream->GetSize())) +1];
 		try
 		{
 			slistream->ReadBuffer(buffer, size);
@@ -3127,8 +3137,8 @@ void tTJSNI_WaveSoundBuffer::SetPan(tjs_int v)
 			PosY = (D3DVALUE)0.001;
 			// PosX = -0.003 .. -0.0001 = 0 = +0.0001 ... +0.003
 			float t;
-			t = ((float)v / 100000.0);
-			t *= t * 0.003;
+			t = static_cast<float>( ((float)v / 100000.0) );
+			t *= static_cast<float>( t * 0.003 );
 			if(v < 0) t = - t;
 			PosX = t;
 			Set3DPositionToBuffer();
@@ -3405,7 +3415,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(useVisBuffer)
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this,
 			/*var. type*/tTJSNI_WaveSoundBuffer);
 
-		_this->SetUseVisBuffer((tjs_int)*param);
+		_this->SetUseVisBuffer(0!=(tjs_int)*param);
 
 		return TJS_S_OK;
 	}

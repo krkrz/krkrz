@@ -17,6 +17,11 @@
 
 #include "ThreadIntf.h"
 
+#include "Exception.h"
+#include <intrin.h>
+
+#pragma intrinsic(__rdtsc)
+
 /*
 	Note: CPU clock measuring routine is in EmergencyExit.cpp, reusing
 	hot-key watching thread.
@@ -40,25 +45,24 @@ static bool TVPCPUChecked = false;
 //---------------------------------------------------------------------------
 static void TVPGetCPUTypeForOne()
 {
-	__try
-	{
+#if 1
+	TVPCheckCPU(); // in detect_cpu.nas
+#else
+	__try {
 		TVPCheckCPU(); // in detect_cpu.nas
-	}
-	__except(EXCEPTION_EXECUTE_HANDLER)
-	{
+	} __except(EXCEPTION_EXECUTE_HANDLER) {
 		// exception had been ocured
 		throw Exception("CPU check failure.");
 	}
+#endif
 
 	// check OSFXSR
 	if(TVPCPUFeatures & TVP_CPU_HAS_SSE)
 	{
-		__try
-		{
-			__emit__(0x0f, 0x57, 0xc0); // xorps xmm0, xmm0   (SSE)
-		}
-		__except(EXCEPTION_EXECUTE_HANDLER)
-		{
+		__try {
+			//__emit__(0x0f, 0x57, 0xc0); // xorps xmm0, xmm0   (SSE)
+			__asm xorps xmm0, xmm0
+		} __except(EXCEPTION_EXECUTE_HANDLER) {
 			// exception had been ocured
 			// execution of 'xorps' is failed (XMM registers not available)
 			TVPCPUFeatures &=~ TVP_CPU_HAS_SSE;
@@ -153,7 +157,7 @@ static ttstr TVPDumpCPUInfo(tjs_int cpu_num)
 
 #undef TVP_DUMP_CPU
 #define TVP_DUMP_CPU(x, n) { \
-	if(vendor == x) features += TJS_W("  " n); }
+	if(vendor == x) features += TJS_W("  ") TJS_W(n); }
 
 	TVP_DUMP_CPU(TVP_CPU_IS_INTEL, "Intel");
 	TVP_DUMP_CPU(TVP_CPU_IS_AMD, "AMD");
@@ -180,7 +184,7 @@ static ttstr TVPDumpCPUInfo(tjs_int cpu_num)
 
 	if(((TVPCPUID1_EAX >> 8) & 0x0f) <= 4)
 		throw Exception("CPU check failure: CPU family 4 or lesser is not supported\r\n"+
-		features.AsAnsiString());
+		features.AsStdString());
 
 	return features;
 }
@@ -214,12 +218,12 @@ void TVPDetectCPU()
 
 	// get process affinity mask
 	DWORD pam = 1;
-	HANDLE hp = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, GetCurrentProcessId());
+	HANDLE hp = ::OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, ::GetCurrentProcessId());
 	if(hp)
 	{
 		DWORD sam = 1;
-		GetProcessAffinityMask(hp, &pam, &sam);
-		CloseHandle(hp);
+		::GetProcessAffinityMask(hp, &pam, &sam);
+		::CloseHandle(hp);
 	}
 
 	// for each CPU...
@@ -265,7 +269,7 @@ void TVPDetectCPU()
 
 	if(TVPCPUType == 0)
 		throw Exception("CPU check failure: Not supported CPU\r\n" +
-		cpuinfo.AsAnsiString());
+		cpuinfo.AsStdString());
 
 	TVPAddImportantLog(TJS_W("(info) finally detected CPU features : ") +
     	TVPDumpCPUFeatures(TVPCPUType));
@@ -304,4 +308,11 @@ tjs_uint32 TVPGetCPUType()
 }
 //---------------------------------------------------------------------------
 
-
+#ifdef NOT_USE_ASM
+tjs_uint64 TVPGetTSC() {
+	if( TVPCPUType & TVP_CPU_HAS_TSC ) {
+		return __rdtsc();
+	}
+	return 0;
+}
+#endif

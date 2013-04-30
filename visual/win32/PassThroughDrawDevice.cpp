@@ -8,7 +8,7 @@
 //---------------------------------------------------------------------------
 //!@file "PassThrough" 描画デバイス管理
 //---------------------------------------------------------------------------
-
+#define NOMINMAX
 #include "tjsCommHead.h"
 #include <vfw.h>
 #include "DrawDevice.h"
@@ -1689,7 +1689,7 @@ StartTick = timeGetTime();
 BltTime += timeGetTime() - StartTick;
 #endif
 
-	got_error:
+//	got_error:
 		if(hr == DDERR_SURFACELOST || hr == DDERR_SURFACEBUSY)
 		{
 			pri->Restore();
@@ -1715,7 +1715,7 @@ BltTime += timeGetTime() - StartTick;
 		GetDirect3D7Device();
 		if(Direct3DDevice7)
 		{
-			HRESULT hr;
+			//HRESULT hr;
 			D3DDEVICEDESC7 desc;
 			ZeroMemory(&desc, sizeof(desc));
 			if(SUCCEEDED(Direct3DDevice7->GetCaps(&desc)))

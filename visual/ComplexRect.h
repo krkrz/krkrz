@@ -22,7 +22,7 @@
 //---------------------------------------------------------------------------
 // tTVPRect - intersection and union
 //---------------------------------------------------------------------------
-class tTVPRect;
+struct tTVPRect;
 extern bool TVPIntersectRect(tTVPRect *dest, const tTVPRect &src1,
 	const tTVPRect &src2);
 extern bool TVPUnionRect(tTVPRect *dest, const tTVPRect &src1, const tTVPRect &src2);

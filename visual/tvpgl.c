@@ -196,9 +196,9 @@ static void TVPCreateTable(void)
 
 			if(a)
 			{
-				float at = a/255.0, bt = b/255.0;
+				float at = (float)(a/255.0), bt = (float)(b/255.0);
 				c = bt / at;
-				c /= (1.0 - bt + c);
+				c /= (float)( (1.0 - bt + c) );
 				ci = (int)(c*255);
 				if(ci>=256) ci = 255; /* will not overflow... */
 			}
@@ -227,9 +227,9 @@ static void TVPCreateTable(void)
 
 			if(a)
 			{
-				float at = a / 255.0, bt = b / 64.0;
+				float at = (float)(a / 255.0), bt = (float)(b / 64.0);
 				c = bt / at;
-				c /= (1.0 - bt + c);
+				c /= (float)( (1.0 - bt + c) );
 				ci = (int)(c*255);
 				if(ci>=256) ci = 255; /* will not overflow... */
 			}
@@ -617,7 +617,7 @@ TVP_GL_FUNC_DECL(void, TVPAlphaBlend_d_c, (tjs_uint32 *dest, const tjs_uint32 *s
 /*export*/
 TVP_GL_FUNC_DECL(void, TVPAlphaBlend_a_c, (tjs_uint32 *dest, const tjs_uint32 *src, tjs_int len))
 {
-	tjs_uint32 d1, s, d, sopa, addr, destalpha;
+	//tjs_uint32 d1, s, d, sopa, addr, destalpha;
 	{
 		int ___index = 0;
 		len -= (4-1);
@@ -6399,7 +6399,7 @@ src++;
 /*export*/
 TVP_GL_FUNC_DECL(void, TVPSubBlend_HDA_o_c, (tjs_uint32 *dest, const tjs_uint32 *src, tjs_int len, tjs_int opa))
 {
-register tjs_uint32 s, d;
+register tjs_uint32 s/*, d*/;
 register tjs_uint32 tmp;
   if(len > 0)
   {

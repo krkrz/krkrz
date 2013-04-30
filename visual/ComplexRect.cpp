@@ -8,6 +8,7 @@
 //---------------------------------------------------------------------------
 // Complex Rectangle Class
 //---------------------------------------------------------------------------
+#define NOMINMAX
 #include "tjsCommHead.h"
 
 #include "ComplexRect.h"
@@ -1210,7 +1211,7 @@ void tTVPComplexRect::RectangleSub(tTVPRegionRect *r, const tTVPRect *rr)
 //---------------------------------------------------------------------------
 void tTVPComplexRect::DumpChain()
 {
-	AnsiString str;
+	std::string str;
 	tIterator it = GetIterator();
 	while(it.Step()) {
 		char tmp[200];

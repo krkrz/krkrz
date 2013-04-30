@@ -11,7 +11,7 @@
 #include "tjsCommHead.h"
 
 #include <algorithm>
-#include <syncobjs.hpp>
+//#include <syncobjs.hpp>
 #include <mmsystem.h>
 #include <EventIntf.h>
 #include "TickCount.h"
@@ -57,7 +57,8 @@ protected:
 	void Execute();
 
 private:
-	void __fastcall UtilWndProc(Messages::TMessage &Msg);
+	//void __fastcall UtilWndProc(Messages::TMessage &Msg);
+	LRESULT CALLBACK UtilWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 	void AddItem(tTJSNI_Timer * item);
 	bool RemoveItem(tTJSNI_Timer *item);
@@ -84,7 +85,8 @@ tTVPTimerThread::tTVPTimerThread() : tTVPThread(true)
 {
 	PendingEventsAvailable = false;
 	SetPriority(TVPLimitTimerCapacity ? ttpNormal : ttpHighest);
-	UtilWindow = AllocateHWnd(UtilWndProc);
+#pragma message( __FILE__ __LINE__ "TODO メッセージハンドラをなんとかする" )
+	//UtilWindow = AllocateHWnd(UtilWndProc);
 	Resume();
 }
 //---------------------------------------------------------------------------
@@ -94,7 +96,8 @@ tTVPTimerThread::~tTVPTimerThread()
 	Resume();
 	Event.Set();
 	WaitFor();
-	DeallocateHWnd(UtilWindow);
+#pragma message( __FILE__ __LINE__ "TODO メッセージハンドラをなんとかする" )
+	//DeallocateHWnd(UtilWindow);
 }
 //---------------------------------------------------------------------------
 void tTVPTimerThread::Execute()
@@ -119,8 +122,7 @@ void tTVPTimerThread::Execute()
 
 				if(item->GetNextTick() < curtick)
 				{
-					tjs_uint n = (curtick - item->GetNextTick()) /
-						item->GetInterval();
+					tjs_uint n = static_cast<tjs_uint>( (curtick - item->GetNextTick()) / item->GetInterval() );
 					n++;
 					if(n > 40)
 					{
@@ -158,7 +160,7 @@ void tTVPTimerThread::Execute()
 				if(step_next >= 0x80000000)
 					sleeptime = 0x7fffffff; // smaller value than step_next is OK
 				else
-					sleeptime = step_next;
+					sleeptime = static_cast<DWORD>( step_next );
 			}
 			else
 			{
@@ -194,10 +196,12 @@ void tTVPTimerThread::Execute()
 	}
 }
 //---------------------------------------------------------------------------
-void __fastcall tTVPTimerThread::UtilWndProc(Messages::TMessage &Msg)
+//void __fastcall tTVPTimerThread::UtilWndProc(Messages::TMessage &Msg)
+LRESULT CALLBACK tTVPTimerThread::UtilWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	LRESULT result = 0;
 	// Window procedure of UtilWindow
-	if(Msg.Msg == WM_USER + 1 && !GetTerminated())
+	if(message == WM_USER + 1 && !GetTerminated())
 	{
 		// pending events occur
 		tTJSCriticalSectionHolder holder(TVPTimerCS); // protect the object
@@ -214,8 +218,9 @@ void __fastcall tTVPTimerThread::UtilWndProc(Messages::TMessage &Msg)
 	}
 	else
 	{
-		Msg.Result =  DefWindowProc(UtilWindow, Msg.Msg, Msg.WParam, Msg.LParam);
+		result =  DefWindowProc(UtilWindow, message, wParam, lParam);
 	}
+	return result;
 }
 //---------------------------------------------------------------------------
 void tTVPTimerThread::AddItem(tTJSNI_Timer * item)

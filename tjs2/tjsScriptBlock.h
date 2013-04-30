@@ -30,7 +30,7 @@ class tTJSScriptBlock
 public:
 	tTJSScriptBlock(tTJS * owner);
 	virtual ~tTJSScriptBlock();
-                            
+
 	// for Bytecode               
 	static const int BYTECODE_FILE_TAG_SIZE = 8;
 private:

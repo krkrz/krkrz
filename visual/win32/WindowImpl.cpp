@@ -29,12 +29,14 @@
 #include "PassThroughDrawDevice.h"
 #include "EventImpl.h"
 
+#include "Application.h"
+#include "Screen.h"
 
 //---------------------------------------------------------------------------
 // Mouse Cursor management
 //---------------------------------------------------------------------------
 static tTJSHashTable<ttstr, tjs_int> TVPCursorTable;
-static TVPCursorCount = 1;
+static int TVPCursorCount = 1;
 tjs_int TVPGetCursor(const ttstr & name)
 {
 	// get placed path
@@ -62,7 +64,8 @@ tjs_int TVPGetCursor(const ttstr & name)
 	if(!handle) TVPThrowExceptionMessage(TVPCannotLoadCursor, place);
 
 	TVPCursorCount++;
-	Screen->Cursors[TVPCursorCount] = handle; // using VCL
+	//Screen->Cursors[TVPCursorCount] = handle; // using VCL
+	// TODO カーソル設定関係は要らないかな？
 
 	TVPCursorTable.Add(place, TVPCursorCount);
 
@@ -174,14 +177,14 @@ enum tTVPFullScreenResolutionMode
 static IDirectDraw *TVPDirectDraw=NULL;
 static IDirectDraw2 *TVPDirectDraw2=NULL;
 static IDirectDraw7 *TVPDirectDraw7=NULL;
-static HRESULT WINAPI (*TVPDirectDrawCreate)
+static HRESULT (WINAPI * TVPDirectDrawCreate)
 	( GUID FAR *lpGUID, LPDIRECTDRAW FAR *lplpDD, IUnknown FAR *pUnkOuter ) = NULL;
-static HRESULT WINAPI (*TVPDirectDrawCreateEx)
+static HRESULT (WINAPI * TVPDirectDrawCreateEx)
 	( GUID FAR * lpGuid, LPVOID  *lplpDD, REFIID  iid,IUnknown FAR *pUnkOuter ) = NULL;
 
-static HRESULT WINAPI (*TVPDirectDrawEnumerateA)
+static HRESULT (WINAPI * TVPDirectDrawEnumerateA)
 	( LPDDENUMCALLBACKA lpCallback, LPVOID lpContext ) = NULL;
-static HRESULT WINAPI (*TVPDirectDrawEnumerateExA)
+static HRESULT (WINAPI * TVPDirectDrawEnumerateExA)
 	( LPDDENUMCALLBACKEXA lpCallback, LPVOID lpContext, DWORD dwFlags) = NULL;
 
 static HMODULE TVPDirectDrawDLLHandle=NULL;
@@ -317,14 +320,14 @@ void TVPDumpDirectDrawDriverInformation()
 				// driver version(actual)
 				char driverpath[1024];
 				char *driverpath_filename = NULL;
-				bool success = SearchPath(NULL, DDID.szDriver, NULL, 1023, driverpath, &driverpath_filename);
+				bool success = 0!=SearchPath(NULL, DDID.szDriver, NULL, 1023, driverpath, &driverpath_filename);
 
 				if(!success)
 				{
 					char syspath[1024];
 					GetSystemDirectory(syspath, 1023);
 					strcat(syspath, "\\drivers"); // SystemDir\drivers
-					success = SearchPath(syspath, DDID.szDriver, NULL, 1023, driverpath, &driverpath_filename);
+					success = 0!=SearchPath(syspath, DDID.szDriver, NULL, 1023, driverpath, &driverpath_filename);
 				}
 
 				if(!success)
@@ -332,7 +335,7 @@ void TVPDumpDirectDrawDriverInformation()
 					char syspath[1024];
 					GetWindowsDirectory(syspath, 1023);
 					strcat(syspath, "\\system32"); // WinDir\system32
-					success = SearchPath(syspath, DDID.szDriver, NULL, 1023, driverpath, &driverpath_filename);
+					success = 0!=SearchPath(syspath, DDID.szDriver, NULL, 1023, driverpath, &driverpath_filename);
 				}
 
 				if(!success)
@@ -340,7 +343,7 @@ void TVPDumpDirectDrawDriverInformation()
 					char syspath[1024];
 					GetWindowsDirectory(syspath, 1023);
 					strcat(syspath, "\\system32\\drivers"); // WinDir\system32\drivers
-					success = SearchPath(syspath, DDID.szDriver, NULL, 1023, driverpath, &driverpath_filename);
+					success = 0!=SearchPath(syspath, DDID.szDriver, NULL, 1023, driverpath, &driverpath_filename);
 				}
 
 				if(success)
@@ -413,7 +416,7 @@ static void TVPInitDirectDraw()
 		// Enumerate display drivers, for debugging information
 		try
 		{
-			TVPDirectDrawEnumerateExA = (HRESULT WINAPI (*)
+			TVPDirectDrawEnumerateExA = (HRESULT (WINAPI * )
 				( LPDDENUMCALLBACKEXA , LPVOID , DWORD )	)
 					GetProcAddress(TVPDirectDrawDLLHandle, "DirectDrawEnumerateExA");
 			if(TVPDirectDrawEnumerateExA)
@@ -425,7 +428,7 @@ static void TVPInitDirectDraw()
 			}
 			else
 			{
-				TVPDirectDrawEnumerateA = (HRESULT WINAPI (*)
+				TVPDirectDrawEnumerateA = (HRESULT (WINAPI * )
 					( LPDDENUMCALLBACKA , LPVOID  ))
 					GetProcAddress(TVPDirectDrawDLLHandle, "DirectDrawEnumerateA");
 				if(TVPDirectDrawEnumerateA)
@@ -445,13 +448,13 @@ static void TVPInitDirectDraw()
 		try
 		{
 			// get DirectDrawCreaet function
-			TVPDirectDrawCreate = (HRESULT(WINAPI*)(_GUID*,IDirectDraw**,IUnknown*))
+			TVPDirectDrawCreate = (HRESULT(WINAPI * )(_GUID*,IDirectDraw**,IUnknown*))
 				GetProcAddress(TVPDirectDrawDLLHandle, "DirectDrawCreate");
 			if(!TVPDirectDrawCreate)
 				TVPThrowExceptionMessage(TVPCannotInitDirectDraw,
 					TJS_W("Missing DirectDrawCreate in ddraw.dll"));
 
-			TVPDirectDrawCreateEx = (HRESULT(WINAPI*)( GUID FAR *, LPVOID  *, REFIID,IUnknown FAR *))
+			TVPDirectDrawCreateEx = (HRESULT(WINAPI * )( GUID FAR *, LPVOID  *, REFIID,IUnknown FAR *))
 				GetProcAddress(TVPDirectDrawDLLHandle, "DirectDrawCreateEx");
 
 			// create IDirectDraw object
@@ -469,8 +472,8 @@ static void TVPInitDirectDraw()
 					(void **)&TVPDirectDraw2);
 				if(FAILED(hr))
 					TVPThrowExceptionMessage(TVPCannotInitDirectDraw,
-						ttstr(TJS_W("Querying of IID_IDirectDraw2 failed."
-							"/HR="))+
+						ttstr(TJS_W("Querying of IID_IDirectDraw2 failed.")
+							TJS_W("/HR="))+
 							TJSInt32ToHex((tjs_uint32)hr));
 			}
 			else
@@ -488,8 +491,8 @@ static void TVPInitDirectDraw()
 					(void **)&TVPDirectDraw2);
 				if(FAILED(hr))
 					TVPThrowExceptionMessage(TVPCannotInitDirectDraw,
-						ttstr(TJS_W("Querying of IID_IDirectDraw2 failed."
-							" (DirectX on this system may be too old)/HR="))+
+						ttstr(TJS_W("Querying of IID_IDirectDraw2 failed.")
+							TJS_W(" (DirectX on this system may be too old)/HR="))+
 							TJSInt32ToHex((tjs_uint32)hr));
 
 				TVPDirectDraw->Release(), TVPDirectDraw = NULL;
@@ -652,8 +655,8 @@ static void TVPDoReductionNumerAndDenom(tjs_int &n, tjs_int &d)
 static void TVPGetOriginalScreenMetrics()
 {
 	// retrieve original (un-fullscreened) information
-	TVPDefaultScreenMode.Width = Screen->Width;
-	TVPDefaultScreenMode.Height = Screen->Height;
+	TVPDefaultScreenMode.Width = Screen->GetWidth();
+	TVPDefaultScreenMode.Height = Screen->GetHeight();
 	HDC dc = GetDC(0);
 	TVPDefaultScreenMode.BitsPerPixel = GetDeviceCaps(dc, BITSPIXEL);
 	ReleaseDC(0, dc);
@@ -1245,9 +1248,9 @@ static tTVPAtExit
 HWND TVPGetModalWindowOwnerHandle()
 {
 	if(TVPFullScreenedWindow)
-		return TVPFullScreenedWindow->Handle;
+		return TVPFullScreenedWindow->GetHandle();
 	else
-		return Application->Handle;
+		return Application->GetHandle();
 }
 //---------------------------------------------------------------------------
 
@@ -1374,11 +1377,12 @@ void tTJSNI_Window::PostInputEvent(const ttstr &name, iTJSDispatch2 * params)
 			TVPThrowExceptionMessage(TVPSpecifiedEventNeedsParameter2,
 				name, TJS_W("shift"));
 
-		Word vcl_key = key;
+		WORD vcl_key = key;
 		if(type == etOnKeyDown)
 			Form->InternalKeyDown(key, shift);
 		else if(type == etOnKeyUp)
-			Form->OnKeyUp(Form, vcl_key, TVP_TShiftState_From_uint32(shift));
+			//Form->OnKeyUp(Form, vcl_key, TVP_TShiftState_From_uint32(shift));
+			Form->OnKeyUp( vcl_key, TVP_TShiftState_From_uint32(shift) );
 	}
 	else if(type == etOnKeyPress)
 	{
@@ -1399,7 +1403,8 @@ void tTJSNI_Window::PostInputEvent(const ttstr &name, iTJSDispatch2 * params)
 				name, TJS_W("key"));
 
 		char vcl_key = key;
-		Form->OnKeyPress(Form, vcl_key);
+		//Form->OnKeyPress(Form, vcl_key);
+		Form->OnKeyPress(vcl_key,0,false,false);
 	}
 }
 
@@ -1445,11 +1450,13 @@ void TJS_INTF_METHOD tTJSNI_Window::WindowReleaseCapture()
 	::ReleaseCapture(); // Windows API
 }
 //---------------------------------------------------------------------------
+#ifdef USE_OBSOLETE_FUNCTIONS
 void TJS_INTF_METHOD tTJSNI_Window::SetHintText(const ttstr & text)
 {
 	// set hint text to window
 	if(Form) Form->SetHintText(text);
 }
+#endif
 //---------------------------------------------------------------------------
 void TJS_INTF_METHOD tTJSNI_Window::SetAttentionPoint(tTJSNI_BaseLayer *layer,
 	tjs_int l, tjs_int t)
@@ -1457,12 +1464,13 @@ void TJS_INTF_METHOD tTJSNI_Window::SetAttentionPoint(tTJSNI_BaseLayer *layer,
 	// set attention point to window
 	if(Form)
 	{
-		TFont * font = NULL;
+		class TFont * font = NULL;
 		if(layer)
 		{
 			tTVPBaseBitmap *bmp = layer->GetMainImage();
 			if(bmp)
-				font = bmp->GetFontCanvas()->Font;
+				//font = bmp->GetFontCanvas()->GetFont();
+				font = bmp->GetFontCanvas();
 		}
 
 		Form->SetAttentionPoint(l, t, font);
@@ -1515,7 +1523,7 @@ void tTJSNI_Window::EndUpdate()
 TMenuItem * tTJSNI_Window::GetRootMenuItem()
 {
 	if(!Form) return NULL;
-	return Form->MainMenu->Items;
+	return Form->GetMainMenuItems();
 }
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetMenuBarVisible(bool b)
@@ -1634,12 +1642,14 @@ void tTJSNI_Window::OnCloseQueryCalled(bool b)
 	if(Form) Form->OnCloseQueryCalled(b);
 }
 //---------------------------------------------------------------------------
+#ifdef USE_OBSOLETE_FUNCTIONS
 void tTJSNI_Window::BeginMove()
 {
 	if(Form->GetFullScreenMode())
 		TVPThrowExceptionMessage(TVPInvalidMethodInFullScreen);
 	if(Form) Form->BeginMove();
 }
+#endif
 //---------------------------------------------------------------------------
 void tTJSNI_Window::BringToFront()
 {
@@ -1651,6 +1661,7 @@ void tTJSNI_Window::Update(tTVPUpdateType type)
 	if(Form) Form->UpdateWindow(type);
 }
 //---------------------------------------------------------------------------
+#ifdef USE_OBSOLETE_FUNCTIONS
 void tTJSNI_Window::ShowModal()
 {
 	if(Form && Form->GetFullScreenMode())
@@ -1662,6 +1673,7 @@ void tTJSNI_Window::ShowModal()
 		Form->ShowWindowAsModal();
 	}
 }
+#endif
 //---------------------------------------------------------------------------
 void tTJSNI_Window::HideMouseCursor()
 {
@@ -1683,95 +1695,95 @@ void tTJSNI_Window::SetVisible(bool s)
 //---------------------------------------------------------------------------
 void tTJSNI_Window::GetCaption(ttstr & v) const
 {
-	if(Form) v = Form->Caption; else v.Clear();
+	if(Form) v = Form->GetCaption(); else v.Clear();
 }
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetCaption(const ttstr & v)
 {
-	if(Form) Form->Caption = v.AsAnsiString();
+	if(Form) Form->SetCaption( v.AsStdString() );
 }
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetWidth(tjs_int w)
 {
 	if(Form->GetFullScreenMode())
 		TVPThrowExceptionMessage(TVPInvalidPropertyInFullScreen);
-	if(Form) Form->Width = w;
+	if(Form) Form->SetWidth( w );
 }
 //---------------------------------------------------------------------------
 tjs_int tTJSNI_Window::GetWidth() const
 {
 	if(!Form) return 0;
-	return Form->Width;
+	return Form->GetWidth();
 }
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetHeight(tjs_int h)
 {
 	if(Form->GetFullScreenMode())
 		TVPThrowExceptionMessage(TVPInvalidPropertyInFullScreen);
-	if(Form) Form->Height = h;
+	if(Form) Form->SetHeight( h );
 }
 //---------------------------------------------------------------------------
 tjs_int tTJSNI_Window::GetHeight() const
 {
 	if(!Form) return 0;
-	return Form->Height;
+	return Form->GetHeight();
 }
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetLeft(tjs_int l)
 {
 	if(Form->GetFullScreenMode())
 		TVPThrowExceptionMessage(TVPInvalidPropertyInFullScreen);
-	if(Form) Form->Left = l;
+	if(Form) Form->SetLeft( l );
 }
 //---------------------------------------------------------------------------
 tjs_int tTJSNI_Window::GetLeft() const
 {
 	if(!Form) return 0;
-	return Form->Left;
+	return Form->GetLeft();
 }
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetTop(tjs_int t)
 {
 	if(Form->GetFullScreenMode())
 		TVPThrowExceptionMessage(TVPInvalidPropertyInFullScreen);
-	if(Form) Form->Top = t;
+	if(Form) Form->SetTop( t );
 }
 //---------------------------------------------------------------------------
 tjs_int tTJSNI_Window::GetTop() const
 {
 	if(!Form) return 0;
-	return Form->Top;
+	return Form->GetTop();
 }
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetSize(tjs_int w, tjs_int h)
 {
 	if(Form->GetFullScreenMode())
 		TVPThrowExceptionMessage(TVPInvalidPropertyInFullScreen);
-	if(Form) Form->SetBounds(Form->Left, Form->Top, w, h);
+	if(Form) Form->SetBounds(Form->GetLeft(), Form->GetTop(), w, h);
 }
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetMinWidth(int v)
 {
 	if(Form->GetFullScreenMode())
 		TVPThrowExceptionMessage(TVPInvalidPropertyInFullScreen);
-	if(Form) Form->Constraints->MinWidth = v;
+	if(Form) Form->SetMinWidth( v );
 }
 //---------------------------------------------------------------------------
 int  tTJSNI_Window::GetMinWidth() const
 {
-	if(Form) return Form->Constraints->MinWidth; else return 0;
+	if(Form) return Form->GetMinWidth(); else return 0;
 }
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetMinHeight(int v)
 {
 	if(Form->GetFullScreenMode())
 		TVPThrowExceptionMessage(TVPInvalidPropertyInFullScreen);
-	if(Form) Form->Constraints->MinHeight = v;
+	if(Form) Form->SetMinHeight( v );
 }
 //---------------------------------------------------------------------------
 int  tTJSNI_Window::GetMinHeight() const
 {
-	if(Form) return Form->Constraints->MinHeight; else return 0;
+	if(Form) return Form->GetMinHeight(); else return 0;
 }
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetMinSize(int w, int h)
@@ -1780,8 +1792,7 @@ void tTJSNI_Window::SetMinSize(int w, int h)
 		TVPThrowExceptionMessage(TVPInvalidPropertyInFullScreen);
 	if(Form)
 	{
-		Form->Constraints->MinWidth = w;
-		Form->Constraints->MinHeight = h;
+		Form->SetMinSize( w, h );
 	}
 }
 //---------------------------------------------------------------------------
@@ -1789,24 +1800,24 @@ void tTJSNI_Window::SetMaxWidth(int v)
 {
 	if(Form->GetFullScreenMode())
 		TVPThrowExceptionMessage(TVPInvalidPropertyInFullScreen);
-	if(Form) Form->Constraints->MaxWidth = v;
+	if(Form) Form->SetMaxWidth( v );
 }
 //---------------------------------------------------------------------------
 int  tTJSNI_Window::GetMaxWidth() const
 {
-	if(Form) return Form->Constraints->MaxWidth; else return 0;
+	if(Form) return Form->GetMaxWidth(); else return 0;
 }
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetMaxHeight(int v)
 {
 	if(Form->GetFullScreenMode())
 		TVPThrowExceptionMessage(TVPInvalidPropertyInFullScreen);
-	if(Form) Form->Constraints->MaxHeight = v;
+	if(Form) Form->SetMaxHeight( v );
 }
 //---------------------------------------------------------------------------
 int  tTJSNI_Window::GetMaxHeight() const
 {
-	if(Form) return Form->Constraints->MaxHeight; else return 0;
+	if(Form) return Form->GetMaxHeight(); else return 0;
 }
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetMaxSize(int w, int h)
@@ -1815,8 +1826,7 @@ void tTJSNI_Window::SetMaxSize(int w, int h)
 		TVPThrowExceptionMessage(TVPInvalidPropertyInFullScreen);
 	if(Form)
 	{
-		Form->Constraints->MaxWidth = w;
-		Form->Constraints->MaxHeight = h;
+		Form->SetMaxSize( w, h );
 	}
 }
 //---------------------------------------------------------------------------
@@ -1824,9 +1834,10 @@ void tTJSNI_Window::SetPosition(tjs_int l, tjs_int t)
 {
 	if(Form->GetFullScreenMode())
 		TVPThrowExceptionMessage(TVPInvalidPropertyInFullScreen);
-	if(Form) Form->SetBounds(l, t, Form->Width, Form->Height);
+	if(Form) Form->SetBounds(l, t, Form->GetWidth(), Form->GetHeight());
 }
 //---------------------------------------------------------------------------
+#ifdef USE_OBSOLETE_FUNCTIONS
 void tTJSNI_Window::SetLayerLeft(tjs_int l)
 {
 	if(Form) Form->SetLayerLeft(l);
@@ -1866,6 +1877,7 @@ bool tTJSNI_Window::GetInnerSunken() const
 	if(!Form) return true;
 	return Form->GetInnerSunken();
 }
+#endif
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetInnerWidth(tjs_int w)
 {
@@ -1925,6 +1937,7 @@ bool tTJSNI_Window::GetStayOnTop() const
 	return Form->GetStayOnTop();
 }
 //---------------------------------------------------------------------------
+#ifdef USE_OBSOLETE_FUNCTIONS
 void tTJSNI_Window::SetShowScrollBars(bool b)
 {
 	if(Form) Form->SetShowScrollBars(b);
@@ -1935,6 +1948,7 @@ bool tTJSNI_Window::GetShowScrollBars() const
 	if(!Form) return true;
 	return Form->GetShowScrollBars();
 }
+#endif
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetFullScreen(bool b)
 {
@@ -1972,6 +1986,7 @@ bool tTJSNI_Window::GetTrapKey() const
 	return Form->GetTrapKey();
 }
 //---------------------------------------------------------------------------
+#ifdef USE_OBSOLETE_FUNCTIONS
 void tTJSNI_Window::SetMaskRegion(tjs_int threshold)
 {
 	if(!Form) return;
@@ -1979,8 +1994,7 @@ void tTJSNI_Window::SetMaskRegion(tjs_int threshold)
 	if(!DrawDevice) TVPThrowExceptionMessage(TVPWindowHasNoLayer);
 	tTJSNI_BaseLayer *lay = DrawDevice->GetPrimaryLayer();
 	if(!lay) TVPThrowExceptionMessage(TVPWindowHasNoLayer);
-	Form->SetMaskRegion(((tTJSNI_Layer*)lay)->CreateMaskRgn((tjs_uint)threshold));
-
+	Form->SetMaskRegion( ((tTJSNI_Layer*)lay)->CreateMaskRgn((tjs_uint)threshold) );
 }
 //---------------------------------------------------------------------------
 void tTJSNI_Window::RemoveMaskRegion()
@@ -1988,6 +2002,7 @@ void tTJSNI_Window::RemoveMaskRegion()
 	if(!Form) return;
 	Form->RemoveMaskRegion();
 }
+#endif
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetMouseCursorState(tTVPMouseCursorState mcs)
 {
@@ -2001,6 +2016,7 @@ tTVPMouseCursorState tTJSNI_Window::GetMouseCursorState() const
 	return Form->GetMouseCursorState();
 }
 //---------------------------------------------------------------------------
+#ifdef USE_OBSOLETE_FUNCTIONS
 void tTJSNI_Window::SetFocusable(bool b)
 {
 	if(!Form) return;
@@ -2012,6 +2028,7 @@ bool tTJSNI_Window::GetFocusable()
 	if(!Form) return true;
 	return Form->GetFocusable();
 }
+#endif
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetZoom(tjs_int numer, tjs_int denom)
 {

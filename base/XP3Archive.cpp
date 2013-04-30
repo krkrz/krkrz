@@ -352,8 +352,8 @@ tTVPXP3Archive::tTVPXP3Archive(const ttstr & name) : tTVPArchive(name)
 	static tjs_uint8 cn_adlr[] =
 		{ 0x61/*'a'*/, 0x64/*'d'*/, 0x6c/*'l'*/, 0x72/*'r'*/ };
 
-	TVPAddLog(TJS_W("(info) Trying to read XP3 virtual file system "
-		"information from : ") +
+	TVPAddLog(TJS_W("(info) Trying to read XP3 virtual file system ")
+		TJS_W("information from : ") +
 		name);
 
 	int segmentcount = 0;
@@ -947,7 +947,7 @@ tjs_uint64 TJS_INTF_METHOD tTVPXP3ArchiveStream::Seek(tjs_int64 offset, tjs_int 
 	{
 	case TJS_BS_SEEK_SET:
 		newpos = offset;
-		if(offset >= 0 && offset <= OrgSize)
+		if(offset >= 0 && offset <= static_cast<tjs_int64>(OrgSize) )
 		{
 			SeekToPosition(newpos);
 		}
@@ -955,7 +955,7 @@ tjs_uint64 TJS_INTF_METHOD tTVPXP3ArchiveStream::Seek(tjs_int64 offset, tjs_int 
 
 	case TJS_BS_SEEK_CUR:
 		newpos = offset + CurPos;
-		if(offset >= 0 && offset <= OrgSize)
+		if(offset >= 0 && offset <= static_cast<tjs_int64>(OrgSize) )
 		{
 			SeekToPosition(newpos);
 		}
@@ -963,7 +963,7 @@ tjs_uint64 TJS_INTF_METHOD tTVPXP3ArchiveStream::Seek(tjs_int64 offset, tjs_int 
 
 	case TJS_BS_SEEK_END:
 		newpos = offset + OrgSize;
-		if(offset >= 0 && offset <= OrgSize)
+		if(offset >= 0 && offset <= static_cast<tjs_int64>(OrgSize) )
 		{
 			SeekToPosition(newpos);
 		}

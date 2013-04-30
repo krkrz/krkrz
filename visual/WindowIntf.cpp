@@ -18,7 +18,7 @@
 #include "DebugIntf.h"
 #include "EventIntf.h"
 #include "LayerBitmapIntf.h"
-#include "MenuItemIntf.h"
+//#include "MenuItemIntf.h"
 #include "LayerIntf.h"
 #include "SysInitIntf.h"
 #include "VideoOvlIntf.h"
@@ -26,6 +26,7 @@
 #include "PassThroughDrawDevice.h"
 #include "EventImpl.h"
 
+#include "Application.h"
 
 //---------------------------------------------------------------------------
 // Window List
@@ -592,6 +593,9 @@ void TJS_INTF_METHOD tTJSNI_BaseWindow::NotifySrcResize()
 	if(WindowUpdating)
 		TVPThrowExceptionMessage(TVPInvalidMethodInUpdating);
 }
+
+#pragma message( __LOC__ "Menu クラス無効化" )
+#if 0
 //---------------------------------------------------------------------------
 iTJSDispatch2 * tTJSNI_BaseWindow::GetMenuItemObjectNoAddRef()
 {
@@ -604,6 +608,7 @@ iTJSDispatch2 * tTJSNI_BaseWindow::GetMenuItemObjectNoAddRef()
 	MenuItemObject = TVPCreateMenuItemObject(Owner);
 	return MenuItemObject;
 }
+#endif
 //---------------------------------------------------------------------------
 void tTJSNI_BaseWindow::RegisterVideoOverlayObject(tTJSNI_BaseVideoOverlay * ovl)
 {
@@ -679,6 +684,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/close)
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/close)
 //----------------------------------------------------------------------
+#ifdef USE_OBSOLETE_FUNCTIONS
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/beginMove)
 {
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
@@ -686,6 +692,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/beginMove)
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/beginMove)
+#endif
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/bringToFront)
 {
@@ -706,6 +713,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/update)
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/update)
 //----------------------------------------------------------------------
+#ifdef USE_OBSOLETE_FUNCTIONS
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/showModal)
 {
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
@@ -713,7 +721,9 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/showModal)
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/showModal)
+#endif
 //----------------------------------------------------------------------
+#ifdef USE_OBSOLETE_FUNCTIONS
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/setMaskRegion)
 {
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
@@ -732,6 +742,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/removeMaskRegion)
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/removeMaskRegion)
+#endif
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/add)
 {
@@ -789,6 +800,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/setPos) // not setPosition
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/setPos)
 //----------------------------------------------------------------------
+#ifdef USE_OBSOLETE_FUNCTIONS
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/setLayerPos) // not setLayerPosition
 {
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
@@ -797,6 +809,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/setLayerPos) // not setLayerPosition
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/setLayerPos)
+#endif
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/setInnerSize)
 {
@@ -1022,7 +1035,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/onCloseQuery)
 	TVP_ACTION_INVOKE_MEMBER("canClose");
 	TVP_ACTION_INVOKE_END(tTJSVariantClosure(objthis, objthis));
 */
-	_this->OnCloseQueryCalled((bool)*param[0]);
+	_this->OnCloseQueryCalled( 0 != (tjs_int)*param[0]); // TODO テスト
 
 	return TJS_S_OK;
 }
@@ -1266,6 +1279,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(top)
 }
 TJS_END_NATIVE_PROP_DECL(top)
 //----------------------------------------------------------------------
+#ifdef USE_OBSOLETE_FUNCTIONS
 TJS_BEGIN_NATIVE_PROP_DECL(focusable)
 {
 	TJS_BEGIN_NATIVE_PROP_GETTER
@@ -1279,13 +1293,15 @@ TJS_BEGIN_NATIVE_PROP_DECL(focusable)
 	TJS_BEGIN_NATIVE_PROP_SETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
-		_this->SetFocusable((bool)(tjs_int)*param);
+		_this->SetFocusable( 0 != (tjs_int)*param);
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_SETTER
 }
 TJS_END_NATIVE_PROP_DECL(focusable)
+#endif
 //----------------------------------------------------------------------
+#ifdef USE_OBSOLETE_FUNCTIONS
 TJS_BEGIN_NATIVE_PROP_DECL(layerLeft)
 {
 	TJS_BEGIN_NATIVE_PROP_GETTER
@@ -1345,6 +1361,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(innerSunken)
 	TJS_END_NATIVE_PROP_SETTER
 }
 TJS_END_NATIVE_PROP_DECL(innerSunken)
+#endif
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_PROP_DECL(innerWidth)
 {
@@ -1466,6 +1483,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(stayOnTop)
 }
 TJS_END_NATIVE_PROP_DECL(stayOnTop)
 //----------------------------------------------------------------------
+#ifdef USE_OBSOLETE_FUNCTIONS
 TJS_BEGIN_NATIVE_PROP_DECL(showScrollBars)
 {
 	TJS_BEGIN_NATIVE_PROP_GETTER
@@ -1485,6 +1503,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(showScrollBars)
 	TJS_END_NATIVE_PROP_SETTER
 }
 TJS_END_NATIVE_PROP_DECL(showScrollBars)
+#endif
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_PROP_DECL(useMouseKey)
 {
@@ -1565,6 +1584,9 @@ TJS_BEGIN_NATIVE_PROP_DECL(mouseCursorState)
 	TJS_END_NATIVE_PROP_SETTER
 }
 TJS_END_NATIVE_PROP_DECL(mouseCursorState)
+	
+#pragma message( __LOC__ "Menu クラス無効化" )
+#if 0
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_PROP_DECL(menu)
 {
@@ -1580,6 +1602,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(menu)
 	TJS_DENY_NATIVE_PROP_SETTER
 }
 TJS_END_NATIVE_PROP_DECL(menu)
+#endif
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_PROP_DECL(fullScreen)
 {
@@ -1594,7 +1617,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(fullScreen)
 	TJS_BEGIN_NATIVE_PROP_SETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
-		_this->SetFullScreen((tjs_int)*param);
+		_this->SetFullScreen( 0 != (tjs_int)*param );
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_SETTER

@@ -21,6 +21,7 @@
 #endif
 
 #ifdef __WIN32__
+#define _CRT_SECURE_NO_WARNINGS
 #include <windows.h>
 #endif
 

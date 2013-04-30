@@ -130,7 +130,7 @@ tjs_uint64 TJS_INTF_METHOD tTVPMemoryStream::Seek(tjs_int64 offset, tjs_int when
 	case TJS_BS_SEEK_SET:
 		if(offset >= 0)
 		{
-			if(offset <= Size) CurrentPos = offset;
+			if(offset <= Size) CurrentPos = static_cast<tjs_uint>(offset);
 		}
 		return CurrentPos;
 
@@ -346,7 +346,7 @@ tjs_uint TJS_INTF_METHOD tTVPPartialStream::Read(void *buffer, tjs_uint read_siz
 {
 	if(CurrentPos + read_size >= Size)
 	{
-		read_size = Size - CurrentPos;
+		read_size = static_cast<tjs_uint>(Size - CurrentPos);
 	}
 
 	tjs_uint read = Stream->Read(buffer, read_size);

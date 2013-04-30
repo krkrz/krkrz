@@ -96,7 +96,7 @@ static bool inline TVPIsTypeUsingAlphaChannel(tTVPLayerType type)
 // tTVPDrawable definition
 //---------------------------------------------------------------------------
 class tTVPBaseBitmap;
-class tTVPRect;
+struct tTVPRect;
 class tTVPDrawable
 {
 public:

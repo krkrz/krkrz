@@ -11,7 +11,7 @@
 #include "tjsCommHead.h"
 
 #include <mmsystem.h>
-#include <syncobjs.hpp>
+//#include <syncobjs.hpp>
 #include "tjsUtils.h"
 #include "TickCount.h"
 #include "SysInitIntf.h"

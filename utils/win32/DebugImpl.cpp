@@ -62,14 +62,14 @@ TJS_BEGIN_NATIVE_PROP_DECL(visible)
 {
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
-		*result = TVPMainForm->Visible;
+		*result = TVPMainForm->GetVisible();
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_GETTER
 
 	TJS_BEGIN_NATIVE_PROP_SETTER
 	{
-		TVPMainForm->Visible = param->operator bool();
+		TVPMainForm->SetVisible( param->operator bool() );
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_SETTER
