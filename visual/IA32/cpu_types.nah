@@ -1,0 +1,40 @@
+; this is a part of TVP (KIRIKIRI) software source.
+; see other sources for license.
+; (C)2001-2003 W.Dee <dee@kikyou.info> and contributors
+
+;;[emit_c_h]/*[*/
+;;[emit_c_h]//---------------------------------------------------------------------------
+;;[emit_c_h]// CPU Types
+;;[emit_c_h]//---------------------------------------------------------------------------
+;;[emit_c_h]/*]*/
+
+;;[emit_c_h_equ_begin]
+TVP_CPU_HAS_FPU			equ		000010000h
+TVP_CPU_HAS_MMX			equ		000020000h
+TVP_CPU_HAS_3DN			equ		000040000h
+TVP_CPU_HAS_SSE			equ		000080000h
+TVP_CPU_HAS_CMOV		equ		000100000h
+TVP_CPU_HAS_E3DN		equ		000200000h
+TVP_CPU_HAS_EMMX		equ		000400000h
+TVP_CPU_HAS_SSE2		equ		000800000h
+TVP_CPU_HAS_TSC			equ		001000000h
+
+TVP_CPU_FEATURE_MASK	equ		0ffff0000h
+
+TVP_CPU_IS_INTEL		equ		000000010h
+TVP_CPU_IS_AMD			equ		000000020h
+TVP_CPU_IS_IDT			equ		000000030h
+TVP_CPU_IS_CYRIX		equ		000000040h
+TVP_CPU_IS_NEXGEN		equ		000000050h
+TVP_CPU_IS_RISE			equ		000000060h
+TVP_CPU_IS_UMC			equ		000000070h
+TVP_CPU_IS_TRANSMETA	equ		000000080h
+TVP_CPU_IS_UNKNOWN		equ		000000000h
+
+TVP_CPU_VENDOR_MASK		equ		000000ff0h
+
+TVP_CPU_FAMILY_MASK		equ		00000000fh
+
+;;[emit_c_h_equ_end]
+
+; note: EMMX is refered to as MMX2
