@@ -226,7 +226,7 @@ LRESULT WINAPI Window::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 		}
 	case WM_SYSCOMMAND:
 		if( wParam == SC_CLOSE ) {
-			ModalResult == mrCancel;
+			ModalResult = mrCancel;
 		}
 		return ::DefWindowProc(hWnd,msg,wParam,lParam);
 	case WM_DESTROY:
