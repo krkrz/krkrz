@@ -66,7 +66,7 @@ void TVPShowVersionForm()
 	// get DirectDraw driver information
 	TVPEnsureDirectDrawObject();
 	TVPDumpDirectDrawDriverInformation();
-	::DialogBox( NULL, MAKEINTRESOURCE(IDD_INPUT_STRING), NULL, (DLGPROC)DlgProc );
+	::DialogBox( NULL, MAKEINTRESOURCE(IDD_VERSION_DIALOG), NULL, (DLGPROC)DlgProc );
 }
 //---------------------------------------------------------------------------
 
