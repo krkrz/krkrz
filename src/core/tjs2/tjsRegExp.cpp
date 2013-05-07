@@ -161,8 +161,7 @@ public:
 //---------------------------------------------------------------------------
 #endif
 
-void replace_regex( tTJSVariant **param, tjs_int numparams, tTJSNI_RegExp *__this, iTJSDispatch2 *objthis) {
-	
+void replace_regex( tTJSVariant **param, tjs_int numparams, tTJSNI_RegExp *_this, iTJSDispatch2 *objthis, ttstr &res ) {
 	ttstr to;
 	tTJSVariantClosure funcval;
 	bool func;
@@ -178,6 +177,76 @@ void replace_regex( tTJSVariant **param, tjs_int numparams, tTJSNI_RegExp *__thi
 		}
 		func = true;
 	}
+	// grep thru target string
+	tjs_int lastpos = 0;
+	tjs_int targlen = target.GetLen();
+	OnigRegion* region = onig_region_new();
+	const tjs_char* s = target.c_str();
+	const tjs_char* send = s + targlen;
+	int r = onig_search( _this->RegEx, (UChar*)s, (UChar*)send, (UChar*)s, (UChar*)send, region, ONIG_OPTION_NONE );
+	int lastm = 0;
+	if( r >= 0 ) { // match
+		//ttstr res;
+		do {
+			tjs_int pos = region->beg[0];
+			tjs_int len = region->end[0] - region->beg[0];
+			if( pos > lastpos )
+				res += ttstr(target.c_str() + lastpos, pos - lastpos);
+
+			if( !func ) {
+				res += to;
+			} else {
+				// call the callback function descripted as param[1]
+				tTJSVariant result;
+				tjs_error hr;
+				iTJSDispatch2 *array = tTJSNC_RegExp::GetResultArray( true, target, _this, region );
+				tTJSVariant arrayval(array, array);
+				tTJSVariant *param = &arrayval;
+				array->Release();
+				hr = funcval.FuncCall(0, NULL, NULL, &result, 1, &param, NULL);
+				if( TJS_FAILED(hr) ) {
+					onig_region_free( region, 1  );
+					return;
+				}
+				result.ToString();
+				res += result.GetString();
+			}
+			lastpos = pos + len;
+			s += region->end[0];
+			lastm = region->end[0];
+			onig_region_free( region, 0  );
+		} while( onig_search( _this->RegEx, (UChar*)s, (UChar*)send, (UChar*)s, (UChar*)send, region, ONIG_OPTION_NONE ) >= 0 );
+
+	}
+	onig_region_free( region, 1  );
+}
+
+iTJSDispatch2* split_regex( const ttstr &target, iTJSDispatch2 * array, tTJSNI_RegExp *_this, bool purgeempty ) {
+	tjs_uint targlen = target.GetLen();
+	OnigRegion* region = onig_region_new();
+	const tjs_char* s = target.c_str();
+	const tjs_char* send = s + targlen;
+	int r = onig_search( _this->RegEx, (UChar*)s, (UChar*)send, (UChar*)s, (UChar*)send, region, ONIG_OPTION_NONE );
+	int storecount = 0;
+	int lastm = 0;
+	if( r >= 0 ) { // match
+		do {
+			int len = region->beg[0] - lastm;
+			if( !purgeempty || len > 0 ) {
+				tTJSVariant val = ttstr( s, len );
+				array->PropSetByNum(TJS_MEMBERENSURE, storecount++, &val, array);
+			}
+			s += region->end[0];
+			lastm = region->end[0];
+			onig_region_free( region, 0  );
+		} while( onig_search( _this->RegEx, (UChar*)s, (UChar*)send, (UChar*)s, (UChar*)send, region, ONIG_OPTION_NONE ) >= 0 );
+		if( !purgeempty || s <= send ) {
+			tTJSVariant val = ttstr( s, send-s );
+			array->PropSetByNum(TJS_MEMBERENSURE, storecount++, &val, array);
+		}
+	}
+	onig_region_free( region, 1  );
+	return array;
 }
 
 #if 0
@@ -266,34 +335,6 @@ public:
 };
 #endif
 //---------------------------------------------------------------------------
-
-iTJSDispatch2* split_regex( const ttstr &target, iTJSDispatch2 * array, tTJSNI_RegExp *_this, bool purgeempty ) {
-	tjs_uint targlen = target.GetLen();
-	OnigRegion* region = onig_region_new();
-	const tjs_char* s = target.c_str();
-	const tjs_char* send = s + targlen;
-	int r = onig_search( _this->RegEx, (UChar*)s, (UChar*)send, (UChar*)s, (UChar*)send, region, ONIG_OPTION_NONE );
-	int storecount = 0;
-	int lastm = 0;
-	if( r >= 0 ) { // match
-		do {
-			int len = region->beg[0] - lastm;
-			if( !purgeempty || len > 0 ) {
-				tTJSVariant val = ttstr( s, len );
-				array->PropSetByNum(TJS_MEMBERENSURE, storecount++, &val, array);
-			}
-			s += region->end[0];
-			lastm = region->end[0];
-			onig_region_free( region, 0  );
-		} while( onig_search( _this->RegEx, (UChar*)s, (UChar*)send, (UChar*)s, (UChar*)send, region, ONIG_OPTION_NONE ) >= 0 );
-		if( !purgeempty || s <= send ) {
-			tTJSVariant val = ttstr( s, send-s );
-			array->PropSetByNum(TJS_MEMBERENSURE, storecount++, &val, array);
-		}
-	}
-	onig_region_free( region, 1  );
-	return array;
-}
 
 
 //---------------------------------------------------------------------------
@@ -561,6 +602,10 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/replace)
 
 
 	if(result) *result = predicate.GetRes();
+#else
+	ttstr res;
+	replace_regex( param, numparams, _this, objthis, res );
+	if(result) *result = res;
 #endif
 /*
 	if(numparams >= 3)
@@ -858,7 +903,7 @@ bool tTJSNC_RegExp::Exec(OnigRegion* region, ttstr target, tTJSNI_RegExp *_this)
 	return matched;
 }
 //---------------------------------------------------------------------------
-iTJSDispatch2 * tTJSNC_RegExp::GetResultArray( bool matched, const ttstr& target, tTJSNI_RegExp *_this, const const OnigRegion* region ) {
+iTJSDispatch2 * tTJSNC_RegExp::GetResultArray( bool matched, const ttstr& target, tTJSNI_RegExp *_this, const OnigRegion* region ) {
 	iTJSDispatch2 *array = TJSCreateArrayObject();
 	if( matched ) {
 		//if(_this->RegEx->.empty()) {
