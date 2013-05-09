@@ -518,8 +518,8 @@ process_exp_stub("../../sound/WaveIntf.h");
 print OFH "#include \"WaveImpl.h\"\n";
 process_exp_stub("../../sound/win32/WaveImpl.h");
 
-print OFH "#include \"MIDIImpl.h\"\n";
-process_exp_stub("../../sound/win32/MIDIImpl.h");
+#print OFH "#include \"MIDIImpl.h\"\n";
+#process_exp_stub("../../sound/win32/MIDIImpl.h");
 
 print OFH "#include \"GraphicsLoaderIntf.h\"\n";
 process_exp_stub("../../visual/GraphicsLoaderIntf.h");

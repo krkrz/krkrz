@@ -1923,7 +1923,6 @@ extern void * TVPImportFuncPtrd9b1c73516daea6a9c6564e2b731615a;
 extern void * TVPImportFuncPtr003f9d3de568fcd71dd532f33d38839c;
 extern void * TVPImportFuncPtr5da29a19bbe279a89be00e16c59d7641;
 extern void * TVPImportFuncPtrc1b52e8f3578d11f369552a887e13c5b;
-extern void * TVPImportFuncPtrdcd6ba3960e3e2cf6dbe585b1f67b0ac;
 extern void * TVPImportFuncPtr5b1fa785e397e643dd09cb43c2f2f4db;
 extern void * TVPImportFuncPtr29af78765c764c566e6adc77e0ea7041;
 extern void * TVPImportFuncPtr9e0df54e4c24ee28d5517c1743faa3a3;
@@ -4736,7 +4735,9 @@ enum tTVPMouseButton
 {
 	mbLeft,
 	mbRight,
-	mbMiddle
+	mbMiddle,
+	mbX1,
+	mbX2
 };
 
 
@@ -5372,9 +5373,11 @@ public:
 	//!				マウスのキャプチャを開放すること。
 	virtual void TJS_INTF_METHOD WindowReleaseCapture() = 0;
 
+#ifdef USE_OBSOLETE_FUNCTIONS
 	//! @brief		ツールチップヒントを設定する
 	//! @param		text		ヒントテキスト(空文字列の場合はヒントの表示をキャンセルする)
 	virtual void TJS_INTF_METHOD SetHintText(const ttstr & text) = 0;
+#endif
 
 	//! @brief		注視ポイントの設定
 	//! @param		layer		フォント情報の含まれるレイヤ
@@ -5632,10 +5635,12 @@ public:
 	//!				マウスのキャプチャを開放する。
 	virtual void TJS_INTF_METHOD WindowReleaseCapture(iTVPLayerManager * manager) = 0;
 
+#ifdef USE_OBSOLETE_FUNCTIONS
 	//! @brief		(LayerManager→DrawDevice) ツールチップヒントを設定する
 	//! @param		manager		レイヤマネージャ
 	//! @param		text		ヒントテキスト(空文字列の場合はヒントの表示をキャンセルする)
 	virtual void TJS_INTF_METHOD SetHintText(iTVPLayerManager * manager, const ttstr & text) = 0;
+#endif
 
 	//! @brief		(LayerManager→DrawDevice) 注視ポイントの設定
 	//! @param		manager		レイヤマネージャ
@@ -7966,16 +7971,6 @@ inline IDirectSound * TVPGetDirectSound()
 	}
 	typedef IDirectSound * (__stdcall * __functype)();
 	return ((__functype)(TVPImportFuncPtrc1b52e8f3578d11f369552a887e13c5b))();
-}
-inline void TVPMIDIOutData(const tjs_uint8 * data , int len)
-{
-	if(!TVPImportFuncPtrdcd6ba3960e3e2cf6dbe585b1f67b0ac)
-	{
-		static char funcname[] = "void ::TVPMIDIOutData(const tjs_uint8 *,int)";
-		TVPImportFuncPtrdcd6ba3960e3e2cf6dbe585b1f67b0ac = TVPGetImportFuncPtr(funcname);
-	}
-	typedef void (__stdcall * __functype)(const tjs_uint8 *, int);
-	((__functype)(TVPImportFuncPtrdcd6ba3960e3e2cf6dbe585b1f67b0ac))(data, len);
 }
 inline void TVPClearGraphicCache()
 {
