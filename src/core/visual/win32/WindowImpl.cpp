@@ -1661,7 +1661,6 @@ void tTJSNI_Window::Update(tTVPUpdateType type)
 	if(Form) Form->UpdateWindow(type);
 }
 //---------------------------------------------------------------------------
-#ifdef USE_OBSOLETE_FUNCTIONS
 void tTJSNI_Window::ShowModal()
 {
 	if(Form && Form->GetFullScreenMode())
@@ -1673,7 +1672,6 @@ void tTJSNI_Window::ShowModal()
 		Form->ShowWindowAsModal();
 	}
 }
-#endif
 //---------------------------------------------------------------------------
 void tTJSNI_Window::HideMouseCursor()
 {

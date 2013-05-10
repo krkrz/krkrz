@@ -224,6 +224,15 @@ LRESULT WINAPI Window::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 		} else {
 			return ::DefWindowProc(hWnd,msg,wParam,lParam);
 		}
+	case WM_ACTIVATE: {
+		WPARAM fActive =  wParam & 0xFFFF;
+		if( fActive == WA_INACTIVE ) {
+			OnDeactive( (HWND)lParam );
+		} else if( fActive == WA_ACTIVE || fActive == WA_CLICKACTIVE ) {
+			OnActive( (HWND)lParam );
+		}
+		return ::DefWindowProc(hWnd,msg,wParam,lParam);
+	}
 	case WM_SYSCOMMAND:
 		if( wParam == SC_CLOSE ) {
 			ModalResult = mrCancel;
@@ -687,7 +696,7 @@ int Window::ShowModal() {
 	}
 	::ReleaseCapture();
 	Application->ModalStarted();
-	std::vector<class TTVPWindowForm*> disablewins;
+	std::vector<class TTVPWindowForm*> disablewins; // TODO アクティブウィンドウを得て処理する方がスマートか？
 	try {
 		//HWND hActiveWnd = ::GetActiveWindow();
 		Application->GetDisableWindowList( disablewins );
@@ -710,7 +719,11 @@ int Window::ShowModal() {
 			}
 		}
 		Application->EnableWindows( disablewins );
+		disablewins.clear();
 	} catch(...) {
+		if( disablewins.size() > 0 ) {
+			Application->EnableWindows( disablewins );
+		}
 		Application->ModalFinished();
 		throw;
 	}
