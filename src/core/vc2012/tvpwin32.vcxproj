@@ -135,6 +135,7 @@
     <ClInclude Include="..\environ\win32\TFont.h" />
     <ClInclude Include="..\environ\win32\Timer.h" />
     <ClInclude Include="..\environ\win32\TMLWindow.h" />
+    <ClInclude Include="..\environ\win32\UtilWindow.h" />
     <ClInclude Include="..\environ\win32\VersionFormUnit.h" />
     <ClInclude Include="..\environ\win32\WideNativeFuncs.h" />
     <ClInclude Include="..\environ\win32\WindowFormUnit.h" />
@@ -272,6 +273,7 @@
     <ClCompile Include="..\environ\win32\MouseCursor.cpp" />
     <ClCompile Include="..\environ\win32\Screen.cpp" />
     <ClCompile Include="..\environ\win32\TMLWindow.cpp" />
+    <ClCompile Include="..\environ\win32\UtilWindow.cpp" />
     <ClCompile Include="..\environ\win32\VersionFormUnit.cpp" />
     <ClCompile Include="..\environ\win32\WideNativeFuncs.cpp" />
     <ClCompile Include="..\environ\win32\WindowFormUnit.cpp" />

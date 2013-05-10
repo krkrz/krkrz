@@ -251,7 +251,10 @@ HRESULT Window::CreateWnd( const std::string& classname, const std::string& titl
 	WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC | CS_DBLCLKS, Window::WndProc, 0L, 0L,
 						GetModuleHandle(NULL), NULL, NULL, NULL, NULL,
 						window_class_name_.c_str(), NULL };
-	::RegisterClassEx( &wc );
+	BOOL ClassRegistered = ::GetClassInfoEx( wc.hInstance, wc.lpszClassName, &wc );
+	if( ClassRegistered == 0 ) {
+		::RegisterClassEx( &wc );
+	}
 	wc_ = wc;
 
 	RECT	winRc = { 0, 0, window_client_size_.cx, window_client_size_.cy };

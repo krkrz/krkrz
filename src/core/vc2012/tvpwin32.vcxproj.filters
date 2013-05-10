@@ -492,6 +492,9 @@
     <ClInclude Include="..\sound\WaveSegmentQueue.h">
       <Filter>sound</Filter>
     </ClInclude>
+    <ClInclude Include="..\environ\win32\UtilWindow.h">
+      <Filter>environ\win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -847,6 +850,9 @@
     </ClCompile>
     <ClCompile Include="..\sound\WaveSegmentQueue.cpp">
       <Filter>sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\environ\win32\UtilWindow.cpp">
+      <Filter>environ\win32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
