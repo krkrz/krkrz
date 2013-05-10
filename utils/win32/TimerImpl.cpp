@@ -20,6 +20,7 @@
 #include "ThreadIntf.h"
 #include "MsgIntf.h"
 
+#include "UtilWindow.h"
 
 //---------------------------------------------------------------------------
 
@@ -33,7 +34,7 @@
 //---------------------------------------------------------------------------
 // tTVPTimerThread
 //---------------------------------------------------------------------------
-class tTVPTimerThread : public tTVPThread
+class tTVPTimerThread : public tTVPThread, public UtilWindow
 {
 	// thread for triggering punctual event.
 	// normal Windows timer cannot call the timer callback routine at
@@ -43,8 +44,6 @@ class tTVPTimerThread : public tTVPThread
 	std::vector<tTJSNI_Timer *> Pending; // timer object which has pending events
 	bool PendingEventsAvailable;
 	tTVPThreadEvent Event;
-
-	HWND UtilWindow; // utility window to notify the pending events occur
 
 public:
 
@@ -58,7 +57,7 @@ protected:
 
 private:
 	//void __fastcall UtilWndProc(Messages::TMessage &Msg);
-	LRESULT CALLBACK UtilWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+	virtual LRESULT WINAPI Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
 
 	void AddItem(tTJSNI_Timer * item);
 	bool RemoveItem(tTJSNI_Timer *item);
@@ -85,8 +84,7 @@ tTVPTimerThread::tTVPTimerThread() : tTVPThread(true)
 {
 	PendingEventsAvailable = false;
 	SetPriority(TVPLimitTimerCapacity ? ttpNormal : ttpHighest);
-#pragma message( __FILE__ __LINE__ "TODO メッセージハンドラをなんとかする" )
-	//UtilWindow = AllocateHWnd(UtilWndProc);
+	AllocateUtilWnd();
 	Resume();
 }
 //---------------------------------------------------------------------------
@@ -96,8 +94,7 @@ tTVPTimerThread::~tTVPTimerThread()
 	Resume();
 	Event.Set();
 	WaitFor();
-#pragma message( __FILE__ __LINE__ "TODO メッセージハンドラをなんとかする" )
-	//DeallocateHWnd(UtilWindow);
+	DeallocateUtilWnd();
 }
 //---------------------------------------------------------------------------
 void tTVPTimerThread::Execute()
@@ -175,7 +172,7 @@ void tTVPTimerThread::Execute()
 				if(!PendingEventsAvailable)
 				{
 					PendingEventsAvailable = true;
-					::PostMessage(UtilWindow, WM_USER+1, 0, 0);
+					PostMessage(WM_USER+1, 0, 0);
 				}
 			}
 
@@ -197,7 +194,7 @@ void tTVPTimerThread::Execute()
 }
 //---------------------------------------------------------------------------
 //void __fastcall tTVPTimerThread::UtilWndProc(Messages::TMessage &Msg)
-LRESULT CALLBACK tTVPTimerThread::UtilWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT WINAPI tTVPTimerThread::Proc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
 	LRESULT result = 0;
 	// Window procedure of UtilWindow
@@ -218,7 +215,7 @@ LRESULT CALLBACK tTVPTimerThread::UtilWndProc(HWND hWnd, UINT message, WPARAM wP
 	}
 	else
 	{
-		result =  DefWindowProc(UtilWindow, message, wParam, lParam);
+		result =  UtilWindow::Proc( hWnd, message, wParam, lParam);
 	}
 	return result;
 }

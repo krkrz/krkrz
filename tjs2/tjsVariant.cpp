@@ -293,6 +293,7 @@ tTJSVariantString * TJSRealToHexString(tjs_real r)
 
 	*(p++) = TJS_W('p');
 	TJS_sprintf(p, TJS_W("%d"), exp);
+	//TJS_snprintf(p, (sizeof(tmp)-(p-tmp))/sizeof(tjs_char), TJS_W("%d"), exp);
 
 	return TJSAllocVariantString(tmp);
 }
@@ -751,7 +752,7 @@ bool tTJSVariant::NormalCompare(const tTJSVariant &val2) const
 		}
 		return r1 == r2;
 	}
-	catch(eTJSVariantError &e)
+	catch(eTJSVariantError &/*e*/)
 	{
 		return false;
 	}

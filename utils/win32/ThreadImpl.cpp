@@ -213,14 +213,14 @@ void TVPBeginThreadTask(tjs_int taskNum)
     if (TVPProcesserIdList.empty())
       TVPProcesserIdList.push_back(MAXIMUM_PROCESSORS);
   }
-  while (TVPThreadList.size() < extraThreadNum) {
+  while ( static_cast<tjs_int>(TVPThreadList.size()) < extraThreadNum) {
     ThreadInfo *threadInfo = new ThreadInfo();
     threadInfo->readyToExit = false;
     threadInfo->thread = CreateThread(NULL, 0, ThreadLoop, threadInfo, CREATE_SUSPENDED, NULL);
     SetThreadIdealProcessor(threadInfo->thread, TVPProcesserIdList[TVPThreadList.size() % TVPProcesserIdList.size()]);
     TVPThreadList.push_back(threadInfo);
   }
-  while (TVPThreadList.size() > extraThreadNum) {
+  while ( static_cast<tjs_int>(TVPThreadList.size()) > extraThreadNum) {
     ThreadInfo *threadInfo = TVPThreadList.back();
     threadInfo->readyToExit = true;
     while (ResumeThread(threadInfo->thread) == 0)

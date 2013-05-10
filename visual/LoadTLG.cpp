@@ -444,7 +444,7 @@ static void TVPInternalLoadTLG(void* formatdata, void *callbackdata, tTVPGraphic
 	else if(!memcmp("TLG6.0\x00raw\x1a\x00", mark, 11))
 	{
 		TVPLoadTLG6(formatdata, callbackdata, sizecallback,
-			scanlinecallback, src, keyidx, mode);
+			scanlinecallback, src, keyidx, mode!=glmNormal);
 	}
 	else
 	{

@@ -190,7 +190,8 @@ enum {
 };
 
 LRESULT WINAPI TTVPWindowForm::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam ) {
-	switch( msg ) {
+	//switch( msg )
+	{
 		/*
 	case WM_MOVE:
 		return WMMove();
@@ -228,8 +229,8 @@ LRESULT WINAPI TTVPWindowForm::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
 		return WMNCLButtonDown();
 	case WM_NCRBUTTONDOWN:
 		return WMNCRButtonDown();
-		*/
 	default:
+		*/
 		return TML::Window::Proc( hWnd, msg, wParam, lParam );
 	}
 }

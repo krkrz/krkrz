@@ -917,7 +917,7 @@ tTJSVariantString * TJSFormatString(const tjs_char *format, tjs_uint numparams,
 			else if((!width_ind && prec_ind) || (width_ind && !prec_ind))
 			{
 				if(in>=numparams) TJS_eTJSVariantError(TJSBadParamCount);
-				ind[0] = (params[in++])->AsInteger();
+				ind[0] = static_cast<int>( (params[in++])->AsInteger() );
 				if(width_ind && ind[0] + prec > 900) goto error;
 				if(prec_ind && ind[0] + width > 900) goto error;
 				if(in>=numparams) TJS_eTJSVariantError(TJSBadParamCount);
@@ -927,9 +927,9 @@ tTJSVariantString * TJSFormatString(const tjs_char *format, tjs_uint numparams,
 			else
 			{
 				if(in>=numparams) TJS_eTJSVariantError(TJSBadParamCount);
-				ind[0] = (params[in++])->AsInteger();
+				ind[0] = static_cast<int>( (params[in++])->AsInteger() );
 				if(in>=numparams) TJS_eTJSVariantError(TJSBadParamCount);
-				ind[1] = (params[in++])->AsInteger();
+				ind[1] = static_cast<int>( (params[in++])->AsInteger() );
 				if(ind[0] + ind[1] > 900) goto error;
 				if(in>=numparams) TJS_eTJSVariantError(TJSBadParamCount);
 				tTVInteger integer = (params[in++])->AsInteger();
@@ -973,7 +973,7 @@ tTJSVariantString * TJSFormatString(const tjs_char *format, tjs_uint numparams,
 			else if((!width_ind && prec_ind) || (width_ind && !prec_ind))
 			{
 				if(in>=numparams) TJS_eTJSVariantError(TJSBadParamCount);
-				ind[0] = (params[in++])->AsInteger();
+				ind[0] = static_cast<int>( (params[in++])->AsInteger() );
  				if(width_ind && ind[0] + prec > 900) goto error;
 				if(prec_ind && ind[0] + width > 900) goto error;
 				if(in>=numparams) TJS_eTJSVariantError(TJSBadParamCount);
@@ -983,9 +983,9 @@ tTJSVariantString * TJSFormatString(const tjs_char *format, tjs_uint numparams,
 			else
 			{
 				if(in>=numparams) TJS_eTJSVariantError(TJSBadParamCount);
-				ind[0] = (params[in++])->AsInteger();
+				ind[0] = static_cast<int>( (params[in++])->AsInteger() );
 				if(in>=numparams) TJS_eTJSVariantError(TJSBadParamCount);
-				ind[1] = (params[in++])->AsInteger();
+				ind[1] = static_cast<int>( (params[in++])->AsInteger() );
 				if(ind[0] + ind[1] > 900) goto error;
 				if(in>=numparams) TJS_eTJSVariantError(TJSBadParamCount);
 				tTVReal real = (params[in++])->AsReal();
