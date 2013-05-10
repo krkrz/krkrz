@@ -7162,7 +7162,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/drawText)
 		(numparams >= 5 && param[4]->Type() != tvtVoid)?(tjs_int)*param[4] : (tjs_int)255,
 		(numparams >= 6 && param[5]->Type() != tvtVoid)? param[5]->operator bool() : true,
 		(numparams >= 7 && param[6]->Type() != tvtVoid)? (tjs_int)*param[6] : 0,
-		(numparams >= 8 && param[7]->Type() != tvtVoid)? (tjs_int64)*param[7] : 0,
+		(numparams >= 8 && param[7]->Type() != tvtVoid)? static_cast<tjs_uint32>((tjs_int64)*param[7]) : 0,
 		(numparams >= 9 && param[8]->Type() != tvtVoid)? (tjs_int)*param[8] : 0,
 		(numparams >=10 && param[9]->Type() != tvtVoid)? (tjs_int)*param[9] : 0,
 		(numparams >=11 && param[10]->Type() != tvtVoid)? (tjs_int)*param[10] : 0

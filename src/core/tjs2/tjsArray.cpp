@@ -134,8 +134,7 @@ class tTJSArraySortCompare_NormalAscending :
 public:
 	result_type operator () (first_argument_type lhs, second_argument_type rhs) const
 	{
-		//return lhs < rhs;
-		return lhs.operator <(rhs);
+		return (lhs < rhs).operator bool();
 	}
 };
 class tTJSArraySortCompare_NormalDescending :
@@ -144,8 +143,7 @@ class tTJSArraySortCompare_NormalDescending :
 public:
 	result_type operator () (first_argument_type lhs, second_argument_type rhs) const
 	{
-		//return lhs > rhs;
-		return lhs.operator > (rhs);
+		return (lhs > rhs).operator bool();
 	}
 };
 class tTJSArraySortCompare_NumericAscending :
@@ -159,11 +157,9 @@ public:
 			tTJSVariant ltmp(lhs), rtmp(rhs);
 			ltmp.tonumber();
 			rtmp.tonumber();
-			//return ltmp < rtmp;
-			return ltmp.operator <(rtmp);
+			return (ltmp < rtmp).operator bool();
 		}
-		//return lhs < rhs;
-		return lhs.operator < (rhs);
+		return (lhs < rhs).operator bool();
 	}
 };
 class tTJSArraySortCompare_NumericDescending :
@@ -177,11 +173,9 @@ public:
 			tTJSVariant ltmp(lhs), rtmp(rhs);
 			ltmp.tonumber();
 			rtmp.tonumber();
-			//return ltmp > rtmp;
-			return ltmp.operator > ( rtmp );
+			return (ltmp > rtmp).operator bool();
 		}
-		//return lhs > rhs;
-		return lhs.operator > (rhs);
+		return (lhs > rhs).operator bool();
 	}
 };
 class tTJSArraySortCompare_StringAscending :
@@ -191,8 +185,7 @@ public:
 	result_type operator () (first_argument_type lhs, second_argument_type rhs) const
 	{
 		if(lhs.Type() == tvtString && rhs.Type() == tvtString)
-			//return lhs < rhs;
-			return lhs.operator < ( rhs );
+			return (lhs < rhs).operator bool();
 		return (ttstr)lhs < (ttstr)rhs;
 	}
 };
@@ -203,8 +196,7 @@ public:
 	result_type operator () (first_argument_type lhs, second_argument_type rhs) const
 	{
 		if(lhs.Type() == tvtString && rhs.Type() == tvtString)
-			//return lhs > rhs;
-			return lhs.operator > (rhs);
+			return (lhs > rhs).operator bool();
 		return (ttstr)lhs > (ttstr)rhs;
 	}
 };

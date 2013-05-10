@@ -34,7 +34,7 @@ inline void TVPCopyToClipboard(const ttstr & unicode)
 			if(!ansihandle) throw std::exception("copying to clipboard failed.");
 
 			char *mem = (char*)GlobalLock(ansihandle);
-			if(mem) strncpy(mem, ansistr.c_str(),ansistrlen);
+			if(mem) strncpy_s(mem, ansistrlen, ansistr.c_str(),ansistrlen);
 			GlobalUnlock(ansihandle);
 
 			::SetClipboardData( CF_TEXT, ansihandle );

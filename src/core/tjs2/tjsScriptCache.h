@@ -46,8 +46,8 @@ private:
 		static tjs_uint32 Make(const tScriptCacheData &val)
 		{
 			tjs_uint32 v = tTJSHashFunc<ttstr>::Make(val.Script);
-			v ^= val.ExpressionMode;
-			v ^= val.MustReturnResult;
+			v ^= val.ExpressionMode?1:0;
+			v ^= val.MustReturnResult?1:0;
 			return v;
 		}
 	};

@@ -314,7 +314,7 @@ tjs_uint64 TJS_INTF_METHOD tTVPPartialStream::Seek(tjs_int64 offset, tjs_int whe
 	{
 	case TJS_BS_SEEK_SET:
 		newpos = offset;
-		if(offset >= 0 && offset <= Size)
+		if(offset >= 0 && offset <= static_cast<tjs_int64>(Size) )
 		{
 			newpos += Start;
 			CurrentPos = Stream->Seek(newpos, TJS_BS_SEEK_SET) - Start;
@@ -323,7 +323,7 @@ tjs_uint64 TJS_INTF_METHOD tTVPPartialStream::Seek(tjs_int64 offset, tjs_int whe
 
 	case TJS_BS_SEEK_CUR:
 		newpos = offset + CurrentPos;
-		if(offset >= 0 && offset <= Size)
+		if(offset >= 0 && offset <= static_cast<tjs_int64>(Size) )
 		{
 			newpos += Start;
 			CurrentPos = Stream->Seek(newpos, TJS_BS_SEEK_SET) - Start;
@@ -332,7 +332,7 @@ tjs_uint64 TJS_INTF_METHOD tTVPPartialStream::Seek(tjs_int64 offset, tjs_int whe
 
 	case TJS_BS_SEEK_END:
 		newpos = offset + Size;
-		if(offset >= 0 && offset <= Size)
+		if(offset >= 0 && offset <= static_cast<tjs_int64>(Size) )
 		{
 			newpos += Start;
 			CurrentPos = Stream->Seek(newpos, TJS_BS_SEEK_SET) - Start;

@@ -186,7 +186,7 @@ TJS_EXP_FUNC_DEF(void, TJSAlignedDealloc, (void *ptr));
 #define TJS_FC_IS_NAN(x)  (((x)&TJS_FC_CLASS_MASK) == TJS_FC_CLASS_NAN)
 #define TJS_FC_IS_INF(x)  (((x)&TJS_FC_CLASS_MASK) == TJS_FC_CLASS_INF)
 
-#define TJS_FC_IS_NEGATIVE(x) ((bool)((x) & TJS_FC_SIGN_MASK))
+#define TJS_FC_IS_NEGATIVE(x) (0!=((x) & TJS_FC_SIGN_MASK))
 #define TJS_FC_IS_POSITIVE(x) (!TJS_FC_IS_NEGATIVE(x))
 
 
