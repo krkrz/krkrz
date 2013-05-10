@@ -114,7 +114,7 @@ public:
 	}
 	virtual ~Window() {
 		if( ime_control_ ) delete ime_control_;
-		UnregisterWindow();
+		// UnregisterWindow();
 	}
 	bool HasFocus() {
 		return window_handle_ == ::GetFocus();

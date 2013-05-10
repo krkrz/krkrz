@@ -22,7 +22,7 @@
 #include <ddraw.h>
 
 #include "Application.h"
-
+#include "UtilWindow.h"
 
 //---------------------------------------------------------------------------
 // TVPInvokeEvents
@@ -124,7 +124,7 @@ bool TVPGetSystemEventDisabledState()
 //---------------------------------------------------------------------------
 // tTVPContinuousHandlerCallLimitThread
 //---------------------------------------------------------------------------
-class tTVPContinuousHandlerCallLimitThread : public tTVPThread
+class tTVPContinuousHandlerCallLimitThread : public tTVPThread, public UtilWindow
 {
 	tjs_uint64 NextEventTick;
 	tjs_uint64 Interval;
@@ -132,7 +132,6 @@ class tTVPContinuousHandlerCallLimitThread : public tTVPThread
 	tTJSCriticalSection CS;
 
 	bool Enabled;
-	HWND UtilWindow;
 
 public:
 	tTVPContinuousHandlerCallLimitThread();
@@ -140,14 +139,6 @@ public:
 
 protected:
 	void Execute();
-
-	//void __fastcall UtilWndProc(Messages::TMessage &Msg)
-	LRESULT CALLBACK UtilWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-	{
-		//Msg.Result =  DefWindowProc(UtilWindow, Msg.Msg, Msg.WParam, Msg.LParam);
-		//return;
-		return DefWindowProc( UtilWindow, message, wParam, lParam);
-	}
 
 public:
 	void SetEnabled(bool enabled);
@@ -165,8 +156,7 @@ tTVPContinuousHandlerCallLimitThread::tTVPContinuousHandlerCallLimitThread()
 	NextEventTick = 0;
 	Interval = (1<<TVP_SUBMILLI_FRAC_BITS)*1000/60; // default 60Hz
 	Enabled = false;
-#pragma message( __LOC__ "TODO メッセージハンドラをなんとかする" )
-//	UtilWindow = AllocateHWnd(UtilWndProc);
+	AllocateUtilWnd();
 	Resume();
 }
 //---------------------------------------------------------------------------
@@ -179,8 +169,7 @@ tTVPContinuousHandlerCallLimitThread::~tTVPContinuousHandlerCallLimitThread()
 	Resume();
 	Event.Set();
 	WaitFor();
-#pragma message( __LOC__ "TODO メッセージハンドラをなんとかする" )
-	//DeallocateHWnd(UtilWindow);
+	DeallocateUtilWnd();
 }
 //---------------------------------------------------------------------------
 
@@ -201,7 +190,7 @@ void tTVPContinuousHandlerCallLimitThread::Execute()
 				if(NextEventTick <= curtick)
 				{
 					TVPProcessContinuousHandlerEventFlag = true; // set flag to process event on next idle
-					::PostMessage(UtilWindow, WM_APP+2, 0, 0);
+					PostMessage( WM_APP+2, 0, 0);
 					while(NextEventTick <= curtick) NextEventTick += Interval;
 				}
 				tjs_uint64 sleeptime_64 = NextEventTick - curtick;
@@ -357,7 +346,7 @@ bool TVPGetWaitVSync()
 //---------------------------------------------------------------------------
 // VSync用のタイミングを発生させるためのスレッド
 //---------------------------------------------------------------------------
-class tTVPVSyncTimingThread : public tTVPThread
+class tTVPVSyncTimingThread : public tTVPThread, public UtilWindow
 {
 	DWORD SleepTime;
 	tTVPThreadEvent Event;
@@ -366,7 +355,6 @@ class tTVPVSyncTimingThread : public tTVPThread
 	DWORD LastVBlankTick; //!< 最後の vblank の時間
 
 	bool Enabled;
-	HWND UtilWindow;
 
 public:
 	tTVPVSyncTimingThread();
@@ -376,7 +364,7 @@ protected:
 	void Execute();
 
 	//void __fastcall UtilWndProc(Messages::TMessage &Msg);
-	LRESULT CALLBACK UtilWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+	virtual LRESULT WINAPI Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
 
 public:
 	void MeasureVSyncInterval(); // VSyncInterval を計測する
@@ -392,8 +380,7 @@ tTVPVSyncTimingThread::tTVPVSyncTimingThread()
 	LastVBlankTick = 0;
 	VSyncInterval = 16; // 初期値。
 	Enabled = false;
-#pragma message( __LOC__ "TODO メッセージハンドラをなんとかする" )
-//	UtilWindow = AllocateHWnd(&tTVPVSyncTimingThread::UtilWndProc);
+	AllocateUtilWnd();
 	MeasureVSyncInterval();
 	Resume();
 }
@@ -407,8 +394,7 @@ tTVPVSyncTimingThread::~tTVPVSyncTimingThread()
 	Resume();
 	Event.Set();
 	WaitFor();
-#pragma message( __LOC__ "TODO メッセージハンドラをなんとかする" )
-	//DeallocateHWnd(UtilWindow);
+	DeallocateUtilWnd();
 }
 //---------------------------------------------------------------------------
 
@@ -450,7 +436,7 @@ void tTVPVSyncTimingThread::Execute()
 		}
 
 		// イベントをポストする
-		::PostMessage(UtilWindow, WM_APP+2, 0, (LPARAM)sleep_start_tick);
+		PostMessage( WM_APP+2, 0, (LPARAM)sleep_start_tick);
 
 		Event.WaitFor(0x7fffffff); // vsync まで待つ
 	}
@@ -460,12 +446,10 @@ void tTVPVSyncTimingThread::Execute()
 
 //---------------------------------------------------------------------------
 //void __fastcall tTVPVSyncTimingThread::UtilWndProc(Messages::TMessage &Msg)
-LRESULT CALLBACK tTVPVSyncTimingThread::UtilWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT WINAPI tTVPVSyncTimingThread::Proc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
-	if(message != WM_APP+2)
-	{
-		return DefWindowProc(UtilWindow, message, wParam, lParam);
-		//return;
+	if(message != WM_APP+2) {
+		return UtilWindow::Proc( hWnd, message, wParam, lParam);
 	}
 
 	// tTVPVSyncTimingThread から投げられたメッセージ
