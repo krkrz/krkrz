@@ -57,6 +57,80 @@ TShiftState TVP_TShiftState_From_uint32(tjs_uint32 state){
 tTVPMouseButton TVP_TMouseButton_To_tTVPMouseButton(int button) {
 	return (tTVPMouseButton)button;
 }
+
+
+//---------------------------------------------------------------------------
+// Modal Window List
+//---------------------------------------------------------------------------
+// modal window list is used to ensure modal window accessibility when
+// the system is full-screened,
+std::vector<TTVPWindowForm *> TVPModalWindowList;
+//---------------------------------------------------------------------------
+static void TVPAddModalWindow(TTVPWindowForm * window)
+{
+	std::vector<TTVPWindowForm *>::iterator i;
+	i = std::find(TVPModalWindowList.begin(), TVPModalWindowList.end(), window);
+	if(i == TVPModalWindowList.end())
+		TVPModalWindowList.push_back(window);
+}
+//---------------------------------------------------------------------------
+static void TVPRemoveModalWindow(TTVPWindowForm *window)
+{
+	std::vector<TTVPWindowForm *>::iterator i;
+	i = std::find(TVPModalWindowList.begin(), TVPModalWindowList.end(), window);
+	if(i != TVPModalWindowList.end())
+		TVPModalWindowList.erase(i);
+}
+//---------------------------------------------------------------------------
+#include "DebugIntf.h"
+void TVPShowModalAtAppActivate()
+{
+	// called when the application is activated
+	if(TVPFullScreenedWindow != NULL)
+	{
+		// any window is full-screened
+		::ShowWindow(TVPFullScreenedWindow->GetHandle(), SW_RESTORE); // restore the window
+
+		// send message which brings modal windows to front
+		std::vector<TTVPWindowForm *>::iterator i;
+		for(i = TVPModalWindowList.begin(); i != TVPModalWindowList.end(); i++)
+			(*i)->InvokeShowVisible();
+		for(i = TVPModalWindowList.begin(); i != TVPModalWindowList.end(); i++)
+			(*i)->InvokeShowTop();
+	}
+}
+//---------------------------------------------------------------------------
+HDWP TVPShowModalAtTimer(HDWP hdwp)
+{
+	// called every 4 seconds, to ensure the modal window visible
+	if(TVPFullScreenedWindow != NULL)
+	{
+		// send message which brings modal windows to front
+		std::vector<TTVPWindowForm *>::iterator i;
+		for(i = TVPModalWindowList.begin(); i != TVPModalWindowList.end(); i++)
+			hdwp = (*i)->ShowTop(hdwp);
+	}
+	return hdwp;
+}
+//---------------------------------------------------------------------------
+void TVPHideModalAtAppDeactivate()
+{
+	// called when the application is deactivated
+	if(TVPFullScreenedWindow != NULL)
+	{
+		// any window is full-screened
+
+		// hide modal windows
+		std::vector<TTVPWindowForm *>::iterator i;
+		for(i = TVPModalWindowList.begin(); i != TVPModalWindowList.end(); i++)
+			(*i)->SetVisible( false );
+	}
+
+	// hide also popups
+	TTVPWindowForm::DeliverPopupHide();
+}
+//---------------------------------------------------------------------------
+
 //---------------------------------------------------------------------------
 // Window/Bitmap options
 //---------------------------------------------------------------------------
@@ -120,8 +194,8 @@ TTVPWindowForm::TTVPWindowForm( TApplication* app, tTJSNI_Window* ni ) : TML::Wi
 	
 	NextSetWindowHandleToDrawDevice = true;
 	LastSentDrawDeviceDestRect.clear();
-
-	Closing = false;
+	
+	InMode = false;
 	Closing = false;
 	ProgramClosing = false;
 	InnerWidthSave = GetInnerWidth();
@@ -687,14 +761,14 @@ void TTVPWindowForm::UpdateWindow(tTVPUpdateType type ) {
 		TVPDeliverWindowUpdateEvents();
 	}
 }
-/*
+
 void TTVPWindowForm::ShowWindowAsModal() {
 	// TODO: what's modalwindowlist ?
 	ModalResult = 0;
 	InMode = true;
 	TVPAddModalWindow(this); // add to modal window list
 	try {
-		TForm::ShowModal();
+		ShowModal();
 	} catch(...) {
 		TVPRemoveModalWindow(this);
 		InMode = false;
@@ -703,7 +777,7 @@ void TTVPWindowForm::ShowWindowAsModal() {
 	TVPRemoveModalWindow(this);
 	InMode = false;
 }
-*/
+
 
 void TTVPWindowForm::RegisterWindowMessageReceiver(tTVPWMRRegMode mode, void * proc, const void *userdata) {
 	if( mode == wrmRegister ) {
@@ -784,9 +858,9 @@ void TTVPWindowForm::OnCloseQueryCalled( bool b ) {
 	if( !ProgramClosing ) {
 		// closing action by the user
 		if( b ) {
-			//if( InMode )
-			//	ModalResult = 1; // when modal
-			//else
+			if( InMode )
+				ModalResult = 1; // when modal
+			else
 				SetVisible( false );  // just hide
 
 			Closing = false;
@@ -1341,7 +1415,24 @@ void TTVPWindowForm::CheckMenuBarDrop() {
 		}
 	}
 }
-
+void TTVPWindowForm::InvokeShowVisible() {
+	// this posts window message which invokes WMShowVisible
+	::PostMessage( GetHandle(), TVP_WM_SHOWVISIBLE, 0, 0);
+}
+//---------------------------------------------------------------------------
+void TTVPWindowForm::InvokeShowTop(bool activate) {
+	// this posts window message which invokes WMShowTop
+	::PostMessage( GetHandle(), TVP_WM_SHOWTOP, activate ? 1:0, 0);
+}
+//---------------------------------------------------------------------------
+HDWP TTVPWindowForm::ShowTop(HDWP hdwp) {
+	if( GetVisible() ) {
+		hdwp = ::DeferWindowPos(hdwp, GetHandle(), HWND_TOPMOST, 0, 0, 0, 0,
+			SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOREPOSITION|
+			SWP_NOSIZE|WM_SHOWWINDOW);
+	}
+	return hdwp;
+}
 void TTVPWindowForm::OnMouseMove( int shift, int x, int y ) {
 	TranslateWindowToPaintBox(x, y);
 	if( TJSNativeInstance ) {
@@ -1401,5 +1492,15 @@ void TTVPWindowForm::OnMouseWheel( int delta, int shift, int x, int y ) {
 			tjs_uint32 s = TVP_TShiftState_To_uint32(shift);
 			TVPPostInputEvent(new tTVPOnMouseWheelInputEvent(TJSNativeInstance, shift, delta, x, y));
 		}
+	}
+}
+
+void TTVPWindowForm::OnActive( HWND preactive ) {
+	if( TVPFullScreenedWindow == this )
+		TVPShowModalAtAppActivate();
+}
+void TTVPWindowForm::OnDeactive( HWND postactive ) {
+	if( TJSNativeInstance ) {
+		TVPPostInputEvent( new tTVPOnReleaseCaptureInputEvent(TJSNativeInstance) );
 	}
 }

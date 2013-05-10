@@ -105,7 +105,7 @@ class TTVPWindowForm : public TML::Window {
 private:
 	TML::WindowMenu* MainMenu;
 
-	//bool InMode;
+	bool InMode;
 	//bool Focusable;
 
 	//-- drawdevice related
@@ -275,7 +275,7 @@ public:
 	//-- methods/properties
 	//void BeginMove(){}
 	void UpdateWindow(tTVPUpdateType type = utNormal);
-	//void ShowWindowAsModal();
+	void ShowWindowAsModal();
 
 	void RegisterWindowMessageReceiver(tTVPWMRRegMode mode, void * proc, const void *userdata);
 
@@ -331,6 +331,11 @@ public:
 
 	class TMenuItem* GetMainMenuItems() {return NULL;}
 
+	
+	void InvokeShowVisible();
+	void InvokeShowTop(bool activate = true);
+	HDWP ShowTop(HDWP hdwp);
+
 	//-- DirectInput related
 	void CreateDirectInputDevice();
 	void FreeDirectInputDevice();
@@ -359,6 +364,9 @@ public:
 	LRESULT WMNCLButtonDown();
 	LRESULT WMNCRButtonDown();
 	
+	virtual void OnActive( HWND preactive );
+	virtual void OnDeactive( HWND postactive );
+
 	virtual void OnKeyDown( WORD vk, int shift, int repreat, bool prevkeystate );
 	virtual void OnKeyUp( WORD vk, int shift );
 	virtual void OnKeyPress( WORD vk, int repreat, bool prevkeystate, bool convertkey );

@@ -324,9 +324,7 @@ public:
 	void BringToFront();
 	void Update(tTVPUpdateType);
 
-#ifdef USE_OBSOLETE_FUNCTIONS
 	void ShowModal();
-#endif
 
 	void HideMouseCursor();
 
