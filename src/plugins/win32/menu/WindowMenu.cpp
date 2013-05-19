@@ -270,7 +270,8 @@ void WindowMenuItem::SetRadioItem( bool b ) {
 }
 void WindowMenuItem::SetShortCut( int key ) {
 	short_cut_key_ = key;
-	// TODO register to core
+	char virt = static_cast<char>(key >> 16);
+	TVPRegisterAcceleratorKey( hWnd_, virt, static_cast<short>(key&0xffff), menu_item_info_.wID );
 }
 void WindowMenuItem::SetVisible( bool b ) {
 	is_visible_ = b;
@@ -284,7 +285,6 @@ void WindowMenuItem::Popup( int flags, int x, int y ) {
 	}
 }
 */
-
 void WindowMenuItem::OnClick() {
 	if( owner_ ) {
 		owner_->MenuItemClick();

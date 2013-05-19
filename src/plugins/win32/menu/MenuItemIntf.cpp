@@ -13,15 +13,74 @@
 #include "MenuItemIntf.h"
 
 
-//---------------------------------------------------------------------------
-// Input Events
-//---------------------------------------------------------------------------
-// For input event tag
-// tTVPUniqueTagForInputEvent tTVPOnMenuItemClickInputEvent      ::Tag;
-//---------------------------------------------------------------------------
-
-
-
+static TCHAR tempKeyText[32];
+static const wchar_t* ShortCutKeyCode( int key ) {
+	/*
+	switch( key ) {
+	case 0x08: return L"BkSp";
+	case 0x09: return L"Tab";
+	case 0x0D: return L"Enter";
+	case 0x1B: return L"Esc";
+	case 0x20: return L"Esc";
+	case 0x21: return L"Esc";
+	case 0x22: return L"Esc";
+	case 0x23: return L"Esc";
+	case 0x24: return L"Esc";
+	case 0x25: return L"Esc";
+	case 0x26: return L"Esc";
+	case 0x27: return L"Esc";
+	case 0x28: return L"Esc";
+	}
+	*/
+	int code = (::MapVirtualKey( key, 0 )<<16)|(1<<25);
+	if( ::GetKeyNameText( code, tempKeyText, 32 ) > 0 ) {
+		return tempKeyText;
+	}
+	return NULL;
+}
+static int TextToShortCut( const wchar_t* text ) {
+	int virt = 0;
+	const wchar_t* ret = NULL;
+	if( wcsstr( text, L"Shift+" ) ) {
+		virt |= FSHIFT;
+	}
+	if( wcsstr( text, L"Ctrl+" ) ) {
+		virt |= FCONTROL;
+	}
+	if( wcsstr( text, L"Alt+" ) ) {
+		virt |= FALT;
+	}
+	// 以下判定不完全、上の修飾文字列を除いて判定する必要がある
+	for( int k = 8; k <= 255; k++ ) {
+		const wchar_t* name = ShortCutKeyCode(k);
+		if( name != NULL && wcsstr( text, name ) ) {
+			virt |= FVIRTKEY;
+			return (virt << 16) | k;
+		}
+	}
+	return (virt << 16);
+}
+static ttstr ShortCutToText( int key ) {
+	std::wstring str;
+	int virt = key >> 16;
+	if( virt & FSHIFT ) {
+		str += L"Shift+";
+	}
+	if( virt & FCONTROL ) {
+		str += L"Ctrl+";
+	}
+	if( virt & FALT ) {
+		str += L"Alt+";
+	}
+	key &= 0xFFFF;
+	if( key >= 8 && key <= 255 ) {
+		const wchar_t* name = ShortCutKeyCode(key);
+		if( name != NULL ) {
+			str += std::wstring(name);
+		}
+	}
+	return ttstr(str.c_str()); 
+}
 
 static const tjs_char * TVPSpecifyWindow = TJS_W("Window クラスのオブジェクトを指定してください");
 static const tjs_char * TVPSpecifyMenuItem = TJS_W("MenuItem クラスのオブジェクトを指定してください");
@@ -468,13 +527,13 @@ bool tTJSNI_MenuItem::GetRadio() const
 void tTJSNI_MenuItem::SetShortcut(const ttstr & shortcut)
 {
 	if(!MenuItem) return;
-	// MenuItem->SetShortCut( TextToShortCut(shortcut.c_str()) ); TODO
+	 MenuItem->SetShortCut( TextToShortCut(shortcut.c_str()) );
 }
 //---------------------------------------------------------------------------
 void tTJSNI_MenuItem::GetShortcut(ttstr & shortcut) const
 {
 	if(!MenuItem) shortcut.Clear();
-	// shortcut = ShortCutToText(MenuItem->GetShortCut() ); TODO
+	shortcut = ShortCutToText(MenuItem->GetShortCut() );
 }
 //---------------------------------------------------------------------------
 void tTJSNI_MenuItem::SetVisible(bool b)
