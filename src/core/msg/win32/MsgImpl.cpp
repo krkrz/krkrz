@@ -31,7 +31,7 @@ void TVPGetVersion(void)
 		TVPVersionRelease = 0;
 		TVPVersionBuild = 0;
 
-		TVPGetFileVersionOf(_argv[0], TVPVersionMajor, TVPVersionMinor,
+		TVPGetFileVersionOf(ExePath().c_str(), TVPVersionMajor, TVPVersionMinor,
 			TVPVersionRelease, TVPVersionBuild);
 	}
 }

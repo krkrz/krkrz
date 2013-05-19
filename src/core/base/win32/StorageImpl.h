@@ -208,7 +208,6 @@ TJS_EXP_FUNC_DEF(tTJSBinaryStream *, TVPCreateBinaryStreamAdapter, (IStream *ref
 
 
 
-
 //---------------------------------------------------------------------------
 // tTVPPluginHolder
 //---------------------------------------------------------------------------

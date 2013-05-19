@@ -390,14 +390,10 @@ bool TVPRemoveFolder(const ttstr &name)
 //---------------------------------------------------------------------------
 ttstr TVPGetAppPath()
 {
-	static ttstr exepath(TVPExtractStoragePath(
-		TVPNormalizeStorageName(ParamStr(0))));
+	static ttstr exepath(TVPExtractStoragePath(TVPNormalizeStorageName(ExePath())));
 	return exepath;
 }
 //---------------------------------------------------------------------------
-
-
-
 
 //---------------------------------------------------------------------------
 // TVPOpenStream
@@ -1130,7 +1126,7 @@ tTVPPluginHolder::tTVPPluginHolder(const ttstr &aname)
 	{
 		// not found in TVP storage system; search exepath, exepath\system, exepath\plugin
 		ttstr exepath =
-			IncludeTrailingBackslash(ExtractFileDir(ParamStr(0)));
+			IncludeTrailingBackslash(ExtractFileDir(ExePath()));
 		ttstr pname = exepath + aname;
 		if(TVPCheckExistentLocalFile(pname))
 		{

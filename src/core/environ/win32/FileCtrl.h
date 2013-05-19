@@ -4,70 +4,71 @@
 
 #include <shlwapi.h>
 #include <winnetwk.h>
+#include "tstring.h"
 
-inline std::string IncludeTrailingBackslash( const std::string& path ) {
-	if( path[path.length()-1] != '\\' ) {
-		return std::string(path+"\\");
+inline tstring IncludeTrailingBackslash( const tstring& path ) {
+	if( path[path.length()-1] != _T('\\') ) {
+		return tstring(path+_T("\\"));
 	}
-	return std::string(path);
+	return tstring(path);
 }
-inline std::string ExcludeTrailingBackslash( const std::string& path ) {
-	if( path[path.length()-1] == '\\' ) {
-		return std::string(path.c_str(),path.length()-1);
+inline tstring ExcludeTrailingBackslash( const tstring& path ) {
+	if( path[path.length()-1] == _T('\\') ) {
+		return tstring(path.c_str(),path.length()-1);
 	}
-	return std::string(path);
+	return tstring(path);
 }
 
-inline std::string ExtractFileDir( const std::string& path ) {
-	char drive[_MAX_DRIVE];
-	char dir[_MAX_DIR];
-	_splitpath_s(path.c_str(), drive, _MAX_DRIVE, dir,_MAX_DIR, NULL, 0, NULL, 0 );
-	std::string dirstr = std::string( dir );
+inline tstring ExtractFileDir( const tstring& path ) {
+	TCHAR drive[_MAX_DRIVE];
+	TCHAR dir[_MAX_DIR];
+	_tsplitpath_s(path.c_str(), drive, _MAX_DRIVE, dir,_MAX_DIR, NULL, 0, NULL, 0 );
+	tstring dirstr = tstring( dir );
 	if( dirstr[dirstr.length()-1] != '\\' ) {
-		return std::string( drive ) + dirstr;
+		return tstring( drive ) + dirstr;
 	} else {
-		return std::string( drive ) + dirstr.substr(0,dirstr.length()-1);
+		return tstring( drive ) + dirstr.substr(0,dirstr.length()-1);
 	}
 }
-inline std::string ExtractFilePath( const std::string& path ) {
-	char drive[_MAX_DRIVE];
-	char dir[_MAX_DIR];
-	_splitpath_s(path.c_str(), drive, _MAX_DRIVE, dir,_MAX_DIR, NULL, 0, NULL, 0 );
-	return std::string( drive ) + std::string( dir );
+inline tstring ExtractFilePath( const tstring& path ) {
+	TCHAR drive[_MAX_DRIVE];
+	TCHAR dir[_MAX_DIR];
+	_tsplitpath_s(path.c_str(), drive, _MAX_DRIVE, dir,_MAX_DIR, NULL, 0, NULL, 0 );
+	return tstring( drive ) + tstring( dir );
 }
 
-inline bool DirectoryExists( const std::string& path ) {
+inline bool DirectoryExists( const tstring& path ) {
 	return (0!=::PathIsDirectory(path.c_str()));
 }
-inline bool FileExists( const std::string& path ) {
+inline bool FileExists( const tstring& path ) {
 	return ( (0!=::PathFileExists(path.c_str())) && (0==::PathIsDirectory(path.c_str())) );
 }
-inline std::string ChangeFileExt( const std::string& path, const std::string& ext ) {
-	char drive[_MAX_DRIVE];
-	char dir[_MAX_DIR];
-	char fname[_MAX_FNAME];
-	_splitpath_s( path.c_str(), drive, _MAX_DRIVE, dir, _MAX_DIR, fname, _MAX_FNAME, NULL, 0 );
-	return std::string( drive ) + std::string( dir ) + std::string( fname ) + ext;
+inline tstring ChangeFileExt( const tstring& path, const tstring& ext ) {
+	TCHAR drive[_MAX_DRIVE];
+	TCHAR dir[_MAX_DIR];
+	TCHAR fname[_MAX_FNAME];
+	_tsplitpath_s( path.c_str(), drive, _MAX_DRIVE, dir, _MAX_DIR, fname, _MAX_FNAME, NULL, 0 );
+	return tstring( drive ) + tstring( dir ) + tstring( fname ) + ext;
 }
-inline std::string ExtractFileName( const std::string& path ) {
-	char fname[_MAX_FNAME];
-	char ext[_MAX_EXT];
-	_splitpath_s( path.c_str(), NULL, 0, NULL, 0, fname, _MAX_FNAME, ext, _MAX_EXT );
-	return std::string( fname ) + std::string( ext );
+inline tstring ExtractFileName( const tstring& path ) {
+	TCHAR fname[_MAX_FNAME];
+	TCHAR ext[_MAX_EXT];
+	_tsplitpath_s( path.c_str(), NULL, 0, NULL, 0, fname, _MAX_FNAME, ext, _MAX_EXT );
+	return tstring( fname ) + tstring( ext );
 }
-inline std::string ExpandUNCFileName( const std::string& path ) {
-	std::string result;
+inline tstring ExpandUNCFileName( const tstring& path ) {
+	tstring result;
 	DWORD InfoSize = 0;
 	if( ERROR_MORE_DATA == WNetGetUniversalName( path.c_str(), UNIVERSAL_NAME_INFO_LEVEL, NULL, &InfoSize) ) {
 		UNIVERSAL_NAME_INFO* pInfo = reinterpret_cast<UNIVERSAL_NAME_INFO*>( ::GlobalAlloc(GMEM_FIXED, InfoSize) );
 		DWORD ret = ::WNetGetUniversalName( path.c_str(), UNIVERSAL_NAME_INFO_LEVEL, pInfo, &InfoSize);
 		if( NO_ERROR == ret ) {
-			result = std::string(pInfo->lpUniversalName);
+			result = tstring(pInfo->lpUniversalName);
 		}
 		::GlobalFree(pInfo);
 	} else {
-		char fullpath[_MAX_PATH];
-		result = std::string( _fullpath( fullpath, path.c_str(), _MAX_PATH ) );
+		TCHAR fullpath[_MAX_PATH];
+		result = tstring( _tfullpath( fullpath, path.c_str(), _MAX_PATH ) );
 	}
 	return result;
 }

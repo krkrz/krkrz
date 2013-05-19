@@ -148,11 +148,14 @@ void TVPStartObjectHashMapLog(void)
 		si.cb = sizeof(si);
 		si.dwFlags = STARTF_USESHOWWINDOW;
 		si.wShowWindow = SW_SHOWNORMAL;
-
+		
+		TCHAR szFull[_MAX_PATH];
+		::GetModuleFileName(NULL, szFull, sizeof(szFull) / sizeof(TCHAR));
+		tstring exepath(szFull);
 		BOOL ret =
 			CreateProcess(
 				NULL,
-				const_cast<LPSTR>((ParamStr(0) + " -@processohmlog").c_str()),
+				const_cast<LPSTR>((exepath + " -@processohmlog").c_str()),
 				NULL,
 				NULL,
 				TRUE,
