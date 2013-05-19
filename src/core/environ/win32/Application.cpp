@@ -93,19 +93,42 @@ AcceleratorKey::~AcceleratorKey() {
 	delete[] keys_;
 }
 void AcceleratorKey::AddKey( WORD id, WORD key, BYTE virt ) {
-	ACCEL* table = new ACCEL[key_count_+1];
+	// まずは存在するかチェックする
+	bool found = false;
+	int index = 0;
 	for( int i = 0; i < key_count_; i++ ) {
-		table[i] = keys_[i];
+		if( keys_[i].cmd == id ) {
+			index = i;
+			found = true;
+			break;
+		}
 	}
-	table[key_count_].cmd = id;
-	table[key_count_].key = key;
-	table[key_count_].fVirt = virt;
-	key_count_++;
-	HACCEL hAccel = ::CreateAcceleratorTable( table, key_count_ );
-	if( hAccel_ != NULL ) ::DestroyAcceleratorTable( hAccel_ );
-	hAccel_ = hAccel;
-	delete[] keys_;
-	keys_ = table;
+	if( found ) {
+		// 既に登録されているコマンドなのでキー情報の更新を行う
+		if( keys_[index].key == key && keys_[index].fVirt == virt ) {
+			// 変更されていない
+			return;
+		}
+		keys_[index].key = key;
+		keys_[index].fVirt = virt;
+		HACCEL hAccel = ::CreateAcceleratorTable( keys_, key_count_ );
+		if( hAccel_ != NULL ) ::DestroyAcceleratorTable( hAccel_ );
+		hAccel_ = hAccel;
+	} else {
+		ACCEL* table = new ACCEL[key_count_+1];
+		for( int i = 0; i < key_count_; i++ ) {
+			table[i] = keys_[i];
+		}
+		table[key_count_].cmd = id;
+		table[key_count_].key = key;
+		table[key_count_].fVirt = virt;
+		key_count_++;
+		HACCEL hAccel = ::CreateAcceleratorTable( table, key_count_ );
+		if( hAccel_ != NULL ) ::DestroyAcceleratorTable( hAccel_ );
+		hAccel_ = hAccel;
+		delete[] keys_;
+		keys_ = table;
+	}
 
 }
 void AcceleratorKey::DelKey( WORD id ) {
@@ -114,6 +137,7 @@ void AcceleratorKey::DelKey( WORD id ) {
 	for( int i = 0; i < key_count_; i++ ) {
 		if( keys_[i].cmd == id ) {
 			found = true;
+			break;
 		}
 	}
 	if( found == false ) return;
