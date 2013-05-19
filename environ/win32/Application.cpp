@@ -39,13 +39,21 @@
 HINSTANCE hInst;
 TApplication* Application;
 
-std::string ParamStr( int index ) {
+#if 0
+tstring ParamStr( int index ) {
 	if( index < (int)Application->CommandLines.size() ) {
-		return std::string(Application->CommandLines[index]);
+		return tstring(Application->CommandLines[index]);
 	} else {
-		return std::string();
+		return tstring();
 	}
 }
+#endif
+tstring ExePath() {
+	TCHAR szFull[_MAX_PATH];
+	::GetModuleFileName(NULL, szFull, sizeof(szFull) / sizeof(TCHAR));
+	return tstring(szFull);
+}
+
 bool TVPCheckCmdDescription();
 bool TVPCheckAbout();
 bool TVPCheckPrintDataPath();
@@ -55,6 +63,77 @@ int _argc;
 char ** _argv;
 extern void TVPInitWideNativeFunctions();
 
+AcceleratorKeyTable::AcceleratorKeyTable() {
+	// デフォルトを読み込む
+	hAccel_ = ::LoadAccelerators( (HINSTANCE)GetModuleHandle(0), MAKEINTRESOURCE(IDC_TVPWIN32));
+}
+AcceleratorKeyTable::~AcceleratorKeyTable() {
+}
+void AcceleratorKeyTable::AddKey( HWND hWnd, WORD id, WORD key, BYTE virt ) {
+	std::map<HWND,AcceleratorKey*>::iterator i = keys_.find(hWnd);
+	if( i != keys_.end() ) {
+		i->second->AddKey(id,key,virt);
+	} else {
+		AcceleratorKey* acc = new AcceleratorKey();
+		acc->AddKey( id, key, virt );
+		keys_.insert( std::map<HWND, AcceleratorKey*>::value_type( hWnd, acc ) );
+	}
+}
+void AcceleratorKeyTable::DelKey( HWND hWnd, WORD id ) {
+	std::map<HWND,AcceleratorKey*>::iterator i = keys_.find(hWnd);
+	if( i != keys_.end() ) {
+		i->second->DelKey(id);
+	}
+}
+
+AcceleratorKey::AcceleratorKey() : hAccel_(NULL), keys_(NULL), key_count_(0) {
+}
+AcceleratorKey::~AcceleratorKey() {
+	if( hAccel_ != NULL ) ::DestroyAcceleratorTable( hAccel_ );
+	delete[] keys_;
+}
+void AcceleratorKey::AddKey( WORD id, WORD key, BYTE virt ) {
+	ACCEL* table = new ACCEL[key_count_+1];
+	for( int i = 0; i < key_count_; i++ ) {
+		table[i] = keys_[i];
+	}
+	table[key_count_].cmd = id;
+	table[key_count_].key = key;
+	table[key_count_].fVirt = virt;
+	key_count_++;
+	HACCEL hAccel = ::CreateAcceleratorTable( table, key_count_ );
+	if( hAccel_ != NULL ) ::DestroyAcceleratorTable( hAccel_ );
+	hAccel_ = hAccel;
+	delete[] keys_;
+	keys_ = table;
+
+}
+void AcceleratorKey::DelKey( WORD id ) {
+	// まずは存在するかチェックする
+	bool found = false;
+	for( int i = 0; i < key_count_; i++ ) {
+		if( keys_[i].cmd == id ) {
+			found = true;
+		}
+	}
+	if( found == false ) return;
+
+	// 存在した場合作り直し
+	ACCEL* table = new ACCEL[key_count_-1];
+	int dest = 0;
+	for( int i = 0; i < key_count_; i++ ) {
+		if( keys_[i].cmd != id ) {
+			table[dest] = keys_[i];
+			dest++;
+		}
+	}
+	key_count_--;
+	HACCEL hAccel = ::CreateAcceleratorTable( table, key_count_ );
+	if( hAccel_ != NULL ) ::DestroyAcceleratorTable( hAccel_ );
+	hAccel_ = hAccel;
+	delete[] keys_;
+	keys_ = table;
+}
 int APIENTRY WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPTSTR lpCmdLine, _In_ int nCmdShow ) {
 	TVPInitWideNativeFunctions();
 
@@ -187,7 +266,7 @@ void TApplication::ShowException( class Exception* e ) {
 void TApplication::Run() {
 	MSG msg;
 	HACCEL hAccelTable;
-	hAccelTable = LoadAccelerators( (HINSTANCE)GetModuleHandle(0), MAKEINTRESOURCE(IDC_TVPWIN32));
+	//hAccelTable = LoadAccelerators( (HINSTANCE)GetModuleHandle(0), MAKEINTRESOURCE(IDC_TVPWIN32));
 
 	// メイン メッセージ ループ:
 	HWND mainWnd = INVALID_HANDLE_VALUE;
@@ -198,9 +277,8 @@ void TApplication::Run() {
 		BOOL ret = TRUE;
 		while( ::PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE) ) {
 			ret = ::GetMessage( &msg, NULL, 0, 0);
-			//while( ::GetMessage( &msg, NULL, 0, 0) ) {
+			hAccelTable = accel_key_.GetHandle(msg.hwnd);
 			if( ret && !TranslateAccelerator(msg.hwnd, hAccelTable, &msg) ) {
-			//if( !TranslateAccelerator(msg.hwnd, hAccelTable, &msg) ) {
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
 			}
@@ -214,6 +292,7 @@ void TApplication::Run() {
 		}
 		if( done ) { // idle 処理が終わったら、メッセージ待ちへ
 			BOOL dret = ::GetMessage( &msg, NULL, 0, 0 );
+			hAccelTable = accel_key_.GetHandle(msg.hwnd);
 			if( dret && !TranslateAccelerator(msg.hwnd, hAccelTable, &msg) ) {
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
@@ -282,6 +361,13 @@ void TApplication::EnableWindows( const  std::vector<TTVPWindowForm*>& ignores )
 		}
 	}
 }
+
+void TApplication::RegisterAcceleratorKey(HWND hWnd, char virt, short key, short cmd) {
+	accel_key_.AddKey( hWnd, cmd, key, virt );
+}
+void TApplication::UnregisterAcceleratorKey(HWND hWnd, short cmd) {
+	accel_key_.DelKey( hWnd, cmd );
+}
 /**
  仮実装 TODO
 */
@@ -298,4 +384,11 @@ std::vector<std::string>* LoadLinesFromFile( const std::string& path ) {
     }
     fclose(fp);
 	return ret;
+}
+
+void TVPRegisterAcceleratorKey(HWND hWnd, char virt, short key, short cmd) {
+	if( Application ) Application->RegisterAcceleratorKey( hWnd, virt, key, cmd );
+}
+void TVPUnregisterAcceleratorKey(HWND hWnd, short cmd) {
+	if( Application ) Application->UnregisterAcceleratorKey( hWnd, cmd );
 }

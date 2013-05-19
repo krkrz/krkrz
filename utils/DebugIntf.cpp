@@ -694,7 +694,7 @@ class tTVPTJS2DumpOutputGateway : public iTJSConsoleOutput
 void TVPTJS2StartDump()
 {
 	tjs_nchar filename[MAX_PATH];
-	TJS_nstrcpy(filename, _argv[0]);
+	TJS_nstrcpy(filename, ExePath().c_str());
 	TJS_nstrcat(filename, TJS_N(".dump.txt"));
 	TVPDumpOutFileName = filename;
 	TVPDumpOutFile = fopen(filename, TJS_N("wb+"));

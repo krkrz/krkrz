@@ -264,6 +264,12 @@ enum {
 };
 
 LRESULT WINAPI TTVPWindowForm::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam ) {
+	tTVPWindowMessage Message;
+	Message.LParam = lParam;
+	Message.WParam = wParam;
+	Message.Msg = msg;
+	Message.Result = 0;
+	if( DeliverMessageToReceiver( Message) ) return Message.Result;
 	//switch( msg )
 	{
 		/*

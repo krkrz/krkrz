@@ -13,6 +13,7 @@
 
 #include "tjsNative.h"
 #include "tjsHashSearch.h"
+#include "tstring.h"
 #include <vector>
 
 //---------------------------------------------------------------------------
@@ -270,7 +271,6 @@ TJS_EXP_FUNC_DEF(bool, TVPIsExistentStorage, (const ttstr &name));
 
 TJS_EXP_FUNC_DEF(void, TVPClearStorageCaches, ());
 	// clear all internal storage related caches.
-
 
 extern tjs_uint TVPSegmentCacheLimit; // XP3 segment cache limit, in bytes.
 

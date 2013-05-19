@@ -2,10 +2,12 @@
 #ifndef __T_APPLICATION_H__
 #define __T_APPLICATION_H__
 
-#include <string>
 #include <vector>
+#include <map>
+#include "tstring.h"
 
-std::string ParamStr( int index );
+//tstring ParamStr( int index );
+tstring ExePath();
 
 // å„Ç≈å©í ÇµÇÃÇÊÇ§ï˚ñ@Ç…ïœçXÇ∑ÇÈ
 extern int _argc;
@@ -66,7 +68,35 @@ public:
 	} 
 	virtual void Handle( SystemEvent& message ) = 0;
 };
+class AcceleratorKey {
+	HACCEL hAccel_;
+	ACCEL* keys_;
+	int key_count_;
 
+public:
+	AcceleratorKey();
+	~AcceleratorKey();
+	void AddKey( WORD id, WORD key, BYTE virt );
+	void DelKey( WORD id );
+	HACCEL GetHandle() { return hAccel_; }
+};
+class AcceleratorKeyTable {
+	std::map<HWND,AcceleratorKey*> keys_;
+	HACCEL hAccel_;
+
+public:
+	AcceleratorKeyTable();
+	~AcceleratorKeyTable();
+	void AddKey( HWND hWnd, WORD id, WORD key, BYTE virt );
+	void DelKey( HWND hWnd, WORD id );
+	HACCEL GetHandle(HWND hWnd) {
+		std::map<HWND,AcceleratorKey*>::iterator i = keys_.find(hWnd);
+		if( i != keys_.end() ) {
+			return i->second->GetHandle();
+		}
+		return hAccel_;
+	}
+};
 class TApplication {
 	std::vector<EventDispatcher*> dispatcher_;
 	std::vector<class TTVPWindowForm*> windows_list_;
@@ -76,6 +106,8 @@ class TApplication {
 	FILE* oldstdin_;
 	FILE* oldstdout_;
 	std::string console_title_;
+	AcceleratorKeyTable accel_key_;
+
 public:
 	TApplication() : is_attach_console_(false) {}
 	void CheckConsole();
@@ -140,6 +172,10 @@ public:
 	void DisableWindows();
 	void EnableWindows( const std::vector<class TTVPWindowForm*>& ignores );
 	void GetDisableWindowList( std::vector<class TTVPWindowForm*>& win );
+
+	
+	void RegisterAcceleratorKey(HWND hWnd, char virt, short key, short cmd);
+	void UnregisterAcceleratorKey(HWND hWnd, short cmd);
 };
 std::vector<std::string>* LoadLinesFromFile( const std::string& path );
 

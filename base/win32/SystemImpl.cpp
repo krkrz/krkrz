@@ -825,7 +825,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(exeName)
 {
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
-		static ttstr exename(TVPNormalizeStorageName(ParamStr(0)));
+		static ttstr exename(TVPNormalizeStorageName(ExePath()));
 		*result = exename;
 		return TJS_S_OK;
 	}

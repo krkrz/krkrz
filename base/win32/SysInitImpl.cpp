@@ -794,7 +794,7 @@ void TVPInitializeBaseSystems()
 		//char dir[MAXDIR];
 		//fnsplit(_argv[0], drive, dir, NULL, NULL);
 		//ttstr curdir(ttstr(drive)  + ttstr(dir));
-		std::string path = ( std::string(_argv[0]) );
+		tstring path = ( ExePath() );
 		ttstr curdir(path);
 		if(curdir.GetLastChar() != TJS_W('\\')) curdir += TJS_W('\\');
 		TVPSetCurrentDirectory(curdir);
@@ -944,7 +944,7 @@ void TVPBeforeSystemInit()
 	if(!forcedataxp3 && !nosel)
 	{
 		char tmp[MAX_PATH];
-		strcpy(tmp, IncludeTrailingBackslash(ExtractFileDir(ParamStr(0))).c_str());
+		strcpy(tmp, IncludeTrailingBackslash(ExtractFileDir(ExePath())).c_str());
 		strcat(tmp, "content-data");
 		if(DirectoryExists(tmp))
 		{
@@ -960,7 +960,7 @@ void TVPBeforeSystemInit()
  	if(!nosel)
 	{
 		char tmp[MAX_PATH];
-		strcpy(tmp, IncludeTrailingBackslash(ExtractFileDir(ParamStr(0))).c_str());
+		strcpy(tmp, IncludeTrailingBackslash(ExtractFileDir(ExePath())).c_str());
 		strcat(tmp, "data.xp3");
 		if(FileExists(tmp))
 		{
@@ -975,7 +975,7 @@ void TVPBeforeSystemInit()
  	if(!nosel)
 	{
 		char tmp[MAX_PATH];
-		strcpy(tmp, IncludeTrailingBackslash(ExtractFileDir(ParamStr(0))).c_str());
+		strcpy(tmp, IncludeTrailingBackslash(ExtractFileDir(ExePath())).c_str());
 		strcat(tmp, "data.exe");
 		if(FileExists(tmp))
 		{
@@ -989,9 +989,9 @@ void TVPBeforeSystemInit()
 	// check self combined xpk archive
 	if(!nosel)
 	{
-		if(TVPIsXP3Archive(TVPNormalizeStorageName(ParamStr(0))))
+		if(TVPIsXP3Archive(TVPNormalizeStorageName(ExePath())))
 		{
-			strcpy(buf, ParamStr(0).c_str());
+			strcpy(buf, ExePath().c_str());
 			TVPProjectDirSelected = true;
 			bufset = true;
 			nosel = true;
@@ -1003,7 +1003,7 @@ void TVPBeforeSystemInit()
 	if(!forcedataxp3 && !nosel)
 	{
 		char tmp[MAX_PATH];
-		strcpy(tmp, IncludeTrailingBackslash(ExtractFileDir(ParamStr(0))).c_str());
+		strcpy(tmp, IncludeTrailingBackslash(ExtractFileDir(ExePath())).c_str());
 		strcat(tmp, "data");
 		if(DirectoryExists(tmp))
 		{
@@ -1019,7 +1019,7 @@ void TVPBeforeSystemInit()
 	if(!bufset)
 	{
 		if(forcedataxp3) throw EAbort("Aborted");
-		strcpy(buf, ExtractFileDir(ParamStr(0)).c_str());
+		strcpy(buf, ExtractFileDir(ExePath()).c_str());
 		int curdirlen = strlen(buf);
 		if(buf[curdirlen-1] != '\\') buf[curdirlen] = '\\', buf[curdirlen+1] = 0;
 	}
@@ -1031,7 +1031,7 @@ void TVPBeforeSystemInit()
 		if(!krdevui)
 		{
 			std::string toolspath = (IncludeTrailingBackslash(
-					ExtractFilePath(ParamStr(0))) + "tools\\krdevui.dll");
+					ExtractFilePath(ExePath())) + "tools\\krdevui.dll");
 			krdevui = LoadLibrary(toolspath.c_str());
 		}
 
@@ -1345,7 +1345,7 @@ void TVPMainWindowClosed()
 //---------------------------------------------------------------------------
 static std::vector<std::string> * TVPGetEmbeddedOptions()
 {
-	std::string filename = ParamStr(0);
+	std::string filename = ExePath();
 	//TStream *stream = new TFileStream(filename, fmOpenRead|fmShareDenyWrite);
 
 	char *buf = NULL;
@@ -1566,7 +1566,7 @@ static void TVPInitProgramArgumentsAndDataPath(bool stop_after_datapath_got)
 		{
 			// read embedded options and default configuration file
 			options[0] = NULL; // TVPGetEmbeddedOptions();
-			options[1] = TVPGetConfigFileOptions(TConfMainFrame::GetConfigFileName(ParamStr(0)));
+			options[1] = TVPGetConfigFileOptions(TConfMainFrame::GetConfigFileName(ExePath()));
 
 			// at this point, we need to push all exsting known options
 			// to be able to see datapath
@@ -1579,12 +1579,12 @@ static void TVPInitProgramArgumentsAndDataPath(bool stop_after_datapath_got)
 			std::string config_datapath;
 			if(TVPGetCommandLine(TJS_W("-datapath"), &val))
 				config_datapath = ((ttstr)val).AsStdString();
-			TVPNativeDataPath = TConfMainFrame::GetDataPathDirectory(config_datapath, ParamStr(0));
+			TVPNativeDataPath = TConfMainFrame::GetDataPathDirectory(config_datapath, ExePath());
 
 			if(stop_after_datapath_got) return;
 
 			// read per-user configuration file
-			options[2] = TVPGetConfigFileOptions(TConfMainFrame::GetUserConfigFileName(config_datapath, ParamStr(0)));
+			options[2] = TVPGetConfigFileOptions(TConfMainFrame::GetUserConfigFileName(config_datapath, ExePath()));
 
 			// push each options into option stock
 			// we need to clear TVPProgramArguments first because of the
@@ -1879,7 +1879,7 @@ bool TVPExecuteUserConfig()
 	if(!process) return false;
 
 	// execute user config mode
-	TVPShowUserConfig(ParamStr(0));
+	TVPShowUserConfig(ExePath());
 
 	// exit
 	return true;

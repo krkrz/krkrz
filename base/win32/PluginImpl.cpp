@@ -540,8 +540,7 @@ void TVPLoadPluigins(void)
 	// search plugins from path: (exepath), (exepath)\system, (exepath)\plugin
 	std::vector<tTVPFoundPlugin> list;
 
-	std::string exepath =
-		IncludeTrailingBackslash(ExtractFileDir(ParamStr(0)));
+	tstring exepath = IncludeTrailingBackslash(ExtractFileDir(ExePath()));
 
 	TVPSearchPluginsAt(list, exepath);
 	TVPSearchPluginsAt(list, exepath + "system\\");
