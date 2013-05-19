@@ -11,66 +11,101 @@
 #ifndef MenuItemIntfH
 #define MenuItemIntfH
 
-#include "tjsNative.h"
-#include "EventIntf.h"
+#include "WindowMenu.h"
+#include "tp_stub.h"
 #include "ObjectList.h"
+#include <map>
 
 //---------------------------------------------------------------------------
 // tTJSNI_MenuItem
 //---------------------------------------------------------------------------
-class tTJSNI_Window;
-class tTJSNI_MenuItem;
-class tTJSNI_BaseMenuItem : public tTJSNativeInstance
-{
+class tTJSNI_MenuItem : public tTJSNativeInstance {
 	typedef tTJSNativeInstance inherited;
 
-	tObjectList<tTJSNI_BaseMenuItem> Children;
+	tObjectList<tTJSNI_MenuItem> Children;
+
+	WindowMenuItem * MenuItem;
+
+	ttstr Caption;
+	ttstr Shortcut;
 
 protected:
-	tTJSNI_Window *Window;
+	//tTJSNI_Window *Window;
+	iTJSDispatch2 *OwnerWindow;
+	HWND HWnd;
 
 	iTJSDispatch2 *Owner;
 	tTJSVariantClosure ActionOwner; // object to send action
 
-	tTJSNI_BaseMenuItem *Parent;
+	tTJSNI_MenuItem *Parent;
 
 	bool ChildrenArrayValid;
 	iTJSDispatch2 * ChildrenArray;
 	iTJSDispatch2 * ArrayClearMethod;
 
 public:
-	tTJSNI_BaseMenuItem();
+	void MenuItemClick();
+
+public:
+	tTJSNI_MenuItem();
 	tjs_error TJS_INTF_METHOD
-		Construct(tjs_int numparams, tTJSVariant **param,
-			iTJSDispatch2 *tjs_obj);
+		Construct(tjs_int numparams, tTJSVariant **param, iTJSDispatch2 *tjs_obj);
 	void TJS_INTF_METHOD Invalidate();
 
 public:
 	static tTJSNI_MenuItem * CastFromVariant(const tTJSVariant & from);
 
 protected:
-	virtual bool CanDeliverEvents() const = 0; // must be implemented in each platforms
+	virtual bool CanDeliverEvents() const; // must be implemented in each platforms
 
 protected:
-	void AddChild(tTJSNI_BaseMenuItem *item);
-	void RemoveChild(tTJSNI_BaseMenuItem *item);
+	void AddChild(tTJSNI_MenuItem *item);
+	void RemoveChild(tTJSNI_MenuItem *item);
 
 public:
-	virtual void Add(tTJSNI_MenuItem * item) = 0;
-	virtual void Insert(tTJSNI_MenuItem *item, tjs_int index) = 0;
-	virtual void Remove(tTJSNI_MenuItem *item) = 0;
+	void Add(tTJSNI_MenuItem * item);
+	void Insert(tTJSNI_MenuItem *item, tjs_int index);
+	void Remove(tTJSNI_MenuItem *item);
 
+	void SetCaption(const ttstr & caption);
+	void GetCaption(ttstr & caption) const;
+
+	void SetChecked(bool b);
+	bool GetChecked() const;
+
+	void SetEnabled(bool b);
+	bool GetEnabled() const;
+
+	void SetGroup(tjs_int g);
+	tjs_int GetGroup() const;
+
+	void SetRadio(bool b);
+	bool GetRadio() const;
+
+	void SetShortcut(const ttstr & shortcut);
+	void GetShortcut(ttstr & shortcut) const;
+
+	void SetVisible(bool b);
+	bool GetVisible() const;
+
+	tjs_int GetIndex() const;
+	void SetIndex(tjs_int newIndex);
+
+	tjs_int TrackPopup(tjs_uint32 flags, tjs_int x, tjs_int y) const;
+
+//-- interface to plugin
+	HMENU GetMenuItemHandleForPlugin() const;
 
 public:
 	tTJSVariantClosure GetActionOwnerNoAddRef() const { return ActionOwner; }
 
 	iTJSDispatch2 * GetOwnerNoAddRef() const { return Owner; }
 
-	tTJSNI_BaseMenuItem * GetParent() const { return Parent; }
+	tTJSNI_MenuItem * GetParent() const { return Parent; }
 
-	tTJSNI_BaseMenuItem * GetRootMenuItem() const;
+	tTJSNI_MenuItem * GetRootMenuItem() const;
 
-	tTJSNI_Window * GetWindow() const { return Window; }
+	iTJSDispatch2 * GetWindow() const { return OwnerWindow; }
 
 	iTJSDispatch2 * GetChildrenArrayNoAddRef();
 
@@ -80,8 +115,7 @@ public:
 };
 //---------------------------------------------------------------------------
 
-#include "MenuItemImpl.h" // must define tTJSNI_MenuItem class
-
+#if 0
 //---------------------------------------------------------------------------
 // tTJSNC_MenuItem : TJS MenuItem class
 //---------------------------------------------------------------------------
@@ -100,8 +134,9 @@ protected:
 		this must return a proper instance of tTJSNC_MenuItem.
 	*/
 };
+#endif
 //---------------------------------------------------------------------------
-extern tTJSNativeClass * TVPCreateNativeClass_MenuItem();
+extern iTJSDispatch2 * TVPCreateNativeClass_MenuItem();
 	/*
 		implement this in each platform.
 		this must return a proper instance of tTJSNC_MenuItem.
@@ -114,6 +149,7 @@ extern iTJSDispatch2 * TVPCreateMenuItemObject(iTJSDispatch2 * window);
 //---------------------------------------------------------------------------
 
 
+#if 0
 //---------------------------------------------------------------------------
 // tTVPMenuItemOnClickInputEvent : onClick input event class
 //---------------------------------------------------------------------------
@@ -127,5 +163,6 @@ public:
 	{ ((tTJSNI_BaseMenuItem*)GetSource())->OnClick(); }
 };
 //---------------------------------------------------------------------------
+#endif
 
 #endif

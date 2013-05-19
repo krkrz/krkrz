@@ -41,11 +41,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>..\..\..\..\..\bin\win32\plugin</OutDir>
+    <OutDir>..\..\..\..\..\bin\win32\plugin\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>..\..\..\..\..\bin\win32\plugin</OutDir>
+    <OutDir>..\..\..\..\..\bin\win32\plugin\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -63,6 +63,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ModuleDefinitionFile>menu.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -91,13 +92,11 @@
   <ItemGroup>
     <ClCompile Include="..\..\tp_stub.cpp" />
     <ClCompile Include="..\Main.cpp" />
-    <ClCompile Include="..\MenuItemImpl.cpp" />
     <ClCompile Include="..\MenuItemIntf.cpp" />
     <ClCompile Include="..\WindowMenu.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\tp_stub.h" />
-    <ClInclude Include="..\MenuItemImpl.h" />
     <ClInclude Include="..\MenuItemIntf.h" />
     <ClInclude Include="..\WindowMenu.h" />
   </ItemGroup>

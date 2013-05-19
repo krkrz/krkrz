@@ -96,7 +96,7 @@ s = sign,  negative if this is 1, otherwise positive.
 #define TJS_IEEE_D_SIGNIFICAND_MASK       (TJS_UI64_VAL(0x000fffffffffffff))
 #define TJS_IEEE_D_SIGNIFICAND_MSB_MASK   (TJS_UI64_VAL(0x0008000000000000))
 
-#define TJS_IEEE_D_GET_SIGN(x)   ((bool)(x & TJS_IEEE_D_SIGN_MASK))
+#define TJS_IEEE_D_GET_SIGN(x)   (0!=(x & TJS_IEEE_D_SIGN_MASK))
 #define TJS_IEEE_D_GET_EXP(x)  ((tjs_int)(((x & TJS_IEEE_D_EXP_MASK) >> \
 								TJS_IEEE_D_SIGNIFICAND_BITS) - TJS_IEEE_D_EXP_BIAS))
 #define TJS_IEEE_D_GET_SIGNIFICAND(x) (x & TJS_IEEE_D_SIGNIFICAND_MASK)
@@ -197,7 +197,7 @@ public:
 #define TJS_FC_IS_NAN(x)  (((x)&TJS_FC_CLASS_MASK) == TJS_FC_CLASS_NAN)
 #define TJS_FC_IS_INF(x)  (((x)&TJS_FC_CLASS_MASK) == TJS_FC_CLASS_INF)
 
-#define TJS_FC_IS_NEGATIVE(x) ((bool)((x) & TJS_FC_SIGN_MASK))
+#define TJS_FC_IS_NEGATIVE(x) (0!=((x) & TJS_FC_SIGN_MASK))
 #define TJS_FC_IS_POSITIVE(x) (!TJS_FC_IS_NEGATIVE(x))
 
 
@@ -1928,6 +1928,8 @@ extern void * TVPImportFuncPtr29af78765c764c566e6adc77e0ea7041;
 extern void * TVPImportFuncPtr9e0df54e4c24ee28d5517c1743faa3a3;
 extern void * TVPImportFuncPtrd3aaa55d66777d7308ffa7a348c84841;
 extern void * TVPImportFuncPtrb426fbfb6ccb4e89c252b6af566995b8;
+extern void * TVPImportFuncPtrc145419db7b63f7488ea05a2a8826c1d;
+extern void * TVPImportFuncPtrd795cd5ebfb6ca6f1b91bafbe66d7a65;
 extern void * TVPImportFuncPtr678c2b211f8d8f661f6fdd95c52fbaa8;
 extern void * TVPImportFuncPtr9ec5b02d14238454101dad083b5dfc3b;
 extern void * TVPImportFuncPtr471b3daf08ed9b828679d0dae78250ed;
@@ -8021,6 +8023,26 @@ inline tjs_uint32 TVPGetCurrentShiftKeyState()
 	}
 	typedef tjs_uint32 (__stdcall * __functype)();
 	return ((__functype)(TVPImportFuncPtrb426fbfb6ccb4e89c252b6af566995b8))();
+}
+inline void TVPRegisterAcceleratorKey(HWND hWnd , char virt , short key , short cmd)
+{
+	if(!TVPImportFuncPtrc145419db7b63f7488ea05a2a8826c1d)
+	{
+		static char funcname[] = "void ::TVPRegisterAcceleratorKey(HWND,char,short,short)";
+		TVPImportFuncPtrc145419db7b63f7488ea05a2a8826c1d = TVPGetImportFuncPtr(funcname);
+	}
+	typedef void (__stdcall * __functype)(HWND , char , short , short);
+	((__functype)(TVPImportFuncPtrc145419db7b63f7488ea05a2a8826c1d))(hWnd, virt, key, cmd);
+}
+inline void TVPUnregisterAcceleratorKey(HWND hWnd , short cmd)
+{
+	if(!TVPImportFuncPtrd795cd5ebfb6ca6f1b91bafbe66d7a65)
+	{
+		static char funcname[] = "void ::TVPUnregisterAcceleratorKey(HWND,short)";
+		TVPImportFuncPtrd795cd5ebfb6ca6f1b91bafbe66d7a65 = TVPGetImportFuncPtr(funcname);
+	}
+	typedef void (__stdcall * __functype)(HWND , short);
+	((__functype)(TVPImportFuncPtrd795cd5ebfb6ca6f1b91bafbe66d7a65))(hWnd, cmd);
 }
 inline void TVPEnsureDirectDrawObject()
 {

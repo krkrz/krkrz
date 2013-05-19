@@ -1,9 +1,63 @@
 #include <windows.h>
 #include "tp_stub.h"
+#include "MenuItemIntf.h"
+
+static std::map<HWND,iTJSDispatch2*> MENU_LIST;
+static void AddMenuDispatch( HWND hWnd, iTJSDispatch2* menu ) {
+	MENU_LIST.insert( std::map<HWND, iTJSDispatch2*>::value_type( hWnd, menu ) );
+}
+static iTJSDispatch2* GetMenuDispatch( HWND hWnd ) {
+	std::map<HWND, iTJSDispatch2*>::iterator i = MENU_LIST.find( hWnd );
+	if( i != MENU_LIST.end() ) {
+		return i->second;
+	}
+	return NULL;
+}
+static void DelMenuDispatch( HWND hWnd ) {
+	MENU_LIST.erase(hWnd);
+}
+/**
+ * メニューの中から既に存在しなくなったWindowについているメニューオブジェクトを削除する
+ */
+static void UpdateMenuList() {
+	std::map<HWND, iTJSDispatch2*>::iterator i = MENU_LIST.begin();
+	for( ; i != MENU_LIST.end(); ) {
+		BOOL exist = ::IsWindow( i->first );
+		if( exist == 0 ) {
+			// 既になくなったWindow
+			std::map<HWND, iTJSDispatch2*>::iterator target = i;
+			i++;
+			iTJSDispatch2* menu = target->second;
+			MENU_LIST.erase( target );
+			menu->Release();
+		} else {
+			i++;
+		}
+	}
+}
+class WindowMenuProperty : public tTJSDispatch {
+	tjs_error TJS_INTF_METHOD PropGet( tjs_uint32 flag,	const tjs_char * membername, tjs_uint32 *hint, tTJSVariant *result,	iTJSDispatch2 *objthis ) {
+		tTJSVariant var;
+		if( TJS_FAILED(objthis->PropGet(0, TJS_W("HWND"), NULL, &var, objthis)) ) {
+			return TJS_E_INVALIDOBJECT;
+		}
+		HWND hWnd = (HWND)(tjs_int64)var;
+		iTJSDispatch2* menu = GetMenuDispatch( hWnd );
+		if( menu == NULL ) {
+			UpdateMenuList();
+			menu = TVPCreateMenuItemObject(objthis);
+			AddMenuDispatch( hWnd, menu );
+		}
+		*result = tTJSVariant(menu, menu);
+		return TJS_S_OK;
+	}
+	tjs_error TJS_INTF_METHOD PropSet( tjs_uint32 flag, const tjs_char *membername,	tjs_uint32 *hint, const tTJSVariant *param,	iTJSDispatch2 *objthis ) {
+		return TJS_E_ACCESSDENYED;
+	}
+} *gWindowMenuProperty;
 
 //---------------------------------------------------------------------------
-int WINAPI DllEntryPoint(HINSTANCE hinst, unsigned long reason, void* lpReserved)
-{
+int WINAPI DllEntryPoint(HINSTANCE hinst, unsigned long reason, void* lpReserved) {
 	return 1;
 }
 //---------------------------------------------------------------------------
@@ -19,56 +73,26 @@ extern "C" __declspec(dllexport) HRESULT _stdcall V2Link(iTVPFunctionExporter *e
 	iTJSDispatch2 * global = TVPGetScriptDispatch();
 
 	{
-		// プロパティ初期化
-		//-----------------------------------------------------------------------
-		// 1 まずクラスオブジェクトを作成
-		iTJSDispatch2 * tjsclass = Create_NC_NIC();
-
-		// 2 tjsclass を tTJSVariant 型に変換
-		val = tTJSVariant(tjsclass);
-
-		// 3 すでに val が tjsclass を保持しているので、tjsclass は
-		//   Release する
-		tjsclass->Release();
-
-		// 4 global の PropSet メソッドを用い、オブジェクトを登録する
-		global->PropSet(
-			TJS_MEMBERENSURE, // メンバがなかった場合には作成するようにするフラグ
-			TJS_W("NIC"), // メンバ名 ( かならず TJS_W( ) で囲む )
-			NULL, // ヒント ( 本来はメンバ名のハッシュ値だが、NULL でもよい )
-			&val, // 登録する値
-			global // コンテキスト ( global でよい )
-			);
-		//-----------------------------------------------------------------------
+		gWindowMenuProperty = new WindowMenuProperty();
+		val = tTJSVariant(gWindowMenuProperty);
+		gWindowMenuProperty->Release();
+		tTJSVariant win;
+		if( TJS_SUCCEEDED(global->PropGet(0,TJS_W("Window"),NULL,&win,global)) ) {
+			iTJSDispatch2* obj = win.AsObjectNoAddRef();
+			obj->PropSet(TJS_MEMBERENSURE,TJS_W("menu"),NULL,&val,obj);
+		}
 
 		//-----------------------------------------------------------------------
-		tjsclass = Create_NC_Hash();
+		iTJSDispatch2 * tjsclass = TVPCreateNativeClass_MenuItem();
 		val = tTJSVariant(tjsclass);
 		tjsclass->Release();
-		global->PropSet( TJS_MEMBERENSURE, TJS_W("Hash"), NULL, &val, global );
-		//-----------------------------------------------------------------------
-		tjsclass = Create_NC_Base64();
-		val = tTJSVariant(tjsclass);
-		tjsclass->Release();
-		global->PropSet( TJS_MEMBERENSURE, TJS_W("Base64"), NULL, &val, global );
-		//-----------------------------------------------------------------------
-		tjsclass = Create_NC_HMAC();
-		val = tTJSVariant(tjsclass);
-		tjsclass->Release();
-		global->PropSet( TJS_MEMBERENSURE, TJS_W("HMAC"), NULL, &val, global );
-		//-----------------------------------------------------------------------
-		tjsclass = Create_NC_Crypt();
-		val = tTJSVariant(tjsclass);
-		tjsclass->Release();
-		global->PropSet( TJS_MEMBERENSURE, TJS_W("Crypt"), NULL, &val, global );
+		global->PropSet( TJS_MEMBERENSURE, TJS_W("MenuItem"), NULL, &val, global );
 		//-----------------------------------------------------------------------
 		
 	}
 
 	// - global を Release する
 	global->Release();
-
-	// もし、登録する関数が複数ある場合は 1 ～ 4 を繰り返す
 
 	// val をクリアする。
 	// これは必ず行う。そうしないと val が保持しているオブジェクト
@@ -109,6 +133,8 @@ extern "C" __declspec(dllexport) HRESULT _stdcall V2Unlink()
 	// - まず、TJS のグローバルオブジェクトを取得する
 	iTJSDispatch2 * global = TVPGetScriptDispatch();
 
+	// メニューは解放されないはずなので、明示的には解放しない
+
 	// - global の DeleteMember メソッドを用い、オブジェクトを削除する
 	if(global)
 	{
@@ -116,11 +142,7 @@ extern "C" __declspec(dllexport) HRESULT _stdcall V2Unlink()
 		// global は NULL になり得るので global が NULL でない
 		// ことをチェックする
 
-		global->DeleteMember( 0, TJS_W("NIC"), NULL, global );
-		global->DeleteMember( 0, TJS_W("Hash"), NULL, global );
-		global->DeleteMember( 0, TJS_W("Base64"), NULL, global );
-		global->DeleteMember( 0, TJS_W("HMAC"), NULL, global );
-		global->DeleteMember( 0, TJS_W("Crypt"), NULL, global );
+		global->DeleteMember( 0, TJS_W("MenuItem"), NULL, global );
 	}
 
 	// - global を Release する
