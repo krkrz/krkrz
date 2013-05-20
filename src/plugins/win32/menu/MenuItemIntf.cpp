@@ -40,20 +40,24 @@ static const wchar_t* ShortCutKeyCode( int key ) {
 }
 static int TextToShortCut( const wchar_t* text ) {
 	int virt = 0;
+	const wchar_t* tail = text;
 	const wchar_t* ret = NULL;
-	if( wcsstr( text, L"Shift+" ) ) {
+	if( (ret = wcsstr( text, L"Shift+" )) != NULL ) {
 		virt |= FSHIFT;
+		if( tail < (ret + 6) ) tail = (ret + 6);
 	}
-	if( wcsstr( text, L"Ctrl+" ) ) {
+	if( (ret = wcsstr( text, L"Ctrl+" )) != NULL ) {
 		virt |= FCONTROL;
+		if( tail < (ret + 5) ) tail = (ret + 5);
 	}
-	if( wcsstr( text, L"Alt+" ) ) {
+	if( (ret = wcsstr( text, L"Alt+" )) != NULL ) {
 		virt |= FALT;
+		if( tail < (ret + 4) ) tail = (ret + 4);
 	}
-	// 以下判定不完全、上の修飾文字列を除いて判定する必要がある
+	text = tail;
 	for( int k = 8; k <= 255; k++ ) {
 		const wchar_t* name = ShortCutKeyCode(k);
-		if( name != NULL && wcsstr( text, name ) ) {
+		if( name != NULL && wcscmp( text, name ) == 0 ) {
 			virt |= FVIRTKEY;
 			return (virt << 16) | k;
 		}

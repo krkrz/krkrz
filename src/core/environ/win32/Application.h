@@ -89,6 +89,7 @@ public:
 	~AcceleratorKeyTable();
 	void AddKey( HWND hWnd, WORD id, WORD key, BYTE virt );
 	void DelKey( HWND hWnd, WORD id );
+	void DelTable( HWND hWnd );
 	HACCEL GetHandle(HWND hWnd) {
 		std::map<HWND,AcceleratorKey*>::iterator i = keys_.find(hWnd);
 		if( i != keys_.end() ) {
@@ -176,6 +177,7 @@ public:
 	
 	void RegisterAcceleratorKey(HWND hWnd, char virt, short key, short cmd);
 	void UnregisterAcceleratorKey(HWND hWnd, short cmd);
+	void DeleteAcceleratorKeyTable( HWND hWnd );
 };
 std::vector<std::string>* LoadLinesFromFile( const std::string& path );
 

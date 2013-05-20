@@ -22,7 +22,8 @@ static void DelMenuDispatch( HWND hWnd ) {
 static void UpdateMenuList() {
 	std::map<HWND, iTJSDispatch2*>::iterator i = MENU_LIST.begin();
 	for( ; i != MENU_LIST.end(); ) {
-		BOOL exist = ::IsWindow( i->first );
+		HWND hWnd = i->first;
+		BOOL exist = ::IsWindow( hWnd );
 		if( exist == 0 ) {
 			// Šù‚É‚È‚­‚È‚Á‚½Window
 			std::map<HWND, iTJSDispatch2*>::iterator target = i;
@@ -30,6 +31,7 @@ static void UpdateMenuList() {
 			iTJSDispatch2* menu = target->second;
 			MENU_LIST.erase( target );
 			menu->Release();
+			TVPDeleteAcceleratorKeyTable( hWnd );
 		} else {
 			i++;
 		}

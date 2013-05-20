@@ -68,6 +68,10 @@ AcceleratorKeyTable::AcceleratorKeyTable() {
 	hAccel_ = ::LoadAccelerators( (HINSTANCE)GetModuleHandle(0), MAKEINTRESOURCE(IDC_TVPWIN32));
 }
 AcceleratorKeyTable::~AcceleratorKeyTable() {
+	std::map<HWND,AcceleratorKey*>::iterator i = keys_.begin();
+	for( ; i != keys_.end(); i++ ) {
+		delete (i->second);
+	}
 }
 void AcceleratorKeyTable::AddKey( HWND hWnd, WORD id, WORD key, BYTE virt ) {
 	std::map<HWND,AcceleratorKey*>::iterator i = keys_.find(hWnd);
@@ -86,6 +90,13 @@ void AcceleratorKeyTable::DelKey( HWND hWnd, WORD id ) {
 	}
 }
 
+void AcceleratorKeyTable::DelTable( HWND hWnd ) {
+	std::map<HWND,AcceleratorKey*>::iterator i = keys_.find(hWnd);
+	if( i != keys_.end() ) {
+		delete (i->second);
+		keys_.erase(i);
+	}
+}
 AcceleratorKey::AcceleratorKey() : hAccel_(NULL), keys_(NULL), key_count_(0) {
 }
 AcceleratorKey::~AcceleratorKey() {
@@ -392,6 +403,9 @@ void TApplication::RegisterAcceleratorKey(HWND hWnd, char virt, short key, short
 void TApplication::UnregisterAcceleratorKey(HWND hWnd, short cmd) {
 	accel_key_.DelKey( hWnd, cmd );
 }
+void TApplication::DeleteAcceleratorKeyTable( HWND hWnd ) {
+	accel_key_.DelTable( hWnd );
+}
 /**
  ‰¼ŽÀ‘• TODO
 */
@@ -415,4 +429,7 @@ void TVPRegisterAcceleratorKey(HWND hWnd, char virt, short key, short cmd) {
 }
 void TVPUnregisterAcceleratorKey(HWND hWnd, short cmd) {
 	if( Application ) Application->UnregisterAcceleratorKey( hWnd, cmd );
+}
+void TVPDeleteAcceleratorKeyTable( HWND hWnd ) {
+	if( Application ) Application->DeleteAcceleratorKeyTable( hWnd );
 }

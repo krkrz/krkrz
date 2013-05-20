@@ -1930,6 +1930,7 @@ extern void * TVPImportFuncPtrd3aaa55d66777d7308ffa7a348c84841;
 extern void * TVPImportFuncPtrb426fbfb6ccb4e89c252b6af566995b8;
 extern void * TVPImportFuncPtrc145419db7b63f7488ea05a2a8826c1d;
 extern void * TVPImportFuncPtrd795cd5ebfb6ca6f1b91bafbe66d7a65;
+extern void * TVPImportFuncPtr4564a3ce5cf48cb47e63a3948cef03be;
 extern void * TVPImportFuncPtr678c2b211f8d8f661f6fdd95c52fbaa8;
 extern void * TVPImportFuncPtr9ec5b02d14238454101dad083b5dfc3b;
 extern void * TVPImportFuncPtr471b3daf08ed9b828679d0dae78250ed;
@@ -8043,6 +8044,16 @@ inline void TVPUnregisterAcceleratorKey(HWND hWnd , short cmd)
 	}
 	typedef void (__stdcall * __functype)(HWND , short);
 	((__functype)(TVPImportFuncPtrd795cd5ebfb6ca6f1b91bafbe66d7a65))(hWnd, cmd);
+}
+inline void TVPDeleteAcceleratorKeyTable(HWND hWnd)
+{
+	if(!TVPImportFuncPtr4564a3ce5cf48cb47e63a3948cef03be)
+	{
+		static char funcname[] = "void ::TVPDeleteAcceleratorKeyTable(HWND)";
+		TVPImportFuncPtr4564a3ce5cf48cb47e63a3948cef03be = TVPGetImportFuncPtr(funcname);
+	}
+	typedef void (__stdcall * __functype)(HWND);
+	((__functype)(TVPImportFuncPtr4564a3ce5cf48cb47e63a3948cef03be))(hWnd);
 }
 inline void TVPEnsureDirectDrawObject()
 {
