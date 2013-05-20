@@ -1,7 +1,60 @@
 #include <windows.h>
 #include "tp_stub.h"
 #include "MenuItemIntf.h"
+#include "resource.h"
+#include <tchar.h>
+#include <string.h>
 
+const tjs_char* TVPSpecifyWindow = NULL;
+const tjs_char* TVPSpecifyMenuItem = NULL;
+const tjs_char* TVPInternalError = NULL;
+const tjs_char* TVPNotChildMenuItem = NULL;
+const tjs_char* TVPMenuIDOverflow = NULL;
+
+static void LoadMessageFromResource() {
+	static const int BUFF_SIZE = 1024;
+	HINSTANCE hInstance = ::GetModuleHandle(_T("menu.dll"));
+	TCHAR buffer[BUFF_SIZE];
+	TCHAR* work;
+	int len;
+
+	len = ::LoadString( hInstance, IDS_SPECIFY_WINDOW, buffer, BUFF_SIZE );
+	work = new TCHAR[len+1];
+	_tcscpy_s( work, len+1, buffer );
+	TVPSpecifyWindow = work;
+
+	len = ::LoadString( hInstance, IDS_SPECIFY_MENU_ITEM, buffer, BUFF_SIZE );
+	work = new TCHAR[len+1];
+	_tcscpy_s( work, len+1, buffer );
+	TVPSpecifyMenuItem = work;
+
+	len = ::LoadString( hInstance, IDS_INTERNAL_ERROR, buffer, BUFF_SIZE );
+	work = new TCHAR[len+1];
+	_tcscpy_s( work, len+1, buffer );
+	TVPInternalError = work;
+
+	len = ::LoadString( hInstance, IDS_NOT_CHILD_MENU_ITEM, buffer, BUFF_SIZE );
+	work = new TCHAR[len+1];
+	_tcscpy_s( work, len+1, buffer );
+	TVPNotChildMenuItem = work;
+	
+	len = ::LoadString( hInstance, IDS_MENU_ID_OVERFLOW, buffer, BUFF_SIZE );
+	work = new TCHAR[len+1];
+	_tcscpy_s( work, len+1, buffer );
+	TVPMenuIDOverflow = work;
+}
+static void FreeMessage() {
+	delete[] TVPSpecifyWindow;
+	delete[] TVPSpecifyMenuItem;
+	delete[] TVPInternalError;
+	delete[] TVPNotChildMenuItem;
+	delete[] TVPMenuIDOverflow;
+	TVPSpecifyWindow = NULL;
+	TVPSpecifyMenuItem = NULL;
+	TVPInternalError = NULL;
+	TVPNotChildMenuItem = NULL;
+	TVPMenuIDOverflow = NULL;
+}
 static std::map<HWND,iTJSDispatch2*> MENU_LIST;
 static void AddMenuDispatch( HWND hWnd, iTJSDispatch2* menu ) {
 	MENU_LIST.insert( std::map<HWND, iTJSDispatch2*>::value_type( hWnd, menu ) );
@@ -65,6 +118,8 @@ int WINAPI DllEntryPoint(HINSTANCE hinst, unsigned long reason, void* lpReserved
 static tjs_int GlobalRefCountAtInit = 0;
 extern "C" __declspec(dllexport) HRESULT _stdcall V2Link(iTVPFunctionExporter *exporter)
 {
+	LoadMessageFromResource();
+
 	// スタブの初期化(必ず記述する)
 	TVPInitImportStub(exporter);
 
@@ -152,6 +207,7 @@ extern "C" __declspec(dllexport) HRESULT _stdcall V2Unlink()
 	// スタブの使用終了(必ず記述する)
 	TVPUninitImportStub();
 
+	FreeMessage();
 	return S_OK;
 }
 //---------------------------------------------------------------------------

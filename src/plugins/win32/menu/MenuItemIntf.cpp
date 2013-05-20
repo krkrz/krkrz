@@ -77,10 +77,10 @@ static ttstr ShortCutToText( int key ) {
 	return ttstr(str.c_str()); 
 }
 
-static const tjs_char * TVPSpecifyWindow = TJS_W("Window クラスのオブジェクトを指定してください");
-static const tjs_char * TVPSpecifyMenuItem = TJS_W("MenuItem クラスのオブジェクトを指定してください");
-static const tjs_char * TVPInternalError = TJS_W("内部エラーが発生しました: at %1 line %2");
-static const tjs_char * TVPNotChildMenuItem = TJS_W("指定されたメニュー項目はこのメニュー項目の子ではありません");
+extern const tjs_char* TVPSpecifyWindow;
+extern const tjs_char* TVPSpecifyMenuItem;
+extern const tjs_char* TVPInternalError;
+extern const tjs_char* TVPNotChildMenuItem;
 
 #define TVPThrowInternalError \
 	TVPThrowExceptionMessage(TVPInternalError, __FILE__,  __LINE__)

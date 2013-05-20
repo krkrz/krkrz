@@ -9,7 +9,7 @@ int WindowMenuItem::CURRENT_MENU_ID = WindowMenuItem::MENU_ID_MIN;
 std::vector<int> WindowMenuItem::FREE_ID_LIST;
 std::map<int, WindowMenuItem*> WindowMenuItem::ID_TO_ITEM;
 
-static const tjs_char * TVPMenuIDOverflow = TJS_W("‚±‚êˆÈã MenuItem ‚ğì‚é‚±‚Æ‚Ío—ˆ‚Ü‚¹‚ñ");
+extern const tjs_char* TVPMenuIDOverflow;
 
 int WindowMenuItem::GetNewMenuId( WindowMenuItem* item ) {
 	// —v‘f‚ª‚ ‚éê‡‚Í‚»‚ê‚ğ•Ô‚·
