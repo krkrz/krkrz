@@ -29,7 +29,7 @@
 //#include "MenuItemIntf.h"
 #include "ClipboardIntf.h"
 #include "MsgIntf.h"
-#include "KAGParser.h"
+//#include "KAGParser.h"
 #include "VideoOvlIntf.h"
 //#include "PadIntf.h"
 #include "TextStream.h"
@@ -480,7 +480,7 @@ void TVPInitScriptEngine()
 	REGISTER_OBJECT(Scripts, TVPCreateNativeClass_Scripts()); // declared in this file
 
 	/* KAG special support */
-	REGISTER_OBJECT(KAGParser, new tTJSNC_KAGParser());
+	//REGISTER_OBJECT(KAGParser, new tTJSNC_KAGParser());
 
 	/* WaveSoundBuffer and its filters */
 	iTJSDispatch2 * waveclass = NULL;
