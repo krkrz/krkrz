@@ -21,15 +21,6 @@ static const wchar_t* ShortCutKeyCode( int key ) {
 	case 0x09: return L"Tab";
 	case 0x0D: return L"Enter";
 	case 0x1B: return L"Esc";
-	case 0x20: return L"Esc";
-	case 0x21: return L"Esc";
-	case 0x22: return L"Esc";
-	case 0x23: return L"Esc";
-	case 0x24: return L"Esc";
-	case 0x25: return L"Esc";
-	case 0x26: return L"Esc";
-	case 0x27: return L"Esc";
-	case 0x28: return L"Esc";
 	}
 	*/
 	int code = (::MapVirtualKey( key, 0 )<<16)|(1<<25);
@@ -393,11 +384,9 @@ tTJSNI_MenuItem * tTJSNI_MenuItem::GetRootMenuItem() const
 //---------------------------------------------------------------------------
 void tTJSNI_MenuItem::MenuItemClick()
 {
-	OnClick();
-	// VCL event handler
 	// post to the event queue
-	// TODO TVPPostEvent ‚Ö•ÏX‚·‚é‚±‚Æ
-	// TVPPostInputEvent(new tTVPOnMenuItemClickInputEvent(this));
+	static ttstr eventname(TJS_W("fireClick"));
+	TVPPostEvent(Owner, Owner, eventname, 0, 0, 0, NULL);
 }
 //---------------------------------------------------------------------------
 bool tTJSNI_MenuItem::CanDeliverEvents() const
@@ -690,28 +679,28 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/onClick)
 		/*var. type*/tTJSNI_MenuItem);
 
 	tTJSVariantClosure obj = _this->GetActionOwnerNoAddRef();
-	if(obj.Object)
-	{
-		/*
-		TVP_ACTION_INVOKE_BEGIN(0, "onClick", objthis);
-		TVP_ACTION_INVOKE_END(obj);
-		*/
-		{
-			if( numparams < 0 ) return TJS_E_BADPARAMCOUNT;
+	if(obj.Object) {
+		if( numparams < 0 ) return TJS_E_BADPARAMCOUNT;
+		tjs_int arg_count = 0;
+		iTJSDispatch2 *evobj = TVPCreateEventObject(TJS_W("onClick"), objthis, objthis );
+		tTJSVariant evval(evobj, evobj);
+		evobj->Release();
 
-			tjs_int arg_count = 0;
-			iTJSDispatch2 *evobj = TVPCreateEventObject(TJS_W("onClick"), objthis, objthis );
-			tTJSVariant evval(evobj, evobj);
-			evobj->Release();
-
-			tTJSVariant *pevval = &evval;
-			obj.FuncCall( 0, TJS_W("action"), NULL, result, 1, &pevval, NULL);
-		}
+		tTJSVariant *pevval = &evval;
+		obj.FuncCall( 0, TJS_W("action"), NULL, result, 1, &pevval, NULL);
 	}
 
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/onClick)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/fireClick)
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_MenuItem);
+	_this->OnClick();
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/fireClick)
 //----------------------------------------------------------------------
 
 //--properties
