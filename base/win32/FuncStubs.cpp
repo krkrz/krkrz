@@ -1437,7 +1437,6 @@ static void __stdcall TVP_Stub_4bf80e9bac16b9e3f9bf385b2fbce657(const ttstr & li
 {
 	return TVPAddImportantLog(line);
 }
-#include "KAGParser.h"
 #include "Random.h"
 static void __stdcall TVP_Stub_51aeacf2b6ef9deb01c3b3db201d6bf9(const void * buf , tjs_int bufsize)
 {

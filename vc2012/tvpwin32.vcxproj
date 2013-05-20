@@ -199,7 +199,6 @@
     <ClInclude Include="..\utils\ClipboardIntf.h" />
     <ClInclude Include="..\utils\Debugger.h" />
     <ClInclude Include="..\utils\DebugIntf.h" />
-    <ClInclude Include="..\utils\KAGParser.h" />
     <ClInclude Include="..\utils\md5.h" />
     <ClInclude Include="..\utils\ObjectList.h" />
     <ClInclude Include="..\utils\Random.h" />
@@ -328,7 +327,6 @@
     <ClCompile Include="..\tjs2\tjsVariantString.cpp" />
     <ClCompile Include="..\utils\ClipboardIntf.cpp" />
     <ClCompile Include="..\utils\DebugIntf.cpp" />
-    <ClCompile Include="..\utils\KAGParser.cpp" />
     <ClCompile Include="..\utils\md5.c" />
     <ClCompile Include="..\utils\Random.cpp" />
     <ClCompile Include="..\utils\ThreadIntf.cpp" />

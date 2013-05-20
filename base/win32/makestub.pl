@@ -497,8 +497,8 @@ process_exp_stub("../../utils/ThreadIntf.h");
 print OFH "#include \"DebugIntf.h\"\n";
 process_exp_stub("../../utils/DebugIntf.h");
 
-print OFH "#include \"KAGParser.h\"\n";
-process_exp_stub("../../utils/KAGParser.h");
+#print OFH "#include \"KAGParser.h\"\n";
+#process_exp_stub("../../utils/KAGParser.h");
 
 print OFH "#include \"Random.h\"\n";
 process_exp_stub("../../utils/Random.h");
