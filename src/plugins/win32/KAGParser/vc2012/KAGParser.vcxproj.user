@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LocalDebuggerCommand>..\..\..\..\..\bin\win32\tvpwin32.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommandArguments>-debug</LocalDebuggerCommandArguments>
+    <LocalDebuggerWorkingDirectory>C:\ToolDev\kirikiri_vc\krkrz\bin\win32</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+</Project>

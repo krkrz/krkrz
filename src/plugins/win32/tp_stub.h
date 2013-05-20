@@ -4647,17 +4647,6 @@ typedef void * TVP_THREAD_PARAM;
 
 
 //---------------------------------------------------------------------------
-// KAG Parser debug level
-//---------------------------------------------------------------------------
-enum tTVPKAGDebugLevel
-{
-	tkdlNone, // none is reported
-	tkdlSimple, // simple report
-	tkdlVerbose // complete report ( verbose )
-};
-
-
-//---------------------------------------------------------------------------
 // tTVPClipboardFormat
 //---------------------------------------------------------------------------
 enum tTVPClipboardFormat
