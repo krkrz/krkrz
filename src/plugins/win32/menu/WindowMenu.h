@@ -34,7 +34,6 @@ private:
 	bool is_visible_;
 
 	WindowMenuItem* parent_;
-	// WindowMenuItem* root_;
 
 	std::vector<WindowMenuItem*> children_;
 
@@ -68,7 +67,6 @@ public:
 	void Add( WindowMenuItem* item );
 	void Insert( int index, WindowMenuItem* item );
 	void Delete( int index );
-	//void Popup( int flags, int x, int y );
 
 	void SetCaption( const TCHAR* caption );
 	const TCHAR* GetCaption() const { return menu_item_info_.dwTypeData; }

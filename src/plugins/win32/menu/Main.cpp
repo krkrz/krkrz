@@ -57,7 +57,6 @@ class WindowMenuProperty : public tTJSDispatch {
 		return TJS_E_ACCESSDENYED;
 	}
 } *gWindowMenuProperty;
-//extern const wchar_t* ShortCutKeyCode( int key );
 //---------------------------------------------------------------------------
 int WINAPI DllEntryPoint(HINSTANCE hinst, unsigned long reason, void* lpReserved) {
 	return 1;
@@ -66,15 +65,6 @@ int WINAPI DllEntryPoint(HINSTANCE hinst, unsigned long reason, void* lpReserved
 static tjs_int GlobalRefCountAtInit = 0;
 extern "C" __declspec(dllexport) HRESULT _stdcall V2Link(iTVPFunctionExporter *exporter)
 {
-	/*
-	for( int i = 8; i < 256; i++ ) {
-		const wchar_t* tmp = ShortCutKeyCode(i);
-		if( tmp ) {
-			OutputDebugString(tmp);
-			OutputDebugString(L"\n");
-		}
-	}
-	*/
 	// スタブの初期化(必ず記述する)
 	TVPInitImportStub(exporter);
 

@@ -30,7 +30,6 @@ class tTJSNI_MenuItem : public tTJSNativeInstance {
 	ttstr Shortcut;
 
 protected:
-	//tTJSNI_Window *Window;
 	iTJSDispatch2 *OwnerWindow;
 	HWND HWnd;
 
@@ -56,7 +55,7 @@ public:
 	static tTJSNI_MenuItem * CastFromVariant(const tTJSVariant & from);
 
 protected:
-	virtual bool CanDeliverEvents() const; // must be implemented in each platforms
+	virtual bool CanDeliverEvents() const;
 
 protected:
 	void AddChild(tTJSNI_MenuItem *item);
@@ -115,54 +114,12 @@ public:
 };
 //---------------------------------------------------------------------------
 
-#if 0
-//---------------------------------------------------------------------------
-// tTJSNC_MenuItem : TJS MenuItem class
-//---------------------------------------------------------------------------
-class tTJSNC_MenuItem : public tTJSNativeClass
-{
-	typedef tTJSNativeClass inherited;
-
-public:
-	tTJSNC_MenuItem();
-	static tjs_uint32 ClassID;
-
-protected:
-	tTJSNativeInstance *CreateNativeInstance();
-	/*
-		implement this in each platform.
-		this must return a proper instance of tTJSNC_MenuItem.
-	*/
-};
-#endif
 //---------------------------------------------------------------------------
 extern iTJSDispatch2 * TVPCreateNativeClass_MenuItem();
-	/*
-		implement this in each platform.
-		this must return a proper instance of tTJSNC_MenuItem.
-		usually simple returns: new tTJSNC_MenuItem();
-	*/
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
 extern iTJSDispatch2 * TVPCreateMenuItemObject(iTJSDispatch2 * window);
 //---------------------------------------------------------------------------
-
-
-#if 0
-//---------------------------------------------------------------------------
-// tTVPMenuItemOnClickInputEvent : onClick input event class
-//---------------------------------------------------------------------------
-class tTVPOnMenuItemClickInputEvent : public tTVPBaseInputEvent
-{
-	static tTVPUniqueTagForInputEvent Tag;
-public:
-	tTVPOnMenuItemClickInputEvent(tTJSNI_BaseMenuItem *menu) :
-		tTVPBaseInputEvent(menu, Tag) {};
-	void Deliver() const
-	{ ((tTJSNI_BaseMenuItem*)GetSource())->OnClick(); }
-};
-//---------------------------------------------------------------------------
-#endif
 
 #endif

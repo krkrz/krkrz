@@ -96,7 +96,6 @@ static bool __stdcall MyReceiver(void *userdata, tTVPWindowMessage *Message) {
 	case TVP_WM_DETACH: // ウインドウが切り離された
 		break; 
 	case TVP_WM_ATTACH: // ウインドウが設定された
-		//self->storeHWND((HWND)Message->LParam);
 		break;
 	case WM_COMMAND: {
 		WORD wID = Message->WParam & 0xFFFF;
@@ -117,7 +116,6 @@ static tjs_int32 TJS_NATIVE_CLASSID_NAME = -1;
 tTJSNI_MenuItem::tTJSNI_MenuItem()
 {
 	Owner = NULL;
-	// Window = NULL;
 	OwnerWindow = NULL;
 	Parent = NULL;
 	ChildrenArrayValid = false;
@@ -142,16 +140,6 @@ tjs_error TJS_INTF_METHOD tTJSNI_MenuItem::Construct(tjs_int numparams, tTJSVari
 		if( param[1]->Type() == tvtObject ) {
 			// may be Window instance
 			tTJSVariant var;
-			/*
-			tTJSVariantClosure clo = param[1]->AsObjectClosureNoAddRef();
-			if( clo.Object == NULL) TVPThrowExceptionMessage(TVPSpecifyWindow);
-			if( TJS_FAILED(clo.Object->PropGet(TJS_IGNOREPROP, TJS_W("HWND"), NULL, &var, clo.Object)) ) {
-				TVPThrowExceptionMessage(TVPSpecifyWindow);
-			}
-			HWnd = (HWND)(tjs_int64)var;
-			OwnerWindow = clo.Object;
-			*/
-			//iTJSDispatch2* win = param[1]->AsObjectNoAddRef();
 			iTJSDispatch2* win = param[1]->AsObjectNoAddRef();
 			if( TJS_FAILED(win->PropGet(0, TJS_W("HWND"), NULL, &var, win)) ) {
 				TVPThrowExceptionMessage(TVPSpecifyWindow);
@@ -166,23 +154,6 @@ tjs_error TJS_INTF_METHOD tTJSNI_MenuItem::Construct(tjs_int numparams, tTJSVari
 		HMENU hMenu = ::CreateMenu();
 		MenuItem = new WindowMenuItem(this,HWnd,hMenu);
 		::SetMenu( HWnd, hMenu );
-
-		/*
-		MENUITEMINFO info;
-		ZeroMemory( &info, sizeof(info) );
-		info.cbSize = sizeof( info );
-		info.fMask = MIIM_TYPE;
-		info.fType = MFT_STRING;
-		info.dwTypeData = L"追加された項目";
-		InsertMenuItem( hMenu, 4096, FALSE, &info );
-		DrawMenuBar( HWnd );
-		*/
-
-		/*
-		tTJSVariant val(this);
-		OwnerWindow->PropSet( TJS_MEMBERENSURE, TJS_W("menu"), NULL, &val, OwnerWindow );
-		*/
-		
 		iTJSDispatch2 *obj = OwnerWindow;
 		// registerMessageReceiver を呼ぶ
 		tTJSVariant mode, proc, userdata;
@@ -198,14 +169,6 @@ tjs_error TJS_INTF_METHOD tTJSNI_MenuItem::Construct(tjs_int numparams, tTJSVari
 			TVPThrowExceptionMessage(TVPSpecifyWindow);
 		}
 		HWnd = (HWND)(tjs_int64)var;
-		/*
-		tTJSVariantClosure clo = param[0]->AsObjectClosureNoAddRef();
-		if( clo.Object == NULL) TVPThrowExceptionMessage(TVPSpecifyWindow);
-		if( TJS_FAILED(clo.Object->PropGet(TJS_IGNOREPROP, TJS_W("HWND"), NULL, &var, clo.Object)) ) {
-			TVPThrowExceptionMessage(TVPSpecifyWindow);
-		}
-		HWnd = (HWND)(tjs_int)var;
-		*/
 		MenuItem = new WindowMenuItem(this,HWnd);
 	}
 
@@ -223,7 +186,6 @@ void TJS_INTF_METHOD tTJSNI_MenuItem::Invalidate()
 	bool dodeletemenuitem = (OwnerWindow == NULL);
 
 	TVPCancelSourceEvents(Owner);
-	//TVPCancelInputEvents(this); TODO
 
 	{ // locked
 		tObjectListSafeLockHolder<tTJSNI_MenuItem> holder(Children);
@@ -253,7 +215,6 @@ void TJS_INTF_METHOD tTJSNI_MenuItem::Invalidate()
 
 	inherited::Invalidate();
 
-	// delete VCL object
 	if(dodeletemenuitem) delete MenuItem, MenuItem = NULL;
 }
 //---------------------------------------------------------------------------
@@ -558,8 +519,7 @@ tjs_int tTJSNI_MenuItem::TrackPopup(tjs_uint32 flags, tjs_int x, tjs_int y) cons
 	if(!MenuItem) return 0;
 
 	HWND  hWindow;
-	if (GetRootMenuItem() /*&& GetRootMenuItem()->GetWindow()*/ ) {
-		//hWindow = GetRootMenuItem()->GetWindow()->GetMenuOwnerWindowHandle();
+	if( GetRootMenuItem()  ) {
 		hWindow = HWnd;
 	} else {
 		return 0;
@@ -586,17 +546,6 @@ tjs_int tTJSNI_MenuItem::TrackPopup(tjs_uint32 flags, tjs_int x, tjs_int y) cons
 
 	return rvPopup;
 }
-
-#if 0
-//---------------------------------------------------------------------------
-// tTJSNC_MenuItem::CreateNativeInstance
-//---------------------------------------------------------------------------
-tTJSNativeInstance *tTJSNC_MenuItem::CreateNativeInstance()
-{
-	return new tTJSNI_MenuItem();
-}
-//---------------------------------------------------------------------------
-#endif
 
 
 static iTJSNativeInstance * TJS_INTF_METHOD Create_NI_MenuItem() {
@@ -967,7 +916,6 @@ TJS_BEGIN_NATIVE_PROP_DECL(HMENU)
 	TJS_DENY_NATIVE_PROP_SETTER
 }
 TJS_END_NATIVE_PROP_DECL(HMENU)
-//TJS_END_NATIVE_PROP_DECL_OUTER(cls, HMENU)
 //---------------------------------------------------------------------------
 //----------------------------------------------------------------------
 

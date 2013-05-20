@@ -9,9 +9,8 @@ int WindowMenuItem::CURRENT_MENU_ID = WindowMenuItem::MENU_ID_MIN;
 std::vector<int> WindowMenuItem::FREE_ID_LIST;
 std::map<int, WindowMenuItem*> WindowMenuItem::ID_TO_ITEM;
 
-/**
- * íœŽž‚ÉIDŽg‚¢‰ñ‚·‚æ‚¤‚É‚µ‚½•û‚ª‚¢‚¢
- */
+static const tjs_char * TVPMenuIDOverflow = TJS_W("‚±‚êˆÈã MenuItem ‚ðì‚é‚±‚Æ‚Ío—ˆ‚Ü‚¹‚ñ");
+
 int WindowMenuItem::GetNewMenuId( WindowMenuItem* item ) {
 	// —v‘f‚ª‚ ‚éê‡‚Í‚»‚ê‚ð•Ô‚·
 	if( FREE_ID_LIST.size() > 0 ) {
@@ -25,6 +24,7 @@ int WindowMenuItem::GetNewMenuId( WindowMenuItem* item ) {
 	CURRENT_MENU_ID++;
 	if( result > MENU_ID_MAX ) {
 		// exception
+		TVPThrowExceptionMessage(TVPMenuIDOverflow);
 	}
 	ID_TO_ITEM.insert( std::map<int, WindowMenuItem*>::value_type( result, item ) );
 	return result;
@@ -71,7 +71,6 @@ void WindowMenuItem::SetMenuIndex( int index ) {
 	if( GetMenuIndex() != index ) {
 		parent_->Remove( this, false );
 		parent_->Insert( index, this );
-		// UpdateMenu();
 	}
 }
 
@@ -86,7 +85,6 @@ void WindowMenuItem::UpdateChildren() {
 		int index = 0;
 		for( int i = 0; i < count; i++ ) {
 			if( children_[i]->GetVisible() ) {
-				//::SetMenuItemInfo( hMenu_, index, TRUE, &(children_[i]->menu_item_info_) );
 				::InsertMenuItem( hMenu_, index, TRUE, &(children_[i]->menu_item_info_) );
 				index++;
 			}
@@ -198,7 +196,6 @@ void WindowMenuItem::SetCaption( const TCHAR* caption ) {
 	if( menu_item_info_.dwTypeData ) {
 		delete[] (TCHAR*)menu_item_info_.dwTypeData;
 		menu_item_info_.dwTypeData = NULL;
-		//menu_item_info_.cch = 0;
 	}
 	menu_item_info_.fMask &= ~(MIIM_STRING|MIIM_FTYPE);
 	if( caption ) {
@@ -207,7 +204,6 @@ void WindowMenuItem::SetCaption( const TCHAR* caption ) {
 			TCHAR* c = new TCHAR[len];
 			_tcscpy_s( c, len, caption );
 			menu_item_info_.dwTypeData = (LPWSTR)c;
-			//menu_item_info_.cch = len;
 			menu_item_info_.fMask |= MIIM_TYPE;
 		}
 	}
@@ -278,13 +274,6 @@ void WindowMenuItem::SetVisible( bool b ) {
 	UpdateMenu();
 }
 
-/*
-void WindowMenuItem::Popup( int flags, int x, int y ) {
-	if( hMenu_ ) {
-		::TrackPopupMenu( hMenu_, flags, x, y, 0, hWnd_, NULL );
-	}
-}
-*/
 void WindowMenuItem::OnClick() {
 	if( owner_ ) {
 		owner_->MenuItemClick();
