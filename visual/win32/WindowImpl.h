@@ -107,6 +107,7 @@ TJS_EXP_FUNC_DEF(tjs_uint32, TVPGetCurrentShiftKeyState, ());
 // implement for Application
 TJS_EXP_FUNC_DEF(void, TVPRegisterAcceleratorKey, (HWND hWnd, char virt, short key, short cmd) );
 TJS_EXP_FUNC_DEF(void, TVPUnregisterAcceleratorKey, (HWND hWnd, short cmd));
+TJS_EXP_FUNC_DEF(void, TVPDeleteAcceleratorKeyTable, (HWND hWnd));
 HWND TVPGetModalWindowOwnerHandle();
 //---------------------------------------------------------------------------
 
