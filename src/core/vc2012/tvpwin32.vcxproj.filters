@@ -58,6 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
+    <Text Include="optionarea.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -873,6 +874,9 @@
       <Filter>リソース ファイル</Filter>
     </None>
     <None Include="optionarea.bin">
+      <Filter>リソース ファイル</Filter>
+    </None>
+    <None Include="text1.bin">
       <Filter>リソース ファイル</Filter>
     </None>
   </ItemGroup>
