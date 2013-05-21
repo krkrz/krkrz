@@ -92,6 +92,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\tp_stub.cpp" />
     <ClCompile Include="..\KAGParser.cpp" />
+    <ClCompile Include="..\Main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\tp_stub.h" />

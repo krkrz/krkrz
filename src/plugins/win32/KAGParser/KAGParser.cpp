@@ -8,19 +8,10 @@
 //---------------------------------------------------------------------------
 // KAG Parser Utility Class
 //---------------------------------------------------------------------------
-#include "tjsCommHead.h"
 
 
 #include "KAGParser.h"
-#include "StorageIntf.h"
-#include "tjsDictionary.h"
-#include "MsgIntf.h"
-#include "DebugIntf.h"
-#include "ScriptMgnIntf.h"
-#include "tjsHashSearch.h"
-#include "TextStream.h"
-#include "tjsGlobalStringMap.h"
-#include "EventIntf.h"
+
 
 //---------------------------------------------------------------------------
 /*
@@ -32,9 +23,28 @@
   acquire speed in compensation for ability of customizing.
 */
 //---------------------------------------------------------------------------
+#define TJS_strchr			wcschr
+#define TJS_strcmp			wcscmp
+#define TJS_strncpy			wcsncpy_s
 
+const tjs_char* TVPKAGNoLine = TJS_W("読み込もうとしたシナリオファイル %1 は空です");
+const tjs_char* TVPKAGCannotOmmitFirstLabelName = TJS_W("シナリオファイルの最初のラベル名は省略できません");
+const tjs_char* TVPInternalError = TJS_W("内部エラーが発生しました: at %1 line %2");
+const tjs_char* TVPKAGMalformedSaveData = TJS_W("栞データが異常です。データが破損している可能性があります");
+const tjs_char* TVPKAGLabelNotFound = TJS_W("シナリオファイル %1 内にラベル %2 が見つかりません");
+const tjs_char* TVPLabelOrScriptInMacro = TJS_W("ラベルや iscript はマクロ中に記述できません");
+const tjs_char* TVPKAGInlineScriptNotEnd = TJS_W("[endscript] または @endscript が見つかりません");
+const tjs_char* TVPKAGSyntaxError = TJS_W("タグの文法エラーです。'[' や ']' の対応、\" と \" の対応、スペースの入れ忘れ、余分な改行、macro ～ endmacro の対応、必要な属性の不足などを確認してください");
+const tjs_char* TVPKAGCallStackUnderflow = TJS_W("return タグが call タグと対応していません ( return タグが多い )");
+const tjs_char* TVPKAGReturnLostSync = TJS_W("シナリオファイルに変更があったため return の戻り先位置を特定できません");
+const tjs_char* TVPKAGSpecifyKAGParser = TJS_W("KAGParser クラスのオブジェクトを指定してください");
+const tjs_char* TVPUnknownMacroName = TJS_W("マクロ \"%1\" は登録されていません");
 
+#define TVPThrowInternalError \
+	TVPThrowExceptionMessage(TVPInternalError, __FILE__,  __LINE__)
 
+#define TJS_NATIVE_CLASSID_NAME ClassID_KAGParser
+static tjs_int32 TJS_NATIVE_CLASSID_NAME = -1;
 //---------------------------------------------------------------------------
 // tTVPScenarioCacheItem : Scenario Cache Item
 //---------------------------------------------------------------------------
@@ -1761,7 +1771,7 @@ parse_start:
 						ttstr exp;
 						DicObj->PropGet(0, __exp_name.c_str(), __exp_name.GetHint(), &val, DicObj);
 						exp = val;
-						const std::string s = exp.AsStdString();
+						//const std::string s = exp.AsStdString();
 						if(exp == TJS_W(""))
 							TVPThrowExceptionMessage(TVPKAGSyntaxError);
 						TVPExecuteExpression(exp, Owner, &val);
@@ -1854,7 +1864,7 @@ parse_start:
 
 							tjs_char *d = newbuf.AllocBuffer(finallen + 1);
 
-							TJS_strncpy(d, CurLineStr, tagstartpos);
+							TJS_strncpy(d, finallen + 1, CurLineStr, tagstartpos);
 							d += tagstartpos;
 
 							// escape '['
@@ -1896,7 +1906,7 @@ parse_start:
 							ttstr newbuf;
 							tjs_char *d = newbuf.AllocBuffer(finallen + 1);
 
-							TJS_strncpy(d, CurLineStr, tagstartpos);
+							TJS_strncpy(d, finallen + 1, CurLineStr, tagstartpos);
 							d += tagstartpos;
 							TJS_strcpy(d, macrocontent.c_str());
 							d += maclen;
@@ -2256,15 +2266,15 @@ iTJSDispatch2 *tTJSNI_KAGParser::GetMacroTopNoAddRef() const
 
 
 
-
+static iTJSNativeInstance * TJS_INTF_METHOD Create_NI_KAGParser() {
+	return new tTJSNI_KAGParser();
+}
 
 //---------------------------------------------------------------------------
 // tTJSNC_KAGParser : KAGParser TJS native class
 //---------------------------------------------------------------------------
-tjs_uint32 tTJSNC_KAGParser::ClassID = (tjs_uint32)-1;
-tTJSNC_KAGParser::tTJSNC_KAGParser() :
-	tTJSNativeClass(TJS_W("KAGParser"))
-{
+iTJSDispatch2 * TVPCreateNativeClass_KAGParser() {
+	tTJSNativeClassForPlugin * classobj = TJSCreateNativeClassForPlugin(TJS_W("KAGParser"), Create_NI_KAGParser);
 	// register native methods/properties
 
 	TJS_BEGIN_NATIVE_MEMBERS(KAGParser)
@@ -2331,12 +2341,12 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/assign)
 
 	if(numparams < 1) return TJS_E_BADPARAMCOUNT;
 
-	tTJSNI_KAGParser *src;
+	tTJSNI_KAGParser *src = NULL;
 	tTJSVariantClosure clo = param[0]->AsObjectClosureNoAddRef();
 	if(clo.Object)
 	{
 		if(TJS_FAILED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE,
-			tTJSNC_KAGParser::ClassID, (iTJSNativeInstance**)&src)))
+			ClassID_KAGParser, (iTJSNativeInstance**)&src)))
 			TVPThrowExceptionMessage(TVPKAGSpecifyKAGParser);
 	}
 	else
@@ -2632,12 +2642,10 @@ TJS_END_NATIVE_PROP_DECL(curLabel)
 
 //----------------------------------------------------------------------
 	TJS_END_NATIVE_MEMBERS
+	
+	return classobj;
 }
-//---------------------------------------------------------------------------
-iTJSNativeInstance *tTJSNC_KAGParser::CreateNativeInstance()
-{
-	return new tTJSNI_KAGParser();
-}
+#undef TJS_NATIVE_CLASSID_NAME
 //---------------------------------------------------------------------------
 
 

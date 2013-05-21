@@ -12,10 +12,12 @@
 #ifndef KAGParserH
 #define KAGParserH
 //---------------------------------------------------------------------------
-#include "tjsNative.h"
+
+#include <windows.h>
+#include "tp_stub.h"
 #include "tjsHashSearch.h"
-
-
+#include <vector>
+using namespace TJS;
 /*[*/
 //---------------------------------------------------------------------------
 // KAG Parser debug level
@@ -316,8 +318,9 @@ public:
 
 };
 
+extern iTJSDispatch2 * TVPCreateNativeClass_KAGParser();
 
-
+#if 0
 //---------------------------------------------------------------------------
 // tTJSNC_KAGParser
 //---------------------------------------------------------------------------
@@ -332,5 +335,6 @@ private:
 	iTJSNativeInstance *CreateNativeInstance();
 };
 //---------------------------------------------------------------------------
+#endif
 
 #endif
