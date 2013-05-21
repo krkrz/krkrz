@@ -297,9 +297,6 @@ TVP_MSG_DECL(TVPCannotCreateInstance,
 TVP_MSG_DECL(TVPUnknownWaveFormat,
 	TJS_W("%1 は対応できない Wave 形式です"));
 
-TVP_MSG_DECL(TVPSpecifyMenuItem,
-	TJS_W("MenuItem クラスのオブジェクトを指定してください"));
-
 TVP_MSG_DECL(TVPCurrentTransitionMustBeStopping,
 	TJS_W("現在のトランジションを停止させてから新しいトランジションを開始してください。同じレイヤに対して複数のトランジションを同時に実行しようとするとこのエラーが発生します"));
 
@@ -345,41 +342,6 @@ TVP_MSG_DECL(TVPInvalidWindowSizeMustBeIn64to32768,
 TVP_MSG_DECL(TVPInvalidOverlapCountMustBeIn2to32,
 	TJS_W("overlap は 2～32 の範囲の 2 の累乗で無ければなりません"));
 
-TVP_MSG_DECL(TVPKAGNoLine,
-	TJS_W("読み込もうとしたシナリオファイル %1 は空です"));
-
-TVP_MSG_DECL(TVPKAGCannotOmmitFirstLabelName,
-	TJS_W("シナリオファイルの最初のラベル名は省略できません"));
-
-TVP_MSG_DECL(TVPKAGLabelNotFound,
-	TJS_W("シナリオファイル %1 内にラベル %2 が見つかりません"));
-
-TVP_MSG_DECL(TVPKAGInlineScriptNotEnd,
-	TJS_W("[endscript] または @endscript が見つかりません"));
-
-TVP_MSG_DECL(TVPKAGSyntaxError,
-	TJS_W("タグの文法エラーです。'[' や ']' の対応、\" と \" の対応、スペースの入れ忘れ、余分な改行、macro ～ endmacro の対応、必要な属性の不足などを確認してください"));
-
-TVP_MSG_DECL(TVPKAGMacroEntityNotAvailable,
-	TJS_W("マクロエンティティはマクロ外では使用できません"));
-
-TVP_MSG_DECL(TVPKAGCallStackUnderflow,
-	TJS_W("return タグが call タグと対応していません ( return タグが多い )"));
-
-TVP_MSG_DECL(TVPKAGReturnLostSync,
-	TJS_W("シナリオファイルに変更があったため return の戻り先位置を特定できません"));
-
-TVP_MSG_DECL(TVPKAGSpecifyKAGParser,
-	TJS_W("KAGParser クラスのオブジェクトを指定してください"));
-
-TVP_MSG_DECL(TVPKAGMalformedSaveData,
-	TJS_W("栞データが異常です。データが破損している可能性があります"));
-
-TVP_MSG_DECL(TVPLabelOrScriptInMacro,
-	TJS_W("ラベルや iscript はマクロ中に記述できません"));
-
-TVP_MSG_DECL(TVPUnknownMacroName,
-	TJS_W("マクロ \"%1\" は登録されていません"));
 
 //---------------------------------------------------------------------------
 // Utility Functions
