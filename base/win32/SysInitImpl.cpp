@@ -41,6 +41,7 @@
 #include "Exception.h"
 #include "ConfMainFrameUnit.h"
 #include "FileStream.h"
+#include "resource.h"
 
 #define TVP_NEED_UI_VERSION (((0x0001)<<16)+ 4) // needed development UI DLL version
 
@@ -1339,77 +1340,59 @@ void TVPMainWindowClosed()
 //---------------------------------------------------------------------------
 // GetCommandLine
 //---------------------------------------------------------------------------
-#if 0 // 実行ファイル内のオプションは対応しない
-#define TVP_FIND_OPTION_MIN_OFS 512*1024  // min 512KB
-#define TVP_FIND_OPTION_MAX_OFS 5*1024*1024 // max 5MB
-//---------------------------------------------------------------------------
 static std::vector<std::string> * TVPGetEmbeddedOptions()
 {
-	std::string filename = ExePath();
-	//TStream *stream = new TFileStream(filename, fmOpenRead|fmShareDenyWrite);
-
-	char *buf = NULL;
-	std::vector<std::string> *ret = NULL;
-
-	const char * errmsg = NULL;
-
-	tjs_uint offset;
-	try
-	{
-		ret = new std::vector<std::string>();
-		unsigned int size = stream->Size;
-		if(size < TVP_FIND_OPTION_MIN_OFS)
-			errmsg = "too small executable size."; // too small
-
-		if(!errmsg)
-		{
-			if(size > TVP_FIND_OPTION_MAX_OFS) size = TVP_FIND_OPTION_MAX_OFS;
-			buf = new char [size - TVP_FIND_OPTION_MIN_OFS];
-			stream->Position = TVP_FIND_OPTION_MIN_OFS;
-			stream->Read(buf, size - TVP_FIND_OPTION_MIN_OFS);
-
-			// search "XOPT_EMBED_AREA_" ( aligned by 16 )
-			static char XPT_1[] = "XOPT_EMBED\0\0";
-			static char XPT_2[] = "_AREA_";
-			char mark[17];
-			strcpy(mark, XPT_1);
-			strcat(mark, XPT_2); // combine string to avoid search the mark in code itself
-			bool found = false;
-			for(offset = TVP_FIND_OPTION_MIN_OFS; offset < size; offset += 16)
-			{
-				if(buf[offset - TVP_FIND_OPTION_MIN_OFS] == 'X')
-				{
-					if(!memcmp(buf+offset - TVP_FIND_OPTION_MIN_OFS,
-						mark, 16))
-					{
-						ret->Text = buf + offset + 16 + 4 - TVP_FIND_OPTION_MIN_OFS;
-						found = true;
-						break;
-					}
-				}
-			}
-
-			if(!found) errmsg = "not found in executable.";
+	HMODULE hModule = ::GetModuleHandle(NULL);
+	const char *buf = NULL;
+	unsigned int size = 0;
+	HRSRC hRsrc = ::FindResource(NULL, MAKEINTRESOURCE(IDR_OPTION), TEXT("TEXT"));
+	if( hRsrc != NULL ) {
+		size = ::SizeofResource( hModule, hRsrc );
+		HGLOBAL hGlobal = ::LoadResource( hModule, hRsrc );
+		if( hGlobal != NULL ) {
+			buf = reinterpret_cast<const char*>(::LockResource(hGlobal));
 		}
 	}
-	catch(...)
-	{
-		if(buf) delete [] buf;
+	if( buf == NULL ) return NULL;
+
+	std::vector<std::string> *ret = NULL;
+	const char * errmsg = NULL;
+	try {
+		ret = new std::vector<std::string>();
+		if( size < 1 ) errmsg = "too small executable size."; // too small
+
+		if(!errmsg) {
+			const char *tail = buf + size;
+			const char *start = buf;
+			while( buf < tail ) {
+				if( buf[0] == 0x0D && buf[1] == 0x0A ) {
+					ret->push_back( std::string(start,buf) );
+					start = buf + 2;
+				} else if( buf[0] == ',' ) {
+					ret->push_back( std::string(start,buf) );
+					start = buf + 1;
+				} else if( buf[0] == '\0' ) {
+					ret->push_back( std::string(start,buf) );
+					start = buf + 1;
+					break;
+				}
+				buf++;
+			}
+			if( start < buf ) {
+				ret->push_back( std::string(start,buf) );
+			}
+		}
+	} catch(...) {
 		if(ret) delete ret;
-		delete stream;
 		throw;
 	}
-	delete [] buf;
-	delete stream;
 
 	if(errmsg)
-		TVPAddImportantLog(ttstr("(info) Loading executable embedded options failed (ignoring) : ") +
-			errmsg);
+		TVPAddImportantLog(ttstr("(info) Loading executable embedded options failed (ignoring) : ") + errmsg);
 	else
 		TVPAddImportantLog("(info) Loading executable embedded options succeeded.");
 	return ret;
 }
-#endif
 //---------------------------------------------------------------------------
 static std::vector<std::string> * TVPGetConfigFileOptions(const std::string& filename)
 {
@@ -1565,7 +1548,7 @@ static void TVPInitProgramArgumentsAndDataPath(bool stop_after_datapath_got)
 		try
 		{
 			// read embedded options and default configuration file
-			options[0] = NULL; // TVPGetEmbeddedOptions();
+			options[0] = TVPGetEmbeddedOptions();
 			options[1] = TVPGetConfigFileOptions(TConfMainFrame::GetConfigFileName(ExePath()));
 
 			// at this point, we need to push all exsting known options
