@@ -370,6 +370,8 @@
     <Image Include="tvpwin32.ico" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="binary1.bin" />
+    <None Include="optionarea.bin" />
     <None Include="res\movetab.cur" />
     <None Include="res\nodrop.cur" />
     <None Include="res\nomovetab.cur" />
