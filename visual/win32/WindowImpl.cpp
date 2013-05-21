@@ -1520,33 +1520,6 @@ void tTJSNI_Window::EndUpdate()
 	tTJSNI_BaseWindow::EndUpdate();
 }
 //---------------------------------------------------------------------------
-TMenuItem * tTJSNI_Window::GetRootMenuItem()
-{
-	if(!Form) return NULL;
-	return Form->GetMainMenuItems();
-}
-//---------------------------------------------------------------------------
-void tTJSNI_Window::SetMenuBarVisible(bool b)
-{
-	if(!Form) return;
-	if(Form->GetFullScreenMode())
-		TVPThrowExceptionMessage(TVPInvalidPropertyInFullScreen);
-
-	Form->SetMenuBarVisible(b);
-}
-//---------------------------------------------------------------------------
-bool tTJSNI_Window::GetMenuBarVisible() const
-{
-	if(!Form) return false;
-	return Form->GetMenuBarVisible();
-}
-//---------------------------------------------------------------------------
-HWND tTJSNI_Window::GetMenuOwnerWindowHandle()
-{
-	if(!Form) return NULL;
-	return Form->GetMenuOwnerWindowHandle();
-}
-//---------------------------------------------------------------------------
 HWND tTJSNI_Window::GetSurfaceWindowHandle()
 {
 	if(!Form) return NULL;

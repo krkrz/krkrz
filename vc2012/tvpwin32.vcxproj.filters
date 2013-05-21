@@ -324,12 +324,6 @@
     <ClInclude Include="..\environ\win32\MouseCursor.h">
       <Filter>environ\win32</Filter>
     </ClInclude>
-    <ClInclude Include="..\environ\win32\MenuContainerForm.h">
-      <Filter>environ\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="..\environ\win32\WindowMenu.h">
-      <Filter>environ\win32</Filter>
-    </ClInclude>
     <ClInclude Include="..\tjs2\tjsRegExp.h">
       <Filter>tjs2</Filter>
     </ClInclude>
@@ -711,9 +705,6 @@
       <Filter>environ\win32</Filter>
     </ClCompile>
     <ClCompile Include="..\environ\win32\MouseCursor.cpp">
-      <Filter>environ\win32</Filter>
-    </ClCompile>
-    <ClCompile Include="..\environ\win32\WindowMenu.cpp">
       <Filter>environ\win32</Filter>
     </ClCompile>
     <ClCompile Include="..\tjs2\tjsRegExp.cpp">

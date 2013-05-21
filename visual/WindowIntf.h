@@ -246,12 +246,6 @@ public:
 	void Add(tTJSVariantClosure clo);
 	void Remove(tTJSVariantClosure clo);
 
-	//----- interface to menu object
-private:
-	iTJSDispatch2 * MenuItemObject;
-public:
-	//iTJSDispatch2 * GetMenuItemObjectNoAddRef();
-
 	//----- interface to video overlay object
 protected:
 	tObjectList<tTJSNI_BaseVideoOverlay> VideoOverlay;
