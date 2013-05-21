@@ -8,7 +8,6 @@
 
 #include "TMLWindow.h"
 #include "MouseCursor.h"
-#include "WindowMenu.h"
 
 enum {
 	crDefault = 0x0,
@@ -93,7 +92,6 @@ struct tTVPMessageReceiverRecord
 	{ return Proc(const_cast<void*>(UserData), Message); }	
 };
 class tTJSNI_Window;
-class TTVPMenuContainerForm;
 struct tTVPRect;
 class tTVPBaseBitmap;
 class tTVPWheelDirectInputDevice; // class for DirectInputDevice management
@@ -103,7 +101,6 @@ class TTVPWindowForm : public TML::Window {
 	static const int TVP_MOUSE_MAX_ACCEL = 30;
 	static const int TVP_MOUSE_SHIFT_ACCEL = 40;
 private:
-	TML::WindowMenu* MainMenu;
 
 	bool InMode;
 	//bool Focusable;
@@ -126,8 +123,6 @@ private:
 	int LastMouseDownX, LastMouseDownY; // in Layer coodinates
 	
 	POINT LastMouseMovedPos;  // in Layer coodinates
-	/** フルスクリーン用のメニュー表示コンテナ */
-	class TTVPMenuContainerForm* MenuContainer;
 	//-- full screen managemant related
 	int InnerWidthSave;
 	int InnerHeightSave;
@@ -175,17 +170,11 @@ private:
 	tjs_int ZoomNumer; // Zooming factor numerator (setting)
 	tjs_int ActualZoomDenom; // Zooming factor denominator (actual)
 	tjs_int ActualZoomNumer; // Zooming factor numerator (actual)
-
-	//-- menu related
-	bool MenuBarVisible;
 	
 	DWORD LastRecheckInputStateSent;
 private:
 	void SetDrawDeviceDestRect();
 	void TranslateWindowToPaintBox(int &x, int &y);
-	void DestroyMenuContainer();
-	void CreateMenuContainer();
-	void CheckMenuBarDrop();
 
 	void FirePopupHide();
 	bool CanSendPopupHide() const { return /*!Focusable &&*/ GetVisible() && GetStayOnTop(); }
@@ -289,15 +278,10 @@ public:
 	void SendCloseMessage();
 	
 	void ZoomRectangle( tjs_int & left, tjs_int & top, tjs_int & right, tjs_int & bottom);
-	
-	HWND GetMenuOwnerWindowHandle();
+
 	HWND GetSurfaceWindowHandle();
 	HWND GetWindowHandle(tjs_int &ofsx, tjs_int &ofsy);
 	HWND GetWindowHandleForPlugin();
-
-	void SetMenuBarVisible(bool b);
-	bool GetMenuBarVisible() const;
-	void RevertMenuBarVisible();
 
 	//-- form mode
 	bool GetFormEnabled();
@@ -328,9 +312,6 @@ public:
 	
 	void SetAttentionPoint(tjs_int left, tjs_int top, class TFont *font);
 	void DisableAttentionPoint();
-
-	class TMenuItem* GetMainMenuItems() {return NULL;}
-
 	
 	void InvokeShowVisible();
 	void InvokeShowTop(bool activate = true);
@@ -353,9 +334,6 @@ public:
 	LRESULT WMEnable();
 	LRESULT WMSetFocus();
 	LRESULT WMKillFocus();
-
-	LRESULT WMEnterMenuLoop();
-	LRESULT WMExitMenuLoop();
 
 	LRESULT WMKeyDown();
 

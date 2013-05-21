@@ -18,7 +18,6 @@
 #include "DebugIntf.h"
 #include "EventIntf.h"
 #include "LayerBitmapIntf.h"
-//#include "MenuItemIntf.h"
 #include "LayerIntf.h"
 #include "SysInitIntf.h"
 #include "VideoOvlIntf.h"
@@ -134,7 +133,6 @@ tTJSNI_BaseWindow::tTJSNI_BaseWindow()
 {
 	ObjectVectorLocked = false;
 	DrawBuffer = NULL;
-	MenuItemObject = NULL;
 	WindowExposedRegion.clear();
 	WindowUpdating = false;
 	DrawDevice = NULL;
@@ -228,14 +226,6 @@ tTJSNI_BaseWindow::Invalidate()
 		{
 			TVPAddLog(e.GetMessage()); // just in case, log the error
 		}
-	}
-
-	// invalidate menu object
-	if(MenuItemObject)
-	{
-		MenuItemObject->Invalidate(0, NULL, NULL, MenuItemObject);
-		MenuItemObject->Release();
-		MenuItemObject = NULL;
 	}
 
 	// remove all events (again)
@@ -594,21 +584,6 @@ void TJS_INTF_METHOD tTJSNI_BaseWindow::NotifySrcResize()
 		TVPThrowExceptionMessage(TVPInvalidMethodInUpdating);
 }
 
-#pragma message( __LOC__ "Menu クラス無効化" )
-#if 0
-//---------------------------------------------------------------------------
-iTJSDispatch2 * tTJSNI_BaseWindow::GetMenuItemObjectNoAddRef()
-{
-	// return MenuItemObject
-	if(MenuItemObject) return MenuItemObject;
-
-	// create MenuItemObect
-	if(!Owner) 	TVPThrowExceptionMessage(TVPInternalError,
-			TJS_W("tTJSNI_BaseWindow::GetMenuItemObjectNoAddRef"));
-	MenuItemObject = TVPCreateMenuItemObject(Owner);
-	return MenuItemObject;
-}
-#endif
 //---------------------------------------------------------------------------
 void tTJSNI_BaseWindow::RegisterVideoOverlayObject(tTJSNI_BaseVideoOverlay * ovl)
 {
@@ -1582,25 +1557,6 @@ TJS_BEGIN_NATIVE_PROP_DECL(mouseCursorState)
 	TJS_END_NATIVE_PROP_SETTER
 }
 TJS_END_NATIVE_PROP_DECL(mouseCursorState)
-	
-#pragma message( __LOC__ "Menu クラス無効化" )
-#if 0
-//----------------------------------------------------------------------
-TJS_BEGIN_NATIVE_PROP_DECL(menu)
-{
-	TJS_BEGIN_NATIVE_PROP_GETTER
-	{
-		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
-		iTJSDispatch2 *dsp = _this->GetMenuItemObjectNoAddRef();
-		*result = tTJSVariant(dsp, dsp);
-		return TJS_S_OK;
-	}
-	TJS_END_NATIVE_PROP_GETTER
-
-	TJS_DENY_NATIVE_PROP_SETTER
-}
-TJS_END_NATIVE_PROP_DECL(menu)
-#endif
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_PROP_DECL(fullScreen)
 {

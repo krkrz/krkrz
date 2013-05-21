@@ -6,7 +6,6 @@
 #include "stdafx.h"
 #include "tjsCommHead.h"
 #include "tvpinputdefs.h"
-#include "WindowMenu.h"
 
 #include "ImeControl.h"
 
@@ -231,7 +230,6 @@ public:
 		return 0 != (flags_&FALG_FULLSCREEN);
 	}
 
-	void SetMenu( class WindowMenu* menu );
 	int ShowModal();
 
 	void GetClientRect( struct tTVPRect& rt );

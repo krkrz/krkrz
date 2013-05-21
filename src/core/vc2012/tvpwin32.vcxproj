@@ -127,7 +127,6 @@
     <ClInclude Include="..\environ\win32\FileStream.h" />
     <ClInclude Include="..\environ\win32\InputStringForm.h" />
     <ClInclude Include="..\environ\win32\MainFormUnit.h" />
-    <ClInclude Include="..\environ\win32\MenuContainerForm.h" />
     <ClInclude Include="..\environ\win32\MouseCursor.h" />
     <ClInclude Include="..\environ\win32\Screen.h" />
     <ClInclude Include="..\environ\win32\StringUtil.h" />
@@ -139,7 +138,6 @@
     <ClInclude Include="..\environ\win32\VersionFormUnit.h" />
     <ClInclude Include="..\environ\win32\WideNativeFuncs.h" />
     <ClInclude Include="..\environ\win32\WindowFormUnit.h" />
-    <ClInclude Include="..\environ\win32\WindowMenu.h" />
     <ClInclude Include="..\msg\MsgIntf.h" />
     <ClInclude Include="..\msg\svn_revision.h" />
     <ClInclude Include="..\msg\win32\MsgImpl.h" />
@@ -276,7 +274,6 @@
     <ClCompile Include="..\environ\win32\VersionFormUnit.cpp" />
     <ClCompile Include="..\environ\win32\WideNativeFuncs.cpp" />
     <ClCompile Include="..\environ\win32\WindowFormUnit.cpp" />
-    <ClCompile Include="..\environ\win32\WindowMenu.cpp" />
     <ClCompile Include="..\msg\MsgIntf.cpp" />
     <ClCompile Include="..\msg\win32\MsgImpl.cpp" />
     <ClCompile Include="..\msg\win32\OptionsDesc.cpp" />

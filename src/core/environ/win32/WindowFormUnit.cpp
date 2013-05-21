@@ -15,7 +15,6 @@
 #include "tjsArray.h"
 #include "StorageIntf.h"
 #include "MsgIntf.h"
-#include "MenuContainerForm.h"
 #include "MainFormUnit.h"
 #include "SysInitIntf.h"
 #include "PluginImpl.h"
@@ -200,8 +199,6 @@ TTVPWindowForm::TTVPWindowForm( TApplication* app, tTJSNI_Window* ni ) : TML::Wi
 	ProgramClosing = false;
 	InnerWidthSave = GetInnerWidth();
 	InnerHeightSave = GetInnerHeight();
-	MenuContainer = NULL;
-	MenuBarVisible = true;
 
 	AttentionFont = new TFont();
 	
@@ -235,8 +232,6 @@ TTVPWindowForm::TTVPWindowForm( TApplication* app, tTJSNI_Window* ni ) : TML::Wi
 	ReloadDeviceTick = 0;
 	
 	LastRecheckInputStateSent = 0;
-
-	MainMenu = NULL;
 }
 TTVPWindowForm::~TTVPWindowForm() {
 	Application->RemoveWindow(this);
@@ -322,22 +317,9 @@ void TTVPWindowForm::TickBeat(){
 	// called every 50ms intervally
 	DWORD tickcount = static_cast<DWORD>(TVPGetTickCount());
 	bool focused = HasFocus();
-	/*
-	bool showingmenu = InMenuLoop;
-	if( MenuContainer ) {
-		focused = focused || MenuContainer->Focused();
-		showingmenu = showingmenu || MenuContainer->GetShowingMenu();
-	}
-	*/
-
-	// set mouse cursor state
-	//SetForceMouseCursorVisible(showingmenu);
-
-	// watch menu bar drop
-	//if(focused && !showingmenu) CheckMenuBarDrop();
 
 	// mouse key
-	if(UseMouseKey && /*PaintBox && !showingmenu &&*/ focused) {
+	if(UseMouseKey &&  focused) {
 		GenerateMouseEvent(false, false, false, false);
 	}
 
@@ -352,7 +334,7 @@ void TTVPWindowForm::TickBeat(){
 	tjs_uint32 shift = TVPGetCurrentShiftKeyState();
 	if( TVPWheelDetectionType == wdtDirectInput ) {
 		CreateDirectInputDevice();
-		if( /*!showingmenu && */ focused && TJSNativeInstance && DIWheelDevice /*&& PaintBox*/ ) {
+		if( focused && TJSNativeInstance && DIWheelDevice /*&& PaintBox*/ ) {
 			tjs_int delta = DIWheelDevice->GetWheelDelta();
 			if( delta ) {
 				POINT origin = {0,0};
@@ -373,7 +355,7 @@ void TTVPWindowForm::TickBeat(){
 	if( TVPJoyPadDetectionType == jdtDirectInput ) {
 		CreateDirectInputDevice();
 		if( DIPadDevice && TJSNativeInstance /*&& PaintBox*/ ) {
-			if( /*!showingmenu &&*/ focused )
+			if( focused )
 				DIPadDevice->UpdateWithCurrentState();
 			else
 				DIPadDevice->UpdateWithSuspendedState();
@@ -640,8 +622,6 @@ void TTVPWindowForm::SetFullScreenMode( bool b ) {
 			ScrollBox->Height = sb_h;
 			*/
 
-			// float menu bar
-			CreateMenuContainer();
 
 			// re-adjust video rect
 			if(TJSNativeInstance) TJSNativeInstance->ReadjustVideoRect();
@@ -656,9 +636,6 @@ void TTVPWindowForm::SetFullScreenMode( bool b ) {
 			SetWindowPos( GetHandle(), HWND_TOP, 0, 0, 0, 0, SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOREPOSITION|SWP_NOSIZE|SWP_SHOWWINDOW );
 		} else {
 			if(TVPFullScreenedWindow != this) return;
-
-			// dock menu bar
-			DestroyMenuContainer();
 
 			// revert from fullscreen
 			TVPRevertFromFullScreen( GetHandle() );
@@ -701,20 +678,7 @@ void TTVPWindowForm::SetFullScreenMode( bool b ) {
 bool TTVPWindowForm::GetFullScreenMode() const { 
 	return false;
 }
-void TTVPWindowForm::CreateMenuContainer() {
-	if( !MenuContainer ) {
-		// create MenuContainer
-#pragma message( __LOC__ "TODO" )
-		// MenuContainer = new TTVPMenuContainerForm(this);
-	}
-}
-void TTVPWindowForm::DestroyMenuContainer() {
-	if( MenuContainer ) {
-		// delete MeunContainer
-		delete MenuContainer;
-		MenuContainer = NULL;
-	}
-}
+
 void TTVPWindowForm::CallWindowDetach(bool close) {
 	if( TJSNativeInstance ) TJSNativeInstance->GetDrawDevice()->SetTargetWindow( NULL, false );
 
@@ -899,15 +863,6 @@ void TTVPWindowForm::ZoomRectangle( tjs_int& left, tjs_int& top, tjs_int& right,
 	bottom = MulDiv(bottom,  ActualZoomNumer, ActualZoomDenom);
 }
 
-HWND TTVPWindowForm::GetMenuOwnerWindowHandle() {
-	if(MenuContainer) {
-		// this is a quick hack which let MenuContainer be visible,
-		// because the menu owner window must be visible to receive menu command.
-		MenuContainer->PrepareToReceiveMenuCommand();
-		return MenuContainer->GetHandle();
-	}
-	return GetHandle();
-}
 HWND TTVPWindowForm::GetSurfaceWindowHandle() {
 	return GetHandle();
 }
@@ -932,19 +887,6 @@ HWND TTVPWindowForm::GetWindowHandleForPlugin() {
 	return GetHandle();
 }
 
-void TTVPWindowForm::SetMenuBarVisible( bool b ) { 
-	MenuBarVisible = b;
-	SetMenu( b ? MainMenu : NULL );
-}
-bool TTVPWindowForm::GetMenuBarVisible() const {
-	return MenuBarVisible;
-}
-/**
- メニューバー表示を復元
- */
-void TTVPWindowForm::RevertMenuBarVisible() {
-	SetMenu( MenuBarVisible ? MainMenu : NULL );
-}
 void TTVPWindowForm::ResetDrawDevice() {
 	NextSetWindowHandleToDrawDevice = true;
 	LastSentDrawDeviceDestRect.clear();
@@ -1320,13 +1262,6 @@ LRESULT TTVPWindowForm::WMKillFocus() {
 	return 0;
 }
 
-LRESULT TTVPWindowForm::WMEnterMenuLoop() {
-	return 0;
-}
-LRESULT TTVPWindowForm::WMExitMenuLoop() {
-	return 0;
-}
-
 LRESULT TTVPWindowForm::WMKeyDown() {
 	return 0;
 }
@@ -1411,16 +1346,6 @@ void TTVPWindowForm::DeliverPopupHide() {
 	}
 }
 
-void TTVPWindowForm::CheckMenuBarDrop() {
-	if( MenuContainer && MenuBarVisible && GetWindowActive() ) {
-		POINT pos = {0, GetHeight()};
-		::GetCursorPos(&pos);
-		if( pos.y <= 0 ) {
-#pragma message(__LOC__ "TODO" )
-			//MenuContainer->StartDropWatch();
-		}
-	}
-}
 void TTVPWindowForm::InvokeShowVisible() {
 	// this posts window message which invokes WMShowVisible
 	::PostMessage( GetHandle(), TVP_WM_SHOWVISIBLE, 0, 0);
@@ -1446,7 +1371,6 @@ void TTVPWindowForm::OnMouseMove( int shift, int x, int y ) {
 		TVPPostInputEvent( new tTVPOnMouseMoveInputEvent(TJSNativeInstance, x, y, s), TVP_EPT_DISCARDABLE );
 	}
 
-	CheckMenuBarDrop();
 	RestoreMouseCursor();
 
 	int pos = (y << 16) + x;

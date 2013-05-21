@@ -6,7 +6,6 @@
 #include <vector>
 #include <windowsx.h>
 #include "MainFormUnit.h"
-#include "WindowMenu.h"
 #include "Exception.h"
 #include "Application.h"
 #include "Resource.h"
@@ -680,13 +679,7 @@ void Window::GetClientRect( struct tTVPRect& rt ) {
 	rt.bottom = r.bottom;
 	rt.right = r.right;
 }
-void Window::SetMenu( class WindowMenu* menu ) {
-	if( menu ) {
-		::SetMenu( GetHandle(), menu->GetHandle() );
-	} else {
-		::SetMenu( GetHandle(), NULL );
-	}
-}
+
 int Window::ShowModal() {
 	if( GetVisible() || !GetEnable() ) {
 		throw Exception("Cannot Show Modal.");
