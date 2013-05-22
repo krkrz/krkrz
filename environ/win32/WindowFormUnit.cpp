@@ -258,6 +258,41 @@ enum {
 	CM_MOUSELEAVE = CM_BASE + 20,
 };
 
+bool TTVPWindowForm::FindKeyTrapper(LRESULT &result, UINT msg, WPARAM wparam, LPARAM lparam) {
+	// find most recent "trapKeys = true" window.
+	tjs_int count = TVPGetWindowCount();
+	for( tjs_int i = count - 1; i >= 0; i-- ) {
+		tTJSNI_Window * win = TVPGetWindowListAt(i);
+		if( win ) {
+			TTVPWindowForm * form = win->GetForm();
+			if( form ) {
+				if( form->TrapKeys && form->GetVisible() ) {
+					// found
+					return form->ProcessTrappedKeyMessage(result, msg, wparam, lparam);
+				}
+			}
+		}
+	}
+	// not found
+	return false;
+}
+bool TTVPWindowForm::ProcessTrappedKeyMessage(LRESULT &result, UINT msg, WPARAM wparam, LPARAM lparam) {
+	// perform key message
+	if( msg == WM_KEYDOWN ) {
+		CanReceiveTrappedKeys = true;
+			// to prevent receiving a key, which is pushed when the window is just created
+	}
+
+	if( CanReceiveTrappedKeys ) {
+		InReceivingTrappedKeys = true;
+		result = TML::Window::Proc( GetHandle(), msg, wparam, lparam );
+		InReceivingTrappedKeys = false;
+	}
+	if( msg == WM_KEYUP ) 	{
+		CanReceiveTrappedKeys = true;
+	}
+	return true;
+}
 LRESULT WINAPI TTVPWindowForm::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam ) {
 	tTVPWindowMessage Message;
 	Message.LParam = lParam;
@@ -265,6 +300,35 @@ LRESULT WINAPI TTVPWindowForm::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
 	Message.Msg = msg;
 	Message.Result = 0;
 	if( DeliverMessageToReceiver( Message) ) return Message.Result;
+
+	if( Message.Msg == WM_SYSCOMMAND ) {
+		long subcom = Message.WParam & 0xfff0;
+		bool ismain = false;
+		if( TJSNativeInstance ) ismain = TJSNativeInstance->IsMainWindow();
+		if( ismain ) {
+			if( subcom == SC_MINIMIZE && !Application->IsIconic() ) {
+				Application->Minimize();
+				return;
+			}
+			if(subcom == SC_RESTORE && Application->IsIconic() ) {
+				Application->Restore();
+				return;
+			}
+		}
+	} else if(!InReceivingTrappedKeys // to prevent infinite recursive call
+		&& Message.Msg >= WM_KEYFIRST && Message.Msg <= WM_KEYLAST ) {
+		// hide popups when alt key is pressed
+		if(Message.Msg == WM_SYSKEYDOWN && !CanSendPopupHide())
+			DeliverPopupHide();
+
+		// drain message to key trapping window
+		LRESULT res;
+		if(FindKeyTrapper(res, Message.Msg, Message.WParam, Message.LParam))
+		{
+			Message.Result = res;
+			return;
+		}
+	}
 	//switch( msg )
 	{
 		/*
