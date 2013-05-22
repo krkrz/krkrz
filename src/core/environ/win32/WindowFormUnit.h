@@ -204,6 +204,9 @@ private:
 
 	int ConvertImeMode( tTVPImeMode mode );
 	void OffsetClientPoint( int &x, int &y );
+	
+	static bool FindKeyTrapper(LRESULT &result, UINT msg, WPARAM wparam, LPARAM lparam);
+	bool ProcessTrappedKeyMessage(LRESULT &result, UINT msg, WPARAM wparam, LPARAM lparam);
 protected:
 	LRESULT WINAPI Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
 

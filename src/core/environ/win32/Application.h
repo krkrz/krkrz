@@ -116,6 +116,15 @@ public:
 	bool IsAttachConsole() { return is_attach_console_; }
 
 	HWND GetHandle();
+	bool IsIconic() {
+		HWND hWnd = GetHandle();
+		if( hWnd != INVALID_HANDLE_VALUE ) {
+			return 0 != ::IsIconic(hWnd);
+		}
+		return true; // そもそもウィンドウがない
+	}
+	void Minimize();
+	void Restore();
 
 	void AddWindow( class TTVPWindowForm* win ) {
 		windows_list_.push_back( win );
@@ -150,7 +159,9 @@ public:
 	static inline int MessageDlg( const std::string& string, const std::string& caption, int type ) {
 		::MessageBox( NULL, string.c_str(), caption.c_str(), type  );
 	}
-	void Terminate() {}
+	void Terminate() {
+		::PostQuitMessage(0);
+	}
 	void SetHintHidePause( int v ) {}
 	void SetShowHint( bool b ) {}
 	void SetShowMainForm( bool b ) {}

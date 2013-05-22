@@ -294,6 +294,18 @@ HWND TApplication::GetHandle() {
 		return INVALID_HANDLE_VALUE;
 	}
 }
+void TApplication::Minimize() {
+	size_t size = windows_list_.size();
+	for( size_t i = 0; i < size; i++ ) {
+		::ShowWindow( windows_list_[i]->GetHandle(), SW_MINIMIZE );
+	}
+}
+void TApplication::Restore() {
+	size_t size = windows_list_.size();
+	for( size_t i = 0; i < size; i++ ) {
+		::ShowWindow( windows_list_[i]->GetHandle(), SW_RESTORE );
+	}
+}
 
 void TApplication::ShowException( class Exception* e ) {
 	::MessageBox( NULL, e->what(), "ívñΩìIÇ»ÉGÉâÅ[", MB_OK );
