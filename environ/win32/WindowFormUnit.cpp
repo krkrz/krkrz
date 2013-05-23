@@ -370,8 +370,8 @@ LRESULT WINAPI TTVPWindowForm::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
 		return WMNCRButtonDown();
 	default:
 		*/
-		return TML::Window::Proc( hWnd, msg, wParam, lParam );
 	}
+	return TML::Window::Proc( hWnd, msg, wParam, lParam );
 }
 bool TTVPWindowForm::GetFormEnabled() { 
 	return TRUE == ::IsWindowEnabled(GetHandle());

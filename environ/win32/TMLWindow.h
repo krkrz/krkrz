@@ -40,6 +40,7 @@ protected:
 	SIZE			min_size_;
 	SIZE			max_size_;
 	int				border_style_;
+	bool			in_window_;
 
 	int ModalResult;
 
@@ -107,7 +108,8 @@ protected:
 	HICON GetBigIcon();
 public:
 	Window()
-	: window_handle_(NULL), created_(false), LeftDoubleClick(false), ime_control_(NULL), border_style_(0), ModalResult(0) {
+	: window_handle_(NULL), created_(false), LeftDoubleClick(false), ime_control_(NULL), border_style_(0), ModalResult(0),
+		in_window_(false) {
 		min_size_.cx = min_size_.cy = 0;
 		max_size_.cx = max_size_.cy = 0;
 	}
@@ -238,8 +240,8 @@ public:
 	virtual void OnActive( HWND preactive ) {}
 	virtual void OnDeactive( HWND postactive ) {}
 	virtual void OnClose( CloseAction& action ){}
-	virtual void OnFocus() {}
-	virtual void OnFocusLost() {}
+	virtual void OnFocus(HWND hFocusLostWnd) {}
+	virtual void OnFocusLost(HWND hFocusingWnd) {}
 	virtual void OnMouseDown( int button, int shift, int x, int y ){}
 	virtual void OnMouseUp( int button, int shift, int x, int y ){}
 	virtual void OnMouseMove( int shift, int x, int y ){}
@@ -249,7 +251,18 @@ public:
 	virtual void OnKeyUp( WORD vk, int shift ){}
 	virtual void OnKeyDown( WORD vk, int shift, int repreat, bool prevkeystate ){}
 	virtual void OnKeyPress( WORD vk, int repreat, bool prevkeystate, bool convertkey ){}
+	virtual void OnMove( int x, int y ) {}
+	virtual void OnDropFile( HDROP hDrop ) {}
+	virtual int OnMouseActivate( HWND hTopLevelParentWnd, WORD hitTestCode, WORD MouseMsg ) { return MA_ACTIVATE; }
+	virtual void OnEnable( bool enabled ) {}
+	virtual void OnEnterMenuLoop( bool entered ) {}
+	virtual void OnExitMenuLoop( bool isShortcutMenu ) {}
+	virtual void OnDeviceChange( int event, void *data ) {}
+	virtual void OnNonClientMouseDown( int button, int hittest, int x, int y ){}
+	virtual void OnMouseEnter() {}
+	virtual void OnMouseLeave() {}
 };
+
 
 
 };

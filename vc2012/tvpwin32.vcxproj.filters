@@ -873,9 +873,6 @@
     <None Include="binary1.bin">
       <Filter>リソース ファイル</Filter>
     </None>
-    <None Include="optionarea.bin">
-      <Filter>リソース ファイル</Filter>
-    </None>
     <None Include="text1.bin">
       <Filter>リソース ファイル</Filter>
     </None>
