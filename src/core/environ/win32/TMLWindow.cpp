@@ -59,11 +59,25 @@ LRESULT WINAPI Window::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 		0x0020 (MK_XBUTTON1) 	Windows 2000/XP： 1番目の X ボタンが押されています。
 		0x0040 (MK_XBUTTON2)	Windows 2000/XP： 2番目の X ボタンが押されています。
 		*/
+	case WM_MOUSELEAVE:
+		OnMouseLeave();
+		in_window_ = false;
+		return 0;
+
 	case WM_MOUSEWHEEL:
 		OnMouseWheel( GET_WHEEL_DELTA_WPARAM(wParam), GetShiftState(wParam), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
 		return 0;
 
 	case WM_MOUSEMOVE:
+		if( in_window_ == false ) {
+			OnMouseEnter();
+			in_window_ = true;
+			TRACKMOUSEEVENT tme;
+            tme.cbSize = sizeof(TRACKMOUSEEVENT);
+            tme.dwFlags = TME_LEAVE;
+            tme.hwndTrack = hWnd;
+            ::TrackMouseEvent( &tme ); // エラーはハンドリングしてもあまり意味無いので無視
+		}
 		OnMouseMove( GetShiftState(wParam), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
 		return 0;
 
@@ -195,10 +209,10 @@ LRESULT WINAPI Window::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 		return 0;
 		
 	case WM_SETFOCUS:
-		OnFocus();
+		OnFocus( reinterpret_cast<HWND>(wParam) );
 		return ::DefWindowProc(hWnd,msg,wParam,lParam);
 	case WM_KILLFOCUS:
-		OnFocusLost();
+		OnFocusLost( reinterpret_cast<HWND>(wParam) );
 		return ::DefWindowProc(hWnd,msg,wParam,lParam);
 	case WM_GETMINMAXINFO:
 		if( min_size_.cx != 0 ||  min_size_.cy != 0 || max_size_.cx != 0 || max_size_.cy != 0 ) {
@@ -241,6 +255,32 @@ LRESULT WINAPI Window::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 		OnDestroy();
 		PostQuitMessage( 0 );
 		return 0;
+	case WM_MOVE:
+		OnMove( GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
+		break;
+	case WM_DROPFILES:
+		OnDropFile( reinterpret_cast<HDROP>(wParam) );
+		return 0;
+	case WM_MOUSEACTIVATE:
+		return OnMouseActivate( reinterpret_cast<HWND>(wParam), LOWORD(lParam), HIWORD(lParam) );
+	case WM_ENABLE:
+		OnEnable( wParam != 0 );
+		break;
+	case WM_ENTERMENULOOP:
+		OnEnterMenuLoop( wParam != 0 );
+		break;
+	case WM_EXITMENULOOP:
+		OnExitMenuLoop( wParam != 0 );
+		break;
+	case WM_DEVICECHANGE:
+		OnDeviceChange( wParam, reinterpret_cast<void*>(lParam) );
+		break;
+	case WM_NCLBUTTONDOWN:
+		OnNonClientMouseDown( mbLeft, wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
+		break;
+	case WM_NCRBUTTONDOWN:
+		OnNonClientMouseDown( mbRight, wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
+		break;
 	default:
 		return ::DefWindowProc(hWnd,msg,wParam,lParam);
 	}
