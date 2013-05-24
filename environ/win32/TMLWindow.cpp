@@ -281,6 +281,13 @@ LRESULT WINAPI Window::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 	case WM_NCRBUTTONDOWN:
 		OnNonClientMouseDown( mbRight, wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
 		break;
+	case WM_SHOWWINDOW:
+		if( wParam ) {
+			OnShow( lParam );
+		} else {
+			OnHide( lParam );
+		}
+		break;
 	default:
 		return ::DefWindowProc(hWnd,msg,wParam,lParam);
 	}

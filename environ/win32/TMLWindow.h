@@ -4,6 +4,7 @@
 
 #include <string>
 #include "stdafx.h"
+#include <shellapi.h>
 #include "tjsCommHead.h"
 #include "tvpinputdefs.h"
 
@@ -261,6 +262,8 @@ public:
 	virtual void OnNonClientMouseDown( int button, int hittest, int x, int y ){}
 	virtual void OnMouseEnter() {}
 	virtual void OnMouseLeave() {}
+	virtual void OnShow( int status ) {}
+	virtual void OnHide( int status ) {}
 };
 
 

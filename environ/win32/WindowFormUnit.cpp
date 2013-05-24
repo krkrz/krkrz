@@ -308,11 +308,11 @@ LRESULT WINAPI TTVPWindowForm::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
 		if( ismain ) {
 			if( subcom == SC_MINIMIZE && !Application->IsIconic() ) {
 				Application->Minimize();
-				return;
+				return 0;
 			}
 			if(subcom == SC_RESTORE && Application->IsIconic() ) {
 				Application->Restore();
-				return;
+				return 0;
 			}
 		}
 	} else if(!InReceivingTrappedKeys // to prevent infinite recursive call
@@ -323,55 +323,44 @@ LRESULT WINAPI TTVPWindowForm::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
 
 		// drain message to key trapping window
 		LRESULT res;
-		if(FindKeyTrapper(res, Message.Msg, Message.WParam, Message.LParam))
-		{
+		if(FindKeyTrapper(res, Message.Msg, Message.WParam, Message.LParam)) {
 			Message.Result = res;
-			return;
+			return res;
 		}
 	}
-	//switch( msg )
-	{
-		/*
-	case WM_MOVE:
-		return WMMove();
-	case WM_DROPFILES:
-		return WMDropFiles();
-	case CM_MOUSEENTER:
-		return CMMouseEnter();
-	case CM_MOUSELEAVE:
-		return CMMouseLeave();
-	case WM_MOUSEACTIVATE:
-		return WMMouseActivate();
+	switch( msg ) {
 	case TVP_WM_SHOWVISIBLE:
-		return WMShowVisible();
+		WMShowVisible();
+		return 0;
 	case TVP_WM_SHOWTOP:
-		return WMShowTop();
+		WMShowTop(wParam);
+		return 0;
 	case TVP_WM_RETRIEVEFOCUS:
-		return WMRetrieveFocus();
+		WMRetrieveFocus();
+		return 0;
 	case TVP_WM_ACQUIREIMECONTROL:
-		return WMAcquireImeControl();
-	case WM_ENABLE:
-		return WMEnable();
-	case WM_SETFOCUS:
-		return WMSetFocus();
-	case WM_KILLFOCUS:
-		return WMKillFocus();
-	case WM_ENTERMENULOOP:
-		return WMEnterMenuLoop();
-	case WM_EXITMENULOOP:
-		return WMExitMenuLoop();
-	case WM_KEYDOWN:
-		return WMKeyDown();
-	case WM_DEVICECHANGE:
-		return WMDeviceChange();
-	case WM_NCLBUTTONDOWN:
-		return WMNCLButtonDown();
-	case WM_NCRBUTTONDOWN:
-		return WMNCRButtonDown();
+		WMAcquireImeControl();
+		return 0;
 	default:
-		*/
+		return TML::Window::Proc( hWnd, msg, wParam, lParam );
 	}
-	return TML::Window::Proc( hWnd, msg, wParam, lParam );
+}
+void TTVPWindowForm::WMShowVisible() {
+	SetVisible(true);
+}
+void TTVPWindowForm::WMShowTop( WPARAM wParam ) {
+	if( GetVisible() ) {
+		//if( wParam ) SetZOrder(true);
+		::SetWindowPos( GetHandle(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOREPOSITION|SWP_NOSIZE|SWP_SHOWWINDOW);
+	}
+}
+void TTVPWindowForm::WMRetrieveFocus() {
+	Application->BringToFront();
+	SetFocus( GetHandle() );
+}
+
+void TTVPWindowForm::WMAcquireImeControl() {
+	AcquireImeControl();
 }
 bool TTVPWindowForm::GetFormEnabled() { 
 	return TRUE == ::IsWindowEnabled(GetHandle());
@@ -1289,57 +1278,6 @@ void TTVPWindowForm::FreeDirectInputDevice() {
 		DIPadDevice = NULL;
 	}
 }
-LRESULT TTVPWindowForm::CMMouseEnter() {
-	return 0;
-}
-LRESULT TTVPWindowForm::CMMouseLeave() {
-	return 0;
-}
-LRESULT TTVPWindowForm::WMMouseActivate() {
-	return 0;
-}
-LRESULT TTVPWindowForm::WMMove() {
-	return 0;
-}
-LRESULT TTVPWindowForm::WMDropFiles() {
-	return 0;
-}
-LRESULT TTVPWindowForm::WMShowVisible() {
-	return 0;
-}
-LRESULT TTVPWindowForm::WMShowTop() {
-	return 0;
-}
-LRESULT TTVPWindowForm::WMRetrieveFocus() {
-	return 0;
-}
-LRESULT TTVPWindowForm::WMAcquireImeControl() {
-	return 0;
-}
-LRESULT TTVPWindowForm::WMEnable() {
-	return 0;
-}
-LRESULT TTVPWindowForm::WMSetFocus() {
-	return 0;
-}
-LRESULT TTVPWindowForm::WMKillFocus() {
-	return 0;
-}
-
-LRESULT TTVPWindowForm::WMKeyDown() {
-	return 0;
-}
-
-LRESULT TTVPWindowForm::WMDeviceChange() {
-	return 0;
-}
-
-LRESULT TTVPWindowForm::WMNCLButtonDown() {
-	return 0;
-}
-LRESULT TTVPWindowForm::WMNCRButtonDown() {
-	return 0;
-}
 
 void TTVPWindowForm::OnKeyDown( WORD vk, int shift, int repreat, bool prevkeystate ) {
 	if(TJSNativeInstance) {
@@ -1497,4 +1435,112 @@ void TTVPWindowForm::OnDeactive( HWND postactive ) {
 	if( TJSNativeInstance ) {
 		TVPPostInputEvent( new tTVPOnReleaseCaptureInputEvent(TJSNativeInstance) );
 	}
+}
+void TTVPWindowForm::OnMove( int x, int y ) {
+	if(TJSNativeInstance) {
+		TJSNativeInstance->WindowMoved();
+	}
+}
+void TTVPWindowForm::OnDropFile( HDROP hDrop ) {
+	TCHAR filename[MAX_PATH];
+	tjs_int filecount= ::DragQueryFile(hDrop, 0xFFFFFFFF, NULL, MAX_PATH);
+	iTJSDispatch2 * array = TJSCreateArrayObject();
+	try {
+		tjs_int count = 0;
+		for( tjs_int i = filecount-1; i>=0; i-- ) {
+			::DragQueryFile( hDrop, i, filename, MAX_PATH );
+			WIN32_FIND_DATA fd;
+			HANDLE h;
+			// existence checking
+			if((h = ::FindFirstFile(filename, &fd)) != INVALID_HANDLE_VALUE) {
+				::FindClose(h);
+				tTJSVariant val = TVPNormalizeStorageName(ttstr(filename));
+				// push into array
+				array->PropSetByNum(TJS_MEMBERENSURE|TJS_IGNOREPROP, count++, &val, array);
+			}
+		}
+		::DragFinish(hDrop);
+
+		tTJSVariant arg(array, array);
+		TVPPostInputEvent(  new tTVPOnFileDropInputEvent(TJSNativeInstance, arg));
+	} catch(...) {
+		array->Release();
+		throw;
+	}
+	array->Release();
+}
+/*
+int TTVPWindowForm::OnMouseActivate( HWND hTopLevelParentWnd, WORD hitTestCode, WORD MouseMsg ) {
+	if(!Focusable) {
+		// override default action (which activates the window)
+		if( hitTestCode == HTCLIENT )
+			return MA_NOACTIVATE;
+		else
+			return MA_NOACTIVATEANDEAT;
+	} else {
+		return MA_ACTIVATE;
+	}
+}
+*/
+void TTVPWindowForm::OnEnable( bool enabled ) {
+	// enabled status has changed
+	if(TJSNativeInstance) {
+		TVPPostInputEvent( new tTVPOnReleaseCaptureInputEvent(TJSNativeInstance));
+	}
+}
+/*
+void TTVPWindowForm::OnEnterMenuLoop( bool entered ) {
+}
+void TTVPWindowForm::OnExitMenuLoop( bool isShortcutMenu ) {
+}
+*/
+void TTVPWindowForm::OnDeviceChange( int event, void *data ) {
+	if( event == DBT_DEVNODES_CHANGED ) {
+		// reload DInput device
+		ReloadDevice = true; // to reload device
+		ReloadDeviceTick = GetTickCount() + 4000; // reload at 4secs later
+	}
+}
+void TTVPWindowForm::OnNonClientMouseDown( int button, int hittest, int x, int y ) {
+	if(!CanSendPopupHide()) {
+		DeliverPopupHide();
+	}
+}
+void TTVPWindowForm::OnMouseEnter() {
+	// mouse entered in client area
+	DWORD tick = GetTickCount();
+	TVPPushEnvironNoise(&tick, sizeof(tick));
+	if(TJSNativeInstance) {
+		TVPPostInputEvent(new tTVPOnMouseEnterInputEvent(TJSNativeInstance));
+	}
+}
+void TTVPWindowForm::OnMouseLeave() {
+	// mouse leaved from client area
+	DWORD tick = GetTickCount();
+	TVPPushEnvironNoise(&tick, sizeof(tick));
+	if(TJSNativeInstance) {
+		TVPPostInputEvent( new tTVPOnMouseOutOfWindowInputEvent(TJSNativeInstance));
+		TVPPostInputEvent( new tTVPOnMouseLeaveInputEvent(TJSNativeInstance));
+	}
+}
+void TTVPWindowForm::OnShow( int status ) {
+	::DragAcceptFiles( GetHandle(), TRUE );
+	::PostMessage( GetHandle(), TVP_WM_ACQUIREIMECONTROL, 0, 0);
+}
+void TTVPWindowForm::OnHide( int status ) {
+}
+void TTVPWindowForm::OnFocus(HWND hFocusLostWnd) {
+	::PostMessage( GetHandle(), TVP_WM_ACQUIREIMECONTROL, 0, 0);
+
+	//if(PaintBox) CreateCaret(PaintBox->Parent->Handle, NULL, 1, 1);
+
+	if(DIPadDevice && TJSNativeInstance ) DIPadDevice->WindowActivated();
+	if(TJSNativeInstance) TJSNativeInstance->FireOnActivate(true);
+}
+void TTVPWindowForm::OnFocusLost(HWND hFocusingWnd) {
+	DestroyCaret();
+	UnacquireImeControl();
+
+	if(DIPadDevice && TJSNativeInstance ) DIPadDevice->WindowDeactivated();
+	if(TJSNativeInstance) TJSNativeInstance->FireOnActivate(false);
 }

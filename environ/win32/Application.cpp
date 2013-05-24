@@ -307,6 +307,12 @@ void TApplication::Restore() {
 	}
 }
 
+void TApplication::BringToFront() {
+	size_t size = windows_list_.size();
+	for( size_t i = 0; i < size; i++ ) {
+		windows_list_[i]->BringToFront();
+	}
+}
 void TApplication::ShowException( class Exception* e ) {
 	::MessageBox( NULL, e->what(), "ívñΩìIÇ»ÉGÉâÅ[", MB_OK );
 }
