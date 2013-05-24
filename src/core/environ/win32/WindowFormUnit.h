@@ -325,26 +325,6 @@ public:
 	void FreeDirectInputDevice();
 
 	// message hander
-	LRESULT CMMouseEnter();
-	LRESULT CMMouseLeave();
-	LRESULT WMMouseActivate();
-	LRESULT WMMove();
-	LRESULT WMDropFiles();
-	LRESULT WMShowVisible();
-	LRESULT WMShowTop();
-	LRESULT WMRetrieveFocus();
-	LRESULT WMAcquireImeControl();
-	LRESULT WMEnable();
-	LRESULT WMSetFocus();
-	LRESULT WMKillFocus();
-
-	LRESULT WMKeyDown();
-
-	LRESULT WMDeviceChange();
-
-	LRESULT WMNCLButtonDown();
-	LRESULT WMNCRButtonDown();
-	
 	virtual void OnActive( HWND preactive );
 	virtual void OnDeactive( HWND postactive );
 
@@ -360,6 +340,28 @@ public:
 	virtual void OnMouseDoubleClick( int button, int x, int y );
 	virtual void OnMouseClick( int button, int shift, int x, int y );
 	virtual void OnMouseWheel( int delta, int shift, int x, int y );
+
+	virtual void OnMove( int x, int y );
+	virtual void OnDropFile( HDROP hDrop );
+	// virtual int OnMouseActivate( HWND hTopLevelParentWnd, WORD hitTestCode, WORD MouseMsg );
+	virtual void OnEnable( bool enabled );
+	//virtual void OnEnterMenuLoop( bool entered );
+	//virtual void OnExitMenuLoop( bool isShortcutMenu );
+	virtual void OnDeviceChange( int event, void *data );
+	virtual void OnNonClientMouseDown( int button, int hittest, int x, int y );
+	virtual void OnMouseEnter();
+	virtual void OnMouseLeave();
+	virtual void OnShow( int status );
+	virtual void OnHide( int status );
+	
+	virtual void OnFocus(HWND hFocusLostWnd);
+	virtual void OnFocusLost(HWND hFocusingWnd);
+
+
+	void WMShowVisible();
+	void WMShowTop( WPARAM wParam );
+	void WMRetrieveFocus();
+	void WMAcquireImeControl();
 };
 
 #endif // __WINDOW_FORM_UNIT_H__

@@ -125,6 +125,7 @@ public:
 	}
 	void Minimize();
 	void Restore();
+	void BringToFront();
 
 	void AddWindow( class TTVPWindowForm* win ) {
 		windows_list_.push_back( win );
