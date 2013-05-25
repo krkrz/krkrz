@@ -23,7 +23,7 @@ class MouseCursor {
 		CURSOR_WAIT,		// 砂時計カーソル 
 		CURSOR_EOT,
 	};
-	static const LPSTR CURSORS[CURSOR_EOT];
+	static const LPTSTR CURSORS[CURSOR_EOT];
 	static HCURSOR CURSOR_HANDLES[CURSOR_EOT];
 	static const int INVALID_CURSOR_INDEX = 0x7FFFFFFF;
 	static bool is_cursor_hide_;

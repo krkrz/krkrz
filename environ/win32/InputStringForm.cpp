@@ -2,10 +2,11 @@
 #include "stdafx.h"
 #include "InputStringForm.h"
 #include "Resource.h"
+#include "tstring.h"
 
-static std::string Title;
-static std::string Caption;
-static std::string EditText;
+static tstring Title;
+static tstring Caption;
+static tstring EditText;
 
 static LRESULT WINAPI DlgProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam ) {
 	switch( msg ) {
@@ -21,10 +22,10 @@ static LRESULT WINAPI DlgProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 			::EndDialog(hWnd, IDOK);
 			return TRUE;
 		} else if(LOWORD(wParam) == IDCANCEL) {
-			char str[256];
+			TCHAR str[256];
 			str[0] = 0;
             GetDlgItemText( hWnd, IDC_EDIT_TEXT, str, 255 );
-			Caption = std::string(str);
+			Caption = tstring(str);
 			EndDialog(hWnd, IDCANCEL);
 			return TRUE;
 		}
@@ -37,7 +38,7 @@ static LRESULT WINAPI DlgProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 	}
 	return ::DefWindowProc(hWnd,msg,wParam,lParam);
 }
-bool InputQuery( const std::string& title, const std::string& caption, std::string& edit ) {
+bool InputQuery( const tstring& title, const tstring& caption, tstring& edit ) {
 	Title = title;
 	Caption = caption;
 	EditText = edit;

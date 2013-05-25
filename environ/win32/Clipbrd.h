@@ -28,13 +28,13 @@ inline void TVPCopyToClipboard(const ttstr & unicode)
 		try
 		{
 			// store ANSI string
-			std::string ansistr = unicode.AsStdString();
-			int ansistrlen = ansistr.length() + 1;
+			tstring ansistr = unicode.AsStdString();
+			int ansistrlen = (ansistr.length() + 1)*sizeof(TCHAR);
 			ansihandle = GlobalAlloc(GMEM_DDESHARE | GMEM_MOVEABLE, ansistrlen);
 			if(!ansihandle) throw std::exception("copying to clipboard failed.");
 
-			char *mem = (char*)GlobalLock(ansihandle);
-			if(mem) strncpy_s(mem, ansistrlen, ansistr.c_str(),ansistrlen);
+			TCHAR *mem = (TCHAR*)GlobalLock(ansihandle);
+			if(mem) _tcsncpy_s(mem, ansistrlen, ansistr.c_str(),ansistrlen);
 			GlobalUnlock(ansihandle);
 
 			::SetClipboardData( CF_TEXT, ansihandle );

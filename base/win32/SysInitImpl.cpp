@@ -49,8 +49,8 @@
 //---------------------------------------------------------------------------
 // global data
 //---------------------------------------------------------------------------
-std::string TVPNativeProjectDir;
-std::string TVPNativeDataPath;
+tstring TVPNativeProjectDir;
+tstring TVPNativeDataPath;
 bool TVPProjectDirSelected = false;
 bool TVPSystemIsBasedOnNT = false; // is system NT based ?
 //---------------------------------------------------------------------------
@@ -886,7 +886,7 @@ void TVPBeforeSystemInit()
 	}
 
 
-	char buf[MAX_PATH];
+	TCHAR buf[MAX_PATH];
 	bool bufset = false;
 	bool nosel = false;
 	bool forcesel = false;
@@ -904,17 +904,16 @@ void TVPBeforeSystemInit()
 		{
 			for(tjs_int i = 1; i<_argc; i++)
 			{
-				if(_argv[i][0] == '-' &&
-					_argv[i][1] == '-' && _argv[i][2] == 0)
+				if(_argv[i][0] == '-' && _argv[i][1] == '-' && _argv[i][2] == 0)
 					break;
 
 				if(_argv[i][0] != '-')
 				{
 					// TODO: set the current directory
-					strncpy(buf, _argv[i], MAX_PATH-1);
+					_tcsncpy(buf, ttstr(_argv[i]).c_str(), MAX_PATH-1);
 					buf[MAX_PATH-1] = '\0';
 					if(DirectoryExists(buf)) // is directory?
-						strcat(buf, "\\");
+						_tcscat(buf, _T("\\"));
 
 					TVPProjectDirSelected = true;
 					bufset = true;
@@ -930,10 +929,10 @@ void TVPBeforeSystemInit()
 		// sel option was set
 		if(bufset)
 		{
-			char path[MAX_PATH];
-			char *dum = 0;
+			TCHAR path[MAX_PATH];
+			TCHAR *dum = 0;
 			GetFullPathName(buf, MAX_PATH-1, path, &dum);
-			strcpy(buf, path);
+			_tcscpy(buf, path);
 			TVPProjectDirSelected = false;
 			bufset = true;
 		}
@@ -944,13 +943,13 @@ void TVPBeforeSystemInit()
 	// check "content-data" directory
 	if(!forcedataxp3 && !nosel)
 	{
-		char tmp[MAX_PATH];
-		strcpy(tmp, IncludeTrailingBackslash(ExtractFileDir(ExePath())).c_str());
-		strcat(tmp, "content-data");
+		TCHAR tmp[MAX_PATH];
+		_tcscpy(tmp, IncludeTrailingBackslash(ExtractFileDir(ExePath())).c_str());
+		_tcscat(tmp, _T("content-data"));
 		if(DirectoryExists(tmp))
 		{
-			strcat(tmp, "\\");
-			strcpy(buf, tmp);
+			_tcscat(tmp, _T("\\"));
+			_tcscpy(buf, tmp);
 			TVPProjectDirSelected = true;
 			bufset = true;
 			nosel = true;
@@ -960,12 +959,12 @@ void TVPBeforeSystemInit()
 	// check "data.xp3" archive
  	if(!nosel)
 	{
-		char tmp[MAX_PATH];
-		strcpy(tmp, IncludeTrailingBackslash(ExtractFileDir(ExePath())).c_str());
-		strcat(tmp, "data.xp3");
+		TCHAR tmp[MAX_PATH];
+		_tcscpy(tmp, IncludeTrailingBackslash(ExtractFileDir(ExePath())).c_str());
+		_tcscat(tmp, _T("data.xp3"));
 		if(FileExists(tmp))
 		{
-			strcpy(buf, tmp);
+			_tcscpy(buf, tmp);
 			TVPProjectDirSelected = true;
 			bufset = true;
 			nosel = true;
@@ -975,12 +974,12 @@ void TVPBeforeSystemInit()
 	// check "data.exe" archive
  	if(!nosel)
 	{
-		char tmp[MAX_PATH];
-		strcpy(tmp, IncludeTrailingBackslash(ExtractFileDir(ExePath())).c_str());
-		strcat(tmp, "data.exe");
+		TCHAR tmp[MAX_PATH];
+		_tcscpy(tmp, IncludeTrailingBackslash(ExtractFileDir(ExePath())).c_str());
+		_tcscat(tmp, _T("data.exe"));
 		if(FileExists(tmp))
 		{
-			strcpy(buf, tmp);
+			_tcscpy(buf, tmp);
 			TVPProjectDirSelected = true;
 			bufset = true;
 			nosel = true;
@@ -992,7 +991,7 @@ void TVPBeforeSystemInit()
 	{
 		if(TVPIsXP3Archive(TVPNormalizeStorageName(ExePath())))
 		{
-			strcpy(buf, ExePath().c_str());
+			_tcscpy(buf, ExePath().c_str());
 			TVPProjectDirSelected = true;
 			bufset = true;
 			nosel = true;
@@ -1003,13 +1002,13 @@ void TVPBeforeSystemInit()
 	// check "data" directory
 	if(!forcedataxp3 && !nosel)
 	{
-		char tmp[MAX_PATH];
-		strcpy(tmp, IncludeTrailingBackslash(ExtractFileDir(ExePath())).c_str());
-		strcat(tmp, "data");
+		TCHAR tmp[MAX_PATH];
+		_tcscpy(tmp, IncludeTrailingBackslash(ExtractFileDir(ExePath())).c_str());
+		_tcscat(tmp, _T("data"));
 		if(DirectoryExists(tmp))
 		{
-			strcat(tmp, "\\");
-			strcpy(buf, tmp);
+			_tcscat(tmp, _T("\\"));
+			_tcscpy(buf, tmp);
 			TVPProjectDirSelected = true;
 			bufset = true;
 			nosel = true;
@@ -1019,28 +1018,28 @@ void TVPBeforeSystemInit()
 	// decide a directory to execute or to show folder selection
 	if(!bufset)
 	{
-		if(forcedataxp3) throw EAbort("Aborted");
-		strcpy(buf, ExtractFileDir(ExePath()).c_str());
-		int curdirlen = strlen(buf);
+		if(forcedataxp3) throw EAbort(_T("Aborted"));
+		_tcscpy(buf, ExtractFileDir(ExePath()).c_str());
+		int curdirlen = _tcslen(buf);
 		if(buf[curdirlen-1] != '\\') buf[curdirlen] = '\\', buf[curdirlen+1] = 0;
 	}
 
+#pragma message (__LOC__ "TODO : 選択ダイアログを出す")
 	if(!forcedataxp3 && (!nosel || forcesel))
 	{
+#if 0
 		// load krdevui.dll ( TVP[KiRikiri] Development User Interface )
-		HMODULE krdevui = LoadLibrary("krdevui.dll");
+		HMODULE krdevui = LoadLibrary(_T("krdevui.dll"));
 		if(!krdevui)
 		{
-			std::string toolspath = (IncludeTrailingBackslash(
-					ExtractFilePath(ExePath())) + "tools\\krdevui.dll");
+			tstring toolspath = (IncludeTrailingBackslash( ExtractFilePath(ExePath())) + _T("tools\\krdevui.dll"));
 			krdevui = LoadLibrary(toolspath.c_str());
 		}
 
 		if(!krdevui)
 		{
 			// cannot locate the dll
-			throw Exception(
-				ttstr(TVPCannnotLocateUIDLLForFolderSelection).AsStdString());
+			throw Exception( ttstr(TVPCannnotLocateUIDLLForFolderSelection).AsStdString());
 		}
 
 		typedef int (PASCAL *UIShowFolderSelectorForm_t)(void *reserved, char *buf);
@@ -1090,6 +1089,7 @@ void TVPBeforeSystemInit()
 			// ok, prepare to execute the script
 			TVPProjectDirSelected = true;
 		}
+#endif
 	}
 
 	// check project dir and store some environmental variables
@@ -1098,10 +1098,10 @@ void TVPBeforeSystemInit()
 		Application->SetShowMainForm( false );
 	}
 
-	tjs_int buflen = strlen(buf);
+	tjs_int buflen = _tcslen(buf);
 	if(buflen >= 1)
 	{
-		if(buf[buflen-1] != '\\') buf[buflen] = static_cast<char>(TVPArchiveDelimiter), buf[buflen+1] = 0; // TODO ここのキャストはあまり好ましくないな
+		if(buf[buflen-1] != _T('\\')) buf[buflen] = static_cast<TCHAR>(TVPArchiveDelimiter), buf[buflen+1] = 0; // TODO ここのキャストはあまり好ましくないな
 	}
 
 	TVPProjectDir = TVPNormalizeStorageName(buf);
@@ -1394,15 +1394,15 @@ static std::vector<std::string> * TVPGetEmbeddedOptions()
 	return ret;
 }
 //---------------------------------------------------------------------------
-static std::vector<std::string> * TVPGetConfigFileOptions(const std::string& filename)
+static std::vector<std::string> * TVPGetConfigFileOptions(const tstring& filename)
 {
 	// load .cf file
-	std::string errmsg;
+	tstring errmsg;
 	if(!FileExists(filename))
-		errmsg = "file not found.";
+		errmsg = _T("file not found.");
 
 	std::vector<std::string> * ret = NULL; // new std::vector<std::string>();
-	if(errmsg == "")
+	if(errmsg == _T(""))
 	{
 		try
 		{
@@ -1419,7 +1419,7 @@ static std::vector<std::string> * TVPGetConfigFileOptions(const std::string& fil
 		}
 	}
 
-	if(errmsg != "")
+	if(errmsg != _T(""))
 		TVPAddImportantLog(ttstr("(info) Loading configuration file \"") + filename.c_str() +
 			"\" failed (ignoring) : " + errmsg.c_str());
 	else
@@ -1530,7 +1530,7 @@ static void PushConfigFileOptions(const std::vector<std::string> * options)
 	{
 		if( (*options)[j].c_str()[0] != ';') // unless comment
 			TVPProgramArguments.push_back(
-				TVPParseCommandLineOne(TJS_W("-") + ttstr((*options)[j])));
+			TVPParseCommandLineOne(TJS_W("-") + ttstr((*options)[j].c_str())));
 	}
 }
 //---------------------------------------------------------------------------
@@ -1559,7 +1559,7 @@ static void TVPInitProgramArgumentsAndDataPath(bool stop_after_datapath_got)
 
 			// read datapath
 			tTJSVariant val;
-			std::string config_datapath;
+			tstring config_datapath;
 			if(TVPGetCommandLine(TJS_W("-datapath"), &val))
 				config_datapath = ((ttstr)val).AsStdString();
 			TVPNativeDataPath = TConfMainFrame::GetDataPathDirectory(config_datapath, ExePath());
@@ -1725,7 +1725,7 @@ bool TVPCheckCmdDescription(void)
 			}
 			delete stream;
 
-			HANDLE handle = OpenEvent(EVENT_ALL_ACCESS, FALSE, _argv[i+3]);
+			HANDLE handle = OpenEvent(EVENT_ALL_ACCESS, FALSE, ttstr(_argv[i+3]).c_str() );
 			if(!handle) return true; // processed but errored
 			SetEvent(handle);
 			CloseHandle(handle);
@@ -1766,7 +1766,7 @@ bool TVPCheckAbout(void)
 //---------------------------------------------------------------------------
 // TVPExecuteAsync
 //---------------------------------------------------------------------------
-static void TVPExecuteAsync( const std::string& progname)
+static void TVPExecuteAsync( const tstring& progname)
 {
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
@@ -1778,7 +1778,7 @@ static void TVPExecuteAsync( const std::string& progname)
 	BOOL ret =
 		CreateProcess(
 			NULL,
-			const_cast<LPSTR>(progname.c_str()),
+			const_cast<LPTSTR>(progname.c_str()),
 			NULL,
 			NULL,
 			FALSE,
@@ -1806,7 +1806,7 @@ static void TVPExecuteAsync( const std::string& progname)
 //---------------------------------------------------------------------------
 // TVPWaitWritePermit
 //---------------------------------------------------------------------------
-static bool TVPWaitWritePermit(const std::string& fn)
+static bool TVPWaitWritePermit(const tstring& fn)
 {
 	tjs_int timeout = 10; // 10/1 = 5 seconds
 	while(true)

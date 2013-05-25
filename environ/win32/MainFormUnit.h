@@ -13,6 +13,7 @@
 //---------------------------------------------------------------------------
 #include <windows.h>
 #include <string>
+#include "tstring.h"
 //---------------------------------------------------------------------------
 class TTVPMainForm
 {
@@ -85,8 +86,8 @@ MB_RETRYCANCEL	ƒƒbƒZ[ƒWƒ{ƒbƒNƒX‚ÉmÄsnAmƒLƒƒƒ“ƒZƒ‹n‚ÌŠeƒvƒbƒVƒ…ƒ{ƒ^ƒ“‚
 MB_YESNO	ƒƒbƒZ[ƒWƒ{ƒbƒNƒX‚Ém‚Í‚¢nAm‚¢‚¢‚¦n‚ÌŠeƒvƒbƒVƒ…ƒ{ƒ^ƒ“‚ğ•\¦‚µ‚Ü‚·B
 MB_YESNOCANCEL	ƒƒbƒZ[ƒWƒ{ƒbƒNƒX‚Ém‚Í‚¢nAm‚¢‚¢‚¦nAmƒLƒƒƒ“ƒZƒ‹n‚ÌŠeƒvƒbƒVƒ…ƒ{ƒ^ƒ“‚ğ•\¦‚µ‚Ü‚·B
 */
-inline int MessageDlg( const std::string& string, int type, int buttons, void* helpCtx ) {
-	return ::MessageBox( NULL, string.c_str(), "", type | buttons );
+inline int MessageDlg( const tstring& string, int type, int buttons, void* helpCtx ) {
+	return ::MessageBox( NULL, string.c_str(), _T(""), type | buttons );
 }
 
 extern TTVPMainForm *TVPMainForm;

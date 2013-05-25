@@ -169,7 +169,7 @@ void AcceleratorKey::DelKey( WORD id ) {
 	delete[] keys_;
 	keys_ = table;
 }
-int APIENTRY WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPTSTR lpCmdLine, _In_ int nCmdShow ) {
+int APIENTRY WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow ) {
 	TVPInitWideNativeFunctions();
 
 	hInst = hInstance;
@@ -212,7 +212,7 @@ int APIENTRY WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
 		if(TVPCheckAbout()) return 0; // version information dialog box;
 
-		Application->SetTitle( "‹g—¢‹g—¢" );
+		Application->SetTitle( _T("‹g—¢‹g—¢") );
 		// Application->CreateForm(__classid(TTVPMainForm), &TVPMainForm);
 		TVPMainForm = new TTVPMainForm();
 
@@ -242,7 +242,7 @@ int APIENTRY WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		if(!TVPSystemUninitCalled)
 			Application->ShowException(&Exception(e.GetMessage().AsStdString()));
 	} catch(...) {
-		Application->ShowException(&Exception("Unknown error!"));
+		Application->ShowException(&Exception(_T("Unknown error!")));
 	}
 
 	if(engine_init) TVPUninitScriptEngine();
@@ -270,7 +270,7 @@ void TApplication::CheckConsole() {
 
 		TCHAR console[256];
 		::GetConsoleTitle( console, 256 );
-		console_title_ = std::string( console );
+		console_title_ = tstring( console );
 
 		//printf( __argv[0] );
 		printf("\n");
@@ -314,7 +314,7 @@ void TApplication::BringToFront() {
 	}
 }
 void TApplication::ShowException( class Exception* e ) {
-	::MessageBox( NULL, e->what(), "’v–½“I‚ÈƒGƒ‰[", MB_OK );
+	::MessageBox( NULL, e->what(), _T("’v–½“I‚ÈƒGƒ‰["), MB_OK );
 }
 void TApplication::Run() {
 	MSG msg;
@@ -363,7 +363,7 @@ void TApplication::Run() {
 	}
 }
 
-void TApplication::SetTitle( const std::string& caption ) {
+void TApplication::SetTitle( const tstring& caption ) {
 	title_ = caption;
 	if( windows_list_.size() > 0 ) {
 		windows_list_[0]->SetCaption( caption );
@@ -427,9 +427,9 @@ void TApplication::DeleteAcceleratorKeyTable( HWND hWnd ) {
 /**
  ‰¼ŽÀ‘• TODO
 */
-std::vector<std::string>* LoadLinesFromFile( const std::string& path ) {
+std::vector<std::string>* LoadLinesFromFile( const tstring& path ) {
 	FILE *fp = NULL;
-	fopen_s( &fp, path.c_str(), "r");
+	_tfopen_s( &fp, path.c_str(), _T("r"));
     if( fp == NULL ) {
 		return NULL;
     }

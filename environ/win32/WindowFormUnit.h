@@ -217,8 +217,8 @@ public:
 	static void DeliverPopupHide();
 
 	//-- properties
-	std::string GetCaption() const {
-		std::string ret;
+	tstring GetCaption() const {
+		tstring ret;
 		TML::Window::GetCaption( ret );
 		return ret;
 	}

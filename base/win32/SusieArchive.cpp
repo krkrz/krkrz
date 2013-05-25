@@ -71,9 +71,9 @@ public:
 
 	bool CheckSupported(tTVPLocalFileStream * stream, std::string localname);
 
-	void GetFileList(std::string localname, std::vector<tTVPSusieFileRecord> &dest);
+	void GetFileList(tstring localname, std::vector<tTVPSusieFileRecord> &dest);
 
-	tTJSBinaryStream * CreateStream(std::string localname,
+	tTJSBinaryStream * CreateStream(tstring localname,
 		unsigned long pos, unsigned long sise);
 
 	tTJSCriticalSection & GetCS() { return CS; }
@@ -111,14 +111,14 @@ bool tTVPSusieArchivePlugin::CheckSupported(tTVPLocalFileStream * stream,
 	return 0!=res;
 }
 //---------------------------------------------------------------------------
-void tTVPSusieArchivePlugin::GetFileList(std::string localname,
+void tTVPSusieArchivePlugin::GetFileList(tstring localname,
 	std::vector<tTVPSusieFileRecord> &dest)
 {
 	// retrieve file list
 	TVPAddLog(TJS_W("(info) Listing files in ") + ttstr(localname.c_str()) + TJS_W(" ..."));
 
 	HLOCAL infohandle = NULL;
-	int errorcode = 0xff&GetArchiveInfo(const_cast<LPSTR>(localname.c_str()), 0, 0x00, &infohandle);
+	int errorcode = 0xff&GetArchiveInfo(const_cast<LPSTR>(ttstr(localname).AsNarrowStdString().c_str()), 0, 0x00, &infohandle);
 	if(infohandle == NULL)
 	{
 		TVPThrowExceptionMessage(TVPSusiePluginError,
@@ -182,11 +182,11 @@ void tTVPSusieArchivePlugin::GetFileList(std::string localname,
 	TVPAddLog(TJS_W("(info) ") + ttstr((tjs_int)dest.size()) + TJS_W(" files found."));
 }
 //---------------------------------------------------------------------------
-tTJSBinaryStream * tTVPSusieArchivePlugin::CreateStream(std::string localname,
+tTJSBinaryStream * tTVPSusieArchivePlugin::CreateStream(tstring localname,
 	unsigned long pos, unsigned long size)
 {
 	HLOCAL memhandle = NULL;
-	int errorcode = 0xff & GetFile(const_cast<LPSTR>(localname.c_str()), pos, (LPSTR)(void*)&memhandle,
+	int errorcode = 0xff & GetFile(const_cast<LPSTR>(ttstr(localname).AsNarrowStdString().c_str()), pos, (LPSTR)(void*)&memhandle,
 		0x0100, (FARPROC)ProgressCallback, 0);
 	if(errorcode || memhandle == NULL)
 	{
@@ -296,7 +296,7 @@ void TVPUnloadArchiveSPI(HINSTANCE inst)
 //---------------------------------------------------------------------------
 // TVPCheckSusieSupport : checks which plugin supports specified archive
 //---------------------------------------------------------------------------
-tTVPSusieArchivePlugin * TVPCheckSusieSupport(const ttstr &name, std::string &a_localname)
+tTVPSusieArchivePlugin * TVPCheckSusieSupport(const ttstr &name, tstring &a_localname)
 {
 	if(TVPSusiePluginVector.size() == 0) return NULL;
 
@@ -311,7 +311,7 @@ tTVPSusieArchivePlugin * TVPCheckSusieSupport(const ttstr &name, std::string &a_
 	for(i = TVPSusiePluginVector.end() - 1; i >= TVPSusiePluginVector.begin(); i--)
 	{
 		stream.SetPosition(0);
-		if((*i)->CheckSupported(&stream, a_localname))
+		if((*i)->CheckSupported(&stream, localname.AsNarrowStdString()))
 			return *i;
 	}
 
@@ -328,12 +328,12 @@ tTVPSusieArchivePlugin * TVPCheckSusieSupport(const ttstr &name, std::string &a_
 class tTVPSusieArchive : public tTVPArchive
 {
 	tTVPSusieArchivePlugin *Plugin;
-	std::string LocalName;
+	tstring LocalName;
 	std::vector<tTVPSusieFileRecord> FileRecords;
 
 public:
 	tTVPSusieArchive(tTVPSusieArchivePlugin *plugin, const ttstr & name,
-		std::string localname);
+		tstring localname);
 	~tTVPSusieArchive();
 
 	tjs_uint GetCount();
@@ -343,7 +343,7 @@ public:
 };
 //---------------------------------------------------------------------------
 tTVPSusieArchive::tTVPSusieArchive(tTVPSusieArchivePlugin *plugin,
-	const ttstr &name, std::string localname) : tTVPArchive(name)
+	const ttstr &name, tstring localname) : tTVPArchive(name)
 {
 	LocalName = localname;
 	Plugin = plugin;
@@ -387,7 +387,7 @@ tTJSBinaryStream * tTVPSusieArchive::CreateStreamByIndex(tjs_uint idx)
 //---------------------------------------------------------------------------
 tTVPArchive * TVPOpenSusieArchive(const ttstr & name)
 {
-	std::string localname;
+	tstring localname;
 	tTVPSusieArchivePlugin *plugin = TVPCheckSusieSupport(name, localname);
 	if(plugin)
 	{

@@ -34,7 +34,7 @@ public:
 		logfont.lfHeight = -12;
 		logfont.lfWidth = 0;
 		logfont.lfCharSet = SHIFTJIS_CHARSET;
-		strncpy_s( logfont.lfFaceName, LF_FACESIZE, "‚l‚r ‚oƒSƒVƒbƒN", LF_FACESIZE );
+		_tcsncpy_s( logfont.lfFaceName, LF_FACESIZE, _T("‚l‚r ‚oƒSƒVƒbƒN"), LF_FACESIZE );
 		logfont.lfItalic = FALSE;
 		logfont.lfUnderline = FALSE;
 		logfont.lfStrikeOut = FALSE;

@@ -184,7 +184,7 @@ void TVPInitWindowOptions()
 
 
 TTVPWindowForm::TTVPWindowForm( TApplication* app, tTJSNI_Window* ni ) : TML::Window(), CurrentMouseCursor(crDefault) {
-	CreateWnd( "TVPMainWindow", Application->GetTitle(), 10, 10 );
+	CreateWnd( _T("TVPMainWindow"), Application->GetTitle(), 10, 10 );
 	TVPInitWindowOptions();
 	
 	// initialize members

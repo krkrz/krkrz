@@ -151,7 +151,7 @@ typedef void (TJS_USERENTRY *tTVPFinallyBlockFunction)(void *data);
 TJS_EXP_FUNC_DEF(void, TVPDoTryBlock, (tTVPTryBlockFunction tryblock, tTVPCatchBlockFunction catchblock, tTVPFinallyBlockFunction finallyblock, void *data));
 
 
-TJS_EXP_FUNC_DEF(bool, TVPGetFileVersionOf, (const char * module_filename, tjs_int &major, tjs_int &minor, tjs_int &release, tjs_int &build));
+TJS_EXP_FUNC_DEF(bool, TVPGetFileVersionOf, (const wchar_t* module_filename, tjs_int &major, tjs_int &minor, tjs_int &release, tjs_int &build));
 
 
 //---------------------------------------------------------------------------

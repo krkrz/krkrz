@@ -317,7 +317,7 @@ ttstr TVPGetTemporaryName()
 			}
 			else
 			{
-				char tmp[MAX_PATH+1];
+				TCHAR tmp[MAX_PATH+1];
 				GetTempPath(MAX_PATH, tmp);
 				TVPTempPath = ttstr(tmp);
 			}
@@ -422,12 +422,7 @@ tTJSBinaryStream * TVPOpenStream(const ttstr & _name, tjs_uint32 flags)
 //---------------------------------------------------------------------------
 bool TVPCheckExistentLocalFile(const ttstr &name)
 {
-	DWORD attrib;
-	if(procGetFileAttributesW)
-		attrib = procGetFileAttributesW(name.c_str());
-	else
-		attrib = GetFileAttributesA(name.AsStdString().c_str());
-
+	DWORD attrib = ::GetFileAttributes(name.c_str());
 	if(attrib == 0xffffffff || (attrib & FILE_ATTRIBUTE_DIRECTORY))
 		return false; // not a file
 	else
@@ -443,12 +438,7 @@ bool TVPCheckExistentLocalFile(const ttstr &name)
 //---------------------------------------------------------------------------
 bool TVPCheckExistentLocalFolder(const ttstr &name)
 {
-	DWORD attrib;
-	if(procGetFileAttributesW)
-		attrib = procGetFileAttributesW(name.c_str());
-	else
-		attrib = GetFileAttributesA(name.AsStdString().c_str());
-
+	DWORD attrib = GetFileAttributes(name.c_str());
 	if(attrib != 0xffffffff && (attrib & FILE_ATTRIBUTE_DIRECTORY))
 		return true; // a folder
 	else
@@ -525,17 +515,7 @@ static bool _TVPCreateFolders(const ttstr &folder)
 
 	if(!_TVPCreateFolders(parent)) return false;
 
-	BOOL res;
-	if(procCreateDirectoryW)
-	{
-		res = procCreateDirectoryW(folder.c_str(), NULL);
-	}
-	else
-	{
-		tTJSNarrowStringHolder holder(folder.c_str());
-		res = CreateDirectoryA(holder, NULL);
-	}
-
+	BOOL res = ::CreateDirectory(folder.c_str(), NULL);
 	return 0!=res;
 }
 
@@ -585,29 +565,14 @@ tTVPLocalFileStream::tTVPLocalFileStream(const ttstr &origname,
 	tjs_int trycount = 0;
 
 retry:
-	if(procCreateFileW)
-	{
-		Handle = procCreateFileW(
-			localname.c_str(),
-			rw,
-			FILE_SHARE_READ, // read shared accesss is strongly needed
-			NULL,
-			dwcd,
-			FILE_ATTRIBUTE_NORMAL,
-			NULL);
-	}
-	else
-	{
-		tTJSNarrowStringHolder holder(localname.c_str());
-		Handle = CreateFileA(
-			holder,
-			rw,
-			FILE_SHARE_READ, // read shared accesss is strongly needed
-			NULL,
-			dwcd,
-			FILE_ATTRIBUTE_NORMAL,
-			NULL);
-	}
+	Handle = CreateFile(
+		localname.c_str(),
+		rw,
+		FILE_SHARE_READ, // read shared accesss is strongly needed
+		NULL,
+		dwcd,
+		FILE_ATTRIBUTE_NORMAL,
+		NULL);
 
 	if(Handle == INVALID_HANDLE_VALUE)
 	{
@@ -1176,18 +1141,18 @@ ttstr TVPSearchCD(const ttstr & name)
 	// search CD which has specified volume label name.
 	// return drive letter ( such as 'A' or 'B' )
 	// return empty string if not found.
-	std::string narrow_name = name.AsStdString();
+	tstring narrow_name = name.AsStdString();
 
-	char dr[4];
-	for(dr[0]='A',dr[1]=':',dr[2]='\\',dr[3]=0;dr[0]<='Z';dr[0]++)
+	TCHAR dr[4];
+	for(dr[0]=_T('A'),dr[1]=_T(':'),dr[2]=_T('\\'),dr[3]=0;dr[0]<=_T('Z');dr[0]++)
 	{
-		if(GetDriveType(dr) == DRIVE_CDROM)
+		if(::GetDriveType(dr) == DRIVE_CDROM)
 		{
-			char vlabel[256];
-			char fs[256];
+			TCHAR vlabel[256];
+			TCHAR fs[256];
 			DWORD mcl = 0,sfs = 0;
 			GetVolumeInformation(dr, vlabel, 255, NULL, &mcl, &sfs, fs, 255);
-			if( icomp(std::string(vlabel),narrow_name) )
+			if( icomp(tstring(vlabel),narrow_name) )
 			//if(std::string(vlabel).AnsiCompareIC(narrow_name)==0)
 				return ttstr((tjs_char)dr[0]);
 		}

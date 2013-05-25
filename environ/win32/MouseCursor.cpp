@@ -2,7 +2,7 @@
 #include "MouseCursor.h"
 #include "WindowFormUnit.h"
 
-const LPSTR MouseCursor::CURSORS[CURSOR_EOT] = {
+const LPTSTR MouseCursor::CURSORS[CURSOR_EOT] = {
 	IDC_APPSTARTING,
 	IDC_ARROW,
 	IDC_CROSS,

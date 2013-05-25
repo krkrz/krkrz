@@ -44,7 +44,7 @@ bool TVPLoggingToFile = false;
 static tjs_uint TVPLogToFileRollBack = 100;
 static ttstr *TVPImportantLogs = NULL;
 static ttstr TVPLogLocation;
-tjs_nchar TVPNativeLogLocation[MAX_PATH];
+TCHAR TVPNativeLogLocation[MAX_PATH];
 //---------------------------------------------------------------------------
 
 
@@ -104,7 +104,7 @@ public:
 	~tTVPLogStreamHolder() { if(Stream) fclose(Stream); Alive = false; }
 
 private:
-	void Open(const tjs_nchar *mode);
+	void Open(const TCHAR *mode);
 
 public:
 	void Clear(); // clear log stream
@@ -114,13 +114,13 @@ public:
 
 } static TVPLogStreamHolder;
 //---------------------------------------------------------------------------
-void tTVPLogStreamHolder::Open(const tjs_nchar *mode)
+void tTVPLogStreamHolder::Open(const TCHAR *mode)
 {
 	if(OpenFailed) return; // no more try
 
 	try
 	{
-		tjs_nchar filename[MAX_PATH];
+		TCHAR filename[MAX_PATH];
 		if(TVPLogLocation.GetLen() == 0)
 		{
 			Stream = NULL;
@@ -129,10 +129,10 @@ void tTVPLogStreamHolder::Open(const tjs_nchar *mode)
 		else
 		{
 			// no log location specified
-			TJS_nstrcpy(filename, TVPNativeLogLocation);
-			TJS_nstrcat(filename, TJS_N("\\krkr.console.log"));
+			_tcscpy(filename, TVPNativeLogLocation);
+			_tcscat(filename, _T("\\krkr.console.log"));
 			TVPEnsureDataPathDirectory();
-			Stream = fopen(filename, mode);
+			Stream = _tfopen(filename, mode);
 			if(!Stream) OpenFailed = true;
 		}
 
@@ -184,12 +184,12 @@ void tTVPLogStreamHolder::Clear()
 	// clear log text
 	if(Stream) fclose(Stream);
 
-	Open(TJS_N("wb"));
+	Open(_T("wb"));
 }
 //---------------------------------------------------------------------------
 void tTVPLogStreamHolder::Log(const ttstr & text)
 {
-	if(!Stream) Open(TJS_N("ab"));
+	if(!Stream) Open(_T("ab"));
 
 	try
 	{
@@ -446,9 +446,9 @@ void TVPSetLogLocation(const ttstr &loc)
 	}
 	else
 	{
-		TJS_nstrcpy(TVPNativeLogLocation, native.AsStdString().c_str());
-		if(TVPNativeLogLocation[TJS_nstrlen(TVPNativeLogLocation)-1] != '\\')
-			TJS_nstrcat(TVPNativeLogLocation, "\\");
+		_tcscpy(TVPNativeLogLocation, native.AsStdString().c_str());
+		if(TVPNativeLogLocation[_tcslen(TVPNativeLogLocation)-1] != _T('\\'))
+			_tcscat(TVPNativeLogLocation, _T("\\"));
 	}
 
 	TVPLogStreamHolder.Reopen();
@@ -693,11 +693,11 @@ class tTVPTJS2DumpOutputGateway : public iTJSConsoleOutput
 //---------------------------------------------------------------------------
 void TVPTJS2StartDump()
 {
-	tjs_nchar filename[MAX_PATH];
-	TJS_nstrcpy(filename, ExePath().c_str());
-	TJS_nstrcat(filename, TJS_N(".dump.txt"));
+	TCHAR filename[MAX_PATH];
+	_tcscpy(filename, ExePath().c_str());
+	_tcscat(filename, _T(".dump.txt"));
 	TVPDumpOutFileName = filename;
-	TVPDumpOutFile = fopen(filename, TJS_N("wb+"));
+	TVPDumpOutFile = _tfopen(filename, _T("wb+"));
 	if(TVPDumpOutFile)
 	{
 		// TODO: 32-bit unicode support

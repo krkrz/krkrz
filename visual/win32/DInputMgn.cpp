@@ -260,25 +260,25 @@ IDirectInput * TVPAddRefDirectInput()
 
 	TVPDirectInputInit = true;
 
-	TVPDirectInputLibHandle = LoadLibrary("dinput.dll");
+	TVPDirectInputLibHandle = ::LoadLibrary(_T("dinput.dll"));
 	if(!TVPDirectInputLibHandle) return NULL; // load error; is not a fatal error
 
-	HRESULT (WINAPI *procDirectInputCreateA)
+	HRESULT (WINAPI *procDirectInputCreateW)
 		(HINSTANCE hinst, DWORD dwVersion,
-			LPDIRECTINPUTA *ppDI, LPUNKNOWN punkOuter);
+			LPDIRECTINPUTW *ppDI, LPUNKNOWN punkOuter);
 
-	procDirectInputCreateA =
-		(HRESULT (WINAPI *)(HINSTANCE, DWORD, LPDIRECTINPUTA*, LPUNKNOWN))
+	procDirectInputCreateW =
+		(HRESULT (WINAPI *)(HINSTANCE, DWORD, LPDIRECTINPUTW*, LPUNKNOWN))
 		GetProcAddress(TVPDirectInputLibHandle, "DirectInputCreateA");
-	if(!procDirectInputCreateA)
+	if(!procDirectInputCreateW)
 	{
 		// missing DirectInputCreate
-		FreeLibrary(TVPDirectInputLibHandle);
+		::FreeLibrary(TVPDirectInputLibHandle);
 		TVPDirectInputLibHandle = NULL;
 		return NULL;
 	}
 
-	HRESULT hr = procDirectInputCreateA(GetHInstance(), DIRECTINPUT_VERSION,
+	HRESULT hr = procDirectInputCreateW(GetHInstance(), DIRECTINPUT_VERSION,
 		&TVPDirectInput, NULL);
 	if(FAILED(hr))
 	{
