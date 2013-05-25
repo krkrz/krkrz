@@ -306,6 +306,8 @@ HRESULT Window::CreateWnd( const tstring& classname, const tstring& title, int w
 	WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC | CS_DBLCLKS, Window::WndProc, 0L, 0L,
 						GetModuleHandle(NULL), NULL, NULL, NULL, NULL,
 						window_class_name_.c_str(), NULL };
+	wc.hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_TVPWIN32));
+	wc.hIconSm = ::LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_TVPWIN32));
 	BOOL ClassRegistered = ::GetClassInfoEx( wc.hInstance, wc.lpszClassName, &wc );
 	if( ClassRegistered == 0 ) {
 		::RegisterClassEx( &wc );
