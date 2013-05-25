@@ -52,12 +52,12 @@ public:
 		return DefWindowProc( hWnd, message, wParam, lParam );
 	}
 	HWND AllocateHWnd() {
-		const char* classname = "TPUtilWindow";
+		const TCHAR* classname = _T("TPUtilWindow");
 		WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC, WindowsProcedure, 0L, 0L,
 							GetModuleHandle(NULL), NULL, NULL, NULL, NULL,
 							classname, NULL };
 		::RegisterClassEx( &wc );
-		window_handle_ = ::CreateWindow( classname, "",
+		window_handle_ = ::CreateWindow( classname, _T(""),
 							WS_OVERLAPPEDWINDOW, 0, 0, 0, 0,
 							NULL, NULL, wc.hInstance, NULL );
 		if( window_handle_ == NULL )
@@ -101,12 +101,12 @@ public:
 class TApplication {
 	std::vector<EventDispatcher*> dispatcher_;
 	std::vector<class TTVPWindowForm*> windows_list_;
-	std::string title_;
+	tstring title_;
 
 	bool is_attach_console_;
 	FILE* oldstdin_;
 	FILE* oldstdout_;
-	std::string console_title_;
+	tstring console_title_;
 	AcceleratorKeyTable accel_key_;
 
 public:
@@ -154,10 +154,10 @@ public:
 #endif
 	}
 	void HandleMessage() {}
-	std::string GetTitle() const { return title_; }
-	void SetTitle( const std::string& caption );
+	tstring GetTitle() const { return title_; }
+	void SetTitle( const tstring& caption );
 
-	static inline int MessageDlg( const std::string& string, const std::string& caption, int type ) {
+	static inline int MessageDlg( const tstring& string, const tstring& caption, int type ) {
 		::MessageBox( NULL, string.c_str(), caption.c_str(), type  );
 	}
 	void Terminate() {
@@ -191,17 +191,17 @@ public:
 	void UnregisterAcceleratorKey(HWND hWnd, short cmd);
 	void DeleteAcceleratorKeyTable( HWND hWnd );
 };
-std::vector<std::string>* LoadLinesFromFile( const std::string& path );
+std::vector<std::string>* LoadLinesFromFile( const tstring& path );
 
 // スタブ、正しくは動作しないはず。
 inline HWND AllocateHWnd( LRESULT (CALLBACK *UtilWndProc)(HWND,UINT,WPARAM,LPARAM) ) {
 	
-	const char* classname = "TPUtilWindow";
+	const TCHAR* classname = _T("TPUtilWindow");
 	WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC, UtilWndProc, 0L, 0L,
 						GetModuleHandle(NULL), NULL, NULL, NULL, NULL,
 						classname, NULL };
 	::RegisterClassEx( &wc );
-	HWND hWnd = ::CreateWindow( classname, "",
+	HWND hWnd = ::CreateWindow( classname, _T(""),
 						WS_OVERLAPPEDWINDOW, 0, 0, 0, 0,
 						NULL, NULL, wc.hInstance, NULL );
 	return hWnd;

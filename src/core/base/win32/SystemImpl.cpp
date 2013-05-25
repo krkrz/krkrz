@@ -196,12 +196,12 @@ static bool TVPShellExecute(const ttstr &target, const ttstr &param)
 	}
 	else
 	{
-		std::string a_target(target.AsStdString());
-		std::string a_param(param.AsStdString());
+		tstring a_target(target.AsStdString());
+		tstring a_param(param.AsStdString());
 		if(ShellExecute(NULL, NULL,
 			target.AsStdString().c_str(),
 			param.IsEmpty() ? NULL : a_param.c_str(),
-			"",
+			_T(""),
 			SW_SHOWNORMAL)
 			<=(void *)32)
 		{
@@ -280,32 +280,15 @@ static void TVPReadRegValue(tTJSVariant &result, const ttstr & key)
 
 	// open key
 	HKEY handle;
-	LONG res;
-
-	if(procRegOpenKeyExW)
-		res = procRegOpenKeyExW(root, keyname.c_str(), 0, KEY_READ, &handle);
-	else
-		res = RegOpenKeyExA(root, keyname.AsStdString().c_str(), 0, KEY_READ, &handle);
+	LONG res = RegOpenKeyEx(root, keyname.AsStdString().c_str(), 0, KEY_READ, &handle);
 	if(res != ERROR_SUCCESS) { result.Clear(); return; }
 
 	// try query value size and read key
 	DWORD size;
 	DWORD type;
 
-
-	std::string a_valuename;
-
-	if(!procRegQueryValueExW)
-		a_valuename = valuename.AsStdString();
-
 	// query size
-	if(procRegQueryValueExW)
-		res = procRegQueryValueExW(handle, valuename.c_str(), 0,
-			&type, NULL, &size);
-	else
-		res = RegQueryValueExA(handle, a_valuename.c_str(), 0,
-			&type, NULL, &size);
-
+	res = RegQueryValueEx(handle, valuename.c_str(), 0, &type, NULL, &size);
 
 	if(res != ERROR_SUCCESS)
 	{
@@ -343,12 +326,7 @@ static void TVPReadRegValue(tTJSVariant &result, const ttstr & key)
 		try
 		{
 			DWORD size2 = size;
-			if(procRegQueryValueExW)
-				res = procRegQueryValueExW(handle, valuename.c_str(), 0,
-					NULL, data, &size2);
-			else
-				res = RegQueryValueExA(handle, a_valuename.c_str(), 0,
-					NULL, data, &size2);
+			res = RegQueryValueEx(handle, valuename.c_str(), 0, NULL, data, &size2);
 
 			if(res == ERROR_MORE_DATA)
 			{
@@ -499,15 +477,7 @@ ttstr TVPGetAppDataPath()
 bool TVPCreateAppLock(const ttstr &lockname)
 {
 	// lock application using mutex
-	if(procCreateMutexW)
-	{
-		procCreateMutexW(NULL, TRUE, lockname.c_str());
-	}
-	else
-	{
-		std::string a_lockname(lockname.AsStdString());
-		CreateMutexA(NULL, TRUE, a_lockname.c_str());
-	}
+	CreateMutex(NULL, TRUE, lockname.c_str());
 
 	if(GetLastError())
 	{
@@ -682,7 +652,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/system)
 
 	ttstr target = *param[0];
 
-	int ret = system(target.AsStdString().c_str());
+	int ret = _tsystem(target.c_str());
 
 	TVPDeliverCompactEvent(TVP_COMPACT_LEVEL_MAX); // this should clear all caches
 

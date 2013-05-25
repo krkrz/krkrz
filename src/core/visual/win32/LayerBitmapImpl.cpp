@@ -14,6 +14,7 @@
 #include <memory>
 #include <stdlib.h>
 #include <math.h>
+#include "tstring.h"
 
 #include "LayerBitmapIntf.h"
 #include "LayerBitmapImpl.h"
@@ -154,29 +155,14 @@ tTVPPrerenderedFont::tTVPPrerenderedFont(const ttstr &storage) :
 	Storage = storage;
 
 	// open local storage via CreateFile
-	if(procCreateFileW)
-	{
-		FileHandle = procCreateFileW(
-			LocalStorage.GetLocalName().c_str(),
-			GENERIC_READ,
-			FILE_SHARE_READ,
-			NULL,
-			OPEN_EXISTING,
-			FILE_ATTRIBUTE_NORMAL,
-			NULL);
-	}
-	else
-	{
-		tTJSNarrowStringHolder holder(LocalStorage.GetLocalName().c_str());
-		FileHandle = CreateFile(
-			holder,
-			GENERIC_READ,
-			FILE_SHARE_READ,
-			NULL,
-			OPEN_EXISTING,
-			FILE_ATTRIBUTE_NORMAL,
-			NULL);
-	}
+	FileHandle = CreateFile(
+		LocalStorage.GetLocalName().c_str(),
+		GENERIC_READ,
+		FILE_SHARE_READ,
+		NULL,
+		OPEN_EXISTING,
+		FILE_ATTRIBUTE_NORMAL,
+		NULL);
 
 	if(FileHandle == INVALID_HANDLE_VALUE)
 	{
@@ -1479,7 +1465,7 @@ void * tTVPBitmap::GetScanLine(tjs_uint l) const
 //---------------------------------------------------------------------------
 // default LOGFONT retrieve function
 //---------------------------------------------------------------------------
-static const char * const TVPDefaultFontName = TJS_N("‚l‚r ‚oƒSƒVƒbƒN"); // TODO: i18n
+static const TCHAR * const TVPDefaultFontName = _T("‚l‚r ‚oƒSƒVƒbƒN"); // TODO: i18n
 static LOGFONT TVPDefaultLOGFONT;
 static tTVPFont TVPDefaultFont;
 static bool TVPDefaultLOGFONTCreated = false;
@@ -1501,7 +1487,7 @@ static void TVPConstructDefaultFont()
 		l.lfOutPrecision = OUT_DEFAULT_PRECIS;
 		l.lfQuality = DEFAULT_QUALITY;
 		l.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
-		strcpy(l.lfFaceName, TVPDefaultFontName); // TODO: i18n
+		_tcscpy(l.lfFaceName, TVPDefaultFontName); // TODO: i18n
 
 		TVPDefaultFont.Height = l.lfHeight;
 		TVPDefaultFont.Flags = 0;
@@ -1521,9 +1507,9 @@ static void TVPConstructDefaultFont()
 class tTVPAnsiStringHash
 {
 public:
-	static tjs_uint32 Make(const std::string &val)
+	static tjs_uint32 Make(const tstring &val)
 	{
-		const char * ptr = val.c_str();
+		const TCHAR * ptr = val.c_str();
 		if(*ptr == 0) return 0;
 		tjs_uint32 v = 0;
 		while(*ptr)
@@ -1540,8 +1526,7 @@ public:
 		return v;
 	}
 };
-static tTJSHashTable<std::string, tjs_int, tTVPAnsiStringHash>
-	TVPFontNames;
+static tTJSHashTable<tstring, tjs_int, tTVPAnsiStringHash> TVPFontNames;
 bool TVPFontNamesInit = false;
 //---------------------------------------------------------------------------
 struct tTVPFontSearchStruct
@@ -1553,7 +1538,7 @@ struct tTVPFontSearchStruct
 static int CALLBACK TVPEnumFontsProc(LOGFONT *lplf, TEXTMETRIC *lptm,
 	DWORD type, LPARAM data)
 {
-	TVPFontNames.Add(std::string(lplf->lfFaceName), 1);
+	TVPFontNames.Add(tstring(lplf->lfFaceName), 1);
 	return 1;
 }
 //---------------------------------------------------------------------------
@@ -1570,7 +1555,7 @@ static void TVPInitFontNames()
 	TVPFontNamesInit = true;
 }
 //---------------------------------------------------------------------------
-static bool TVPFontExists(const std::string &name)
+static bool TVPFontExists(const tstring &name)
 {
 	// check existence of font
 	TVPInitFontNames();
@@ -1580,7 +1565,7 @@ static bool TVPFontExists(const std::string &name)
 	return t != NULL;
 }
 //---------------------------------------------------------------------------
-std::string TVPGetBeingFont(std::string fonts)
+tstring TVPGetBeingFont(tstring fonts)
 {
 	// retrieve being font in the system.
 	// font candidates are given by "fonts", separated by comma.
@@ -1599,10 +1584,10 @@ std::string TVPGetBeingFont(std::string fonts)
 
 	bool prev_empty_name = false;
 
-	while(fonts!="")
+	while(fonts!=_T(""))
 	{
-		std::string fontname;
-		int pos = fonts.find_first_of(",");
+		tstring fontname;
+		int pos = fonts.find_first_of(_T(","));
 		if( pos != std::string::npos )
 		{
 			fontname = Trim( fonts.substr( 0, pos) );
@@ -1611,17 +1596,17 @@ std::string TVPGetBeingFont(std::string fonts)
 		else
 		{
 			fontname = Trim(fonts);
-			fonts="";
+			fonts=_T("");
 		}
 
 		// no existing check if previously specified font candidate is empty
 		// eg. ",Fontname"
 
-		if(fontname != "" && (prev_empty_name || TVPFontExists(fontname) ) )
+		if(fontname != _T("") && (prev_empty_name || TVPFontExists(fontname) ) )
 		{
 			if(vfont && fontname.c_str()[0] != '@')
 			{
-				return  "@" + fontname;
+				return  _T("@") + fontname;
 			}
 			else
 			{
@@ -1629,12 +1614,12 @@ std::string TVPGetBeingFont(std::string fonts)
 			}
 		}
 
-		prev_empty_name = (fontname == "");
+		prev_empty_name = (fontname == _T(""));
 	}
 
 	if(vfont)
 	{
-		return std::string("@") + TVPDefaultFontName;
+		return tstring(_T("@")) + TVPDefaultFontName;
 	}
 	else
 	{
@@ -1970,8 +1955,8 @@ void tTVPNativeBaseBitmap::ApplyFont()
 		LogFont.lfUnderline = (Font.Flags & TVP_TF_UNDERLINE) ? TRUE:FALSE;
 		LogFont.lfStrikeOut = (Font.Flags & TVP_TF_STRIKEOUT) ? TRUE:FALSE;
 		LogFont.lfEscapement = LogFont.lfOrientation = Font.Angle;
-		std::string face = TVPGetBeingFont(Font.Face.AsStdString());
-		strncpy(LogFont.lfFaceName, face.c_str(), LF_FACESIZE -1);
+		tstring face = TVPGetBeingFont(Font.Face.AsStdString());
+		_tcsncpy(LogFont.lfFaceName, face.c_str(), LF_FACESIZE -1);
 		LogFont.lfFaceName[LF_FACESIZE-1] = 0;
 
 		// compute ascent offset

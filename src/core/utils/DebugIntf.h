@@ -30,7 +30,7 @@ extern void TVPTJS2EndDump();
 extern void TVPOnError();
 extern ttstr TVPGetImportantLog();
 extern void TVPSetLogLocation(const ttstr &loc);
-extern tjs_nchar TVPNativeLogLocation[MAX_PATH];
+extern TCHAR TVPNativeLogLocation[MAX_PATH];
 extern void TVPStartLogToFile(bool clear);
 //---------------------------------------------------------------------------
 

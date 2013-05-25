@@ -153,9 +153,9 @@ void TVPStartObjectHashMapLog(void)
 		::GetModuleFileName(NULL, szFull, sizeof(szFull) / sizeof(TCHAR));
 		tstring exepath(szFull);
 		BOOL ret =
-			CreateProcess(
+			::CreateProcess(
 				NULL,
-				const_cast<LPSTR>((exepath + " -@processohmlog").c_str()),
+				const_cast<LPTSTR>((exepath + _T(" -@processohmlog")).c_str()),
 				NULL,
 				NULL,
 				TRUE,

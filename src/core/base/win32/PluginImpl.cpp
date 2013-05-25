@@ -501,15 +501,15 @@ bool TVPUnloadPlugin(const ttstr & name)
 //---------------------------------------------------------------------------
 struct tTVPFoundPlugin
 {
-	std::string Path;
-	std::string Name;
+	tstring Path;
+	tstring Name;
 	bool operator < (const tTVPFoundPlugin &rhs) const { return Name < rhs.Name; }
 };
 static tjs_int TVPAutoLoadPluginCount = 0;
-static void TVPSearchPluginsAt(std::vector<tTVPFoundPlugin> &list, std::string folder)
+static void TVPSearchPluginsAt(std::vector<tTVPFoundPlugin> &list, tstring folder)
 {
 	WIN32_FIND_DATA ffd;
-	HANDLE handle = FindFirstFile((folder + "*.tpm").c_str(), &ffd);
+	HANDLE handle = ::FindFirstFile((folder + _T("*.tpm")).c_str(), &ffd);
 	if(handle != INVALID_HANDLE_VALUE)
 	{
 		BOOL cont;
@@ -543,8 +543,8 @@ void TVPLoadPluigins(void)
 	tstring exepath = IncludeTrailingBackslash(ExtractFileDir(ExePath()));
 
 	TVPSearchPluginsAt(list, exepath);
-	TVPSearchPluginsAt(list, exepath + "system\\");
-	TVPSearchPluginsAt(list, exepath + "plugin\\");
+	TVPSearchPluginsAt(list, exepath + _T("system\\"));
+	TVPSearchPluginsAt(list, exepath + _T("plugin\\"));
 
 	// sort by filename
 	std::sort(list.begin(), list.end());
@@ -876,8 +876,7 @@ void TVPDoTryBlock(
 //---------------------------------------------------------------------------
 // TVPGetFileVersionOf
 //---------------------------------------------------------------------------
-bool TVPGetFileVersionOf(const char * module_filename, tjs_int &major, tjs_int &minor,
-	tjs_int &release, tjs_int &build)
+bool TVPGetFileVersionOf(const TCHAR* module_filename, tjs_int &major, tjs_int &minor, tjs_int &release, tjs_int &build)
 {
 	// retrieve file version
 	major = minor = release = build = 0;
@@ -889,20 +888,20 @@ bool TVPGetFileVersionOf(const char * module_filename, tjs_int &major, tjs_int &
 	UINT dum;
 	DWORD dum2;
 
-	char * filename = new char [strlen(module_filename) + 1];
+	TCHAR* filename = new TCHAR[_tcslen(module_filename) + 1];
 	try
 	{
-		strcpy(filename, module_filename);
+		_tcscpy(filename, module_filename);
 
-		DWORD size = GetFileVersionInfoSize (filename, &dum2);
+		DWORD size = ::GetFileVersionInfoSize (filename, &dum2);
 		if(size)
 		{
 			VersionInfo = new BYTE[size + 2];
 			try
 			{
-				if(GetFileVersionInfo(filename, 0, size, (void*)VersionInfo))
+				if(::GetFileVersionInfo(filename, 0, size, (void*)VersionInfo))
 				{
-					if(VerQueryValue((void*)VersionInfo, "\\", (void**)(&FixedFileInfo),
+					if(::VerQueryValue((void*)VersionInfo, _T("\\"), (void**)(&FixedFileInfo),
 						&dum))
 					{
 						major   = FixedFileInfo->dwFileVersionMS >> 16;

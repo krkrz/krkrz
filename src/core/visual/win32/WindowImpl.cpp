@@ -308,8 +308,8 @@ void TVPDumpDirectDrawDriverInformation()
 
 				// driver version(reported)
 				log = infostart + TJS_W("Driver version (reported) : ");
-				char tmp[256];
-				wsprintf( tmp, "%d.%02d.%02d.%04d ",
+				TCHAR tmp[256];
+				wsprintf( tmp, _T("%d.%02d.%02d.%04d "),
 						  HIWORD( DDID.liDriverVersion.u.HighPart ),
 						  LOWORD( DDID.liDriverVersion.u.HighPart ),
 						  HIWORD( DDID.liDriverVersion.u.LowPart  ),
@@ -318,32 +318,33 @@ void TVPDumpDirectDrawDriverInformation()
 				TVPAddImportantLog(log);
 
 				// driver version(actual)
-				char driverpath[1024];
-				char *driverpath_filename = NULL;
-				bool success = 0!=SearchPath(NULL, DDID.szDriver, NULL, 1023, driverpath, &driverpath_filename);
+				tstring driverName = ttstr(DDID.szDriver).AsStdString();
+				TCHAR driverpath[1024];
+				TCHAR *driverpath_filename = NULL;
+				bool success = 0!=SearchPath(NULL, driverName.c_str(), NULL, 1023, driverpath, &driverpath_filename);
 
 				if(!success)
 				{
-					char syspath[1024];
+					TCHAR syspath[1024];
 					GetSystemDirectory(syspath, 1023);
-					strcat(syspath, "\\drivers"); // SystemDir\drivers
-					success = 0!=SearchPath(syspath, DDID.szDriver, NULL, 1023, driverpath, &driverpath_filename);
+					_tcscat(syspath, _T("\\drivers")); // SystemDir\drivers
+					success = 0!=SearchPath(syspath, driverName.c_str(), NULL, 1023, driverpath, &driverpath_filename);
 				}
 
 				if(!success)
 				{
-					char syspath[1024];
+					TCHAR syspath[1024];
 					GetWindowsDirectory(syspath, 1023);
-					strcat(syspath, "\\system32"); // WinDir\system32
-					success = 0!=SearchPath(syspath, DDID.szDriver, NULL, 1023, driverpath, &driverpath_filename);
+					_tcscat(syspath, _T("\\system32")); // WinDir\system32
+					success = 0!=SearchPath(syspath, driverName.c_str(), NULL, 1023, driverpath, &driverpath_filename);
 				}
 
 				if(!success)
 				{
-					char syspath[1024];
+					TCHAR syspath[1024];
 					GetWindowsDirectory(syspath, 1023);
-					strcat(syspath, "\\system32\\drivers"); // WinDir\system32\drivers
-					success = 0!=SearchPath(syspath, DDID.szDriver, NULL, 1023, driverpath, &driverpath_filename);
+					_tcscat(syspath, _T("\\system32\\drivers")); // WinDir\system32\drivers
+					success = 0!=SearchPath(syspath, driverName.c_str(), NULL, 1023, driverpath, &driverpath_filename);
 				}
 
 				if(success)
@@ -352,7 +353,7 @@ void TVPDumpDirectDrawDriverInformation()
 					tjs_int major, minor, release, build;
 					if(TVPGetFileVersionOf(driverpath, major, minor, release, build))
 					{
-						wsprintf(tmp, "%d.%d.%d.%d", (int)major, (int)minor, (int)release, (int)build);
+						wsprintf(tmp, _T("%d.%d.%d.%d"), (int)major, (int)minor, (int)release, (int)build);
 						log += tmp;
 					}
 					else
@@ -368,14 +369,14 @@ void TVPDumpDirectDrawDriverInformation()
 				TVPAddImportantLog(log);
 
 				// device id
-				wsprintf(tmp, "VendorId:%08X  DeviceId:%08X  SubSysId:%08X  Revision:%08X",
+				wsprintf(tmp, _T("VendorId:%08X  DeviceId:%08X  SubSysId:%08X  Revision:%08X"),
 					DDID.dwVendorId, DDID.dwDeviceId, DDID.dwSubSysId, DDID.dwRevision);
 				log = infostart + TJS_W("Device ids : ") + tmp;
 				TVPAddImportantLog(log);
 
 				// Device GUID
 				GUID *pguid = &DDID.guidDeviceIdentifier;
-				wsprintf( tmp, "%08X-%04X-%04X-%02X%02X%02X%02X%02X%02X%02X%02X",
+				wsprintf( tmp, _T("%08X-%04X-%04X-%02X%02X%02X%02X%02X%02X%02X%02X"),
 						  pguid->Data1,
 						  pguid->Data2,
 						  pguid->Data3,
@@ -385,7 +386,7 @@ void TVPDumpDirectDrawDriverInformation()
 				TVPAddImportantLog(log);
 
 				// WHQL level
-				wsprintf(tmp, "%08x", DDID.dwWHQLLevel);
+				wsprintf(tmp, _T("%08x"), DDID.dwWHQLLevel);
 				log = infostart + TJS_W("WHQL level : ")  + tmp;
 				TVPAddImportantLog(log);
 			}
@@ -408,7 +409,7 @@ static void TVPInitDirectDraw()
 	{
 		// load ddraw.dll
 		TVPAddLog(TJS_W("(info) Loading DirectDraw ..."));
-		TVPDirectDrawDLLHandle = LoadLibrary("ddraw.dll");
+		TVPDirectDrawDLLHandle = LoadLibrary(_T("ddraw.dll"));
 		if(!TVPDirectDrawDLLHandle)
 			TVPThrowExceptionMessage(TVPCannotInitDirectDraw,
 				TJS_W("Cannot load ddraw.dll"));

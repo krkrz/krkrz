@@ -2,21 +2,22 @@
 #ifndef __EXCEPTION_H__
 #define __EXCEPTION_H__
 
-#include <exception>
+//#include <exception>
+#include "tstring.h"
 
-class Exception : public std::exception {
-	std::string message_;
+class Exception /*: public std::exception*/ {
+	tstring message_;
 public:
-	Exception( const std::string& mes ) : message_(mes) {
+	Exception( const tstring& mes ) : message_(mes) {
 	}
-	virtual const char* what() const {
+	virtual const TCHAR* what() const {
 		return message_.c_str();
 	}
 };
 
 class EAbort : public Exception {
 public:
-	EAbort( const char* mes ) : Exception(std::string(mes)) {
+	EAbort( const TCHAR* mes ) : Exception(tstring(mes)) {
 	}
 };
 

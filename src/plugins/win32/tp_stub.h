@@ -1888,7 +1888,7 @@ extern void * TVPImportFuncPtreba9b272d78a4b0cd7f9212e29a58607;
 extern void * TVPImportFuncPtrcfbe8ee9d43aa64ae4190eac91f7c55f;
 extern void * TVPImportFuncPtra4308a386968ef5d23025ab8a9e8c6db;
 extern void * TVPImportFuncPtr5a4fcbe1e398e3d9690d571acbbbae9f;
-extern void * TVPImportFuncPtrb8305ae2ae49a3f7f711105e77bafdf0;
+extern void * TVPImportFuncPtr5b62f504fe6d22428d7518d6c52d775d;
 extern void * TVPImportFuncPtrfb3b405f8747b54f26c332b9e6af81cd;
 extern void * TVPImportFuncPtrb7ccd11d130f186883c109d2ba17b598;
 extern void * TVPImportFuncPtrcf8ab6c24f25993ccc7663e572ac2991;
@@ -7614,15 +7614,15 @@ inline void TVPDoTryBlock(tTVPTryBlockFunction tryblock , tTVPCatchBlockFunction
 	typedef void (__stdcall * __functype)(tTVPTryBlockFunction , tTVPCatchBlockFunction , tTVPFinallyBlockFunction , void *);
 	((__functype)(TVPImportFuncPtr5a4fcbe1e398e3d9690d571acbbbae9f))(tryblock, catchblock, finallyblock, data);
 }
-inline bool TVPGetFileVersionOf(const char * module_filename , tjs_int & major , tjs_int & minor , tjs_int & release , tjs_int & build)
+inline bool TVPGetFileVersionOf(const wchar_t * module_filename , tjs_int & major , tjs_int & minor , tjs_int & release , tjs_int & build)
 {
-	if(!TVPImportFuncPtrb8305ae2ae49a3f7f711105e77bafdf0)
+	if(!TVPImportFuncPtr5b62f504fe6d22428d7518d6c52d775d)
 	{
-		static char funcname[] = "bool ::TVPGetFileVersionOf(const char *,tjs_int &,tjs_int &,tjs_int &,tjs_int &)";
-		TVPImportFuncPtrb8305ae2ae49a3f7f711105e77bafdf0 = TVPGetImportFuncPtr(funcname);
+		static char funcname[] = "bool ::TVPGetFileVersionOf(const wchar_t *,tjs_int &,tjs_int &,tjs_int &,tjs_int &)";
+		TVPImportFuncPtr5b62f504fe6d22428d7518d6c52d775d = TVPGetImportFuncPtr(funcname);
 	}
-	typedef bool (__stdcall * __functype)(const char *, tjs_int &, tjs_int &, tjs_int &, tjs_int &);
-	return ((__functype)(TVPImportFuncPtrb8305ae2ae49a3f7f711105e77bafdf0))(module_filename, major, minor, release, build);
+	typedef bool (__stdcall * __functype)(const wchar_t *, tjs_int &, tjs_int &, tjs_int &, tjs_int &);
+	return ((__functype)(TVPImportFuncPtr5b62f504fe6d22428d7518d6c52d775d))(module_filename, major, minor, release, build);
 }
 inline bool TVPGetCommandLine(const tjs_char * name , tTJSVariant * value = NULL)
 {

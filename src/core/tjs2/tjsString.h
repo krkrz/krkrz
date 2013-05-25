@@ -125,6 +125,13 @@ public:
 		return tstring(holder.operator const char *());
 #endif
 	}
+	const std::string AsNarrowStdString() const
+	{
+		if(!Ptr) return std::string("");
+			// this constant string value must match std::string in type
+		tTJSNarrowStringHolder holder(Ptr->operator const tjs_char*());
+		return std::string(holder.operator const char *());
+	}
 
 	TJS_CONST_METHOD_DEF(tTJSVariantString *, AsVariantStringNoAddRef, ())
 	{

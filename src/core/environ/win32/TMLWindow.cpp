@@ -296,7 +296,7 @@ LRESULT WINAPI Window::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 void Window::OnPaint() {
 }
 const DWORD Window::DEFAULT_EX_STYLE = WS_EX_ACCEPTFILES | WS_EX_APPWINDOW;
-HRESULT Window::CreateWnd( const std::string& classname, const std::string& title, int width, int height )
+HRESULT Window::CreateWnd( const tstring& classname, const tstring& title, int width, int height )
 {
 	window_class_name_ = classname;
 	window_title_ = title;
@@ -337,7 +337,7 @@ void Window::UnregisterWindow() {
 	::UnregisterClass( window_class_name_.c_str(), wc_.hInstance );
 }
 
-void Window::SetWidnowTitle( const std::string& title ) {
+void Window::SetWidnowTitle( const tstring& title ) {
 	if( window_title_ != title ) {
 		window_title_ = title;
 		if( window_handle_ ) {
@@ -437,11 +437,11 @@ void Window::SetEnable( bool s ) {
 	::EnableWindow( GetHandle(), s ? TRUE : FALSE );
 }
 
-void Window::GetCaption( std:: string& v ) const {
+void Window::GetCaption( tstring& v ) const {
 	v.clear();
 	int len = ::GetWindowTextLength( GetHandle() );
 	if( len > 0 ) {
-		std::vector<char> caption(len+1,0);
+		std::vector<TCHAR> caption(len+1,0);
 		int readlen = ::GetWindowText( GetHandle(), &(caption[0]), len+1 );
 		if( readlen > 0 ) {
 			v.assign( &(caption[0]) );
@@ -451,7 +451,7 @@ void Window::GetCaption( std:: string& v ) const {
 // “à•”‚Å‚Á‚Ä‚¢‚é‚Ì‚æ‚è‚àA‚¿‚á‚ñ‚Æ–ˆ‰ñæ“¾‚µ‚½•û‚ª‚¢‚¢‚©
 //	v = window_title_;
 }
-void Window::SetCaption( const std::string& v ) {
+void Window::SetCaption( const tstring& v ) {
 	if( window_title_ != v ) {
 		window_title_ = v;
 		::SetWindowText( GetHandle(), window_title_.c_str() );
@@ -729,7 +729,7 @@ void Window::GetClientRect( struct tTVPRect& rt ) {
 
 int Window::ShowModal() {
 	if( GetVisible() || !GetEnable() ) {
-		throw Exception("Cannot Show Modal.");
+		throw Exception(_T("Cannot Show Modal."));
 	}
 	if( ::GetCapture() != 0 ) {
 		::SendMessage( ::GetCapture(), WM_CANCELMODE, 0, 0 );

@@ -686,8 +686,8 @@ static ttstr TVPGetSoundBufferFormatString(const WAVEFORMATEXTENSIBLE &wfx)
 	return debuglog;
 }
 //---------------------------------------------------------------------------
-static BOOL CALLBACK DSoundEnumCallback( GUID* pGUID, const char * strDesc,
-	const char * strDrvName,  VOID* pContext )
+static BOOL CALLBACK DSoundEnumCallback( GUID* pGUID, const TCHAR * strDesc,
+	const TCHAR * strDrvName,  VOID* pContext )
 {
 	ttstr log(TJS_W("(info) DirectSound Driver/Device found : "));
 	if(strDesc) log += ttstr(strDesc);
@@ -695,30 +695,30 @@ static BOOL CALLBACK DSoundEnumCallback( GUID* pGUID, const char * strDesc,
 	{
 		log += TJS_W(" [");
 
-		char driverpath[1024];
-		char *driverpath_filename = NULL;
+		TCHAR driverpath[1024];
+		TCHAR* driverpath_filename = NULL;
 		bool success = 0!=SearchPath(NULL, strDrvName, NULL, 1023, driverpath, &driverpath_filename);
 		if(!success)
 		{
-			char syspath[1024];
+			TCHAR syspath[1024];
 			GetSystemDirectory(syspath, 1023);
-			strcat(syspath, "\\drivers"); // SystemDir\drivers
+			_tcscat(syspath, _T("\\drivers")); // SystemDir\drivers
 			success = 0!=SearchPath(syspath, strDrvName, NULL, 1023, driverpath, &driverpath_filename);
 		}
 
 		if(!success)
 		{
-			char syspath[1024];
+			TCHAR syspath[1024];
 			GetWindowsDirectory(syspath, 1023);
-			strcat(syspath, "\\system32"); // WinDir\system32
+			_tcscat(syspath, _T("\\system32")); // WinDir\system32
 			success = 0!=SearchPath(syspath, strDrvName, NULL, 1023, driverpath, &driverpath_filename);
 		}
 
 		if(!success)
 		{
-			char syspath[1024];
+			TCHAR syspath[1024];
 			GetWindowsDirectory(syspath, 1023);
-			strcat(syspath, "\\system32\\drivers"); // WinDir\system32\drivers
+			_tcscat(syspath, _T("\\system32\\drivers")); // WinDir\system32\drivers
 			success = 0!=SearchPath(syspath, strDrvName, NULL, 1023, driverpath, &driverpath_filename);
 		}
 
@@ -728,8 +728,8 @@ static BOOL CALLBACK DSoundEnumCallback( GUID* pGUID, const char * strDesc,
 			tjs_int major, minor, release, build;
 			if(TVPGetFileVersionOf(driverpath, major, minor, release, build))
 			{
-				char tmp[256];
-				wsprintf(tmp, " version %d.%d.%d.%d", (int)major, (int)minor, (int)release, (int)build);
+				TCHAR tmp[256];
+				wsprintf(tmp, _T(" version %d.%d.%d.%d"), (int)major, (int)minor, (int)release, (int)build);
 				log += tmp;
 			}
 			else
@@ -761,7 +761,7 @@ static void TVPInitDirectSound()
 	if(TVPDirectSoundDLL == NULL)
 	{
 		// map dsound.dll
-		TVPDirectSoundDLL = LoadLibrary("dsound.dll");
+		TVPDirectSoundDLL = LoadLibrary(_T("dsound.dll"));
 		if(!TVPDirectSoundDLL)
 		{
 			TVPThrowExceptionMessage(TVPCannotInitDirectSound,
@@ -771,11 +771,10 @@ static void TVPInitDirectSound()
 		// Enum DirectSound devices
 		try
 		{
-			HRESULT (WINAPI *DirectSoundEnumerateA)(LPDSENUMCALLBACKA, LPVOID);
-			DirectSoundEnumerateA = (HRESULT (WINAPI *)
-				(LPDSENUMCALLBACKA, LPVOID)) GetProcAddress(TVPDirectSoundDLL, "DirectSoundEnumerateA");
-			if(DirectSoundEnumerateA)
-				DirectSoundEnumerateA(DSoundEnumCallback, NULL);
+			HRESULT (WINAPI *DirectSoundEnumerateW)(LPDSENUMCALLBACKW, LPVOID);
+			DirectSoundEnumerateW = (HRESULT (WINAPI *)(LPDSENUMCALLBACKW, LPVOID)) GetProcAddress(TVPDirectSoundDLL, "DirectSoundEnumerateW");
+			if(DirectSoundEnumerateW)
+				DirectSoundEnumerateW(DSoundEnumCallback, NULL);
 		}
 		catch(...)
 		{

@@ -183,7 +183,7 @@ static ttstr TVPDumpCPUInfo(tjs_int cpu_num)
 	TVPAddImportantLog(features);
 
 	if(((TVPCPUID1_EAX >> 8) & 0x0f) <= 4)
-		throw Exception("CPU check failure: CPU family 4 or lesser is not supported\r\n"+
+		throw Exception(_T("CPU check failure: CPU family 4 or lesser is not supported\r\n")+
 		features.AsStdString());
 
 	return features;
@@ -238,7 +238,7 @@ void TVPDetectCPU()
 			thread->WaitEnd();
 			bool succeeded = thread->GetSucceeded();
 			delete thread;
-			if(!succeeded) throw Exception("CPU check failure");
+			if(!succeeded) throw Exception(_T("CPU check failure"));
 			cpuinfo += TVPDumpCPUInfo(cpu) + TJS_W("\r\n");
 
 			// mask features
@@ -268,7 +268,7 @@ void TVPDetectCPU()
 	TVPDisableCPU(TVP_CPU_HAS_SSE2, TJS_W("-cpusse2"));
 
 	if(TVPCPUType == 0)
-		throw Exception("CPU check failure: Not supported CPU\r\n" +
+		throw Exception(_T("CPU check failure: Not supported CPU\r\n") +
 		cpuinfo.AsStdString());
 
 	TVPAddImportantLog(TJS_W("(info) finally detected CPU features : ") +

@@ -74,14 +74,14 @@ static UINT APIENTRY TVPOFNHookProc(HWND hdlg, UINT uiMsg, WPARAM wParam,
 	return 0;
 }
 //---------------------------------------------------------------------------
-static void TVPPushFilterPair(std::vector<std::string> &filters, std::string filter)
+static void TVPPushFilterPair(std::vector<tstring> &filters, tstring filter)
 {
-	int vpos = filter.find_first_of("|");
+	int vpos = filter.find_first_of(_T("|"));
 	if(vpos)
 	{
 		//AnsiString name = filter.SubString(1, vpos - 1);
-		std::string name = filter.substr(0, vpos);
-		std::string wild = filter.c_str() + vpos;
+		tstring name = filter.substr(0, vpos);
+		tstring wild = filter.c_str() + vpos;
 		filters.push_back(name);
 		filters.push_back(wild);
 	}
@@ -97,11 +97,11 @@ bool TVPSelectFile(iTJSDispatch2 *params)
 	// show open dialog box
 	// NOTE: currently this only shows ANSI version of file open dialog.
 	tTJSVariant val;
-	char * filter = NULL;
-	char * filename = NULL;
-	std::string initialdir;
-	std::string title;
-	std::string defaultext;
+	TCHAR* filter = NULL;
+	TCHAR* filename = NULL;
+	tstring initialdir;
+	tstring title;
+	tstring defaultext;
 	BOOL result;
 
 	try
@@ -123,7 +123,7 @@ bool TVPSelectFile(iTJSDispatch2 *params)
 		if(TJS_SUCCEEDED(params->PropGet(TJS_MEMBERMUSTEXIST, TJS_W("filter"), 0,
 			&val, params)))
 		{
-			std::vector<std::string> filterlist;
+			std::vector<tstring> filterlist;
 			if(val.Type() != tvtObject)
 			{
 				TVPPushFilterPair(filterlist, ttstr(val).AsStdString());
@@ -151,19 +151,17 @@ bool TVPSelectFile(iTJSDispatch2 *params)
 
 			// create filter buffer
 			tjs_int bufsize = 2;
-			for(std::vector<std::string>::iterator i = filterlist.begin();
-				i != filterlist.end(); i++)
+			for(std::vector<tstring>::iterator i = filterlist.begin(); i != filterlist.end(); i++)
 			{
 				bufsize += i->length() + 1;
 			}
 
-			filter = new char[bufsize];
+			filter = new TCHAR[bufsize];
 
-			char *p = filter;
-			for(std::vector<std::string>::iterator i = filterlist.begin();
-				i != filterlist.end(); i++)
+			TCHAR* p = filter;
+			for(std::vector<tstring>::iterator i = filterlist.begin(); i != filterlist.end(); i++)
 			{
-				strcpy(p, i->c_str());
+				_tcscpy(p, i->c_str());
 				p += i->length() + 1;
 			}
 			*(p++) = 0;
@@ -175,26 +173,24 @@ bool TVPSelectFile(iTJSDispatch2 *params)
 		ofn.lpstrCustomFilter = NULL;
 		ofn.nMaxCustFilter = 0;
 
-		if(TJS_SUCCEEDED(params->PropGet(TJS_MEMBERMUSTEXIST, TJS_W("filterIndex"), 0,
-			&val, params)))
+		if(TJS_SUCCEEDED(params->PropGet(TJS_MEMBERMUSTEXIST, TJS_W("filterIndex"), 0, &val, params)))
 			ofn.nFilterIndex = (tjs_int)val;
 		else
 			ofn.nFilterIndex = 0;
 
 		// filenames
-		filename = new char [MAX_PATH + 1];
+		filename = new TCHAR[MAX_PATH + 1];
  		filename[0] = 0;
 
-		if(TJS_SUCCEEDED(params->PropGet(TJS_MEMBERMUSTEXIST, TJS_W("name"), 0,
-			&val, params)))
+		if(TJS_SUCCEEDED(params->PropGet(TJS_MEMBERMUSTEXIST, TJS_W("name"), 0, &val, params)))
 		{
 			ttstr lname(val);
 			if(!lname.IsEmpty())
 			{
 				lname = TVPNormalizeStorageName(lname);
 				TVPGetLocalName(lname);
-				std::string name = lname.AsStdString();
-				strncpy(filename, name.c_str(), MAX_PATH);
+				tstring name = lname.AsStdString();
+				_tcsncpy(filename, name.c_str(), MAX_PATH);
 				filename[MAX_PATH] = 0;
 			}
 		}
@@ -206,8 +202,7 @@ bool TVPSelectFile(iTJSDispatch2 *params)
 
 		// initial dir
 		ofn.lpstrInitialDir = NULL;
-		if(TJS_SUCCEEDED(params->PropGet(TJS_MEMBERMUSTEXIST, TJS_W("initialDir"), 0,
-			&val, params)))
+		if(TJS_SUCCEEDED(params->PropGet(TJS_MEMBERMUSTEXIST, TJS_W("initialDir"), 0, &val, params)))
 		{
 			ttstr lname(val);
 			if(!lname.IsEmpty())
@@ -220,8 +215,7 @@ bool TVPSelectFile(iTJSDispatch2 *params)
 		}
 	
 		// title
-		if(TJS_SUCCEEDED(params->PropGet(TJS_MEMBERMUSTEXIST, TJS_W("title"), 0,
-			&val, params)))
+		if(TJS_SUCCEEDED(params->PropGet(TJS_MEMBERMUSTEXIST, TJS_W("title"), 0, &val, params)))
 		{
 			title = ttstr(val).AsStdString();
 			ofn.lpstrTitle = title.c_str();
@@ -233,8 +227,7 @@ bool TVPSelectFile(iTJSDispatch2 *params)
 
 		// flags
 		bool issave = false;
-		if(TJS_SUCCEEDED(params->PropGet(TJS_MEMBERMUSTEXIST, TJS_W("save"), 0,
-			&val, params)))
+		if(TJS_SUCCEEDED(params->PropGet(TJS_MEMBERMUSTEXIST, TJS_W("save"), 0, &val, params)))
 			issave = val.operator bool();
 
 		ofn.Flags = OFN_ENABLEHOOK|OFN_EXPLORER|OFN_NOCHANGEDIR|
@@ -247,8 +240,7 @@ bool TVPSelectFile(iTJSDispatch2 *params)
 			ofn.Flags |= OFN_OVERWRITEPROMPT;
 
 		// default extension
-		if(TJS_SUCCEEDED(params->PropGet(TJS_MEMBERMUSTEXIST, TJS_W("defaultExt"), 0,
-			&val, params)))
+		if(TJS_SUCCEEDED(params->PropGet(TJS_MEMBERMUSTEXIST, TJS_W("defaultExt"), 0, &val, params)))
 		{
 			defaultext = ttstr(val).AsStdString();
 			ofn.lpstrDefExt = defaultext.c_str();
@@ -285,13 +277,11 @@ bool TVPSelectFile(iTJSDispatch2 *params)
 
 			// filter index
 			val = (tjs_int)ofn.nFilterIndex;
-			params->PropSet(TJS_MEMBERENSURE, TJS_W("filterIndex"), 0,
-				&val, params);
+			params->PropSet(TJS_MEMBERENSURE, TJS_W("filterIndex"), 0, &val, params);
 
 			// file name
 			val = TVPNormalizeStorageName(ttstr(filename));
-			params->PropSet(TJS_MEMBERENSURE, TJS_W("name"), 0,
-				&val, params);
+			params->PropSet(TJS_MEMBERENSURE, TJS_W("name"), 0, &val, params);
 		}
 
 	}
