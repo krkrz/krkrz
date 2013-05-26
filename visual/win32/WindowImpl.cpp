@@ -21,7 +21,6 @@
 #include "SysInitIntf.h"
 #include "tjsHashSearch.h"
 #include "StorageIntf.h"
-#include "WideNativeFuncs.h"
 #include "VideoOvlIntf.h"
 #include "DebugIntf.h"
 #include "PluginImpl.h"
@@ -49,23 +48,13 @@ tjs_int TVPGetCursor(const ttstr & name)
 	// not found
 	tTVPLocalTempStorageHolder file(place);
 
-	HCURSOR handle;
-
-	if(procLoadCursorFromFileW)
-	{
-		handle = procLoadCursorFromFileW(file.GetLocalName().c_str());
-	}
-	else
-	{
-		tTJSNarrowStringHolder holder(file.GetLocalName().c_str());
-		handle = LoadCursorFromFileA(holder);
-	}
+	HCURSOR handle = ::LoadCursorFromFile(file.GetLocalName().c_str());
 
 	if(!handle) TVPThrowExceptionMessage(TVPCannotLoadCursor, place);
 
 	TVPCursorCount++;
 	//Screen->Cursors[TVPCursorCount] = handle; // using VCL
-	// TODO カーソル設定関係は要らないかな？
+#pragma message ( __LOC__ "TODO カーソル設定関係は要らないかな？" )
 
 	TVPCursorTable.Add(place, TVPCursorCount);
 

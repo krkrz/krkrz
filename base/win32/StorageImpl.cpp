@@ -16,7 +16,6 @@
 #include "MsgIntf.h"
 
 #include "StorageImpl.h"
-#include "WideNativeFuncs.h"
 #include "WindowImpl.h"
 #include "GraphicsLoaderImpl.h"
 #include "SysInitIntf.h"
@@ -122,63 +121,31 @@ void TJS_INTF_METHOD tTVPFileMedia::GetListAt(const ttstr &_name, iTVPStorageLis
 	GetLocalName(name);
 	name += TJS_W("*.*");
 
-	if(procFindFirstFileW && procFindNextFileW)
+	// perform UNICODE operation
+	WIN32_FIND_DATAW ffd;
+	HANDLE handle = ::FindFirstFile(name.c_str(), &ffd);
+	if(handle != INVALID_HANDLE_VALUE)
 	{
-		// perform UNICODE operation
-		WIN32_FIND_DATAW ffd;
-		HANDLE handle = procFindFirstFileW(name.c_str(), &ffd);
-		if(handle != INVALID_HANDLE_VALUE)
+		BOOL cont;
+		do
 		{
-			BOOL cont;
-			do
+			if(!(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 			{
-				if(!(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+				ttstr file(ffd.cFileName);
+				tjs_char *p = file.Independ();
+				while(*p)
 				{
-					ttstr file(ffd.cFileName);
-					tjs_char *p = file.Independ();
-					while(*p)
-					{
-						// make all characters small
-						if(*p >= TJS_W('A') && *p <= TJS_W('Z'))
-							*p += TJS_W('a') - TJS_W('A');
-						p++;
-					}
-					lister->Add(file);
+					// make all characters small
+					if(*p >= TJS_W('A') && *p <= TJS_W('Z'))
+						*p += TJS_W('a') - TJS_W('A');
+					p++;
 				}
+				lister->Add(file);
+			}
 
-				cont = procFindNextFileW(handle, &ffd);
-			} while(cont);
-			FindClose(handle);
-		}
-	}
-	else
-	{
-		// perform ANSI operation
-		WIN32_FIND_DATA ffd;
-		HANDLE handle = FindFirstFile(name.AsStdString().c_str(), &ffd);
-		if(handle != INVALID_HANDLE_VALUE)
-		{
-			BOOL cont;
-			do
-			{
-				if(!(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
-				{
-					ttstr file(ffd.cFileName);
-					tjs_char *p = file.Independ();
-					while(*p)
-					{
-						// make all characters small
-						if(*p >= TJS_W('A') && *p <= TJS_W('Z'))
-							*p += TJS_W('a') - TJS_W('A');
-						p++;
-					}
-					lister->Add(file);
-				}
-
-				cont = FindNextFile(handle, &ffd);
-			} while(cont);
-			FindClose(handle);
-		}
+			cont = ::FindNextFile(handle, &ffd);
+		} while(cont);
+		FindClose(handle);
 	}
 }
 //---------------------------------------------------------------------------
@@ -309,18 +276,10 @@ ttstr TVPGetTemporaryName()
 
 		if(!TVPTempPathInit)
 		{
-			if(procGetTempPathW)
-			{
-				tjs_char tmp[MAX_PATH+1];
-				procGetTempPathW(MAX_PATH, tmp);
-				TVPTempPath = tmp;
-			}
-			else
-			{
-				TCHAR tmp[MAX_PATH+1];
-				GetTempPath(MAX_PATH, tmp);
-				TVPTempPath = ttstr(tmp);
-			}
+			TCHAR tmp[MAX_PATH+1];
+			::GetTempPath(MAX_PATH, tmp);
+			TVPTempPath = tmp;
+
 			if(TVPTempPath.GetLastChar() != TJS_W('\\')) TVPTempPath += TJS_W("\\");
 			TVPProcessID = (tjs_int) GetCurrentProcessId();
 			TVPTempUniqueNum = (tjs_int) GetTickCount();
@@ -351,15 +310,7 @@ ttstr TVPGetTemporaryName()
 //---------------------------------------------------------------------------
 bool TVPRemoveFile(const ttstr &name)
 {
-	if(!procDeleteFileW)
-	{
-		tTJSNarrowStringHolder holder(name.c_str());
-		return 0!=DeleteFileA(holder);
-	}
-	else
-	{
-		return 0!=DeleteFileW(name.c_str());
-	}
+	return 0!=::DeleteFile(name.c_str());
 }
 //---------------------------------------------------------------------------
 
@@ -370,15 +321,7 @@ bool TVPRemoveFile(const ttstr &name)
 //---------------------------------------------------------------------------
 bool TVPRemoveFolder(const ttstr &name)
 {
-	if(!procRemoveDirectoryW)
-	{
-		tTJSNarrowStringHolder holder(name.c_str());
-		return 0!=RemoveDirectoryA(holder);
-	}
-	else
-	{
-		return 0!=RemoveDirectoryW(name.c_str());
-	}
+	return 0!=RemoveDirectory(name.c_str());
 }
 //---------------------------------------------------------------------------
 

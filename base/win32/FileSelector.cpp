@@ -14,7 +14,6 @@
 
 #include "MsgIntf.h"
 #include "StorageImpl.h"
-#include "WideNativeFuncs.h"
 #include "WindowImpl.h"
 #include "SysInitIntf.h"
 #include "DebugIntf.h"

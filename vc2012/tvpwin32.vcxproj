@@ -121,6 +121,7 @@
     <ClInclude Include="..\base\XP3Archive.h" />
     <ClInclude Include="..\environ\win32\Application.h" />
     <ClInclude Include="..\environ\win32\Clipbrd.h" />
+    <ClInclude Include="..\environ\win32\CompatibleNativeFuncs.h" />
     <ClInclude Include="..\environ\win32\DetectCPU.h" />
     <ClInclude Include="..\environ\win32\EmergencyExit.h" />
     <ClInclude Include="..\environ\win32\Exception.h" />
@@ -137,7 +138,6 @@
     <ClInclude Include="..\environ\win32\TMLWindow.h" />
     <ClInclude Include="..\environ\win32\UtilWindow.h" />
     <ClInclude Include="..\environ\win32\VersionFormUnit.h" />
-    <ClInclude Include="..\environ\win32\WideNativeFuncs.h" />
     <ClInclude Include="..\environ\win32\WindowFormUnit.h" />
     <ClInclude Include="..\msg\MsgIntf.h" />
     <ClInclude Include="..\msg\svn_revision.h" />
@@ -264,6 +264,7 @@
     <ClCompile Include="..\base\XP3Archive.cpp" />
     <ClCompile Include="..\environ\win32\Application.cpp" />
     <ClCompile Include="..\environ\win32\Clipbrd.cpp" />
+    <ClCompile Include="..\environ\win32\CompatibleNativeFuncs.cpp" />
     <ClCompile Include="..\environ\win32\DetectCPU.cpp" />
     <ClCompile Include="..\environ\win32\EmergencyExit.cpp" />
     <ClCompile Include="..\environ\win32\InputStringForm.cpp" />
@@ -273,7 +274,6 @@
     <ClCompile Include="..\environ\win32\TMLWindow.cpp" />
     <ClCompile Include="..\environ\win32\UtilWindow.cpp" />
     <ClCompile Include="..\environ\win32\VersionFormUnit.cpp" />
-    <ClCompile Include="..\environ\win32\WideNativeFuncs.cpp" />
     <ClCompile Include="..\environ\win32\WindowFormUnit.cpp" />
     <ClCompile Include="..\msg\MsgIntf.cpp" />
     <ClCompile Include="..\msg\win32\MsgImpl.cpp" />

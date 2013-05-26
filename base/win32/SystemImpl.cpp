@@ -21,7 +21,6 @@
 #include "StorageIntf.h"
 #include "StorageImpl.h"
 #include "TickCount.h"
-#include "WideNativeFuncs.h"
 #include "ComplexRect.h"
 #include "WindowImpl.h"
 #include "MainFormUnit.h"
@@ -176,41 +175,18 @@ static bool TVPShellExecute(const ttstr &target, const ttstr &param)
 {
 	// open or execute target file
 //	ttstr file = TVPGetNativeName(TVPNormalizeStorageName(target));
-
-	if(procShellExecuteW)
+	if(::ShellExecute(NULL, NULL,
+		target.c_str(),
+		param.IsEmpty() ? NULL : param.c_str(),
+		L"",
+		SW_SHOWNORMAL)
+		<=(void *)32)
 	{
-		if(ShellExecuteW(NULL, NULL,
-			target.c_str(),
-			param.IsEmpty() ? NULL : param.c_str(),
-			L"",
-			SW_SHOWNORMAL)
-			<=(void *)32)
-		{
-			return false;
-		}
-		else
-		{
-			return true;
-		}
-
+		return false;
 	}
 	else
 	{
-		tstring a_target(target.AsStdString());
-		tstring a_param(param.AsStdString());
-		if(ShellExecute(NULL, NULL,
-			target.AsStdString().c_str(),
-			param.IsEmpty() ? NULL : a_param.c_str(),
-			_T(""),
-			SW_SHOWNORMAL)
-			<=(void *)32)
-		{
-			return false;
-		}
-		else
-		{
-			return true;
-		}
+		return true;
 	}
 }
 //---------------------------------------------------------------------------
@@ -364,16 +340,8 @@ static void TVPReadRegValue(tTJSVariant &result, const ttstr & key)
 
 			case REG_EXPAND_SZ:
 			case REG_SZ:
-				if(procRegQueryValueExW)
-				{
-					// data is stored in unicode
-					result = ttstr((const tjs_char*)data);
-				}
-				else
-				{
-					// data is stored in ANSI
-					result = ttstr((const char*)data);
-				}
+				// data is stored in unicode
+				result = ttstr((const tjs_char*)data);
 				break;
 			}
 		}
@@ -399,20 +367,10 @@ static void TVPReadRegValue(tTJSVariant &result, const ttstr & key)
 //---------------------------------------------------------------------------
 static ttstr TVPGetSpecialFolderPath(int csidl)
 {
-	if(procSHGetSpecialFolderPathW)
-	{
-		WCHAR path[MAX_PATH+1];
-		if(!procSHGetSpecialFolderPathW(NULL, path, csidl, false))
-			return ttstr();
-		return ttstr(path);
-	}
-	else
-	{
-		char path[MAX_PATH+1];
-		if(!SHGetSpecialFolderPathA(NULL, path, csidl, false))
-			return ttstr();
-		return ttstr(path);
-	}
+	WCHAR path[MAX_PATH+1];
+	if(!SHGetSpecialFolderPath(NULL, path, csidl, false))
+		return ttstr();
+	return ttstr(path);
 }
 //---------------------------------------------------------------------------
 

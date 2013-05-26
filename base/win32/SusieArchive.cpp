@@ -13,7 +13,6 @@
 #include <time.h>
 #include "StorageImpl.h"
 #include "SusieArchive.h"
-#include "WideNativeFuncs.h"
 #include "GraphicsLoaderImpl.h"
 #include "DebugIntf.h"
 #include "XP3Archive.h"

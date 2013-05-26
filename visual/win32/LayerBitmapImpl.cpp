@@ -24,7 +24,6 @@
 #include "tjsHashSearch.h"
 #include "EventIntf.h"
 #include "SysInitImpl.h"
-#include "WideNativeFuncs.h"
 #include "StorageIntf.h"
 #include "DebugIntf.h"
 #include "WindowFormUnit.h"
@@ -1017,39 +1016,12 @@ static tTVPCharacterData * TVPGetCharacter(const tTVPFontAndCharacterData & font
 
 
 		// retrieve character code
-		unsigned char pbuf[10+1];
-		tjs_int pbuflen;
 		WORD code;
-
-		if(!procGetGlyphOutlineW)
-		{
-			// system supports ANSI
-			pbuflen = TJS_wctomb((char*)pbuf, font.Character);
-			if(pbuflen == -1) return NULL; // not drawable character
-
-			pbuf[pbuflen] = 0;
-
-			if(pbuf[1] == 0) // single byte
-				code = pbuf[0];
-			else // multi byte
-				code = pbuf[1]+ (pbuf[0] << 8);
-		}
-		else
-		{
-			// system supports UNICODE
-			code = font.Character;
-		}
-
+		// system supports UNICODE
+		code = font.Character;
 
 		// get buffer size and output dimensions
-		int size;
-
-		if(!procGetGlyphOutlineW)
-			size = GetGlyphOutlineA(bmp->GetFontDC(), code, format, &gm, 0,
-				NULL, transmat);
-		else
-			size = procGetGlyphOutlineW(bmp->GetFontDC(), code, format, &gm, 0,
-				NULL, transmat);
+		int size = ::GetGlyphOutline(bmp->GetFontDC(), code, format, &gm, 0, NULL, transmat);
 
 		// set up structure's variables
 		tTVPCharacterData * data = new tTVPCharacterData();
@@ -1058,12 +1030,7 @@ static tTVPCharacterData * TVPGetCharacter(const tTVPFontAndCharacterData & font
 			SIZE s;
 			s.cx = 0;
 			s.cy = 0;
-			if(!procGetTextExtentPoint32W)
-				GetTextExtentPoint32A(bmp->GetNonBoldFontDC(),
-					(const char*)pbuf, pbuflen, &s);
-			else
-				procGetTextExtentPoint32W(bmp->GetNonBoldFontDC(),
-					&font.Character, 1, &s);
+			GetTextExtentPoint32(bmp->GetNonBoldFontDC(), &font.Character, 1, &s);
 
 			if(font.Font.Flags & TVP_TF_BOLD)
 			{
@@ -1140,13 +1107,7 @@ static tTVPCharacterData * TVPGetCharacter(const tTVPFontAndCharacterData & font
 			try
 			{
 				// draw to buffer
-
-				if(!procGetGlyphOutlineW)
-					GetGlyphOutlineA(bmp->GetFontDC(), code, format, &gm, size,
-						data->GetData(), transmat);
-				else
-					procGetGlyphOutlineW(bmp->GetFontDC(), code, format, &gm, size,
-						data->GetData(), transmat);
+				::GetGlyphOutline(bmp->GetFontDC(), code, format, &gm, size, data->GetData(), transmat);
 
 				if((TVPChUseResampling || !TVPSystemIsBasedOnNT) &&
 					(font.Font.Flags & TVP_TF_BOLD))
@@ -1719,24 +1680,7 @@ static void TVPGetTextExtent(tjs_char ch, tjs_int &w, tjs_int &h)
 	SIZE s;
 	s.cx = 0;
 	s.cy = 0;
-	if(!procGetTextExtentPoint32W)
-	{
-		unsigned char pbuf[10+1];
-		tjs_int pbuflen = TJS_wctomb((char*)pbuf, ch);
-		if(pbuflen != -1)
-		{
-			pbuf[pbuflen] = 0;
-			//GetTextExtentPoint32A(TVPNonBoldFontDCGetCanvas()->GetHandle(),
-			GetTextExtentPoint32A(TVPBitmapForNonBoldFontDC->GetDC(),
-				(const char*)pbuf, pbuflen, &s);
-		}
-	}
-	else
-	{
-		//procGetTextExtentPoint32W(TVPNonBoldFontDCGetCanvas()->GetHandle(),
-		procGetTextExtentPoint32W(TVPBitmapForNonBoldFontDC->GetDC(),
-			&ch, 1, &s);
-	}
+	::GetTextExtentPoint32(TVPBitmapForNonBoldFontDC->GetDC(), &ch, 1, &s);
 
 	w = s.cx;
 	h = s.cy;

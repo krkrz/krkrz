@@ -61,7 +61,7 @@ void TVPOnError();
 
 int _argc;
 char ** _argv;
-extern void TVPInitWideNativeFunctions();
+extern void TVPInitCompatibleNativeFunctions();
 
 AcceleratorKeyTable::AcceleratorKeyTable() {
 	// デフォルトを読み込む
@@ -170,7 +170,7 @@ void AcceleratorKey::DelKey( WORD id ) {
 	keys_ = table;
 }
 int APIENTRY WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow ) {
-	TVPInitWideNativeFunctions();
+	TVPInitCompatibleNativeFunctions();
 
 	hInst = hInstance;
 
