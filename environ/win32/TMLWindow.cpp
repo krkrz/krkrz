@@ -9,6 +9,7 @@
 #include "Exception.h"
 #include "Application.h"
 #include "Resource.h"
+#include "CompatibleNativeFuncs.h"
 
 namespace TML {
 
@@ -83,20 +84,27 @@ LRESULT WINAPI Window::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 
 	case WM_LBUTTONDOWN:
 		// ::SetTimer( GetHandle(), msg, ::GetDoubleClickTime(), NULL );
-		LeftDoubleClick = false;
-		OnMouseDown( mbLeft, GetShiftState(wParam), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
+		if( ignore_touch_mouse_ == false ) {
+			LeftDoubleClick = false;
+			OnMouseDown( mbLeft, GetShiftState(wParam), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
+		}
 		return 0;
 	case WM_LBUTTONUP:
-		if( LeftDoubleClick == false ) {
-			OnMouseClick( mbLeft, GetShiftState(wParam), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
+		if( ignore_touch_mouse_ == false ) {
+			if( LeftDoubleClick == false ) {
+				OnMouseClick( mbLeft, GetShiftState(wParam), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
+			}
+			LeftDoubleClick = false;
+			OnMouseUp( mbLeft, GetShiftState(wParam), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) ); 
 		}
-		LeftDoubleClick = false;
-		OnMouseUp( mbLeft, GetShiftState(wParam), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
+		ignore_touch_mouse_ = false;
 		return 0;
 	case WM_LBUTTONDBLCLK:
-		LeftDoubleClick = true;
-		OnMouseDoubleClick( mbLeft, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
-		OnMouseDown( mbLeft, GetShiftState(wParam), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
+		if( ignore_touch_mouse_ == false ) {
+			LeftDoubleClick = true;
+			OnMouseDoubleClick( mbLeft, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
+			OnMouseDown( mbLeft, GetShiftState(wParam), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
+		}
 		return 0;
 
 	case WM_RBUTTONDOWN:
@@ -139,58 +147,85 @@ LRESULT WINAPI Window::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 			return 0;
 		}
 		return ::DefWindowProc(hWnd,msg,wParam,lParam);
-#if 0
 	case WM_TOUCH: {
 		// user32.dll から GetTouchInputInfo など読み込む
-		UINT cInputs = LOWORD(wParam);
-		PTOUCHINPUT pInputs = new TOUCHINPUT[cInputs];
-		if( NULL != pInputs ) {
-			if( GetTouchInputInfo( (HTOUCHINPUT)lParam, cInputs, pInputs, sizeof(TOUCHINPUT)) ) {
-				// process pInputs
-				if( !CloseTouchInputHandle((HTOUCHINPUT)lParam) ) {
-					// error handling
+		if( procGetTouchInputInfo && procCloseTouchInputHandle ) {
+			UINT cInputs = LOWORD(wParam);
+			PTOUCHINPUT pInputs = new TOUCHINPUT[cInputs];
+			if( NULL != pInputs ) {
+				if( procGetTouchInputInfo( (HTOUCHINPUT)lParam, cInputs, pInputs, sizeof(TOUCHINPUT)) ) {
+					// process pInputs
+					for( UINT i = 0; i < cInputs; i++ ) {
+						int x = pInputs[i].x / 100;
+						int y = pInputs[i].y / 100;
+						POINT pt = {x,y};
+						::ClientToScreen( GetHandle(), &pt );
+						int lx = pInputs[i].x % 100;
+						int ly = pInputs[i].y % 100;
+						double vx = x + static_cast<double>(lx)/100.0;
+						double vy = y + static_cast<double>(ly)/100.0;
+						double cx = 1;
+						double cy = 1;
+						if( pInputs[i].dwMask & TOUCHINPUTMASKF_CONTACTAREA ) {
+							cx = static_cast<double>(pInputs[i].cxContact) / 100.0;
+							cy = static_cast<double>(pInputs[i].cyContact) / 100.0;
+						}
+						if( pInputs[i].dwFlags & TOUCHEVENTF_DOWN ) {
+							OnTouchDown( vx, vy, cx, cy, pInputs[i].dwID );
+						}
+						if( pInputs[i].dwFlags & TOUCHEVENTF_MOVE ) {
+							OnTouchMove( vx, vy, cx, cy, pInputs[i].dwID );
+						}
+						if( pInputs[i].dwFlags & TOUCHEVENTF_UP ) {
+							OnTouchUp( vx, vy, cx, cy, pInputs[i].dwID );
+						}
+					}
+					ignore_touch_mouse_ = true;
+					if( !procCloseTouchInputHandle((HTOUCHINPUT)lParam) ) {
+						// error handling
+					}
+				} else {
+					// GetLastError() and error handling
 				}
+				delete[] pInputs;
 			} else {
-				// GetLastError() and error handling
+				// error handling, presumably out of memory
 			}
-			delete[] pInputs;
-		} else {
-			// error handling, presumably out of memory
 		}
 		return DefWindowProc(hWnd, msg, wParam, lParam);
 	}
-	case WM_GESTURE: {
-		GESTUREINFO gi;
-		ZeroMemory(&gi, sizeof(GESTUREINFO));
-		gi.cbSize = sizeof(gi);
-		BOOL bResult = GetGestureInfo((HGESTUREINFO)lParam, &gi);
-		BOOL bHandled = FALSE;
-		switch (gi.dwID){
-        case GID_ZOOM:
-            // Code for zooming goes here
-			bHandled = TRUE;
-            break;
-        case GID_PAN:
-			bHandled = TRUE;
-            break;
-        case GID_ROTATE:
-			bHandled = TRUE;
-            break;
-        case GID_TWOFINGERTAP:
-			bHandled = TRUE;
-            break;
-        case GID_PRESSANDTAP:
-			bHandled = TRUE;
-            break;
-        default:
-            // You have encountered an unknown gesture
-            break;
+	case WM_GESTURE:
+		if( procGetGestureInfo && procCloseGestureInfoHandle ) {
+			GESTUREINFO gi;
+			ZeroMemory(&gi, sizeof(GESTUREINFO));
+			gi.cbSize = sizeof(gi);
+			BOOL bResult = procGetGestureInfo((HGESTUREINFO)lParam, &gi);
+			BOOL bHandled = FALSE;
+			switch (gi.dwID){
+			case GID_ZOOM:
+				// Code for zooming goes here
+				bHandled = TRUE;
+				break;
+			case GID_PAN:
+				bHandled = TRUE;
+				break;
+			case GID_ROTATE:
+				bHandled = TRUE;
+				break;
+			case GID_TWOFINGERTAP:
+				bHandled = TRUE;
+				break;
+			case GID_PRESSANDTAP:
+				bHandled = TRUE;
+				break;
+			default:
+				// You have encountered an unknown gesture
+				break;
+			}
+			procCloseGestureInfoHandle((HGESTUREINFO)lParam);
+			if( bHandled ) return 0;
 		}
-		CloseGestureInfoHandle((HGESTUREINFO)lParam);
-		if( bHandled ) return 0;
-		else return DefWindowProc(hWnd, msg, wParam, lParam);
-	}
-#endif
+		return DefWindowProc(hWnd, msg, wParam, lParam);
 	 /*
 	case WM_IDLE:
 		if( TVPMainForm ) {
@@ -333,6 +368,14 @@ HRESULT Window::CreateWnd( const tstring& classname, const tstring& title, int w
 	if( ::UpdateWindow(window_handle_) == 0 )
 		return HRESULT_FROM_WIN32(::GetLastError());
 
+	// ハードがマルチタッチをサポートしているかどうか
+	if( procRegisterTouchWindow ) {
+		int value= ::GetSystemMetrics( SM_DIGITIZER );
+		if( (value & (NID_MULTI_INPUT|NID_READY)) == (NID_MULTI_INPUT|NID_READY) ) {
+			// マルチタッチサポート & 準備できている
+			BOOL ret = procRegisterTouchWindow( window_handle_, 0/*TWF_WANTPALM|TWF_FINETOUCH*/ );
+		}
+	}
 	return S_OK;
 }
 void Window::UnregisterWindow() {

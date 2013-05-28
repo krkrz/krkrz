@@ -218,6 +218,9 @@ int APIENTRY WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
 		TVPLoadPluigins(); // load plugin module *.tpm
 
+		// Check digitizer
+		Application->CheckDigitizer();
+
 		if(TVPProjectDirSelected) TVPInitializeStartupScript();
 
 		Application->Run();
@@ -423,6 +426,31 @@ void TApplication::UnregisterAcceleratorKey(HWND hWnd, short cmd) {
 }
 void TApplication::DeleteAcceleratorKeyTable( HWND hWnd ) {
 	accel_key_.DelTable( hWnd );
+}
+void TApplication::CheckDigitizer() {
+// TODO メッセージはリソースへ
+	int value = ::GetSystemMetrics(SM_DIGITIZER);
+	if( value == 0 ) return;
+
+	TVPAddLog(_T("Enable Digitizer"));
+	if( value & NID_INTEGRATED_TOUCH ) {
+		TVPAddLog(_T("統合型のタッチ デジタイザーが入力に使用されています。"));
+	}
+	if( value & NID_EXTERNAL_TOUCH ) {
+		TVPAddLog(_T("外付けのタッチ デジタイザーが入力に使用されています。"));
+	}
+	if( value & NID_INTEGRATED_PEN ) {
+		TVPAddLog(_T("統合型のペン デジタイザーが入力に使用されています。"));
+	}
+	if( value & NID_EXTERNAL_PEN ) {
+		TVPAddLog(_T("外付けのペン デジタイザーが入力に使用されています。"));
+	}
+	if( value & NID_MULTI_INPUT ) {
+		TVPAddLog(_T("複数入力がサポートされた入力デジタイザーが入力に使用されています。"));
+	}
+	if( value & NID_READY ) {
+		TVPAddLog(_T("入力デジタイザーで入力の準備ができています。"));
+	}
 }
 /**
  仮実装 TODO

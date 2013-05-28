@@ -172,6 +172,19 @@ private:
 	tjs_int ActualZoomNumer; // Zooming factor numerator (actual)
 	
 	DWORD LastRecheckInputStateSent;
+
+	struct TouchPoint {
+		static const int USE_POINT = 0x01 << 0;
+		static const int START_SCALING = 0x01 << 1;
+		static const int START_ROT = 0x01 << 2;
+		DWORD id;
+		double fx;
+		double fy;
+		double x;
+		double y;
+		DWORD flag;
+	};
+	TouchPoint touch_points_[10];
 private:
 	void SetDrawDeviceDestRect();
 	void TranslateWindowToPaintBox(int &x, int &y);
@@ -356,7 +369,13 @@ public:
 	
 	virtual void OnFocus(HWND hFocusLostWnd);
 	virtual void OnFocusLost(HWND hFocusingWnd);
+	
+	virtual void OnTouchDown( double x, double y, double cx, double cy, DWORD id );
+	virtual void OnTouchMove( double x, double y, double cx, double cy, DWORD id );
+	virtual void OnTouchUp( double x, double y, double cx, double cy, DWORD id );
 
+	void OnTouchScaling( double rate, double cx, double cy );
+	void OnTouchRotate( double angle, double cx, double cy );
 
 	void WMShowVisible();
 	void WMShowTop( WPARAM wParam );

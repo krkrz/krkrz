@@ -58,6 +58,16 @@ TVP_NATIVE_FUNC_REG(
 	BOOL, WINAPI, CloseGestureInfoHandle,
 	(HGESTUREINFO hGestureInfo),
 	_T("USER32.DLL"))
+
+TVP_NATIVE_FUNC_REG(
+	BOOL, WINAPI, RegisterTouchWindow,
+	(HWND hWnd, ULONG ulFlags),
+	_T("USER32.DLL"))
+
+TVP_NATIVE_FUNC_REG(
+	BOOL, WINAPI, UnregisterTouchWindow,
+	(HWND hWnd),
+	_T("USER32.DLL"))
 /////
 //---------------------------------------------------------------------------
 #if defined(TVP_WNF_B)

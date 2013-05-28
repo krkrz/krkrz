@@ -120,6 +120,11 @@ tTVPUniqueTagForInputEvent tTVPOnFileDropInputEvent           ::Tag;
 tTVPUniqueTagForInputEvent tTVPOnMouseWheelInputEvent         ::Tag;
 tTVPUniqueTagForInputEvent tTVPOnPopupHideInputEvent          ::Tag;
 tTVPUniqueTagForInputEvent tTVPOnWindowActivateEvent          ::Tag;
+tTVPUniqueTagForInputEvent tTVPOnTouchDownInputEvent          ::Tag;
+tTVPUniqueTagForInputEvent tTVPOnTouchUpInputEvent            ::Tag;
+tTVPUniqueTagForInputEvent tTVPOnTouchMoveInputEvent          ::Tag;
+tTVPUniqueTagForInputEvent tTVPOnTouchScalingInputEvent       ::Tag;
+tTVPUniqueTagForInputEvent tTVPOnTouchRotateInputEvent        ::Tag;
 //---------------------------------------------------------------------------
 
 
@@ -370,6 +375,59 @@ void tTJSNI_BaseWindow::OnMouseMove(tjs_int x, tjs_int y, tjs_uint32 flags)
 			3, arg);
 	}
 	if(DrawDevice) DrawDevice->OnMouseMove(x, y, flags);
+}
+//---------------------------------------------------------------------------
+void tTJSNI_BaseWindow::OnTouchDown( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id ) {
+	if(!CanDeliverEvents()) return;
+	if(Owner)
+	{
+		tTJSVariant arg[5] = { x, y, cx, cy, (tjs_int64)id };
+		static ttstr eventname(TJS_W("onTouchDown"));
+		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 5, arg);
+	}
+	//if(DrawDevice) DrawDevice->OnTouchDown(x, y, cx, cy, id);
+}
+//---------------------------------------------------------------------------
+void tTJSNI_BaseWindow::OnTouchUp( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id ) {
+	if(!CanDeliverEvents()) return;
+	if(Owner)
+	{
+		tTJSVariant arg[5] = { x, y, cx, cy, (tjs_int64)id };
+		static ttstr eventname(TJS_W("onTouchUp"));
+		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 5, arg);
+	}
+	//if(DrawDevice) DrawDevice->OnTouchDown(x, y, cx, cy, id);
+}
+//---------------------------------------------------------------------------
+void tTJSNI_BaseWindow::OnTouchMove( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id ) {
+	if(!CanDeliverEvents()) return;
+	if(Owner)
+	{
+		tTJSVariant arg[5] = { x, y, cx, cy, (tjs_int64)id };
+		static ttstr eventname(TJS_W("onTouchMove"));
+		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 5, arg);
+	}
+	//if(DrawDevice) DrawDevice->OnTouchDown(x, y, cx, cy, id);
+}
+//---------------------------------------------------------------------------
+void tTJSNI_BaseWindow::OnTouchScaling( double rate, double cx, double cy ) {
+	if(!CanDeliverEvents()) return;
+	if(Owner)
+	{
+		tTJSVariant arg[3] = { rate, cx, cy };
+		static ttstr eventname(TJS_W("onTouchScaling"));
+		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 3, arg);
+	}
+}
+//---------------------------------------------------------------------------
+void tTJSNI_BaseWindow::OnTouchRotate( double angle, double cx, double cy ) {
+	if(!CanDeliverEvents()) return;
+	if(Owner)
+	{
+		tTJSVariant arg[3] = { angle, cx, cy };
+		static ttstr eventname(TJS_W("onTouchRotate"));
+		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 3, arg);
+	}
 }
 //---------------------------------------------------------------------------
 void tTJSNI_BaseWindow::OnReleaseCapture()
@@ -948,6 +1006,82 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/onMouseWheel)
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/onMouseWheel)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/onTouchDown)
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
+
+	TVP_ACTION_INVOKE_BEGIN(5, "onTouchDown", objthis);
+	TVP_ACTION_INVOKE_MEMBER("x");
+	TVP_ACTION_INVOKE_MEMBER("y");
+	TVP_ACTION_INVOKE_MEMBER("cx");
+	TVP_ACTION_INVOKE_MEMBER("cy");
+	TVP_ACTION_INVOKE_MEMBER("id");
+	TVP_ACTION_INVOKE_END(tTJSVariantClosure(objthis, objthis));
+
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/onTouchDown)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/onTouchUp)
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
+
+	TVP_ACTION_INVOKE_BEGIN(5, "onTouchUp", objthis);
+	TVP_ACTION_INVOKE_MEMBER("x");
+	TVP_ACTION_INVOKE_MEMBER("y");
+	TVP_ACTION_INVOKE_MEMBER("cx");
+	TVP_ACTION_INVOKE_MEMBER("cy");
+	TVP_ACTION_INVOKE_MEMBER("id");
+	TVP_ACTION_INVOKE_END(tTJSVariantClosure(objthis, objthis));
+
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/onTouchUp)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/onTouchMove)
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
+
+	TVP_ACTION_INVOKE_BEGIN(5, "onTouchMove", objthis);
+	TVP_ACTION_INVOKE_MEMBER("x");
+	TVP_ACTION_INVOKE_MEMBER("y");
+	TVP_ACTION_INVOKE_MEMBER("cx");
+	TVP_ACTION_INVOKE_MEMBER("cy");
+	TVP_ACTION_INVOKE_MEMBER("id");
+	TVP_ACTION_INVOKE_END(tTJSVariantClosure(objthis, objthis));
+
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/onTouchMove)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/onTouchScaling)
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
+
+	TVP_ACTION_INVOKE_BEGIN(3, "onTouchScaling", objthis);
+	TVP_ACTION_INVOKE_MEMBER("rate");
+	TVP_ACTION_INVOKE_MEMBER("cx");
+	TVP_ACTION_INVOKE_MEMBER("cy");
+	TVP_ACTION_INVOKE_END(tTJSVariantClosure(objthis, objthis));
+
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/onTouchScaling)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/onTouchRotate)
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
+
+	TVP_ACTION_INVOKE_BEGIN(3, "onTouchRotate", objthis);
+	TVP_ACTION_INVOKE_MEMBER("angle");
+	TVP_ACTION_INVOKE_MEMBER("cx");
+	TVP_ACTION_INVOKE_MEMBER("cy");
+	TVP_ACTION_INVOKE_END(tTJSVariantClosure(objthis, objthis));
+
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/onTouchRotate)
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/onKeyDown)
 {
