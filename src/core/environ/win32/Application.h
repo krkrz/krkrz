@@ -114,6 +114,7 @@ public:
 	void CheckConsole();
 	void CloseConsole();
 	bool IsAttachConsole() { return is_attach_console_; }
+	void CheckDigitizer();
 
 	HWND GetHandle();
 	bool IsIconic() {

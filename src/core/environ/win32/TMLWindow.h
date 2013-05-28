@@ -43,6 +43,7 @@ protected:
 	SIZE		max_size_;
 	int			border_style_;
 	bool		in_window_;
+	bool		ignore_touch_mouse_;
 
 	int ModalResult;
 
@@ -111,7 +112,7 @@ protected:
 public:
 	Window()
 	: window_handle_(NULL), created_(false), LeftDoubleClick(false), ime_control_(NULL), border_style_(0), ModalResult(0),
-		in_window_(false) {
+		in_window_(false), ignore_touch_mouse_(false) {
 		min_size_.cx = min_size_.cy = 0;
 		max_size_.cx = max_size_.cy = 0;
 	}
@@ -265,6 +266,10 @@ public:
 	virtual void OnMouseLeave() {}
 	virtual void OnShow( int status ) {}
 	virtual void OnHide( int status ) {}
+
+	virtual void OnTouchDown( double x, double y, double cx, double cy, DWORD id ) {}
+	virtual void OnTouchMove( double x, double y, double cx, double cy, DWORD id ) {}
+	virtual void OnTouchUp( double x, double y, double cx, double cy, DWORD id ) {}
 };
 
 

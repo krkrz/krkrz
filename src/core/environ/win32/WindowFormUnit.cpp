@@ -232,6 +232,8 @@ TTVPWindowForm::TTVPWindowForm( TApplication* app, tTJSNI_Window* ni ) : TML::Wi
 	ReloadDeviceTick = 0;
 	
 	LastRecheckInputStateSent = 0;
+
+	::ZeroMemory( touch_points_, sizeof(touch_points_) );
 }
 TTVPWindowForm::~TTVPWindowForm() {
 	Application->RemoveWindow(this);
@@ -1424,6 +1426,115 @@ void TTVPWindowForm::OnMouseWheel( int delta, int shift, int x, int y ) {
 			tjs_uint32 s = TVP_TShiftState_To_uint32(shift);
 			TVPPostInputEvent(new tTVPOnMouseWheelInputEvent(TJSNativeInstance, shift, delta, x, y));
 		}
+	}
+}
+
+void TTVPWindowForm::OnTouchDown( double x, double y, double cx, double cy, DWORD id ) {
+	// TranslateWindowToPaintBox(x, y);
+	if(TJSNativeInstance) {
+		TVPPostInputEvent( new tTVPOnTouchDownInputEvent(TJSNativeInstance, x, y, cx, cy, id));
+	}
+	for( int i = 0; i < 10; i++ ) {
+		if( (touch_points_[i].flag & TouchPoint::USE_POINT) == 0 ) {
+			touch_points_[i].fx = x;
+			touch_points_[i].fy = y;
+			touch_points_[i].x = x;
+			touch_points_[i].y = y;
+			touch_points_[i].id = id;
+			touch_points_[i].flag = TouchPoint::USE_POINT;
+			break;
+		}
+	}
+}
+void TTVPWindowForm::OnTouchMove( double x, double y, double cx, double cy, DWORD id ) {
+	if(TJSNativeInstance) {
+		TVPPostInputEvent( new tTVPOnTouchMoveInputEvent(TJSNativeInstance, x, y, cx, cy, id));
+	}
+	int count = 0;
+	for( int i = 0; i < 10; i++ ) {
+		if( touch_points_[i].flag & TouchPoint::USE_POINT ) {
+			count++;
+		}
+	}
+	if( count != 2 ) return; // 2点タッチのみ反応
+
+	int targetidx;
+	for( targetidx = 0; targetidx < 10; targetidx++ ) {
+		// 違うIDの座標をを探す
+		if( (touch_points_[targetidx].id != id) && (touch_points_[targetidx].flag & TouchPoint::USE_POINT)  ) {
+			break;
+		}
+	}
+	if( targetidx < 10 ) {
+		int selfidx;
+		for( selfidx = 0; selfidx < 10; selfidx++ ) {
+			// 違うIDの座標をを探す
+			if( (touch_points_[selfidx].id == id) && (touch_points_[selfidx].flag & TouchPoint::USE_POINT)  ) {
+				break;
+			}
+		}
+		if( selfidx < 10 ) {
+			double dx = (touch_points_[targetidx].fx - touch_points_[selfidx].fx);
+			double dy = (touch_points_[targetidx].fy - touch_points_[selfidx].fy);
+			double startdistance = std::sqrt( dx*dx +dy*dy );
+			double startangle = std::atan2( dx, dy );
+			dx = (touch_points_[targetidx].x - x);
+			dy = (touch_points_[targetidx].y - y);
+			double currentdistance = std::sqrt( dx*dx +dy*dy );
+			double curentangle = std::atan2( dx, dy );
+			double cx = dx*0.5;
+			double cy = dy*0.5;
+
+			const double threshold = 0.05;
+			double rate = currentdistance / startdistance;
+			if( (touch_points_[targetidx].flag & TouchPoint::START_SCALING) || 
+				(touch_points_[selfidx].flag & TouchPoint::START_SCALING) || 
+				std::abs(rate - 1.0) > threshold ) {
+				touch_points_[targetidx].flag |= TouchPoint::START_SCALING;
+				touch_points_[selfidx].flag |= TouchPoint::START_SCALING;
+				OnTouchScaling( rate, cx, cy );
+			}
+			
+			const double anglethreshold = 0.05;
+			double angle = curentangle - startangle;
+			if( (touch_points_[targetidx].flag & TouchPoint::START_ROT) || 
+				(touch_points_[selfidx].flag & TouchPoint::START_ROT) || 
+				std::abs(rate - 1.0) > threshold ) {
+				touch_points_[targetidx].flag |= TouchPoint::START_ROT;
+				touch_points_[selfidx].flag |= TouchPoint::START_ROT;
+				OnTouchRotate( angle, cx, cy );
+			}
+
+			touch_points_[selfidx].x = x;
+			touch_points_[selfidx].y = y;
+		}
+	}
+}
+void TTVPWindowForm::OnTouchUp( double x, double y, double cx, double cy, DWORD id ) {
+	if(TJSNativeInstance) {
+		TVPPostInputEvent( new tTVPOnTouchUpInputEvent(TJSNativeInstance, x, y, cx, cy, id));
+	}
+	for( int i = 0; i < 10; i++ ) {
+		if( (touch_points_[i].id == id) && (touch_points_[i].flag & TouchPoint::USE_POINT)  ) {
+			touch_points_[i].fx = 0;
+			touch_points_[i].fy = 0;
+			touch_points_[i].x = 0;
+			touch_points_[i].y = 0;
+			touch_points_[i].id = 0;
+			touch_points_[i].flag = 0;
+			break;
+		}
+	}
+}
+void TTVPWindowForm::OnTouchScaling( double rate, double cx, double cy ) {
+	if(TJSNativeInstance) {
+		TVPPostInputEvent( new tTVPOnTouchScalingInputEvent(TJSNativeInstance, rate, cx, cy));
+	}
+}
+
+void TTVPWindowForm::OnTouchRotate( double angle, double cx, double cy ) {
+	if(TJSNativeInstance) {
+		TVPPostInputEvent( new tTVPOnTouchRotateInputEvent(TJSNativeInstance, angle, cx, cy));
 	}
 }
 

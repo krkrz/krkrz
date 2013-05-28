@@ -27,7 +27,7 @@
 void TVPInitCompatibleNativeFunctions()
 {
 	// retrieve function pointer from each module
-	const tjs_int n = sizeof(tTVPCompatibleNativeFunc)/sizeof(tTVPCompatibleNativeFunc);
+	const tjs_int n = sizeof(TVPCompatibleNativeFuncs)/sizeof(tTVPCompatibleNativeFunc);
 	for( tjs_int i = 0; i<n; i++ ) 	{
 		tTVPCompatibleNativeFunc * p = TVPCompatibleNativeFuncs + i;
 		HMODULE module = GetModuleHandle(p->Module);

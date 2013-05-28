@@ -206,6 +206,13 @@ public:
 	void OnPopupHide();
 	void OnActivate(bool activate_or_deactivate);
 
+	void OnTouchDown( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id );
+	void OnTouchUp( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id );
+	void OnTouchMove( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id );
+	
+	void OnTouchScaling( double rate, double cx, double cy );
+	void OnTouchRotate( double angle, double cx, double cy );
+
 	void ClearInputEvents();
 
 	void PostReleaseCaptureEvent();
@@ -516,6 +523,77 @@ public:
 };
 //---------------------------------------------------------------------------
 
+//---------------------------------------------------------------------------
+class tTVPOnTouchDownInputEvent : public tTVPBaseInputEvent
+{
+	static tTVPUniqueTagForInputEvent Tag;
+	tjs_real X;
+	tjs_real Y;
+	tjs_real CX;
+	tjs_real CY;
+	tjs_uint32 ID;
+public:
+	tTVPOnTouchDownInputEvent(tTJSNI_BaseWindow *win, tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id ) :
+		tTVPBaseInputEvent(win, Tag), X(x), Y(y), CX(cx), CY(cy), ID(id) {};
+	void Deliver() const
+	{ ((tTJSNI_BaseWindow*)GetSource())->OnTouchDown(X, Y, CX, CY, ID); }
+};
+//---------------------------------------------------------------------------
+class tTVPOnTouchUpInputEvent : public tTVPBaseInputEvent
+{
+	static tTVPUniqueTagForInputEvent Tag;
+	tjs_real X;
+	tjs_real Y;
+	tjs_real CX;
+	tjs_real CY;
+	tjs_uint32 ID;
+public:
+	tTVPOnTouchUpInputEvent(tTJSNI_BaseWindow *win, tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id ) :
+		tTVPBaseInputEvent(win, Tag), X(x), Y(y), CX(cx), CY(cy), ID(id) {};
+	void Deliver() const
+	{ ((tTJSNI_BaseWindow*)GetSource())->OnTouchUp(X, Y, CX, CY, ID); }
+};
+//---------------------------------------------------------------------------
+class tTVPOnTouchMoveInputEvent : public tTVPBaseInputEvent
+{
+	static tTVPUniqueTagForInputEvent Tag;
+	tjs_real X;
+	tjs_real Y;
+	tjs_real CX;
+	tjs_real CY;
+	tjs_uint32 ID;
+public:
+	tTVPOnTouchMoveInputEvent(tTJSNI_BaseWindow *win, tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id ) :
+		tTVPBaseInputEvent(win, Tag), X(x), Y(y), CX(cx), CY(cy), ID(id) {};
+	void Deliver() const
+	{ ((tTJSNI_BaseWindow*)GetSource())->OnTouchMove(X, Y, CX, CY, ID); }
+};
+//---------------------------------------------------------------------------
+class tTVPOnTouchScalingInputEvent : public tTVPBaseInputEvent
+{
+	static tTVPUniqueTagForInputEvent Tag;
+	tjs_real Rate;
+	tjs_real CX;
+	tjs_real CY;
+public:
+	tTVPOnTouchScalingInputEvent(tTJSNI_BaseWindow *win, tjs_real rate, tjs_real cx, tjs_real cy ) :
+		tTVPBaseInputEvent(win, Tag), Rate(rate), CX(cx), CY(cy) {};
+	void Deliver() const
+	{ ((tTJSNI_BaseWindow*)GetSource())->OnTouchScaling( Rate, CX, CY ); }
+};
+//---------------------------------------------------------------------------
+class tTVPOnTouchRotateInputEvent : public tTVPBaseInputEvent
+{
+	static tTVPUniqueTagForInputEvent Tag;
+	tjs_real Angle;
+	tjs_real CX;
+	tjs_real CY;
+public:
+	tTVPOnTouchRotateInputEvent(tTJSNI_BaseWindow *win, tjs_real angle, tjs_real cx, tjs_real cy ) :
+		tTVPBaseInputEvent(win, Tag), Angle(angle), CX(cx), CY(cy) {};
+	void Deliver() const
+	{ ((tTJSNI_BaseWindow*)GetSource())->OnTouchRotate( Angle, CX, CY ); }
+};
 
 
 #endif
