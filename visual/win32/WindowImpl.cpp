@@ -30,6 +30,7 @@
 
 #include "Application.h"
 #include "Screen.h"
+#include "tjsDictionary.h"
 
 //---------------------------------------------------------------------------
 // Mouse Cursor management
@@ -2021,8 +2022,56 @@ tjs_int tTJSNI_Window::GetZoomDenom() const
 	return Form->GetZoomDenom();
 }
 //---------------------------------------------------------------------------
-
-
+void tTJSNI_Window::SetTouchScaleThreshold( tjs_real threshold ) {
+	if(!Form) return;
+	Form->SetTouchScaleThreshold(threshold);
+}
+//---------------------------------------------------------------------------
+tjs_real tTJSNI_Window::GetTouchScaleThreshold() const {
+	if(!Form) return 0;
+	return Form->GetTouchScaleThreshold();
+}
+//---------------------------------------------------------------------------
+void tTJSNI_Window::SetTouchRotateThreshold( tjs_real threshold ) {
+	if(!Form) return;
+	Form->SetTouchRotateThreshold(threshold);
+}
+//---------------------------------------------------------------------------
+tjs_real tTJSNI_Window::GetTouchRotateThreshold() const {
+	if(!Form) return 0;
+	return Form->GetTouchRotateThreshold();
+}
+//---------------------------------------------------------------------------
+tjs_real tTJSNI_Window::GetTouchPointStartX( tjs_int index ) {
+	if(!Form) return 0;
+	return Form->GetTouchPointStartX(index);
+}
+//---------------------------------------------------------------------------
+tjs_real tTJSNI_Window::GetTouchPointStartY( tjs_int index ) {
+	if(!Form) return 0;
+	return Form->GetTouchPointStartY(index);
+}
+//---------------------------------------------------------------------------
+tjs_real tTJSNI_Window::GetTouchPointX( tjs_int index ) {
+	if(!Form) return 0;
+	return Form->GetTouchPointX(index);
+}
+//---------------------------------------------------------------------------
+tjs_real tTJSNI_Window::GetTouchPointY( tjs_int index ) {
+	if(!Form) return 0;
+	return Form->GetTouchPointY(index);
+}
+//---------------------------------------------------------------------------
+tjs_real tTJSNI_Window::GetTouchPointID( tjs_int index ) {
+	if(!Form) return 0;
+	return Form->GetTouchPointID(index);
+}
+//---------------------------------------------------------------------------
+tjs_int tTJSNI_Window::GetTouchPointCount() {
+	if(!Form) return 0;
+	return Form->GetTouchPointCount();
+}
+//---------------------------------------------------------------------------
 
 
 
@@ -2084,6 +2133,57 @@ TJS_BEGIN_NATIVE_METHOD_DECL(registerMessageReceiver)
 }
 TJS_END_NATIVE_METHOD_DECL_OUTER(cls, registerMessageReceiver)
 //---------------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(getTouchPoint)
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
+	if(numparams < 1) return TJS_E_BADPARAMCOUNT;
+
+	tjs_int index = (tjs_int)*param[0];
+	if( index < _this->GetTouchPointCount() ) {
+		if( result ) {
+			iTJSDispatch2 * object = TJSCreateDictionaryObject();
+
+			static ttstr startX_name(TJS_W("startX"));
+			static ttstr startY_name(TJS_W("startY"));
+			static ttstr X_name(TJS_W("x"));
+			static ttstr Y_name(TJS_W("y"));
+			static ttstr ID_name(TJS_W("ID"));
+			{
+				tTJSVariant val(_this->GetTouchPointStartX(index));
+				if(TJS_FAILED(object->PropSet(TJS_MEMBERENSURE|TJS_IGNOREPROP, startX_name.c_str(), startX_name.GetHint(), &val, object)))
+						TVPThrowInternalError;
+			}
+			{
+				tTJSVariant val(_this->GetTouchPointStartY(index));
+				if(TJS_FAILED(object->PropSet(TJS_MEMBERENSURE|TJS_IGNOREPROP, startY_name.c_str(), startY_name.GetHint(), &val, object)))
+						TVPThrowInternalError;
+			}
+			{
+				tTJSVariant val(_this->GetTouchPointX(index));
+				if(TJS_FAILED(object->PropSet(TJS_MEMBERENSURE|TJS_IGNOREPROP, X_name.c_str(), X_name.GetHint(), &val, object)))
+						TVPThrowInternalError;
+			}
+			{
+				tTJSVariant val(_this->GetTouchPointY(index));
+				if(TJS_FAILED(object->PropSet(TJS_MEMBERENSURE|TJS_IGNOREPROP, Y_name.c_str(), Y_name.GetHint(), &val, object)))
+						TVPThrowInternalError;
+			}
+			{
+				tTJSVariant val(_this->GetTouchPointID(index));
+				if(TJS_FAILED(object->PropSet(TJS_MEMBERENSURE|TJS_IGNOREPROP, ID_name.c_str(), ID_name.GetHint(), &val, object)))
+						TVPThrowInternalError;
+			}
+			tTJSVariant objval(object, object);
+			object->Release();
+			*result = objval;
+		}
+	} else {
+		return TJS_E_INVALIDPARAM;
+	}
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL_OUTER(cls, getTouchPoint)
+//---------------------------------------------------------------------------
 TJS_BEGIN_NATIVE_PROP_DECL(HWND)
 {
 	TJS_BEGIN_NATIVE_PROP_GETTER
@@ -2118,11 +2218,63 @@ TJS_BEGIN_NATIVE_PROP_DECL(drawDevice)
 }
 TJS_END_NATIVE_PROP_DECL_OUTER(cls, drawDevice)
 //---------------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(touchScaleThreshold)
+{
+	TJS_BEGIN_NATIVE_PROP_GETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
+		*result = _this->GetTouchScaleThreshold();
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_GETTER
+
+	TJS_BEGIN_NATIVE_PROP_SETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
+		_this->SetTouchScaleThreshold(*param);
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_PROP_DECL_OUTER(cls, touchScaleThreshold)
+//---------------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(touchRotateThreshold)
+{
+	TJS_BEGIN_NATIVE_PROP_GETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
+		*result = _this->GetTouchRotateThreshold();
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_GETTER
+
+	TJS_BEGIN_NATIVE_PROP_SETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
+		_this->SetTouchRotateThreshold(*param);
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_PROP_DECL_OUTER(cls, touchRotateThreshold)
+//---------------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(touchPointCount)
+{
+	TJS_BEGIN_NATIVE_PROP_GETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
+		*result = _this->GetTouchPointCount();
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_GETTER
+
+	TJS_DENY_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_PROP_DECL_OUTER(cls, touchPointCount)
+//---------------------------------------------------------------------------
 
 	TVPGetDisplayColorFormat(); // this will be ran only once here
 
 	return cls;
 }
 //---------------------------------------------------------------------------
-
-

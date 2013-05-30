@@ -414,7 +414,18 @@ public:
 	tjs_int GetZoomNumer() const;
 	void SetZoomDenom(tjs_int n);
 	tjs_int GetZoomDenom() const;
+	
+	void SetTouchScaleThreshold( tjs_real threshold );
+	tjs_real GetTouchScaleThreshold() const;
+	void SetTouchRotateThreshold( tjs_real threshold );
+	tjs_real GetTouchRotateThreshold() const;
 
+	tjs_real GetTouchPointStartX( tjs_int index );
+	tjs_real GetTouchPointStartY( tjs_int index );
+	tjs_real GetTouchPointX( tjs_int index );
+	tjs_real GetTouchPointY( tjs_int index );
+	tjs_real GetTouchPointID( tjs_int index );
+	tjs_int GetTouchPointCount();
 protected:
 };
 //---------------------------------------------------------------------------
