@@ -8,6 +8,7 @@
 
 #include "TMLWindow.h"
 #include "MouseCursor.h"
+#include "TouchPoint.h"
 
 enum {
 	crDefault = 0x0,
@@ -97,7 +98,7 @@ class tTVPBaseBitmap;
 class tTVPWheelDirectInputDevice; // class for DirectInputDevice management
 class tTVPPadDirectInputDevice; // class for DirectInputDevice management
 
-class TTVPWindowForm : public TML::Window {
+class TTVPWindowForm : public TML::Window, public TouchHandler {
 	static const int TVP_MOUSE_MAX_ACCEL = 30;
 	static const int TVP_MOUSE_SHIFT_ACCEL = 40;
 private:
@@ -173,18 +174,8 @@ private:
 	
 	DWORD LastRecheckInputStateSent;
 
-	struct TouchPoint {
-		static const int USE_POINT = 0x01 << 0;
-		static const int START_SCALING = 0x01 << 1;
-		static const int START_ROT = 0x01 << 2;
-		DWORD id;
-		double fx;
-		double fy;
-		double x;
-		double y;
-		DWORD flag;
-	};
-	TouchPoint touch_points_[10];
+	TouchPointList touch_points_;
+
 private:
 	void SetDrawDeviceDestRect();
 	void TranslateWindowToPaintBox(int &x, int &y);
@@ -374,13 +365,33 @@ public:
 	virtual void OnTouchMove( double x, double y, double cx, double cy, DWORD id );
 	virtual void OnTouchUp( double x, double y, double cx, double cy, DWORD id );
 
-	void OnTouchScaling( double rate, double cx, double cy );
-	void OnTouchRotate( double angle, double cx, double cy );
+	virtual void OnTouchScaling( double startdist, double currentdist, double cx, double cy, int flag );
+	virtual void OnTouchRotate( double startangle, double currentangle, double distance, double cx, double cy, int flag );
+	virtual void OnMultiTouch();
 
 	void WMShowVisible();
 	void WMShowTop( WPARAM wParam );
 	void WMRetrieveFocus();
 	void WMAcquireImeControl();
+
+	void SetTouchScaleThreshold( double threshold ) {
+		touch_points_.SetScaleThreshold( threshold );
+	}
+	double GetTouchScaleThreshold() const {
+		return touch_points_.GetScaleThreshold();
+	}
+	void SetTouchRotateThreshold( double threshold ) {
+		touch_points_.SetRotateThreshold( threshold );
+	}
+	double GetTouchRotateThreshold() const {
+		return touch_points_.GetRotateThreshold();
+	}
+	tjs_real GetTouchPointStartX( tjs_int index ) const { return touch_points_.GetStartX(index); }
+	tjs_real GetTouchPointStartY( tjs_int index ) const { return touch_points_.GetStartY(index); }
+	tjs_real GetTouchPointX( tjs_int index ) const { return touch_points_.GetX(index); }
+	tjs_real GetTouchPointY( tjs_int index ) const { return touch_points_.GetY(index); }
+	tjs_int GetTouchPointID( tjs_int index ) const { return touch_points_.GetID(index); }
+	tjs_int GetTouchPointCount() const { return touch_points_.CountUsePoint(); }
 };
 
 #endif // __WINDOW_FORM_UNIT_H__

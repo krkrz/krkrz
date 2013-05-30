@@ -125,6 +125,7 @@ tTVPUniqueTagForInputEvent tTVPOnTouchUpInputEvent            ::Tag;
 tTVPUniqueTagForInputEvent tTVPOnTouchMoveInputEvent          ::Tag;
 tTVPUniqueTagForInputEvent tTVPOnTouchScalingInputEvent       ::Tag;
 tTVPUniqueTagForInputEvent tTVPOnTouchRotateInputEvent        ::Tag;
+tTVPUniqueTagForInputEvent tTVPOnMultiTouchInputEvent         ::Tag;
 //---------------------------------------------------------------------------
 
 
@@ -410,23 +411,32 @@ void tTJSNI_BaseWindow::OnTouchMove( tjs_real x, tjs_real y, tjs_real cx, tjs_re
 	//if(DrawDevice) DrawDevice->OnTouchDown(x, y, cx, cy, id);
 }
 //---------------------------------------------------------------------------
-void tTJSNI_BaseWindow::OnTouchScaling( double rate, double cx, double cy ) {
+void tTJSNI_BaseWindow::OnTouchScaling( tjs_real startdist, tjs_real curdist, tjs_real cx, tjs_real cy, tjs_int flag ) {
 	if(!CanDeliverEvents()) return;
 	if(Owner)
 	{
-		tTJSVariant arg[3] = { rate, cx, cy };
+		tTJSVariant arg[5] = { startdist, curdist, cx, cy, flag };
 		static ttstr eventname(TJS_W("onTouchScaling"));
-		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 3, arg);
+		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 5, arg);
 	}
 }
 //---------------------------------------------------------------------------
-void tTJSNI_BaseWindow::OnTouchRotate( double angle, double cx, double cy ) {
+void tTJSNI_BaseWindow::OnTouchRotate( tjs_real startangle, tjs_real curangle, tjs_real dist, tjs_real cx, tjs_real cy, tjs_int flag ) {
 	if(!CanDeliverEvents()) return;
 	if(Owner)
 	{
-		tTJSVariant arg[3] = { angle, cx, cy };
+		tTJSVariant arg[6] = { startangle, curangle, dist, cx, cy, flag };
 		static ttstr eventname(TJS_W("onTouchRotate"));
-		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 3, arg);
+		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 6, arg);
+	}
+}
+//---------------------------------------------------------------------------
+void tTJSNI_BaseWindow::OnMultiTouch() {
+	if(!CanDeliverEvents()) return;
+	if(Owner)
+	{
+		static ttstr eventname(TJS_W("onMultiTouch"));
+		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 0, NULL);
 	}
 }
 //---------------------------------------------------------------------------
@@ -1059,10 +1069,12 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/onTouchScaling)
 {
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
 
-	TVP_ACTION_INVOKE_BEGIN(3, "onTouchScaling", objthis);
-	TVP_ACTION_INVOKE_MEMBER("rate");
+	TVP_ACTION_INVOKE_BEGIN(5, "onTouchScaling", objthis);
+	TVP_ACTION_INVOKE_MEMBER("startdistance");
+	TVP_ACTION_INVOKE_MEMBER("currentdistance");
 	TVP_ACTION_INVOKE_MEMBER("cx");
 	TVP_ACTION_INVOKE_MEMBER("cy");
+	TVP_ACTION_INVOKE_MEMBER("flag");
 	TVP_ACTION_INVOKE_END(tTJSVariantClosure(objthis, objthis));
 
 	return TJS_S_OK;
@@ -1073,15 +1085,30 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/onTouchRotate)
 {
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
 
-	TVP_ACTION_INVOKE_BEGIN(3, "onTouchRotate", objthis);
-	TVP_ACTION_INVOKE_MEMBER("angle");
+	TVP_ACTION_INVOKE_BEGIN(6, "onTouchRotate", objthis);
+	TVP_ACTION_INVOKE_MEMBER("startangle");
+	TVP_ACTION_INVOKE_MEMBER("currentangle");
+	TVP_ACTION_INVOKE_MEMBER("distance");
 	TVP_ACTION_INVOKE_MEMBER("cx");
 	TVP_ACTION_INVOKE_MEMBER("cy");
+	TVP_ACTION_INVOKE_MEMBER("flag");
 	TVP_ACTION_INVOKE_END(tTJSVariantClosure(objthis, objthis));
 
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/onTouchRotate)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/onMultiTouch)
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
+
+	TVP_ACTION_INVOKE_BEGIN(0, "onMultiTouch", objthis);
+	TVP_ACTION_INVOKE_END(tTJSVariantClosure(objthis, objthis));
+
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/onMultiTouch)
+
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/onKeyDown)
 {

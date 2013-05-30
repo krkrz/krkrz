@@ -487,6 +487,9 @@
     <ClInclude Include="..\environ\win32\CompatibleNativeFuncs.h">
       <Filter>environ\win32</Filter>
     </ClInclude>
+    <ClInclude Include="..\environ\win32\TouchPoint.h">
+      <Filter>environ\win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -838,6 +841,9 @@
       <Filter>environ\win32</Filter>
     </ClCompile>
     <ClCompile Include="..\environ\win32\CompatibleNativeFuncs.cpp">
+      <Filter>environ\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\environ\win32\TouchPoint.cpp">
       <Filter>environ\win32</Filter>
     </ClCompile>
   </ItemGroup>
