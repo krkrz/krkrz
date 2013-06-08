@@ -201,9 +201,13 @@ void WindowMenuItem::SetCaption( const TCHAR* caption ) {
 	if( caption ) {
 		int len = _tcsnlen( caption, MAX_CAPTION_LENGTH )+1;
 		if( len > 0 ) {
-			TCHAR* c = new TCHAR[len];
-			_tcscpy_s( c, len, caption );
-			menu_item_info_.dwTypeData = (LPWSTR)c;
+			if( len == 2 && caption[0] == _T('-') ) {
+				menu_item_info_.fType |= MFT_SEPARATOR;
+			} else {
+				TCHAR* c = new TCHAR[len];
+				_tcscpy_s( c, len, caption );
+				menu_item_info_.dwTypeData = (LPWSTR)c;
+			}
 			menu_item_info_.fMask |= MIIM_TYPE;
 		}
 	}
