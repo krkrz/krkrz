@@ -11,7 +11,7 @@
 #include "tjsCommHead.h"
 
 #include "ClipboardIntf.h"
-#include "ClipboardImpl.h"
+
 
 //---------------------------------------------------------------------------
 tjs_error TJS_INTF_METHOD
@@ -104,3 +104,18 @@ TJS_END_NATIVE_STATIC_PROP_DECL(asText)
 //---------------------------------------------------------------------------
 
 
+//---------------------------------------------------------------------------
+// tTJSNC_Clipboard
+//---------------------------------------------------------------------------
+tTJSNativeInstance *tTJSNC_Clipboard::CreateNativeInstance()
+{
+	return NULL;
+}
+//---------------------------------------------------------------------------
+tTJSNativeClass * TVPCreateNativeClass_Clipboard()
+{
+	tTJSNativeClass *cls = new tTJSNC_Clipboard();
+
+	return cls;
+}
+//---------------------------------------------------------------------------

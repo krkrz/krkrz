@@ -21,7 +21,7 @@
 
 #include "VersionFormUnit.h"
 #include "DebugIntf.h"
-#include "Clipbrd.h"
+#include "ClipboardIntf.h"
 
 //---------------------------------------------------------------------------
 // TVPCopyImportantLogToClipboard
@@ -33,7 +33,7 @@ void TVPCopyImportantLogToClipboard()
 	TVPDumpDirectDrawDriverInformation();
 
 	// copy
-	TVPCopyToClipboard(TVPGetImportantLog());
+	TVPClipboardSetText(TVPGetImportantLog());
 }
 
 static LRESULT WINAPI DlgProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam ) {

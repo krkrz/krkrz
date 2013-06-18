@@ -87,5 +87,5 @@ public:
 	HDC GetDC() { return hMemDC_; }
 };
 
-void TVPGetFontList(std::vector<std::string> & list, tjs_uint32 flags, TFont * refcanvas);
+void TVPGetFontList(std::vector<std::wstring> & list, tjs_uint32 flags, TFont * refcanvas);
 #endif // __T_FONT_H__

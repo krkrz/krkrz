@@ -9,23 +9,28 @@
 // Clipboard Class interface
 //---------------------------------------------------------------------------
 #include "tjsCommHead.h"
-
-#include "ClipboardImpl.h"
-
-#include "Clipbrd.h"
-//#include "TLogViewer.h"
-#include "Application.h"
+#include "MsgIntf.h"
+#include "Exception.h"
+#include "ClipboardIntf.h"
+#include <windows.h>
 
 //---------------------------------------------------------------------------
 // clipboard related functions
 //---------------------------------------------------------------------------
 bool TVPClipboardHasFormat(tTVPClipboardFormat format)
 {
-	switch(format)
-	{
-	case cbfText:
-		return GetClipboard()->HasFormat(CF_TEXT) ||
-			GetClipboard()->HasFormat(CF_UNICODETEXT); // ANSI text or UNICODE text
+	switch(format) {
+		case cbfText: {
+		bool result = false;
+		if( ::OpenClipboard(0) ) {
+			result = 0 != ::IsClipboardFormatAvailable(CF_TEXT);
+			if( result == false ) {
+				result = 0 != ::IsClipboardFormatAvailable(CF_UNICODETEXT);
+			}
+			::CloseClipboard();
+		}
+		return result; // ANSI text or UNICODE text
+		}
 	default:
 		return false;
 	}
@@ -33,28 +38,61 @@ bool TVPClipboardHasFormat(tTVPClipboardFormat format)
 //---------------------------------------------------------------------------
 void TVPClipboardSetText(const ttstr & text)
 {
-	// this is already implemented in TLogViewer
-	TVPCopyToClipboard(text);
+	if( ::OpenClipboard(0) ) {
+		HGLOBAL ansihandle = NULL;
+		HGLOBAL unicodehandle = NULL;
+		try {
+			// store ANSI string
+			std::string ansistr = text.AsNarrowStdString();
+			int ansistrlen = (ansistr.length() + 1)*sizeof(char);
+			ansihandle = ::GlobalAlloc(GMEM_DDESHARE | GMEM_MOVEABLE, ansistrlen);
+			if( !ansihandle ) TVPThrowExceptionMessage( TVPFaildClipboardCopy );
+
+			char *mem = (char*)::GlobalLock(ansihandle);
+			if(mem) strncpy_s(mem, ansistrlen, ansistr.c_str(),ansistrlen);
+			::GlobalUnlock(ansihandle);
+
+			::SetClipboardData( CF_TEXT, ansihandle );
+			ansihandle = NULL;
+
+			// store UNICODE string
+			unicodehandle = ::GlobalAlloc(GMEM_DDESHARE | GMEM_MOVEABLE, (text.GetLen() + 1) * sizeof(tjs_char));
+			if(!unicodehandle) TVPThrowExceptionMessage( TVPFaildClipboardCopy );;
+
+			tjs_char *unimem = (tjs_char*)::GlobalLock(unicodehandle);
+			if(unimem) TJS_strcpy(unimem, text.c_str());
+			::GlobalUnlock(unicodehandle);
+
+			::SetClipboardData( CF_UNICODETEXT, unicodehandle );
+			unicodehandle = NULL;
+		} catch(...) {
+			if(ansihandle) ::GlobalFree(ansihandle);
+			if(unicodehandle) ::GlobalFree(unicodehandle);
+			::CloseClipboard();
+			throw;
+		}
+		::CloseClipboard();
+	}
 }
 //---------------------------------------------------------------------------
 bool TVPClipboardGetText(ttstr & text)
 {
-	if(!OpenClipboard(Application->GetHandle())) return false;
+	if(!::OpenClipboard(NULL)) return false;
 
 	bool result = false;
 	try
 	{
 		// select CF_UNICODETEXT or CF_TEXT
 		UINT formats[2] = { CF_UNICODETEXT, CF_TEXT};
-		int format = GetPriorityClipboardFormat(formats, 2);
+		int format = ::GetPriorityClipboardFormat(formats, 2);
 
 		if(format == CF_UNICODETEXT)
 		{
 			// try to read unicode text
-			HGLOBAL hglb = (HGLOBAL)GetClipboardData(CF_UNICODETEXT);
+			HGLOBAL hglb = (HGLOBAL)::GetClipboardData(CF_UNICODETEXT);
 			if(hglb != NULL)
 			{
-				const tjs_char *p = (const tjs_char *)GlobalLock(hglb);
+				const tjs_char *p = (const tjs_char *)::GlobalLock(hglb);
 				if(p)
 				{
 					try
@@ -64,20 +102,20 @@ bool TVPClipboardGetText(ttstr & text)
 					}
 					catch(...)
 					{
-						GlobalUnlock(hglb);
+						::GlobalUnlock(hglb);
 						throw;
 					}
-					GlobalUnlock(hglb);
+					::GlobalUnlock(hglb);
 				}
 			}
 		}
 		else if(format == CF_TEXT)
 		{
 			// try to read ansi text
-			HGLOBAL hglb = (HGLOBAL)GetClipboardData(CF_TEXT);
+			HGLOBAL hglb = (HGLOBAL)::GetClipboardData(CF_TEXT);
 			if(hglb != NULL)
 			{
-				const char *p = (const char *)GlobalLock(hglb);
+				const char *p = (const char *)::GlobalLock(hglb);
 				if(p)
 				{
 					try
@@ -87,40 +125,22 @@ bool TVPClipboardGetText(ttstr & text)
 					}
 					catch(...)
 					{
-						GlobalUnlock(hglb);
+						::GlobalUnlock(hglb);
 						throw;
 					}
-					GlobalUnlock(hglb);
+					::GlobalUnlock(hglb);
 				}
 			}
 		}
 	}
 	catch(...)
 	{
-		CloseClipboard();
+		::CloseClipboard();
 		throw;
 	}
-	CloseClipboard();
+	::CloseClipboard();
 
 	return result;
 }
 //---------------------------------------------------------------------------
 
-
-
-
-//---------------------------------------------------------------------------
-// tTJSNC_Clipboard
-//---------------------------------------------------------------------------
-tTJSNativeInstance *tTJSNC_Clipboard::CreateNativeInstance()
-{
-	return NULL;
-}
-//---------------------------------------------------------------------------
-tTJSNativeClass * TVPCreateNativeClass_Clipboard()
-{
-	tTJSNativeClass *cls = new tTJSNC_Clipboard();
-
-	return cls;
-}
-//---------------------------------------------------------------------------

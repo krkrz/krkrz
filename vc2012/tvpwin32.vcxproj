@@ -54,7 +54,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);__WIN32__;NO_STRICT;TJS_TEXT_OUT_CRLF;TJS_JP_LOCALIZED;TJS_DEBUG_DUMP_STRING;_CRT_SECURE_NO_WARNING;ENABLE_DEBUGGER;TVP_LOG_TO_COMMANDLINE_CONSOLE;</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../external/include;../external/include/zlib;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../external/include;../external/include/zlib;../external/include/freetype;../platform/win32;</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
@@ -62,7 +62,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>./lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;zlib_d.lib;libjpeg_d.lib;libpng_d.lib;onig_s_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;zlib_d.lib;libjpeg_d.lib;libpng_d.lib;onig_s_d.lib;freetype2412MT_D.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -75,7 +75,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);__WIN32__;NO_STRICT;TJS_TEXT_OUT_CRLF;TJS_JP_LOCALIZED;TJS_DEBUG_DUMP_STRING;TVP_LOG_TO_COMMANDLINE_CONSOLE;</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../external/include;../external/include/zlib;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../external/include;../external/include/zlib;../external/include/freetype;../platform/win32;</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -86,7 +86,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>./lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;zlib.lib;libjpeg.lib;libpng.lib;onig_s.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;zlib.lib;libjpeg.lib;libpng.lib;onig_s.lib;freetype2412MT.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>true</ImageHasSafeExceptionHandlers>
     </Link>
     <ResourceCompile>
@@ -120,7 +120,6 @@
     <ClInclude Include="..\base\win32\SystemImpl.h" />
     <ClInclude Include="..\base\XP3Archive.h" />
     <ClInclude Include="..\environ\win32\Application.h" />
-    <ClInclude Include="..\environ\win32\Clipbrd.h" />
     <ClInclude Include="..\environ\win32\CompatibleNativeFuncs.h" />
     <ClInclude Include="..\environ\win32\DetectCPU.h" />
     <ClInclude Include="..\environ\win32\EmergencyExit.h" />
@@ -144,6 +143,7 @@
     <ClInclude Include="..\msg\svn_revision.h" />
     <ClInclude Include="..\msg\win32\MsgImpl.h" />
     <ClInclude Include="..\msg\win32\OptionsDesc.h" />
+    <ClInclude Include="..\platform\win32\BitmapInfomation.h" />
     <ClInclude Include="..\sound\PhaseVocoderDSP.h" />
     <ClInclude Include="..\sound\PhaseVocoderFilter.h" />
     <ClInclude Include="..\sound\RingBuffer.h" />
@@ -203,13 +203,12 @@
     <ClInclude Include="..\utils\ObjectList.h" />
     <ClInclude Include="..\utils\Random.h" />
     <ClInclude Include="..\utils\ThreadIntf.h" />
+    <ClInclude Include="..\utils\TickCount.h" />
     <ClInclude Include="..\utils\TimerIntf.h" />
-    <ClInclude Include="..\utils\win32\ClipboardImpl.h" />
-    <ClInclude Include="..\utils\win32\DebugImpl.h" />
     <ClInclude Include="..\utils\win32\ThreadImpl.h" />
-    <ClInclude Include="..\utils\win32\TickCount.h" />
     <ClInclude Include="..\utils\win32\TimerImpl.h" />
     <ClInclude Include="..\visual\argb.h" />
+    <ClInclude Include="..\visual\CharacterData.h" />
     <ClInclude Include="..\visual\ComplexRect.h" />
     <ClInclude Include="..\visual\drawable.h" />
     <ClInclude Include="..\visual\GraphicsLoaderIntf.h" />
@@ -218,6 +217,7 @@
     <ClInclude Include="..\visual\LayerIntf.h" />
     <ClInclude Include="..\visual\LayerManager.h" />
     <ClInclude Include="..\visual\LoadTLG.h" />
+    <ClInclude Include="..\visual\PrerenderedFont.h" />
     <ClInclude Include="..\visual\Resampler.h" />
     <ClInclude Include="..\visual\transhandler.h" />
     <ClInclude Include="..\visual\TransIntf.h" />
@@ -264,7 +264,6 @@
     <ClCompile Include="..\base\win32\SystemImpl.cpp" />
     <ClCompile Include="..\base\XP3Archive.cpp" />
     <ClCompile Include="..\environ\win32\Application.cpp" />
-    <ClCompile Include="..\environ\win32\Clipbrd.cpp" />
     <ClCompile Include="..\environ\win32\CompatibleNativeFuncs.cpp" />
     <ClCompile Include="..\environ\win32\DetectCPU.cpp" />
     <ClCompile Include="..\environ\win32\EmergencyExit.cpp" />
@@ -280,6 +279,7 @@
     <ClCompile Include="..\msg\MsgIntf.cpp" />
     <ClCompile Include="..\msg\win32\MsgImpl.cpp" />
     <ClCompile Include="..\msg\win32\OptionsDesc.cpp" />
+    <ClCompile Include="..\platform\win32\BitmapInfomation.cpp" />
     <ClCompile Include="..\sound\PhaseVocoderDSP.cpp" />
     <ClCompile Include="..\sound\PhaseVocoderFilter.cpp" />
     <ClCompile Include="..\sound\SoundBufferBaseIntf.cpp" />
@@ -330,12 +330,14 @@
     <ClCompile Include="..\utils\md5.c" />
     <ClCompile Include="..\utils\Random.cpp" />
     <ClCompile Include="..\utils\ThreadIntf.cpp" />
+    <ClCompile Include="..\utils\TickCount.cpp" />
     <ClCompile Include="..\utils\TimerIntf.cpp" />
     <ClCompile Include="..\utils\win32\ClipboardImpl.cpp" />
     <ClCompile Include="..\utils\win32\DebugImpl.cpp" />
+    <ClCompile Include="..\utils\win32\MiscUtility.cpp" />
     <ClCompile Include="..\utils\win32\ThreadImpl.cpp" />
-    <ClCompile Include="..\utils\win32\TickCount.cpp" />
     <ClCompile Include="..\utils\win32\TimerImpl.cpp" />
+    <ClCompile Include="..\visual\CharacterData.cpp" />
     <ClCompile Include="..\visual\ComplexRect.cpp" />
     <ClCompile Include="..\visual\GraphicsLoaderIntf.cpp" />
     <ClCompile Include="..\visual\IA32\tvpgl_ia32_intf.c" />
@@ -345,6 +347,7 @@
     <ClCompile Include="..\visual\LoadJPEG.cpp" />
     <ClCompile Include="..\visual\LoadPNG.cpp" />
     <ClCompile Include="..\visual\LoadTLG.cpp" />
+    <ClCompile Include="..\visual\PrerenderedFont.cpp" />
     <ClCompile Include="..\visual\Resampler.cpp" />
     <ClCompile Include="..\visual\TransIntf.cpp" />
     <ClCompile Include="..\visual\tvpgl.c" />
