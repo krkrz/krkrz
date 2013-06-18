@@ -33,6 +33,8 @@
 
 #include "StringUtil.h"
 #include "TFont.h"
+#include "CharacterData.h"
+#include "PrerenderedFont.h"
 
 //---------------------------------------------------------------------------
 // prototypes
@@ -98,243 +100,7 @@ static tjs_int TVPGlobalFontStateMagic = 0;
 	// this is for checking global font status' change
 
 class tTVPPrerenderedFont;
-static tTJSHashTable<ttstr, tTVPPrerenderedFont *> TVPPrerenderedFonts;
-
-#pragma pack(push, 1)
-struct tTVPPrerenderedCharacterItem
-{
-	tjs_uint32 Offset;
-	tjs_uint16 Width;
-	tjs_uint16 Height;
-	tjs_int16 OriginX;
-	tjs_int16 OriginY;
-	tjs_int16 IncX;
-	tjs_int16 IncY;
-	tjs_int16 Inc;
-	tjs_uint16 Reserved;
-};
-#pragma pack(pop)
-
-//---------------------------------------------------------------------------
-// tTVPPrerenderedFont
-//---------------------------------------------------------------------------
-class tTVPPrerenderedFont
-{
-private:
-	ttstr Storage;
-	HANDLE FileHandle; // tft file handle
-	HANDLE MappingHandle; // file mapping handle
-	const tjs_uint8 * Image; // tft mapped memory
-	tjs_uint RefCount;
-	tTVPLocalTempStorageHolder LocalStorage;
-
-	tjs_int Version; // data version
-	const tjs_char * ChIndex;
-	const tTVPPrerenderedCharacterItem * Index;
-	tjs_uint IndexCount;
-
-public:
-	tTVPPrerenderedFont(const ttstr &storage);
-	~tTVPPrerenderedFont();
-	void AddRef();
-	void Release();
-
-	const tTVPPrerenderedCharacterItem *
-		Find(tjs_char ch); // serch character
-	void Retrieve(const tTVPPrerenderedCharacterItem * item, tjs_uint8 *buffer,
-		tjs_int bufferpitch);
-
-};
-//---------------------------------------------------------------------------
-tTVPPrerenderedFont::tTVPPrerenderedFont(const ttstr &storage) :
-	LocalStorage(storage)
-{
-	RefCount = 1;
-
-	Storage = storage;
-
-	// open local storage via CreateFile
-	FileHandle = CreateFile(
-		LocalStorage.GetLocalName().c_str(),
-		GENERIC_READ,
-		FILE_SHARE_READ,
-		NULL,
-		OPEN_EXISTING,
-		FILE_ATTRIBUTE_NORMAL,
-		NULL);
-
-	if(FileHandle == INVALID_HANDLE_VALUE)
-	{
-		TVPThrowExceptionMessage(TVPCannotOpenStorage, storage);
-	}
-
-	MappingHandle = NULL;
-	Image = NULL;
-	try
-	{
-		// map the file into memory
-		MappingHandle = CreateFileMapping(FileHandle, NULL, PAGE_READONLY,
-			0, 0, NULL);
-		if(MappingHandle == NULL)
-		{
-			CloseHandle(FileHandle);
-			TVPThrowExceptionMessage(TVPPrerenderedFontMappingFailed,
-				TJS_W("CreateFileMapping failed."));
-		}
-
-		Image = (const tjs_uint8*)MapViewOfFile(MappingHandle,
-			FILE_MAP_READ, 0, 0, 0);
-		if(Image == NULL)
-		{
-			CloseHandle(MappingHandle);
-			CloseHandle(FileHandle);
-			TVPThrowExceptionMessage(TVPPrerenderedFontMappingFailed,
-				TJS_W("MapViewOfFile failed."));
-		}
-
-		// check header
-		if(memcmp("TVP pre-rendered font\x1a", Image, 22))
-		{
-			TVPThrowExceptionMessage(TVPPrerenderedFontMappingFailed,
-				TJS_W("Signature not found or invalid pre-rendered font file."));
-		}
-
-		if(Image[23] != 2)
-		{
-			TVPThrowExceptionMessage(TVPPrerenderedFontMappingFailed,
-				TJS_W("Not a 16-bit UNICODE font file."));
-		}
-
-		Version = Image[22];
-		if(Version != 0 && Version != 1)
-		{
-			TVPThrowExceptionMessage(TVPPrerenderedFontMappingFailed,
-				TJS_W("Invalid header version."));
-		}
-
-		// read index offset
-		IndexCount = *(const tjs_uint32*)(Image + 24);
-		ChIndex = (const tjs_char*)(Image + *(const tjs_uint32*)(Image + 28));
-		Index = (const tTVPPrerenderedCharacterItem*)
-			(Image + *(const tjs_uint32*)(Image + 32));
-	}
-	catch(...)
-	{
-		if(Image) UnmapViewOfFile(Image);
-		if(MappingHandle) CloseHandle(MappingHandle);
-		CloseHandle(FileHandle);
-		throw;
-	}
-
-	TVPPrerenderedFonts.Add(storage, this);
-}
-//---------------------------------------------------------------------------
-tTVPPrerenderedFont::~tTVPPrerenderedFont()
-{
-	UnmapViewOfFile(Image);
-	CloseHandle(MappingHandle);
-	CloseHandle(FileHandle);
-
-	TVPPrerenderedFonts.Delete(Storage);
-}
-//---------------------------------------------------------------------------
-void tTVPPrerenderedFont::AddRef()
-{
-	RefCount ++;
-}
-//---------------------------------------------------------------------------
-void tTVPPrerenderedFont::Release()
-{
-	if(RefCount == 1)
-		delete this;
-	else
-		RefCount --;
-}
-//---------------------------------------------------------------------------
-const tTVPPrerenderedCharacterItem *
-		tTVPPrerenderedFont::Find(tjs_char ch)
-{
-	// search through ChIndex
-	tjs_uint s = 0;
-	tjs_uint e = IndexCount;
-	const tjs_char *chindex = ChIndex;
-	while(true)
-	{
-		tjs_int d = e-s;
-		if(d <= 1)
-		{
-			if(chindex[s] == ch)
-				return Index + s;
-			else
-				return NULL;
-		}
-		tjs_uint m = s + (d>>1);
-		if(chindex[m] > ch) e = m; else s = m;
-	}
-}
-//---------------------------------------------------------------------------
-void tTVPPrerenderedFont::Retrieve(const tTVPPrerenderedCharacterItem * item,
-	tjs_uint8 *buffer, tjs_int bufferpitch)
-{
-	// retrieve font data and store to buffer
-	// bufferpitch must be larger then or equal to item->Width
-	if(item->Width == 0 || item->Height == 0) return;
-
-	const tjs_uint8 *ptr = item->Offset + Image;
-	tjs_uint8 *dest = buffer;
-	tjs_uint8 *destlim = dest + item->Width * item->Height;
-
-	// expand compressed character bitmap data
-	if(Version == 0)
-	{
-		// version 0 decompressor
-		while(dest < destlim)
-		{
-			if(*ptr == 0x41) // running
-			{
-				ptr++;
-				tjs_uint8 last = dest[-1];
-				tjs_int len = *ptr;
-				ptr++;
-				while(len--) *(dest++) = (tjs_uint8)last;
-			}
-			else
-			{
-				*(dest++) = *(ptr++);
-			}
-		}
-	}
-	else if(Version >= 1)
-	{
-		// version 1+ decompressor
-		while(dest < destlim)
-		{
-			if(*ptr >= 0x41) // running
-			{
-				tjs_int len = *ptr - 0x40;
-				ptr++;
-				tjs_uint8 last = dest[-1];
-				while(len--) *(dest++) = (tjs_uint8)last;
-			}
-			else
-			{
-				*(dest++) = *(ptr++);
-			}
-		}
-	}
-
-	// expand to each pitch
-	ptr = destlim - item->Width;
-	dest = buffer + bufferpitch * item->Height - bufferpitch;
-	while(buffer <= dest)
-	{
-		if(dest != ptr)
-			memmove(dest, ptr, item->Width);
-		dest -= bufferpitch;
-		ptr -= item->Width;
-	}
-}
-//---------------------------------------------------------------------------
+tTJSHashTable<ttstr, tTVPPrerenderedFont *> TVPPrerenderedFonts;
 
 
 
@@ -496,358 +262,6 @@ public:
 		return v;
 	}
 };
-//---------------------------------------------------------------------------
-class tTVPCharacterData
-{
-	// character data holder for caching
-private:
-	tjs_uint8 * Data;
-	tjs_int RefCount;
-
-public:
-	tjs_int OriginX;
-	tjs_int OriginY;
-	tjs_int CellIncX;
-	tjs_int CellIncY;
-	tjs_int Pitch;
-	tjs_uint BlackBoxX;
-	tjs_uint BlackBoxY;
-	tjs_int BlurLevel;
-	tjs_int BlurWidth;
-
-	bool Antialiased;
-	bool Blured;
-	bool FullColored;
-
-public:
-	tTVPCharacterData() { RefCount = 1; Data = NULL; }
-	~tTVPCharacterData() { if(Data) delete [] Data; }
-
-	void Alloc(tjs_int size)
-	{
-		if(Data) delete [] Data, Data = NULL;
-		Data = new tjs_uint8[size];
-	}
-
-	tjs_uint8 * GetData() const { return Data; }
-
-	void AddRef() { RefCount ++; }
-	void Release()
-	{
-		if(RefCount == 1)
-		{
-			delete this;
-		}
-		else
-		{
-			RefCount--;
-		}
-	}
-
-	void Expand();
-
-	void Blur(tjs_int blurlevel, tjs_int blurwidth);
-	void Blur();
-
-	void Bold(tjs_int size);
-	void Bold2(tjs_int size);
-
-	void Resample4();
-	void Resample8();
-};
-//---------------------------------------------------------------------------
-void tTVPCharacterData::Expand()
-{
-	// expand the bitmap stored in 1bpp, to 8bpp
-	tjs_int newpitch = (((BlackBoxX -1)>>2)+1)<<2;
-	tjs_uint8 *nd;
-	tjs_uint8 *newdata = nd = new tjs_uint8[newpitch * BlackBoxY];
-	tjs_int h = BlackBoxY;
-	tjs_uint8 *d = Data;
-
-	tjs_int w = BlackBoxX;
-	static tjs_uint32 pal[2] = {0, 64};
-	while(h--)
-	{
-		TVPBLExpand1BitTo8BitPal(nd, d, w, pal);
-		nd += newpitch, d += Pitch;
-	}
-	if(Data) delete [] Data;
-	Data = newdata;
-	Pitch = newpitch;
-}
-//---------------------------------------------------------------------------
-void tTVPCharacterData::Blur(tjs_int blurlevel, tjs_int blurwidth)
-{
-	// blur the bitmap with given parameters
-	// blur the bitmap
-	if(!Data) return;
-	if(blurlevel == 255 && blurwidth == 0) return; // no need to blur
-	if(blurwidth == 0)
-	{
-		// no need to blur but must be transparent
-		TVPChBlurMulCopy65(Data, Data, Pitch*BlackBoxY, BlurLevel<<10);
-		return;
-	}
-
-	// simple blur ( need to optimize )
-	tjs_int bw = std::abs(blurwidth);
-	tjs_int newwidth = BlackBoxX + bw*2;
-	tjs_int newheight = BlackBoxY + bw*2;
-	tjs_int newpitch =  (((newwidth -1)>>2)+1)<<2;
-
-	tjs_uint8 *newdata = new tjs_uint8[newpitch * newheight];
-
-	TVPChBlurCopy65(newdata, newpitch, newwidth, newheight, Data, Pitch, BlackBoxX,
-		BlackBoxY, bw, blurlevel);
-
-	delete [] Data;
-	Data = newdata;
-	BlackBoxX = newwidth;
-	BlackBoxY = newheight;
-	Pitch = newpitch;
-	OriginX -= blurwidth;
-	OriginY -= blurwidth;
-}
-//---------------------------------------------------------------------------
-void tTVPCharacterData::Blur()
-{
-	// blur the bitmap
-	Blur(BlurLevel, BlurWidth);
-}
-//---------------------------------------------------------------------------
-void tTVPCharacterData::Bold(tjs_int size)
-{
-	// enbold the bitmap for 65-level grayscale bitmap
-	if(size < 0) size = -size;
-	tjs_int level = (tjs_int)(size / 50) + 1;
-	if(level > 8) level = 8;
-
-	// compute new metrics
-	tjs_int newwidth = BlackBoxX + level;
-	tjs_int newheight = BlackBoxY;
-	tjs_int newpitch =  (((newwidth -1)>>2)+1)<<2;
-	tjs_uint8 *newdata = new tjs_uint8[newpitch * newheight];
-
-	// apply bold
-	tjs_uint8 * srcp = Data;
-	tjs_uint8 * destp = newdata;
-	for(tjs_int y = 0; y<newheight; y++)
-	{
-		for(tjs_int i = 0; i<level; i++) destp[i] = srcp[i];
-		destp[0] = srcp[0];
-		for(tjs_int x = level; x<newwidth-level; x++)
-		{
-			tjs_uint largest = srcp[x];
-			for(tjs_int xx = x-level; xx<x; xx++)
-				if((tjs_uint)srcp[xx] > largest) largest = srcp[xx];
-			destp[x] = largest;
-		}
-		for(tjs_int i = 0; i<level; i++) destp[newwidth-i-1] = srcp[BlackBoxX-1-i];
-
-		srcp += Pitch;
-		destp += newpitch;
-	}
-
-	// replace old data
-	delete [] Data;
-	Data = newdata;
-	BlackBoxX = newwidth;
-	BlackBoxY = newheight;
-	OriginX -= level /2;
-	Pitch = newpitch;
-}
-//---------------------------------------------------------------------------
-void tTVPCharacterData::Bold2(tjs_int size)
-{
-	// enbold the bitmap for black/white monochrome bitmap
-	if(size < 0) size = -size;
-	tjs_int level = (tjs_int)(size / 50) + 1;
-	if(level > 8) level = 8;
-
-	// compute new metrics
-	tjs_int newwidth = BlackBoxX + level;
-	tjs_int newheight = BlackBoxY;
-	tjs_int newpitch =  (((newwidth -1)>>5)+1)<<2;
-	tjs_uint8 *newdata = new tjs_uint8[newpitch * newheight];
-
-	// apply bold
-	tjs_uint8 * srcp = Data;
-	tjs_uint8 * destp = newdata;
-	for(tjs_int y = 0; y<newheight; y++)
-	{
-		memcpy(destp, srcp, Pitch);
-		if(newpitch > Pitch) destp[Pitch] = 0;
-
-		for(tjs_int i = 1; i<=level; i++)
-		{
-			tjs_uint8 bollow = 0;
-			tjs_int bl = 8 - i;
-			for(tjs_int x = 0; x < Pitch; x++)
-			{
-				destp[x] |= (srcp[x] >> i) + bollow;
-				bollow = srcp[x] << bl;
-			}
-			if(newpitch > Pitch) destp[Pitch] |= bollow;
-		}
-
-		srcp += Pitch;
-		destp += newpitch;
-	}
-
-	// replace old data
-	delete [] Data;
-	Data = newdata;
-	BlackBoxX = newwidth;
-	BlackBoxY = newheight;
-	OriginX -= level /2;
-	Pitch = newpitch;
-}
-//---------------------------------------------------------------------------
-void tTVPCharacterData::Resample4()
-{
-	// down-sampling 4x4
-
-	static tjs_uint16 bitcounter[256] = {0xffff};
-	if(bitcounter[0] == 0xffff)
-	{
-		// initialize bitcounter table
-		tjs_uint i;
-		for(i = 0; i<256; i++)
-		{
-			tjs_uint16 v;
-			tjs_int n;
-			n = i & 0x0f;
-			n = (n & 0x5) + ((n & 0xa)>>1);
-			n = (n & 0x3) + ((n & 0xc)>>2);
-			v = (n<<2);
-			n = i >> 4;
-			n = (n & 0x5) + ((n & 0xa)>>1);
-			n = (n & 0x3) + ((n & 0xc)>>2);
-			v |= ((n<<2)) << 8;
-			bitcounter[i] = v;
-		}
-	}
-
-	tjs_int newwidth = ((BlackBoxX-1)>>2)+1;
-	tjs_int newheight = ((BlackBoxY-1)>>2)+1;
-	tjs_int newpitch =  (((newwidth -1)>>2)+1)<<2;
-	tjs_uint8 *newdata = new tjs_uint8[newpitch * newheight];
-
-	// resampling
-	tjs_uint8 * srcp = Data;
-	tjs_uint8 * destp = newdata;
-	for(tjs_int y = 0; y<newheight; y++)
-	{
-		if(BlackBoxX & 7) srcp[BlackBoxX / 8] &=
-			((tjs_int8)0x80) >> ((BlackBoxX & 7) -1); // mask right fraction
-
-		tjs_uint orgy = y*4;
-		tjs_int rem = BlackBoxY - orgy;
-		rem = rem > 4 ? 4 : rem;
-
-		tjs_uint8 *dp = destp;
-		tjs_int lim = (newwidth+1) >> 1;
-		for(tjs_int i = 0; i<lim; i++)
-		{
-			tjs_uint32 n = 0;
-			tjs_uint8 *sp = srcp + i;
-			switch(rem)
-			{
-			case 4:	n += bitcounter[*sp]; sp += Pitch;
-			case 3:	n += bitcounter[*sp]; sp += Pitch;
-			case 2:	n += bitcounter[*sp]; sp += Pitch;
-			case 1:	n += bitcounter[*sp];
-			}
-			dp[0] = n >> 8;
-			dp[1] = n & 0xff;
-			dp += 2;
-		}
-
-		srcp += Pitch * 4;
-		destp += newpitch;
-	}
-
-	// replace old data
-	delete [] Data;
-	Data = newdata;
-	BlackBoxX = newwidth;
-	BlackBoxY = newheight;
-	OriginX = OriginX /4;
-	OriginY = OriginY /4;
-	Pitch = newpitch;
-}
-//---------------------------------------------------------------------------
-void tTVPCharacterData::Resample8()
-{
-	// down-sampling 8x8
-
-	static tjs_uint8 bitcounter[256] = {0xff};
-	if(bitcounter[0] == 0xff)
-	{
-		// initialize bitcounter table
-		tjs_uint i;
-		for(i = 0; i<256; i++)
-		{
-			tjs_int n;
-			n = (i & 0x55) + ((i & 0xaa)>>1);
-			n = (n & 0x33) + ((n & 0xcc)>>2);
-			n = (n & 0x0f) + ((n & 0xf0)>>4);
-			bitcounter[i] = (tjs_uint8)n;
-		}
-	}
-
-	tjs_int newwidth = ((BlackBoxX-1)>>3)+1;
-	tjs_int newheight = ((BlackBoxY-1)>>3)+1;
-	tjs_int newpitch =  (((newwidth -1)>>2)+1)<<2;
-	tjs_uint8 *newdata = new tjs_uint8[newpitch * newheight];
-
-	// resampling
-	tjs_uint8 * srcp = Data;
-	tjs_uint8 * destp = newdata;
-	for(tjs_int y = 0;;)
-	{
-		if(BlackBoxX & 7) srcp[BlackBoxX / 8] &=
-			((tjs_int8)0x80) >> ((BlackBoxX & 7) -1); // mask right fraction
-
-		tjs_uint orgy = y*8;
-		tjs_int rem = BlackBoxY - orgy;
-		rem = rem > 8 ? 8 : rem;
-
-		for(tjs_int x = 0; x<newwidth; x++)
-		{
-			tjs_uint n = 0;
-			tjs_uint8 *sp = srcp + x;
-			switch(rem)
-			{
-			case 8:	n += bitcounter[*sp]; sp += Pitch;
-			case 7:	n += bitcounter[*sp]; sp += Pitch;
-			case 6:	n += bitcounter[*sp]; sp += Pitch;
-			case 5:	n += bitcounter[*sp]; sp += Pitch;
-			case 4:	n += bitcounter[*sp]; sp += Pitch;
-			case 3:	n += bitcounter[*sp]; sp += Pitch;
-			case 2:	n += bitcounter[*sp]; sp += Pitch;
-			case 1:	n += bitcounter[*sp];
-			}
-			destp[x] = n;
-		}
-
-		y++;
-		if(y >= newheight) break;
-		srcp += Pitch * 8;
-		destp += newpitch;
-	}
-
-	// replace old data
-	delete [] Data;
-	Data = newdata;
-	BlackBoxX = newwidth;
-	BlackBoxY = newheight;
-	OriginX = OriginX /8;
-	OriginY = OriginY /8;
-	Pitch = newpitch;
-}
-//---------------------------------------------------------------------------
 
 
 
@@ -924,8 +338,8 @@ static tTVPCharacterData * TVPGetCharacter(const tTVPFontAndCharacterData & font
 		tTVPCharacterData *data = new tTVPCharacterData();
 		data->BlackBoxX = pitem->Width;
 		data->BlackBoxY = pitem->Height;
-		data->CellIncX = pitem->IncX;
-		data->CellIncY = pitem->IncY;
+		data->Metrics.CellIncX = pitem->IncX;
+		data->Metrics.CellIncY = pitem->IncY;
 		data->OriginX = pitem->OriginX + aofsx;
 		data->OriginY = -pitem->OriginY + aofsy;
 
@@ -1044,19 +458,19 @@ static tTVPCharacterData * TVPGetCharacter(const tTVPFontAndCharacterData & font
 
 			if(font.Font.Angle == 0)
 			{
-				data->CellIncX = s.cx;
-				data->CellIncY = 0;
+				data->Metrics.CellIncX = s.cx;
+				data->Metrics.CellIncY = 0;
 			}
 			else if(font.Font.Angle == 2700)
 			{
-				data->CellIncX = 0;
-				data->CellIncY = s.cx;
+				data->Metrics.CellIncX = 0;
+				data->Metrics.CellIncY = s.cx;
 			}
 			else
 			{
 				double angle = font.Font.Angle * (M_PI/1800);
-				data->CellIncX = static_cast<tjs_int>(  cos(angle) * s.cx);
-				data->CellIncY = static_cast<tjs_int>(- sin(angle) * s.cx);
+				data->Metrics.CellIncX = static_cast<tjs_int>(  cos(angle) * s.cx);
+				data->Metrics.CellIncY = static_cast<tjs_int>(- sin(angle) * s.cx);
 			}
 		}
 
@@ -1262,7 +676,6 @@ static void TVPFreeBitmapBits(void *ptr)
 //---------------------------------------------------------------------------
 // tTVPBitmap : internal bitmap object
 //---------------------------------------------------------------------------
-bool TVPUseDIBSection = false; // always false since 2.29 2007.03.28
 /*
 	important:
 	Note that each lines must be started at tjs_uint32 ( 4bytes ) aligned address.
@@ -1275,24 +688,14 @@ tTVPBitmap::tTVPBitmap(tjs_uint width, tjs_uint height, tjs_uint bpp)
 	TVPInitWindowOptions(); // ensure window/bitmap usage options are initialized
 
 	RefCount = 1;
-	BitmapDC = BitmapHandle = OldBitmapHandle = NULL; // for DIBSection
 
 	Allocate(width, height, bpp); // allocate initial bitmap
 }
 //---------------------------------------------------------------------------
 tTVPBitmap::~tTVPBitmap()
 {
-	if(TVPUseDIBSection)
-	{
-		SelectObject(BitmapDC, OldBitmapHandle);
-		DeleteObject(BitmapHandle);
-		DeleteDC(BitmapDC);
-	}
-	else
-	{
-		TVPFreeBitmapBits(Bits);
-	}
-	GlobalFree((HGLOBAL)BitmapInfo);
+	TVPFreeBitmapBits(Bits);
+	delete BitmapInfo;
 }
 //---------------------------------------------------------------------------
 tTVPBitmap::tTVPBitmap(const tTVPBitmap & r)
@@ -1301,16 +704,15 @@ tTVPBitmap::tTVPBitmap(const tTVPBitmap & r)
 	TVPInitWindowOptions(); // ensure window/bitmap usage options are initialized
 
 	RefCount = 1;
-	BitmapDC = BitmapHandle = OldBitmapHandle = NULL; // for DIBSection
 
 	// allocate bitmap which has the same metrics to r
 	Allocate(r.GetWidth(), r.GetHeight(), r.GetBPP());
 
 	// copy BitmapInfo
-	memcpy(BitmapInfo, r.BitmapInfo, BitmapInfoSize);
+	*BitmapInfo = *r.BitmapInfo;
 
 	// copy Bits
-	if(r.Bits) memcpy(Bits, r.Bits, r.BitmapInfo->bmiHeader.biSizeImage);
+	if(r.Bits) memcpy(Bits, r.Bits, r.BitmapInfo->GetImageSize() );
 
 	// copy pitch
 	PitchBytes = r.PitchBytes;
@@ -1323,100 +725,35 @@ void tTVPBitmap::Allocate(tjs_uint width, tjs_uint height, tjs_uint bpp)
 	// bpp must be 8 or 32
 
 	// create BITMAPINFO
-	BitmapInfoSize = sizeof(BITMAPINFOHEADER) +
-			((bpp==8)?sizeof(RGBQUAD)*256 : 0);
-	BitmapInfo = (BITMAPINFO*)
-		GlobalAlloc(GPTR, BitmapInfoSize);
-	if(!BitmapInfo) TVPThrowExceptionMessage(TVPCannotAllocateBitmapBits,
-		TJS_W("allocating BITMAPINFOHEADER"), ttstr((tjs_int)BitmapInfoSize));
+	BitmapInfo = new BitmapInfomation( width, height, bpp );
 
 	Width = width;
 	Height = height;
-
-	tjs_uint bitmap_width = width;
-		// note that the allocated bitmap size can be bigger than the
-		// original size because the horizontal pitch of the bitmap
-		// is aligned to a paragraph (16bytes)
-
-	if(bpp == 8)
-	{
-		bitmap_width = (((bitmap_width-1) / 16)+1) *16; // align to a paragraph
-		PitchBytes = (((bitmap_width-1) >> 2)+1) <<2;
-	}
-	else
-	{
-		bitmap_width = (((bitmap_width-1) / 4)+1) *4; // align to a paragraph
-		PitchBytes = bitmap_width * 4;
-	}
-
+	PitchBytes = BitmapInfo->GetPitchBytes();
 	PitchStep = -PitchBytes;
-
-
-	BitmapInfo->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-	BitmapInfo->bmiHeader.biWidth = bitmap_width;
-	BitmapInfo->bmiHeader.biHeight = height;
-	BitmapInfo->bmiHeader.biPlanes = 1;
-	BitmapInfo->bmiHeader.biBitCount = bpp;
-	BitmapInfo->bmiHeader.biCompression = BI_RGB;
-	BitmapInfo->bmiHeader.biSizeImage = PitchBytes * height;
-	BitmapInfo->bmiHeader.biXPelsPerMeter = 0;
-	BitmapInfo->bmiHeader.biYPelsPerMeter = 0;
-	BitmapInfo->bmiHeader.biClrUsed = 0;
-	BitmapInfo->bmiHeader.biClrImportant = 0;
-
-	// create grayscale palette
-	if(bpp == 8)
-	{
-		RGBQUAD *pal = (RGBQUAD*)((tjs_uint8*)BitmapInfo + sizeof(BITMAPINFOHEADER));
-
-		for(tjs_int i=0; i<256; i++)
-		{
-			pal[i].rgbBlue = pal[i].rgbGreen = pal[i].rgbRed = (BYTE)i;
-			pal[i].rgbReserved = 0;
-		}
-	}
 
 	// allocate bitmap bits
 	try
 	{
-		if(TVPUseDIBSection)
-		{
-			HDC ref = GetDC(0);
-			BitmapHandle = CreateDIBSection(ref, BitmapInfo, DIB_RGB_COLORS,
-				&Bits, NULL, 0);
-			if(!BitmapHandle)
-			{
-				ReleaseDC(0, ref);
-				TVPThrowExceptionMessage(TVPCannotAllocateBitmapBits,
-					TJS_W("CreateDIBSection failed"), TJS_W("(") +
-				ttstr((int)width) + TJS_W("x") + ttstr((int)height) + TJS_W(")"));
-			}
-			BitmapDC = CreateCompatibleDC(ref);
-			ReleaseDC(0, ref);
-			OldBitmapHandle = SelectObject(BitmapDC, BitmapHandle);
-		}
-		else
-		{
-			Bits = TVPAllocBitmapBits(BitmapInfo->bmiHeader.biSizeImage,
-				width, height);
-		}
+		Bits = TVPAllocBitmapBits(BitmapInfo->GetImageSize(), width, height);
 	}
 	catch(...)
 	{
-		GlobalFree((HGLOBAL)BitmapInfo), BitmapInfo = NULL;
+		delete BitmapInfo;
+		BitmapInfo = NULL;
 		throw;
 	}
 }
 //---------------------------------------------------------------------------
 void * tTVPBitmap::GetScanLine(tjs_uint l) const
 {
-	if((tjs_int)l>=BitmapInfo->bmiHeader.biHeight)
+	if((tjs_int)l>=BitmapInfo->GetHeight() )
 	{
 		TVPThrowExceptionMessage(TVPScanLineRangeOver, ttstr((tjs_int)l),
-			ttstr((tjs_int)BitmapInfo->bmiHeader.biHeight-1));
+			ttstr((tjs_int)BitmapInfo->GetHeight()-1));
 	}
 
-	return (BitmapInfo->bmiHeader.biHeight - l -1 ) * PitchBytes + (tjs_uint8*)Bits;
+	return (BitmapInfo->GetHeight() - l -1 ) * PitchBytes + (tjs_uint8*)Bits;
 }
 //---------------------------------------------------------------------------
 
@@ -1979,9 +1316,9 @@ bool tTVPNativeBaseBitmap::SelectFont(tjs_uint32 flags, const ttstr &caption,
 void tTVPNativeBaseBitmap::GetFontList(tjs_uint32 flags, std::vector<ttstr> &list)
 {
 	ApplyFont();
-	std::vector<std::string> ansilist;
+	std::vector<std::wstring> ansilist;
 	TVPGetFontList(ansilist, flags, GetFontCanvas());
-	for(std::vector<std::string>::iterator i = ansilist.begin(); i != ansilist.end(); i++)
+	for(std::vector<std::wstring>::iterator i = ansilist.begin(); i != ansilist.end(); i++)
 		list.push_back(i->c_str());
 }
 //---------------------------------------------------------------------------
@@ -2422,20 +1759,20 @@ void tTVPNativeBaseBitmap::DrawTextMultiple(const tTVPRect &destrect,
 				}
 
 				// step to the next character position
-				x += data->CellIncX;
-				if(data->CellIncY != 0)
+				x += data->Metrics.CellIncX;
+				if(data->Metrics.CellIncY != 0)
 				{
 					// Windows 9x returns negative CellIncY.
 					// so we must verify whether CellIncY is proper.
 					if(Font.Angle < 1800)
 					{
-						if(data->CellIncY > 0) data->CellIncY = - data->CellIncY;
+						if(data->Metrics.CellIncY > 0) data->Metrics.CellIncY = - data->Metrics.CellIncY;
 					}
 					else
 					{
-						if(data->CellIncY < 0) data->CellIncY = - data->CellIncY;
+						if(data->Metrics.CellIncY < 0) data->Metrics.CellIncY = - data->Metrics.CellIncY;
 					}
-					y += data->CellIncY;
+					y += data->Metrics.CellIncY;
 				}
 			}
 		}

@@ -433,6 +433,9 @@ void TVPInitScriptEngine()
 	// create script engine object
 	TVPScriptEngine = new tTJS();
 
+	// add kirikiriz
+	TVPScriptEngine->SetPPValue( TJS_W("kirikiriz"), 1 );
+
 	// set TJSGetRandomBits128
 	TJSGetRandomBits128 = TVPGetRandomBits128;
 

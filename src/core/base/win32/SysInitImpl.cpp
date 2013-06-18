@@ -1368,9 +1368,9 @@ static std::vector<std::string> * TVPGetEmbeddedOptions()
 				if( buf[0] == 0x0D && buf[1] == 0x0A ) {
 					ret->push_back( std::string(start,buf) );
 					start = buf + 2;
-				} else if( buf[0] == ',' ) {
-					ret->push_back( std::string(start,buf) );
-					start = buf + 1;
+//				} else if( buf[0] == ',' ) {
+//					ret->push_back( std::string(start,buf) );
+//					start = buf + 1;
 				} else if( buf[0] == '\0' ) {
 					ret->push_back( std::string(start,buf) );
 					start = buf + 1;

@@ -42,9 +42,11 @@ static bool TVPAppTitleInit = false;
 //---------------------------------------------------------------------------
 static void TVPShowSimpleMessageBox(const ttstr & text, const ttstr & caption)
 {
-	::MessageBox(TVPGetModalWindowOwnerHandle(),
-		text.AsStdString().c_str(),
-		caption.AsStdString().c_str(), MB_OK|MB_ICONINFORMATION);
+	HWND hWnd = TVPGetModalWindowOwnerHandle();
+	if( hWnd == INVALID_HANDLE_VALUE ) {
+		hWnd = NULL;
+	}
+	::MessageBox( hWnd, text.AsStdString().c_str(), caption.AsStdString().c_str(), MB_OK|MB_ICONINFORMATION );
 }
 //---------------------------------------------------------------------------
 
@@ -459,12 +461,19 @@ bool TVPCreateAppLock(const ttstr &lockname)
 //---------------------------------------------------------------------------
 static void TVPGetDesktopRect(tTVPRect &dest)
 {
+#if 0
 	RECT r;
 	SystemParametersInfo(SPI_GETWORKAREA, 0, &r, 0);
 	dest.left = r.left;
 	dest.top = r.top;
 	dest.right = r.right;
 	dest.bottom = r.bottom;
+#else
+	dest.top = ::GetSystemMetrics(SM_XVIRTUALSCREEN);
+	dest.left = ::GetSystemMetrics(SM_XVIRTUALSCREEN);
+	dest.bottom = dest.top + ::GetSystemMetrics(SM_CYVIRTUALSCREEN);
+	dest.right = dest.left + ::GetSystemMetrics(SM_CXVIRTUALSCREEN);
+#endif
 }
 //---------------------------------------------------------------------------
 

@@ -1023,24 +1023,18 @@ void tTJSNI_VideoOverlay::SetMixingLayer( tTJSNI_BaseLayer *l )
 				tTVPBitmap *bmp = l->GetMainImage()->GetBitmap();
 				if( bmp )
 				{
+					// Ž©‘O‚ÅDC‚ðì‚é
 					HDC hdc;
-					if( (hdc = bmp->GetBitmapDC()) != NULL )
-					{	// ‚·‚Å‚ÉHDC‚ª‚ ‚é‚Ì‚Å‚»‚ê‚ðŽg‚¤
-						VideoOverlay->SetMixingBitmap( hdc, &dest, alpha );
-					}
-					else
-					{	// Ž©‘O‚ÅDC‚ðì‚é
-						HDC			ref = GetDC(0);
-						HBITMAP		myDIB = CreateDIBitmap( ref, bmp->GetBITMAPINFOHEADER(), CBM_INIT, bmp->GetBits(), bmp->GetBITMAPINFO(), bmp->Is8bit() ? DIB_PAL_COLORS : DIB_RGB_COLORS );
-						hdc = CreateCompatibleDC( NULL );
-						HGDIOBJ		hOldBmp = SelectObject( hdc, myDIB );
+					HDC			ref = GetDC(0);
+					HBITMAP		myDIB = CreateDIBitmap( ref, bmp->GetBITMAPINFOHEADER(), CBM_INIT, bmp->GetBits(), bmp->GetBITMAPINFO(), bmp->Is8bit() ? DIB_PAL_COLORS : DIB_RGB_COLORS );
+					hdc = CreateCompatibleDC( NULL );
+					HGDIOBJ		hOldBmp = SelectObject( hdc, myDIB );
 
-						VideoOverlay->SetMixingBitmap( hdc, &dest, alpha );
+					VideoOverlay->SetMixingBitmap( hdc, &dest, alpha );
 
-						SelectObject( hdc, hOldBmp );
-						DeleteObject( myDIB );
-						DeleteDC( hdc );
-					}
+					SelectObject( hdc, hOldBmp );
+					DeleteObject( myDIB );
+					DeleteDC( hdc );
 				}
 			}
 			else

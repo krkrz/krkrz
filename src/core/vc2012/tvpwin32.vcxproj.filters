@@ -55,6 +55,12 @@
     <Filter Include="sound\win32">
       <UniqueIdentifier>{e116b75c-ed4d-47a5-9a92-ff38c939c0e5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="platform">
+      <UniqueIdentifier>{3946f907-251b-460a-9061-dfb3a9137ae2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="platform\win32">
+      <UniqueIdentifier>{1e11e97e-ffad-4370-b7a4-4786814e08d8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -274,9 +280,6 @@
     <ClInclude Include="..\environ\win32\Application.h">
       <Filter>environ\win32</Filter>
     </ClInclude>
-    <ClInclude Include="..\environ\win32\Clipbrd.h">
-      <Filter>environ\win32</Filter>
-    </ClInclude>
     <ClInclude Include="..\environ\win32\VersionFormUnit.h">
       <Filter>environ\win32</Filter>
     </ClInclude>
@@ -406,16 +409,7 @@
     <ClInclude Include="..\visual\WindowIntf.h">
       <Filter>visual</Filter>
     </ClInclude>
-    <ClInclude Include="..\utils\win32\ClipboardImpl.h">
-      <Filter>utils\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="..\utils\win32\DebugImpl.h">
-      <Filter>utils\win32</Filter>
-    </ClInclude>
     <ClInclude Include="..\utils\win32\ThreadImpl.h">
-      <Filter>utils\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="..\utils\win32\TickCount.h">
       <Filter>utils\win32</Filter>
     </ClInclude>
     <ClInclude Include="..\utils\win32\TimerImpl.h">
@@ -489,6 +483,18 @@
     </ClInclude>
     <ClInclude Include="..\environ\win32\TouchPoint.h">
       <Filter>environ\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utils\TickCount.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\platform\win32\BitmapInfomation.h">
+      <Filter>platform\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\CharacterData.h">
+      <Filter>visual</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\PrerenderedFont.h">
+      <Filter>visual</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -702,9 +708,6 @@
     <ClCompile Include="..\visual\IA32\tvpgl_ia32_intf.c">
       <Filter>visual\IA32</Filter>
     </ClCompile>
-    <ClCompile Include="..\environ\win32\Clipbrd.cpp">
-      <Filter>environ\win32</Filter>
-    </ClCompile>
     <ClCompile Include="..\environ\win32\MouseCursor.cpp">
       <Filter>environ\win32</Filter>
     </ClCompile>
@@ -786,9 +789,6 @@
     <ClCompile Include="..\utils\win32\ThreadImpl.cpp">
       <Filter>utils\win32</Filter>
     </ClCompile>
-    <ClCompile Include="..\utils\win32\TickCount.cpp">
-      <Filter>utils\win32</Filter>
-    </ClCompile>
     <ClCompile Include="..\utils\win32\TimerImpl.cpp">
       <Filter>utils\win32</Filter>
     </ClCompile>
@@ -845,6 +845,21 @@
     </ClCompile>
     <ClCompile Include="..\environ\win32\TouchPoint.cpp">
       <Filter>environ\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utils\win32\MiscUtility.cpp">
+      <Filter>utils\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utils\TickCount.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\platform\win32\BitmapInfomation.cpp">
+      <Filter>platform\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\CharacterData.cpp">
+      <Filter>visual</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\PrerenderedFont.cpp">
+      <Filter>visual</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

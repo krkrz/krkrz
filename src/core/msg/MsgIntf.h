@@ -24,65 +24,74 @@
 
 #define WIDEN2(x) L ## x
 #define WIDEN(x) WIDEN2(x)
+
+
+#ifdef TJS_TEXT_OUT_CRLF
+#define RETURN_CODE TJS_W("\r\n")
+#else
+#define RETURN_CODE TJS_W("\n")
+#endif
+
 //---------------------------------------------------------------------------
 // Message Strings ( these should be localized )
 //---------------------------------------------------------------------------
 // Japanese localized messages
 TVP_MSG_DECL_CONST(TVPAboutString,
 	
-TJS_W("吉里吉里[きりきり] 2 実行コア version %1 ( TJS version %2 )\n")
-TJS_W("Compiled on ") WIDEN(__DATE__) TJS_W(" ") WIDEN(__TIME__) TJS_W("\n")
-TJS_W("SVN Revision: ") TVP_SVN_REVISION TJS_W("\n")
-TJS_W("Copyright (C) 1997-2012 W.Dee and contributors All rights reserved.\n")
-TJS_W("Contributors in alphabetical order:\n")
-TJS_W("  Go Watanabe, Kenjo, Kiyobee, Kouhei Yanagita, mey, MIK, Takenori Imoto, yun\n")
-TJS_W("吉里吉里実行コアの使用/配布/改変は、\n")
-TJS_W("SDK 付属の license.txt に書かれているライセンスに従って行うことができます.\n")
-TJS_W("------------------------------------------------------------------------------\n")
-TJS_W("Thanks for many libraries, contributers and supporters not listible here.\n")
-TJS_W("This software is based in part on the work of Independent JPEG Group.\n")
-TJS_W("Regex++ Copyright (c) 1998-2003 Dr John Maddock\n")
-TJS_W("ERINA-Library Copyright (C) 2001 Leshade Entis, Entis-soft.\n")
-TJS_W("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n")
-TJS_W("Using \"A C-program for MT19937\"\n")
-TJS_W("\n")
-TJS_W("   Copyright (C) 1997 - 2002, Makoto Matsumoto and Takuji Nishimura,\n")
-TJS_W("   All rights reserved.\n")
-TJS_W("\n")
-TJS_W("   Redistribution and use in source and binary forms, with or without\n")
-TJS_W("   modification, are permitted provided that the following conditions\n")
-TJS_W("   are met:\n")
-TJS_W("\n")
-TJS_W("     1. Redistributions of source code must retain the above copyright\n")
-TJS_W("        notice, this list of conditions and the following disclaimer.\n")
-TJS_W("\n")
-TJS_W("     2. Redistributions in binary form must reproduce the above copyright\n")
-TJS_W("        notice, this list of conditions and the following disclaimer in the\n")
-TJS_W("        documentation and/or other materials provided with the distribution.\n")
-TJS_W("\n")
-TJS_W("     3. The names of its contributors may not be used to endorse or promote\n")
-TJS_W("        products derived from this software without specific prior written\n")
-TJS_W("        permission.\n")
-TJS_W("\n")
-TJS_W("   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n")
-TJS_W("   \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\n")
-TJS_W("   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR\n")
-TJS_W("   A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR\n")
-TJS_W("   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,\n")
-TJS_W("   EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,\n")
-TJS_W("   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR\n")
-TJS_W("   PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF\n")
-TJS_W("   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING\n")
-TJS_W("   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS\n")
-TJS_W("   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n")
-TJS_W("------------------------------------------------------------------------------\n")
-TJS_W("環境情報\n")
+TJS_W("吉里吉里[きりきり] Z 実行コア version %1 ( TJS version %2 )") RETURN_CODE
+TJS_W("Compiled on ") WIDEN(__DATE__) TJS_W(" ") WIDEN(__TIME__) RETURN_CODE
+TJS_W("SVN Revision: ") TVP_SVN_REVISION RETURN_CODE
+TJS_W("Copyright (C) 1997-2012 W.Dee and contributors All rights reserved.") RETURN_CODE
+TJS_W("Contributors in alphabetical order:") RETURN_CODE
+TJS_W("  Go Watanabe, Kenjo, Kiyobee, Kouhei Yanagita, mey, MIK, Takenori Imoto, yun") RETURN_CODE
+TJS_W("吉里吉里実行コアの使用/配布/改変は、") RETURN_CODE
+TJS_W("SDK 付属の license.txt に書かれているライセンスに従って行うことができます.") RETURN_CODE
+TJS_W("------------------------------------------------------------------------------") RETURN_CODE
+TJS_W("Thanks for many libraries, contributers and supporters not listible here.") RETURN_CODE
+TJS_W("This software is based in part on the work of Independent JPEG Group.") RETURN_CODE
+TJS_W("Regex++ Copyright (c) 1998-2003 Dr John Maddock") RETURN_CODE
+TJS_W("ERINA-Library Copyright (C) 2001 Leshade Entis, Entis-soft.") RETURN_CODE
+TJS_W("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ") RETURN_CODE
+TJS_W("Using \"A C-program for MT19937\"") RETURN_CODE
+RETURN_CODE
+TJS_W("   Copyright (C) 1997 - 2002, Makoto Matsumoto and Takuji Nishimura,") RETURN_CODE
+TJS_W("   All rights reserved.") RETURN_CODE
+RETURN_CODE
+TJS_W("   Redistribution and use in source and binary forms, with or without") RETURN_CODE
+TJS_W("   modification, are permitted provided that the following conditions") RETURN_CODE
+TJS_W("   are met:") RETURN_CODE
+RETURN_CODE
+TJS_W("     1. Redistributions of source code must retain the above copyright") RETURN_CODE
+TJS_W("        notice, this list of conditions and the following disclaimer.") RETURN_CODE
+RETURN_CODE
+TJS_W("     2. Redistributions in binary form must reproduce the above copyright") RETURN_CODE
+TJS_W("        notice, this list of conditions and the following disclaimer in the") RETURN_CODE
+TJS_W("        documentation and/or other materials provided with the distribution.") RETURN_CODE
+RETURN_CODE
+TJS_W("     3. The names of its contributors may not be used to endorse or promote") RETURN_CODE
+TJS_W("        products derived from this software without specific prior written") RETURN_CODE
+TJS_W("        permission.") RETURN_CODE
+RETURN_CODE
+TJS_W("   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS") RETURN_CODE
+TJS_W("   \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT") RETURN_CODE
+TJS_W("   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR") RETURN_CODE
+TJS_W("   A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR") RETURN_CODE
+TJS_W("   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,") RETURN_CODE
+TJS_W("   EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,") RETURN_CODE
+TJS_W("   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR") RETURN_CODE
+TJS_W("   PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF") RETURN_CODE
+TJS_W("   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING") RETURN_CODE
+TJS_W("   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS") RETURN_CODE
+TJS_W("   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.") RETURN_CODE
+TJS_W("------------------------------------------------------------------------------") RETURN_CODE
+TJS_W("環境情報") RETURN_CODE
   // important log (environment information, Debug.notice etc.) comes here
 );
+#undef RETURN_CODE
 
 TVP_MSG_DECL_CONST(TVPVersionInformation,
 	
-TJS_W("吉里吉里[きりきり] 2 実行コア/%1 ")
+TJS_W("吉里吉里[きりきり] Z 実行コア/%1 ")
 TJS_W("(SVN revision:") TVP_SVN_REVISION TJS_W("; Compiled on ") WIDEN(__DATE__) TJS_W(" ") WIDEN(__TIME__) TJS_W(") TJS2/%2 ")
 TJS_W("Copyright (C) 1997-2012 W.Dee and contributors All rights reserved."));
 
@@ -341,6 +350,12 @@ TVP_MSG_DECL(TVPInvalidWindowSizeMustBeIn64to32768,
 
 TVP_MSG_DECL(TVPInvalidOverlapCountMustBeIn2to32,
 	TJS_W("overlap は 2～32 の範囲の 2 の累乗で無ければなりません"));
+
+//---------------------------------------------------------------------------
+// 埋め込まれていたメッセージをコピー
+
+TVP_MSG_DECL(TVPFaildClipboardCopy,
+	TJS_W("copying to clipboard failed."));
 
 
 //---------------------------------------------------------------------------

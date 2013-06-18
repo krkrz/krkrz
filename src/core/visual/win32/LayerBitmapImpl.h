@@ -14,12 +14,11 @@
 #include "tvpfontstruc.h"
 #include "ComplexRect.h"
 
-
+#include "BitmapInfomation.h"
 
 //---------------------------------------------------------------------------
 extern void TVPSetFontCacheForLowMem();
 //---------------------------------------------------------------------------
-
 
 
 
@@ -31,17 +30,12 @@ class tTVPBitmap
 	tjs_int RefCount;
 
 	void * Bits; // pointer to bitmap bits
-	BITMAPINFO *BitmapInfo; // DIB information
-	tjs_int BitmapInfoSize;
+	BitmapInfomation *BitmapInfo; // DIB information
 
 	tjs_int PitchBytes; // bytes required in a line
 	tjs_int PitchStep; // step bytes to next(below) line
 	tjs_int Width; // actual width
 	tjs_int Height; // actual height
-
-	HDC BitmapDC; // for DIBSection
-	HBITMAP BitmapHandle, OldBitmapHandle; // for DIBSection
-
 
 public:
 	tTVPBitmap(tjs_uint width, tjs_uint height, tjs_uint bpp);
@@ -68,9 +62,9 @@ public:
 	tjs_uint GetWidth() const { return Width; }
 	tjs_uint GetHeight() const { return Height; }
 
-	tjs_uint GetBPP() const { return BitmapInfo->bmiHeader.biBitCount; }
-	bool Is32bit() const { return BitmapInfo->bmiHeader.biBitCount == 32; }
-	bool Is8bit() const { return BitmapInfo->bmiHeader.biBitCount == 8; }
+	tjs_uint GetBPP() const { return BitmapInfo->GetBPP(); }
+	bool Is32bit() const { return BitmapInfo->Is32bit(); }
+	bool Is8bit() const { return BitmapInfo->Is8bit(); }
 
 
 	void * GetScanLine(tjs_uint l) const;
@@ -79,12 +73,12 @@ public:
 
 	bool IsIndependent() const { return RefCount == 1; }
 
-	const BITMAPINFO * GetBITMAPINFO() const { return BitmapInfo; }
-	const BITMAPINFOHEADER * GetBITMAPINFOHEADER() const
-		{ return (const BITMAPINFOHEADER*)BitmapInfo; }
-	const void * GetBits() const { return Bits; }
+#ifdef _WIN32
+	const BITMAPINFO * GetBITMAPINFO() const { return BitmapInfo->GetBITMAPINFO(); }
+	const BITMAPINFOHEADER * GetBITMAPINFOHEADER() const { return (const BITMAPINFOHEADER*)( BitmapInfo->GetBITMAPINFO() ); }
+#endif
 
-	HDC GetBitmapDC() const { return BitmapDC; }
+	const void * GetBits() const { return Bits; }
 };
 //---------------------------------------------------------------------------
 
@@ -164,8 +158,7 @@ private:
 public:
 	HDC GetFontDC();
 	HDC GetNonBoldFontDC();
-	//class TCanvas * GetFontCanvas();
-	class TFont * GetFontCanvas();
+	class TFont *GetFontCanvas();
 
 public:
 	void SetFont(const tTVPFont &font);

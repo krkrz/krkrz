@@ -10,7 +10,7 @@
 //---------------------------------------------------------------------------
 #include "tjsCommHead.h"
 
-#include "DebugImpl.h"
+#include "DebugIntf.h"
 #include "MainFormUnit.h"
 
 

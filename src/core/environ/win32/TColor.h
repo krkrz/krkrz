@@ -1,6 +1,9 @@
 
 #ifndef __T_COLOR_H__
 #define __T_COLOR_H__
+
+#include <windows.h>
+
 enum {
 	clScrollBar = 0x80000000,
 	clBackground = 0x80000001,
@@ -34,6 +37,9 @@ enum {
 };
 
 inline unsigned long ColorToRGB( unsigned long col ) {
+	if( ((int)col) < 0 ) {
+		return ::GetSysColor( (int)(col&0xff) );
+	}
 	return col;
 }
 
