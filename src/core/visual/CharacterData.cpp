@@ -19,6 +19,7 @@ tTVPCharacterData::tTVPCharacterData(tjs_uint8 * indata,
 	OriginY = originy;
 	BlackBoxX = blackboxw;
 	BlackBoxY = blackboxh;
+	Gray = 65;
 
 	// サイズのチェック
 	if( BlackBoxX != 0 && BlackBoxY != 0 ) {

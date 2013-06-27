@@ -35,6 +35,10 @@
 #include "TFont.h"
 #include "CharacterData.h"
 #include "PrerenderedFont.h"
+#include "FontSystem.h"
+#include "FreeType.h"
+#include "FreeTypeFontRasterizer.h"
+#include "GDIFontRasterizer.h"
 
 //---------------------------------------------------------------------------
 // prototypes
@@ -43,6 +47,36 @@ void TVPClearFontCache();
 //---------------------------------------------------------------------------
 
 
+//---------------------------------------------------------------------------
+// default FONT retrieve function
+//---------------------------------------------------------------------------
+FontSystem* TVPFontSystem = NULL;
+
+enum {
+	FONT_RASTER_FREE_TYPE,
+	FONT_RASTER_GDI,
+	FONT_RASTER_EOT
+};
+static FontRasterizer* TVPFontRasterizers[FONT_RASTER_EOT];
+static bool TVPFontRasterizersInit = false;
+static tjs_int TVPCurrentFontRasterizers = FONT_RASTER_GDI;
+void TVPInializeFontRasterizers() {
+	if( TVPFontRasterizersInit == false ) {
+		TVPFontRasterizers[FONT_RASTER_FREE_TYPE] = new FreeTypeFontRasterizer();
+		TVPFontRasterizers[FONT_RASTER_GDI] = new GDIFontRasterizer();
+	}
+}
+// ここで切り換えること考えると AddRef 意味ないな。もう一つ上位で処理しないと
+// ここに書かれたメソッドをクラス化して
+void SetFontRasterizer( tjs_int index ) {
+	if( TVPCurrentFontRasterizers != index && index >= 0 && index < FONT_RASTER_EOT ) {
+		TVPCurrentFontRasterizers = index;
+		TVPClearFontCache(); // ラスタライザが切り替わる時、キャッシュはクリアしてしまう
+	}
+}
+FontRasterizer* GetCurrentRasterizer() {
+	return TVPFontRasterizers[TVPCurrentFontRasterizers];
+}
 
 //---------------------------------------------------------------------------
 // #define TVP_ALLOC_GBUF_MALLOC
@@ -51,42 +85,6 @@ void TVPClearFontCache();
 #define TVP_CH_MAX_CACHE_COUNT 1300
 #define TVP_CH_MAX_CACHE_COUNT_LOW 100
 #define TVP_CH_MAX_CACHE_HASH_SIZE 512
-//---------------------------------------------------------------------------
-
-static bool TVPChUseResampling = false; // whether to use resampling anti-aliasing
-enum tTVPChAntialiasMethod
-{	camAPI,	camResample4, camResample8, camSubpixelRGB, camSubpixelBGR };
-static tTVPChAntialiasMethod TVPChAntialiasMethod = camResample8;
-static bool TVPChAntialiasMethodInit = false;
-//---------------------------------------------------------------------------
-static void TVPInitChAntialiasMethod()
-{
-	if(TVPChAntialiasMethodInit) return;
-
-	TVPChAntialiasMethod = TVPSystemIsBasedOnNT ? camAPI : camResample8; // default
-
-	tTJSVariant val;
-	if(TVPGetCommandLine(TJS_W("-aamethod"), &val))
-	{
-		ttstr str(val);
-#if 0 // まったく意味のないコード？
-		if(str == TJS_W("auto"))
-			; // nothing to do
-#endif
-		if(str == TJS_W("res8"))
-			TVPChAntialiasMethod = camResample8;
-		else if(str == TJS_W("res4"))
-			TVPChAntialiasMethod = camResample4;
-		else if(str == TJS_W("api"))
-			TVPChAntialiasMethod = camAPI;
-		else if(str == TJS_W("rgb"))
-			TVPChAntialiasMethod = camSubpixelRGB;
-		else if(str == TJS_W("bgr"))
-			TVPChAntialiasMethod = camSubpixelBGR;
-	}
-
-	TVPChAntialiasMethodInit = true;
-}
 //---------------------------------------------------------------------------
 
 
@@ -223,51 +221,6 @@ static tTVPPrerenderedFont * TVPGetPrerenderedMappedFont(const tTVPFont &font)
 //---------------------------------------------------------------------------
 
 
-
-
-
-
-
-//---------------------------------------------------------------------------
-// Character Cache management
-//---------------------------------------------------------------------------
-struct tTVPFontAndCharacterData
-{
-	tTVPFont Font;
-	tjs_uint32 FontHash;
-	tjs_char Character;
-	tjs_int BlurLevel;
-	tjs_int BlurWidth;
-	bool Antialiased;
-	bool Blured;
-	bool operator == (const tTVPFontAndCharacterData &rhs) const
-	{
-		return Character == rhs.Character && Font == rhs.Font &&
-			Antialiased == rhs.Antialiased && BlurLevel == rhs.BlurLevel &&
-			BlurWidth == rhs.BlurWidth && Blured == rhs.Blured;
-	}
-};
-//---------------------------------------------------------------------------
-class tTVPFontHashFunc
-{
-public:
-	static tjs_uint32 Make(const tTVPFontAndCharacterData &val)
-	{
-		tjs_uint32 v = val.FontHash;
-
-		v ^= val.Antialiased?1:0;
-		v ^= val.Character;
-		v ^= val.Blured?1:0;
-		v ^= val.BlurLevel ^ val.BlurWidth;
-		return v;
-	}
-};
-
-
-
-
-
-
 //---------------------------------------------------------------------------
 typedef tTJSRefHolder<tTVPCharacterData> tTVPCharacterDataHolder;
 
@@ -305,8 +258,6 @@ static tTVPCharacterData * TVPGetCharacter(const tTVPFontAndCharacterData & font
 {
 	// returns specified character data.
 	// draw a character if needed.
-
-	TVPInitChAntialiasMethod();
 
 	// compact interface initialization
 	if(!TVPClearFontCacheCallbackInit)
@@ -382,201 +333,11 @@ static tTVPCharacterData * TVPGetCharacter(const tTVPFontAndCharacterData & font
 	else
 	{
 		// render font
+		tTVPCharacterData *data = GetCurrentRasterizer()->GetBitmap( font, aofsx, aofsy );
 
-		// setup GLYPHMETRICS and reveive buffer
-		GLYPHMETRICS gm;
-		ZeroMemory(&gm, sizeof(gm));
-		static MAT2 no_transform_matrix = { {0,1}, {0,0}, {0,0}, {0,1} };
-			// transformation matrix for intact conversion
-			// | 1 0 |
-			// | 0 1 |
-		static MAT2 scale_4x_matrix = { {0,4}, {0,0}, {0,0}, {0,4} };
-			// transformation matrix for 4x
-			// | 4 0 |
-			// | 0 4 |
-		static MAT2 scale_8x_matrix = { {0,8}, {0,0}, {0,0}, {0,8} };
-			// transformation matrix for 8x
-			// | 8 0 |
-			// | 0 8 |
-
-
-		// determine format and transformation matrix
-		tjs_int factor = 0;
-		MAT2 *transmat;
-		UINT format = font.Antialiased ? GGO_GRAY8_BITMAP : GGO_BITMAP;
-		if(font.Antialiased)
-		{
-			switch(TVPChAntialiasMethod)
-			{
-			case camAPI:
-				transmat = &no_transform_matrix;
-				break;
-			case camResample4:
-				transmat = &scale_4x_matrix, factor = 2;
-				format = GGO_BITMAP;
-				break;
-			case camSubpixelRGB:
-			case camSubpixelBGR:
-			case camResample8:
-				transmat = &scale_8x_matrix, factor = 3;
-				format = GGO_BITMAP;
-				break;
-			}
-		}
-		else
-		{
-			transmat = &no_transform_matrix;
-		}
-
-
-		// retrieve character code
-		WORD code;
-		// system supports UNICODE
-		code = font.Character;
-
-		// get buffer size and output dimensions
-		int size = ::GetGlyphOutline(bmp->GetFontDC(), code, format, &gm, 0, NULL, transmat);
-
-		// set up structure's variables
-		tTVPCharacterData * data = new tTVPCharacterData();
-
-		{
-			SIZE s;
-			s.cx = 0;
-			s.cy = 0;
-			GetTextExtentPoint32(bmp->GetNonBoldFontDC(), &font.Character, 1, &s);
-
-			if(font.Font.Flags & TVP_TF_BOLD)
-			{
-				// calculate bold font width;
-				// because sucking Win32 API returns different character size
-				// between Win9x and WinNT, when we specified bold characters.
-				// so we must alternatively calculate bold font size based on
-				// non-bold font width.
-				s.cx += (int)(s.cx / 50) + 1;
-			}
-
-			if(font.Font.Angle == 0)
-			{
-				data->Metrics.CellIncX = s.cx;
-				data->Metrics.CellIncY = 0;
-			}
-			else if(font.Font.Angle == 2700)
-			{
-				data->Metrics.CellIncX = 0;
-				data->Metrics.CellIncY = s.cx;
-			}
-			else
-			{
-				double angle = font.Font.Angle * (M_PI/1800);
-				data->Metrics.CellIncX = static_cast<tjs_int>(  cos(angle) * s.cx);
-				data->Metrics.CellIncY = static_cast<tjs_int>(- sin(angle) * s.cx);
-			}
-		}
-
-		data->BlackBoxX = gm.gmBlackBoxX;
-		data->BlackBoxY = gm.gmBlackBoxY;
-		data->OriginX =
-			(gm.gmptGlyphOrigin.x) +
-			(aofsx<<factor);
-		data->OriginY = -gm.gmptGlyphOrigin.y + (aofsy<<factor);
-
-		data->Antialiased = font.Antialiased;
-
-		data->FullColored = false;
-
-		data->Blured = font.Blured;
-		data->BlurWidth = font.BlurWidth;
-		data->BlurLevel = font.BlurLevel;
-
-		if(size == 0 || gm.gmBlackBoxY == 0)
-		{
-			data->BlackBoxX = 0;
-			data->BlackBoxY = 0;
-
-			// add to hash table
-			tTVPCharacterDataHolder holder(data);
-			TVPFontCache.AddWithHash(font, hash, holder);
-		}
-		else
-		{
-
-			if(format == GGO_GRAY8_BITMAP)
-			{
-				data->Pitch = (size / gm.gmBlackBoxY) & ~0x03;
-					// data is aligned to DWORD
-				/*
-					data->Pitch = (((gm.gmBlackBoxX -1)>>2)+1)<<2 seems to be proper,
-					but does not work with some characters.
-				*/
-			}
-			else
-			{
-				data->Pitch = (((gm.gmBlackBoxX -1)>>5)+1)<<2;
-					// data is aligned to DWORD
-			}
-
-			data->Alloc(size);
-
-			try
-			{
-				// draw to buffer
-				::GetGlyphOutline(bmp->GetFontDC(), code, format, &gm, size, data->GetData(), transmat);
-
-				if((TVPChUseResampling || !TVPSystemIsBasedOnNT) &&
-					(font.Font.Flags & TVP_TF_BOLD))
-				{
-					// our sucking win9x based OS cannot output bold characters
-					// even if BOLD is specified.
-					if(format == GGO_BITMAP)
-						data->Bold2(font.Font.Height<<factor);
-					else
-						data->Bold(font.Font.Height<<factor);
-						// so here we go a nasty way ...
-				}
-
-				if(!font.Antialiased)
-				{
-					// not antialiased
-					data->Expand(); // nasty...
-				}
-				else
-				{
-					// antialiased
-					switch(TVPChAntialiasMethod)
-					{
-					case camAPI:
-						break;
-					case camResample4:
-						data->Resample4();
-						break;
-					case camResample8:
-						data->Resample8();
-						break;
-					case camSubpixelRGB:
-//						data->ResampleRGB();
-						break;
-					case camSubpixelBGR:
-//						data->ResampleBGR();
-						break;
-					}
-				}
-
-				// apply blur
-				if(font.Blured) data->Blur(); // nasty ...
-
-				// add to hash table
-				tTVPCharacterDataHolder holder(data);
-				TVPFontCache.AddWithHash(font, hash, holder);
-
-			}
-			catch(...)
-			{
-				data->Release();
-				throw;
-			}
-		}
-
+		// add to hash table
+		tTVPCharacterDataHolder holder(data);
+		TVPFontCache.AddWithHash(font, hash, holder);
 		return data;
 	}
 }
@@ -757,294 +518,21 @@ void * tTVPBitmap::GetScanLine(tjs_uint l) const
 }
 //---------------------------------------------------------------------------
 
-
-
-
-//---------------------------------------------------------------------------
-// default LOGFONT retrieve function
-//---------------------------------------------------------------------------
-static const TCHAR * const TVPDefaultFontName = _T("ＭＳ Ｐゴシック"); // TODO: i18n
-static LOGFONT TVPDefaultLOGFONT;
-static tTVPFont TVPDefaultFont;
-static bool TVPDefaultLOGFONTCreated = false;
-static void TVPConstructDefaultFont()
-{
-	if(!TVPDefaultLOGFONTCreated)
-	{
-		TVPDefaultLOGFONTCreated = true;
-		LOGFONT &l = TVPDefaultLOGFONT;
-		l.lfHeight = -12;
-		l.lfWidth = 0;
-		l.lfEscapement = 0;
-		l.lfOrientation = 0;
-		l.lfWeight = 400;
-		l.lfItalic = FALSE;
-		l.lfUnderline = FALSE;
-		l.lfStrikeOut = FALSE;
-		l.lfCharSet = SHIFTJIS_CHARSET; // TODO: i18n
-		l.lfOutPrecision = OUT_DEFAULT_PRECIS;
-		l.lfQuality = DEFAULT_QUALITY;
-		l.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
-		_tcscpy(l.lfFaceName, TVPDefaultFontName); // TODO: i18n
-
-		TVPDefaultFont.Height = l.lfHeight;
-		TVPDefaultFont.Flags = 0;
-		TVPDefaultFont.Angle = 0;
-		TVPDefaultFont.Face = ttstr(l.lfFaceName);
-	}
-}
-//---------------------------------------------------------------------------
-
-
-
-
-
-//---------------------------------------------------------------------------
-// font enumeration and existence check
-//---------------------------------------------------------------------------
-class tTVPAnsiStringHash
-{
-public:
-	static tjs_uint32 Make(const tstring &val)
-	{
-		const TCHAR * ptr = val.c_str();
-		if(*ptr == 0) return 0;
-		tjs_uint32 v = 0;
-		while(*ptr)
-		{
-			v += *ptr;
-			v += (v << 10);
-			v ^= (v >> 6);
-			ptr++;
-		}
-		v += (v << 3);
-		v ^= (v >> 11);
-		v += (v << 15);
-		if(!v) v = (tjs_uint32)-1;
-		return v;
-	}
-};
-static tTJSHashTable<tstring, tjs_int, tTVPAnsiStringHash> TVPFontNames;
-bool TVPFontNamesInit = false;
-//---------------------------------------------------------------------------
-struct tTVPFontSearchStruct
-{
-	const char *Face;
-	bool Found;
-};
-//---------------------------------------------------------------------------
-static int CALLBACK TVPEnumFontsProc(LOGFONT *lplf, TEXTMETRIC *lptm,
-	DWORD type, LPARAM data)
-{
-	TVPFontNames.Add(tstring(lplf->lfFaceName), 1);
-	return 1;
-}
-//---------------------------------------------------------------------------
-static void TVPInitFontNames()
-{
-	// enumlate all fonts
-	if(TVPFontNamesInit) return;
-
-	HDC dc = GetDC(NULL);
-	EnumFonts(dc, NULL, (int (__stdcall *)())TVPEnumFontsProc,
-			(LPARAM)NULL);
- 	ReleaseDC(NULL, dc);
-
-	TVPFontNamesInit = true;
-}
-//---------------------------------------------------------------------------
-static bool TVPFontExists(const tstring &name)
-{
-	// check existence of font
-	TVPInitFontNames();
-
-	int * t = TVPFontNames.Find(name);
-
-	return t != NULL;
-}
-//---------------------------------------------------------------------------
-tstring TVPGetBeingFont(tstring fonts)
-{
-	// retrieve being font in the system.
-	// font candidates are given by "fonts", separated by comma.
-
-	bool vfont;
-
-	if(fonts.c_str()[0] == '@')      // for vertical writing
-	{
-		fonts = fonts.c_str() + 1;
-		vfont = true;
-	}
-	else
-	{
-		vfont = false;
-	}
-
-	bool prev_empty_name = false;
-
-	while(fonts!=_T(""))
-	{
-		tstring fontname;
-		int pos = fonts.find_first_of(_T(","));
-		if( pos != std::string::npos )
-		{
-			fontname = Trim( fonts.substr( 0, pos) );
-			fonts = fonts.c_str()+pos;
-		}
-		else
-		{
-			fontname = Trim(fonts);
-			fonts=_T("");
-		}
-
-		// no existing check if previously specified font candidate is empty
-		// eg. ",Fontname"
-
-		if(fontname != _T("") && (prev_empty_name || TVPFontExists(fontname) ) )
-		{
-			if(vfont && fontname.c_str()[0] != '@')
-			{
-				return  _T("@") + fontname;
-			}
-			else
-			{
-				return fontname;
-			}
-		}
-
-		prev_empty_name = (fontname == _T(""));
-	}
-
-	if(vfont)
-	{
-		return tstring(_T("@")) + TVPDefaultFontName;
-	}
-	else
-	{
-		return TVPDefaultFontName;
-	}
-}
-//---------------------------------------------------------------------------
-
-
-
-
-
-//---------------------------------------------------------------------------
-// device context for font representation
-//---------------------------------------------------------------------------
-static tjs_int TVPFontDCRefCount = 0;
-/*
-static TBitmap * TVPBitmapForFontDC = NULL;
-static TBitmap * TVPBitmapForNonBoldFontDC = NULL;
-*/
-static TFont * TVPBitmapForFontDC = NULL;
-static TFont * TVPBitmapForNonBoldFontDC = NULL;
-static tTVPNativeBaseBitmap * TVPFontDCLastBitmap = NULL;
-static LOGFONT TVPFontDCCurentLOGFONT;
-//---------------------------------------------------------------------------
-static void TVPFontDCAddRef()
-{
-	if(TVPFontDCRefCount == 0)
-	{/*
-		TVPBitmapForFontDC = new TBitmap();
-		TVPBitmapForFontDC->SetWidth( 32 );
-		TVPBitmapForFontDC->SetHeight( 32 );
-		TVPBitmapForFontDC->SetPixelFormat( pf32bit );
-		TVPBitmapForNonBoldFontDC = new TBitmap();
-		TVPBitmapForNonBoldFontDC->SetWidth( 32 );
-		TVPBitmapForNonBoldFontDC->SetHeight( 32 );
-		TVPBitmapForNonBoldFontDC->SetPixelFormat( pf32bit );
-		*/
-		TVPBitmapForFontDC = new TFont();
-		TVPBitmapForNonBoldFontDC = new TFont();
-	}
-	TVPFontDCRefCount ++;
-}
-//---------------------------------------------------------------------------
-static void TVPFontDCRelease()
-{
-	TVPFontDCRefCount --;
-	TVPFontDCLastBitmap = NULL;
-	if(TVPFontDCRefCount == 0)
-	{
-		delete TVPBitmapForFontDC;
-		TVPBitmapForFontDC = NULL;
-		delete TVPBitmapForNonBoldFontDC;
-		TVPBitmapForNonBoldFontDC = NULL;
-	}
-}
-//---------------------------------------------------------------------------
-static void TVPFontDCApplyFont(tTVPNativeBaseBitmap *bmp, bool force)
-{
-	if(bmp != TVPFontDCLastBitmap || force)
-	{
-		//TVPBitmapForFontDC->GetCanvas()->GetFont()->SetHandle(
-		//	CreateFontIndirect(bmp->GetLOGFONT()) );
-		TVPBitmapForFontDC->ApplyFont( bmp->GetLOGFONT() );
-		TVPFontDCCurentLOGFONT = *(bmp->GetLOGFONT());
-		int orgweight = TVPFontDCCurentLOGFONT.lfWeight;
-		TVPFontDCCurentLOGFONT.lfWeight = 400;
-		//TVPBitmapForNonBoldFontDC->GetCanvas()->GetFont()->SetHandle(
-		//	CreateFontIndirect(&TVPFontDCCurentLOGFONT) );
-		TVPBitmapForNonBoldFontDC->ApplyFont( &TVPFontDCCurentLOGFONT );
-		TVPFontDCCurentLOGFONT.lfWeight = orgweight;
-		TVPFontDCLastBitmap = bmp;
-	}
-}
-//---------------------------------------------------------------------------
-/*
-static TCanvas * TVPFontDCGetCanvas() { return TVPBitmapForFontDC->GetCanvas(); }
-static TCanvas * TVPNonBoldFontDCGetCanvas() { return TVPBitmapForNonBoldFontDC->GetCanvas(); }
-*/
-//---------------------------------------------------------------------------
-static tjs_int TVPFontDCGetAscentHeight()
-{
-	/*
-  int otmSize = ::GetOutlineTextMetrics(TVPFontDCGetCanvas()->GetHandle(), 0, NULL);
-  char *otmBuf = new char[otmSize];
-  OUTLINETEXTMETRIC *otm = (OUTLINETEXTMETRIC*)otmBuf;
-  ::GetOutlineTextMetrics(TVPFontDCGetCanvas()->GetHandle(), otmSize, otm);
-  tjs_int result = otm->otmAscent;
-  delete[] otmBuf;
-  return result;
-  */
-  return TVPBitmapForFontDC->GetAscentHeight();
-}
-//---------------------------------------------------------------------------
-static void TVPGetTextExtent(tjs_char ch, tjs_int &w, tjs_int &h)
-{
-	SIZE s;
-	s.cx = 0;
-	s.cy = 0;
-	::GetTextExtentPoint32(TVPBitmapForNonBoldFontDC->GetDC(), &ch, 1, &s);
-
-	w = s.cx;
-	h = s.cy;
-
-	if(TVPFontDCCurentLOGFONT.lfWeight >= 700)
-	{
-		w += (int)(h / 50) + 1; // calculate bold font size
-	}
-}
-//---------------------------------------------------------------------------
-
-
-
-
-
-
 //---------------------------------------------------------------------------
 // tTVPNativeBaseBitmap
 //---------------------------------------------------------------------------
 tTVPNativeBaseBitmap::tTVPNativeBaseBitmap(tjs_uint w, tjs_uint h, tjs_uint bpp)
 {
-	TVPFontDCAddRef();
+	TVPInializeFontRasterizers();
+	// TVPFontRasterizer->AddRef(); TODO
 
-	TVPConstructDefaultFont();
-	Font = TVPDefaultFont;
+	if( TVPFontSystem == NULL ) {
+		TVPFontSystem = new FontSystem();
+	}
+	// TVPConstructDefaultFont();
+	Font = TVPFontSystem->GetDefaultFont();
 	PrerenderedFont = NULL;
-	LogFont = TVPDefaultLOGFONT;
+	//LogFont = TVPDefaultLOGFONT;
 	FontChanged = true;
 	GlobalFontState = -1;
 	TextWidth = TextHeight = 0;
@@ -1053,14 +541,15 @@ tTVPNativeBaseBitmap::tTVPNativeBaseBitmap(tjs_uint w, tjs_uint h, tjs_uint bpp)
 //---------------------------------------------------------------------------
 tTVPNativeBaseBitmap::tTVPNativeBaseBitmap(const tTVPNativeBaseBitmap & r)
 {
-	TVPFontDCAddRef();
+	TVPInializeFontRasterizers();
+	// TVPFontRasterizer->AddRef(); TODO
 
 	Bitmap = r.Bitmap;
 	Bitmap->AddRef();
 
 	Font = r.Font;
 	PrerenderedFont = NULL;
-	LogFont = TVPDefaultLOGFONT;
+	//LogFont = TVPDefaultLOGFONT;
 	FontChanged = true;
 	TextWidth = TextHeight = 0;
 }
@@ -1070,7 +559,7 @@ tTVPNativeBaseBitmap::~tTVPNativeBaseBitmap()
 	Bitmap->Release();
 	if(PrerenderedFont) PrerenderedFont->Release();
 
-	TVPFontDCRelease();
+	// TVPFontRasterizer->Release(); TODO
 }
 //---------------------------------------------------------------------------
 tjs_uint tTVPNativeBaseBitmap::GetWidth() const
@@ -1229,7 +718,7 @@ void tTVPNativeBaseBitmap::ApplyFont()
 
 		if(PrerenderedFont) PrerenderedFont->Release();
 		PrerenderedFont = TVPGetPrerenderedMappedFont(Font);
-
+#if 0
 		LogFont.lfHeight = -std::abs(Font.Height);
 		LogFont.lfItalic = (Font.Flags & TVP_TF_ITALIC) ? TRUE:FALSE;
 		LogFont.lfWeight = (Font.Flags & TVP_TF_BOLD) ? 700 : 400;
@@ -1239,10 +728,10 @@ void tTVPNativeBaseBitmap::ApplyFont()
 		tstring face = TVPGetBeingFont(Font.Face.AsStdString());
 		_tcsncpy(LogFont.lfFaceName, face.c_str(), LF_FACESIZE -1);
 		LogFont.lfFaceName[LF_FACESIZE-1] = 0;
-
+#endif
 		// compute ascent offset
-		TVPFontDCApplyFont(this, true);
-		tjs_int ascent = TVPFontDCGetAscentHeight();
+		GetCurrentRasterizer()->ApplyFont( this, true );
+		tjs_int ascent = GetCurrentRasterizer()->GetAscentHeight();
 		RadianAngle = Font.Angle * (M_PI/1800);
 		double angle90 = RadianAngle + M_PI_2;
 		AscentOfsX = static_cast<tjs_int>(-cos(angle90) * ascent);
@@ -1254,10 +743,11 @@ void tTVPNativeBaseBitmap::ApplyFont()
 	}
 	else
 	{
-		TVPFontDCApplyFont(this, false);
+		GetCurrentRasterizer()->ApplyFont( this, false );
 	}
 }
 //---------------------------------------------------------------------------
+/*
 HDC tTVPNativeBaseBitmap::GetFontDC()
 {
 	ApplyFont();
@@ -1271,13 +761,15 @@ HDC tTVPNativeBaseBitmap::GetNonBoldFontDC()
 	//return TVPNonBoldFontDCGetCanvas()->GetHandle();
 	return TVPBitmapForNonBoldFontDC->GetDC();
 }
+*/
 //---------------------------------------------------------------------------
 //TCanvas * tTVPNativeBaseBitmap::GetFontCanvas()
 TFont * tTVPNativeBaseBitmap::GetFontCanvas()
 {
 	ApplyFont();
 	//return TVPFontDCGetCanvas();
-	return TVPBitmapForFontDC;
+	// return TVPBitmapForFontDC;
+	return NULL; // TODO 後でこのメソッド自体を無効化すること
 }
 //---------------------------------------------------------------------------
 void tTVPNativeBaseBitmap::SetFont(const tTVPFont &font)
@@ -1400,92 +892,177 @@ bool tTVPNativeBaseBitmap::InternalDrawText(tTVPCharacterData *data, tjs_int x,
 	h = drect.bottom - drect.top;
 	w = drect.right - drect.left;
 	bp = data->GetData() + pitch * srect.top;
-
-	if(dtdata->bltmode == bmAlphaOnAlpha)
-	{
-		if(dtdata->opa > 0)
+	if( data->Gray == 256 ) {
+		if(dtdata->bltmode == bmAlphaOnAlpha)
+		{
+			if(dtdata->opa > 0)
+			{
+				if(dtdata->opa == 255)
+				{
+					while(h--)
+						TVPApplyColorMap_d((tjs_uint32*)sl + drect.left,
+							bp + srect.left, w, color), sl += dtdata->bmppitch,
+							bp += pitch;
+				}
+				else
+				{
+					while(h--)
+						TVPApplyColorMap_do((tjs_uint32*)sl + drect.left,
+							bp + srect.left, w, color, dtdata->opa), sl += dtdata->bmppitch,
+							bp += pitch;
+				}
+			}
+			else
+			{
+				// opacity removal
+				if(dtdata->opa == -255)
+				{
+					while(h--)
+						TVPRemoveOpacity((tjs_uint32*)sl + drect.left,
+							bp + srect.left, w), sl += dtdata->bmppitch,
+							bp += pitch;
+				}
+				else
+				{
+					while(h--)
+						TVPRemoveOpacity_o((tjs_uint32*)sl + drect.left,
+							bp + srect.left, w, -dtdata->opa), sl += dtdata->bmppitch,
+							bp += pitch;
+				}
+			}
+		}
+		else if(dtdata->bltmode == bmAlphaOnAddAlpha)
 		{
 			if(dtdata->opa == 255)
 			{
 				while(h--)
-					TVPApplyColorMap65_d((tjs_uint32*)sl + drect.left,
+					TVPApplyColorMap_a((tjs_uint32*)sl + drect.left,
 						bp + srect.left, w, color), sl += dtdata->bmppitch,
 						bp += pitch;
 			}
 			else
 			{
 				while(h--)
-					TVPApplyColorMap65_do((tjs_uint32*)sl + drect.left,
+					TVPApplyColorMap_ao((tjs_uint32*)sl + drect.left,
 						bp + srect.left, w, color, dtdata->opa), sl += dtdata->bmppitch,
 						bp += pitch;
 			}
 		}
 		else
 		{
-			// opacity removal
-			if(dtdata->opa == -255)
+			if(dtdata->opa == 255)
+			{
+				if(dtdata->holdalpha)
+					while(h--)
+						TVPApplyColorMap_HDA((tjs_uint32*)sl + drect.left,
+							bp + srect.left, w, color), sl += dtdata->bmppitch,
+							bp += pitch;
+				else
+					while(h--)
+						TVPApplyColorMap((tjs_uint32*)sl + drect.left,
+							bp + srect.left, w, color), sl += dtdata->bmppitch,
+							bp += pitch;
+			}
+			else
+			{
+				if(dtdata->holdalpha)
+					while(h--)
+						TVPApplyColorMap_HDA_o((tjs_uint32*)sl + drect.left,
+							bp + srect.left, w, color, dtdata->opa), sl += dtdata->bmppitch,
+							bp += pitch;
+				else
+					while(h--)
+						TVPApplyColorMap_o((tjs_uint32*)sl + drect.left,
+							bp + srect.left, w, color, dtdata->opa), sl += dtdata->bmppitch,
+							bp += pitch;
+			}
+		}
+	} else {
+		if(dtdata->bltmode == bmAlphaOnAlpha)
+		{
+			if(dtdata->opa > 0)
+			{
+				if(dtdata->opa == 255)
+				{
+					while(h--)
+						TVPApplyColorMap65_d((tjs_uint32*)sl + drect.left,
+							bp + srect.left, w, color), sl += dtdata->bmppitch,
+							bp += pitch;
+				}
+				else
+				{
+					while(h--)
+						TVPApplyColorMap65_do((tjs_uint32*)sl + drect.left,
+							bp + srect.left, w, color, dtdata->opa), sl += dtdata->bmppitch,
+							bp += pitch;
+				}
+			}
+			else
+			{
+				// opacity removal
+				if(dtdata->opa == -255)
+				{
+					while(h--)
+						TVPRemoveOpacity65((tjs_uint32*)sl + drect.left,
+							bp + srect.left, w), sl += dtdata->bmppitch,
+							bp += pitch;
+				}
+				else
+				{
+					while(h--)
+						TVPRemoveOpacity65_o((tjs_uint32*)sl + drect.left,
+							bp + srect.left, w, -dtdata->opa), sl += dtdata->bmppitch,
+							bp += pitch;
+				}
+			}
+		}
+		else if(dtdata->bltmode == bmAlphaOnAddAlpha)
+		{
+			if(dtdata->opa == 255)
 			{
 				while(h--)
-					TVPRemoveOpacity65((tjs_uint32*)sl + drect.left,
-						bp + srect.left, w), sl += dtdata->bmppitch,
+					TVPApplyColorMap65_a((tjs_uint32*)sl + drect.left,
+						bp + srect.left, w, color), sl += dtdata->bmppitch,
 						bp += pitch;
 			}
 			else
 			{
 				while(h--)
-					TVPRemoveOpacity65_o((tjs_uint32*)sl + drect.left,
-						bp + srect.left, w, -dtdata->opa), sl += dtdata->bmppitch,
+					TVPApplyColorMap65_ao((tjs_uint32*)sl + drect.left,
+						bp + srect.left, w, color, dtdata->opa), sl += dtdata->bmppitch,
 						bp += pitch;
 			}
 		}
-	}
-	else if(dtdata->bltmode == bmAlphaOnAddAlpha)
-	{
-		if(dtdata->opa == 255)
-		{
-			while(h--)
-				TVPApplyColorMap65_a((tjs_uint32*)sl + drect.left,
-					bp + srect.left, w, color), sl += dtdata->bmppitch,
-					bp += pitch;
-		}
 		else
 		{
-			while(h--)
-				TVPApplyColorMap65_ao((tjs_uint32*)sl + drect.left,
-					bp + srect.left, w, color, dtdata->opa), sl += dtdata->bmppitch,
-					bp += pitch;
+			if(dtdata->opa == 255)
+			{
+				if(dtdata->holdalpha)
+					while(h--)
+						TVPApplyColorMap65_HDA((tjs_uint32*)sl + drect.left,
+							bp + srect.left, w, color), sl += dtdata->bmppitch,
+							bp += pitch;
+				else
+					while(h--)
+						TVPApplyColorMap65((tjs_uint32*)sl + drect.left,
+							bp + srect.left, w, color), sl += dtdata->bmppitch,
+							bp += pitch;
+			}
+			else
+			{
+				if(dtdata->holdalpha)
+					while(h--)
+						TVPApplyColorMap65_HDA_o((tjs_uint32*)sl + drect.left,
+							bp + srect.left, w, color, dtdata->opa), sl += dtdata->bmppitch,
+							bp += pitch;
+				else
+					while(h--)
+						TVPApplyColorMap65_o((tjs_uint32*)sl + drect.left,
+							bp + srect.left, w, color, dtdata->opa), sl += dtdata->bmppitch,
+							bp += pitch;
+			}
 		}
 	}
-	else
-	{
-		if(dtdata->opa == 255)
-		{
-			if(dtdata->holdalpha)
-				while(h--)
-					TVPApplyColorMap65_HDA((tjs_uint32*)sl + drect.left,
-						bp + srect.left, w, color), sl += dtdata->bmppitch,
-						bp += pitch;
-			else
-				while(h--)
-					TVPApplyColorMap65((tjs_uint32*)sl + drect.left,
-						bp + srect.left, w, color), sl += dtdata->bmppitch,
-						bp += pitch;
-		}
-		else
-		{
-			if(dtdata->holdalpha)
-				while(h--)
-					TVPApplyColorMap65_HDA_o((tjs_uint32*)sl + drect.left,
-						bp + srect.left, w, color, dtdata->opa), sl += dtdata->bmppitch,
-						bp += pitch;
-			else
-				while(h--)
-					TVPApplyColorMap65_o((tjs_uint32*)sl + drect.left,
-						bp + srect.left, w, color, dtdata->opa), sl += dtdata->bmppitch,
-						bp += pitch;
-		}
-	}
-
 	return true;
 }
 //---------------------------------------------------------------------------
@@ -1859,7 +1436,7 @@ void tTVPNativeBaseBitmap::GetTextSize(const ttstr & text)
 				else
 				{
 					tjs_int w, h;
-					TVPGetTextExtent(*buf, w, h);
+					GetCurrentRasterizer()->GetTextExtent( *buf, w, h );
 					width += w;
 				}
 				buf++;
@@ -1875,7 +1452,7 @@ void tTVPNativeBaseBitmap::GetTextSize(const ttstr & text)
 			while(*buf)
 			{
 				tjs_int w, h;
-				TVPGetTextExtent(*buf, w, h);
+				GetCurrentRasterizer()->GetTextExtent( *buf, w, h );
 				width += w;
 				buf++;
 			}

@@ -1,0 +1,27 @@
+
+#ifndef __FREE_TYPE_FONT_RASTERIZER_H__
+#define __FREE_TYPE_FONT_RASTERIZER_H__
+
+#include "tjsCommHead.h"
+#include "CharacterData.h"
+#include "FontRasterizer.h"
+
+class FreeTypeFontRasterizer : public FontRasterizer {
+	tjs_int RefCount;
+	class tFreeTypeFace* Face; //!< Faceオブジェクト
+	class tFreeTypeFace* BoldFace; //!< Faceオブジェクト
+	class tTVPNativeBaseBitmap * LastBitmap;
+	tTVPFont CurrentFont;
+
+public:
+	FreeTypeFontRasterizer();
+	~FreeTypeFontRasterizer();
+	void AddRef();
+	void Release();
+	void ApplyFont( class tTVPNativeBaseBitmap *bmp, bool force );
+	void GetTextExtent(tjs_char ch, tjs_int &w, tjs_int &h);
+	tjs_int GetAscentHeight();
+	tTVPCharacterData* GetBitmap( const tTVPFontAndCharacterData & font, tjs_int aofsx, tjs_int aofsy );
+};
+
+#endif // __FREE_TYPE_FONT_RASTERIZER_H__

@@ -315,6 +315,17 @@ void TVPGetFontList( std::vector<std::wstring> & list, tjs_uint32 flags, TFont *
 
 	::EnumFontFamiliesEx( refcanvas->GetDC(), &l, (FONTENUMPROC)TVPFSFEnumFontsProc, reinterpret_cast<LPARAM>(&data), 0);
 }
+
+static int CALLBACK EnumAllFontsProc( LOGFONT *lplf, TEXTMETRIC *lptm, DWORD type, LPARAM data ) {
+	std::vector<std::wstring>* list = (std::vector<std::wstring>*)data;
+	list->push_back( std::wstring(lplf->lfFaceName) );
+	return 1;
+}
+void TVPGetAllFontList( std::vector<std::wstring>& list ) {
+	HDC dc = ::GetDC(NULL);
+	::EnumFonts(dc, NULL, (int (__stdcall *)())EnumAllFontsProc,(LPARAM)&list );
+ 	::ReleaseDC(NULL, dc);
+}
 enum {
 	CM_BASE = 0xB000,
 	CM_MOUSEENTER = CM_BASE + 19,
