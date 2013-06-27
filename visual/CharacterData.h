@@ -4,6 +4,8 @@
 #define __CHARACTER_DATA_H__
 
 #include "tjsCommHead.h"
+#include "tvpfontstruc.h"
+
 /**
  * １グリフのメトリックを表す構造体
  */
@@ -35,6 +37,7 @@ public:
 	tjs_uint BlackBoxY;
 	tjs_int BlurLevel;
 	tjs_int BlurWidth;
+	tjs_uint Gray; // 階調
 
 	bool Antialiased;
 	bool Blured;
@@ -82,5 +85,44 @@ public:
 	void Resample4();
 	void Resample8();
 };
+
+//---------------------------------------------------------------------------
+// Character Cache management
+//---------------------------------------------------------------------------
+struct tTVPFontAndCharacterData
+{
+	tTVPFont Font;
+	tjs_uint32 FontHash;
+	tjs_char Character;
+	tjs_int BlurLevel;
+	tjs_int BlurWidth;
+	bool Antialiased;
+	bool Blured;
+	bool operator == (const tTVPFontAndCharacterData &rhs) const
+	{
+		return Character == rhs.Character && Font == rhs.Font &&
+			Antialiased == rhs.Antialiased && BlurLevel == rhs.BlurLevel &&
+			BlurWidth == rhs.BlurWidth && Blured == rhs.Blured;
+	}
+};
+//---------------------------------------------------------------------------
+class tTVPFontHashFunc
+{
+public:
+	static tjs_uint32 Make(const tTVPFontAndCharacterData &val)
+	{
+		tjs_uint32 v = val.FontHash;
+
+		v ^= val.Antialiased?1:0;
+		v ^= val.Character;
+		v ^= val.Blured?1:0;
+		v ^= val.BlurLevel ^ val.BlurWidth;
+		return v;
+	}
+};
+
+
+
+
 
 #endif // __CHARACTER_DATA_H__

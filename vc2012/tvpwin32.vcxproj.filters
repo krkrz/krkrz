@@ -496,6 +496,33 @@
     <ClInclude Include="..\visual\PrerenderedFont.h">
       <Filter>visual</Filter>
     </ClInclude>
+    <ClInclude Include="..\visual\win32\FontSystem.h">
+      <Filter>visual\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\FreeType.h">
+      <Filter>visual</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\FreeTypeFace.h">
+      <Filter>visual</Filter>
+    </ClInclude>
+    <ClInclude Include="..\platform\win32\NativeFreeTypeFace.h">
+      <Filter>platform\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utils\cp932_uni.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utils\uni_cp932.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\FontRasterizer.h">
+      <Filter>visual</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\FreeTypeFontRasterizer.h">
+      <Filter>visual</Filter>
+    </ClInclude>
+    <ClInclude Include="..\platform\win32\GDIFontRasterizer.h">
+      <Filter>platform\win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -860,6 +887,27 @@
     </ClCompile>
     <ClCompile Include="..\visual\PrerenderedFont.cpp">
       <Filter>visual</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\win32\FontSystem.cpp">
+      <Filter>visual\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\FreeType.cpp">
+      <Filter>visual</Filter>
+    </ClCompile>
+    <ClCompile Include="..\platform\win32\NativeFreeTypeFace.cpp">
+      <Filter>platform\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utils\cp932_uni.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utils\uni_cp932.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\FreeTypeFontRasterizer.cpp">
+      <Filter>visual</Filter>
+    </ClCompile>
+    <ClCompile Include="..\platform\win32\GDIFontRasterizer.cpp">
+      <Filter>platform\win32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

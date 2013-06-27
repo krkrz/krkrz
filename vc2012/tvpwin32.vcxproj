@@ -144,6 +144,8 @@
     <ClInclude Include="..\msg\win32\MsgImpl.h" />
     <ClInclude Include="..\msg\win32\OptionsDesc.h" />
     <ClInclude Include="..\platform\win32\BitmapInfomation.h" />
+    <ClInclude Include="..\platform\win32\GDIFontRasterizer.h" />
+    <ClInclude Include="..\platform\win32\NativeFreeTypeFace.h" />
     <ClInclude Include="..\sound\PhaseVocoderDSP.h" />
     <ClInclude Include="..\sound\PhaseVocoderFilter.h" />
     <ClInclude Include="..\sound\RingBuffer.h" />
@@ -197,6 +199,7 @@
     <ClInclude Include="..\tjs2\tjsVariant.h" />
     <ClInclude Include="..\tjs2\tjsVariantString.h" />
     <ClInclude Include="..\utils\ClipboardIntf.h" />
+    <ClInclude Include="..\utils\cp932_uni.h" />
     <ClInclude Include="..\utils\Debugger.h" />
     <ClInclude Include="..\utils\DebugIntf.h" />
     <ClInclude Include="..\utils\md5.h" />
@@ -205,12 +208,17 @@
     <ClInclude Include="..\utils\ThreadIntf.h" />
     <ClInclude Include="..\utils\TickCount.h" />
     <ClInclude Include="..\utils\TimerIntf.h" />
+    <ClInclude Include="..\utils\uni_cp932.h" />
     <ClInclude Include="..\utils\win32\ThreadImpl.h" />
     <ClInclude Include="..\utils\win32\TimerImpl.h" />
     <ClInclude Include="..\visual\argb.h" />
     <ClInclude Include="..\visual\CharacterData.h" />
     <ClInclude Include="..\visual\ComplexRect.h" />
     <ClInclude Include="..\visual\drawable.h" />
+    <ClInclude Include="..\visual\FontRasterizer.h" />
+    <ClInclude Include="..\visual\FreeType.h" />
+    <ClInclude Include="..\visual\FreeTypeFace.h" />
+    <ClInclude Include="..\visual\FreeTypeFontRasterizer.h" />
     <ClInclude Include="..\visual\GraphicsLoaderIntf.h" />
     <ClInclude Include="..\visual\IA32\tvpgl_ia32_intf.h" />
     <ClInclude Include="..\visual\LayerBitmapIntf.h" />
@@ -228,6 +236,7 @@
     <ClInclude Include="..\visual\voMode.h" />
     <ClInclude Include="..\visual\win32\DInputMgn.h" />
     <ClInclude Include="..\visual\win32\DrawDevice.h" />
+    <ClInclude Include="..\visual\win32\FontSystem.h" />
     <ClInclude Include="..\visual\win32\GraphicsLoaderImpl.h" />
     <ClInclude Include="..\visual\win32\krmovie.h" />
     <ClInclude Include="..\visual\win32\LayerBitmapImpl.h" />
@@ -280,6 +289,8 @@
     <ClCompile Include="..\msg\win32\MsgImpl.cpp" />
     <ClCompile Include="..\msg\win32\OptionsDesc.cpp" />
     <ClCompile Include="..\platform\win32\BitmapInfomation.cpp" />
+    <ClCompile Include="..\platform\win32\GDIFontRasterizer.cpp" />
+    <ClCompile Include="..\platform\win32\NativeFreeTypeFace.cpp" />
     <ClCompile Include="..\sound\PhaseVocoderDSP.cpp" />
     <ClCompile Include="..\sound\PhaseVocoderFilter.cpp" />
     <ClCompile Include="..\sound\SoundBufferBaseIntf.cpp" />
@@ -326,12 +337,14 @@
     <ClCompile Include="..\tjs2\tjsVariant.cpp" />
     <ClCompile Include="..\tjs2\tjsVariantString.cpp" />
     <ClCompile Include="..\utils\ClipboardIntf.cpp" />
+    <ClCompile Include="..\utils\cp932_uni.cpp" />
     <ClCompile Include="..\utils\DebugIntf.cpp" />
     <ClCompile Include="..\utils\md5.c" />
     <ClCompile Include="..\utils\Random.cpp" />
     <ClCompile Include="..\utils\ThreadIntf.cpp" />
     <ClCompile Include="..\utils\TickCount.cpp" />
     <ClCompile Include="..\utils\TimerIntf.cpp" />
+    <ClCompile Include="..\utils\uni_cp932.cpp" />
     <ClCompile Include="..\utils\win32\ClipboardImpl.cpp" />
     <ClCompile Include="..\utils\win32\DebugImpl.cpp" />
     <ClCompile Include="..\utils\win32\MiscUtility.cpp" />
@@ -339,6 +352,8 @@
     <ClCompile Include="..\utils\win32\TimerImpl.cpp" />
     <ClCompile Include="..\visual\CharacterData.cpp" />
     <ClCompile Include="..\visual\ComplexRect.cpp" />
+    <ClCompile Include="..\visual\FreeType.cpp" />
+    <ClCompile Include="..\visual\FreeTypeFontRasterizer.cpp" />
     <ClCompile Include="..\visual\GraphicsLoaderIntf.cpp" />
     <ClCompile Include="..\visual\IA32\tvpgl_ia32_intf.c" />
     <ClCompile Include="..\visual\LayerBitmapIntf.cpp" />
@@ -354,6 +369,7 @@
     <ClCompile Include="..\visual\VideoOvlIntf.cpp" />
     <ClCompile Include="..\visual\win32\DInputMgn.cpp" />
     <ClCompile Include="..\visual\win32\DrawDevice.cpp" />
+    <ClCompile Include="..\visual\win32\FontSystem.cpp" />
     <ClCompile Include="..\visual\win32\GraphicsLoaderImpl.cpp" />
     <ClCompile Include="..\visual\win32\LayerBitmapImpl.cpp" />
     <ClCompile Include="..\visual\win32\LayerImpl.cpp" />
