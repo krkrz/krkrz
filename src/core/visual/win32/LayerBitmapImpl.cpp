@@ -59,7 +59,7 @@ enum {
 };
 static FontRasterizer* TVPFontRasterizers[FONT_RASTER_EOT];
 static bool TVPFontRasterizersInit = false;
-static tjs_int TVPCurrentFontRasterizers = FONT_RASTER_GDI;
+static tjs_int TVPCurrentFontRasterizers = FONT_RASTER_FREE_TYPE;
 void TVPInializeFontRasterizers() {
 	if( TVPFontRasterizersInit == false ) {
 		TVPFontRasterizers[FONT_RASTER_FREE_TYPE] = new FreeTypeFontRasterizer();
@@ -1106,6 +1106,7 @@ void tTVPNativeBaseBitmap::DrawTextSingle(const tTVPRect &destrect,
 	tTVPFontAndCharacterData font;
 	font.Font = Font;
 	font.Antialiased = aa;
+	font.Hinting = true;
 	font.BlurLevel = shlevel;
 	font.BlurWidth = shwidth;
 	font.FontHash = FontHash;
@@ -1287,6 +1288,7 @@ void tTVPNativeBaseBitmap::DrawTextMultiple(const tTVPRect &destrect,
 	tTVPFontAndCharacterData font;
 	font.Font = Font;
 	font.Antialiased = aa;
+	font.Hinting = true;
 	font.BlurLevel = shlevel;
 	font.BlurWidth = shwidth;
 	font.FontHash = FontHash;

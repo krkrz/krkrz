@@ -98,11 +98,12 @@ struct tTVPFontAndCharacterData
 	tjs_int BlurWidth;
 	bool Antialiased;
 	bool Blured;
-	bool operator == (const tTVPFontAndCharacterData &rhs) const
-	{
+	bool Hinting;
+	bool operator == (const tTVPFontAndCharacterData &rhs) const {
 		return Character == rhs.Character && Font == rhs.Font &&
 			Antialiased == rhs.Antialiased && BlurLevel == rhs.BlurLevel &&
-			BlurWidth == rhs.BlurWidth && Blured == rhs.Blured;
+			BlurWidth == rhs.BlurWidth && Blured == rhs.Blured &&
+			Hinting == rhs.Hinting;
 	}
 };
 //---------------------------------------------------------------------------

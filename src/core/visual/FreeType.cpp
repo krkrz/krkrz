@@ -567,7 +567,7 @@ bool tFreeTypeFace::LoadGlyphSlotFromCharcode(tjs_char code)
 			// note: ビットマップフォントを読み込みたくない場合は FT_LOAD_NO_BITMAP を指定
 
 	if(Options & TVP_FACE_OPTIONS_NO_HINTING)
-		load_glyph_flag |= FT_LOAD_NO_HINTING;
+		load_glyph_flag |= FT_LOAD_NO_HINTING|FT_LOAD_NO_AUTOHINT;
 	if(Options & TVP_FACE_OPTIONS_FORCE_AUTO_HINTING)
 		load_glyph_flag |= FT_LOAD_FORCE_AUTOHINT;
 
@@ -577,7 +577,8 @@ bool tFreeTypeFace::LoadGlyphSlotFromCharcode(tjs_char code)
 	if(err) return false;
 
 	// フォントの変形を行う
-	if(Options & TVP_TF_BOLD) FT_GlyphSlot_Embolden(FTFace->glyph);
+	if( Options & TVP_TF_BOLD ) FT_GlyphSlot_Embolden(FTFace->glyph);
+	if( Options & TVP_TF_ITALIC ) FT_GlyphSlot_Oblique( FTFace->glyph );
 
 	return true;
 }

@@ -61,10 +61,38 @@ public:
 	tjs_int GetHeight() { return Height; }
 	void SetHeight(int height);
 
+	void SetOption( tjs_uint32 opt ) {
+		Options |= opt;
+	}
+	void ClearOption( tjs_uint32 opt ) {
+		Options &= ~opt;
+	}
+	bool GetOption( tjs_uint32 opt ) const {
+		return (Options&opt) == opt;
+	}
+
 	tjs_int GetAscent() const {
-		double ratio=(double)FTFace->size->metrics.y_ppem / (double)FTFace->units_per_EM;
-		// const FT_Size_Metrics &m=FTFace->size->metrics;
-		return (tjs_int)(FTFace->ascender*ratio);
+		tjs_int ppem = FTFace->size->metrics.y_ppem;
+		tjs_int upe = FTFace->units_per_EM;
+		return FTFace->ascender * ppem / upe;
+	}
+	void GetUnderline( tjs_int& pos, tjs_int& thickness ) const {
+		tjs_int ppem = FTFace->size->metrics.y_ppem;
+		tjs_int upe = FTFace->units_per_EM;
+		tjs_int liney = 0; //下線の位置
+		tjs_int height = FTFace->size->metrics.height * ppem / upe;
+		liney = GetAscent() + 1;
+		thickness = FTFace->underline_thickness * ppem / upe;
+		if( liney > height ) {
+			liney = height - 1;
+		}
+		pos = liney;
+	}
+	void GetStrikeOut( tjs_int& pos, tjs_int& thickness ) const {
+		tjs_int ppem = FTFace->size->metrics.y_ppem;
+		tjs_int upe = FTFace->units_per_EM;
+		thickness = FTFace->underline_thickness * ppem / upe;
+		pos = FTFace->ascender * 2 * ppem / 5 / upe;
 	}
 	tTVPCharacterData * GetGlyphFromCharcode(tjs_char code);
 	bool GetGlyphMetricsFromCharcode(tjs_char code, tGlyphMetrics & metrics);
