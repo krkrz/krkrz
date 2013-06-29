@@ -27,14 +27,14 @@ private:
 	tjs_int RefCount;
 
 public:
-	tjs_int OriginX;
-	tjs_int OriginY;
-	tGlyphMetrics	Metrics;	//!< メトリック
+	tjs_int OriginX; //!< 文字幅
+	tjs_int OriginY; //!< 文字高さ
+	tGlyphMetrics	Metrics; //!< メトリック、送り幅と高さを保持
 	//tjs_int CellIncX;
 	//tjs_int CellIncY;
-	tjs_int Pitch;
-	tjs_uint BlackBoxX;
-	tjs_uint BlackBoxY;
+	tjs_int Pitch; //!< 保持している画像ピッチ
+	tjs_uint BlackBoxX; //!< 保持している画像幅
+	tjs_uint BlackBoxY; //!< 保持している画像高さ
 	tjs_int BlurLevel;
 	tjs_int BlurWidth;
 	tjs_uint Gray; // 階調
@@ -53,8 +53,7 @@ public:
 	tTVPCharacterData(const tTVPCharacterData & ref);
 	~tTVPCharacterData() { if(Data) delete [] Data; }
 
-	void Alloc(tjs_int size)
-	{
+	void Alloc(tjs_int size) {
 		if(Data) delete [] Data, Data = NULL;
 		Data = new tjs_uint8[size];
 	}
@@ -62,14 +61,10 @@ public:
 	tjs_uint8 * GetData() const { return Data; }
 
 	void AddRef() { RefCount ++; }
-	void Release()
-	{
-		if(RefCount == 1)
-		{
+	void Release() {
+		if(RefCount == 1) {
 			delete this;
-		}
-		else
-		{
+		} else {
 			RefCount--;
 		}
 	}
@@ -84,6 +79,14 @@ public:
 
 	void Resample4();
 	void Resample8();
+
+	/**
+	 * 水平線を追加する(取り消し線、アンダーライン用)
+	 * @param liney : ライン中心位置
+	 * @param thickness : ライン太さ
+	 * @param val : ライン値
+	 */
+	void AddHorizontalLine( tjs_int liney, tjs_int thickness, tjs_uint8 val );
 };
 
 //---------------------------------------------------------------------------

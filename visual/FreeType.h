@@ -47,6 +47,7 @@ class tFreeTypeFace
 	tjs_uint (*UnicodeToLocalChar)(tjs_char in); //!< SJISなどをUnicodeに変換する関数
 	tjs_char (*LocalCharToUnicode)(tjs_uint in); //!< UnicodeをSJISなどに変換する関数
 
+	static inline tjs_int FT_PosToInt( tjs_int x ) { return (((x) + (1 << 5)) >> 6); }
 public:
 	tFreeTypeFace(const std::wstring &fontname, tjs_uint32 options);
 	~tFreeTypeFace();
@@ -80,9 +81,9 @@ public:
 		tjs_int ppem = FTFace->size->metrics.y_ppem;
 		tjs_int upe = FTFace->units_per_EM;
 		tjs_int liney = 0; //下線の位置
-		tjs_int height = FTFace->size->metrics.height * ppem / upe;
-		liney = GetAscent() + 1;
-		thickness = FTFace->underline_thickness * ppem / upe;
+		tjs_int height = FT_PosToInt( FTFace->size->metrics.height );
+		liney = ((FTFace->ascender-FTFace->underline_position) * ppem + upe-1) / upe;
+		thickness = (FTFace->underline_thickness * ppem + upe-1) / upe;
 		if( liney > height ) {
 			liney = height - 1;
 		}
@@ -92,7 +93,9 @@ public:
 		tjs_int ppem = FTFace->size->metrics.y_ppem;
 		tjs_int upe = FTFace->units_per_EM;
 		thickness = FTFace->underline_thickness * ppem / upe;
-		pos = FTFace->ascender * 2 * ppem / 5 / upe;
+		if( thickness < 1 ) thickness = 1;
+		pos = FTFace->ascender * 4 * ppem / (5 * upe);
+		//pos = FTFace->ascender * ppem / upe;
 	}
 	tTVPCharacterData * GetGlyphFromCharcode(tjs_char code);
 	bool GetGlyphMetricsFromCharcode(tjs_char code, tGlyphMetrics & metrics);

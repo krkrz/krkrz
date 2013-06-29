@@ -346,3 +346,57 @@ void tTVPCharacterData::Resample8()
 	Pitch = newpitch;
 }
 //---------------------------------------------------------------------------
+void tTVPCharacterData::AddHorizontalLine( tjs_int liney, tjs_int thickness, tjs_uint8 val ) {
+	tjs_int linetop = liney - thickness/2;
+	if( linetop < 0 ) linetop = 0;
+	tjs_int linebottom = linetop + thickness;
+
+	tjs_int newwidth = BlackBoxX;
+	tjs_int newheight = BlackBoxY;
+	if( BlackBoxX != Metrics.CellIncX ) {
+		newwidth = Metrics.CellIncX;
+	}
+	int top = OriginY;
+	int bottom = top + BlackBoxY;
+	if( linetop < top ) { // ã‰ß‚¬‚é
+		top = linetop;
+	} else if( linebottom >= bottom ) { // ‰º‰ß‚¬‚é
+		bottom = linebottom;
+	}
+	newheight = bottom - top;
+	// ‘å‚«‚³‚ª•Ï‰»‚·‚éŽž‚Íì‚è’¼‚·
+	if( newwidth != BlackBoxX || newheight != BlackBoxY ) {
+		tjs_int newpitch =  (((newwidth -1)>>2)+1)<<2;
+		tjs_uint8 *newdata = new tjs_uint8[newpitch * newheight];
+		memset( newdata, 0, sizeof(tjs_uint8)*newpitch*newheight );
+		// x ‚Í OriginX •ª‚¸‚ê‚é
+		// y ‚Í OriginY - top•ª‚¸‚ê‚é
+		tjs_int offsetx = OriginX;
+		tjs_int offsety = OriginY - top;
+		tjs_uint8 *sp = Data;
+		tjs_uint8 *dp = newdata + offsety*newpitch + offsetx;
+		for( tjs_int y = 0; y < BlackBoxY; y++ ) {
+			for( tjs_int x = 0; x < BlackBoxX; x++ ) {
+				dp[x] = sp[x];
+			}
+			sp += Pitch;
+			dp += newpitch;
+		}
+		delete [] Data;
+		Data = newdata;
+		BlackBoxX = newwidth;
+		BlackBoxY = newheight;
+		OriginX = 0;
+		OriginY = top;
+		Pitch = newpitch;
+	}
+	tjs_int end = linetop-OriginY+thickness;
+	tjs_uint8 *dp = Data + (linetop-OriginY)*Pitch;
+	for( tjs_int y = 0; y < thickness; y++ ) {
+		for( tjs_int x = 0; x < BlackBoxX; x++ ) {
+			dp[x] = val;
+		}
+		dp += Pitch;
+	}
+}
+//---------------------------------------------------------------------------
