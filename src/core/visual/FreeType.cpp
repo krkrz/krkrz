@@ -487,6 +487,9 @@ tTVPCharacterData * tFreeTypeFace::GetGlyphFromCharcode(tjs_char code)
 				}
 			}
 		}
+		// 64倍されているものを解除する
+		metrics.CellIncX = FT_PosToInt( metrics.CellIncX );
+		metrics.CellIncY = FT_PosToInt( metrics.CellIncY );
 
 		// tGlyphBitmap を作成して返す
 		glyph_bmp = new tTVPCharacterData(
@@ -498,6 +501,22 @@ tTVPCharacterData * tFreeTypeFace::GetGlyphFromCharcode(tjs_char code)
 			  ft_bmp->rows,
 			metrics);
 		glyph_bmp->Gray = 256;
+
+		
+		if( Options & TVP_TF_UNDERLINE ) {
+			tjs_int pos = -1, thickness = -1;
+			GetUnderline( pos, thickness );
+			if( pos >= 0 && thickness > 0 ) {
+				glyph_bmp->AddHorizontalLine( pos, thickness, 255 );
+			}
+		}
+		if( Options & TVP_TF_STRIKEOUT ) {
+			tjs_int pos = -1, thickness = -1;
+			GetStrikeOut( pos, thickness );
+			if( pos >= 0 && thickness > 0 ) {
+				glyph_bmp->AddHorizontalLine( pos, thickness, 255 );
+			}
+		}
 	}
 	catch(...)
 	{

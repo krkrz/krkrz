@@ -97,10 +97,7 @@ FontRasterizer* GetCurrentRasterizer() {
 static tjs_int TVPGlobalFontStateMagic = 0;
 	// this is for checking global font status' change
 
-class tTVPPrerenderedFont;
 tTJSHashTable<ttstr, tTVPPrerenderedFont *> TVPPrerenderedFonts;
-
-
 
 
 
@@ -718,17 +715,7 @@ void tTVPNativeBaseBitmap::ApplyFont()
 
 		if(PrerenderedFont) PrerenderedFont->Release();
 		PrerenderedFont = TVPGetPrerenderedMappedFont(Font);
-#if 0
-		LogFont.lfHeight = -std::abs(Font.Height);
-		LogFont.lfItalic = (Font.Flags & TVP_TF_ITALIC) ? TRUE:FALSE;
-		LogFont.lfWeight = (Font.Flags & TVP_TF_BOLD) ? 700 : 400;
-		LogFont.lfUnderline = (Font.Flags & TVP_TF_UNDERLINE) ? TRUE:FALSE;
-		LogFont.lfStrikeOut = (Font.Flags & TVP_TF_STRIKEOUT) ? TRUE:FALSE;
-		LogFont.lfEscapement = LogFont.lfOrientation = Font.Angle;
-		tstring face = TVPGetBeingFont(Font.Face.AsStdString());
-		_tcsncpy(LogFont.lfFaceName, face.c_str(), LF_FACESIZE -1);
-		LogFont.lfFaceName[LF_FACESIZE-1] = 0;
-#endif
+
 		// compute ascent offset
 		GetCurrentRasterizer()->ApplyFont( this, true );
 		tjs_int ascent = GetCurrentRasterizer()->GetAscentHeight();
@@ -747,23 +734,6 @@ void tTVPNativeBaseBitmap::ApplyFont()
 	}
 }
 //---------------------------------------------------------------------------
-/*
-HDC tTVPNativeBaseBitmap::GetFontDC()
-{
-	ApplyFont();
-	//return TVPFontDCGetCanvas()->GetHandle();
-	return TVPBitmapForFontDC->GetDC();
-}
-//---------------------------------------------------------------------------
-HDC tTVPNativeBaseBitmap::GetNonBoldFontDC()
-{
-	ApplyFont();
-	//return TVPNonBoldFontDCGetCanvas()->GetHandle();
-	return TVPBitmapForNonBoldFontDC->GetDC();
-}
-*/
-//---------------------------------------------------------------------------
-//TCanvas * tTVPNativeBaseBitmap::GetFontCanvas()
 TFont * tTVPNativeBaseBitmap::GetFontCanvas()
 {
 	ApplyFont();

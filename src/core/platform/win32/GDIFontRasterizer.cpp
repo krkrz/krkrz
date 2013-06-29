@@ -296,6 +296,27 @@ tTVPCharacterData* GDIFontRasterizer::GetBitmap( const tTVPFontAndCharacterData 
 			throw;
 		}
 	}
+	if( font.Font.Flags & (TVP_TF_UNDERLINE|TVP_TF_STRIKEOUT) ) {
+		OUTLINETEXTMETRIC otm = { sizeof(OUTLINETEXTMETRIC) };
+		::GetOutlineTextMetrics( FontDC->GetDC(), otm.otmSize, &otm );
+		tjs_int y = GetAscentHeight();
+		if( font.Font.Flags & TVP_TF_UNDERLINE ) {
+			tjs_int liney = y - otm.otmsUnderscorePosition;
+			tjs_int height = otm.otmTextMetrics.tmHeight;
+			tjs_int thickness = otm.otmsUnderscoreSize;
+			if( liney >= height ) liney = height - 1;
+			if( liney >= 0 && thickness > 0 ) {
+				data->AddHorizontalLine( liney, thickness, 64 );
+			}
+		}
+		if( font.Font.Flags & TVP_TF_STRIKEOUT ) {
+			tjs_int liney = y - otm.otmsStrikeoutPosition;
+			tjs_int thickness =  otm.otmsStrikeoutSize;
+			if( liney >= 0 && thickness > 0 ) {
+				data->AddHorizontalLine( liney, thickness, 64 );
+			}
+		}
+	}
 	return data;
 }
 

@@ -107,8 +107,8 @@ tTVPCharacterData* FreeTypeFontRasterizer::GetBitmap( const tTVPFontAndCharacter
 	}
 	tTVPCharacterData* data = Face->GetGlyphFromCharcode(font.Character);
 
-	int cx = data->Metrics.CellIncX >> 6;
-	int cy = data->Metrics.CellIncY >> 6;
+	int cx = data->Metrics.CellIncX;
+	int cy = data->Metrics.CellIncY;
 	if( font.Font.Angle == 0 ) {
 		data->Metrics.CellIncX = cx;
 		data->Metrics.CellIncY = 0;
