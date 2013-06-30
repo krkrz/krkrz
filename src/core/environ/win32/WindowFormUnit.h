@@ -317,7 +317,7 @@ public:
 	tTVPImeMode GetDefaultImeMode() const { return  DefaultImeMode; }
 	void ResetImeMode();
 	
-	void SetAttentionPoint(tjs_int left, tjs_int top, class TFont *font);
+	void SetAttentionPoint(tjs_int left, tjs_int top, const struct tTVPFont * font );
 	void DisableAttentionPoint();
 	
 	void InvokeShowVisible();

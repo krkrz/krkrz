@@ -1455,13 +1455,17 @@ void TJS_INTF_METHOD tTJSNI_Window::SetAttentionPoint(tTJSNI_BaseLayer *layer,
 	// set attention point to window
 	if(Form)
 	{
-		class TFont * font = NULL;
+		//class TFont * font = NULL;
+		const tTVPFont * font = NULL;
 		if(layer)
 		{
 			tTVPBaseBitmap *bmp = layer->GetMainImage();
-			if(bmp)
-				//font = bmp->GetFontCanvas()->GetFont();
-				font = bmp->GetFontCanvas();
+			if(bmp) {
+				//font = bmp->GetFontCanvas()->GetFont(); =
+				// font = bmp->GetFontCanvas();
+				const tTVPFont & finfo = bmp->GetFont();
+				font = &finfo;
+			}
 		}
 
 		Form->SetAttentionPoint(l, t, font);

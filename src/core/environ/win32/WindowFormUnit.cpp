@@ -253,10 +253,11 @@ TTVPWindowForm * TVPFullScreenedWindow;
 struct tTVPFSEnumFontsProcData {
 	std::vector<std::wstring> &List;
 	tjs_uint32 Flags;
-	LOGFONT RefFont;
-	tTVPFSEnumFontsProcData(std::vector<std::wstring> & list, tjs_uint32 flags, TFont * reffont) :
-		List(list), Flags(flags) {
-		reffont->GetFont( &RefFont );
+	//LOGFONT RefFont;
+	BYTE CharSet;
+	tTVPFSEnumFontsProcData(std::vector<std::wstring> & list, tjs_uint32 flags, BYTE charSet ) :
+		List(list), Flags(flags), CharSet(charSet) {
+		//reffont->GetFont( &RefFont );
 	}
 };
 //---------------------------------------------------------------------------
@@ -275,7 +276,8 @@ static int CALLBACK TVPFSFEnumFontsProc( ENUMLOGFONTEX *lpelfe, NEWTEXTMETRICEX 
 
 	if( data->Flags & TVP_FSF_SAMECHARSET ) {
 		// same character set only ?
-		if(lpelfe->elfLogFont.lfCharSet != data->RefFont.lfCharSet) return 1;
+		//if(lpelfe->elfLogFont.lfCharSet != data->RefFont.lfCharSet) return 1;
+		if(lpelfe->elfLogFont.lfCharSet != data->CharSet ) return 1;
 	}
 
 	if( data->Flags & TVP_FSF_NOVERTICAL ) {
@@ -295,8 +297,8 @@ static int CALLBACK TVPFSFEnumFontsProc( ENUMLOGFONTEX *lpelfe, NEWTEXTMETRICEX 
 
 	return 1;
 }
-void TVPGetFontList( std::vector<std::wstring> & list, tjs_uint32 flags, TFont * refcanvas ) {
-	tTVPFSEnumFontsProcData data( list, flags, refcanvas );
+void TVPGetFontList(std::vector<std::wstring> & list, tjs_uint32 flags, const tTVPFont & font ) {
+	tTVPFSEnumFontsProcData data( list, flags, SHIFTJIS_CHARSET ); // TODO: i18n
 
 	LOGFONT l;
 	l.lfHeight = -12;
@@ -312,8 +314,10 @@ void TVPGetFontList( std::vector<std::wstring> & list, tjs_uint32 flags, TFont *
 	l.lfQuality = DEFAULT_QUALITY;
 	l.lfPitchAndFamily = 0;
 	l.lfFaceName[0] = '\0';
-
-	::EnumFontFamiliesEx( refcanvas->GetDC(), &l, (FONTENUMPROC)TVPFSFEnumFontsProc, reinterpret_cast<LPARAM>(&data), 0);
+	
+	HDC dc = ::GetDC(NULL);
+	::EnumFontFamiliesEx( dc, &l, (FONTENUMPROC)TVPFSFEnumFontsProc, reinterpret_cast<LPARAM>(&data), 0);
+ 	::ReleaseDC(NULL, dc);
 }
 
 static int CALLBACK EnumAllFontsProc( LOGFONT *lplf, TEXTMETRIC *lptm, DWORD type, LPARAM data ) {
@@ -1319,7 +1323,7 @@ void TTVPWindowForm::ResetImeMode() {
 	SetImeMode(DefaultImeMode);
 }
 
-void TTVPWindowForm::SetAttentionPoint(tjs_int left, tjs_int top, TFont *font) {
+void TTVPWindowForm::SetAttentionPoint(tjs_int left, tjs_int top, const tTVPFont * font) {
 	OffsetClientPoint( left, top );
 
 	// set attention point information
@@ -1327,7 +1331,7 @@ void TTVPWindowForm::SetAttentionPoint(tjs_int left, tjs_int top, TFont *font) {
 	AttentionPoint.y = top;
 	AttentionPointEnabled = true;
 	if( font ) {
-		AttentionFont->Assign(font);
+		AttentionFont->Assign(*font);
 	} else {
 		TFont * default_font = new TFont();
 		AttentionFont->Assign(default_font);

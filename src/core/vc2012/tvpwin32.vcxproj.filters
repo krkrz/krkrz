@@ -349,9 +349,6 @@
     <ClInclude Include="..\visual\win32\PassThroughDrawDevice.h">
       <Filter>visual\win32</Filter>
     </ClInclude>
-    <ClInclude Include="..\visual\win32\TransImpl.h">
-      <Filter>visual\win32</Filter>
-    </ClInclude>
     <ClInclude Include="..\visual\win32\VideoOvlImpl.h">
       <Filter>visual\win32</Filter>
     </ClInclude>
@@ -496,9 +493,6 @@
     <ClInclude Include="..\visual\PrerenderedFont.h">
       <Filter>visual</Filter>
     </ClInclude>
-    <ClInclude Include="..\visual\win32\FontSystem.h">
-      <Filter>visual\win32</Filter>
-    </ClInclude>
     <ClInclude Include="..\visual\FreeType.h">
       <Filter>visual</Filter>
     </ClInclude>
@@ -522,6 +516,9 @@
     </ClInclude>
     <ClInclude Include="..\platform\win32\GDIFontRasterizer.h">
       <Filter>platform\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\FontSystem.h">
+      <Filter>visual</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -759,9 +756,6 @@
     <ClCompile Include="..\visual\win32\PassThroughDrawDevice.cpp">
       <Filter>visual\win32</Filter>
     </ClCompile>
-    <ClCompile Include="..\visual\win32\TransImpl.cpp">
-      <Filter>visual\win32</Filter>
-    </ClCompile>
     <ClCompile Include="..\visual\win32\VideoOvlImpl.cpp">
       <Filter>visual\win32</Filter>
     </ClCompile>
@@ -888,9 +882,6 @@
     <ClCompile Include="..\visual\PrerenderedFont.cpp">
       <Filter>visual</Filter>
     </ClCompile>
-    <ClCompile Include="..\visual\win32\FontSystem.cpp">
-      <Filter>visual\win32</Filter>
-    </ClCompile>
     <ClCompile Include="..\visual\FreeType.cpp">
       <Filter>visual</Filter>
     </ClCompile>
@@ -908,6 +899,9 @@
     </ClCompile>
     <ClCompile Include="..\platform\win32\GDIFontRasterizer.cpp">
       <Filter>platform\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\FontSystem.cpp">
+      <Filter>visual</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
