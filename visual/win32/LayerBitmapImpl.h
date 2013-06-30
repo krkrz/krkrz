@@ -142,10 +142,8 @@ private:
 	bool FontChanged;
 	tjs_int GlobalFontState;
 
-
 	// v--- these can be recreated in ApplyFont if FontChanged flag is set
 	tTVPPrerenderedFont *PrerenderedFont;
-	//LOGFONT LogFont;
 	tjs_int AscentOfsX;
 	tjs_int AscentOfsY;
 	double RadianAngle;
@@ -154,16 +152,9 @@ private:
 
 	void ApplyFont();
 
-
-public:
-	//HDC GetFontDC();
-	//HDC GetNonBoldFontDC();
-	class TFont *GetFontCanvas();
-
 public:
 	void SetFont(const tTVPFont &font);
 	const tTVPFont & GetFont() const { return Font; };
-	//const LOGFONT * GetLOGFONT() const { return &LogFont; }
 
 	bool SelectFont(tjs_uint32 Flags, const ttstr &caption, const ttstr &prompt,
 		const ttstr &samplestring, ttstr &selectedfont);

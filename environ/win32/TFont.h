@@ -2,7 +2,9 @@
 
 #ifndef __T_FONT_H__
 #define __T_FONT_H__
+#include "FontSystem.h"
 
+extern FontSystem* TVPFontSystem;
 
 class TFont {
 	HFONT hFont_;
@@ -40,8 +42,48 @@ public:
 		logfont.lfStrikeOut = FALSE;
 		ApplyFont( &logfont );
 	}
+	TFont( const tTVPFont &font ) : hFont_(INVALID_HANDLE_VALUE), hOldFont_(INVALID_HANDLE_VALUE), hMemDC_(INVALID_HANDLE_VALUE),
+		hBmp_(INVALID_HANDLE_VALUE), hOldBmp_(INVALID_HANDLE_VALUE) {
+		BITMAPINFO bmpinfo;
+		ZeroMemory( &bmpinfo, sizeof(bmpinfo) );
+		bmpinfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+		bmpinfo.bmiHeader.biBitCount = 32;
+		bmpinfo.bmiHeader.biPlanes = 1;
+		bmpinfo.bmiHeader.biWidth = 32;
+		bmpinfo.bmiHeader.biHeight = 32;
+
+		hMemDC_ = ::CreateCompatibleDC( NULL );
+		char * Bits;
+		hBmp_ = ::CreateDIBSection( NULL, &bmpinfo, DIB_RGB_COLORS, (void **)(&Bits), NULL, 0 );
+		hOldBmp_ = ::SelectObject( hMemDC_, hBmp_ );
+
+		// デフォルトの LOGFONT 指定した方が良さそう
+		HFONT hFont = (HFONT)::GetStockObject( ANSI_FIXED_FONT );
+		LOGFONT LogFont={0};
+		LogFont.lfHeight = -std::abs(font.Height);
+		LogFont.lfItalic = (font.Flags & TVP_TF_ITALIC) ? TRUE:FALSE;
+		LogFont.lfWeight = (font.Flags & TVP_TF_BOLD) ? 700 : 400;
+		LogFont.lfUnderline = (font.Flags & TVP_TF_UNDERLINE) ? TRUE:FALSE;
+		LogFont.lfStrikeOut = (font.Flags & TVP_TF_STRIKEOUT) ? TRUE:FALSE;
+		LogFont.lfEscapement = LogFont.lfOrientation = font.Angle;
+		LogFont.lfCharSet = SHIFTJIS_CHARSET; // TODO: i18n
+		LogFont.lfOutPrecision = OUT_DEFAULT_PRECIS;
+		LogFont.lfQuality = DEFAULT_QUALITY;
+		LogFont.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
+		tstring face = TVPFontSystem->GetBeingFont(font.Face.AsStdString());
+		_tcsncpy(LogFont.lfFaceName, face.c_str(), LF_FACESIZE -1);
+		LogFont.lfFaceName[LF_FACESIZE-1] = 0;
+
+		ApplyFont( &LogFont );
+	}
 	~TFont() {
 		::SelectObject( hMemDC_, hOldBmp_ );
+		if( INVALID_HANDLE_VALUE != hOldFont_ ) {
+			::SelectObject( hMemDC_, hOldFont_ );
+		}
+		if( hFont_ != INVALID_HANDLE_VALUE ) {
+			::DeleteObject( hFont_ );
+		}
 		::DeleteObject( hBmp_ );
 		::DeleteDC( hMemDC_ );
 	}
@@ -60,6 +102,23 @@ public:
 		LOGFONT logfont = {0};
 		font->GetFont( &logfont );
 		ApplyFont( &logfont );
+	}
+	void Assign( const tTVPFont &font ) {
+		LOGFONT LogFont={0};
+		LogFont.lfHeight = -std::abs(font.Height);
+		LogFont.lfItalic = (font.Flags & TVP_TF_ITALIC) ? TRUE:FALSE;
+		LogFont.lfWeight = (font.Flags & TVP_TF_BOLD) ? 700 : 400;
+		LogFont.lfUnderline = (font.Flags & TVP_TF_UNDERLINE) ? TRUE:FALSE;
+		LogFont.lfStrikeOut = (font.Flags & TVP_TF_STRIKEOUT) ? TRUE:FALSE;
+		LogFont.lfEscapement = LogFont.lfOrientation = font.Angle;
+		LogFont.lfCharSet = SHIFTJIS_CHARSET; // TODO: i18n
+		LogFont.lfOutPrecision = OUT_DEFAULT_PRECIS;
+		LogFont.lfQuality = DEFAULT_QUALITY;
+		LogFont.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
+		tstring face = TVPFontSystem->GetBeingFont(font.Face.AsStdString());
+		_tcsncpy(LogFont.lfFaceName, face.c_str(), LF_FACESIZE -1);
+		LogFont.lfFaceName[LF_FACESIZE-1] = 0;
+		ApplyFont( &LogFont );
 	}
 	void ApplyFont( const LOGFONT* info ) {
 		HFONT hFont = ::CreateFontIndirect( info );
@@ -87,5 +146,5 @@ public:
 	HDC GetDC() { return hMemDC_; }
 };
 
-void TVPGetFontList(std::vector<std::wstring> & list, tjs_uint32 flags, TFont * refcanvas);
+void TVPGetFontList(std::vector<std::wstring> & list, tjs_uint32 flags, const tTVPFont & font );
 #endif // __T_FONT_H__

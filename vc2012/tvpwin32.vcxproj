@@ -216,6 +216,7 @@
     <ClInclude Include="..\visual\ComplexRect.h" />
     <ClInclude Include="..\visual\drawable.h" />
     <ClInclude Include="..\visual\FontRasterizer.h" />
+    <ClInclude Include="..\visual\FontSystem.h" />
     <ClInclude Include="..\visual\FreeType.h" />
     <ClInclude Include="..\visual\FreeTypeFace.h" />
     <ClInclude Include="..\visual\FreeTypeFontRasterizer.h" />
@@ -236,13 +237,11 @@
     <ClInclude Include="..\visual\voMode.h" />
     <ClInclude Include="..\visual\win32\DInputMgn.h" />
     <ClInclude Include="..\visual\win32\DrawDevice.h" />
-    <ClInclude Include="..\visual\win32\FontSystem.h" />
     <ClInclude Include="..\visual\win32\GraphicsLoaderImpl.h" />
     <ClInclude Include="..\visual\win32\krmovie.h" />
     <ClInclude Include="..\visual\win32\LayerBitmapImpl.h" />
     <ClInclude Include="..\visual\win32\LayerImpl.h" />
     <ClInclude Include="..\visual\win32\PassThroughDrawDevice.h" />
-    <ClInclude Include="..\visual\win32\TransImpl.h" />
     <ClInclude Include="..\visual\win32\VideoOvlImpl.h" />
     <ClInclude Include="..\visual\win32\WindowImpl.h" />
     <ClInclude Include="..\visual\WindowIntf.h" />
@@ -352,6 +351,7 @@
     <ClCompile Include="..\utils\win32\TimerImpl.cpp" />
     <ClCompile Include="..\visual\CharacterData.cpp" />
     <ClCompile Include="..\visual\ComplexRect.cpp" />
+    <ClCompile Include="..\visual\FontSystem.cpp" />
     <ClCompile Include="..\visual\FreeType.cpp" />
     <ClCompile Include="..\visual\FreeTypeFontRasterizer.cpp" />
     <ClCompile Include="..\visual\GraphicsLoaderIntf.cpp" />
@@ -369,12 +369,10 @@
     <ClCompile Include="..\visual\VideoOvlIntf.cpp" />
     <ClCompile Include="..\visual\win32\DInputMgn.cpp" />
     <ClCompile Include="..\visual\win32\DrawDevice.cpp" />
-    <ClCompile Include="..\visual\win32\FontSystem.cpp" />
     <ClCompile Include="..\visual\win32\GraphicsLoaderImpl.cpp" />
     <ClCompile Include="..\visual\win32\LayerBitmapImpl.cpp" />
     <ClCompile Include="..\visual\win32\LayerImpl.cpp" />
     <ClCompile Include="..\visual\win32\PassThroughDrawDevice.cpp" />
-    <ClCompile Include="..\visual\win32\TransImpl.cpp" />
     <ClCompile Include="..\visual\win32\VideoOvlImpl.cpp" />
     <ClCompile Include="..\visual\win32\WindowImpl.cpp" />
     <ClCompile Include="..\visual\WindowIntf.cpp" />

@@ -68,11 +68,14 @@ void TVPInializeFontRasterizers() {
 }
 // ここで切り換えること考えると AddRef 意味ないな。もう一つ上位で処理しないと
 // ここに書かれたメソッドをクラス化して
-void SetFontRasterizer( tjs_int index ) {
+void TVPSetFontRasterizer( tjs_int index ) {
 	if( TVPCurrentFontRasterizers != index && index >= 0 && index < FONT_RASTER_EOT ) {
 		TVPCurrentFontRasterizers = index;
 		TVPClearFontCache(); // ラスタライザが切り替わる時、キャッシュはクリアしてしまう
 	}
+}
+tjs_int TVPGetFontRasterizer() {
+	return TVPCurrentFontRasterizers;
 }
 FontRasterizer* GetCurrentRasterizer() {
 	return TVPFontRasterizers[TVPCurrentFontRasterizers];
@@ -734,14 +737,6 @@ void tTVPNativeBaseBitmap::ApplyFont()
 	}
 }
 //---------------------------------------------------------------------------
-TFont * tTVPNativeBaseBitmap::GetFontCanvas()
-{
-	ApplyFont();
-	//return TVPFontDCGetCanvas();
-	// return TVPBitmapForFontDC;
-	return NULL; // TODO 後でこのメソッド自体を無効化すること
-}
-//---------------------------------------------------------------------------
 void tTVPNativeBaseBitmap::SetFont(const tTVPFont &font)
 {
 	Font = font;
@@ -779,7 +774,7 @@ void tTVPNativeBaseBitmap::GetFontList(tjs_uint32 flags, std::vector<ttstr> &lis
 {
 	ApplyFont();
 	std::vector<std::wstring> ansilist;
-	TVPGetFontList(ansilist, flags, GetFontCanvas());
+	TVPGetFontList(ansilist, flags, GetFont() );
 	for(std::vector<std::wstring>::iterator i = ansilist.begin(); i != ansilist.end(); i++)
 		list.push_back(i->c_str());
 }

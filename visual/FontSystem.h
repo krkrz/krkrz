@@ -45,7 +45,7 @@ class FontSystem {
 	bool DefaultLOGFONTCreated;
 
 	// win32
-	LOGFONT DefaultLOGFONT;
+	//LOGFONT DefaultLOGFONT;
 	// win32
 
 	void InitFontNames();

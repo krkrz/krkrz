@@ -27,6 +27,9 @@
 
 #include "TColor.h"
 
+extern void TVPSetFontRasterizer( tjs_int index );
+extern tjs_int TVPGetFontRasterizer();
+
 //---------------------------------------------------------------------------
 // global flags
 //---------------------------------------------------------------------------
@@ -9310,8 +9313,27 @@ TJS_BEGIN_NATIVE_PROP_DECL(angle)
 }
 TJS_END_NATIVE_PROP_DECL(angle)
 //----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(rasterizer)
+{
+	TJS_BEGIN_NATIVE_PROP_GETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Font);
+		*result = TVPGetFontRasterizer();
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_GETTER
 
-
+	TJS_BEGIN_NATIVE_PROP_SETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Font);
+		TVPSetFontRasterizer(*param);
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_SETTER
+}
+//TJS_END_NATIVE_STATIC_PROP_DECL(rasterizer)
+TJS_END_NATIVE_PROP_DECL(rasterizer)
+//----------------------------------------------------------------------
 
 	TJS_END_NATIVE_MEMBERS
 }
