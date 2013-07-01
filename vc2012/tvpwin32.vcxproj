@@ -133,10 +133,8 @@
     <ClInclude Include="..\environ\win32\StringUtil.h" />
     <ClInclude Include="..\environ\win32\TColor.h" />
     <ClInclude Include="..\environ\win32\TFont.h" />
-    <ClInclude Include="..\environ\win32\Timer.h" />
     <ClInclude Include="..\environ\win32\TMLWindow.h" />
     <ClInclude Include="..\environ\win32\TouchPoint.h" />
-    <ClInclude Include="..\environ\win32\UtilWindow.h" />
     <ClInclude Include="..\environ\win32\VersionFormUnit.h" />
     <ClInclude Include="..\environ\win32\WindowFormUnit.h" />
     <ClInclude Include="..\msg\MsgIntf.h" />
@@ -145,7 +143,9 @@
     <ClInclude Include="..\msg\win32\OptionsDesc.h" />
     <ClInclude Include="..\platform\win32\BitmapInfomation.h" />
     <ClInclude Include="..\platform\win32\GDIFontRasterizer.h" />
+    <ClInclude Include="..\platform\win32\NativeEventQueue.h" />
     <ClInclude Include="..\platform\win32\NativeFreeTypeFace.h" />
+    <ClInclude Include="..\platform\win32\TVPTimer.h" />
     <ClInclude Include="..\sound\PhaseVocoderDSP.h" />
     <ClInclude Include="..\sound\PhaseVocoderFilter.h" />
     <ClInclude Include="..\sound\RingBuffer.h" />
@@ -281,7 +281,6 @@
     <ClCompile Include="..\environ\win32\Screen.cpp" />
     <ClCompile Include="..\environ\win32\TMLWindow.cpp" />
     <ClCompile Include="..\environ\win32\TouchPoint.cpp" />
-    <ClCompile Include="..\environ\win32\UtilWindow.cpp" />
     <ClCompile Include="..\environ\win32\VersionFormUnit.cpp" />
     <ClCompile Include="..\environ\win32\WindowFormUnit.cpp" />
     <ClCompile Include="..\msg\MsgIntf.cpp" />
@@ -289,7 +288,9 @@
     <ClCompile Include="..\msg\win32\OptionsDesc.cpp" />
     <ClCompile Include="..\platform\win32\BitmapInfomation.cpp" />
     <ClCompile Include="..\platform\win32\GDIFontRasterizer.cpp" />
+    <ClCompile Include="..\platform\win32\NativeEventQueue.cpp" />
     <ClCompile Include="..\platform\win32\NativeFreeTypeFace.cpp" />
+    <ClCompile Include="..\platform\win32\TVPTimer.cpp" />
     <ClCompile Include="..\sound\PhaseVocoderDSP.cpp" />
     <ClCompile Include="..\sound\PhaseVocoderFilter.cpp" />
     <ClCompile Include="..\sound\SoundBufferBaseIntf.cpp" />

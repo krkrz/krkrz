@@ -19,11 +19,11 @@
 namespace TJS
 {
 /**
- * ãƒã‚¤ãƒŠãƒªå½¢å¼ã§ãƒ‡ãƒ¼ã‚¿ã‚’ã‚¹ãƒˆãƒªãƒ¼ãƒ æ›¸ãå‡ºã—ã™ã‚‹ãŸã‚ã®ã‚¯ãƒ©ã‚¹
- * å½¢å¼ã¯ã€MessagePack ã«è¿‘ã„ã‚‚ã®ã§ç´°éƒ¨TJS2ç”¨ã«èª¿æ•´ã—ã¦ã„ã‚‹
- * æ–‡å­—åˆ—ã¯ã€UTF-16ã®ã¾ã¾æ ¼ç´
- * ã‚¨ãƒ³ãƒ‡ã‚£ã‚¢ãƒ³ã¯ãƒªãƒˆãƒ«ã‚¨ãƒ³ãƒ‡ã‚£ã‚¢ãƒ³ã«ãªã£ã¦ã„ã‚‹
- * ãƒ˜ãƒƒãƒ€ãƒ¼ã‚‚è¿½åŠ ã•ã‚Œã‚‹
+ * ƒoƒCƒiƒŠŒ`®‚Åƒf[ƒ^‚ğƒXƒgƒŠ[ƒ€‘‚«o‚µ‚·‚é‚½‚ß‚ÌƒNƒ‰ƒX
+ * Œ`®‚ÍAMessagePack ‚É‹ß‚¢‚à‚Ì‚Å×•”TJS2—p‚É’²®‚µ‚Ä‚¢‚é
+ * •¶š—ñ‚ÍAUTF-16‚Ì‚Ü‚ÜŠi”[
+ * ƒGƒ“ƒfƒBƒAƒ“‚ÍƒŠƒgƒ‹ƒGƒ“ƒfƒBƒAƒ“‚É‚È‚Á‚Ä‚¢‚é
+ * ƒwƒbƒ_[‚à’Ç‰Á‚³‚ê‚é
  */
 class tTJSBinarySerializer {
 public:
@@ -55,7 +55,7 @@ public:
 		
 		TYPE_FIX_RAW_MIN = 0xD4,
 		TYPE_FIX_RAW_MAX = 0xD9,
-		TYPE_FIX_RAW_LEN = TYPE_FIX_RAW_MAX - TYPE_FIX_RAW_MIN, // 5byteã¾ã§ã ã‹ã‚‰åŠ¹æœå°‘ãªã„ãŒã€æ–‡å­—ã®æ–¹ãŒé »åº¦é«˜ã„ã®ã§æ–‡å­—ã«RAWã‚¨ãƒªã‚¢ã‚’å‰²ã‚Šå½“ã¦ã‚‹
+		TYPE_FIX_RAW_LEN = TYPE_FIX_RAW_MAX - TYPE_FIX_RAW_MIN, // 5byte‚Ü‚Å‚¾‚©‚çŒø‰Ê­‚È‚¢‚ªA•¶š‚Ì•û‚ª•p“x‚‚¢‚Ì‚Å•¶š‚ÉRAWƒGƒŠƒA‚ğŠ„‚è“–‚Ä‚é
 
 		TYPE_RAW16 = 0xDA,
 		TYPE_RAW32 = 0xDB,
@@ -82,9 +82,9 @@ public:
 	struct BinaryPack {
 		static const tjs_int DATA_CAPACITY = 0x4000; // 16KB
 
-		tjs_uint8* Data; // ãƒ‡ãƒ¼ã‚¿å®Ÿä½“
-		tjs_int32 Size; // ç¾åœ¨åŸ‹ã¾ã£ã¦ã„ã‚‹ä½ç½®
-		tjs_int32 Capacity; // ãƒ‡ãƒ¼ã‚¿å®Ÿä½“æœ€å¤§ã‚µã‚¤ã‚º
+		tjs_uint8* Data; // ƒf[ƒ^À‘Ì
+		tjs_int32 Size; // Œ»İ–„‚Ü‚Á‚Ä‚¢‚éˆÊ’u
+		tjs_int32 Capacity; // ƒf[ƒ^À‘ÌÅ‘åƒTƒCƒY
 
 		BinaryPack() : Size(0), Capacity(DATA_CAPACITY) {
 			Data = new tjs_uint8[DATA_CAPACITY];
@@ -243,7 +243,7 @@ public:
 #endif
 	}
 	/**
-	 * æµ®å‹•å°æ•°ç‚¹å€¤ã‚’æ ¼ç´ã™ã‚‹
+	 * •‚“®¬”“_’l‚ğŠi”[‚·‚é
 	 */
 	static inline void PutDouble( tTJSBinaryStream* stream, double b ) {
 		tjs_uint64 v = *(tjs_uint64*)&b;
@@ -286,7 +286,7 @@ public:
 		stream->Write( val, len );
 	}
 	/**
-	 * ã‚ªã‚¯ãƒ†ãƒƒãƒˆå‹ã®å€¤ã‚’æ ¼ç´ã™ã‚‹
+	 * ƒIƒNƒeƒbƒgŒ^‚Ì’l‚ğŠi”[‚·‚é
 	 */
 	static inline void PutOctet( tTJSBinaryStream* stream, tTJSVariantOctet* val ) {
 		tjs_uint len = 0;
@@ -299,7 +299,7 @@ public:
 	}
 
 	/**
-	 * æ–‡å­—åˆ—ã‚’æ ¼ç´ã™ã‚‹
+	 * •¶š—ñ‚ğŠi”[‚·‚é
 	 */
 	static inline void PutString( tTJSBinaryStream* stream, const tTJSVariantString* val ) {
 		const tjs_char* data = NULL;
@@ -437,8 +437,8 @@ public:
 	}
 
 	/**
-	 * ãƒã‚¤ã‚¢ãƒ³ãƒˆå€¤ã‚’æ ¼ç´ã™ã‚‹
-	 * ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå‹ã¯ç„¡è¦–ã—ã¦ã„ã‚‹
+	 * ƒoƒCƒAƒ“ƒg’l‚ğŠi”[‚·‚é
+	 * ƒIƒuƒWƒFƒNƒgŒ^‚Í–³‹‚µ‚Ä‚¢‚é
 	 */
 	static void PutVariant( tTJSBinaryStream* stream, tTJSVariant& v );
 	

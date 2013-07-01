@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------
 /*
-	Risa [りさ]      alias 吉里吉里3 [kirikiri-3]
+	Risa [�肳]      alias �g���g��3 [kirikiri-3]
 	 stands for "Risa Is a Stagecraft Architecture"
 	Copyright (C) 2000 W.Dee <dee@kikyou.info> and contributors
 
@@ -8,7 +8,7 @@
 */
 //---------------------------------------------------------------------------
 //! @file
-//! @brief FreeType の Face 基底クラスの定義
+//! @brief FreeType �� Face ���N���X�̒�`
 //---------------------------------------------------------------------------
 
 #ifndef FREETYPEFACE_H
@@ -23,13 +23,13 @@
 
 //---------------------------------------------------------------------------
 /**
- * FreeType Face の基底クラス
+ * FreeType Face �̊��N���X
  */
 class tBaseFreeTypeFace
 {
 public:
-	virtual FT_Face GetFTFace() const = 0; //!< FreeType の Face オブジェクトを返す
-	virtual void GetFaceNameList(std::vector<std::wstring> & dest) const = 0; //!< このフォントファイルが持っているフォントを配列として返す
+	virtual FT_Face GetFTFace() const = 0; //!< FreeType �� Face �I�u�W�F�N�g��Ԃ�
+	virtual void GetFaceNameList(std::vector<std::wstring> & dest) const = 0; //!< ���̃t�H���g�t�@�C���������Ă���t�H���g��z��Ƃ��ĕԂ�
 	virtual ~tBaseFreeTypeFace() {;}
 };
 //---------------------------------------------------------------------------

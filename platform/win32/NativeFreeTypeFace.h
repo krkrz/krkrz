@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------
 /*
-	Risa [„Çä„Åï]      alias ÂêâÈáåÂêâÈáå3 [kirikiri-3]
+	Risa [ÇËÇ≥]      alias ãgó¢ãgó¢3 [kirikiri-3]
 	 stands for "Risa Is a Stagecraft Architecture"
 	Copyright (C) 2000 W.Dee <dee@kikyou.info> and contributors
 
@@ -8,7 +8,7 @@
 */
 //---------------------------------------------------------------------------
 //! @file
-// @brief Win32 GDI ÁµåÁî±„Åß„ÅÆFreeType Face
+// @brief Win32 GDI åoóRÇ≈ÇÃFreeType Face
 //---------------------------------------------------------------------------
 #ifndef _NATIVEFREETYPEFACE_H_
 #define _NATIVEFREETYPEFACE_H_
@@ -22,18 +22,18 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-//! @brief		Win32 GDI ÁµåÁî±„Åß„ÅÆFreeType Face „ÇØ„É©„Çπ
+//! @brief		Win32 GDI åoóRÇ≈ÇÃFreeType Face ÉNÉâÉX
 //---------------------------------------------------------------------------
 class tNativeFreeTypeFace : public tBaseFreeTypeFace
 {
 protected:
-	std::wstring FaceName;	//!< FaceÂêç = „Éï„Ç©„É≥„ÉàÂêç
-	FT_Face Face;	//!< FreeType face „Ç™„Éñ„Ç∏„Çß„ÇØ„Éà
+	std::wstring FaceName;	//!< Faceñº = ÉtÉHÉìÉgñº
+	FT_Face Face;	//!< FreeType face ÉIÉuÉWÉFÉNÉg
 
 private:
-	HDC DC;			//!< „Éá„Éê„Ç§„Çπ„Ç≥„É≥„ÉÜ„Ç≠„Çπ„Éà
-	HFONT OldFont;	//!< „Éá„Éê„Ç§„Çπ„Ç≥„É≥„ÉÜ„Ç≠„Çπ„Éà„Å´ÂÖÉ„ÄÖÁôªÈå≤„Åï„Çå„Å¶„ÅÑ„ÅüÂè§„ÅÑ„Éï„Ç©„É≥„Éà
-	bool IsTTC;		//!< TTC(TrueTypeCollection)„Éï„Ç°„Ç§„É´„ÇíÊâ±„Å£„Å¶„ÅÑ„ÇãÂ†¥Âêà„Å´Áúü
+	HDC DC;			//!< ÉfÉoÉCÉXÉRÉìÉeÉLÉXÉg
+	HFONT OldFont;	//!< ÉfÉoÉCÉXÉRÉìÉeÉLÉXÉgÇ…å≥ÅXìoò^Ç≥ÇÍÇƒÇ¢ÇΩå√Ç¢ÉtÉHÉìÉg
+	bool IsTTC;		//!< TTC(TrueTypeCollection)ÉtÉ@ÉCÉãÇàµÇ¡ÇƒÇ¢ÇÈèÍçáÇ…ê^
 	FT_StreamRec Stream;
 
 public:

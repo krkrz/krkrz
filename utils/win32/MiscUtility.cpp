@@ -37,6 +37,7 @@ tjs_uint TVPEncodeUnicodeToSJIS( tjs_char in ) {
 		}
 		return ret;
 	}
+	return 0;
 }
 //---------------------------------------------------------------------------
 tjs_char TVPEncodeSJISToUnicode(tjs_uint in) {

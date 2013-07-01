@@ -283,9 +283,6 @@
     <ClInclude Include="..\environ\win32\VersionFormUnit.h">
       <Filter>environ\win32</Filter>
     </ClInclude>
-    <ClInclude Include="..\environ\win32\Timer.h">
-      <Filter>environ\win32</Filter>
-    </ClInclude>
     <ClInclude Include="..\environ\win32\EmergencyExit.h">
       <Filter>environ\win32</Filter>
     </ClInclude>
@@ -472,9 +469,6 @@
     <ClInclude Include="..\sound\WaveSegmentQueue.h">
       <Filter>sound</Filter>
     </ClInclude>
-    <ClInclude Include="..\environ\win32\UtilWindow.h">
-      <Filter>environ\win32</Filter>
-    </ClInclude>
     <ClInclude Include="..\environ\win32\CompatibleNativeFuncs.h">
       <Filter>environ\win32</Filter>
     </ClInclude>
@@ -519,6 +513,12 @@
     </ClInclude>
     <ClInclude Include="..\visual\FontSystem.h">
       <Filter>visual</Filter>
+    </ClInclude>
+    <ClInclude Include="..\platform\win32\TVPTimer.h">
+      <Filter>platform\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\platform\win32\NativeEventQueue.h">
+      <Filter>platform\win32</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -858,9 +858,6 @@
     <ClCompile Include="..\sound\WaveSegmentQueue.cpp">
       <Filter>sound</Filter>
     </ClCompile>
-    <ClCompile Include="..\environ\win32\UtilWindow.cpp">
-      <Filter>environ\win32</Filter>
-    </ClCompile>
     <ClCompile Include="..\environ\win32\CompatibleNativeFuncs.cpp">
       <Filter>environ\win32</Filter>
     </ClCompile>
@@ -902,6 +899,12 @@
     </ClCompile>
     <ClCompile Include="..\visual\FontSystem.cpp">
       <Filter>visual</Filter>
+    </ClCompile>
+    <ClCompile Include="..\platform\win32\TVPTimer.cpp">
+      <Filter>platform\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\platform\win32\NativeEventQueue.cpp">
+      <Filter>platform\win32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -39,8 +39,10 @@
 	#include "kmp_pi.h"
 #endif
 
-#include "Timer.h"
+#include "TVPTimer.h"
 #include "Application.h"
+#include "UserEvent.h"
+#include "NativeEventQueue.h"
 
 //---------------------------------------------------------------------------
 // Options management
@@ -586,7 +588,7 @@ static LPDIRECTSOUNDBUFFER TVPPrimaryBuffer = NULL;
 static LPDIRECTSOUND3DLISTENER TVPDirectSound3DListener = NULL;
 static bool TVPPrimaryBufferPlayingByProgram = false;
 static HMODULE TVPDirectSoundDLL = NULL;
-static TTimer *TVPPrimaryDelayedStopperTimer = NULL;
+static TVPTimer *TVPPrimaryDelayedStopperTimer = NULL;
 static bool TVPDirectSoundShutdown = false;
 static bool TVPDeferedSettingAvailable = false;
 //---------------------------------------------------------------------------
@@ -789,11 +791,10 @@ static void TVPInitDirectSound()
 			if(!TVPPrimaryDelayedStopperTimer)
 			{
 				// create timer to stop primary buffer playing at delayed timing
-				TVPPrimaryDelayedStopperTimer = new TTimer(Application);
+				TVPPrimaryDelayedStopperTimer = new TVPTimer();
 				TVPPrimaryDelayedStopperTimer->SetInterval( 4000 );
 				TVPPrimaryDelayedStopperTimer->SetEnabled( false );
-#pragma message( __LOC__ "TODO イベントハンドラをなんとかする" )
-//				TVPPrimaryDelayedStopperTimer->SetOnTimer( TVPPrimaryDelayedStopper.OnTimer );
+				TVPPrimaryDelayedStopperTimer->SetOnTimerHandler( &TVPPrimaryDelayedStopper, &tTVPPrimaryDelayedStopper::OnTimer );
 			}
 		}
 
@@ -1451,19 +1452,20 @@ class tTVPWaveSoundBufferThread : public tTVPThread
 {
 	tTVPThreadEvent Event;
 
-	HWND UtilWindow; // utility window to notify the pending events occur
+	//HWND UtilWindow; // utility window to notify the pending events occur
 	bool PendingLabelEventExists;
 	bool WndProcToBeCalled;
 	DWORD NextLabelEventTick;
 	DWORD LastFilledTick;
 
+	NativeEventQueue<tTVPWaveSoundBufferThread> EventQueue;
 public:
 	tTVPWaveSoundBufferThread();
 	~tTVPWaveSoundBufferThread();
 
 private:
 	//void __fastcall UtilWndProc(Messages::TMessage &Msg);
-	LRESULT CALLBACK UtilWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+	void UtilWndProc( NativeEvent& ev );
 
 public:
 	void ReschedulePendingLabelEvent(tjs_int tick);
@@ -1479,10 +1481,9 @@ public:
 } static *TVPWaveSoundBufferThread = NULL;
 //---------------------------------------------------------------------------
 tTVPWaveSoundBufferThread::tTVPWaveSoundBufferThread()
-	: tTVPThread(true)
+	: tTVPThread(true), EventQueue(this,&tTVPWaveSoundBufferThread::UtilWndProc)
 {
-#pragma message( __LOC__ "TODO メッセージハンドラをなんとかする" )
-//	UtilWindow = AllocateHWnd(UtilWndProc);
+	EventQueue.Allocate();
 	PendingLabelEventExists = false;
 	NextLabelEventTick = 0;
 	LastFilledTick = 0;
@@ -1498,16 +1499,14 @@ tTVPWaveSoundBufferThread::~tTVPWaveSoundBufferThread()
 	Resume();
 	Event.Set();
 	WaitFor();
-#pragma message( __LOC__ "TODO メッセージハンドラをなんとかする" )
-	//DeallocateHWnd(UtilWindow);
+	EventQueue.Deallocate();
 }
 //---------------------------------------------------------------------------
 //void __fastcall tTVPWaveSoundBufferThread::UtilWndProc(Messages::TMessage &Msg)
-LRESULT CALLBACK tTVPWaveSoundBufferThread::UtilWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+void tTVPWaveSoundBufferThread::UtilWndProc( NativeEvent& ev )
 {
-	LRESULT result = 0;
 	// Window procedure of UtilWindow
-	if(message == WM_USER + 1 && !GetTerminated())
+	if( ev.Message == TVP_EV_WAVE_SND_BUF_THREAD && !GetTerminated())
 	{
 		// pending events occur
 		tTJSCriticalSectionHolder holder(TVPWaveSoundBufferVectorCS); // protect the object
@@ -1543,9 +1542,8 @@ LRESULT CALLBACK tTVPWaveSoundBufferThread::UtilWndProc(HWND hWnd, UINT message,
 	}
 	else
 	{
-		result =  DefWindowProc(UtilWindow, message, wParam, lParam);
+		EventQueue.HandlerDefault(ev);
 	}
-	return result;
 }
 //---------------------------------------------------------------------------
 void tTVPWaveSoundBufferThread::ReschedulePendingLabelEvent(tjs_int tick)
@@ -1585,7 +1583,7 @@ void tTVPWaveSoundBufferThread::Execute(void)
 				if(!WndProcToBeCalled)
 				{
 					WndProcToBeCalled = true;
-					::PostMessage(UtilWindow, WM_USER+1, 0, 0);
+					EventQueue.PostEvent( NativeEvent(TVP_EV_WAVE_SND_BUF_THREAD) );
 				}
 			}
 
