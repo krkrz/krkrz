@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------
 /*
-	Risa [繧翫＆]      alias 蜷蛾㈹蜷蛾㈹3 [kirikiri-3]
+	Risa [りさ]      alias 吉里吉里3 [kirikiri-3]
 	 stands for "Risa Is a Stagecraft Architecture"
 	Copyright (C) 2000 W.Dee <dee@kikyou.info> and contributors
 
@@ -8,9 +8,9 @@
 */
 //---------------------------------------------------------------------------
 //! @file
-//! @brief UNICODE->CP932(竕担JIS) 螟画鋤
+//! @brief UNICODE->CP932(≒SJIS) 変換
 //---------------------------------------------------------------------------
-// UNICODE縺ｨSJIS(cp932)縺ｮ螟画鋤繝槭ャ繝励↓縺､縺�縺ｦ縺ｯ unicode.org 繧貞盾辣ｧ縺ｮ縺薙→
+// UNICODEとSJIS(cp932)の変換マップについては unicode.org を参照のこと
 
 
 

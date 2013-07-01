@@ -14,19 +14,18 @@
 #include "SoundBufferBaseImpl.h"
 #include "WaveImpl.h"
 
-#include "Application.h"
-#include "Timer.h"
+#include "TVPTimer.h"
 
 //---------------------------------------------------------------------------
 // Sound Buffer Timer Dispatcher ( for fading or commiting defered settings )
 //---------------------------------------------------------------------------
-static class TTimer * TVPSoundBufferTimer = NULL; // VCL TTimer
+static class TVPTimer * TVPSoundBufferTimer = NULL;
 static std::vector<tTJSNI_SoundBuffer *> TVPSoundBufferVector;
 //---------------------------------------------------------------------------
 class tTVPSoundBufferTimerDispatcher
 {
 public:
-	void __fastcall Handler(class TObject *sender)
+	void Handler()
 	{
 		std::vector<tTJSNI_SoundBuffer *>::iterator i;
 		for(i = TVPSoundBufferVector.begin(); i != TVPSoundBufferVector.end();
@@ -43,10 +42,9 @@ void TVPAddSoundBuffer(tTJSNI_SoundBuffer * buf)
 	if(TVPSoundBufferVector.size() == 0)
 	{
 		// first buffer
-		TVPSoundBufferTimer = new TTimer(Application); // Create VCL TTimer Object
+		TVPSoundBufferTimer = new TVPTimer(); // Create Timer Object
 		TVPSoundBufferTimer->SetInterval( TVP_SB_BEAT_INTERVAL );
-#pragma message( __LOC__ "TODO イベントハンドラをなんとかする" )
-//		TVPSoundBufferTimer->SetOnTimerHandler( TVPSoundBufferTimerDispatcher.Handler );
+		TVPSoundBufferTimer->SetOnTimerHandler( &TVPSoundBufferTimerDispatcher, &tTVPSoundBufferTimerDispatcher::Handler );
 	}
 
 	TVPSoundBufferVector.push_back(buf);

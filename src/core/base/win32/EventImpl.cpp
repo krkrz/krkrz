@@ -22,7 +22,8 @@
 #include <ddraw.h>
 
 #include "Application.h"
-#include "UtilWindow.h"
+#include "NativeEventQueue.h"
+#include "UserEvent.h"
 
 //---------------------------------------------------------------------------
 // TVPInvokeEvents
@@ -124,7 +125,7 @@ bool TVPGetSystemEventDisabledState()
 //---------------------------------------------------------------------------
 // tTVPContinuousHandlerCallLimitThread
 //---------------------------------------------------------------------------
-class tTVPContinuousHandlerCallLimitThread : public tTVPThread, public UtilWindow
+class tTVPContinuousHandlerCallLimitThread : public tTVPThread
 {
 	tjs_uint64 NextEventTick;
 	tjs_uint64 Interval;
@@ -133,6 +134,8 @@ class tTVPContinuousHandlerCallLimitThread : public tTVPThread, public UtilWindo
 
 	bool Enabled;
 
+	NativeEventQueue<tTVPContinuousHandlerCallLimitThread> EventQueue;
+
 public:
 	tTVPContinuousHandlerCallLimitThread();
 	~tTVPContinuousHandlerCallLimitThread();
@@ -140,10 +143,15 @@ public:
 protected:
 	void Execute();
 
+	void WndProc(NativeEvent& ev) {
+		EventQueue.HandlerDefault(ev);
+	}
+
 public:
 	void SetEnabled(bool enabled);
 
 	void SetInterval(tjs_uint64 interval) { Interval = interval; }
+
 
 } static * TVPContinuousHandlerCallLimitThread = NULL;
 //---------------------------------------------------------------------------
@@ -151,12 +159,12 @@ public:
 
 //---------------------------------------------------------------------------
 tTVPContinuousHandlerCallLimitThread::tTVPContinuousHandlerCallLimitThread()
-	 : tTVPThread(true)
+	 : tTVPThread(true), EventQueue(this,&tTVPContinuousHandlerCallLimitThread::WndProc)
 {
 	NextEventTick = 0;
 	Interval = (1<<TVP_SUBMILLI_FRAC_BITS)*1000/60; // default 60Hz
 	Enabled = false;
-	AllocateUtilWnd();
+	EventQueue.Allocate();
 	Resume();
 }
 //---------------------------------------------------------------------------
@@ -169,7 +177,7 @@ tTVPContinuousHandlerCallLimitThread::~tTVPContinuousHandlerCallLimitThread()
 	Resume();
 	Event.Set();
 	WaitFor();
-	DeallocateUtilWnd();
+	EventQueue.Deallocate();
 }
 //---------------------------------------------------------------------------
 
@@ -190,7 +198,7 @@ void tTVPContinuousHandlerCallLimitThread::Execute()
 				if(NextEventTick <= curtick)
 				{
 					TVPProcessContinuousHandlerEventFlag = true; // set flag to process event on next idle
-					PostMessage( WM_APP+2, 0, 0);
+					EventQueue.PostEvent( NativeEvent(TVP_EV_CONTINUE_LIMIT_THREAD) );
 					while(NextEventTick <= curtick) NextEventTick += Interval;
 				}
 				tjs_uint64 sleeptime_64 = NextEventTick - curtick;
@@ -346,7 +354,7 @@ bool TVPGetWaitVSync()
 //---------------------------------------------------------------------------
 // VSync用のタイミングを発生させるためのスレッド
 //---------------------------------------------------------------------------
-class tTVPVSyncTimingThread : public tTVPThread, public UtilWindow
+class tTVPVSyncTimingThread : public tTVPThread
 {
 	DWORD SleepTime;
 	tTVPThreadEvent Event;
@@ -356,6 +364,8 @@ class tTVPVSyncTimingThread : public tTVPThread, public UtilWindow
 
 	bool Enabled;
 
+	NativeEventQueue<tTVPVSyncTimingThread> EventQueue;
+
 public:
 	tTVPVSyncTimingThread();
 	~tTVPVSyncTimingThread();
@@ -364,7 +374,7 @@ protected:
 	void Execute();
 
 	//void __fastcall UtilWndProc(Messages::TMessage &Msg);
-	virtual LRESULT WINAPI Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
+	void Proc( NativeEvent& ev );
 
 public:
 	void MeasureVSyncInterval(); // VSyncInterval を計測する
@@ -374,13 +384,13 @@ public:
 
 //---------------------------------------------------------------------------
 tTVPVSyncTimingThread::tTVPVSyncTimingThread()
-	 : tTVPThread(true)
+	 : tTVPThread(true), EventQueue(this,&tTVPVSyncTimingThread::Proc)
 {
 	SleepTime = 1;
 	LastVBlankTick = 0;
 	VSyncInterval = 16; // 初期値。
 	Enabled = false;
-	AllocateUtilWnd();
+	EventQueue.Allocate();
 	MeasureVSyncInterval();
 	Resume();
 }
@@ -394,7 +404,7 @@ tTVPVSyncTimingThread::~tTVPVSyncTimingThread()
 	Resume();
 	Event.Set();
 	WaitFor();
-	DeallocateUtilWnd();
+	EventQueue.Deallocate();
 }
 //---------------------------------------------------------------------------
 
@@ -436,7 +446,10 @@ void tTVPVSyncTimingThread::Execute()
 		}
 
 		// イベントをポストする
-		PostMessage( WM_APP+2, 0, (LPARAM)sleep_start_tick);
+		NativeEvent ev(TVP_EV_VSYNC_TIMING_THREAD);
+		ev.LParam = (LPARAM)sleep_start_tick;
+		EventQueue.PostEvent(ev);
+		//PostMessage( TVP_EV_VSYNC_TIMING_THREAD, 0, (LPARAM)sleep_start_tick);
 
 		Event.WaitFor(0x7fffffff); // vsync まで待つ
 	}
@@ -446,10 +459,12 @@ void tTVPVSyncTimingThread::Execute()
 
 //---------------------------------------------------------------------------
 //void __fastcall tTVPVSyncTimingThread::UtilWndProc(Messages::TMessage &Msg)
-LRESULT WINAPI tTVPVSyncTimingThread::Proc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
+void tTVPVSyncTimingThread::Proc( NativeEvent& ev )
 {
-	if(message != WM_APP+2) {
-		return UtilWindow::Proc( hWnd, message, wParam, lParam);
+	if(ev.Message != TVP_EV_VSYNC_TIMING_THREAD) {
+		EventQueue.HandlerDefault(ev);
+		return;
+		//return UtilWindow::Proc( hWnd, message, wParam, lParam);
 	}
 
 	// tTVPVSyncTimingThread から投げられたメッセージ
@@ -554,7 +569,7 @@ if(timeGetTime() > last_report_tick + 5000)
 	TVPAddLog(TJS_W("VSync wait time : ") + ttstr((int)(vblank_wait_end - vblank_wait_start)));
 }
 */
-	return 0;
+//	return 0;
 }
 //---------------------------------------------------------------------------
 

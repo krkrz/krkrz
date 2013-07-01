@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------
 /*
-	Risa [ã‚Šã•]      alias å‰é‡Œå‰é‡Œ3 [kirikiri-3]
+	Risa [‚è‚³]      alias ‹g—¢‹g—¢3 [kirikiri-3]
 	 stands for "Risa Is a Stagecraft Architecture"
 	Copyright (C) 2000 W.Dee <dee@kikyou.info> and contributors
 
@@ -8,9 +8,9 @@
 */
 //---------------------------------------------------------------------------
 //! @file
-//! @brief UNICODE->CP932(â‰’SJIS) å¤‰æ›
+//! @brief UNICODE->CP932(àSJIS) •ÏŠ·
 //---------------------------------------------------------------------------
-// UNICODEã¨SJIS(cp932)ã®å¤‰æ›ãƒãƒƒãƒ—ã«ã¤ã„ã¦ã¯ unicode.org ã‚’å‚ç…§ã®ã“ã¨
+// UNICODE‚ÆSJIS(cp932)‚Ì•ÏŠ·ƒ}ƒbƒv‚É‚Â‚¢‚Ä‚Í unicode.org ‚ğQÆ‚Ì‚±‚Æ
 
 
 #include "tjsCommHead.h"
@@ -19,7 +19,7 @@
 
 //---------------------------------------------------------------------------
 /**
- * UNICODEã¨ShiftJISã‚³ãƒ¼ãƒ‰ã®çµ„ã‚’è¡¨ã™å‹
+ * UNICODE‚ÆShiftJISƒR[ƒh‚Ì‘g‚ğ•\‚·Œ^
  */
 struct tUnicodeAndSJISPair
 {
@@ -30,7 +30,7 @@ struct tUnicodeAndSJISPair
 
 //---------------------------------------------------------------------------
 /**
- * UNICODEã¨ShiftJISã‚³ãƒ¼ãƒ‰ã®çµ„(UNICODEã§ã‚½ãƒ¼ãƒˆæ¸ˆã¿)
+ * UNICODE‚ÆShiftJISƒR[ƒh‚Ì‘g(UNICODE‚Åƒ\[ƒgÏ‚İ)
  */
 static const tUnicodeAndSJISPair UnicodeAndSJISPair[] = {
 { 0x0000U, 0x0000U },{ 0x0001U, 0x0001U },{ 0x0002U, 0x0002U },
@@ -2542,7 +2542,7 @@ static const tUnicodeAndSJISPair UnicodeAndSJISPair[] = {
 
 //---------------------------------------------------------------------------
 /**
- * UNICODEã¨ShiftJISã‚³ãƒ¼ãƒ‰ã®çµ„ã®æ•°
+ * UNICODE‚ÆShiftJISƒR[ƒh‚Ì‘g‚Ì”
  */
 #define NumUnicodeAndSJISPair \
 	(sizeof(UnicodeAndSJISPair) / sizeof(UnicodeAndSJISPair[0]))
@@ -2550,18 +2550,18 @@ static const tUnicodeAndSJISPair UnicodeAndSJISPair[] = {
 
 //---------------------------------------------------------------------------
 /**
- * UNICODEã‚’ShiftJIS(CP932)ã«å¤‰æ›ã™ã‚‹
- * @param in	å¤‰æ›ã—ãŸã„æ–‡å­—
- * @return	å¤‰æ›ã•ã‚ŒãŸShiftJISæ–‡å­—(0=å¤‰æ›å¤±æ•—)
- * @note	ShiftJIS æ–‡å­—ã¯ 16bit æ•°å€¤ã§è¿”ã•ã‚Œã‚‹(å®Ÿéš›ã®æˆ»ã‚Šå€¤ã®å‹ã¯tjs_uint)
- * @note	ãŒã€ã„ã‚ã‚†ã‚‹åŠè§’æ–‡å­—ã®å ´åˆã¯ä¸Šä½8ãƒ“ãƒƒãƒˆã¯0ã€ã„ã‚ã‚†ã‚‹å…¨è§’æ–‡å­—ã¯
- * @note	ShiftJISã‚³ãƒ¼ãƒ‰ãŒãã®ã¾ã¾å…¥ã‚‹ã€‚
+ * UNICODE‚ğShiftJIS(CP932)‚É•ÏŠ·‚·‚é
+ * @param in	•ÏŠ·‚µ‚½‚¢•¶š
+ * @return	•ÏŠ·‚³‚ê‚½ShiftJIS•¶š(0=•ÏŠ·¸”s)
+ * @note	ShiftJIS •¶š‚Í 16bit ”’l‚Å•Ô‚³‚ê‚é(ÀÛ‚Ì–ß‚è’l‚ÌŒ^‚Ítjs_uint)
+ * @note	‚ªA‚¢‚í‚ä‚é”¼Šp•¶š‚Ìê‡‚ÍãˆÊ8ƒrƒbƒg‚Í0A‚¢‚í‚ä‚é‘SŠp•¶š‚Í
+ * @note	ShiftJISƒR[ƒh‚ª‚»‚Ì‚Ü‚Ü“ü‚éB
  */
 tjs_uint UnicodeToSJIS(tjs_char in)
 {
-	// UnicodeAndSJISPair ã«å¯¾ã—ã¦äºŒåˆ†æ¤œç´¢ã‚’è¡Œã†
+	// UnicodeAndSJISPair ‚É‘Î‚µ‚Ä“ñ•ªŒŸõ‚ğs‚¤
 	if(in >= 0x10000) return 0;
-		// 0x10000 ä»¥ä¸Šã®ã‚³ãƒ¼ãƒ‰ãƒã‚¤ãƒ³ãƒˆã«å¯¾ã—ã¦ã¯SJISæ–‡å­—å¤‰æ›ã¯å®šç¾©ã•ã‚Œã¦ã„ãªã„
+		// 0x10000 ˆÈã‚ÌƒR[ƒhƒ|ƒCƒ“ƒg‚É‘Î‚µ‚Ä‚ÍSJIS•¶š•ÏŠ·‚Í’è‹`‚³‚ê‚Ä‚¢‚È‚¢
 
 	tjs_uint s = 0, e = NumUnicodeAndSJISPair;
 	while(e - s > 1)
@@ -2573,7 +2573,7 @@ tjs_uint UnicodeToSJIS(tjs_char in)
 			e = m;
 	}
 	if(UnicodeAndSJISPair[s].Unicode == static_cast<tjs_uint16>(in))
-		return UnicodeAndSJISPair[s].SJIS; // è¦‹ã¤ã‹ã£ãŸ
+		return UnicodeAndSJISPair[s].SJIS; // Œ©‚Â‚©‚Á‚½
 	return 0;
 }
 //---------------------------------------------------------------------------

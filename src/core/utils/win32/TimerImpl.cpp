@@ -20,7 +20,8 @@
 #include "ThreadIntf.h"
 #include "MsgIntf.h"
 
-#include "UtilWindow.h"
+#include "NativeEventQueue.h"
+#include "UserEvent.h"
 
 //---------------------------------------------------------------------------
 
@@ -34,7 +35,7 @@
 //---------------------------------------------------------------------------
 // tTVPTimerThread
 //---------------------------------------------------------------------------
-class tTVPTimerThread : public tTVPThread, public UtilWindow
+class tTVPTimerThread : public tTVPThread
 {
 	// thread for triggering punctual event.
 	// normal Windows timer cannot call the timer callback routine at
@@ -44,6 +45,8 @@ class tTVPTimerThread : public tTVPThread, public UtilWindow
 	std::vector<tTJSNI_Timer *> Pending; // timer object which has pending events
 	bool PendingEventsAvailable;
 	tTVPThreadEvent Event;
+	
+	NativeEventQueue<tTVPTimerThread> EventQueue;
 
 public:
 
@@ -57,7 +60,7 @@ protected:
 
 private:
 	//void __fastcall UtilWndProc(Messages::TMessage &Msg);
-	virtual LRESULT WINAPI Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
+	void Proc( NativeEvent& event );
 
 	void AddItem(tTJSNI_Timer * item);
 	bool RemoveItem(tTJSNI_Timer *item);
@@ -80,11 +83,11 @@ public:
 
 } static * TVPTimerThread = NULL;
 //---------------------------------------------------------------------------
-tTVPTimerThread::tTVPTimerThread() : tTVPThread(true)
+tTVPTimerThread::tTVPTimerThread() : tTVPThread(true), EventQueue(this,&tTVPTimerThread::Proc)
 {
 	PendingEventsAvailable = false;
 	SetPriority(TVPLimitTimerCapacity ? ttpNormal : ttpHighest);
-	AllocateUtilWnd();
+	EventQueue.Allocate();
 	Resume();
 }
 //---------------------------------------------------------------------------
@@ -94,7 +97,7 @@ tTVPTimerThread::~tTVPTimerThread()
 	Resume();
 	Event.Set();
 	WaitFor();
-	DeallocateUtilWnd();
+	EventQueue.Deallocate();
 }
 //---------------------------------------------------------------------------
 void tTVPTimerThread::Execute()
@@ -172,7 +175,7 @@ void tTVPTimerThread::Execute()
 				if(!PendingEventsAvailable)
 				{
 					PendingEventsAvailable = true;
-					PostMessage(WM_USER+1, 0, 0);
+					EventQueue.PostEvent( NativeEvent(TVP_EV_TIMER_THREAD) );
 				}
 			}
 
@@ -194,11 +197,10 @@ void tTVPTimerThread::Execute()
 }
 //---------------------------------------------------------------------------
 //void __fastcall tTVPTimerThread::UtilWndProc(Messages::TMessage &Msg)
-LRESULT WINAPI tTVPTimerThread::Proc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
+void tTVPTimerThread::Proc( NativeEvent& ev )
 {
-	LRESULT result = 0;
 	// Window procedure of UtilWindow
-	if(message == WM_USER + 1 && !GetTerminated())
+	if( ev.Message == TVP_EV_TIMER_THREAD && !GetTerminated())
 	{
 		// pending events occur
 		tTJSCriticalSectionHolder holder(TVPTimerCS); // protect the object
@@ -215,9 +217,8 @@ LRESULT WINAPI tTVPTimerThread::Proc( HWND hWnd, UINT message, WPARAM wParam, LP
 	}
 	else
 	{
-		result =  UtilWindow::Proc( hWnd, message, wParam, lParam);
+		EventQueue.HandlerDefault(ev);
 	}
-	return result;
 }
 //---------------------------------------------------------------------------
 void tTVPTimerThread::AddItem(tTJSNI_Timer * item)

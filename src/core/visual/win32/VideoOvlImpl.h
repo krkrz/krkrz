@@ -18,9 +18,10 @@
 #include "StorageIntf.h"
 #include "UtilStreams.h"
 
-// Start:	Add:	T.Imoto
 #include "voMode.h"
-// End:		Add:	T.Imoto
+
+#include "NativeEventQueue.h"
+
 //---------------------------------------------------------------------------
 // tTJSNI_VideoOverlay : VideoOverlay Native Instance
 //---------------------------------------------------------------------------
@@ -36,7 +37,8 @@ class tTJSNI_VideoOverlay : public tTJSNI_BaseVideoOverlay
 
 	HWND OwnerWindow;
 
-	HWND UtilWindow; // window which receives messages from video overlay object
+	// HWND UtilWindow; // window which receives messages from video overlay object
+	NativeEventQueue<tTJSNI_VideoOverlay> EventQueue;
 
 	tTVPLocalTempStorageHolder *LocalTempStorageHolder;
 // Start:	Add:	T.Imoto
@@ -196,7 +198,7 @@ public:
 
 private:
 	//void __fastcall WndProc(Messages::TMessage &Msg);
-	LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+	void WndProc( NativeEvent& ev );
 		// UtilWindow's window procedure
 	void ClearWndProcMessages(); // clear WndProc's message queue
 

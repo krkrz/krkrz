@@ -28,6 +28,7 @@
 #include <evcode.h>
 
 #include "Application.h"
+
 //---------------------------------------------------------------------------
 class tTVPVideoModule
 {
@@ -177,6 +178,7 @@ static tTVPAtExit TVPShutdownVideoOverlayAtExit
 // tTJSNI_VideoOverlay
 //---------------------------------------------------------------------------
 tTJSNI_VideoOverlay::tTJSNI_VideoOverlay()
+: EventQueue(this,&tTJSNI_VideoOverlay::WndProc)
 {
 	VideoOverlay = NULL;
 	Rect.left = 0;
@@ -187,8 +189,7 @@ tTJSNI_VideoOverlay::tTJSNI_VideoOverlay()
 	OwnerWindow = NULL;
 	LocalTempStorageHolder = NULL;
 
-#pragma message( __LOC__ "TODO メッセージハンドラをなんとかする" )
-	//UtilWindow = AllocateHWnd(WndProc);
+	EventQueue.Allocate();
 
 	Layer1 = NULL;
 	Layer2 = NULL;
@@ -221,8 +222,7 @@ void TJS_INTF_METHOD tTJSNI_VideoOverlay::Invalidate()
 
 	Close();
 
-#pragma message( __LOC__ "TODO メッセージハンドラをなんとかする" )
-//	if(UtilWindow) DeallocateHWnd(UtilWindow);
+	EventQueue.Deallocate();
 }
 //---------------------------------------------------------------------------
 void tTJSNI_VideoOverlay::Open(const ttstr &_name)
@@ -306,22 +306,22 @@ void tTJSNI_VideoOverlay::Open(const ttstr &_name)
 	{
 		if(flash)
 		{
-			mod->GetVideoOverlayObject(UtilWindow,
+			mod->GetVideoOverlayObject(EventQueue.GetOwner(),
 				NULL, (LocalTempStorageHolder->GetLocalName() + param).c_str(),
 				ext.c_str(), 0, &VideoOverlay);
 		}
 		else
 		{
 			if(Mode == vomLayer)
-				mod->GetVideoLayerObject(UtilWindow,
+				mod->GetVideoLayerObject(EventQueue.GetOwner(),
 					istream, name.c_str(), ext.c_str(),
 					size, &VideoOverlay);
 			else if(Mode == vomMixer)
-				mod->GetMixingVideoOverlayObject(UtilWindow,
+				mod->GetMixingVideoOverlayObject(EventQueue.GetOwner(),
 					istream, name.c_str(), ext.c_str(),
 					size, &VideoOverlay);
 			else
-				mod->GetVideoOverlayObject(UtilWindow,
+				mod->GetVideoOverlayObject(EventQueue.GetOwner(),
 					istream, name.c_str(), ext.c_str(),
 					size, &VideoOverlay);
 		}
@@ -628,7 +628,7 @@ void tTJSNI_VideoOverlay::DetachVideoOverlay()
 	if(VideoOverlay && Window && (Mode == vomOverlay || Mode == vomMixer) )
 	{
 		VideoOverlay->SetWindow(NULL);
-		VideoOverlay->SetMessageDrainWindow(UtilWindow);
+		VideoOverlay->SetMessageDrainWindow(EventQueue.GetOwner());
 			// once set to util window
 	}
 }
@@ -644,19 +644,19 @@ void tTJSNI_VideoOverlay::SetRectOffset(tjs_int ofsx, tjs_int ofsy)
 }
 //---------------------------------------------------------------------------
 //void __fastcall tTJSNI_VideoOverlay::WndProc(Messages::TMessage &Msg)
-LRESULT CALLBACK tTJSNI_VideoOverlay::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+void tTJSNI_VideoOverlay::WndProc( NativeEvent& ev )
 {
-	// UtilWindow's message procedure
+	// EventQueue's message procedure
 	if(VideoOverlay)
 	{
-		if(message == WM_GRAPHNOTIFY)
+		if(ev.Message == WM_GRAPHNOTIFY)
 		{
 			long evcode, p1, p2;
 			bool got;
 			do {
 				VideoOverlay->GetEvent(&evcode, &p1, &p2, &got);
 				if( got == false)
-					return 0;
+					return;
 
 				switch( evcode )
 				{
@@ -686,7 +686,7 @@ LRESULT CALLBACK tTJSNI_VideoOverlay::WndProc(HWND hWnd, UINT message, WPARAM wP
 						{
 							int		curFrame = p1;
 							if( Layer1 == NULL && Layer2 == NULL )	// nothing to do.
-								return 0;
+								return;
 
 							// 2フレーム以上差があるときはGetFrame() を現在のフレームとする
 							int frame = GetFrame();
@@ -696,7 +696,7 @@ LRESULT CALLBACK tTJSNI_VideoOverlay::WndProc(HWND hWnd, UINT message, WPARAM wP
 							if( (!IsPrepare) && (SegLoopEndFrame > 0) && (frame >= SegLoopEndFrame) ) {
 								SetFrame( SegLoopStartFrame > 0 ? SegLoopStartFrame : 0 );
 								FirePeriodEvent(perSegLoop); // fire period event by segment loop rewind
-								return 0; // Updateを行わない
+								return; // Updateを行わない
 							}
 
 							// get video image size
@@ -761,7 +761,7 @@ LRESULT CALLBACK tTJSNI_VideoOverlay::WndProc(HWND hWnd, UINT message, WPARAM wP
 							if( (!IsPrepare) && (SegLoopEndFrame > 0) && (frame >= SegLoopEndFrame) ) {
 								SetFrame( SegLoopStartFrame > 0 ? SegLoopStartFrame : 0 );
 								FirePeriodEvent(perSegLoop); // fire period event by segment loop rewind
-								return 0;
+								return;
 							}
 							VideoOverlay->PresentVideoImage();
 							FireFrameUpdateEvent( frame );
@@ -776,18 +776,18 @@ LRESULT CALLBACK tTJSNI_VideoOverlay::WndProc(HWND hWnd, UINT message, WPARAM wP
 				}
 				VideoOverlay->FreeEventParams( evcode, p1, p2 );
 			} while( got );
-			return 0;
+			return;
 		}
-		else if(message == WM_CALLBACKCMD)
+		else if(ev.Message== WM_CALLBACKCMD)
 		{
 			// wparam : command
 			// lparam : argument
-			FireCallbackCommand((tjs_char*)wParam, (tjs_char*)lParam);
-			return 0;
+			FireCallbackCommand((tjs_char*)ev.WParam, (tjs_char*)ev.LParam);
+			return;
 		}
 	}
 
-	return DefWindowProc(UtilWindow, message, wParam, lParam);
+	EventQueue.HandlerDefault(ev);
 }
 //---------------------------------------------------------------------------
 // Start:	Add:	T.Imoto
@@ -1328,7 +1328,7 @@ void tTJSNI_VideoOverlay::ClearWndProcMessages()
 {
 	// clear WndProc's message queue
 	MSG msg;
-	while(PeekMessage(&msg, UtilWindow, WM_GRAPHNOTIFY, WM_GRAPHNOTIFY+2, PM_REMOVE))
+	while(PeekMessage(&msg, EventQueue.GetOwner(), WM_GRAPHNOTIFY, WM_GRAPHNOTIFY+2, PM_REMOVE))
 	{
 		if(VideoOverlay)
 		{

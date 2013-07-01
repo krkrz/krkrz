@@ -4409,7 +4409,7 @@ void tTJSNI_BaseLayer::SetFontItalic(bool b)
 //---------------------------------------------------------------------------
 bool tTJSNI_BaseLayer::GetFontItalic() const
 {
-	return Font.Flags & TVP_TF_ITALIC;
+	return 0!=(Font.Flags & TVP_TF_ITALIC);
 }
 //---------------------------------------------------------------------------
 void tTJSNI_BaseLayer::SetFontStrikeout(bool b)
