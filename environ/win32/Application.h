@@ -18,56 +18,7 @@ enum {
 	mrAbort,
 	mrCancel,
 };
-// イベントハンドラについては要検討
-class SystemEvent {
-public:
-	LRESULT Result;
-	HWND HWnd;
-	UINT Message;
-	WPARAM WParam;
-	LPARAM LParam;
-};
 
-class IMessageHandler {
-public:
-	virtual void Handle( SystemEvent& message ) = 0;
-};
-
-class EventDispatcher {
-	HWND window_handle_;
-public:
-	IMessageHandler* mHandler;
-	static LRESULT CALLBACK WindowsProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
-		EventDispatcher	*dispatcher = reinterpret_cast<EventDispatcher*>(GetWindowLong(hWnd,GWL_USERDATA));
-		if( dispatcher != NULL ) {
-			SystemEvent ev;
-			ev.HWnd = hWnd;
-			ev.Message = message;
-			ev.WParam = wParam;
-			ev.LParam = lParam;
-			ev.Result = 0;
-			dispatcher->Handle( ev );
-			return ev.Result;
-		}
-		return DefWindowProc( hWnd, message, wParam, lParam );
-	}
-	HWND AllocateHWnd() {
-		const TCHAR* classname = _T("TPUtilWindow");
-		WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC, WindowsProcedure, 0L, 0L,
-							GetModuleHandle(NULL), NULL, NULL, NULL, NULL,
-							classname, NULL };
-		::RegisterClassEx( &wc );
-		window_handle_ = ::CreateWindow( classname, _T(""),
-							WS_OVERLAPPEDWINDOW, 0, 0, 0, 0,
-							NULL, NULL, wc.hInstance, NULL );
-		if( window_handle_ == NULL )
-			return NULL;
-		//::SetWindowLong(window_handle_,GWL_USERDATA,(LONG)this);
-		::SetWindowLongPtr( window_handle_, GWLP_USERDATA, (LONG_PTR)this ); // for x64
-		return window_handle_;
-	} 
-	virtual void Handle( SystemEvent& message ) = 0;
-};
 class AcceleratorKey {
 	HACCEL hAccel_;
 	ACCEL* keys_;
@@ -99,7 +50,6 @@ public:
 	}
 };
 class TApplication {
-	std::vector<EventDispatcher*> dispatcher_;
 	std::vector<class TTVPWindowForm*> windows_list_;
 	tstring title_;
 
@@ -133,28 +83,9 @@ public:
 	}
 	void RemoveWindow( class TTVPWindowForm* win );
 
-	void ProcessMessages() {
-#if 0
-		int count = dispatcher_.size();
-		for( int i = 0; i < count; i++ ) {
-			if( dispatcher_[i]->HWnd != INVALID_HANDLE_VALUE ) {
-				MSG msg;
-				HWND hWnd = dispatcher_[i]->HWnd;
-				while(true) {
-					if( PeekMessage( &msg,NULL,0,0,PM_NOREMOVE) ) {
-						SystemEvent event={};
-						if( !GetMessage( &msg,NULL,0,0) ) break;
-						TranslateMessage(&msg);
-						DispatchMessage(&msg);
-					} else {
-						break;
-					}
-				}
-			}
-		}
-#endif
-	}
-	void HandleMessage() {}
+	void ProcessMessages();
+	void HandleMessage();
+
 	tstring GetTitle() const { return title_; }
 	void SetTitle( const tstring& caption );
 

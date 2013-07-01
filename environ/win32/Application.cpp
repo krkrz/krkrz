@@ -366,6 +366,31 @@ void TApplication::Run() {
 	}
 }
 
+void TApplication::ProcessMessages() {
+	MSG msg = {0};
+	while( ::PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE) && msg.message != WM_QUIT ) {
+		BOOL ret = ::GetMessage( &msg, NULL, 0, 0);
+		HACCEL hAccelTable = accel_key_.GetHandle(msg.hwnd);
+		if( ret && !TranslateAccelerator(msg.hwnd, hAccelTable, &msg) ) {
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+	}
+}
+void TApplication::HandleMessage() {
+	MSG msg = {0};
+	BOOL hasMes = FALSE;
+	if( (hasMes = ::PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE)) && msg.message != WM_QUIT ) {
+		BOOL ret = ::GetMessage( &msg, NULL, 0, 0);
+		HACCEL hAccelTable = accel_key_.GetHandle(msg.hwnd);
+		if( ret && !TranslateAccelerator(msg.hwnd, hAccelTable, &msg) ) {
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+	} else if( hasMes == FALSE ) {
+		// –{—ˆ‚ÍIdle ˆ—‚ª“ü‚Á‚Ä‚¢‚é‚¯‚ÇA‚±‚±‚Å‚Ís‚í‚È‚¢
+	}
+}
 void TApplication::SetTitle( const tstring& caption ) {
 	title_ = caption;
 	if( windows_list_.size() > 0 ) {
