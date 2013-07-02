@@ -207,10 +207,10 @@
     <ClInclude Include="..\utils\Random.h" />
     <ClInclude Include="..\utils\ThreadIntf.h" />
     <ClInclude Include="..\utils\TickCount.h" />
+    <ClInclude Include="..\utils\TimerImpl.h" />
     <ClInclude Include="..\utils\TimerIntf.h" />
     <ClInclude Include="..\utils\uni_cp932.h" />
     <ClInclude Include="..\utils\win32\ThreadImpl.h" />
-    <ClInclude Include="..\utils\win32\TimerImpl.h" />
     <ClInclude Include="..\visual\argb.h" />
     <ClInclude Include="..\visual\CharacterData.h" />
     <ClInclude Include="..\visual\ComplexRect.h" />
@@ -343,13 +343,12 @@
     <ClCompile Include="..\utils\Random.cpp" />
     <ClCompile Include="..\utils\ThreadIntf.cpp" />
     <ClCompile Include="..\utils\TickCount.cpp" />
+    <ClCompile Include="..\utils\TimerImpl.cpp" />
     <ClCompile Include="..\utils\TimerIntf.cpp" />
     <ClCompile Include="..\utils\uni_cp932.cpp" />
     <ClCompile Include="..\utils\win32\ClipboardImpl.cpp" />
-    <ClCompile Include="..\utils\win32\DebugImpl.cpp" />
     <ClCompile Include="..\utils\win32\MiscUtility.cpp" />
     <ClCompile Include="..\utils\win32\ThreadImpl.cpp" />
-    <ClCompile Include="..\utils\win32\TimerImpl.cpp" />
     <ClCompile Include="..\visual\CharacterData.cpp" />
     <ClCompile Include="..\visual\ComplexRect.cpp" />
     <ClCompile Include="..\visual\FontSystem.cpp" />

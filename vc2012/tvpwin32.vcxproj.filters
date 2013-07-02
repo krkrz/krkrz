@@ -406,9 +406,6 @@
     <ClInclude Include="..\utils\win32\ThreadImpl.h">
       <Filter>utils\win32</Filter>
     </ClInclude>
-    <ClInclude Include="..\utils\win32\TimerImpl.h">
-      <Filter>utils\win32</Filter>
-    </ClInclude>
     <ClInclude Include="..\utils\ClipboardIntf.h">
       <Filter>utils</Filter>
     </ClInclude>
@@ -519,6 +516,9 @@
     </ClInclude>
     <ClInclude Include="..\platform\win32\NativeEventQueue.h">
       <Filter>platform\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utils\TimerImpl.h">
+      <Filter>utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -804,13 +804,7 @@
     <ClCompile Include="..\utils\win32\ClipboardImpl.cpp">
       <Filter>utils\win32</Filter>
     </ClCompile>
-    <ClCompile Include="..\utils\win32\DebugImpl.cpp">
-      <Filter>utils\win32</Filter>
-    </ClCompile>
     <ClCompile Include="..\utils\win32\ThreadImpl.cpp">
-      <Filter>utils\win32</Filter>
-    </ClCompile>
-    <ClCompile Include="..\utils\win32\TimerImpl.cpp">
       <Filter>utils\win32</Filter>
     </ClCompile>
     <ClCompile Include="..\utils\ClipboardIntf.cpp">
@@ -905,6 +899,9 @@
     </ClCompile>
     <ClCompile Include="..\platform\win32\NativeEventQueue.cpp">
       <Filter>platform\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utils\TimerImpl.cpp">
+      <Filter>utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
