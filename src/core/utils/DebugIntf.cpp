@@ -22,6 +22,7 @@
 #endif // ENABLE_DEBUGGER
 
 #include "Application.h"
+#include "MainFormUnit.h"
 //---------------------------------------------------------------------------
 // global variables
 //---------------------------------------------------------------------------
@@ -643,7 +644,17 @@ TJS_END_NATIVE_STATIC_PROP_DECL(clearLogFileOnError)
 	TVPAddImportantLog(ttstr(TVPVersionInformation2));
 } // end of tTJSNC_Debug::tTJSNC_Debug
 //---------------------------------------------------------------------------
-
+tTJSNativeInstance *tTJSNC_Debug::CreateNativeInstance()
+{
+	return NULL;
+}
+//---------------------------------------------------------------------------
+tTJSNativeClass * TVPCreateNativeClass_Debug()
+{
+	tTJSNativeClass *cls = new tTJSNC_Debug();
+	return cls;
+}
+//---------------------------------------------------------------------------
 
 
 
@@ -731,4 +742,13 @@ iTJSConsoleOutput *TVPGetTJS2DumpOutputGateway()
 }
 //---------------------------------------------------------------------------
 
+
+//---------------------------------------------------------------------------
+// on-error hook
+//---------------------------------------------------------------------------
+void TVPOnErrorHook()
+{
+	if(TVPMainForm) TVPMainForm->NotifySystemError();
+}
+//---------------------------------------------------------------------------
 

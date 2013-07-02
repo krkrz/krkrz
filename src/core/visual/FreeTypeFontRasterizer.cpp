@@ -4,6 +4,7 @@
 #include "LayerBitmapIntf.h"
 #include "FreeType.h"
 #include <math.h>
+#include "MsgIntf.h"
 
 FreeTypeFontRasterizer::FreeTypeFontRasterizer() : RefCount(0), Face(NULL), LastBitmap(NULL) {
 }
@@ -49,7 +50,7 @@ void FreeTypeFontRasterizer::ApplyFont( class tTVPNativeBaseBitmap *bmp, bool fo
 			Face = new tFreeTypeFace( stdname, opt );
 			recreate = true;
 		}
-		Face->SetHeight( font.Height );
+		Face->SetHeight( font.Height < 0 ? -font.Height : font.Height );
 		if( recreate == false ) {
 			if( font.Flags & TVP_TF_ITALIC ) {
 				Face->SetOption(TVP_TF_ITALIC);
@@ -106,6 +107,9 @@ tTVPCharacterData* FreeTypeFontRasterizer::GetBitmap( const tTVPFontAndCharacter
 		//Face->ClearOption( TVP_FACE_OPTIONS_FORCE_AUTO_HINTING );
 	}
 	tTVPCharacterData* data = Face->GetGlyphFromCharcode(font.Character);
+	if( data == NULL ) {
+		TVPThrowExceptionMessage( TJS_W("Font Rasterize error.") );
+	}
 
 	int cx = data->Metrics.CellIncX;
 	int cy = data->Metrics.CellIncY;
