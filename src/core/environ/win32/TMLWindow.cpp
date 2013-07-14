@@ -345,7 +345,16 @@ HRESULT Window::CreateWnd( const tstring& classname, const tstring& title, int w
 	wc.hIconSm = ::LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_TVPWIN32));
 	BOOL ClassRegistered = ::GetClassInfoEx( wc.hInstance, wc.lpszClassName, &wc );
 	if( ClassRegistered == 0 ) {
-		::RegisterClassEx( &wc );
+		if( ::RegisterClassEx( &wc ) == 0 ) {
+#ifdef _DEBUG
+			LPVOID lpMsgBuf;
+			::FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+				NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, NULL );
+			::OutputDebugString( (LPCWSTR)lpMsgBuf );
+			::LocalFree(lpMsgBuf);
+#endif
+			return HRESULT_FROM_WIN32(::GetLastError());
+		}
 	}
 	wc_ = wc;
 
@@ -354,13 +363,22 @@ HRESULT Window::CreateWnd( const tstring& classname, const tstring& title, int w
 	window_handle_ = ::CreateWindowEx( DEFAULT_EX_STYLE, window_class_name_.c_str(), window_title_.c_str(),
 						WS_OVERLAPPEDWINDOW, 0, 0, winRc.right-winRc.left, winRc.bottom-winRc.top,
 						NULL, NULL, wc.hInstance, NULL );
-
-	if( window_handle_ == NULL )
+	
+	if( window_handle_ == NULL ) {
+#ifdef _DEBUG
+		LPVOID lpMsgBuf;
+		::FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+			NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, NULL );
+		::OutputDebugString( (LPCWSTR)lpMsgBuf );
+		::LocalFree(lpMsgBuf);
+#endif
 		return HRESULT_FROM_WIN32(::GetLastError());
+	}
 	created_ = true;
 	ime_control_ = new ImeControl(window_handle_);
 	border_style_ = bsSizeable;
-
+	
+    ::SetWindowLongPtr( window_handle_, GWLP_WNDPROC, (LONG_PTR)Window::WndProc );
 	::SetWindowLongPtr( window_handle_, GWLP_USERDATA, (LONG_PTR)this );
 
 	//::ShowWindow(window_handle_,SW_SHOWDEFAULT);
@@ -545,16 +563,19 @@ void Window::SetBorderStyle(tTVPBorderStyle st) {
 	case bsSingle:
 		style = ~notStyle;
 		style = WS_CAPTION | WS_BORDER;
+		style |= WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU | WS_EX_CONTEXTHELP; // 必要みたい
 		exStyle &= ~DEFAULT_EX_STYLE;
 		break;
 	case bsNone:
 		style = ~notStyle;
 		style = WS_POPUP;
+		style |= WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU | WS_EX_CONTEXTHELP; // 必要みたい
 		exStyle &= ~DEFAULT_EX_STYLE;
 		break;
 	case bsSizeable:
 		style = ~notStyle;
 		style = WS_OVERLAPPED;
+		style |= WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU | WS_EX_CONTEXTHELP; // 必要みたい
 		exStyle &= ~DEFAULT_EX_STYLE;
 		break;
 	case bsToolWindow:

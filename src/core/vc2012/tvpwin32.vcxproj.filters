@@ -208,9 +208,6 @@
     <ClInclude Include="..\base\win32\PluginImpl.h">
       <Filter>base\win32</Filter>
     </ClInclude>
-    <ClInclude Include="..\base\win32\ScriptMgnImpl.h">
-      <Filter>base\win32</Filter>
-    </ClInclude>
     <ClInclude Include="..\base\win32\StorageImpl.h">
       <Filter>base\win32</Filter>
     </ClInclude>

@@ -791,14 +791,7 @@ void TVPInitializeBaseSystems()
 
 	// set default current directory
 	{
-		//char drive[MAXDRIVE];
-		//char dir[MAXDIR];
-		//fnsplit(_argv[0], drive, dir, NULL, NULL);
-		//ttstr curdir(ttstr(drive)  + ttstr(dir));
-		tstring path = ( ExePath() );
-		ttstr curdir(path);
-		if(curdir.GetLastChar() != TJS_W('\\')) curdir += TJS_W('\\');
-		TVPSetCurrentDirectory(curdir);
+		TVPSetCurrentDirectory( IncludeTrailingBackslash(ExtractFileDir(ExePath())) );
 	}
 
 	// load message map file
@@ -902,6 +895,8 @@ void TVPBeforeSystemInit()
 		}
 		else
 		{
+			TCHAR exeDir[MAX_PATH];
+			_tcscpy(exeDir, IncludeTrailingBackslash(ExtractFileDir(ExePath())).c_str());
 			for(tjs_int i = 1; i<_argc; i++)
 			{
 				if(_argv[i][0] == '-' && _argv[i][1] == '-' && _argv[i][2] == 0)
@@ -910,6 +905,7 @@ void TVPBeforeSystemInit()
 				if(_argv[i][0] != '-')
 				{
 					// TODO: set the current directory
+					::SetCurrentDirectory( exeDir );
 					_tcsncpy(buf, ttstr(_argv[i]).c_str(), MAX_PATH-1);
 					buf[MAX_PATH-1] = '\0';
 					if(DirectoryExists(buf)) // is directory?
@@ -1308,13 +1304,11 @@ void TVPTerminateAsync(int code)
 	TVPTerminateCode = code;
 
 	// posting dummy message will prevent "missing WM_QUIT bug" in DirectDraw framework.
-	if(TVPMainForm)
-		::PostMessage(TVPMainForm->GetHandle(), WM_USER+0x31/*dummy msg*/, 0, 0);
+	if(TVPMainForm) TVPMainForm->CallDeliverAllEventsOnIdle();
 
 	Application->Terminate();
 
-	if(TVPMainForm)
-		::PostMessage(TVPMainForm->GetHandle(), WM_USER+0x31/*dummy msg*/, 0, 0);
+	if(TVPMainForm) TVPMainForm->CallDeliverAllEventsOnIdle();
 }
 //---------------------------------------------------------------------------
 void TVPTerminateSync(int code)
@@ -1327,7 +1321,7 @@ void TVPTerminateSync(int code)
 void TVPMainWindowClosed()
 {
 	// called from WindowIntf.cpp, caused by closing all window.
-	if(TVPMainForm && !TVPMainForm->GetVisible() && TVPTerminateOnWindowClose) TVPTerminateAsync();
+	if( TVPTerminateOnWindowClose) TVPTerminateAsync();
 }
 //---------------------------------------------------------------------------
 

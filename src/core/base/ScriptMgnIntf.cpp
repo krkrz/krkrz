@@ -39,6 +39,9 @@
 #include "PhaseVocoderFilter.h"
 #include "PassThroughDrawDevice.h"
 #include "BinaryStream.h"
+#include "SysInitImpl.h"
+#include "MainFormUnit.h"
+#include "Application.h"
 
 //---------------------------------------------------------------------------
 // Script system initialization script
@@ -1041,6 +1044,85 @@ bool TVPProcessUnhandledException(eTJS &e)
 }
 //---------------------------------------------------------------------------
 
+//---------------------------------------------------------------------------
+void TVPStartObjectHashMap()
+{
+	// addref ObjectHashMap if the program is being debugged.
+	if(TJSEnableDebugMode)
+		TJSAddRefObjectHashMap();
+}
+
+//---------------------------------------------------------------------------
+// TVPBeforeProcessUnhandledException
+//---------------------------------------------------------------------------
+void TVPBeforeProcessUnhandledException()
+{
+	TVPDumpHWException();
+}
+//---------------------------------------------------------------------------
+
+
+
+
+//---------------------------------------------------------------------------
+// TVPShowScriptException
+//---------------------------------------------------------------------------
+/*
+	These functions display the error location, reason, etc.
+	And disable the script event dispatching to avoid massive occurrence of
+	errors.
+*/
+//---------------------------------------------------------------------------
+void TVPShowScriptException(eTJS &e)
+{
+	TVPSetSystemEventDisabledState(true);
+	TVPOnError();
+
+	if(!TVPSystemUninitCalled)
+	{
+		ttstr errstr = (ttstr(TVPScriptExceptionRaised) + TJS_W("\n") + e.GetMessage());
+		TVPAddLog(ttstr(TVPScriptExceptionRaised) + TJS_W("\n") + e.GetMessage());
+		//MessageDlg(errstr.AsStdString(), mtError, TMsgDlgButtons() << mbOK, 0);
+
+		Application->MessageDlg( errstr.AsStdString(), std::wstring(), mtError, mbOK );
+	}
+//	throw EAbort("Script Error Abortion");
+}
+//---------------------------------------------------------------------------
+void TVPShowScriptException(eTJSScriptError &e)
+{
+	TVPSetSystemEventDisabledState(true);
+	TVPOnError();
+
+	if(!TVPSystemUninitCalled)
+	{
+		ttstr errstr = (ttstr(TVPScriptExceptionRaised) + TJS_W("\n") + e.GetMessage());
+		TVPAddLog(ttstr(TVPScriptExceptionRaised) + TJS_W("\n") + e.GetMessage());
+		if(e.GetTrace().GetLen() != 0)
+			TVPAddLog(ttstr(TJS_W("trace : ")) + e.GetTrace());
+		//Application->MessageBox( errstr.AsStdString().c_str(), Application->GetTitle().c_str(), MB_OK|MB_ICONSTOP );
+		Application->MessageDlg( errstr.AsStdString(), Application->GetTitle(), mtStop, mbOK );
+	}
+}
+//---------------------------------------------------------------------------
+
+
+
+//---------------------------------------------------------------------------
+// TVPInitializeStartupScript
+//---------------------------------------------------------------------------
+void TVPInitializeStartupScript()
+{
+	TVPStartObjectHashMap();
+
+	TVPExecuteStartupScript();
+	if(TVPTerminateOnNoWindowStartup && TVPGetWindowCount() == 0 ) {
+		// no window is created and main window is invisible
+		Application->Terminate();
+	}
+}
+//---------------------------------------------------------------------------
+
 
 
 
@@ -1282,6 +1364,25 @@ tTJSNativeInstance * tTJSNC_Scripts::CreateNativeInstance()
 	TVPThrowExceptionMessage(TVPCannotCreateInstance);
 
 	return NULL;
+}
+//---------------------------------------------------------------------------
+
+
+//---------------------------------------------------------------------------
+// TVPCreateNativeClass_Scripts
+//---------------------------------------------------------------------------
+tTJSNativeClass * TVPCreateNativeClass_Scripts()
+{
+	tTJSNC_Scripts *cls = new tTJSNC_Scripts();
+
+	// setup some platform-specific members
+
+//----------------------------------------------------------------------
+
+// currently none
+
+//----------------------------------------------------------------------
+	return cls;
 }
 //---------------------------------------------------------------------------
 

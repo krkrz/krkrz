@@ -1,0 +1,113 @@
+//Scripts.evalStorage("fontselect.tjs");
+System.doFontSelect = function {
+	// 遅延読み込み
+	Scripts.evalStorage("fontselect.tjs");
+	return global.System.doFontSelect(...);
+} incontextof global;
+
+System.inputString = function {
+	// System.inputStringの互換実装
+	Scripts.evalStorage("inputstring.tjs");
+	return global.System.inputString(...);
+} incontextof global;
+
+@if (kirikiriz)
+// krkrz 用メニュー拡張
+Plugins.link("menu.dll");
+@endif
+class        FontSelectTestWindow extends Window {
+	function FontSelectTestWindow { super.Window(); setup(...); }
+	function finalize {
+		System.inform("term");
+		delete global.win;
+		super.finalize(...);
+	}
+	function createMenuItem(caption, onClick) {
+		var item = new MenuItem(this, caption);
+		if (onClick !== void) item.onClick = onClick;
+		return item;
+	}
+	// [???] onCloseQueryはまだ未実装？
+	function onCloseQuery {
+		System.inform("onCloseQuery");
+		System.terminate(); // [XXX] プロセスが残るのを防ぐ
+		return super.onCloseQuery(true);
+	}
+	function setup(w, h) {
+		caption = "フォント選択サンプル";
+@if (!kirikiriz)
+		borderStyle = bsSingle; //[???] borderStyleを指定すると閉じるボタンが消える（未実装？）
+		if (typeof this.showScrollBars != "undefined")
+			/**/   this.showScrollBars  = false;
+@endif
+		setInnerSize(w, h);
+
+		var prim = new Layer(this, null);
+		with (prim) {
+			.setSize(w, h);
+			.fillRect(0, 0, w, h, 0);
+			.font.face = "ＭＳ Ｐゴシック";
+			.font.height = 32;
+			.drawText(0, 0, "abcdefghijk日本語", 0xFFFFFF);
+			.visible = true;
+		}
+		add(prim);
+
+		// [XXX] デスクトップ中央に配置
+		with (System) setPos(.desktopLeft+ (.desktopWidth -width )\2,
+							 .desktopTop + (.desktopHeight-height)\2);
+
+		var fmenu = createMenuItem("&File");
+		if (typeof global.frGDI != "undefined") {
+			fmenu.add(createMenuItem("FontSelect(&GDI)", onFontSelect1));
+			fmenu.add(createMenuItem("FontSelect(&FreeType)", onFontSelect2));
+		} else {
+			fmenu.add(createMenuItem("Font&Select", onFontSelect));
+		}
+		fmenu.add(createMenuItem("&Option", onEvalInput));
+		fmenu.add(createMenuItem("-"));
+		fmenu.add(createMenuItem("E&xit", this.close));
+		menu.add(fmenu);
+
+@if (!kirikiriz)
+		menu.visible = true; //[???] visible = trueにするとメニューバーが消える（デフォで表示）
+@endif
+	}
+	function onFontSelect1() { onFontSelect("frGDI"); }
+	function onFontSelect2() { onFontSelect("frFreeType"); }
+	function onFontSelect(fr) {
+		// cf. fontselect.tjs
+		var lay = this.primaryLayer;
+		lay.font.face = "ＭＳ ゴシック";
+		if (fr != "" && typeof global[fr] != "undefined") {
+			lay.font.rasterizer = global[fr];
+		}
+		var sel = System.doFontSelect(lay, _defaultFontFlags, "フォントの選択", "フォントを選択してください", "ABCDEFGHIあいうえお亜胃宇絵御");
+		if (sel !== void) System.inform("選択されました:"+sel);
+		else              System.inform("キャンセルされました");
+	}
+	var _defaultFontFlagsText = "fsfNoVertical | fsfTrueTypeOnly | fsfUseFontFace";
+	var _defaultFontFlags = Scripts.eval(_defaultFontFlagsText);
+
+	function onEvalInput {
+		var input = System.inputString(System.title, "Option:", _defaultFontFlagsText);
+		if (input !== void) {
+			try {
+				var flags = Scripts.eval(input);
+				if (typeof flags == "void" || typeof flags == "Integer") {
+					_defaultFontFlagsText = input;
+					_defaultFontFlags = (int)+flags;
+					System.inform("Option: 0x%X".sprintf(_defaultFontFlags));
+				}
+			} catch (e) {
+				System.inform("Exception:"+e.message);
+			}
+		}
+	}
+}
+
+
+var win = new FontSelectTestWindow(320, 240);
+win.visible = true;
+
+

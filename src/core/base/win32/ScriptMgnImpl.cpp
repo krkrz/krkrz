@@ -12,9 +12,8 @@
 
 #include "MainFormUnit.h"
 #include "WindowIntf.h"
-#include "ScriptMgnImpl.h"
+#include "ScriptMgnIntf.h"
 #include "MsgIntf.h"
-//#include "PadFormUnit.h"
 #include "tjsScriptBlock.h"
 #include "EventIntf.h"
 #include "SysInitImpl.h"
@@ -110,13 +109,7 @@ public:
 // Object Hash Map (memory leak detector) related
 //---------------------------------------------------------------------------
 static char TVPObjectHashMapLogStream[sizeof(tTVPPipeStream)];
-//---------------------------------------------------------------------------
-void TVPStartObjectHashMap()
-{
-	// addref ObjectHashMap if the program is being debugged.
-	if(TJSEnableDebugMode)
-		TJSAddRefObjectHashMap();
-}
+
 //---------------------------------------------------------------------------
 void TVPStartObjectHashMapLog(void)
 {
@@ -241,112 +234,5 @@ bool TVPCheckProcessLog()
 
 
 
-//---------------------------------------------------------------------------
-// TVPBeforeProcessUnhandledException
-//---------------------------------------------------------------------------
-void TVPBeforeProcessUnhandledException()
-{
-	TVPDumpHWException();
-}
-//---------------------------------------------------------------------------
 
-
-
-
-//---------------------------------------------------------------------------
-// TVPShowScriptException
-//---------------------------------------------------------------------------
-/*
-	These functions display the error location, reason, etc.
-	And disable the script event dispatching to avoid massive occurrence of
-	errors.
-*/
-//---------------------------------------------------------------------------
-void TVPShowScriptException(eTJS &e)
-{
-	TVPSetSystemEventDisabledState(true);
-	TVPOnError();
-
-	if(!TVPSystemUninitCalled)
-	{
-		if(TVPMainForm) TVPMainForm->SetVisible( true );
-		ttstr errstr = (ttstr(TVPScriptExceptionRaised) + TJS_W("\n") + e.GetMessage());
-		TVPAddLog(ttstr(TVPScriptExceptionRaised) + TJS_W("\n") + e.GetMessage());
-		//MessageDlg(errstr.AsStdString(), mtError, TMsgDlgButtons() << mbOK, 0);
-		MessageDlg(errstr.AsStdString(), mtError, MB_OK, 0);
-	}
-//	throw EAbort("Script Error Abortion");
-}
-//---------------------------------------------------------------------------
-void TVPShowScriptException(eTJSScriptError &e)
-{
-	TVPSetSystemEventDisabledState(true);
-	TVPOnError();
-
-	if(!TVPSystemUninitCalled)
-	{
-
-		if(TVPMainForm) TVPMainForm->SetVisible( true );
-#pragma message( __LOC__ "TODO PadƒNƒ‰ƒX–³Œø‰»" )
-#if 0 // Not use pad class
-		TTVPPadForm *pad = new TTVPPadForm(Application);
-		pad->FreeOnTerminate = true;
-		pad->ExecButtonEnabled = false;
-		pad->SetLines(e.GetBlockNoAddRef()->GetScript());
-		pad->GoToLine(1+e.GetBlockNoAddRef()->SrcPosToLine(e.GetPosition() )
-			- e.GetBlockNoAddRef()->GetLineOffset());
-		pad->ReadOnly = true;
-		pad->StatusText = e.GetMessage();
-		pad->Caption = ttstr(TVPExceptionCDPName).AsStdString();
-		pad->Visible = true;
-#endif
-		ttstr errstr = (ttstr(TVPScriptExceptionRaised) + TJS_W("\n") + e.GetMessage());
-		TVPAddLog(ttstr(TVPScriptExceptionRaised) + TJS_W("\n") + e.GetMessage());
-		if(e.GetTrace().GetLen() != 0)
-			TVPAddLog(ttstr(TJS_W("trace : ")) + e.GetTrace());
-		//Application->MessageBox( errstr.AsStdString().c_str(), Application->GetTitle().c_str(), MB_OK|MB_ICONSTOP );
-		::MessageBox( NULL, errstr.AsStdString().c_str(), Application->GetTitle().c_str(), MB_OK|MB_ICONSTOP );
-		//	throw EAbort("Script Error Abortion");
-	}
-}
-//---------------------------------------------------------------------------
-
-
-
-//---------------------------------------------------------------------------
-// TVPInitializeStartupScript
-//---------------------------------------------------------------------------
-void TVPInitializeStartupScript()
-{
-	TVPStartObjectHashMap();
-
-	TVPExecuteStartupScript();
-	if(TVPTerminateOnNoWindowStartup && TVPGetWindowCount() == 0 && (TVPMainForm && !TVPMainForm->GetVisible()))
-	{
-		// no window is created and main window is invisible
-		Application->Terminate();
-	}
-}
-//---------------------------------------------------------------------------
-
-
-
-
-//---------------------------------------------------------------------------
-// TVPCreateNativeClass_Scripts
-//---------------------------------------------------------------------------
-tTJSNativeClass * TVPCreateNativeClass_Scripts()
-{
-	tTJSNC_Scripts *cls = new tTJSNC_Scripts();
-
-	// setup some platform-specific members
-
-//----------------------------------------------------------------------
-
-// currently none
-
-//----------------------------------------------------------------------
-	return cls;
-}
-//---------------------------------------------------------------------------
 

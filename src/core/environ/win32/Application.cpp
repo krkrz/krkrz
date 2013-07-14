@@ -12,7 +12,6 @@
 #include "DebugIntf.h"
 #include "MsgIntf.h"
 #include "ScriptMgnIntf.h"
-#include "ScriptMgnImpl.h"
 #include "tjsError.h"
 #include "PluginImpl.h"
 #include "SystemIntf.h"

@@ -38,7 +38,7 @@ extern void TVPStartLogToFile(bool clear);
 //---------------------------------------------------------------------------
 // implement in each platform
 //---------------------------------------------------------------------------
-extern void TVPOnErrorHook();
+//extern void TVPOnErrorHook();
 	// called from TVPOnError, on system error.
 //---------------------------------------------------------------------------
 

@@ -3057,7 +3057,10 @@ void tTJSNI_WaveSoundBuffer::SetVolumeToSoundBuffer()
 			// TVPSoundGlobalFocusModeByOption which is more restrictive.
 			tTVPSoundGlobalFocusMode mode =
 				GlobalFocusMode > TVPSoundGlobalFocusModeByOption ?
-					GlobalFocusMode : TVPSoundGlobalFocusModeByOption;
+				GlobalFocusMode : TVPSoundGlobalFocusModeByOption;
+				
+#pragma message ( __LOC__ "TODO 仕様として、最小化や非アクティブでの無音化を削除するか" )
+			/*
 			switch(mode)
 			{
 			case sgfmNeverMute:
@@ -3074,6 +3077,7 @@ void tTJSNI_WaveSoundBuffer::SetVolumeToSoundBuffer()
 					mutevol = TVPSoundGlobalFocusMuteVolume;
 				break;
 			}
+			*/
 		}
 
 		// compute volume for each buffer

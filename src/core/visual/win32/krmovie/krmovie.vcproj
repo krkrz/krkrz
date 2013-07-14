@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="shift_jis"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="9.00"
 	Name="krmovie"
 	ProjectGUID="{2315E2BC-8321-4A8F-B551-06BA07255854}"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -51,7 +52,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="&quot;C:\Program Files\Microsoft SDKs\Windows\v6.0\Samples\Multimedia\DirectShow\BaseClasses&quot;;..\;..\..\..\..\plugins\win32;&quot;C:\WMSDK\WMFSDK9\include&quot;;"
+				AdditionalIncludeDirectories="&quot;C:\Program Files\Microsoft SDKs\Windows\v7.0\Samples\multimedia\directshow\baseclasses&quot;;..\;..\..\..\..\plugins\win32;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;KRMOVIE_EXPORTS;_WIN32_WINNT=0x0400;WINVER=0x0500;NO_DSHOW_STRSAFE"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -79,7 +80,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/COMMENT:&quot;(--has-option--)&quot;"
-				AdditionalDependencies="odbc32.lib odbccp32.lib version.lib winmm.lib strmiids.lib quartz.lib &quot;C:\Program Files\Microsoft SDKs\Windows\v6.0\Samples\Multimedia\DirectShow\BaseClasses\Release_MBCS\strmbase.lib&quot; dmoguids.lib"
+				AdditionalDependencies="odbc32.lib odbccp32.lib version.lib winmm.lib strmiids.lib quartz.lib &quot;C:\Program Files\Microsoft SDKs\Windows\v7.0\Samples\multimedia\directshow\baseclasses\Release_MBCS\strmbase.lib&quot; dmoguids.lib"
 				OutputFile=".\..\..\..\..\..\bin\win32/krmovie.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -89,6 +90,8 @@
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				BaseAddress="0x62000000"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary=".\..\..\..\..\..\bin\win32/krmovie.lib"
 				TargetMachine="1"
 			/>
@@ -109,9 +112,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -151,7 +151,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;C:\Program Files\Microsoft DirectX SDK (February 2007)\Samples\C++\DirectShow\BaseClasses&quot;;..\..\..\..\plugins\win32;&quot;C:\WMSDK\WMFSDK9\include&quot;;"
+				AdditionalIncludeDirectories="&quot;C:\Program Files\Microsoft SDKs\Windows\v7.0\Samples\multimedia\directshow\baseclasses&quot;;..\..\..\..\plugins\win32;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;KRMOVIE_EXPORTS;DEBUG;_WIN32_WINNT=0x400"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -178,7 +178,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/COMMENT:&quot;(--has-option--)&quot;"
-				AdditionalDependencies="odbc32.lib odbccp32.lib version.lib winmm.lib strmiids.lib quartz.lib &quot;C:\Program Files\Microsoft DirectX SDK (February 2007)\Samples\C++\DirectShow\BaseClasses\Debug\strmbasd.lib&quot; dmoguids.lib"
+				AdditionalDependencies="odbc32.lib odbccp32.lib version.lib winmm.lib strmiids.lib quartz.lib &quot;C:\Program Files\Microsoft SDKs\Windows\v7.0\Samples\multimedia\directshow\baseclasses\Debug_MBCS\strmbasd.lib&quot; dmoguids.lib"
 				OutputFile=".\..\..\..\..\..\bin\win32/krmovie.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -187,6 +187,8 @@
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\..\..\..\..\bin\win32/krmovie.pdb"
 				BaseAddress="0x62000000"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary=".\..\..\..\..\..\bin\win32/krmovie.lib"
 				TargetMachine="1"
 			/>
@@ -207,9 +209,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
