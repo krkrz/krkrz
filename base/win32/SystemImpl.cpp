@@ -480,8 +480,8 @@ static void TVPGetDesktopRect(tTVPRect &dest)
 
 
 
-
-
+// アプリのアクティブ、非アクティブはなくなった
+#if 0
 //---------------------------------------------------------------------------
 // System.onActivate and System.onDeactivate related
 //---------------------------------------------------------------------------
@@ -525,8 +525,7 @@ static void TVPOnApplicationActivate(bool activate_or_deactivate)
 	TVPFireOnApplicationActivateEvent(activate_or_deactivate);
 }
 //---------------------------------------------------------------------------
-
-
+#endif
 
 
 
@@ -882,6 +881,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(desktopHeight)
 }
 TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, desktopHeight)
 //----------------------------------------------------------------------
+#if 0 // アプリ最前面はなくなった
 TJS_BEGIN_NATIVE_PROP_DECL(stayOnTop)
 {
 	TJS_BEGIN_NATIVE_PROP_GETTER
@@ -900,7 +900,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(stayOnTop)
 }
 TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, stayOnTop)
 //----------------------------------------------------------------------
-
+#endif
 
 	return cls;
 

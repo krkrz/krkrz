@@ -15,6 +15,7 @@ Windows Mediaƒtƒ@ƒCƒ‹‚ğ“Ç‚İ‚Ş
 #define __WM_READER_H__
 
 #include <windows.h>
+#include <tchar.h>
 #include <streams.h>
 #include <dshow.h>
 #include <atlcomcli.h>

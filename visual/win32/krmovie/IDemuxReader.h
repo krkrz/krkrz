@@ -17,6 +17,7 @@
 
 #include <windows.h>
 //#include <dshow.h>
+#include <tchar.h>
 #include <streams.h>
 #include <dshow.h>
 #include <wmsdk.h>

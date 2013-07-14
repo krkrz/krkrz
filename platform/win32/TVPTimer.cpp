@@ -13,27 +13,47 @@ TVPTimer::~TVPTimer() {
 	}
 }
 int TVPTimer::CreateUtilWindow() {
+	::ZeroMemory( &wc_, sizeof(wc_) );
 	wc_.cbSize = sizeof(WNDCLASSEX);
-	wc_.style = 0;
-	wc_.lpfnWndProc = TVPTimer::WndProc;
-	wc_.cbClsExtra = 0;
-	wc_.cbWndExtra = 0;
+	//wc_.style = 0;
+	//wc_.lpfnWndProc = TVPTimer::WndProc;
+	wc_.lpfnWndProc = ::DefWindowProc;
+	//wc_.cbClsExtra = 0;
+	//wc_.cbWndExtra = 0;
 	wc_.hInstance = ::GetModuleHandle(NULL);
-	wc_.hIcon = 0;
-	wc_.hCursor = 0;
-	wc_.hbrBackground = 0;
-	wc_.lpszMenuName = NULL;
-	wc_.lpszClassName = L"TPUtilWindow";
+	//wc_.hIcon = 0;
+	//wc_.hCursor = 0;
+	//wc_.hbrBackground = 0;
+	//wc_.lpszMenuName = NULL;
+	wc_.lpszClassName = L"TVPUtilWindow";//L"TVPTimerWindow";
 
 	BOOL ClassRegistered = ::GetClassInfoEx( wc_.hInstance, wc_.lpszClassName, &wc_ );
 	if( ClassRegistered == 0 ) {
-		::RegisterClassEx( &wc_ );
+		if( ::RegisterClassEx( &wc_ ) == 0 ) {
+#ifdef _DEBUG
+			LPVOID lpMsgBuf;
+			::FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+				NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, NULL );
+			::OutputDebugString( (LPCWSTR)lpMsgBuf );
+			::LocalFree(lpMsgBuf);
+#endif
+			return HRESULT_FROM_WIN32(::GetLastError());
+		}
 	}
 	window_handle_ = ::CreateWindowEx( WS_EX_TOOLWINDOW, wc_.lpszClassName, L"",
 						WS_POPUP, 0, 0, 0, 0, NULL, NULL, wc_.hInstance, NULL );
-
-	if( window_handle_ == NULL )
+	
+	if( window_handle_ == NULL ) {
+#ifdef _DEBUG
+		LPVOID lpMsgBuf;
+		::FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+			NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, NULL );
+		::OutputDebugString( (LPCWSTR)lpMsgBuf );
+		::LocalFree(lpMsgBuf);
+#endif
 		return HRESULT_FROM_WIN32(::GetLastError());
+	}
+    ::SetWindowLongPtr( window_handle_, GWLP_WNDPROC, (LONG_PTR)TVPTimer::WndProc );
 	::SetWindowLongPtr( window_handle_, GWLP_USERDATA, (LONG_PTR)this );
 	return S_OK;
 }

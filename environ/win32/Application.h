@@ -19,6 +19,29 @@ enum {
 	mrCancel,
 };
 
+/*
+MB_ABORTRETRYIGNORE	メッセージボックスに［中止］、［再試行］、［無視］の各プッシュボタンを表示します。
+MB_CANCELTRYCONTINUE	Windows 2000：メッセージボックスに［キャンセル］、［再実行］、［続行］の各プッシュボタンを表示します。MB_ABORTRETRYIGNORE の代わりに、このメッセージボックスタイプを使ってください。
+MB_HELP	Windows 95/98、Windows NT 4.0 以降：メッセージボックスに［ヘルプ］ボタンを追加します。ユーザーが［ヘルプ］ボタンをクリックするか F1 キーを押すと、システムはオーナーへ メッセージを送信します。
+MB_OK	メッセージボックスに［OK］プッシュボタンだけを表示します。これは既定のメッセージボックスタイプです。
+MB_OKCANCEL	メッセージボックスに［OK］、［キャンセル］の各プッシュボタンを表示します。
+MB_RETRYCANCEL	メッセージボックスに［再試行］、［キャンセル］の各プッシュボタンを表示します。
+MB_YESNO	メッセージボックスに［はい］、［いいえ］の各プッシュボタンを表示します。
+MB_YESNOCANCEL	メッセージボックスに［はい］、［いいえ］、［キャンセル］の各プッシュボタンを表示します。
+*/
+
+enum {
+  mtWarning = MB_ICONWARNING,
+  mtError = MB_ICONERROR,
+  mtInformation = MB_ICONINFORMATION,
+  mtConfirmation = MB_ICONQUESTION,
+  mtStop = MB_ICONSTOP,
+  mtCustom = 0
+};
+enum {
+	mbOK = MB_OK,
+};
+
 class AcceleratorKey {
 	HACCEL hAccel_;
 	ACCEL* keys_;
@@ -89,8 +112,8 @@ public:
 	tstring GetTitle() const { return title_; }
 	void SetTitle( const tstring& caption );
 
-	static inline int MessageDlg( const tstring& string, const tstring& caption, int type ) {
-		::MessageBox( NULL, string.c_str(), caption.c_str(), type  );
+	static inline int MessageDlg( const tstring& string, const tstring& caption, int type, int button ) {
+		return ::MessageBox( NULL, string.c_str(), caption.c_str(), type|button  );
 	}
 	void Terminate() {
 		::PostQuitMessage(0);

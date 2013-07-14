@@ -14,6 +14,7 @@
 #ifndef __DEMUX_SOURCE_H__
 #define __DEMUX_SOURCE_H__
 
+#include <tchar.h>
 #include "IDemuxReader.h"
 #include <source.h>
 #include <ctlutil.h>

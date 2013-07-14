@@ -1142,23 +1142,23 @@ void tTVPDSMovie::ParseVideoType( CMediaType &mt, const wchar_t *type )
 {
 	// note: audio-less mpeg stream must have an extension of
 	// ".mpv" .
-	if      (wcsicmp(type, L".mpg") == 0)
+	if      (_wcsicmp(type, L".mpg") == 0)
 		mt.subtype = MEDIASUBTYPE_MPEG1System;
-	else if (wcsicmp(type, L".mpeg") == 0)
+	else if (_wcsicmp(type, L".mpeg") == 0)
 		mt.subtype = MEDIASUBTYPE_MPEG1System;
-	else if (wcsicmp(type, L".mpv") == 0) 
+	else if (_wcsicmp(type, L".mpv") == 0) 
 		mt.subtype = MEDIASUBTYPE_MPEG1Video;
 //		mt.subtype = MEDIASUBTYPE_MPEG1System;
-	else if (wcsicmp(type, L".m1v") == 0) 
+	else if (_wcsicmp(type, L".m1v") == 0) 
 		mt.subtype = MEDIASUBTYPE_MPEG1Video;
-	else if (wcsicmp(type, L".dat") == 0)
+	else if (_wcsicmp(type, L".dat") == 0)
 		mt.subtype = MEDIASUBTYPE_MPEG1VideoCD;
-	else if (wcsicmp(type, L".avi") == 0)
+	else if (_wcsicmp(type, L".avi") == 0)
 		mt.subtype = MEDIASUBTYPE_Avi;
-	else if (wcsicmp(type, L".mov") == 0)
+	else if (_wcsicmp(type, L".mov") == 0)
 		mt.subtype = MEDIASUBTYPE_QTMovie;
-//	else if (wcsicmp(type, L".mp4") == 0)
-//		mt.subtype = MEDIASUBTYPE_QTMovie;
+	//else if (_wcsicmp(type, L".mp4") == 0)
+	//	mt.subtype = MFVideoFormat_H264;
 //	else if (wcsicmp(type, L".wmv") == 0)
 //		mt.subtype = SubTypeGUID_WMV3;
 	else
@@ -1171,8 +1171,8 @@ void tTVPDSMovie::ParseVideoType( CMediaType &mt, const wchar_t *type )
 //----------------------------------------------------------------------------
 bool tTVPDSMovie::IsWindowsMediaFile( const wchar_t *type ) const
 {
-	if( (wcsicmp(type, L".asf") == 0) || (wcsicmp(type, L".wma") == 0) ||
-		(wcsicmp(type, L".wmv") == 0) )
+	if( (_wcsicmp(type, L".asf") == 0) || (_wcsicmp(type, L".wma") == 0) ||
+		(_wcsicmp(type, L".wmv") == 0) )
 	{
 		return true;
 	}
@@ -1567,6 +1567,7 @@ void tTVPDSMovie::BuildMPEGGraph( IBaseFilter *pRdr, IBaseFilter *pSrc )
 
 	return;
 }
+
 //----------------------------------------------------------------------------
 //! @brief	  	WMV 用のグラフを手動で構築する
 //! @param		pRdr : レンダーフィルタ

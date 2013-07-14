@@ -16,6 +16,8 @@
 #include "OptionInfo.h"
 #include "tp_stub.h"
 #include <windows.h>
+#define COMPILE_MULTIMON_STUBS
+#include <multimon.h>
 
 #define EC_UPDATE		(EC_USER+1)
 

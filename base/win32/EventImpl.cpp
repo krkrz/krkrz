@@ -108,13 +108,13 @@ bool TVPGetBreathing()
 //---------------------------------------------------------------------------
 void TVPSetSystemEventDisabledState(bool en)
 {
-	TVPMainForm->SetEventButtonDown( !en );
+	TVPMainForm->SetEventEnabled( !en );
 	if(!en) TVPDeliverAllEvents();
 }
 //---------------------------------------------------------------------------
 bool TVPGetSystemEventDisabledState()
 {
-	return !TVPMainForm->GetEventButtonDown();
+	return !TVPMainForm->GetEventEnabled();
 }
 //---------------------------------------------------------------------------
 
