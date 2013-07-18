@@ -81,9 +81,10 @@ class TApplication {
 	FILE* oldstdout_;
 	tstring console_title_;
 	AcceleratorKeyTable accel_key_;
+	bool tarminate_;
 
 public:
-	TApplication() : is_attach_console_(false) {}
+	TApplication() : is_attach_console_(false), tarminate_(false) {}
 	void CheckConsole();
 	void CloseConsole();
 	bool IsAttachConsole() { return is_attach_console_; }
@@ -106,6 +107,7 @@ public:
 	}
 	void RemoveWindow( class TTVPWindowForm* win );
 
+	bool ProcessMessage( MSG &msg );
 	void ProcessMessages();
 	void HandleMessage();
 
@@ -147,7 +149,7 @@ public:
 	void DeleteAcceleratorKeyTable( HWND hWnd );
 };
 std::vector<std::string>* LoadLinesFromFile( const tstring& path );
-
+/*
 // スタブ、正しくは動作しないはず。
 inline HWND AllocateHWnd( LRESULT (CALLBACK *UtilWndProc)(HWND,UINT,WPARAM,LPARAM) ) {
 	
@@ -164,7 +166,7 @@ inline HWND AllocateHWnd( LRESULT (CALLBACK *UtilWndProc)(HWND,UINT,WPARAM,LPARA
 inline bool DeallocateHWnd( HWND hWnd ) {
 	return 0 != ::DestroyWindow( hWnd );
 }
-
+*/
 
 inline HINSTANCE GetHInstance() { return ((HINSTANCE)GetModuleHandle(0)); }
 extern class TApplication* Application;

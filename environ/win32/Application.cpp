@@ -328,7 +328,7 @@ void TApplication::Run() {
 	if( ( windows_list_.size() > 0 ) ) {
 		mainWnd = windows_list_[0]->GetHandle();
 	}
-	while( windows_list_.size() > 0 ) {
+	while( windows_list_.size() > 0 && tarminate_ == false ) {
 		BOOL ret = TRUE;
 		while( ::PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE) ) {
 			ret = ::GetMessage( &msg, NULL, 0, 0);
@@ -336,6 +336,7 @@ void TApplication::Run() {
 			if( ret && !TranslateAccelerator(msg.hwnd, hAccelTable, &msg) ) {
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
+				if( msg.message == WM_QUIT ) tarminate_ = true;
 			}
 		}
 		if( ret == 0 ) {
@@ -351,6 +352,7 @@ void TApplication::Run() {
 			if( dret && !TranslateAccelerator(msg.hwnd, hAccelTable, &msg) ) {
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
+				if( msg.message == WM_QUIT ) tarminate_ = true;
 			}
 			if( dret == 0 ) {
 				if( msg.hwnd == mainWnd ) break;
@@ -364,29 +366,33 @@ void TApplication::Run() {
 		}
 	}
 }
-
-void TApplication::ProcessMessages() {
-	MSG msg = {0};
-	while( ::PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE) && msg.message != WM_QUIT ) {
-		BOOL ret = ::GetMessage( &msg, NULL, 0, 0);
-		HACCEL hAccelTable = accel_key_.GetHandle(msg.hwnd);
-		if( ret && !TranslateAccelerator(msg.hwnd, hAccelTable, &msg) ) {
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
+bool TApplication::ProcessMessage( MSG &msg ) {
+	bool result = false;
+	if( ::PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE) ) {
+		BOOL msgExists = ::PeekMessage( &msg, NULL, 0, 0, PM_REMOVE);
+		if( msgExists == 0 ) {
+			return result;
+		}
+		result = true;
+		if( msg.message != WM_QUIT ) {
+			HACCEL hAccelTable = accel_key_.GetHandle(msg.hwnd);
+			if( !TranslateAccelerator(msg.hwnd, hAccelTable, &msg) ) {
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
+		} else {
+			tarminate_ = true;
 		}
 	}
+	return result;
+}
+void TApplication::ProcessMessages() {
+	MSG msg = {0};
+	while(ProcessMessage(msg));
 }
 void TApplication::HandleMessage() {
 	MSG msg = {0};
-	BOOL hasMes = FALSE;
-	if( (hasMes = ::PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE)) && msg.message != WM_QUIT ) {
-		BOOL ret = ::GetMessage( &msg, NULL, 0, 0);
-		HACCEL hAccelTable = accel_key_.GetHandle(msg.hwnd);
-		if( ret && !TranslateAccelerator(msg.hwnd, hAccelTable, &msg) ) {
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
-	} else if( hasMes == FALSE ) {
+	if( !ProcessMessage(msg) ) {
 		// ñ{óàÇÕIdle èàóùÇ™ì¸Ç¡ÇƒÇ¢ÇÈÇØÇ«ÅAÇ±Ç±Ç≈ÇÕçsÇÌÇ»Ç¢
 	}
 }

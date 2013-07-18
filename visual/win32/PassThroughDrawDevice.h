@@ -31,7 +31,7 @@ public:
 		dtNone, //!< drawer なし
 		dtDrawDib, //!< もっとも単純なdrawer
 		dtDBGDI, // GDI によるダブルバッファリングを行うdrawer
-		dtDBDD, // DirectDraw によるダブルバッファリングを行うdrawer
+		//dtDBDD, // DirectDraw によるダブルバッファリングを行うdrawer
 		dtDBD3D // Direct3D によるダブルバッファリングを行うdrawer
 	};
 
