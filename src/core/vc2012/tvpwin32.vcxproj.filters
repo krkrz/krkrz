@@ -334,9 +334,6 @@
     <ClInclude Include="..\visual\win32\krmovie.h">
       <Filter>visual\win32</Filter>
     </ClInclude>
-    <ClInclude Include="..\visual\win32\LayerBitmapImpl.h">
-      <Filter>visual\win32</Filter>
-    </ClInclude>
     <ClInclude Include="..\visual\win32\LayerImpl.h">
       <Filter>visual\win32</Filter>
     </ClInclude>
@@ -516,6 +513,21 @@
     </ClInclude>
     <ClInclude Include="..\utils\TimerImpl.h">
       <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\LayerBitmapImpl.h">
+      <Filter>visual</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\win32\BitmapBitsAlloc.h">
+      <Filter>visual\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\win32\D3D9Drawer.h">
+      <Filter>visual\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\win32\Drawer.h">
+      <Filter>visual\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\win32\GDIDrawer.h">
+      <Filter>visual\win32</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -744,9 +756,6 @@
     <ClCompile Include="..\visual\win32\GraphicsLoaderImpl.cpp">
       <Filter>visual\win32</Filter>
     </ClCompile>
-    <ClCompile Include="..\visual\win32\LayerBitmapImpl.cpp">
-      <Filter>visual\win32</Filter>
-    </ClCompile>
     <ClCompile Include="..\visual\win32\LayerImpl.cpp">
       <Filter>visual\win32</Filter>
     </ClCompile>
@@ -899,6 +908,18 @@
     </ClCompile>
     <ClCompile Include="..\utils\TimerImpl.cpp">
       <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\LayerBitmapImpl.cpp">
+      <Filter>visual</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\win32\BitmapBitsAlloc.cpp">
+      <Filter>visual\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\win32\D3D9Drawer.cpp">
+      <Filter>visual\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\win32\GDIDrawer.cpp">
+      <Filter>visual\win32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

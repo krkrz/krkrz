@@ -47,7 +47,7 @@ static bool TVPGetMainThreadPriorityControl()
 }
 
 
-TTVPMainForm::TTVPMainForm() {
+TTVPMainForm::TTVPMainForm() : EventEnable(true) {
 	ContinuousEventCalling = false;
 	AutoShowConsoleOnError = false;
 	ApplicationStayOnTop = false;
