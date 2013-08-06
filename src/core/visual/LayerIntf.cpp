@@ -3776,7 +3776,7 @@ void tTJSNI_BaseLayer::ColorRect(const tTVPRect &rect, tjs_uint32 color, tjs_int
 
 	case dfMask: // mask ( opacity will be ignored )
 		if(!MainImage) TVPThrowExceptionMessage(TVPNotDrawableLayerType);
-		ImageModified = MainImage->FillMask(destrect, color&0xff || ImageModified);
+		ImageModified = MainImage->FillMask(destrect, color&0xff ) || ImageModified;
 		break;
 
 	case dfProvince: // province ( opacity will be ignored )

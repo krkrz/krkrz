@@ -52,6 +52,8 @@ namespace TJS
 										   // value         : value property; you must
 										   //               : dereference using unary '*' operator.
 										   // the method must return true for found, false for not-found.
+#define TJS_CII_SET_SUPRECLASS	0x00000004 // register super class instance
+#define TJS_CII_GET_SUPRECLASS	0x00000005 // retrieve super class instance
 
 #define TJS_OL_LOCK				0x00000001 // Lock the object
 #define TJS_OL_UNLOCK			0x00000002 // Unlock the object

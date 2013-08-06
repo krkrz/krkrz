@@ -187,6 +187,7 @@
     <ClInclude Include="..\tjs2\tjsNamespace.h" />
     <ClInclude Include="..\tjs2\tjsNative.h" />
     <ClInclude Include="..\tjs2\tjsObject.h" />
+    <ClInclude Include="..\tjs2\tjsObjectExtendable.h" />
     <ClInclude Include="..\tjs2\tjspp.tab.h" />
     <ClInclude Include="..\tjs2\tjsRandomGenerator.h" />
     <ClInclude Include="..\tjs2\tjsRegExp.h" />
@@ -211,6 +212,7 @@
     <ClInclude Include="..\utils\uni_cp932.h" />
     <ClInclude Include="..\utils\win32\ThreadImpl.h" />
     <ClInclude Include="..\visual\argb.h" />
+    <ClInclude Include="..\visual\BitmapIntf.h" />
     <ClInclude Include="..\visual\CharacterData.h" />
     <ClInclude Include="..\visual\ComplexRect.h" />
     <ClInclude Include="..\visual\drawable.h" />
@@ -221,12 +223,14 @@
     <ClInclude Include="..\visual\FreeTypeFontRasterizer.h" />
     <ClInclude Include="..\visual\GraphicsLoaderIntf.h" />
     <ClInclude Include="..\visual\IA32\tvpgl_ia32_intf.h" />
+    <ClInclude Include="..\visual\ImageFunction.h" />
     <ClInclude Include="..\visual\LayerBitmapImpl.h" />
     <ClInclude Include="..\visual\LayerBitmapIntf.h" />
     <ClInclude Include="..\visual\LayerIntf.h" />
     <ClInclude Include="..\visual\LayerManager.h" />
     <ClInclude Include="..\visual\LoadTLG.h" />
     <ClInclude Include="..\visual\PrerenderedFont.h" />
+    <ClInclude Include="..\visual\RectItf.h" />
     <ClInclude Include="..\visual\Resampler.h" />
     <ClInclude Include="..\visual\transhandler.h" />
     <ClInclude Include="..\visual\TransIntf.h" />
@@ -330,6 +334,7 @@
     <ClCompile Include="..\tjs2\tjsNamespace.cpp" />
     <ClCompile Include="..\tjs2\tjsNative.cpp" />
     <ClCompile Include="..\tjs2\tjsObject.cpp" />
+    <ClCompile Include="..\tjs2\tjsObjectExtendable.cpp" />
     <ClCompile Include="..\tjs2\tjspp.tab.cpp" />
     <ClCompile Include="..\tjs2\tjsRandomGenerator.cpp" />
     <ClCompile Include="..\tjs2\tjsRegExp.cpp" />
@@ -352,6 +357,7 @@
     <ClCompile Include="..\utils\win32\ClipboardImpl.cpp" />
     <ClCompile Include="..\utils\win32\MiscUtility.cpp" />
     <ClCompile Include="..\utils\win32\ThreadImpl.cpp" />
+    <ClCompile Include="..\visual\BitmapIntf.cpp" />
     <ClCompile Include="..\visual\CharacterData.cpp" />
     <ClCompile Include="..\visual\ComplexRect.cpp" />
     <ClCompile Include="..\visual\FontSystem.cpp" />
@@ -359,6 +365,7 @@
     <ClCompile Include="..\visual\FreeTypeFontRasterizer.cpp" />
     <ClCompile Include="..\visual\GraphicsLoaderIntf.cpp" />
     <ClCompile Include="..\visual\IA32\tvpgl_ia32_intf.c" />
+    <ClCompile Include="..\visual\ImageFunction.cpp" />
     <ClCompile Include="..\visual\LayerBitmapImpl.cpp" />
     <ClCompile Include="..\visual\LayerBitmapIntf.cpp" />
     <ClCompile Include="..\visual\LayerIntf.cpp" />
@@ -367,6 +374,7 @@
     <ClCompile Include="..\visual\LoadPNG.cpp" />
     <ClCompile Include="..\visual\LoadTLG.cpp" />
     <ClCompile Include="..\visual\PrerenderedFont.cpp" />
+    <ClCompile Include="..\visual\RectItf.cpp" />
     <ClCompile Include="..\visual\Resampler.cpp" />
     <ClCompile Include="..\visual\TransIntf.cpp" />
     <ClCompile Include="..\visual\tvpgl.c" />

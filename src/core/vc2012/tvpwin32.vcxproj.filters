@@ -529,6 +529,18 @@
     <ClInclude Include="..\visual\win32\GDIDrawer.h">
       <Filter>visual\win32</Filter>
     </ClInclude>
+    <ClInclude Include="..\tjs2\tjsObjectExtendable.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\BitmapIntf.h">
+      <Filter>visual</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\ImageFunction.h">
+      <Filter>visual</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\RectItf.h">
+      <Filter>visual</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -920,6 +932,18 @@
     </ClCompile>
     <ClCompile Include="..\visual\win32\GDIDrawer.cpp">
       <Filter>visual\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjsObjectExtendable.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\BitmapIntf.cpp">
+      <Filter>visual</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\ImageFunction.cpp">
+      <Filter>visual</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\RectItf.cpp">
+      <Filter>visual</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
