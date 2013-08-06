@@ -27,6 +27,9 @@ extern void TVPSetFontCacheForLowMem();
 //---------------------------------------------------------------------------
 class tTVPBitmap
 {
+public:
+	static const tjs_int DEFAULT_PALETTE_COUNT = 256;
+private:
 	tjs_int RefCount;
 
 	void * Bits; // pointer to bitmap bits
@@ -36,6 +39,9 @@ class tTVPBitmap
 	tjs_int PitchStep; // step bytes to next(below) line
 	tjs_int Width; // actual width
 	tjs_int Height; // actual height
+
+	tjs_int ActualPalCount;
+	tjs_uint* Palette;
 
 public:
 	tTVPBitmap(tjs_uint width, tjs_uint height, tjs_uint bpp);
@@ -79,6 +85,10 @@ public:
 #endif
 
 	const void * GetBits() const { return Bits; }
+	const tjs_uint* GetPalette() const { return Palette; };
+	tjs_uint* GetPalette() { return Palette; };
+	tjs_uint GetPaletteCount() const { return ActualPalCount; };
+	void SetPaletteCount( tjs_uint count );
 };
 //---------------------------------------------------------------------------
 
@@ -135,6 +145,8 @@ public:
 	/* other utilities */
 	tTVPBitmap * GetBitmap() const { return Bitmap; }
 
+	tjs_uint GetPalette( tjs_uint index ) const;
+	void SetPalette( tjs_uint index, tjs_uint color );
 
 	/* font and text functions */
 private:

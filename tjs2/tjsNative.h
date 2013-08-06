@@ -11,7 +11,7 @@
 #ifndef tjsNativeH
 #define tjsNativeH
 
-#include "tjsObject.h"
+#include "tjsObjectExtendable.h"
 
 namespace TJS
 {
@@ -182,9 +182,9 @@ public:
 //---------------------------------------------------------------------------
 // tTJSNativeClass
 //---------------------------------------------------------------------------
-class tTJSNativeClass : public tTJSCustomObject
+class tTJSNativeClass : public tTJSExtendableObject
 {
-	typedef tTJSCustomObject inherited;
+	typedef tTJSExtendableObject inherited;
 
 public:
 	tTJSNativeClass(const ttstr &name);

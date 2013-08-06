@@ -79,6 +79,8 @@ struct tTVPRect
 			tTVPPoint upper_left;
 			tTVPPoint bottom_right;
 		};
+
+		tjs_int array[4];
 	};
 
 	tjs_int get_width() const { return right - left; }

@@ -364,6 +364,7 @@ tTVPBitmap::~tTVPBitmap()
 {
 	tTVPBitmapBitsAlloc::Free(Bits);
 	delete BitmapInfo;
+	if( Palette ) delete Palette;
 }
 //---------------------------------------------------------------------------
 tTVPBitmap::tTVPBitmap(const tTVPBitmap & r)
@@ -381,6 +382,10 @@ tTVPBitmap::tTVPBitmap(const tTVPBitmap & r)
 
 	// copy Bits
 	if(r.Bits) memcpy(Bits, r.Bits, r.BitmapInfo->GetImageSize() );
+	if(r.Palette) {
+		memcpy(Palette, r.Palette, sizeof(tjs_uint)*DEFAULT_PALETTE_COUNT );
+		ActualPalCount = r.ActualPalCount;
+	}
 
 	// copy pitch
 	PitchBytes = r.PitchBytes;
@@ -404,6 +409,13 @@ void tTVPBitmap::Allocate(tjs_uint width, tjs_uint height, tjs_uint bpp)
 	try
 	{
 		Bits = tTVPBitmapBitsAlloc::Alloc(BitmapInfo->GetImageSize(), width, height);
+		if( bpp == 8 ) {
+			Palette = new tjs_uint[DEFAULT_PALETTE_COUNT];
+			ActualPalCount = 0;
+		} else {
+			Palette = NULL;
+			ActualPalCount = 0;
+		}
 	}
 	catch(...)
 	{
@@ -422,6 +434,14 @@ void * tTVPBitmap::GetScanLine(tjs_uint l) const
 	}
 
 	return (BitmapInfo->GetHeight() - l -1 ) * PitchBytes + (tjs_uint8*)Bits;
+}
+//---------------------------------------------------------------------------
+void tTVPBitmap::SetPaletteCount( tjs_uint count ) {
+	if( !Is8bit() ) TVPThrowExceptionMessage(TVPInvalidOperationFor32BPP);
+	if( count >= DEFAULT_PALETTE_COUNT )
+		TVPThrowExceptionMessage(TJSRangeError);
+
+	ActualPalCount = count;
 }
 //---------------------------------------------------------------------------
 
@@ -512,6 +532,8 @@ void tTVPNativeBaseBitmap::SetSize(tjs_uint w, tjs_uint h, bool keepimage)
 
 				memcpy(ds, ss, cs);
 			}
+			if( pixelsize == 1 )
+				memcpy(newbitmap->GetPalette(), Bitmap->GetPalette(), sizeof(tjs_uint)*tTVPBitmap::DEFAULT_PALETTE_COUNT);
 		}
 
 		Bitmap->Release();
@@ -609,6 +631,22 @@ void tTVPNativeBaseBitmap::Recreate(tjs_uint w, tjs_uint h, tjs_uint bpp)
 	Bitmap->Release();
 	Bitmap = new tTVPBitmap(w, h, bpp);
 	FontChanged = true; // informs internal font information is invalidated
+}
+//---------------------------------------------------------------------------
+tjs_uint tTVPNativeBaseBitmap::GetPalette( tjs_uint index ) const {
+	if( !Is8BPP() ) TVPThrowExceptionMessage(TVPInvalidOperationFor32BPP);
+	if( index >= Bitmap->GetPaletteCount() )
+		TVPThrowExceptionMessage(TJSRangeError);
+
+	return Bitmap->GetPalette()[index];
+}
+//---------------------------------------------------------------------------
+void tTVPNativeBaseBitmap::SetPalette( tjs_uint index, tjs_uint color ) {
+	if( !Is8BPP() ) TVPThrowExceptionMessage(TVPInvalidOperationFor32BPP);
+	if( index >= Bitmap->GetPaletteCount() ) {
+		Bitmap->SetPaletteCount( index+1 );
+	}
+	Bitmap->GetPalette()[index] = color;
 }
 //---------------------------------------------------------------------------
 void tTVPNativeBaseBitmap::ApplyFont()

@@ -216,6 +216,9 @@ TVP_MSG_DECL(TVPInvalidImageSaveType,
 TVP_MSG_DECL(TVPInvalidOperationFor8BPP,
 	TJS_W("8bpp 画像に対しては行えない操作を行おうとしました"));
 
+TVP_MSG_DECL(TVPInvalidOperationFor32BPP,
+	TJS_W("32bpp 画像に対しては行えない操作を行おうとしました"));
+
 TVP_MSG_DECL(TVPSpecifyWindow,
 	TJS_W("Window クラスのオブジェクトを指定してください"));
 

@@ -295,7 +295,11 @@ void tTJSNativeClass::Finalize(void)
 //---------------------------------------------------------------------------
 iTJSDispatch2 * tTJSNativeClass::CreateBaseTJSObject()
 {
-	return new tTJSCustomObject;
+	if( SuperClass ) {
+		return new tTJSExtendableObject;
+	} else {
+		return new tTJSCustomObject;
+	}
 }
 //---------------------------------------------------------------------------
 tjs_error TJS_INTF_METHOD
@@ -307,8 +311,14 @@ tTJSNativeClass::FuncCall(tjs_uint32 flag, const tjs_char * membername,
 	if(!GetValidity())
 		return TJS_E_INVALIDOBJECT;
 
-	if(membername) return tTJSCustomObject::FuncCall(flag, membername, hint,
-		result, numparams, param, objthis);
+	if(membername) {
+		tjs_error hr = tTJSCustomObject::FuncCall(flag, membername, hint,
+			result, numparams, param, objthis);
+		if( hr == TJS_E_MEMBERNOTFOUND && SuperClass != NULL ) {
+			hr = SuperClass->FuncCall( flag, membername, hint, result, numparams, param, objthis );
+		}
+		return hr;
+	}
 
 	tTJSVariant name(ClassName);
 	objthis->ClassInstanceInfo(TJS_CII_ADD, 0, &name); // add class name
@@ -371,6 +381,13 @@ tTJSNativeClass::CreateNew(tjs_uint32 flag, const tjs_char * membername,
 	iTJSDispatch2 *objthis)
 {
 	// CreateNew
+	iTJSDispatch2 *superinst = NULL;
+	if( SuperClass != NULL && membername == NULL ) {
+		tjs_error hr = SuperClass->CreateNew( flag, membername, hint, &superinst, numparams, param, objthis );
+		if(TJS_FAILED(hr)) {
+			superinst = NULL;
+		}
+	}
 
 	iTJSDispatch2 *dsp = CreateBaseTJSObject();
 
@@ -386,6 +403,13 @@ tTJSNativeClass::CreateNew(tjs_uint32 flag, const tjs_char * membername,
 
 		if(TJS_FAILED(hr)) return hr;
 
+		if( superinst != NULL ) {
+			tTJSVariant param(superinst,superinst);
+			dsp->ClassInstanceInfo( TJS_CII_SET_SUPRECLASS, 0, &param );
+			superinst->Release();
+			superinst = NULL;
+		}
+
 		hr = FuncCall(0, ClassName.c_str(), ClassName.GetHint(), NULL, numparams, param, dsp);
 			// call the constructor
 		if(hr == TJS_E_MEMBERNOTFOUND) hr = TJS_S_OK;
@@ -394,10 +418,15 @@ tTJSNativeClass::CreateNew(tjs_uint32 flag, const tjs_char * membername,
 	catch(...)
 	{
 		dsp->Release();
+		if( superinst ) superinst->Release();
 		throw;
 	}
 
-	if(TJS_SUCCEEDED(hr)) *result = dsp;
+	if(TJS_SUCCEEDED(hr)) {
+		*result = dsp;
+	} else if( superinst ) {
+		superinst->Release();
+	}
 	return hr;
 }
 //---------------------------------------------------------------------------

@@ -43,6 +43,10 @@
 #include "MainFormUnit.h"
 #include "Application.h"
 
+#include "RectItf.h"
+#include "ImageFunction.h"
+#include "BitmapIntf.h"
+
 //---------------------------------------------------------------------------
 // Script system initialization script
 //---------------------------------------------------------------------------
@@ -486,6 +490,9 @@ void TVPInitScriptEngine()
 	//REGISTER_OBJECT(Pad, TVPCreateNativeClass_Pad());
 	REGISTER_OBJECT(Clipboard, TVPCreateNativeClass_Clipboard());
 	REGISTER_OBJECT(Scripts, TVPCreateNativeClass_Scripts()); // declared in this file
+	REGISTER_OBJECT(Rect, TVPCreateNativeClass_Rect());
+	REGISTER_OBJECT(Bitmap, TVPCreateNativeClass_Bitmap());
+	REGISTER_OBJECT(ImageFunction, TVPCreateNativeClass_ImageFunction());
 
 	/* KAG special support */
 	//REGISTER_OBJECT(KAGParser, new tTJSNC_KAGParser());
