@@ -137,7 +137,9 @@ tjs_int tTJSNI_Bitmap::GetPixelBufferPitch() const {
 void tTJSNI_Bitmap::CopyFrom( const tTJSNI_Bitmap* src ) {
 	Bitmap->Assign(*src->GetBitmap());
 }
-
+void tTJSNI_Bitmap::CopyFrom( const  tTVPBaseBitmap* src ) {
+	Bitmap->Assign(*src);
+}
 tjs_uint32 tTJSNC_Bitmap::ClassID = -1;
 
 tTJSNC_Bitmap::tTJSNC_Bitmap() : inherited(TJS_W("Bitmap") ) {

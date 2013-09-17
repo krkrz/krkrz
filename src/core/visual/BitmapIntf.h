@@ -52,6 +52,10 @@ public:
 	void CopyFrom( const tTJSNI_Bitmap* src );
 
 	bool IsLoading() const { return Loading; }
+
+	// for internal
+	void CopyFrom( const tTVPBaseBitmap* src );
+	void SetLoading( bool load ) { Loading = load; }
 };
 
 
