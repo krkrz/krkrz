@@ -183,7 +183,8 @@ void TVPInitWindowOptions()
 //---------------------------------------------------------------------------
 
 
-TTVPWindowForm::TTVPWindowForm( TApplication* app, tTJSNI_Window* ni ) : TML::Window(), CurrentMouseCursor(crDefault), touch_points_(this) {
+TTVPWindowForm::TTVPWindowForm( TApplication* app, tTJSNI_Window* ni ) : TML::Window(), CurrentMouseCursor(crDefault), touch_points_(this),
+	LayerLeft(0), LayerTop(0), LayerWidth(32), LayerHeight(32) {
 	CreateWnd( _T("TVPMainWindow"), Application->GetTitle(), 10, 10 );
 	TVPInitWindowOptions();
 	
@@ -650,6 +651,8 @@ void TTVPWindowForm::InternalSetPaintBoxSize() {
 	//tjs_int t = MulDiv(LayerTop,    ActualZoomNumer, ActualZoomDenom);
 	tjs_int w = MulDiv(LayerWidth,  ActualZoomNumer, ActualZoomDenom);
 	tjs_int h = MulDiv(LayerHeight, ActualZoomNumer, ActualZoomDenom);
+	if( w < 1 ) w = 1;
+	if( h < 1 ) h = 1;
 	//PaintBox->SetBounds(l, t, w, h);
 	SetInnerSize( w, h );
 	SetDrawDeviceDestRect();
