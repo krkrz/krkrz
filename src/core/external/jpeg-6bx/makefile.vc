@@ -14,10 +14,11 @@ LD= link
 # You may want to adjust these compiler options:
 !ifdef crtdll
 # (DLL version of CRT)
-CFLAGS= -nologo -c -MD -W3 -O2 -GF -Gy -DNDEBUG -I.
+CFLAGS= -nologo -c -MT -W3 -O2 -GF -Gy -DNDEBUG -I.
 !else
 # (Single threaded static CRT)
-CFLAGS= -nologo -c -ML -W3 -O2 -GF -Gy -DNDEBUG -I.
+CFLAGS= -nologo -c -MT -W3 -O2 -GF -Gy -DNDEBUG -I.
+#CFLAGS= -GS -GL -W3 -Gy -Zi -O2 -Gd -Oi -MT -nologo -DNDEBUG
 !endif
 
 # Generally, we recommend defining any configuration symbols in jconfig.h,
@@ -31,7 +32,8 @@ NAFLAGS= $(NASM_OBJFMT) -I./
 NASM_OBJFMT= -fwin32 -DWIN32
 
 # Link-time options:
-LDFLAGS= -nologo -release -subsystem:console,4.0 -opt:nowin98
+LDFLAGS= -nologo -release -SAFESEH:NO
+#-subsystem:console,4.0 -opt:nowin98
 
 # To link any special libraries, add the necessary commands here.
 LDLIBS= 

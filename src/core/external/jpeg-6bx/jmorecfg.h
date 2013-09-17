@@ -340,13 +340,28 @@ typedef int boolean;
  *    can't use color quantization if you change that value.
  */
 
+#if 0
 #define RGB_RED		0	/* Offset of Red in an RGB scanline element */
 #define RGB_GREEN	1	/* Offset of Green */
 #define RGB_BLUE	2	/* Offset of Blue */
 #define RGB_PIXELSIZE	3	/* JSAMPLEs per RGB scanline element */
 
 #undef RGBX_FILLER_0XFF 	/* fill dummy bytes with 0xFF in RGBX format */
-
+#else	// 32bit bmp format
+#if 0
+#define RGB_RED			2
+#define RGB_GREEN		1
+#define RGB_BLUE		0
+#define RGB_PIXELSIZE	3
+#undef RGBX_FILLER_0XFF
+#else
+#define RGB_RED			2
+#define RGB_GREEN		1
+#define RGB_BLUE		0
+#define RGB_PIXELSIZE	4
+#define RGBX_FILLER_0XFF
+#endif
+#endif
 
 /* SIMD support options: */
 
