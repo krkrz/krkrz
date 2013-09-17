@@ -20,6 +20,7 @@
 #include "tjsNative.h"
 #include "tjsArray.h"
 #include "tjsDebug.h"
+#include "tjsOctPack.h"
 
 #ifdef ENABLE_DEBUGGER
 #include "debugger.h"
@@ -2402,7 +2403,7 @@ tjs_int tTJSInterCodeContext::CallFunctionDirect(tTJSVariant *ra,
 		else if(type == tvtOctet)
 		{
 			ProcessOctetFunction(name->GetString(),
-				TJS_GET_VM_REG(ra, code[2]),
+				TJS_GET_VM_REG(ra, code[2]).AsOctetNoAddRef(),
 				pass_args, pass_args_count, code[1]?TJS_GET_VM_REG_ADDR(ra, code[1]):NULL);
 			hr = TJS_S_OK;
 		}
@@ -2454,7 +2455,7 @@ tjs_int tTJSInterCodeContext::CallFunctionIndirect(tTJSVariant *ra,
 		else if(type == tvtOctet)
 		{
 			ProcessOctetFunction(name.c_str(),
-				TJS_GET_VM_REG(ra, code[2]),
+				TJS_GET_VM_REG(ra, code[2]).AsOctetNoAddRef(),
 				pass_args, pass_args_count, code[1]?TJS_GET_VM_REG_ADDR(ra, code[1]):NULL);
 			hr = TJS_S_OK;
 		}
@@ -2849,10 +2850,29 @@ void tTJSInterCodeContext::ProcessStringFunction(const tjs_char *member,
 	TJSThrowFrom_tjs_error(TJS_E_MEMBERNOTFOUND, member);
 }
 //---------------------------------------------------------------------------
-void tTJSInterCodeContext::ProcessOctetFunction(const tjs_char *member, const ttstr & target,
+void tTJSInterCodeContext::ProcessOctetFunction(const tjs_char *member, const tTJSVariantOctet * target,
 		tTJSVariant **args, tjs_int numargs, tTJSVariant *result)
 {
-	// TODO: unpack/pack implementation
+	if(!member) TJSThrowFrom_tjs_error(TJS_E_MEMBERNOTFOUND, TJS_W(""));
+	switch( member[0] ) {
+	case L'u':
+		if( !TJS_strcmp( TJS_W("unpack"), member) ) {
+			tjs_error err = TJSOctetUnpack( target, args, numargs, result );
+			if( err != TJS_S_OK ) {
+				TJSThrowFrom_tjs_error( err );
+			}
+			return;
+		}
+		break;
+#if 0
+	case L'p':
+		if( !TJS_strcmp( TJS_W("pack"), member) ) {
+			if(numargs < 2) TJSThrowFrom_tjs_error(TJS_E_BADPARAMCOUNT);
+			ttstr templ = *args[0];
+		}
+		break;
+#endif
+	}
 
 	TJSThrowFrom_tjs_error(TJS_E_MEMBERNOTFOUND, member);
 }

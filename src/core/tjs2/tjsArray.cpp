@@ -18,6 +18,7 @@
 #include "tjsDictionary.h"
 #include "tjsUtils.h"
 #include "tjsBinarySerializer.h"
+#include "tjsOctPack.h"
 
 #ifndef TJS_NO_REGEXP
 #include "tjsRegExp.h"
@@ -920,6 +921,17 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/* func.name */find)
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_METHOD_DECL(/* func.name */find)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/* func.name */pack)
+{
+	TJS_GET_NATIVE_INSTANCE(/* var. name */ni, /* var. type */tTJSArrayNI);
+
+	if(numparams < 1) return TJS_E_BADPARAMCOUNT;
+	if(result) return TJSOctetPack( param, numparams, ni->Items, result );
+
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/* func.name */pack)
 //----------------------------------------------------------------------
 
 

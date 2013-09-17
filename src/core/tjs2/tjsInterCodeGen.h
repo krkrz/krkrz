@@ -560,7 +560,7 @@ private:
 	static void AddClassInstanceInfo(tTJSVariant *ra, const tjs_int32 *code);
 	void ProcessStringFunction(const tjs_char *member, const ttstr & target,
 		tTJSVariant **args, tjs_int numargs, tTJSVariant *result);
-	void ProcessOctetFunction(const tjs_char *member, const ttstr & target,
+	void ProcessOctetFunction(const tjs_char *member, const tTJSVariantOctet * target,
 		tTJSVariant **args, tjs_int numargs, tTJSVariant *result);
 	static void TypeOf(tTJSVariant &val);
 	void Eval(tTJSVariant &val, iTJSDispatch2 * objthis, bool resneed);

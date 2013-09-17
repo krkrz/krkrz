@@ -541,6 +541,9 @@
     <ClInclude Include="..\visual\RectItf.h">
       <Filter>visual</Filter>
     </ClInclude>
+    <ClInclude Include="..\tjs2\tjsOctPack.h">
+      <Filter>tjs2</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -944,6 +947,9 @@
     </ClCompile>
     <ClCompile Include="..\visual\RectItf.cpp">
       <Filter>visual</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjsOctPack.cpp">
+      <Filter>tjs2</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
