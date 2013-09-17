@@ -316,7 +316,7 @@ HRESULT CWMReader::OpenStream( IStream *stream )
 	if( m_WMReader.p == NULL )
 	{	// DLLÇ©ÇÁWMCreateSyncReaderÇì«Ç›çûÇÒÇ≈égópÇ∑ÇÈ
 		if( m_WmvDll.IsLoaded() == false )
-			m_WmvDll.Load("wmvcore.dll");
+			m_WmvDll.Load(_T("wmvcore.dll"));
 		if( m_WmvDll.IsLoaded() == false )
 			return m_WmvDll.GetLastError();
 

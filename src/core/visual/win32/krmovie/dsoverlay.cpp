@@ -100,6 +100,18 @@ void __stdcall tTVPDSVideoOverlay::BuildGraph( HWND callbackwin, IStream *stream
 				if( FAILED(hr = GraphBuilder()->Render(m_Reader->GetPin(0))) )
 					ThrowDShowException(L"Failed to call IGraphBuilder::Render.", hr);
 			}
+#ifdef ENABLE_THEORA
+			else if( mt.subtype == MEDIASUBTYPE_Ogg )
+			{
+				CComPtr<IBaseFilter>	pVRender;	// for video renderer filter
+				if( FAILED(hr = pVRender.CoCreateInstance(CLSID_VideoRenderer, NULL, CLSCTX_INPROC_SERVER)) )
+					ThrowDShowException(L"Failed to create video renderer filter object.", hr);
+				if( FAILED(hr = GraphBuilder()->AddFilter(pVRender, L"Video Renderer")) )
+					ThrowDShowException(L"Failed to call IFilterGraph::AddFilter.", hr);
+				
+				BuildTheoraGraph( pVRender, m_Reader );
+			}
+#endif
 			else
 			{
 				CComPtr<IBaseFilter>	pVRender;	// for video renderer filter

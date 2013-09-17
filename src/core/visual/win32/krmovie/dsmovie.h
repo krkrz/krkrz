@@ -27,6 +27,9 @@
 
 class CIStreamProxy;
 class CIStreamReader;
+#ifdef ENABLE_THEORA
+extern const GUID MEDIASUBTYPE_Ogg;
+#endif
 //----------------------------------------------------------------------------
 //! @brief DirectShowƒNƒ‰ƒX
 //!
@@ -180,6 +183,9 @@ protected:
 	void ParseVideoType( CMediaType &mt, const wchar_t *type );
 	bool IsWindowsMediaFile( const wchar_t *type ) const;
 	void BuildWMVGraph( IBaseFilter *pRdr, IStream *pStream );
+#ifdef ENABLE_THEORA
+	void BuildTheoraGraph( IBaseFilter *pRdr, IBaseFilter *pSrc );
+#endif
 
 	HRESULT __stdcall AddToROT( DWORD ROTreg );
 	void __stdcall RemoveFromROT( DWORD ROTreg );

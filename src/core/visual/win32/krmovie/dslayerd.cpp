@@ -185,6 +185,14 @@ void __stdcall tTVPDSLayerVideo::BuildGraph( HWND callbackwin, IStream *stream,
 				}
 #endif
 			}
+#ifdef ENABLE_THEORA
+			else if( mt.subtype == MEDIASUBTYPE_Ogg )
+			{
+				if( FAILED(hr = GraphBuilder()->AddFilter( pBRender, L"Buffer Renderer")) )
+					ThrowDShowException(L"Failed to call GraphBuilder()->AddFilter( pBRender, L\"Buffer Renderer\").", hr);
+				BuildTheoraGraph( pBRender, m_Reader); // may throw an exception
+			}
+#endif
 			else
 			{
 				if( FAILED(hr = GraphBuilder()->AddFilter( pBRender, L"Buffer Renderer")) )
