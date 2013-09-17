@@ -616,9 +616,9 @@ HRESULT CVMRCustomAllocatorPresenter9::CreateD3D()
 
 	if( m_D3DDll.IsLoaded() == false )
 #if _DEBUG
-		m_D3DDll.Load("d3d9d.dll");
+		m_D3DDll.Load(_T("d3d9d.dll"));
 #else
-		m_D3DDll.Load("d3d9.dll");
+		m_D3DDll.Load(_T("d3d9.dll"));
 #endif
 	if( m_D3DDll.IsLoaded() == false )
 		return m_D3DDll.GetLastError();
@@ -796,9 +796,9 @@ HRESULT CVMRCustomAllocatorPresenter9::CreateChildWindow()
 	if( (m_Rect.right - m_Rect.left) != 0 && (m_Rect.bottom - m_Rect.top) != 0 ) {
 		RECT clientRect;
 		CalcChildWindowSize( clientRect );
-		m_ChildWnd = CreateWindow( _T("krmovie VMR9 Child Window Class"), "VMR9 child", WS_CHILDWINDOW, clientRect.left, clientRect.top, clientRect.right - clientRect.left, clientRect.bottom - clientRect.top, Owner()->OwnerWindow, NULL, Owner()->m_OwnerInst, NULL );
+		m_ChildWnd = CreateWindow( _T("krmovie VMR9 Child Window Class"), _T("VMR9 child"), WS_CHILDWINDOW, clientRect.left, clientRect.top, clientRect.right - clientRect.left, clientRect.bottom - clientRect.top, Owner()->OwnerWindow, NULL, Owner()->m_OwnerInst, NULL );
 	} else {
-		m_ChildWnd = CreateWindow( _T("krmovie VMR9 Child Window Class"), "VMR9 child", WS_CHILDWINDOW, 0, 0, 320, 240, Owner()->OwnerWindow, NULL, Owner()->m_OwnerInst, NULL );
+		m_ChildWnd = CreateWindow( _T("krmovie VMR9 Child Window Class"), _T("VMR9 child"), WS_CHILDWINDOW, 0, 0, 320, 240, Owner()->OwnerWindow, NULL, Owner()->m_OwnerInst, NULL );
 	}
 	if( m_ChildWnd == NULL )
 		return HRESULT_FROM_WIN32(GetLastError());

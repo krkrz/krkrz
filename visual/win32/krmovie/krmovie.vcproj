@@ -4,6 +4,7 @@
 	Version="9.00"
 	Name="krmovie"
 	ProjectGUID="{2315E2BC-8321-4A8F-B551-06BA07255854}"
+	RootNamespace="krmovie"
 	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
@@ -22,7 +23,7 @@
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
-			CharacterSet="2"
+			CharacterSet="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -52,7 +53,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="&quot;C:\Program Files\Microsoft SDKs\Windows\v7.0\Samples\multimedia\directshow\baseclasses&quot;;..\;..\..\..\..\plugins\win32;"
+				AdditionalIncludeDirectories="&quot;$(BASECLASSES)&quot;;..\;..\..\..\..\plugins\win32;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;KRMOVIE_EXPORTS;_WIN32_WINNT=0x0400;WINVER=0x0500;NO_DSHOW_STRSAFE"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -80,10 +81,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/COMMENT:&quot;(--has-option--)&quot;"
-				AdditionalDependencies="odbc32.lib odbccp32.lib version.lib winmm.lib strmiids.lib quartz.lib &quot;C:\Program Files\Microsoft SDKs\Windows\v7.0\Samples\multimedia\directshow\baseclasses\Release_MBCS\strmbase.lib&quot; dmoguids.lib"
+				AdditionalDependencies="odbc32.lib odbccp32.lib version.lib winmm.lib strmiids.lib quartz.lib &quot;$(BASECLASSES)\Release\strmbase.lib&quot; dmoguids.lib"
 				OutputFile=".\..\..\..\..\..\bin\win32/krmovie.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="ogg\bin"
 				IgnoreDefaultLibraryNames=""
 				ModuleDefinitionFile=".\krmovie.def"
 				ProgramDatabaseFile=".\..\..\..\..\..\bin\win32/krmovie.pdb"
@@ -125,7 +127,7 @@
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
-			CharacterSet="2"
+			CharacterSet="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -151,7 +153,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;C:\Program Files\Microsoft SDKs\Windows\v7.0\Samples\multimedia\directshow\baseclasses&quot;;..\..\..\..\plugins\win32;"
+				AdditionalIncludeDirectories="&quot;$(BASECLASSES)&quot;;..\;..\..\..\..\plugins\win32;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;KRMOVIE_EXPORTS;DEBUG;_WIN32_WINNT=0x400"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -178,10 +180,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/COMMENT:&quot;(--has-option--)&quot;"
-				AdditionalDependencies="odbc32.lib odbccp32.lib version.lib winmm.lib strmiids.lib quartz.lib &quot;C:\Program Files\Microsoft SDKs\Windows\v7.0\Samples\multimedia\directshow\baseclasses\Debug_MBCS\strmbasd.lib&quot; dmoguids.lib"
+				AdditionalDependencies="odbc32.lib odbccp32.lib version.lib winmm.lib strmiids.lib quartz.lib &quot;$(BASECLASSES)\Debug\strmbasd.lib&quot; dmoguids.lib dsogg_d.lib"
 				OutputFile=".\..\..\..\..\..\bin\win32/krmovie.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories=".\ogg\bin"
 				IgnoreDefaultLibraryNames=""
 				ModuleDefinitionFile=".\krmovie.def"
 				GenerateDebugInformation="true"
@@ -231,7 +234,6 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
-						PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;KRMOVIE_EXPORTS;$(NoInherit)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -240,7 +242,6 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="0"
-						PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_MBCS;_USRDLL;KRMOVIE_EXPORTS;DEBUG;$(NoInherit)"
 						BasicRuntimeChecks="3"
 					/>
 				</FileConfiguration>
@@ -254,7 +255,6 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="2"
-						PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;KRMOVIE_EXPORTS;$(NoInherit)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -263,7 +263,6 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						Optimization="0"
-						PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_MBCS;_USRDLL;KRMOVIE_EXPORTS;DEBUG;$(NoInherit)"
 						BasicRuntimeChecks="3"
 					/>
 				</FileConfiguration>

@@ -24,6 +24,12 @@
 #include "CDemuxSource.h"
 #include "CWMReader.h"
 
+#ifdef ENABLE_THEORA
+#include "OggFilterFactory.h"
+
+#pragma comment(lib,"dsogg.lib")
+#endif
+
 // {BAE59473-019E-4f1f-8A8C-3D41A9F4921E}
 static const GUID CLSID_WMReaderSource = 
 { 0xbae59473, 0x19e, 0x4f1f, { 0x8a, 0x8c, 0x3d, 0x41, 0xa9, 0xf4, 0x92, 0x1e } };
@@ -33,6 +39,11 @@ static const GUID CLSID_WMVDecoderDMO =
 { 0x82d353df, 0x90bd, 0x4382, { 0x8b, 0xc2, 0x3f, 0x61, 0x92, 0xb7, 0x6e, 0x34 } };
 static const GUID CLSID_WMADecoderDMO = 
 { 0x2eeb4adf, 0x4578, 0x4d10, { 0xbc, 0xa7, 0xbb, 0x95, 0x5f, 0x56, 0x32, 0x0a } };
+
+#ifdef ENABLE_THEORA
+const GUID MEDIASUBTYPE_Ogg = 
+{ 0xdd142c1e, 0xc1e, 0x4381, { 0xa2, 0x4e, 0xb, 0x2d, 0x80, 0xb6, 0x9, 0x8a } };
+#endif
 
 tTVPDSMovie::tTVPDSMovie()
 {
@@ -1161,6 +1172,10 @@ void tTVPDSMovie::ParseVideoType( CMediaType &mt, const wchar_t *type )
 	//	mt.subtype = MFVideoFormat_H264;
 //	else if (wcsicmp(type, L".wmv") == 0)
 //		mt.subtype = SubTypeGUID_WMV3;
+#ifdef ENABLE_THEORA
+	else if (_wcsicmp(type, L".ogg") == 0 || _wcsicmp(type, L".ogv") == 0)
+		mt.subtype = MEDIASUBTYPE_Ogg;
+#endif
 	else
 		TVPThrowExceptionMessage(L"Unknown video format extension."); // unknown format
 }
@@ -1230,7 +1245,7 @@ void tTVPDSMovie::DebugOutputPinMediaType( IPin *pPin )
 			if(Fetched)
 			{
 #if _DEBUG
-				DisplayType( "DebugOutputPinMediaType:\n", pMediaType );
+				DisplayType( _T("DebugOutputPinMediaType:\n"), pMediaType );
 #endif
 				UtilDeleteMediaType(pMediaType);
 			}
@@ -1643,6 +1658,63 @@ void tTVPDSMovie::BuildWMVGraph( IBaseFilter *pRdr, IStream *pStream )
 		ThrowDShowException(L"Failed to call ConnectFilters( pWMADec, pDDSRenderer ).", hr);
 
 }
+#ifdef ENABLE_THEORA
+//----------------------------------------------------------------------------
+//! @brief	  	Theora(ogg) 用のグラフを手動で構築する
+//! @param		pRdr : グラフに参加しているレンダーフィルタ
+//! @param		pSrc : グラフに参加しているソースフィルタ
+//----------------------------------------------------------------------------
+void tTVPDSMovie::BuildTheoraGraph( IBaseFilter *pRdr, IBaseFilter *pSrc )
+{
+	HRESULT	hr;
+
+	// Connect to Ogg splitter filter
+	CComPtr<IBaseFilter>	pOggSplitter( CreateOggSplitter() );	// for MPEG 1 splitter filter
+
+	if( FAILED(hr = GraphBuilder()->AddFilter(pOggSplitter, L"Ogg Stream Splitter")) )
+		ThrowDShowException(L"Failed to call GraphBuilder()->AddFilter(pOggSplitter, L\"Ogg Stream Splitter\").", hr);
+	if( FAILED(hr = ConnectFilters( pSrc, pOggSplitter )) )
+		ThrowDShowException(L"Failed to call ConnectFilters( pSrc, pOggSplitter ).", hr);
+
+	// Connect to Theora video codec filter
+	CComPtr<IBaseFilter>	pTheoraVideoCodec( CreateTheoraDecoder() );	// for Theora video codec filter
+	if( FAILED(hr = GraphBuilder()->AddFilter(pTheoraVideoCodec, L"Theora Video Decoder")) )
+		ThrowDShowException(L"Failed to call GraphBuilder()->AddFilter(pTheoraVideoCodec, L\"Theora Video Decoder\").", hr);
+	if( FAILED(hr = ConnectFilters( pOggSplitter, pTheoraVideoCodec )) )
+		ThrowDShowException(L"Failed to call ConnectFilters( pOggSplitter, pTheoraVideoCodec ).", hr);
+
+	// Connect to render filter
+	if( FAILED(hr = ConnectFilters( pTheoraVideoCodec, pRdr )) )
+		ThrowDShowException(L"Failed to call ConnectFilters( pTheoraVideoCodec, pRdr ).", hr);
+
+	// Connect to Vorbis audio codec filter
+	CComPtr<IBaseFilter>	pVorbisAudioCodec( CreateVorbisDecoder() );	// for Vorbis audio codec filter
+	if( FAILED(hr = GraphBuilder()->AddFilter(pVorbisAudioCodec, L"Vorbis Audio Decoder")) )
+		ThrowDShowException(L"Failed to call GraphBuilder()->AddFilter(pVorbisAudioCodec, L\"Vorbis Audio Decoder\").", hr);
+	if( FAILED(hr = ConnectFilters( pOggSplitter, pVorbisAudioCodec )) )
+	{	// not have Audio.
+		if( FAILED(hr = GraphBuilder()->RemoveFilter( pVorbisAudioCodec)) )
+			ThrowDShowException(L"Failed to call GraphBuilder()->RemoveFilter( pVorbisAudioCodec).", hr);
+		return;
+	}
+
+	// Connect to DDS render filter
+	CComPtr<IBaseFilter>	pDDSRenderer;	// for sound renderer filter
+	if( FAILED(hr = pDDSRenderer.CoCreateInstance(CLSID_DSoundRender, NULL, CLSCTX_INPROC_SERVER)) )
+		ThrowDShowException(L"Failed to create sound render filter object.", hr);
+	if( FAILED(hr = GraphBuilder()->AddFilter(pDDSRenderer, L"Sound Renderer")) )
+		ThrowDShowException(L"Failed to call GraphBuilder()->AddFilter(pDDSRenderer, L\"Sound Renderer\").", hr);
+	if( FAILED(hr = ConnectFilters( pVorbisAudioCodec, pDDSRenderer ) ) )
+	{
+		if( FAILED(hr = GraphBuilder()->RemoveFilter( pVorbisAudioCodec)) )
+			ThrowDShowException(L"Failed to call GraphBuilder()->RemoveFilter( pVorbisAudioCodec).", hr);
+		if( FAILED(hr = GraphBuilder()->RemoveFilter( pDDSRenderer)) )
+			ThrowDShowException(L"Failed to call GraphBuilder()->RemoveFilter( pDDSRenderer).", hr);
+	}
+
+	return;
+}
+#endif
 //----------------------------------------------------------------------------
 //! @brief	  	2つのフィルターを接続する
 //! @param		pFilterUpstream : アップストリームフィルタ
@@ -1675,7 +1747,7 @@ HRESULT tTVPDSMovie::ConnectFilters( IBaseFilter* pFilterUpstream, IBaseFilter* 
 			ThrowDShowException(L"Failed to call pIPinUpstream->QueryPinInfo(&PinInfoUpstream).", hr);
 #if _DEBUG
 		sprintf(debug, "upstream: %ls\n", PinInfoUpstream.achName);
-		OutputDebugString(debug);
+		OutputDebugStringA(debug);
 
 		DebugOutputPinMediaType(pIPinUpstream);
 #endif
@@ -1700,7 +1772,7 @@ HRESULT tTVPDSMovie::ConnectFilters( IBaseFilter* pFilterUpstream, IBaseFilter* 
 				{
 #if _DEBUG
 					sprintf(debug, "    downstream: %ls\n", PinInfoDownstream.achName);
-					OutputDebugString(debug);
+					OutputDebugStringA(debug);
 
 					DebugOutputPinMediaType(pIPinDownstream);
 #endif
