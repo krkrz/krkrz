@@ -188,6 +188,7 @@
     <ClInclude Include="..\tjs2\tjsNative.h" />
     <ClInclude Include="..\tjs2\tjsObject.h" />
     <ClInclude Include="..\tjs2\tjsObjectExtendable.h" />
+    <ClInclude Include="..\tjs2\tjsOctPack.h" />
     <ClInclude Include="..\tjs2\tjspp.tab.h" />
     <ClInclude Include="..\tjs2\tjsRandomGenerator.h" />
     <ClInclude Include="..\tjs2\tjsRegExp.h" />
@@ -335,6 +336,7 @@
     <ClCompile Include="..\tjs2\tjsNative.cpp" />
     <ClCompile Include="..\tjs2\tjsObject.cpp" />
     <ClCompile Include="..\tjs2\tjsObjectExtendable.cpp" />
+    <ClCompile Include="..\tjs2\tjsOctPack.cpp" />
     <ClCompile Include="..\tjs2\tjspp.tab.cpp" />
     <ClCompile Include="..\tjs2\tjsRandomGenerator.cpp" />
     <ClCompile Include="..\tjs2\tjsRegExp.cpp" />
