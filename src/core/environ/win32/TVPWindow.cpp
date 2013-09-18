@@ -2,7 +2,7 @@
 #include "tjsCommHead.h"
 #include "WindowIntf.h"
 #include "ComplexRect.h"
-#include "TMLWindow.h"
+#include "TVPWindow.h"
 #include <vector>
 #include <windowsx.h>
 #include "MainFormUnit.h"
@@ -11,18 +11,16 @@
 #include "Resource.h"
 #include "CompatibleNativeFuncs.h"
 
-namespace TML {
-
-LRESULT WINAPI Window::WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
+LRESULT WINAPI tTVPWindow::WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
-	Window	*win = reinterpret_cast<Window*>(GetWindowLongPtr(hWnd,GWLP_USERDATA));
+	tTVPWindow *win = reinterpret_cast<tTVPWindow*>(GetWindowLongPtr(hWnd,GWLP_USERDATA));
 	if( win != NULL ) {
 		return win->Proc( hWnd, msg, wParam, lParam );
 	}
 	return ::DefWindowProc(hWnd,msg,wParam,lParam);
 }
 
-LRESULT WINAPI Window::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam ) {
+LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam ) {
 	switch( msg ) {
 	case WM_PAINT: {
 		PAINTSTRUCT ps;
@@ -328,17 +326,17 @@ LRESULT WINAPI Window::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 	}
 	return ::DefWindowProc(hWnd,msg,wParam,lParam);
 }
-void Window::OnPaint() {
+void tTVPWindow::OnPaint() {
 }
-const DWORD Window::DEFAULT_EX_STYLE = WS_EX_ACCEPTFILES | WS_EX_APPWINDOW;
-HRESULT Window::CreateWnd( const tstring& classname, const tstring& title, int width, int height )
+const DWORD tTVPWindow::DEFAULT_EX_STYLE = WS_EX_ACCEPTFILES | WS_EX_APPWINDOW;
+HRESULT tTVPWindow::CreateWnd( const tstring& classname, const tstring& title, int width, int height )
 {
 	window_class_name_ = classname;
 	window_title_ = title;
 	window_client_size_.cx = width;
 	window_client_size_.cy = height;
 
-	WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC | CS_DBLCLKS, Window::WndProc, 0L, 0L,
+	WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC | CS_DBLCLKS, tTVPWindow::WndProc, 0L, 0L,
 						GetModuleHandle(NULL), NULL, NULL, NULL, NULL,
 						window_class_name_.c_str(), NULL };
 	wc.hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_TVPWIN32));
@@ -378,7 +376,7 @@ HRESULT Window::CreateWnd( const tstring& classname, const tstring& title, int w
 	ime_control_ = new ImeControl(window_handle_);
 	border_style_ = bsSizeable;
 	
-    ::SetWindowLongPtr( window_handle_, GWLP_WNDPROC, (LONG_PTR)Window::WndProc );
+    ::SetWindowLongPtr( window_handle_, GWLP_WNDPROC, (LONG_PTR)tTVPWindow::WndProc );
 	::SetWindowLongPtr( window_handle_, GWLP_USERDATA, (LONG_PTR)this );
 
 	//::ShowWindow(window_handle_,SW_SHOWDEFAULT);
@@ -396,11 +394,11 @@ HRESULT Window::CreateWnd( const tstring& classname, const tstring& title, int w
 	}
 	return S_OK;
 }
-void Window::UnregisterWindow() {
+void tTVPWindow::UnregisterWindow() {
 	::UnregisterClass( window_class_name_.c_str(), wc_.hInstance );
 }
 
-void Window::SetWidnowTitle( const tstring& title ) {
+void tTVPWindow::SetWidnowTitle( const tstring& title ) {
 	if( window_title_ != title ) {
 		window_title_ = title;
 		if( window_handle_ ) {
@@ -409,7 +407,7 @@ void Window::SetWidnowTitle( const tstring& title ) {
 	}
 }
 
-void Window::SetScreenSize( int width, int height ) {
+void tTVPWindow::SetScreenSize( int width, int height ) {
 	if( window_client_size_.cx != width || window_client_size_.cy != height ) {
 		window_client_size_.cx = width;
 		window_client_size_.cy = height;
@@ -422,7 +420,7 @@ void Window::SetScreenSize( int width, int height ) {
 	}
 }
 /*
-int Window::MainLoop() {
+int tTVPWindow::MainLoop() {
 	MSG msg;
 	ZeroMemory( &msg, sizeof(msg) );
 	// 最初に生成関係のたまっているメッセージを処理する
@@ -444,15 +442,15 @@ int Window::MainLoop() {
 	return 0;
 }
 */
-bool Window::Initialize() {
+bool tTVPWindow::Initialize() {
 	return true;
 }
-void Window::OnDestroy() {
+void tTVPWindow::OnDestroy() {
 	::SetWindowLongPtr( window_handle_, GWLP_USERDATA, (LONG_PTR)NULL );
 	delete this;
 }
 
-void Window::SetClientSize( HWND hWnd, SIZE& size ) {
+void tTVPWindow::SetClientSize( HWND hWnd, SIZE& size ) {
 	HMENU hMenu = ::GetMenu( hWnd );
 	DWORD style = ::GetWindowLong( hWnd, GWL_STYLE );
 	DWORD exStyle = ::GetWindowLong( hWnd, GWL_EXSTYLE );
@@ -474,7 +472,7 @@ void Window::SetClientSize( HWND hWnd, SIZE& size ) {
 
 
 // 表示状態
-bool Window::GetVisible() const {
+bool tTVPWindow::GetVisible() const {
 /*
 	WINDOWPLACEMENT wndpl;
 //	::ZeroMemory( &wndpl, sizeof(wndpl) );
@@ -489,18 +487,18 @@ bool Window::GetVisible() const {
 */
 	return ::IsWindowVisible( GetHandle() ) ? true : false;
 }
-void Window::SetVisible( bool s ) {
+void tTVPWindow::SetVisible( bool s ) {
 	::ShowWindow( GetHandle(), s ? SW_SHOW : SW_HIDE );
 }
 
-bool Window::GetEnable() const {
+bool tTVPWindow::GetEnable() const {
 	return ::IsWindowEnabled( GetHandle() ) ? true : false;
 }
-void Window::SetEnable( bool s ) {
+void tTVPWindow::SetEnable( bool s ) {
 	::EnableWindow( GetHandle(), s ? TRUE : FALSE );
 }
 
-void Window::GetCaption( tstring& v ) const {
+void tTVPWindow::GetCaption( tstring& v ) const {
 	v.clear();
 	int len = ::GetWindowTextLength( GetHandle() );
 	if( len > 0 ) {
@@ -514,7 +512,7 @@ void Window::GetCaption( tstring& v ) const {
 // 内部で持っているのよりも、ちゃんと毎回取得した方がいいか
 //	v = window_title_;
 }
-void Window::SetCaption( const tstring& v ) {
+void tTVPWindow::SetCaption( const tstring& v ) {
 	if( window_title_ != v ) {
 		window_title_ = v;
 		::SetWindowText( GetHandle(), window_title_.c_str() );
@@ -548,7 +546,7 @@ bsSizeToolWin : bsToolWindow と似ていますが、サイズ変更が可能です。
 WS_CAPTION | WS_THICKFRAME
 WS_EX_TOOLWINDOW
 */
-void Window::SetBorderStyle(tTVPBorderStyle st) {
+void tTVPWindow::SetBorderStyle(tTVPBorderStyle st) {
 	const DWORD notStyle = WS_POPUP | WS_CAPTION | WS_BORDER | WS_THICKFRAME | WS_DLGFRAME;
 	DWORD style = ::GetWindowLong( GetHandle(), GWL_STYLE);
 	DWORD exStyle = ::GetWindowLong( GetHandle(), GWL_EXSTYLE);
@@ -603,16 +601,16 @@ void Window::SetBorderStyle(tTVPBorderStyle st) {
 	::SetWindowPos( GetHandle(), 0, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE );
 	::InvalidateRect( GetHandle(), NULL, TRUE );
 }
-tTVPBorderStyle Window::GetBorderStyle() const {
+tTVPBorderStyle tTVPWindow::GetBorderStyle() const {
 	return static_cast<tTVPBorderStyle>(border_style_);
 }
-HICON Window::GetBigIcon() {
+HICON tTVPWindow::GetBigIcon() {
 	return (HICON)SendMessage( GetHandle(), WM_GETICON, ICON_BIG, 0 );
 }
 
-const UINT Window::SIZE_CHANGE_FLAGS = SWP_DEFERERASE | SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER;
+const UINT tTVPWindow::SIZE_CHANGE_FLAGS = SWP_DEFERERASE | SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER;
 
-void Window::SetWidth( int w ) {
+void tTVPWindow::SetWidth( int w ) {
 	RECT rect;
 	if( ::GetWindowRect( GetHandle(), &rect ) ) {
 		if( ::SetWindowPos( GetHandle(), NULL, rect.left, rect.top, w, rect.bottom-rect.top, SIZE_CHANGE_FLAGS ) == 0 ) {
@@ -621,7 +619,7 @@ void Window::SetWidth( int w ) {
 	}
 }
 
-int Window::GetWidth() const {
+int tTVPWindow::GetWidth() const {
 	RECT rect;
 	if( ::GetWindowRect( GetHandle(), &rect ) ) {
 		return rect.right - rect.left;
@@ -631,7 +629,7 @@ int Window::GetWidth() const {
 	}
 }
 
-void Window::SetHeight( int h ) {
+void tTVPWindow::SetHeight( int h ) {
 	RECT rect;
 	if( ::GetWindowRect( GetHandle(), &rect ) ) {
 		if( ::SetWindowPos( GetHandle(), NULL, rect.left, rect.top, rect.right-rect.left, h, SIZE_CHANGE_FLAGS ) == 0 ) {
@@ -640,7 +638,7 @@ void Window::SetHeight( int h ) {
 	}
 }
 
-int Window::GetHeight() const {
+int tTVPWindow::GetHeight() const {
 	RECT rect;
 	if( ::GetWindowRect( GetHandle(), &rect ) ) {
 		return rect.bottom - rect.top;
@@ -650,7 +648,7 @@ int Window::GetHeight() const {
 	}
 }
 
-void Window::SetSize( int w, int h ) {
+void tTVPWindow::SetSize( int w, int h ) {
 	RECT rect;
 	if( ::GetWindowRect( GetHandle(), &rect ) ) {
 		if( ::SetWindowPos( GetHandle(), NULL, rect.left, rect.top, w, h, SIZE_CHANGE_FLAGS ) == 0 ) {
@@ -658,7 +656,7 @@ void Window::SetSize( int w, int h ) {
 		}
 	}
 }
-void Window::GetSize( int &w, int &h ) {
+void tTVPWindow::GetSize( int &w, int &h ) {
 	RECT rect;
 	if( ::GetWindowRect( GetHandle(), &rect ) ) {
 		h = rect.bottom - rect.top;
@@ -667,9 +665,9 @@ void Window::GetSize( int &w, int &h ) {
 		h = w = 0;
 	}
 }
-const UINT Window::POS_CHANGE_FLAGS = SWP_DEFERERASE | SWP_NOACTIVATE | SWP_NOSIZE | SWP_NOOWNERZORDER | SWP_NOZORDER;
+const UINT tTVPWindow::POS_CHANGE_FLAGS = SWP_DEFERERASE | SWP_NOACTIVATE | SWP_NOSIZE | SWP_NOOWNERZORDER | SWP_NOZORDER;
 
-void Window::SetLeft( int l ) {
+void tTVPWindow::SetLeft( int l ) {
 	RECT rect;
 	if( ::GetWindowRect( GetHandle(), &rect ) ) {
 		if( ::SetWindowPos( GetHandle(), NULL, l, rect.top, rect.right-rect.left, rect.bottom-rect.top, POS_CHANGE_FLAGS ) == 0 ) {
@@ -677,7 +675,7 @@ void Window::SetLeft( int l ) {
 		}
 	}
 }
-int Window::GetLeft() const {
+int tTVPWindow::GetLeft() const {
 	RECT rect;
 	if( ::GetWindowRect( GetHandle(), &rect ) ) {
 		return rect.left;
@@ -686,7 +684,7 @@ int Window::GetLeft() const {
 		return 0;
 	}
 }
-void Window::SetTop( int t ) {
+void tTVPWindow::SetTop( int t ) {
 	RECT rect;
 	if( ::GetWindowRect( GetHandle(), &rect ) ) {
 		if( ::SetWindowPos( GetHandle(), NULL, rect.left, t, rect.right-rect.left, rect.bottom-rect.top, POS_CHANGE_FLAGS ) == 0 ) {
@@ -694,7 +692,7 @@ void Window::SetTop( int t ) {
 		}
 	}
 }
-int Window::GetTop() const {
+int tTVPWindow::GetTop() const {
 	RECT rect;
 	if( ::GetWindowRect( GetHandle(), &rect ) ) {
 		return rect.top;
@@ -703,7 +701,7 @@ int Window::GetTop() const {
 		return 0;
 	}
 }
-void Window::SetPosition( int l, int t ) {
+void tTVPWindow::SetPosition( int l, int t ) {
 	RECT rect;
 	if( ::GetWindowRect( GetHandle(), &rect ) ) {
 		if( ::SetWindowPos( GetHandle(), NULL, l, t, rect.right-rect.left, rect.bottom-rect.top, POS_CHANGE_FLAGS ) == 0 ) {
@@ -711,10 +709,10 @@ void Window::SetPosition( int l, int t ) {
 		}
 	}
 }
-void Window::SetBounds( int x, int y, int width, int height ) {
+void tTVPWindow::SetBounds( int x, int y, int width, int height ) {
 	::SetWindowPos( GetHandle(), NULL, x, y, width, height, POS_CHANGE_FLAGS );
 }
-void Window::SetInnerWidth( int w ) {
+void tTVPWindow::SetInnerWidth( int w ) {
 	RECT rect;
 	if( ::GetClientRect( GetHandle(), &rect ) ) {
 		SIZE size;
@@ -726,7 +724,7 @@ void Window::SetInnerWidth( int w ) {
 	}
 }
 
-int Window::GetInnerWidth() const {
+int tTVPWindow::GetInnerWidth() const {
 	RECT rect;
 	if( ::GetClientRect( GetHandle(), &rect ) ) {
 		return rect.right - rect.left;
@@ -735,7 +733,7 @@ int Window::GetInnerWidth() const {
 		return 0;
 	}
 }
-void Window::SetInnerHeight( int h ) {
+void tTVPWindow::SetInnerHeight( int h ) {
 	RECT rect;
 	if( ::GetClientRect( GetHandle(), &rect ) ) {
 		SIZE size;
@@ -747,7 +745,7 @@ void Window::SetInnerHeight( int h ) {
 	}
 }
 
-int Window::GetInnerHeight() const {
+int tTVPWindow::GetInnerHeight() const {
 	RECT rect;
 	if( ::GetClientRect( GetHandle(), &rect ) ) {
 		return rect.bottom - rect.top;
@@ -757,23 +755,23 @@ int Window::GetInnerHeight() const {
 	}
 }
 
-void Window::SetInnerSize( int w, int h ) {
+void tTVPWindow::SetInnerSize( int w, int h ) {
 	SIZE size;
 	size.cx = w;
 	size.cy = h;
 	SetClientSize( GetHandle(), size );
 }
 
-void Window::BringToFront() {
+void tTVPWindow::BringToFront() {
 	::SetWindowPos( GetHandle(), HWND_TOP, 0, 0, 0, 0, (SWP_SHOWWINDOW|SWP_NOMOVE|SWP_NOSIZE) );
 }
-void Window::SetStayOnTop( bool b ) {
+void tTVPWindow::SetStayOnTop( bool b ) {
 	static const UINT flags = SWP_NOSIZE | SWP_NOMOVE | SWP_NOREDRAW | SWP_NOACTIVATE | SWP_NOCOPYBITS | SWP_NOSENDCHANGING;
 	if( ::SetWindowPos( GetHandle(), b ? HWND_TOPMOST : HWND_NOTOPMOST, 0,0,0,0, flags ) == 0 ) {
 		// error
 	}
 }
-bool Window::GetStayOnTop() const {
+bool tTVPWindow::GetStayOnTop() const {
 	DWORD exStyle = ::GetWindowLong( GetHandle(), GWL_EXSTYLE );
 	if( exStyle == 0 ) {
 		// error
@@ -781,10 +779,10 @@ bool Window::GetStayOnTop() const {
 	}
 	return (exStyle & WS_EX_TOPMOST) ? true : false;
 }
-void Window::SetFullScreenMode(bool b) {
+void tTVPWindow::SetFullScreenMode(bool b) {
 }
 
-void Window::GetClientRect( struct tTVPRect& rt ) {
+void tTVPWindow::GetClientRect( struct tTVPRect& rt ) {
 	RECT r;
 	::GetClientRect( GetHandle(), &r );
 	rt.top = r.top;
@@ -793,7 +791,7 @@ void Window::GetClientRect( struct tTVPRect& rt ) {
 	rt.right = r.right;
 }
 
-int Window::ShowModal() {
+int tTVPWindow::ShowModal() {
 	if( GetVisible() || !GetEnable() ) {
 		throw Exception(_T("Cannot Show Modal."));
 	}
@@ -903,4 +901,3 @@ end;
 */
 	return ModalResult;
 }
-}; // namespace

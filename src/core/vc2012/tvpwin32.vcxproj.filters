@@ -301,9 +301,6 @@
     <ClInclude Include="..\environ\win32\Screen.h">
       <Filter>environ\win32</Filter>
     </ClInclude>
-    <ClInclude Include="..\environ\win32\TMLWindow.h">
-      <Filter>environ\win32</Filter>
-    </ClInclude>
     <ClInclude Include="..\environ\win32\InputStringForm.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -544,6 +541,9 @@
     <ClInclude Include="..\tjs2\tjsOctPack.h">
       <Filter>tjs2</Filter>
     </ClInclude>
+    <ClInclude Include="..\environ\win32\TVPWindow.h">
+      <Filter>environ\win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -736,9 +736,6 @@
       <Filter>environ\win32</Filter>
     </ClCompile>
     <ClCompile Include="..\environ\win32\Screen.cpp">
-      <Filter>environ\win32</Filter>
-    </ClCompile>
-    <ClCompile Include="..\environ\win32\TMLWindow.cpp">
       <Filter>environ\win32</Filter>
     </ClCompile>
     <ClCompile Include="..\environ\win32\InputStringForm.cpp">
@@ -950,6 +947,9 @@
     </ClCompile>
     <ClCompile Include="..\tjs2\tjsOctPack.cpp">
       <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\environ\win32\TVPWindow.cpp">
+      <Filter>environ\win32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

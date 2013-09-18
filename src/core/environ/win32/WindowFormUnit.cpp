@@ -183,7 +183,7 @@ void TVPInitWindowOptions()
 //---------------------------------------------------------------------------
 
 
-TTVPWindowForm::TTVPWindowForm( TApplication* app, tTJSNI_Window* ni ) : TML::Window(), CurrentMouseCursor(crDefault), touch_points_(this),
+TTVPWindowForm::TTVPWindowForm( TApplication* app, tTJSNI_Window* ni ) : tTVPWindow(), CurrentMouseCursor(crDefault), touch_points_(this),
 	LayerLeft(0), LayerTop(0), LayerWidth(32), LayerHeight(32) {
 	CreateWnd( _T("TVPMainWindow"), Application->GetTitle(), 10, 10 );
 	TVPInitWindowOptions();
@@ -364,7 +364,7 @@ bool TTVPWindowForm::ProcessTrappedKeyMessage(LRESULT &result, UINT msg, WPARAM 
 
 	if( CanReceiveTrappedKeys ) {
 		InReceivingTrappedKeys = true;
-		result = TML::Window::Proc( GetHandle(), msg, wparam, lparam );
+		result = tTVPWindow::Proc( GetHandle(), msg, wparam, lparam );
 		InReceivingTrappedKeys = false;
 	}
 	if( msg == WM_KEYUP ) 	{
@@ -421,7 +421,7 @@ LRESULT WINAPI TTVPWindowForm::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
 		WMAcquireImeControl();
 		return 0;
 	default:
-		return TML::Window::Proc( hWnd, msg, wParam, lParam );
+		return tTVPWindow::Proc( hWnd, msg, wParam, lParam );
 	}
 }
 void TTVPWindowForm::WMShowVisible() {

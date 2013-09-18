@@ -6,7 +6,7 @@
 #include "tvpinputdefs.h"
 #include "WindowIntf.h"
 
-#include "TMLWindow.h"
+#include "TVPWindow.h"
 #include "MouseCursor.h"
 #include "TouchPoint.h"
 
@@ -98,7 +98,7 @@ class tTVPBaseBitmap;
 class tTVPWheelDirectInputDevice; // class for DirectInputDevice management
 class tTVPPadDirectInputDevice; // class for DirectInputDevice management
 
-class TTVPWindowForm : public TML::Window, public TouchHandler {
+class TTVPWindowForm : public tTVPWindow, public TouchHandler {
 	static const int TVP_MOUSE_MAX_ACCEL = 30;
 	static const int TVP_MOUSE_SHIFT_ACCEL = 40;
 private:
@@ -223,7 +223,7 @@ public:
 	//-- properties
 	tstring GetCaption() const {
 		tstring ret;
-		TML::Window::GetCaption( ret );
+		tTVPWindow::GetCaption( ret );
 		return ret;
 	}
 
