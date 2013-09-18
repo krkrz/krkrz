@@ -1,0 +1,264 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ソース ファイル">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="ヘッダー ファイル">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="NASM Source">
+      <UniqueIdentifier>{dc555348-09fc-4bb3-ab1e-03d935150b10}</UniqueIdentifier>
+      <Extensions>asm</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="jcapimin.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jcapistd.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jccoefct.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jccolor.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jcdctmgr.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jchuff.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jcinit.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jcmainct.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jcmarker.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jcmaster.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jcparam.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jcphuff.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jcprepct.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jcsample.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jctrans.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jdatadst.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jdapimin.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jdapistd.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jdatasrc.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jdcoefct.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jdcolor.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jddctmgr.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jdhuff.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jdinput.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jdmainct.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jdmarker.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jdmaster.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jdmerge.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jdphuff.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jdpostct.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jdsample.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jdtrans.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jquant1.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jquant2.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jcomapi.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jerror.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jmemmgr.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jutils.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="jmemnobs.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="jccolmmx.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jccolss2.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jcqnt3dn.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jcqntflt.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jcqntint.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jcqntmmx.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jcqnts2f.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jcqnts2i.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jcqntsse.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jcsammmx.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jcsamss2.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jdcolmmx.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jdcolss2.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jdmermmx.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jdmerss2.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jdsammmx.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jdsamss2.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jf3dnflt.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jfdctflt.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jfdctfst.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jfdctint.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jfmmxfst.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jfmmxint.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jfss2fst.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jfss2int.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="ji3dnflt.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jfsseflt.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jidctflt.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jidctfst.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jidctint.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jidctred.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jimmxfst.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jimmxred.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jimmxint.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jiss2flt.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jiss2fst.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jiss2int.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jisseflt.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jiss2red.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jsimdcpu.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+    <None Include="jsimdw32.asm">
+      <Filter>NASM Source</Filter>
+    </None>
+  </ItemGroup>
+</Project>
