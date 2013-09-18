@@ -61,11 +61,11 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="contrib\masmx86\inffas32.asm">
-      <Filter>ASM Source</Filter>
-    </None>
-    <None Include="contrib\masmx86\match686.asm">
-      <Filter>ASM Source</Filter>
-    </None>
+    <CustomBuild Include="contrib\masmx86\inffas32.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="contrib\masmx86\match686.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>

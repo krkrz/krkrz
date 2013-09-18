@@ -134,128 +134,128 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="jccolmmx.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jccolss2.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jcqnt3dn.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jcqntflt.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jcqntint.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jcqntmmx.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jcqnts2f.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jcqnts2i.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jcqntsse.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jcsammmx.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jcsamss2.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jdcolmmx.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jdcolss2.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jdmermmx.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jdmerss2.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jdsammmx.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jdsamss2.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jf3dnflt.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jfdctflt.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jfdctfst.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jfdctint.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jfmmxfst.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jfmmxint.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jfss2fst.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jfss2int.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="ji3dnflt.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jfsseflt.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jidctflt.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jidctfst.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jidctint.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jidctred.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jimmxfst.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jimmxred.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jimmxint.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jiss2flt.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jiss2fst.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jiss2int.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jisseflt.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jiss2red.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jsimdcpu.asm">
-      <Filter>NASM Source</Filter>
-    </None>
-    <None Include="jsimdw32.asm">
-      <Filter>NASM Source</Filter>
-    </None>
+    <CustomBuild Include="jccolmmx.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jccolss2.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jcqnt3dn.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jcqntflt.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jcqntint.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jcqntmmx.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jcqnts2f.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jcqnts2i.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jcqntsse.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jcsammmx.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jcsamss2.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jdcolmmx.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jdcolss2.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jdmermmx.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jdmerss2.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jdsammmx.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jdsamss2.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jf3dnflt.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jfdctflt.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jfdctfst.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jfdctint.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jfmmxfst.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jfmmxint.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jfss2fst.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jfss2int.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jfsseflt.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ji3dnflt.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jidctflt.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jidctfst.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jidctint.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jidctred.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jimmxfst.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jimmxint.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jimmxred.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jiss2flt.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jiss2fst.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jiss2int.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jiss2red.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jisseflt.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jsimdcpu.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jsimdw32.asm">
+      <Filter>ソース ファイル</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>
