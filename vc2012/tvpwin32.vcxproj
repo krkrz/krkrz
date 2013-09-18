@@ -132,8 +132,8 @@
     <ClInclude Include="..\environ\win32\StringUtil.h" />
     <ClInclude Include="..\environ\win32\TColor.h" />
     <ClInclude Include="..\environ\win32\TFont.h" />
-    <ClInclude Include="..\environ\win32\TMLWindow.h" />
     <ClInclude Include="..\environ\win32\TouchPoint.h" />
+    <ClInclude Include="..\environ\win32\TVPWindow.h" />
     <ClInclude Include="..\environ\win32\VersionFormUnit.h" />
     <ClInclude Include="..\environ\win32\WindowFormUnit.h" />
     <ClInclude Include="..\msg\MsgIntf.h" />
@@ -287,8 +287,8 @@
     <ClCompile Include="..\environ\win32\MainFormUnit.cpp" />
     <ClCompile Include="..\environ\win32\MouseCursor.cpp" />
     <ClCompile Include="..\environ\win32\Screen.cpp" />
-    <ClCompile Include="..\environ\win32\TMLWindow.cpp" />
     <ClCompile Include="..\environ\win32\TouchPoint.cpp" />
+    <ClCompile Include="..\environ\win32\TVPWindow.cpp" />
     <ClCompile Include="..\environ\win32\VersionFormUnit.cpp" />
     <ClCompile Include="..\environ\win32\WindowFormUnit.cpp" />
     <ClCompile Include="..\msg\MsgIntf.cpp" />
