@@ -309,13 +309,13 @@ static ogg_uint32_t bitreverse(ogg_uint32_t x){
   return((x>> 1)&0x55555555UL) | ((x<< 1)&0xaaaaaaaaUL);
 }
 
-static int sort32a(const void *a,const void *b){
+static int _cdecl sort32a(const void *a,const void *b){
   return ( **(ogg_uint32_t **)a>**(ogg_uint32_t **)b)- 
     ( **(ogg_uint32_t **)a<**(ogg_uint32_t **)b);
 }
 
 /* decode codebook arrangement is more heavily optimized than encode */
-int vorbis_book_init_decode(codebook *c,const static_codebook *s){
+int vorbis_book_init_decode(codebook *c,const static_codebook *s, float gain){
   int i,j,n=0,tabn;
   int *sortindex;
   memset(c,0,sizeof(*c));
@@ -367,6 +367,10 @@ int vorbis_book_init_decode(codebook *c,const static_codebook *s){
   }
 
   c->valuelist=_book_unquantize(s,n,sortindex);
+
+  if(c->valuelist)
+  	for(i=0;i<n*s->dim;i++) c->valuelist[i]*=gain;
+
   c->dec_index=_ogg_malloc(n*sizeof(*c->dec_index));
 
   for(n=0,i=0;i<s->entries;i++)

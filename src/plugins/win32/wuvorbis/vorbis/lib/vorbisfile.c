@@ -735,10 +735,10 @@ int ov_open_callbacks(void *f,OggVorbis_File *vf,char *initial,long ibytes,
 
 int ov_open(FILE *f,OggVorbis_File *vf,char *initial,long ibytes){
   ov_callbacks callbacks = {
-    (size_t (*)(void *, size_t, size_t, void *))  fread,
-    (int (*)(void *, ogg_int64_t, int))              _fseek64_wrap,
-    (int (*)(void *))                             fclose,
-    (long (*)(void *))                            ftell
+    (size_t (_cdecl*)(void *, size_t, size_t, void *))  fread,
+    (int (_cdecl*)(void *, ogg_int64_t, int))              _fseek64_wrap,
+    (int (_cdecl*)(void *))                             fclose,
+    (long (_cdecl*)(void *))                            ftell
   };
 
   return ov_open_callbacks((void *)f, vf, initial, ibytes, callbacks);
@@ -785,10 +785,10 @@ int ov_test_callbacks(void *f,OggVorbis_File *vf,char *initial,long ibytes,
 
 int ov_test(FILE *f,OggVorbis_File *vf,char *initial,long ibytes){
   ov_callbacks callbacks = {
-    (size_t (*)(void *, size_t, size_t, void *))  fread,
-    (int (*)(void *, ogg_int64_t, int))              _fseek64_wrap,
-    (int (*)(void *))                             fclose,
-    (long (*)(void *))                            ftell
+    (size_t (_cdecl*)(void *, size_t, size_t, void *))  fread,
+    (int (_cdecl*)(void *, ogg_int64_t, int))              _fseek64_wrap,
+    (int (_cdecl*)(void *))                             fclose,
+    (long (_cdecl*)(void *))                            ftell
   };
 
   return ov_test_callbacks((void *)f, vf, initial, ibytes, callbacks);
@@ -1493,6 +1493,320 @@ static int host_is_big_endian() {
   return 0;
 }
 
+
+extern	int CPU_SSE;
+extern	int CPU_MMX;
+extern  int CPU_3DN;
+
+static void float_to_pcm_stereo(float **pcm, short int *output, int samples)
+{
+	int tmp1;
+	int tmp2;
+	_asm
+	{
+		mov		eax, pcm
+		mov		edx, [eax]  // channel 1
+		mov		esi, [eax + 4]  // channel 2
+		mov		ecx, samples;
+		mov		edi, output; // out
+loop0:
+		fld		dword ptr [edx]
+		add		edi, 4
+		fld		dword ptr [esi]
+		add		edx, 4
+		fistp	dword ptr tmp2
+		add		esi, 4
+		fistp	dword ptr tmp1
+
+		mov		eax, tmp1
+		mov		ebx, tmp2
+		cmp		eax, -32768
+		jle		esc1_1
+		cmp		eax, 32767
+		jge		esc1_2
+		jmp		escp1
+esc1_1:	
+		mov		eax, -32768
+		jmp		escp1
+esc1_2:
+		mov		eax, 32767
+
+escp1:
+		and		eax, 0xffff
+
+		cmp		ebx, -32768
+		jle		esc2_1
+		cmp		ebx, 32767
+		jge		esc2_2
+		shl		ebx, 16
+		jmp		escp2
+esc2_1:	
+		mov		ebx, -32768*65536
+		jmp		escp2
+esc2_2:
+		mov		ebx, +32767*65536
+
+escp2:
+		or		ebx, eax
+		dec		ecx
+		mov		[edi-4], ebx
+
+		jnz		loop0
+	};
+}
+
+__declspec(align(8)) static int packed_sign_ext[] = {0x80000000, 0x80000000};
+__declspec(align(8)) static float packed_adj_q[] = {0.5, 0.5};
+
+
+static int float_to_pcm_stereo_3dn(float **pcm, short int *output, int samples)
+{
+	_asm
+	{
+		mov eax, pcm
+		mov edx, [eax]
+		mov esi, [eax + 4]
+		mov ecx, samples
+		mov edi, output
+		shl	ecx, 2
+		add ecx, edi
+		cmp edi, ecx
+		jnl exit0
+
+		align 16
+loop0:
+		add esi, 32 // pcm[1]
+
+		movq	mm0,	[edx]
+		movq	mm4,	[edx+8]
+		movq	mm1,	[esi-32]
+		movq	mm5,	[esi+8-32]
+
+		movq	mm2,	mm0
+		movq	mm3,	mm4
+		pand	mm2,	packed_sign_ext
+		pand	mm3,	packed_sign_ext
+		pxor	mm2,	packed_adj_q
+		pxor	mm3,	packed_adj_q
+		pfadd	mm0,	mm2
+		pfadd	mm4,	mm3
+
+		movq	mm2,	mm1
+		movq	mm3,	mm5
+		pand	mm2,	packed_sign_ext
+		pand	mm3,	packed_sign_ext
+		pxor	mm2,	packed_adj_q
+		pxor	mm3,	packed_adj_q
+		pfadd	mm1,	mm2
+		pfadd	mm5,	mm3
+
+		pf2id	mm0,	mm0
+		pf2id	mm4,	mm4
+		pf2id	mm1,	mm1
+		pf2id	mm5,	mm5
+		movq	mm2,	mm0
+		movq	mm6,	mm4
+		movq	mm3,	mm1
+		movq	mm7,	mm5
+		prefetch	[edx + 64]
+		prefetch	[esi + 64]
+		punpckldq	mm2,	mm3
+		punpckldq	mm6,	mm7
+		punpckhdq	mm0,	mm1
+		punpckhdq	mm4,	mm5
+		packssdw	mm2,	mm0
+		packssdw	mm6,	mm4
+		movq	[edi],	mm2
+		movq	[edi+8],	mm6
+
+
+		movq	mm0,	[edx+16]
+		movq	mm4,	[edx+24]
+		movq	mm1,	[esi+16-32]
+		movq	mm5,	[esi+24-32]
+
+		movq	mm2,	mm0
+		movq	mm3,	mm4
+		pand	mm2,	packed_sign_ext
+		pand	mm3,	packed_sign_ext
+		pxor	mm2,	packed_adj_q
+		pxor	mm3,	packed_adj_q
+		pfadd	mm0,	mm2
+		pfadd	mm4,	mm3
+
+		movq	mm2,	mm1
+		movq	mm3,	mm5
+		pand	mm2,	packed_sign_ext
+		pand	mm3,	packed_sign_ext
+		pxor	mm2,	packed_adj_q
+		pxor	mm3,	packed_adj_q
+		pfadd	mm1,	mm2
+		pfadd	mm5,	mm3
+
+		pf2id	mm0,	mm0
+		pf2id	mm4,	mm4
+		pf2id	mm1,	mm1
+		pf2id	mm5,	mm5
+		movq	mm2,	mm0
+		movq	mm6,	mm4
+		movq	mm3,	mm1
+		movq	mm7,	mm5
+
+		add edx, 32 // pcm[0]
+		add edi, 32 // output
+
+		punpckldq	mm2,	mm3
+		punpckldq	mm6,	mm7
+		punpckhdq	mm0,	mm1
+		punpckhdq	mm4,	mm5
+		cmp edi, ecx
+		packssdw	mm2,	mm0
+		packssdw	mm6,	mm4
+		movq	[edi+16-32],	mm2
+		movq	[edi+24-32],	mm6
+
+		jl loop0
+exit0:
+		femms
+		sub edi, output
+		shr edi, 2
+		mov eax, edi
+	}
+}
+static int float_to_pcm_stereo_sse(float **pcm, short int *output, int samples)
+{
+	_asm
+	{
+		mov eax, pcm
+		mov edx, [eax]
+		mov esi, [eax + 4]
+		mov ecx, samples
+		mov edi, output
+		shl	ecx, 2
+		add ecx, edi
+		cmp edi, ecx
+		jnl exit0
+
+		align 16
+loop0:
+		cvtps2pi mm0, [esi]
+		add edi, 32
+		cvtps2pi mm4, [esi + 8]
+		cvtps2pi mm1, [edx]
+		cvtps2pi mm3, [edx + 8]
+		movq mm2, mm1
+		movq mm5, mm3
+		prefetcht0		[esi + 64]
+		punpckldq mm2, mm0
+		cvtps2pi mm7, [esi + 16]
+		punpckldq mm5, mm4
+		cvtps2pi mm6, [edx + 16]
+		punpckhdq mm1, mm0
+		add esi, 32
+		punpckhdq mm3, mm4
+		prefetcht0		[edx + 64]
+		packssdw mm2, mm1
+		movq mm4, mm6
+		packssdw mm5, mm3
+		movq [edi - 32], mm2
+		punpckldq mm4, mm7
+		movq [edi + 8 - 32], mm5
+		punpckhdq mm6, mm7
+		cvtps2pi mm3, [edx + 24]
+		packssdw mm4, mm6
+		cvtps2pi mm1, [esi + 24 - 32]
+		movq mm5, mm3
+		add edx, 32
+		punpckldq mm5, mm1
+		movq [edi + 16 - 32], mm4
+		punpckhdq mm3, mm1
+		cmp edi, ecx
+		packssdw mm5, mm3
+		movq [edi + 24 - 32], mm5
+
+		jl loop0
+exit0:
+		emms
+		sub edi, output
+		shr edi, 2
+		mov eax, edi
+	}
+}
+
+static void float_to_pcm(float **pcm, short int *output, int samples, int chans)
+{
+	vorbis_fpu_control fpu;
+	vorbis_fpu_setround(&fpu);
+	if(!samples) return;
+	if(chans != 2)
+	{
+		int i;
+		for(i=0;i<chans;i++) { /* It's faster in this order */
+		  float *src=pcm[i];
+		  short *dest=output+i;
+		  int j;
+		  int val;
+		  for(j=0;j<samples;j++) {
+			val=vorbis_ftoi(src[j]/**32768.f*/);
+			if(val>32767) *dest = (short int)32767;
+			else if(val<-32768) *dest = (short int)-32768;
+			else *dest=val;
+			dest+=chans;
+		  }
+		}
+	}
+	else
+	{
+		// special optimization for chans = 2
+		if(CPU_SSE && CPU_MMX)
+		{
+			int p;
+			int i;
+			samples -= 15;
+			p = float_to_pcm_stereo_sse(pcm, output, samples);
+			samples += 15;
+
+			for(i=0;i<chans;i++) { /* It's faster in this order */
+			  float *src=pcm[i];
+			  short *dest=output+i + p * chans;
+			  int j;
+			  int val;
+			  for(j=p;j<samples;j++) {
+				val=vorbis_ftoi(src[j]/**32768.f*/);
+				if(val>32767) *dest = (short int)32767;
+				else if(val<-32768) *dest = (short int)-32768;
+				else *dest=val;
+				dest+=chans;
+			  }
+			}
+		}
+		else if(CPU_3DN)
+		{
+			int p;
+			int i;
+			samples -= 15;
+			p = float_to_pcm_stereo_3dn(pcm, output, samples);
+			samples += 15;
+
+			for(i=0;i<chans;i++) { /* It's faster in this order */
+			  float *src=pcm[i];
+			  short *dest=output+i + p * chans;
+			  int j;
+			  int val;
+			  for(j=p;j<samples;j++) {
+				val=vorbis_ftoi(src[j]/**32768.f*/);
+				if(val>32767) *dest = (short int)32767;
+				else if(val<-32768) *dest = (short int)-32768;
+				else *dest=val;
+				dest+=chans;
+			  }
+			}
+		}
+		else
+				float_to_pcm_stereo(pcm, output, samples);
+	}
+	vorbis_fpu_restore(fpu);
+}
 /* up to this point, everything could more or less hide the multiple
    logical bitstream nature of chaining from the toplevel application
    if the toplevel application didn't particularly care.  However, at
@@ -1566,7 +1880,15 @@ long ov_read(OggVorbis_File *vf,char *buffer,int length,
     /* a tight loop to pack each size */
     {
       int val;
-      if(word==1){
+	  if(word == 4) /* added by dee, for 32bit float extraction */
+	  {
+		  float *dest = (float*)buffer;
+		for(j=0;j<samples;j++)
+		 for(i=0;i<channels;i++){
+			  *dest++ = pcm[i][j];
+		  }
+	  }
+      else if(word==1){
 	int off=(sgned?0:128);
 	vorbis_fpu_setround(&fpu);
 	for(j=0;j<samples;j++)
@@ -1583,19 +1905,7 @@ long ov_read(OggVorbis_File *vf,char *buffer,int length,
 	if(host_endian==bigendianp){
 	  if(sgned){
 	    
-	    vorbis_fpu_setround(&fpu);
-	    for(i=0;i<channels;i++) { /* It's faster in this order */
-	      float *src=pcm[i];
-	      short *dest=((short *)buffer)+i;
-	      for(j=0;j<samples;j++) {
-		val=vorbis_ftoi(src[j]*32768.f);
-		if(val>32767)val=32767;
-		else if(val<-32768)val=-32768;
-		*dest=val;
-		dest+=channels;
-	      }
-	    }
-	    vorbis_fpu_restore(fpu);
+		float_to_pcm(pcm, (short*)buffer, samples, channels);
 	    
 	  }else{
 	    
@@ -1852,8 +2162,8 @@ int ov_crosslap(OggVorbis_File *vf1, OggVorbis_File *vf2){
      buffer of vf2 */
   /* consolidate and expose the buffer. */
   vorbis_synthesis_lapout(&vf2->vd,&pcm);
-  _analysis_output_always("pcmL",0,pcm[0],n1*2,0,0,0);
-  _analysis_output_always("pcmR",0,pcm[1],n1*2,0,0,0);
+//  _analysis_output_always("pcmL",0,pcm[0],n1*2,0,0,0); // disabled by W.Dee 20031206
+//  _analysis_output_always("pcmR",0,pcm[1],n1*2,0,0,0);
 
   /* splice */
   _ov_splice(pcm,lappcm,n1,n2,vi1->channels,vi2->channels,w1,w2);

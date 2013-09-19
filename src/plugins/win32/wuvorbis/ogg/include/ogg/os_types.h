@@ -19,10 +19,10 @@
 
 /* make it easy on the folks that want to compile the libs with a
    different malloc than stdlib */
-#define _ogg_malloc  malloc
-#define _ogg_calloc  calloc
-#define _ogg_realloc realloc
-#define _ogg_free    free
+#define _ogg_malloc  dee_ogg_malloc
+#define _ogg_calloc  dee_ogg_calloc
+#define _ogg_realloc dee_ogg_realloc
+#define _ogg_free    dee_ogg_free
 
 #if defined(_WIN32) 
 

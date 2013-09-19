@@ -294,7 +294,7 @@ static void cheby(float *g, int ord) {
   }
 }
 
-static int comp(const void *a,const void *b){
+static int _cdecl comp(const void *a,const void *b){
   return (*(float *)a<*(float *)b)-(*(float *)a>*(float *)b);
 }
 

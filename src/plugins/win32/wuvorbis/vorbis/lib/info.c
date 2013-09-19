@@ -149,7 +149,13 @@ int vorbis_info_blocksize(vorbis_info *vi,int zo){
 /* used by synthesis, which has a full, alloced vi */
 void vorbis_info_init(vorbis_info *vi){
   memset(vi,0,sizeof(*vi));
+  vi->global_gain = 1.0;
   vi->codec_setup=_ogg_calloc(1,sizeof(codec_setup_info));
+}
+
+/* set global gain. shoud be called before decoding a stream */
+void vorbis_info_set_global_gain(vorbis_info *vi, float gain){
+	vi->global_gain = gain;
 }
 
 void vorbis_info_clear(vorbis_info *vi){
@@ -180,10 +186,10 @@ void vorbis_info_clear(vorbis_info *vi){
     }
     if(ci->fullbooks)
 	_ogg_free(ci->fullbooks);
-    
+#ifndef DECODE_ONLY    
     for(i=0;i<ci->psys;i++)
       _vi_psy_free(ci->psy_param[i]);
-
+#endif
     _ogg_free(ci);
   }
 

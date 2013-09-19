@@ -729,6 +729,205 @@ static int mapping0_forward(vorbis_block *vb){
   return(0);
 }
 
+
+__declspec(align(16)) static int sign_extractor[] = {0x80000000, 0x80000000, 0x80000000, 0x80000000};
+extern int CPU_SSE;
+extern int CPU_3DN;
+
+
+static int channel_coupling_asm(float *pcmM, float *pcmA, int n)
+{
+_asm
+{
+	push		ebx
+
+	mov			eax,		pcmM
+	mov			ebx,		pcmA
+	mov			ecx,		ebx
+	sub			ecx,		eax							// ecx = pcmA - pcmM
+	mov			esi,		n
+	lea			esi,		[esi*4 + eax]				// edx = limit
+
+	cmp			eax,		esi
+	jae			exit0
+
+	push		ebp
+
+	align 16
+loop0:
+	fld			dword ptr [eax]
+	mov			edi,		[ebx]			// ang
+	mov			ebp,		[eax]			// mag
+	xor			ebp,		edi
+	fld			dword ptr [eax]
+	and			ebp,		0x80000000		// extract sign
+	sar			edi,		31				// make mask
+	xor			[ebx],		ebp				// change sign
+	mov			edx,		edi
+	fld			dword ptr [ebx]
+	and			edx,		ecx
+	fsub									// st= mag +- ang
+	not			edi
+	and			edi,		ecx
+	add			ebx,		2*4
+	fstp		dword ptr [edi+eax]
+	fstp		dword ptr [edx+eax]
+
+	fld			dword ptr [eax+4]
+	mov			edi,		[ebx+4-2*4]		// ang
+	mov			ebp,		[eax+4]			// mag
+	xor			ebp,		edi
+	fld			dword ptr [eax+4]
+	and			ebp,		0x80000000		// extract sign
+	sar			edi,		31				// make mask
+	xor			[ebx+4-2*4],ebp				// change sign
+	mov			edx,		edi
+	fld			dword ptr [ebx+4-2*4]
+	and			edx,		ecx
+	fsub									// st= mag +- ang
+	not			edi
+	add			eax,		2*4
+	and			edi,		ecx
+	cmp			eax,		esi
+	fstp		dword ptr [edi+eax+4-2*4]
+	fstp		dword ptr [edx+eax+4-2*4]
+
+	jb			loop0
+	
+	pop			ebp
+
+exit0:
+	sub			eax,		pcmM
+	shr			eax,		2
+	pop			ebx
+
+}
+
+}
+
+static int channel_coupling_sse(float *pcmM, float *pcmA, int n)
+{
+_asm
+{
+	push		ebx
+
+	mov			eax,		pcmM
+	mov			ecx,		eax
+	mov			ebx,		pcmA
+	mov			edx,		n
+	lea			edx,		[edx*4 + eax]
+	xorps		xmm7,		xmm7						// xmm7 = 0
+
+	cmp			eax,		edx
+	jae			exit0
+
+	align 16
+loop0:
+	movaps		xmm1,		[ebx]						// xmm1 = ang
+	movaps		xmm2,		xmm1
+
+	movaps		xmm0,		[eax]
+	add			ebx,		4*4
+	cmpnleps	xmm2,		xmm7						// xmm2 = ang > 0
+
+	movaps		xmm3,		xmm0
+	movaps		xmm5,		xmm2
+	prefetcht0	[ebx + 16 - 4*4]
+	xorps		xmm3,		xmm1
+	movaps		xmm6,		xmm0
+	andnps		xmm3,		sign_extractor
+
+	xorps		xmm1,		xmm3						// xmm1 = +ang or -ang (sign is changed)
+	prefetcht0	[eax + 16]
+
+	andps		xmm2,		xmm1
+	andnps		xmm5,		xmm1
+	add			eax,		4*4
+	addps		xmm6,		xmm5
+	addps		xmm2,		xmm0
+	movaps		[eax - 4*4],	xmm6
+	cmp			eax,		edx
+	movaps		[ebx - 4*4],	xmm2
+
+	jb			loop0
+
+exit0:
+	sub			eax,		ecx
+	shr			eax,		2
+	pop			ebx
+
+}
+
+}
+static int channel_coupling_3dn(float *pcmM, float *pcmA, int n)
+{
+_asm
+{
+	push		ebx
+
+	mov			eax,		pcmM
+	mov			ecx,		eax
+	mov			ebx,		pcmA
+	mov			edx,		n
+	lea			edx,		[edx*4 + eax]
+	pxor		mm7,		mm7						// mm7 = 0
+
+	cmp			eax,		edx
+	jae			exit30
+
+	align 16
+loop30:
+	movq		mm1,		[ebx]					// mm1 = ang
+	movq		mm2,		mm1
+	movq		mm0,		[eax]
+	pfcmpgt		mm2,		mm7						// mm2 = ang > 0
+	movq		mm3,		mm0
+	movq		mm5,		mm2
+	pxor		mm3,		mm1
+	movq		mm6,		mm0
+	pandn		mm3,		sign_extractor
+	pxor		mm1,		mm3						// mm1 = +ang or -ang (sign is changed)
+	pand		mm2,		mm1
+	pandn		mm5,		mm1
+	pfadd		mm6,		mm5
+	pfadd		mm2,		mm0
+	movq		[eax],		mm6
+	movq		[ebx],		mm2
+
+	movq		mm1,		[ebx+8]					// mm1 = ang
+	movq		mm2,		mm1
+	movq		mm0,		[eax+8]
+	pfcmpgt		mm2,		mm7						// mm2 = ang > 0
+	movq		mm3,		mm0
+	movq		mm5,		mm2
+	pxor		mm3,		mm1
+	movq		mm6,		mm0
+	pandn		mm3,		sign_extractor
+	pxor		mm1,		mm3						// mm1 = +ang or -ang (sign is changed)
+	pand		mm2,		mm1
+	pandn		mm5,		mm1
+	pfadd		mm6,		mm5
+	pfadd		mm2,		mm0
+	movq		[eax+8],		mm6
+	movq		[ebx+8],		mm2
+
+	add			ebx,		4*4
+	add			eax,		4*4
+	cmp			eax,		edx
+	jb			loop30
+
+exit30:
+	sub			eax,		ecx
+	shr			eax,		2
+	pop			ebx
+	femms
+}
+
+}
+
+
+
+
 static int mapping0_inverse(vorbis_block *vb,vorbis_info_mapping *l){
   vorbis_dsp_state     *vd=vb->vd;
   vorbis_info          *vi=vd->vi;
@@ -790,27 +989,133 @@ static int mapping0_inverse(vorbis_block *vb,vorbis_info_mapping *l){
     float *pcmM=vb->pcm[info->coupling_mag[i]];
     float *pcmA=vb->pcm[info->coupling_ang[i]];
 
-    for(j=0;j<n/2;j++){
-      float mag=pcmM[j];
-      float ang=pcmA[j];
+	if(CPU_SSE)
+	{
+		int lim = n/2;
+		int j;
 
-      if(mag>0)
-	if(ang>0){
-	  pcmM[j]=mag;
-	  pcmA[j]=mag-ang;
-	}else{
-	  pcmA[j]=mag;
-	  pcmM[j]=mag+ang;
+		lim -= 3;
+
+		j = channel_coupling_sse(pcmM, pcmA, lim);
+
+		lim += 3;
+
+		for(;j<lim;j++){
+			float mag=pcmM[j];
+			float ang=pcmA[j];
+
+			if(ang>0){
+				pcmM[j]=mag;
+				pcmA[j]=mag > 0 ? mag-ang : mag+ang;
+			}else{
+				pcmM[j]=mag > 0 ? mag+ang : mag-ang;
+				pcmA[j]=mag;
+			}
+		}
 	}
-      else
-	if(ang>0){
-	  pcmM[j]=mag;
-	  pcmA[j]=mag+ang;
-	}else{
-	  pcmA[j]=mag;
-	  pcmM[j]=mag-ang;
+	else if(CPU_3DN)
+	{
+		int lim = n/2;
+		int j;
+
+		lim -= 3;
+
+		j = channel_coupling_3dn(pcmM, pcmA, lim);
+
+		lim += 3;
+
+		for(;j<lim;j++){
+			float mag=pcmM[j];
+			float ang=pcmA[j];
+
+			if(ang>0){
+				pcmM[j]=mag;
+				pcmA[j]=mag > 0 ? mag-ang : mag+ang;
+			}else{
+				pcmM[j]=mag > 0 ? mag+ang : mag-ang;
+				pcmA[j]=mag;
+			}
+		}
 	}
-    }
+	else if(1)
+	{
+		int lim = n/2;
+		int j;
+
+		lim -= 3;
+
+		j = channel_coupling_asm(pcmM, pcmA, lim);
+
+		lim += 3;
+
+		for(;j<lim;j++){
+			float mag=pcmM[j];
+			float ang=pcmA[j];
+
+			if(ang>0){
+				pcmM[j]=mag;
+				pcmA[j]=mag > 0 ? mag-ang : mag+ang;
+			}else{
+				pcmM[j]=mag > 0 ? mag+ang : mag-ang;
+				pcmA[j]=mag;
+			}
+		}
+	}
+	else
+	{
+		for(j=0;j<n/2;j++){
+			
+			long temp;
+			register long temp2;
+			long mag = *(long*)(pcmM + j);
+			long ang = *(long*)(pcmA + j);
+			temp = ang ^ ((  mag ^ ang ) & 0x80000000);
+
+
+/*
+			((float*) (ang & 0x80000000 ? pcmM : pcmA))[j] = pcmM[j] - *(float*)&temp;
+			((long *) (ang & 0x80000000 ? pcmA : pcmM))[j] = mag;
+*/
+			temp2 = (ang >> 31) & ((long)pcmM ^ (long)pcmA);
+			((float*)(temp2 ^ (long)pcmA))[j] = pcmM[j] - *(float*)&temp;
+			((long *)(temp2 ^ (long)pcmM))[j] = mag;
+/*
+			float mag=pcmM[j];
+		  float ang=pcmA[j];
+
+
+			if(ang>0){
+				pcmM[j]=mag;
+				pcmA[j]=mag > 0 ? mag-ang : mag+ang;
+			}else{
+				pcmM[j]=mag > 0 ? mag+ang : mag-ang;
+				pcmA[j]=mag;
+*/
+			}
+/*
+			
+			float mag=pcmM[j];
+		  float ang=pcmA[j];
+
+		  if(mag>0)
+		if(ang>0){
+		  pcmM[j]=mag;
+		  pcmA[j]=mag-ang;
+		}else{
+		  pcmM[j]=mag+ang;
+		  pcmA[j]=mag;
+		}
+		  else
+		if(ang>0){
+		  pcmM[j]=mag;
+		  pcmA[j]=mag+ang;
+		}else{
+		  pcmM[j]=mag-ang;
+		  pcmA[j]=mag;
+		}
+		}
+*/
+	}
   }
 
   /* compute and apply spectral envelope */
@@ -835,10 +1140,18 @@ static int mapping0_inverse(vorbis_block *vb,vorbis_info_mapping *l){
 
 /* export hooks */
 vorbis_func_mapping mapping0_exportbundle={
+#ifdef DECODE_ONLY
+	NULL,
+#else
   &mapping0_pack,
+#endif
   &mapping0_unpack,
   &mapping0_free_info,
+#ifdef DECODE_ONLY
+	NULL,
+#else
   &mapping0_forward,
+#endif
   &mapping0_inverse
 };
 

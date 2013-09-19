@@ -159,6 +159,8 @@ static void *floor0_inverse1(vorbis_block *vb,vorbis_look_floor *i){
   vorbis_info_floor0 *info=look->vi;
   int j,k;
 
+  float recip_global_gain = vb->vd->vi->global_gain != 0.0 ? 1.0 / vb->vd->vi->global_gain : 0.0;
+
   int ampraw=oggpack_read(&vb->opb,info->ampbits);
   if(ampraw>0){ /* also handles the -1 out of data case */
     long maxval=(1<<info->ampbits)-1;
@@ -176,7 +178,12 @@ static void *floor0_inverse1(vorbis_block *vb,vorbis_look_floor *i){
       float *lsp=_vorbis_block_alloc(vb,sizeof(*lsp)*(look->m+b->dim+1));
             
       for(j=0;j<look->m;j+=b->dim)
-	if(vorbis_book_decodev_set(b,lsp+j,&vb->opb,b->dim)==-1)goto eop;
+	  {
+		if(vorbis_book_decodev_set(b,lsp+j,&vb->opb,b->dim)==-1)goto eop;
+		/* we must apply recip of global gain because the codebook is already
+		   controlled by global gain! */
+		for(k=0;k<b->dim;k++) lsp[j+k]*=recip_global_gain;
+	  }
       for(j=0;j<look->m;){
 	for(k=0;k<b->dim;k++,j++)lsp[j]+=last;
 	last=lsp[j-1];

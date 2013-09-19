@@ -24,7 +24,7 @@
 #ifdef FLOAT_LOOKUP
 
 /* interpolated lookup based cos function, domain 0 to PI only */
-float vorbis_coslook(float a){
+float __inline vorbis_coslook(float a){
   double d=a*(.31830989*(float)COS_LOOKUP_SZ);
   int i=vorbis_ftoi(d-.5);
 
@@ -32,14 +32,14 @@ float vorbis_coslook(float a){
 }
 
 /* interpolated 1./sqrt(p) where .5 <= p < 1. */
-float vorbis_invsqlook(float a){
+float __inline vorbis_invsqlook(float a){
   double d=a*(2.f*(float)INVSQ_LOOKUP_SZ)-(float)INVSQ_LOOKUP_SZ;
   int i=vorbis_ftoi(d-.5f);
   return INVSQ_LOOKUP[i]+ (d-i)*(INVSQ_LOOKUP[i+1]-INVSQ_LOOKUP[i]);
 }
 
 /* interpolated 1./sqrt(p) where .5 <= p < 1. */
-float vorbis_invsq2explook(int a){
+float __inline vorbis_invsq2explook(int a){
   return INVSQ2EXP_LOOKUP[a-INVSQ2EXP_LOOKUP_MIN];
 }
 

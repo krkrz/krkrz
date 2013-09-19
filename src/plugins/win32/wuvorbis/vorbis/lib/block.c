@@ -82,7 +82,7 @@ static int ilog2(unsigned int v){
 /* block abstraction setup *********************************************/
 
 #ifndef WORD_ALIGN
-#define WORD_ALIGN 8
+#define WORD_ALIGN 16
 #endif
 
 int vorbis_block_init(vorbis_dsp_state *v, vorbis_block *vb){
@@ -207,6 +207,7 @@ static int _vds_shared_init(vorbis_dsp_state *v,vorbis_info *vi,int encp){
   b->window[0]=ilog2(ci->blocksizes[0])-6;
   b->window[1]=ilog2(ci->blocksizes[1])-6;
 
+#ifndef DECODE_ONLY
   if(encp){ /* encode/decode differ here */
 
     /* analysis always needs an fft */
@@ -230,12 +231,15 @@ static int _vds_shared_init(vorbis_dsp_state *v,vorbis_info *vi,int encp){
     }
 
     v->analysisp=1;
-  }else{
+  }else
+#endif
+  {
     /* finish the codebooks */
     if(!ci->fullbooks){
       ci->fullbooks=_ogg_calloc(ci->books,sizeof(*ci->fullbooks));
       for(i=0;i<ci->books;i++){
-	vorbis_book_init_decode(ci->fullbooks+i,ci->book_param[i]);
+		  /* apply gain control */
+		  vorbis_book_init_decode(ci->fullbooks+i,ci->book_param[i],vi->global_gain);
 	/* decode codebooks are now standalone after init */
 	vorbis_staticbook_destroy(ci->book_param[i]);
 	ci->book_param[i]=NULL;
@@ -279,6 +283,7 @@ static int _vds_shared_init(vorbis_dsp_state *v,vorbis_info *vi,int encp){
   return 0;
 }
 
+#ifndef DECODE_ONLY
 /* arbitrary settings and spec-mandated numbers get filled in here */
 int vorbis_analysis_init(vorbis_dsp_state *v,vorbis_info *vi){
   private_state *b=NULL;
@@ -295,6 +300,7 @@ int vorbis_analysis_init(vorbis_dsp_state *v,vorbis_info *vi){
 
   return(0);
 }
+#endif
 
 void vorbis_dsp_clear(vorbis_dsp_state *v){
   int i;
@@ -305,10 +311,12 @@ void vorbis_dsp_clear(vorbis_dsp_state *v){
 
     if(b){
 	
+#ifndef DECODE_ONLY
       if(b->ve){
 	_ve_envelope_clear(b->ve);
 	_ogg_free(b->ve);
       }
+#endif
 
       if(b->transform[0]){
 	mdct_clear(b->transform[0][0]);
@@ -333,18 +341,18 @@ void vorbis_dsp_clear(vorbis_dsp_state *v){
 	    free_look(b->residue[i]);
 	_ogg_free(b->residue);
       }
+#ifndef DECODE_ONLY
       if(b->psy){
 	for(i=0;i<ci->psys;i++)
 	  _vp_psy_clear(b->psy+i);
 	_ogg_free(b->psy);
       }
-
       if(b->psy_g_look)_vp_global_free(b->psy_g_look);
       vorbis_bitrate_clear(&b->bms);
 
       drft_clear(&b->fft_look[0]);
       drft_clear(&b->fft_look[1]);
-
+#endif
     }
     
     if(v->pcm){
@@ -488,6 +496,7 @@ int vorbis_analysis_wrote(vorbis_dsp_state *v, int vals){
   return(0);
 }
 
+#ifndef DECODE_ONLY
 /* do the deltas, envelope shaping, pre-echo and determine the size of
    the next block on which to continue analysis */
 int vorbis_analysis_blockout(vorbis_dsp_state *v,vorbis_block *vb){
@@ -650,6 +659,7 @@ int vorbis_analysis_blockout(vorbis_dsp_state *v,vorbis_block *vb){
   /* done */
   return(1);
 }
+#endif
 
 int vorbis_synthesis_restart(vorbis_dsp_state *v){
   vorbis_info *vi=v->vi;
@@ -673,6 +683,151 @@ int vorbis_synthesis_restart(vorbis_dsp_state *v){
 
   return(0);
 }
+
+
+void vorbis_apply_window_3dn(float *pcm, float *w1, float *w2, float *p, float *pcmlim)
+{
+	_asm
+	{
+		push ebx
+		mov edi, pcm
+		mov	ebx, w1
+		mov esi, w2
+		mov edx, p
+		mov ecx, pcmlim
+		cmp edi, ecx
+		jnl p3dexit1
+
+	p3dloop1:
+		add		esi,	4*4
+		movq			mm0,			[ebx - 2*4]			// load window backward
+		movq			mm3,			[ebx - 4*4]			// load window backward
+		punpckldq		mm1,			mm0					//
+		punpckldq		mm4,			mm3					//
+		punpckhdq		mm0,			mm1					// swap hi-order dword and low-order dword of mm0
+		punpckhdq		mm3,			mm4					// swap hi-order dword and low-order dword of mm3
+		pfmul			mm0,			[edi]				// multiply pcm
+		pfmul			mm3,			[edi+2*4]			// multiply pcm
+		movq			mm2,			[esi-4*4]			// load window forward
+		movq			mm5,			[esi+2*4-4*4]		// load window forward
+		pfmul			mm2,			[edx]				// multiply p
+		pfmul			mm5,			[edx+2*4]			// multiply p
+		pfadd			mm0,			mm2					// add
+		pfadd			mm3,			mm5					// add
+		movq			[edi],			mm0					// store
+		movq			[edi+2*4],		mm3					// store
+
+		add		edx,	4*4
+		add		edi,	4*4
+		sub		ebx,	4*4
+
+		cmp edi, ecx
+		jl	p3dloop1
+
+	p3dexit1:
+		pop ebx
+		femms
+	}
+}
+
+void vorbis_apply_window_sse(float *pcm, float *w1, float *w2, float *p, float *pcmlim)
+{
+	// p and pcm must be alingned
+	_asm
+	{
+		push ebx
+		mov edi, pcm
+		mov	ebx, w1
+		mov esi, w2
+		mov edx, p
+		mov ecx, pcmlim
+		cmp edi, ecx
+		jnl pexit1
+
+		sub		ebx,	4*4
+		align 16
+	ploop1:
+
+		movaps	xmm0,	[ebx]
+		add		esi,	8*4
+		movaps	xmm3,	[ebx - 4*4]
+		shufps	xmm0,	xmm0,	0*64+1*16+2*4+3
+		shufps	xmm3,	xmm3,	0*64+1*16+2*4+3
+		mulps	xmm0,	[edi]
+		mulps	xmm3,	[edi + 4*4]
+		movaps	xmm1,	[esi - 8*4]
+		add		edx,	8*4
+		movaps	xmm4,	[esi + 4*4 - 8*4]
+		add		edi,	8*4
+		mulps	xmm1,	[edx - 8*4]
+		sub		ebx,	8*4
+		mulps	xmm4,	[edx + 4*4 - 8*4]
+		cmp edi, ecx
+		addps	xmm0,	xmm1
+		addps	xmm3,	xmm4
+		movaps	[edi - 8*4],	xmm0
+		movaps	[edi + 4*4 - 8*4],	xmm3
+
+		prefetcht0	[edi + 64]
+
+		jl	ploop1
+
+	pexit1:
+		pop ebx
+	}
+}
+void vorbis_apply_window_sse_ua(float *pcm, float *w1, float *w2, float *p, float *pcmlim)
+{
+	// unaligned version
+	_asm
+	{
+		push ebx
+		mov edi, pcm
+		mov	ebx, w1
+		mov esi, w2
+		mov edx, p
+		mov ecx, pcmlim
+		cmp edi, ecx
+		jnl pexit1
+
+		align 16
+	ploop1:
+
+		movups	xmm0,	[ebx - 4*4]
+		movups	xmm3,	[ebx - 4*4 - 4*4]
+		shufps	xmm0,	xmm0,	0*64+1*16+2*4+3
+		shufps	xmm3,	xmm3,	0*64+1*16+2*4+3
+		movups	xmm2,	[edi]
+		movups	xmm5,	[edi + 4*4]
+		mulps	xmm0,	xmm2
+		mulps	xmm3,	xmm5
+		movups	xmm1,	[esi]
+		movups	xmm4,	[esi + 4*4]
+		movups	xmm2,	[edx]
+		movups	xmm5,	[edx + 4*4]
+		mulps	xmm1,	xmm2
+		mulps	xmm4,	xmm5
+		prefetcht0	[edx + 32]
+		addps	xmm0,	xmm1
+		addps	xmm3,	xmm4
+		movups	[edi],	xmm0
+		movups	[edi + 4*4],	xmm3
+
+		add		edi,	8*4
+		sub		ebx,	8*4
+		add		esi,	8*4
+		add		edx,	8*4
+
+		cmp edi, ecx
+		jl	ploop1
+
+	pexit1:
+		pop ebx
+	}
+}
+extern int CPU_SSE;
+extern int CPU_3DN;
+
 
 int vorbis_synthesis_init(vorbis_dsp_state *v,vorbis_info *vi){
   if(_vds_shared_init(v,vi,0)) return 1;
@@ -741,15 +896,63 @@ int vorbis_synthesis_blockin(vorbis_dsp_state *v,vorbis_block *vb){
 	  float *w=_vorbis_window_get(b->window[1]-hs);
 	  float *pcm=v->pcm[j]+prevCenter;
 	  float *p=vb->pcm[j];
-	  for(i=0;i<n1;i++)
-	    pcm[i]=pcm[i]*w[n1-i-1] + p[i]*w[i];
+	  if(CPU_SSE && !(n1 & 0x0f) )
+	  {
+		if(! ( ((long)pcm | (long)p) & 0x0f ) )
+			vorbis_apply_window_sse(pcm, w+n1, w, p, pcm + n1);
+		else
+			vorbis_apply_window_sse_ua(pcm, w+n1, w, p, pcm + n1);
+	  }
+	  else if(CPU_3DN && !(n1 & 0x0f) )
+	  {
+		vorbis_apply_window_3dn(pcm, w+n1, w, p, pcm + n1);
+	  }
+	  else
+	  {
+		  i=0;
+		  n1 -= 3;
+		  for(;i<n1;i+=4)
+		  {
+			pcm[i  ]=pcm[i  ]*w[n1-i+(-1 +3)] + p[i  ]*w[i  ];
+			pcm[i+1]=pcm[i+1]*w[n1-i+(-2 +3)] + p[i+1]*w[i+1];
+			pcm[i+2]=pcm[i+2]*w[n1-i+(-3 +3)] + p[i+2]*w[i+2];
+			pcm[i+3]=pcm[i+3]*w[n1-i+(-4 +3)] + p[i+3]*w[i+3];
+		  }
+		  n1 += 3;
+		  for(;i<n1;i++)
+			pcm[i]=pcm[i]*w[n1-i-1] + p[i]*w[i];
+	  }
 	}else{
 	  /* large/small */
 	  float *w=_vorbis_window_get(b->window[0]-hs);
 	  float *pcm=v->pcm[j]+prevCenter+n1/2-n0/2;
 	  float *p=vb->pcm[j];
-	  for(i=0;i<n0;i++)
-	    pcm[i]=pcm[i]*w[n0-i-1] +p[i]*w[i];
+	  if(CPU_SSE && !(n0 & 0x0f) )
+	  {
+		if(! ( ((long)pcm | (long)p) & 0x0f ) )
+			vorbis_apply_window_sse(pcm, w+n0, w, p, pcm + n0);
+		else
+			vorbis_apply_window_sse_ua(pcm, w+n0, w, p, pcm + n0);
+	  }
+	  else if(CPU_3DN && !(n0 & 0x0f) )
+	  {
+		vorbis_apply_window_3dn(pcm, w+n0, w, p, pcm + n0);
+	  }
+	  else
+	  {
+		  i=0;
+		  n0 -= 3;
+		  for(;i<n0;i+=4)
+		  {
+			pcm[i  ]=pcm[i  ]*w[n0-i+(-1 +3)] + p[i  ]*w[i  ];
+			pcm[i+1]=pcm[i+1]*w[n0-i+(-2 +3)] + p[i+1]*w[i+1];
+			pcm[i+2]=pcm[i+2]*w[n0-i+(-3 +3)] + p[i+2]*w[i+2];
+			pcm[i+3]=pcm[i+3]*w[n0-i+(-4 +3)] + p[i+3]*w[i+3];
+		  }
+		  n0 += 3;
+		  for(;i<n0;i++)
+			pcm[i]=pcm[i]*w[n0-i-1] + p[i]*w[i];
+	  }
 	}
       }else{
 	if(v->W){
@@ -757,8 +960,34 @@ int vorbis_synthesis_blockin(vorbis_dsp_state *v,vorbis_block *vb){
 	  float *w=_vorbis_window_get(b->window[0]-hs);
 	  float *pcm=v->pcm[j]+prevCenter;
 	  float *p=vb->pcm[j]+n1/2-n0/2;
-	  for(i=0;i<n0;i++)
-	    pcm[i]=pcm[i]*w[n0-i-1] +p[i]*w[i];
+	  if(CPU_SSE && !(n0 & 0x0f) )
+	  {
+		if(! ( ((long)pcm | (long)p) & 0x0f ) )
+			vorbis_apply_window_sse(pcm, w+n0, w, p, pcm + n0);
+		else
+			vorbis_apply_window_sse_ua(pcm, w+n0, w, p, pcm + n0);
+		i = n0;
+	  }
+	  else if(CPU_3DN && !(n0 & 0x0f) )
+	  {
+		vorbis_apply_window_3dn(pcm, w+n0, w, p, pcm + n0);
+		i = n0;
+	  }
+	  else
+	  {
+		  i=0;
+		  n0 -= 3;
+		  for(;i<n0;i+=4)
+		  {
+			pcm[i  ]=pcm[i  ]*w[n0-i+(-1 +3)] + p[i  ]*w[i  ];
+			pcm[i+1]=pcm[i+1]*w[n0-i+(-2 +3)] + p[i+1]*w[i+1];
+			pcm[i+2]=pcm[i+2]*w[n0-i+(-3 +3)] + p[i+2]*w[i+2];
+			pcm[i+3]=pcm[i+3]*w[n0-i+(-4 +3)] + p[i+3]*w[i+3];
+		  }
+		  n0 += 3;
+		  for(;i<n0;i++)
+			pcm[i]=pcm[i]*w[n0-i-1] + p[i]*w[i];
+	  }
 	  for(;i<n1/2+n0/2;i++)
 	    pcm[i]=p[i];
 	}else{
@@ -766,8 +995,32 @@ int vorbis_synthesis_blockin(vorbis_dsp_state *v,vorbis_block *vb){
 	  float *w=_vorbis_window_get(b->window[0]-hs);
 	  float *pcm=v->pcm[j]+prevCenter;
 	  float *p=vb->pcm[j];
-	  for(i=0;i<n0;i++)
-	    pcm[i]=pcm[i]*w[n0-i-1] +p[i]*w[i];
+	  if(CPU_SSE && !(n0 & 0x0f) )
+	  {
+		if(! ( ((long)pcm | (long)p) & 0x0f ) )
+			vorbis_apply_window_sse(pcm, w+n0, w, p, pcm + n0);
+		else
+			vorbis_apply_window_sse_ua(pcm, w+n0, w, p, pcm + n0);
+	  }
+	  else if(CPU_3DN && !(n0 & 0x0f) )
+	  {
+			vorbis_apply_window_3dn(pcm, w+n0, w, p, pcm + n0);
+	  }
+	  else
+	  {
+		  i=0;
+		  n0 -= 3;
+		  for(;i<n0;i+=4)
+		  {
+			pcm[i  ]=pcm[i  ]*w[n0-i+(-1 +3)] + p[i  ]*w[i  ];
+			pcm[i+1]=pcm[i+1]*w[n0-i+(-2 +3)] + p[i+1]*w[i+1];
+			pcm[i+2]=pcm[i+2]*w[n0-i+(-3 +3)] + p[i+2]*w[i+2];
+			pcm[i+3]=pcm[i+3]*w[n0-i+(-4 +3)] + p[i+3]*w[i+3];
+		  }
+		  n0 += 3;
+		  for(;i<n0;i++)
+			pcm[i]=pcm[i]*w[n0-i-1] + p[i]*w[i];
+	  }
 	}
       }
       
@@ -775,8 +1028,7 @@ int vorbis_synthesis_blockin(vorbis_dsp_state *v,vorbis_block *vb){
       {
 	float *pcm=v->pcm[j]+thisCenter;
 	float *p=vb->pcm[j]+n;
-	for(i=0;i<n;i++)
-	  pcm[i]=p[i];
+	memcpy(pcm, p, n * sizeof(float));
       }
     }
     

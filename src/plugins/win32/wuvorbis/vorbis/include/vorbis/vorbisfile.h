@@ -36,11 +36,12 @@ extern "C"
  * the right values. For seek_func(), you *MUST* return -1 if the stream is
  * unseekable
  */
+#pragma pack(push, 4)
 typedef struct {
-  size_t (*read_func)  (void *ptr, size_t size, size_t nmemb, void *datasource);
-  int    (*seek_func)  (void *datasource, ogg_int64_t offset, int whence);
-  int    (*close_func) (void *datasource);
-  long   (*tell_func)  (void *datasource);
+  size_t (_cdecl* read_func)  (void *ptr, size_t size, size_t nmemb, void *datasource);
+  int    (_cdecl* seek_func)  (void *datasource, ogg_int64_t offset, int whence);
+  int    (_cdecl* close_func) (void *datasource);
+  long   (_cdecl* tell_func)  (void *datasource);
 } ov_callbacks;
 
 #define  NOTOPEN   0
@@ -85,6 +86,7 @@ typedef struct OggVorbis_File {
   ov_callbacks callbacks;
 
 } OggVorbis_File;
+#pragma pack(pop)
 
 extern int ov_clear(OggVorbis_File *vf);
 extern int ov_open(FILE *f,OggVorbis_File *vf,char *initial,long ibytes);
@@ -130,6 +132,8 @@ extern long ov_read_float(OggVorbis_File *vf,float ***pcm_channels,int samples,
 extern long ov_read(OggVorbis_File *vf,char *buffer,int length,
 		    int bigendianp,int word,int sgned,int *bitstream);
 extern int ov_crosslap(OggVorbis_File *vf1,OggVorbis_File *vf2);
+
+extern void ov_set_global_gain(OggVorbis_File *vf, float gain);
 
 extern int ov_halfrate(OggVorbis_File *vf,int flag);
 extern int ov_halfrate_p(OggVorbis_File *vf);

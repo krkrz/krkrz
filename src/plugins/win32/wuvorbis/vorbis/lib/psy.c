@@ -1015,7 +1015,7 @@ float **_vp_quantize_couple_memo(vorbis_block *vb,
 }
 
 /* this is for per-channel noise normalization */
-static int apsort(const void *a, const void *b){
+static int _cdecl apsort(const void *a, const void *b){
   float f1=fabs(**(float**)a);
   float f2=fabs(**(float**)b);
   return (f1<f2)-(f1>f2);

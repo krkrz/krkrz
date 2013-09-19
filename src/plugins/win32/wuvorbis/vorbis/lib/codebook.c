@@ -290,6 +290,33 @@ int vorbis_book_encodev(codebook *book,int best,float *a,oggpack_buffer *b){
   return(vorbis_book_encode(book,best,b));
 }
 
+/* oggpack_look and oggpack_adv: copied from bitwise.c to do inline */
+STIN long oggpack_look(oggpack_buffer *b,int bits){
+  unsigned long ret;
+  unsigned long m= (bits==32)?-1:((1<<bits)-1); /*mask[bits]*/
+
+  bits+=b->endbit;
+
+  if(b->endbyte+4>=b->storage){
+    /* not the main path */
+    if(b->endbyte*8+bits>b->storage*8)return(-1);
+  }
+
+  ret = *(ogg_uint32_t*)(b->ptr) >> b->endbit;
+
+  if(bits>32 && b->endbit)
+	  ret|=b->ptr[4]<<(32-b->endbit);
+
+  return(m&ret);
+}
+
+STIN void oggpack_adv(oggpack_buffer *b,int bits){
+  bits+=b->endbit;
+  b->ptr+=bits>>3;
+  b->endbyte+=bits>>3;
+  b->endbit=bits&7;
+}
+
 /* the 'eliminate the decode tree' optimization actually requires the
    codewords to be MSb first, not LSb.  This is an annoying inelegancy
    (and one of the first places where carefully thought out design
@@ -297,14 +324,42 @@ int vorbis_book_encodev(codebook *book,int best,float *a,oggpack_buffer *b){
    to an MSb bitpacker), but not actually the huge hit it appears to
    be.  The first-stage decode table catches most words so that
    bitreverse is not in the main execution path. */
-
-static ogg_uint32_t bitreverse(ogg_uint32_t x){
+/*
+STIN ogg_uint32_t bitreverse(ogg_uint32_t x){
   x=    ((x>>16)&0x0000ffff) | ((x<<16)&0xffff0000);
   x=    ((x>> 8)&0x00ff00ff) | ((x<< 8)&0xff00ff00);
   x=    ((x>> 4)&0x0f0f0f0f) | ((x<< 4)&0xf0f0f0f0);
   x=    ((x>> 2)&0x33333333) | ((x<< 2)&0xcccccccc);
   return((x>> 1)&0x55555555) | ((x<< 1)&0xaaaaaaaa);
 }
+*/
+
+STIN ogg_uint32_t bitreverse(ogg_uint32_t x){
+	_asm
+	{
+		mov		eax,	x
+		bswap	eax
+		mov		edx,	eax
+		shl		edx,	4
+		shr		eax,	4
+		and		edx,	0xf0f0f0f0
+		and		eax,	0x0f0f0f0f
+		or		eax,	edx
+		mov		edx,	eax
+		shl		edx,	2
+		shr		eax,	2
+		and		edx,	0xcccccccc
+		and		eax,	0x33333333
+		or		eax,	edx
+		mov		edx,	eax
+		shl		edx,	1
+		shr		eax,	1
+		and		edx,	0xaaaaaaaa
+		and		eax,	0x55555555
+		or		eax,	edx
+	}
+}
+
 
 STIN long decode_packed_entry_number(codebook *book, oggpack_buffer *b){
   int  read=book->dec_maxlength;
@@ -325,11 +380,14 @@ STIN long decode_packed_entry_number(codebook *book, oggpack_buffer *b){
     hi=book->used_entries;
   }
 
-  lok = oggpack_look(b, read);
 
-  while(lok<0 && read>1)
-    lok = oggpack_look(b, --read);
+  do{
+    lok = oggpack_look(b, read--);
+  }while(lok<0 && read>0);
+
   if(lok<0)return -1;
+
+  read ++;
 
   /* bisect search for the codeword in the ordered list */
   {
@@ -351,6 +409,7 @@ STIN long decode_packed_entry_number(codebook *book, oggpack_buffer *b){
   oggpack_adv(b, read);
   return(-1);
 }
+
 
 /* Decode side is specced and easier, because we don't need to find
    matches using different criteria; we simply read and map.  There are
@@ -456,6 +515,36 @@ long vorbis_book_decodevv_add(codebook *book,float **a,long offset,int ch,
   long i,j,entry;
   int chptr=0;
 
+if(ch == 2)
+{
+/* special optimization for ch == 2 */
+  for(i=offset/2;i<(offset+n)/2;){
+    entry = decode_packed_entry_number(book,b);
+    if(entry==-1)return(-1);
+    {
+      int dim = book->dim;
+      const float *t = book->valuelist+entry*dim;
+      dim--;
+      for (j=0;j<dim;j+=2){
+	a[0][i+0]+=t[j+0];
+	a[1][i+0]+=t[j+1];
+	i++;
+      }
+      dim++;
+      for (;j<dim;j++){
+	a[chptr++][i]+=t[j];
+	if(chptr==ch){
+	  chptr=0;
+	  i++;
+	}
+      }
+    }
+  }
+
+}
+else
+{
+
   for(i=offset/ch;i<(offset+n)/ch;){
     entry = decode_packed_entry_number(book,b);
     if(entry==-1)return(-1);
@@ -470,6 +559,7 @@ long vorbis_book_decodevv_add(codebook *book,float **a,long offset,int ch,
       }
     }
   }
+}
   return(0);
 }
 

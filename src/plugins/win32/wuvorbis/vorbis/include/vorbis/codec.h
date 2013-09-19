@@ -25,6 +25,8 @@ extern "C"
 
 #include <ogg/ogg.h>
 
+#pragma pack(push, 4)
+
 typedef struct vorbis_info{
   int version;
   int channels;
@@ -49,6 +51,8 @@ typedef struct vorbis_info{
   long bitrate_nominal;
   long bitrate_lower;
   long bitrate_window;
+
+  float  global_gain;
 
   void *codec_setup;
 } vorbis_info;
@@ -163,6 +167,7 @@ typedef struct vorbis_comment{
 /* Vorbis PRIMITIVES: general ***************************************/
 
 extern void     vorbis_info_init(vorbis_info *vi);
+extern void     vorbis_info_set_global_gain(vorbis_info *info, float global_gain);
 extern void     vorbis_info_clear(vorbis_info *vi);
 extern int      vorbis_info_blocksize(vorbis_info *vi,int zo);
 extern void     vorbis_comment_init(vorbis_comment *vc);
@@ -231,6 +236,8 @@ extern int      vorbis_synthesis_halfrate_p(vorbis_info *v);
 #define OV_EBADPACKET -136
 #define OV_EBADLINK   -137
 #define OV_ENOSEEK    -138
+
+#pragma pack(pop)
 
 #ifdef __cplusplus
 }

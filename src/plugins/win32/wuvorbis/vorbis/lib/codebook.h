@@ -119,7 +119,7 @@ typedef struct codebook{
 extern void vorbis_staticbook_clear(static_codebook *b);
 extern void vorbis_staticbook_destroy(static_codebook *b);
 extern int vorbis_book_init_encode(codebook *dest,const static_codebook *source);
-extern int vorbis_book_init_decode(codebook *dest,const static_codebook *source);
+extern int vorbis_book_init_decode(codebook *dest,const static_codebook *source, float global_gain);
 extern void vorbis_book_clear(codebook *b);
 
 extern float *_book_unquantize(const static_codebook *b,int n,int *map);

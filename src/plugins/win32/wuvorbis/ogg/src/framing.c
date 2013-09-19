@@ -43,7 +43,9 @@ int ogg_page_eos(ogg_page *og){
 }
 
 ogg_int64_t ogg_page_granulepos(ogg_page *og){
-  unsigned char *page=og->header;
+ ogg_int64_t *page= (ogg_int64_t *)(og->header + 6);
+ return *page;
+/*
   ogg_int64_t granulepos=page[13]&(0xff);
   granulepos= (granulepos<<8)|(page[12]&0xff);
   granulepos= (granulepos<<8)|(page[11]&0xff);
@@ -53,6 +55,7 @@ ogg_int64_t ogg_page_granulepos(ogg_page *og){
   granulepos= (granulepos<<8)|(page[7]&0xff);
   granulepos= (granulepos<<8)|(page[6]&0xff);
   return(granulepos);
+*/
 }
 
 int ogg_page_serialno(ogg_page *og){
@@ -63,10 +66,13 @@ int ogg_page_serialno(ogg_page *og){
 }
  
 long ogg_page_pageno(ogg_page *og){
+	return *(long*)(og->header + 18);
+/*
   return(og->header[18] |
 	 (og->header[19]<<8) |
 	 (og->header[20]<<16) |
 	 (og->header[21]<<24));
+*/
 }
 
 
@@ -568,6 +574,7 @@ long ogg_sync_pageseek(ogg_sync_state *oy,ogg_page *og){
   if(oy->bodybytes+oy->headerbytes>bytes)return(0);
   
   /* The whole test page is buffered.  Verify the checksum */
+  
   {
     /* Grab the checksum bytes, set the header field to zero */
     char chksum[4];

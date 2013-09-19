@@ -224,7 +224,7 @@ void oggpackB_readinit(oggpack_buffer *b,unsigned char *buf,int bytes){
 /* Read in bits without advancing the bitptr; bits <= 32 */
 long oggpack_look(oggpack_buffer *b,int bits){
   unsigned long ret;
-  unsigned long m=mask[bits];
+  unsigned long m= (bits==32)?-1:((1<<bits)-1); /*mask[bits]*/
 
   bits+=b->endbit;
 
@@ -285,10 +285,10 @@ long oggpackB_look1(oggpack_buffer *b){
   return((b->ptr[0]>>(7-b->endbit))&1);
 }
 
-void oggpack_adv(oggpack_buffer *b,int bits){
+void __inline oggpack_adv(oggpack_buffer *b,int bits){
   bits+=b->endbit;
-  b->ptr+=bits/8;
-  b->endbyte+=bits/8;
+  b->ptr+=bits>>3;
+  b->endbyte+=bits>>3;
   b->endbit=bits&7;
 }
 
@@ -296,7 +296,7 @@ void oggpackB_adv(oggpack_buffer *b,int bits){
   oggpack_adv(b,bits);
 }
 
-void oggpack_adv1(oggpack_buffer *b){
+void __inline oggpack_adv1(oggpack_buffer *b){
   if(++(b->endbit)>7){
     b->endbit=0;
     b->ptr++;
@@ -338,8 +338,8 @@ long oggpack_read(oggpack_buffer *b,int bits){
   
  overflow:
 
-  b->ptr+=bits/8;
-  b->endbyte+=bits/8;
+  b->ptr+=bits>>3;
+  b->endbyte+=bits>>3;
   b->endbit=bits&7;
   return(ret);
 }
