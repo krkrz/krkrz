@@ -1,0 +1,875 @@
+
+
+Network Working Group				               Phil Kerr
+Internet-Draft		 			    Ogg Vorbis Community
+October 27, 2003                                               OpenDrama
+Expires: April 27, 2003      
+
+
+  	      RTP Payload Format for Vorbis Encoded Audio
+
+		   <draft-kerr-avt-vorbis-rtp-03.txt>
+
+Status of this Memo
+
+   This document is an Internet-Draft and is in full conformance
+   with all provisions of Section 10 of RFC2026.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF), its areas, and its working groups.  Note that
+   other groups may also distribute working documents as
+   Internet-Drafts.
+
+   Internet-Drafts are draft documents valid for a maximum of six
+   months and may be updated, replaced, or obsoleted by other
+   documents at any time.  It is inappropriate to use Internet-
+   Drafts as reference material or to cite them other than as
+   "work in progress".
+
+   The list of current Internet-Drafts can be accessed at 
+   http://www.ietf.org/ietf/1id-abstracts.txt
+
+   The list of Internet-Draft Shadow Directories can be accessed at
+   http://www.ietf.org/shadow.html.
+
+Copyright Notice
+
+   Copyright (C) The Internet Society (2003).  All Rights Reserved.
+
+Abstract
+	
+   This document describes a RTP payload format for transporting 
+   Vorbis encoded audio.  It details the RTP encapsulation mechanism 
+   for raw Vorbis data and details the delivery mechanisms for the 
+   decoder probability model, referred to as a codebook, metadata 
+   and other setup information.
+
+   [Note to RFC Editor: All references to RFC XXXX are to be replaced 
+   by references to the RFC number of this memo, when published.]
+
+
+
+
+
+
+
+
+Kerr                     Expires April 27, 2003                 [Page 1]
+
+Internet Draft      draft-kerr-avt-vorbis-rtp-03.txt    October 27, 2003
+
+
+Table of Contents
+
+   1.         Introduction ........................................    2
+   1.1        Terminology .........................................    2
+   2.         Payload Format ......................................    3
+   2.1        RTP Header ..........................................    3
+   2.2        Payload Header ......................................    4
+   2.3        Payload Data ........................................    5
+   2.4        Example RTP Packet ..................................    5
+   3.         Frame Packetizing ...................................    6
+   3.1        Example Fragmented Vorbis Packet ....................    6
+   3.2        Packet Loss .........................................    8
+   4.         Configuration Headers ...............................    8
+   4.1        RTCP Based Config Header Transmission ...............    9
+   4.2        Codebook Caching ....................................   11
+   5.         Session Description .................................   11
+   5.1        SDP Based Config Header Transmission ................   12
+   6.         IANA Considerations .................................   13
+   7.         Congestion Control ..................................   13
+   8.         Security Considerations .............................   14
+   9.         Acknowledgements ....................................   14
+   10.        Normative References ................................   14
+   10.1       Informative References ................................ 15
+   11.        Full Copyright Statement ............................   15
+   11.1       IPR Statement .......................................   15
+   12.        Authors Address .....................................   15
+
+
+1 Introduction
+
+   Vorbis is a general purpose perceptual audio codec intended to allow 
+   maximum encoder flexibility, thus allowing it to scale competitively 
+   over an exceptionally wide range of bitrates.   At the high 
+   quality/bitrate end of the scale (CD or DAT rate stereo, 
+   16/24 bits), it is in the same league as MPEG-2 and MPC. Similarly, 
+   the 1.0 encoder can encode high-quality CD and DAT rate stereo at 
+   below 48k bits/sec without resampling to a lower rate.   Vorbis is 
+   also intended for lower and higher sample rates (from 8kHz 
+   telephony to 192kHz digital masters) and a range of channel 
+   representations (monaural, polyphonic, stereo, quadraphonic, 5.1, 
+   ambisonic, or up to 255 discrete channels).
+
+   Vorbis encoded audio is generally encapsulated within an Ogg format 
+   bitstream [1], which provides framing and synchronization.  For the 
+   purposes of RTP transport, this layer is unnecessary, and so raw 
+   Vorbis packets are used in the payload.
+
+1.1 Terminology
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+   document are to be interpreted as described in RFC 2119 [2].
+
+
+Kerr                     Expires April 27, 2003                 [Page 2]
+
+Internet Draft      draft-kerr-avt-vorbis-rtp-03.txt    October 27, 2003
+
+
+2 Payload Format
+
+   For RTP based transportation of Vorbis encoded audio the standard 
+   RTP header is followed by an 8 bit payload header, then the payload 
+   data.  The payload header is used to signify if the following packet
+   contains fragmented Vorbis data and/or the the number of whole Vorbis
+   data frames.  The payload data contains the raw Vorbis bitstream 
+   information.
+
+
+2.1 RTP Header
+
+     0                   1                   2                   3
+   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |V=2|P|X|  CC   |M|     PT      |       sequence number         |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                           timestamp                           |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |           synchronization source (SSRC) identifier            |
+   +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+   |            contributing source (CSRC) identifiers             |
+   |                              ...                              |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+   The RTP header begins with an octet of fields (V, P, X, and CC) to   
+   support specialized RTP uses (see [4] and [5] for details). For 
+   Vorbis RTP, the following values are used.
+
+   Version (V): 2 bits
+      This field identifies the version of RTP. The version
+      used by this specification is two (2).
+
+   Padding (P): 1 bit
+      Padding MAY be used with this payload format according to 
+      section 5.1 of [3].  
+
+   Extension (X): 1 bit
+      Always set to 0, as audio silence suppression is not used by 
+      the Vorbis codec. 
+
+   CSRC count (CC): 4 bits
+      The CSRC count is used in accordance with [3].
+
+
+
+
+
+
+Kerr                     Expires April 27, 2003                 [Page 3]
+
+Internet Draft      draft-kerr-avt-vorbis-rtp-03.txt    October 27, 2003
+
+
+   Marker (M): 1 bit
+      Set to zero.  Audio silence suppression not used.  This conforms
+      to section 4.1 of [6].
+
+   Payload Type (PT): 7 bits
+      An RTP profile for a class of applications is expected to assign 
+      a payload type for this format, or a dynamically allocated 
+      payload type SHOULD be chosen which designates the payload as 
+      Vorbis.
+
+   Sequence number: 16 bits
+      The sequence number increments by one for each RTP data packet
+      sent, and may be used by the receiver to detect packet loss and
+      to restore packet sequence. This field is detailed further in
+      [3].
+
+   Timestamp: 32 bits
+      A timestamp representing the sampling time of the first sample of
+      the first Vorbis packet in the RTP packet.  The clock frequency 
+      MUST be set to the sample rate of the encoded audio data and is 
+      conveyed out-of-band as a SDP attribute.
+
+   SSRC/CSRC identifiers: 
+      These two fields, 32 bits each with one SSRC field and a maximum 
+      of 16 CSRC fields, are as defined in [3].  
+
+
+2.2 Payload Header
+
+   After the RTP Header section the next octet is the Payload Header.  
+   This octet is split into a number of bitfields detailing the format
+   of the following Payload Data packets.
+
+     0   1   2   3   4   5   6   7
+   +---+---+---+---+---+---+---+---+
+   | C | F | R |  # of packets     |
+   +---+---+---+---+---+---+---+---+
+
+   Continuation (C): 1 bit
+      Set to one if this is a continuation of a fragmented packet.
+
+   Fragmented (F): 1 bit
+      Set to one if the payload contains complete packets or if it
+      contains the last fragment of a fragmented packet. 
+
+   Reserved (R): 1 bit
+      Reserved, MUST be set to zero by senders, and ignored by 
+      receivers.
+
+   The last 5 bits are the number of complete packets in this payload.  
+   This provides for a maximum number of 32 Vorbis packets in the 
+   payload.  If C is set to one, this number MUST be 0.
+
+Kerr                     Expires April 27, 2003                 [Page 4]
+
+Internet Draft      draft-kerr-avt-vorbis-rtp-03.txt    October 27, 2003
+
+
+2.3 Payload Data
+
+   Vorbis packets are unbounded in length currently.  At some future
+   point there will likely be a practical limit placed on packet
+   length.  
+
+   Typical Vorbis packet sizes are from very small (2-3 bytes) to 
+   quite large (8-12 kilobytes).  The reference implementation [11] 
+   typically produces packets less than ~800 bytes, except for the
+   header packets which are ~4-12 kilobytes.
+
+   Within a RTP context the maximum Vorbis packet SHOULD be kept below
+   the MTU size, typically 1500 octets, including the RTP and payload 
+   headers, to avoid fragmentation.  For the delivery of Vorbis audio 
+   using RTP the maximum size of the header block is limited to 64K.
+
+   If the payload contains a single Vorbis packet or a Vorbis packet
+   fragment, the Vorbis packet data follows the payload header.
+
+   For payloads which consist of multiple Vorbis packets, payload data 
+   consists of one octet representing the packet length followed by 
+   the packet data for each of the Vorbis packets in the payload.
+
+   The Vorbis packet length field is the length of the Vorbis data 
+   block minus one octet.   
+
+   The payload packing of the Vorbis data packets SHOULD follow the
+   guidelines set-out in section 4.4 of [5] where the oldest packet
+   occurs immediately after the RTP packet header.
+
+   Channel mapping of the audio is in accordance with BS. 775-1 
+   ITU-R.
+
+
+2.4 Example RTP Packet
+
+   Here is an example RTP packet containing two Vorbis packets.
+
+   RTP Packet Header:
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   | 2 |0|0|  0    |0|      PT     |       sequence number         |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                 timestamp (in sample rate units)              |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |          synchronisation source (SSRC) identifier             |
+   +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+   |            contributing source (CSRC) identifiers             |
+   |                              ...                              |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+Kerr                     Expires April 27, 2003                 [Page 5]
+
+Internet Draft      draft-kerr-avt-vorbis-rtp-03.txt    October 27, 2003
+
+
+   Payload Data:
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |0|1|0| # pks: 2|      len      |         vorbis data ...       |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                      ...vorbis data...                        |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |      ...      |      len      |   next vorbis packet data...  |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+3 Frame Packetizing
+
+   Each RTP packet contains either one complete Vorbis packet, one 
+   Vorbis packet fragment, or an integer number of complete Vorbis 
+   packets (up to a max of 32 packets, since the number of packets 
+   is defined by a 5 bit value).
+
+   Any Vorbis packet that is larger than 256 octets and less than the
+   path-MTU MUST be placed in a RTP packet by itself.
+
+   Any Vorbis packet that is 256 bytes or less SHOULD be bundled in the
+   RTP packet with as many Vorbis packets as will fit, up to a maximum
+   of 32.
+
+   If a Vorbis packet will not fit within the network MTU, it SHOULD be
+   fragmented.  A fragmented packet has a zero in the last five bits 
+   of the payload header.  Each fragment after the first will also set 
+   the Continued (C) bit to one in the payload header.  The RTP packet 
+   containing the last fragment of the Vorbis packet will have the 
+   Fragmented (F) bit set to one.  To maintain the correct sequence
+   for fragmented packet reception the timestamp field of fragmented 
+   packets MUST be the same as the first packet sent, with the sequence 
+   number incremented as normal for the subsequent RTP packets.  Path 
+   MTU is detailed in [9] and [10].
+
+
+
+
+3.1 Example Fragmented Vorbis Packet
+
+   Here is an example fragmented Vorbis packet split over three RTP
+   packets.  
+
+
+
+
+
+
+
+
+
+Kerr                     Expires April 27, 2003                 [Page 6]
+
+Internet Draft      draft-kerr-avt-vorbis-rtp-03.txt    October 27, 2003
+
+
+   Packet 1:
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |V=2|P|X|  CC   |M|     PT      |           1000                |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                             xxxxx                             |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |           synchronization source (SSRC) identifier            |
+   +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+   |            contributing source (CSRC) identifiers             |
+   |                              ...                              |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |0|0|0|        0|      len      |         vorbis data ..        |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                       ..vorbis data..                         |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+   In this packet the initial sequence number is 1000 and the 
+   timestamp is xxxxx.  The number of packets field is set to 0.
+
+
+   Packet 2:
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |V=2|P|X|  CC   |M|     PT      |           1001                |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                             xxxxx                             |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |           synchronization source (SSRC) identifier            |
+   +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+   |            contributing source (CSRC) identifiers             |
+   |                              ...                              |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |1|0|0|        0|      len      |         vorbis data ...       |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                       ..vorbis data..                         |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+   The C bit is set to 1 and the number of packets field is set to 0.
+   For large Vorbis fragments there can be several of these type of
+   payload packets.  The maximum packet size SHOULD be no greater
+   than the path MTU, including all RTP and payload headers.  The 
+   sequence number has been incremented by one but the timestamp field 
+   remains the same as the initial packet.
+
+
+
+
+
+Kerr                     Expires April 27, 2003                 [Page 7]
+
+Internet Draft      draft-kerr-avt-vorbis-rtp-03.txt    October 27, 2003
+
+
+   Packet 3:
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |V=2|P|X|  CC   |M|     PT      |           1002                |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                             xxxxx                             |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |           synchronization source (SSRC) identifier            |
+   +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+   |            contributing source (CSRC) identifiers             |
+   |                              ...                              |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |1|1|0|        0|      len      |         vorbis data ..        |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                       ..vorbis data..                         |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+   This is the last Vorbis fragment packet.  The C and F bits are 
+   set and the packet count remains set to 0.  As in the previous 
+   packets the timestamp remains set to the first packet in the 
+   sequence and the sequence number has been incremented.
+
+
+3.2 Packet Loss
+
+   As there is no error correction within the Vorbis stream, packet 
+   loss will result in a loss of signal.  Packet loss is more of an 
+   issue for fragmented Vorbis packets as the client will have to 
+   cope with the handling of the C and F flags.  If we use the 
+   fragmented Vorbis packet example above and the first packet is
+   lost the client SHOULD detect that the next packet has the packet
+   count field set to 0 and the C bit is set and MUST drop it.  The
+   next packet, which is the final fragmented packet, SHOULD be dropped
+   in the same manner, or buffered.  Feedback reports on lost and 
+   dropped packets MUST be sent back via RTCP.
+
+
+4 Configuration Headers
+
+   To decode a Vorbis stream three configuration header blocks are
+   needed.  The first header indicates the sample and bitrates, the 
+   number of channels and the version of the Vorbis encoder used.  
+   The second header contains the decoders probability model, or 
+   codebooks and the third header details stream metadata.
+
+
+
+
+
+
+Kerr                     Expires April 27, 2003                 [Page 8]
+
+Internet Draft      draft-kerr-avt-vorbis-rtp-03.txt    October 27, 2003
+
+
+   As the RTP stream may change certain configuration data mid-session
+   there are two different methods for delivering this configuration
+   data to a client, RTCP which is detailed below and SDP which is 
+   detailed in section 5.  SDP delivery is used to set-up an initial
+   state for the client application and RTCP is used to change state
+   during the session.  The changes may be due to different metadata
+   or codebooks as well as different bitrates of the stream.
+
+   Unlike other mainstream audio codecs Vorbis has no statically 
+   configured probability model, instead it packs all entropy decoding
+   configuration, VQ and Huffman models into a self-contained codebook.
+   This codebook block also requires additional identification 
+   information detailing the number of audio channels, bit rates and
+   other information used to initialise the Vorbis stream.
+
+
+4.1 RTCP Based Header Transmission
+
+   The three header data blocks are sent out-of-band as an APP defined 
+   RTCP message with the 4 octet name field set to VORB. 
+
+   Synchronizing the configuration headers to the RTP stream is 
+   critical.  A 32 bit timestamp field is used to indicate the
+   timepoint when a VORB header MUST be applied to the RTP stream. 
+   VORB RTCP packets SHOULD be sent just ahead of the change in the
+   RTP stream.  As the reception loss of the RTCP header will mean 
+   the RTP stream will fail to decode properly the freqency of their 
+   periodic retransmission SHOULD be high enough to minimize the    
+   stream disturbance whilst remaining under the RTCP bandwidth
+   allocation.
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |V=2|P| subtype |   PT=APP=204  |             Length            |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                           SSRC/CSRC                           |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                             VORB                              |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                 Timestamp (in sample rate units)              |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                        Vorbis Version                         |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                       Audio Sample Rate                       |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                        Bitrate Maximum                        |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                        Bitrate Nominal                        |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+Kerr                     Expires April 27, 2003                 [Page 9]
+
+Internet Draft      draft-kerr-avt-vorbis-rtp-03.txt    October 27, 2003
+
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                        Bitrate Minimum                        |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   | bsz 0 | bsz 1 |       Num Audio Channels      |c|m|o|x|x|x|x|x|
+   +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+   |     Codebook length           |      Codebook checksum        |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   ..                          Codebook                            |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   ..                          URI string                          |
+   +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+   |                      Vendor string length                     |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                         Vendor string                        ..
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                    User comments list length                  |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   ..               User comment length / User comment             |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+   The first Vorbis config header defines the Vorbis stream 
+   attributes.  The Vorbis version MUST be set to zero to comply with
+   this document.  The fields Sample Rate, Bitrate Maximum/Nominal/
+   Minimum and Num Audio Channels are set in accordance with [6] with 
+   the bsz fields above referring to the blocksize parameters.  The 
+   framing bit is not used for RTP transportation and so applications 
+   constructing Vorbis files MUST take care to set this if required.
+
+   The next 8 bits are used to indicate the presence of the two 
+   other Vorbis stream config headers and the size overflow header.
+
+   The c flag indicates the presence of a codebook header block, the
+   m flag indicates the presence of a comment metadata block.  The o
+   flag indicates if the size of either of the c and m headers would
+   make the VORB packet greater than that allowed for a RTCP message.
+
+   The remaining five bits, indicated with an x, are reserved/unused
+   and MUST be set to 0 for this version of the document.
+
+   If the c flag is set then the next header block will contain the 
+   codebook configuration data.  
+
+   The configuration information detailed above MUST be completely 
+   intact, as a client can not decode a stream with an incomplete 
+   or corrupted codebook set.
+
+   A 16 bit codebook length field and a 16 bit 1's complement checksum
+   of the codebook precedes the codebook datablock.  The length field 
+   allows for codebooks to be up to 64K in size. The checksum is used 
+   to detect a corrupted codebook.  
+
+Kerr                     Expires April 27, 2003                [Page 10]
+
+Internet Draft      draft-kerr-avt-vorbis-rtp-03.txt    October 27, 2003
+
+
+   If a checksum failure is detected then a new config header file
+   SHOULD be obtained from SDP, if the codebook has not changed since
+   the session has started.  If no SDP value is set and no other method
+   for obtaining the config headers exists then this is considered to 
+   be a failure and SHOULD be reported to the client application.
+
+   If the m flag is set then the next header block will contain the 
+   comment metadata, such as artist name, track title and so on.  These
+   metadata messages are not intended to be fully descriptive but to 
+   offer basic track/song information.  This message MUST be sent at 
+   the start of the stream, together with the setup and codebook 
+   headers, even if it contains no information.  During a session the
+   metadata associated with the stream may change from that specified 
+   at the start, e.g. a live concert broadcast changing acts/scenes, so
+   clients MUST have the ability to receive m header blocks.  Details
+   on the format of the comments can be found in the Vorbis 
+   documentation [7].
+
+   The format for the data takes the form of a 32 bit codec vendors
+   name length field followed by the name encoded in UTF-8.  The next
+   field denotes the number of user comments and then the user comments
+   length and text field pairs, up to the number indicated by the user 
+   comment list length.   
+
+   If the o, overflow, bit is set then the URI of a whole header block
+   is specified in an overflow URI field, which is a null terminated 
+   UTF-8 string.  The header file specified at the URI MUST NOT have 
+   the overflow flag set, otherwise a loop condition will occur. 
+
+
+4.2 Codebook Caching
+
+   Codebook caching allows clients that have previously connected to a 
+   stream to re-use the codebooks and thus begin the playback of the 
+   session faster.  When a client receives a codebook it may store
+   it, together with the MD5 key, locally and can compare the MD5 key
+   of locally cached codebooks with the key it receives via SDP, which
+   is detailed in section 5.   
+   
+
+5 Session Description for Vorbis RTP Streams
+
+   Session description information concerning the Vorbis stream 
+   SHOULD be provided if possible and MUST be in accordance with [8].  
+   The SDP information is split into two sections, a mandatory 
+   section detailing the RTP stream and an optional section used to 
+   convey information needed for codebook caching.
+
+
+
+
+
+
+Kerr                     Expires April 27, 2003                [Page 11]
+
+Internet Draft      draft-kerr-avt-vorbis-rtp-03.txt    October 27, 2003
+
+
+   Below is an outline of the mandatory SDP attributes.
+
+   c=IN IP4/6 <Vorbis stream>
+   m=audio <port> RTP/AVP 98
+   a=rtpmap:98 vorbis/<sample rate>
+   a=fmtp:98 header=<URI of Vorbis codebooks>
+   a=fmtp:98 md5key=<MD5 key of codebook>
+
+   The port value is specified by the server application bound to 
+   the address specified in the c attribute.  The bitrate value 
+   specified in the a attribute MUST match the Vorbis sample rate 
+   value.
+
+   The Vorbis codebook specified in the header attribute MUST contain
+   all of the configuration data.  If the codebook MD5 attribute, 
+   md5key, is set the key is compared to a locally held cache and 
+   if found the associated local codebook is used, if not the 
+   client MUST use the configuration headers specified with the 
+   header attribute.  
+
+5.1 SDP Based Config Header Transmission
+
+   The optional SDP attributes are used to convey details of the 
+   Vorbis stream which are required for codebook caching.  If the 
+   following attributes are set they take precedent over values 
+   specified in the u attribute detailed above.  The maximum size
+   of the mandatory and optional SDP attributes MUST be less than
+   1K in size to conform to section 4.1 of [8].
+
+   a=fmtp:98 bitrate_min=<Bitrate Minimum>
+   a=fmtp:98 bitrate_norm=<Bitrate Normal>
+   a=fmtp:98 bitrate_max=<Bitrate Maximum>
+   a=fmtp:98 bsz0=<Block Size 0>
+   a=fmtp:98 bsz1=<Block Size 1>
+   a=fmtp:98 channels=<Num Audio Channels>
+   a=fmtp:98 meta_vendor=<Vendor Name>
+
+
+   The metadata attribute, meta_vendor, provides the bare minimum 
+   information required for decoding but does not convey any 
+   meaningful stream metadata information.  As outlined in the Vorbis 
+   comment field and header specification documentation, [7], a number 
+   of predefined field names are available which SHOULD be used.  An 
+   example would be:
+
+
+
+
+Kerr                     Expires April 27, 2003                [Page 12]
+
+Internet Draft      draft-kerr-avt-vorbis-rtp-03.txt    October 27, 2003
+
+
+   a=fmtp:98 meta_vendor=Xiph.Org libVorbis I 20020717
+   a=fmtp:98 meta_artist=Honest Bob and the Factory-to-Dealer-Incentives
+   a=fmtp:98 meta_title=I'm Still Around
+   a=fmtp:98 meta_tracknumber=5
+
+
+6 IANA Considerations
+
+   MIME media type name: audio
+
+   MIME subtype: vorbis
+
+   Required Parameters:
+         header indicates the URI of the decoding codebook.
+         md5key indicates the MD5 key of the codebooks.
+
+   Optional Parameters: 
+         bitrate_min, bitrate_norm and bitrate_max indicate the 
+         minimum, nominal and maximum bitrates.  bsz0 and bsz1
+         indicate the blocksize values.  channels indicates the 
+         number of audio channels in the stream.  meta_vendor 
+         indicates the encoding codec vendor.
+
+   Encoding considerations:
+         This type is only defined for transfer via RTP as specified 
+         in RFC XXXX.
+
+   Security Considerations:
+         See Section 6 of RFC 3047.
+
+   Interoperability considerations: none
+
+   Published specification:
+         See the Vorbis documentation [2] for details.
+
+   Applications which use this media type:
+         Audio streaming and conferencing tools
+
+   Additional information: none
+
+   Person & email address to contact for further information:
+         Phil Kerr
+         philkerr@elec.gla.ac.uk/phil@plus24.com
+
+   Intended usage: COMMON
+
+   Author/Change controller:
+         Author: Phil Kerr
+         Change controller: IETF AVT Working Group
+
+7 Congestion Control    
+
+   Vorbis clients SHOULD send regular receiver reports detailing 
+   congestion.  A mechanism for dynamically downgrading the stream, 
+   known as bitrate peeling, will allow for a graceful backing off
+   of the stream bitrate.  This feature is not available at present
+   so an alternative would be to redirect the client to a lower 
+   bitrate stream if one is available.  
+ 
+Kerr                     Expires April 27, 2003                [Page 13]
+
+Internet Draft      draft-kerr-avt-vorbis-rtp-03.txt    October 27, 2003
+
+
+8 Security Considerations
+
+   RTP packets using this payload format are subject to the security 
+   considerations discussed in the RTP specification [3].  This implies 
+   that the confidentiality of the media stream is achieved by using
+   encryption.  Because the data compression used with this payload
+   format is applied end-to-end, encryption may be performed on the 
+   compressed data.  Where the size of a data block is set care MUST 
+   be taken to prevent buffer overflows in the client applications.
+
+
+9 Acknowledgments
+
+   This document is a continuation of draft-moffitt-vorbis-rtp-00.txt.
+   The MIME type section is a continuation of draft-short-avt-rtp-
+   vorbis-mime-00.txt
+
+   Thanks to the AVT, Ogg Vorbis Communities / Xiph.org including 
+   Steve Casner, Ramon Garcia, Pascal Hennequin, Ralph Jiles, 
+   Tor-Einar Jarnbjo, Colin Law, John Lazzaro, Jack Moffitt, 
+   Colin Perkins, Barry Short, Mike Smith, Magnus Westerlund.
+
+
+10 Normative References
+
+   1.  The Ogg Encapsulation Format Version 0 (RFC 3533), S. Pfeiffer.
+
+   2.  Key words for use in RFCs to Indicate Requirement Levels 
+       (RFC 2119), S. Bradner.
+
+   3.  RTP: A Transport Protocol for Real-Time Applications (RFC 1889),
+       Schulzrinne, et al.
+  
+   4.  RTP: A transport protocol for real-time applications. Work   
+       in progress, draft-ietf-avt-rtp-new-11.txt.
+
+   5.  RTP Profile for Audio and Video Conferences with Minimal Control. 
+       Work in progress, draft-ietf-avt-profile-new-12.txt.
+
+   6.  Ogg Vorbis I spec:  Codec setup and packet decode.
+       http://www.xiph.org/ogg/vorbis/doc/vorbis-spec-ref.html
+
+   7.  Ogg Vorbis I spec:  Comment field and header specification. 
+       http://www.xiph.org/ogg/vorbis/doc/v-comment.html
+
+   8.  SDP: Session Description Protocol (RFC 2327), Handley, M. and 
+       V. Jacobson.
+  
+   9.  Path MTU Discovery (RFC 1063), Mogul & Deering 
+
+   10. Path MTU Discovery for IP version 6 (RFC 1981), McCann, J. et al.
+
+
+
+
+
+Kerr                     Expires April 27, 2003                [Page 14]
+
+Internet Draft      draft-kerr-avt-vorbis-rtp-03.txt    October 27, 2003
+
+
+10.1 Informative References
+
+   11. libvorbis: Available from the Xiph website, http://www.xiph.org  
+
+
+11 Full Copyright Statement
+
+   Copyright (C) The Internet Society (2003). All Rights Reserved.
+
+   This document and translations of it may be copied and furnished to
+   others, and derivative works that comment on or otherwise explain it
+   or assist in its implementation may be prepared, copied, published
+   and distributed, in whole or in part, without restriction of any
+   kind, provided that the above copyright notice and this paragraph are
+   included on all such copies and derivative works. However, this
+   document itself may not be modified in any way, such as by removing
+   the copyright notice or references to the Internet Society or other
+   Internet organizations, except as needed for the purpose of
+   developing Internet standards in which case the procedures for
+   copyrights defined in the Internet Standards process must be
+   followed, or as required to translate it into languages other than
+   English.
+
+   The limited permissions granted above are perpetual and will not be
+   revoked by the Internet Society or its successors or assigns.
+
+   This document and the information contained herein is provided on an
+   "AS IS" basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING
+   TASK FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING
+   BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION
+   HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF
+   MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+10.1 IPR Statement
+
+   "The IETF takes no position regarding the validity or scope of   any intellectual property or other rights that might be claimed   to  pertain to the implementation or use of the technology   described in this document or the extent to which any license   under such rights might or might not be available; neither does   it represent that it has made any effort to identify any such   rights.  Information on the IETF's procedures with respect to   rights in standards-track and standards-related documentation   can be found in BCP-11.  Copies of claims of rights made   available for publication and any assurances of licenses to   be made available, or the result of an attempt made   to obtain a general license or permission for the use of such   proprietary rights by implementors or users of this   specification can be obtained from the IETF Secretariat."
+
+   Further IPR details on the Vorbis bitstream may be found on the
+   Xiph website: http://www.xiph.org
+
+
+
+12 Authors Address
+
+   Phil Kerr
+   Centre for Music Technology
+   University of Glasgow
+   Glasgow, Scotland
+   UK, G12 8LT
+   Phone: +44 141 330 5740
+   Email: philkerr@elec.gla.ac.uk
+          phil@plus24.com
+
+   WWW: http://www.xiph.org/
+
+
+Kerr                     Expires April 27, 2003                [Page 15]
+
