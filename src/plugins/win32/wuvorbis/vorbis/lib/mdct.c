@@ -275,8 +275,11 @@ _asm
 	xorps		xmm2,	neg_0						// a xmm2 =	-c		d		a		-a
 	xorps		xmm1,	neg_0						// b xmm1 =	d		c		b		-b
 	xorps		xmm6,	xmm6						// b xmm6 =	0		0		0		0
-	movhps		xmm2,	xmm6						// a xmm2 =	0		0		a		-a
-	movhps		xmm1,	xmm6						// b xmm1 =	0		0		b		-b
+//	movhps		xmm2,	xmm6						// a xmm2 =	0		0		a		-a
+//	movhps		xmm1,	xmm6						// b xmm1 =	0		0		b		-b
+// à»â∫Ç™ê≥ÇµÇ¢Ç∆évÇÌÇÍÇÈ
+	movlhps		xmm2,	xmm6						// a xmm2 =	0		0		a		-a
+	movlhps		xmm1,	xmm6						// b xmm1 =	0		0		b		-b
 
 	subps		xmm3,	xmm2						// a xmm3 =	-c		d		b-a		b+a
 	addps		xmm7,	xmm1						// b xmm7 = d		c		a+b		a-b

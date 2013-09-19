@@ -435,7 +435,7 @@ HRESULT VorbisWaveDecoder::SetStream(IStream *stream, LPWSTR url)
 			if(sel)
 			{
 				float db = (float)atof(sel); // in db
-				gain *= (float)pow(10.0, db / 20); // convert db to multiplier
+				gain *= (float)pow(10.0, db / 20.0); // convert db to multiplier
 			}
 			
 			vorbis_info_set_global_gain(ov_info(&InputFile, i), gain);
@@ -556,7 +556,7 @@ static void InternalSetCPUType(tjs_uint32 cputype)
 	if(CPU_SSE && CPU_3DN) CPU_SSE = 0; // Athlon XP; 3DNow! is faster than SSE on this decoder.
 }
 //---------------------------------------------------------------------------
-extern "C" HRESULT _stdcall _export V2Link(iTVPFunctionExporter *exporter)
+extern "C" __declspec(dllexport) HRESULT _stdcall V2Link(iTVPFunctionExporter *exporter)
 {
 #ifndef NOT_HAVE_TP_STUB
 	// exported function, only called by kirikiri ver 2+
@@ -630,7 +630,7 @@ extern "C" HRESULT _stdcall _export V2Link(iTVPFunctionExporter *exporter)
 	return S_OK;
 }
 //---------------------------------------------------------------------------
-extern "C" HRESULT _stdcall _export V2Unlink()
+extern "C" __declspec(dllexport) HRESULT _stdcall V2Unlink()
 {
 #ifndef NOT_HAVE_TP_STUB
 	TVPUninitImportStub();
@@ -645,7 +645,7 @@ extern "C" HRESULT _stdcall _export V2Unlink()
 	return S_OK;
 }
 //---------------------------------------------------------------------------
-extern "C" const wchar_t * _stdcall _export GetOptionDesc()
+extern "C" __declspec(dllexport) const wchar_t * _stdcall GetOptionDesc()
 {
 	if(GetACP() == 932) // 932 == Japan
 	{
@@ -755,7 +755,7 @@ void * dee_ogg_realloc(void *block, size_t bytes)
 //---------------------------------------------------------------------------
 // ##########################################################################
 //---------------------------------------------------------------------------
-extern "C" int _stdcall _export Query_sizeof_OggVorbis_File()
+extern "C" __declspec(dllexport) int _stdcall Query_sizeof_OggVorbis_File()
 {
 	// returns sizeof(OggVorbis_File)
 	return sizeof(OggVorbis_File);
