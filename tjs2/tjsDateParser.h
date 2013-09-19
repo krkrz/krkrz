@@ -12,7 +12,7 @@
 #define tjsDateParserH
 
 #include "tjsTypes.h"
-#include "tjsdate.tab.h"
+#include "tjsdate.tab.hpp"
 
 
 namespace TJS

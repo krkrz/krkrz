@@ -120,7 +120,7 @@ int dperror(char * msg)
 
 
 /* Line 189 of yacc.c  */
-#line 123 "tjsdate.tab.c"
+#line 123 "tjsdate.tab.cpp"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -170,7 +170,7 @@ typedef union YYSTYPE
 
 
 /* Line 214 of yacc.c  */
-#line 173 "tjsdate.tab.c"
+#line 173 "tjsdate.tab.cpp"
 } YYSTYPE;
 YYLEX_PROTO_DECL
 
@@ -184,7 +184,7 @@ YYLEX_PROTO_DECL
 
 
 /* Line 264 of yacc.c  */
-#line 185 "tjsdate.tab.c"
+#line 185 "tjsdate.tab.cpp"
 
 #ifdef short
 # undef short
@@ -1606,7 +1606,7 @@ yyreduce:
 
 
 /* Line 1455 of yacc.c  */
-#line 1607 "tjsdate.tab.c"
+#line 1607 "tjsdate.tab.cpp"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);

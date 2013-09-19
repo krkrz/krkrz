@@ -1,27 +1,28 @@
-@echo off
 echo tjs.y :
 perl CR.pl tjs.y
-bison -dv tjs.y
-perl postbison.pl tjs.tab.c
-perl wrapTJSns.pl tjs.tab.h
+bison -dv -o tjs.tab.cpp tjs.y
+perl postbison.pl tjs.tab.cpp
+perl wrapTJSns.pl tjs.tab.hpp
 echo copying ...
 echo tjspp.y :
 perl CR.pl tjspp.y
-bison -dv --name-prefix=pp tjspp.y
-perl postbison.pl tjspp.tab.c
-perl wrapTJSns.pl tjspp.tab.h
+bison -dv --name-prefix=pp -o tjspp.tab.cpp tjspp.y
+perl postbison.pl tjspp.tab.cpp
+perl wrapTJSns.pl tjspp.tab.hpp
 echo copying ...
-copy tjs.tab.c ..\tjs.tab.cpp
-copy tjs.tab.h ..\tjs.tab.h
-copy tjspp.tab.c ..\tjspp.tab.cpp
-copy tjspp.tab.h ..\tjspp.tab.h
+copy tjs.tab.cpp ..\tjs.tab.cpp
+copy tjs.tab.hpp ..\tjs.tab.hpp
+copy tjspp.tab.cpp ..\tjspp.tab.cpp
+copy tjspp.tab.hpp ..\tjspp.tab.hpp
 echo tjsdate.y :
 perl CR.pl tjsdate.y
-bison -dv --name-prefix=dp tjsdate.y
-perl postbison.pl tjsdate.tab.c
-perl wrapTJSns.pl tjsdate.tab.h
+bison -dv --name-prefix=dp -o tjsdate.tab.cpp tjsdate.y
+perl postbison.pl tjsdate.tab.cpp
+perl wrapTJSns.pl tjsdate.tab.hpp
 echo copying ...
-copy tjsdate.tab.c ..\tjsdate.tab.cpp
-copy tjsdate.tab.h ..\tjsdate.tab.h
+copy tjsdate.tab.cpp ..\tjsdate.tab.cpp
+copy tjsdate.tab.hpp ..\tjsdate.tab.hpp
 call gen_wordtable.bat
-pause
+del *.cpp
+del *.hpp
+del *.output
