@@ -19,7 +19,7 @@ int WINAPI DllEntryPoint(HINSTANCE hinst, unsigned long reason, void* lpReserved
 }
 //---------------------------------------------------------------------------
 // V2Link は DLL がリンクされるときに実行される
-extern "C" HRESULT _stdcall _export V2Link(iTVPFunctionExporter *exporter)
+extern "C" __declspec(dllexport) HRESULT _stdcall V2Link(iTVPFunctionExporter *exporter)
 {
 	// スタブの初期化
 	TVPInitImportStub(exporter); // 必ずこれは記述
@@ -39,7 +39,7 @@ extern "C" HRESULT _stdcall _export V2Link(iTVPFunctionExporter *exporter)
 }
 //---------------------------------------------------------------------------
 // V2Unlink は DLL がアンリンクされるときに実行される
-extern "C" HRESULT _stdcall _export V2Unlink()
+extern "C" __declspec(dllexport) HRESULT _stdcall V2Unlink()
 {
 	// トランジションハンドラプロバイダの登録削除
 	UnregisterWaveTransHandlerProvider();

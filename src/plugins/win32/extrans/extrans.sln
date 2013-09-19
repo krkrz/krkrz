@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "extrans", "extrans.vcxproj", "{BD1451D7-6DE8-4E13-AD59-0DCA682996EC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BD1451D7-6DE8-4E13-AD59-0DCA682996EC}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BD1451D7-6DE8-4E13-AD59-0DCA682996EC}.Debug|Win32.Build.0 = Debug|Win32
+		{BD1451D7-6DE8-4E13-AD59-0DCA682996EC}.Release|Win32.ActiveCfg = Release|Win32
+		{BD1451D7-6DE8-4E13-AD59-0DCA682996EC}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

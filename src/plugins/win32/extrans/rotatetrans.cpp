@@ -75,13 +75,13 @@ public:
 		{
 			// 上弦 ( 最初が動きが早く、徐々に遅くなる )
 			zm = 1.0 - zm;
-			zm = pow(zm, -Accel);
+			zm = pow((double)zm, -Accel);
 			zm = 1.0 - zm;
 		}
 		else if(Accel > 0)
 		{
 			// 下弦 ( 最初は動きが遅く、徐々に早くなる )
-			zm = pow(zm, Accel);
+			zm = pow((double)zm, Accel);
 		}
 
 		tjs_int scx = Width/2;
@@ -93,13 +93,13 @@ public:
 		{
 			// 上弦 ( 最初が動きが早く、徐々に遅くなる )
 			tm = 1.0 - tm;
-			tm = pow(tm, -TwistAccel);
+			tm = pow((double)tm, -TwistAccel);
 			tm = 1.0 - tm;
 		}
 		else if(TwistAccel > 0)
 		{
 			// 下弦 ( 最初は動きが遅く、徐々に早くなる )
-			tm = pow(tm, TwistAccel);
+			tm = pow((double)tm, TwistAccel);
 		}
 
 		float rad = CurTime == Time ? 0 : 2 * 3.14159265368979 * Twist * tm;
