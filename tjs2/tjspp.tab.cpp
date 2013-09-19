@@ -124,7 +124,7 @@ int _pperror(char * msg, void *pm)
 
 
 /* Line 189 of yacc.c  */
-#line 127 "tjspp.tab.c"
+#line 127 "tjspp.tab.cpp"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -194,7 +194,7 @@ typedef union YYSTYPE
 
 
 /* Line 214 of yacc.c  */
-#line 197 "tjspp.tab.c"
+#line 197 "tjspp.tab.cpp"
 } YYSTYPE;
 YYLEX_PROTO_DECL
 
@@ -208,7 +208,7 @@ YYLEX_PROTO_DECL
 
 
 /* Line 264 of yacc.c  */
-#line 209 "tjspp.tab.c"
+#line 209 "tjspp.tab.cpp"
 
 #ifdef short
 # undef short
@@ -1635,7 +1635,7 @@ yyreduce:
 
 
 /* Line 1455 of yacc.c  */
-#line 1636 "tjspp.tab.c"
+#line 1636 "tjspp.tab.cpp"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);

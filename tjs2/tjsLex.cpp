@@ -12,7 +12,7 @@
 
 #include <math.h>
 #include "tjsInterCodeGen.h"
-#include "tjs.tab.h"
+#include "tjs.tab.hpp"
 #include "tjsLex.h"
 #include "tjsVariant.h"
 #include "tjsError.h"

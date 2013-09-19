@@ -13,7 +13,7 @@
 #include <time.h>
 
 #include "tjsDateParser.h"
-#include "tjsdate.tab.h"
+#include "tjsdate.tab.hpp"
 
 #include "tjsError.h"
 

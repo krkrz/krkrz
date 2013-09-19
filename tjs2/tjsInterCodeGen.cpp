@@ -16,7 +16,7 @@
 #include "tjsScriptBlock.h"
 #include "tjsGlobalStringMap.h"
 
-#include "tjs.tab.h"
+#include "tjs.tab.hpp"
 #include "tjsError.h"
 #include "tjsUtils.h"
 #include "tjsDebug.h"

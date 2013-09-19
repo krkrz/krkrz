@@ -14,7 +14,7 @@
 #include "tjsCompileControl.h"
 #include "tjsLex.h"
 #include "tjsVariant.h"
-#include "tjspp.tab.h"
+#include "tjspp.tab.hpp"
 #include "tjsError.h"
 
 
