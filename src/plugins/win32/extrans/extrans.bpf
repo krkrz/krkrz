@@ -1,0 +1,15 @@
+USEDEF("extrans.def");
+USEUNIT("Main.cpp");
+USEUNIT("wave.cpp");
+USEUNIT("mosaic.cpp");
+USEUNIT("turn.cpp");
+USEUNIT("turntrans_table.cpp");
+USEUNIT("rotatebase.cpp");
+USEUNIT("rotatetrans.cpp");
+USEUNIT("ripple.cpp");
+USE("common.h", File);
+USEUNIT("..\tp_stub.cpp");
+//---------------------------------------------------------------------------
+This file is used by the project manager only and should be treated like the project file
+
+DllEntryPoint
