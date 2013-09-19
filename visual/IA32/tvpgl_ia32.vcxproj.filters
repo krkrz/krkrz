@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ASM Source">
+      <UniqueIdentifier>{037537ce-de93-4a62-824f-4d296714db41}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="addalphablend.nas">
+      <Filter>ASM Source</Filter>
+    </None>
+    <None Include="addblend.nas">
+      <Filter>ASM Source</Filter>
+    </None>
+    <None Include="adjust_color.nas">
+      <Filter>ASM Source</Filter>
+    </None>
+    <None Include="affine.nas">
+      <Filter>ASM Source</Filter>
+    </None>
+    <None Include="alphablend.nas">
+      <Filter>ASM Source</Filter>
+    </None>
+    <None Include="boxblur.nas">
+      <Filter>ASM Source</Filter>
+    </None>
+    <None Include="colorfill.nas">
+      <Filter>ASM Source</Filter>
+    </None>
+    <None Include="colormap.nas">
+      <Filter>ASM Source</Filter>
+    </None>
+    <None Include="darkenblend.nas">
+      <Filter>ASM Source</Filter>
+    </None>
+    <None Include="detect_cpu.nas">
+      <Filter>ASM Source</Filter>
+    </None>
+    <None Include="lightenblend.nas">
+      <Filter>ASM Source</Filter>
+    </None>
+    <None Include="make_alpha_from_key.nas">
+      <Filter>ASM Source</Filter>
+    </None>
+    <None Include="mulblend.nas">
+      <Filter>ASM Source</Filter>
+    </None>
+    <None Include="pixelformat.nas">
+      <Filter>ASM Source</Filter>
+    </None>
+    <None Include="screenblend.nas">
+      <Filter>ASM Source</Filter>
+    </None>
+    <None Include="stretch.nas">
+      <Filter>ASM Source</Filter>
+    </None>
+    <None Include="subblend.nas">
+      <Filter>ASM Source</Filter>
+    </None>
+    <None Include="tlg5.nas">
+      <Filter>ASM Source</Filter>
+    </None>
+    <None Include="tlg6_chroma.nas">
+      <Filter>ASM Source</Filter>
+    </None>
+    <None Include="tlg6_golomb.nas">
+      <Filter>ASM Source</Filter>
+    </None>
+    <None Include="tvpps_asm.nas">
+      <Filter>ASM Source</Filter>
+    </None>
+    <None Include="univtrans.nas">
+      <Filter>ASM Source</Filter>
+    </None>
+  </ItemGroup>
+</Project>
