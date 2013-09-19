@@ -102,12 +102,18 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ml /coff /Zi /c /safeseh /Fl$(Configuration)\%(Filename).lst /Fo $(Configuration)\%(Filename).obj contrib\masmx86\%(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ml /coff /Zi /c /safeseh /Fl$(Configuration)\%(Filename).lst /Fo $(Configuration)\%(Filename).obj contrib\masmx86\%(Filename).asm</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="contrib\masmx86\match686.asm">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ml /coff /Zi /c /safeseh /Fl$(Configuration)\%(Filename).lst /Fo $(Configuration)\%(Filename).obj contrib\masmx86\%(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ml /coff /Zi /c /safeseh /Fl$(Configuration)\%(Filename).lst /Fo $(Configuration)\%(Filename).obj contrib\masmx86\%(Filename).asm</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

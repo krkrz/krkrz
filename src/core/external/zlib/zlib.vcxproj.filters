@@ -3,7 +3,7 @@
   <ItemGroup>
     <Filter Include="ソース ファイル">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat</Extensions>
     </Filter>
     <Filter Include="ヘッダー ファイル">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
@@ -11,6 +11,7 @@
     </Filter>
     <Filter Include="ASM Source">
       <UniqueIdentifier>{1f790f7b-2aa1-4a25-b98a-ead5e1733162}</UniqueIdentifier>
+      <Extensions>asm</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -62,10 +63,10 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="contrib\masmx86\inffas32.asm">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ASM Source</Filter>
     </CustomBuild>
     <CustomBuild Include="contrib\masmx86\match686.asm">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ASM Source</Filter>
     </CustomBuild>
   </ItemGroup>
 </Project>
