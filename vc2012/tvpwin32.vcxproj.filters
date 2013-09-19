@@ -82,9 +82,6 @@
     <ClInclude Include="..\tjs2\tjs.h">
       <Filter>tjs2</Filter>
     </ClInclude>
-    <ClInclude Include="..\tjs2\tjs.tab.h">
-      <Filter>tjs2</Filter>
-    </ClInclude>
     <ClInclude Include="..\tjs2\tjsArray.h">
       <Filter>tjs2</Filter>
     </ClInclude>
@@ -107,9 +104,6 @@
       <Filter>tjs2</Filter>
     </ClInclude>
     <ClInclude Include="..\tjs2\tjsDate.h">
-      <Filter>tjs2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\tjs2\tjsdate.tab.h">
       <Filter>tjs2</Filter>
     </ClInclude>
     <ClInclude Include="..\tjs2\tjsDateParser.h">
@@ -167,9 +161,6 @@
       <Filter>tjs2</Filter>
     </ClInclude>
     <ClInclude Include="..\tjs2\tjsObject.h">
-      <Filter>tjs2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\tjs2\tjspp.tab.h">
       <Filter>tjs2</Filter>
     </ClInclude>
     <ClInclude Include="..\tjs2\tjsRandomGenerator.h">
@@ -544,6 +535,15 @@
     <ClInclude Include="..\environ\win32\TVPWindow.h">
       <Filter>environ\win32</Filter>
     </ClInclude>
+    <ClInclude Include="..\tjs2\tjs.tab.hpp">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjsdate.tab.hpp">
+      <Filter>tjs2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tjs2\tjspp.tab.hpp">
+      <Filter>tjs2</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -553,9 +553,6 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="..\tjs2\tjs.cpp">
-      <Filter>tjs2</Filter>
-    </ClCompile>
-    <ClCompile Include="..\tjs2\tjs.tab.cpp">
       <Filter>tjs2</Filter>
     </ClCompile>
     <ClCompile Include="..\tjs2\tjsArray.cpp">
@@ -577,9 +574,6 @@
       <Filter>tjs2</Filter>
     </ClCompile>
     <ClCompile Include="..\tjs2\tjsDate.cpp">
-      <Filter>tjs2</Filter>
-    </ClCompile>
-    <ClCompile Include="..\tjs2\tjsdate.tab.cpp">
       <Filter>tjs2</Filter>
     </ClCompile>
     <ClCompile Include="..\tjs2\tjsDateParser.cpp">
@@ -631,9 +625,6 @@
       <Filter>tjs2</Filter>
     </ClCompile>
     <ClCompile Include="..\tjs2\tjsObject.cpp">
-      <Filter>tjs2</Filter>
-    </ClCompile>
-    <ClCompile Include="..\tjs2\tjspp.tab.cpp">
       <Filter>tjs2</Filter>
     </ClCompile>
     <ClCompile Include="..\tjs2\tjsRandomGenerator.cpp">
@@ -950,6 +941,15 @@
     </ClCompile>
     <ClCompile Include="..\environ\win32\TVPWindow.cpp">
       <Filter>environ\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjs.tab.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjsdate.tab.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tjs2\tjspp.tab.cpp">
+      <Filter>tjs2</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

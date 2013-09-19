@@ -3,7 +3,7 @@
   <ItemGroup>
     <Filter Include="ソース ファイル">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;</Extensions>
     </Filter>
     <Filter Include="ヘッダー ファイル">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
@@ -135,127 +135,127 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="jccolmmx.asm">
-      <Filter>ソース ファイル</Filter>
+      <Filter>NASM Source</Filter>
     </CustomBuild>
     <CustomBuild Include="jccolss2.asm">
-      <Filter>ソース ファイル</Filter>
+      <Filter>NASM Source</Filter>
     </CustomBuild>
     <CustomBuild Include="jcqnt3dn.asm">
-      <Filter>ソース ファイル</Filter>
+      <Filter>NASM Source</Filter>
     </CustomBuild>
     <CustomBuild Include="jcqntflt.asm">
-      <Filter>ソース ファイル</Filter>
+      <Filter>NASM Source</Filter>
     </CustomBuild>
     <CustomBuild Include="jcqntint.asm">
-      <Filter>ソース ファイル</Filter>
+      <Filter>NASM Source</Filter>
     </CustomBuild>
     <CustomBuild Include="jcqntmmx.asm">
-      <Filter>ソース ファイル</Filter>
+      <Filter>NASM Source</Filter>
     </CustomBuild>
     <CustomBuild Include="jcqnts2f.asm">
-      <Filter>ソース ファイル</Filter>
+      <Filter>NASM Source</Filter>
     </CustomBuild>
     <CustomBuild Include="jcqnts2i.asm">
-      <Filter>ソース ファイル</Filter>
+      <Filter>NASM Source</Filter>
     </CustomBuild>
     <CustomBuild Include="jcqntsse.asm">
-      <Filter>ソース ファイル</Filter>
+      <Filter>NASM Source</Filter>
     </CustomBuild>
     <CustomBuild Include="jcsammmx.asm">
-      <Filter>ソース ファイル</Filter>
+      <Filter>NASM Source</Filter>
     </CustomBuild>
     <CustomBuild Include="jcsamss2.asm">
-      <Filter>ソース ファイル</Filter>
+      <Filter>NASM Source</Filter>
     </CustomBuild>
     <CustomBuild Include="jdcolmmx.asm">
-      <Filter>ソース ファイル</Filter>
+      <Filter>NASM Source</Filter>
     </CustomBuild>
     <CustomBuild Include="jdcolss2.asm">
-      <Filter>ソース ファイル</Filter>
+      <Filter>NASM Source</Filter>
     </CustomBuild>
     <CustomBuild Include="jdmermmx.asm">
-      <Filter>ソース ファイル</Filter>
+      <Filter>NASM Source</Filter>
     </CustomBuild>
     <CustomBuild Include="jdmerss2.asm">
-      <Filter>ソース ファイル</Filter>
+      <Filter>NASM Source</Filter>
     </CustomBuild>
     <CustomBuild Include="jdsammmx.asm">
-      <Filter>ソース ファイル</Filter>
+      <Filter>NASM Source</Filter>
     </CustomBuild>
     <CustomBuild Include="jdsamss2.asm">
-      <Filter>ソース ファイル</Filter>
-    </CustomBuild>
-    <CustomBuild Include="jf3dnflt.asm">
-      <Filter>ソース ファイル</Filter>
+      <Filter>NASM Source</Filter>
     </CustomBuild>
     <CustomBuild Include="jfdctflt.asm">
-      <Filter>ソース ファイル</Filter>
+      <Filter>NASM Source</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jf3dnflt.asm">
+      <Filter>NASM Source</Filter>
     </CustomBuild>
     <CustomBuild Include="jfdctfst.asm">
-      <Filter>ソース ファイル</Filter>
+      <Filter>NASM Source</Filter>
     </CustomBuild>
     <CustomBuild Include="jfdctint.asm">
-      <Filter>ソース ファイル</Filter>
+      <Filter>NASM Source</Filter>
     </CustomBuild>
     <CustomBuild Include="jfmmxfst.asm">
-      <Filter>ソース ファイル</Filter>
-    </CustomBuild>
-    <CustomBuild Include="jfmmxint.asm">
-      <Filter>ソース ファイル</Filter>
+      <Filter>NASM Source</Filter>
     </CustomBuild>
     <CustomBuild Include="jfss2fst.asm">
-      <Filter>ソース ファイル</Filter>
+      <Filter>NASM Source</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jfmmxint.asm">
+      <Filter>NASM Source</Filter>
     </CustomBuild>
     <CustomBuild Include="jfss2int.asm">
-      <Filter>ソース ファイル</Filter>
+      <Filter>NASM Source</Filter>
     </CustomBuild>
     <CustomBuild Include="jfsseflt.asm">
-      <Filter>ソース ファイル</Filter>
-    </CustomBuild>
-    <CustomBuild Include="ji3dnflt.asm">
-      <Filter>ソース ファイル</Filter>
+      <Filter>NASM Source</Filter>
     </CustomBuild>
     <CustomBuild Include="jidctflt.asm">
-      <Filter>ソース ファイル</Filter>
+      <Filter>NASM Source</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ji3dnflt.asm">
+      <Filter>NASM Source</Filter>
     </CustomBuild>
     <CustomBuild Include="jidctfst.asm">
-      <Filter>ソース ファイル</Filter>
+      <Filter>NASM Source</Filter>
     </CustomBuild>
     <CustomBuild Include="jidctint.asm">
-      <Filter>ソース ファイル</Filter>
+      <Filter>NASM Source</Filter>
     </CustomBuild>
     <CustomBuild Include="jidctred.asm">
-      <Filter>ソース ファイル</Filter>
-    </CustomBuild>
-    <CustomBuild Include="jimmxfst.asm">
-      <Filter>ソース ファイル</Filter>
+      <Filter>NASM Source</Filter>
     </CustomBuild>
     <CustomBuild Include="jimmxint.asm">
-      <Filter>ソース ファイル</Filter>
+      <Filter>NASM Source</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jimmxfst.asm">
+      <Filter>NASM Source</Filter>
     </CustomBuild>
     <CustomBuild Include="jimmxred.asm">
-      <Filter>ソース ファイル</Filter>
+      <Filter>NASM Source</Filter>
     </CustomBuild>
     <CustomBuild Include="jiss2flt.asm">
-      <Filter>ソース ファイル</Filter>
-    </CustomBuild>
-    <CustomBuild Include="jiss2fst.asm">
-      <Filter>ソース ファイル</Filter>
-    </CustomBuild>
-    <CustomBuild Include="jiss2int.asm">
-      <Filter>ソース ファイル</Filter>
+      <Filter>NASM Source</Filter>
     </CustomBuild>
     <CustomBuild Include="jiss2red.asm">
-      <Filter>ソース ファイル</Filter>
+      <Filter>NASM Source</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jiss2int.asm">
+      <Filter>NASM Source</Filter>
+    </CustomBuild>
+    <CustomBuild Include="jiss2fst.asm">
+      <Filter>NASM Source</Filter>
     </CustomBuild>
     <CustomBuild Include="jisseflt.asm">
-      <Filter>ソース ファイル</Filter>
+      <Filter>NASM Source</Filter>
     </CustomBuild>
     <CustomBuild Include="jsimdcpu.asm">
-      <Filter>ソース ファイル</Filter>
+      <Filter>NASM Source</Filter>
     </CustomBuild>
     <CustomBuild Include="jsimdw32.asm">
-      <Filter>ソース ファイル</Filter>
+      <Filter>NASM Source</Filter>
     </CustomBuild>
   </ItemGroup>
 </Project>

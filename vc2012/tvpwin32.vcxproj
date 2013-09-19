@@ -92,6 +92,10 @@
     <ResourceCompile>
       <Culture>0x0411</Culture>
     </ResourceCompile>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <Text Include="optionarea.txt" />
@@ -158,7 +162,7 @@
     <ClInclude Include="..\sound\win32\tvpsnd.h" />
     <ClInclude Include="..\sound\win32\WaveImpl.h" />
     <ClInclude Include="..\tjs2\tjs.h" />
-    <ClInclude Include="..\tjs2\tjs.tab.h" />
+    <ClInclude Include="..\tjs2\tjs.tab.hpp" />
     <ClInclude Include="..\tjs2\tjsArray.h" />
     <ClInclude Include="..\tjs2\tjsBinarySerializer.h" />
     <ClInclude Include="..\tjs2\tjsByteCodeLoader.h" />
@@ -167,7 +171,7 @@
     <ClInclude Include="..\tjs2\tjsConfig.h" />
     <ClInclude Include="..\tjs2\tjsConstArrayData.h" />
     <ClInclude Include="..\tjs2\tjsDate.h" />
-    <ClInclude Include="..\tjs2\tjsdate.tab.h" />
+    <ClInclude Include="..\tjs2\tjsdate.tab.hpp" />
     <ClInclude Include="..\tjs2\tjsDateParser.h" />
     <ClInclude Include="..\tjs2\tjsDebug.h" />
     <ClInclude Include="..\tjs2\tjsDictionary.h" />
@@ -189,7 +193,7 @@
     <ClInclude Include="..\tjs2\tjsObject.h" />
     <ClInclude Include="..\tjs2\tjsObjectExtendable.h" />
     <ClInclude Include="..\tjs2\tjsOctPack.h" />
-    <ClInclude Include="..\tjs2\tjspp.tab.h" />
+    <ClInclude Include="..\tjs2\tjspp.tab.hpp" />
     <ClInclude Include="..\tjs2\tjsRandomGenerator.h" />
     <ClInclude Include="..\tjs2\tjsRegExp.h" />
     <ClInclude Include="..\tjs2\tjsScriptBlock.h" />
