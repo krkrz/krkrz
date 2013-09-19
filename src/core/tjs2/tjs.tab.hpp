@@ -188,7 +188,7 @@ typedef union YYSTYPE
 
 
 /* Line 1676 of yacc.c  */
-#line 191 "tjs.tab.h"
+#line 191 "tjs.tab.hpp"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
