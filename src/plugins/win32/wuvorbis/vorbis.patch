@@ -1,0 +1,4734 @@
+Index: include/vorbis/codec.h
+===================================================================
+--- include/vorbis/codec.h	(リビジョン 7879)
++++ include/vorbis/codec.h	(作業コピー)
+@@ -25,6 +25,8 @@
+ 
+ #include <ogg/ogg.h>
+ 
++#pragma pack(push, 4)
++
+ typedef struct vorbis_info{
+   int version;
+   int channels;
+@@ -50,6 +52,8 @@
+   long bitrate_lower;
+   long bitrate_window;
+ 
++  float  global_gain;
++
+   void *codec_setup;
+ } vorbis_info;
+ 
+@@ -163,6 +167,7 @@
+ /* Vorbis PRIMITIVES: general ***************************************/
+ 
+ extern void     vorbis_info_init(vorbis_info *vi);
++extern void     vorbis_info_set_global_gain(vorbis_info *info, float global_gain);
+ extern void     vorbis_info_clear(vorbis_info *vi);
+ extern int      vorbis_info_blocksize(vorbis_info *vi,int zo);
+ extern void     vorbis_comment_init(vorbis_comment *vc);
+@@ -232,6 +237,8 @@
+ #define OV_EBADLINK   -137
+ #define OV_ENOSEEK    -138
+ 
++#pragma pack(pop)
++
+ #ifdef __cplusplus
+ }
+ #endif /* __cplusplus */
+Index: include/vorbis/vorbisfile.h
+===================================================================
+--- include/vorbis/vorbisfile.h	(リビジョン 7879)
++++ include/vorbis/vorbisfile.h	(作業コピー)
+@@ -36,11 +36,12 @@
+  * the right values. For seek_func(), you *MUST* return -1 if the stream is
+  * unseekable
+  */
++#pragma pack(push, 4)
+ typedef struct {
+-  size_t (*read_func)  (void *ptr, size_t size, size_t nmemb, void *datasource);
+-  int    (*seek_func)  (void *datasource, ogg_int64_t offset, int whence);
+-  int    (*close_func) (void *datasource);
+-  long   (*tell_func)  (void *datasource);
++  size_t (_cdecl* read_func)  (void *ptr, size_t size, size_t nmemb, void *datasource);
++  int    (_cdecl* seek_func)  (void *datasource, ogg_int64_t offset, int whence);
++  int    (_cdecl* close_func) (void *datasource);
++  long   (_cdecl* tell_func)  (void *datasource);
+ } ov_callbacks;
+ 
+ #define  NOTOPEN   0
+@@ -85,6 +86,7 @@
+   ov_callbacks callbacks;
+ 
+ } OggVorbis_File;
++#pragma pack(pop)
+ 
+ extern int ov_clear(OggVorbis_File *vf);
+ extern int ov_open(FILE *f,OggVorbis_File *vf,char *initial,long ibytes);
+@@ -131,6 +133,8 @@
+ 		    int bigendianp,int word,int sgned,int *bitstream);
+ extern int ov_crosslap(OggVorbis_File *vf1,OggVorbis_File *vf2);
+ 
++extern void ov_set_global_gain(OggVorbis_File *vf, float gain);
++
+ extern int ov_halfrate(OggVorbis_File *vf,int flag);
+ extern int ov_halfrate_p(OggVorbis_File *vf);
+ 
+Index: lib/lsp.c
+===================================================================
+--- lib/lsp.c	(リビジョン 7879)
++++ lib/lsp.c	(作業コピー)
+@@ -11,7 +11,7 @@
+  ********************************************************************
+ 
+   function: LSP (also called LSF) conversion routines
+-  last mod: $Id: lsp.c,v 1.24 2002/10/16 07:44:21 xiphmont Exp $
++  last mod: $Id$
+ 
+   The LSP generation code is taken (with minimal modification and a
+   few bugfixes) from "On the Computation of the LSP Frequencies" by
+@@ -294,7 +294,7 @@
+   }
+ }
+ 
+-static int comp(const void *a,const void *b){
++static int _cdecl comp(const void *a,const void *b){
+   return (*(float *)a<*(float *)b)-(*(float *)a>*(float *)b);
+ }
+ 
+Index: lib/floor0.c
+===================================================================
+--- lib/floor0.c	(リビジョン 7879)
++++ lib/floor0.c	(作業コピー)
+@@ -11,7 +11,7 @@
+  ********************************************************************
+ 
+  function: floor backend 0 implementation
+- last mod: $Id: floor0.c,v 1.55 2003/09/05 23:17:49 giles Exp $
++ last mod: $Id$
+ 
+  ********************************************************************/
+ 
+@@ -158,6 +158,8 @@
+   vorbis_look_floor0 *look=(vorbis_look_floor0 *)i;
+   vorbis_info_floor0 *info=look->vi;
+   int j,k;
++
++  float recip_global_gain = vb->vd->vi->global_gain != 0.0 ? 1.0 / vb->vd->vi->global_gain : 0.0;
+ 
+   int ampraw=oggpack_read(&vb->opb,info->ampbits);
+   if(ampraw>0){ /* also handles the -1 out of data case */
+@@ -175,8 +177,13 @@
+          vector */
+       float *lsp=_vorbis_block_alloc(vb,sizeof(*lsp)*(look->m+b->dim+1));
+             
+-      for(j=0;j<look->m;j+=b->dim)
+-	if(vorbis_book_decodev_set(b,lsp+j,&vb->opb,b->dim)==-1)goto eop;
++      for(j=0;j<look->m;j+=b->dim)
++	  {
++		if(vorbis_book_decodev_set(b,lsp+j,&vb->opb,b->dim)==-1)goto eop;
++		/* we must apply recip of global gain because the codebook is already
++		   controlled by global gain! */
++		for(k=0;k<b->dim;k++) lsp[j+k]*=recip_global_gain;
++	  }
+       for(j=0;j<look->m;){
+ 	for(k=0;k<b->dim;k++,j++)lsp[j]+=last;
+ 	last=lsp[j-1];
+Index: lib/floor1.c
+===================================================================
+--- lib/floor1.c	(リビジョン 7879)
++++ lib/floor1.c	(作業コピー)
+@@ -11,7 +11,7 @@
+  ********************************************************************
+ 
+  function: floor backend 1 implementation
+- last mod: $Id: floor1.c,v 1.27 2003/12/30 11:02:22 xiphmont Exp $
++ last mod: $Id$
+ 
+  ********************************************************************/
+ 
+@@ -83,13 +83,13 @@
+   }
+ }
+ 
+-static int ilog(unsigned int v){
+-  int ret=0;
+-  while(v){
+-    ret++;
+-    v>>=1;
+-  }
+-  return(ret);
++STIN int ilog(unsigned int v){
++	int r;
++	if(v & 0xffff0000) r = 16, v >>= 16; else r = 0;
++	if(v & 0xff00) r += 8, v >>= 8;
++	if(v & 0xf0) r += 4, v >>= 4;
++	v<<=1;
++	return r + ((0xffffaa50 >> v) &0x03) + 1;
+ }
+ 
+ static int ilog2(unsigned int v){
+@@ -189,7 +189,7 @@
+   return(NULL);
+ }
+ 
+-static int icomp(const void *a,const void *b){
++static int _cdecl icomp(const void *a,const void *b){
+   return(**(int **)a-**(int **)b);
+ }
+ 
+@@ -267,20 +267,13 @@
+ 
+   return(look);
+ }
+-
+-static int render_point(int x0,int x1,int y0,int y1,int x){
++
++static int __inline render_point(int x0,int x1,int y0,int y1,int x){
+   y0&=0x7fff; /* mask off flag */
+   y1&=0x7fff;
+     
+   {
+-    int dy=y1-y0;
+-    int adx=x1-x0;
+-    int ady=abs(dy);
+-    int err=ady*(x-x0);
+-    
+-    int off=err/adx;
+-    if(dy<0)return(y0-off);
+-    return(y0+off);
++    return (y1-y0)*(x-x0)/(x1-x0) + y0;
+   }
+ }
+ 
+@@ -292,95 +285,110 @@
+ }
+ 
+ static float FLOOR1_fromdB_LOOKUP[256]={
+-  1.0649863e-07F, 1.1341951e-07F, 1.2079015e-07F, 1.2863978e-07F, 
+-  1.3699951e-07F, 1.4590251e-07F, 1.5538408e-07F, 1.6548181e-07F, 
+-  1.7623575e-07F, 1.8768855e-07F, 1.9988561e-07F, 2.128753e-07F, 
+-  2.2670913e-07F, 2.4144197e-07F, 2.5713223e-07F, 2.7384213e-07F, 
+-  2.9163793e-07F, 3.1059021e-07F, 3.3077411e-07F, 3.5226968e-07F, 
+-  3.7516214e-07F, 3.9954229e-07F, 4.2550680e-07F, 4.5315863e-07F, 
+-  4.8260743e-07F, 5.1396998e-07F, 5.4737065e-07F, 5.8294187e-07F, 
+-  6.2082472e-07F, 6.6116941e-07F, 7.0413592e-07F, 7.4989464e-07F, 
+-  7.9862701e-07F, 8.5052630e-07F, 9.0579828e-07F, 9.6466216e-07F, 
+-  1.0273513e-06F, 1.0941144e-06F, 1.1652161e-06F, 1.2409384e-06F, 
+-  1.3215816e-06F, 1.4074654e-06F, 1.4989305e-06F, 1.5963394e-06F, 
+-  1.7000785e-06F, 1.8105592e-06F, 1.9282195e-06F, 2.0535261e-06F, 
+-  2.1869758e-06F, 2.3290978e-06F, 2.4804557e-06F, 2.6416497e-06F, 
+-  2.8133190e-06F, 2.9961443e-06F, 3.1908506e-06F, 3.3982101e-06F, 
+-  3.6190449e-06F, 3.8542308e-06F, 4.1047004e-06F, 4.3714470e-06F, 
+-  4.6555282e-06F, 4.9580707e-06F, 5.2802740e-06F, 5.6234160e-06F, 
+-  5.9888572e-06F, 6.3780469e-06F, 6.7925283e-06F, 7.2339451e-06F, 
+-  7.7040476e-06F, 8.2047000e-06F, 8.7378876e-06F, 9.3057248e-06F, 
+-  9.9104632e-06F, 1.0554501e-05F, 1.1240392e-05F, 1.1970856e-05F, 
+-  1.2748789e-05F, 1.3577278e-05F, 1.4459606e-05F, 1.5399272e-05F, 
+-  1.6400004e-05F, 1.7465768e-05F, 1.8600792e-05F, 1.9809576e-05F, 
+-  2.1096914e-05F, 2.2467911e-05F, 2.3928002e-05F, 2.5482978e-05F, 
+-  2.7139006e-05F, 2.8902651e-05F, 3.0780908e-05F, 3.2781225e-05F, 
+-  3.4911534e-05F, 3.7180282e-05F, 3.9596466e-05F, 4.2169667e-05F, 
+-  4.4910090e-05F, 4.7828601e-05F, 5.0936773e-05F, 5.4246931e-05F, 
+-  5.7772202e-05F, 6.1526565e-05F, 6.5524908e-05F, 6.9783085e-05F, 
+-  7.4317983e-05F, 7.9147585e-05F, 8.4291040e-05F, 8.9768747e-05F, 
+-  9.5602426e-05F, 0.00010181521F, 0.00010843174F, 0.00011547824F, 
+-  0.00012298267F, 0.00013097477F, 0.00013948625F, 0.00014855085F, 
+-  0.00015820453F, 0.00016848555F, 0.00017943469F, 0.00019109536F, 
+-  0.00020351382F, 0.00021673929F, 0.00023082423F, 0.00024582449F, 
+-  0.00026179955F, 0.00027881276F, 0.00029693158F, 0.00031622787F, 
+-  0.00033677814F, 0.00035866388F, 0.00038197188F, 0.00040679456F, 
+-  0.00043323036F, 0.00046138411F, 0.00049136745F, 0.00052329927F, 
+-  0.00055730621F, 0.00059352311F, 0.00063209358F, 0.00067317058F, 
+-  0.00071691700F, 0.00076350630F, 0.00081312324F, 0.00086596457F, 
+-  0.00092223983F, 0.00098217216F, 0.0010459992F, 0.0011139742F, 
+-  0.0011863665F, 0.0012634633F, 0.0013455702F, 0.0014330129F, 
+-  0.0015261382F, 0.0016253153F, 0.0017309374F, 0.0018434235F, 
+-  0.0019632195F, 0.0020908006F, 0.0022266726F, 0.0023713743F, 
+-  0.0025254795F, 0.0026895994F, 0.0028643847F, 0.0030505286F, 
+-  0.0032487691F, 0.0034598925F, 0.0036847358F, 0.0039241906F, 
+-  0.0041792066F, 0.0044507950F, 0.0047400328F, 0.0050480668F, 
+-  0.0053761186F, 0.0057254891F, 0.0060975636F, 0.0064938176F, 
+-  0.0069158225F, 0.0073652516F, 0.0078438871F, 0.0083536271F, 
+-  0.0088964928F, 0.009474637F, 0.010090352F, 0.010746080F, 
+-  0.011444421F, 0.012188144F, 0.012980198F, 0.013823725F, 
+-  0.014722068F, 0.015678791F, 0.016697687F, 0.017782797F, 
+-  0.018938423F, 0.020169149F, 0.021479854F, 0.022875735F, 
+-  0.024362330F, 0.025945531F, 0.027631618F, 0.029427276F, 
+-  0.031339626F, 0.033376252F, 0.035545228F, 0.037855157F, 
+-  0.040315199F, 0.042935108F, 0.045725273F, 0.048696758F, 
+-  0.051861348F, 0.055231591F, 0.058820850F, 0.062643361F, 
+-  0.066714279F, 0.071049749F, 0.075666962F, 0.080584227F, 
+-  0.085821044F, 0.091398179F, 0.097337747F, 0.10366330F, 
+-  0.11039993F, 0.11757434F, 0.12521498F, 0.13335215F, 
+-  0.14201813F, 0.15124727F, 0.16107617F, 0.17154380F, 
+-  0.18269168F, 0.19456402F, 0.20720788F, 0.22067342F, 
+-  0.23501402F, 0.25028656F, 0.26655159F, 0.28387361F, 
+-  0.30232132F, 0.32196786F, 0.34289114F, 0.36517414F, 
+-  0.38890521F, 0.41417847F, 0.44109412F, 0.46975890F, 
+-  0.50028648F, 0.53279791F, 0.56742212F, 0.60429640F, 
+-  0.64356699F, 0.68538959F, 0.72993007F, 0.77736504F, 
+-  0.82788260F, 0.88168307F, 0.9389798F, 1.F, 
++ 1.0649863e-07f*32768.0f, 1.1341951e-07f*32768.0f, 1.2079015e-07f*32768.0f, 1.2863978e-07f*32768.0f, 
++ 1.3699951e-07f*32768.0f, 1.4590251e-07f*32768.0f, 1.5538408e-07f*32768.0f, 1.6548181e-07f*32768.0f, 
++ 1.7623575e-07f*32768.0f, 1.8768855e-07f*32768.0f, 1.9988561e-07f*32768.0f, 2.128753e-07f*32768.0f, 
++ 2.2670913e-07f*32768.0f, 2.4144197e-07f*32768.0f, 2.5713223e-07f*32768.0f, 2.7384213e-07f*32768.0f, 
++ 2.9163793e-07f*32768.0f, 3.1059021e-07f*32768.0f, 3.3077411e-07f*32768.0f, 3.5226968e-07f*32768.0f, 
++ 3.7516214e-07f*32768.0f, 3.9954229e-07f*32768.0f, 4.2550680e-07f*32768.0f, 4.5315863e-07f*32768.0f, 
++ 4.8260743e-07f*32768.0f, 5.1396998e-07f*32768.0f, 5.4737065e-07f*32768.0f, 5.8294187e-07f*32768.0f, 
++ 6.2082472e-07f*32768.0f, 6.6116941e-07f*32768.0f, 7.0413592e-07f*32768.0f, 7.4989464e-07f*32768.0f, 
++ 7.9862701e-07f*32768.0f, 8.5052630e-07f*32768.0f, 9.0579828e-07f*32768.0f, 9.6466216e-07f*32768.0f, 
++ 1.0273513e-06f*32768.0f, 1.0941144e-06f*32768.0f, 1.1652161e-06f*32768.0f, 1.2409384e-06f*32768.0f, 
++ 1.3215816e-06f*32768.0f, 1.4074654e-06f*32768.0f, 1.4989305e-06f*32768.0f, 1.5963394e-06f*32768.0f, 
++ 1.7000785e-06f*32768.0f, 1.8105592e-06f*32768.0f, 1.9282195e-06f*32768.0f, 2.0535261e-06f*32768.0f, 
++ 2.1869758e-06f*32768.0f, 2.3290978e-06f*32768.0f, 2.4804557e-06f*32768.0f, 2.6416497e-06f*32768.0f, 
++ 2.8133190e-06f*32768.0f, 2.9961443e-06f*32768.0f, 3.1908506e-06f*32768.0f, 3.3982101e-06f*32768.0f, 
++ 3.6190449e-06f*32768.0f, 3.8542308e-06f*32768.0f, 4.1047004e-06f*32768.0f, 4.3714470e-06f*32768.0f, 
++ 4.6555282e-06f*32768.0f, 4.9580707e-06f*32768.0f, 5.2802740e-06f*32768.0f, 5.6234160e-06f*32768.0f, 
++ 5.9888572e-06f*32768.0f, 6.3780469e-06f*32768.0f, 6.7925283e-06f*32768.0f, 7.2339451e-06f*32768.0f, 
++ 7.7040476e-06f*32768.0f, 8.2047000e-06f*32768.0f, 8.7378876e-06f*32768.0f, 9.3057248e-06f*32768.0f, 
++ 9.9104632e-06f*32768.0f, 1.0554501e-05f*32768.0f, 1.1240392e-05f*32768.0f, 1.1970856e-05f*32768.0f, 
++ 1.2748789e-05f*32768.0f, 1.3577278e-05f*32768.0f, 1.4459606e-05f*32768.0f, 1.5399272e-05f*32768.0f, 
++ 1.6400004e-05f*32768.0f, 1.7465768e-05f*32768.0f, 1.8600792e-05f*32768.0f, 1.9809576e-05f*32768.0f, 
++ 2.1096914e-05f*32768.0f, 2.2467911e-05f*32768.0f, 2.3928002e-05f*32768.0f, 2.5482978e-05f*32768.0f, 
++ 2.7139006e-05f*32768.0f, 2.8902651e-05f*32768.0f, 3.0780908e-05f*32768.0f, 3.2781225e-05f*32768.0f, 
++ 3.4911534e-05f*32768.0f, 3.7180282e-05f*32768.0f, 3.9596466e-05f*32768.0f, 4.2169667e-05f*32768.0f, 
++ 4.4910090e-05f*32768.0f, 4.7828601e-05f*32768.0f, 5.0936773e-05f*32768.0f, 5.4246931e-05f*32768.0f, 
++ 5.7772202e-05f*32768.0f, 6.1526565e-05f*32768.0f, 6.5524908e-05f*32768.0f, 6.9783085e-05f*32768.0f, 
++ 7.4317983e-05f*32768.0f, 7.9147585e-05f*32768.0f, 8.4291040e-05f*32768.0f, 8.9768747e-05f*32768.0f, 
++ 9.5602426e-05f*32768.0f, 0.00010181521f*32768.0f, 0.00010843174f*32768.0f, 0.00011547824f*32768.0f, 
++ 0.00012298267f*32768.0f, 0.00013097477f*32768.0f, 0.00013948625f*32768.0f, 0.00014855085f*32768.0f, 
++ 0.00015820453f*32768.0f, 0.00016848555f*32768.0f, 0.00017943469f*32768.0f, 0.00019109536f*32768.0f, 
++ 0.00020351382f*32768.0f, 0.00021673929f*32768.0f, 0.00023082423f*32768.0f, 0.00024582449f*32768.0f, 
++ 0.00026179955f*32768.0f, 0.00027881276f*32768.0f, 0.00029693158f*32768.0f, 0.00031622787f*32768.0f, 
++ 0.00033677814f*32768.0f, 0.00035866388f*32768.0f, 0.00038197188f*32768.0f, 0.00040679456f*32768.0f, 
++ 0.00043323036f*32768.0f, 0.00046138411f*32768.0f, 0.00049136745f*32768.0f, 0.00052329927f*32768.0f, 
++ 0.00055730621f*32768.0f, 0.00059352311f*32768.0f, 0.00063209358f*32768.0f, 0.00067317058f*32768.0f, 
++ 0.00071691700f*32768.0f, 0.00076350630f*32768.0f, 0.00081312324f*32768.0f, 0.00086596457f*32768.0f, 
++ 0.00092223983f*32768.0f, 0.00098217216f*32768.0f, 0.0010459992f*32768.0f, 0.0011139742f*32768.0f, 
++ 0.0011863665f*32768.0f, 0.0012634633f*32768.0f, 0.0013455702f*32768.0f, 0.0014330129f*32768.0f, 
++ 0.0015261382f*32768.0f, 0.0016253153f*32768.0f, 0.0017309374f*32768.0f, 0.0018434235f*32768.0f, 
++ 0.0019632195f*32768.0f, 0.0020908006f*32768.0f, 0.0022266726f*32768.0f, 0.0023713743f*32768.0f, 
++ 0.0025254795f*32768.0f, 0.0026895994f*32768.0f, 0.0028643847f*32768.0f, 0.0030505286f*32768.0f, 
++ 0.0032487691f*32768.0f, 0.0034598925f*32768.0f, 0.0036847358f*32768.0f, 0.0039241906f*32768.0f, 
++ 0.0041792066f*32768.0f, 0.0044507950f*32768.0f, 0.0047400328f*32768.0f, 0.0050480668f*32768.0f, 
++ 0.0053761186f*32768.0f, 0.0057254891f*32768.0f, 0.0060975636f*32768.0f, 0.0064938176f*32768.0f, 
++ 0.0069158225f*32768.0f, 0.0073652516f*32768.0f, 0.0078438871f*32768.0f, 0.0083536271f*32768.0f, 
++ 0.0088964928f*32768.0f, 0.009474637f*32768.0f, 0.010090352f*32768.0f, 0.010746080f*32768.0f, 
++ 0.011444421f*32768.0f, 0.012188144f*32768.0f, 0.012980198f*32768.0f, 0.013823725f*32768.0f, 
++ 0.014722068f*32768.0f, 0.015678791f*32768.0f, 0.016697687f*32768.0f, 0.017782797f*32768.0f, 
++ 0.018938423f*32768.0f, 0.020169149f*32768.0f, 0.021479854f*32768.0f, 0.022875735f*32768.0f, 
++ 0.024362330f*32768.0f, 0.025945531f*32768.0f, 0.027631618f*32768.0f, 0.029427276f*32768.0f, 
++ 0.031339626f*32768.0f, 0.033376252f*32768.0f, 0.035545228f*32768.0f, 0.037855157f*32768.0f, 
++ 0.040315199f*32768.0f, 0.042935108f*32768.0f, 0.045725273f*32768.0f, 0.048696758f*32768.0f, 
++ 0.051861348f*32768.0f, 0.055231591f*32768.0f, 0.058820850f*32768.0f, 0.062643361f*32768.0f, 
++ 0.066714279f*32768.0f, 0.071049749f*32768.0f, 0.075666962f*32768.0f, 0.080584227f*32768.0f, 
++ 0.085821044f*32768.0f, 0.091398179f*32768.0f, 0.097337747f*32768.0f, 0.10366330f*32768.0f, 
++ 0.11039993f*32768.0f, 0.11757434f*32768.0f, 0.12521498f*32768.0f, 0.13335215f*32768.0f, 
++ 0.14201813f*32768.0f, 0.15124727f*32768.0f, 0.16107617f*32768.0f, 0.17154380f*32768.0f, 
++ 0.18269168f*32768.0f, 0.19456402f*32768.0f, 0.20720788f*32768.0f, 0.22067342f*32768.0f, 
++ 0.23501402f*32768.0f, 0.25028656f*32768.0f, 0.26655159f*32768.0f, 0.28387361f*32768.0f, 
++ 0.30232132f*32768.0f, 0.32196786f*32768.0f, 0.34289114f*32768.0f, 0.36517414f*32768.0f, 
++ 0.38890521f*32768.0f, 0.41417847f*32768.0f, 0.44109412f*32768.0f, 0.46975890f*32768.0f, 
++ 0.50028648f*32768.0f, 0.53279791f*32768.0f, 0.56742212f*32768.0f, 0.60429640f*32768.0f, 
++ 0.64356699f*32768.0f, 0.68538959f*32768.0f, 0.72993007f*32768.0f, 0.77736504f*32768.0f, 
++ 0.82788260f*32768.0f, 0.88168307f*32768.0f, 0.9389798f*32768.0f, 1.f*32768.0f, 
+ };
+ 
+-static void render_line(int x0,int x1,int y0,int y1,float *d){
+-  int dy=y1-y0;
+-  int adx=x1-x0;
+-  int ady=abs(dy);
+-  int base=dy/adx;
+-  int sy=(dy<0?base-1:base+1);
+-  int x=x0;
+-  int y=y0;
+-  int err=0;
++void scale_FLOOR1_fromdB_LOOKUP(float fac)
++{
++	int i;
++	for(i = 0; i < sizeof(FLOOR1_fromdB_LOOKUP)/sizeof(FLOOR1_fromdB_LOOKUP[0]); i++)
++			FLOOR1_fromdB_LOOKUP[i] *= fac;
++}
+ 
+-  ady-=abs(base*adx);
+ 
+-  d[x]*=FLOOR1_fromdB_LOOKUP[y];
+-  while(++x<x1){
+-    err=err+ady;
+-    if(err>=adx){
+-      err-=adx;
+-      y+=sy;
+-    }else{
+-      y+=base;
+-    }
+-    d[x]*=FLOOR1_fromdB_LOOKUP[y];
+-  }
++STIN void render_line(int x0,int x1,int y0,int y1,float *d){
++	/* using fixed-point interpolation */
++
++	int step = ((y1-y0)<<22) / (x1 - x0);
++	int y = y0 << 22;
++
++	float *f0 = d + x0;
++	float *f1 = d + x1;
++
++	f1 -= 3;
++
++	while(f0<f1)
++	{
++		f0[0] *= FLOOR1_fromdB_LOOKUP[y>>22];
++		f0[1] *= FLOOR1_fromdB_LOOKUP[(y+step)>>22];
++		f0[2] *= FLOOR1_fromdB_LOOKUP[(y+step   +step)>>22];
++		f0[3] *= FLOOR1_fromdB_LOOKUP[(y+step*4 -step)>>22];
++		y += step*4;
++		f0+=4;
++	}
++
++	f1 += 3;
++
++	while(f0<f1)
++	{
++		f0[0] *= FLOOR1_fromdB_LOOKUP[y>>22];
++
++		y += step;
++		f0++;
++	}
+ }
+ 
+ static void render_line0(int x0,int x1,int y0,int y1,int *d){
+@@ -1003,23 +1011,25 @@
+     }
+ 
+     /* unwrap positive values and reconsitute via linear interpolation */
+-    for(i=2;i<look->posts;i++){
+-      int predicted=render_point(info->postlist[look->loneighbor[i-2]],
+-				 info->postlist[look->hineighbor[i-2]],
+-				 fit_value[look->loneighbor[i-2]],
+-				 fit_value[look->hineighbor[i-2]],
+-				 info->postlist[i]);
++    for(i=0;i<look->posts-2;i++){
++    	int lo = look->loneighbor[i];
++    	int hi = look->hineighbor[i];
++      int predicted=render_point(info->postlist[lo],
++				 info->postlist[hi],
++				 fit_value[lo],
++				 fit_value[hi],
++				 info->postlist[i+2]);
+       int hiroom=look->quant_q-predicted;
+       int loroom=predicted;
+       int room=(hiroom<loroom?hiroom:loroom)<<1;
+-      int val=fit_value[i];
++      int val=fit_value[i+2];
+ 
+       if(val){
+ 	if(val>=room){
+ 	  if(hiroom>loroom){
+ 	    val = val-loroom;
+ 	  }else{
+-	    val = -1-(val-hiroom);
++	    val = ~(val-hiroom);
+ 	  }
+ 	}else{
+ 	  if(val&1){
+@@ -1029,12 +1039,12 @@
+ 	  }
+ 	}
+ 
+-	fit_value[i]=val+predicted;
+-	fit_value[look->loneighbor[i-2]]&=0x7fff;
+-	fit_value[look->hineighbor[i-2]]&=0x7fff;
++	fit_value[i+2]=val+predicted;
++	fit_value[lo]&=0x7fff;
++	fit_value[hi]&=0x7fff;
+ 
+       }else{
+-	fit_value[i]=predicted|0x8000;
++	fit_value[i+2]=predicted|0x8000;
+       }
+ 	
+     }
+Index: lib/psy.c
+===================================================================
+--- lib/psy.c	(リビジョン 7879)
++++ lib/psy.c	(作業コピー)
+@@ -11,7 +11,7 @@
+  ********************************************************************
+ 
+  function: psychoacoustics not including preecho
+- last mod: $Id: psy.c,v 1.81 2002/10/21 07:00:11 xiphmont Exp $
++ last mod: $Id$
+ 
+  ********************************************************************/
+ 
+@@ -1015,7 +1015,7 @@
+ }
+ 
+ /* this is for per-channel noise normalization */
+-static int apsort(const void *a, const void *b){
++static int _cdecl apsort(const void *a, const void *b){
+   float f1=fabs(**(float**)a);
+   float f2=fabs(**(float**)b);
+   return (f1<f2)-(f1>f2);
+Index: lib/mapping0.c
+===================================================================
+--- lib/mapping0.c	(リビジョン 7879)
++++ lib/mapping0.c	(作業コピー)
+@@ -11,7 +11,7 @@
+  ********************************************************************
+ 
+  function: channel mapping 0 implementation
+- last mod: $Id: mapping0.c,v 1.61 2003/12/30 11:02:22 xiphmont Exp $
++ last mod: $Id$
+ 
+  ********************************************************************/
+ 
+@@ -729,6 +729,205 @@
+   return(0);
+ }
+ 
++
++__declspec(align(16)) static int sign_extractor[] = {0x80000000, 0x80000000, 0x80000000, 0x80000000};
++extern int CPU_SSE;
++extern int CPU_3DN;
++
++
++static int channel_coupling_asm(float *pcmM, float *pcmA, int n)
++{
++_asm
++{
++	push		ebx
++
++	mov			eax,		pcmM
++	mov			ebx,		pcmA
++	mov			ecx,		ebx
++	sub			ecx,		eax							// ecx = pcmA - pcmM
++	mov			esi,		n
++	lea			esi,		[esi*4 + eax]				// edx = limit
++
++	cmp			eax,		esi
++	jae			exit0
++
++	push		ebp
++
++	align 16
++loop0:
++	fld			dword ptr [eax]
++	mov			edi,		[ebx]			// ang
++	mov			ebp,		[eax]			// mag
++	xor			ebp,		edi
++	fld			dword ptr [eax]
++	and			ebp,		0x80000000		// extract sign
++	sar			edi,		31				// make mask
++	xor			[ebx],		ebp				// change sign
++	mov			edx,		edi
++	fld			dword ptr [ebx]
++	and			edx,		ecx
++	fsub									// st= mag +- ang
++	not			edi
++	and			edi,		ecx
++	add			ebx,		2*4
++	fstp		dword ptr [edi+eax]
++	fstp		dword ptr [edx+eax]
++
++	fld			dword ptr [eax+4]
++	mov			edi,		[ebx+4-2*4]		// ang
++	mov			ebp,		[eax+4]			// mag
++	xor			ebp,		edi
++	fld			dword ptr [eax+4]
++	and			ebp,		0x80000000		// extract sign
++	sar			edi,		31				// make mask
++	xor			[ebx+4-2*4],ebp				// change sign
++	mov			edx,		edi
++	fld			dword ptr [ebx+4-2*4]
++	and			edx,		ecx
++	fsub									// st= mag +- ang
++	not			edi
++	add			eax,		2*4
++	and			edi,		ecx
++	cmp			eax,		esi
++	fstp		dword ptr [edi+eax+4-2*4]
++	fstp		dword ptr [edx+eax+4-2*4]
++
++	jb			loop0
++	
++	pop			ebp
++
++exit0:
++	sub			eax,		pcmM
++	shr			eax,		2
++	pop			ebx
++
++}
++
++}
++
++static int channel_coupling_sse(float *pcmM, float *pcmA, int n)
++{
++_asm
++{
++	push		ebx
++
++	mov			eax,		pcmM
++	mov			ecx,		eax
++	mov			ebx,		pcmA
++	mov			edx,		n
++	lea			edx,		[edx*4 + eax]
++	xorps		xmm7,		xmm7						// xmm7 = 0
++
++	cmp			eax,		edx
++	jae			exit0
++
++	align 16
++loop0:
++	movaps		xmm1,		[ebx]						// xmm1 = ang
++	movaps		xmm2,		xmm1
++
++	movaps		xmm0,		[eax]
++	add			ebx,		4*4
++	cmpnleps	xmm2,		xmm7						// xmm2 = ang > 0
++
++	movaps		xmm3,		xmm0
++	movaps		xmm5,		xmm2
++	prefetcht0	[ebx + 16 - 4*4]
++	xorps		xmm3,		xmm1
++	movaps		xmm6,		xmm0
++	andnps		xmm3,		sign_extractor
++
++	xorps		xmm1,		xmm3						// xmm1 = +ang or -ang (sign is changed)
++	prefetcht0	[eax + 16]
++
++	andps		xmm2,		xmm1
++	andnps		xmm5,		xmm1
++	add			eax,		4*4
++	addps		xmm6,		xmm5
++	addps		xmm2,		xmm0
++	movaps		[eax - 4*4],	xmm6
++	cmp			eax,		edx
++	movaps		[ebx - 4*4],	xmm2
++
++	jb			loop0
++
++exit0:
++	sub			eax,		ecx
++	shr			eax,		2
++	pop			ebx
++
++}
++
++}
++static int channel_coupling_3dn(float *pcmM, float *pcmA, int n)
++{
++_asm
++{
++	push		ebx
++
++	mov			eax,		pcmM
++	mov			ecx,		eax
++	mov			ebx,		pcmA
++	mov			edx,		n
++	lea			edx,		[edx*4 + eax]
++	pxor		mm7,		mm7						// mm7 = 0
++
++	cmp			eax,		edx
++	jae			exit30
++
++	align 16
++loop30:
++	movq		mm1,		[ebx]					// mm1 = ang
++	movq		mm2,		mm1
++	movq		mm0,		[eax]
++	pfcmpgt		mm2,		mm7						// mm2 = ang > 0
++	movq		mm3,		mm0
++	movq		mm5,		mm2
++	pxor		mm3,		mm1
++	movq		mm6,		mm0
++	pandn		mm3,		sign_extractor
++	pxor		mm1,		mm3						// mm1 = +ang or -ang (sign is changed)
++	pand		mm2,		mm1
++	pandn		mm5,		mm1
++	pfadd		mm6,		mm5
++	pfadd		mm2,		mm0
++	movq		[eax],		mm6
++	movq		[ebx],		mm2
++
++	movq		mm1,		[ebx+8]					// mm1 = ang
++	movq		mm2,		mm1
++	movq		mm0,		[eax+8]
++	pfcmpgt		mm2,		mm7						// mm2 = ang > 0
++	movq		mm3,		mm0
++	movq		mm5,		mm2
++	pxor		mm3,		mm1
++	movq		mm6,		mm0
++	pandn		mm3,		sign_extractor
++	pxor		mm1,		mm3						// mm1 = +ang or -ang (sign is changed)
++	pand		mm2,		mm1
++	pandn		mm5,		mm1
++	pfadd		mm6,		mm5
++	pfadd		mm2,		mm0
++	movq		[eax+8],		mm6
++	movq		[ebx+8],		mm2
++
++	add			ebx,		4*4
++	add			eax,		4*4
++	cmp			eax,		edx
++	jb			loop30
++
++exit30:
++	sub			eax,		ecx
++	shr			eax,		2
++	pop			ebx
++	femms
++}
++
++}
++
++
++
++
+ static int mapping0_inverse(vorbis_block *vb,vorbis_info_mapping *l){
+   vorbis_dsp_state     *vd=vb->vd;
+   vorbis_info          *vi=vd->vi;
+@@ -790,29 +989,135 @@
+     float *pcmM=vb->pcm[info->coupling_mag[i]];
+     float *pcmA=vb->pcm[info->coupling_ang[i]];
+ 
+-    for(j=0;j<n/2;j++){
+-      float mag=pcmM[j];
+-      float ang=pcmA[j];
++	if(CPU_SSE)
++	{
++		int lim = n/2;
++		int j;
+ 
+-      if(mag>0)
+-	if(ang>0){
+-	  pcmM[j]=mag;
+-	  pcmA[j]=mag-ang;
+-	}else{
+-	  pcmA[j]=mag;
+-	  pcmM[j]=mag+ang;
++		lim -= 3;
++
++		j = channel_coupling_sse(pcmM, pcmA, lim);
++
++		lim += 3;
++
++		for(;j<lim;j++){
++			float mag=pcmM[j];
++			float ang=pcmA[j];
++
++			if(ang>0){
++				pcmM[j]=mag;
++				pcmA[j]=mag > 0 ? mag-ang : mag+ang;
++			}else{
++				pcmM[j]=mag > 0 ? mag+ang : mag-ang;
++				pcmA[j]=mag;
++			}
++		}
+ 	}
+-      else
+-	if(ang>0){
+-	  pcmM[j]=mag;
+-	  pcmA[j]=mag+ang;
+-	}else{
+-	  pcmA[j]=mag;
+-	  pcmM[j]=mag-ang;
++	else if(CPU_3DN)
++	{
++		int lim = n/2;
++		int j;
++
++		lim -= 3;
++
++		j = channel_coupling_3dn(pcmM, pcmA, lim);
++
++		lim += 3;
++
++		for(;j<lim;j++){
++			float mag=pcmM[j];
++			float ang=pcmA[j];
++
++			if(ang>0){
++				pcmM[j]=mag;
++				pcmA[j]=mag > 0 ? mag-ang : mag+ang;
++			}else{
++				pcmM[j]=mag > 0 ? mag+ang : mag-ang;
++				pcmA[j]=mag;
++			}
++		}
+ 	}
+-    }
++	else if(1)
++	{
++		int lim = n/2;
++		int j;
++
++		lim -= 3;
++
++		j = channel_coupling_asm(pcmM, pcmA, lim);
++
++		lim += 3;
++
++		for(;j<lim;j++){
++			float mag=pcmM[j];
++			float ang=pcmA[j];
++
++			if(ang>0){
++				pcmM[j]=mag;
++				pcmA[j]=mag > 0 ? mag-ang : mag+ang;
++			}else{
++				pcmM[j]=mag > 0 ? mag+ang : mag-ang;
++				pcmA[j]=mag;
++			}
++		}
++	}
++	else
++	{
++		for(j=0;j<n/2;j++){
++			
++			long temp;
++			register long temp2;
++			long mag = *(long*)(pcmM + j);
++			long ang = *(long*)(pcmA + j);
++			temp = ang ^ ((  mag ^ ang ) & 0x80000000);
++
++
++/*
++			((float*) (ang & 0x80000000 ? pcmM : pcmA))[j] = pcmM[j] - *(float*)&temp;
++			((long *) (ang & 0x80000000 ? pcmA : pcmM))[j] = mag;
++*/
++			temp2 = (ang >> 31) & ((long)pcmM ^ (long)pcmA);
++			((float*)(temp2 ^ (long)pcmA))[j] = pcmM[j] - *(float*)&temp;
++			((long *)(temp2 ^ (long)pcmM))[j] = mag;
++/*
++			float mag=pcmM[j];
++		  float ang=pcmA[j];
++
++
++			if(ang>0){
++				pcmM[j]=mag;
++				pcmA[j]=mag > 0 ? mag-ang : mag+ang;
++			}else{
++				pcmM[j]=mag > 0 ? mag+ang : mag-ang;
++				pcmA[j]=mag;
++*/
++			}
++/*
++			
++			float mag=pcmM[j];
++		  float ang=pcmA[j];
++
++		  if(mag>0)
++		if(ang>0){
++		  pcmM[j]=mag;
++		  pcmA[j]=mag-ang;
++		}else{
++		  pcmM[j]=mag+ang;
++		  pcmA[j]=mag;
++		}
++		  else
++		if(ang>0){
++		  pcmM[j]=mag;
++		  pcmA[j]=mag+ang;
++		}else{
++		  pcmM[j]=mag-ang;
++		  pcmA[j]=mag;
++		}
++		}
++*/
++	}
+   }
+-
++
+   /* compute and apply spectral envelope */
+   for(i=0;i<vi->channels;i++){
+     float *pcm=vb->pcm[i];
+@@ -835,10 +1140,18 @@
+ 
+ /* export hooks */
+ vorbis_func_mapping mapping0_exportbundle={
+-  &mapping0_pack,
++#ifdef DECODE_ONLY
++	NULL,
++#else
++  &mapping0_pack,
++#endif
+   &mapping0_unpack,
+   &mapping0_free_info,
++#ifdef DECODE_ONLY
++	NULL,
++#else
+   &mapping0_forward,
++#endif
+   &mapping0_inverse
+ };
+ 
+Index: lib/codebook.c
+===================================================================
+--- lib/codebook.c	(リビジョン 7879)
++++ lib/codebook.c	(作業コピー)
+@@ -11,7 +11,7 @@
+  ********************************************************************
+ 
+  function: basic codebook pack/unpack/code/decode operations
+- last mod: $Id: codebook.c,v 1.39 2002/06/28 22:19:35 xiphmont Exp $
++ last mod: $Id$
+ 
+  ********************************************************************/
+ 
+@@ -290,6 +290,33 @@
+   return(vorbis_book_encode(book,best,b));
+ }
+ 
++/* oggpack_look and oggpack_adv: copied from bitwise.c to do inline */
++STIN long oggpack_look(oggpack_buffer *b,int bits){
++  unsigned long ret;
++  unsigned long m= (bits==32)?-1:((1<<bits)-1); /*mask[bits]*/
++
++  bits+=b->endbit;
++
++  if(b->endbyte+4>=b->storage){
++    /* not the main path */
++    if(b->endbyte*8+bits>b->storage*8)return(-1);
++  }
++
++  ret = *(ogg_uint32_t*)(b->ptr) >> b->endbit;
++
++  if(bits>32 && b->endbit)
++	  ret|=b->ptr[4]<<(32-b->endbit);
++
++  return(m&ret);
++}
++
++STIN void oggpack_adv(oggpack_buffer *b,int bits){
++  bits+=b->endbit;
++  b->ptr+=bits>>3;
++  b->endbyte+=bits>>3;
++  b->endbit=bits&7;
++}
++
+ /* the 'eliminate the decode tree' optimization actually requires the
+    codewords to be MSb first, not LSb.  This is an annoying inelegancy
+    (and one of the first places where carefully thought out design
+@@ -297,15 +324,43 @@
+    to an MSb bitpacker), but not actually the huge hit it appears to
+    be.  The first-stage decode table catches most words so that
+    bitreverse is not in the main execution path. */
+-
+-static ogg_uint32_t bitreverse(ogg_uint32_t x){
++/*
++STIN ogg_uint32_t bitreverse(ogg_uint32_t x){
+   x=    ((x>>16)&0x0000ffff) | ((x<<16)&0xffff0000);
+   x=    ((x>> 8)&0x00ff00ff) | ((x<< 8)&0xff00ff00);
+   x=    ((x>> 4)&0x0f0f0f0f) | ((x<< 4)&0xf0f0f0f0);
+   x=    ((x>> 2)&0x33333333) | ((x<< 2)&0xcccccccc);
+   return((x>> 1)&0x55555555) | ((x<< 1)&0xaaaaaaaa);
+ }
++*/
+ 
++STIN ogg_uint32_t bitreverse(ogg_uint32_t x){
++	_asm
++	{
++		mov		eax,	x
++		bswap	eax
++		mov		edx,	eax
++		shl		edx,	4
++		shr		eax,	4
++		and		edx,	0xf0f0f0f0
++		and		eax,	0x0f0f0f0f
++		or		eax,	edx
++		mov		edx,	eax
++		shl		edx,	2
++		shr		eax,	2
++		and		edx,	0xcccccccc
++		and		eax,	0x33333333
++		or		eax,	edx
++		mov		edx,	eax
++		shl		edx,	1
++		shr		eax,	1
++		and		edx,	0xaaaaaaaa
++		and		eax,	0x55555555
++		or		eax,	edx
++	}
++}
++
++
+ STIN long decode_packed_entry_number(codebook *book, oggpack_buffer *b){
+   int  read=book->dec_maxlength;
+   long lo,hi;
+@@ -325,12 +380,15 @@
+     hi=book->used_entries;
+   }
+ 
+-  lok = oggpack_look(b, read);
+ 
+-  while(lok<0 && read>1)
+-    lok = oggpack_look(b, --read);
++  do{
++    lok = oggpack_look(b, read--);
++  }while(lok<0 && read>0);
++
+   if(lok<0)return -1;
+ 
++  read ++;
++
+   /* bisect search for the codeword in the ordered list */
+   {
+     ogg_uint32_t testword=bitreverse((ogg_uint32_t)lok);
+@@ -352,6 +410,7 @@
+   return(-1);
+ }
+ 
++
+ /* Decode side is specced and easier, because we don't need to find
+    matches using different criteria; we simply read and map.  There are
+    two things we need to do 'depending':
+@@ -456,6 +515,36 @@
+   long i,j,entry;
+   int chptr=0;
+ 
++if(ch == 2)
++{
++/* special optimization for ch == 2 */
++  for(i=offset/2;i<(offset+n)/2;){
++    entry = decode_packed_entry_number(book,b);
++    if(entry==-1)return(-1);
++    {
++      int dim = book->dim;
++      const float *t = book->valuelist+entry*dim;
++      dim--;
++      for (j=0;j<dim;j+=2){
++	a[0][i+0]+=t[j+0];
++	a[1][i+0]+=t[j+1];
++	i++;
++      }
++      dim++;
++      for (;j<dim;j++){
++	a[chptr++][i]+=t[j];
++	if(chptr==ch){
++	  chptr=0;
++	  i++;
++	}
++      }
++    }
++  }
++
++}
++else
++{
++
+   for(i=offset/ch;i<(offset+n)/ch;){
+     entry = decode_packed_entry_number(book,b);
+     if(entry==-1)return(-1);
+@@ -470,6 +559,7 @@
+       }
+     }
+   }
++}
+   return(0);
+ }
+ 
+Index: lib/codebook.h
+===================================================================
+--- lib/codebook.h	(リビジョン 7879)
++++ lib/codebook.h	(作業コピー)
+@@ -11,7 +11,7 @@
+  ********************************************************************
+ 
+  function: basic shared codebook operations
+- last mod: $Id: codebook.h,v 1.13 2002/06/28 22:19:35 xiphmont Exp $
++ last mod: $Id$
+ 
+  ********************************************************************/
+ 
+@@ -119,7 +119,7 @@
+ extern void vorbis_staticbook_clear(static_codebook *b);
+ extern void vorbis_staticbook_destroy(static_codebook *b);
+ extern int vorbis_book_init_encode(codebook *dest,const static_codebook *source);
+-extern int vorbis_book_init_decode(codebook *dest,const static_codebook *source);
++extern int vorbis_book_init_decode(codebook *dest,const static_codebook *source, float global_gain);
+ extern void vorbis_book_clear(codebook *b);
+ 
+ extern float *_book_unquantize(const static_codebook *b,int n,int *map);
+Index: lib/info.c
+===================================================================
+--- lib/info.c	(リビジョン 7879)
++++ lib/info.c	(作業コピー)
+@@ -11,7 +11,7 @@
+  ********************************************************************
+ 
+  function: maintain the info structure, info <-> header packets
+- last mod: $Id: info.c,v 1.63 2003/12/30 11:02:22 xiphmont Exp $
++ last mod: $Id$
+ 
+  ********************************************************************/
+ 
+@@ -149,9 +149,15 @@
+ /* used by synthesis, which has a full, alloced vi */
+ void vorbis_info_init(vorbis_info *vi){
+   memset(vi,0,sizeof(*vi));
++  vi->global_gain = 1.0;
+   vi->codec_setup=_ogg_calloc(1,sizeof(codec_setup_info));
+ }
+ 
++/* set global gain. shoud be called before decoding a stream */
++void vorbis_info_set_global_gain(vorbis_info *vi, float gain){
++	vi->global_gain = gain;
++}
++
+ void vorbis_info_clear(vorbis_info *vi){
+   codec_setup_info     *ci=vi->codec_setup;
+   int i;
+@@ -180,10 +186,10 @@
+     }
+     if(ci->fullbooks)
+ 	_ogg_free(ci->fullbooks);
+-    
++#ifndef DECODE_ONLY    
+     for(i=0;i<ci->psys;i++)
+       _vi_psy_free(ci->psy_param[i]);
+-
++#endif
+     _ogg_free(ci);
+   }
+ 
+Index: lib/vorbisfile.c
+===================================================================
+--- lib/vorbisfile.c	(リビジョン 7879)
++++ lib/vorbisfile.c	(作業コピー)
+@@ -735,10 +735,10 @@
+ 
+ int ov_open(FILE *f,OggVorbis_File *vf,char *initial,long ibytes){
+   ov_callbacks callbacks = {
+-    (size_t (*)(void *, size_t, size_t, void *))  fread,
+-    (int (*)(void *, ogg_int64_t, int))              _fseek64_wrap,
+-    (int (*)(void *))                             fclose,
+-    (long (*)(void *))                            ftell
++    (size_t (_cdecl*)(void *, size_t, size_t, void *))  fread,
++    (int (_cdecl*)(void *, ogg_int64_t, int))              _fseek64_wrap,
++    (int (_cdecl*)(void *))                             fclose,
++    (long (_cdecl*)(void *))                            ftell
+   };
+ 
+   return ov_open_callbacks((void *)f, vf, initial, ibytes, callbacks);
+@@ -785,10 +785,10 @@
+ 
+ int ov_test(FILE *f,OggVorbis_File *vf,char *initial,long ibytes){
+   ov_callbacks callbacks = {
+-    (size_t (*)(void *, size_t, size_t, void *))  fread,
+-    (int (*)(void *, ogg_int64_t, int))              _fseek64_wrap,
+-    (int (*)(void *))                             fclose,
+-    (long (*)(void *))                            ftell
++    (size_t (_cdecl*)(void *, size_t, size_t, void *))  fread,
++    (int (_cdecl*)(void *, ogg_int64_t, int))              _fseek64_wrap,
++    (int (_cdecl*)(void *))                             fclose,
++    (long (_cdecl*)(void *))                            ftell
+   };
+ 
+   return ov_test_callbacks((void *)f, vf, initial, ibytes, callbacks);
+@@ -1493,6 +1493,320 @@
+   return 0;
+ }
+ 
++
++extern	int CPU_SSE;
++extern	int CPU_MMX;
++extern  int CPU_3DN;
++
++static void float_to_pcm_stereo(float **pcm, short int *output, int samples)
++{
++	int tmp1;
++	int tmp2;
++	_asm
++	{
++		mov		eax, pcm
++		mov		edx, [eax]  // channel 1
++		mov		esi, [eax + 4]  // channel 2
++		mov		ecx, samples;
++		mov		edi, output; // out
++loop0:
++		fld		dword ptr [edx]
++		add		edi, 4
++		fld		dword ptr [esi]
++		add		edx, 4
++		fistp	dword ptr tmp2
++		add		esi, 4
++		fistp	dword ptr tmp1
++
++		mov		eax, tmp1
++		mov		ebx, tmp2
++		cmp		eax, -32768
++		jle		esc1_1
++		cmp		eax, 32767
++		jge		esc1_2
++		jmp		escp1
++esc1_1:	
++		mov		eax, -32768
++		jmp		escp1
++esc1_2:
++		mov		eax, 32767
++
++escp1:
++		and		eax, 0xffff
++
++		cmp		ebx, -32768
++		jle		esc2_1
++		cmp		ebx, 32767
++		jge		esc2_2
++		shl		ebx, 16
++		jmp		escp2
++esc2_1:	
++		mov		ebx, -32768*65536
++		jmp		escp2
++esc2_2:
++		mov		ebx, +32767*65536
++
++escp2:
++		or		ebx, eax
++		dec		ecx
++		mov		[edi-4], ebx
++
++		jnz		loop0
++	};
++}
++
++__declspec(align(8)) static int packed_sign_ext[] = {0x80000000, 0x80000000};
++__declspec(align(8)) static float packed_adj_q[] = {0.5, 0.5};
++
++
++static int float_to_pcm_stereo_3dn(float **pcm, short int *output, int samples)
++{
++	_asm
++	{
++		mov eax, pcm
++		mov edx, [eax]
++		mov esi, [eax + 4]
++		mov ecx, samples
++		mov edi, output
++		shl	ecx, 2
++		add ecx, edi
++		cmp edi, ecx
++		jnl exit0
++
++		align 16
++loop0:
++		add esi, 32 // pcm[1]
++
++		movq	mm0,	[edx]
++		movq	mm4,	[edx+8]
++		movq	mm1,	[esi-32]
++		movq	mm5,	[esi+8-32]
++
++		movq	mm2,	mm0
++		movq	mm3,	mm4
++		pand	mm2,	packed_sign_ext
++		pand	mm3,	packed_sign_ext
++		pxor	mm2,	packed_adj_q
++		pxor	mm3,	packed_adj_q
++		pfadd	mm0,	mm2
++		pfadd	mm4,	mm3
++
++		movq	mm2,	mm1
++		movq	mm3,	mm5
++		pand	mm2,	packed_sign_ext
++		pand	mm3,	packed_sign_ext
++		pxor	mm2,	packed_adj_q
++		pxor	mm3,	packed_adj_q
++		pfadd	mm1,	mm2
++		pfadd	mm5,	mm3
++
++		pf2id	mm0,	mm0
++		pf2id	mm4,	mm4
++		pf2id	mm1,	mm1
++		pf2id	mm5,	mm5
++		movq	mm2,	mm0
++		movq	mm6,	mm4
++		movq	mm3,	mm1
++		movq	mm7,	mm5
++		prefetch	[edx + 64]
++		prefetch	[esi + 64]
++		punpckldq	mm2,	mm3
++		punpckldq	mm6,	mm7
++		punpckhdq	mm0,	mm1
++		punpckhdq	mm4,	mm5
++		packssdw	mm2,	mm0
++		packssdw	mm6,	mm4
++		movq	[edi],	mm2
++		movq	[edi+8],	mm6
++
++
++		movq	mm0,	[edx+16]
++		movq	mm4,	[edx+24]
++		movq	mm1,	[esi+16-32]
++		movq	mm5,	[esi+24-32]
++
++		movq	mm2,	mm0
++		movq	mm3,	mm4
++		pand	mm2,	packed_sign_ext
++		pand	mm3,	packed_sign_ext
++		pxor	mm2,	packed_adj_q
++		pxor	mm3,	packed_adj_q
++		pfadd	mm0,	mm2
++		pfadd	mm4,	mm3
++
++		movq	mm2,	mm1
++		movq	mm3,	mm5
++		pand	mm2,	packed_sign_ext
++		pand	mm3,	packed_sign_ext
++		pxor	mm2,	packed_adj_q
++		pxor	mm3,	packed_adj_q
++		pfadd	mm1,	mm2
++		pfadd	mm5,	mm3
++
++		pf2id	mm0,	mm0
++		pf2id	mm4,	mm4
++		pf2id	mm1,	mm1
++		pf2id	mm5,	mm5
++		movq	mm2,	mm0
++		movq	mm6,	mm4
++		movq	mm3,	mm1
++		movq	mm7,	mm5
++
++		add edx, 32 // pcm[0]
++		add edi, 32 // output
++
++		punpckldq	mm2,	mm3
++		punpckldq	mm6,	mm7
++		punpckhdq	mm0,	mm1
++		punpckhdq	mm4,	mm5
++		cmp edi, ecx
++		packssdw	mm2,	mm0
++		packssdw	mm6,	mm4
++		movq	[edi+16-32],	mm2
++		movq	[edi+24-32],	mm6
++
++		jl loop0
++exit0:
++		femms
++		sub edi, output
++		shr edi, 2
++		mov eax, edi
++	}
++}
++static int float_to_pcm_stereo_sse(float **pcm, short int *output, int samples)
++{
++	_asm
++	{
++		mov eax, pcm
++		mov edx, [eax]
++		mov esi, [eax + 4]
++		mov ecx, samples
++		mov edi, output
++		shl	ecx, 2
++		add ecx, edi
++		cmp edi, ecx
++		jnl exit0
++
++		align 16
++loop0:
++		cvtps2pi mm0, [esi]
++		add edi, 32
++		cvtps2pi mm4, [esi + 8]
++		cvtps2pi mm1, [edx]
++		cvtps2pi mm3, [edx + 8]
++		movq mm2, mm1
++		movq mm5, mm3
++		prefetcht0		[esi + 64]
++		punpckldq mm2, mm0
++		cvtps2pi mm7, [esi + 16]
++		punpckldq mm5, mm4
++		cvtps2pi mm6, [edx + 16]
++		punpckhdq mm1, mm0
++		add esi, 32
++		punpckhdq mm3, mm4
++		prefetcht0		[edx + 64]
++		packssdw mm2, mm1
++		movq mm4, mm6
++		packssdw mm5, mm3
++		movq [edi - 32], mm2
++		punpckldq mm4, mm7
++		movq [edi + 8 - 32], mm5
++		punpckhdq mm6, mm7
++		cvtps2pi mm3, [edx + 24]
++		packssdw mm4, mm6
++		cvtps2pi mm1, [esi + 24 - 32]
++		movq mm5, mm3
++		add edx, 32
++		punpckldq mm5, mm1
++		movq [edi + 16 - 32], mm4
++		punpckhdq mm3, mm1
++		cmp edi, ecx
++		packssdw mm5, mm3
++		movq [edi + 24 - 32], mm5
++
++		jl loop0
++exit0:
++		emms
++		sub edi, output
++		shr edi, 2
++		mov eax, edi
++	}
++}
++
++static void float_to_pcm(float **pcm, short int *output, int samples, int chans)
++{
++	vorbis_fpu_control fpu;
++	vorbis_fpu_setround(&fpu);
++	if(!samples) return;
++	if(chans != 2)
++	{
++		int i;
++		for(i=0;i<chans;i++) { /* It's faster in this order */
++		  float *src=pcm[i];
++		  short *dest=output+i;
++		  int j;
++		  int val;
++		  for(j=0;j<samples;j++) {
++			val=vorbis_ftoi(src[j]/**32768.f*/);
++			if(val>32767) *dest = (short int)32767;
++			else if(val<-32768) *dest = (short int)-32768;
++			else *dest=val;
++			dest+=chans;
++		  }
++		}
++	}
++	else
++	{
++		// special optimization for chans = 2
++		if(CPU_SSE && CPU_MMX)
++		{
++			int p;
++			int i;
++			samples -= 15;
++			p = float_to_pcm_stereo_sse(pcm, output, samples);
++			samples += 15;
++
++			for(i=0;i<chans;i++) { /* It's faster in this order */
++			  float *src=pcm[i];
++			  short *dest=output+i + p * chans;
++			  int j;
++			  int val;
++			  for(j=p;j<samples;j++) {
++				val=vorbis_ftoi(src[j]/**32768.f*/);
++				if(val>32767) *dest = (short int)32767;
++				else if(val<-32768) *dest = (short int)-32768;
++				else *dest=val;
++				dest+=chans;
++			  }
++			}
++		}
++		else if(CPU_3DN)
++		{
++			int p;
++			int i;
++			samples -= 15;
++			p = float_to_pcm_stereo_3dn(pcm, output, samples);
++			samples += 15;
++
++			for(i=0;i<chans;i++) { /* It's faster in this order */
++			  float *src=pcm[i];
++			  short *dest=output+i + p * chans;
++			  int j;
++			  int val;
++			  for(j=p;j<samples;j++) {
++				val=vorbis_ftoi(src[j]/**32768.f*/);
++				if(val>32767) *dest = (short int)32767;
++				else if(val<-32768) *dest = (short int)-32768;
++				else *dest=val;
++				dest+=chans;
++			  }
++			}
++		}
++		else
++				float_to_pcm_stereo(pcm, output, samples);
++	}
++	vorbis_fpu_restore(fpu);
++}
+ /* up to this point, everything could more or less hide the multiple
+    logical bitstream nature of chaining from the toplevel application
+    if the toplevel application didn't particularly care.  However, at
+@@ -1566,7 +1880,15 @@
+     /* a tight loop to pack each size */
+     {
+       int val;
+-      if(word==1){
++	  if(word == 4) /* added by dee, for 32bit float extraction */
++	  {
++		  float *dest = (float*)buffer;
++		for(j=0;j<samples;j++)
++		 for(i=0;i<channels;i++){
++			  *dest++ = pcm[i][j];
++		  }
++	  }
++      else if(word==1){
+ 	int off=(sgned?0:128);
+ 	vorbis_fpu_setround(&fpu);
+ 	for(j=0;j<samples;j++)
+@@ -1583,19 +1905,7 @@
+ 	if(host_endian==bigendianp){
+ 	  if(sgned){
+ 	    
+-	    vorbis_fpu_setround(&fpu);
+-	    for(i=0;i<channels;i++) { /* It's faster in this order */
+-	      float *src=pcm[i];
+-	      short *dest=((short *)buffer)+i;
+-	      for(j=0;j<samples;j++) {
+-		val=vorbis_ftoi(src[j]*32768.f);
+-		if(val>32767)val=32767;
+-		else if(val<-32768)val=-32768;
+-		*dest=val;
+-		dest+=channels;
+-	      }
+-	    }
+-	    vorbis_fpu_restore(fpu);
++		float_to_pcm(pcm, (short*)buffer, samples, channels);
+ 	    
+ 	  }else{
+ 	    
+@@ -1852,8 +2162,8 @@
+      buffer of vf2 */
+   /* consolidate and expose the buffer. */
+   vorbis_synthesis_lapout(&vf2->vd,&pcm);
+-  _analysis_output_always("pcmL",0,pcm[0],n1*2,0,0,0);
+-  _analysis_output_always("pcmR",0,pcm[1],n1*2,0,0,0);
++//  _analysis_output_always("pcmL",0,pcm[0],n1*2,0,0,0); // disabled by W.Dee 20031206
++//  _analysis_output_always("pcmR",0,pcm[1],n1*2,0,0,0);
+ 
+   /* splice */
+   _ov_splice(pcm,lappcm,n1,n2,vi1->channels,vi2->channels,w1,w2);
+Index: lib/window.c
+===================================================================
+--- lib/window.c	(リビジョン 7879)
++++ lib/window.c	(作業コピー)
+@@ -11,7 +11,7 @@
+  ********************************************************************
+ 
+  function: window functions
+- last mod: $Id: window.c,v 1.23 2003/09/01 22:59:54 xiphmont Exp $
++ last mod: $Id$
+ 
+  ********************************************************************/
+ 
+@@ -20,7 +20,7 @@
+ #include "os.h"
+ #include "misc.h"
+ 
+-static float vwin64[32] = {
++__declspec(align(16)) static float vwin64[32] = {
+   0.0009460463F, 0.0085006468F, 0.0235352254F, 0.0458950567F, 
+   0.0753351908F, 0.1115073077F, 0.1539457973F, 0.2020557475F, 
+   0.2551056759F, 0.3122276645F, 0.3724270287F, 0.4346027792F, 
+@@ -31,7 +31,7 @@
+   0.9989462667F, 0.9997230082F, 0.9999638688F, 0.9999995525F, 
+ };
+ 
+-static float vwin128[64] = {
++__declspec(align(16)) static float vwin128[64] = {
+   0.0002365472F, 0.0021280687F, 0.0059065254F, 0.0115626550F, 
+   0.0190823442F, 0.0284463735F, 0.0396300935F, 0.0526030430F, 
+   0.0673285281F, 0.0837631763F, 0.1018564887F, 0.1215504095F, 
+@@ -50,7 +50,7 @@
+   0.9999331503F, 0.9999825563F, 0.9999977357F, 0.9999999720F, 
+ };
+ 
+-static float vwin256[128] = {
++__declspec(align(16)) static float vwin256[128] = {
+   0.0000591390F, 0.0005321979F, 0.0014780301F, 0.0028960636F, 
+   0.0047854363F, 0.0071449926F, 0.0099732775F, 0.0132685298F, 
+   0.0170286741F, 0.0212513119F, 0.0259337111F, 0.0310727950F, 
+@@ -85,7 +85,7 @@
+   0.9999958064F, 0.9999989077F, 0.9999998584F, 0.9999999983F, 
+ };
+ 
+-static float vwin512[256] = {
++__declspec(align(16)) static float vwin512[256] = {
+   0.0000147849F, 0.0001330607F, 0.0003695946F, 0.0007243509F, 
+   0.0011972759F, 0.0017882983F, 0.0024973285F, 0.0033242588F, 
+   0.0042689632F, 0.0053312973F, 0.0065110982F, 0.0078081841F, 
+@@ -152,7 +152,7 @@
+   0.9999997377F, 0.9999999317F, 0.9999999911F, 0.9999999999F, 
+ };
+ 
+-static float vwin1024[512] = {
++__declspec(align(16)) static float vwin1024[512] = {
+   0.0000036962F, 0.0000332659F, 0.0000924041F, 0.0001811086F, 
+   0.0002993761F, 0.0004472021F, 0.0006245811F, 0.0008315063F, 
+   0.0010679699F, 0.0013339631F, 0.0016294757F, 0.0019544965F, 
+@@ -283,7 +283,7 @@
+   0.9999999836F, 0.9999999957F, 0.9999999994F, 1.0000000000F, 
+ };
+ 
+-static float vwin2048[1024] = {
++__declspec(align(16)) static float vwin2048[1024] = {
+   0.0000009241F, 0.0000083165F, 0.0000231014F, 0.0000452785F, 
+   0.0000748476F, 0.0001118085F, 0.0001561608F, 0.0002079041F, 
+   0.0002670379F, 0.0003335617F, 0.0004074748F, 0.0004887765F, 
+@@ -542,7 +542,7 @@
+   0.9999999990F, 0.9999999997F, 1.0000000000F, 1.0000000000F, 
+ };
+ 
+-static float vwin4096[2048] = {
++__declspec(align(16)) static float vwin4096[2048] = {
+   0.0000002310F, 0.0000020791F, 0.0000057754F, 0.0000113197F, 
+   0.0000187121F, 0.0000279526F, 0.0000390412F, 0.0000519777F, 
+   0.0000667623F, 0.0000833949F, 0.0001018753F, 0.0001222036F, 
+@@ -1057,7 +1057,7 @@
+   0.9999999999F, 1.0000000000F, 1.0000000000F, 1.0000000000F, 
+ };
+ 
+-static float vwin8192[4096] = {
++__declspec(align(16)) static float vwin8192[4096] = {
+   0.0000000578F, 0.0000005198F, 0.0000014438F, 0.0000028299F, 
+   0.0000046780F, 0.0000069882F, 0.0000097604F, 0.0000129945F, 
+   0.0000166908F, 0.0000208490F, 0.0000254692F, 0.0000305515F, 
+Index: lib/lookup_data.h
+===================================================================
+--- lib/lookup_data.h	(リビジョン 7879)
++++ lib/lookup_data.h	(作業コピー)
+@@ -11,7 +11,7 @@
+  ********************************************************************
+ 
+   function: lookup data; generated by lookups.pl; edit there
+-  last mod: $Id: lookup_data.h,v 1.10 2003/01/18 08:09:28 msmith Exp $
++  last mod: $Id$
+ 
+  ********************************************************************/
+ 
+@@ -111,15 +111,21 @@
+ };
+ 
+ static float FROMdB2_LOOKUP[FROMdB2_LOOKUP_SZ]={
+-	   0.9928302478f,   0.9786445908f,   0.9646616199f,   0.9508784391f,
+-	   0.9372921937f,     0.92390007f,   0.9106992942f,   0.8976871324f,
+-	   0.8848608897f,   0.8722179097f,   0.8597555737f,   0.8474713009f,
+-	    0.835362547f,   0.8234268041f,   0.8116616003f,   0.8000644989f,
+-	   0.7886330981f,   0.7773650302f,   0.7662579617f,    0.755309592f,
+-	   0.7445176537f,   0.7338799116f,   0.7233941627f,   0.7130582353f,
+-	   0.7028699885f,   0.6928273125f,   0.6829281272f,   0.6731703824f,
+-	   0.6635520573f,   0.6540711597f,   0.6447257262f,   0.6355138211f,
++	   0.9928302478f*32768.0f,   0.9786445908f*32768.0f,   0.9646616199f*32768.0f,   0.9508784391f*32768.0f,
++	   0.9372921937f*32768.0f,     0.92390007f*32768.0f,   0.9106992942f*32768.0f,   0.8976871324f*32768.0f,
++	   0.8848608897f*32768.0f,   0.8722179097f*32768.0f,   0.8597555737f*32768.0f,   0.8474713009f*32768.0f,
++	    0.835362547f*32768.0f,   0.8234268041f*32768.0f,   0.8116616003f*32768.0f,   0.8000644989f*32768.0f,
++	   0.7886330981f*32768.0f,   0.7773650302f*32768.0f,   0.7662579617f*32768.0f,    0.755309592f*32768.0f,
++	   0.7445176537f*32768.0f,   0.7338799116f*32768.0f,   0.7233941627f*32768.0f,   0.7130582353f*32768.0f,
++	   0.7028699885f*32768.0f,   0.6928273125f*32768.0f,   0.6829281272f*32768.0f,   0.6731703824f*32768.0f,
++	   0.6635520573f*32768.0f,   0.6540711597f*32768.0f,   0.6447257262f*32768.0f,   0.6355138211f*32768.0f,
+ };
++void scale_FROMdB2_LOOKUP(float fac)
++{
++	int i;
++	for(i = 0; i < sizeof(FROMdB2_LOOKUP)/sizeof(FROMdB2_LOOKUP[0]); i++)
++			FROMdB2_LOOKUP[i] *= fac;
++}
+ 
+ #ifdef INT_LOOKUP
+ 
+Index: lib/lookup.c
+===================================================================
+--- lib/lookup.c	(リビジョン 9835)
++++ lib/lookup.c	(作業コピー)
+@@ -11,7 +11,7 @@
+  ********************************************************************
+ 
+   function: lookup based functions
+-  last mod: $Id: lookup.c,v 1.9 2002/01/22 08:06:07 xiphmont Exp $
++  last mod: $Id$
+ 
+  ********************************************************************/
+ 
+@@ -24,7 +24,7 @@
+ #ifdef FLOAT_LOOKUP
+ 
+ /* interpolated lookup based cos function, domain 0 to PI only */
+-float vorbis_coslook(float a){
++float __inline vorbis_coslook(float a){
+   double d=a*(.31830989*(float)COS_LOOKUP_SZ);
+   int i=vorbis_ftoi(d-.5);
+ 
+@@ -32,14 +32,14 @@
+ }
+ 
+ /* interpolated 1./sqrt(p) where .5 <= p < 1. */
+-float vorbis_invsqlook(float a){
++float __inline vorbis_invsqlook(float a){
+   double d=a*(2.f*(float)INVSQ_LOOKUP_SZ)-(float)INVSQ_LOOKUP_SZ;
+   int i=vorbis_ftoi(d-.5f);
+   return INVSQ_LOOKUP[i]+ (d-i)*(INVSQ_LOOKUP[i+1]-INVSQ_LOOKUP[i]);
+ }
+ 
+ /* interpolated 1./sqrt(p) where .5 <= p < 1. */
+-float vorbis_invsq2explook(int a){
++float __inline vorbis_invsq2explook(int a){
+   return INVSQ2EXP_LOOKUP[a-INVSQ2EXP_LOOKUP_MIN];
+ }
+ 
+Index: lib/res0.c
+===================================================================
+--- lib/res0.c	(リビジョン 7879)
++++ lib/res0.c	(作業コピー)
+@@ -11,7 +11,7 @@
+  ********************************************************************
+ 
+  function: residue backend 0, 1 and 2 implementation
+- last mod: $Id: res0.c,v 1.50 2003/12/30 11:02:22 xiphmont Exp $
++ last mod: $Id$
+ 
+  ********************************************************************/
+ 
+Index: lib/sharedbook.c
+===================================================================
+--- lib/sharedbook.c	(リビジョン 7879)
++++ lib/sharedbook.c	(作業コピー)
+@@ -11,7 +11,7 @@
+  ********************************************************************
+ 
+  function: basic shared codebook operations
+- last mod: $Id: sharedbook.c,v 1.29 2002/10/11 07:44:28 xiphmont Exp $
++ last mod: $Id$
+ 
+  ********************************************************************/
+ 
+@@ -309,13 +309,13 @@
+   return((x>> 1)&0x55555555UL) | ((x<< 1)&0xaaaaaaaaUL);
+ }
+ 
+-static int sort32a(const void *a,const void *b){
++static int _cdecl sort32a(const void *a,const void *b){
+   return ( **(ogg_uint32_t **)a>**(ogg_uint32_t **)b)- 
+     ( **(ogg_uint32_t **)a<**(ogg_uint32_t **)b);
+ }
+ 
+ /* decode codebook arrangement is more heavily optimized than encode */
+-int vorbis_book_init_decode(codebook *c,const static_codebook *s){
++int vorbis_book_init_decode(codebook *c,const static_codebook *s, float gain){
+   int i,j,n=0,tabn;
+   int *sortindex;
+   memset(c,0,sizeof(*c));
+@@ -367,6 +367,10 @@
+   }
+ 
+   c->valuelist=_book_unquantize(s,n,sortindex);
++
++  if(c->valuelist)
++  	for(i=0;i<n*s->dim;i++) c->valuelist[i]*=gain;
++
+   c->dec_index=_ogg_malloc(n*sizeof(*c->dec_index));
+ 
+   for(n=0,i=0;i<s->entries;i++)
+Index: lib/mdct.c
+===================================================================
+--- lib/mdct.c	(リビジョン 7879)
++++ lib/mdct.c	(作業コピー)
+@@ -12,7 +12,7 @@
+ 
+  function: normalized modified discrete cosine transform
+            power of two length transform only [64 <= n ]
+- last mod: $Id: mdct.c,v 1.32 2002/10/16 02:43:48 xiphmont Exp $
++ last mod: $Id$
+ 
+  Original algorithm adapted long ago from _The use of multirate filter
+  banks for coding of high quality digital audio_, by T. Sporer,
+@@ -37,6 +37,14 @@
+    roundoff isn't done (so it's noisy).  Consider it functional, but
+    only a starting point.  There's no point on a machine with an FPU */
+ 
++/*
++	June 20, 2003    W.Dee <dee@kikyou.info>
++
++		added some SSE/3DNow optimizations.
++		This file is still under license of original libvorbis
++		license.
++*/
++
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+@@ -45,14 +53,16 @@
+ #include "mdct.h"
+ #include "os.h"
+ #include "misc.h"
+-
++
+ /* build lookups for trig functions; also pre-figure scaling and
+    some window function algebra. */
++extern int CPU_SSE;
++extern int CPU_3DN;
+ 
+ void mdct_init(mdct_lookup *lookup,int n){
+   int   *bitrev=_ogg_malloc(sizeof(*bitrev)*(n/4));
+   DATA_TYPE *T=_ogg_malloc(sizeof(*T)*(n+n/4));
+-  
++
+   int i;
+   int n2=n>>1;
+   int log2n=lookup->log2n=rint(log((float)n)/log(2.f));
+@@ -90,169 +100,903 @@
+   lookup->scale=FLOAT_CONV(4.f/n);
+ }
+ 
+-/* 8 point butterfly (in place, 4 register) */
+-STIN void mdct_butterfly_8(DATA_TYPE *x){
+-  REG_TYPE r0   = x[6] + x[2];
+-  REG_TYPE r1   = x[6] - x[2];
+-  REG_TYPE r2   = x[4] + x[0];
+-  REG_TYPE r3   = x[4] - x[0];
++__declspec(align(16)) static int neg_0_2[] = {0x80000000, 0x0, 0x80000000, 0x0};
++__declspec(align(16)) static int neg_0_1_2_3[] = {0x80000000, 0x80000000, 0x80000000, 0x80000000};
++__declspec(align(16)) static int neg_1_2[] = {0x0, 0x80000000, 0x80000000, 0x0};
++__declspec(align(16)) static int neg_1_3[] = {0x0, 0x80000000, 0x0, 0x80000000};
++__declspec(align(16)) static int neg_0_1[] = {0x80000000, 0x80000000, 0x0, 0x0};
++__declspec(align(16)) static int neg_0[] = {0x80000000, 0x0, 0x0, 0x0};
+ 
+-	   x[6] = r0   + r2;
+-	   x[4] = r0   - r2;
+-	   
+-	   r0   = x[5] - x[1];
+-	   r2   = x[7] - x[3];
+-	   x[0] = r1   + r0;
+-	   x[2] = r1   - r0;
+-	   
+-	   r0   = x[5] + x[1];
+-	   r1   = x[7] + x[3];
+-	   x[3] = r2   + r3;
+-	   x[1] = r2   - r3;
+-	   x[7] = r1   + r0;
+-	   x[5] = r1   - r0;
+-	   
++__declspec(align(16)) static float packed_cPI2_8_inv[] = {cPI2_8, cPI2_8, 1.0, -1.0};
++__declspec(align(16)) static float packed_cPI2_8[] = {cPI2_8, cPI2_8, 1.0, 1.0};
++
++__declspec(align(16)) static float packed_2_3_a[] = {cPI1_8, cPI3_8, 1.0, 1.0};
++__declspec(align(16)) static float packed_2_3_b[] = {-cPI3_8, cPI1_8, 0.0, 0.0};
++
++__declspec(align(16)) static float packed_3_1_c[] = {cPI3_8, cPI3_8, cPI2_8, cPI2_8};
++__declspec(align(16)) static float packed_3_1_d[] = {-cPI1_8, cPI1_8, -cPI2_8, cPI2_8};
++
++__declspec(align(16)) static float packed_1_3_b[] = {cPI1_8, cPI3_8, 1.0, -1.0};
++__declspec(align(16)) static float packed_1_3_a[] = {cPI3_8, -cPI1_8, 0.0, 0.0};
++
++__declspec(align(16)) static float packed_ddbb[] = {cPI3_8, cPI1_8, cPI2_8, cPI2_8};
++__declspec(align(16)) static float packed_ccaa[] = {cPI1_8, -cPI3_8, cPI2_8, -cPI2_8};
++
++__declspec(align(16)) static float packed_halve[] = {0.5, 0.5, 0.5, 0.5};
++
++
++__declspec(align(8)) static int neg_q_1[] = {0, 0x80000000};
++__declspec(align(8)) static int neg_q_0[] = {0x80000000, 0};
++__declspec(align(8)) static int neg_q_0_1[] = {0x80000000, 0x80000000};
++__declspec(align(8)) static float packed_halve_q[] = {0.5, 0.5};
++
++__declspec(align(8)) static float pi_q_18_m38[] = { cPI1_8, -cPI3_8 };
++__declspec(align(8)) static float pi_q_38_18[] =  { cPI3_8, cPI1_8 };
++__declspec(align(8)) static float pi_q_28_28[] =  { cPI2_8, cPI2_8 };
++__declspec(align(8)) static float pi_q_38_m18[] = { cPI3_8, -cPI1_8 };
++__declspec(align(8)) static float pi_q_18_38[] =  { cPI1_8, cPI3_8 };
++__declspec(align(8)) static float pi_q_m18_38[] = { -cPI1_8, cPI3_8 };
++__declspec(align(8)) static float pi_q_m38_18[] = { -cPI3_8, cPI1_8 };
++
++
++
++/* 8 point butterfly (in place, 4 register) (3dn) */
++STIN void mdct_butterfly_8_3dn(DATA_TYPE *x){
++	_asm
++	{
++		mov				eax,				x
++	}
++	_asm
++	{
++		// make mm1=(D,C) mm0=(B,A)
++		movq			mm0,				[eax]					// mm0:	x[1]			x[0]
++		movq			mm2,				[eax+4*4]				// mm2:	x[5]			x[4]
++
++		movq			mm1,				mm0
++		pxor			mm0,				neg_q_1					// mm0:	-x[1]			x[0]
++		pxor			mm1,				neg_q_0					// mm1:	x[1]			-x[0]
++		pfadd			mm0,				mm2						// mm0:	B				A			***mm0
++		pfadd			mm1,				mm2						// mm1:	D				C			***mm1
++
++		// make mm3=(H,G) mm2=(F,E)
++		movq			mm2,				[eax+4*2]				// mm2:	x[3]			x[2]
++		movq			mm4,				[eax+4*6]				// mm4:	x[7]			x[6]
++
++		movq			mm3,				mm2
++		pxor			mm2,				neg_q_1					// mm2:	-x[3]			x[2]
++		pxor			mm3,				neg_q_0					// mm3:	x[3]			-x[2]
++		pfadd			mm2,				mm4						// mm2:	F				E			***mm2
++		pfadd			mm3,				mm4						// mm3:	H				G			***mm3
++
++		// make (H,E) (D,A)
++		movq			mm4,				mm2
++		movq			mm5,				mm0
++		punpckldq		mm4,				mm4						// mm4:	E				E
++		punpckldq		mm5,				mm5						// mm5:	A				A
++		punpckhdq		mm4,				mm3						// mm4:	H				E
++		punpckhdq		mm5,				mm1						// mm5:	D				A
++
++		// make x[4..7]
++		movq			mm6,				mm4
++		pfadd			mm6,				mm5						// mm5:	H+D				E+A
++		movq			[eax +6*4],			mm6						// store
++
++		pfsub			mm4,				mm5						// mm4:	H-D				E-A
++		movq			[eax +4*4],			mm4
++
++		// make mm3=(F,G) mm0=(C,B)
++		punpckhdq		mm2,				mm2						// mm2:	F				F
++		punpckhdq		mm0,				mm0						// mm0:	B				B
++		punpckldq		mm3,				mm2						// mm3:	F				G
++		punpckldq		mm0,				mm1						// mm0:	C				B
++
++		// make x[0..3]
++		movq			mm4,				mm3
++		pxor			mm0,				neg_q_1					// mm0:	-C				B
++		pfadd			mm4,				mm0						// mm4:	F-C				G+B
++		movq			[eax +0*4],			mm4						// store
++		pfsub			mm3,				mm0						// mm3:	F+C				G-B
++		movq			[eax +2*4],			mm3						// store
++
++	}
++
++/*
++	float A,B,C,D,E,F,G,H;
++	A   = x[4] + x[0];
++	B   = x[5] - x[1];
++	C   = x[4] - x[0];
++	D   = x[5] + x[1];
++	E   = x[6] + x[2];
++	F   = x[7] - x[3];
++	G   = x[6] - x[2];
++	H   = x[7] + x[3];
++	x[0] = G   + B;
++	x[1] = F   - C;
++	x[2] = G   - B;
++	x[3] = F   + C;
++	x[4] = E   - A;
++	x[5] = H   - D;
++	x[6] = E   + A;
++	x[7] = H   + D;
++*/
++}
++
++/* 8 point butterfly (in place, 4 register) */
++STIN void mdct_butterfly_8(DATA_TYPE *x){
++  REG_TYPE r0   = x[6] + x[2];
++  REG_TYPE r1   = x[6] - x[2];
++  REG_TYPE r2   = x[4] + x[0];
++  REG_TYPE r3   = x[4] - x[0];
++
++	   x[6] = r0   + r2;
++	   x[4] = r0   - r2;
++
++	   r0   = x[5] - x[1];
++	   r2   = x[7] - x[3];
++	   x[0] = r1   + r0;
++	   x[2] = r1   - r0;
++
++	   r0   = x[5] + x[1];
++	   r1   = x[7] + x[3];
++	   x[3] = r2   + r3;
++	   x[1] = r2   - r3;
++	   x[7] = r1   + r0;
++	   x[5] = r1   - r0;
++}
++
++/* 16 point butterfly (sse) */
++STIN void mdct_butterfly_16_sse(DATA_TYPE *x){
++_asm
++{
++	mov			eax,	x
++
++
++	movaps		xmm0,	[eax]						// a xmm0 =	x3		x2		x1		x0
++	movaps		xmm5,	[eax + 16]					// b xmm4 =	x7		x6		x5		x4
++	movaps		xmm1,	[eax + 32]					// a xmm1 =	x11		x10		x9		x8
++	movaps		xmm4,	[eax + 48]					// b xmm4 =	x15		x14		x13		x12
++
++	movaps		xmm2,	xmm0						// a xmm2 =	x3		x2		x1		x0
++	movaps		xmm6,	xmm4						// b xmm6 =	x15		x14		x13		x12
++	subps		xmm2,	xmm1						// a xmm2 =	d		-c		b		a
++	subps		xmm6,	xmm5						// b xmm6 =	d		c		b		a
++
++	addps		xmm0,	xmm1						// a
++	addps		xmm4,	xmm5						// b
++
++	movaps		xmm7,	xmm6						// b xmm7 =	d		c		b		a
++	movaps		xmm3,	xmm2						// a xmm3 =	d		-c		b		a
++	movaps		xmm1,	xmm6						// b xmm1 =	d		c		b		a
++
++	shufps		xmm3,	xmm3,	2*64+3*16+1*4+1		// a xmm3 =	-c		d		b		b
++	shufps		xmm7,	xmm7,	3*64+2*16+0*4+0		// b xmm7 =	d		c		a		a
++	shufps		xmm2,	xmm2,	2*64+3*16+0*4+0		// a xmm2 =	-c		d		a		a
++	shufps		xmm1,	xmm1,	3*64+2*16+1*4+1		// b xmm1 =	d		c		b		b
++	xorps		xmm2,	neg_0						// a xmm2 =	-c		d		a		-a
++	xorps		xmm1,	neg_0						// b xmm1 =	d		c		b		-b
++	xorps		xmm6,	xmm6						// b xmm6 =	0		0		0		0
++	movhps		xmm2,	xmm6						// a xmm2 =	0		0		a		-a
++	movhps		xmm1,	xmm6						// b xmm1 =	0		0		b		-b
++
++	subps		xmm3,	xmm2						// a xmm3 =	-c		d		b-a		b+a
++	addps		xmm7,	xmm1						// b xmm7 = d		c		a+b		a-b
++	mulps		xmm3,	packed_cPI2_8_inv			// a xmm3 =	c		d		(b-a)*C	(b+a)*C
++	mulps		xmm7,	packed_cPI2_8				// b xmm7 =	d		c		(a+b)*C	(a-b)*C
++
++	movaps		xmm2,	xmm7						// a xmm2 =	x7		x6		x5		x4
++	movaps		xmm6,	xmm4						// b xmm5 =	x7		x6		x5		x4
++	addps		xmm2,	xmm3						// a xmm2 =	d		c		b		a
++	addps		xmm6,	xmm0						// b xmm6 =	d		c		b		a
++
++	subps		xmm7,	xmm3						// a xmm7 =	h		g		f		e
++	subps		xmm4,	xmm0						// b xmm4 =	h		g		f		e
++
++	movaps		xmm1,	xmm7						// a xmm1 =	h		g		f		e
++	movaps		xmm5,	xmm4						// b xmm5 =	h		g		f		e
++	shufps		xmm1,	xmm1,	3*64+2*16+3*4+2		// a xmm1 =	h		g		h		g
++	shufps		xmm5,	xmm5,	3*64+2*16+3*4+2		// b xmm5 =	h		g		h		g
++	shufps		xmm7,	xmm7,	0*64+1*16+0*4+1		// a xmm7 =	e		f		e		f
++	shufps		xmm4,	xmm4,	0*64+1*16+0*4+1		// b xmm4 =	e		f		e		f
++	xorps		xmm7,	neg_1_2						// a xmm7 =	e		-f		-e		f
++	xorps		xmm4,	neg_1_2						// b xmm4 =	e		-f		-e		f
++	addps		xmm7,	xmm1						// a xmm7 =	h+e		g-f		h-e		g+f
++	addps		xmm4,	xmm5						// b xmm4 =	h+e		g-f		h-e		g+f
++	movaps		[eax],	xmm7						// a store x[3] x[2] x[1] x[0]
++	movaps		[eax + 32],	xmm4					// b store x[3] x[2] x[1] x[0]
++
++	movaps		xmm1,	xmm2						// a xmm1 =	d		c		b		a
++	movaps		xmm5,	xmm6						// b xmm5 =	d		c		b		a
++	shufps		xmm1,	xmm1,	3*64+2*16+3*4+2		// a xmm1 =	d		c		d		c
++	shufps		xmm5,	xmm5,	3*64+2*16+3*4+2		// b xmm5 =	d		c		d		c
++	shufps		xmm2,	xmm2,	1*64+0*16+1*4+0		// a xmm2 =	b		a		b		a
++	shufps		xmm6,	xmm6,	1*64+0*16+1*4+0		// b xmm6 =	b		a		b		a
++	xorps		xmm2,	neg_0_1						// a xmm2 =	b		a		-b		-a
++	xorps		xmm6,	neg_0_1						// b xmm6 =	b		a		-b		-a
++	addps		xmm2,	xmm1						// a xmm2 =	d+b		c+a		d-b		c-a
++	addps		xmm6,	xmm5						// b xmm6 =	d+b		c+a		d-b		c-a
++	movaps		[eax + 16],	xmm2					// a store x[7] x[6] x[5] x[4]
++	movaps		[eax + 16 + 32],	xmm6			// b store x[7] x[6] x[5] x[4]
+ }
++/*
++ REG_TYPE a,b,c,d;
+ 
+-/* 16 point butterfly (in place, 4 register) */
+-STIN void mdct_butterfly_16(DATA_TYPE *x){
+-  REG_TYPE r0     = x[1]  - x[9];
+-  REG_TYPE r1     = x[0]  - x[8];
++a      = (x[0]  - x[8]);
++b      = (x[1]  - x[9]);
++c      =-(x[2]  - x[10]);
++d      = (x[3]  - x[11]);
++x[8]  += x[0];
++x[9]  += x[1];
++x[10] += x[2];
++x[11] += x[3];
++x[0]   = MULT_NORM((b   + a) * cPI2_8);
++x[1]   = MULT_NORM((b   - a) * cPI2_8);
++x[2]   = d;
++x[3]   = c;
+ 
+-           x[8]  += x[0];
+-           x[9]  += x[1];
+-           x[0]   = MULT_NORM((r0   + r1) * cPI2_8);
+-           x[1]   = MULT_NORM((r0   - r1) * cPI2_8);
++a      = x[12] - x[4];
++b      = x[13] - x[5];
++c      = x[14] - x[6];
++d      = x[15] - x[7];
++x[12] += x[4];
++x[13] += x[5];
++x[14] += x[6];
++x[15] += x[7];
++x[4]   = MULT_NORM((a   - b) * cPI2_8);
++x[5]   = MULT_NORM((a   + b) * cPI2_8);
++x[6]   = c;
++x[7]   = d;
++*/
+ 
+-           r0     = x[3]  - x[11];
+-           r1     = x[10] - x[2];
+-           x[10] += x[2];
+-           x[11] += x[3];
+-           x[2]   = r0;
+-           x[3]   = r1;
++}
+ 
+-           r0     = x[12] - x[4];
+-           r1     = x[13] - x[5];
+-           x[12] += x[4];
+-           x[13] += x[5];
+-           x[4]   = MULT_NORM((r0   - r1) * cPI2_8);
+-           x[5]   = MULT_NORM((r0   + r1) * cPI2_8);
++/* 16 point butterfly (in place, 4 register) (3dn) */
++STIN void mdct_butterfly_16_3dn(DATA_TYPE *x){
++  REG_TYPE r0;
++  REG_TYPE r1;
++
++	_asm
++	{
++		mov			eax,		x
++	}
++	_asm
++	{
++		movq				mm0,				[eax +  0*4]
++/**/	movq				mm3,				[eax +  2*4]
++		movq				mm1,				mm0
++/**/	movq				mm4,				[eax + 10*4]
++		pfsub				mm1,				[eax +  8*4]
++/**/	movq				mm5,				mm4
++		pfadd				mm0,				[eax +  8*4]
++/**/	pxor				mm3,				neg_q_0
++		movq				[eax +  8*4],		mm0
++/**/	pxor				mm5,				neg_q_1
++/**/	pfadd				mm4,				[eax +  2*4]
++
++		movq				mm2,				mm1
++/**/	pfadd				mm5,				mm3
++		pxor				mm2,				neg_q_0
++/**/	movq				[eax + 10*4],		mm4
++		pfacc				mm1,				mm2
++/**/	punpckldq			mm3,				mm5
++		pfmul				mm1,				pi_q_28_28
++/**/	punpckhdq			mm5,				mm3
++		movq				[eax +  0*4],		mm1
++/**/	movq				[eax +  2*4],		mm5
++	}
++/*
++		   r0 = x[0]  - x[8];
++		   r1 = x[1]  - x[9];
++           x[8]  += x[0];
++           x[9]  += x[1];
++           x[0]   = MULT_NORM(( r1   + r0) * cPI2_8);
++           x[1]   = MULT_NORM(( r1   - r0) * cPI2_8);
++           r0     = - x[2] + x[10] ;
++           r1     =   x[3] - x[11];
++           x[10] += x[2];
++           x[11] += x[3];
++           x[2]   = r1;
++           x[3]   = r0;
++*/
++	_asm
++	{
++		movq				mm0,				[eax + 12*4]
++/**/	movq				mm6,				[eax + 14*4]
++		movq				mm1,				mm0
++/**/	movq				mm7,				mm6
++		pfsub				mm1,				[eax +  4*4]
++		pfadd				mm0,				[eax +  4*4]
++/**/	pfadd				mm6,				[eax +  6*4]
++		movq				[eax + 12*4],		mm0
++
++		movq				mm2,				mm1
++/**/	pfsub				mm7,				[eax +  6*4]
++		pxor				mm1,				neg_q_1
++/**/	movq				[eax + 14*4],		mm6
++		pfacc				mm1,				mm2
++/**/	movq				[eax +  6*4],		mm7
++		pfmul				mm1,				pi_q_28_28
++		movq				[eax +  4*4],		mm1
++	}
++/*
++		   r0     = x[12] - x[4];
++           r1     = x[13] - x[5];
++           x[12] += x[4];
++           x[13] += x[5];
++           x[4]   = MULT_NORM((r0   - r1) * cPI2_8);
++           x[5]   = MULT_NORM((r0   + r1) * cPI2_8);
++           r0     = x[14] - x[6];
++           r1     = x[15] - x[7];
++           x[14] += x[6];
++           x[15] += x[7];
++           x[6]  = r0;
++           x[7]  = r1;
++*/
++
++   mdct_butterfly_8_3dn(x);
++   mdct_butterfly_8_3dn(x+8);
++}
++
++/* 16 point butterfly (in place, 4 register) */
++STIN void mdct_butterfly_16(DATA_TYPE *x){
++  REG_TYPE r0     = x[1]  - x[9];
++  REG_TYPE r1     = x[0]  - x[8];
++
++           x[8]  += x[0];
++           x[9]  += x[1];
++           x[0]   = MULT_NORM((r0   + r1) * cPI2_8);
++           x[1]   = MULT_NORM((r0   - r1) * cPI2_8);
++
++           r0     = x[3]  - x[11];
++           r1     = x[10] - x[2];
++           x[10] += x[2];
++           x[11] += x[3];
++           x[2]   = r0;
++           x[3]   = r1;
++
++           r0     = x[12] - x[4];
++           r1     = x[13] - x[5];
++           x[12] += x[4];
++           x[13] += x[5];
++           x[4]   = MULT_NORM((r0   - r1) * cPI2_8);
++           x[5]   = MULT_NORM((r0   + r1) * cPI2_8);
++
++           r0     = x[14] - x[6];
++           r1     = x[15] - x[7];
++           x[14] += x[6];
++           x[15] += x[7];
++           x[6]  = r0;
++           x[7]  = r1;
++
++   mdct_butterfly_8(x);
++   mdct_butterfly_8(x+8);
++}
+ 
+-           r0     = x[14] - x[6];
+-           r1     = x[15] - x[7];
+-           x[14] += x[6];
+-           x[15] += x[7];
+-           x[6]  = r0;
+-           x[7]  = r1;
++/* 32 point butterfly (sse) */
++STIN void mdct_butterfly_32_sse(DATA_TYPE *x){
++//REG_TYPE	a,b,c,d;
++_asm
++{
++	mov			eax,	x
++}
+ 
+-	   mdct_butterfly_8(x);
+-	   mdct_butterfly_8(x+8);
++
++_asm
++{
++	movaps		xmm5,	[eax + 8*4]					// b xmm5 =	x11		x10		x9		x8
++	movaps		xmm1,	[eax + 12*4]				// a xmm1 =	x15		x14		x13		x12
++	movaps		xmm4,	[eax + 24*4]				// b xmm4 =	x27		x26		x25		x24
++	movaps		xmm0,	[eax + 28*4]				// a xmm0 =	x31		x30		x29		x28
++
++
++	movaps		xmm6,	xmm4						// b xmm6 =	x27		x26		x25		x24
++	movaps		xmm2,	xmm0						// a xmm2 =	x31		x30		x29		x28
++	subps		xmm6,	xmm5						// b xmm6 =	d		c		b		a
++	subps		xmm2,	xmm1						// a xmm2 =	d		c		b		a
++
++	addps		xmm4,	xmm5						// b
++	addps		xmm0,	xmm1						// a
++	movaps		[eax + 24*4],	xmm4				// b store x27 x26 x25 x24
++	movaps		[eax + 28*4],	xmm0				// a store x31 x30 x29 x28
++
++	movaps		xmm3,	xmm2						// a xmm3 =	d		c		b		a
++	movaps		xmm7,	xmm6						// b xmm7 =	d		c		b		a
++	shufps		xmm3,	xmm3,	3*64+2*16+0*4+0		// a xmm3 =	d		c		a		a
++	shufps		xmm7,	xmm7,	2*64+2*16+1*4+0		// b xmm7 =	c		c		b		a
++	prefetcht0	[eax + 64*4]
++	shufps		xmm2,	xmm2,	3*64+2*16+1*4+1		// a xmm2 =	d		c		b		b
++	shufps		xmm6,	xmm6,	3*64+3*16+0*4+1		// b xmm6 =	d		d		a		b
++
++	mulps		xmm7,	packed_3_1_c				// b xmm7 =	c*C2	c*C2	b*C3	a*C3
++	mulps		xmm3,	packed_2_3_a				// a xmm3 =	d		c		a*C3	a*C1
++	mulps		xmm6,	packed_3_1_d				// b xmm6 =	d*C2	-d*C2	a*C1	-b*C1
++	mulps		xmm2,	packed_2_3_b				// a xmm2 =	0		0		b*C1	-b*C3
++
++	addps		xmm6,	xmm7						// b
++	addps		xmm2,	xmm3						// a
++	movaps		[eax + 8*4],	xmm6				// b store x11 x10 x9 x8
++	movaps		[eax + 12*4],	xmm2				// a store x15 x14 x13 x12
+ }
+ 
+-/* 32 point butterfly (in place, 4 register) */
+-STIN void mdct_butterfly_32(DATA_TYPE *x){
+-  REG_TYPE r0     = x[30] - x[14];
+-  REG_TYPE r1     = x[31] - x[15];
++_asm
++{
++	movaps		xmm4,	[eax + 0*4]					// b xmm4 =	x3		x2		x1		x0
++	movaps		xmm0,	[eax + 4*4]					// a xmm0 =	x7		x6		x5		x4
++	movaps		xmm5,	[eax + 16*4]				// b xmm5 =	x19		x18		x17		x16
++	movaps		xmm1,	[eax + 20*4]				// a xmm1 =	x23		x22		x21		x20
+ 
+-           x[30] +=         x[14];           
+-	   x[31] +=         x[15];
+-           x[14]  =         r0;              
+-	   x[15]  =         r1;
++	movaps		xmm6,	xmm4						// b xmm6 =	x3		x2		x1		x0
++	movaps		xmm2,	xmm0						// a xmm2 =	x7		x6		x5		x4
++	subps		xmm6,	xmm5						// b xmm6 =	d		c		b		a
++	subps		xmm2,	xmm1						// a xmm2 =	d		-c		b		a
+ 
+-           r0     = x[28] - x[12];   
+-	   r1     = x[29] - x[13];
+-           x[28] +=         x[12];           
+-	   x[29] +=         x[13];
+-           x[12]  = MULT_NORM( r0 * cPI1_8  -  r1 * cPI3_8 );
+-	   x[13]  = MULT_NORM( r0 * cPI3_8  +  r1 * cPI1_8 );
++	addps		xmm4,	xmm5						// b
++	addps		xmm0,	xmm1						// a
++	movaps		[eax + 16*4],	xmm4				// b store x19 x18 x17 x16
++	movaps		[eax + 20*4],	xmm0				// a store x23 x22 x21 x20
+ 
+-           r0     = x[26] - x[10];
+-	   r1     = x[27] - x[11];
+-	   x[26] +=         x[10];
+-	   x[27] +=         x[11];
+-	   x[10]  = MULT_NORM(( r0  - r1 ) * cPI2_8);
+-	   x[11]  = MULT_NORM(( r0  + r1 ) * cPI2_8);
++	movaps		xmm3,	xmm2						// a xmm3 =	d		-c		b		a
++	movaps		xmm7,	xmm6						// b xmm7 =	d		c		b		a
++	shufps		xmm3,	xmm3,	2*64+3*16+1*4+1		// a xmm3 =	-c		d		b		b
++	shufps		xmm7,	xmm7,	3*64+3*16+1*4+1		// b xmm7 =	d		d		b		b
++	shufps		xmm2,	xmm2,	2*64+3*16+0*4+0		// a xmm2 =	-c		d		a		a
++	shufps		xmm6,	xmm6,	2*64+2*16+0*4+0		// b xmm6 =	c		c		a		a
+ 
+-	   r0     = x[24] - x[8];
+-	   r1     = x[25] - x[9];
+-	   x[24] += x[8];
+-	   x[25] += x[9];
+-	   x[8]   = MULT_NORM( r0 * cPI3_8  -  r1 * cPI1_8 );
+-	   x[9]   = MULT_NORM( r1 * cPI3_8  +  r0 * cPI1_8 );
++	mulps		xmm7,	packed_ddbb					// b xmm7 =	d*C2	d*C2	b*C1	b*C3
++	mulps		xmm3,	packed_1_3_b				// a xmm3 =	c		d		b*C3	b*C1
++	mulps		xmm6,	packed_ccaa					// b xmm6 =	-c*C2	c*C2	-a*C3	a*C1
++	mulps		xmm2,	packed_1_3_a				// a xmm2 =	0		0		-a*C1	a*C3
+ 
+-	   r0     = x[22] - x[6];
+-	   r1     = x[7]  - x[23];
+-	   x[22] += x[6];
+-	   x[23] += x[7];
+-	   x[6]   = r1;
+-	   x[7]   = r0;
++	addps		xmm6,	xmm7						// b
++	addps		xmm2,	xmm3						// a
++	movaps		[eax + 0*4],	xmm6				// b store x4 x3 x2 x1
++	movaps		[eax + 4*4],	xmm2				// a store x7 x6 x5 x4
++}
++/*
++a     = x[28] - x[12];
++b     = x[29] - x[13];
++c     = x[30] - x[14];
++d     = x[31] - x[15];
++x[28] += x[12];
++x[29] += x[13];
++x[30] += x[14];
++x[31] += x[15];
++x[12]  = MULT_NORM( a * cPI1_8  -  b * cPI3_8 );
++x[13]  = MULT_NORM( a * cPI3_8  +  b * cPI1_8 );
++x[14]  = c;
++x[15]  = d;
++a     = x[24] - x[8];
++b     = x[25] - x[9];
++c     = x[26] - x[10];
++d     = x[27] - x[11];
++x[24] += x[8];
++x[25] += x[9];
++x[26] += x[10];
++x[27] += x[11];
++x[8]   = MULT_NORM( a * cPI3_8  -  b * cPI1_8 );
++x[9]   = MULT_NORM( b * cPI3_8  +  a * cPI1_8 );
++x[10]  = MULT_NORM(( c  - d ) * cPI2_8);
++x[11]  = MULT_NORM(( c  + d ) * cPI2_8);
++a     =  (x[4]  - x[20]);
++b     =  (x[5]  - x[21]);
++c     = -(x[6]  - x[22]);
++d     =  (x[7]  - x[23]);
++x[20] += x[4];
++x[21] += x[5];
++x[22] += x[6];
++x[23] += x[7];
++x[4]   = MULT_NORM( b * cPI1_8  +  a * cPI3_8 );
++x[5]   = MULT_NORM( b * cPI3_8  -  a * cPI1_8 );
++x[6]   = d;
++x[7]   = c;
++a     = x[0]  - x[16];
++b     = x[1]  - x[17];
++c     = x[2]  - x[18];
++d     = x[3]  - x[19];
++x[16] += x[0];
++x[17] += x[1];
++x[18] += x[2];
++x[19] += x[3];
++x[0]   = MULT_NORM( b * cPI3_8  +  a * cPI1_8 );
++x[1]   = MULT_NORM( b * cPI1_8  -  a * cPI3_8 );
++x[2]   = MULT_NORM(( d  + c ) * cPI2_8);
++x[3]   = MULT_NORM(( d  - c ) * cPI2_8);
++*/
+ 
+-	   r0     = x[4]  - x[20];
+-	   r1     = x[5]  - x[21];
+-	   x[20] += x[4];
+-	   x[21] += x[5];
+-	   x[4]   = MULT_NORM( r1 * cPI1_8  +  r0 * cPI3_8 );
+-	   x[5]   = MULT_NORM( r1 * cPI3_8  -  r0 * cPI1_8 );
++	   mdct_butterfly_16_sse(x);
++	   mdct_butterfly_16_sse(x+16);
++}
+ 
+-	   r0     = x[2]  - x[18];
+-	   r1     = x[3]  - x[19];
+-	   x[18] += x[2];
+-	   x[19] += x[3];
+-	   x[2]   = MULT_NORM(( r1  + r0 ) * cPI2_8);
+-	   x[3]   = MULT_NORM(( r1  - r0 ) * cPI2_8);
++/* 32 point butterfly (in place, 4 register) (3dn) */
++STIN void mdct_butterfly_32_3dn(DATA_TYPE *x){
++
++	REG_TYPE r0;
++	REG_TYPE r1;
++	REG_TYPE r2;
++	REG_TYPE r3;
++
++	_asm
++	{
++		mov			eax,			x	
++	}
++
++	_asm
++	{
++/**/	movq				mm2,				[eax + 28*4]
++		movq				mm0,				[eax + 30*4]
++/**/	movq				mm3,				mm2
++		movq				mm1,				mm0
++/**/	pfsub				mm3,				[eax + 12*4]
++		pfsub				mm1,				[eax + 14*4]
++/**/	pfadd				mm2,				[eax + 12*4]
++		pfadd				mm0,				[eax + 14*4]
++/**/	movq				[eax + 28*4],		mm2
++		movq				[eax + 30*4],		mm0
++/**/	movq				mm2,				mm3
++		movq				[eax + 14*4],		mm1
++/**/	pfmul				mm3,				pi_q_18_m38
+ 
+-	   r0     = x[0]  - x[16];
+-	   r1     = x[1]  - x[17];
+-	   x[16] += x[0];
+-	   x[17] += x[1];
+-	   x[0]   = MULT_NORM( r1 * cPI3_8  +  r0 * cPI1_8 );
+-	   x[1]   = MULT_NORM( r1 * cPI1_8  -  r0 * cPI3_8 );
++/**/	pfmul				mm2,				pi_q_38_18
++		movq				mm4,				[eax + 26*4]
++/**/	pfacc				mm3,				mm2
++		movq				mm5,				mm4
++/**/	movq				[eax + 12*4],		mm3
++
++		pfsub				mm5,				[eax + 10*4]
++		pfadd				mm4,				[eax + 10*4]
++		movq				[eax + 26*4],		mm4
++
++		movq				mm6,				mm5
++/**/	movq				mm7,				[eax + 24*4]
++		pxor				mm6,				neg_q_1
++/**/	movq				mm0,				mm7
++		pfacc				mm6,				mm5					// mm6 =	r0+r1		r0-r1
++/**/	pfsub				mm0,				[eax +  8*4]
++		pfmul				mm6,				pi_q_28_28
++/**/	pfadd				mm7,				[eax +  8*4]
++		movq				[eax + 10*4],		mm6
+ 
+-	   mdct_butterfly_16(x);
+-	   mdct_butterfly_16(x+16);
++/**/	movq				[eax + 24*4],		mm7
++		movq				mm2,				[eax +  6*4]
++/**/	movq				mm1,				mm0
++		movq				mm3,				[eax + 22*4]
++/**/	pfmul				mm0,				pi_q_38_m18
++		movq				mm4,				mm3
++/**/	pfmul				mm1,				pi_q_18_38
++		pxor				mm2,				neg_q_0
++/**/	pfacc				mm0,				mm1
++		pxor				mm4,				neg_q_1
++/**/	movq				[eax +  8*4],		mm0
++
++		pfadd				mm3,				[eax +  6*4]
++/**/	movq				mm5,				[eax +  4*4]
++		pfadd				mm4,				mm2
++/**/	movq				mm6,				mm5
++		movq				[eax + 22*4],		mm3
++/**/	pfsub				mm6,				[eax + 20*4]
++		punpckldq			mm2,				mm4
++/**/	pfadd				mm5,				[eax + 20*4]
++		punpckhdq			mm4,				mm2
++/**/	movq				[eax + 20*4],		mm5
++		movq				[eax +  6*4],		mm4
+ 
++/*!*/	movq				mm3,				[eax +  0*4]
++/**/	movq				mm7,				mm6
++/*!*/	movq				mm4,				mm3
++		movq				mm0,				[eax +  2*4]
++/*!*/	pfsub				mm4,				[eax + 16*4]
++/**/	pfmul				mm6,				pi_q_38_18
++		movq				mm1,				mm0
++/*!*/	pfadd				mm3,				[eax + 16*4]
++/**/	pfmul				mm7,				pi_q_m18_38
++		pfsub				mm1,				[eax + 18*4]
++/*!*/	movq				[eax + 16*4],		mm3
++/**/	pfacc				mm6,				mm7
++		pfadd				mm0,				[eax + 18*4]
++/**/	movq				[eax +  4*4],		mm6
++
++		movq				[eax + 18*4],		mm0
++/*!*/	movq				mm5,				mm4
++		movq				mm2,				mm1					// mm2 =	r1			r0
++/*!*/	pfmul				mm4,				pi_q_18_38
++		pxor				mm2,				neg_q_0				// mm2 =	r1			-r0
++/*!*/	pfmul				mm5,				pi_q_m38_18
++		pfacc				mm1,				mm2					// mm2 =	r1-r0		r1+r0
++/*!*/	pfacc				mm4,				mm5
++		pfmul				mm1,				pi_q_28_28			// mm2 =	(r1-r0)*C	(r1+r0)*C
++/*!*/	movq				[eax +  0*4],		mm4
++		movq				[eax +  2*4],		mm1
++
++	}
++/* 
++
++	   r0	  = x[30] - x[14];
++	   r1	  = x[31] - x[15];
++	   r2     = x[30] + x[14];
++	   r3     = x[31] + x[15];
++       x[30]  = r2;
++	   x[31]  = r3;
++       x[14]  =         r0;
++	   x[15]  =         r1;
++       r0     = x[28] - x[12];
++	   r1     = x[29] - x[13];
++       x[28] +=         x[12];
++	   x[29] +=         x[13];
++       x[12]  = MULT_NORM( r0 * cPI1_8  -  r1 * cPI3_8 );
++	   x[13]  = MULT_NORM( r0 * cPI3_8  +  r1 * cPI1_8 );
++	   r0     = x[26] - x[10];
++	   r1     = x[27] - x[11];
++	   x[26] +=         x[10];
++	   x[27] +=         x[11];
++	   x[10]  = MULT_NORM(( r0  - r1 ) * cPI2_8);
++	   x[11]  = MULT_NORM(( r0  + r1 ) * cPI2_8);
++       r0     = x[24] - x[8];
++	   r1     = x[25] - x[9];
++	   x[24] += x[8];
++	   x[25] += x[9];
++	   x[8]   = MULT_NORM( r0 * cPI3_8  -  r1 * cPI1_8 );
++	   x[9]   = MULT_NORM( r0 * cPI1_8  +  r1 * cPI3_8 );
++	   r0     = -x[6] + x[22];
++	   r1     =  x[7] - x[23];
++	   x[22] += x[6];
++	   x[23] += x[7];
++	   x[6]   = r1;
++	   x[7]   = r0;
++	   r0     = x[4]  - x[20];
++	   r1     = x[5]  - x[21];
++	   x[20] += x[4];
++	   x[21] += x[5];
++	   x[4]   = MULT_NORM( r1 * cPI1_8  +  r0 * cPI3_8 );
++	   x[5]   = MULT_NORM( r1 * cPI3_8  -  r0 * cPI1_8 );
++	   r0     = x[2]  - x[18];
++	   r1     = x[3]  - x[19];
++	   x[18] += x[2];
++	   x[19] += x[3];
++	   x[2]   = MULT_NORM(( r1  + r0 ) * cPI2_8);
++	   x[3]   = MULT_NORM(( r1  - r0 ) * cPI2_8);
++	   r0     = x[0]  - x[16];
++	   r1     = x[1]  - x[17];
++	   x[16] += x[0];
++	   x[17] += x[1];
++	   x[0]   = MULT_NORM( r1 * cPI3_8  +  r0 * cPI1_8 );
++	   x[1]   = MULT_NORM( r1 * cPI1_8  -  r0 * cPI3_8 );
++*/
++	   mdct_butterfly_16_3dn(x);
++	   mdct_butterfly_16_3dn(x+16);
++
++	   _asm {femms}
++}
++/* 32 point butterfly (in place, 4 register) */
++STIN void mdct_butterfly_32(DATA_TYPE *x){
++  REG_TYPE r0     = x[30] - x[14];
++  REG_TYPE r1     = x[31] - x[15];
++
++           x[30] +=         x[14];
++	   x[31] +=         x[15];
++           x[14]  =         r0;
++	   x[15]  =         r1;
++
++           r0     = x[28] - x[12];
++	   r1     = x[29] - x[13];
++           x[28] +=         x[12];
++	   x[29] +=         x[13];
++           x[12]  = MULT_NORM( r0 * cPI1_8  -  r1 * cPI3_8 );
++	   x[13]  = MULT_NORM( r0 * cPI3_8  +  r1 * cPI1_8 );
++
++           r0     = x[26] - x[10];
++	   r1     = x[27] - x[11];
++	   x[26] +=         x[10];
++	   x[27] +=         x[11];
++	   x[10]  = MULT_NORM(( r0  - r1 ) * cPI2_8);
++	   x[11]  = MULT_NORM(( r0  + r1 ) * cPI2_8);
++
++	   r0     = x[24] - x[8];
++	   r1     = x[25] - x[9];
++	   x[24] += x[8];
++	   x[25] += x[9];
++	   x[8]   = MULT_NORM( r0 * cPI3_8  -  r1 * cPI1_8 );
++	   x[9]   = MULT_NORM( r1 * cPI3_8  +  r0 * cPI1_8 );
++
++	   r0     = x[22] - x[6];
++	   r1     = x[7]  - x[23];
++	   x[22] += x[6];
++	   x[23] += x[7];
++	   x[6]   = r1;
++	   x[7]   = r0;
++
++	   r0     = x[4]  - x[20];
++	   r1     = x[5]  - x[21];
++	   x[20] += x[4];
++	   x[21] += x[5];
++	   x[4]   = MULT_NORM( r1 * cPI1_8  +  r0 * cPI3_8 );
++	   x[5]   = MULT_NORM( r1 * cPI3_8  -  r0 * cPI1_8 );
++
++	   r0     = x[2]  - x[18];
++	   r1     = x[3]  - x[19];
++	   x[18] += x[2];
++	   x[19] += x[3];
++	   x[2]   = MULT_NORM(( r1  + r0 ) * cPI2_8);
++	   x[3]   = MULT_NORM(( r1  - r0 ) * cPI2_8);
++
++	   r0     = x[0]  - x[16];
++	   r1     = x[1]  - x[17];
++	   x[16] += x[0];
++	   x[17] += x[1];
++	   x[0]   = MULT_NORM( r1 * cPI3_8  +  r0 * cPI1_8 );
++	   x[1]   = MULT_NORM( r1 * cPI1_8  -  r0 * cPI3_8 );
++
++	   mdct_butterfly_16(x);
++	   mdct_butterfly_16(x+16);
++}
++
++/* N point first stage butterfly (in place, 2 register) */
++STIN void mdct_butterfly_first_sse(DATA_TYPE *T,
++					DATA_TYPE *x,
++					int points){
++
++  DATA_TYPE *x1        = x          + points      - 8;
++  DATA_TYPE *x2        = x          + (points>>1) - 8;
++  REG_TYPE   r0;
++  REG_TYPE   r1;
++
++_asm
++{
++	push		ebx
++	mov			eax,		x1
++	mov			ebx,		x2
++	mov			esi,		T
++	mov			ecx,		x
++	movaps		xmm7,		neg_1_3
++
++loopg:
++	movaps		xmm0,		[eax + 16]					// xmm0 =	x1_7		x1_6		x1_5		x1_4
++	movaps		xmm1,		[ebx + 16]					// xmm1 =	x2_7		x2_6		x2_5		x2_4
++
++
++	movaps		xmm2,		xmm0						// xmm3 =	x1_7		x1_6		x1_5		x1_4
++	subps		xmm0,		xmm1						// xmm0 =	d			c			b			a
++	addps		xmm2,		xmm1						//
++	movaps		[eax + 16],	xmm2						// store
++
++	movhps		xmm2,		[esi]						// xmm2 =	T1			T0			*			*
++	movlps		xmm2,		[esi + 16]					// xmm2 =	T1			T0			T1t			T0t
++
++	movaps		xmm3,		xmm2						// xmm3 =	T1			T0			T1t			T0t
++	shufps		xmm3,		xmm3,	2*64+3*16+0*4+1		// xmm3 =	T0			T1			T0t			T1t
++
++	movaps		xmm4,		xmm0						// xmm4 =	d			c			b			a
++	prefetcht0				[esi + 64]
++	shufps		xmm4,		xmm4,	3*64+3*16+1*4+1		// xmm4 =	d			d			b			b
++
++	mulps		xmm3,		xmm4						// xmm3 =	d*T0		d*T1		b*T0t		b*T1t
++
++	shufps		xmm0,		xmm0,	2*64+2*16+0*4+0		// xmm0 =	c			c			a			a
++
++	mulps		xmm0,		xmm2						// xmm0 =	c*T1		c*T0		a*T1t		a*T0t
++
++	xorps		xmm0,		xmm7						// xmm0 =	-c*T1t		c*T0		-a*T1t		a*T0t
++
++	addps		xmm0,		xmm3
++	movaps		[ebx + 16],	xmm0
++
++	add			esi,		32
++
++	movaps		xmm0,		[eax]						// xmm0 =	x1_3		x1_2		x1_1		x1_0
++	movaps		xmm1,		[ebx]						// xmm1 =	x2_3		x2_2		x2_1		x2_0
++	movaps		xmm2,		xmm0						// xmm3 =	x1_3		x1_2		x1_1		x1_0
++	subps		xmm0,		xmm1						// xmm0 =	d			c			b			a
++	addps		xmm2,		xmm1						//
++	movaps		[eax],		xmm2						// store
++
++	movhps		xmm2,		[esi]						// xmm2 =	T1			T0			*			*
++	movlps		xmm2,		[esi + 16]					// xmm2 =	T1			T0			T1t			T0t
++
++	movaps		xmm3,		xmm2						// xmm3 =	T1			T0			T1t			T0t
++	shufps		xmm3,		xmm3,	2*64+3*16+0*4+1		// xmm3 =	T0			T1			T0t			T1t
++
++	movaps		xmm4,		xmm0						// xmm4 =	d			c			b			a
++	shufps		xmm4,		xmm4,	3*64+3*16+1*4+1		// xmm4 =	d			d			b			b
++
++	mulps		xmm3,		xmm4						// xmm3 =	d*T0		d*T1		b*T0t		b*T1t
++
++	shufps		xmm0,		xmm0,	2*64+2*16+0*4+0		// xmm0 =	c			c			a			a
++
++	mulps		xmm0,		xmm2						// xmm0 =	c*T1		c*T0		a*T1t		a*T0t
++
++	xorps		xmm0,		xmm7						// xmm0 =	-c*T1t		c*T0		-a*T1t		a*T0t
++
++	addps		xmm0,		xmm3
++	movaps		[ebx],		xmm0
++
++	add			esi,		32
++
++	sub			ebx,		8*4
++	sub			eax,		8*4
++
++	cmp			ebx,		ecx
++
++	jae			loopg
++
++	pop			ebx
+ }
++/*
++  do{
+ 
++               r0      = x1[6]      -  x2[6];
++	       r1      = x1[7]      -  x2[7];
++	       x1[6]  += x2[6];
++	       x1[7]  += x2[7];
++	       x2[6]   = MULT_NORM(r1 * T[1]  +  r0 * T[0]);
++	       x2[7]   = MULT_NORM(r1 * T[0]  -  r0 * T[1]);
++
++	       r0      = x1[4]      -  x2[4];
++	       r1      = x1[5]      -  x2[5];
++	       x1[4]  += x2[4];
++	       x1[5]  += x2[5];
++	       x2[4]   = MULT_NORM(r1 * T[5]  +  r0 * T[4]);
++	       x2[5]   = MULT_NORM(r1 * T[4]  -  r0 * T[5]);
++
++	       r0      = x1[2]      -  x2[2];
++	       r1      = x1[3]      -  x2[3];
++	       x1[2]  += x2[2];
++	       x1[3]  += x2[3];
++	       x2[2]   = MULT_NORM(r1 * T[9]  +  r0 * T[8]);
++	       x2[3]   = MULT_NORM(r1 * T[8]  -  r0 * T[9]);
++
++	       r0      = x1[0]      -  x2[0];
++	       r1      = x1[1]      -  x2[1];
++	       x1[0]  += x2[0];
++	       x1[1]  += x2[1];
++	       x2[0]   = MULT_NORM(r1 * T[13] +  r0 * T[12]);
++	       x2[1]   = MULT_NORM(r1 * T[12] -  r0 * T[13]);
++
++    x1-=8;
++    x2-=8;
++    T+=16;
++
++  }while(x2>=x);
++*/
++}
++
+ /* N point first stage butterfly (in place, 2 register) */
+ STIN void mdct_butterfly_first(DATA_TYPE *T,
+ 					DATA_TYPE *x,
+ 					int points){
+-  
++
+   DATA_TYPE *x1        = x          + points      - 8;
+   DATA_TYPE *x2        = x          + (points>>1) - 8;
+   REG_TYPE   r0;
+   REG_TYPE   r1;
+ 
+   do{
+-    
++
+                r0      = x1[6]      -  x2[6];
+ 	       r1      = x1[7]      -  x2[7];
+ 	       x1[6]  += x2[6];
+ 	       x1[7]  += x2[7];
+ 	       x2[6]   = MULT_NORM(r1 * T[1]  +  r0 * T[0]);
+ 	       x2[7]   = MULT_NORM(r1 * T[0]  -  r0 * T[1]);
+-	       
++
+ 	       r0      = x1[4]      -  x2[4];
+ 	       r1      = x1[5]      -  x2[5];
+ 	       x1[4]  += x2[4];
+ 	       x1[5]  += x2[5];
+ 	       x2[4]   = MULT_NORM(r1 * T[5]  +  r0 * T[4]);
+ 	       x2[5]   = MULT_NORM(r1 * T[4]  -  r0 * T[5]);
+-	       
++
+ 	       r0      = x1[2]      -  x2[2];
+ 	       r1      = x1[3]      -  x2[3];
+ 	       x1[2]  += x2[2];
+ 	       x1[3]  += x2[3];
+ 	       x2[2]   = MULT_NORM(r1 * T[9]  +  r0 * T[8]);
+ 	       x2[3]   = MULT_NORM(r1 * T[8]  -  r0 * T[9]);
+-	       
++
+ 	       r0      = x1[0]      -  x2[0];
+ 	       r1      = x1[1]      -  x2[1];
+ 	       x1[0]  += x2[0];
+ 	       x1[1]  += x2[1];
+ 	       x2[0]   = MULT_NORM(r1 * T[13] +  r0 * T[12]);
+ 	       x2[1]   = MULT_NORM(r1 * T[12] -  r0 * T[13]);
+-	       
++
+     x1-=8;
+     x2-=8;
+     T+=16;
+@@ -260,46 +1004,325 @@
+   }while(x2>=x);
+ }
+ 
+-/* N/stage point generic N stage butterfly (in place, 2 register) */
++/* N/stage point generic N stage butterfly (sse) */
++STIN void mdct_butterfly_generic_sse(DATA_TYPE *T,
++					  DATA_TYPE *x,
++					  int points,
++					  int trigint){
++
++  DATA_TYPE *x1        = x          + points      - 8;
++  DATA_TYPE *x2        = x          + (points>>1) - 8;
++
++_asm
++{
++	push		ebx
++	mov			eax,		x1
++	mov			ebx,		x2
++	mov			esi,		T
++	mov			edx,		trigint
++	shl			edx,		2
++	mov			ecx,		x
++	mov			edi,		edx
++	add			edi,		edx							// trigint * 2
++
++loopg:
++	movaps		xmm4,		[eax]						// b xmm4 =	x1_3		x1_2		x1_1		x1_0
++	movaps		xmm0,		[eax + 16]					// a xmm0 =	x1_7		x1_6		x1_5		x1_4
++	movaps		xmm5,		[ebx]						// b xmm5 =	x2_3		x2_2		x2_1		x2_0
++	movaps		xmm1,		[ebx + 16]					// a xmm1 =	x2_7		x2_6		x2_5		x2_4
++
++	movaps		xmm2,		xmm0						// a xmm2 =	x1_7		x1_6		x1_5		x1_4
++	movaps		xmm6,		xmm4						// b xmm6 =	x1_3		x1_2		x1_1		x1_0
++	subps		xmm0,		xmm1						// a xmm0 =	d			c			b			a
++	subps		xmm4,		xmm5						// b xmm4 =	d			c			b			a
++	addps		xmm6,		xmm5						// b
++	addps		xmm2,		xmm1						// a
++	movaps		[eax],		xmm6						// b store
++	movaps		[eax + 16],	xmm2						// a store
++
++	movhps		xmm2,		[esi]						// a xmm2 =	T1			T0			*			*
++	movhps		xmm6,		[esi + edi]					// b xmm6 =	T1			T0			*			*
++	movlps		xmm2,		[esi + edx]					// a xmm2 =	T1			T0			T1t			T0t
++	add			esi,		edx
++	movlps		xmm6,		[esi + edi]					// b xmm6 =	T1			T0			T1t			T0t
++
++	movaps		xmm3,		xmm2						// a xmm3 =	T1			T0			T1t			T0t
++	movaps		xmm7,		xmm6						// b xmm7 =	T1			T0			T1t			T0t
++	shufps		xmm3,		xmm3,	2*64+3*16+0*4+1		// a xmm3 =	T0			T1			T0t			T1t
++	shufps		xmm7,		xmm7,	2*64+3*16+0*4+1		// b xmm7 =	T0			T1			T0t			T1t
++
++	movaps		xmm1,		xmm0						// a xmm1 =	d			c			b			a
++	movaps		xmm5,		xmm4						// b xmm5 =	d			c			b			a
++	shufps		xmm1,		xmm1,	3*64+3*16+1*4+1		// a xmm1 =	d			d			b			b
++	shufps		xmm5,		xmm5,	3*64+3*16+1*4+1		// b xmm5 =	d			d			b			b
++
++	mulps		xmm3,		xmm1						// a xmm3 =	d*T0		d*T1		b*T0t		b*T1t
++	mulps		xmm7,		xmm5						// b xmm7 =	d*T0		d*T1		b*T0t		b*T1t
++
++	shufps		xmm4,		xmm4,	2*64+2*16+0*4+0		// b xmm4 =	c			c			a			a
++	shufps		xmm0,		xmm0,	2*64+2*16+0*4+0		// a xmm0 =	c			c			a			a
++
++	mulps		xmm4,		xmm6						// b xmm4 =	c*T1		c*T0		a*T1t		a*T0t
++	mulps		xmm0,		xmm2						// a xmm0 =	c*T1		c*T0		a*T1t		a*T0t
++
++	xorps		xmm4,		neg_1_3						// b xmm4 =	-c*T1t		c*T0		-a*T1t		a*T0t
++	xorps		xmm0,		neg_1_3						// a xmm0 =	-c*T1t		c*T0		-a*T1t		a*T0t
++
++	addps		xmm4,		xmm7						// b
++	addps		xmm0,		xmm3						// a
++	movaps		[ebx],		xmm4						// b
++	movaps		[ebx + 16],	xmm0						// a
++
++	add			esi,		edi
++	add			esi,		edx
++
++	sub			ebx,		8*4
++	sub			eax,		8*4
++
++	cmp			ebx,		ecx
++
++	jae			loopg
++	pop			ebx
++}
++
++/*
++  do{
++	       a      = x1[4]      -  x2[4];
++	       b      = x1[5]      -  x2[5];
++           c      = x1[6]      -  x2[6];
++	       d      = x1[7]      -  x2[7];
++	       x1[4]  += x2[4];
++	       x1[5]  += x2[5];
++	       x1[6]  += x2[6];
++	       x1[7]  += x2[7];
++	       x2[4]   = MULT_NORM(b * T[1 + trigint]  +  a * T[0 + trigint]);
++	       x2[5]   = MULT_NORM(b * T[0 + trigint]  -  a * T[1 + trigint]);
++	       x2[6]   = MULT_NORM(d * T[1]            +  c * T[0]);
++	       x2[7]   = MULT_NORM(d * T[0]            -  c * T[1]);
++	       T+=trigint * 2;
++	       a      = x1[0]      -  x2[0];
++	       b      = x1[1]      -  x2[1];
++	       c      = x1[2]      -  x2[2];
++	       d      = x1[3]      -  x2[3];
++	       x1[0]  += x2[0];
++	       x1[1]  += x2[1];
++	       x1[2]  += x2[2];
++	       x1[3]  += x2[3];
++	       x2[0]   = MULT_NORM(b * T[1 + trigint]  +  a * T[0 + trigint]);
++	       x2[1]   = MULT_NORM(b * T[0 + trigint]  -  a * T[1 + trigint]);
++	       x2[2]   = MULT_NORM(d * T[1]            +  c * T[0]);
++	       x2[3]   = MULT_NORM(d * T[0]            -  c * T[1]);
++	       T+=trigint * 2;
++	x1-=8;
++    x2-=8;
++  }while(x2>=x);
++*/
++}
++/* N/stage point generic N stage butterfly (3dn) */
++STIN void mdct_butterfly_generic_3dn(DATA_TYPE *T,
++					  DATA_TYPE *x,
++					  int points,
++					  int trigint){
++  DATA_TYPE *x1        = x          + points      - 8;
++  DATA_TYPE *x2        = x          + (points>>1) - 8;
++//  REG_TYPE   r0;
++//  REG_TYPE   r1;
++  _asm
++  {
++		mov			eax,				x1					// eax = x1
++		mov			ecx,				x2					// ecx = x2
++		mov			edi,				x
++		mov			edx,				T
++		mov			esi,				trigint
++		shl			esi,				2
++  }
++loop_bg3:
++/*
++  do{
++*/
++	 _asm
++	{
++		movq		mm0,				[edx]				// mm0 =	T[1]		T[0]
++		movq		mm1,				mm0
++		punpckldq	mm2,				mm1
++		punpckhdq	mm1,				mm2					// mm1 =	T[0]		T[1]
++		pxor		mm1,				neg_q_0				// mm1 =	-T[0]		T[1]
++
++		movq		mm2,				[eax +6*4]			// mm2 =	x1[7]		x1[6]
++		movq		mm3,				[ecx +6*4]			// mm3 =	x2[7]		x2[6]
++		movq		mm4,				mm2
++		pfsub		mm2,				mm3					// mm2 =	r1			r0
++		pfadd		mm4,				mm3					// mm4 =	x1[7]+x2[7]	x1[6]+x2[6]
++		movq		[eax +6*4],			mm4					// x1[7], x2[6] store
++
++		pfmul		mm0,				mm2					// mm0 =	r1*T[1]		r0*T[0]
++		add			edx,				esi					// T += trigint
++		pfmul		mm1,				mm2					// mm1 =	r1*T[0]		-r0*T[1]
++		pfacc		mm0,				mm1					// mm0 =	r1*T1+r0*T0	r1*T0-r0*T1
++		movq		[ecx +6*4],			mm0					// x2[7], x2[6] store
++
++	}
++/*
++           r0      = x1[6]      -  x2[6];
++	       r1      = x1[7]      -  x2[7];
++	       x1[6]  += x2[6];
++	       x1[7]  += x2[7];
++	       x2[6]   = MULT_NORM(r1 * T[1]  +  r0 * T[0]);
++	       x2[7]   = MULT_NORM(r1 * T[0]  -  r0 * T[1]);
++
++	       T+=trigint;
++*/
++	_asm
++	{
++		movq		mm0,				[edx]				// mm0 =	T[1]		T[0]
++		movq		mm1,				mm0
++		punpckldq	mm2,				mm1
++		punpckhdq	mm1,				mm2					// mm1 =	T[0]		T[1]
++		pxor		mm1,				neg_q_0				// mm1 =	-T[0]		T[1]
++
++		movq		mm2,				[eax +4*4]			// mm2 =	x1[5]		x1[4]
++		movq		mm3,				[ecx +4*4]			// mm3 =	x2[5]		x2[4]
++		movq		mm4,				mm2
++		pfsub		mm2,				mm3					// mm2 =	r1			r0
++		pfadd		mm4,				mm3					// mm4 =	x1[5]+x2[5]	x1[4]+x2[4]
++		movq		[eax +4*4],			mm4					// x1[5], x2[4] store
++
++		pfmul		mm0,				mm2					// mm0 =	r1*T[1]		r0*T[0]
++		add			edx,				esi					// T += trigint
++		pfmul		mm1,				mm2					// mm1 =	r1*T[0]		-r0*T[1]
++		pfacc		mm0,				mm1					// mm0 =	r1*T1+r0*T0	r1*T0-r0*T1
++		movq		[ecx +4*4],			mm0					// x2[5], x2[4] store
++
++	}
++/*
++	       r0      = x1[4]      -  x2[4];
++	       r1      = x1[5]      -  x2[5];
++	       x1[4]  += x2[4];
++	       x1[5]  += x2[5];
++	       x2[4]   = MULT_NORM(r1 * T[1]  +  r0 * T[0]);
++	       x2[5]   = MULT_NORM(r1 * T[0]  -  r0 * T[1]);
++
++	       T+=trigint;
++*/
++	_asm
++	{
++		movq		mm0,				[edx]				// mm0 =	T[1]		T[0]
++		movq		mm1,				mm0
++		punpckldq	mm2,				mm1
++		punpckhdq	mm1,				mm2					// mm1 =	T[0]		T[1]
++		pxor		mm1,				neg_q_0				// mm1 =	-T[0]		T[1]
++
++		movq		mm2,				[eax +2*4]			// mm2 =	x1[3]		x1[2]
++		movq		mm3,				[ecx +2*4]			// mm3 =	x2[3]		x2[2]
++		movq		mm4,				mm2
++		pfsub		mm2,				mm3					// mm2 =	r1			r0
++		pfadd		mm4,				mm3					// mm4 =	x1[3]+x2[3]	x1[2]+x2[2]
++		movq		[eax +2*4],			mm4					// x1[3], x2[2] store
++
++		pfmul		mm0,				mm2					// mm0 =	r1*T[1]		r0*T[0]
++		add			edx,				esi					// T += trigint
++		pfmul		mm1,				mm2					// mm1 =	r1*T[0]		-r0*T[1]
++		pfacc		mm0,				mm1					// mm0 =	r1*T1+r0*T0	r1*T0-r0*T1
++		movq		[ecx +2*4],			mm0					// x2[3], x2[2] store
++
++	}
++/*
++	       r0      = x1[2]      -  x2[2];
++	       r1      = x1[3]      -  x2[3];
++	       x1[2]  += x2[2];
++	       x1[3]  += x2[3];
++	       x2[2]   = MULT_NORM(r1 * T[1]  +  r0 * T[0]);
++	       x2[3]   = MULT_NORM(r1 * T[0]  -  r0 * T[1]);
++
++	       T+=trigint;
++*/
++	_asm
++	{
++		movq		mm0,				[edx]				// mm0 =	T[1]		T[0]
++		movq		mm1,				mm0
++		punpckldq	mm2,				mm1
++		punpckhdq	mm1,				mm2					// mm1 =	T[0]		T[1]
++		pxor		mm1,				neg_q_0				// mm1 =	-T[0]		T[1]
++
++		movq		mm2,				[eax +0*4]			// mm2 =	x1[1]		x1[0]
++		movq		mm3,				[ecx +0*4]			// mm3 =	x2[1]		x2[0]
++		movq		mm4,				mm2
++		pfsub		mm2,				mm3					// mm2 =	r1			r0
++		pfadd		mm4,				mm3					// mm4 =	x1[1]+x2[1]	x1[0]+x2[0]
++		movq		[eax +0*4],			mm4					// x1[1], x2[0] store
++
++		pfmul		mm0,				mm2					// mm0 =	r1*T[1]		r0*T[0]
++		add			edx,				esi					// T += trigint
++		pfmul		mm1,				mm2					// mm1 =	r1*T[0]		-r0*T[1]
++		pfacc		mm0,				mm1					// mm0 =	r1*T1+r0*T0	r1*T0-r0*T1
++		movq		[ecx +0*4],			mm0					// x2[1], x2[0] store
++	}
++
++/*
++	       r0      = x1[0]      -  x2[0];
++	       r1      = x1[1]      -  x2[1];
++	       x1[0]  += x2[0];
++	       x1[1]  += x2[1];
++	       x2[0]   = MULT_NORM(r1 * T[1]  +  r0 * T[0]);
++	       x2[1]   = MULT_NORM(r1 * T[0]  -  r0 * T[1]);
++
++	       T+=trigint;
++*/
++	_asm
++	{
++		sub			eax,				8*4
++		sub			ecx,				8*4
++
++		cmp			ecx,				edi
++
++		jae			loop_bg3
++		femms
++	}
++/*
++    x1-=8;
++    x2-=8;
++
++  }while(x2>=x);
++*/
++}
+ STIN void mdct_butterfly_generic(DATA_TYPE *T,
+ 					  DATA_TYPE *x,
+ 					  int points,
+ 					  int trigint){
+-  
+   DATA_TYPE *x1        = x          + points      - 8;
+   DATA_TYPE *x2        = x          + (points>>1) - 8;
+   REG_TYPE   r0;
+   REG_TYPE   r1;
+ 
+   do{
+-    
+-               r0      = x1[6]      -  x2[6];
++
++           r0      = x1[6]      -  x2[6];
+ 	       r1      = x1[7]      -  x2[7];
+ 	       x1[6]  += x2[6];
+ 	       x1[7]  += x2[7];
+ 	       x2[6]   = MULT_NORM(r1 * T[1]  +  r0 * T[0]);
+ 	       x2[7]   = MULT_NORM(r1 * T[0]  -  r0 * T[1]);
+-	       
++
+ 	       T+=trigint;
+-	       
++
+ 	       r0      = x1[4]      -  x2[4];
+ 	       r1      = x1[5]      -  x2[5];
+ 	       x1[4]  += x2[4];
+ 	       x1[5]  += x2[5];
+ 	       x2[4]   = MULT_NORM(r1 * T[1]  +  r0 * T[0]);
+ 	       x2[5]   = MULT_NORM(r1 * T[0]  -  r0 * T[1]);
+-	       
++
+ 	       T+=trigint;
+-	       
++
+ 	       r0      = x1[2]      -  x2[2];
+ 	       r1      = x1[3]      -  x2[3];
+ 	       x1[2]  += x2[2];
+ 	       x1[3]  += x2[3];
+ 	       x2[2]   = MULT_NORM(r1 * T[1]  +  r0 * T[0]);
+ 	       x2[3]   = MULT_NORM(r1 * T[0]  -  r0 * T[1]);
+-	       
++
+ 	       T+=trigint;
+-	       
++
+ 	       r0      = x1[0]      -  x2[0];
+ 	       r1      = x1[1]      -  x2[1];
+ 	       x1[0]  += x2[0];
+@@ -317,23 +1340,55 @@
+ STIN void mdct_butterflies(mdct_lookup *init,
+ 			     DATA_TYPE *x,
+ 			     int points){
+-  
++
+   DATA_TYPE *T=init->trig;
+   int stages=init->log2n-5;
+   int i,j;
+-  
++
+   if(--stages>0){
+-    mdct_butterfly_first(T,x,points);
++	if(CPU_SSE)
++		mdct_butterfly_first_sse(T,x,points);
++	else
++		mdct_butterfly_first(T,x,points);
+   }
+ 
+-  for(i=1;--stages>0;i++){
+-    for(j=0;j<(1<<i);j++)
+-      mdct_butterfly_generic(T,x+(points>>i)*j,points>>i,4<<i);
+-  }
++  	if(CPU_SSE)
++	{
++	  for(i=1;--stages>0;i++){
++		for(j=0;j<(1<<i);j++)
++		  mdct_butterfly_generic_sse(T,x+(points>>i)*j,points>>i,4<<i);
++	  }
++	}
++	else if(CPU_3DN)
++	{
++	  for(i=1;--stages>0;i++){
++		for(j=0;j<(1<<i);j++)
++		  mdct_butterfly_generic_3dn(T,x+(points>>i)*j,points>>i,4<<i);
++	  }
++	}
++	else
++	{
++	  for(i=1;--stages>0;i++){
++		for(j=0;j<(1<<i);j++)
++		  mdct_butterfly_generic(T,x+(points>>i)*j,points>>i,4<<i);
++	  }
++	}
+ 
+-  for(j=0;j<points;j+=32)
+-    mdct_butterfly_32(x+j);
+-
++	if(CPU_SSE)
++	{
++	  for(j=0;j<points;j+=32)
++		mdct_butterfly_32_sse(x+j);
++	}
++	else if(CPU_3DN)
++	{
++	  for(j=0;j<points;j+=32)
++		mdct_butterfly_32_3dn(x+j);
++	}
++	else
++	{
++	  for(j=0;j<points;j+=32)
++		mdct_butterfly_32(x+j);
++	}
+ }
+ 
+ void mdct_clear(mdct_lookup *l){
+@@ -344,7 +1399,7 @@
+   }
+ }
+ 
+-STIN void mdct_bitreverse(mdct_lookup *init, 
++STIN void mdct_bitreverse_sse(mdct_lookup *init,
+ 			    DATA_TYPE *x){
+   int        n       = init->n;
+   int       *bit     = init->bitrev;
+@@ -352,20 +1407,318 @@
+   DATA_TYPE *w1      = x = w0+(n>>1);
+   DATA_TYPE *T       = init->trig+n;
+ 
++_asm
++{
++	push		ebx
++	mov			eax,		x
++	mov			ebx,		bit
++	mov			ecx,		w0
++	mov			edx,		w1
++	mov			esi,		T
++
++loopf:
++	sub			edx,		4*4							// w1 -= 4
++
++	mov			edi,		[ebx + 0]					// edi = x0
++	movlps		xmm0,		[edi*4 + eax]				// xmm0 =	*			*			x0[1]		x0[0]
++	mov			edi,		[ebx + 4]					// edi = x1
++	movlps		xmm1,		[edi*4 + eax]				// xmm1 =	*			*			x1[1]		x1[0]
++	mov			edi,		[ebx + 8]					// edi = x2
++	movhps		xmm0,		[edi*4 + eax]				// xmm0 =	x2[1]		x2[0]		x0[1]		x0[0]
++	mov			edi,		[ebx + 12]					// edi = x3
++	movhps		xmm1,		[edi*4 + eax]				// xmm1 =	x3[1]		x3[0]		x1[1]		x1[0]
++
++	movaps		xmm2,		xmm1						// xmm2 =	x3[1]		x3[0]		x1[1]		x1[0]
++	movaps		xmm3,		[esi]						// xmm3 =	T[3]		T[2]		T[1]		T[0]
++	xorps		xmm2,		neg_1_3						// xmm2 =	-x3[1]		x3[0]		-x1[1]		x1[0]
++	movaps		xmm4,		xmm3						// xmm4 =	T[3]		T[2]		T[1]		T[0]
++	addps		xmm2,		xmm0						// xmm2 =	r4			r5			r0			r1
++	shufps		xmm4,		xmm4,	2*64+3*16+0*4+1		// xmm4 =	T[2]		T[3]		T[0]		T[1]
++	movaps		xmm5,		xmm2						// xmm5 =	r4			r5			r0			r1
++	xorps		xmm4,		neg_1_3						// xmm4 =	-T[2]		T[3]		-T[0]		T[1]
++	shufps		xmm5,		xmm5,	2*64+2*16+0*4+0		// xmm5 =	r5			r5			r1			r1
++//	prefetcht0	[esi + 32]
++	mulps		xmm3,		xmm5						// xmm3 =	r5*T[3]		r5*T[2]		r1*T[1]		r1*T[0]
++	shufps		xmm2,		xmm2,	3*64+3*16+1*4+1		// xmm2 =	r4			r4			r0			r0
++	xorps		xmm1,		neg_1_3						// xmm1 =	-x3[1]		x3[0]		-x1[1]		x1[0]
++	mulps		xmm2,		xmm4						// xmm2 =	-r4*T[2]	r4*T[3]		-r0*T[0]	r0*T[1]
++	subps		xmm0,		xmm1						// xmm0 =	x2[1]+x3[1]	x2[0]-x3[0]	x0[1]+x1[1]	x0[0]-x1[0]
++	addps		xmm2,		xmm3						// xmm2 =	r7			r6			r3			r2
++	mulps		xmm0,		packed_halve				// xmm0 =	r4			r5			r0			r1
++	add			ecx,		4*4							// w0 += 4
++
++	movaps		xmm6,		xmm0						// xmm6 =	r4			r5			r0			r1
++	add			esi,		4*4							// T += 4
++	shufps		xmm6,		xmm6,	2*64+3*16+0*4+1		// xmm6 =	r5			r4			r1			r0
++	add			ebx,		4*4							// bit += 4
++	addps		xmm6,		xmm2						// xmm6 =	r5+r7		r4+r6		r1+r3		r0+r2
++	movaps		[ecx - 4*4],	xmm6					// store w0
++
++	shufps		xmm2,		xmm2,	1*64+0*16+3*4+2		// xmm2 =	r3			r2			r7			r6
++	shufps		xmm0,		xmm0,	0*64+1*16+2*4+3		// xmm0 =	r1			r0			r5			r4
++	subps		xmm2,		xmm0						// xmm2 =	r3-r1		r2-r0		r7-r5		r6-r4
++	cmp			ecx,		edx
++	xorps		xmm2,		neg_0_2						// xmm2 =	r3-r1		-r2+r0		r7-r5		-r6+r4
++	movaps		[edx],		xmm2						// store w1
++
++	jb			loopf
++	pop			ebx
++}
++
++/*
++
++  DATA_TYPE *x0, *x1, *x2, *x3;
++  REG_TYPE r0, r1, r2, r3;
++  REG_TYPE r4, r5, r6, r7;
++
+   do{
++
++w1    -= 4;
++
++
++x0     = x+bit[0];
++x1     = x+bit[1];
++x2     = x+bit[2];
++x3     = x+bit[3];
++
++r1     = x0[0]  + x1[0];
++r0     = x0[1]  - x1[1];
++r5     = x2[0]  + x3[0];
++r4     = x2[1]  - x3[1];
++
++r2     = MULT_NORM(r1     * T[0]   + r0 * T[1]);
++r3     = MULT_NORM(r1     * T[1]   - r0 * T[0]);
++r6     = MULT_NORM(r5     * T[2]   + r4 * T[3]);
++r7     = MULT_NORM(r5     * T[3]   - r4 * T[2]);
++
++r1     = HALVE(x0[0] - x1[0]);
++r0     = HALVE(x0[1] + x1[1]);
++r5     = HALVE(x2[0] - x3[0]);
++r4     = HALVE(x2[1] + x3[1]);
++
++w0[0]  =   r0     + r2;
++w0[1]  =   r1     + r3;
++w0[2]  =   r4     + r6;
++w0[3]  =   r5     + r7;
++
++w1[0]  = -(r6     - r4);
++w1[1]  =  (r7     - r5);
++w1[2]  = -(r2     - r0);
++w1[3]  =  (r3     - r1);
++
++T     += 4;
++bit   += 4;
++w0    += 4;
++
++  }while(w0<w1);
++
++*/
++}
++
++
++STIN void mdct_bitreverse_3dn(mdct_lookup *init,
++			    DATA_TYPE *x){
++  int        n       = init->n;
++  int       *bit     = init->bitrev;
++  DATA_TYPE *w0      = x;
++  DATA_TYPE *w1      = x = w0+(n>>1);
++  DATA_TYPE *T       = init->trig+n;
++
++	_asm
++	{
++		push		ebx
++		mov			ecx,			bit
++		mov			esi,			w0
++		mov			edi,			w1
++		mov			edx,			T
++	}
++loopbr3:
++/*
++  do{
++*/
++
++	_asm
++	{
++		mov			eax,			[ecx + 0*4]
++		shl			eax,			2
++		add			eax,			x									// eax=	x0
++		mov			ebx,			[ecx + 1*4]
++		shl			ebx,			2
++		add			ebx,			x									// ebx=	x1
++	}
++/*
++
+     DATA_TYPE *x0    = x+bit[0];
+     DATA_TYPE *x1    = x+bit[1];
++*/
+ 
++	_asm
++	{
++		movq		mm0,				[edx]				// a mm0 =	T[1]		T[0]
++		movq		mm4,				[eax]				// b mm4 =	x0[1]		x0[0]
++		movq		mm1,				mm0					// a 
++		movq		mm5,				[ebx]				// b mm5 =	x1[1]		x1[0]
++		punpckldq	mm2,				mm1					// a 
++		pxor		mm5,				neg_q_0				// b mm5 =	x1[1]		-x1[0]
++		punpckhdq	mm1,				mm2					// a mm1 =	T[0]		T[1]
++		pfadd		mm4,				mm5					// b mm4 =	x0[1]+x1[1]	x0[0]-x1[0]
++		pxor		mm1,				neg_q_1				// a mm1 =	-T[0]		T[1]
++
++		movq		mm2,				[eax]				// a mm2 =	x0[1]		x0[0]
++		movq		mm3,				[ebx]				// a mm3 =	x1[1]		x1[0]
++		pfmul		mm4,				packed_halve_q		// b
++		pxor		mm3,				neg_q_1				// a mm3 =	-x1[1]		x1[0]
++		sub			edi,				4*4
++		pfadd		mm2,				mm3					// a mm2 =	x0[1]-x1[1]	x0[0]+x1[0]
++															// a mm2 =	r0			r1		(swapped)
++
++		pfmul		mm1,				mm2					// a mm1 =	-r0*T[0]	r1*T[1]
++		pfmul		mm0,				mm2					// a mm0 =	r0*T[1]		r1*T[0]
++		punpckldq	mm5,				mm4					// b
++		pfacc		mm0,				mm1					// a mm0 =	r1*T0+r0*T1	r1*T1-r0*T0
++															// a mm0 =	r3,			r2
++
++		punpckhdq	mm4,				mm5					// b mm4 =	x0[0]-x1[0]	x0[1]+x1[1]
++															// b mm4 =	r1			r0
++	}
++
++/*
+     REG_TYPE  r0     = x0[1]  - x1[1];
+     REG_TYPE  r1     = x0[0]  + x1[0];
+     REG_TYPE  r2     = MULT_NORM(r1     * T[0]   + r0 * T[1]);
+     REG_TYPE  r3     = MULT_NORM(r1     * T[1]   - r0 * T[0]);
++              r0     = HALVE(x0[1] + x1[1]);
++              r1     = HALVE(x0[0] - x1[0]);
++	      w1    -= 4;
++*/
++	_asm
++	{
++		add			esi,				4*4
++		movq		mm1,				mm4
++		mov			eax,			[ecx + 2*4]
++		pfadd		mm1,				mm0					// mm1 =	r0+r2		r1+r3
++		shl			eax,			2
++		movq		[esi-4*4],		mm1					// w0[1],w0[0]  store
++		add			eax,			x									// eax=	x0
++		pxor		mm4,				neg_q_1				// mm4 =	-r1			r0
++		mov			ebx,			[ecx + 3*4]
++		pxor		mm0,				neg_q_0				// mm0 =	r3			-r2
++		shl			ebx,			2
++		pfadd		mm0,				mm4					// mm4 =	-r1+r3		r0-r2
++		movq		[edi+2*4],			mm0					// w1[3],w1[2] store
++		add			ebx,			x									// ebx=	x1
++	}
++/*
+ 
++	      w0[0]  = r0     + r2;
++	      w0[1]  = r1     + r3;
++	      w1[2]  = r0     - r2;
++	      w1[3]  = -r1    + r3;
++              x0     = x+bit[2];
++              x1     = x+bit[3];
++*/
++	_asm
++	{
++		movq		mm0,				[edx+4*2]			// a mm0 =	T[3]		T[2]
++		movq		mm4,				[eax]				// b mm4 =	x0[1]		x0[0]
++		movq		mm1,				mm0					// a
++		movq		mm5,				[ebx]				// b mm5 =	x1[1]		x1[0]
++		punpckldq	mm2,				mm1					// a
++		pxor		mm5,				neg_q_0				// b mm5 =	x1[1]		-x1[0]
++		punpckhdq	mm1,				mm2					// a mm1 =	T[2]		T[3]
++		pfadd		mm4,				mm5					// b mm4 =	x0[1]+x1[1]	x0[0]-x1[0]
++		pxor		mm1,				neg_q_1				// a mm1 =	-T[2]		T[3]
++
++		movq		mm2,				[eax]				// a mm2 =	x0[1]		x0[0]
++		movq		mm3,				[ebx]				// a mm3 =	x1[1]		x1[0]
++		pfmul		mm4,				packed_halve_q		// b
++		pxor		mm3,				neg_q_1				// a mm3 =	-x1[1]		x1[0]
++		punpckldq	mm5,				mm4					// b
++		pfadd		mm2,				mm3					// a mm2 =	x0[1]-x1[1]	x0[0]+x1[0]
++															// a mm2 =	r0			r1		(swapped)
++		pfmul		mm1,				mm2					// a mm1 =	-r0*T[2]		r1*T[3]
++		punpckhdq	mm4,				mm5					// b mm4 =	x0[0]-x1[0]	x0[1]+x1[1]
++		pfmul		mm0,				mm2					// a mm0 =	r0*T[3]		r1*T[2]
++		pfacc		mm0,				mm1					// a mm0 =	r1*T2+r0*T3	r1*T3-r0*T2
++															// a mm0 =	r3,			r2
++															// b mm4 =	r1			r0
++	}
++/*
++              r0     = x0[1]  - x1[1];
++              r1     = x0[0]  + x1[0];
++              r2     = MULT_NORM(r1     * T[2]   + r0 * T[3]);
++              r3     = MULT_NORM(r1     * T[3]   - r0 * T[2]);
++              r0     = HALVE(x0[1] + x1[1]);
++              r1     = HALVE(x0[0] - x1[0]);
++*/
++	_asm
++	{
++	}
++
++/*
++*/
++	_asm
++	{
++		movq		mm6,				mm4
++		add			edx,				4*4
++		pfadd		mm6,				mm0					// mm6 =	r0+r2		r1+r3
++		movq		[esi+2*4-4*4],		mm6					// w0[3],w0[2]  store
++		pxor		mm4,				neg_q_1				// mm4 =	-r1			r0
++		pxor		mm0,				neg_q_0				// mm0 =	r3			-r2
++		add			ecx,				4*4
++		pfadd		mm0,				mm4					// mm4 =	-r1+r3		r0-r2
++		movq		[edi],				mm0					// w1[1],w1[0] store
++	}
++/*
++	      w0[2]  = r0     + r2;
++	      w0[3]  = r1     + r3;
++	      w1[0]  = r0     - r2;
++	      w1[1]  =-r1     + r3;
++	      T     += 4;
++	      bit   += 4;
++	      w0    += 4;
++*/
++
++	_asm
++	{
++		cmp		esi,	edi
++		jb		loopbr3
++	}
++/*
++
++  }while(w0<w1);
++*/
++
++	_asm
++	{
++		pop		ebx
++		femms
++	}
++
++}
++
++STIN void mdct_bitreverse(mdct_lookup *init,
++			    DATA_TYPE *x){
++  int        n       = init->n;
++  int       *bit     = init->bitrev;
++  DATA_TYPE *w0      = x;
++  DATA_TYPE *w1      = x = w0+(n>>1);
++  DATA_TYPE *T       = init->trig+n;
++
++  do{
++    DATA_TYPE *x0    = x+bit[0];
++    DATA_TYPE *x1    = x+bit[1];
++
++    REG_TYPE  r0     = x0[1]  - x1[1];
++    REG_TYPE  r1     = x0[0]  + x1[0];
++    REG_TYPE  r2     = MULT_NORM(r1     * T[0]   + r0 * T[1]);
++    REG_TYPE  r3     = MULT_NORM(r1     * T[1]   - r0 * T[0]);
++
+ 	      w1    -= 4;
+ 
+               r0     = HALVE(x0[1] + x1[1]);
+               r1     = HALVE(x0[0] - x1[0]);
+-      
++
+ 	      w0[0]  = r0     + r2;
+ 	      w1[2]  = r0     - r2;
+ 	      w0[1]  = r1     + r3;
+@@ -381,7 +1734,7 @@
+ 
+               r0     = HALVE(x0[1] + x1[1]);
+               r1     = HALVE(x0[0] - x1[0]);
+-      
++
+ 	      w0[2]  = r0     + r2;
+ 	      w1[0]  = r0     - r2;
+ 	      w0[3]  = r1     + r3;
+@@ -394,7 +1747,660 @@
+   }while(w0<w1);
+ }
+ 
++void mdct_backward_sse(mdct_lookup *init, DATA_TYPE *_in, DATA_TYPE *_out){
++  int n=init->n;
++  int n2=n>>1;
++  int n4=n>>2;
++
++
++  /* rotate */
++
++  DATA_TYPE *iX = _in+n2-7;
++  DATA_TYPE *oX = _out+n2+n4;
++  DATA_TYPE *T  = init->trig+n4;
++
++_asm
++{
++	mov			edi,	oX
++	mov			esi,	iX
++	mov			edx,	T
++	mov			ecx,	_in
++	movaps		xmm7,	neg_0_2
++
++loop0:
++	sub			edi,	4*4
++	movaps		xmm0,	[edx]							// xmm0 =  T3   T2   T1   T0
++	movups		xmm1,	[esi]							// xmm1 =  iX3  iX2  iX1  iX0
++	movups		xmm2,	[esi + 4*4]						// xmm2 =  iX7  iX6  iX5  iX4
++
++	prefetcht0	[esi - 64]
++
++	movaps		xmm3,	xmm0							// xmm3 =  T3   T2   T1   T0
++	movaps		xmm4,	xmm1							// xmm4 =  iX3  iX2  iX1  iX0
++	shufps		xmm3,	xmm0,	1*64+1*16+3*4+3			// xmm3 =  T1   T1   T3   T3
++	shufps		xmm4,	xmm2,	0*64+2*16+0*4+2			// xmm4 =  iX4  iX6  iX0  iX2
++
++
++	movaps		xmm1,	xmm4							// xmm1 =  iX4  iX6  iX0  iX2
++	xorps		xmm4,	xmm7							// xmm4 =  iX4 -iX6  iX0 -iX2
++
++	sub			esi,	8*4
++
++	mulps		xmm4,	xmm3							// xmm4 = tmp0
++
++	prefetcht0	[edx + 64]
++
++	shufps		xmm0,	xmm0,	0*64+0*16+2*4+2			// xmm0 =  T0   T0   T2   T2
++
++	add			edx,	4*4
++
++	shufps		xmm1,	xmm1,	2*64+3*16+0*4+1			// xmm1 =  iX6  iX4  iX2  iX0
++	mulps		xmm1,	xmm0							// xmm0 = tmp1
++
++	cmp			esi,	ecx
++
++	subps		xmm4,	xmm1							// xmm4 = tmp0 - tmp1
++	movaps		[edi],	xmm4							// oX = xmm4
++
++
++	jae			loop0
++
++}
++
++/*
++  do{
++    oX         -= 4;
++    oX[0]   = MULT_NORM(-iX[2] * T[3] - iX[0]  * T[2]);
++    oX[1]   = MULT_NORM (iX[0] * T[3] - iX[2]  * T[2]);
++    oX[2]   = MULT_NORM(-iX[6] * T[1] - iX[4]  * T[0]);
++    oX[3]   = MULT_NORM (iX[4] * T[1] - iX[6]  * T[0]);
++    iX         -= 8;
++    T          += 4;
++  }while(iX>=_in);
++*/
++
++  iX            = _in+n2-8;
++  oX            = _out+n2+n4;
++  T             = init->trig+n4;
++
++_asm
++{
++	mov			edi,	oX
++	mov			esi,	iX
++	mov			edx,	T
++	mov			ecx,	_in
++	movaps		xmm7,	neg_0_2
++	sub			edx,	4*4
++
++loop1:
++	movaps		xmm0,	[edx]							// xmm0 =  T3   T2   T1   T0
++	movaps		xmm1,	[esi]							// xmm1 =  iX3  iX2  iX1  iX0
++	movaps		xmm2,	[esi + 4*4]						// xmm2 =  iX7  iX6  iX5  iX4
++
++	movaps		xmm3,	xmm0							// xmm3 =  T3   T2   T1   T0
++
++	prefetcht0	[edx - 64]
++
++	shufps		xmm3,	xmm3,	0*64+1*16+2*4+3			// xmm3 =  T0   T1   T2   T3
++
++	add			edi,	4*4
++
++	movaps		xmm4,	xmm2							// xmm4 =  iX7  iX6  iX5  iX4
++
++	prefetcht0	[esi - 64]
++
++	shufps		xmm4,	xmm1,	0*64+0*16+0*4+0			// xmm4 =  iX0  iX0  iX4  iX4
++
++	sub			esi,	8*4
++
++	mulps		xmm4,	xmm3							// xmm4 = tmp0
++
++	shufps		xmm2,	xmm1,	2*64+2*16+2*4+2			// xmm2 =  iX2  iX2  iX6  iX6
++
++	shufps		xmm0,	xmm0,	1*64+0*16+3*4+2			// xmm0 =  T1   T0   T3   T2
++
++	sub			edx,	4*4
++
++	xorps		xmm0,	xmm7							// xmm0 = -T1   T0  -T3   T2
++
++	mulps		xmm0,	xmm2							// xmm0 = tmp1
++
++	cmp			esi,	ecx
++
++	subps		xmm4,	xmm0							// xmm4 = tmp0 - tmp1
++	movaps		[edi - 4*4],	xmm4					// oX = xmm4
++
++	jae			loop1
++}
++
++/*
++  do{
++    T          -= 4;
++    oX[0]       =  MULT_NORM (iX[4] * T[3] + iX[6] * T[2]);
++    oX[1]       =  MULT_NORM (iX[4] * T[2] - iX[6] * T[3]);
++    oX[2]       =  MULT_NORM (iX[0] * T[1] + iX[2] * T[0]);
++    oX[3]       =  MULT_NORM (iX[0] * T[0] - iX[2] * T[1]);
++    iX         -= 8;
++    oX         += 4;
++  }while(iX>=_in);
++*/
++
++  mdct_butterflies(init,_out+n2,n2);
++  mdct_bitreverse_sse(init,_out);
++
++  /* roatate + window */
++
++  {
++    DATA_TYPE *oX1=_out+n2+n4;
++    DATA_TYPE *oX2=_out+n2+n4;
++    DATA_TYPE *iX =_out;
++    T             =init->trig+n2;
++
++_asm
++{
++	push		ebx
++	mov			edi,	oX2
++	mov			edx,	oX1
++	mov			esi,	iX
++	mov			ebx,	T
++
++loop3:
++	sub			edx,	4*4
++
++	movaps		xmm0,	[ebx]							// xmm0 =	T3	T2	T1	T0
++	movaps		xmm1,	[ebx + 16]						// xmm1 =	T7	T6	T5	T4
++	movaps		xmm2,	[esi]							// xmm2 =	iX3	iX2	iX1	iX0
++	movaps		xmm3,	[esi + 16]						// xmm3 =	iX7	iX6	iX5	iX4
++
++
++	movaps		xmm4,	xmm1							// xmm4 =	T7	T6	T5	T4
++	movaps		xmm6,	xmm1							// xmm6 =	T7	T6	T5	T4
++//	prefetcht0	[ebx + 64]
++	shufps		xmm4,	xmm0,	1*64+3*16+1*4+3			// xmm4 =	T1	T3	T5	T7
++	shufps		xmm6,	xmm0,	0*64+2*16+0*4+2			// xmm6 =	T0	T2	T4	T6
++
++	movaps		xmm5,	xmm3							// xmm5 =	iX7	iX6	iX5	iX4
++	movaps		xmm7,	xmm3							// xmm7 =	iX7	iX6	iX5	iX4
++	shufps		xmm5,	xmm2,	0*64+2*16+0*4+2			// xmm5 =	iX0	iX2	iX4	iX6
++	shufps		xmm7,	xmm2,	1*64+3*16+1*4+3			// xmm7 =	iX1	iX3	iX5	iX7
++
++//	prefetcht0	[esi + 64]
++	mulps		xmm4,	xmm5							// xmm4 = tmp0
++
++
++	mulps		xmm6,	xmm7							// xmm6 = tmp1
++	add			edi,	4*4
++	movaps		xmm7,	xmm0							// xmm7 =	T3	T2	T1	T0
++
++	subps		xmm4,	xmm6							// xmm4 = tmp0 - tmp1
++
++	shufps		xmm7,	xmm1,	2*64+0*16+2*4+0			// xmm7 =	T6	T4	T2	T0
++
++	movaps		xmm5,	xmm2							// xmm5 =	iX3	iX2	iX1	iX0
++	movaps		[edx],	xmm4
++
++	shufps		xmm5,	xmm3,	2*64+0*16+2*4+0			// xmm5 =	iX0	iX2	iX4	iX6
++
++	mulps		xmm7,	xmm5							// xmm7 = tmp2
++	add			esi,	8*4
++
++	movaps		xmm5,	xmm0							// xmm5 =	T3	T2	T1	T0
++	movaps		xmm6,	xmm2							// xmm6 =	iX3	iX2	iX1	iX0
++	shufps		xmm5,	xmm1,	3*64+1*16+3*4+1			// xmm5 =	T0	T2	T4	T6
++
++	add			ebx,	8*4
++	shufps		xmm6,	xmm3,	3*64+1*16+3*4+1			// xmm6 =	iX1	iX3	iX5	iX7
++
++	cmp			esi,	edx
++
++	mulps		xmm5,	xmm6							// xmm5 = tmp3
++
++	addps		xmm7,	xmm5							// xmm7 = tmp2 + tmp3
++
++	xorps		xmm7,	neg_0_1_2_3						// negate xmm7
++
++	movaps		[edi - 4*4],	xmm7
++
++	jb			loop3
++	pop			ebx
++}
++/*
++	do{
++      oX1-=4;
++
++      oX1[0]  =  MULT_NORM (iX[6] * T[7] - iX[7] * T[6]);
++      oX1[1]  =  MULT_NORM (iX[4] * T[5] - iX[5] * T[4]);
++      oX1[2]  =  MULT_NORM (iX[2] * T[3] - iX[3] * T[2]);
++	  oX1[3]  =  MULT_NORM (iX[0] * T[1] - iX[1] * T[0]);
++
++      oX2[0]  = -MULT_NORM (iX[0] * T[0] + iX[1] * T[1]);
++      oX2[1]  = -MULT_NORM (iX[2] * T[2] + iX[3] * T[3]);
++      oX2[2]  = -MULT_NORM (iX[4] * T[4] + iX[5] * T[5]);
++      oX2[3]  = -MULT_NORM (iX[6] * T[6] + iX[7] * T[7]);
++
++      oX2+=4;
++      iX    +=   8;
++      T     +=   8;
++    }while(iX<oX1);
++*/
++    iX=_out+n2+n4;
++    oX1=_out+n4;
++    oX2=oX1;
++
++_asm
++{
++	mov			edi,	oX2
++	mov			esi,	oX1
++	mov			edx,	iX
++	movaps		xmm7,	neg_0_1_2_3
++
++loop4:
++	sub			edx,	4*4
++	sub			esi,	4*4
++	lea			edi,	[edi + 4*4]
++	movaps		xmm0,	[edx]
++	movaps		[esi],	xmm0
++	prefetcht0	[edx - 32]
++	cmp			edi,	edx
++	shufps		xmm0,	xmm0,	0*64+1*16+2*4+3
++	xorps		xmm0,	xmm7
++	movaps		[edi - 4*4],	xmm0
++
++	jb			loop4
++}
++/*
++    do{
++      oX1-=4;
++      iX-=4;
++
++      oX2[0] = -(oX1[3] = iX[3]);
++      oX2[1] = -(oX1[2] = iX[2]);
++      oX2[2] = -(oX1[1] = iX[1]);
++      oX2[3] = -(oX1[0] = iX[0]);
++
++      oX2+=4;
++    }while(oX2<iX);
++*/
++    iX=_out+n2+n4;
++    oX1=_out+n2+n4;
++    oX2=_out+n2;
++_asm
++{
++	mov			edi,	oX1
++	mov			esi,	iX
++	mov			edx,	oX2
++
++loop5:
++	sub			edi,	4*4
++
++	movaps		xmm0,	[esi]
++	shufps		xmm0,	xmm0,	0*64+1*16+2*4+3
++	movaps		[edi],	xmm0
++
++	add			esi,	4*4
++
++	cmp			edi,	edx
++	ja			loop5
++}
++/*
++    do{
++      oX1-=4;
++      oX1[0]= iX[3];
++      oX1[1]= iX[2];
++      oX1[2]= iX[1];
++      oX1[3]= iX[0];
++      iX+=4;
++    }while(oX1>oX2);
++*/
++  }
++}
++
++void mdct_backward_3dn(mdct_lookup *init, DATA_TYPE *_in, DATA_TYPE *_out){
++{
++  int n=init->n;
++  int n2=n>>1;
++  int n4=n>>2;
++
++  /* rotate */
++
++  DATA_TYPE *iX = _in+n2-7;
++  DATA_TYPE *oX = _out+n2+n4;
++  DATA_TYPE *T  = init->trig+n4;
++
++  _asm
++  {
++		mov		eax,		iX
++		mov		ecx,		oX
++		mov		edx,		T
++		mov		edi,		_in
++
++loop3dna:
++		sub				ecx,			4*4
++
++		movq			mm1,			[edx + 2*4]			// a mm1 =	T[3]			T[2]
++		movq			mm5,			[edx + 0*4]			// b mm5 =	T[1]			T[0]
++		movd			mm2,			[eax]				// a mm2 =	iX[1]			iX[0]
++		movd			mm6,			[eax + 4*4]			// b mm6 =	iX[5]			iX[4]
++		movd			mm3,			[eax + 2*4]			// a mm3 =	iX[3]			iX[2]
++		movd			mm7,			[eax + 6*4]			// b mm7 =	iX[7]			iX6]
++		movq			mm4,			mm2					// a
++		movq			mm0,			mm6					// b
++		punpckldq		mm2,			mm3					// a mm2 =	iX[2]			iX[0]
++		punpckldq		mm6,			mm7					// b mm6 =	iX[6]			iX[4]
++		pfmul			mm2,			mm1					// a mm2 =	iX[2]*T[3]		iX[0]*T[2]
++  	prefetch	[edx + 32]
++		pfmul			mm6,			mm5					// b mm6 =	iX[6]*T[1]		iX[4]*T[0]
++		punpckldq		mm3,			mm4					// a mm3 =	iX[0]			iX[2]
++		punpckldq		mm7,			mm0					// b mm7 =	iX[4]			iX[6]
++		pfmul			mm3,			mm1					// a mm3 =	iX[0]*T[3]		iX[2]*T[2]
++  	prefetch	[eax - 32]
++		pfmul			mm7,			mm5					// b mm7 =	iX[4]*T[1]		iX[6]*T[0]
++		pxor			mm2,			neg_q_0_1			// a mm2 =	-iX[2]*T[3]		-iX[0]*T[2]
++		pxor			mm6,			neg_q_0_1			// b mm6 =	-iX[6]*T[1]		-iX[4]*T[0]
++		pxor			mm3,			neg_q_0				// a mm3 =	iX[0]*T[3]		-iX[2]*T[2]
++		pxor			mm7,			neg_q_0				// b mm7 =	iX[4]*T[1]		-iX[6]*T[0]
++		pfacc			mm2,			mm3					// a mm2 =	oX[1]			oX[2]
++		pfacc			mm6,			mm7					// b mm6 =	oX[1]			oX[2]
++		movq			[ecx+0*4],		mm2					// a store
++		movq			[ecx+2*4],		mm6					// b store
++
++		sub				eax,			8*4
++		add				edx,			4*4
++
++		cmp				eax,			edi
++		jae				loop3dna
++		femms
++  }
++/*
++
++
++  do{
++    oX         -= 4;
++    oX[0]       = MULT_NORM(-iX[2] * T[3] - iX[0]  * T[2]);
++    oX[1]       = MULT_NORM (iX[0] * T[3] - iX[2]  * T[2]);
++    oX[2]       = MULT_NORM(-iX[6] * T[1] - iX[4]  * T[0]);
++    oX[3]       = MULT_NORM (iX[4] * T[1] - iX[6]  * T[0]);
++    iX         -= 8;
++    T          += 4;
++  }while(iX>=_in);
++
++*/
++
++  iX            = _in+n2-8;
++  oX            = _out+n2+n4;
++  T             = init->trig+n4;
++
++	_asm
++  	{
++		mov		eax,		iX
++		mov		ecx,		oX
++		mov		edx,		T
++		mov		edi,		_in
++  	}
++loop3dnb:
++	_asm
++	{
++
++		movq			mm1,			[edx + 2*4 -4*4]	// a mm1 =	T[3]			T[2]
++		movq			mm0,			[edx + 0*4 -4*4]	// b mm0 =	T[1]			T[0]
++		movq			mm2,			[eax + 4*4]			// a mm2 =	iX[5]			iX[4]
++		movq			mm3,			[eax + 0*4]			// b mm3 =	iX[1]			iX[0]
++
++		movq			mm5,			mm1					// a
++		movq			mm4,			mm0					// b
++		punpckldq		mm6,			mm5					// a
++		punpckldq		mm7,			mm4					// b
++		punpckhdq		mm5,			mm6					// a mm5 =	T[2]			T[3]
++		punpckhdq		mm4,			mm7					// b mm4 =	T[0]			T[1]
++		punpckldq		mm2,			[eax + 6*4]			// a mm2 =	iX[6]			iX[4]
++		sub				edx,			4*4
++		punpckldq		mm3,			[eax + 2*4]			// b mm3 =	iX[2]			iX[0]
++		pfmul			mm5,			mm2					// a mm5 =	iX[6]*T[2]		iX[4]*T[3]
++		add				ecx,			4*4
++		pfmul			mm4,			mm3					// b mm4 =	iX[2]*T[0]		iX[0]*T[1]
++		sub				eax,			8*4
++		pfmul			mm1,			mm2					// a mm1 =	iX[6]*T[3]		iX[4]*T[2]
++		cmp				eax,			edi
++		pfmul			mm0,			mm3					// b mm0 =	iX[2]*T[1]		iX[0]*T[0]
++		pxor			mm1,			neg_q_1				// a mm1 =	-iX[6]*T[3]		iX[4]*T[2]
++		pxor			mm0,			neg_q_1				// b mm0 =	-iX[2]*T[1]		iX[0]*T[0]
++		pfacc			mm5,			mm1					// a mm5 =	oX[1]			oX[0]
++		pfacc			mm4,			mm0					// b mm4 =	oX[1]			oX[0]
++		movq			[ecx+0*4 -4*4],	mm5					// a store
++		movq			[ecx+2*4 -4*4],	mm4					// b store
++
++
++		jae				loop3dnb
++		femms
++	}
++
++/*
++  do{
++    T          -= 4;
++    oX[0]       =  MULT_NORM (iX[4] * T[3] + iX[6] * T[2]);
++    oX[1]       =  MULT_NORM (iX[4] * T[2] - iX[6] * T[3]);
++    oX[2]       =  MULT_NORM (iX[0] * T[1] + iX[2] * T[0]);
++    oX[3]       =  MULT_NORM (iX[0] * T[0] - iX[2] * T[1]);
++    iX         -= 8;
++    oX         += 4;
++  }while(iX>=_in);
++*/
++
++
++
++  mdct_butterflies(init,_out+n2,n2);
++  mdct_bitreverse_3dn(init,_out);
++
++  /* roatate + window */
++
++  {
++    DATA_TYPE *oX1=_out+n2+n4;
++    DATA_TYPE *oX2=_out+n2+n4;
++    DATA_TYPE *iX =_out;
++    T             =init->trig+n2;
++	_asm
++  	{
++  		mov				ecx,			oX1
++  		mov				edx,			oX2
++  		mov				eax,			iX
++  		mov				edi,			T
++  	}
++loop3dnc:
++  	_asm
++  	{
++  		sub				ecx,			4*4
++
++//      oX1[3]  =  MULT_NORM (iX[0] * T[1] - iX[1] * T[0]);
++//      oX2[0]  = -MULT_NORM (iX[0] * T[0] + iX[1] * T[1]);
++//      oX1[2]  =  MULT_NORM (iX[2] * T[3] - iX[3] * T[2]);
++//      oX2[1]  = -MULT_NORM (iX[2] * T[2] + iX[3] * T[3]);
++	  		movq			mm0,			[edi]				// mm0 =	T1				T0
++	  		movq			mm2,			[edi+2*4]
++	  		movq			mm3,			[eax+2*4]
++	  		movq			mm1,			[eax]				// mm1 =	iX1				iX0
++	  		movq			mm4,			mm0
++	  		movq			mm5,			mm2
++	  		punpckldq		mm6,			mm4
++	  		punpckldq		mm7,			mm5
++	  		punpckhdq		mm4,			mm6					// mm4 =	T0				T1
++	  		punpckhdq		mm5,			mm7
++	  		pfmul			mm0,			mm1					// mm0 =	iX1*T1			iX0*T0
++	  		pfmul			mm2,			mm3
++	  		pfmul			mm4,			mm1					// mm4 =	iX1*T0			iX0*T1
++	  		pfmul			mm5,			mm3
++	  		pxor			mm4,			neg_q_1				// mm4 =	-iX1*T0			iX0*T1
++	  		pxor			mm5,			neg_q_1
++	  		pfacc			mm4,			mm0					// mm4 =	iX0*T0+iX1*T1	iX0*T1-iX1*T0
++	  		pfacc			mm5,			mm2
++	  		pxor			mm4,			neg_q_1				// mm4 =	-iX0*T0-iX1*T1	iX0*T1-iX1*T0
++	  		pxor			mm5,			neg_q_1
++	  															// mm4 =	oX2[0]			oX1[3]
++
++	  															// mm5 =	oX2[1]			oX1[2]
++
++
++//      oX1[1]  =  MULT_NORM (iX[4] * T[5] - iX[5] * T[4]);
++//      oX2[2]  = -MULT_NORM (iX[4] * T[4] + iX[5] * T[5]);
++//      oX1[0]  =  MULT_NORM (iX[6] * T[7] - iX[7] * T[6]);
++//      oX2[3]  = -MULT_NORM (iX[6] * T[6] + iX[7] * T[7]);
++	  		movq			mm0,			[edi+4*4]
++	  		movq			mm1,			[eax+4*4]
++	  		movq			mm6,			mm0
++	  		punpckldq		mm3,			mm6
++	  		punpckhdq		mm6,			mm3
++	  		pfmul			mm0,			mm1
++  			pfmul			mm6,			mm1
++
++
++			movq			mm1,			[edi+6*4]
++	  		movq			mm2,			[eax+6*4]
++	  		movq			mm7,			mm1
++	  		punpckldq		mm3,			mm7
++	  		punpckhdq		mm7,			mm3
++	  		pfmul			mm1,			mm2
++  			pfmul			mm7,			mm2
++
++  			pxor			mm6,			neg_q_1
++  			pxor			mm7,			neg_q_1
++	  		pfacc			mm6,			mm0
++	  		pfacc			mm7,			mm1
++	  		pxor			mm6,			neg_q_1
++	  		pxor			mm7,			neg_q_1
++	  															// mm6 =	oX2[2]			oX1[1]
++
++	  															// mm7 =	oX2[3]			oX1[0]
++	  		// make oX1[1] oX1[0]
++	  		movq			mm0,			mm7
++	  		punpckldq		mm0,			mm6
++	  		movq			[ecx],			mm0
++
++	  		// make oX1[3] oX1[2]
++	  		movq			mm1,			mm5
++	  		punpckldq		mm1,			mm4
++	  		movq			[ecx+2*4],		mm1
++
++	  		// make oX2[1] oX2[0]
++	  		punpckhdq		mm4,			mm5
++	  		movq			[edx],			mm4
++
++	  		// make oX2[3] oX2[2]
++			punpckhdq		mm6,			mm7
++	  		movq			[edx+2*4],		mm6
++
++  		add				edi,			8*4
++  		add				eax,			8*4
++		add				edx,			4*4
++
++  		cmp				eax,			ecx
++  		jb				loop3dnc
++		femms
++  	}
++
++/*
++    do{
++      oX1-=4;
++
++      oX1[3]  =  MULT_NORM (iX[0] * T[1] - iX[1] * T[0]);
++      oX2[0]  = -MULT_NORM (iX[0] * T[0] + iX[1] * T[1]);
++
++      oX1[2]  =  MULT_NORM (iX[2] * T[3] - iX[3] * T[2]);
++      oX2[1]  = -MULT_NORM (iX[2] * T[2] + iX[3] * T[3]);
++
++      oX1[1]  =  MULT_NORM (iX[4] * T[5] - iX[5] * T[4]);
++      oX2[2]  = -MULT_NORM (iX[4] * T[4] + iX[5] * T[5]);
++
++      oX1[0]  =  MULT_NORM (iX[6] * T[7] - iX[7] * T[6]);
++      oX2[3]  = -MULT_NORM (iX[6] * T[6] + iX[7] * T[7]);
++
++      oX2+=4;
++      iX    +=   8;
++      T     +=   8;
++    }while(iX<oX1);
++
++*/
++    iX=_out+n2+n4;
++    oX1=_out+n4;
++    oX2=oX1;
++	_asm
++	{
++		mov		edi,		iX
++		mov		ecx,		oX1
++		mov		edx,		oX2
++loop3dnd:
++
++		sub		ecx,		4*4
++		sub		edi,		4*4
++
++		mov		eax,			[edi + 3*4]
++		mov		esi,			[edi + 2*4]
++		mov		[ecx + 3*4],	eax
++		mov		[ecx + 2*4],	esi
++		xor		eax,			0x80000000
++		xor		esi,			0x80000000
++		mov		[edx + 0*4],	eax
++		mov		[edx + 1*4],	esi
++
++
++		mov		eax,			[edi + 1*4]
++		mov		esi,			[edi + 0*4]
++		mov		[ecx + 1*4],	eax
++		mov		[ecx + 0*4],	esi
++		xor		eax,			0x80000000
++		xor		esi,			0x80000000
++		mov		[edx + 2*4],	eax
++		mov		[edx + 3*4],	esi
++
++
++		add		edx,		4*4
++		cmp		edx,		edi
++		jb		loop3dnd
++	}
++
++
++/*
++   do{
++      oX1-=4;
++      iX-=4;
++
++      oX2[0] = -(oX1[3] = iX[3]);
++      oX2[1] = -(oX1[2] = iX[2]);
++      oX2[2] = -(oX1[1] = iX[1]);
++      oX2[3] = -(oX1[0] = iX[0]);
++
++      oX2+=4;
++    }while(oX2<iX);
++*/
++
++    iX=_out+n2+n4;
++    oX1=_out+n2+n4;
++    oX2=_out+n2;
++    do{
++      oX1-=4;
++      oX1[0]= iX[3];
++      oX1[1]= iX[2];
++      oX1[2]= iX[1];
++      oX1[3]= iX[0];
++      iX+=4;
++    }while(oX1>oX2);
++  }
++	}
++}
++
++
++
+ void mdct_backward(mdct_lookup *init, DATA_TYPE *in, DATA_TYPE *out){
++	if(CPU_SSE)
++	{
++			mdct_backward_sse(init, in, out);
++		return;
++	}
++	else if(CPU_3DN)
++	{
++			mdct_backward_3dn(init, in, out);
++		return;
++	}
++
++	{
+   int n=init->n;
+   int n2=n>>1;
+   int n4=n>>2;
+@@ -439,7 +2445,7 @@
+     DATA_TYPE *oX2=out+n2+n4;
+     DATA_TYPE *iX =out;
+     T             =init->trig+n2;
+-    
++
+     do{
+       oX1-=4;
+ 
+@@ -459,7 +2465,45 @@
+       iX    +=   8;
+       T     +=   8;
+     }while(iX<oX1);
+-
++
++    iX=out+n2+n4;
++    oX1=out+n4;
++    oX2=oX1;
++	_asm
++	{
++		mov		edi,		iX
++		mov		ecx,		oX1
++		mov		edx,		oX2
++loopasmd:
++
++		sub		ecx,		4*4
++		sub		edi,		4*4
++
++		mov		eax,			[edi + 3*4]
++		mov		esi,			[edi + 2*4]
++		mov		[ecx + 3*4],	eax
++		mov		[ecx + 2*4],	esi
++		xor		eax,			0x80000000
++		xor		esi,			0x80000000
++		mov		[edx + 0*4],	eax
++		mov		[edx + 1*4],	esi
++
++
++		mov		eax,			[edi + 1*4]
++		mov		esi,			[edi + 0*4]
++		mov		[ecx + 1*4],	eax
++		mov		[ecx + 0*4],	esi
++		xor		eax,			0x80000000
++		xor		esi,			0x80000000
++		mov		[edx + 2*4],	eax
++		mov		[edx + 3*4],	esi
++
++
++		add		edx,		4*4
++		cmp		edx,		edi
++		jb		loopasmd
++	}
++/*
+     iX=out+n2+n4;
+     oX1=out+n4;
+     oX2=oX1;
+@@ -475,7 +2519,7 @@
+ 
+       oX2+=4;
+     }while(oX2<iX);
+-
++*/
+     iX=out+n2+n4;
+     oX1=out+n2+n4;
+     oX2=out+n2;
+@@ -488,8 +2532,11 @@
+       iX+=4;
+     }while(oX1>oX2);
+   }
++	}
+ }
+ 
++
++
+ void mdct_forward(mdct_lookup *init, DATA_TYPE *in, DATA_TYPE *out){
+   int n=init->n;
+   int n2=n>>1;
+@@ -501,44 +2548,44 @@
+   /* rotate */
+ 
+   /* window + rotate + step 1 */
+-  
++
+   REG_TYPE r0;
+   REG_TYPE r1;
+   DATA_TYPE *x0=in+n2+n4;
+   DATA_TYPE *x1=x0+1;
+   DATA_TYPE *T=init->trig+n2;
+-  
++
+   int i=0;
+-  
++
+   for(i=0;i<n8;i+=2){
+     x0 -=4;
+     T-=2;
+     r0= x0[2] + x1[0];
+-    r1= x0[0] + x1[2];       
++    r1= x0[0] + x1[2];
+     w2[i]=   MULT_NORM(r1*T[1] + r0*T[0]);
+     w2[i+1]= MULT_NORM(r1*T[0] - r0*T[1]);
+     x1 +=4;
+   }
+ 
+   x1=in+1;
+-  
++
+   for(;i<n2-n8;i+=2){
+     T-=2;
+     x0 -=4;
+     r0= x0[2] - x1[0];
+-    r1= x0[0] - x1[2];       
++    r1= x0[0] - x1[2];
+     w2[i]=   MULT_NORM(r1*T[1] + r0*T[0]);
+     w2[i+1]= MULT_NORM(r1*T[0] - r0*T[1]);
+     x1 +=4;
+   }
+-    
++
+   x0=in+n;
+ 
+   for(;i<n2;i+=2){
+     T-=2;
+     x0 -=4;
+     r0= -x0[2] - x1[0];
+-    r1= -x0[0] - x1[2];       
++    r1= -x0[0] - x1[2];
+     w2[i]=   MULT_NORM(r1*T[1] + r0*T[0]);
+     w2[i+1]= MULT_NORM(r1*T[0] - r0*T[1]);
+     x1 +=4;
+Index: lib/block.c
+===================================================================
+--- lib/block.c	(リビジョン 7879)
++++ lib/block.c	(作業コピー)
+@@ -11,7 +11,7 @@
+  ********************************************************************
+ 
+  function: PCM data vector blocking, windowing and dis/reassembly
+- last mod: $Id: block.c,v 1.76 2003/12/30 11:02:22 xiphmont Exp $
++ last mod: $Id$
+ 
+  Handle windowing, overlap-add, etc of the PCM vectors.  This is made
+  more amusing by Vorbis' current two allowed block sizes.
+@@ -82,7 +82,7 @@
+ /* block abstraction setup *********************************************/
+ 
+ #ifndef WORD_ALIGN
+-#define WORD_ALIGN 8
++#define WORD_ALIGN 16
+ #endif
+ 
+ int vorbis_block_init(vorbis_dsp_state *v, vorbis_block *vb){
+@@ -207,6 +207,7 @@
+   b->window[0]=ilog2(ci->blocksizes[0])-6;
+   b->window[1]=ilog2(ci->blocksizes[1])-6;
+ 
++#ifndef DECODE_ONLY
+   if(encp){ /* encode/decode differ here */
+ 
+     /* analysis always needs an fft */
+@@ -230,12 +231,15 @@
+     }
+ 
+     v->analysisp=1;
+-  }else{
++  }else
++#endif
++  {
+     /* finish the codebooks */
+     if(!ci->fullbooks){
+       ci->fullbooks=_ogg_calloc(ci->books,sizeof(*ci->fullbooks));
+-      for(i=0;i<ci->books;i++){
+-	vorbis_book_init_decode(ci->fullbooks+i,ci->book_param[i]);
++      for(i=0;i<ci->books;i++){
++		  /* apply gain control */
++		  vorbis_book_init_decode(ci->fullbooks+i,ci->book_param[i],vi->global_gain);
+ 	/* decode codebooks are now standalone after init */
+ 	vorbis_staticbook_destroy(ci->book_param[i]);
+ 	ci->book_param[i]=NULL;
+@@ -278,7 +282,8 @@
+ 
+   return 0;
+ }
+-
++
++#ifndef DECODE_ONLY
+ /* arbitrary settings and spec-mandated numbers get filled in here */
+ int vorbis_analysis_init(vorbis_dsp_state *v,vorbis_info *vi){
+   private_state *b=NULL;
+@@ -294,7 +299,8 @@
+   vorbis_bitrate_init(vi,&b->bms);
+ 
+   return(0);
+-}
++}
++#endif
+ 
+ void vorbis_dsp_clear(vorbis_dsp_state *v){
+   int i;
+@@ -305,10 +311,12 @@
+ 
+     if(b){
+ 	
++#ifndef DECODE_ONLY
+       if(b->ve){
+ 	_ve_envelope_clear(b->ve);
+ 	_ogg_free(b->ve);
+       }
++#endif
+ 
+       if(b->transform[0]){
+ 	mdct_clear(b->transform[0][0]);
+@@ -333,18 +341,18 @@
+ 	    free_look(b->residue[i]);
+ 	_ogg_free(b->residue);
+       }
++#ifndef DECODE_ONLY
+       if(b->psy){
+ 	for(i=0;i<ci->psys;i++)
+ 	  _vp_psy_clear(b->psy+i);
+ 	_ogg_free(b->psy);
+       }
+-
+       if(b->psy_g_look)_vp_global_free(b->psy_g_look);
+       vorbis_bitrate_clear(&b->bms);
+ 
+       drft_clear(&b->fft_look[0]);
+       drft_clear(&b->fft_look[1]);
+-
++#endif
+     }
+     
+     if(v->pcm){
+@@ -487,7 +495,8 @@
+   }
+   return(0);
+ }
+-
++
++#ifndef DECODE_ONLY
+ /* do the deltas, envelope shaping, pre-echo and determine the size of
+    the next block on which to continue analysis */
+ int vorbis_analysis_blockout(vorbis_dsp_state *v,vorbis_block *vb){
+@@ -649,7 +658,8 @@
+ 
+   /* done */
+   return(1);
+-}
++}
++#endif
+ 
+ int vorbis_synthesis_restart(vorbis_dsp_state *v){
+   vorbis_info *vi=v->vi;
+@@ -674,6 +684,151 @@
+   return(0);
+ }
+ 
++
++void vorbis_apply_window_3dn(float *pcm, float *w1, float *w2, float *p, float *pcmlim)
++{
++	_asm
++	{
++		push ebx
++		mov edi, pcm
++		mov	ebx, w1
++		mov esi, w2
++		mov edx, p
++		mov ecx, pcmlim
++		cmp edi, ecx
++		jnl p3dexit1
++
++	p3dloop1:
++		add		esi,	4*4
++		movq			mm0,			[ebx - 2*4]			// load window backward
++		movq			mm3,			[ebx - 4*4]			// load window backward
++		punpckldq		mm1,			mm0					//
++		punpckldq		mm4,			mm3					//
++		punpckhdq		mm0,			mm1					// swap hi-order dword and low-order dword of mm0
++		punpckhdq		mm3,			mm4					// swap hi-order dword and low-order dword of mm3
++		pfmul			mm0,			[edi]				// multiply pcm
++		pfmul			mm3,			[edi+2*4]			// multiply pcm
++		movq			mm2,			[esi-4*4]			// load window forward
++		movq			mm5,			[esi+2*4-4*4]		// load window forward
++		pfmul			mm2,			[edx]				// multiply p
++		pfmul			mm5,			[edx+2*4]			// multiply p
++		pfadd			mm0,			mm2					// add
++		pfadd			mm3,			mm5					// add
++		movq			[edi],			mm0					// store
++		movq			[edi+2*4],		mm3					// store
++
++		add		edx,	4*4
++		add		edi,	4*4
++		sub		ebx,	4*4
++
++		cmp edi, ecx
++		jl	p3dloop1
++
++	p3dexit1:
++		pop ebx
++		femms
++	}
++}
++
++void vorbis_apply_window_sse(float *pcm, float *w1, float *w2, float *p, float *pcmlim)
++{
++	// p and pcm must be alingned
++	_asm
++	{
++		push ebx
++		mov edi, pcm
++		mov	ebx, w1
++		mov esi, w2
++		mov edx, p
++		mov ecx, pcmlim
++		cmp edi, ecx
++		jnl pexit1
++
++		sub		ebx,	4*4
++		align 16
++	ploop1:
++
++		movaps	xmm0,	[ebx]
++		add		esi,	8*4
++		movaps	xmm3,	[ebx - 4*4]
++		shufps	xmm0,	xmm0,	0*64+1*16+2*4+3
++		shufps	xmm3,	xmm3,	0*64+1*16+2*4+3
++		mulps	xmm0,	[edi]
++		mulps	xmm3,	[edi + 4*4]
++		movaps	xmm1,	[esi - 8*4]
++		add		edx,	8*4
++		movaps	xmm4,	[esi + 4*4 - 8*4]
++		add		edi,	8*4
++		mulps	xmm1,	[edx - 8*4]
++		sub		ebx,	8*4
++		mulps	xmm4,	[edx + 4*4 - 8*4]
++		cmp edi, ecx
++		addps	xmm0,	xmm1
++		addps	xmm3,	xmm4
++		movaps	[edi - 8*4],	xmm0
++		movaps	[edi + 4*4 - 8*4],	xmm3
++
++		prefetcht0	[edi + 64]
++
++		jl	ploop1
++
++	pexit1:
++		pop ebx
++	}
++}
++void vorbis_apply_window_sse_ua(float *pcm, float *w1, float *w2, float *p, float *pcmlim)
++{
++	// unaligned version
++	_asm
++	{
++		push ebx
++		mov edi, pcm
++		mov	ebx, w1
++		mov esi, w2
++		mov edx, p
++		mov ecx, pcmlim
++		cmp edi, ecx
++		jnl pexit1
++
++		align 16
++	ploop1:
++
++		movups	xmm0,	[ebx - 4*4]
++		movups	xmm3,	[ebx - 4*4 - 4*4]
++		shufps	xmm0,	xmm0,	0*64+1*16+2*4+3
++		shufps	xmm3,	xmm3,	0*64+1*16+2*4+3
++		movups	xmm2,	[edi]
++		movups	xmm5,	[edi + 4*4]
++		mulps	xmm0,	xmm2
++		mulps	xmm3,	xmm5
++		movups	xmm1,	[esi]
++		movups	xmm4,	[esi + 4*4]
++		movups	xmm2,	[edx]
++		movups	xmm5,	[edx + 4*4]
++		mulps	xmm1,	xmm2
++		mulps	xmm4,	xmm5
++		prefetcht0	[edx + 32]
++		addps	xmm0,	xmm1
++		addps	xmm3,	xmm4
++		movups	[edi],	xmm0
++		movups	[edi + 4*4],	xmm3
++
++		add		edi,	8*4
++		sub		ebx,	8*4
++		add		esi,	8*4
++		add		edx,	8*4
++
++		cmp edi, ecx
++		jl	ploop1
++
++	pexit1:
++		pop ebx
++	}
++}
++extern int CPU_SSE;
++extern int CPU_3DN;
++
++
+ int vorbis_synthesis_init(vorbis_dsp_state *v,vorbis_info *vi){
+   if(_vds_shared_init(v,vi,0)) return 1;
+   vorbis_synthesis_restart(v);
+@@ -741,15 +896,63 @@
+ 	  float *w=_vorbis_window_get(b->window[1]-hs);
+ 	  float *pcm=v->pcm[j]+prevCenter;
+ 	  float *p=vb->pcm[j];
+-	  for(i=0;i<n1;i++)
+-	    pcm[i]=pcm[i]*w[n1-i-1] + p[i]*w[i];
++	  if(CPU_SSE && !(n1 & 0x0f) )
++	  {
++		if(! ( ((long)pcm | (long)p) & 0x0f ) )
++			vorbis_apply_window_sse(pcm, w+n1, w, p, pcm + n1);
++		else
++			vorbis_apply_window_sse_ua(pcm, w+n1, w, p, pcm + n1);
++	  }
++	  else if(CPU_3DN && !(n1 & 0x0f) )
++	  {
++		vorbis_apply_window_3dn(pcm, w+n1, w, p, pcm + n1);
++	  }
++	  else
++	  {
++		  i=0;
++		  n1 -= 3;
++		  for(;i<n1;i+=4)
++		  {
++			pcm[i  ]=pcm[i  ]*w[n1-i+(-1 +3)] + p[i  ]*w[i  ];
++			pcm[i+1]=pcm[i+1]*w[n1-i+(-2 +3)] + p[i+1]*w[i+1];
++			pcm[i+2]=pcm[i+2]*w[n1-i+(-3 +3)] + p[i+2]*w[i+2];
++			pcm[i+3]=pcm[i+3]*w[n1-i+(-4 +3)] + p[i+3]*w[i+3];
++		  }
++		  n1 += 3;
++		  for(;i<n1;i++)
++			pcm[i]=pcm[i]*w[n1-i-1] + p[i]*w[i];
++	  }
+ 	}else{
+ 	  /* large/small */
+ 	  float *w=_vorbis_window_get(b->window[0]-hs);
+ 	  float *pcm=v->pcm[j]+prevCenter+n1/2-n0/2;
+ 	  float *p=vb->pcm[j];
+-	  for(i=0;i<n0;i++)
+-	    pcm[i]=pcm[i]*w[n0-i-1] +p[i]*w[i];
++	  if(CPU_SSE && !(n0 & 0x0f) )
++	  {
++		if(! ( ((long)pcm | (long)p) & 0x0f ) )
++			vorbis_apply_window_sse(pcm, w+n0, w, p, pcm + n0);
++		else
++			vorbis_apply_window_sse_ua(pcm, w+n0, w, p, pcm + n0);
++	  }
++	  else if(CPU_3DN && !(n0 & 0x0f) )
++	  {
++		vorbis_apply_window_3dn(pcm, w+n0, w, p, pcm + n0);
++	  }
++	  else
++	  {
++		  i=0;
++		  n0 -= 3;
++		  for(;i<n0;i+=4)
++		  {
++			pcm[i  ]=pcm[i  ]*w[n0-i+(-1 +3)] + p[i  ]*w[i  ];
++			pcm[i+1]=pcm[i+1]*w[n0-i+(-2 +3)] + p[i+1]*w[i+1];
++			pcm[i+2]=pcm[i+2]*w[n0-i+(-3 +3)] + p[i+2]*w[i+2];
++			pcm[i+3]=pcm[i+3]*w[n0-i+(-4 +3)] + p[i+3]*w[i+3];
++		  }
++		  n0 += 3;
++		  for(;i<n0;i++)
++			pcm[i]=pcm[i]*w[n0-i-1] + p[i]*w[i];
++	  }
+ 	}
+       }else{
+ 	if(v->W){
+@@ -757,8 +960,34 @@
+ 	  float *w=_vorbis_window_get(b->window[0]-hs);
+ 	  float *pcm=v->pcm[j]+prevCenter;
+ 	  float *p=vb->pcm[j]+n1/2-n0/2;
+-	  for(i=0;i<n0;i++)
+-	    pcm[i]=pcm[i]*w[n0-i-1] +p[i]*w[i];
++	  if(CPU_SSE && !(n0 & 0x0f) )
++	  {
++		if(! ( ((long)pcm | (long)p) & 0x0f ) )
++			vorbis_apply_window_sse(pcm, w+n0, w, p, pcm + n0);
++		else
++			vorbis_apply_window_sse_ua(pcm, w+n0, w, p, pcm + n0);
++		i = n0;
++	  }
++	  else if(CPU_3DN && !(n0 & 0x0f) )
++	  {
++		vorbis_apply_window_3dn(pcm, w+n0, w, p, pcm + n0);
++		i = n0;
++	  }
++	  else
++	  {
++		  i=0;
++		  n0 -= 3;
++		  for(;i<n0;i+=4)
++		  {
++			pcm[i  ]=pcm[i  ]*w[n0-i+(-1 +3)] + p[i  ]*w[i  ];
++			pcm[i+1]=pcm[i+1]*w[n0-i+(-2 +3)] + p[i+1]*w[i+1];
++			pcm[i+2]=pcm[i+2]*w[n0-i+(-3 +3)] + p[i+2]*w[i+2];
++			pcm[i+3]=pcm[i+3]*w[n0-i+(-4 +3)] + p[i+3]*w[i+3];
++		  }
++		  n0 += 3;
++		  for(;i<n0;i++)
++			pcm[i]=pcm[i]*w[n0-i-1] + p[i]*w[i];
++	  }
+ 	  for(;i<n1/2+n0/2;i++)
+ 	    pcm[i]=p[i];
+ 	}else{
+@@ -766,8 +995,32 @@
+ 	  float *w=_vorbis_window_get(b->window[0]-hs);
+ 	  float *pcm=v->pcm[j]+prevCenter;
+ 	  float *p=vb->pcm[j];
+-	  for(i=0;i<n0;i++)
+-	    pcm[i]=pcm[i]*w[n0-i-1] +p[i]*w[i];
++	  if(CPU_SSE && !(n0 & 0x0f) )
++	  {
++		if(! ( ((long)pcm | (long)p) & 0x0f ) )
++			vorbis_apply_window_sse(pcm, w+n0, w, p, pcm + n0);
++		else
++			vorbis_apply_window_sse_ua(pcm, w+n0, w, p, pcm + n0);
++	  }
++	  else if(CPU_3DN && !(n0 & 0x0f) )
++	  {
++			vorbis_apply_window_3dn(pcm, w+n0, w, p, pcm + n0);
++	  }
++	  else
++	  {
++		  i=0;
++		  n0 -= 3;
++		  for(;i<n0;i+=4)
++		  {
++			pcm[i  ]=pcm[i  ]*w[n0-i+(-1 +3)] + p[i  ]*w[i  ];
++			pcm[i+1]=pcm[i+1]*w[n0-i+(-2 +3)] + p[i+1]*w[i+1];
++			pcm[i+2]=pcm[i+2]*w[n0-i+(-3 +3)] + p[i+2]*w[i+2];
++			pcm[i+3]=pcm[i+3]*w[n0-i+(-4 +3)] + p[i+3]*w[i+3];
++		  }
++		  n0 += 3;
++		  for(;i<n0;i++)
++			pcm[i]=pcm[i]*w[n0-i-1] + p[i]*w[i];
++	  }
+ 	}
+       }
+       
+@@ -775,8 +1028,7 @@
+       {
+ 	float *pcm=v->pcm[j]+thisCenter;
+ 	float *p=vb->pcm[j]+n;
+-	for(i=0;i<n;i++)
+-	  pcm[i]=p[i];
++	memcpy(pcm, p, n * sizeof(float));
+       }
+     }
+     

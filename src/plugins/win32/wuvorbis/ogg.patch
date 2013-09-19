@@ -1,0 +1,201 @@
+Index: ogg/include/ogg/os_types.h
+===================================================================
+--- ogg/include/ogg/os_types.h	(revision 7879)
++++ ogg/include/ogg/os_types.h	(working copy)
+@@ -19,10 +19,10 @@
+ 
+ /* make it easy on the folks that want to compile the libs with a
+    different malloc than stdlib */
+-#define _ogg_malloc  malloc
+-#define _ogg_calloc  calloc
+-#define _ogg_realloc realloc
+-#define _ogg_free    free
++#define _ogg_malloc  dee_ogg_malloc
++#define _ogg_calloc  dee_ogg_calloc
++#define _ogg_realloc dee_ogg_realloc
++#define _ogg_free    dee_ogg_free
+ 
+ #if defined(_WIN32) 
+ 
+Index: ogg/src/framing.c
+===================================================================
+--- ogg/src/framing.c	(revision 7879)
++++ ogg/src/framing.c	(working copy)
+@@ -42,8 +42,10 @@
+   return((int)(og->header[5]&0x04));
+ }
+ 
+-ogg_int64_t ogg_page_granulepos(ogg_page *og){
+-  unsigned char *page=og->header;
++ogg_int64_t ogg_page_granulepos(ogg_page *og){
++ ogg_int64_t *page= (ogg_int64_t *)(og->header + 6);
++ return *page;
++/*
+   ogg_int64_t granulepos=page[13]&(0xff);
+   granulepos= (granulepos<<8)|(page[12]&0xff);
+   granulepos= (granulepos<<8)|(page[11]&0xff);
+@@ -52,7 +54,8 @@
+   granulepos= (granulepos<<8)|(page[8]&0xff);
+   granulepos= (granulepos<<8)|(page[7]&0xff);
+   granulepos= (granulepos<<8)|(page[6]&0xff);
+-  return(granulepos);
++  return(granulepos);
++*/
+ }
+ 
+ int ogg_page_serialno(ogg_page *og){
+@@ -62,11 +65,14 @@
+ 	 (og->header[17]<<24));
+ }
+  
+-long ogg_page_pageno(ogg_page *og){
++long ogg_page_pageno(ogg_page *og){
++	return *(long*)(og->header + 18);
++/*
+   return(og->header[18] |
+ 	 (og->header[19]<<8) |
+ 	 (og->header[20]<<16) |
+-	 (og->header[21]<<24));
++	 (og->header[21]<<24));
++*/
+ }
+ 
+ 
+@@ -117,7 +123,7 @@
+ }
+ #endif
+ 
+-static const ogg_uint32_t crc_lookup[256]={
++static const ogg_uint32_t crc_lookup[256]={
+   0x00000000,0x04c11db7,0x09823b6e,0x0d4326d9,
+   0x130476dc,0x17c56b6b,0x1a864db2,0x1e475005,
+   0x2608edb8,0x22c9f00f,0x2f8ad6d6,0x2b4bcb61,
+@@ -260,10 +266,10 @@
+     for(i=0;i<og->body_len;i++)
+       crc_reg=(crc_reg<<8)^crc_lookup[((crc_reg >> 24)&0xff)^og->body[i]];
+     
+-    og->header[22]=(unsigned char)(crc_reg&0xff);
+-    og->header[23]=(unsigned char)((crc_reg>>8)&0xff);
+-    og->header[24]=(unsigned char)((crc_reg>>16)&0xff);
+-    og->header[25]=(unsigned char)((crc_reg>>24)&0xff);
++    og->header[22]=(unsigned char)(crc_reg&0xff);
++    og->header[23]=(unsigned char)((crc_reg>>8)&0xff);
++    og->header[24]=(unsigned char)((crc_reg>>16)&0xff);
++    og->header[25]=(unsigned char)((crc_reg>>24)&0xff);
+   }
+ }
+ 
+@@ -378,7 +384,7 @@
+ 
+   /* 64 bits of PCM position */
+   for(i=6;i<14;i++){
+-    os->header[i]=(unsigned char)(granule_pos&0xff);
++    os->header[i]=(unsigned char)(granule_pos&0xff);
+     granule_pos>>=8;
+   }
+ 
+@@ -386,7 +392,7 @@
+   {
+     long serialno=os->serialno;
+     for(i=14;i<18;i++){
+-      os->header[i]=(unsigned char)(serialno&0xff);
++      os->header[i]=(unsigned char)(serialno&0xff);
+       serialno>>=8;
+     }
+   }
+@@ -401,7 +407,7 @@
+   {
+     long pageno=os->pageno++;
+     for(i=18;i<22;i++){
+-      os->header[i]=(unsigned char)(pageno&0xff);
++      os->header[i]=(unsigned char)(pageno&0xff);
+       pageno>>=8;
+     }
+   }
+@@ -413,9 +419,9 @@
+   os->header[25]=0;
+   
+   /* segment table */
+-  os->header[26]=(unsigned char)(vals&0xff);
++  os->header[26]=(unsigned char)(vals&0xff);
+   for(i=0;i<vals;i++)
+-    bytes+=os->header[i+27]=(unsigned char)(os->lacing_vals[i]&0xff);
++    bytes+=os->header[i+27]=(unsigned char)(os->lacing_vals[i]&0xff);
+   
+   /* set pointers in the ogg_page struct */
+   og->header=os->header;
+@@ -567,7 +573,8 @@
+   
+   if(oy->bodybytes+oy->headerbytes>bytes)return(0);
+   
+-  /* The whole test page is buffered.  Verify the checksum */
++  /* The whole test page is buffered.  Verify the checksum */
++  
+   {
+     /* Grab the checksum bytes, set the header field to zero */
+     char chksum[4];
+@@ -593,7 +600,7 @@
+       /* Bad checksum. Lose sync */
+       goto sync_fail;
+     }
+-  }
++  }
+   
+   /* yes, have a whole page all ready to go */
+   {
+@@ -645,7 +652,7 @@
+      buffer.  If it doesn't verify, we look for the next potential
+      frame */
+ 
+-  for(;;){
++  for(;;){
+     long ret=ogg_sync_pageseek(oy,og);
+     if(ret>0){
+       /* have a page */
+Index: ogg/src/bitwise.c
+===================================================================
+--- ogg/src/bitwise.c	(revision 7879)
++++ ogg/src/bitwise.c	(working copy)
+@@ -224,7 +224,7 @@
+ /* Read in bits without advancing the bitptr; bits <= 32 */
+ long oggpack_look(oggpack_buffer *b,int bits){
+   unsigned long ret;
+-  unsigned long m=mask[bits];
++  unsigned long m= (bits==32)?-1:((1<<bits)-1); /*mask[bits]*/
+ 
+   bits+=b->endbit;
+ 
+@@ -285,10 +285,10 @@
+   return((b->ptr[0]>>(7-b->endbit))&1);
+ }
+ 
+-void oggpack_adv(oggpack_buffer *b,int bits){
++void __inline oggpack_adv(oggpack_buffer *b,int bits){
+   bits+=b->endbit;
+-  b->ptr+=bits/8;
+-  b->endbyte+=bits/8;
++  b->ptr+=bits>>3;
++  b->endbyte+=bits>>3;
+   b->endbit=bits&7;
+ }
+ 
+@@ -296,7 +296,7 @@
+   oggpack_adv(b,bits);
+ }
+ 
+-void oggpack_adv1(oggpack_buffer *b){
++void __inline oggpack_adv1(oggpack_buffer *b){
+   if(++(b->endbit)>7){
+     b->endbit=0;
+     b->ptr++;
+@@ -338,8 +338,8 @@
+   
+  overflow:
+ 
+-  b->ptr+=bits/8;
+-  b->endbyte+=bits/8;
++  b->ptr+=bits>>3;
++  b->endbyte+=bits>>3;
+   b->endbit=bits&7;
+   return(ret);
+ }
