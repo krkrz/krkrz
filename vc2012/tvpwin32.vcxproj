@@ -237,6 +237,7 @@
     <ClInclude Include="..\visual\PrerenderedFont.h" />
     <ClInclude Include="..\visual\RectItf.h" />
     <ClInclude Include="..\visual\Resampler.h" />
+    <ClInclude Include="..\visual\SaveTLG.h" />
     <ClInclude Include="..\visual\transhandler.h" />
     <ClInclude Include="..\visual\TransIntf.h" />
     <ClInclude Include="..\visual\tvpfontstruc.h" />
@@ -382,6 +383,8 @@
     <ClCompile Include="..\visual\PrerenderedFont.cpp" />
     <ClCompile Include="..\visual\RectItf.cpp" />
     <ClCompile Include="..\visual\Resampler.cpp" />
+    <ClCompile Include="..\visual\SaveTLG5.cpp" />
+    <ClCompile Include="..\visual\SaveTLG6.cpp" />
     <ClCompile Include="..\visual\TransIntf.cpp" />
     <ClCompile Include="..\visual\tvpgl.c" />
     <ClCompile Include="..\visual\VideoOvlIntf.cpp" />

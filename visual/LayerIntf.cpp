@@ -2373,6 +2373,52 @@ void tTJSNI_BaseLayer::SaveLayerImage(const ttstr &name, const ttstr &type)
 		TVPSaveAsPNG(name, type, MainImage);
 	else if( type.StartsWith(TJS_W("jpg")) )
 		TVPSaveAsJPG(name, type, MainImage);
+	else if( type.StartsWith(TJS_W("tlg")) ) {
+		std::vector<std::string> tags;
+		tags.push_back("mode");
+		switch(Type) {
+		case ltOpaque:				tags.push_back("opaque");		break;
+		case ltAlpha:				tags.push_back("alpha");		break;
+		case ltAdditive:			tags.push_back("add");			break;
+		case ltSubtractive:			tags.push_back("sub");			break;
+		case ltMultiplicative:		tags.push_back("mul");			break;
+		case ltDodge:				tags.push_back("dodge");		break;
+		case ltDarken:				tags.push_back("darken");		break;
+		case ltLighten:				tags.push_back("lighten");		break;
+		case ltScreen:				tags.push_back("screen");		break;
+		case ltAddAlpha:			tags.push_back("addalpha");		break;
+		case ltPsNormal:			tags.push_back("psnormal");		break;
+		case ltPsAdditive:			tags.push_back("psadd");		break;
+		case ltPsSubtractive:		tags.push_back("pssub");		break;
+		case ltPsMultiplicative:	tags.push_back("psmul");		break;
+		case ltPsScreen:			tags.push_back("psscreen");		break;
+		case ltPsOverlay:			tags.push_back("psoverlay");	break;
+		case ltPsHardLight:			tags.push_back("pshlight");		break;
+		case ltPsSoftLight:			tags.push_back("psslight");		break;
+		case ltPsColorDodge:		tags.push_back("psdodge");		break;
+		case ltPsColorDodge5:		tags.push_back("psdodge5");		break;
+		case ltPsColorBurn:			tags.push_back("psburn");		break;
+		case ltPsLighten:			tags.push_back("pslighten");	break;
+		case ltPsDarken:			tags.push_back("psdarken");		break;
+		case ltPsDifference:	 	tags.push_back("psdiff");		break;
+		case ltPsDifference5:	 	tags.push_back("psdiff5");		break;
+		case ltPsExclusion:			tags.push_back("psexcl");		break;
+		default:					tags.push_back("opaque");		break;
+		}
+		if( ImageLeft > 0 ) {
+			tags.push_back("offs_x");
+			tags.push_back(ttstr(ImageLeft).AsNarrowStdString() );
+		}
+		if( ImageTop > 0 ) {
+			tags.push_back("offs_y");
+			tags.push_back(ttstr(ImageTop).AsNarrowStdString() );
+		}
+		if( ImageLeft > 0 || ImageTop > 0 ) {
+			tags.push_back("offs_unit");
+			tags.push_back("pixel");
+		}
+		TVPSaveAsTLG( name, type, MainImage, tags );
+	}
 
 }
 //---------------------------------------------------------------------------
