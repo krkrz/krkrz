@@ -86,6 +86,8 @@ void tTJSNI_Bitmap::Save(const ttstr &name, const ttstr &type) {
 
 	if( type.StartsWith(TJS_W("bmp")) )
 		TVPSaveAsBMP(name, type, Bitmap);
+	if( type.StartsWith(TJS_W("png")) )
+		TVPSaveAsPNG(name, type, Bitmap);
 }
 
 void tTJSNI_Bitmap::SetSize(tjs_uint width, tjs_uint height) {
