@@ -3,14 +3,15 @@
   <ItemGroup>
     <Filter Include="ASM Source">
       <UniqueIdentifier>{c67a46fd-f3d1-4c89-8df8-1c9305524263}</UniqueIdentifier>
+      <Extensions>nas</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="pv_def.nas">
+    <CustomBuild Include="pv_sse.nas">
       <Filter>ASM Source</Filter>
-    </None>
-    <None Include="pv_sse.nas">
+    </CustomBuild>
+    <CustomBuild Include="pv_def.nas">
       <Filter>ASM Source</Filter>
-    </None>
+    </CustomBuild>
   </ItemGroup>
 </Project>
