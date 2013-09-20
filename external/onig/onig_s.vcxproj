@@ -84,9 +84,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="enc\ascii.c" />
     <ClCompile Include="enc\big5.c" />
     <ClCompile Include="enc\cp1251.c" />
