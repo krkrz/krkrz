@@ -2367,7 +2367,11 @@ void tTJSNI_BaseLayer::SaveLayerImage(const ttstr &name, const ttstr &type)
 {
 	if(!MainImage) TVPThrowExceptionMessage(TVPNotDrawableLayerType);
 
-	TVPSaveAsBMP(name, type, MainImage);	
+	if( type.StartsWith(TJS_W("bmp")) )
+		TVPSaveAsBMP(name, type, MainImage);
+	if( type.StartsWith(TJS_W("png")) )
+		TVPSaveAsPNG(name, type, MainImage);
+
 }
 //---------------------------------------------------------------------------
 iTJSDispatch2 * tTJSNI_BaseLayer::LoadImages(const ttstr &name, tjs_uint32 colorkey)

@@ -2,6 +2,8 @@
 #include "tjsCommHead.h"
 
 #include "GraphicsLoaderIntf.h"
+#include "LayerBitmapIntf.h"
+#include "StorageIntf.h"
 #include "MsgIntf.h"
 #include "tvpgl.h"
 
@@ -434,3 +436,92 @@ void TVPLoadPNG(void* formatdata, void *callbackdata, tTVPGraphicSizeCallback si
 
 }
 //---------------------------------------------------------------------------
+/**
+ * PNG書き込みフラッシュ
+ * @param png_ptr : PNG情報
+ */
+static void PNG_write_flash( png_structp png_ptr )
+{
+	// 何もしない
+}
+//---------------------------------------------------------------------------
+/**
+ * PNG書き込み
+ * @param png_ptr : PNG情報
+ * @param buf : 書き込みデータ
+ * @param size : データサイズ
+ */
+static void PNG_write_write( png_structp png_ptr, png_bytep buf, png_size_t size )
+{
+    tTJSBinaryStream* stream=(tTJSBinaryStream*)png_get_io_ptr(png_ptr);
+    stream->WriteBuffer(buf,(tjs_uint)size);
+}
+//---------------------------------------------------------------------------
+/**
+ * PNG書き込み
+ * フルカラーでの書き込みのみ対応
+ * @param storagename : 出力ファイル名
+ * @param mode : モード (現在はpngのみ可)
+ * @param image : 書き出しイメージデータ
+ */
+void TVPSaveAsPNG( const ttstr & storagename, const ttstr & mode, const tTVPBaseBitmap* image )
+{
+	if(!image->Is32BPP())
+		TVPThrowInternalError;
+
+	if( mode != TJS_W("png") ) TVPThrowExceptionMessage(TVPInvalidImageSaveType, mode);
+
+	tjs_uint height = image->GetHeight();
+	tjs_uint width = image->GetWidth();
+	if( height == 0 || width == 0 ) TVPThrowInternalError;
+
+	// open stream
+	tTJSBinaryStream *stream = TVPCreateStream(TVPNormalizeStorageName(storagename), TJS_BS_WRITE);
+
+	try {
+		TVPClearGraphicCache();
+
+		png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,NULL,NULL,NULL);
+		if( !png_ptr ) {
+			TVPThrowExceptionMessage(TJS_W("PNG save error."));
+		}
+		png_infop info_ptr = png_create_info_struct(png_ptr);
+		if( !info_ptr ) {
+			png_destroy_write_struct(&png_ptr,NULL);
+			TVPThrowExceptionMessage(TJS_W("PNG save error."));
+		}
+
+		png_set_write_fn( png_ptr, (png_voidp)stream, (png_rw_ptr)PNG_write_write, (png_flush_ptr)PNG_write_flash );
+
+		png_set_IHDR( png_ptr, info_ptr, width, height, 8, PNG_COLOR_TYPE_RGB_ALPHA, PNG_INTERLACE_NONE,
+					PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT );
+	
+		png_color_8 sig_bit;
+		sig_bit.red = 8;
+		sig_bit.green = 8;
+		sig_bit.blue = 8;
+		sig_bit.gray = 0;
+		sig_bit.alpha = 8;
+		png_set_sBIT( png_ptr, info_ptr, &sig_bit );
+
+		/* ----- インフォメーションヘッダー書出し */
+		png_write_info( png_ptr, info_ptr );
+		png_set_bgr( png_ptr );
+
+		/* ----- ピクセル書出し */
+		tjs_uint32* buff = new tjs_uint32[width];
+		for( tjs_uint32 y = 0; y < height; y++ ) {
+			memcpy( buff, image->GetScanLine(y), width*sizeof(tjs_uint32) );
+			png_write_row( png_ptr, (png_bytep)buff );
+		}
+		/* ----- 書き出しの終了、後始末 */
+		png_write_end( png_ptr, info_ptr );
+		png_destroy_write_struct( &png_ptr, &info_ptr );
+		delete buff;
+	} catch(...) {
+		delete stream;
+		throw;
+	}
+	delete stream;
+}
+
