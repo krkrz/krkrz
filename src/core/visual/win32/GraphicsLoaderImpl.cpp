@@ -82,7 +82,7 @@ tTVPSusiePlugin::tTVPSusiePlugin(HINSTANCE inst, const char *api)
 		buffer[255] = 0;
 
 		// here buffer contains exetension information such as "*.JPG" "*.RGB;*.Q0"
-		strlwr(buffer);
+		_strlwr(buffer);
 
 		// split buffer to each extensions
 		char *p = buffer;

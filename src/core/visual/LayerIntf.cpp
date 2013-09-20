@@ -2369,8 +2369,10 @@ void tTJSNI_BaseLayer::SaveLayerImage(const ttstr &name, const ttstr &type)
 
 	if( type.StartsWith(TJS_W("bmp")) )
 		TVPSaveAsBMP(name, type, MainImage);
-	if( type.StartsWith(TJS_W("png")) )
+	else if( type.StartsWith(TJS_W("png")) )
 		TVPSaveAsPNG(name, type, MainImage);
+	else if( type.StartsWith(TJS_W("jpg")) )
+		TVPSaveAsJPG(name, type, MainImage);
 
 }
 //---------------------------------------------------------------------------
