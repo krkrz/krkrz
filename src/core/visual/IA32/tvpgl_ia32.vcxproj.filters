@@ -3,74 +3,75 @@
   <ItemGroup>
     <Filter Include="ASM Source">
       <UniqueIdentifier>{037537ce-de93-4a62-824f-4d296714db41}</UniqueIdentifier>
+      <Extensions>nas</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="addalphablend.nas">
+    <CustomBuild Include="univtrans.nas">
       <Filter>ASM Source</Filter>
-    </None>
-    <None Include="addblend.nas">
+    </CustomBuild>
+    <CustomBuild Include="addalphablend.nas">
       <Filter>ASM Source</Filter>
-    </None>
-    <None Include="adjust_color.nas">
+    </CustomBuild>
+    <CustomBuild Include="addblend.nas">
       <Filter>ASM Source</Filter>
-    </None>
-    <None Include="affine.nas">
+    </CustomBuild>
+    <CustomBuild Include="adjust_color.nas">
       <Filter>ASM Source</Filter>
-    </None>
-    <None Include="alphablend.nas">
+    </CustomBuild>
+    <CustomBuild Include="affine.nas">
       <Filter>ASM Source</Filter>
-    </None>
-    <None Include="boxblur.nas">
+    </CustomBuild>
+    <CustomBuild Include="alphablend.nas">
       <Filter>ASM Source</Filter>
-    </None>
-    <None Include="colorfill.nas">
+    </CustomBuild>
+    <CustomBuild Include="boxblur.nas">
       <Filter>ASM Source</Filter>
-    </None>
-    <None Include="colormap.nas">
+    </CustomBuild>
+    <CustomBuild Include="colorfill.nas">
       <Filter>ASM Source</Filter>
-    </None>
-    <None Include="darkenblend.nas">
+    </CustomBuild>
+    <CustomBuild Include="colormap.nas">
       <Filter>ASM Source</Filter>
-    </None>
-    <None Include="detect_cpu.nas">
+    </CustomBuild>
+    <CustomBuild Include="darkenblend.nas">
       <Filter>ASM Source</Filter>
-    </None>
-    <None Include="lightenblend.nas">
+    </CustomBuild>
+    <CustomBuild Include="detect_cpu.nas">
       <Filter>ASM Source</Filter>
-    </None>
-    <None Include="make_alpha_from_key.nas">
+    </CustomBuild>
+    <CustomBuild Include="lightenblend.nas">
       <Filter>ASM Source</Filter>
-    </None>
-    <None Include="mulblend.nas">
+    </CustomBuild>
+    <CustomBuild Include="make_alpha_from_key.nas">
       <Filter>ASM Source</Filter>
-    </None>
-    <None Include="pixelformat.nas">
+    </CustomBuild>
+    <CustomBuild Include="mulblend.nas">
       <Filter>ASM Source</Filter>
-    </None>
-    <None Include="screenblend.nas">
+    </CustomBuild>
+    <CustomBuild Include="pixelformat.nas">
       <Filter>ASM Source</Filter>
-    </None>
-    <None Include="stretch.nas">
+    </CustomBuild>
+    <CustomBuild Include="screenblend.nas">
       <Filter>ASM Source</Filter>
-    </None>
-    <None Include="subblend.nas">
+    </CustomBuild>
+    <CustomBuild Include="stretch.nas">
       <Filter>ASM Source</Filter>
-    </None>
-    <None Include="tlg5.nas">
+    </CustomBuild>
+    <CustomBuild Include="subblend.nas">
       <Filter>ASM Source</Filter>
-    </None>
-    <None Include="tlg6_chroma.nas">
+    </CustomBuild>
+    <CustomBuild Include="tlg5.nas">
       <Filter>ASM Source</Filter>
-    </None>
-    <None Include="tlg6_golomb.nas">
+    </CustomBuild>
+    <CustomBuild Include="tlg6_chroma.nas">
       <Filter>ASM Source</Filter>
-    </None>
-    <None Include="tvpps_asm.nas">
+    </CustomBuild>
+    <CustomBuild Include="tlg6_golomb.nas">
       <Filter>ASM Source</Filter>
-    </None>
-    <None Include="univtrans.nas">
+    </CustomBuild>
+    <CustomBuild Include="tvpps_asm.nas">
       <Filter>ASM Source</Filter>
-    </None>
+    </CustomBuild>
   </ItemGroup>
 </Project>
