@@ -117,10 +117,12 @@ extern void TVPLoadERI(void* formatdata, void *callbackdata, tTVPGraphicSizeCall
 
 
 //---------------------------------------------------------------------------
-// BMP saving handler
+// Image saving handler
 //---------------------------------------------------------------------------
 extern void TVPSaveAsBMP(const ttstr & storagename, const ttstr & mode,
 	tTVPBaseBitmap *bmp);
+extern void TVPSaveAsPNG( const ttstr & storagename, const ttstr & mode,
+	const tTVPBaseBitmap* image );
 //---------------------------------------------------------------------------
 
 
