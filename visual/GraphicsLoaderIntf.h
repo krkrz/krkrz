@@ -123,6 +123,8 @@ extern void TVPSaveAsBMP(const ttstr & storagename, const ttstr & mode,
 	tTVPBaseBitmap *bmp);
 extern void TVPSaveAsPNG( const ttstr & storagename, const ttstr & mode,
 	const tTVPBaseBitmap* image );
+extern void TVPSaveAsJPG( const ttstr & storagename, const ttstr & mode,
+	const tTVPBaseBitmap* image );
 //---------------------------------------------------------------------------
 
 

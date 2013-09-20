@@ -2,6 +2,8 @@
 #include "tjsCommHead.h"
 
 #include "GraphicsLoaderIntf.h"
+#include "LayerBitmapIntf.h"
+#include "StorageIntf.h"
 #include "MsgIntf.h"
 #include "tvpgl.h"
 
@@ -292,4 +294,143 @@ void TVPLoadJPEG(void* formatdata, void *callbackdata, tTVPGraphicSizeCallback s
 	jpeg_destroy_decompress(&cinfo);
 }
 //---------------------------------------------------------------------------
+struct stream_destination_mgr {
+	struct jpeg_destination_mgr	pub;		/* public fields */
+	tTJSBinaryStream*			stream;
+	JOCTET*						buffer;		/* buffer start address */
+	int							bufsize;	/* size of buffer */
+	int							bufsizeinit;/* size of buffer */
+	size_t						datasize;	/* final size of compressed data */
+	int*						outsize;	/* user pointer to datasize */
+};
+typedef stream_destination_mgr* stream_dest_ptr;
 
+METHODDEF(void) JPEG_write_init_destination( j_compress_ptr cinfo ) {
+	stream_dest_ptr dest = (stream_dest_ptr)cinfo->dest;
+	dest->pub.next_output_byte = dest->buffer;
+	dest->pub.free_in_buffer = dest->bufsize;
+	dest->datasize = 0;	 /* reset output size */
+}
+
+METHODDEF(boolean) JPEG_write_empty_output_buffer( j_compress_ptr cinfo ) {
+	stream_dest_ptr dest = (stream_dest_ptr)cinfo->dest;
+	
+	// 足りなくなったら途中書き込み
+	size_t	wrotelen = dest->bufsizeinit - dest->pub.free_in_buffer;
+	dest->stream->WriteBuffer( dest->buffer, wrotelen );
+
+	dest->pub.next_output_byte = dest->buffer;
+	dest->pub.free_in_buffer = dest->bufsize;
+	return TRUE;
+}
+
+METHODDEF(void) JPEG_write_term_destination( j_compress_ptr cinfo ) {
+	stream_dest_ptr dest = (stream_dest_ptr)cinfo->dest;
+	dest->datasize = dest->bufsize - dest->pub.free_in_buffer;
+	if( dest->outsize ) *dest->outsize += (int)dest->datasize;
+}
+METHODDEF(void) JPEG_write_stream( j_compress_ptr cinfo, JOCTET* buffer, int bufsize, int* outsize, tTJSBinaryStream* stream ) {
+	stream_dest_ptr dest;
+
+	/* first call for this instance - need to setup */
+	if (cinfo->dest == 0) {
+		cinfo->dest = (struct jpeg_destination_mgr*)(*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_PERMANENT, sizeof(stream_destination_mgr) );
+	}
+
+	dest = (stream_dest_ptr) cinfo->dest;
+	dest->stream = stream;
+	dest->bufsize = bufsize;
+	dest->bufsizeinit = bufsize;
+	dest->buffer = buffer;
+	dest->outsize = outsize;
+	/* set method callbacks */
+	dest->pub.init_destination = JPEG_write_init_destination;
+	dest->pub.empty_output_buffer = JPEG_write_empty_output_buffer;
+	dest->pub.term_destination = JPEG_write_term_destination;
+}
+//---------------------------------------------------------------------------
+/**
+ * JPG書き込み
+ * フルカラーでの書き込みのみ対応
+ * @param storagename : 出力ファイル名
+ * @param mode : モード "jpg" と必要なら圧縮率を数値で後に付け足す
+ * @param image : 書き出しイメージデータ
+ */
+void TVPSaveAsJPG( const ttstr & storagename, const ttstr & mode, const tTVPBaseBitmap* image )
+{
+	if(!image->Is32BPP())
+		TVPThrowInternalError;
+
+	if( !mode.StartsWith(TJS_W("jpg")) ) TVPThrowExceptionMessage(TVPInvalidImageSaveType, mode);
+	tjs_uint quality = 90;
+	if( mode.length() > 3 ) {
+		quality = 0;
+		for( tjs_int len = 3; len < mode.length(); len++ ) {
+			tjs_char c = mode[len];
+			if( c >= TJS_W('0') && c <= TJS_W('9') ) {
+				quality *= 10;
+				quality += c-TJS_W('0');
+			}
+		}
+		if( quality <= 0 ) quality = 10;
+		if( quality > 100 ) quality = 100;
+	}
+
+	tjs_uint height = image->GetHeight();
+	tjs_uint width = image->GetWidth();
+	if( height == 0 || width == 0 ) TVPThrowInternalError;
+
+	// open stream
+	tTJSBinaryStream *stream = TVPCreateStream(TVPNormalizeStorageName(storagename), TJS_BS_WRITE);
+	struct jpeg_compress_struct cinfo;
+	
+	size_t buff_size = width*height*sizeof(tjs_uint32);
+	tjs_uint8* dest_buf = new tjs_uint8[buff_size];
+	try {
+		TVPClearGraphicCache();
+
+		struct jpeg_error_mgr jerr;
+		cinfo.err = jpeg_std_error( &jerr );
+		jerr.error_exit = my_error_exit;
+		jerr.output_message = my_output_message;
+		jerr.reset_error_mgr = my_reset_error_mgr;
+		// emit_message, format_message はデフォルトのを使う
+
+		jpeg_create_compress( &cinfo );
+		
+		int num_write_bytes = 0; //size of jpeg after compression
+		JOCTET *jpgbuff = (JOCTET*)dest_buf; //JOCTET pointer to buffer
+		JPEG_write_stream( &cinfo, jpgbuff , buff_size, &num_write_bytes, stream );
+
+		cinfo.image_width = width;
+		cinfo.image_height = height;
+		cinfo.input_components = 4;
+		cinfo.in_color_space = JCS_RGB;
+		cinfo.dct_method = JDCT_ISLOW;
+
+		jpeg_set_defaults( &cinfo );
+		jpeg_set_quality( &cinfo, quality, TRUE );
+		jpeg_start_compress( &cinfo, TRUE );
+		
+		while( cinfo.next_scanline < cinfo.image_height ) {
+			JSAMPROW row_pointer[1];
+			int y = cinfo.next_scanline;
+			row_pointer[0] = reinterpret_cast<JSAMPROW>(const_cast<void*>(image->GetScanLine(y)));
+			jpeg_write_scanlines( &cinfo, row_pointer, 1 );
+		}
+		jpeg_finish_compress(&cinfo);
+		if( cinfo.dest ) {
+			delete cinfo.dest;
+			cinfo.dest = NULL;
+		}
+		jpeg_destroy_compress(&cinfo);
+		stream->WriteBuffer( dest_buf, num_write_bytes );
+	} catch(...) {
+		jpeg_destroy_compress(&cinfo);
+		delete[] dest_buf;
+		delete stream;
+		throw;
+	}
+	delete[] dest_buf;
+	delete stream;
+}
