@@ -468,8 +468,14 @@ void TVPSaveAsPNG( const ttstr & storagename, const ttstr & mode, const tTVPBase
 {
 	if(!image->Is32BPP())
 		TVPThrowInternalError;
-
-	if( mode != TJS_W("png") ) TVPThrowExceptionMessage(TVPInvalidImageSaveType, mode);
+	
+	int bpp = 32;
+	if( !mode.StartsWith(TJS_W("png")) ) TVPThrowExceptionMessage(TVPInvalidImageSaveType, mode);
+	if( mode.length() > 3 ) {
+		if( mode == TJS_W("png24") ) {
+			bpp = 24;
+		}
+	}
 
 	tjs_uint height = image->GetHeight();
 	tjs_uint width = image->GetWidth();
@@ -493,7 +499,7 @@ void TVPSaveAsPNG( const ttstr & storagename, const ttstr & mode, const tTVPBase
 
 		png_set_write_fn( png_ptr, (png_voidp)stream, (png_rw_ptr)PNG_write_write, (png_flush_ptr)PNG_write_flash );
 
-		png_set_IHDR( png_ptr, info_ptr, width, height, 8, PNG_COLOR_TYPE_RGB_ALPHA, PNG_INTERLACE_NONE,
+		png_set_IHDR( png_ptr, info_ptr, width, height, 8, (bpp == 32 ? PNG_COLOR_TYPE_RGB_ALPHA : PNG_COLOR_TYPE_RGB), PNG_INTERLACE_NONE,
 					PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT );
 	
 		png_color_8 sig_bit;
@@ -501,7 +507,7 @@ void TVPSaveAsPNG( const ttstr & storagename, const ttstr & mode, const tTVPBase
 		sig_bit.green = 8;
 		sig_bit.blue = 8;
 		sig_bit.gray = 0;
-		sig_bit.alpha = 8;
+		sig_bit.alpha = bpp == 32 ? 8 : 0;
 		png_set_sBIT( png_ptr, info_ptr, &sig_bit );
 
 		/* ----- インフォメーションヘッダー書出し */
@@ -509,10 +515,25 @@ void TVPSaveAsPNG( const ttstr & storagename, const ttstr & mode, const tTVPBase
 		png_set_bgr( png_ptr );
 
 		/* ----- ピクセル書出し */
-		tjs_uint32* buff = new tjs_uint32[width];
-		for( tjs_uint32 y = 0; y < height; y++ ) {
-			memcpy( buff, image->GetScanLine(y), width*sizeof(tjs_uint32) );
-			png_write_row( png_ptr, (png_bytep)buff );
+		tjs_uint width_byte = (bpp*width)/8;
+		tjs_uint8* buff = new tjs_uint8[width_byte];
+		if( bpp == 32 ) {
+			for( tjs_uint32 y = 0; y < height; y++ ) {
+				memcpy( buff, image->GetScanLine(y), width_byte );
+				png_write_row( png_ptr, (png_bytep)buff );
+			}
+		} else {
+			for( tjs_uint32 y = 0; y < height; y++ ) {
+				const tjs_uint8* src = reinterpret_cast<const tjs_uint8*>(image->GetScanLine(y));
+				tjs_uint8* dst = buff;
+				for( tjs_uint32 x = 0; x < width; x++ ) {
+					*dst = *src; dst++; src++;
+					*dst = *src; dst++; src++;
+					*dst = *src; dst++; src++;
+					src++;
+				}
+				png_write_row( png_ptr, (png_bytep)buff );
+			}
 		}
 		/* ----- 書き出しの終了、後始末 */
 		png_write_end( png_ptr, info_ptr );

@@ -35,7 +35,7 @@ public:
 
 	iTJSDispatch2* Load(const ttstr &name, tjs_uint32 colorkey);
 	void LoadAsync(const ttstr &name, tjs_uint32 colorkey);
-	void Save(const ttstr &name, const ttstr &type);
+	void Save(const ttstr &name, const ttstr &type, iTJSDispatch2* meta = NULL);
 
 	void SetSize(tjs_uint width, tjs_uint height);
 

@@ -125,6 +125,8 @@ extern void TVPSaveAsPNG( const ttstr & storagename, const ttstr & mode,
 	const tTVPBaseBitmap* image );
 extern void TVPSaveAsJPG( const ttstr & storagename, const ttstr & mode,
 	const tTVPBaseBitmap* image );
+extern void TVPSaveAsTLG( const ttstr & storagename, const ttstr & mode,
+	const tTVPBaseBitmap* image, const std::vector<std::string>& tags );
 //---------------------------------------------------------------------------
 
 

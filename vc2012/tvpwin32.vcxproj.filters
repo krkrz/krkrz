@@ -544,6 +544,9 @@
     <ClInclude Include="..\tjs2\tjspp.tab.hpp">
       <Filter>tjs2</Filter>
     </ClInclude>
+    <ClInclude Include="..\visual\SaveTLG.h">
+      <Filter>visual</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -950,6 +953,12 @@
     </ClCompile>
     <ClCompile Include="..\tjs2\tjspp.tab.cpp">
       <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\SaveTLG5.cpp">
+      <Filter>visual</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\SaveTLG6.cpp">
+      <Filter>visual</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

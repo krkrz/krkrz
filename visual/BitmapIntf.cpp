@@ -81,7 +81,7 @@ iTJSDispatch2 * tTJSNI_Bitmap::Load(const ttstr &name, tjs_uint32 colorkey) {
 void tTJSNI_Bitmap::LoadAsync(const ttstr &name, tjs_uint32 colorkey) {
 	Loading = true;
 }
-void tTJSNI_Bitmap::Save(const ttstr &name, const ttstr &type) {
+void tTJSNI_Bitmap::Save(const ttstr &name, const ttstr &type, iTJSDispatch2* meta ) {
 	if(!Bitmap) TVPThrowExceptionMessage(TVPNotDrawableLayerType);
 
 	if( type.StartsWith(TJS_W("bmp")) )
@@ -90,6 +90,39 @@ void tTJSNI_Bitmap::Save(const ttstr &name, const ttstr &type) {
 		TVPSaveAsPNG(name, type, Bitmap);
 	else if( type.StartsWith(TJS_W("jpg")) )
 		TVPSaveAsJPG(name, type, Bitmap);
+	else if( type.StartsWith(TJS_W("tlg")) ) {
+		std::vector<std::string> tags;
+		if( meta ) {
+			struct MetaDictionaryEnumCallback : public tTJSDispatch {
+				std::vector<std::string>& Tags;
+	
+				MetaDictionaryEnumCallback( std::vector<std::string>& tags ) : Tags(tags) {}
+
+				tjs_error TJS_INTF_METHOD FuncCall(tjs_uint32 flag, const tjs_char * membername,
+					tjs_uint32 *hint, tTJSVariant *result, tjs_int numparams,
+					tTJSVariant **param, iTJSDispatch2 *objthis) {
+					// called from tTJSCustomObject::EnumMembers
+					if(numparams < 3) return TJS_E_BADPARAMCOUNT;
+
+					// hidden members are not processed
+					tjs_uint32 flags = (tjs_int)*param[1];
+					if(flags & TJS_HIDDENMEMBER) {
+						if(result) *result = (tjs_int)1;
+						return TJS_S_OK;
+					}
+					// push items
+					ttstr value = *param[0];
+					Tags.push_back( value.AsNarrowStdString() );
+					value = *param[2];
+					Tags.push_back( value.AsNarrowStdString() );
+					if(result) *result = (tjs_int)1;
+					return TJS_S_OK;
+				}
+			} callback(tags);
+			meta->EnumMembers(TJS_IGNOREPROP, &tTJSVariantClosure(&callback, NULL), meta);
+		}
+		TVPSaveAsTLG( name, type, Bitmap, tags );
+	}
 }
 
 void tTJSNI_Bitmap::SetSize(tjs_uint width, tjs_uint height) {
@@ -244,7 +277,9 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/save)
 	ttstr type(TJS_W("bmp"));
 	if(numparams >=2 && param[1]->Type() != tvtVoid)
 		type = *param[1];
-	_this->Save(name, type); // TODO TLG6 の時のパラメータ配列も受けられるようにしたいところ
+	iTJSDispatch2* meta = NULL;
+	if( numparams >= 3 ) meta = param[2]->AsObjectNoAddRef();
+	_this->Save( name, type, meta );
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/save)
