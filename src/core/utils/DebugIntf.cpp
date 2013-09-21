@@ -296,13 +296,11 @@ void TVPAddLog(const ttstr &line, bool appendtoimportant)
 #endif	// ENABLE_DEBUGGER
 #ifdef TVP_LOG_TO_COMMANDLINE_CONSOLE
 	if( Application->IsAttachConsole() ) {
+		/*
 		wprintf( buf.c_str() );
 		wprintf( L"\n" );
-		/*
-		HANDLE hStdOutput = ::GetStdHandle(STD_OUTPUT_HANDLE);
-		DWORD len;
-		::WriteConsoleW( hStdOutput, buf.c_str(), buf.length(), &len, NULL );
 		*/
+		Application->PrintConsole( buf.c_str(), buf.length() );
 	}
 #endif
 	if(TVPLoggingToFile) TVPLogStreamHolder.Log(buf);

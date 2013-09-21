@@ -87,6 +87,7 @@ public:
 	TApplication() : is_attach_console_(false), tarminate_(false) {}
 	void CheckConsole();
 	void CloseConsole();
+	void PrintConsole( const wchar_t* mes, unsigned long len );
 	bool IsAttachConsole() { return is_attach_console_; }
 	void CheckDigitizer();
 

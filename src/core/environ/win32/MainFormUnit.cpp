@@ -145,14 +145,14 @@ void TTVPMainForm::SystemWatchTimerTimer() {
 		static bool clock_rough_printed = false;
 		if( !clock_rough_printed && TVPCPUClockAccuracy == ccaRough ) {
 			tjs_char msg[80];
-			TJS_sprintf(msg, TJS_W("(info) CPU clock (roughly) : %dMHz"), (int)TVPCPUClock);
+			swprintf_s(msg, 80, TJS_W("(info) CPU clock (roughly) : %dMHz"), (int)TVPCPUClock);
 			TVPAddImportantLog(msg);
 			clock_rough_printed = true;
 		}
 		static bool clock_printed = false;
 		if( !clock_printed && TVPCPUClockAccuracy == ccaAccurate ) {
 			tjs_char msg[80];
-			TJS_sprintf(msg, TJS_W("(info) CPU clock : %.1fMHz"), (float)TVPCPUClock);
+			swprintf_s(msg, 80, TJS_W("(info) CPU clock : %.1fMHz"), (float)TVPCPUClock);
 			TVPAddImportantLog(msg);
 			clock_printed = true;
 		}
