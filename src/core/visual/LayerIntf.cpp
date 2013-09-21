@@ -24,6 +24,7 @@
 #include "TickCount.h"
 #include "DebugIntf.h"
 #include "LayerManager.h"
+#include "BitmapIntf.h"
 
 #include "TColor.h"
 
@@ -2131,6 +2132,37 @@ void tTJSNI_BaseLayer::AssignImages(tTJSNI_BaseLayer *src)
 	if(main_changed) Update(false); // update
 }
 //---------------------------------------------------------------------------
+void tTJSNI_BaseLayer::AssignMainImageWithUpdate(tTVPBaseBitmap *bmp)
+{
+	// assign images
+	bool main_changed = true;
+
+	if(bmp)
+	{
+		if(MainImage)
+			main_changed = MainImage->Assign(*bmp);
+		else
+			MainImage = new tTVPBaseBitmap(*bmp);
+		FontChanged = true; // invalidate font assignment cache
+	}
+	else
+	{
+		DeallocateImage();
+	}
+
+	if(main_changed && MainImage)
+	{
+		InternalSetImageSize(MainImage->GetWidth(), MainImage->GetHeight());
+			// adjust position
+	}
+
+	ImageModified = true;
+
+	if(MainImage) ResetClip();  // cliprect is reset
+
+	if(main_changed) Update(false); // update
+}
+//---------------------------------------------------------------------------
 void tTJSNI_BaseLayer::AssignMainImage(tTVPBaseBitmap *bmp)
 {
 	// assign single main bitmap image. the image size assigned must be
@@ -2153,6 +2185,12 @@ void tTJSNI_BaseLayer::AssignMainImage(tTVPBaseBitmap *bmp)
 		ImageModified = true;
 		Update(false); // update
 	}
+}
+//---------------------------------------------------------------------------
+void tTJSNI_BaseLayer::CopyFromMainImage( tTJSNI_Bitmap* bmp )
+{
+	if(!MainImage) TVPThrowExceptionMessage(TVPNotDrawableLayerType);
+	bmp->CopyFrom( MainImage );
 }
 //---------------------------------------------------------------------------
 void tTJSNI_BaseLayer::SetHasImage(bool b)
@@ -7449,6 +7487,44 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/dump)
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/dump)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/copyToMainImage)
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
+
+	if(numparams < 1) return TJS_E_BADPARAMCOUNT;
+
+	tTJSVariantClosure clo = param[0]->AsObjectClosureNoAddRef();
+	tTJSNI_Bitmap* dstbmp = NULL;
+	if( clo.Object ) {
+		if(TJS_FAILED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE,
+			tTJSNC_Bitmap::ClassID, (iTJSNativeInstance**)&dstbmp)))
+			return TJS_E_INVALIDPARAM;
+		if( dstbmp ) _this->CopyFromMainImage( dstbmp );
+	}
+
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/copyToMainImage)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/copyFromMainImage)
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
+
+	if(numparams < 1) return TJS_E_BADPARAMCOUNT;
+
+	tTJSVariantClosure clo = param[0]->AsObjectClosureNoAddRef();
+	tTJSNI_Bitmap* srcbmp = NULL;
+	if( clo.Object ) {
+		if(TJS_FAILED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE,
+			tTJSNC_Bitmap::ClassID, (iTJSNativeInstance**)&srcbmp)))
+			return TJS_E_INVALIDPARAM;
+		if( srcbmp ) _this->AssignMainImageWithUpdate( srcbmp->GetBitmap() );
+	}
+
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/copyFromMainImage)
 //----------------------------------------------------------------------
 
 //-- events
