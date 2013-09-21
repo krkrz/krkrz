@@ -289,6 +289,12 @@ void TApplication::CloseConsole() {
 		::FreeConsole();
 	}
 }
+void TApplication::PrintConsole( const wchar_t* mes, unsigned long len ) {
+	DWORD wlen;
+	HANDLE hStdOutput = ::GetStdHandle(STD_OUTPUT_HANDLE);
+	::WriteConsoleW( hStdOutput, mes, len, &wlen, NULL );
+	::WriteConsoleW( hStdOutput, "\n", 1, &wlen, NULL );
+}
 HWND TApplication::GetHandle() {
 	if( windows_list_.size() > 0 ) {
 		return windows_list_[0]->GetHandle();
