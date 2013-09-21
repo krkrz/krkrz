@@ -70,8 +70,8 @@ public:
 		LogFont.lfOutPrecision = OUT_DEFAULT_PRECIS;
 		LogFont.lfQuality = DEFAULT_QUALITY;
 		LogFont.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
-		tstring face = TVPFontSystem->GetBeingFont(font.Face.AsStdString());
-		_tcsncpy(LogFont.lfFaceName, face.c_str(), LF_FACESIZE -1);
+		std::wstring face = TVPFontSystem->GetBeingFont(font.Face.AsStdString());
+		wcsncpy_s(LogFont.lfFaceName, LF_FACESIZE, face.c_str(), LF_FACESIZE -1);
 		LogFont.lfFaceName[LF_FACESIZE-1] = 0;
 
 		ApplyFont( &LogFont );
@@ -115,8 +115,8 @@ public:
 		LogFont.lfOutPrecision = OUT_DEFAULT_PRECIS;
 		LogFont.lfQuality = DEFAULT_QUALITY;
 		LogFont.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
-		tstring face = TVPFontSystem->GetBeingFont(font.Face.AsStdString());
-		_tcsncpy(LogFont.lfFaceName, face.c_str(), LF_FACESIZE -1);
+		std::wstring face = TVPFontSystem->GetBeingFont(font.Face.AsStdString());
+		wcsncpy_s(LogFont.lfFaceName, LF_FACESIZE, face.c_str(), LF_FACESIZE -1);
 		LogFont.lfFaceName[LF_FACESIZE-1] = 0;
 		ApplyFont( &LogFont );
 	}
