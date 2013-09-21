@@ -422,6 +422,9 @@ public:
 		// assign single main bitmap image. the image size assigned must be
 		// identical to the destination layer bitmap.
 
+	void AssignMainImageWithUpdate(tTVPBaseBitmap *bmp);
+	void CopyFromMainImage( class tTJSNI_Bitmap* bmp );
+
 	void SetNeutralColor(tjs_uint32 color) { NeutralColor = color; }
 	tjs_uint32 GetNeutralColor() const { return NeutralColor; }
 
