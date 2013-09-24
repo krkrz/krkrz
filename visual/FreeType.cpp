@@ -98,7 +98,7 @@ tGenericFreeTypeFace::tGenericFreeTypeFace(const ttstr &fontname, tjs_uint32 opt
 		// FT_StreamRec の各フィールドを埋める
 		FT_StreamRec * fsr = &Stream;
 		fsr->base = 0;
-		fsr->size = File->GetSize();
+		fsr->size = static_cast<unsigned long>(File->GetSize());
 		fsr->pos = 0;
 		fsr->descriptor.pointer = this;
 		fsr->pathname.pointer = NULL;

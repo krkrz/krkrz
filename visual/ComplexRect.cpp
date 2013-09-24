@@ -1215,7 +1215,7 @@ void tTVPComplexRect::DumpChain()
 	tIterator it = GetIterator();
 	while(it.Step()) {
 		TCHAR tmp[200];
-		_stprintf(tmp, _T("%p (%p) %p : "), it.Get().Prev, &(it.Get()), it.Get().Next);
+		swprintf_s(tmp, 200, _T("%p (%p) %p : "), it.Get().Prev, &(it.Get()), it.Get().Next);
 		str += tmp;
 	}
 	OutputDebugString(str.c_str());

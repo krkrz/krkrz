@@ -375,8 +375,8 @@ void tTVPCharacterData::AddHorizontalLine( tjs_int liney, tjs_int thickness, tjs
 		tjs_int offsety = OriginY - top;
 		tjs_uint8 *sp = Data;
 		tjs_uint8 *dp = newdata + offsety*newpitch + offsetx;
-		for( tjs_int y = 0; y < BlackBoxY; y++ ) {
-			for( tjs_int x = 0; x < BlackBoxX; x++ ) {
+		for( tjs_uint y = 0; y < BlackBoxY; y++ ) {
+			for( tjs_uint x = 0; x < BlackBoxX; x++ ) {
 				dp[x] = sp[x];
 			}
 			sp += Pitch;
@@ -393,7 +393,7 @@ void tTVPCharacterData::AddHorizontalLine( tjs_int liney, tjs_int thickness, tjs
 	tjs_int end = linetop-OriginY+thickness;
 	tjs_uint8 *dp = Data + (linetop-OriginY)*Pitch;
 	for( tjs_int y = 0; y < thickness; y++ ) {
-		for( tjs_int x = 0; x < BlackBoxX; x++ ) {
+		for( tjs_uint x = 0; x < BlackBoxX; x++ ) {
 			dp[x] = val;
 		}
 		dp += Pitch;
