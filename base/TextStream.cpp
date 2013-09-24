@@ -17,7 +17,7 @@
 #include "EventIntf.h"
 #include "UtilStreams.h"
 #include "tjsError.h"
-
+#include "CharacterSet.h"
 
 /*
 	Text stream is used by TJS's Array.save, Dictionary.saveStruct etc.
@@ -152,10 +152,17 @@ public:
 				{
 					Stream->ReadBuffer(nbuf, size);
 					nbuf[size] = 0; // terminater
+#ifndef TVP_TEXT_READ_ANSI_MBCS
+					BufferLen = TVPUtf8ToWideCharString((const char*)nbuf, NULL);
+					if(BufferLen == (size_t)-1) TVPThrowExceptionMessage(TJSNarrowToWideConversionError);
+					Buffer = new tjs_char [ BufferLen +1];
+					TVPUtf8ToWideCharString((const char*)nbuf, Buffer);
+#else
 					BufferLen = TJS_narrowtowidelen((tjs_nchar*)nbuf);
 					if(BufferLen == (size_t)-1) TVPThrowExceptionMessage(TJSNarrowToWideConversionError);
 					Buffer = new tjs_char [ BufferLen +1];
 					TJS_narrowtowide(Buffer, (tjs_nchar*)nbuf, BufferLen);
+#endif
 				}
 				catch(...)
 				{
