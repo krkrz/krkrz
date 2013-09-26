@@ -507,7 +507,7 @@ print OFH "#include \"ClipboardIntf.h\"\n";
 process_exp_stub("../../utils/ClipboardIntf.h");
 
 print OFH "#include \"TickCount.h\"\n";
-process_exp_stub("../../utils/win32/TickCount.h");
+process_exp_stub("../../utils/TickCount.h");
 
 print OFH "#include \"MsgIntf.h\"\n";
 process_exp_stub("../../msg/MsgIntf.h");
