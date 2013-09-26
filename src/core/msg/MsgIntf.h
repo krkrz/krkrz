@@ -180,6 +180,9 @@ TVP_MSG_DECL(TVPCannotWriteToArchive,
 TVP_MSG_DECL(TVPUnsupportedCipherMode,
 	TJS_W("%1 は未対応の暗号化形式か、データが破損しています"));
 
+TVP_MSG_DECL(TVPUnsupportedEncoding,
+	TJS_W("%1 は未対応のエンコード方式です。"));
+
 TVP_MSG_DECL(TVPUnsupportedModeString,
 	TJS_W("認識できないモード文字列の指定です(%1)"));
 

@@ -265,6 +265,8 @@ typedef tTJSString ttstr;
 										   // value         : value property; you must
 										   //               : dereference using unary '*' operator.
 										   // the method must return true for found, false for not-found.
+#define TJS_CII_SET_SUPRECLASS	0x00000004 // register super class instance
+#define TJS_CII_GET_SUPRECLASS	0x00000005 // retrieve super class instance
 
 #define TJS_OL_LOCK				0x00000001 // Lock the object
 #define TJS_OL_UNLOCK			0x00000002 // Unlock the object
@@ -1829,6 +1831,7 @@ extern void * TVPImportFuncPtr55a9b73f877bfd4c6d8157e7b1c458df;
 extern void * TVPImportFuncPtrd070209f152dd22087e6e996e02c85cf;
 extern void * TVPImportFuncPtr308f905626bc51c7ef9b65b2c0ca34b2;
 extern void * TVPImportFuncPtr95aab2a1ac9491e8026f4977e0918760;
+extern void * TVPImportFuncPtre0ac94325eb783ca2fe7856a54444c90;
 extern void * TVPImportFuncPtr0c99a79e866f08b4df3914e83fc203dc;
 extern void * TVPImportFuncPtr900476efbc2031e643c042ca8e63a3d7;
 extern void * TVPImportFuncPtr07dfce61d490cf671a2d5359d713d64a;
@@ -4705,10 +4708,10 @@ struct IDirectSound;
 //---------------------------------------------------------------------------
 // font ralated constants
 //---------------------------------------------------------------------------
-#define TVP_TF_ITALIC    0x01
-#define TVP_TF_BOLD      0x02
-#define TVP_TF_UNDERLINE 0x04
-#define TVP_TF_STRIKEOUT 0x08
+#define TVP_TF_ITALIC    0x0100
+#define TVP_TF_BOLD      0x0200
+#define TVP_TF_UNDERLINE 0x0400
+#define TVP_TF_STRIKEOUT 0x0800
 
 
 //---------------------------------------------------------------------------
@@ -4978,6 +4981,8 @@ struct tTVPRect
 			tTVPPoint upper_left;
 			tTVPPoint bottom_right;
 		};
+
+		tjs_int array[4];
 	};
 
 	tjs_int get_width() const { return right - left; }
@@ -7023,6 +7028,16 @@ inline iTJSTextReadStream * TVPCreateTextStreamForRead(const ttstr & name , cons
 	}
 	typedef iTJSTextReadStream * (__stdcall * __functype)(const ttstr &, const ttstr &);
 	return ((__functype)(TVPImportFuncPtr95aab2a1ac9491e8026f4977e0918760))(name, modestr);
+}
+inline iTJSTextReadStream * TVPCreateTextStreamForReadByEncoding(const ttstr & name , const ttstr & modestr , const ttstr & encoding)
+{
+	if(!TVPImportFuncPtre0ac94325eb783ca2fe7856a54444c90)
+	{
+		static char funcname[] = "iTJSTextReadStream * ::TVPCreateTextStreamForReadByEncoding(const ttstr &,const ttstr &,const ttstr &)";
+		TVPImportFuncPtre0ac94325eb783ca2fe7856a54444c90 = TVPGetImportFuncPtr(funcname);
+	}
+	typedef iTJSTextReadStream * (__stdcall * __functype)(const ttstr &, const ttstr &, const ttstr &);
+	return ((__functype)(TVPImportFuncPtre0ac94325eb783ca2fe7856a54444c90))(name, modestr, encoding);
 }
 inline iTJSTextWriteStream * TVPCreateTextStreamForWrite(const ttstr & name , const ttstr & modestr)
 {
