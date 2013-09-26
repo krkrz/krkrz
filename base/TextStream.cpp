@@ -42,7 +42,7 @@ class tTVPTextReadStream : public iTJSTextReadStream
 	tjs_int CryptMode;
 
 public:
-	tTVPTextReadStream(const ttstr  & name, const ttstr & modestr)
+	tTVPTextReadStream(const ttstr  & name, const ttstr & modestr, const ttstr &encoding)
 	{
 		// following syntax of modestr is currently supported.
 		// oN: read from binary offset N (in bytes)
@@ -152,17 +152,19 @@ public:
 				{
 					Stream->ReadBuffer(nbuf, size);
 					nbuf[size] = 0; // terminater
-#ifndef TVP_TEXT_READ_ANSI_MBCS
-					BufferLen = TVPUtf8ToWideCharString((const char*)nbuf, NULL);
-					if(BufferLen == (size_t)-1) TVPThrowExceptionMessage(TJSNarrowToWideConversionError);
-					Buffer = new tjs_char [ BufferLen +1];
-					TVPUtf8ToWideCharString((const char*)nbuf, Buffer);
-#else
-					BufferLen = TJS_narrowtowidelen((tjs_nchar*)nbuf);
-					if(BufferLen == (size_t)-1) TVPThrowExceptionMessage(TJSNarrowToWideConversionError);
-					Buffer = new tjs_char [ BufferLen +1];
-					TJS_narrowtowide(Buffer, (tjs_nchar*)nbuf, BufferLen);
-#endif
+					if( encoding == TJS_W("UTF-8") ) {
+						BufferLen = TVPUtf8ToWideCharString((const char*)nbuf, NULL);
+						if(BufferLen == (size_t)-1) TVPThrowExceptionMessage(TJSNarrowToWideConversionError);
+						Buffer = new tjs_char [ BufferLen +1];
+						TVPUtf8ToWideCharString((const char*)nbuf, Buffer);
+					} else if( encoding == TJS_W("Shift_JIS") ) {
+						BufferLen = TJS_narrowtowidelen((tjs_nchar*)nbuf);
+						if(BufferLen == (size_t)-1) TVPThrowExceptionMessage(TJSNarrowToWideConversionError);
+						Buffer = new tjs_char [ BufferLen +1];
+						TJS_narrowtowide(Buffer, (tjs_nchar*)nbuf, BufferLen);
+					} else {
+						TVPThrowExceptionMessage(TVPUnsupportedEncoding, encoding);
+					}
 				}
 				catch(...)
 				{
@@ -610,7 +612,17 @@ public:
 iTJSTextReadStream * TVPCreateTextStreamForRead(const ttstr & name,
 	const ttstr & modestr)
 {
-	return new tTVPTextReadStream(name, modestr);
+#ifdef TVP_TEXT_READ_ANSI_MBCS
+	return new tTVPTextReadStream(name, modestr,TJS_W("Shift_JIS"));
+#else
+	return new tTVPTextReadStream(name, modestr,TJS_W("UTF-8"));
+#endif
+}
+//---------------------------------------------------------------------------
+iTJSTextReadStream * TVPCreateTextStreamForReadByEncoding(const ttstr & name,
+	const ttstr & modestr, const ttstr & encoding)
+{
+	return new tTVPTextReadStream(name, modestr,encoding);
 }
 //---------------------------------------------------------------------------
 iTJSTextWriteStream * TVPCreateTextStreamForWrite(const ttstr & name,

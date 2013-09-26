@@ -18,6 +18,7 @@
 // TextStream Functions
 //---------------------------------------------------------------------------
 TJS_EXP_FUNC_DEF(iTJSTextReadStream *, TVPCreateTextStreamForRead, (const ttstr &name, const ttstr &modestr));
+TJS_EXP_FUNC_DEF(iTJSTextReadStream *, TVPCreateTextStreamForReadByEncoding, (const ttstr & name, const ttstr & modestr, const ttstr & encoding));
 TJS_EXP_FUNC_DEF(iTJSTextWriteStream *, TVPCreateTextStreamForWrite, (const ttstr &name, const ttstr &modestr));
 //---------------------------------------------------------------------------
 
