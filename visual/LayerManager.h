@@ -121,6 +121,50 @@ public:
 	//! @param		y		プライマリレイヤ座標上における y 位置
 	virtual void TJS_INTF_METHOD NotifyMouseWheel(tjs_uint32 shift, tjs_int delta, tjs_int x, tjs_int y) = 0;
 
+	//! @brief		画面がタッチされた
+	//! @param		x		描画矩形内における x 位置(描画矩形の左上が原点)
+	//! @param		y		描画矩形内における y 位置(描画矩形の左上が原点)
+	//! @param		cx		触れている幅
+	//! @param		cy		触れている高さ
+	//! @param		id		タッチ識別用ID
+	virtual void TJS_INTF_METHOD NotifyTouchDown( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id ) = 0;
+
+	//! @brief		タッチが離された
+	//! @param		x		描画矩形内における x 位置(描画矩形の左上が原点)
+	//! @param		y		描画矩形内における y 位置(描画矩形の左上が原点)
+	//! @param		cx		触れている幅
+	//! @param		cy		触れている高さ
+	//! @param		id		タッチ識別用ID
+	virtual void TJS_INTF_METHOD NotifyTouchUp( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id ) = 0;
+
+	//! @brief		タッチが移動した
+	//! @param		x		描画矩形内における x 位置(描画矩形の左上が原点)
+	//! @param		y		描画矩形内における y 位置(描画矩形の左上が原点)
+	//! @param		cx		触れている幅
+	//! @param		cy		触れている高さ
+	//! @param		id		タッチ識別用ID
+	virtual void TJS_INTF_METHOD NotifyTouchMove( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id ) = 0;
+
+	//! @brief		拡大タッチ操作が行われた
+	//! @param		startdist	開始時の2点間の幅
+	//! @param		curdist	現在の2点間の幅
+	//! @param		cx		触れている幅
+	//! @param		cy		触れている高さ
+	//! @param		flag	タッチ状態フラグ
+	virtual void TJS_INTF_METHOD NotifyTouchScaling( tjs_real startdist, tjs_real curdist, tjs_real cx, tjs_real cy, tjs_int flag ) = 0;
+
+	//! @brief		回転タッチ操作が行われた
+	//! @param		startangle	開始時の角度
+	//! @param		curangle	現在の角度
+	//! @param		dist	現在の2点間の幅
+	//! @param		cx		触れている幅
+	//! @param		cy		触れている高さ
+	//! @param		flag	タッチ状態フラグ
+	virtual void TJS_INTF_METHOD NotifyTouchRotate( tjs_real startangle, tjs_real curangle, tjs_real dist, tjs_real cx, tjs_real cy, tjs_int flag ) = 0;
+
+	//! @brief		マルチタッチ状態が更新された
+	virtual void TJS_INTF_METHOD NotifyMultiTouch() = 0;
+
 	//! @brief		入力状態のチェック
 	//! @note		ウィンドウから約1秒おきに、レイヤマネージャがユーザからの入力の状態を
 	//!				再チェックするために呼ばれる。レイヤ状態の変化がユーザの入力とは
@@ -302,6 +346,26 @@ public:
 		{ PrimaryKeyPress(key); }
 	virtual void TJS_INTF_METHOD NotifyMouseWheel(tjs_uint32 shift, tjs_int delta, tjs_int x, tjs_int y)
 		{ PrimaryMouseWheel(shift, delta, x, y); }
+
+	virtual void TJS_INTF_METHOD NotifyTouchDown( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id )
+		{ PrimaryTouchDown(x, y, cx, cy, id); }
+	virtual void TJS_INTF_METHOD NotifyTouchUp( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id )
+		{ PrimaryTouchUp(x, y, cx, cy, id); }
+	virtual void TJS_INTF_METHOD NotifyTouchMove( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id )
+		{ PrimaryTouchMove(x, y, cx, cy, id); }
+	virtual void TJS_INTF_METHOD NotifyTouchScaling( tjs_real startdist, tjs_real curdist, tjs_real cx, tjs_real cy, tjs_int flag )
+		{ PrimaryTouchScaling(startdist, curdist, cx, cy, flag); }
+	virtual void TJS_INTF_METHOD NotifyTouchRotate( tjs_real startangle, tjs_real curangle, tjs_real dist, tjs_real cx, tjs_real cy, tjs_int flag )
+		{ PrimaryTouchRotate(startangle, curangle, dist, cx, cy, flag); }
+	virtual void TJS_INTF_METHOD NotifyMultiTouch()
+		{ PrimaryMultiTouch(); }
+
+	void PrimaryTouchDown( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id );
+	void PrimaryTouchUp( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id );
+	void PrimaryTouchMove( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id );
+	void PrimaryTouchScaling( tjs_real startdist, tjs_real curdist, tjs_real cx, tjs_real cy, tjs_int flag );
+	void PrimaryTouchRotate( tjs_real startangle, tjs_real curangle, tjs_real dist, tjs_real cx, tjs_real cy, tjs_int flag );
+	void PrimaryMultiTouch();
 
 	tTJSNI_BaseLayer * GetMostFrontChildAt(tjs_int x, tjs_int y,
 		tTJSNI_BaseLayer *except = NULL, bool get_disabled = false);

@@ -517,6 +517,30 @@ void tTVPLayerManager::PrimaryMouseMove(tjs_int x, tjs_int y, tjs_uint32 flags)
 	}
 }
 //---------------------------------------------------------------------------
+void tTVPLayerManager::PrimaryTouchDown( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id )
+{
+}
+//---------------------------------------------------------------------------
+void tTVPLayerManager::PrimaryTouchUp( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id )
+{
+}
+//---------------------------------------------------------------------------
+void tTVPLayerManager::PrimaryTouchMove( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id )
+{
+}
+//---------------------------------------------------------------------------
+void tTVPLayerManager::PrimaryTouchScaling( tjs_real startdist, tjs_real curdist, tjs_real cx, tjs_real cy, tjs_int flag )
+{
+}
+//---------------------------------------------------------------------------
+void tTVPLayerManager::PrimaryTouchRotate( tjs_real startangle, tjs_real curangle, tjs_real dist, tjs_real cx, tjs_real cy, tjs_int flag )
+{
+}
+//---------------------------------------------------------------------------
+void tTVPLayerManager::PrimaryMultiTouch()
+{
+}
+//---------------------------------------------------------------------------
 void tTVPLayerManager::ForceMouseLeave()
 {
 	if(LastMouseMoveSent)
