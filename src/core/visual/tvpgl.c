@@ -9887,8 +9887,125 @@ TVP_GL_FUNC_DECL(void, TVPChBlurCopy65_c, (tjs_uint8 *dest, tjs_int destpitch, t
 	}
 }
 
+/*export*/
+TVP_GL_FUNC_DECL(void, TVPChBlurMulCopy_c, (tjs_uint8 *dest, const tjs_uint8 *src, tjs_int len, tjs_int level) )
+{
+	tjs_int a, b;
+	{
+		int ___index = 0;
+		len -= (4-1);
 
+		while(___index < len)
+		{
+			a = (src[(___index+(0*2))] * level >> 18);
+			b = (src[(___index+(0*2+1))] * level >> 18);
+			if(a>=255) a = 255;
+			if(b>=255) b = 255;
+			dest[(___index+(0*2))] = a;
+			dest[(___index+(0*2+1))] = b;
+			a = (src[(___index+(1*2))] * level >> 18);
+			b = (src[(___index+(1*2+1))] * level >> 18);
+			if(a>=255) a = 255;
+			if(b>=255) b = 255;
+			dest[(___index+(1*2))] = a;
+			dest[(___index+(1*2+1))] = b;
+			___index += 4;
+		}
 
+		len += (4-1);
+
+		while(___index < len)
+		{
+			a = (src[___index] * level >> 18);;
+			if(a>=255) a = 255;
+			dest[___index] = a;;
+			___index ++;
+		}
+	}
+}
+
+/*export*/
+TVP_GL_FUNC_DECL(void, TVPChBlurAddMulCopy_c, (tjs_uint8 *dest, const tjs_uint8 *src, tjs_int len, tjs_int level) )
+{
+	tjs_int a, b;
+	{
+		int ___index = 0;
+		len -= (4-1);
+
+		while(___index < len)
+		{
+			a = dest[(___index+(0*2))] +(src[(___index+(0*2))] * level >> 18);
+			b = dest[(___index+(0*2+1))] +(src[(___index+(0*2+1))] * level >> 18);
+			if(a>=255) a = 255;
+			if(b>=255) b = 255;
+			dest[(___index+(0*2))] = a;
+			dest[(___index+(0*2+1))] = b;
+			a = dest[(___index+(1*2))] +(src[(___index+(1*2))] * level >> 18);
+			b = dest[(___index+(1*2+1))] +(src[(___index+(1*2+1))] * level >> 18);
+			if(a>=255) a = 255;
+			if(b>=255) b = 255;
+			dest[(___index+(1*2))] = a;
+			dest[(___index+(1*2+1))] = b;
+			___index += 4;
+		}
+
+		len += (4-1);
+
+		while(___index < len)
+		{
+			a = dest[___index] +(src[___index] * level >> 18);;
+			if(a>=255) a = 255;;
+			dest[___index] = a;;
+			___index ++;
+		}
+	}
+}
+
+/*export*/
+TVP_GL_FUNC_DECL(void, TVPChBlurCopy_c, (tjs_uint8 *dest, tjs_int destpitch, tjs_int destwidth, tjs_int destheight, const tjs_uint8 * src, tjs_int srcpitch, tjs_int srcwidth, tjs_int srcheight, tjs_int blurwidth, tjs_int blurlevel) )
+{
+	tjs_int lvsum, x, y;
+
+	/* clear destination */
+	memset(dest, 0, destpitch*destheight);
+
+	/* compute filter level */
+	lvsum = 0;
+	for(y = -blurwidth; y <= blurwidth; y++)
+	{
+		for(x = -blurwidth; x <= blurwidth; x++)
+		{
+			tjs_int len = fast_int_hypot(x, y);
+			if(len <= blurwidth)
+				lvsum += (blurwidth - len +1);
+		}
+	}
+
+	if(lvsum) lvsum = (1<<18)/lvsum; else lvsum=(1<<18);
+
+	/* apply */
+	for(y = -blurwidth; y <= blurwidth; y++)
+	{
+		for(x = -blurwidth; x <= blurwidth; x++)
+		{
+			tjs_int len = fast_int_hypot(x, y);
+			if(len <= blurwidth)
+			{
+				tjs_int sy;
+
+				len = blurwidth - len +1;
+				len *= lvsum;
+				len *= blurlevel;
+				len >>= 8;
+				for(sy = 0; sy < srcheight; sy++)
+				{
+					TVPChBlurAddMulCopy(dest + (y + sy + blurwidth)*destpitch + x + blurwidth, 
+						src + sy * srcpitch, srcwidth, len);
+				}
+			}
+		}
+	}
+}
 
 /*export*/
 TVP_GL_FUNC_DECL(void, TVPBLExpand1BitTo8BitPal_c, (tjs_uint8 *dest, const tjs_uint8 *buf, tjs_int len, const tjs_uint32 *pal))
@@ -12113,6 +12230,9 @@ TVP_GL_FUNC_PTR_DECL(void, TVPAdjustGamma_a,  (tjs_uint32 *dest, tjs_int len, tT
 TVP_GL_FUNC_PTR_DECL(void, TVPChBlurMulCopy65,  (tjs_uint8 *dest, const tjs_uint8 *src, tjs_int len, tjs_int level));
 TVP_GL_FUNC_PTR_DECL(void, TVPChBlurAddMulCopy65,  (tjs_uint8 *dest, const tjs_uint8 *src, tjs_int len, tjs_int level));
 TVP_GL_FUNC_PTR_DECL(void, TVPChBlurCopy65,  (tjs_uint8 *dest, tjs_int destpitch, tjs_int destwidth, tjs_int destheight, const tjs_uint8 * src, tjs_int srcpitch, tjs_int srcwidth, tjs_int srcheight, tjs_int blurwidth, tjs_int blurlevel));
+TVP_GL_FUNC_PTR_DECL(void, TVPChBlurMulCopy,  (tjs_uint8 *dest, const tjs_uint8 *src, tjs_int len, tjs_int level) );
+TVP_GL_FUNC_PTR_DECL(void, TVPChBlurAddMulCopy,  (tjs_uint8 *dest, const tjs_uint8 *src, tjs_int len, tjs_int level) );
+TVP_GL_FUNC_PTR_DECL(void, TVPChBlurCopy,  (tjs_uint8 *dest, tjs_int destpitch, tjs_int destwidth, tjs_int destheight, const tjs_uint8 * src, tjs_int srcpitch, tjs_int srcwidth, tjs_int srcheight, tjs_int blurwidth, tjs_int blurlevel) );
 TVP_GL_FUNC_PTR_DECL(void, TVPBLExpand1BitTo8BitPal,  (tjs_uint8 *dest, const tjs_uint8 *buf, tjs_int len, const tjs_uint32 *pal));
 TVP_GL_FUNC_PTR_DECL(void, TVPBLExpand1BitTo8Bit,  (tjs_uint8 *dest, const tjs_uint8 *buf, tjs_int len));
 TVP_GL_FUNC_PTR_DECL(void, TVPBLExpand1BitTo32BitPal,  (tjs_uint32 *dest, const tjs_uint8 *buf, tjs_int len, const tjs_uint32 *pal));
@@ -12378,6 +12498,9 @@ TVP_GL_FUNC_DECL(void, TVPInitTVPGL, ())
 	TVPChBlurMulCopy65 = TVPChBlurMulCopy65_c;
 	TVPChBlurAddMulCopy65 = TVPChBlurAddMulCopy65_c;
 	TVPChBlurCopy65 = TVPChBlurCopy65_c;
+	TVPChBlurMulCopy = TVPChBlurMulCopy_c;
+	TVPChBlurAddMulCopy = TVPChBlurAddMulCopy_c;
+	TVPChBlurCopy = TVPChBlurCopy_c;
 	TVPBLExpand1BitTo8BitPal = TVPBLExpand1BitTo8BitPal_c;
 	TVPBLExpand1BitTo8Bit = TVPBLExpand1BitTo8Bit_c;
 	TVPBLExpand1BitTo32BitPal = TVPBLExpand1BitTo32BitPal_c;
