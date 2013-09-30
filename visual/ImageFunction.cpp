@@ -881,6 +881,81 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/drawText)
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_STATIC_METHOD_DECL(/*func. name*/drawText)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/drawGlyph)
+{
+	// bmp, x, y, glyph, color, opa=255, aa=true, face=dfAlpha, shadowlevel=0, shadowcolor=0x000000, shadowwidth=0, shadowofsx=0, shadowofsy=0, hda=false, clipRect=null
+	if(numparams < 5) return TJS_E_BADPARAMCOUNT;
+
+	tTJSNI_Bitmap * dst = NULL;
+	tTJSVariantClosure clo = param[0]->AsObjectClosureNoAddRef();
+	if(clo.Object) {
+		if(TJS_FAILED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE,
+			tTJSNC_Bitmap::ClassID, (iTJSNativeInstance**)&dst)))
+			return TJS_E_INVALIDPARAM;
+	}
+	if( !dst ) return TJS_E_INVALIDPARAM;
+
+	tjs_int x = *param[1];
+	tjs_int y = *param[2];
+	iTJSDispatch2* glyph = param[3]->AsObjectNoAddRef();
+	tjs_uint32 color = static_cast<tjs_uint32>((tjs_int64)*param[4]);
+	tjs_int opa = (numparams >= 6 && param[5]->Type() != tvtVoid)?(tjs_int)*param[5] : (tjs_int)255;
+	bool aa = (numparams >= 7 && param[6]->Type() != tvtVoid)? param[6]->operator bool() : true;
+	tTVPDrawFace face = (numparams >= 8 && param[7]->Type() != tvtVoid)? (tTVPDrawFace)(tjs_int)(*param[7]) : dfAlpha;
+	tjs_int shadowlevel = (numparams >= 9 && param[8]->Type() != tvtVoid)? (tjs_int)*param[8] : 0;
+	tjs_uint32 shadowcolor = (numparams >= 10 && param[9]->Type() != tvtVoid)? static_cast<tjs_uint32>((tjs_int64)*param[9]) : 0;
+	tjs_int shadowwidth = (numparams >= 11 && param[10]->Type() != tvtVoid)? (tjs_int)*param[10] : 0;
+	tjs_int shadowofsx = (numparams >=12 && param[11]->Type() != tvtVoid)? (tjs_int)*param[11] : 0;
+	tjs_int shadowofsy = (numparams >=13 && param[12]->Type() != tvtVoid)? (tjs_int)*param[12] : 0;
+	bool hda = (numparams >=14 && param[13]->Type() != tvtVoid)? param[13]->operator bool() : false;
+
+	tTVPRect clipRect( 0, 0, dst->GetWidth(), dst->GetHeight() );
+	if(numparams >= 15 && param[14]->Type() == tvtObject ) {
+		tTJSNI_Rect * rect = NULL;
+		clo = param[14]->AsObjectClosureNoAddRef();
+		if(clo.Object) {
+			if(TJS_FAILED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE,
+				tTJSNC_Rect::ClassID, (iTJSNativeInstance**)&rect)))
+				return TJS_E_INVALIDPARAM;
+			clipRect = rect->Get();
+		}
+	}
+
+	tTVPBBBltMethod met;
+	switch(face)
+	{
+	case dfAlpha:
+		met = bmAlphaOnAlpha;
+		break;
+	case dfAddAlpha:
+		if(opa<0) return TJS_E_INVALIDPARAM;
+		met = bmAlphaOnAddAlpha;
+		break;
+	case dfOpaque:
+		met = bmAlpha;
+		break;
+	default:
+		met = bmAlphaOnAlpha;
+		break;
+	}
+	color = TVPToActualColor(color);
+	tTVPComplexRect r;
+	dst->GetBitmap()->DrawGlyph(glyph, clipRect, x, y, color, met, opa, hda, aa, shadowlevel, shadowcolor, shadowwidth,
+		shadowofsx, shadowofsy, &r);
+
+	if( result ) {
+		if( r.GetCount() ) {
+			const tTVPRect& ur = r.GetBound();
+			iTJSDispatch2 *ret = TVPCreateRectObject( ur.left, ur.top, ur.right, ur.bottom );
+			*result = tTJSVariant(ret, ret);
+		} else {
+			result->Clear();
+		}
+	}
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_STATIC_METHOD_DECL(/*func. name*/drawGlyph)
 
 	TJS_END_NATIVE_MEMBERS
 }

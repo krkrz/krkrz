@@ -11,8 +11,8 @@
  */
 struct tGlyphMetrics
 {
-	tjs_int CellIncX;		//!< 一文字進めるの必要なX方向のピクセル数(64倍されている数値なので注意)
-	tjs_int CellIncY;		//!< 一文字進めるの必要なY方向のピクセル数(64倍されている数値なので注意)
+	tjs_int CellIncX;		//!< 一文字進めるの必要なX方向のピクセル数
+	tjs_int CellIncY;		//!< 一文字進めるの必要なY方向のピクセル数
 };
 
 //---------------------------------------------------------------------------
@@ -44,12 +44,13 @@ public:
 	bool FullColored;
 
 public:
-	tTVPCharacterData() { RefCount = 1; Data = NULL; }
-	tTVPCharacterData(tjs_uint8 * indata,
+	tTVPCharacterData() : FullColored(false){ RefCount = 1; Data = NULL; }
+	tTVPCharacterData( const tjs_uint8 * indata,
 		tjs_int inpitch,
 		tjs_int originx, tjs_int originy,
 		tjs_uint blackboxw, tjs_uint blackboxh,
-		const tGlyphMetrics & metrics);
+		const tGlyphMetrics & metrics,
+		bool fullcolor = false );
 	tTVPCharacterData(const tTVPCharacterData & ref);
 	~tTVPCharacterData() { if(Data) delete [] Data; }
 

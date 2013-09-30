@@ -887,6 +887,73 @@ bool tTVPNativeBaseBitmap::InternalDrawText(tTVPCharacterData *data, tjs_int x,
 							bp += pitch;
 			}
 		}
+	} else if( data->FullColored ) {
+		if(dtdata->bltmode == bmAlphaOnAlpha)
+		{
+			if(dtdata->opa > 0)
+			{
+				if(dtdata->opa == 255)
+				{
+					while(h--)
+						TVPAlphaBlend_d((tjs_uint32*)sl + drect.left,
+							(tjs_uint32*)bp + srect.left, w), sl += dtdata->bmppitch,
+							bp += pitch;
+				}
+				else
+				{
+					while(h--)
+						TVPAlphaBlend_do((tjs_uint32*)sl + drect.left,
+							(tjs_uint32*)bp + srect.left, w, dtdata->opa), sl += dtdata->bmppitch,
+							bp += pitch;
+				}
+			}
+		}
+		else if(dtdata->bltmode == bmAlphaOnAddAlpha)
+		{
+			if(dtdata->opa == 255)
+			{
+				while(h--)
+					TVPAlphaBlend_a((tjs_uint32*)sl + drect.left,
+						(tjs_uint32*)bp + srect.left, w), sl += dtdata->bmppitch,
+						bp += pitch;
+			}
+			else
+			{
+				while(h--)
+					TVPAlphaBlend_ao((tjs_uint32*)sl + drect.left,
+						(tjs_uint32*)bp + srect.left, w, dtdata->opa), sl += dtdata->bmppitch,
+						bp += pitch;
+			}
+		}
+		else
+		{
+			if(dtdata->opa == 255)
+			{
+				if(dtdata->holdalpha)
+					while(h--)
+						TVPAlphaBlend_HDA((tjs_uint32*)sl + drect.left,
+							(tjs_uint32*)bp + srect.left, w), sl += dtdata->bmppitch,
+							bp += pitch;
+				else
+					while(h--)
+						TVPAlphaBlend((tjs_uint32*)sl + drect.left,
+							(tjs_uint32*)bp + srect.left, w), sl += dtdata->bmppitch,
+							bp += pitch;
+			}
+			else
+			{
+				if(dtdata->holdalpha)
+					while(h--)
+						TVPAlphaBlend_HDA_o((tjs_uint32*)sl + drect.left,
+							(tjs_uint32*)bp + srect.left, w, dtdata->opa), sl += dtdata->bmppitch,
+							bp += pitch;
+				else
+					while(h--)
+						TVPAlphaBlend_o((tjs_uint32*)sl + drect.left,
+							(tjs_uint32*)bp + srect.left, w, dtdata->opa), sl += dtdata->bmppitch,
+							bp += pitch;
+			}
+		}
 	} else {
 		if(dtdata->bltmode == bmAlphaOnAlpha)
 		{
@@ -974,6 +1041,165 @@ bool tTVPNativeBaseBitmap::InternalDrawText(tTVPCharacterData *data, tjs_int x,
 		}
 	}
 	return true;
+}
+//---------------------------------------------------------------------------
+void tTVPNativeBaseBitmap::DrawGlyph(iTJSDispatch2* glyph, const tTVPRect &destrect, tjs_int x, tjs_int y,
+			tjs_uint32 color, tTVPBBBltMethod bltmode, tjs_int opa,
+			bool holdalpha, bool aa, tjs_int shlevel,
+			tjs_uint32 shadowcolor,
+			tjs_int shwidth, tjs_int shofsx, tjs_int shofsy,
+			tTVPComplexRect *updaterects )
+{
+	if(!Is32BPP()) TVPThrowExceptionMessage(TVPInvalidOperationFor8BPP);
+
+	if(bltmode == bmAlphaOnAlpha)
+	{
+		if(opa < -255) opa = -255;
+		if(opa > 255) opa = 255;
+	}
+	else
+	{
+		if(opa < 0) opa = 0;
+		if(opa > 255 ) opa = 255;
+	}
+
+	if(opa == 0) return; // nothing to do
+
+
+	tjs_int itemcount;
+	tTJSVariant tmp;
+	if(TJS_SUCCEEDED(glyph->PropGet(TJS_MEMBERMUSTEXIST, TJS_W("count"), 0, &tmp, glyph)))
+		itemcount = tmp;
+	else
+		itemcount = 0;
+
+	if( itemcount < 8 ) TVPThrowExceptionMessage(TJS_W("Faild glyph for DrawGlyph."));
+
+	enum {
+		GLYPH_WIDTH,
+		GLYPH_HEIGHT,
+		GLYPH_ORIGINX,
+		GLYPH_ORIGINY,
+		GLYPH_INCX,
+		GLYPH_INCY,
+		GLYPH_INC,
+		GLYPH_BITMAP,
+		GLYPH_COLORS,
+		GLYPH_EOT
+	};
+	tjs_int glyphitem[7];
+	for( tjs_int i = 0; i < 7; i++ ) {
+		if(TJS_FAILED(glyph->PropGetByNum(TJS_MEMBERMUSTEXIST, i, &tmp, glyph)))
+			TVPThrowExceptionMessage(TJS_W("Faild glyph for DrawGlyph."));
+		glyphitem[i] = tmp;
+	}
+
+	if(TJS_FAILED(glyph->PropGetByNum(TJS_MEMBERMUSTEXIST, GLYPH_BITMAP, &tmp, glyph)))
+		TVPThrowExceptionMessage(TJS_W("Faild glyph for DrawGlyph."));
+
+	tjs_int numcolor = 256;
+	if( itemcount >= 9 ) {
+		if(TJS_FAILED(glyph->PropGetByNum(TJS_MEMBERMUSTEXIST, GLYPH_COLORS, &tmp, glyph)))
+			TVPThrowExceptionMessage(TJS_W("Faild glyph for DrawGlyph."));
+		numcolor = tmp;
+	}
+	tTJSVariantOctet *o = tmp.AsOctetNoAddRef();
+
+	Independ();
+	ApplyFont();
+
+	tTVPDrawTextData dtdata;
+	dtdata.rect = destrect;
+	dtdata.bmppitch = GetPitchBytes();
+	dtdata.bltmode = bltmode;
+	dtdata.opa = opa;
+	dtdata.holdalpha = holdalpha;
+
+	tTVPCharacterData* data = NULL;
+	tTVPCharacterData* shadow = NULL;
+	try {
+		tGlyphMetrics metrics;
+		metrics.CellIncX = glyphitem[GLYPH_INCX];
+		metrics.CellIncY = glyphitem[GLYPH_INCY];
+		data = new tTVPCharacterData( o->GetData(), glyphitem[GLYPH_WIDTH],
+			glyphitem[GLYPH_ORIGINX] + AscentOfsX, -glyphitem[GLYPH_ORIGINY] + AscentOfsY,
+			glyphitem[GLYPH_WIDTH], glyphitem[GLYPH_HEIGHT],
+			metrics, numcolor > 256 );
+
+		data->Antialiased = aa;
+		data->Blured = false;
+		data->BlurWidth = shwidth;
+		data->BlurLevel = shlevel;
+		data->Gray = numcolor;
+		if( shlevel != 0 ) {
+			if( shlevel == 255 && shwidth == 0 ) {
+				// normal shadow
+				shadow = data;
+				shadow->AddRef();
+			} else {
+				// blured shadow
+				shadow = new tTVPCharacterData( o->GetData(), glyphitem[GLYPH_WIDTH],
+					glyphitem[GLYPH_ORIGINX] + AscentOfsX, -glyphitem[GLYPH_ORIGINY] + AscentOfsY,
+					glyphitem[GLYPH_WIDTH], glyphitem[GLYPH_HEIGHT],
+					metrics, numcolor > 256 );
+				shadow->Antialiased = aa;
+				shadow->Blured = true;
+				shadow->BlurWidth = shwidth;
+				shadow->BlurLevel = shlevel;
+				shadow->Gray = numcolor;
+				if( !shadow->FullColored ) shadow->Blur();
+			}
+		}
+
+		if(data)
+		{
+
+			if(data->BlackBoxX != 0 && data->BlackBoxY != 0)
+			{
+				tTVPRect drect;
+				tTVPRect shadowdrect;
+
+				bool shadowdrawn = false;
+
+				if(shadow)
+				{
+					shadowdrawn = InternalDrawText(shadow, x + shofsx, y + shofsy,
+						shadowcolor, &dtdata, shadowdrect);
+				}
+
+				bool drawn = InternalDrawText(data, x, y, color, &dtdata, drect);
+				if(updaterects)
+				{
+					if(!shadowdrawn)
+					{
+						if(drawn) updaterects->Or(drect);
+					}
+					else
+					{
+						if(drawn)
+						{
+							tTVPRect d;
+							TVPUnionRect(&d, drect, shadowdrect);
+							updaterects->Or(d);
+						}
+						else
+						{
+							updaterects->Or(shadowdrect);
+						}
+					}
+				}
+			}
+		}
+	}
+	catch(...)
+	{
+		if(data) data->Release();
+		if(shadow) shadow->Release();
+		throw;
+	}
+
+	if(data) data->Release();
+	if(shadow) shadow->Release();
 }
 //---------------------------------------------------------------------------
 void tTVPNativeBaseBitmap::DrawTextSingle(const tTVPRect &destrect,
