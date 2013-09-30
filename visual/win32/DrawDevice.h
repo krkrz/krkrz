@@ -164,6 +164,50 @@ public:
 	//! @param		y		描画矩形内における y 位置(描画矩形の左上が原点)
 	virtual void TJS_INTF_METHOD OnMouseWheel(tjs_uint32 shift, tjs_int delta, tjs_int x, tjs_int y) = 0;
 
+	//! @brief		(Window→DrawDevice) 画面がタッチされた
+	//! @param		x		描画矩形内における x 位置(描画矩形の左上が原点)
+	//! @param		y		描画矩形内における y 位置(描画矩形の左上が原点)
+	//! @param		cx		触れている幅
+	//! @param		cy		触れている高さ
+	//! @param		id		タッチ識別用ID
+	virtual void TJS_INTF_METHOD OnTouchDown( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id ) = 0;
+
+	//! @brief		(Window→DrawDevice) タッチが離された
+	//! @param		x		描画矩形内における x 位置(描画矩形の左上が原点)
+	//! @param		y		描画矩形内における y 位置(描画矩形の左上が原点)
+	//! @param		cx		触れている幅
+	//! @param		cy		触れている高さ
+	//! @param		id		タッチ識別用ID
+	virtual void TJS_INTF_METHOD OnTouchUp( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id ) = 0;
+
+	//! @brief		(Window→DrawDevice) タッチが移動した
+	//! @param		x		描画矩形内における x 位置(描画矩形の左上が原点)
+	//! @param		y		描画矩形内における y 位置(描画矩形の左上が原点)
+	//! @param		cx		触れている幅
+	//! @param		cy		触れている高さ
+	//! @param		id		タッチ識別用ID
+	virtual void TJS_INTF_METHOD OnTouchMove( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id ) = 0;
+
+	//! @brief		(Window→DrawDevice) 拡大タッチ操作が行われた
+	//! @param		startdist	開始時の2点間の幅
+	//! @param		curdist	現在の2点間の幅
+	//! @param		cx		触れている幅
+	//! @param		cy		触れている高さ
+	//! @param		flag	タッチ状態フラグ
+	virtual void TJS_INTF_METHOD OnTouchScaling( tjs_real startdist, tjs_real curdist, tjs_real cx, tjs_real cy, tjs_int flag ) = 0;
+
+	//! @brief		(Window→DrawDevice) 回転タッチ操作が行われた
+	//! @param		startangle	開始時の角度
+	//! @param		curangle	現在の角度
+	//! @param		dist	現在の2点間の幅
+	//! @param		cx		触れている幅
+	//! @param		cy		触れている高さ
+	//! @param		flag	タッチ状態フラグ
+	virtual void TJS_INTF_METHOD OnTouchRotate( tjs_real startangle, tjs_real curangle, tjs_real dist, tjs_real cx, tjs_real cy, tjs_int flag ) = 0;
+
+	//! @brief		(Window→DrawDevice) マルチタッチ状態が更新された
+	virtual void TJS_INTF_METHOD OnMultiTouch() = 0;
+
 	//! @brief		(Window->DrawDevice) 入力状態のチェック
 	//! @note		ウィンドウから約1秒おきに、レイヤマネージャがユーザからの入力の状態を
 	//!				再チェックするために呼ばれる。レイヤ状態の変化がユーザの入力とは
@@ -365,6 +409,7 @@ public:
 	//!				レイヤマネージャがなければ偽が返る
 	//! @note		x, y は DestRectの (0,0) を原点とする座標として渡されると見なす
 	bool TransformToPrimaryLayerManager(tjs_int &x, tjs_int &y);
+	bool TransformToPrimaryLayerManager(tjs_real &x, tjs_real &y);
 
 	//! @brief		LayerManager→Device方向の座標の変換を行う
 	//! @param		x		X位置
@@ -403,6 +448,12 @@ public:
 	virtual void TJS_INTF_METHOD OnKeyUp(tjs_uint key, tjs_uint32 shift);
 	virtual void TJS_INTF_METHOD OnKeyPress(tjs_char key);
 	virtual void TJS_INTF_METHOD OnMouseWheel(tjs_uint32 shift, tjs_int delta, tjs_int x, tjs_int y);
+	virtual void TJS_INTF_METHOD OnTouchDown( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id );
+	virtual void TJS_INTF_METHOD OnTouchUp( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id );
+	virtual void TJS_INTF_METHOD OnTouchMove( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id );
+	virtual void TJS_INTF_METHOD OnTouchScaling( tjs_real startdist, tjs_real curdist, tjs_real cx, tjs_real cy, tjs_int flag );
+	virtual void TJS_INTF_METHOD OnTouchRotate( tjs_real startangle, tjs_real curangle, tjs_real dist, tjs_real cx, tjs_real cy, tjs_int flag );
+	virtual void TJS_INTF_METHOD OnMultiTouch();
 	virtual void TJS_INTF_METHOD RecheckInputState();
 
 	// layer manager → drawdevice
