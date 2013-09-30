@@ -85,6 +85,23 @@ bool tTVPDrawDevice::TransformFromPrimaryLayerManager(tjs_int &x, tjs_int &y)
 }
 //---------------------------------------------------------------------------
 
+//---------------------------------------------------------------------------
+bool tTVPDrawDevice::TransformToPrimaryLayerManager(tjs_real &x, tjs_real &y)
+{
+	iTVPLayerManager * manager = GetLayerManagerAt(PrimaryLayerManagerIndex);
+	if(!manager) return false;
+
+	// プライマリレイヤマネージャのプライマリレイヤのサイズを得る
+	tjs_int pl_w, pl_h;
+	if(!manager->GetPrimaryLayerSize(pl_w, pl_h)) return false;
+
+	// x , y は DestRect の 0, 0 を原点とした座標として渡されてきている
+	x = pl_w ? (x * DestRect.get_width()  / pl_w) : 0.0;
+	y = pl_h ? (y * DestRect.get_height() / pl_h) : 0.0;
+
+	return true;
+}
+//---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
 void TJS_INTF_METHOD tTVPDrawDevice::Destruct()
@@ -295,6 +312,73 @@ void TJS_INTF_METHOD tTVPDrawDevice::OnMouseWheel(tjs_uint32 shift, tjs_int delt
 }
 //---------------------------------------------------------------------------
 
+//---------------------------------------------------------------------------
+void TJS_INTF_METHOD tTVPDrawDevice::OnTouchDown( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id )
+{
+	if(!TransformToPrimaryLayerManager(x, y)) return;
+	iTVPLayerManager * manager = GetLayerManagerAt(PrimaryLayerManagerIndex);
+	if(!manager) return;
+
+	manager->NotifyTouchDown(x, y, cx, cy, id);
+}
+//---------------------------------------------------------------------------
+
+
+//---------------------------------------------------------------------------
+void TJS_INTF_METHOD tTVPDrawDevice::OnTouchUp( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id )
+{
+	if(!TransformToPrimaryLayerManager(x, y)) return;
+	iTVPLayerManager * manager = GetLayerManagerAt(PrimaryLayerManagerIndex);
+	if(!manager) return;
+
+	manager->NotifyTouchUp(x, y, cx, cy, id);
+}
+//---------------------------------------------------------------------------
+
+
+//---------------------------------------------------------------------------
+void TJS_INTF_METHOD tTVPDrawDevice::OnTouchMove( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id )
+{
+	if(!TransformToPrimaryLayerManager(x, y)) return;
+	iTVPLayerManager * manager = GetLayerManagerAt(PrimaryLayerManagerIndex);
+	if(!manager) return;
+
+	manager->NotifyTouchMove(x, y, cx, cy, id);
+}
+//---------------------------------------------------------------------------
+
+
+//---------------------------------------------------------------------------
+void TJS_INTF_METHOD tTVPDrawDevice::OnTouchScaling( tjs_real startdist, tjs_real curdist, tjs_real cx, tjs_real cy, tjs_int flag )
+{
+	iTVPLayerManager * manager = GetLayerManagerAt(PrimaryLayerManagerIndex);
+	if(!manager) return;
+
+	manager->NotifyTouchScaling(startdist, curdist, cx, cy, flag);
+}
+//---------------------------------------------------------------------------
+
+
+//---------------------------------------------------------------------------
+void TJS_INTF_METHOD tTVPDrawDevice::OnTouchRotate( tjs_real startangle, tjs_real curangle, tjs_real dist, tjs_real cx, tjs_real cy, tjs_int flag )
+{
+	iTVPLayerManager * manager = GetLayerManagerAt(PrimaryLayerManagerIndex);
+	if(!manager) return;
+
+	manager->NotifyTouchRotate(startangle, curangle, dist, cx, cy, flag);
+}
+//---------------------------------------------------------------------------
+
+
+//---------------------------------------------------------------------------
+void TJS_INTF_METHOD tTVPDrawDevice::OnMultiTouch()
+{
+	iTVPLayerManager * manager = GetLayerManagerAt(PrimaryLayerManagerIndex);
+	if(!manager) return;
+
+	manager->NotifyMultiTouch();
+}
+//---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
 void TJS_INTF_METHOD tTVPDrawDevice::RecheckInputState()

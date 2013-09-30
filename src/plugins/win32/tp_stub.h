@@ -2110,6 +2110,9 @@ extern void * TVPImportFuncPtr4d99b9e38121251b40a90cd2bd5fea63;
 extern void * TVPImportFuncPtrf1509827696ebf5627bee1a45d675fb8;
 extern void * TVPImportFuncPtrbbb625e23229350453161810c41419dd;
 extern void * TVPImportFuncPtr489a6aae30de0feff5d3c5fbd42ae325;
+extern void * TVPImportFuncPtr6b9a349305f8c689dcfdbcea2566769c;
+extern void * TVPImportFuncPtr6320d208ce1a570aca52c3cdf7421f7c;
+extern void * TVPImportFuncPtr0f83f0459badd1cd352041b9243d712f;
 extern void * TVPImportFuncPtr186a94b2fed609ed2d2a7ac1a2bed87f;
 extern void * TVPImportFuncPtrbde8efb9971664f2b52fe912745e2791;
 extern void * TVPImportFuncPtr386d6fa5cb73e3519b62d20470e5414b;
@@ -5269,6 +5272,50 @@ public:
 	//! @param		y		プライマリレイヤ座標上における y 位置
 	virtual void TJS_INTF_METHOD NotifyMouseWheel(tjs_uint32 shift, tjs_int delta, tjs_int x, tjs_int y) = 0;
 
+	//! @brief		画面がタッチされた
+	//! @param		x		描画矩形内における x 位置(描画矩形の左上が原点)
+	//! @param		y		描画矩形内における y 位置(描画矩形の左上が原点)
+	//! @param		cx		触れている幅
+	//! @param		cy		触れている高さ
+	//! @param		id		タッチ識別用ID
+	virtual void TJS_INTF_METHOD NotifyTouchDown( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id ) = 0;
+
+	//! @brief		タッチが離された
+	//! @param		x		描画矩形内における x 位置(描画矩形の左上が原点)
+	//! @param		y		描画矩形内における y 位置(描画矩形の左上が原点)
+	//! @param		cx		触れている幅
+	//! @param		cy		触れている高さ
+	//! @param		id		タッチ識別用ID
+	virtual void TJS_INTF_METHOD NotifyTouchUp( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id ) = 0;
+
+	//! @brief		タッチが移動した
+	//! @param		x		描画矩形内における x 位置(描画矩形の左上が原点)
+	//! @param		y		描画矩形内における y 位置(描画矩形の左上が原点)
+	//! @param		cx		触れている幅
+	//! @param		cy		触れている高さ
+	//! @param		id		タッチ識別用ID
+	virtual void TJS_INTF_METHOD NotifyTouchMove( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id ) = 0;
+
+	//! @brief		拡大タッチ操作が行われた
+	//! @param		startdist	開始時の2点間の幅
+	//! @param		curdist	現在の2点間の幅
+	//! @param		cx		触れている幅
+	//! @param		cy		触れている高さ
+	//! @param		flag	タッチ状態フラグ
+	virtual void TJS_INTF_METHOD NotifyTouchScaling( tjs_real startdist, tjs_real curdist, tjs_real cx, tjs_real cy, tjs_int flag ) = 0;
+
+	//! @brief		回転タッチ操作が行われた
+	//! @param		startangle	開始時の角度
+	//! @param		curangle	現在の角度
+	//! @param		dist	現在の2点間の幅
+	//! @param		cx		触れている幅
+	//! @param		cy		触れている高さ
+	//! @param		flag	タッチ状態フラグ
+	virtual void TJS_INTF_METHOD NotifyTouchRotate( tjs_real startangle, tjs_real curangle, tjs_real dist, tjs_real cx, tjs_real cy, tjs_int flag ) = 0;
+
+	//! @brief		マルチタッチ状態が更新された
+	virtual void TJS_INTF_METHOD NotifyMultiTouch() = 0;
+
 	//! @brief		入力状態のチェック
 	//! @note		ウィンドウから約1秒おきに、レイヤマネージャがユーザからの入力の状態を
 	//!				再チェックするために呼ばれる。レイヤ状態の変化がユーザの入力とは
@@ -5588,6 +5635,50 @@ public:
 	//! @param		x		描画矩形内における x 位置(描画矩形の左上が原点)
 	//! @param		y		描画矩形内における y 位置(描画矩形の左上が原点)
 	virtual void TJS_INTF_METHOD OnMouseWheel(tjs_uint32 shift, tjs_int delta, tjs_int x, tjs_int y) = 0;
+
+	//! @brief		(Window→DrawDevice) 画面がタッチされた
+	//! @param		x		描画矩形内における x 位置(描画矩形の左上が原点)
+	//! @param		y		描画矩形内における y 位置(描画矩形の左上が原点)
+	//! @param		cx		触れている幅
+	//! @param		cy		触れている高さ
+	//! @param		id		タッチ識別用ID
+	virtual void TJS_INTF_METHOD OnTouchDown( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id ) = 0;
+
+	//! @brief		(Window→DrawDevice) タッチが離された
+	//! @param		x		描画矩形内における x 位置(描画矩形の左上が原点)
+	//! @param		y		描画矩形内における y 位置(描画矩形の左上が原点)
+	//! @param		cx		触れている幅
+	//! @param		cy		触れている高さ
+	//! @param		id		タッチ識別用ID
+	virtual void TJS_INTF_METHOD OnTouchUp( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id ) = 0;
+
+	//! @brief		(Window→DrawDevice) タッチが移動した
+	//! @param		x		描画矩形内における x 位置(描画矩形の左上が原点)
+	//! @param		y		描画矩形内における y 位置(描画矩形の左上が原点)
+	//! @param		cx		触れている幅
+	//! @param		cy		触れている高さ
+	//! @param		id		タッチ識別用ID
+	virtual void TJS_INTF_METHOD OnTouchMove( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id ) = 0;
+
+	//! @brief		(Window→DrawDevice) 拡大タッチ操作が行われた
+	//! @param		startdist	開始時の2点間の幅
+	//! @param		curdist	現在の2点間の幅
+	//! @param		cx		触れている幅
+	//! @param		cy		触れている高さ
+	//! @param		flag	タッチ状態フラグ
+	virtual void TJS_INTF_METHOD OnTouchScaling( tjs_real startdist, tjs_real curdist, tjs_real cx, tjs_real cy, tjs_int flag ) = 0;
+
+	//! @brief		(Window→DrawDevice) 回転タッチ操作が行われた
+	//! @param		startangle	開始時の角度
+	//! @param		curangle	現在の角度
+	//! @param		dist	現在の2点間の幅
+	//! @param		cx		触れている幅
+	//! @param		cy		触れている高さ
+	//! @param		flag	タッチ状態フラグ
+	virtual void TJS_INTF_METHOD OnTouchRotate( tjs_real startangle, tjs_real curangle, tjs_real dist, tjs_real cx, tjs_real cy, tjs_int flag ) = 0;
+
+	//! @brief		(Window→DrawDevice) マルチタッチ状態が更新された
+	virtual void TJS_INTF_METHOD OnMultiTouch() = 0;
 
 	//! @brief		(Window->DrawDevice) 入力状態のチェック
 	//! @note		ウィンドウから約1秒おきに、レイヤマネージャがユーザからの入力の状態を
@@ -9818,6 +9909,36 @@ inline void TVPChBlurCopy65(tjs_uint8 * dest , tjs_int destpitch , tjs_int destw
 	}
 	typedef void (__stdcall * __functype)(tjs_uint8 *, tjs_int , tjs_int , tjs_int , const tjs_uint8 *, tjs_int , tjs_int , tjs_int , tjs_int , tjs_int);
 	((__functype)(TVPImportFuncPtr489a6aae30de0feff5d3c5fbd42ae325))(dest, destpitch, destwidth, destheight, src, srcpitch, srcwidth, srcheight, blurwidth, blurlevel);
+}
+inline void TVPChBlurMulCopy(tjs_uint8 * dest , const tjs_uint8 * src , tjs_int len , tjs_int level)
+{
+	if(!TVPImportFuncPtr6b9a349305f8c689dcfdbcea2566769c)
+	{
+		static char funcname[] = "void ::TVPChBlurMulCopy(tjs_uint8 *,const tjs_uint8 *,tjs_int,tjs_int)";
+		TVPImportFuncPtr6b9a349305f8c689dcfdbcea2566769c = TVPGetImportFuncPtr(funcname);
+	}
+	typedef void (__stdcall * __functype)(tjs_uint8 *, const tjs_uint8 *, tjs_int , tjs_int);
+	((__functype)(TVPImportFuncPtr6b9a349305f8c689dcfdbcea2566769c))(dest, src, len, level);
+}
+inline void TVPChBlurAddMulCopy(tjs_uint8 * dest , const tjs_uint8 * src , tjs_int len , tjs_int level)
+{
+	if(!TVPImportFuncPtr6320d208ce1a570aca52c3cdf7421f7c)
+	{
+		static char funcname[] = "void ::TVPChBlurAddMulCopy(tjs_uint8 *,const tjs_uint8 *,tjs_int,tjs_int)";
+		TVPImportFuncPtr6320d208ce1a570aca52c3cdf7421f7c = TVPGetImportFuncPtr(funcname);
+	}
+	typedef void (__stdcall * __functype)(tjs_uint8 *, const tjs_uint8 *, tjs_int , tjs_int);
+	((__functype)(TVPImportFuncPtr6320d208ce1a570aca52c3cdf7421f7c))(dest, src, len, level);
+}
+inline void TVPChBlurCopy(tjs_uint8 * dest , tjs_int destpitch , tjs_int destwidth , tjs_int destheight , const tjs_uint8 * src , tjs_int srcpitch , tjs_int srcwidth , tjs_int srcheight , tjs_int blurwidth , tjs_int blurlevel)
+{
+	if(!TVPImportFuncPtr0f83f0459badd1cd352041b9243d712f)
+	{
+		static char funcname[] = "void ::TVPChBlurCopy(tjs_uint8 *,tjs_int,tjs_int,tjs_int,const tjs_uint8 *,tjs_int,tjs_int,tjs_int,tjs_int,tjs_int)";
+		TVPImportFuncPtr0f83f0459badd1cd352041b9243d712f = TVPGetImportFuncPtr(funcname);
+	}
+	typedef void (__stdcall * __functype)(tjs_uint8 *, tjs_int , tjs_int , tjs_int , const tjs_uint8 *, tjs_int , tjs_int , tjs_int , tjs_int , tjs_int);
+	((__functype)(TVPImportFuncPtr0f83f0459badd1cd352041b9243d712f))(dest, destpitch, destwidth, destheight, src, srcpitch, srcwidth, srcheight, blurwidth, blurlevel);
 }
 inline void TVPBLExpand1BitTo8BitPal(tjs_uint8 * dest , const tjs_uint8 * buf , tjs_int len , const tjs_uint32 * pal)
 {
