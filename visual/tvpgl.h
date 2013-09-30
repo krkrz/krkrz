@@ -49,11 +49,9 @@ typedef struct
 #define TVP_GL_FUNC_DECL(rettype, funcname, arg)  rettype __cdecl funcname arg
 #define TVP_GL_FUNC_EXTERN_DECL(rettype, funcname, arg)  extern rettype __cdecl funcname arg
 #define TVP_GL_FUNC_PTR_DECL(rettype, funcname, arg) rettype (__cdecl * funcname) arg
-//#define TVP_GL_FUNC_PTR_EXTERN_DECL_(rettype, funcname, arg) extern rettype (*__cdecl funcname) arg
 #define TVP_GL_FUNC_PTR_EXTERN_DECL_(rettype, funcname, arg) extern rettype (__cdecl * funcname) arg
 #define TVP_GL_FUNC_PTR_EXTERN_DECL TVP_GL_FUNC_PTR_EXTERN_DECL_
 #endif
-
 
 extern unsigned char TVPDivTable[256*256];
 extern unsigned char TVP252DitherPalette[3][256];
@@ -371,6 +369,9 @@ TVP_GL_FUNC_PTR_EXTERN_DECL(void, TVPAdjustGamma_a,  (tjs_uint32 *dest, tjs_int 
 TVP_GL_FUNC_PTR_EXTERN_DECL(void, TVPChBlurMulCopy65,  (tjs_uint8 *dest, const tjs_uint8 *src, tjs_int len, tjs_int level));
 TVP_GL_FUNC_PTR_EXTERN_DECL(void, TVPChBlurAddMulCopy65,  (tjs_uint8 *dest, const tjs_uint8 *src, tjs_int len, tjs_int level));
 TVP_GL_FUNC_PTR_EXTERN_DECL(void, TVPChBlurCopy65,  (tjs_uint8 *dest, tjs_int destpitch, tjs_int destwidth, tjs_int destheight, const tjs_uint8 * src, tjs_int srcpitch, tjs_int srcwidth, tjs_int srcheight, tjs_int blurwidth, tjs_int blurlevel));
+TVP_GL_FUNC_PTR_EXTERN_DECL(void, TVPChBlurMulCopy,  (tjs_uint8 *dest, const tjs_uint8 *src, tjs_int len, tjs_int level) );
+TVP_GL_FUNC_PTR_EXTERN_DECL(void, TVPChBlurAddMulCopy,  (tjs_uint8 *dest, const tjs_uint8 *src, tjs_int len, tjs_int level) );
+TVP_GL_FUNC_PTR_EXTERN_DECL(void, TVPChBlurCopy,  (tjs_uint8 *dest, tjs_int destpitch, tjs_int destwidth, tjs_int destheight, const tjs_uint8 * src, tjs_int srcpitch, tjs_int srcwidth, tjs_int srcheight, tjs_int blurwidth, tjs_int blurlevel) );
 TVP_GL_FUNC_PTR_EXTERN_DECL(void, TVPBLExpand1BitTo8BitPal,  (tjs_uint8 *dest, const tjs_uint8 *buf, tjs_int len, const tjs_uint32 *pal));
 TVP_GL_FUNC_PTR_EXTERN_DECL(void, TVPBLExpand1BitTo8Bit,  (tjs_uint8 *dest, const tjs_uint8 *buf, tjs_int len));
 TVP_GL_FUNC_PTR_EXTERN_DECL(void, TVPBLExpand1BitTo32BitPal,  (tjs_uint32 *dest, const tjs_uint8 *buf, tjs_int len, const tjs_uint32 *pal));
@@ -478,5 +479,6 @@ TVP_GL_FUNC_EXTERN_DECL(void, TVPUninitTVPGL, ());
 #define TVP_RGBA2COLOR(r,g,b,a) \
 	(((a)<<24) +  (((r)<<16) + ((g)<<8) + (b)))
 /*]*/
+
 #endif
 /* end of the file */

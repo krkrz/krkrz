@@ -172,9 +172,9 @@ static void TVPCreateTable(void)
 
 			if(a)
 			{
-				float at = a/255.0, bt = b/255.0;
+				float at = (float)(a/255.0), bt = (float)(b/255.0);
 				c = bt / at;
-				c /= (1.0 - bt + c);
+				c /= (float)( (1.0 - bt + c) );
 				ci = (int)(c*255);
 				if(ci>=256) ci = 255; /* will not overflow... */
 			}
@@ -203,9 +203,9 @@ static void TVPCreateTable(void)
 
 			if(a)
 			{
-				float at = a / 255.0, bt = b / 64.0;
+				float at = (float)(a / 255.0), bt = (float)(b / 64.0);
 				c = bt / at;
-				c /= (1.0 - bt + c);
+				c /= (float)( (1.0 - bt + c) );
 				ci = (int)(c*255);
 				if(ci>=256) ci = 255; /* will not overflow... */
 			}
