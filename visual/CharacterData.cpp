@@ -2,12 +2,18 @@
 #include "CharacterData.h"
 #include "tvpgl.h"
 #include "MsgIntf.h"
-
-tTVPCharacterData::tTVPCharacterData(tjs_uint8 * indata,
+//---------------------------------------------------------------------------
+void TVPChBlurMulCopy_c(tjs_uint8 *dest, const tjs_uint8 *src, tjs_int len, tjs_int level);
+void TVPChBlurAddMulCopy_c(tjs_uint8 *dest, const tjs_uint8 *src, tjs_int len, tjs_int level);
+void TVPChBlurCopy_c(tjs_uint8 *dest, tjs_int destpitch, tjs_int destwidth, tjs_int destheight, const tjs_uint8 * src, tjs_int srcpitch, tjs_int srcwidth, tjs_int srcheight, tjs_int blurwidth, tjs_int blurlevel);
+//---------------------------------------------------------------------------
+tTVPCharacterData::tTVPCharacterData( const tjs_uint8 * indata,
 	tjs_int inpitch,
 	tjs_int originx, tjs_int originy,
 	tjs_uint blackboxw, tjs_uint blackboxh,
-	const tGlyphMetrics & metrics ) {
+	const tGlyphMetrics & metrics, bool fullcolor )
+: Antialiased(false), Blured(false)
+{
 
 	// フィールドのクリア
 	RefCount = 1; // 参照カウンタの初期値は 1
@@ -20,22 +26,37 @@ tTVPCharacterData::tTVPCharacterData(tjs_uint8 * indata,
 	BlackBoxX = blackboxw;
 	BlackBoxY = blackboxh;
 	Gray = 65;
+	FullColored = fullcolor;
 
 	// サイズのチェック
 	if( BlackBoxX != 0 && BlackBoxY != 0 ) {
 		try {
 			// ビットマップをコピー
+			if( fullcolor ) {
+				//- 横方向のピッチを計算
+				// MMX 等の使用を考えて横方向は 8 バイトでアライン
+				Pitch = (((blackboxw*4 - 1) >> 3) + 1) << 3;
 
-			//- 横方向のピッチを計算
-			// MMX 等の使用を考えて横方向は 8 バイトでアライン
-			Pitch = (((blackboxw - 1) >> 3) + 1) << 3;
+				//- バイト数を計算してメモリを確保
+				Data = new tjs_uint8 [Pitch * blackboxh];
 
-			//- バイト数を計算してメモリを確保
-			Data = new tjs_uint8 [Pitch * blackboxh];
+				//- ビットマップをコピー
+				inpitch *= 4;
+				for(tjs_uint y = 0; y < blackboxh; y++) {
+					memcpy( Data + Pitch * y, indata + inpitch * y, blackboxw*4);
+				}
+			} else {
+				//- 横方向のピッチを計算
+				// MMX 等の使用を考えて横方向は 8 バイトでアライン
+				Pitch = (((blackboxw - 1) >> 3) + 1) << 3;
 
-			//- ビットマップをコピー
-			for(tjs_uint y = 0; y < blackboxh; y++) {
-				memcpy( Data + Pitch * y, indata + inpitch * y, blackboxw);
+				//- バイト数を計算してメモリを確保
+				Data = new tjs_uint8 [Pitch * blackboxh];
+
+				//- ビットマップをコピー
+				for(tjs_uint y = 0; y < blackboxh; y++) {
+					memcpy( Data + Pitch * y, indata + inpitch * y, blackboxw);
+				}
 			}
 		} catch(...) {
 			if(Data) delete [] Data;
@@ -56,6 +77,9 @@ tTVPCharacterData::tTVPCharacterData(const tTVPCharacterData & ref) {
 //---------------------------------------------------------------------------
 void tTVPCharacterData::Expand()
 {
+	if( FullColored )
+		TVPThrowExceptionMessage( TJS_W("unimplemented: tTVPCharacterData::Expand for FullColored") );
+
 	// expand the bitmap stored in 1bpp, to 8bpp
 	tjs_int newpitch = (((BlackBoxX -1)>>2)+1)<<2;
 	tjs_uint8 *nd;
@@ -77,6 +101,9 @@ void tTVPCharacterData::Expand()
 //---------------------------------------------------------------------------
 void tTVPCharacterData::Blur(tjs_int blurlevel, tjs_int blurwidth)
 {
+	if( FullColored )
+		TVPThrowExceptionMessage( TJS_W("unimplemented: tTVPCharacterData::Blur for FullColored") );
+
 	// blur the bitmap with given parameters
 	// blur the bitmap
 	if(!Data) return;
@@ -84,7 +111,10 @@ void tTVPCharacterData::Blur(tjs_int blurlevel, tjs_int blurwidth)
 	if(blurwidth == 0)
 	{
 		// no need to blur but must be transparent
-		TVPChBlurMulCopy65(Data, Data, Pitch*BlackBoxY, BlurLevel<<10);
+		if( Gray == 256 )
+			TVPChBlurMulCopy_c(Data, Data, Pitch*BlackBoxY, BlurLevel<<10);
+		else
+			TVPChBlurMulCopy65(Data, Data, Pitch*BlackBoxY, BlurLevel<<10);
 		return;
 	}
 
@@ -96,8 +126,12 @@ void tTVPCharacterData::Blur(tjs_int blurlevel, tjs_int blurwidth)
 
 	tjs_uint8 *newdata = new tjs_uint8[newpitch * newheight];
 
-	TVPChBlurCopy65(newdata, newpitch, newwidth, newheight, Data, Pitch, BlackBoxX,
-		BlackBoxY, bw, blurlevel);
+	if( Gray == 256 )
+		TVPChBlurCopy_c(newdata, newpitch, newwidth, newheight, Data, Pitch, BlackBoxX,
+			BlackBoxY, bw, blurlevel);
+	else
+		TVPChBlurCopy65(newdata, newpitch, newwidth, newheight, Data, Pitch, BlackBoxX,
+			BlackBoxY, bw, blurlevel);
 
 	delete [] Data;
 	Data = newdata;
@@ -116,6 +150,9 @@ void tTVPCharacterData::Blur()
 //---------------------------------------------------------------------------
 void tTVPCharacterData::Bold(tjs_int size)
 {
+	if( FullColored )
+		TVPThrowExceptionMessage( TJS_W("unimplemented: tTVPCharacterData::Bold for FullColored") );
+
 	// enbold the bitmap for 65-level grayscale bitmap
 	if(size < 0) size = -size;
 	tjs_int level = (tjs_int)(size / 50) + 1;
@@ -158,6 +195,9 @@ void tTVPCharacterData::Bold(tjs_int size)
 //---------------------------------------------------------------------------
 void tTVPCharacterData::Bold2(tjs_int size)
 {
+	if( FullColored )
+		TVPThrowExceptionMessage( TJS_W("unimplemented: tTVPCharacterData::Bold2 for FullColored") );
+
 	// enbold the bitmap for black/white monochrome bitmap
 	if(size < 0) size = -size;
 	tjs_int level = (tjs_int)(size / 50) + 1;
@@ -204,6 +244,9 @@ void tTVPCharacterData::Bold2(tjs_int size)
 //---------------------------------------------------------------------------
 void tTVPCharacterData::Resample4()
 {
+	if( FullColored )
+		TVPThrowExceptionMessage( TJS_W("unimplemented: tTVPCharacterData::Resample4 for FullColored") );
+
 	// down-sampling 4x4
 
 	static tjs_uint16 bitcounter[256] = {0xffff};
@@ -278,6 +321,9 @@ void tTVPCharacterData::Resample4()
 //---------------------------------------------------------------------------
 void tTVPCharacterData::Resample8()
 {
+	if( FullColored )
+		TVPThrowExceptionMessage( TJS_W("unimplemented: tTVPCharacterData::Resample8 for FullColored") );
+
 	// down-sampling 8x8
 
 	static tjs_uint8 bitcounter[256] = {0xff};
@@ -347,6 +393,9 @@ void tTVPCharacterData::Resample8()
 }
 //---------------------------------------------------------------------------
 void tTVPCharacterData::AddHorizontalLine( tjs_int liney, tjs_int thickness, tjs_uint8 val ) {
+	if( FullColored )
+		TVPThrowExceptionMessage( TJS_W("unimplemented: tTVPCharacterData::AddHorizontalLine for FullColored") );
+
 	tjs_int linetop = liney - thickness/2;
 	if( linetop < 0 ) linetop = 0;
 	tjs_int linebottom = linetop + thickness;
@@ -400,3 +449,118 @@ void tTVPCharacterData::AddHorizontalLine( tjs_int liney, tjs_int thickness, tjs
 	}
 }
 //---------------------------------------------------------------------------
+void TVPChBlurMulCopy_c(tjs_uint8 *dest, const tjs_uint8 *src, tjs_int len, tjs_int level)
+{
+	tjs_int a, b;
+	{
+		int ___index = 0;
+		len -= (4-1);
+
+		while(___index < len)
+		{
+			a = (src[(___index+(0*2))] * level >> 18);
+			b = (src[(___index+(0*2+1))] * level >> 18);
+			if(a>=255) a = 255;
+			if(b>=255) b = 255;
+			dest[(___index+(0*2))] = a;
+			dest[(___index+(0*2+1))] = b;
+			a = (src[(___index+(1*2))] * level >> 18);
+			b = (src[(___index+(1*2+1))] * level >> 18);
+			if(a>=255) a = 255;
+			if(b>=255) b = 255;
+			dest[(___index+(1*2))] = a;
+			dest[(___index+(1*2+1))] = b;
+			___index += 4;
+		}
+
+		len += (4-1);
+
+		while(___index < len)
+		{
+			a = (src[___index] * level >> 18);;
+			if(a>=255) a = 255;
+			dest[___index] = a;;
+			___index ++;
+		}
+	}
+}
+void TVPChBlurAddMulCopy_c(tjs_uint8 *dest, const tjs_uint8 *src, tjs_int len, tjs_int level)
+{
+	tjs_int a, b;
+	{
+		int ___index = 0;
+		len -= (4-1);
+
+		while(___index < len)
+		{
+			a = dest[(___index+(0*2))] +(src[(___index+(0*2))] * level >> 18);
+			b = dest[(___index+(0*2+1))] +(src[(___index+(0*2+1))] * level >> 18);
+			if(a>=255) a = 255;
+			if(b>=255) b = 255;
+			dest[(___index+(0*2))] = a;
+			dest[(___index+(0*2+1))] = b;
+			a = dest[(___index+(1*2))] +(src[(___index+(1*2))] * level >> 18);
+			b = dest[(___index+(1*2+1))] +(src[(___index+(1*2+1))] * level >> 18);
+			if(a>=255) a = 255;
+			if(b>=255) b = 255;
+			dest[(___index+(1*2))] = a;
+			dest[(___index+(1*2+1))] = b;
+			___index += 4;
+		}
+
+		len += (4-1);
+
+		while(___index < len)
+		{
+			a = dest[___index] +(src[___index] * level >> 18);;
+			if(a>=255) a = 255;;
+			dest[___index] = a;;
+			___index ++;
+		}
+	}
+}
+extern "C" tjs_uint fast_int_hypot(tjs_int lx, tjs_int ly);
+void TVPChBlurCopy_c(tjs_uint8 *dest, tjs_int destpitch, tjs_int destwidth, tjs_int destheight, const tjs_uint8 * src, tjs_int srcpitch, tjs_int srcwidth, tjs_int srcheight, tjs_int blurwidth, tjs_int blurlevel)
+{
+	tjs_int lvsum, x, y;
+
+	/* clear destination */
+	memset(dest, 0, destpitch*destheight);
+
+	/* compute filter level */
+	lvsum = 0;
+	for(y = -blurwidth; y <= blurwidth; y++)
+	{
+		for(x = -blurwidth; x <= blurwidth; x++)
+		{
+			tjs_int len = fast_int_hypot(x, y);
+			if(len <= blurwidth)
+				lvsum += (blurwidth - len +1);
+		}
+	}
+
+	if(lvsum) lvsum = (1<<18)/lvsum; else lvsum=(1<<18);
+
+	/* apply */
+	for(y = -blurwidth; y <= blurwidth; y++)
+	{
+		for(x = -blurwidth; x <= blurwidth; x++)
+		{
+			tjs_int len = fast_int_hypot(x, y);
+			if(len <= blurwidth)
+			{
+				tjs_int sy;
+
+				len = blurwidth - len +1;
+				len *= lvsum;
+				len *= blurlevel;
+				len >>= 8;
+				for(sy = 0; sy < srcheight; sy++)
+				{
+					TVPChBlurAddMulCopy_c(dest + (y + sy + blurwidth)*destpitch + x + blurwidth, 
+						src + sy * srcpitch, srcwidth, len);
+				}
+			}
+		}
+	}
+}
