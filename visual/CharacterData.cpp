@@ -2,10 +2,7 @@
 #include "CharacterData.h"
 #include "tvpgl.h"
 #include "MsgIntf.h"
-//---------------------------------------------------------------------------
-void TVPChBlurMulCopy_c(tjs_uint8 *dest, const tjs_uint8 *src, tjs_int len, tjs_int level);
-void TVPChBlurAddMulCopy_c(tjs_uint8 *dest, const tjs_uint8 *src, tjs_int len, tjs_int level);
-void TVPChBlurCopy_c(tjs_uint8 *dest, tjs_int destpitch, tjs_int destwidth, tjs_int destheight, const tjs_uint8 * src, tjs_int srcpitch, tjs_int srcwidth, tjs_int srcheight, tjs_int blurwidth, tjs_int blurlevel);
+
 //---------------------------------------------------------------------------
 tTVPCharacterData::tTVPCharacterData( const tjs_uint8 * indata,
 	tjs_int inpitch,
@@ -112,7 +109,7 @@ void tTVPCharacterData::Blur(tjs_int blurlevel, tjs_int blurwidth)
 	{
 		// no need to blur but must be transparent
 		if( Gray == 256 )
-			TVPChBlurMulCopy_c(Data, Data, Pitch*BlackBoxY, BlurLevel<<10);
+			TVPChBlurMulCopy(Data, Data, Pitch*BlackBoxY, BlurLevel<<10);
 		else
 			TVPChBlurMulCopy65(Data, Data, Pitch*BlackBoxY, BlurLevel<<10);
 		return;
@@ -127,7 +124,7 @@ void tTVPCharacterData::Blur(tjs_int blurlevel, tjs_int blurwidth)
 	tjs_uint8 *newdata = new tjs_uint8[newpitch * newheight];
 
 	if( Gray == 256 )
-		TVPChBlurCopy_c(newdata, newpitch, newwidth, newheight, Data, Pitch, BlackBoxX,
+		TVPChBlurCopy(newdata, newpitch, newwidth, newheight, Data, Pitch, BlackBoxX,
 			BlackBoxY, bw, blurlevel);
 	else
 		TVPChBlurCopy65(newdata, newpitch, newwidth, newheight, Data, Pitch, BlackBoxX,
@@ -449,118 +446,4 @@ void tTVPCharacterData::AddHorizontalLine( tjs_int liney, tjs_int thickness, tjs
 	}
 }
 //---------------------------------------------------------------------------
-void TVPChBlurMulCopy_c(tjs_uint8 *dest, const tjs_uint8 *src, tjs_int len, tjs_int level)
-{
-	tjs_int a, b;
-	{
-		int ___index = 0;
-		len -= (4-1);
 
-		while(___index < len)
-		{
-			a = (src[(___index+(0*2))] * level >> 18);
-			b = (src[(___index+(0*2+1))] * level >> 18);
-			if(a>=255) a = 255;
-			if(b>=255) b = 255;
-			dest[(___index+(0*2))] = a;
-			dest[(___index+(0*2+1))] = b;
-			a = (src[(___index+(1*2))] * level >> 18);
-			b = (src[(___index+(1*2+1))] * level >> 18);
-			if(a>=255) a = 255;
-			if(b>=255) b = 255;
-			dest[(___index+(1*2))] = a;
-			dest[(___index+(1*2+1))] = b;
-			___index += 4;
-		}
-
-		len += (4-1);
-
-		while(___index < len)
-		{
-			a = (src[___index] * level >> 18);;
-			if(a>=255) a = 255;
-			dest[___index] = a;;
-			___index ++;
-		}
-	}
-}
-void TVPChBlurAddMulCopy_c(tjs_uint8 *dest, const tjs_uint8 *src, tjs_int len, tjs_int level)
-{
-	tjs_int a, b;
-	{
-		int ___index = 0;
-		len -= (4-1);
-
-		while(___index < len)
-		{
-			a = dest[(___index+(0*2))] +(src[(___index+(0*2))] * level >> 18);
-			b = dest[(___index+(0*2+1))] +(src[(___index+(0*2+1))] * level >> 18);
-			if(a>=255) a = 255;
-			if(b>=255) b = 255;
-			dest[(___index+(0*2))] = a;
-			dest[(___index+(0*2+1))] = b;
-			a = dest[(___index+(1*2))] +(src[(___index+(1*2))] * level >> 18);
-			b = dest[(___index+(1*2+1))] +(src[(___index+(1*2+1))] * level >> 18);
-			if(a>=255) a = 255;
-			if(b>=255) b = 255;
-			dest[(___index+(1*2))] = a;
-			dest[(___index+(1*2+1))] = b;
-			___index += 4;
-		}
-
-		len += (4-1);
-
-		while(___index < len)
-		{
-			a = dest[___index] +(src[___index] * level >> 18);;
-			if(a>=255) a = 255;;
-			dest[___index] = a;;
-			___index ++;
-		}
-	}
-}
-extern "C" tjs_uint fast_int_hypot(tjs_int lx, tjs_int ly);
-void TVPChBlurCopy_c(tjs_uint8 *dest, tjs_int destpitch, tjs_int destwidth, tjs_int destheight, const tjs_uint8 * src, tjs_int srcpitch, tjs_int srcwidth, tjs_int srcheight, tjs_int blurwidth, tjs_int blurlevel)
-{
-	tjs_int lvsum, x, y;
-
-	/* clear destination */
-	memset(dest, 0, destpitch*destheight);
-
-	/* compute filter level */
-	lvsum = 0;
-	for(y = -blurwidth; y <= blurwidth; y++)
-	{
-		for(x = -blurwidth; x <= blurwidth; x++)
-		{
-			tjs_int len = fast_int_hypot(x, y);
-			if(len <= blurwidth)
-				lvsum += (blurwidth - len +1);
-		}
-	}
-
-	if(lvsum) lvsum = (1<<18)/lvsum; else lvsum=(1<<18);
-
-	/* apply */
-	for(y = -blurwidth; y <= blurwidth; y++)
-	{
-		for(x = -blurwidth; x <= blurwidth; x++)
-		{
-			tjs_int len = fast_int_hypot(x, y);
-			if(len <= blurwidth)
-			{
-				tjs_int sy;
-
-				len = blurwidth - len +1;
-				len *= lvsum;
-				len *= blurlevel;
-				len >>= 8;
-				for(sy = 0; sy < srcheight; sy++)
-				{
-					TVPChBlurAddMulCopy_c(dest + (y + sy + blurwidth)*destpitch + x + blurwidth, 
-						src + sy * srcpitch, srcwidth, len);
-				}
-			}
-		}
-	}
-}

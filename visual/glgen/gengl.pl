@@ -355,8 +355,8 @@ typedef struct
 #ifdef _WIN32
 #define TVP_GL_FUNC_DECL(rettype, funcname, arg)  rettype __cdecl funcname arg
 #define TVP_GL_FUNC_EXTERN_DECL(rettype, funcname, arg)  extern rettype __cdecl funcname arg
-#define TVP_GL_FUNC_PTR_DECL(rettype, funcname, arg) rettype __cdecl (*funcname) arg
-#define TVP_GL_FUNC_PTR_EXTERN_DECL_(rettype, funcname, arg) extern rettype __cdecl (*funcname) arg
+#define TVP_GL_FUNC_PTR_DECL(rettype, funcname, arg) rettype (__cdecl * funcname) arg
+#define TVP_GL_FUNC_PTR_EXTERN_DECL_(rettype, funcname, arg) extern rettype (__cdecl * funcname) arg
 #define TVP_GL_FUNC_PTR_EXTERN_DECL TVP_GL_FUNC_PTR_EXTERN_DECL_
 #endif
 
@@ -389,7 +389,7 @@ print FC &get_file_content('maketab.c');
 $cnt =  <<EOF;
 
 /* add here compiler specific inline directives */
-#ifdef __BORLANDC__
+#if defined( __BORLANDC__ ) || ( _MSC_VER )
 	#define TVP_INLINE_FUNC __inline
 #else
 	#define TVP_INLINE_FUNC 
@@ -697,7 +697,7 @@ print FC <<EOF;
 /*export*/
 TVP_GL_FUNC_DECL(void, TVPAlphaBlend_a_c, (tjs_uint32 *dest, const tjs_uint32 *src, tjs_int len))
 {
-	tjs_uint32 d1, s, d, sopa, addr, destalpha;
+	//tjs_uint32 d1, s, d, sopa, addr, destalpha;
 EOF
 
 
@@ -4064,7 +4064,7 @@ print FC <<EOF;
 /*export*/
 TVP_GL_FUNC_DECL(void, TVPSubBlend_HDA_o_c, (tjs_uint32 *dest, const tjs_uint32 *src, tjs_int len, tjs_int opa))
 {
-register tjs_uint32 s, d;
+register tjs_uint32 s/*, d*/;
 register tjs_uint32 tmp;
 EOF
 
@@ -6041,8 +6041,125 @@ TVP_GL_FUNC_DECL(void, TVPChBlurCopy65_c, (tjs_uint8 *dest, tjs_int destpitch, t
 	}
 }
 
+/*export*/
+TVP_GL_FUNC_DECL(void, TVPChBlurMulCopy_c, (tjs_uint8 *dest, const tjs_uint8 *src, tjs_int len, tjs_int level) )
+{
+	tjs_int a, b;
+	{
+		int ___index = 0;
+		len -= (4-1);
 
+		while(___index < len)
+		{
+			a = (src[(___index+(0*2))] * level >> 18);
+			b = (src[(___index+(0*2+1))] * level >> 18);
+			if(a>=255) a = 255;
+			if(b>=255) b = 255;
+			dest[(___index+(0*2))] = a;
+			dest[(___index+(0*2+1))] = b;
+			a = (src[(___index+(1*2))] * level >> 18);
+			b = (src[(___index+(1*2+1))] * level >> 18);
+			if(a>=255) a = 255;
+			if(b>=255) b = 255;
+			dest[(___index+(1*2))] = a;
+			dest[(___index+(1*2+1))] = b;
+			___index += 4;
+		}
 
+		len += (4-1);
+
+		while(___index < len)
+		{
+			a = (src[___index] * level >> 18);;
+			if(a>=255) a = 255;
+			dest[___index] = a;;
+			___index ++;
+		}
+	}
+}
+
+/*export*/
+TVP_GL_FUNC_DECL(void, TVPChBlurAddMulCopy_c, (tjs_uint8 *dest, const tjs_uint8 *src, tjs_int len, tjs_int level) )
+{
+	tjs_int a, b;
+	{
+		int ___index = 0;
+		len -= (4-1);
+
+		while(___index < len)
+		{
+			a = dest[(___index+(0*2))] +(src[(___index+(0*2))] * level >> 18);
+			b = dest[(___index+(0*2+1))] +(src[(___index+(0*2+1))] * level >> 18);
+			if(a>=255) a = 255;
+			if(b>=255) b = 255;
+			dest[(___index+(0*2))] = a;
+			dest[(___index+(0*2+1))] = b;
+			a = dest[(___index+(1*2))] +(src[(___index+(1*2))] * level >> 18);
+			b = dest[(___index+(1*2+1))] +(src[(___index+(1*2+1))] * level >> 18);
+			if(a>=255) a = 255;
+			if(b>=255) b = 255;
+			dest[(___index+(1*2))] = a;
+			dest[(___index+(1*2+1))] = b;
+			___index += 4;
+		}
+
+		len += (4-1);
+
+		while(___index < len)
+		{
+			a = dest[___index] +(src[___index] * level >> 18);;
+			if(a>=255) a = 255;;
+			dest[___index] = a;;
+			___index ++;
+		}
+	}
+}
+
+/*export*/
+TVP_GL_FUNC_DECL(void, TVPChBlurCopy_c, (tjs_uint8 *dest, tjs_int destpitch, tjs_int destwidth, tjs_int destheight, const tjs_uint8 * src, tjs_int srcpitch, tjs_int srcwidth, tjs_int srcheight, tjs_int blurwidth, tjs_int blurlevel) )
+{
+	tjs_int lvsum, x, y;
+
+	/* clear destination */
+	memset(dest, 0, destpitch*destheight);
+
+	/* compute filter level */
+	lvsum = 0;
+	for(y = -blurwidth; y <= blurwidth; y++)
+	{
+		for(x = -blurwidth; x <= blurwidth; x++)
+		{
+			tjs_int len = fast_int_hypot(x, y);
+			if(len <= blurwidth)
+				lvsum += (blurwidth - len +1);
+		}
+	}
+
+	if(lvsum) lvsum = (1<<18)/lvsum; else lvsum=(1<<18);
+
+	/* apply */
+	for(y = -blurwidth; y <= blurwidth; y++)
+	{
+		for(x = -blurwidth; x <= blurwidth; x++)
+		{
+			tjs_int len = fast_int_hypot(x, y);
+			if(len <= blurwidth)
+			{
+				tjs_int sy;
+
+				len = blurwidth - len +1;
+				len *= lvsum;
+				len *= blurlevel;
+				len >>= 8;
+				for(sy = 0; sy < srcheight; sy++)
+				{
+					TVPChBlurAddMulCopy(dest + (y + sy + blurwidth)*destpitch + x + blurwidth, 
+						src + sy * srcpitch, srcwidth, len);
+				}
+			}
+		}
+	}
+}
 
 EOF
 
