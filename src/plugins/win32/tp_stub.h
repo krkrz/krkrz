@@ -5417,11 +5417,9 @@ public:
 	//!				マウスのキャプチャを開放すること。
 	virtual void TJS_INTF_METHOD WindowReleaseCapture() = 0;
 
-#ifdef USE_OBSOLETE_FUNCTIONS
 	//! @brief		ツールチップヒントを設定する
 	//! @param		text		ヒントテキスト(空文字列の場合はヒントの表示をキャンセルする)
-	virtual void TJS_INTF_METHOD SetHintText(const ttstr & text) = 0;
-#endif
+	virtual void TJS_INTF_METHOD SetHintText(iTJSDispatch2* sender, const ttstr & text) = 0;
 
 	//! @brief		注視ポイントの設定
 	//! @param		layer		フォント情報の含まれるレイヤ
@@ -5723,12 +5721,10 @@ public:
 	//!				マウスのキャプチャを開放する。
 	virtual void TJS_INTF_METHOD WindowReleaseCapture(iTVPLayerManager * manager) = 0;
 
-#ifdef USE_OBSOLETE_FUNCTIONS
 	//! @brief		(LayerManager→DrawDevice) ツールチップヒントを設定する
 	//! @param		manager		レイヤマネージャ
 	//! @param		text		ヒントテキスト(空文字列の場合はヒントの表示をキャンセルする)
-	virtual void TJS_INTF_METHOD SetHintText(iTVPLayerManager * manager, const ttstr & text) = 0;
-#endif
+	virtual void TJS_INTF_METHOD SetHintText(iTVPLayerManager * manager, iTJSDispatch2* sender, const ttstr & text) = 0;
 
 	//! @brief		(LayerManager→DrawDevice) 注視ポイントの設定
 	//! @param		manager		レイヤマネージャ

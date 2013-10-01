@@ -313,12 +313,11 @@ public:
 		// get cursor position in primary coordinates
 	void SetCursorPos(tjs_int x, tjs_int y);
 		// set cursor position in primary coordinates
-	
-#ifdef USE_OBSOLETE_FUNCTIONS
+
 	void NotifyHintChange(tTJSNI_BaseLayer *layer, const ttstr & hint);
-	void SetHint(const ttstr &hint);
+	void SetHint(iTJSDispatch2* sender, const ttstr &hint);
 		// set layer hint to current window
-#endif
+
 	void NotifyLayerResize();  // layer -> window
 	void NotifyWindowInvalidation(); // layer -> window
 
