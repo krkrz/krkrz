@@ -251,12 +251,10 @@ public:
 	//!				マウスのキャプチャを開放する。
 	virtual void TJS_INTF_METHOD WindowReleaseCapture(iTVPLayerManager * manager) = 0;
 
-#ifdef USE_OBSOLETE_FUNCTIONS
 	//! @brief		(LayerManager→DrawDevice) ツールチップヒントを設定する
 	//! @param		manager		レイヤマネージャ
 	//! @param		text		ヒントテキスト(空文字列の場合はヒントの表示をキャンセルする)
-	virtual void TJS_INTF_METHOD SetHintText(iTVPLayerManager * manager, const ttstr & text) = 0;
-#endif
+	virtual void TJS_INTF_METHOD SetHintText(iTVPLayerManager * manager, iTJSDispatch2* sender, const ttstr & text) = 0;
 
 	//! @brief		(LayerManager→DrawDevice) 注視ポイントの設定
 	//! @param		manager		レイヤマネージャ
@@ -461,9 +459,7 @@ public:
 	virtual void TJS_INTF_METHOD SetMouseCursor(iTVPLayerManager * manager, tjs_int cursor);
 	virtual void TJS_INTF_METHOD GetCursorPos(iTVPLayerManager * manager, tjs_int &x, tjs_int &y);
 	virtual void TJS_INTF_METHOD SetCursorPos(iTVPLayerManager * manager, tjs_int x, tjs_int y);
-#ifdef USE_OBSOLETE_FUNCTIONS
-	virtual void TJS_INTF_METHOD SetHintText(iTVPLayerManager * manager, const ttstr & text);
-#endif
+	virtual void TJS_INTF_METHOD SetHintText(iTVPLayerManager * manager, iTJSDispatch2* sender, const ttstr & text);
 	virtual void TJS_INTF_METHOD WindowReleaseCapture(iTVPLayerManager * manager);
 
 	virtual void TJS_INTF_METHOD SetAttentionPoint(iTVPLayerManager * manager, tTJSNI_BaseLayer *layer,

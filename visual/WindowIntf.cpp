@@ -126,6 +126,7 @@ tTVPUniqueTagForInputEvent tTVPOnTouchMoveInputEvent          ::Tag;
 tTVPUniqueTagForInputEvent tTVPOnTouchScalingInputEvent       ::Tag;
 tTVPUniqueTagForInputEvent tTVPOnTouchRotateInputEvent        ::Tag;
 tTVPUniqueTagForInputEvent tTVPOnMultiTouchInputEvent         ::Tag;
+tTVPUniqueTagForInputEvent tTVPOnHintChangeInputEvent         ::Tag;
 //---------------------------------------------------------------------------
 
 
@@ -559,6 +560,17 @@ void tTJSNI_BaseWindow::OnActivate(bool activate_or_deactivate)
 			TVPPostEvent(Owner, Owner, activate_or_deactivate?a_eventname:d_eventname,
 				0, TVP_EPT_IMMEDIATE, 0, NULL);
 		}
+	}
+}
+//---------------------------------------------------------------------------
+void tTJSNI_BaseWindow::OnHintChange( const ttstr& text, tjs_int x, tjs_int y, bool isshow )
+{
+	if(!CanDeliverEvents()) return;
+	if(Owner)
+	{
+		tTJSVariant arg[6] = { text, x, y, isshow ? 1 : 0 };
+		static ttstr eventname(TJS_W("onHintChanged"));
+		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 4, arg);
 	}
 }
 //---------------------------------------------------------------------------

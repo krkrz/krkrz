@@ -96,11 +96,9 @@ public:
 	//!				マウスのキャプチャを開放すること。
 	virtual void TJS_INTF_METHOD WindowReleaseCapture() = 0;
 
-#ifdef USE_OBSOLETE_FUNCTIONS
 	//! @brief		ツールチップヒントを設定する
 	//! @param		text		ヒントテキスト(空文字列の場合はヒントの表示をキャンセルする)
-	virtual void TJS_INTF_METHOD SetHintText(const ttstr & text) = 0;
-#endif
+	virtual void TJS_INTF_METHOD SetHintText(iTJSDispatch2* sender, const ttstr & text) = 0;
 
 	//! @brief		注視ポイントの設定
 	//! @param		layer		フォント情報の含まれるレイヤ
@@ -213,6 +211,8 @@ public:
 	void OnTouchScaling( tjs_real startdist, tjs_real curdist, tjs_real cx, tjs_real cy, tjs_int flag );
 	void OnTouchRotate( tjs_real startangle, tjs_real curangle, tjs_real dist, tjs_real cx, tjs_real cy, tjs_int flag );
 	void OnMultiTouch();
+
+	void OnHintChange( const ttstr& text, tjs_int x, tjs_int y, bool isshow );
 
 	void ClearInputEvents();
 
@@ -610,6 +610,22 @@ public:
 		tTVPBaseInputEvent(win, Tag) {};
 	void Deliver() const
 	{ ((tTJSNI_BaseWindow*)GetSource())->OnMultiTouch(); }
+};
+//---------------------------------------------------------------------------
+class tTVPOnHintChangeInputEvent : public tTVPBaseInputEvent
+{
+	static tTVPUniqueTagForInputEvent Tag;
+	ttstr HintMessage;
+	tjs_int HintX;
+	tjs_int HintY;
+	bool IsShow;
+public:
+	tTVPOnHintChangeInputEvent(tTJSNI_BaseWindow *win, const ttstr& text, tjs_int x, tjs_int y, bool isshow ) :
+		tTVPBaseInputEvent(win, Tag)
+		, HintMessage(text), HintX(x), HintY(y), IsShow(isshow)	{};
+
+	void Deliver() const
+	{ ((tTJSNI_BaseWindow*)GetSource())->OnHintChange( HintMessage, HintX, HintY, IsShow ); }
 };
 
 

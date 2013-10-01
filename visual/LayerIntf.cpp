@@ -331,6 +331,7 @@ tTJSNI_BaseLayer::tTJSNI_BaseLayer()
 	Cursor = 0; // 0 = crDefault
 	CursorX_Work = 0;
 	ShowParentHint = true;
+	IgnoreHintSensing = false;
 	UseAttention = false;
 	ImeMode = ::imDisable;
 	AttentionLeft = AttentionTop = 0;
@@ -2787,7 +2788,7 @@ void tTJSNI_BaseLayer::SetCursorPos(tjs_int x, tjs_int y)
 void tTJSNI_BaseLayer::SetCurrentHintToWindow()
 {
 	// set current hint to the window
-	
+	if( IgnoreHintSensing ) return;
 	if(Manager)
 	{
 		tTJSNI_BaseLayer *p = this;
@@ -2797,21 +2798,18 @@ void tTJSNI_BaseLayer::SetCurrentHintToWindow()
 			p = p->Parent;
 		}
 
-#ifdef USE_OBSOLETE_FUNCTIONS
-		Manager->SetHint(p->Hint);
-#endif
+		Manager->SetHint( GetOwnerNoAddRef(), p->Hint);
 	}
 }
 //---------------------------------------------------------------------------
-#ifdef USE_OBSOLETE_FUNCTIONS
 void tTJSNI_BaseLayer::SetHint(const ttstr & hint)
 {
 	ShowParentHint = false;
+	IgnoreHintSensing = false;
 	Hint = hint;
 	if(Manager)
 		Manager->NotifyHintChange(this, hint);
 }
-#endif
 //---------------------------------------------------------------------------
 void tTJSNI_BaseLayer::SetAttentionLeft(tjs_int l)
 {
@@ -8707,7 +8705,6 @@ TJS_BEGIN_NATIVE_PROP_DECL(cursorY)
 }
 TJS_END_NATIVE_PROP_DECL(cursorY)
 //----------------------------------------------------------------------
-#ifdef USE_OBSOLETE_FUNCTIONS
 TJS_BEGIN_NATIVE_PROP_DECL(hint)
 {
 	TJS_BEGIN_NATIVE_PROP_GETTER
@@ -8727,7 +8724,6 @@ TJS_BEGIN_NATIVE_PROP_DECL(hint)
 	TJS_END_NATIVE_PROP_SETTER
 }
 TJS_END_NATIVE_PROP_DECL(hint)
-#endif
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_PROP_DECL(showParentHint)
 {
@@ -8748,6 +8744,26 @@ TJS_BEGIN_NATIVE_PROP_DECL(showParentHint)
 	TJS_END_NATIVE_PROP_SETTER
 }
 TJS_END_NATIVE_PROP_DECL(showParentHint)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(ignoreHintSensing)
+{
+	TJS_BEGIN_NATIVE_PROP_GETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
+		*result = _this->GetIgnoreHintSensing();
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_GETTER
+
+	TJS_BEGIN_NATIVE_PROP_SETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
+		_this->SetIgnoreHintSensing(*param);
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_PROP_DECL(ignoreHintSensing)
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_PROP_DECL(focusable)
 {

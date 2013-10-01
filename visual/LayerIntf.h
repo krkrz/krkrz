@@ -519,16 +519,17 @@ public:
 private:
 	ttstr Hint; // layer hint text
 	bool ShowParentHint; // show parent's hint ?
+	bool IgnoreHintSensing;
 
 	void SetCurrentHintToWindow(); // set current hint to the window
 
 public:
-#ifdef USE_OBSOLETE_FUNCTIONS
 	const ttstr & GetHint() const { return Hint; }
 	void SetHint(const ttstr & hint);
-#endif
 	bool GetShowParentHint() const { return ShowParentHint; }
 	void SetShowParentHint(bool b) { ShowParentHint = b; }
+	bool GetIgnoreHintSensing() const { return IgnoreHintSensing; }
+	void SetIgnoreHintSensing(bool b) { IgnoreHintSensing = b; }
 
 public:
 	tjs_int GetAttentionLeft() const { return AttentionLeft; }
