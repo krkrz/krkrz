@@ -131,11 +131,11 @@ ttstr TVPGetPlatformName()
 //---------------------------------------------------------------------------
 ttstr TVPGetOSName()
 {
-	OSVERSIONINFO ovi;
+	OSVERSIONINFOEX ovi;
 	ovi.dwOSVersionInfoSize = sizeof(ovi);
-	GetVersionEx(&ovi);
+	GetVersionEx((OSVERSIONINFO*)&ovi);
 	tjs_char buf[256];
-	const tjs_char *osname;
+	const tjs_char *osname = NULL;
 
 	switch(ovi.dwPlatformId)
 	{
@@ -153,7 +153,48 @@ ttstr TVPGetOSName()
 		}
 		break;
 	case VER_PLATFORM_WIN32_NT:
-		osname = TJS_W("Windows NT"); break;
+		if( ovi.dwMajorVersion == 5 ) {
+			switch(ovi.dwMinorVersion) {
+			case 0:
+				osname = TJS_W("Windows 2000");
+				break;
+			case 1:
+				osname = TJS_W("Windows XP");
+				break;
+			case 2:
+				osname = TJS_W("Windows Server 2003");
+				break;
+			}
+		} else if( ovi.dwMajorVersion == 6 ) {
+			switch(ovi.dwMinorVersion) {
+			case 0:
+				if( ovi.wProductType == VER_NT_WORKSTATION )
+					osname = TJS_W("Windows Vista");
+				else
+					osname = TJS_W("Windows Server 2008");
+				break;
+			case 1:
+				if( ovi.wProductType == VER_NT_WORKSTATION )
+					osname = TJS_W("Windows 7");
+				else
+					osname = TJS_W("Windows Server 2008 R2");
+				break;
+			case 2:
+				if( ovi.wProductType == VER_NT_WORKSTATION )
+					osname = TJS_W("Windows 8");
+				else
+					osname = TJS_W("Windows Server 2012");
+				break;
+			case 3:
+				if( ovi.wProductType == VER_NT_WORKSTATION )
+					osname = TJS_W("Windows 8.1");
+				else
+					osname = TJS_W("Windows Server 2012 R2");
+				break;
+			}
+		}
+		if( osname == NULL ) osname = TJS_W("Windows NT");
+		break;
 	default:
 		osname = TJS_W("Unknown"); break;
 	}

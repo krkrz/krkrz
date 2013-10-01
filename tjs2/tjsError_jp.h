@@ -12,7 +12,11 @@
 TJS_MSG_DECL(TJSInternalError, TJS_W("内部エラーが発生しました"))
 TJS_MSG_DECL(TJSWarning, TJS_W("警告: "))
 TJS_MSG_DECL(TJSWarnEvalOperator, TJS_W("グローバルでない場所で後置 ! 演算子が使われています(この演算子の挙動はTJS2 version 2.4.1 で変わりましたのでご注意ください)"))
+#ifdef TVP_TEXT_READ_ANSI_MBCS
 TJS_MSG_DECL(TJSNarrowToWideConversionError, TJS_W("ANSI 文字列を UNICODE 文字列に変換できません。現在のコードページで解釈できない文字が含まれてます。正しいデータが指定されているかを確認してください。データが破損している可能性もあります"))
+#else
+TJS_MSG_DECL(TJSNarrowToWideConversionError, TJS_W("UTF-8 文字列を UNICODE 文字列に変換できません。解釈できない文字が含まれてます。正しいデータが指定されているかを確認してください。データが破損している可能性もあります"))
+#endif
 TJS_MSG_DECL(TJSVariantConvertError, TJS_W("%1 から %2 へ型を変換できません"))
 TJS_MSG_DECL(TJSVariantConvertErrorToObject, TJS_W("%1 から Object へ型を変換できません。Object 型が要求される文脈で Object 型以外の値が渡されるとこのエラーが発生します"))
 TJS_MSG_DECL(TJSIDExpected, TJS_W("識別子を指定してください"))

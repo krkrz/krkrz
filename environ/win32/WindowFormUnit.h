@@ -9,6 +9,7 @@
 #include "TVPWindow.h"
 #include "MouseCursor.h"
 #include "TouchPoint.h"
+#include "TVPTimer.h"
 
 enum {
 	crDefault = 0x0,
@@ -101,6 +102,7 @@ class tTVPPadDirectInputDevice; // class for DirectInputDevice management
 class TTVPWindowForm : public tTVPWindow, public TouchHandler {
 	static const int TVP_MOUSE_MAX_ACCEL = 30;
 	static const int TVP_MOUSE_SHIFT_ACCEL = 40;
+	static const int TVP_TOOLTIP_SHOW_DELAY = 500;
 private:
 
 	bool InMode;
@@ -171,10 +173,16 @@ private:
 	tjs_int ZoomNumer; // Zooming factor numerator (setting)
 	tjs_int ActualZoomDenom; // Zooming factor denominator (actual)
 	tjs_int ActualZoomNumer; // Zooming factor numerator (actual)
-	
+
 	DWORD LastRecheckInputStateSent;
 
 	TouchPointList touch_points_;
+	ttstr HintMessage;
+	tjs_int HintX;
+	tjs_int HintY;
+	TVPTimer* HintTimer;
+	tjs_int HintDelay;
+	iTJSDispatch2* LastHintSender;
 
 private:
 	void SetDrawDeviceDestRect();
@@ -310,7 +318,8 @@ public:
 	void GetCursorPos(tjs_int &x, tjs_int &y);
 	void SetCursorPos(tjs_int x, tjs_int y);
 
-	// void SetHintText(const ttstr &text){}
+	void SetHintText(iTJSDispatch2* sender, const ttstr &text);
+	void UpdateHint();
 
 	void SetImeMode(tTVPImeMode mode);
 	void SetDefaultImeMode(tTVPImeMode mode, bool reset);
@@ -392,6 +401,9 @@ public:
 	tjs_real GetTouchPointY( tjs_int index ) const { return touch_points_.GetY(index); }
 	tjs_int GetTouchPointID( tjs_int index ) const { return touch_points_.GetID(index); }
 	tjs_int GetTouchPointCount() const { return touch_points_.CountUsePoint(); }
+
+	void SetHintDelay( tjs_int delay ) { HintDelay = delay; }
+	tjs_int GetHintDelay() const { return HintDelay; }
 };
 
 #endif // __WINDOW_FORM_UNIT_H__

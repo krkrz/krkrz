@@ -1441,13 +1441,11 @@ void TJS_INTF_METHOD tTJSNI_Window::WindowReleaseCapture()
 	::ReleaseCapture(); // Windows API
 }
 //---------------------------------------------------------------------------
-#ifdef USE_OBSOLETE_FUNCTIONS
-void TJS_INTF_METHOD tTJSNI_Window::SetHintText(const ttstr & text)
+void TJS_INTF_METHOD tTJSNI_Window::SetHintText(iTJSDispatch2* sender, const ttstr & text)
 {
 	// set hint text to window
-	if(Form) Form->SetHintText(text);
+	if(Form) Form->SetHintText(sender,text);
 }
-#endif
 //---------------------------------------------------------------------------
 void TJS_INTF_METHOD tTJSNI_Window::SetAttentionPoint(tTJSNI_BaseLayer *layer,
 	tjs_int l, tjs_int t)
@@ -2076,7 +2074,18 @@ tjs_int tTJSNI_Window::GetTouchPointCount() {
 	return Form->GetTouchPointCount();
 }
 //---------------------------------------------------------------------------
-
+void tTJSNI_Window::SetHintDelay( tjs_int delay )
+{
+	if(!Form) return;
+	return Form->SetHintDelay(delay);
+}
+//---------------------------------------------------------------------------
+tjs_int tTJSNI_Window::GetHintDelay() const
+{
+	if(!Form) return 0;
+	return Form->GetHintDelay();
+}
+//---------------------------------------------------------------------------
 
 
 
@@ -2275,6 +2284,26 @@ TJS_BEGIN_NATIVE_PROP_DECL(touchPointCount)
 	TJS_DENY_NATIVE_PROP_SETTER
 }
 TJS_END_NATIVE_PROP_DECL_OUTER(cls, touchPointCount)
+//---------------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(hintDelay)
+{
+	TJS_BEGIN_NATIVE_PROP_GETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
+		*result = _this->GetHintDelay();
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_GETTER
+
+	TJS_BEGIN_NATIVE_PROP_SETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
+		_this->SetHintDelay(*param);
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_PROP_DECL_OUTER(cls, hintDelay)
 //---------------------------------------------------------------------------
 
 	TVPGetDisplayColorFormat(); // this will be ran only once here

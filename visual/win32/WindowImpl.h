@@ -278,11 +278,7 @@ public:
 	void TJS_INTF_METHOD GetCursorPos(tjs_int &x, tjs_int &y);
 	void TJS_INTF_METHOD SetCursorPos(tjs_int x, tjs_int y);
 	void TJS_INTF_METHOD WindowReleaseCapture();
-
-#ifdef USE_OBSOLETE_FUNCTIONS
-	void TJS_INTF_METHOD SetHintText(const ttstr & text);
-#endif
-
+	void TJS_INTF_METHOD SetHintText(iTJSDispatch2* sender, const ttstr & text);
 	void TJS_INTF_METHOD SetAttentionPoint(tTJSNI_BaseLayer *layer,
 		tjs_int l, tjs_int t);
 	void TJS_INTF_METHOD DisableAttentionPoint();
@@ -426,6 +422,9 @@ public:
 	tjs_real GetTouchPointY( tjs_int index );
 	tjs_real GetTouchPointID( tjs_int index );
 	tjs_int GetTouchPointCount();
+	
+	void SetHintDelay( tjs_int delay );
+	tjs_int GetHintDelay() const;
 protected:
 };
 //---------------------------------------------------------------------------

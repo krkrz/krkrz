@@ -184,7 +184,8 @@ void TVPInitWindowOptions()
 
 
 TTVPWindowForm::TTVPWindowForm( TApplication* app, tTJSNI_Window* ni ) : tTVPWindow(), CurrentMouseCursor(crDefault), touch_points_(this),
-	LayerLeft(0), LayerTop(0), LayerWidth(32), LayerHeight(32) {
+	LayerLeft(0), LayerTop(0), LayerWidth(32), LayerHeight(32),
+	HintX(0), HintY(0), HintTimer(NULL), HintDelay(TVP_TOOLTIP_SHOW_DELAY), LastHintSender(NULL) {
 	CreateWnd( _T("TVPMainWindow"), Application->GetTitle(), 10, 10 );
 	TVPInitWindowOptions();
 	
@@ -235,6 +236,7 @@ TTVPWindowForm::TTVPWindowForm( TApplication* app, tTJSNI_Window* ni ) : tTVPWin
 	LastRecheckInputStateSent = 0;
 }
 TTVPWindowForm::~TTVPWindowForm() {
+	if( HintTimer ) delete HintTimer;
 	Application->RemoveWindow(this);
 }
 tjs_uint32 TVPGetCurrentShiftKeyState() {
@@ -1244,6 +1246,47 @@ void TTVPWindowForm::SetCursorPos(tjs_int x, tjs_int y) {
 	::SetCursorPos(pt.x, pt.y);
 	LastMouseScreenX = LastMouseScreenY = -1; // force to display mouse cursor
 	RestoreMouseCursor();
+}
+
+void TTVPWindowForm::SetHintText(iTJSDispatch2* sender,  const ttstr &text ) {
+	if( HintMessage != text && text.IsEmpty() != true ) {
+		HintMessage.Clear();
+		UpdateHint();
+	}
+	HintMessage = text;
+	
+	POINT p;
+	::GetCursorPos(&p);
+	::ScreenToClient( GetHandle(), &p );
+	HintX = p.x;
+	HintY = p.y;
+
+	if( HintTimer ) HintTimer->SetEnabled(false);
+	if( text.IsEmpty() ) {
+		if( HintTimer ) HintTimer->SetEnabled(false);
+		UpdateHint();
+	} else {
+		if( LastHintSender != sender ) {
+			if( HintDelay > 0 ) {
+				if( HintTimer == NULL ) {
+					HintTimer = new TVPTimer();
+					HintTimer->SetOnTimerHandler( this, &TTVPWindowForm::UpdateHint );
+				}
+				HintTimer->SetEnabled(false);
+				HintTimer->SetInterval( HintDelay );
+				HintTimer->SetEnabled(true);
+			} else if( HintDelay == 0 ) {
+				UpdateHint();
+			}
+		}
+	}
+	LastHintSender = sender;
+}
+void TTVPWindowForm::UpdateHint() {
+	if(TJSNativeInstance) {
+		TVPPostInputEvent( new tTVPOnHintChangeInputEvent(TJSNativeInstance, HintMessage, HintX, HintY, HintMessage.IsEmpty()==false ));
+	}
+	if( HintTimer ) HintTimer->SetEnabled(false);
 }
 void TTVPWindowForm::UnacquireImeControl() {
 	if( TVPControlImeState ) {
