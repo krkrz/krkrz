@@ -250,10 +250,9 @@ public:
 	void SetTrapKey(bool b);
 	bool GetTrapKey() const;
 
-/*
-	void SetMaskRegion(HRGN threshold){}
-	void RemoveMaskRegion(){}
-*/
+	void SetMaskRegion(HRGN threshold);
+	void RemoveMaskRegion();
+
 	void SetMouseCursorToWindow( MouseCursor& cursor );
 
 	void HideMouseCursor();

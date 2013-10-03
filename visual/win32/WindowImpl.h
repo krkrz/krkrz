@@ -391,11 +391,9 @@ public:
 
 	void SetTrapKey(bool b);
 	bool GetTrapKey() const;
-	
-#ifdef USE_OBSOLETE_FUNCTIONS
+
 	void SetMaskRegion(tjs_int threshold);
 	void RemoveMaskRegion();
-#endif
 
 	void SetMouseCursorState(tTVPMouseCursorState mcs);
     tTVPMouseCursorState GetMouseCursorState() const;

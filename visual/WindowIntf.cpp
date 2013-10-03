@@ -779,7 +779,6 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/showModal)
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/showModal)
 //----------------------------------------------------------------------
-#ifdef USE_OBSOLETE_FUNCTIONS
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/setMaskRegion)
 {
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
@@ -798,7 +797,6 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/removeMaskRegion)
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/removeMaskRegion)
-#endif
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/add)
 {
