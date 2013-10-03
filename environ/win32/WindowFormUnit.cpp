@@ -590,6 +590,14 @@ bool TTVPWindowForm::GetTrapKey() const {
 	return TrapKeys;
 }
 
+void TTVPWindowForm::SetMaskRegion(HRGN threshold)
+{
+	::SetWindowRgn(GetHandle(), threshold, GetVisible() ? TRUE : FALSE );
+}
+void TTVPWindowForm::RemoveMaskRegion()
+{
+	::SetWindowRgn(GetHandle(), NULL, GetVisible() ? TRUE : FALSE );
+}
 
 void TTVPWindowForm::HideMouseCursor() {
 	// hide mouse cursor temporarily

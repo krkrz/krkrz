@@ -1950,7 +1950,6 @@ bool tTJSNI_Window::GetTrapKey() const
 	return Form->GetTrapKey();
 }
 //---------------------------------------------------------------------------
-#ifdef USE_OBSOLETE_FUNCTIONS
 void tTJSNI_Window::SetMaskRegion(tjs_int threshold)
 {
 	if(!Form) return;
@@ -1966,7 +1965,6 @@ void tTJSNI_Window::RemoveMaskRegion()
 	if(!Form) return;
 	Form->RemoveMaskRegion();
 }
-#endif
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetMouseCursorState(tTVPMouseCursorState mcs)
 {
