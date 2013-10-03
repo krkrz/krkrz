@@ -117,7 +117,9 @@ private:
 	
 	//-- DirectInput related
 	tTVPWheelDirectInputDevice *DIWheelDevice;
+#ifndef DISABLE_EMBEDDED_GAME_PAD
 	tTVPPadDirectInputDevice *DIPadDevice;
+#endif
 	bool ReloadDevice;
 	DWORD ReloadDeviceTick;
 
