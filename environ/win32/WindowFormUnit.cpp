@@ -157,6 +157,7 @@ void TVPInitWindowOptions()
 			TVPWheelDetectionType = wdtNone;
 	}
 
+#ifndef DISABLE_EMBEDDED_GAME_PAD
 	if(TVPGetCommandLine(TJS_W("-joypad"), &val) )
 	{
 		ttstr str(val);
@@ -167,7 +168,7 @@ void TVPInitWindowOptions()
 		else
 			TVPJoyPadDetectionType = jdtNone;
 	}
-
+#endif
 
 	if(TVPGetCommandLine(TJS_W("-controlime"), &val) )
 	{
@@ -229,7 +230,9 @@ TTVPWindowForm::TTVPWindowForm( TApplication* app, tTJSNI_Window* ni ) : tTVPWin
 	CurrentMouseCursor = crDefault;
 
 	DIWheelDevice = NULL;
+#ifndef DISABLE_EMBEDDED_GAME_PAD
 	DIPadDevice = NULL;
+#endif
 	ReloadDevice = false;
 	ReloadDeviceTick = 0;
 	
@@ -485,6 +488,7 @@ void TTVPWindowForm::TickBeat(){
 		}
 	}
 
+#ifndef DISABLE_EMBEDDED_GAME_PAD
 	// pad detection
 	if( TVPJoyPadDetectionType == jdtDirectInput ) {
 		CreateDirectInputDevice();
@@ -513,7 +517,7 @@ void TTVPWindowForm::TickBeat(){
 			}
 		}
 	}
-
+#endif
 
 	// check RecheckInputState
 	if( tickcount - LastRecheckInputStateSent > 1000 ) {
@@ -1398,17 +1402,21 @@ void TTVPWindowForm::DisableAttentionPoint() {
 }
 void TTVPWindowForm::CreateDirectInputDevice() {
 	if( !DIWheelDevice ) DIWheelDevice = new tTVPWheelDirectInputDevice(GetHandle());
+#ifndef DISABLE_EMBEDDED_GAME_PAD
 	if( !DIPadDevice ) DIPadDevice = new tTVPPadDirectInputDevice(GetHandle());
+#endif
 }
 void TTVPWindowForm::FreeDirectInputDevice() {
 	if( DIWheelDevice ) {
 		delete DIWheelDevice;
 		DIWheelDevice = NULL;
 	}
+#ifndef DISABLE_EMBEDDED_GAME_PAD
 	if( DIPadDevice ) {
 		delete DIPadDevice;
 		DIPadDevice = NULL;
 	}
+#endif
 }
 
 void TTVPWindowForm::OnKeyDown( WORD vk, int shift, int repreat, bool prevkeystate ) {
@@ -1701,13 +1709,17 @@ void TTVPWindowForm::OnFocus(HWND hFocusLostWnd) {
 
 	//if(PaintBox) CreateCaret(PaintBox->Parent->Handle, NULL, 1, 1);
 
+#ifndef DISABLE_EMBEDDED_GAME_PAD
 	if(DIPadDevice && TJSNativeInstance ) DIPadDevice->WindowActivated();
+#endif
 	if(TJSNativeInstance) TJSNativeInstance->FireOnActivate(true);
 }
 void TTVPWindowForm::OnFocusLost(HWND hFocusingWnd) {
 	DestroyCaret();
 	UnacquireImeControl();
 
+#ifndef DISABLE_EMBEDDED_GAME_PAD
 	if(DIPadDevice && TJSNativeInstance ) DIPadDevice->WindowDeactivated();
+#endif
 	if(TJSNativeInstance) TJSNativeInstance->FireOnActivate(false);
 }
