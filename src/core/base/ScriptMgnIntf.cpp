@@ -363,6 +363,7 @@ psexcl		:%[type:ltPsExclusion		],\
 //---------------------------------------------------------------------------
 tTJS *TVPScriptEngine = NULL;
 ttstr TVPStartupScriptName(TJS_W("startup.tjs"));
+static ttstr TVPScriptTextEncoding(TJS_W("UTF-8"));
 //---------------------------------------------------------------------------
 
 
@@ -438,6 +439,13 @@ void TVPInitScriptEngine()
 //			}
 		}
 	}
+	// Set Read text encoding
+	if(TVPGetCommandLine(TJS_W("-readencoding"), &val) )
+	{
+		ttstr str(val);
+		TVPSetDefaultReadEncoding( str );
+	}
+	TVPScriptTextEncoding = ttstr(TVPGetDefaultReadEncoding());
 
 	// create script engine object
 	TVPScriptEngine = new tTJS();
@@ -724,7 +732,7 @@ void TVPExecuteStorage(const ttstr &name, iTJSDispatch2 *context, tTJSVariant *r
 	ttstr place(TVPSearchPlacedPath(name));
 	ttstr shortname(TVPExtractStorageName(place));
 
-	iTJSTextReadStream * stream = TVPCreateTextStreamForRead(place, modestr);
+	iTJSTextReadStream * stream = TVPCreateTextStreamForReadByEncoding(place, modestr,TVPScriptTextEncoding);
 	ttstr buffer;
 	try
 	{
@@ -754,7 +762,7 @@ void TVPCompileStorage( const ttstr& name, bool isrequestresult, bool outputdebu
 
 	ttstr place(TVPSearchPlacedPath(name));
 	ttstr shortname(TVPExtractStorageName(place));
-	iTJSTextReadStream * stream = TVPCreateTextStreamForRead(place, TJS_W(""));
+	iTJSTextReadStream * stream = TVPCreateTextStreamForReadByEncoding(place, TJS_W(""),TVPScriptTextEncoding);
 
 	ttstr buffer;
 	try {
@@ -1360,6 +1368,23 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/getClassNames) /* UNDOCUMENTED: subje
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_STATIC_METHOD_DECL(/*func. name*/getClassNames) /* UNDOCUMENTED: subject to change */
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(textEncoding)
+{
+	TJS_BEGIN_NATIVE_PROP_GETTER
+	{
+		*result = TVPScriptTextEncoding;
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_GETTER
+	TJS_BEGIN_NATIVE_PROP_SETTER
+	{
+		TVPScriptTextEncoding = *param;
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_STATIC_PROP_DECL(textEncoding)
 //----------------------------------------------------------------------
 
 	TJS_END_NATIVE_MEMBERS
