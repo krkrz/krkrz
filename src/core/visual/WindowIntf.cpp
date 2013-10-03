@@ -387,7 +387,7 @@ void tTJSNI_BaseWindow::OnTouchDown( tjs_real x, tjs_real y, tjs_real cx, tjs_re
 		static ttstr eventname(TJS_W("onTouchDown"));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 5, arg);
 	}
-	//if(DrawDevice) DrawDevice->OnTouchDown(x, y, cx, cy, id);
+	if(DrawDevice) DrawDevice->OnTouchDown(x, y, cx, cy, id);
 }
 //---------------------------------------------------------------------------
 void tTJSNI_BaseWindow::OnTouchUp( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id ) {
@@ -398,7 +398,7 @@ void tTJSNI_BaseWindow::OnTouchUp( tjs_real x, tjs_real y, tjs_real cx, tjs_real
 		static ttstr eventname(TJS_W("onTouchUp"));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 5, arg);
 	}
-	//if(DrawDevice) DrawDevice->OnTouchDown(x, y, cx, cy, id);
+	if(DrawDevice) DrawDevice->OnTouchUp(x, y, cx, cy, id);
 }
 //---------------------------------------------------------------------------
 void tTJSNI_BaseWindow::OnTouchMove( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id ) {
@@ -409,7 +409,7 @@ void tTJSNI_BaseWindow::OnTouchMove( tjs_real x, tjs_real y, tjs_real cx, tjs_re
 		static ttstr eventname(TJS_W("onTouchMove"));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 5, arg);
 	}
-	//if(DrawDevice) DrawDevice->OnTouchDown(x, y, cx, cy, id);
+	if(DrawDevice) DrawDevice->OnTouchMove(x, y, cx, cy, id);
 }
 //---------------------------------------------------------------------------
 void tTJSNI_BaseWindow::OnTouchScaling( tjs_real startdist, tjs_real curdist, tjs_real cx, tjs_real cy, tjs_int flag ) {
@@ -420,6 +420,7 @@ void tTJSNI_BaseWindow::OnTouchScaling( tjs_real startdist, tjs_real curdist, tj
 		static ttstr eventname(TJS_W("onTouchScaling"));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 5, arg);
 	}
+	if(DrawDevice) DrawDevice->OnTouchScaling(startdist, curdist, cx, cy, flag);
 }
 //---------------------------------------------------------------------------
 void tTJSNI_BaseWindow::OnTouchRotate( tjs_real startangle, tjs_real curangle, tjs_real dist, tjs_real cx, tjs_real cy, tjs_int flag ) {
@@ -430,6 +431,7 @@ void tTJSNI_BaseWindow::OnTouchRotate( tjs_real startangle, tjs_real curangle, t
 		static ttstr eventname(TJS_W("onTouchRotate"));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 6, arg);
 	}
+	if(DrawDevice) DrawDevice->OnTouchRotate(startangle, curangle, dist, cx, cy, flag);
 }
 //---------------------------------------------------------------------------
 void tTJSNI_BaseWindow::OnMultiTouch() {
@@ -439,6 +441,7 @@ void tTJSNI_BaseWindow::OnMultiTouch() {
 		static ttstr eventname(TJS_W("onMultiTouch"));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 0, NULL);
 	}
+	if(DrawDevice) DrawDevice->OnMultiTouch();
 }
 //---------------------------------------------------------------------------
 void tTJSNI_BaseWindow::OnReleaseCapture()
