@@ -1999,7 +1999,17 @@ void tTJSNI_BaseLayer::FromPrimaryCoordinates(tjs_int &x, tjs_int &y) const
 	}
 }
 //---------------------------------------------------------------------------
+void tTJSNI_BaseLayer::FromPrimaryCoordinates(tjs_real &x, tjs_real &y) const
+{
+	const tTJSNI_BaseLayer *l = this;
 
+	while(l && !l->IsPrimary())
+	{
+		x -= (tjs_real)l->Rect.left; y -= (tjs_real)l->Rect.top;
+		l = l->Parent;
+	}
+}
+//---------------------------------------------------------------------------
 
 
 
@@ -3091,6 +3101,65 @@ void tTJSNI_BaseLayer::ReleaseCapture()
 {
 	if(Manager) Manager->ReleaseCapture();
 		// this releases mouse capture from all layers, ignoring which layer captures.
+}
+//---------------------------------------------------------------------------
+void tTJSNI_BaseLayer::FireTouchDown( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id )
+{
+	if(Owner && !Shutdown)
+	{
+		tTJSVariant arg[5] = { x, y, cx, cy, (tjs_int64)id };
+		static ttstr eventname(TJS_W("onTouchDown"));
+		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 5, arg);
+	}
+}
+//---------------------------------------------------------------------------
+void tTJSNI_BaseLayer::FireTouchUp( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id )
+{
+	if(Owner && !Shutdown)
+	{
+		tTJSVariant arg[5] = { x, y, cx, cy, (tjs_int64)id };
+		static ttstr eventname(TJS_W("onTouchUp"));
+		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 5, arg);
+	}
+}
+//---------------------------------------------------------------------------
+void tTJSNI_BaseLayer::FireTouchMove( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id )
+{
+	if(Owner && !Shutdown)
+	{
+		tTJSVariant arg[5] = { x, y, cx, cy, (tjs_int64)id };
+		static ttstr eventname(TJS_W("onTouchMove"));
+		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE|TVP_EPT_DISCARDABLE, 5, arg);
+	}
+}
+//---------------------------------------------------------------------------
+void tTJSNI_BaseLayer::FireTouchScaling( tjs_real startdist, tjs_real curdist, tjs_real cx, tjs_real cy, tjs_int flag )
+{
+	if(Owner && !Shutdown)
+	{
+		tTJSVariant arg[5] = { startdist, curdist, cx, cy, flag };
+		static ttstr eventname(TJS_W("onTouchScaling"));
+		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 5, arg);
+	}
+}
+//---------------------------------------------------------------------------
+void tTJSNI_BaseLayer::FireTouchRotate( tjs_real startangle, tjs_real curangle, tjs_real dist, tjs_real cx, tjs_real cy, tjs_int flag )
+{
+	if(Owner && !Shutdown)
+	{
+		tTJSVariant arg[6] = { startangle, curangle, dist, cx, cy, flag };
+		static ttstr eventname(TJS_W("onTouchRotate"));
+		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 6, arg);
+	}
+}
+//---------------------------------------------------------------------------
+void tTJSNI_BaseLayer::FireMultiTouch()
+{
+	if(Owner && !Shutdown)
+	{
+		static ttstr eventname(TJS_W("onMultiTouch"));
+		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 0, NULL);
+	}
 }
 //---------------------------------------------------------------------------
 bool tTJSNI_BaseLayer::ParentFocusable() const
@@ -7738,6 +7807,122 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/onMouseLeave)
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/onMouseLeave)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/onTouchDown)
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
+
+	tTJSVariantClosure obj = _this->GetActionOwnerNoAddRef();
+	if(obj.Object)
+	{
+		TVP_ACTION_INVOKE_BEGIN(5, "onTouchDown", objthis);
+		TVP_ACTION_INVOKE_MEMBER("x");
+		TVP_ACTION_INVOKE_MEMBER("y");
+		TVP_ACTION_INVOKE_MEMBER("cx");
+		TVP_ACTION_INVOKE_MEMBER("cy");
+		TVP_ACTION_INVOKE_MEMBER("id");
+		TVP_ACTION_INVOKE_END(obj);
+	}
+
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/onTouchDown)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/onTouchUp)
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
+
+	tTJSVariantClosure obj = _this->GetActionOwnerNoAddRef();
+	if(obj.Object)
+	{
+		TVP_ACTION_INVOKE_BEGIN(5, "onTouchUp", objthis);
+		TVP_ACTION_INVOKE_MEMBER("x");
+		TVP_ACTION_INVOKE_MEMBER("y");
+		TVP_ACTION_INVOKE_MEMBER("cx");
+		TVP_ACTION_INVOKE_MEMBER("cy");
+		TVP_ACTION_INVOKE_MEMBER("id");
+		TVP_ACTION_INVOKE_END(obj);
+	}
+
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/onTouchUp)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/onTouchMove)
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
+
+	tTJSVariantClosure obj = _this->GetActionOwnerNoAddRef();
+	if(obj.Object)
+	{
+		TVP_ACTION_INVOKE_BEGIN(5, "onTouchMove", objthis);
+		TVP_ACTION_INVOKE_MEMBER("x");
+		TVP_ACTION_INVOKE_MEMBER("y");
+		TVP_ACTION_INVOKE_MEMBER("cx");
+		TVP_ACTION_INVOKE_MEMBER("cy");
+		TVP_ACTION_INVOKE_MEMBER("id");
+		TVP_ACTION_INVOKE_END(obj);
+	}
+
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/onTouchMove)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/onTouchScaling)
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
+
+	tTJSVariantClosure obj = _this->GetActionOwnerNoAddRef();
+	if(obj.Object)
+	{
+		TVP_ACTION_INVOKE_BEGIN(5, "onTouchScaling", objthis);
+		TVP_ACTION_INVOKE_MEMBER("startdistance");
+		TVP_ACTION_INVOKE_MEMBER("currentdistance");
+		TVP_ACTION_INVOKE_MEMBER("cx");
+		TVP_ACTION_INVOKE_MEMBER("cy");
+		TVP_ACTION_INVOKE_MEMBER("flag");
+		TVP_ACTION_INVOKE_END(obj);
+	}
+
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/onTouchScaling)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/onTouchRotate)
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
+
+	tTJSVariantClosure obj = _this->GetActionOwnerNoAddRef();
+	if(obj.Object)
+	{
+		TVP_ACTION_INVOKE_BEGIN(6, "onTouchRotate", objthis);
+		TVP_ACTION_INVOKE_MEMBER("startangle");
+		TVP_ACTION_INVOKE_MEMBER("currentangle");
+		TVP_ACTION_INVOKE_MEMBER("distance");
+		TVP_ACTION_INVOKE_MEMBER("cx");
+		TVP_ACTION_INVOKE_MEMBER("cy");
+		TVP_ACTION_INVOKE_MEMBER("flag");
+		TVP_ACTION_INVOKE_END(obj);
+	}
+
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/onTouchRotate)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/onMultiTouch)
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
+
+	tTJSVariantClosure obj = _this->GetActionOwnerNoAddRef();
+	if(obj.Object)
+	{
+		TVP_ACTION_INVOKE_BEGIN(0, "onMultiTouch", objthis);
+		TVP_ACTION_INVOKE_END(obj);
+	}
+
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/onMultiTouch)
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/onBlur)
 {

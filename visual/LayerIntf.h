@@ -395,6 +395,7 @@ public:
 
 	void ToPrimaryCoordinates(tjs_int &x, tjs_int &y) const;
 	void FromPrimaryCoordinates(tjs_int &x, tjs_int &y) const;
+	void FromPrimaryCoordinates(tjs_real &x, tjs_real &y) const;
 
 	//-------------------------------------------- image buffer management --
 private:
@@ -577,6 +578,13 @@ private:
 	void FireMouseMove(tjs_int x, tjs_int y, tjs_uint32 flags);
 	void FireMouseEnter();
 	void FireMouseLeave();
+
+	void FireTouchDown( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id );
+	void FireTouchUp( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id );
+	void FireTouchMove( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id );
+	void FireTouchScaling( tjs_real startdist, tjs_real curdist, tjs_real cx, tjs_real cy, tjs_int flag );
+	void FireTouchRotate( tjs_real startangle, tjs_real curangle, tjs_real dist, tjs_real cx, tjs_real cy, tjs_int flag );
+	void FireMultiTouch();
 
 public:
 	void ReleaseCapture();
