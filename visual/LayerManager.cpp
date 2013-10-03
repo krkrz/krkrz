@@ -511,29 +511,55 @@ void tTVPLayerManager::PrimaryMouseMove(tjs_int x, tjs_int y, tjs_uint32 flags)
 	}
 }
 //---------------------------------------------------------------------------
-#pragma message( __LOC__ "TODO Œã‚ÅŽÀ‘•‚·‚é‚±‚Æ" )
 void tTVPLayerManager::PrimaryTouchDown( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id )
 {
+	tjs_int ix = (tjs_int)x, iy = (tjs_int)y;
+	tTJSNI_BaseLayer * l = GetMostFrontChildAt(ix, iy);
+	if( l )
+	{
+		l->FromPrimaryCoordinates(x, y);
+		l->FireTouchDown(x, y, cx, cy, id);
+	}
 }
 //---------------------------------------------------------------------------
 void tTVPLayerManager::PrimaryTouchUp( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id )
 {
+	tjs_int ix = (tjs_int)x, iy = (tjs_int)y;
+	tTJSNI_BaseLayer * l = GetMostFrontChildAt(ix, iy);
+	if( l )
+	{
+		l->FromPrimaryCoordinates(x, y);
+		l->FireTouchUp(x, y, cx, cy, id);
+	}
 }
 //---------------------------------------------------------------------------
 void tTVPLayerManager::PrimaryTouchMove( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id )
 {
+	tjs_int ix = (tjs_int)x, iy = (tjs_int)y;
+	tTJSNI_BaseLayer * l = GetMostFrontChildAt(ix, iy);
+	if( l )
+	{
+		l->FromPrimaryCoordinates(x, y);
+		l->FireTouchMove(x, y, cx, cy, id);
+	}
 }
 //---------------------------------------------------------------------------
 void tTVPLayerManager::PrimaryTouchScaling( tjs_real startdist, tjs_real curdist, tjs_real cx, tjs_real cy, tjs_int flag )
 {
+	if(FocusedLayer)
+		FocusedLayer->FireTouchScaling(startdist,curdist,cx,cy,flag);
 }
 //---------------------------------------------------------------------------
 void tTVPLayerManager::PrimaryTouchRotate( tjs_real startangle, tjs_real curangle, tjs_real dist, tjs_real cx, tjs_real cy, tjs_int flag )
 {
+	if(FocusedLayer)
+		FocusedLayer->FireTouchRotate(startangle,curangle,dist,cx,cy,flag);
 }
 //---------------------------------------------------------------------------
 void tTVPLayerManager::PrimaryMultiTouch()
 {
+	if(FocusedLayer)
+		FocusedLayer->FireMultiTouch();
 }
 //---------------------------------------------------------------------------
 void tTVPLayerManager::ForceMouseLeave()
