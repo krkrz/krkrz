@@ -24,7 +24,11 @@
 	to input/output text files.
 */
 
-
+#ifdef TVP_TEXT_READ_ANSI_MBCS
+static ttstr DefaultReadEncoding = TJS_W("Shift_JIS");
+#else
+static ttstr DefaultReadEncoding = TJS_W("UTF-8");
+#endif
 //---------------------------------------------------------------------------
 // Interface to tTJSTextStream
 //---------------------------------------------------------------------------
@@ -612,11 +616,7 @@ public:
 iTJSTextReadStream * TVPCreateTextStreamForRead(const ttstr & name,
 	const ttstr & modestr)
 {
-#ifdef TVP_TEXT_READ_ANSI_MBCS
-	return new tTVPTextReadStream(name, modestr,TJS_W("Shift_JIS"));
-#else
-	return new tTVPTextReadStream(name, modestr,TJS_W("UTF-8"));
-#endif
+	return new tTVPTextReadStream(name, modestr,DefaultReadEncoding);
 }
 //---------------------------------------------------------------------------
 iTJSTextReadStream * TVPCreateTextStreamForReadByEncoding(const ttstr & name,
@@ -631,8 +631,14 @@ iTJSTextWriteStream * TVPCreateTextStreamForWrite(const ttstr & name,
 	return new tTVPTextWriteStream(name, modestr);
 }
 //---------------------------------------------------------------------------
-
-
-
-
+void TVPSetDefaultReadEncoding( const ttstr& encoding )
+{
+	DefaultReadEncoding = encoding;
+}
+//---------------------------------------------------------------------------
+const tjs_char* TVPGetDefaultReadEncoding()
+{
+	return DefaultReadEncoding.c_str();
+}
+//---------------------------------------------------------------------------
 
