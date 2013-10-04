@@ -447,6 +447,17 @@ void TVPInitScriptEngine()
 	}
 	TVPScriptTextEncoding = ttstr(TVPGetDefaultReadEncoding());
 
+#ifdef TVP_START_UP_SCRIPT_NAME
+	TVPStartupScriptName = TVP_START_UP_SCRIPT_NAME;
+#else
+	// Set startup script name
+	if(TVPGetCommandLine(TJS_W("-startup"), &val) )
+	{
+		ttstr str(val);
+		TVPStartupScriptName = str;
+	}
+#endif
+
 	// create script engine object
 	TVPScriptEngine = new tTJS();
 
