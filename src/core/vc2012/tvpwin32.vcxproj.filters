@@ -990,11 +990,5 @@
     <None Include="res\nomovetab.cur">
       <Filter>リソース ファイル</Filter>
     </None>
-    <None Include="binary1.bin">
-      <Filter>リソース ファイル</Filter>
-    </None>
-    <None Include="text1.bin">
-      <Filter>リソース ファイル</Filter>
-    </None>
   </ItemGroup>
 </Project>
