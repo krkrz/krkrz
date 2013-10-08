@@ -43,6 +43,7 @@ typedef bool (__stdcall * tTVPWindowMessageReceiver)
 
 
 //---------------------------------------------------------------------------
+/*
 struct tTVP_devicemodeA {
 	// copy of DEVMODE, to avoid windows platform SDK version mismatch
 #pragma pack(push, 1)
@@ -88,6 +89,7 @@ struct tTVP_devicemodeA {
 	DWORD  dmReserved2;
 #pragma pack(pop)
 };
+*/
 //---------------------------------------------------------------------------
 
 
@@ -157,6 +159,9 @@ struct tTVPScreenMode
 		if(BitsPerPixel > rhs.BitsPerPixel) return false;
 		return false;
 	}
+	bool operator == (const tTVPScreenMode & rhs) const {
+		return ( Width == rhs.Width && Height == rhs.Height && BitsPerPixel == rhs.BitsPerPixel );
+	}
 };
 
 //! @brief		Structure for monitor screen mode candidate
@@ -193,32 +198,23 @@ struct tTVPScreenModeCandidate : tTVPScreenMode
 	}
 };
 
-struct IDirectDraw2;
-struct IDirectDrawSurface;
-struct IDirectDrawClipper;
+struct IDirect3D9;
 extern void TVPTestDisplayMode(tjs_int w, tjs_int h, tjs_int & bpp);
-extern void TVPSwitchToFullScreen(HWND window, tjs_int w, tjs_int h);
-extern void TVPRevertFromFullScreen(HWND window);
-TJS_EXP_FUNC_DEF(void, TVPEnsureDirectDrawObject, ());
-void TVPDumpDirectDrawDriverInformation();
+extern void TVPSwitchToFullScreen(HWND window, tjs_int w, tjs_int h, class iTVPDrawDevice* drawdevice);
+extern void TVPRevertFromFullScreen(HWND window,tjs_uint w,tjs_uint h, class iTVPDrawDevice* drawdevice);
+TJS_EXP_FUNC_DEF(void, TVPEnsureDirect3DObject, ());
+void TVPDumpDirect3DDriverInformation();
 extern tTVPScreenModeCandidate TVPFullScreenMode;
 /*[*/
 //---------------------------------------------------------------------------
-// DirectDraw former declaration
+// Direct3D former declaration
 //---------------------------------------------------------------------------
-#ifndef __DDRAW_INCLUDED__
-struct IDirectDraw2;
-struct IDirectDraw7;
-struct IDirectDrawSurface;
-struct IDirectDrawClipper;
+#ifndef DIRECT3D_VERSION
+struct IDirect3D9;
 #endif
 
 /*]*/
-TJS_EXP_FUNC_DEF(IDirectDraw2 *,  TVPGetDirectDrawObjectNoAddRef, ());
-TJS_EXP_FUNC_DEF(IDirectDraw7 *,  TVPGetDirectDraw7ObjectNoAddRef, ());
-TJS_EXP_FUNC_DEF(IDirectDrawSurface *, TVPGetDDPrimarySurfaceNoAddRef, ());
-TJS_EXP_FUNC_DEF(void, TVPSetDDPrimaryClipper, (IDirectDrawClipper * clipper));
-TJS_EXP_FUNC_DEF(void, TVPReleaseDDPrimarySurface, ());
+TJS_EXP_FUNC_DEF(IDirect3D9 *,  TVPGetDirect3DObjectNoAddRef, ());
 extern void TVPMinimizeFullScreenWindowAtInactivation();
 extern void TVPRestoreFullScreenWindowAtActivation();
 //---------------------------------------------------------------------------
@@ -241,6 +237,7 @@ class tTJSNI_BaseLayer;
 class tTJSNI_Window : public tTJSNI_BaseWindow
 {
 	TTVPWindowForm *Form;
+	class tTVPVSyncTimingThread *VSyncTimingThread;
 
 public:
 	tTJSNI_Window();
@@ -262,6 +259,7 @@ public:
 
 private:
 	bool GetWindowActive();
+	void UpdateVSyncThread();
 
 public:
 //-- draw device
@@ -423,6 +421,9 @@ public:
 	
 	void SetHintDelay( tjs_int delay );
 	tjs_int GetHintDelay() const;
+
+	bool WaitForVBlank( tjs_int* in_vblank, tjs_int* delayed );
+
 protected:
 };
 //---------------------------------------------------------------------------

@@ -71,6 +71,7 @@ public:
 
 //---- 再描画関連
 	virtual void TJS_INTF_METHOD Show();
+	virtual bool TJS_INTF_METHOD WaitForVBlank( tjs_int* in_vblank, tjs_int* delayed );
 
 //---- LayerManager からの画像受け渡し関連
 	virtual void TJS_INTF_METHOD StartBitmapCompletion(iTVPLayerManager * manager);
@@ -81,6 +82,10 @@ public:
 
 //---- デバッグ支援
 	virtual void TJS_INTF_METHOD SetShowUpdateRect(bool b);
+
+//---- フルスクリーン
+	virtual bool TJS_INTF_METHOD SwitchToFullScreen( HWND window, tjs_uint w, tjs_uint h, tjs_uint bpp, tjs_uint color, bool changeresolution );
+	virtual void TJS_INTF_METHOD RevertFromFullScreen( HWND window, tjs_uint w, tjs_uint h, tjs_uint bpp, tjs_uint color );
 
 };
 //---------------------------------------------------------------------------

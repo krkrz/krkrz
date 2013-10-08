@@ -3,7 +3,6 @@
 #define __D3D9_DRAWER_H__
 
 #include "Drawer.h"
-#include "DLLLoader.h"
 #include <d3d9.h>
 
 //---------------------------------------------------------------------------
@@ -15,11 +14,8 @@ class tTVPDrawer_D3DDoubleBuffering : public tTVPDrawer
 {
 	typedef tTVPDrawer inherited;
 
-	tTVPDLLLoader		D3DDll;
 	IDirect3D9*			Direct3D;
 	IDirect3DDevice9*	Direct3DDevice;
-	//IDirect3DSurface9*	Surface;
-	//D3DSURFACE_DESC		SurfaceDesc;
 	IDirect3DTexture9*	Texture;
 	//IDirect3DSurface9*	RenderTarget;
 
@@ -31,11 +27,13 @@ class tTVPDrawer_D3DDoubleBuffering : public tTVPDrawer
 
 	bool ShouldShow; //!< show ‚ÅŽÀÛ‚É‰æ–Ê‚É‰æ‘œ‚ð“]‘—‚·‚×‚«‚©
 
-	SIZE BackBufferSize;
+	tjs_uint VsyncInterval;
 
 private:
 	HRESULT DecideD3DPresentParameters( D3DPRESENT_PARAMETERS& d3dpp );
-	UINT GetMonitorNumber();
+	HRESULT DecideD3DPresentParameters( D3DPRESENT_PARAMETERS& d3dpp, HWND window, bool iswindow=true, tjs_uint width=0, tjs_uint height=0, tjs_uint bpp=32, tjs_uint color=0 );
+	HRESULT DecideD3DPresentParametersForFullScreen( D3DPRESENT_PARAMETERS& d3dpp, HWND window );
+	UINT GetMonitorNumber( HWND window );
 	HRESULT InitializeDirect3DState();
 
 public:
@@ -73,7 +71,11 @@ public:
 	void NotifyBitmapCompleted(tjs_int x, tjs_int y, const void * bits, const BITMAPINFO * bitmapinfo, const tTVPRect &cliprect);
 	void EndBitmapCompletion();
 	void Show();
+	bool WaitForVBlank( tjs_int* in_vblank, tjs_int* delayed );
 	virtual int GetInterpolationCapability();
+
+	bool SwitchToFullScreen( HWND window, tjs_uint w, tjs_uint h, tjs_uint bpp, tjs_uint color, bool changeresolution );
+	void RevertFromFullScreen( HWND window, tjs_uint w, tjs_uint h, tjs_uint bpp, tjs_uint color );
 };
 //---------------------------------------------------------------------------
 
