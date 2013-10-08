@@ -547,6 +547,9 @@
     <ClInclude Include="..\visual\SaveTLG.h">
       <Filter>visual</Filter>
     </ClInclude>
+    <ClInclude Include="..\visual\win32\VSyncTimingThread.h">
+      <Filter>visual\win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -959,6 +962,9 @@
     </ClCompile>
     <ClCompile Include="..\visual\SaveTLG6.cpp">
       <Filter>visual</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\win32\VSyncTimingThread.cpp">
+      <Filter>visual\win32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

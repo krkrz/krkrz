@@ -85,13 +85,15 @@ void TVPClearAllWindowInputEvents()
 
 
 //---------------------------------------------------------------------------
-void TVPDeliverDrawDeviceShow()
+bool TVPIsWaitVSync()
 {
+	bool result = false;
 	std::vector<tTJSNI_Window*>::iterator i;
 	for(i = TVPWindowVector.begin(); i!=TVPWindowVector.end(); i++)
 	{
-		(*i)->DeliverDrawDeviceShow();
+		result |= (*i)->GetWaitVSync();
 	}
+	return result;
 }
 //---------------------------------------------------------------------------
 
@@ -138,6 +140,7 @@ tTVPUniqueTagForInputEvent tTVPOnHintChangeInputEvent         ::Tag;
 //---------------------------------------------------------------------------
 tTJSNI_BaseWindow::tTJSNI_BaseWindow()
 {
+	WaitVSync = false;
 	ObjectVectorLocked = false;
 	DrawBuffer = NULL;
 	WindowExposedRegion.clear();
@@ -614,7 +617,7 @@ void tTJSNI_BaseWindow::UpdateContent()
 	// is called from event dispatcher
 	DrawDevice->Update();
 
-	if(!TVPGetWaitVSync()) DrawDevice->Show();
+	if( !WaitVSync ) DrawDevice->Show();
 
  	EndUpdate();
 }
@@ -705,6 +708,17 @@ void tTJSNI_BaseWindow::Remove(tTJSVariantClosure clo)
 		clo.Release();
 		ObjectVector.erase(i);
 	}
+}
+//---------------------------------------------------------------------------
+void tTJSNI_BaseWindow::SetWaitVSync( bool enable )
+{
+	WaitVSync = enable;
+	UpdateVSyncThread();
+}
+//---------------------------------------------------------------------------
+bool tTJSNI_BaseWindow::GetWaitVSync() const
+{
+	return WaitVSync;
 }
 //---------------------------------------------------------------------------
 
@@ -1832,6 +1846,26 @@ TJS_BEGIN_NATIVE_PROP_DECL(primaryLayer)
 }
 TJS_END_NATIVE_PROP_DECL(primaryLayer)
 //----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(waitVSync)
+{
+	TJS_BEGIN_NATIVE_PROP_GETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
+		*result = _this->GetWaitVSync() ? 1 : 0;
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_GETTER
+
+	TJS_BEGIN_NATIVE_PROP_SETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
+		_this->SetWaitVSync( ((tjs_int)*param) ? true : false );
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_PROP_DECL(waitVSync)
+//---------------------------------------------------------------------------
 
 	TJS_END_NATIVE_MEMBERS
 

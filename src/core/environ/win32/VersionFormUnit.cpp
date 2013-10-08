@@ -28,9 +28,9 @@
 //---------------------------------------------------------------------------
 void TVPCopyImportantLogToClipboard()
 {
-	// get DirectDraw driver information
-	TVPEnsureDirectDrawObject();
-	TVPDumpDirectDrawDriverInformation();
+	// get Direct3D driver information
+	TVPEnsureDirect3DObject();
+	TVPDumpDirect3DDriverInformation();
 
 	// copy
 	TVPClipboardSetText(TVPGetImportantLog());
@@ -63,9 +63,9 @@ static LRESULT WINAPI DlgProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 //---------------------------------------------------------------------------
 void TVPShowVersionForm()
 {
-	// get DirectDraw driver information
-	TVPEnsureDirectDrawObject();
-	TVPDumpDirectDrawDriverInformation();
+	// get Direct3D driver information
+	TVPEnsureDirect3DObject();
+	TVPDumpDirect3DDriverInformation();
 	::DialogBox( NULL, MAKEINTRESOURCE(IDD_VERSION_DIALOG), NULL, (DLGPROC)DlgProc );
 }
 //---------------------------------------------------------------------------

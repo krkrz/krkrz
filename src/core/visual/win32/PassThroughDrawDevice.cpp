@@ -77,7 +77,7 @@ static void TVPInitPassThroughOptions()
 	if(TVPPassThroughOptionsGeneration == TVPGetCommandLineArgumentGeneration()) return;
 	TVPPassThroughOptionsGeneration = TVPGetCommandLineArgumentGeneration();
 
-	bool initddraw = false;
+	//bool initd3d = false;
 	tTJSVariant val;
 
 	TVPForceDoublebuffer = false;
@@ -111,7 +111,7 @@ static void TVPInitPassThroughOptions()
 			TVPZoomInterpolation = true;
 	}
 
-	if(initddraw) TVPEnsureDirectDrawObject();
+	//if(initd3d) TVPEnsureDirect3DObject();
 }
 //---------------------------------------------------------------------------
 
@@ -546,7 +546,11 @@ void TJS_INTF_METHOD tTVPPassThroughDrawDevice::Show()
 	if(Drawer) Drawer->Show();
 }
 //---------------------------------------------------------------------------
-
+bool TJS_INTF_METHOD tTVPPassThroughDrawDevice::WaitForVBlank( tjs_int* in_vblank, tjs_int* delayed )
+{
+	if(Drawer) return Drawer->WaitForVBlank(in_vblank, delayed);
+	return false;
+}
 
 //---------------------------------------------------------------------------
 void TJS_INTF_METHOD tTVPPassThroughDrawDevice::StartBitmapCompletion(iTVPLayerManager * manager)
@@ -598,6 +602,29 @@ void TJS_INTF_METHOD tTVPPassThroughDrawDevice::SetShowUpdateRect(bool b)
 }
 //---------------------------------------------------------------------------
 
+//---------------------------------------------------------------------------
+bool TJS_INTF_METHOD tTVPPassThroughDrawDevice::SwitchToFullScreen( HWND window, tjs_uint w, tjs_uint h, tjs_uint bpp, tjs_uint color, bool changeresolution )
+{
+	if( Drawer ) {
+		if( Drawer->SupportFullScreenChange() ) {
+			return Drawer->SwitchToFullScreen( window, w, h, bpp, color, changeresolution );
+		}
+	}
+	return inherited::SwitchToFullScreen( window, w, h, bpp, color, changeresolution );
+}
+//---------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------
+void TJS_INTF_METHOD tTVPPassThroughDrawDevice::RevertFromFullScreen( HWND window, tjs_uint w, tjs_uint h, tjs_uint bpp, tjs_uint color )
+{
+	if( Drawer ) {
+		if( Drawer->SupportFullScreenChange() ) {
+			return Drawer->RevertFromFullScreen( window, w, h, bpp, color );
+		}
+	}
+	return inherited::RevertFromFullScreen( window, w, h, bpp, color );
+}
+//---------------------------------------------------------------------------
 
 
 

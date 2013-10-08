@@ -256,6 +256,7 @@
     <ClInclude Include="..\visual\win32\LayerImpl.h" />
     <ClInclude Include="..\visual\win32\PassThroughDrawDevice.h" />
     <ClInclude Include="..\visual\win32\VideoOvlImpl.h" />
+    <ClInclude Include="..\visual\win32\VSyncTimingThread.h" />
     <ClInclude Include="..\visual\win32\WindowImpl.h" />
     <ClInclude Include="..\visual\WindowIntf.h" />
     <ClInclude Include="Resource.h" />
@@ -397,6 +398,7 @@
     <ClCompile Include="..\visual\win32\LayerImpl.cpp" />
     <ClCompile Include="..\visual\win32\PassThroughDrawDevice.cpp" />
     <ClCompile Include="..\visual\win32\VideoOvlImpl.cpp" />
+    <ClCompile Include="..\visual\win32\VSyncTimingThread.cpp" />
     <ClCompile Include="..\visual\win32\WindowImpl.cpp" />
     <ClCompile Include="..\visual\WindowIntf.cpp" />
     <ClCompile Include="stdafx.cpp">

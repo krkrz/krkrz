@@ -13,10 +13,5 @@
 
 #include "EventIntf.h"
 
-
-//---------------------------------------------------------------------------
-TJS_EXP_FUNC_DEF(bool, TVPGetWaitVSync, ());
-TJS_EXP_FUNC_DEF(void, TVPEnsureVSyncTimingThread, ());
-TJS_EXP_FUNC_DEF(void, TVPReleaseVSyncTimingThread, ());
 //---------------------------------------------------------------------------
 #endif

@@ -10,8 +10,9 @@
 //---------------------------------------------------------------------------
 #include "tjsCommHead.h"
 
-#define DIRECTDRAW_VERSION 0x0300
-#include <ddraw.h>
+//#define DIRECTDRAW_VERSION 0x0300
+//#include <ddraw.h>
+#include <d3d9.h>
 
 #include <algorithm>
 #include "MsgIntf.h"
@@ -31,6 +32,7 @@
 #include "Application.h"
 #include "Screen.h"
 #include "tjsDictionary.h"
+#include "VSyncTimingThread.h"
 
 //---------------------------------------------------------------------------
 // Mouse Cursor management
@@ -65,6 +67,46 @@ tjs_int TVPGetCursor(const ttstr & name)
 
 
 
+
+
+
+//---------------------------------------------------------------------------
+// Direct3D/Full Screen and priamary surface management
+//---------------------------------------------------------------------------
+
+//! @brief		Display resolution mode for full screen
+enum tTVPFullScreenResolutionMode
+{
+	fsrAuto, //!< auto negotiation
+	fsrProportional, //!< let screen resolution fitting neaest to the preferred resolution,
+								//!< preserving the original aspect ratio
+	fsrNearest, //!< let screen resolution fitting neaest to the preferred resolution.
+				//!< There is no guarantee that the aspect ratio is preserved
+	fsrNoChange //!< no change resolution
+};
+static IDirect3D9 *TVPDirect3D=NULL;
+
+static IDirect3D9* (WINAPI * TVPDirect3DCreate)( UINT SDKVersion ) = NULL;
+
+static HMODULE TVPDirect3DDLLHandle=NULL;
+static bool TVPUseChangeDisplaySettings = false;
+static tTVPScreenMode TVPDefaultScreenMode;
+
+static bool TVPInFullScreen = false;
+static HWND TVPFullScreenWindow = NULL;
+tTVPScreenModeCandidate TVPFullScreenMode;
+
+static tjs_int TVPPreferredFullScreenBPP = 0;
+static tTVPFullScreenResolutionMode TVPPreferredFullScreenResolutionMode = fsrNoChange;
+enum tTVPFullScreenUsingEngineZoomMode
+{
+	fszmNone, //!< no zoom by the engine
+	fszmInner, //!< inner fit on the monitor (uncovered areas may be filled with black)
+	fszmOuter //!< outer fit on the monitor (primary layer may jut out of the monitor)
+};
+static tTVPFullScreenUsingEngineZoomMode TVPPreferredFullScreenUsingEngineZoomMode = fszmInner;
+
+
 //---------------------------------------------------------------------------
 // Color Format Detection
 //---------------------------------------------------------------------------
@@ -77,11 +119,27 @@ static tjs_int TVPGetDisplayColorFormat()
 	// 565 : 16bit 565 mode
 	// 0   : other modes
 
+	if( TVPDirect3D ) {
+		// まずは Direct3D を用いて 16bit color format 取得を試みる
+		D3DDISPLAYMODE mode = {0};
+		if( SUCCEEDED( TVPDirect3D->GetAdapterDisplayMode( D3DADAPTER_DEFAULT, &mode ) ) ) {
+			if( mode.Format == D3DFMT_R5G6B5 ) {
+				TVPDisplayColorFormat = 565;
+				return 565;
+			} else if( mode.Format == D3DFMT_X1R5G5B5 ) {
+				TVPDisplayColorFormat = 555;
+				return 555;
+			} else {
+				TVPDisplayColorFormat = 0;
+				return 0;
+			}
+		}
+	}
 	// create temporary bitmap and device contexts
-	HDC desktopdc = GetDC(0);
-	HDC bitmapdc = CreateCompatibleDC(desktopdc);
-	HBITMAP bmp = CreateCompatibleBitmap(desktopdc, 1, 1);
-	HBITMAP oldbmp = SelectObject(bitmapdc, bmp);
+	HDC desktopdc = ::GetDC(0);
+	HDC bitmapdc = ::CreateCompatibleDC(desktopdc);
+	HBITMAP bmp = ::CreateCompatibleBitmap(desktopdc, 1, 1);
+	HBITMAP oldbmp = ::SelectObject(bitmapdc, bmp);
 
 	int count;
 	int r, g, b;
@@ -92,8 +150,8 @@ static tjs_int TVPGetDisplayColorFormat()
 	lastcolor = 0xffffff;
 	for(int i = 0; i < 256; i++)
 	{
-		SetPixel(bitmapdc, 0, 0, RGB(i, 0, 0));
-		COLORREF rgb = GetPixel(bitmapdc, 0, 0);
+		::SetPixel(bitmapdc, 0, 0, RGB(i, 0, 0));
+		COLORREF rgb = ::GetPixel(bitmapdc, 0, 0);
 		if(rgb != lastcolor) count ++;
 		lastcolor = rgb;
 	}
@@ -104,8 +162,8 @@ static tjs_int TVPGetDisplayColorFormat()
 	lastcolor = 0xffffff;
 	for(int i = 0; i < 256; i++)
 	{
-		SetPixel(bitmapdc, 0, 0, RGB(0, i, 0));
-		COLORREF rgb = GetPixel(bitmapdc, 0, 0);
+		::SetPixel(bitmapdc, 0, 0, RGB(0, i, 0));
+		COLORREF rgb = ::GetPixel(bitmapdc, 0, 0);
 		if(rgb != lastcolor) count ++;
 		lastcolor = rgb;
 	}
@@ -116,18 +174,18 @@ static tjs_int TVPGetDisplayColorFormat()
 	lastcolor = 0xffffff;
 	for(int i = 0; i < 256; i++)
 	{
-		SetPixel(bitmapdc, 0, 0, RGB(0, 0, i));
-		COLORREF rgb = GetPixel(bitmapdc, 0, 0);
+		::SetPixel(bitmapdc, 0, 0, RGB(0, 0, i));
+		COLORREF rgb = ::GetPixel(bitmapdc, 0, 0);
 		if(rgb != lastcolor) count ++;
 		lastcolor = rgb;
 	}
 	b = count;
 
 	// free bitmap and device contexts
-	SelectObject(bitmapdc, oldbmp);
-	DeleteObject(bmp);
-	DeleteDC(bitmapdc);
-	ReleaseDC(0, desktopdc);
+	::SelectObject(bitmapdc, oldbmp);
+	::DeleteObject(bmp);
+	::DeleteDC(bitmapdc);
+	::ReleaseDC(0, desktopdc);
 
 	// determine type
 	if(r == 32 && g == 64 && b == 32)
@@ -146,58 +204,6 @@ static tjs_int TVPGetDisplayColorFormat()
 		return 0;
 	}
 }
-//---------------------------------------------------------------------------
-
-
-
-//---------------------------------------------------------------------------
-// DirectDraw/Full Screen and priamary surface management
-//---------------------------------------------------------------------------
-
-//! @brief		Display resolution mode for full screen
-enum tTVPFullScreenResolutionMode
-{
-	fsrAuto, //!< auto negotiation
-	fsrProportional, //!< let screen resolution fitting neaest to the preferred resolution,
-								//!< preserving the original aspect ratio
-	fsrNearest, //!< let screen resolution fitting neaest to the preferred resolution.
-				//!< There is no guarantee that the aspect ratio is preserved
-	fsrNoChange //!< no change resolution
-};
-static IDirectDraw *TVPDirectDraw=NULL;
-static IDirectDraw2 *TVPDirectDraw2=NULL;
-static IDirectDraw7 *TVPDirectDraw7=NULL;
-static HRESULT (WINAPI * TVPDirectDrawCreate)
-	( GUID FAR *lpGUID, LPDIRECTDRAW FAR *lplpDD, IUnknown FAR *pUnkOuter ) = NULL;
-static HRESULT (WINAPI * TVPDirectDrawCreateEx)
-	( GUID FAR * lpGuid, LPVOID  *lplpDD, REFIID  iid,IUnknown FAR *pUnkOuter ) = NULL;
-
-static HRESULT (WINAPI * TVPDirectDrawEnumerateA)
-	( LPDDENUMCALLBACKA lpCallback, LPVOID lpContext ) = NULL;
-static HRESULT (WINAPI * TVPDirectDrawEnumerateExA)
-	( LPDDENUMCALLBACKEXA lpCallback, LPVOID lpContext, DWORD dwFlags) = NULL;
-
-static HMODULE TVPDirectDrawDLLHandle=NULL;
-static bool TVPUseChangeDisplaySettings = false;
-static tTVPScreenMode TVPDefaultScreenMode;
-
-static bool TVPInFullScreen = false;
-static HWND TVPFullScreenWindow = NULL;
-tTVPScreenModeCandidate TVPFullScreenMode;
-static IDirectDrawSurface * TVPDDPrimarySurface = NULL;
-bool TVPDDPrimarySurfaceFailed = false;
-
-static tjs_int TVPPreferredFullScreenBPP = 0;
-static tTVPFullScreenResolutionMode TVPPreferredFullScreenResolutionMode = fsrAuto;
-enum tTVPFullScreenUsingEngineZoomMode
-{
-	fszmNone, //!< no zoom by the engine
-	fszmInner, //!< inner fit on the monitor (uncovered areas may be filled with black)
-	fszmOuter //!< outer fit on the monitor (primary layer may jut out of the monitor)
-};
-static tTVPFullScreenUsingEngineZoomMode TVPPreferredFullScreenUsingEngineZoomMode = fszmInner;
-
-
 //---------------------------------------------------------------------------
 static void TVPInitFullScreenOptions()
 {
@@ -250,139 +256,126 @@ static void TVPInitFullScreenOptions()
 	}
 }
 //---------------------------------------------------------------------------
-static BOOL WINAPI DDEnumCallbackEx( GUID *pGUID, LPSTR pDescription, LPSTR strName,
-							  LPVOID pContext, HMONITOR hm )
+void TVPDumpDirect3DDriverInformation()
 {
-	ttstr log(TJS_W("(info) DirectDraw Driver/Device found : "));
-	if(pDescription)
-		log += ttstr(pDescription);
-	if(strName)
-		log += TJS_W(" [") + ttstr(strName) + TJS_W("]");
-	char tmp[60];
-	sprintf(tmp, "0x%p", hm);
-	log += TJS_W(" (monitor: ") + ttstr(tmp) + TJS_W(")");
-	TVPAddImportantLog(log);
-
-	return  DDENUMRET_OK;
-}
-//---------------------------------------------------------------------------
-static BOOL WINAPI DDEnumCallback( GUID *pGUID, LPSTR pDescription,
-							LPSTR strName, LPVOID pContext )
-{
-	return ( DDEnumCallbackEx( pGUID, pDescription, strName, pContext, NULL ) );
-}
-//---------------------------------------------------------------------------
-void TVPDumpDirectDrawDriverInformation()
-{
-	if(TVPDirectDraw7)
+	if(TVPDirect3D)
 	{
-		IDirectDraw7 *dd7 = TVPDirectDraw7;
+		IDirect3D9 *d3d9 = TVPDirect3D;
 		static bool dumped = false;
 		if(dumped) return;
 		dumped = true;
 
-		TVPAddImportantLog(TJS_W("(info) DirectDraw7 or higher detected. Retrieving current DirectDraw driver information..."));
+		TVPAddImportantLog(TJS_W("(info) IDirect3D9 or higher detected. Retrieving current Direct3D driver information..."));
 
 		try
 		{
-			// dump directdraw information
-			DDDEVICEIDENTIFIER2 DDID = {0};
-			if(SUCCEEDED(dd7->GetDeviceIdentifier(&DDID, 0)))
+			// dump direct3d information
+			UINT numofadapter = d3d9->GetAdapterCount();
+			ttstr infostart(TJS_W("(info)  "));
+			ttstr log;
+			log = infostart + TJS_W("Found ") + ttstr((tjs_int)numofadapter) + TJS_W(" Devices.");
+			TVPAddImportantLog(log);
+
+			for( UINT adapter = 0; adapter < numofadapter; adapter++ )
 			{
-				ttstr infostart(TJS_W("(info)  "));
-				ttstr log;
-
-				// driver string
-				log = infostart + ttstr(DDID.szDescription) + TJS_W(" [") + ttstr(DDID.szDriver) + TJS_W("]");
+				log = infostart + TJS_W("Device Number : ") + ttstr((tjs_int)adapter);
 				TVPAddImportantLog(log);
 
-				// driver version(reported)
-				log = infostart + TJS_W("Driver version (reported) : ");
-				TCHAR tmp[256];
-				wsprintf( tmp, _T("%d.%02d.%02d.%04d "),
-						  HIWORD( DDID.liDriverVersion.u.HighPart ),
-						  LOWORD( DDID.liDriverVersion.u.HighPart ),
-						  HIWORD( DDID.liDriverVersion.u.LowPart  ),
-						  LOWORD( DDID.liDriverVersion.u.LowPart  ) );
-				log += tmp;
-				TVPAddImportantLog(log);
-
-				// driver version(actual)
-				tstring driverName = ttstr(DDID.szDriver).AsStdString();
-				TCHAR driverpath[1024];
-				TCHAR *driverpath_filename = NULL;
-				bool success = 0!=SearchPath(NULL, driverName.c_str(), NULL, 1023, driverpath, &driverpath_filename);
-
-				if(!success)
+				D3DADAPTER_IDENTIFIER9 D3DID = {0};
+				if(SUCCEEDED(d3d9->GetAdapterIdentifier( adapter, 0, &D3DID)))
 				{
-					TCHAR syspath[1024];
-					GetSystemDirectory(syspath, 1023);
-					_tcscat(syspath, _T("\\drivers")); // SystemDir\drivers
-					success = 0!=SearchPath(syspath, driverName.c_str(), NULL, 1023, driverpath, &driverpath_filename);
-				}
+					// driver string
+					log = infostart + ttstr(D3DID.Description) + TJS_W(" [") + ttstr(D3DID.Driver) + TJS_W("]");
+					TVPAddImportantLog(log);
+					log = infostart + TJS_W(" [") + ttstr(D3DID.DeviceName) + TJS_W("]");
+					TVPAddImportantLog(log);
 
-				if(!success)
-				{
-					TCHAR syspath[1024];
-					GetWindowsDirectory(syspath, 1023);
-					_tcscat(syspath, _T("\\system32")); // WinDir\system32
-					success = 0!=SearchPath(syspath, driverName.c_str(), NULL, 1023, driverpath, &driverpath_filename);
-				}
+					// driver version(reported)
+					log = infostart + TJS_W("Driver version (reported) : ");
+					wchar_t tmp[256];
+					wsprintf( tmp, L"%d.%02d.%02d.%04d ",
+							  HIWORD( D3DID.DriverVersion.HighPart ),
+							  LOWORD( D3DID.DriverVersion.HighPart ),
+							  HIWORD( D3DID.DriverVersion.LowPart  ),
+							  LOWORD( D3DID.DriverVersion.LowPart  ) );
+					log += tmp;
+					TVPAddImportantLog(log);
 
-				if(!success)
-				{
-					TCHAR syspath[1024];
-					GetWindowsDirectory(syspath, 1023);
-					_tcscat(syspath, _T("\\system32\\drivers")); // WinDir\system32\drivers
-					success = 0!=SearchPath(syspath, driverName.c_str(), NULL, 1023, driverpath, &driverpath_filename);
-				}
+					// driver version(actual)
+					std::wstring driverName = ttstr(D3DID.Driver).AsStdString();
+					wchar_t driverpath[1024];
+					wchar_t *driverpath_filename = NULL;
+					bool success = 0!=SearchPath(NULL, driverName.c_str(), NULL, 1023, driverpath, &driverpath_filename);
 
-				if(success)
-				{
-					log = infostart + TJS_W("Driver version (") + ttstr(driverpath) + TJS_W(") : ");
-					tjs_int major, minor, release, build;
-					if(TVPGetFileVersionOf(driverpath, major, minor, release, build))
+					if(!success)
 					{
-						wsprintf(tmp, _T("%d.%d.%d.%d"), (int)major, (int)minor, (int)release, (int)build);
-						log += tmp;
+						wchar_t syspath[1024];
+						GetSystemDirectory(syspath, 1023);
+						wcscat(syspath, L"\\drivers"); // SystemDir\drivers
+						success = 0!=SearchPath(syspath, driverName.c_str(), NULL, 1023, driverpath, &driverpath_filename);
+					}
+
+					if(!success)
+					{
+						wchar_t syspath[1024];
+						GetWindowsDirectory(syspath, 1023);
+						wcscat(syspath, L"\\system32"); // WinDir\system32
+						success = 0!=SearchPath(syspath, driverName.c_str(), NULL, 1023, driverpath, &driverpath_filename);
+					}
+
+					if(!success)
+					{
+						wchar_t syspath[1024];
+						GetWindowsDirectory(syspath, 1023);
+						wcscat(syspath, L"\\system32\\drivers"); // WinDir\system32\drivers
+						success = 0!=SearchPath(syspath, driverName.c_str(), NULL, 1023, driverpath, &driverpath_filename);
+					}
+
+					if(success)
+					{
+						log = infostart + TJS_W("Driver version (") + ttstr(driverpath) + TJS_W(") : ");
+						tjs_int major, minor, release, build;
+						if(TVPGetFileVersionOf(driverpath, major, minor, release, build))
+						{
+							wsprintf(tmp, L"%d.%d.%d.%d", (int)major, (int)minor, (int)release, (int)build);
+							log += tmp;
+						}
+						else
+						{
+							log += TJS_W("unknown");
+						}
 					}
 					else
 					{
-						log += TJS_W("unknown");
+						log = infostart + TJS_W("Driver ") + ttstr(D3DID.Driver) +
+							TJS_W(" is not found in search path.");
 					}
+					TVPAddImportantLog(log);
+
+					// device id
+					wsprintf(tmp, L"VendorId:%08X  DeviceId:%08X  SubSysId:%08X  Revision:%08X",
+						D3DID.VendorId, D3DID.DeviceId, D3DID.SubSysId, D3DID.Revision);
+					log = infostart + TJS_W("Device ids : ") + tmp;
+					TVPAddImportantLog(log);
+
+					// Device GUID
+					GUID *pguid = &D3DID.DeviceIdentifier;
+					wsprintf( tmp, L"%08X-%04X-%04X-%02X%02X%02X%02X%02X%02X%02X%02X",
+							  pguid->Data1,
+							  pguid->Data2,
+							  pguid->Data3,
+							  pguid->Data4[0], pguid->Data4[1], pguid->Data4[2], pguid->Data4[3],
+							  pguid->Data4[4], pguid->Data4[5], pguid->Data4[6], pguid->Data4[7] );
+					log = infostart + TJS_W("Unique driver/device id : ") + tmp;
+					TVPAddImportantLog(log);
+
+					// WHQL level
+					wsprintf(tmp, L"%08x", D3DID.WHQLLevel);
+					log = infostart + TJS_W("WHQL level : ")  + tmp;
+					TVPAddImportantLog(log);
+				} else {
+					TVPAddImportantLog(TJS_W("(info) Failed."));
 				}
-				else
-				{
-					log = infostart + TJS_W("Driver ") + ttstr(DDID.szDriver) +
-						TJS_W(" is not found in search path.");
-				}
-				TVPAddImportantLog(log);
-
-				// device id
-				wsprintf(tmp, _T("VendorId:%08X  DeviceId:%08X  SubSysId:%08X  Revision:%08X"),
-					DDID.dwVendorId, DDID.dwDeviceId, DDID.dwSubSysId, DDID.dwRevision);
-				log = infostart + TJS_W("Device ids : ") + tmp;
-				TVPAddImportantLog(log);
-
-				// Device GUID
-				GUID *pguid = &DDID.guidDeviceIdentifier;
-				wsprintf( tmp, _T("%08X-%04X-%04X-%02X%02X%02X%02X%02X%02X%02X%02X"),
-						  pguid->Data1,
-						  pguid->Data2,
-						  pguid->Data3,
-						  pguid->Data4[0], pguid->Data4[1], pguid->Data4[2], pguid->Data4[3],
-						  pguid->Data4[4], pguid->Data4[5], pguid->Data4[6], pguid->Data4[7] );
-				log = infostart + TJS_W("Unique driver/device id : ") + tmp;
-				TVPAddImportantLog(log);
-
-				// WHQL level
-				wsprintf(tmp, _T("%08x"), DDID.dwWHQLLevel);
-				log = infostart + TJS_W("WHQL level : ")  + tmp;
-				TVPAddImportantLog(log);
-			}
-			else
-			{
-				TVPAddImportantLog(TJS_W("(info) Failed."));
 			}
 		}
 		catch(...)
@@ -392,122 +385,34 @@ void TVPDumpDirectDrawDriverInformation()
 
 }
 //---------------------------------------------------------------------------
-static void TVPUnloadDirectDraw();
-static void TVPInitDirectDraw()
+static void TVPUnloadDirect3D();
+static void TVPInitDirect3D()
 {
-	if(!TVPDirectDrawDLLHandle)
+	if(!TVPDirect3DDLLHandle)
 	{
 		// load ddraw.dll
-		TVPAddLog(TJS_W("(info) Loading DirectDraw ..."));
-		TVPDirectDrawDLLHandle = LoadLibrary(_T("ddraw.dll"));
-		if(!TVPDirectDrawDLLHandle)
-			TVPThrowExceptionMessage(TVPCannotInitDirectDraw,
-				TJS_W("Cannot load ddraw.dll"));
-
-		// Enumerate display drivers, for debugging information
-		try
-		{
-			TVPDirectDrawEnumerateExA = (HRESULT (WINAPI * )
-				( LPDDENUMCALLBACKEXA , LPVOID , DWORD )	)
-					GetProcAddress(TVPDirectDrawDLLHandle, "DirectDrawEnumerateExA");
-			if(TVPDirectDrawEnumerateExA)
-			{
-				TVPDirectDrawEnumerateExA( DDEnumCallbackEx, NULL,
-										  DDENUM_ATTACHEDSECONDARYDEVICES |
-										  DDENUM_DETACHEDSECONDARYDEVICES |
-										  DDENUM_NONDISPLAYDEVICES );
-			}
-			else
-			{
-				TVPDirectDrawEnumerateA = (HRESULT (WINAPI * )
-					( LPDDENUMCALLBACKA , LPVOID  ))
-					GetProcAddress(TVPDirectDrawDLLHandle, "DirectDrawEnumerateA");
-				if(TVPDirectDrawEnumerateA)
-				{
-			        TVPDirectDrawEnumerateA( DDEnumCallback, NULL );
-				}
-			}
-		}
-		catch(...)
-		{
-			// Ignore errors
-		}
+		TVPAddLog(TJS_W("(info) Loading Direct3D ..."));
+		TVPDirect3DDLLHandle = ::LoadLibrary( L"d3d9.dll" );
+		if(!TVPDirect3DDLLHandle)
+			TVPThrowExceptionMessage(TVPCannotInitDirect3D, TJS_W("Cannot load d3d9.dll"));
 	}
 
-	if(!TVPDirectDraw2)
+	if(!TVPDirect3D)
 	{
 		try
 		{
-			// get DirectDrawCreaet function
-			TVPDirectDrawCreate = (HRESULT(WINAPI * )(_GUID*,IDirectDraw**,IUnknown*))
-				GetProcAddress(TVPDirectDrawDLLHandle, "DirectDrawCreate");
-			if(!TVPDirectDrawCreate)
-				TVPThrowExceptionMessage(TVPCannotInitDirectDraw,
-					TJS_W("Missing DirectDrawCreate in ddraw.dll"));
+			// get Direct3DCreaet function
+			TVPDirect3DCreate = (IDirect3D9*(WINAPI * )(UINT))GetProcAddress(TVPDirect3DDLLHandle, "Direct3DCreate9");
+			if(!TVPDirect3DCreate)
+				TVPThrowExceptionMessage(TVPCannotInitDirect3D, TJS_W("Missing Direct3DCreate9 in d3d9.dll"));
 
-			TVPDirectDrawCreateEx = (HRESULT(WINAPI * )( GUID FAR *, LPVOID  *, REFIID,IUnknown FAR *))
-				GetProcAddress(TVPDirectDrawDLLHandle, "DirectDrawCreateEx");
-
-			// create IDirectDraw object
-			if(TVPDirectDrawCreateEx)
-			{
-				HRESULT hr;
-				hr = TVPDirectDrawCreateEx(NULL, (void**)&TVPDirectDraw7, IID_IDirectDraw7, NULL);
- 				if(FAILED(hr))
-					TVPThrowExceptionMessage(TVPCannotInitDirectDraw,
-						ttstr(TJS_W("DirectDrawCreateEx failed./HR="))+
-							TJSInt32ToHex((tjs_uint32)hr));
-
-				// retrieve IDirecDraw2 interface
-				hr = TVPDirectDraw7->QueryInterface(IID_IDirectDraw2,
-					(void **)&TVPDirectDraw2);
-				if(FAILED(hr))
-					TVPThrowExceptionMessage(TVPCannotInitDirectDraw,
-						ttstr(TJS_W("Querying of IID_IDirectDraw2 failed.")
-							TJS_W("/HR="))+
-							TJSInt32ToHex((tjs_uint32)hr));
-			}
-			else
-			{
-				HRESULT hr;
-
-				hr = TVPDirectDrawCreate(NULL, &TVPDirectDraw, NULL);
-				if(FAILED(hr))
-					TVPThrowExceptionMessage(TVPCannotInitDirectDraw,
-						ttstr(TJS_W("DirectDrawCreate failed./HR="))+
-							TJSInt32ToHex((tjs_uint32)hr));
-
-				// retrieve IDirecDraw2 interface
-				hr = TVPDirectDraw->QueryInterface(IID_IDirectDraw2,
-					(void **)&TVPDirectDraw2);
-				if(FAILED(hr))
-					TVPThrowExceptionMessage(TVPCannotInitDirectDraw,
-						ttstr(TJS_W("Querying of IID_IDirectDraw2 failed.")
-							TJS_W(" (DirectX on this system may be too old)/HR="))+
-							TJSInt32ToHex((tjs_uint32)hr));
-
-				TVPDirectDraw->Release(), TVPDirectDraw = NULL;
-
-				// retrieve IDirectDraw7 interface
-				hr = TVPDirectDraw2->QueryInterface(IID_IDirectDraw7, (void**)&TVPDirectDraw7);
-				if(FAILED(hr)) TVPDirectDraw7 = NULL;
-			}
-
-
-			if(TVPLoggingToFile)
-			{
-				TVPDumpDirectDrawDriverInformation();
-			}
-
-			// set cooperative level
-			if(TVPDirectDraw7)
-				TVPDirectDraw7->SetCooperativeLevel(NULL, DDSCL_NORMAL);
-			else
-				TVPDirectDraw2->SetCooperativeLevel(NULL, DDSCL_NORMAL);
+			TVPDirect3D = TVPDirect3DCreate( D3D_SDK_VERSION );
+			if( NULL == TVPDirect3D )
+				TVPThrowExceptionMessage(TJS_W("Faild to create Direct3D9."));
 		}
 		catch(...)
 		{
-			TVPUnloadDirectDraw();
+			TVPUnloadDirect3D();
 			throw;
 		}
 	}
@@ -515,101 +420,41 @@ static void TVPInitDirectDraw()
 	TVPGetDisplayColorFormat();
 }
 //---------------------------------------------------------------------------
-static void TVPUninitDirectDraw()
+static void TVPUninitDirect3D()
 {
-	// release DirectDraw object ( DLL will not be released )
+	// release Direct3D object ( DLL will not be released )
 }
 //---------------------------------------------------------------------------
-static void TVPUnloadDirectDraw()
+static void TVPUnloadDirect3D()
 {
-	// release DirectDraw object and /*release it's DLL */
-	TVPUninitDirectDraw();
-	if(TVPDDPrimarySurface) TVPDDPrimarySurface->Release(), TVPDDPrimarySurface = NULL;
-	if(TVPDirectDraw7) TVPDirectDraw7->Release(), TVPDirectDraw7 = NULL;
-	if(TVPDirectDraw2) TVPDirectDraw2->Release(), TVPDirectDraw2 = NULL;
-	if(TVPDirectDraw) TVPDirectDraw -> Release(), TVPDirectDraw = NULL;
-//	if(TVPDirectDrawDLLHandle)
-//		FreeLibrary(TVPDirectDrawDLLHandle), TVPDirectDrawDLLHandle = NULL;
+	// release Direct3D object and /*release it's DLL */
+	TVPUninitDirect3D();
+	if(TVPDirect3D) TVPDirect3D->Release(), TVPDirect3D = NULL;
 
 	TVPGetDisplayColorFormat();
 }
 //---------------------------------------------------------------------------
-void TVPEnsureDirectDrawObject()
+void TVPEnsureDirect3DObject()
 {
 	try
 	{
-		TVPInitDirectDraw();
+		TVPInitDirect3D();
 	}
 	catch(...)
 	{
 	}
 }
 //---------------------------------------------------------------------------
-IDirectDraw2 * TVPGetDirectDrawObjectNoAddRef()
+IDirect3D9 * TVPGetDirect3DObjectNoAddRef()
 {
-	// retrieves DirectDraw2 interface
-	return TVPDirectDraw2;
+	// retrieves IDirect3D9 interface
+	return TVPDirect3D;
 }
 //---------------------------------------------------------------------------
-IDirectDraw7 * TVPGetDirectDraw7ObjectNoAddRef()
-{
-	// retrieves DirectDraw7 interface
-	return TVPDirectDraw7;
-}
-//---------------------------------------------------------------------------
-IDirectDrawSurface * TVPGetDDPrimarySurfaceNoAddRef()
-{
-	if(TVPDDPrimarySurfaceFailed) return NULL;
-	if(TVPDDPrimarySurface) return TVPDDPrimarySurface;
-
-	TVPEnsureDirectDrawObject();
-
-	if(!TVPDirectDraw2)
-	{
-		// DirectDraw not available
-		TVPDDPrimarySurfaceFailed = true;
-		return NULL;
-	}
-
-	DDSURFACEDESC ddsd;
-	ZeroMemory(&ddsd, sizeof(ddsd));
-	ddsd.dwSize = sizeof(ddsd);
-	ddsd.dwFlags = DDSD_CAPS;
-	ddsd.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE;
-
-	HRESULT hr;
-	hr = TVPDirectDraw2->CreateSurface(&ddsd, &TVPDDPrimarySurface, NULL);
-	if(hr != DD_OK)
-	{
-		// failed to create DirectDraw primary surface
-		TVPDDPrimarySurface = NULL;
-		TVPDDPrimarySurfaceFailed = true;
-		return NULL;
-	}
-
-	return TVPDDPrimarySurface;
-}
-//---------------------------------------------------------------------------
-void TVPSetDDPrimaryClipper(IDirectDrawClipper *clipper)
-{
-	// set clipper object
-
-	IDirectDrawSurface * pri = TVPGetDDPrimarySurfaceNoAddRef();
-
-	// set current clipper object
-	if(pri) pri->SetClipper(clipper);
-}
-//---------------------------------------------------------------------------
-void TVPReleaseDDPrimarySurface()
-{
-	if(TVPDDPrimarySurface) TVPDDPrimarySurface->Release(), TVPDDPrimarySurface = NULL;
-}
-//---------------------------------------------------------------------------
-
 
 //---------------------------------------------------------------------------
 static tTVPAtExit
-	TVPUnloadDirectDrawAtExit(TVP_ATEXIT_PRI_RELEASE, TVPUnloadDirectDraw);
+	TVPUnloadDirect3DAtExit(TVP_ATEXIT_PRI_RELEASE, TVPUnloadDirect3D);
 //---------------------------------------------------------------------------
 
 
@@ -653,21 +498,6 @@ static void TVPGetOriginalScreenMetrics()
 	ReleaseDC(0, dc);
 }
 //---------------------------------------------------------------------------
-//! @brief	callback function of TVPEnumerateAllDisplayModes
-static HRESULT WINAPI TVPEnumerateAllDisplayModesCallback(
-	LPDDSURFACEDESC lpDDSufaceDesc, LPVOID lpContext)
-{
-	std::vector<tTVPScreenMode> *modes = reinterpret_cast<std::vector<tTVPScreenMode> *>(lpContext);
-
-	tTVPScreenMode mode;
-	mode.Width  = lpDDSufaceDesc->dwWidth;
-	mode.Height = lpDDSufaceDesc->dwHeight;
-	mode.BitsPerPixel = lpDDSufaceDesc->ddpfPixelFormat.dwRGBBitCount;
-	modes->push_back(mode);
-
-	return DDENUMRET_OK;
-}
-//---------------------------------------------------------------------------
 //! @brief	enumerate all display modes
 void TVPEnumerateAllDisplayModes(std::vector<tTVPScreenMode> & modes)
 {
@@ -676,13 +506,46 @@ void TVPEnumerateAllDisplayModes(std::vector<tTVPScreenMode> & modes)
 	if(!TVPUseChangeDisplaySettings)
 	{
 		// if DisplaySettings APIs is not preferred
-		// use DirectDraw
-		TVPEnsureDirectDrawObject();
-		IDirectDraw2 * dd2 = TVPGetDirectDrawObjectNoAddRef();
-		if(dd2)
+		// use Direct3D
+		TVPEnsureDirect3DObject();
+		IDirect3D9* d3d = TVPGetDirect3DObjectNoAddRef();
+		if(d3d)
 		{
-			dd2->EnumDisplayModes(0, NULL, (void*)&modes,
-					TVPEnumerateAllDisplayModesCallback);
+			static const D3DFORMAT PixelFormatTypes[] = {
+				//D3DFMT_A1R5G5B5, // not support display
+				//D3DFMT_A2R10G10B10, // not support display
+				//D3DFMT_A8R8G8B8, // not support display
+				D3DFMT_R5G6B5,
+				// D3DFMT_X1R5G5B5, // IDirect3D9::EnumAdapterModes では D3DFMT_R5G6B5 と同等と処理される
+				D3DFMT_X8R8G8B8
+			};
+			static const int NumOfFormat = sizeof(PixelFormatTypes) / sizeof(PixelFormatTypes[0]);
+			for( int f = 0; f < NumOfFormat; f++ )
+			{
+				D3DFORMAT format = PixelFormatTypes[f];
+				UINT count = d3d->GetAdapterModeCount(D3DADAPTER_DEFAULT,format);
+				for( UINT a = 0; a < count; a++ )
+				{
+					D3DDISPLAYMODE mode;
+					HRESULT hr = d3d->EnumAdapterModes( D3DADAPTER_DEFAULT, format, a, &mode );
+					if( SUCCEEDED( hr ) )
+					{
+						tTVPScreenMode sm;
+						sm.Width =  mode.Width;
+						sm.Height = mode.Height;
+						// modes.Refreshrate
+						if( mode.Format == D3DFMT_R5G6B5 || mode.Format == D3DFMT_X1R5G5B5 ) {
+							sm.BitsPerPixel = 16;
+							modes.push_back(sm);
+						} else if( mode.Format == D3DFMT_X8R8G8B8 ) {
+							sm.BitsPerPixel = 32;
+							modes.push_back(sm);
+						} else {
+							// unknown ここでは無視
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -695,11 +558,11 @@ void TVPEnumerateAllDisplayModes(std::vector<tTVPScreenMode> & modes)
 		DWORD num = 0;
 		do
 		{
-			tTVP_devicemodeA dm;
-			ZeroMemory(&dm, sizeof(tTVP_devicemodeA));
-			dm.dmSize = sizeof(tTVP_devicemodeA);
+			DEVMODE dm;
+			ZeroMemory(&dm, sizeof(DEVMODE));
+			dm.dmSize = sizeof(DEVMODE);
 			dm.dmDriverExtra = 0;
-			if(EnumDisplaySettings(NULL, num, reinterpret_cast<DEVMODE*>(&dm)) == 0) break;
+			if(::EnumDisplaySettings(NULL, num, reinterpret_cast<DEVMODE*>(&dm)) == 0) break;
 			tTVPScreenMode mode;
 			mode.Width  = dm.dmPelsWidth;
 			mode.Height = dm.dmPelsHeight;
@@ -710,12 +573,12 @@ void TVPEnumerateAllDisplayModes(std::vector<tTVPScreenMode> & modes)
 	}
 
 	TVPAddLog(ttstr(TJS_W("(info) environment: using ")) +
-		(TVPUseChangeDisplaySettings?TJS_W("ChangeDisplaySettings API"):TJS_W("DirectDraw")));
+		(TVPUseChangeDisplaySettings?TJS_W("ChangeDisplaySettings API"):TJS_W("Direct3D")));
 }
 //---------------------------------------------------------------------------
 //! @brief		make full screen mode candidates
 //! @note		Always call this function *before* entering full screen mode
-void TVPMakeFullScreenModeCandidates(
+static void TVPMakeFullScreenModeCandidates(
 	const tTVPScreenMode & preferred,
 	tTVPFullScreenResolutionMode mode,
 	tTVPFullScreenUsingEngineZoomMode zoom_mode,
@@ -756,6 +619,10 @@ void TVPMakeFullScreenModeCandidates(
 	std::vector<tTVPScreenMode> modes;
 	TVPEnumerateAllDisplayModes(modes);
 	std::sort(modes.begin(), modes.end()); // sort by area, and bpp
+	{	// 重複する項目を削除する(リフレッシュレートで重複する可能性がある)
+		std::vector<tTVPScreenMode>::iterator new_end = std::unique(modes.begin(),modes.end());
+		modes.erase(new_end, modes.end());
+	}
 
 	{
 		tjs_int last_width = -1, last_height = -1;
@@ -963,26 +830,36 @@ void TVPMakeFullScreenModeCandidates(
 	}
 }
 //---------------------------------------------------------------------------
-
-
-
-
+#if 0
+tjs_uint TVPGetMonitorNumber( HWND window )
+{
+	if( TVPDirect3D == NULL ) return D3DADAPTER_DEFAULT;
+	HMONITOR windowMonitor = ::MonitorFromWindow( window, MONITOR_DEFAULTTOPRIMARY );
+	UINT iCurrentMonitor = 0;
+	UINT numOfMonitor = TVPDirect3D->GetAdapterCount();
+	for( ; TVPDirect3D < numOfMonitor; ++iCurrentMonitor ) 	{
+		if( IDirect3D9->GetAdapterMonitor(iCurrentMonitor) == windowMonitor )
+			break;
+	}
+	if( iCurrentMonitor == numOfMonitor )
+		iCurrentMonitor = D3DADAPTER_DEFAULT;
+	return iCurrentMonitor;
+}
+#endif
 //---------------------------------------------------------------------------
-void TVPSwitchToFullScreen(HWND window, tjs_int w, tjs_int h)
+void TVPSwitchToFullScreen(HWND window, tjs_int w, tjs_int h, iTVPDrawDevice* drawdevice )
 {
 	if(TVPInFullScreen) return;
 
 	TVPInitFullScreenOptions();
 
-	TVPReleaseVSyncTimingThread();
-
-	TVPReleaseDDPrimarySurface();
+	//TVPReleaseVSyncTimingThread();
 
 	if(!TVPUseChangeDisplaySettings)
 	{
 		try
 		{
-			TVPInitDirectDraw();
+			TVPInitDirect3D();
 		}
 		catch(eTJS &e)
 		{
@@ -994,7 +871,6 @@ void TVPSwitchToFullScreen(HWND window, tjs_int w, tjs_int h)
 			TVPUseChangeDisplaySettings = true;
 		}
 	}
-
 
 	// get fullscreen mode candidates
 	std::vector<tTVPScreenModeCandidate> candidates;
@@ -1014,77 +890,10 @@ void TVPSwitchToFullScreen(HWND window, tjs_int w, tjs_int h)
 		i != candidates.end(); i++)
 	{
 		TVPAddLog(TJS_W("(info) Trying screen mode: ") + i->Dump());
-		if(TVPUseChangeDisplaySettings)
+		success = drawdevice->SwitchToFullScreen( window, i->Width, i->Height, i->BitsPerPixel, TVPDisplayColorFormat, TVPPreferredFullScreenResolutionMode == fsrNoChange );
+		if( success )
 		{
-			DEVMODE dm;
-			ZeroMemory(&dm, sizeof(DEVMODE));
-			dm.dmSize = sizeof(DEVMODE);
-			dm.dmPelsWidth = i->Width;
-			dm.dmPelsHeight = i->Height;
-			dm.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL;
-			dm.dmBitsPerPel = i->BitsPerPixel;
-			LONG ret = ChangeDisplaySettings((DEVMODE*)&dm, CDS_FULLSCREEN);
-			switch(ret)
-			{
-			case DISP_CHANGE_SUCCESSFUL:
-				SetWindowPos(window, HWND_TOP, 0, 0, i->Width, i->Height, SWP_SHOWWINDOW);
-				success = true;
-				break;
-			case DISP_CHANGE_RESTART:
-				TVPAddLog(TJS_W("ChangeDisplaySettings failed: DISP_CHANGE_RESTART"));
-				break;
-			case DISP_CHANGE_BADFLAGS:
-				TVPAddLog(TJS_W("ChangeDisplaySettings failed: DISP_CHANGE_BADFLAGS"));
-				break;
-			case DISP_CHANGE_BADPARAM:
-				TVPAddLog(TJS_W("ChangeDisplaySettings failed: DISP_CHANGE_BADPARAM"));
-				break;
-			case DISP_CHANGE_FAILED:
-				TVPAddLog(TJS_W("ChangeDisplaySettings failed: DISP_CHANGE_FAILED"));
-				break;
-			case DISP_CHANGE_BADMODE:
-				TVPAddLog(TJS_W("ChangeDisplaySettings failed: DISP_CHANGE_BADMODE"));
-				break;
-			case DISP_CHANGE_NOTUPDATED:
-				TVPAddLog(TJS_W("ChangeDisplaySettings failed: DISP_CHANGE_NOTUPDATED"));
-				break;
-			default:
-				TVPAddLog(TJS_W("ChangeDisplaySettings failed: unknown reason (") +
-								ttstr((tjs_int)ret) + TJS_W(")"));
-				break;
-			}
-			if(success)
-			{
-				TVPFullScreenMode = *i;
-				break;
-			}
-		}
-		else
-		{
-			HRESULT hr;
-			hr = TVPDirectDraw2->SetCooperativeLevel(window,
-				DDSCL_EXCLUSIVE|DDSCL_FULLSCREEN|DDSCL_ALLOWREBOOT);
-
-			if(FAILED(hr))
-			{
-				TVPAddLog(TJS_W("IDirectDraw2::SetCooperativeLevel failed/hr=") +
-								TJSInt32ToHex(hr) );
-			}
-			else
-			{
-				hr =TVPDirectDraw2->SetDisplayMode(i->Width, i->Height, i->BitsPerPixel, 0, 0);
-				if(FAILED(hr))
-				{
-					TVPAddLog(
-						ttstr(TJS_W("IDirectDraw2::SetDisplayMode failed/hr=")) + TJSInt32ToHex(hr));
-				}
-				else
-				{
-					success = true;
-					TVPFullScreenMode = *i;
-					break;
-				}
-			}
+			TVPFullScreenMode = *i;
 		}
 	}
 
@@ -1099,35 +908,21 @@ void TVPSwitchToFullScreen(HWND window, tjs_int w, tjs_int h)
 	TVPInFullScreen = true;
 
 	TVPGetDisplayColorFormat();
-	TVPEnsureVSyncTimingThread();
+	//TVPEnsureVSyncTimingThread();
 }
 //---------------------------------------------------------------------------
-void TVPRevertFromFullScreen(HWND window)
+void TVPRevertFromFullScreen(HWND window,tjs_uint w,tjs_uint h, iTVPDrawDevice* drawdevice)
 {
 	if(!TVPInFullScreen) return;
 
-	TVPReleaseVSyncTimingThread();
-	TVPReleaseDDPrimarySurface();
+	//TVPReleaseVSyncTimingThread();
 
-	if(TVPUseChangeDisplaySettings)
-	{
-		ChangeDisplaySettings(NULL, 0);
-	}
-	else
-	{
-		if(TVPDirectDraw2)
-		{
-			TVPDirectDraw2->RestoreDisplayMode();
-			TVPDirectDraw2->SetCooperativeLevel(window, DDSCL_NORMAL);
-			ChangeDisplaySettings(NULL, 0);
-		}
-	}
-	TVPUninitDirectDraw();
+	drawdevice->RevertFromFullScreen( window, w, h, TVPDefaultScreenMode.BitsPerPixel, TVPDisplayColorFormat );
 
 	TVPInFullScreen = false;
 
 	TVPGetDisplayColorFormat();
-	TVPEnsureVSyncTimingThread();
+	//TVPEnsureVSyncTimingThread();
 }
 //---------------------------------------------------------------------------
 
@@ -1171,20 +966,20 @@ void TVPRevertFromFullScreen(HWND window)
 void TVPMinimizeFullScreenWindowAtInactivation()
 {
 	// only works when TVPUseChangeDisplaySettings == true
-	// (DirectDraw framework does this)
+	// (Direct3D framework does this)
 
 	if(!TVPInFullScreen) return;
 	if(!TVPUseChangeDisplaySettings) return;
 
-	ChangeDisplaySettings(NULL, 0);
+	::ChangeDisplaySettings(NULL, 0);
 
-	ShowWindow(TVPFullScreenWindow, SW_MINIMIZE);
+	::ShowWindow(TVPFullScreenWindow, SW_MINIMIZE);
 }
 //---------------------------------------------------------------------------
 void TVPRestoreFullScreenWindowAtActivation()
 {
 	// only works when TVPUseChangeDisplaySettings == true
-	// (DirectDraw framework does this)
+	// (Direct3D framework does this)
 
 	if(!TVPInFullScreen) return;
 	if(!TVPUseChangeDisplaySettings) return;
@@ -1196,7 +991,7 @@ void TVPRestoreFullScreenWindowAtActivation()
 	dm.dmPelsHeight = TVPFullScreenMode.Height;
 	dm.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL;
 	dm.dmBitsPerPel = TVPFullScreenMode.BitsPerPixel;
-	ChangeDisplaySettings((DEVMODE*)&dm, CDS_FULLSCREEN);
+	::ChangeDisplaySettings((DEVMODE*)&dm, CDS_FULLSCREEN);
 
 	ShowWindow(TVPFullScreenWindow, SW_RESTORE);
 	SetWindowPos(TVPFullScreenWindow, HWND_TOP,
@@ -1211,11 +1006,11 @@ static void TVPRestoreDisplayMode()
 	// only works when TVPUseChangeDisplaySettings == true
 	if(!TVPUseChangeDisplaySettings) return;
 	if(!TVPInFullScreen) return;
-	ChangeDisplaySettings(NULL, 0);
+	::ChangeDisplaySettings(NULL, 0);
 }
 //---------------------------------------------------------------------------
 static tTVPAtExit
-	TVPRestoreDisplayModeAtExit(TVP_ATEXIT_PRI_CLEANUP, TVPUnloadDirectDraw);
+	TVPRestoreDisplayModeAtExit(TVP_ATEXIT_PRI_CLEANUP, TVPUnloadDirect3D);
 //---------------------------------------------------------------------------
 
 
@@ -1252,7 +1047,8 @@ HWND TVPGetModalWindowOwnerHandle()
 //---------------------------------------------------------------------------
 tTJSNI_Window::tTJSNI_Window()
 {
-	TVPEnsureVSyncTimingThread();
+	//TVPEnsureVSyncTimingThread();
+	VSyncTimingThread = NULL;
 	Form = NULL;
 }
 //---------------------------------------------------------------------------
@@ -1269,6 +1065,11 @@ tTJSNI_Window::Construct(tjs_int numparams, tTJSVariant **param,
 void TJS_INTF_METHOD tTJSNI_Window::Invalidate()
 {
 	tTJSNI_BaseWindow::Invalidate();
+	if( VSyncTimingThread )
+	{
+		delete VSyncTimingThread;
+		VSyncTimingThread = NULL;
+	}
 	if(Form)
 	{
 		Form->InvalidateClose();
@@ -1555,7 +1356,7 @@ void tTJSNI_Window::ReadjustVideoRect()
 void tTJSNI_Window::WindowMoved()
 {
 	// inform video overlays that the window has moved.
-	// video overlays typically owns DirectDraw surface which is not a part of
+	// video overlays typically owns Direct3D surface which is not a part of
 	// normal window systems and does not matter where the owner window is.
 	// so we must inform window moving to overlay window.
 
@@ -2084,10 +1885,26 @@ tjs_int tTJSNI_Window::GetHintDelay() const
 	return Form->GetHintDelay();
 }
 //---------------------------------------------------------------------------
-
-
-
-
+bool tTJSNI_Window::WaitForVBlank( tjs_int* in_vblank, tjs_int* delayed )
+{
+	if( DrawDevice ) return DrawDevice->WaitForVBlank( in_vblank, delayed );
+	return false;
+}
+//---------------------------------------------------------------------------
+void tTJSNI_Window::UpdateVSyncThread()
+{
+	if( WaitVSync ) {
+		if( VSyncTimingThread == NULL ) {
+			VSyncTimingThread = new tTVPVSyncTimingThread(this);
+		}
+	} else {
+		if( VSyncTimingThread ) {
+			delete VSyncTimingThread;
+		}
+		VSyncTimingThread = NULL;
+	}
+}
+//---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
 // tTJSNC_Window::CreateNativeInstance : returns proper instance object

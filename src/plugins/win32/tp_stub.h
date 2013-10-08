@@ -1833,6 +1833,8 @@ extern void * TVPImportFuncPtr308f905626bc51c7ef9b65b2c0ca34b2;
 extern void * TVPImportFuncPtr95aab2a1ac9491e8026f4977e0918760;
 extern void * TVPImportFuncPtre0ac94325eb783ca2fe7856a54444c90;
 extern void * TVPImportFuncPtr0c99a79e866f08b4df3914e83fc203dc;
+extern void * TVPImportFuncPtrf2de531a016173057ff3540e47fed4e6;
+extern void * TVPImportFuncPtr4224a9066d8d13d6d7e12f1ace6a5beb;
 extern void * TVPImportFuncPtr900476efbc2031e643c042ca8e63a3d7;
 extern void * TVPImportFuncPtr07dfce61d490cf671a2d5359d713d64a;
 extern void * TVPImportFuncPtr52d30ac8479ef7e870b5aff076482799;
@@ -1934,12 +1936,8 @@ extern void * TVPImportFuncPtrb426fbfb6ccb4e89c252b6af566995b8;
 extern void * TVPImportFuncPtrc145419db7b63f7488ea05a2a8826c1d;
 extern void * TVPImportFuncPtrd795cd5ebfb6ca6f1b91bafbe66d7a65;
 extern void * TVPImportFuncPtr4564a3ce5cf48cb47e63a3948cef03be;
-extern void * TVPImportFuncPtr678c2b211f8d8f661f6fdd95c52fbaa8;
-extern void * TVPImportFuncPtr9ec5b02d14238454101dad083b5dfc3b;
-extern void * TVPImportFuncPtr471b3daf08ed9b828679d0dae78250ed;
-extern void * TVPImportFuncPtrd0bb2c604ee6f0bba72ddc017f6416eb;
-extern void * TVPImportFuncPtr3ab4d4d7b57eea827e7bb7c263afb951;
-extern void * TVPImportFuncPtrdc025d3981a832b095736a0214b98797;
+extern void * TVPImportFuncPtrbee2775f2e4042043b7cb08056d2ae5c;
+extern void * TVPImportFuncPtr5fd8dfd2816a2cfd4a51cab41053d575;
 extern void * TVPImportFuncPtr9982ebedc12d343cb098e2a7b25bdef1;
 extern void * TVPImportFuncPtr81eeacbed5ee6129bef4b370e28b5d10;
 extern void * TVPImportFuncPtr6ed1088905d99012d2fb5827ea19527e;
@@ -5478,13 +5476,10 @@ typedef bool (__stdcall * tTVPWindowMessageReceiver)
 
 
 //---------------------------------------------------------------------------
-// DirectDraw former declaration
+// Direct3D former declaration
 //---------------------------------------------------------------------------
-#ifndef __DDRAW_INCLUDED__
-struct IDirectDraw2;
-struct IDirectDraw7;
-struct IDirectDrawSurface;
-struct IDirectDrawClipper;
+#ifndef DIRECT3D_VERSION
+struct IDirect3D9;
 #endif
 
 
@@ -5839,6 +5834,29 @@ public:
 	//!				差分更新の最適化に役立てるための支援機能。
 	//!				実装する必要はないが、実装することが望ましい。
 	virtual void TJS_INTF_METHOD SetShowUpdateRect(bool b) = 0;
+
+	//! @brief		(Window->DrawDevice) フルスクリーン化する
+	//! @param		window		ウィンドウハンドル
+	//! @param		w			要求する幅
+	//! @param		h			要求する高さ
+	//! @param		bpp			Bit per pixels
+	//! @param		color		16bpp の時 565 か 555を指定
+	//! @param		changeresolution	解像度変更を行うかどうか
+	virtual bool TJS_INTF_METHOD SwitchToFullScreen( HWND window, tjs_uint w, tjs_uint h, tjs_uint bpp, tjs_uint color, bool changeresolution ) = 0;
+	
+	//! @brief		(Window->DrawDevice) フルスクリーンを解除する
+	//! @param		window		ウィンドウハンドル
+	//! @param		w			要求する幅
+	//! @param		h			要求する高さ
+	//! @param		bpp			元々のBit per pixels
+	//! @param		color		16bpp の時 565 か 555を指定
+	virtual void TJS_INTF_METHOD RevertFromFullScreen( HWND window, tjs_uint w, tjs_uint h, tjs_uint bpp, tjs_uint color ) = 0;
+
+	//! @brief		(Window->DrawDevice) VBlank待ちを行う
+	//! @param		in_vblank	待たなくてもVBlank内だったかどうかを返す( !0 : 内、0: 外 )
+	//! @param		delayed		1フレーム遅延が発生したかどうかを返す( !0 : 発生、0: 発生せず )
+	//! @return		Wait可不可 true : 可能、false : 不可
+	virtual bool TJS_INTF_METHOD WaitForVBlank( tjs_int* in_vblank, tjs_int* delayed ) = 0;
 };
 //---------------------------------------------------------------------------
 
@@ -7136,6 +7154,26 @@ inline iTJSTextWriteStream * TVPCreateTextStreamForWrite(const ttstr & name , co
 	typedef iTJSTextWriteStream * (__stdcall * __functype)(const ttstr &, const ttstr &);
 	return ((__functype)(TVPImportFuncPtr0c99a79e866f08b4df3914e83fc203dc))(name, modestr);
 }
+inline void TVPSetDefaultReadEncoding(const ttstr & encoding)
+{
+	if(!TVPImportFuncPtrf2de531a016173057ff3540e47fed4e6)
+	{
+		static char funcname[] = "void ::TVPSetDefaultReadEncoding(const ttstr &)";
+		TVPImportFuncPtrf2de531a016173057ff3540e47fed4e6 = TVPGetImportFuncPtr(funcname);
+	}
+	typedef void (__stdcall * __functype)(const ttstr &);
+	((__functype)(TVPImportFuncPtrf2de531a016173057ff3540e47fed4e6))(encoding);
+}
+inline const tjs_char * TVPGetDefaultReadEncoding()
+{
+	if(!TVPImportFuncPtr4224a9066d8d13d6d7e12f1ace6a5beb)
+	{
+		static char funcname[] = "const tjs_char * ::TVPGetDefaultReadEncoding()";
+		TVPImportFuncPtr4224a9066d8d13d6d7e12f1ace6a5beb = TVPGetImportFuncPtr(funcname);
+	}
+	typedef const tjs_char * (__stdcall * __functype)();
+	return ((__functype)(TVPImportFuncPtr4224a9066d8d13d6d7e12f1ace6a5beb))();
+}
 inline tjs_int TVPWideCharToUtf8String(const tjs_char * in , char * out)
 {
 	if(!TVPImportFuncPtr900476efbc2031e643c042ca8e63a3d7)
@@ -8146,65 +8184,25 @@ inline void TVPDeleteAcceleratorKeyTable(HWND hWnd)
 	typedef void (__stdcall * __functype)(HWND);
 	((__functype)(TVPImportFuncPtr4564a3ce5cf48cb47e63a3948cef03be))(hWnd);
 }
-inline void TVPEnsureDirectDrawObject()
+inline void TVPEnsureDirect3DObject()
 {
-	if(!TVPImportFuncPtr678c2b211f8d8f661f6fdd95c52fbaa8)
+	if(!TVPImportFuncPtrbee2775f2e4042043b7cb08056d2ae5c)
 	{
-		static char funcname[] = "void ::TVPEnsureDirectDrawObject()";
-		TVPImportFuncPtr678c2b211f8d8f661f6fdd95c52fbaa8 = TVPGetImportFuncPtr(funcname);
+		static char funcname[] = "void ::TVPEnsureDirect3DObject()";
+		TVPImportFuncPtrbee2775f2e4042043b7cb08056d2ae5c = TVPGetImportFuncPtr(funcname);
 	}
 	typedef void (__stdcall * __functype)();
-	((__functype)(TVPImportFuncPtr678c2b211f8d8f661f6fdd95c52fbaa8))();
+	((__functype)(TVPImportFuncPtrbee2775f2e4042043b7cb08056d2ae5c))();
 }
-inline IDirectDraw2 * TVPGetDirectDrawObjectNoAddRef()
+inline IDirect3D9 * TVPGetDirect3DObjectNoAddRef()
 {
-	if(!TVPImportFuncPtr9ec5b02d14238454101dad083b5dfc3b)
+	if(!TVPImportFuncPtr5fd8dfd2816a2cfd4a51cab41053d575)
 	{
-		static char funcname[] = "IDirectDraw2 * ::TVPGetDirectDrawObjectNoAddRef()";
-		TVPImportFuncPtr9ec5b02d14238454101dad083b5dfc3b = TVPGetImportFuncPtr(funcname);
+		static char funcname[] = "IDirect3D9 * ::TVPGetDirect3DObjectNoAddRef()";
+		TVPImportFuncPtr5fd8dfd2816a2cfd4a51cab41053d575 = TVPGetImportFuncPtr(funcname);
 	}
-	typedef IDirectDraw2 * (__stdcall * __functype)();
-	return ((__functype)(TVPImportFuncPtr9ec5b02d14238454101dad083b5dfc3b))();
-}
-inline IDirectDraw7 * TVPGetDirectDraw7ObjectNoAddRef()
-{
-	if(!TVPImportFuncPtr471b3daf08ed9b828679d0dae78250ed)
-	{
-		static char funcname[] = "IDirectDraw7 * ::TVPGetDirectDraw7ObjectNoAddRef()";
-		TVPImportFuncPtr471b3daf08ed9b828679d0dae78250ed = TVPGetImportFuncPtr(funcname);
-	}
-	typedef IDirectDraw7 * (__stdcall * __functype)();
-	return ((__functype)(TVPImportFuncPtr471b3daf08ed9b828679d0dae78250ed))();
-}
-inline IDirectDrawSurface * TVPGetDDPrimarySurfaceNoAddRef()
-{
-	if(!TVPImportFuncPtrd0bb2c604ee6f0bba72ddc017f6416eb)
-	{
-		static char funcname[] = "IDirectDrawSurface * ::TVPGetDDPrimarySurfaceNoAddRef()";
-		TVPImportFuncPtrd0bb2c604ee6f0bba72ddc017f6416eb = TVPGetImportFuncPtr(funcname);
-	}
-	typedef IDirectDrawSurface * (__stdcall * __functype)();
-	return ((__functype)(TVPImportFuncPtrd0bb2c604ee6f0bba72ddc017f6416eb))();
-}
-inline void TVPSetDDPrimaryClipper(IDirectDrawClipper * clipper)
-{
-	if(!TVPImportFuncPtr3ab4d4d7b57eea827e7bb7c263afb951)
-	{
-		static char funcname[] = "void ::TVPSetDDPrimaryClipper(IDirectDrawClipper *)";
-		TVPImportFuncPtr3ab4d4d7b57eea827e7bb7c263afb951 = TVPGetImportFuncPtr(funcname);
-	}
-	typedef void (__stdcall * __functype)(IDirectDrawClipper *);
-	((__functype)(TVPImportFuncPtr3ab4d4d7b57eea827e7bb7c263afb951))(clipper);
-}
-inline void TVPReleaseDDPrimarySurface()
-{
-	if(!TVPImportFuncPtrdc025d3981a832b095736a0214b98797)
-	{
-		static char funcname[] = "void ::TVPReleaseDDPrimarySurface()";
-		TVPImportFuncPtrdc025d3981a832b095736a0214b98797 = TVPGetImportFuncPtr(funcname);
-	}
-	typedef void (__stdcall * __functype)();
-	((__functype)(TVPImportFuncPtrdc025d3981a832b095736a0214b98797))();
+	typedef IDirect3D9 * (__stdcall * __functype)();
+	return ((__functype)(TVPImportFuncPtr5fd8dfd2816a2cfd4a51cab41053d575))();
 }
 inline iTVPScanLineProvider * TVPSLPLoadImage(const ttstr & name , tjs_int bpp , tjs_uint32 key , tjs_uint w , tjs_uint h)
 {

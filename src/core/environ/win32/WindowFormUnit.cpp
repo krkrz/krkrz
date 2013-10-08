@@ -142,7 +142,7 @@ void TVPInitWindowOptions()
 
 	if(TVPWindowOptionsInit) return;
 
-	bool initddraw = false;
+	//bool initd3d = false;
 
 	tTJSVariant val;
 
@@ -177,7 +177,7 @@ void TVPInitWindowOptions()
 			TVPControlImeState = false;
 	}
 
-	if(initddraw) TVPEnsureDirectDrawObject();
+	//if(initd3d) TVPEnsureDirect3DObject();
 
 	TVPWindowOptionsInit = true;
 }
@@ -733,7 +733,7 @@ void TTVPWindowForm::SetFullScreenMode( bool b ) {
 
 			// try to switch to fullscreen
 			try {
-				TVPSwitchToFullScreen( GetHandle(), desired_fs_w, desired_fs_h );
+				if(TJSNativeInstance) TVPSwitchToFullScreen( GetHandle(), desired_fs_w, desired_fs_h, TJSNativeInstance->GetDrawDevice() );
 			} catch(...) {
 				SetFullScreenMode(false);
 				return;
@@ -786,7 +786,7 @@ void TTVPWindowForm::SetFullScreenMode( bool b ) {
 			if(TVPFullScreenedWindow != this) return;
 
 			// revert from fullscreen
-			TVPRevertFromFullScreen( GetHandle() );
+			if(TJSNativeInstance) TVPRevertFromFullScreen( GetHandle(), OrgWidth, OrgHeight, TJSNativeInstance->GetDrawDevice() );
 			TVPFullScreenedWindow = NULL;
 
 			// revert zooming factor
