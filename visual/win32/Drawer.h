@@ -69,12 +69,17 @@ public:
 		const tTVPRect &cliprect) = 0;
 	virtual void EndBitmapCompletion() = 0;
 	virtual void Show() {;}
+	virtual bool WaitForVBlank( tjs_int* in_vblank, tjs_int* delayed ) { return false; }
 	virtual void SetShowUpdateRect(bool b)  { DrawUpdateRectangle = b; }
 	virtual int GetInterpolationCapability() { return 3; }
 		// bit 0 for point-on-point, bit 1 for bilinear interpolation
 
 	virtual void InitTimings() {;} // notifies begining of benchmark
 	virtual void ReportTimings() {;} // notifies end of benchmark
+
+	virtual bool SupportFullScreenChange() const { return false; }
+	virtual bool SwitchToFullScreen( HWND window, tjs_uint w, tjs_uint h, tjs_uint bpp, tjs_uint color, bool changeresolution ) { return false; }
+	virtual void RevertFromFullScreen( HWND window, tjs_uint w, tjs_uint h, tjs_uint bpp, tjs_uint color ) {}
 };
 //---------------------------------------------------------------------------
 

@@ -17,7 +17,7 @@
 #include "LayerIntf.h"
 #include "LayerManager.h"
 #include "WindowIntf.h"
-
+#include "DebugIntf.h"
 
 //---------------------------------------------------------------------------
 tTVPDrawDevice::tTVPDrawDevice()
@@ -591,7 +591,10 @@ void TJS_INTF_METHOD tTVPDrawDevice::Show()
 	// なにもしない
 }
 //---------------------------------------------------------------------------
-
+bool TJS_INTF_METHOD tTVPDrawDevice::WaitForVBlank( tjs_int* in_vblank, tjs_int* delayed )
+{
+	return false;
+}
 
 //---------------------------------------------------------------------------
 void TJS_INTF_METHOD tTVPDrawDevice::DumpLayerStructure()
@@ -609,5 +612,55 @@ void TJS_INTF_METHOD tTVPDrawDevice::DumpLayerStructure()
 void TJS_INTF_METHOD tTVPDrawDevice::SetShowUpdateRect(bool b)
 {
 	// なにもしない
+}
+//---------------------------------------------------------------------------
+bool TJS_INTF_METHOD tTVPDrawDevice::SwitchToFullScreen( HWND window, tjs_uint w, tjs_uint h, tjs_uint bpp, tjs_uint color, bool changeresolution )
+{
+	// ChangeDisplaySettings を使用したフルスクリーン化
+	bool success = false;
+	DEVMODE dm;
+	ZeroMemory(&dm, sizeof(DEVMODE));
+	dm.dmSize = sizeof(DEVMODE);
+	dm.dmPelsWidth = w;
+	dm.dmPelsHeight = h;
+	dm.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL;
+	dm.dmBitsPerPel = bpp;
+	LONG ret = ::ChangeDisplaySettings((DEVMODE*)&dm, CDS_FULLSCREEN);
+	switch(ret)
+	{
+	case DISP_CHANGE_SUCCESSFUL:
+		::SetWindowPos(window, HWND_TOP, 0, 0, w, h, SWP_SHOWWINDOW);
+		success = true;
+		break;
+	case DISP_CHANGE_RESTART:
+		TVPAddLog(TJS_W("ChangeDisplaySettings failed: DISP_CHANGE_RESTART"));
+		break;
+	case DISP_CHANGE_BADFLAGS:
+		TVPAddLog(TJS_W("ChangeDisplaySettings failed: DISP_CHANGE_BADFLAGS"));
+		break;
+	case DISP_CHANGE_BADPARAM:
+		TVPAddLog(TJS_W("ChangeDisplaySettings failed: DISP_CHANGE_BADPARAM"));
+		break;
+	case DISP_CHANGE_FAILED:
+		TVPAddLog(TJS_W("ChangeDisplaySettings failed: DISP_CHANGE_FAILED"));
+		break;
+	case DISP_CHANGE_BADMODE:
+		TVPAddLog(TJS_W("ChangeDisplaySettings failed: DISP_CHANGE_BADMODE"));
+		break;
+	case DISP_CHANGE_NOTUPDATED:
+		TVPAddLog(TJS_W("ChangeDisplaySettings failed: DISP_CHANGE_NOTUPDATED"));
+		break;
+	default:
+		TVPAddLog(TJS_W("ChangeDisplaySettings failed: unknown reason (") +
+						ttstr((tjs_int)ret) + TJS_W(")"));
+		break;
+	}
+	return success;
+}
+//---------------------------------------------------------------------------
+void TJS_INTF_METHOD tTVPDrawDevice::RevertFromFullScreen( HWND window, tjs_uint w, tjs_uint h, tjs_uint bpp, tjs_uint color )
+{
+	// ChangeDisplaySettings を使用したフルスクリーン解除
+	::ChangeDisplaySettings(NULL, 0);
 }
 //---------------------------------------------------------------------------

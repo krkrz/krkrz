@@ -369,6 +369,29 @@ public:
 	//!				差分更新の最適化に役立てるための支援機能。
 	//!				実装する必要はないが、実装することが望ましい。
 	virtual void TJS_INTF_METHOD SetShowUpdateRect(bool b) = 0;
+
+	//! @brief		(Window->DrawDevice) フルスクリーン化する
+	//! @param		window		ウィンドウハンドル
+	//! @param		w			要求する幅
+	//! @param		h			要求する高さ
+	//! @param		bpp			Bit per pixels
+	//! @param		color		16bpp の時 565 か 555を指定
+	//! @param		changeresolution	解像度変更を行うかどうか
+	virtual bool TJS_INTF_METHOD SwitchToFullScreen( HWND window, tjs_uint w, tjs_uint h, tjs_uint bpp, tjs_uint color, bool changeresolution ) = 0;
+	
+	//! @brief		(Window->DrawDevice) フルスクリーンを解除する
+	//! @param		window		ウィンドウハンドル
+	//! @param		w			要求する幅
+	//! @param		h			要求する高さ
+	//! @param		bpp			元々のBit per pixels
+	//! @param		color		16bpp の時 565 か 555を指定
+	virtual void TJS_INTF_METHOD RevertFromFullScreen( HWND window, tjs_uint w, tjs_uint h, tjs_uint bpp, tjs_uint color ) = 0;
+
+	//! @brief		(Window->DrawDevice) VBlank待ちを行う
+	//! @param		in_vblank	待たなくてもVBlank内だったかどうかを返す( !0 : 内、0: 外 )
+	//! @param		delayed		1フレーム遅延が発生したかどうかを返す( !0 : 発生、0: 発生せず )
+	//! @return		Wait可不可 true : 可能、false : 不可
+	virtual bool TJS_INTF_METHOD WaitForVBlank( tjs_int* in_vblank, tjs_int* delayed ) = 0;
 };
 //---------------------------------------------------------------------------
 /*]*/
@@ -477,10 +500,15 @@ public:
 	virtual void TJS_INTF_METHOD RequestInvalidation(const tTVPRect & rect);
 	virtual void TJS_INTF_METHOD Update();
 	virtual void TJS_INTF_METHOD Show() = 0;
+	virtual bool TJS_INTF_METHOD WaitForVBlank( tjs_int* in_vblank, tjs_int* delayed );
 
 //---- デバッグ支援
 	virtual void TJS_INTF_METHOD DumpLayerStructure();
 	virtual void TJS_INTF_METHOD SetShowUpdateRect(bool b);
+
+//---- フルスクリーン
+	virtual bool TJS_INTF_METHOD SwitchToFullScreen( HWND window, tjs_uint w, tjs_uint h, tjs_uint bpp, tjs_uint color, bool changeresolution );
+	virtual void TJS_INTF_METHOD RevertFromFullScreen( HWND window, tjs_uint w, tjs_uint h, tjs_uint bpp, tjs_uint color );
 
 // ほかのメソッドについては実装しない
 };

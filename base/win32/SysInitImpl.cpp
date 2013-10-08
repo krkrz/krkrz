@@ -1303,7 +1303,7 @@ void TVPTerminateAsync(int code)
 	TVPTerminated = true;
 	TVPTerminateCode = code;
 
-	// posting dummy message will prevent "missing WM_QUIT bug" in DirectDraw framework.
+	// posting dummy message will prevent "missing WM_QUIT bug" in Direct3D framework.
 	if(TVPMainForm) TVPMainForm->CallDeliverAllEventsOnIdle();
 
 	Application->Terminate();

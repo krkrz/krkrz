@@ -26,7 +26,7 @@
 // Window List Management
 //---------------------------------------------------------------------------
 extern void TVPClearAllWindowInputEvents();
-extern void TVPDeliverDrawDeviceShow();
+extern bool TVPIsWaitVSync();
 //---------------------------------------------------------------------------
 
 
@@ -262,6 +262,14 @@ public:
 	void RegisterVideoOverlayObject(tTJSNI_BaseVideoOverlay *ovl);
 	void UnregisterVideoOverlayObject(tTJSNI_BaseVideoOverlay *ovl);
 
+	//----- vsync
+protected:
+	bool WaitVSync;
+	virtual void UpdateVSyncThread() = 0;
+
+public:
+	void SetWaitVSync( bool enable );
+	bool GetWaitVSync() const;
 };
 //---------------------------------------------------------------------------
 

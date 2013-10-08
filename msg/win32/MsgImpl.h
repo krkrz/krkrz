@@ -105,8 +105,8 @@ TVP_MSG_DECL(TVPInvalidLoopInformation,
 TVP_MSG_DECL(TVPNotChildMenuItem,
 	TJS_W("指定されたメニュー項目はこのメニュー項目の子ではありません"));
 
-TVP_MSG_DECL(TVPCannotInitDirectDraw,
-	TJS_W("DirectDraw を初期化できません : %1"));
+TVP_MSG_DECL(TVPCannotInitDirect3D,
+	TJS_W("Direct3D を初期化できません : %1"));
 
 TVP_MSG_DECL(TVPCannotFindDisplayMode,
 	TJS_W("適合する画面モードが見つかりません : %1"));
