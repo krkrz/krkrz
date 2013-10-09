@@ -11,14 +11,8 @@
 #include "tjsCommHead.h"
 
 #include "CharacterSet.h"
+#include "MsgIntf.h"
 //---------------------------------------------------------------------------
-#ifdef _MSC_VER
-// シフト回数多すぎ警告を抑制
-// 16ビット以上の値はサロゲートペア考慮しない場合は存在しないはずだがオリジナルのまま
-// の処理にしておく
-#pragma warning(push)
-#pragma warning(disable:4333)
-#endif
 static tjs_int inline TVPWideCharToUtf8(tjs_char in, char * out)
 {
 	// convert a wide character 'in' to utf-8 character 'out'
@@ -49,6 +43,13 @@ static tjs_int inline TVPWideCharToUtf8(tjs_char in, char * out)
 		}
 		return 3;
 	}
+#if 1
+	else
+	{
+		TVPThrowExceptionMessage(TJS_W("UTF-16では発生し得ないUTF-8への変換"));
+	}
+#else
+	// 以下オリジナルのコードだけど、通らないはず。
 	else if(in < (1<<21))
 	{
 		if(out)
@@ -85,12 +86,9 @@ static tjs_int inline TVPWideCharToUtf8(tjs_char in, char * out)
 		}
 		return 6;
 	}
-
+#endif
 	return -1;
 }
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 //---------------------------------------------------------------------------
 tjs_int TVPWideCharToUtf8String(const tjs_char *in, char * out)
 {
