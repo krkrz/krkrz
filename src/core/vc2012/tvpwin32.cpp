@@ -8,8 +8,8 @@
 
 // グローバル変数:
 HINSTANCE hInst;								// 現在のインターフェイス
-TCHAR szTitle[MAX_LOADSTRING];					// タイトル バーのテキスト
-TCHAR szWindowClass[MAX_LOADSTRING];			// メイン ウィンドウ クラス名
+wchar_t szTitle[MAX_LOADSTRING];					// タイトル バーのテキスト
+wchar_t szWindowClass[MAX_LOADSTRING];			// メイン ウィンドウ クラス名
 
 // このコード モジュールに含まれる関数の宣言を転送します:
 ATOM				MyRegisterClass(HINSTANCE hInstance);

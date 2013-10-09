@@ -210,7 +210,7 @@ static void TJSUninitStringHeap(void)
 				{
 					// using cell
 					char buf[1024];
-					sprintf(buf, "%p:%ls", h + i,
+					TJS_nsprintf(buf, "%p:%ls", h + i,
 						h[i].LongString?h[i].LongString:h[i].ShortString);
 					OutputDebugString(buf);
 				}

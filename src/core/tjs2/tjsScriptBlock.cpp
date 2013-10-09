@@ -278,34 +278,34 @@ void tTJSScriptBlock::SetText(tTJSVariant *result, const tjs_char *text,
 
 		{
 			char buf[256];
-			sprintf(buf, "parsing : %d", parsetime);
+			TJS_nsprintf(buf, "parsing : %d", parsetime);
 			OutputDebugString(buf);
 			if(parsetime)
 			{
-			sprintf(buf, "Commit : %d (%d%%)", time_Commit, time_Commit*100/parsetime);
+			TJS_nsprintf(buf, "Commit : %d (%d%%)", time_Commit, time_Commit*100/parsetime);
 			OutputDebugString(buf);
-			sprintf(buf, "yylex : %d (%d%%)", time_yylex, time_yylex*100/parsetime);
+			TJS_nsprintf(buf, "yylex : %d (%d%%)", time_yylex, time_yylex*100/parsetime);
 			OutputDebugString(buf);
-			sprintf(buf, "MakeNP : %d (%d%%)", time_make_np, time_make_np*100/parsetime);
+			TJS_nsprintf(buf, "MakeNP : %d (%d%%)", time_make_np, time_make_np*100/parsetime);
 			OutputDebugString(buf);
-			sprintf(buf, "GenNodeCode : %d (%d%%)", time_GenNodeCode, time_GenNodeCode*100/parsetime);
+			TJS_nsprintf(buf, "GenNodeCode : %d (%d%%)", time_GenNodeCode, time_GenNodeCode*100/parsetime);
 			OutputDebugString(buf);
-			sprintf(buf, "  PutCode : %d (%d%%)", time_PutCode, time_PutCode*100/parsetime);
+			TJS_nsprintf(buf, "  PutCode : %d (%d%%)", time_PutCode, time_PutCode*100/parsetime);
 			OutputDebugString(buf);
-			sprintf(buf, "  PutData : %d (%d%%)", time_PutData, time_PutData*100/parsetime);
+			TJS_nsprintf(buf, "  PutData : %d (%d%%)", time_PutData, time_PutData*100/parsetime);
 			OutputDebugString(buf);
-			sprintf(buf, "  this_proxy : %d (%d%%)", time_this_proxy, time_this_proxy*100/parsetime);
+			TJS_nsprintf(buf, "  this_proxy : %d (%d%%)", time_this_proxy, time_this_proxy*100/parsetime);
 			OutputDebugString(buf);
 
-			sprintf(buf, "ns::Push : %d (%d%%)", time_ns_Push, time_ns_Push*100/parsetime);
+			TJS_nsprintf(buf, "ns::Push : %d (%d%%)", time_ns_Push, time_ns_Push*100/parsetime);
 			OutputDebugString(buf);
-			sprintf(buf, "ns::Pop : %d (%d%%)", time_ns_Pop, time_ns_Pop*100/parsetime);
+			TJS_nsprintf(buf, "ns::Pop : %d (%d%%)", time_ns_Pop, time_ns_Pop*100/parsetime);
 			OutputDebugString(buf);
-			sprintf(buf, "ns::Find : %d (%d%%)", time_ns_Find, time_ns_Find*100/parsetime);
+			TJS_nsprintf(buf, "ns::Find : %d (%d%%)", time_ns_Find, time_ns_Find*100/parsetime);
 			OutputDebugString(buf);
-			sprintf(buf, "ns::Remove : %d (%d%%)", time_ns_Remove, time_ns_Remove*100/parsetime);
+			TJS_nsprintf(buf, "ns::Remove : %d (%d%%)", time_ns_Remove, time_ns_Remove*100/parsetime);
 			OutputDebugString(buf);
-			sprintf(buf, "ns::Commit : %d (%d%%)", time_ns_Commit, time_ns_Commit*100/parsetime);
+			TJS_nsprintf(buf, "ns::Commit : %d (%d%%)", time_ns_Commit, time_ns_Commit*100/parsetime);
 			OutputDebugString(buf);
 
 			}

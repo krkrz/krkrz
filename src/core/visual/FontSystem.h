@@ -40,7 +40,7 @@ class FontSystem {
 	bool FontNamesInit;
 	tTJSHashTable<std::wstring, tjs_int, tTVPWStringHash> TVPFontNames;
 
-	static const TCHAR * const TVPDefaultFontName;
+	static const wchar_t * const TVPDefaultFontName;
 	tTVPFont DefaultFont;
 	bool DefaultLOGFONTCreated;
 

@@ -276,7 +276,7 @@ ttstr TVPGetTemporaryName()
 
 		if(!TVPTempPathInit)
 		{
-			TCHAR tmp[MAX_PATH+1];
+			wchar_t tmp[MAX_PATH+1];
 			::GetTempPath(MAX_PATH, tmp);
 			TVPTempPath = tmp;
 
@@ -1084,18 +1084,18 @@ ttstr TVPSearchCD(const ttstr & name)
 	// search CD which has specified volume label name.
 	// return drive letter ( such as 'A' or 'B' )
 	// return empty string if not found.
-	tstring narrow_name = name.AsStdString();
+	std::wstring narrow_name = name.AsStdString();
 
-	TCHAR dr[4];
-	for(dr[0]=_T('A'),dr[1]=_T(':'),dr[2]=_T('\\'),dr[3]=0;dr[0]<=_T('Z');dr[0]++)
+	wchar_t dr[4];
+	for(dr[0]=L'A',dr[1]=L':',dr[2]=L'\\',dr[3]=0;dr[0]<=L'Z';dr[0]++)
 	{
 		if(::GetDriveType(dr) == DRIVE_CDROM)
 		{
-			TCHAR vlabel[256];
-			TCHAR fs[256];
+			wchar_t vlabel[256];
+			wchar_t fs[256];
 			DWORD mcl = 0,sfs = 0;
 			GetVolumeInformation(dr, vlabel, 255, NULL, &mcl, &sfs, fs, 255);
-			if( icomp(tstring(vlabel),narrow_name) )
+			if( icomp(std::wstring(vlabel),narrow_name) )
 			//if(std::string(vlabel).AnsiCompareIC(narrow_name)==0)
 				return ttstr((tjs_char)dr[0]);
 		}

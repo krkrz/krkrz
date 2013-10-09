@@ -36,7 +36,7 @@ public:
 		logfont.lfHeight = -12;
 		logfont.lfWidth = 0;
 		logfont.lfCharSet = SHIFTJIS_CHARSET;
-		_tcsncpy_s( logfont.lfFaceName, LF_FACESIZE, _T("‚l‚r ‚oƒSƒVƒbƒN"), LF_FACESIZE );
+		TJS_strncpy_s( logfont.lfFaceName, LF_FACESIZE, L"‚l‚r ‚oƒSƒVƒbƒN", LF_FACESIZE );
 		logfont.lfItalic = FALSE;
 		logfont.lfUnderline = FALSE;
 		logfont.lfStrikeOut = FALSE;
@@ -71,7 +71,7 @@ public:
 		LogFont.lfQuality = DEFAULT_QUALITY;
 		LogFont.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
 		std::wstring face = TVPFontSystem->GetBeingFont(font.Face.AsStdString());
-		wcsncpy_s(LogFont.lfFaceName, LF_FACESIZE, face.c_str(), LF_FACESIZE -1);
+		TJS_strncpy_s(LogFont.lfFaceName, LF_FACESIZE, face.c_str(), LF_FACESIZE -1);
 		LogFont.lfFaceName[LF_FACESIZE-1] = 0;
 
 		ApplyFont( &LogFont );
@@ -116,7 +116,7 @@ public:
 		LogFont.lfQuality = DEFAULT_QUALITY;
 		LogFont.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
 		std::wstring face = TVPFontSystem->GetBeingFont(font.Face.AsStdString());
-		wcsncpy_s(LogFont.lfFaceName, LF_FACESIZE, face.c_str(), LF_FACESIZE -1);
+		TJS_strncpy_s(LogFont.lfFaceName, LF_FACESIZE, face.c_str(), LF_FACESIZE -1);
 		LogFont.lfFaceName[LF_FACESIZE-1] = 0;
 		ApplyFont( &LogFont );
 	}
