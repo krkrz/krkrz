@@ -329,7 +329,7 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 void tTVPWindow::OnPaint() {
 }
 const DWORD tTVPWindow::DEFAULT_EX_STYLE = WS_EX_ACCEPTFILES | WS_EX_APPWINDOW;
-HRESULT tTVPWindow::CreateWnd( const tstring& classname, const tstring& title, int width, int height )
+HRESULT tTVPWindow::CreateWnd( const std::wstring& classname, const std::wstring& title, int width, int height )
 {
 	window_class_name_ = classname;
 	window_title_ = title;
@@ -398,7 +398,7 @@ void tTVPWindow::UnregisterWindow() {
 	::UnregisterClass( window_class_name_.c_str(), wc_.hInstance );
 }
 
-void tTVPWindow::SetWidnowTitle( const tstring& title ) {
+void tTVPWindow::SetWidnowTitle( const std::wstring& title ) {
 	if( window_title_ != title ) {
 		window_title_ = title;
 		if( window_handle_ ) {
@@ -498,11 +498,11 @@ void tTVPWindow::SetEnable( bool s ) {
 	::EnableWindow( GetHandle(), s ? TRUE : FALSE );
 }
 
-void tTVPWindow::GetCaption( tstring& v ) const {
+void tTVPWindow::GetCaption( std::wstring& v ) const {
 	v.clear();
 	int len = ::GetWindowTextLength( GetHandle() );
 	if( len > 0 ) {
-		std::vector<TCHAR> caption(len+1,0);
+		std::vector<wchar_t> caption(len+1,0);
 		int readlen = ::GetWindowText( GetHandle(), &(caption[0]), len+1 );
 		if( readlen > 0 ) {
 			v.assign( &(caption[0]) );
@@ -512,7 +512,7 @@ void tTVPWindow::GetCaption( tstring& v ) const {
 // “à•”‚Å‚Á‚Ä‚¢‚é‚Ì‚æ‚è‚àA‚¿‚á‚ñ‚Æ–ˆ‰ñæ“¾‚µ‚½•û‚ª‚¢‚¢‚©
 //	v = window_title_;
 }
-void tTVPWindow::SetCaption( const tstring& v ) {
+void tTVPWindow::SetCaption( const std::wstring& v ) {
 	if( window_title_ != v ) {
 		window_title_ = v;
 		::SetWindowText( GetHandle(), window_title_.c_str() );
@@ -793,7 +793,7 @@ void tTVPWindow::GetClientRect( struct tTVPRect& rt ) {
 
 int tTVPWindow::ShowModal() {
 	if( GetVisible() || !GetEnable() ) {
-		throw Exception(_T("Cannot Show Modal."));
+		throw Exception(TJS_W("Cannot Show Modal."));
 	}
 	if( ::GetCapture() != 0 ) {
 		::SendMessage( ::GetCapture(), WM_CANCELMODE, 0, 0 );

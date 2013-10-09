@@ -347,7 +347,7 @@ void tTVPPassThroughDrawDevice::CreateDrawer(bool zoom_required, bool should_ben
 				// 結果を格納、それとデバッグ用に表示
 				results[i].score = count * 1000 / (float)(end_tick - start_tick);
 				char msg[80];
-				sprintf(msg, "%.2f fps", (float)results[i].score);
+				TJS_nsprintf(msg, "%.2f fps", (float)results[i].score);
 				TVPAddImportantLog(TJS_W("Passthrough: benchmark result: ") + ttstr(type_names[i]) + TJS_W(" : ") +
 					msg);
 

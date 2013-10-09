@@ -5,7 +5,7 @@
 
 extern void TVPGetAllFontList( std::vector<std::wstring>& list );
 
-const TCHAR * const FontSystem::TVPDefaultFontName = _T("‚l‚r ‚oƒSƒVƒbƒN"); // TODO: i18n
+const wchar_t * const FontSystem::TVPDefaultFontName = TJS_W("‚l‚r ‚oƒSƒVƒbƒN"); // TODO: i18n
 
 void FontSystem::InitFontNames() {
 	// enumlate all fonts
@@ -70,7 +70,7 @@ std::wstring FontSystem::GetBeingFont(std::wstring fonts) {
 
 	bool vfont;
 
-	if(fonts.c_str()[0] == '@') {     // for vertical writing
+	if(fonts.c_str()[0] == TJS_W('@')) {     // for vertical writing
 		fonts = fonts.c_str() + 1;
 		vfont = true;
 	} else {
@@ -78,33 +78,33 @@ std::wstring FontSystem::GetBeingFont(std::wstring fonts) {
 	}
 
 	bool prev_empty_name = false;
-	while(fonts!=_T("")) {
+	while(fonts!=TJS_W("")) {
 		std::wstring fontname;
-		int pos = fonts.find_first_of(_T(","));
+		int pos = fonts.find_first_of(TJS_W(","));
 		if( pos != std::string::npos ) {
 			fontname = Trim( fonts.substr( 0, pos) );
 			fonts = fonts.c_str()+pos;
 		} else {
 			fontname = Trim(fonts);
-			fonts=_T("");
+			fonts=TJS_W("");
 		}
 
 		// no existing check if previously specified font candidate is empty
 		// eg. ",Fontname"
 
-		if(fontname != _T("") && (prev_empty_name || FontExists(fontname) ) ) {
-			if(vfont && fontname.c_str()[0] != '@') {
-				return  _T("@") + fontname;
+		if(fontname != TJS_W("") && (prev_empty_name || FontExists(fontname) ) ) {
+			if(vfont && fontname.c_str()[0] != TJS_W('@')) {
+				return  TJS_W("@") + fontname;
 			} else {
 				return fontname;
 			}
 		}
 
-		prev_empty_name = (fontname == _T(""));
+		prev_empty_name = (fontname == TJS_W(""));
 	}
 
 	if(vfont) {
-		return std::wstring(_T("@")) + TVPDefaultFontName;
+		return std::wstring(TJS_W("@")) + TVPDefaultFontName;
 	} else {
 		return TVPDefaultFontName;
 	}

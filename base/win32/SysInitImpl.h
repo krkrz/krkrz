@@ -20,8 +20,8 @@ extern void TVPInitializeBaseSystems();
 extern AnsiString TVPNativeProjectDir;
 extern AnsiString TVPNativeDataPath;
 */
-extern tstring TVPNativeProjectDir;
-extern tstring TVPNativeDataPath;
+extern std::wstring TVPNativeProjectDir;
+extern std::wstring TVPNativeDataPath;
 
 extern bool TVPProjectDirSelected;
 extern bool TVPSystemIsBasedOnNT;

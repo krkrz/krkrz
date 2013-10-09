@@ -47,10 +47,10 @@ tstring ParamStr( int index ) {
 	}
 }
 #endif
-tstring ExePath() {
-	TCHAR szFull[_MAX_PATH];
-	::GetModuleFileName(NULL, szFull, sizeof(szFull) / sizeof(TCHAR));
-	return tstring(szFull);
+std::wstring ExePath() {
+	wchar_t szFull[_MAX_PATH];
+	::GetModuleFileName(NULL, szFull, sizeof(szFull) / sizeof(wchar_t));
+	return std::wstring(szFull);
 }
 
 bool TVPCheckCmdDescription();
@@ -211,7 +211,7 @@ int APIENTRY WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
 		if(TVPCheckAbout()) return 0; // version information dialog box;
 
-		Application->SetTitle( _T("吉里吉里") );
+		Application->SetTitle( L"吉里吉里" );
 		// Application->CreateForm(__classid(TTVPMainForm), &TVPMainForm);
 		TVPMainForm = new TTVPMainForm();
 
@@ -244,7 +244,7 @@ int APIENTRY WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		if(!TVPSystemUninitCalled)
 			Application->ShowException(&Exception(e.GetMessage().AsStdString()));
 	} catch(...) {
-		Application->ShowException(&Exception(_T("Unknown error!")));
+		Application->ShowException(&Exception(L"Unknown error!"));
 	}
 
 	if(engine_init) TVPUninitScriptEngine();
@@ -270,9 +270,9 @@ void TApplication::CheckConsole() {
 		_wfreopen_s( &oldstdout_, L"CON", L"w", stdout);    // 標準出力の割り当て
 		is_attach_console_ = true;
 
-		TCHAR console[256];
+		wchar_t console[256];
 		::GetConsoleTitle( console, 256 );
-		console_title_ = tstring( console );
+		console_title_ = std::wstring( console );
 
 		//printf( __argv[0] );
 		printf("\n");
@@ -322,7 +322,7 @@ void TApplication::BringToFront() {
 	}
 }
 void TApplication::ShowException( class Exception* e ) {
-	::MessageBox( NULL, e->what(), _T("致命的なエラー"), MB_OK );
+	::MessageBox( NULL, e->what(), L"致命的なエラー", MB_OK );
 }
 void TApplication::Run() {
 	MSG msg;
@@ -402,7 +402,7 @@ void TApplication::HandleMessage() {
 		// 本来はIdle 処理が入っているけど、ここでは行わない
 	}
 }
-void TApplication::SetTitle( const tstring& caption ) {
+void TApplication::SetTitle( const std::wstring& caption ) {
 	title_ = caption;
 	if( windows_list_.size() > 0 ) {
 		windows_list_[0]->SetCaption( caption );
@@ -468,32 +468,32 @@ void TApplication::CheckDigitizer() {
 	int value = ::GetSystemMetrics(SM_DIGITIZER);
 	if( value == 0 ) return;
 
-	TVPAddLog(_T("Enable Digitizer"));
+	TVPAddLog(TJS_W("Enable Digitizer"));
 	if( value & NID_INTEGRATED_TOUCH ) {
-		TVPAddLog(_T("統合型のタッチ デジタイザーが入力に使用されています。"));
+		TVPAddLog(TJS_W("統合型のタッチ デジタイザーが入力に使用されています。"));
 	}
 	if( value & NID_EXTERNAL_TOUCH ) {
-		TVPAddLog(_T("外付けのタッチ デジタイザーが入力に使用されています。"));
+		TVPAddLog(TJS_W("外付けのタッチ デジタイザーが入力に使用されています。"));
 	}
 	if( value & NID_INTEGRATED_PEN ) {
-		TVPAddLog(_T("統合型のペン デジタイザーが入力に使用されています。"));
+		TVPAddLog(TJS_W("統合型のペン デジタイザーが入力に使用されています。"));
 	}
 	if( value & NID_EXTERNAL_PEN ) {
-		TVPAddLog(_T("外付けのペン デジタイザーが入力に使用されています。"));
+		TVPAddLog(TJS_W("外付けのペン デジタイザーが入力に使用されています。"));
 	}
 	if( value & NID_MULTI_INPUT ) {
-		TVPAddLog(_T("複数入力がサポートされた入力デジタイザーが入力に使用されています。"));
+		TVPAddLog(TJS_W("複数入力がサポートされた入力デジタイザーが入力に使用されています。"));
 	}
 	if( value & NID_READY ) {
-		TVPAddLog(_T("入力デジタイザーで入力の準備ができています。"));
+		TVPAddLog(TJS_W("入力デジタイザーで入力の準備ができています。"));
 	}
 }
 /**
  仮実装 TODO
 */
-std::vector<std::string>* LoadLinesFromFile( const tstring& path ) {
+std::vector<std::string>* LoadLinesFromFile( const std::wstring& path ) {
 	FILE *fp = NULL;
-	_tfopen_s( &fp, path.c_str(), _T("r"));
+	_wfopen_s( &fp, path.c_str(), L"r");
     if( fp == NULL ) {
 		return NULL;
     }

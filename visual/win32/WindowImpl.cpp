@@ -293,7 +293,7 @@ void TVPDumpDirect3DDriverInformation()
 					// driver version(reported)
 					log = infostart + TJS_W("Driver version (reported) : ");
 					wchar_t tmp[256];
-					wsprintf( tmp, L"%d.%02d.%02d.%04d ",
+					TJS_snprintf( tmp, 256, L"%d.%02d.%02d.%04d ",
 							  HIWORD( D3DID.DriverVersion.HighPart ),
 							  LOWORD( D3DID.DriverVersion.HighPart ),
 							  HIWORD( D3DID.DriverVersion.LowPart  ),
@@ -311,7 +311,7 @@ void TVPDumpDirect3DDriverInformation()
 					{
 						wchar_t syspath[1024];
 						GetSystemDirectory(syspath, 1023);
-						wcscat(syspath, L"\\drivers"); // SystemDir\drivers
+						TJS_strcat(syspath, L"\\drivers"); // SystemDir\drivers
 						success = 0!=SearchPath(syspath, driverName.c_str(), NULL, 1023, driverpath, &driverpath_filename);
 					}
 
@@ -319,7 +319,7 @@ void TVPDumpDirect3DDriverInformation()
 					{
 						wchar_t syspath[1024];
 						GetWindowsDirectory(syspath, 1023);
-						wcscat(syspath, L"\\system32"); // WinDir\system32
+						TJS_strcat(syspath, L"\\system32"); // WinDir\system32
 						success = 0!=SearchPath(syspath, driverName.c_str(), NULL, 1023, driverpath, &driverpath_filename);
 					}
 
@@ -327,7 +327,7 @@ void TVPDumpDirect3DDriverInformation()
 					{
 						wchar_t syspath[1024];
 						GetWindowsDirectory(syspath, 1023);
-						wcscat(syspath, L"\\system32\\drivers"); // WinDir\system32\drivers
+						TJS_strcat(syspath, L"\\system32\\drivers"); // WinDir\system32\drivers
 						success = 0!=SearchPath(syspath, driverName.c_str(), NULL, 1023, driverpath, &driverpath_filename);
 					}
 
@@ -337,7 +337,7 @@ void TVPDumpDirect3DDriverInformation()
 						tjs_int major, minor, release, build;
 						if(TVPGetFileVersionOf(driverpath, major, minor, release, build))
 						{
-							wsprintf(tmp, L"%d.%d.%d.%d", (int)major, (int)minor, (int)release, (int)build);
+							TJS_snprintf(tmp, 256, L"%d.%d.%d.%d", (int)major, (int)minor, (int)release, (int)build);
 							log += tmp;
 						}
 						else
@@ -353,14 +353,14 @@ void TVPDumpDirect3DDriverInformation()
 					TVPAddImportantLog(log);
 
 					// device id
-					wsprintf(tmp, L"VendorId:%08X  DeviceId:%08X  SubSysId:%08X  Revision:%08X",
+					TJS_snprintf(tmp, 256, L"VendorId:%08X  DeviceId:%08X  SubSysId:%08X  Revision:%08X",
 						D3DID.VendorId, D3DID.DeviceId, D3DID.SubSysId, D3DID.Revision);
 					log = infostart + TJS_W("Device ids : ") + tmp;
 					TVPAddImportantLog(log);
 
 					// Device GUID
 					GUID *pguid = &D3DID.DeviceIdentifier;
-					wsprintf( tmp, L"%08X-%04X-%04X-%02X%02X%02X%02X%02X%02X%02X%02X",
+					TJS_snprintf( tmp, 256, L"%08X-%04X-%04X-%02X%02X%02X%02X%02X%02X%02X%02X",
 							  pguid->Data1,
 							  pguid->Data2,
 							  pguid->Data3,
@@ -370,7 +370,7 @@ void TVPDumpDirect3DDriverInformation()
 					TVPAddImportantLog(log);
 
 					// WHQL level
-					wsprintf(tmp, L"%08x", D3DID.WHQLLevel);
+					TJS_snprintf(tmp, 256, L"%08x", D3DID.WHQLLevel);
 					log = infostart + TJS_W("WHQL level : ")  + tmp;
 					TVPAddImportantLog(log);
 				} else {

@@ -659,7 +659,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/system)
 
 	ttstr target = *param[0];
 
-	int ret = _tsystem(target.c_str());
+	int ret = _wsystem(target.c_str());
 
 	TVPDeliverCompactEvent(TVP_COMPACT_LEVEL_MAX); // this should clear all caches
 

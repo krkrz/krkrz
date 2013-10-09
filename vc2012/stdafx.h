@@ -15,7 +15,6 @@
 #include <stdlib.h>
 #include <malloc.h>
 #include <memory.h>
-#include <tchar.h>
 
 
 // TODO: プログラムに必要な追加ヘッダーをここで参照してください。

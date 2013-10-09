@@ -13,7 +13,6 @@
 
 #include "tjsNative.h"
 #include "tjsHashSearch.h"
-#include "tstring.h"
 #include <vector>
 
 //---------------------------------------------------------------------------

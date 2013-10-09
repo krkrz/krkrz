@@ -71,7 +71,7 @@ tNativeFreeTypeFace::tNativeFreeTypeFace(const std::wstring &fontname,
 		l.lfOutPrecision = OUT_DEFAULT_PRECIS;
 		l.lfQuality = DEFAULT_QUALITY;
 		l.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
-		_tcscpy( l.lfFaceName, fontname.c_str() );
+		TJS_strcpy( l.lfFaceName, fontname.c_str() );
 		l.lfFaceName[LF_FACESIZE-1] = TJS_W('\0');
 
 		HFONT newfont = CreateFontIndirect(&l);
