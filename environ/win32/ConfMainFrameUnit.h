@@ -5,51 +5,50 @@
 #include <windows.h>
 #include <shlobj.h>
 #include "FileCtrl.h"
-#include "tstring.h"
 
 class TConfMainFrame {
 public:
-	static tstring GetSpecialFolderPath(int csidl) {
-		TCHAR path[MAX_PATH+1];
+	static std::wstring GetSpecialFolderPath(int csidl) {
+		wchar_t path[MAX_PATH+1];
 		if(!SHGetSpecialFolderPath(NULL, path, csidl, false))
-			return tstring();
-		return tstring(path);
+			return std::wstring();
+		return std::wstring(path);
 	}
-	static inline tstring GetPersonalPath() {
-		tstring path = GetSpecialFolderPath(CSIDL_PERSONAL);
+	static inline std::wstring GetPersonalPath() {
+		std::wstring path = GetSpecialFolderPath(CSIDL_PERSONAL);
 		if( path.empty() ) path = GetSpecialFolderPath(CSIDL_APPDATA);
 
-		if(path != _T("")) {
+		if(path != L"") {
 			return path;
 		}
-		return _T("");
+		return L"";
 	}
-	static inline tstring GetAppDataPath() {
-		tstring path = GetSpecialFolderPath(CSIDL_APPDATA);
-		if(path != _T("") ) {
+	static inline std::wstring GetAppDataPath() {
+		std::wstring path = GetSpecialFolderPath(CSIDL_APPDATA);
+		if(path != L"" ) {
 			return path;
 		}
-		return _T("");
+		return L"";
 	}
-	static inline tstring ReplaceStringAll( tstring src, const tstring& target, const tstring& dest ) {
+	static inline std::wstring ReplaceStringAll( std::wstring src, const std::wstring& target, const std::wstring& dest ) {
 		int nPos = 0;
-		while( (nPos = src.find(target, nPos)) != tstring::npos ) {
+		while( (nPos = src.find(target, nPos)) != std::wstring::npos ) {
 			src.replace( nPos, target.length(), dest );
 		}
 		return src;
 	}
 
-	static inline tstring GetConfigFileName( const tstring& exename ) {
-		return ChangeFileExt(exename, _T(".cf"));
+	static inline std::wstring GetConfigFileName( const std::wstring& exename ) {
+		return ChangeFileExt(exename, L".cf");
 	}
-	static tstring GetDataPathDirectory( tstring datapath, const tstring& exename ) {
-		if(datapath == _T("") ) datapath = tstring(_T("$(exepath)\\savedata"));
+	static std::wstring GetDataPathDirectory( std::wstring datapath, const std::wstring& exename ) {
+		if(datapath == L"" ) datapath = std::wstring(L"$(exepath)\\savedata");
 
-		tstring exepath = ExcludeTrailingBackslash(ExtractFileDir(exename));
-		tstring personalpath = ExcludeTrailingBackslash(GetPersonalPath());
-		tstring appdatapath = ExcludeTrailingBackslash(GetAppDataPath());
-		if(personalpath == _T("")) personalpath = exepath;
-		if(appdatapath == _T("")) appdatapath = exepath;
+		std::wstring exepath = ExcludeTrailingBackslash(ExtractFileDir(exename));
+		std::wstring personalpath = ExcludeTrailingBackslash(GetPersonalPath());
+		std::wstring appdatapath = ExcludeTrailingBackslash(GetAppDataPath());
+		if(personalpath == L"") personalpath = exepath;
+		if(appdatapath == L"") appdatapath = exepath;
 
 		OSVERSIONINFO osinfo;
 		osinfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
@@ -57,17 +56,17 @@ public:
 
 		bool vista_or_later = osinfo.dwPlatformId == VER_PLATFORM_WIN32_NT && osinfo.dwMajorVersion >= 6;
 
-		tstring vistapath = vista_or_later ? appdatapath : exepath;
+		std::wstring vistapath = vista_or_later ? appdatapath : exepath;
 
-		datapath = ReplaceStringAll(datapath, _T("$(exepath)"), exepath);
-		datapath = ReplaceStringAll(datapath, _T("$(personalpath)"), personalpath);
-		datapath = ReplaceStringAll(datapath, _T("$(appdatapath)"), appdatapath);
-		datapath = ReplaceStringAll(datapath, _T("$(vistapath)"), vistapath);
+		datapath = ReplaceStringAll(datapath, L"$(exepath)", exepath);
+		datapath = ReplaceStringAll(datapath, L"$(personalpath)", personalpath);
+		datapath = ReplaceStringAll(datapath, L"$(appdatapath)", appdatapath);
+		datapath = ReplaceStringAll(datapath, L"$(vistapath)", vistapath);
 		return IncludeTrailingBackslash(ExpandUNCFileName(datapath));
 	}
-	static tstring GetUserConfigFileName( const tstring& datapath, const tstring& exename ) {
+	static std::wstring GetUserConfigFileName( const std::wstring& datapath, const std::wstring& exename ) {
 		// exepath, personalpath, appdatapath
-		return GetDataPathDirectory(datapath, exename) + ExtractFileName(ChangeFileExt(exename, _T(".cfu")));
+		return GetDataPathDirectory(datapath, exename) + ExtractFileName(ChangeFileExt(exename, L".cfu"));
 	}
 };
 

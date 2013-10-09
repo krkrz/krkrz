@@ -34,7 +34,7 @@ struct tTVPCompatibleNativeFunc
 {
 	void ** Ptr;
 	const char * Name;
-	const TCHAR* Module;
+	const wchar_t* Module;
 } static TVPCompatibleNativeFuncs[] = {
 #endif
 //---------------------------------------------------------------------------
@@ -42,32 +42,32 @@ struct tTVPCompatibleNativeFunc
 TVP_NATIVE_FUNC_REG(
 	BOOL, WINAPI, GetTouchInputInfo,
 	(HTOUCHINPUT hTouchInput,UINT cInputs,PTOUCHINPUT pInputs,int cbSize),
-	_T("USER32.DLL"))
+	L"USER32.DLL")
 
 TVP_NATIVE_FUNC_REG(
 	BOOL, WINAPI, CloseTouchInputHandle,
 	(HTOUCHINPUT hTouchInput),
-	_T("USER32.DLL"))
+	L"USER32.DLL")
 
 TVP_NATIVE_FUNC_REG(
 	BOOL, WINAPI, GetGestureInfo,
 	(HGESTUREINFO hGestureInfo,PGESTUREINFO pGestureInfo),
-	_T("USER32.DLL"))
+	L"USER32.DLL")
 
 TVP_NATIVE_FUNC_REG(
 	BOOL, WINAPI, CloseGestureInfoHandle,
 	(HGESTUREINFO hGestureInfo),
-	_T("USER32.DLL"))
+	L"USER32.DLL")
 
 TVP_NATIVE_FUNC_REG(
 	BOOL, WINAPI, RegisterTouchWindow,
 	(HWND hWnd, ULONG ulFlags),
-	_T("USER32.DLL"))
+	L"USER32.DLL")
 
 TVP_NATIVE_FUNC_REG(
 	BOOL, WINAPI, UnregisterTouchWindow,
 	(HWND hWnd),
-	_T("USER32.DLL"))
+	L"USER32.DLL")
 /////
 //---------------------------------------------------------------------------
 #if defined(TVP_WNF_B)

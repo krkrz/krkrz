@@ -4,10 +4,9 @@
 
 #include <vector>
 #include <map>
-#include "tstring.h"
 
 //tstring ParamStr( int index );
-tstring ExePath();
+std::wstring ExePath();
 
 // 後で見通しのよう方法に変更する
 extern int _argc;
@@ -74,12 +73,12 @@ public:
 };
 class TApplication {
 	std::vector<class TTVPWindowForm*> windows_list_;
-	tstring title_;
+	std::wstring title_;
 
 	bool is_attach_console_;
 	FILE* oldstdin_;
 	FILE* oldstdout_;
-	tstring console_title_;
+	std::wstring console_title_;
 	AcceleratorKeyTable accel_key_;
 	bool tarminate_;
 
@@ -112,10 +111,10 @@ public:
 	void ProcessMessages();
 	void HandleMessage();
 
-	tstring GetTitle() const { return title_; }
-	void SetTitle( const tstring& caption );
+	std::wstring GetTitle() const { return title_; }
+	void SetTitle( const std::wstring& caption );
 
-	static inline int MessageDlg( const tstring& string, const tstring& caption, int type, int button ) {
+	static inline int MessageDlg( const std::wstring& string, const std::wstring& caption, int type, int button ) {
 		return ::MessageBox( NULL, string.c_str(), caption.c_str(), type|button  );
 	}
 	void Terminate() {
@@ -149,12 +148,12 @@ public:
 	void UnregisterAcceleratorKey(HWND hWnd, short cmd);
 	void DeleteAcceleratorKeyTable( HWND hWnd );
 };
-std::vector<std::string>* LoadLinesFromFile( const tstring& path );
+std::vector<std::string>* LoadLinesFromFile( const std::wstring& path );
 /*
 // スタブ、正しくは動作しないはず。
 inline HWND AllocateHWnd( LRESULT (CALLBACK *UtilWndProc)(HWND,UINT,WPARAM,LPARAM) ) {
 	
-	const TCHAR* classname = _T("TPUtilWindow");
+	const wchar_t* classname = TJS_W("TPUtilWindow");
 	WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC, UtilWndProc, 0L, 0L,
 						GetModuleHandle(NULL), NULL, NULL, NULL, NULL,
 						classname, NULL };

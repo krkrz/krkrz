@@ -688,8 +688,8 @@ static ttstr TVPGetSoundBufferFormatString(const WAVEFORMATEXTENSIBLE &wfx)
 	return debuglog;
 }
 //---------------------------------------------------------------------------
-static BOOL CALLBACK DSoundEnumCallback( GUID* pGUID, const TCHAR * strDesc,
-	const TCHAR * strDrvName,  VOID* pContext )
+static BOOL CALLBACK DSoundEnumCallback( GUID* pGUID, const wchar_t * strDesc,
+	const wchar_t * strDrvName,  VOID* pContext )
 {
 	ttstr log(TJS_W("(info) DirectSound Driver/Device found : "));
 	if(strDesc) log += ttstr(strDesc);
@@ -697,30 +697,30 @@ static BOOL CALLBACK DSoundEnumCallback( GUID* pGUID, const TCHAR * strDesc,
 	{
 		log += TJS_W(" [");
 
-		TCHAR driverpath[1024];
-		TCHAR* driverpath_filename = NULL;
+		wchar_t driverpath[1024];
+		wchar_t* driverpath_filename = NULL;
 		bool success = 0!=SearchPath(NULL, strDrvName, NULL, 1023, driverpath, &driverpath_filename);
 		if(!success)
 		{
-			TCHAR syspath[1024];
+			wchar_t syspath[1024];
 			GetSystemDirectory(syspath, 1023);
-			_tcscat(syspath, _T("\\drivers")); // SystemDir\drivers
+			TJS_strcat(syspath, TJS_W("\\drivers")); // SystemDir\drivers
 			success = 0!=SearchPath(syspath, strDrvName, NULL, 1023, driverpath, &driverpath_filename);
 		}
 
 		if(!success)
 		{
-			TCHAR syspath[1024];
+			wchar_t syspath[1024];
 			GetWindowsDirectory(syspath, 1023);
-			_tcscat(syspath, _T("\\system32")); // WinDir\system32
+			TJS_strcat(syspath, TJS_W("\\system32")); // WinDir\system32
 			success = 0!=SearchPath(syspath, strDrvName, NULL, 1023, driverpath, &driverpath_filename);
 		}
 
 		if(!success)
 		{
-			TCHAR syspath[1024];
+			wchar_t syspath[1024];
 			GetWindowsDirectory(syspath, 1023);
-			_tcscat(syspath, _T("\\system32\\drivers")); // WinDir\system32\drivers
+			TJS_strcat(syspath, TJS_W("\\system32\\drivers")); // WinDir\system32\drivers
 			success = 0!=SearchPath(syspath, strDrvName, NULL, 1023, driverpath, &driverpath_filename);
 		}
 
@@ -730,8 +730,8 @@ static BOOL CALLBACK DSoundEnumCallback( GUID* pGUID, const TCHAR * strDesc,
 			tjs_int major, minor, release, build;
 			if(TVPGetFileVersionOf(driverpath, major, minor, release, build))
 			{
-				TCHAR tmp[256];
-				wsprintf(tmp, _T(" version %d.%d.%d.%d"), (int)major, (int)minor, (int)release, (int)build);
+				wchar_t tmp[256];
+				TJS_snprintf(tmp, 256, TJS_W(" version %d.%d.%d.%d"), (int)major, (int)minor, (int)release, (int)build);
 				log += tmp;
 			}
 			else
@@ -763,7 +763,7 @@ static void TVPInitDirectSound()
 	if(TVPDirectSoundDLL == NULL)
 	{
 		// map dsound.dll
-		TVPDirectSoundDLL = LoadLibrary(_T("dsound.dll"));
+		TVPDirectSoundDLL = ::LoadLibrary(TJS_W("dsound.dll"));
 		if(!TVPDirectSoundDLL)
 		{
 			TVPThrowExceptionMessage(TVPCannotInitDirectSound,

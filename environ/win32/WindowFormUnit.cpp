@@ -187,7 +187,7 @@ void TVPInitWindowOptions()
 TTVPWindowForm::TTVPWindowForm( TApplication* app, tTJSNI_Window* ni ) : tTVPWindow(), CurrentMouseCursor(crDefault), touch_points_(this),
 	LayerLeft(0), LayerTop(0), LayerWidth(32), LayerHeight(32),
 	HintX(0), HintY(0), HintTimer(NULL), HintDelay(TVP_TOOLTIP_SHOW_DELAY), LastHintSender(NULL) {
-	CreateWnd( _T("TVPMainWindow"), Application->GetTitle(), 10, 10 );
+	CreateWnd( L"TVPMainWindow", Application->GetTitle(), 10, 10 );
 	TVPInitWindowOptions();
 	
 	// initialize members
@@ -1617,7 +1617,7 @@ void TTVPWindowForm::OnMove( int x, int y ) {
 	}
 }
 void TTVPWindowForm::OnDropFile( HDROP hDrop ) {
-	TCHAR filename[MAX_PATH];
+	wchar_t filename[MAX_PATH];
 	tjs_int filecount= ::DragQueryFile(hDrop, 0xFFFFFFFF, NULL, MAX_PATH);
 	iTJSDispatch2 * array = TJSCreateArrayObject();
 	try {

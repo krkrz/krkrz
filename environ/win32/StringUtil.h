@@ -44,7 +44,7 @@ inline std::string Trim( const std::string& val ) {
 	}
 }
 inline std::wstring Trim( const std::wstring& val ) {
-	static const wchar_t* TRIM_STR=_T(" \01\02\03\04\05\06\a\b\t\n\v\f\r\x0E\x0F\x7F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F");
+	static const wchar_t* TRIM_STR=L" \01\02\03\04\05\06\a\b\t\n\v\f\r\x0E\x0F\x7F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F";
 	std::wstring::size_type pos = val.find_first_not_of( TRIM_STR );
 	std::wstring::size_type lastpos = val.find_last_not_of( TRIM_STR );
 	if( pos == lastpos ) {

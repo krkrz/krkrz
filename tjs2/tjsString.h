@@ -17,7 +17,6 @@
 	#include <vcl.h>
 #endif
 #include "tjsVariantString.h"
-#include "tstring.h"
 
 namespace TJS
 {
@@ -91,7 +90,7 @@ public:
 	tTJSString(const AnsiString &str) { Ptr = TJSAllocVariantString(str.c_str()); }
 	tTJSString(const WideString &str) { Ptr = TJSAllocVariantString(str.c_bstr()); }
 #endif
-	tTJSString(const tstring &str) { Ptr = TJSAllocVariantString(str.c_str()); }
+	tTJSString(const std::wstring &str) { Ptr = TJSAllocVariantString(str.c_str()); }
 
 	//--------------------------------------------------------- destructor --
 	TJS_METHOD_DEF(TJS_METHOD_RET_EMPTY, ~tTJSString, ()) { if(Ptr) Ptr->Release(); }
@@ -114,15 +113,15 @@ public:
 	}
 #endif
 
-	const tstring AsStdString() const
+	const std::wstring AsStdString() const
 	{
-		if(!Ptr) return tstring(_T(""));
+		if(!Ptr) return std::wstring(TJS_W(""));
 #ifdef UNICODE
-		return tstring(c_str());
+		return std::wstring(c_str());
 #else
 			// this constant string value must match std::string in type
 		tTJSNarrowStringHolder holder(Ptr->operator const tjs_char*());
-		return tstring(holder.operator const char *());
+		return std::string(holder.operator const char *());
 #endif
 	}
 	const std::string AsNarrowStdString() const

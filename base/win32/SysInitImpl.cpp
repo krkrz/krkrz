@@ -49,8 +49,8 @@
 //---------------------------------------------------------------------------
 // global data
 //---------------------------------------------------------------------------
-tstring TVPNativeProjectDir;
-tstring TVPNativeDataPath;
+std::wstring TVPNativeProjectDir;
+std::wstring TVPNativeDataPath;
 bool TVPProjectDirSelected = false;
 bool TVPSystemIsBasedOnNT = false; // is system NT based ?
 //---------------------------------------------------------------------------
@@ -71,8 +71,8 @@ const static char TVPSystemSecurityOptions[] =
 //---------------------------------------------------------------------------
 int GetSystemSecurityOption(const char *name)
 {
-	size_t namelen = strlen(name);
-	const char *p = strstr(TVPSystemSecurityOptions, name);
+	size_t namelen = TJS_nstrlen(name);
+	const char *p = TJS_nstrstr(TVPSystemSecurityOptions, name);
 	if(!p) return 0;
 	if(p[namelen] == '(' && p[namelen + 2] == ')')
 		return p[namelen+1] - '0';
@@ -125,7 +125,7 @@ static FARPROC WINAPI DllLoadHook(dliNotification dliNotify,  DelayLoadInfo * pd
 		{
 			char buf[256];
 			buf[1] = 0;
-			strcpy(buf, pdli->dlp.szProcName);
+			TJS_nstrcpy(buf, pdli->dlp.szProcName);
 			buf[0] = '_';
 			return (FARPROC)GetProcAddress(_inmm, buf);
 		}
@@ -879,7 +879,7 @@ void TVPBeforeSystemInit()
 	}
 
 
-	TCHAR buf[MAX_PATH];
+	wchar_t buf[MAX_PATH];
 	bool bufset = false;
 	bool nosel = false;
 	bool forcesel = false;
@@ -895,8 +895,8 @@ void TVPBeforeSystemInit()
 		}
 		else
 		{
-			TCHAR exeDir[MAX_PATH];
-			_tcscpy(exeDir, IncludeTrailingBackslash(ExtractFileDir(ExePath())).c_str());
+			wchar_t exeDir[MAX_PATH];
+			TJS_strcpy(exeDir, IncludeTrailingBackslash(ExtractFileDir(ExePath())).c_str());
 			for(tjs_int i = 1; i<_argc; i++)
 			{
 				if(_argv[i][0] == '-' && _argv[i][1] == '-' && _argv[i][2] == 0)
@@ -906,10 +906,10 @@ void TVPBeforeSystemInit()
 				{
 					// TODO: set the current directory
 					::SetCurrentDirectory( exeDir );
-					_tcsncpy(buf, ttstr(_argv[i]).c_str(), MAX_PATH-1);
-					buf[MAX_PATH-1] = '\0';
+					TJS_strncpy(buf, ttstr(_argv[i]).c_str(), MAX_PATH-1);
+					buf[MAX_PATH-1] = TJS_W('\0');
 					if(DirectoryExists(buf)) // is directory?
-						_tcscat(buf, _T("\\"));
+						TJS_strcat(buf, TJS_W("\\"));
 
 					TVPProjectDirSelected = true;
 					bufset = true;
@@ -925,10 +925,10 @@ void TVPBeforeSystemInit()
 		// sel option was set
 		if(bufset)
 		{
-			TCHAR path[MAX_PATH];
-			TCHAR *dum = 0;
+			wchar_t path[MAX_PATH];
+			wchar_t *dum = 0;
 			GetFullPathName(buf, MAX_PATH-1, path, &dum);
-			_tcscpy(buf, path);
+			TJS_strcpy(buf, path);
 			TVPProjectDirSelected = false;
 			bufset = true;
 		}
@@ -939,13 +939,13 @@ void TVPBeforeSystemInit()
 	// check "content-data" directory
 	if(!forcedataxp3 && !nosel)
 	{
-		TCHAR tmp[MAX_PATH];
-		_tcscpy(tmp, IncludeTrailingBackslash(ExtractFileDir(ExePath())).c_str());
-		_tcscat(tmp, _T("content-data"));
+		wchar_t tmp[MAX_PATH];
+		TJS_strcpy(tmp, IncludeTrailingBackslash(ExtractFileDir(ExePath())).c_str());
+		TJS_strcat(tmp, TJS_W("content-data"));
 		if(DirectoryExists(tmp))
 		{
-			_tcscat(tmp, _T("\\"));
-			_tcscpy(buf, tmp);
+			TJS_strcat(tmp, TJS_W("\\"));
+			TJS_strcpy(buf, tmp);
 			TVPProjectDirSelected = true;
 			bufset = true;
 			nosel = true;
@@ -955,12 +955,12 @@ void TVPBeforeSystemInit()
 	// check "data.xp3" archive
  	if(!nosel)
 	{
-		TCHAR tmp[MAX_PATH];
-		_tcscpy(tmp, IncludeTrailingBackslash(ExtractFileDir(ExePath())).c_str());
-		_tcscat(tmp, _T("data.xp3"));
+		wchar_t tmp[MAX_PATH];
+		TJS_strcpy(tmp, IncludeTrailingBackslash(ExtractFileDir(ExePath())).c_str());
+		TJS_strcat(tmp, TJS_W("data.xp3"));
 		if(FileExists(tmp))
 		{
-			_tcscpy(buf, tmp);
+			TJS_strcpy(buf, tmp);
 			TVPProjectDirSelected = true;
 			bufset = true;
 			nosel = true;
@@ -970,12 +970,12 @@ void TVPBeforeSystemInit()
 	// check "data.exe" archive
  	if(!nosel)
 	{
-		TCHAR tmp[MAX_PATH];
-		_tcscpy(tmp, IncludeTrailingBackslash(ExtractFileDir(ExePath())).c_str());
-		_tcscat(tmp, _T("data.exe"));
+		wchar_t tmp[MAX_PATH];
+		TJS_strcpy(tmp, IncludeTrailingBackslash(ExtractFileDir(ExePath())).c_str());
+		TJS_strcat(tmp, TJS_W("data.exe"));
 		if(FileExists(tmp))
 		{
-			_tcscpy(buf, tmp);
+			TJS_strcpy(buf, tmp);
 			TVPProjectDirSelected = true;
 			bufset = true;
 			nosel = true;
@@ -987,7 +987,7 @@ void TVPBeforeSystemInit()
 	{
 		if(TVPIsXP3Archive(TVPNormalizeStorageName(ExePath())))
 		{
-			_tcscpy(buf, ExePath().c_str());
+			TJS_strcpy(buf, ExePath().c_str());
 			TVPProjectDirSelected = true;
 			bufset = true;
 			nosel = true;
@@ -998,13 +998,13 @@ void TVPBeforeSystemInit()
 	// check "data" directory
 	if(!forcedataxp3 && !nosel)
 	{
-		TCHAR tmp[MAX_PATH];
-		_tcscpy(tmp, IncludeTrailingBackslash(ExtractFileDir(ExePath())).c_str());
-		_tcscat(tmp, _T("data"));
+		wchar_t tmp[MAX_PATH];
+		TJS_strcpy(tmp, IncludeTrailingBackslash(ExtractFileDir(ExePath())).c_str());
+		TJS_strcat(tmp, TJS_W("data"));
 		if(DirectoryExists(tmp))
 		{
-			_tcscat(tmp, _T("\\"));
-			_tcscpy(buf, tmp);
+			TJS_strcat(tmp, TJS_W("\\"));
+			TJS_strcpy(buf, tmp);
 			TVPProjectDirSelected = true;
 			bufset = true;
 			nosel = true;
@@ -1014,10 +1014,10 @@ void TVPBeforeSystemInit()
 	// decide a directory to execute or to show folder selection
 	if(!bufset)
 	{
-		if(forcedataxp3) throw EAbort(_T("Aborted"));
-		_tcscpy(buf, ExtractFileDir(ExePath()).c_str());
-		int curdirlen = _tcslen(buf);
-		if(buf[curdirlen-1] != '\\') buf[curdirlen] = '\\', buf[curdirlen+1] = 0;
+		if(forcedataxp3) throw EAbort(TJS_W("Aborted"));
+		TJS_strcpy(buf, ExtractFileDir(ExePath()).c_str());
+		int curdirlen = TJS_strlen(buf);
+		if(buf[curdirlen-1] != TJS_W('\\')) buf[curdirlen] = TJS_W('\\'), buf[curdirlen+1] = 0;
 	}
 
 #pragma message (__LOC__ "TODO : 選択ダイアログを出す")
@@ -1094,10 +1094,10 @@ void TVPBeforeSystemInit()
 		Application->SetShowMainForm( false );
 	}
 
-	tjs_int buflen = _tcslen(buf);
+	tjs_int buflen = TJS_strlen(buf);
 	if(buflen >= 1)
 	{
-		if(buf[buflen-1] != _T('\\')) buf[buflen] = static_cast<TCHAR>(TVPArchiveDelimiter), buf[buflen+1] = 0; // TODO ここのキャストはあまり好ましくないな
+		if(buf[buflen-1] != TJS_W('\\')) buf[buflen] = TVPArchiveDelimiter, buf[buflen+1] = 0;
 	}
 
 	TVPProjectDir = TVPNormalizeStorageName(buf);
@@ -1382,21 +1382,21 @@ static std::vector<std::string> * TVPGetEmbeddedOptions()
 	}
 
 	if(errmsg)
-		TVPAddImportantLog(ttstr("(info) Loading executable embedded options failed (ignoring) : ") + errmsg);
+		TVPAddImportantLog(ttstr(TJS_W("(info) Loading executable embedded options failed (ignoring) : ")) + errmsg);
 	else
-		TVPAddImportantLog("(info) Loading executable embedded options succeeded.");
+		TVPAddImportantLog(TJS_W("(info) Loading executable embedded options succeeded."));
 	return ret;
 }
 //---------------------------------------------------------------------------
-static std::vector<std::string> * TVPGetConfigFileOptions(const tstring& filename)
+static std::vector<std::string> * TVPGetConfigFileOptions(const std::wstring& filename)
 {
 	// load .cf file
-	tstring errmsg;
+	std::wstring errmsg;
 	if(!FileExists(filename))
-		errmsg = _T("file not found.");
+		errmsg = TJS_W("file not found.");
 
 	std::vector<std::string> * ret = NULL; // new std::vector<std::string>();
-	if(errmsg == _T(""))
+	if(errmsg == TJS_W(""))
 	{
 		try
 		{
@@ -1413,12 +1413,12 @@ static std::vector<std::string> * TVPGetConfigFileOptions(const tstring& filenam
 		}
 	}
 
-	if(errmsg != _T(""))
-		TVPAddImportantLog(ttstr("(info) Loading configuration file \"") + filename.c_str() +
-			"\" failed (ignoring) : " + errmsg.c_str());
+	if(errmsg != TJS_W(""))
+		TVPAddImportantLog(ttstr(TJS_W("(info) Loading configuration file \"")) + filename.c_str() +
+			TJS_W("\" failed (ignoring) : ") + errmsg.c_str());
 	else
-		TVPAddImportantLog(ttstr("(info) Loading configuration file \"") + filename.c_str() +
-			"\" succeeded.");
+		TVPAddImportantLog(ttstr(TJS_W("(info) Loading configuration file \"")) + filename.c_str() +
+			TJS_W("\" succeeded."));
 
 	return ret;
 }
@@ -1553,7 +1553,7 @@ static void TVPInitProgramArgumentsAndDataPath(bool stop_after_datapath_got)
 
 			// read datapath
 			tTJSVariant val;
-			tstring config_datapath;
+			std::wstring config_datapath;
 			if(TVPGetCommandLine(TJS_W("-datapath"), &val))
 				config_datapath = ((ttstr)val).AsStdString();
 			TVPNativeDataPath = TConfMainFrame::GetDataPathDirectory(config_datapath, ExePath());
@@ -1760,7 +1760,7 @@ bool TVPCheckAbout(void)
 //---------------------------------------------------------------------------
 // TVPExecuteAsync
 //---------------------------------------------------------------------------
-static void TVPExecuteAsync( const tstring& progname)
+static void TVPExecuteAsync( const std::wstring& progname)
 {
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
@@ -1800,7 +1800,7 @@ static void TVPExecuteAsync( const tstring& progname)
 //---------------------------------------------------------------------------
 // TVPWaitWritePermit
 //---------------------------------------------------------------------------
-static bool TVPWaitWritePermit(const tstring& fn)
+static bool TVPWaitWritePermit(const std::wstring& fn)
 {
 	tjs_int timeout = 10; // 10/1 = 5 seconds
 	while(true)

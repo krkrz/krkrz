@@ -85,7 +85,7 @@ tjs_int tTJSLocalSymbolList::Find(const tjs_char *name)
 		tTJSLocalSymbol *sym=List[i];
 		if(sym)
 		{
-			if(!wcscmp(sym->Name,name))
+			if(!TJS_strcmp(sym->Name,name))
 				return i;
 		}
 	}

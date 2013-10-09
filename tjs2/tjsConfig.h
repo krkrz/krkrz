@@ -64,12 +64,15 @@ TJS_EXP_FUNC_DEF(size_t, TJS_strlen, (const tjs_char *d));
 #define TJS_nstrcpy			strcpy
 #define TJS_nstrcat			strcat
 #define TJS_nstrlen			strlen
+#define TJS_nstrstr			strstr
 #define TJS_strftime		wcsftime
 #define TJS_vfprintf		vfwprintf
 #define TJS_octetcpy		memcpy
 #define TJS_octetcmp		memcmp
 #define TJS_strtod			wcstod
 
+
+#define TJS_strncpy_s		wcsncpy_s
 
 #if defined(__GNUC__)
 	#define TJS_cdecl

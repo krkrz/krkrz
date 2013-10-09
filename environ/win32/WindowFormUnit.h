@@ -231,8 +231,8 @@ public:
 	static void DeliverPopupHide();
 
 	//-- properties
-	tstring GetCaption() const {
-		tstring ret;
+	std::wstring GetCaption() const {
+		std::wstring ret;
 		tTVPWindow::GetCaption( ret );
 		return ret;
 	}

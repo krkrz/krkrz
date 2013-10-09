@@ -7,7 +7,6 @@
 #include <shellapi.h>
 #include "tjsCommHead.h"
 #include "tvpinputdefs.h"
-#include "tstring.h"
 
 #include "ImeControl.h"
 
@@ -35,8 +34,8 @@ protected:
 
 	HWND				window_handle_;
 
-	tstring		window_class_name_;
-	tstring		window_title_;
+	std::wstring	window_class_name_;
+	std::wstring	window_title_;
 	SIZE		window_client_size_;
 	SIZE		min_size_;
 	SIZE		max_size_;
@@ -76,7 +75,7 @@ protected:
 
 	virtual LRESULT WINAPI Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
 
-	HRESULT CreateWnd( const tstring& classname, const tstring& title, int width, int height );
+	HRESULT CreateWnd( const std::wstring& classname, const std::wstring& title, int width, int height );
 
 	virtual void OnDestroy();
 	virtual void OnPaint();
@@ -126,7 +125,7 @@ public:
 	virtual bool Initialize();
 	//virtual int MainLoop();
 
-	void SetWidnowTitle( const tstring& title );
+	void SetWidnowTitle( const std::wstring& title );
 	void SetScreenSize( int width, int height );
 
 	HWND GetHandle() { return window_handle_; }
@@ -146,8 +145,8 @@ public:
 	bool GetEnable() const;
 	void SetEnable( bool s );
 
-	void GetCaption( tstring& v ) const;
-	void SetCaption( const tstring& v );
+	void GetCaption( std::wstring& v ) const;
+	void SetCaption( const std::wstring& v );
 	
 	void SetBorderStyle( enum tTVPBorderStyle st);
 	enum tTVPBorderStyle GetBorderStyle() const;

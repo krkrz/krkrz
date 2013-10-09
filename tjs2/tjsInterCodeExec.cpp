@@ -2623,7 +2623,7 @@ void tTJSInterCodeContext::ProcessStringFunction(const tjs_char *member,
 			return;
 		}
 		const tjs_char *p;
-		p = wcsstr(s + start, (const tjs_char*)*pstr);
+		p = TJS_strstr(s + start, (const tjs_char*)*pstr);
 		if(!p)
 		{
 			if(result) *result = (tjs_int)-1;

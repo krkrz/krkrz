@@ -82,8 +82,8 @@ void GDIFontRasterizer::ApplyFont( tTVPNativeBaseBitmap *bmp, bool force ) {
 		LogFont.lfOutPrecision = OUT_DEFAULT_PRECIS;
 		LogFont.lfQuality = DEFAULT_QUALITY;
 		LogFont.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
-		tstring face = TVPFontSystem->GetBeingFont(font.Face.AsStdString());
-		_tcsncpy(LogFont.lfFaceName, face.c_str(), LF_FACESIZE -1);
+		std::wstring face = TVPFontSystem->GetBeingFont(font.Face.AsStdString());
+		TJS_strncpy(LogFont.lfFaceName, face.c_str(), LF_FACESIZE -1);
 		LogFont.lfFaceName[LF_FACESIZE-1] = 0;
 
 		FontDC->ApplyFont( &LogFont );

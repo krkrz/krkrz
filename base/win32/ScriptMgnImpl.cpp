@@ -142,13 +142,13 @@ void TVPStartObjectHashMapLog(void)
 		si.dwFlags = STARTF_USESHOWWINDOW;
 		si.wShowWindow = SW_SHOWNORMAL;
 		
-		TCHAR szFull[_MAX_PATH];
-		::GetModuleFileName(NULL, szFull, sizeof(szFull) / sizeof(TCHAR));
-		tstring exepath(szFull);
+		wchar_t szFull[_MAX_PATH];
+		::GetModuleFileName(NULL, szFull, sizeof(szFull) / sizeof(wchar_t));
+		std::wstring exepath(szFull);
 		BOOL ret =
 			::CreateProcess(
 				NULL,
-				const_cast<LPTSTR>((exepath + _T(" -@processohmlog")).c_str()),
+				const_cast<LPTSTR>((exepath + L" -@processohmlog").c_str()),
 				NULL,
 				NULL,
 				TRUE,

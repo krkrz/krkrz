@@ -14,7 +14,6 @@
 #include <memory>
 #include <stdlib.h>
 #include <math.h>
-#include "tstring.h"
 
 #include "LayerBitmapIntf.h"
 #include "LayerBitmapImpl.h"
