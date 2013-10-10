@@ -27,6 +27,18 @@ void MouseCursor::Initialize() {
 	}
 }
 
+void MouseCursor::UpdateCurrentCursor() {
+	cursor_index_ = INVALID_CURSOR_INDEX;
+	// hCursor_ = INVALID_HANDLE_VALUE;
+	HCURSOR hCursor = ::GetCursor();
+
+	for( int i = 0; i < CURSOR_EOT; i++ ) {
+		if( CURSOR_HANDLES[i] == hCursor ) {
+			cursor_index_ = i; // インデックスではないので、これではダメか
+			break;
+		}
+	}
+}
 void MouseCursor::SetMouseCursor( int index ) {
 	if( is_cursor_hide_ && index != crNone ) {
 		::ShowCursor( TRUE );
@@ -98,13 +110,13 @@ void MouseCursor::SetMouseCursor( int index ) {
 	}
 }
 void MouseCursor::SetCursor() {
-	if( hCursor_ != INVALID_HANDLE_VALUE ) {
+	/*if( hCursor_ != INVALID_HANDLE_VALUE ) {
 		::SetCursor( hCursor_ );
 		if( is_cursor_hide_ ) {
 			::ShowCursor( TRUE );
 			is_cursor_hide_ = false;
 		}
-	} else if( cursor_index_ != INVALID_CURSOR_INDEX ) {
+	} else */if( cursor_index_ != INVALID_CURSOR_INDEX ) {
 		SetMouseCursor( cursor_index_ );
 	}
 }
