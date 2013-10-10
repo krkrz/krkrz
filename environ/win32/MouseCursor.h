@@ -33,16 +33,19 @@ public:
 	static void SetMouseCursor( int index );
 
 private:
-	HCURSOR hCursor_;
+	//HCURSOR hCursor_;
 	int cursor_index_;
 
+	void UpdateCurrentCursor();
+
 public:
-	MouseCursor() : hCursor_(INVALID_HANDLE_VALUE), cursor_index_(INVALID_CURSOR_INDEX) {}
-	MouseCursor( int index ) : hCursor_(INVALID_HANDLE_VALUE), cursor_index_(index) {}
+	MouseCursor() : /*hCursor_(INVALID_HANDLE_VALUE),*/ cursor_index_(INVALID_CURSOR_INDEX) {}
+	MouseCursor( int index ) : /*hCursor_(INVALID_HANDLE_VALUE),*/ cursor_index_(index) {}
 
 	void SetCursor();
 
 	bool IsCurrentCursor( int index ) {
+		UpdateCurrentCursor();
 		return cursor_index_ == index;
 	}
 	void SetCursorIndex( int index );
