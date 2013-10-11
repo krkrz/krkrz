@@ -3,7 +3,10 @@
 #ifndef __MOUSE_CURSOR_H__
 #define __MOUSE_CURSOR_H__
 
-#include "stdafx.h"
+#include <vector>
+
+#define WIN32_LEAN_AND_MEAN             // Windows ヘッダーから使用されていない部分を除外します。
+#include <windows.h>
 
 class MouseCursor {
 	enum {
@@ -23,24 +26,36 @@ class MouseCursor {
 		CURSOR_WAIT,		// 砂時計カーソル 
 		CURSOR_EOT,
 	};
-	static const LPTSTR CURSORS[CURSOR_EOT];
-	static HCURSOR CURSOR_HANDLES[CURSOR_EOT];
-	static const int INVALID_CURSOR_INDEX = 0x7FFFFFFF;
-	static bool is_cursor_hide_;
+	static const int CURSOR_OFFSET = 22;
+	static const int CURSOR_INDEXES_NUM = 24;
+	static const int CURSOR_INDEXES[CURSOR_INDEXES_NUM]; // 内部のカーソルインデックスと公開カーソルインデックスの変換テーブル
+	static std::vector<HCURSOR> CURSOR_HANDLES_FOR_INDEXES;	// 全カーソルのハンドル、新規読込みされたものは追加される
+
+	static const LPTSTR CURSORS[CURSOR_EOT];	// カーソルとリソースIDの対応テーブル
+	static HCURSOR CURSOR_HANDLES[CURSOR_EOT];	// デフォルトカーソルのハンドルテーブル
+	static const int INVALID_CURSOR_INDEX = 0x7FFFFFFF;	// 無効なカーソルインデックス
+	static bool CURSOR_INITIALIZED;	// カーソル初期化済みか否か
+
+	static bool is_cursor_hide_;	// カーソルがcrNoneで非表示になっているかどうか
 
 public:
 	static void Initialize();
+	static void Finalize();
 	static void SetMouseCursor( int index );
+	static int AddCursor( HCURSOR hCursor ) {
+		int index = CURSOR_HANDLES_FOR_INDEXES.size();
+		CURSOR_HANDLES_FOR_INDEXES.push_back( hCursor );
+		return index - CURSOR_OFFSET;
+	}
 
 private:
-	//HCURSOR hCursor_;
 	int cursor_index_;
 
 	void UpdateCurrentCursor();
 
 public:
-	MouseCursor() : /*hCursor_(INVALID_HANDLE_VALUE),*/ cursor_index_(INVALID_CURSOR_INDEX) {}
-	MouseCursor( int index ) : /*hCursor_(INVALID_HANDLE_VALUE),*/ cursor_index_(index) {}
+	MouseCursor() : cursor_index_(INVALID_CURSOR_INDEX) {}
+	MouseCursor( int index ) : cursor_index_(index) {}
 
 	void SetCursor();
 

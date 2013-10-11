@@ -33,12 +33,12 @@
 #include "Screen.h"
 #include "tjsDictionary.h"
 #include "VSyncTimingThread.h"
+#include "MouseCursor.h"
 
 //---------------------------------------------------------------------------
 // Mouse Cursor management
 //---------------------------------------------------------------------------
 static tTJSHashTable<ttstr, tjs_int> TVPCursorTable;
-static int TVPCursorCount = 1;
 tjs_int TVPGetCursor(const ttstr & name)
 {
 	// get placed path
@@ -55,13 +55,11 @@ tjs_int TVPGetCursor(const ttstr & name)
 
 	if(!handle) TVPThrowExceptionMessage(TVPCannotLoadCursor, place);
 
-	TVPCursorCount++;
-	//Screen->Cursors[TVPCursorCount] = handle; // using VCL
-#pragma message ( __LOC__ "TODO カーソル設定関係は要らないかな？" )
+	int id = MouseCursor::AddCursor( handle );
 
-	TVPCursorTable.Add(place, TVPCursorCount);
+	TVPCursorTable.Add(place, id);
 
-	return TVPCursorCount;
+	return id;
 }
 //---------------------------------------------------------------------------
 
