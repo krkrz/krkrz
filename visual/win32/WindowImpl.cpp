@@ -30,7 +30,7 @@
 #include "EventImpl.h"
 
 #include "Application.h"
-#include "Screen.h"
+#include "TVPScreen.h"
 #include "tjsDictionary.h"
 #include "VSyncTimingThread.h"
 #include "MouseCursor.h"
@@ -489,8 +489,8 @@ static void TVPDoReductionNumerAndDenom(tjs_int &n, tjs_int &d)
 static void TVPGetOriginalScreenMetrics()
 {
 	// retrieve original (un-fullscreened) information
-	TVPDefaultScreenMode.Width = Screen->GetWidth();
-	TVPDefaultScreenMode.Height = Screen->GetHeight();
+	TVPDefaultScreenMode.Width = tTVPScreen::GetWidth();
+	TVPDefaultScreenMode.Height = tTVPScreen::GetHeight();
 	HDC dc = GetDC(0);
 	TVPDefaultScreenMode.BitsPerPixel = GetDeviceCaps(dc, BITSPIXEL);
 	ReleaseDC(0, dc);

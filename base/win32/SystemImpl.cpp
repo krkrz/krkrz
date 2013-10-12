@@ -27,7 +27,7 @@
 #include "DInputMgn.h"
 
 #include "Application.h"
-#include "Screen.h"
+#include "TVPScreen.h"
 
 //---------------------------------------------------------------------------
 static ttstr TVPAppTitle;
@@ -840,7 +840,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(screenWidth)
 {
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
-		*result = Screen->GetWidth();
+		*result = tTVPScreen::GetWidth();
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_GETTER
@@ -853,7 +853,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(screenHeight)
 {
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
-		*result = Screen->GetHeight();
+		*result = tTVPScreen::GetHeight();
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_GETTER

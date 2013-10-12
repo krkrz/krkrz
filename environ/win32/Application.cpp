@@ -453,6 +453,13 @@ void TApplication::EnableWindows( const  std::vector<TTVPWindowForm*>& ignores )
 		}
 	}
 }
+void TApplication::FreeDirectInputDeviceForWindows() {
+	size_t count = windows_list_.size();
+	for( size_t i = 0; i < count; i++ ) {
+		windows_list_[i]->FreeDirectInputDevice();
+	}
+}
+
 
 void TApplication::RegisterAcceleratorKey(HWND hWnd, char virt, short key, short cmd) {
 	accel_key_.AddKey( hWnd, cmd, key, virt );

@@ -18,7 +18,7 @@
 #include "SysInitIntf.h"
 #include "DebugIntf.h"
 
-#include "Screen.h"
+#include "TVPScreen.h"
 
 
 //---------------------------------------------------------------------------
@@ -38,13 +38,13 @@ static UINT APIENTRY TVPOFNHookProc(HWND hdlg, UINT uiMsg, WPARAM wParam,
 		int left, top;
 		HWND parent = GetParent(hdlg);
 		if((TVPLastOFNLeft == -30000 && TVPLastOFNTop == -30000) ||
-			TVPLastScreenWidth != Screen->GetWidth() || TVPLastScreenHeight != Screen->GetHeight() )
+			TVPLastScreenWidth != tTVPScreen::GetWidth() || TVPLastScreenHeight != tTVPScreen::GetHeight() )
 		{
 			// center the window
 			RECT rect;
 			GetWindowRect(parent, &rect);
-			left = ((Screen->GetWidth() - rect.right + rect.left) / 2);
-			top = ((Screen->GetHeight() - rect.bottom + rect.top) / 3);
+			left = ((tTVPScreen::GetWidth() - rect.right + rect.left) / 2);
+			top = ((tTVPScreen::GetHeight() - rect.bottom + rect.top) / 3);
 		}
 		else
 		{
@@ -53,8 +53,8 @@ static UINT APIENTRY TVPOFNHookProc(HWND hdlg, UINT uiMsg, WPARAM wParam,
 			top = TVPLastOFNTop;
 		}
 
-		TVPLastScreenWidth = Screen->GetWidth();
-		TVPLastScreenHeight = Screen->GetHeight();
+		TVPLastScreenWidth = tTVPScreen::GetWidth();
+		TVPLastScreenHeight = tTVPScreen::GetHeight();
 
 		SetWindowPos(parent, 0,
 			left,

@@ -283,9 +283,6 @@
     <ClInclude Include="..\environ\win32\Exception.h">
       <Filter>environ\win32</Filter>
     </ClInclude>
-    <ClInclude Include="..\environ\win32\Screen.h">
-      <Filter>environ\win32</Filter>
-    </ClInclude>
     <ClInclude Include="..\environ\win32\InputStringForm.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -544,6 +541,9 @@
     <ClInclude Include="..\visual\win32\NativeFreeTypeFace.h">
       <Filter>visual\win32</Filter>
     </ClInclude>
+    <ClInclude Include="..\environ\win32\TVPScreen.h">
+      <Filter>environ\win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -724,9 +724,6 @@
       <Filter>environ\win32</Filter>
     </ClCompile>
     <ClCompile Include="..\environ\win32\Application.cpp">
-      <Filter>environ\win32</Filter>
-    </ClCompile>
-    <ClCompile Include="..\environ\win32\Screen.cpp">
       <Filter>environ\win32</Filter>
     </ClCompile>
     <ClCompile Include="..\environ\win32\InputStringForm.cpp">
@@ -959,6 +956,9 @@
     </ClCompile>
     <ClCompile Include="..\visual\win32\NativeFreeTypeFace.cpp">
       <Filter>visual\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\environ\win32\TVPScreen.cpp">
+      <Filter>environ\win32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
