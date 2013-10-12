@@ -107,6 +107,8 @@ public:
 	}
 	void RemoveWindow( class TTVPWindowForm* win );
 
+	void FreeDirectInputDeviceForWindows();
+
 	bool ProcessMessage( MSG &msg );
 	void ProcessMessages();
 	void HandleMessage();
