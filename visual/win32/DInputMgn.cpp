@@ -22,7 +22,7 @@
 
 #include "DebugIntf.h"
 #include "Application.h"
-#include "Screen.h"
+#include "TVPScreen.h"
 
 //---------------------------------------------------------------------------
 // DirectInput management
@@ -734,18 +734,7 @@ bool tTVPPadDirectInputDevice::GetAsyncState(tjs_uint keycode, bool getcurrent)
 static void TVPUninitDirectInput()
 {
 	// release all devices
-#if 0 // TODO 
-	for(tjs_int i = 0; i < Screen->FormCount; i++)
-	{
-		TForm *tform = Screen->Forms[i];
-
-		if(std::string(tform->ClassName()) == "TTVPWindowForm")
-		{
-			TTVPWindowForm * form = (TTVPWindowForm * )tform;
-			form->FreeDirectInputDevice();
-		}
-	}
-#endif
+	Application->FreeDirectInputDeviceForWindows();
 }
 //---------------------------------------------------------------------------
 static tTVPAtExit
