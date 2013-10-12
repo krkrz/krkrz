@@ -55,12 +55,6 @@
     <Filter Include="sound\win32">
       <UniqueIdentifier>{e116b75c-ed4d-47a5-9a92-ff38c939c0e5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="platform">
-      <UniqueIdentifier>{3946f907-251b-460a-9061-dfb3a9137ae2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="platform\win32">
-      <UniqueIdentifier>{1e11e97e-ffad-4370-b7a4-4786814e08d8}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -457,9 +451,6 @@
     <ClInclude Include="..\utils\TickCount.h">
       <Filter>utils</Filter>
     </ClInclude>
-    <ClInclude Include="..\platform\win32\BitmapInfomation.h">
-      <Filter>platform\win32</Filter>
-    </ClInclude>
     <ClInclude Include="..\visual\CharacterData.h">
       <Filter>visual</Filter>
     </ClInclude>
@@ -471,9 +462,6 @@
     </ClInclude>
     <ClInclude Include="..\visual\FreeTypeFace.h">
       <Filter>visual</Filter>
-    </ClInclude>
-    <ClInclude Include="..\platform\win32\NativeFreeTypeFace.h">
-      <Filter>platform\win32</Filter>
     </ClInclude>
     <ClInclude Include="..\utils\cp932_uni.h">
       <Filter>utils</Filter>
@@ -487,17 +475,8 @@
     <ClInclude Include="..\visual\FreeTypeFontRasterizer.h">
       <Filter>visual</Filter>
     </ClInclude>
-    <ClInclude Include="..\platform\win32\GDIFontRasterizer.h">
-      <Filter>platform\win32</Filter>
-    </ClInclude>
     <ClInclude Include="..\visual\FontSystem.h">
       <Filter>visual</Filter>
-    </ClInclude>
-    <ClInclude Include="..\platform\win32\TVPTimer.h">
-      <Filter>platform\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="..\platform\win32\NativeEventQueue.h">
-      <Filter>platform\win32</Filter>
     </ClInclude>
     <ClInclude Include="..\utils\TimerImpl.h">
       <Filter>utils</Filter>
@@ -548,6 +527,21 @@
       <Filter>visual</Filter>
     </ClInclude>
     <ClInclude Include="..\visual\win32\VSyncTimingThread.h">
+      <Filter>visual\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utils\win32\TVPTimer.h">
+      <Filter>utils\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\base\win32\NativeEventQueue.h">
+      <Filter>base\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\win32\BitmapInfomation.h">
+      <Filter>visual\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\win32\GDIFontRasterizer.h">
+      <Filter>visual\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\win32\NativeFreeTypeFace.h">
       <Filter>visual\win32</Filter>
     </ClInclude>
   </ItemGroup>
@@ -879,9 +873,6 @@
     <ClCompile Include="..\utils\TickCount.cpp">
       <Filter>utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\platform\win32\BitmapInfomation.cpp">
-      <Filter>platform\win32</Filter>
-    </ClCompile>
     <ClCompile Include="..\visual\CharacterData.cpp">
       <Filter>visual</Filter>
     </ClCompile>
@@ -890,9 +881,6 @@
     </ClCompile>
     <ClCompile Include="..\visual\FreeType.cpp">
       <Filter>visual</Filter>
-    </ClCompile>
-    <ClCompile Include="..\platform\win32\NativeFreeTypeFace.cpp">
-      <Filter>platform\win32</Filter>
     </ClCompile>
     <ClCompile Include="..\utils\cp932_uni.cpp">
       <Filter>utils</Filter>
@@ -903,17 +891,8 @@
     <ClCompile Include="..\visual\FreeTypeFontRasterizer.cpp">
       <Filter>visual</Filter>
     </ClCompile>
-    <ClCompile Include="..\platform\win32\GDIFontRasterizer.cpp">
-      <Filter>platform\win32</Filter>
-    </ClCompile>
     <ClCompile Include="..\visual\FontSystem.cpp">
       <Filter>visual</Filter>
-    </ClCompile>
-    <ClCompile Include="..\platform\win32\TVPTimer.cpp">
-      <Filter>platform\win32</Filter>
-    </ClCompile>
-    <ClCompile Include="..\platform\win32\NativeEventQueue.cpp">
-      <Filter>platform\win32</Filter>
     </ClCompile>
     <ClCompile Include="..\utils\TimerImpl.cpp">
       <Filter>utils</Filter>
@@ -964,6 +943,21 @@
       <Filter>visual</Filter>
     </ClCompile>
     <ClCompile Include="..\visual\win32\VSyncTimingThread.cpp">
+      <Filter>visual\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utils\win32\TVPTimer.cpp">
+      <Filter>utils\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\base\win32\NativeEventQueue.cpp">
+      <Filter>base\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\win32\BitmapInfomation.cpp">
+      <Filter>visual\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\win32\GDIFontRasterizer.cpp">
+      <Filter>visual\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\win32\NativeFreeTypeFace.cpp">
       <Filter>visual\win32</Filter>
     </ClCompile>
   </ItemGroup>
