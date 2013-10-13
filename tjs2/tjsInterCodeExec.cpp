@@ -3036,9 +3036,9 @@ void tTJSInterCodeContext::RegisterObjectMember(iTJSDispatch2 * dest)
 		std::vector<tjs_int> &pointer = SuperClassGetter->SuperClassGetterPointer; \
 		if(pointer.size() != 0) \
 		{ \
-			std::vector<tjs_int>::iterator i; \
-			for(i = pointer.end()-1; \
-				i >=pointer.begin(); i--) \
+			std::vector<tjs_int>::reverse_iterator i; \
+			for(i = pointer.rbegin(); \
+				i !=pointer.rend(); i++) \
 			{ \
 				tTJSVariant res; \
 				SuperClassGetter->ExecuteAsFunction(NULL, NULL, 0, &res, *i); \
