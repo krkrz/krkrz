@@ -16,7 +16,7 @@
 
 #include "MsgIntf.h"
 #include "VersionFormUnit.h"
-#include "MainFormUnit.h"
+#include "SystemControl.h"
 #include "WindowImpl.h"
 
 #include "VersionFormUnit.h"

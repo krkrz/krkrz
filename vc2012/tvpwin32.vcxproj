@@ -130,9 +130,9 @@
     <ClInclude Include="..\environ\win32\FileCtrl.h" />
     <ClInclude Include="..\environ\win32\FileStream.h" />
     <ClInclude Include="..\environ\win32\InputStringForm.h" />
-    <ClInclude Include="..\environ\win32\MainFormUnit.h" />
     <ClInclude Include="..\environ\win32\MouseCursor.h" />
     <ClInclude Include="..\environ\win32\StringUtil.h" />
+    <ClInclude Include="..\environ\win32\SystemControl.h" />
     <ClInclude Include="..\environ\win32\TColor.h" />
     <ClInclude Include="..\environ\win32\TFont.h" />
     <ClInclude Include="..\environ\win32\TouchPoint.h" />
@@ -290,8 +290,8 @@
     <ClCompile Include="..\environ\win32\DetectCPU.cpp" />
     <ClCompile Include="..\environ\win32\EmergencyExit.cpp" />
     <ClCompile Include="..\environ\win32\InputStringForm.cpp" />
-    <ClCompile Include="..\environ\win32\MainFormUnit.cpp" />
     <ClCompile Include="..\environ\win32\MouseCursor.cpp" />
+    <ClCompile Include="..\environ\win32\SystemControl.cpp" />
     <ClCompile Include="..\environ\win32\TouchPoint.cpp" />
     <ClCompile Include="..\environ\win32\TVPScreen.cpp" />
     <ClCompile Include="..\environ\win32\TVPWindow.cpp" />

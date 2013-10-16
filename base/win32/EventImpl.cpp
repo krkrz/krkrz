@@ -11,7 +11,7 @@
 #include "tjsCommHead.h"
 
 #include "EventImpl.h"
-#include "MainFormUnit.h"
+#include "SystemControl.h"
 #include "ThreadIntf.h"
 #include "TickCount.h"
 #include "TimerIntf.h"
@@ -32,9 +32,9 @@ void TVPInvokeEvents()
 {
 	if(TVPEventInvoked) return;
 	TVPEventInvoked = true;
-	if(TVPMainForm)
+	if(TVPSystemControl)
 	{
-		TVPMainForm->InvokeEvents();
+		TVPSystemControl->InvokeEvents();
 	}
 }
 //---------------------------------------------------------------------------
@@ -46,7 +46,7 @@ void TVPInvokeEvents()
 void TVPEventReceived()
 {
 	TVPEventInvoked = false;
-	TVPMainForm->NotifyEventDelivered();
+	if( TVPSystemControl ) TVPSystemControl->NotifyEventDelivered();
 }
 //---------------------------------------------------------------------------
 
@@ -58,9 +58,9 @@ void TVPEventReceived()
 //---------------------------------------------------------------------------
 void TVPCallDeliverAllEventsOnIdle()
 {
-	if(TVPMainForm)
+	if(TVPSystemControl)
 	{
-		TVPMainForm->CallDeliverAllEventsOnIdle();
+		TVPSystemControl->CallDeliverAllEventsOnIdle();
 	}
 }
 //---------------------------------------------------------------------------
@@ -107,13 +107,13 @@ bool TVPGetBreathing()
 //---------------------------------------------------------------------------
 void TVPSetSystemEventDisabledState(bool en)
 {
-	TVPMainForm->SetEventEnabled( !en );
+	TVPSystemControl->SetEventEnabled( !en );
 	if(!en) TVPDeliverAllEvents();
 }
 //---------------------------------------------------------------------------
 bool TVPGetSystemEventDisabledState()
 {
-	return !TVPMainForm->GetEventEnabled();
+	return !TVPSystemControl->GetEventEnabled();
 }
 //---------------------------------------------------------------------------
 
@@ -261,7 +261,7 @@ void TVPBeginContinuousEvent()
 		{
 			// no limit
 			// this notifies continuous calling of TVPDeliverAllEvents.
-			if(TVPMainForm) TVPMainForm->BeginContinuousEvent();
+			if(TVPSystemControl) TVPSystemControl->BeginContinuousEvent();
 		}
 		else
 		{
@@ -287,7 +287,7 @@ void TVPEndContinuousEvent()
 		TVPContinuousHandlerCallLimitThread->SetEnabled(false);
 
 	// anyway
-	if(TVPMainForm) TVPMainForm->EndContinuousEvent();
+	if(TVPSystemControl) TVPSystemControl->EndContinuousEvent();
 }
 //---------------------------------------------------------------------------
 

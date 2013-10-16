@@ -40,7 +40,7 @@
 #include "PassThroughDrawDevice.h"
 #include "BinaryStream.h"
 #include "SysInitImpl.h"
-#include "MainFormUnit.h"
+#include "SystemControl.h"
 #include "Application.h"
 
 #include "RectItf.h"

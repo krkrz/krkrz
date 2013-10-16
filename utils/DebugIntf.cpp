@@ -22,7 +22,7 @@
 #endif // ENABLE_DEBUGGER
 
 #include "Application.h"
-#include "MainFormUnit.h"
+#include "SystemControl.h"
 //---------------------------------------------------------------------------
 // global variables
 //---------------------------------------------------------------------------
