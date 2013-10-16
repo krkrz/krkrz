@@ -15,7 +15,7 @@
 //#include <syncobjs.hpp>
 #include <math.h>
 #include <algorithm>
-#include "MainFormUnit.h"
+#include "SystemControl.h"
 #include "DebugIntf.h"
 #include "MsgIntf.h"
 #include "StorageIntf.h"

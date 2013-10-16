@@ -10,7 +10,7 @@
 //---------------------------------------------------------------------------
 #include "tjsCommHead.h"
 
-#include "MainFormUnit.h"
+#include "SystemControl.h"
 #include "WindowIntf.h"
 #include "ScriptMgnIntf.h"
 #include "MsgIntf.h"

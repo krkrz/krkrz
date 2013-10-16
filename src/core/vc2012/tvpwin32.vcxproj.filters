@@ -250,9 +250,6 @@
     <ClInclude Include="..\msg\svn_revision.h">
       <Filter>msg</Filter>
     </ClInclude>
-    <ClInclude Include="..\environ\win32\MainFormUnit.h">
-      <Filter>environ\win32</Filter>
-    </ClInclude>
     <ClInclude Include="..\environ\win32\WindowFormUnit.h">
       <Filter>environ\win32</Filter>
     </ClInclude>
@@ -541,6 +538,9 @@
     <ClInclude Include="..\environ\win32\TVPScreen.h">
       <Filter>environ\win32</Filter>
     </ClInclude>
+    <ClInclude Include="..\environ\win32\SystemControl.h">
+      <Filter>environ\win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -713,9 +713,6 @@
     </ClCompile>
     <ClCompile Include="..\msg\MsgIntf.cpp">
       <Filter>msg</Filter>
-    </ClCompile>
-    <ClCompile Include="..\environ\win32\MainFormUnit.cpp">
-      <Filter>environ\win32</Filter>
     </ClCompile>
     <ClCompile Include="..\environ\win32\EmergencyExit.cpp">
       <Filter>environ\win32</Filter>
@@ -956,6 +953,9 @@
     </ClCompile>
     <ClCompile Include="..\utils\MiscUtility.cpp">
       <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\environ\win32\SystemControl.cpp">
+      <Filter>environ\win32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

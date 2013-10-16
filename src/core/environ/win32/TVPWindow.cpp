@@ -5,7 +5,7 @@
 #include "TVPWindow.h"
 #include <vector>
 #include <windowsx.h>
-#include "MainFormUnit.h"
+#include "SystemControl.h"
 #include "Exception.h"
 #include "Application.h"
 #include "Resource.h"

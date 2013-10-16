@@ -21,7 +21,7 @@
 #include "StorageImpl.h"
 #include "MsgIntf.h"
 #include "GraphicsLoaderIntf.h"
-#include "MainFormUnit.h"
+#include "SystemControl.h"
 #include "DebugIntf.h"
 #include "tjsLex.h"
 #include "LayerIntf.h"
@@ -1304,11 +1304,11 @@ void TVPTerminateAsync(int code)
 	TVPTerminateCode = code;
 
 	// posting dummy message will prevent "missing WM_QUIT bug" in Direct3D framework.
-	if(TVPMainForm) TVPMainForm->CallDeliverAllEventsOnIdle();
+	if(TVPSystemControl) TVPSystemControl->CallDeliverAllEventsOnIdle();
 
 	Application->Terminate();
 
-	if(TVPMainForm) TVPMainForm->CallDeliverAllEventsOnIdle();
+	if(TVPSystemControl) TVPSystemControl->CallDeliverAllEventsOnIdle();
 }
 //---------------------------------------------------------------------------
 void TVPTerminateSync(int code)

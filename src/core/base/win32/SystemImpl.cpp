@@ -23,7 +23,7 @@
 #include "TickCount.h"
 #include "ComplexRect.h"
 #include "WindowImpl.h"
-#include "MainFormUnit.h"
+#include "SystemControl.h"
 #include "DInputMgn.h"
 
 #include "Application.h"
