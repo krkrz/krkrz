@@ -104,7 +104,6 @@
   <ItemGroup>
     <ClInclude Include="..\base\BinaryStream.h" />
     <ClInclude Include="..\base\CharacterSet.h" />
-    <ClInclude Include="..\base\common.h" />
     <ClInclude Include="..\base\EventIntf.h" />
     <ClInclude Include="..\base\PluginIntf.h" />
     <ClInclude Include="..\base\ScriptMgnIntf.h" />

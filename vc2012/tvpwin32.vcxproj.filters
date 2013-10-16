@@ -211,9 +211,6 @@
     <ClInclude Include="..\base\CharacterSet.h">
       <Filter>base</Filter>
     </ClInclude>
-    <ClInclude Include="..\base\common.h">
-      <Filter>base</Filter>
-    </ClInclude>
     <ClInclude Include="..\base\EventIntf.h">
       <Filter>base</Filter>
     </ClInclude>
