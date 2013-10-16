@@ -19,7 +19,7 @@
 #include "Exception.h"
 #include "WindowFormUnit.h"
 #include "Resource.h"
-#include "MainFormUnit.h"
+#include "SystemControl.h"
 #include "MouseCursor.h"
 
 #pragma comment( lib, "winmm.lib" )
@@ -213,7 +213,7 @@ int APIENTRY WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
 		Application->SetTitle( L"吉里吉里" );
 		// Application->CreateForm(__classid(TTVPMainForm), &TVPMainForm);
-		TVPMainForm = new TTVPMainForm();
+		TVPSystemControl = new tTVPSystemControl();
 
 		TVPLoadPluigins(); // load plugin module *.tpm
 
@@ -349,8 +349,8 @@ void TApplication::Run() {
 			if( msg.hwnd == mainWnd ) break;
 		}
 		bool done = true;
-		if( TVPMainForm ) {
-			done = TVPMainForm->ApplicationIdel();
+		if( TVPSystemControl ) {
+			done = TVPSystemControl->ApplicationIdel();
 		}
 		if( done ) { // idle 処理が終わったら、メッセージ待ちへ
 			BOOL dret = ::GetMessage( &msg, NULL, 0, 0 );

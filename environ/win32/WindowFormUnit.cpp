@@ -15,7 +15,7 @@
 #include "tjsArray.h"
 #include "StorageIntf.h"
 #include "MsgIntf.h"
-#include "MainFormUnit.h"
+#include "SystemControl.h"
 #include "SysInitIntf.h"
 #include "PluginImpl.h"
 #include "Random.h"

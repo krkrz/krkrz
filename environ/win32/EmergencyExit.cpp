@@ -14,7 +14,7 @@
 
 #include "EmergencyExit.h"
 #include "Random.h"
-#include "MainFormUnit.h"
+#include "SystemControl.h"
 
 #include "tvpgl_ia32_intf.h"
 
@@ -172,7 +172,7 @@ void tTVPEmergencyExitThread::Execute(void)
 		else
 			Event.WaitFor(500);
 
-		if(TVPMainFormAlive && Application != NULL && Application->GetHandle ()!= NULL)
+		if(TVPSystemControlAlive && Application != NULL && Application->GetHandle ()!= NULL)
 		{
 			PostMessage(Application->GetHandle(), WM_USER+0x35/*WM_KEEPALIVE*/, 0, 0);
 			// Send wakeup message to the main window.
