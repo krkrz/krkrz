@@ -11,6 +11,7 @@
 #include "tjsCommHead.h"
 
 #include <cderr.h>
+#include <commdlg.h>
 
 #include "MsgIntf.h"
 #include "StorageImpl.h"

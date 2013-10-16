@@ -1,5 +1,4 @@
 
-#include <windows.h>
 #include "tjsCommHead.h"
 #include "BitmapInfomation.h"
 #include "MsgIntf.h"

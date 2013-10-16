@@ -3,7 +3,6 @@
 #include "CharacterSet.h"
 #ifdef _WIN32
 #include <mmsystem.h>
-#include <windows.h>
 #endif
 
 //---------------------------------------------------------------------------

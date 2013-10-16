@@ -1,5 +1,5 @@
 
-#include "stdafx.h"
+#include "tjsCommHead.h"
 #include "InputStringForm.h"
 #include "Resource.h"
 

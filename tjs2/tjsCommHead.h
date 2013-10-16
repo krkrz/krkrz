@@ -22,6 +22,8 @@
 
 #ifdef __WIN32__
 #define _CRT_SECURE_NO_WARNINGS
+#define WIN32_LEAN_AND_MEAN
+#include "targetver.h"
 #include <windows.h>
 #endif
 
@@ -40,11 +42,8 @@
 #include <stdexcept>
 
 #include "tjsConfig.h"
-
 #include "tjs.h"
 
-typedef std::basic_string<TJS::tjs_char> stdstring;
-typedef std::basic_string<TJS::tjs_nchar> stdnstring;
 
 #ifdef TJS_SUPPORT_VCL
 	#pragma intrinsic strcpy

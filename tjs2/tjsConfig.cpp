@@ -12,9 +12,6 @@
 
 #include "tjsCommHead.h"
 
-#ifdef TJS_DEBUG_PROFILE_TIME
-#include <windows.h>
-#endif
 
 #ifdef __WIN32__
 #include <float.h>

@@ -2,9 +2,8 @@
 #ifndef __DRAWER_H__
 #define __DRAWER_H__
 
-#include <windows.h>
-#include <vfw.h>
 #include "tjsCommHead.h"
+#include <vfw.h>
 
 class tTVPPassThroughDrawDevice;
 struct tTVPRect;
