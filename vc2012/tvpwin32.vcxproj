@@ -351,6 +351,7 @@
     <ClCompile Include="..\utils\cp932_uni.cpp" />
     <ClCompile Include="..\utils\DebugIntf.cpp" />
     <ClCompile Include="..\utils\md5.c" />
+    <ClCompile Include="..\utils\MiscUtility.cpp" />
     <ClCompile Include="..\utils\Random.cpp" />
     <ClCompile Include="..\utils\ThreadIntf.cpp" />
     <ClCompile Include="..\utils\TickCount.cpp" />
@@ -358,7 +359,6 @@
     <ClCompile Include="..\utils\TimerIntf.cpp" />
     <ClCompile Include="..\utils\uni_cp932.cpp" />
     <ClCompile Include="..\utils\win32\ClipboardImpl.cpp" />
-    <ClCompile Include="..\utils\win32\MiscUtility.cpp" />
     <ClCompile Include="..\utils\win32\ThreadImpl.cpp" />
     <ClCompile Include="..\utils\win32\TVPTimer.cpp" />
     <ClCompile Include="..\visual\BitmapIntf.cpp" />
