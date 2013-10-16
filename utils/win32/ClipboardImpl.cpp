@@ -12,7 +12,6 @@
 #include "MsgIntf.h"
 #include "Exception.h"
 #include "ClipboardIntf.h"
-#include <windows.h>
 
 //---------------------------------------------------------------------------
 // clipboard related functions

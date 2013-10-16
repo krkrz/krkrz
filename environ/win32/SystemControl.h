@@ -11,7 +11,6 @@
 #ifndef SystemControlH
 #define SystemControlH
 //---------------------------------------------------------------------------
-#include <windows.h>
 #include <string>
 #include "TVPTimer.h"
 //---------------------------------------------------------------------------

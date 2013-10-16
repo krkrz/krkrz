@@ -12,6 +12,7 @@
 #define PluginImplH
 //---------------------------------------------------------------------------
 #include <memory.h>
+#include <objidl.h> // for IStream
 
 #include "PluginIntf.h"
 

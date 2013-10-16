@@ -2,8 +2,6 @@
 #ifndef __TVP_TIMER_H__
 #define __TVP_TIMER_H__
 
-#include <windows.h>
-
 class TVPTimerEventIntarface {
 public:
 	virtual void Handle() = 0;

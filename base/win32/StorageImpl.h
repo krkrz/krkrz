@@ -14,6 +14,7 @@
 #include "StorageIntf.h"
 #include "UtilStreams.h"
 
+#include <objidl.h> // for IStream
 
 
 //---------------------------------------------------------------------------
