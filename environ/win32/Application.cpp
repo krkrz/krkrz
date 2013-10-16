@@ -36,7 +36,7 @@
 #pragma comment( lib, "tvpsnd_ia32.lib" )
 
 HINSTANCE hInst;
-TApplication* Application;
+tTVPApplication* Application;
 
 #if 0
 tstring ParamStr( int index ) {
@@ -178,7 +178,7 @@ int APIENTRY WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
 	MouseCursor::Initialize();
 
-	Application = new TApplication();
+	Application = new tTVPApplication();
 	Application->ArgC = __argc;
 	Application->ArgV = __argv;
 	for( int i = 0; i < __argc; i++ ) {
@@ -263,7 +263,7 @@ int APIENTRY WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 /**
  * コンソールからの起動か確認し、コンソールからの起動の場合は、標準出力を割り当てる
  */
-void TApplication::CheckConsole() {
+void tTVPApplication::CheckConsole() {
 #ifdef TVP_LOG_TO_COMMANDLINE_CONSOLE
 	if( ::AttachConsole(ATTACH_PARENT_PROCESS) ) {
 		_wfreopen_s( &oldstdin_, L"CON", L"r", stdin );     // 標準入力の割り当て
@@ -279,7 +279,7 @@ void TApplication::CheckConsole() {
 	}
 #endif
 }
-void TApplication::CloseConsole() {
+void tTVPApplication::CloseConsole() {
 	if( is_attach_console_ ) {
 		printf("Exit code: %d\n",TVPTerminateCode);
 		FILE *tmpout, *tmpin;
@@ -289,42 +289,42 @@ void TApplication::CloseConsole() {
 		::FreeConsole();
 	}
 }
-void TApplication::PrintConsole( const wchar_t* mes, unsigned long len ) {
+void tTVPApplication::PrintConsole( const wchar_t* mes, unsigned long len ) {
 	DWORD wlen;
 	HANDLE hStdOutput = ::GetStdHandle(STD_OUTPUT_HANDLE);
 	::WriteConsoleW( hStdOutput, mes, len, &wlen, NULL );
 	::WriteConsoleW( hStdOutput, "\n", 1, &wlen, NULL );
 }
-HWND TApplication::GetHandle() {
+HWND tTVPApplication::GetHandle() {
 	if( windows_list_.size() > 0 ) {
 		return windows_list_[0]->GetHandle();
 	} else {
 		return INVALID_HANDLE_VALUE;
 	}
 }
-void TApplication::Minimize() {
+void tTVPApplication::Minimize() {
 	size_t size = windows_list_.size();
 	for( size_t i = 0; i < size; i++ ) {
 		::ShowWindow( windows_list_[i]->GetHandle(), SW_MINIMIZE );
 	}
 }
-void TApplication::Restore() {
+void tTVPApplication::Restore() {
 	size_t size = windows_list_.size();
 	for( size_t i = 0; i < size; i++ ) {
 		::ShowWindow( windows_list_[i]->GetHandle(), SW_RESTORE );
 	}
 }
 
-void TApplication::BringToFront() {
+void tTVPApplication::BringToFront() {
 	size_t size = windows_list_.size();
 	for( size_t i = 0; i < size; i++ ) {
 		windows_list_[i]->BringToFront();
 	}
 }
-void TApplication::ShowException( class Exception* e ) {
+void tTVPApplication::ShowException( class Exception* e ) {
 	::MessageBox( NULL, e->what(), L"致命的なエラー", MB_OK );
 }
-void TApplication::Run() {
+void tTVPApplication::Run() {
 	MSG msg;
 	HACCEL hAccelTable;
 	//hAccelTable = LoadAccelerators( (HINSTANCE)GetModuleHandle(0), MAKEINTRESOURCE(IDC_TVPWIN32));
@@ -372,7 +372,7 @@ void TApplication::Run() {
 		}
 	}
 }
-bool TApplication::ProcessMessage( MSG &msg ) {
+bool tTVPApplication::ProcessMessage( MSG &msg ) {
 	bool result = false;
 	if( ::PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE) ) {
 		BOOL msgExists = ::PeekMessage( &msg, NULL, 0, 0, PM_REMOVE);
@@ -392,17 +392,17 @@ bool TApplication::ProcessMessage( MSG &msg ) {
 	}
 	return result;
 }
-void TApplication::ProcessMessages() {
+void tTVPApplication::ProcessMessages() {
 	MSG msg = {0};
 	while(ProcessMessage(msg));
 }
-void TApplication::HandleMessage() {
+void tTVPApplication::HandleMessage() {
 	MSG msg = {0};
 	if( !ProcessMessage(msg) ) {
 		// 本来はIdle 処理が入っているけど、ここでは行わない
 	}
 }
-void TApplication::SetTitle( const std::wstring& caption ) {
+void tTVPApplication::SetTitle( const std::wstring& caption ) {
 	title_ = caption;
 	if( windows_list_.size() > 0 ) {
 		windows_list_[0]->SetCaption( caption );
@@ -411,24 +411,24 @@ void TApplication::SetTitle( const std::wstring& caption ) {
 		::SetConsoleTitle( caption.c_str() );
 	}
 }
-HWND TApplication::GetMainWindowHandle() {
+HWND tTVPApplication::GetMainWindowHandle() {
 	if( windows_list_.size() > 0 ) {
 		return windows_list_[0]->GetHandle();
 	}
 	return INVALID_HANDLE_VALUE;
 }
 
-void TApplication::RemoveWindow( TTVPWindowForm* win ) {
+void tTVPApplication::RemoveWindow( TTVPWindowForm* win ) {
 	std::vector<class TTVPWindowForm*>::iterator it = std::remove( windows_list_.begin(), windows_list_.end(), win );
 	windows_list_.erase( it, windows_list_.end() );
 }
 
-void TApplication::PostMessageToMainWindow(UINT message, WPARAM wParam, LPARAM lParam) {
+void tTVPApplication::PostMessageToMainWindow(UINT message, WPARAM wParam, LPARAM lParam) {
 	if( windows_list_.size() > 0 ) {
 		::PostMessage( windows_list_[0]->GetHandle(), message, wParam, lParam );
 	}
 }
-void TApplication::GetDisableWindowList( std::vector<class TTVPWindowForm*>& win ) {
+void tTVPApplication::GetDisableWindowList( std::vector<class TTVPWindowForm*>& win ) {
 	size_t count = windows_list_.size();
 	for( size_t i = 0; i < count; i++ ) {
 		if( windows_list_[i]->GetEnable() == false ) {
@@ -437,13 +437,13 @@ void TApplication::GetDisableWindowList( std::vector<class TTVPWindowForm*>& win
 	}
 }
 
-void TApplication::DisableWindows() {
+void tTVPApplication::DisableWindows() {
 	size_t count = windows_list_.size();
 	for( size_t i = 0; i < count; i++ ) {
 		windows_list_[i]->SetEnable( false );
 	}
 }
-void TApplication::EnableWindows( const  std::vector<TTVPWindowForm*>& ignores ) {
+void tTVPApplication::EnableWindows( const  std::vector<TTVPWindowForm*>& ignores ) {
 	size_t count = windows_list_.size();
 	for( size_t i = 0; i < count; i++ ) {
 		TTVPWindowForm* win = windows_list_[i];
@@ -453,7 +453,7 @@ void TApplication::EnableWindows( const  std::vector<TTVPWindowForm*>& ignores )
 		}
 	}
 }
-void TApplication::FreeDirectInputDeviceForWindows() {
+void tTVPApplication::FreeDirectInputDeviceForWindows() {
 	size_t count = windows_list_.size();
 	for( size_t i = 0; i < count; i++ ) {
 		windows_list_[i]->FreeDirectInputDevice();
@@ -461,16 +461,16 @@ void TApplication::FreeDirectInputDeviceForWindows() {
 }
 
 
-void TApplication::RegisterAcceleratorKey(HWND hWnd, char virt, short key, short cmd) {
+void tTVPApplication::RegisterAcceleratorKey(HWND hWnd, char virt, short key, short cmd) {
 	accel_key_.AddKey( hWnd, cmd, key, virt );
 }
-void TApplication::UnregisterAcceleratorKey(HWND hWnd, short cmd) {
+void tTVPApplication::UnregisterAcceleratorKey(HWND hWnd, short cmd) {
 	accel_key_.DelKey( hWnd, cmd );
 }
-void TApplication::DeleteAcceleratorKeyTable( HWND hWnd ) {
+void tTVPApplication::DeleteAcceleratorKeyTable( HWND hWnd ) {
 	accel_key_.DelTable( hWnd );
 }
-void TApplication::CheckDigitizer() {
+void tTVPApplication::CheckDigitizer() {
 // TODO メッセージはリソースへ
 	int value = ::GetSystemMetrics(SM_DIGITIZER);
 	if( value == 0 ) return;
