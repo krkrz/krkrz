@@ -8,8 +8,8 @@
 
 class GDIFontRasterizer : public FontRasterizer {
 	tjs_int RefCount;
-	class TFont* FontDC;
-	class TFont* NonBoldFontDC;
+	class tTVPSysFont* FontDC;
+	class tTVPSysFont* NonBoldFontDC;
 	class tTVPNativeBaseBitmap* LastBitmap;
 	LOGFONT CurentLOGFONT;
 

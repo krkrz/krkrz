@@ -24,7 +24,7 @@
 #include "tvpinputdefs.h"
 
 #include "Application.h"
-#include "TFont.h"
+#include "TVPSysFont.h"
 #include "TickCount.h"
 
 tjs_uint32 TVP_TShiftState_To_uint32(TShiftState state) {
@@ -203,7 +203,7 @@ TTVPWindowForm::TTVPWindowForm( tTVPApplication* app, tTJSNI_Window* ni ) : tTVP
 	InnerWidthSave = GetInnerWidth();
 	InnerHeightSave = GetInnerHeight();
 
-	AttentionFont = new TFont();
+	AttentionFont = new tTVPSysFont();
 	
 	ZoomDenom = ActualZoomDenom = 1;
 	ZoomNumer = ActualZoomNumer = 1;
@@ -1391,7 +1391,7 @@ void TTVPWindowForm::SetAttentionPoint(tjs_int left, tjs_int top, const tTVPFont
 	if( font ) {
 		AttentionFont->Assign(*font);
 	} else {
-		TFont * default_font = new TFont();
+		tTVPSysFont * default_font = new tTVPSysFont();
 		AttentionFont->Assign(default_font);
 		delete default_font;
 	}

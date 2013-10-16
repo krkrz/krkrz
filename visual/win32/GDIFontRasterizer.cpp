@@ -6,7 +6,7 @@
 #include <math.h>
 
 #include "FontSystem.h"
-#include "TFont.h"
+#include "TVPSysFont.h"
 #include "SysInitImpl.h"
 
 extern FontSystem* TVPFontSystem;
@@ -53,8 +53,8 @@ GDIFontRasterizer::~GDIFontRasterizer() {
 }
 void GDIFontRasterizer::AddRef() {
 	if( RefCount == 0 ) {
-		FontDC = new TFont();
-		NonBoldFontDC = new TFont();
+		FontDC = new tTVPSysFont();
+		NonBoldFontDC = new tTVPSysFont();
 	}
 	RefCount ++;
 }

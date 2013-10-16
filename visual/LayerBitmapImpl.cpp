@@ -31,7 +31,7 @@
 //#include "FontSelectFormUnit.h"
 
 #include "StringUtil.h"
-#include "TFont.h"
+#include "TVPSysFont.h"
 #include "CharacterData.h"
 #include "PrerenderedFont.h"
 #include "FontSystem.h"

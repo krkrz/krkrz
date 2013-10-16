@@ -1,12 +1,12 @@
 
 
-#ifndef __T_FONT_H__
-#define __T_FONT_H__
+#ifndef __TVP_SYS_FONT_H__
+#define __TVP_SYS_FONT_H__
 #include "FontSystem.h"
 
 extern FontSystem* TVPFontSystem;
 
-class TFont {
+class tTVPSysFont {
 	HFONT hFont_;
 	HFONT hOldFont_;
 	HDC hMemDC_;
@@ -14,7 +14,7 @@ class TFont {
 	HBITMAP hOldBmp_;
 
 public:
-	TFont() : hFont_(INVALID_HANDLE_VALUE), hOldFont_(INVALID_HANDLE_VALUE), hMemDC_(INVALID_HANDLE_VALUE),
+	tTVPSysFont() : hFont_(INVALID_HANDLE_VALUE), hOldFont_(INVALID_HANDLE_VALUE), hMemDC_(INVALID_HANDLE_VALUE),
 		hBmp_(INVALID_HANDLE_VALUE), hOldBmp_(INVALID_HANDLE_VALUE) {
 		BITMAPINFO bmpinfo;
 		ZeroMemory( &bmpinfo, sizeof(bmpinfo) );
@@ -42,7 +42,7 @@ public:
 		logfont.lfStrikeOut = FALSE;
 		ApplyFont( &logfont );
 	}
-	TFont( const tTVPFont &font ) : hFont_(INVALID_HANDLE_VALUE), hOldFont_(INVALID_HANDLE_VALUE), hMemDC_(INVALID_HANDLE_VALUE),
+	tTVPSysFont( const tTVPFont &font ) : hFont_(INVALID_HANDLE_VALUE), hOldFont_(INVALID_HANDLE_VALUE), hMemDC_(INVALID_HANDLE_VALUE),
 		hBmp_(INVALID_HANDLE_VALUE), hOldBmp_(INVALID_HANDLE_VALUE) {
 		BITMAPINFO bmpinfo;
 		ZeroMemory( &bmpinfo, sizeof(bmpinfo) );
@@ -76,7 +76,7 @@ public:
 
 		ApplyFont( &LogFont );
 	}
-	~TFont() {
+	~tTVPSysFont() {
 		::SelectObject( hMemDC_, hOldBmp_ );
 		if( INVALID_HANDLE_VALUE != hOldFont_ ) {
 			::SelectObject( hMemDC_, hOldFont_ );
@@ -98,7 +98,7 @@ public:
 		return result;
 	}
 
-	void Assign( const TFont* font ) {
+	void Assign( const tTVPSysFont* font ) {
 		LOGFONT logfont = {0};
 		font->GetFont( &logfont );
 		ApplyFont( &logfont );
@@ -147,4 +147,4 @@ public:
 };
 
 void TVPGetFontList(std::vector<std::wstring> & list, tjs_uint32 flags, const tTVPFont & font );
-#endif // __T_FONT_H__
+#endif // __TVP_SYS_FONT_H__
