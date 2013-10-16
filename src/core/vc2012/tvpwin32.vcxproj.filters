@@ -262,12 +262,6 @@
     <ClInclude Include="..\environ\win32\EmergencyExit.h">
       <Filter>environ\win32</Filter>
     </ClInclude>
-    <ClInclude Include="..\environ\win32\TColor.h">
-      <Filter>environ\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="..\environ\win32\Exception.h">
-      <Filter>environ\win32</Filter>
-    </ClInclude>
     <ClInclude Include="..\environ\win32\InputStringForm.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -540,6 +534,12 @@
     </ClInclude>
     <ClInclude Include="..\environ\win32\ApplicationSpecialPath.h">
       <Filter>environ\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\win32\TVPColor.h">
+      <Filter>visual\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utils\Exception.h">
+      <Filter>utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
