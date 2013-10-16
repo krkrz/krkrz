@@ -21,6 +21,7 @@
 #include <memory>
 
 #include "Application.h"
+#include "UserEvent.h"
 
 double TVPCPUClock = 0; // CPU clock, in MHz
 tTVPCPUClockAccuracy TVPCPUClockAccuracy = ccaNotSet;
@@ -171,14 +172,15 @@ void tTVPEmergencyExitThread::Execute(void)
 			Event.WaitFor(200);
 		else
 			Event.WaitFor(500);
-
+#ifdef TJS_SUPPORT_VCL
 		if(TVPSystemControlAlive && Application != NULL && Application->GetHandle ()!= NULL)
 		{
-			PostMessage(Application->GetHandle(), WM_USER+0x35/*WM_KEEPALIVE*/, 0, 0);
+			PostMessage(Application->GetHandle(), TVP_EV_KEEP_ALIVE, 0, 0);
 			// Send wakeup message to the main window.
 			// VCL sometimes waits message that never come (so hangs up).
 			// This message will wake the VCL up.
 		}
+#endif
 	}
 }
 //---------------------------------------------------------------------------
