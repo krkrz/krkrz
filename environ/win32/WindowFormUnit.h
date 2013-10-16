@@ -157,7 +157,7 @@ private:
 	
 	bool AttentionPointEnabled;
 	POINT AttentionPoint;
-	TFont *AttentionFont;
+	tTVPSysFont *AttentionFont;
 
 	//-- mouse cursor
 	tTVPMouseCursorState MouseCursorState;
