@@ -262,15 +262,6 @@
     <ClInclude Include="..\environ\win32\EmergencyExit.h">
       <Filter>environ\win32</Filter>
     </ClInclude>
-    <ClInclude Include="..\environ\win32\FileCtrl.h">
-      <Filter>environ\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="..\environ\win32\FileStream.h">
-      <Filter>environ\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="..\environ\win32\StringUtil.h">
-      <Filter>environ\win32</Filter>
-    </ClInclude>
     <ClInclude Include="..\environ\win32\TColor.h">
       <Filter>environ\win32</Filter>
     </ClInclude>
@@ -539,6 +530,15 @@
       <Filter>environ\win32</Filter>
     </ClInclude>
     <ClInclude Include="..\environ\win32\SystemControl.h">
+      <Filter>environ\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utils\StringUtil.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utils\FilePathUtil.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\environ\win32\ApplicationSpecialPath.h">
       <Filter>environ\win32</Filter>
     </ClInclude>
   </ItemGroup>

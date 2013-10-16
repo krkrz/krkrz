@@ -30,7 +30,7 @@
 
 #include "Application.h"
 #include "StringUtil.h"
-#include "FileCtrl.h"
+#include "FilePathUtil.h"
 
 //---------------------------------------------------------------------------
 // tTVPFileMedia

@@ -184,7 +184,7 @@ void TVPInitWindowOptions()
 //---------------------------------------------------------------------------
 
 
-TTVPWindowForm::TTVPWindowForm( TApplication* app, tTJSNI_Window* ni ) : tTVPWindow(), CurrentMouseCursor(crDefault), touch_points_(this),
+TTVPWindowForm::TTVPWindowForm( tTVPApplication* app, tTJSNI_Window* ni ) : tTVPWindow(), CurrentMouseCursor(crDefault), touch_points_(this),
 	LayerLeft(0), LayerTop(0), LayerWidth(32), LayerHeight(32),
 	HintX(0), HintY(0), HintTimer(NULL), HintDelay(TVP_TOOLTIP_SHOW_DELAY), LastHintSender(NULL) {
 	CreateWnd( L"TVPMainWindow", Application->GetTitle(), 10, 10 );

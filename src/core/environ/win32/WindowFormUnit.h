@@ -225,7 +225,7 @@ protected:
 	LRESULT WINAPI Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
 
 public:
-	TTVPWindowForm( class TApplication* app, tTJSNI_Window* ni );
+	TTVPWindowForm( class tTVPApplication* app, tTJSNI_Window* ni );
 	virtual ~TTVPWindowForm();
 	
 	static void DeliverPopupHide();

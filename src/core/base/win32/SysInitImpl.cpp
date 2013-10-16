@@ -10,8 +10,8 @@
 //---------------------------------------------------------------------------
 #include "tjsCommHead.h"
 
-//#include <dir.h>
-#include "FileCtrl.h"
+
+#include "FilePathUtil.h"
 #include <delayimp.h>
 #include <mmsystem.h>
 #include <objbase.h>
@@ -29,7 +29,6 @@
 #include "DetectCPU.h"
 #include "OptionsDesc.h"
 #include "XP3Archive.h"
-//#include "ConfSettingsUnit.h"
 #include "ScriptMgnIntf.h"
 #include "XP3Archive.h"
 #include "VersionFormUnit.h"
@@ -37,10 +36,10 @@
 
 #include "tvpgl_ia32_intf.h"
 
+#include "BinaryStream.h"
 #include "Application.h"
 #include "Exception.h"
-#include "ConfMainFrameUnit.h"
-#include "FileStream.h"
+#include "ApplicationSpecialPath.h"
 #include "resource.h"
 
 #define TVP_NEED_UI_VERSION (((0x0001)<<16)+ 4) // needed development UI DLL version
@@ -1543,7 +1542,7 @@ static void TVPInitProgramArgumentsAndDataPath(bool stop_after_datapath_got)
 		{
 			// read embedded options and default configuration file
 			options[0] = TVPGetEmbeddedOptions();
-			options[1] = TVPGetConfigFileOptions(TConfMainFrame::GetConfigFileName(ExePath()));
+			options[1] = TVPGetConfigFileOptions(ApplicationSpecialPath::GetConfigFileName(ExePath()));
 
 			// at this point, we need to push all exsting known options
 			// to be able to see datapath
@@ -1556,12 +1555,12 @@ static void TVPInitProgramArgumentsAndDataPath(bool stop_after_datapath_got)
 			std::wstring config_datapath;
 			if(TVPGetCommandLine(TJS_W("-datapath"), &val))
 				config_datapath = ((ttstr)val).AsStdString();
-			TVPNativeDataPath = TConfMainFrame::GetDataPathDirectory(config_datapath, ExePath());
+			TVPNativeDataPath = ApplicationSpecialPath::GetDataPathDirectory(config_datapath, ExePath());
 
 			if(stop_after_datapath_got) return;
 
 			// read per-user configuration file
-			options[2] = TVPGetConfigFileOptions(TConfMainFrame::GetUserConfigFileName(config_datapath, ExePath()));
+			options[2] = TVPGetConfigFileOptions(ApplicationSpecialPath::GetUserConfigFileName(config_datapath, ExePath()));
 
 			// push each options into option stock
 			// we need to clear TVPProgramArguments first because of the
@@ -1704,13 +1703,11 @@ bool TVPCheckCmdDescription(void)
 	{
 		if(!strcmp(_argv[i], "-@cmddesc")) // this does not refer TVPGetCommandLine
 		{
-			std::string fn = _argv[i+2];
-			TFileStream* stream = new TFileStream(fn, fmCreate|fmShareDenyWrite);
+			tTJSBinaryStream* stream = TVPCreateBinaryStreamForWrite( ttstr(_argv[i+2]), TJS_W("") );
 			try
 			{
 				ttstr str = TVPGetCommandDesc();
-				stream->WriteBuffer(str.c_str(),
-					str.GetLen()*sizeof(tjs_char));
+				stream->WriteBuffer(str.c_str(), str.GetLen()*sizeof(tjs_char));
 			}
 			catch(...)
 			{
@@ -1719,10 +1716,10 @@ bool TVPCheckCmdDescription(void)
 			}
 			delete stream;
 
-			HANDLE handle = OpenEvent(EVENT_ALL_ACCESS, FALSE, ttstr(_argv[i+3]).c_str() );
+			HANDLE handle = ::OpenEvent(EVENT_ALL_ACCESS, FALSE, ttstr(_argv[i+3]).c_str() );
 			if(!handle) return true; // processed but errored
-			SetEvent(handle);
-			CloseHandle(handle);
+			::SetEvent(handle);
+			::CloseHandle(handle);
 
 			return true; // processed
 		}
