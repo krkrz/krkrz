@@ -28,8 +28,6 @@
 #include FT_BITMAP_H
 
 extern bool TVPEncodeUTF8ToUTF16( std::wstring &output, const std::string &source );
-extern tjs_uint TVPEncodeUnicodeToSJIS( tjs_char in );
-extern tjs_char TVPEncodeSJISToUnicode(tjs_uint in);
 
 //---------------------------------------------------------------------------
 
@@ -302,8 +300,8 @@ tFreeTypeFace::tFreeTypeFace(const std::wstring &fontname, tjs_uint32 options)
 		{
 			// SJIS Ç÷ÇÃêÿÇËë÷Ç¶Ç™ê¨å˜ÇµÇΩ
 			// ïœä∑ä÷êîÇÉZÉbÉgÇ∑ÇÈ
-			UnicodeToLocalChar = TVPEncodeUnicodeToSJIS;
-			LocalCharToUnicode = TVPEncodeSJISToUnicode;
+			UnicodeToLocalChar = UnicodeToSJIS;
+			LocalCharToUnicode = SJISToUnicode;
 		}
 	}
 }

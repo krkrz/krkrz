@@ -861,9 +861,6 @@
     <ClCompile Include="..\environ\win32\TouchPoint.cpp">
       <Filter>environ\win32</Filter>
     </ClCompile>
-    <ClCompile Include="..\utils\win32\MiscUtility.cpp">
-      <Filter>utils\win32</Filter>
-    </ClCompile>
     <ClCompile Include="..\utils\TickCount.cpp">
       <Filter>utils</Filter>
     </ClCompile>
@@ -956,6 +953,9 @@
     </ClCompile>
     <ClCompile Include="..\environ\win32\TVPScreen.cpp">
       <Filter>environ\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utils\MiscUtility.cpp">
+      <Filter>utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
