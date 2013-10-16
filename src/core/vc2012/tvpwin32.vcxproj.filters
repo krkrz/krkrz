@@ -61,16 +61,7 @@
     <Text Include="optionarea.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="Resource.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="tvpwin32.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="..\tjs2\tjs.h">
@@ -261,9 +252,6 @@
     </ClInclude>
     <ClInclude Include="..\environ\win32\EmergencyExit.h">
       <Filter>environ\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="..\environ\win32\InputStringForm.h">
-      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="..\environ\win32\DetectCPU.h">
       <Filter>environ\win32</Filter>
@@ -543,12 +531,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="stdafx.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="tvpwin32.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="..\tjs2\tjs.cpp">
       <Filter>tjs2</Filter>
     </ClCompile>
@@ -719,9 +701,6 @@
     </ClCompile>
     <ClCompile Include="..\environ\win32\Application.cpp">
       <Filter>environ\win32</Filter>
-    </ClCompile>
-    <ClCompile Include="..\environ\win32\InputStringForm.cpp">
-      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="..\environ\win32\DetectCPU.cpp">
       <Filter>environ\win32</Filter>
@@ -957,6 +936,9 @@
     <ClCompile Include="..\visual\win32\TVPScreen.cpp">
       <Filter>visual\win32</Filter>
     </ClCompile>
+    <ClCompile Include="..\environ\win32\InputStringForm.cpp">
+      <Filter>environ\win32</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="tvpwin32.rc">
@@ -970,22 +952,5 @@
     <Image Include="tvpwin32.ico">
       <Filter>リソース ファイル</Filter>
     </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="res\movetab.cur">
-      <Filter>リソース ファイル</Filter>
-    </None>
-    <None Include="res\nodrop.cur">
-      <Filter>リソース ファイル</Filter>
-    </None>
-    <None Include="res\splith.cur">
-      <Filter>リソース ファイル</Filter>
-    </None>
-    <None Include="res\splitv.cur">
-      <Filter>リソース ファイル</Filter>
-    </None>
-    <None Include="res\nomovetab.cur">
-      <Filter>リソース ファイル</Filter>
-    </None>
   </ItemGroup>
 </Project>

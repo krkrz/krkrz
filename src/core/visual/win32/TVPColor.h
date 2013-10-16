@@ -2,8 +2,6 @@
 #ifndef __TVP_COLOR_H__
 #define __TVP_COLOR_H__
 
-#include <windows.h>
-
 enum {
 	clScrollBar = 0x80000000,
 	clBackground = 0x80000001,

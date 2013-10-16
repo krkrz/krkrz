@@ -1,6 +1,8 @@
 
 #include "tjsCommHead.h"
 
+#include <mmsystem.h>
+
 #include "VSyncTimingThread.h"
 #include "WindowImpl.h"
 #include "EventIntf.h"

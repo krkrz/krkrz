@@ -8,7 +8,6 @@
 #include "EventImpl.h"
 #include "WindowImpl.h"
 
-#include <windows.h>
 #include <d3d9.h>
 
 extern bool TVPZoomInterpolation;

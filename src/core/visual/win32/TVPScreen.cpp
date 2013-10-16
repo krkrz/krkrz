@@ -1,6 +1,5 @@
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+#include "tjsCommHead.h"
 
 #include "TVPScreen.h"
 #include "Application.h"

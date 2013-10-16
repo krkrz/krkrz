@@ -3,9 +3,8 @@
 #define __TVP_WINDOW_H__
 
 #include <string>
-#include "stdafx.h"
 #include <shellapi.h>
-#include "tjsCommHead.h"
+#include <oleidl.h> // for MK_ALT
 #include "tvpinputdefs.h"
 
 #include "ImeControl.h"

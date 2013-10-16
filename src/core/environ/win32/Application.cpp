@@ -1,12 +1,11 @@
 
+#include "tjsCommHead.h"
+
 #include <algorithm>
 #include <string>
 #include <vector>
-#include <windows.h>
+
 #include "Application.h"
-
-#include "tjsCommHead.h"
-
 #include "SysInitIntf.h"
 #include "SysInitImpl.h"
 #include "DebugIntf.h"

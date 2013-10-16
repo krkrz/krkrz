@@ -11,8 +11,6 @@
 #ifndef CompatibleNativeFuncsH
 #define CompatibleNativeFuncsH
 
-#include <windows.h>
-
 //---------------------------------------------------------------------------
 // macros
 //---------------------------------------------------------------------------

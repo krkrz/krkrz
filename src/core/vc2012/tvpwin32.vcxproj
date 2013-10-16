@@ -127,7 +127,6 @@
     <ClInclude Include="..\environ\win32\CompatibleNativeFuncs.h" />
     <ClInclude Include="..\environ\win32\DetectCPU.h" />
     <ClInclude Include="..\environ\win32\EmergencyExit.h" />
-    <ClInclude Include="..\environ\win32\InputStringForm.h" />
     <ClInclude Include="..\environ\win32\MouseCursor.h" />
     <ClInclude Include="..\environ\win32\SystemControl.h" />
     <ClInclude Include="..\environ\win32\TouchPoint.h" />
@@ -259,9 +258,6 @@
     <ClInclude Include="..\visual\win32\WindowImpl.h" />
     <ClInclude Include="..\visual\WindowIntf.h" />
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="stdafx.h" />
-    <ClInclude Include="targetver.h" />
-    <ClInclude Include="tvpwin32.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\base\BinaryStream.cpp" />
@@ -400,11 +396,6 @@
     <ClCompile Include="..\visual\win32\VSyncTimingThread.cpp" />
     <ClCompile Include="..\visual\win32\WindowImpl.cpp" />
     <ClCompile Include="..\visual\WindowIntf.cpp" />
-    <ClCompile Include="stdafx.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="tvpwin32.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="tvpwin32.rc" />
@@ -412,13 +403,6 @@
   <ItemGroup>
     <Image Include="small.ico" />
     <Image Include="tvpwin32.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="res\movetab.cur" />
-    <None Include="res\nodrop.cur" />
-    <None Include="res\nomovetab.cur" />
-    <None Include="res\splith.cur" />
-    <None Include="res\splitv.cur" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

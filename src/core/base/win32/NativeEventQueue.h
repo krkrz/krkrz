@@ -2,8 +2,6 @@
 #ifndef __NATIVE_EVENT_QUEUE_H__
 #define __NATIVE_EVENT_QUEUE_H__
 
-#include <windows.h>
-
 // 呼び出されるハンドラがシングルスレッドで動作するイベントキュー
 
 class NativeEvent {

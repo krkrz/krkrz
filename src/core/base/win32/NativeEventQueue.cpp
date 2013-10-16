@@ -1,4 +1,5 @@
 
+#include "tjsCommHead.h"
 #include "NativeEventQueue.h"
 
 int NativeEventQueueImplement::CreateUtilWindow() {

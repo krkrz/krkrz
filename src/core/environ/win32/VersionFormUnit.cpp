@@ -9,10 +9,9 @@
 // Version information dialog box
 //---------------------------------------------------------------------------
 
-#include "stdafx.h"
-#include "Resource.h"
-
 #include "tjsCommHead.h"
+
+#include "Resource.h"
 
 #include "MsgIntf.h"
 #include "VersionFormUnit.h"

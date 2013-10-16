@@ -5,9 +5,6 @@
 
 #include <vector>
 
-#define WIN32_LEAN_AND_MEAN             // Windows ヘッダーから使用されていない部分を除外します。
-#include <windows.h>
-
 class MouseCursor {
 	enum {
 		CURSOR_APPSTARTING,	// 標準矢印カーソルおよび小型砂時計カーソル
