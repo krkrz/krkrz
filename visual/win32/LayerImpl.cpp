@@ -13,7 +13,7 @@
 #include "LayerImpl.h"
 #include "MsgIntf.h"
 
-#include "TColor.h"
+#include "TVPColor.h"
 
 //---------------------------------------------------------------------------
 //  convert color identifier or TVP system color to/from actual color
