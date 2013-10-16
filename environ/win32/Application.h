@@ -5,7 +5,6 @@
 #include <vector>
 #include <map>
 
-//tstring ParamStr( int index );
 std::wstring ExePath();
 
 // 後で見通しのよう方法に変更する
@@ -17,17 +16,6 @@ enum {
 	mrAbort,
 	mrCancel,
 };
-
-/*
-MB_ABORTRETRYIGNORE	メッセージボックスに［中止］、［再試行］、［無視］の各プッシュボタンを表示します。
-MB_CANCELTRYCONTINUE	Windows 2000：メッセージボックスに［キャンセル］、［再実行］、［続行］の各プッシュボタンを表示します。MB_ABORTRETRYIGNORE の代わりに、このメッセージボックスタイプを使ってください。
-MB_HELP	Windows 95/98、Windows NT 4.0 以降：メッセージボックスに［ヘルプ］ボタンを追加します。ユーザーが［ヘルプ］ボタンをクリックするか F1 キーを押すと、システムはオーナーへ メッセージを送信します。
-MB_OK	メッセージボックスに［OK］プッシュボタンだけを表示します。これは既定のメッセージボックスタイプです。
-MB_OKCANCEL	メッセージボックスに［OK］、［キャンセル］の各プッシュボタンを表示します。
-MB_RETRYCANCEL	メッセージボックスに［再試行］、［キャンセル］の各プッシュボタンを表示します。
-MB_YESNO	メッセージボックスに［はい］、［いいえ］の各プッシュボタンを表示します。
-MB_YESNOCANCEL	メッセージボックスに［はい］、［いいえ］、［キャンセル］の各プッシュボタンを表示します。
-*/
 
 enum {
   mtWarning = MB_ICONWARNING,
@@ -71,7 +59,7 @@ public:
 		return hAccel_;
 	}
 };
-class TApplication {
+class tTVPApplication {
 	std::vector<class TTVPWindowForm*> windows_list_;
 	std::wstring title_;
 
@@ -83,7 +71,7 @@ class TApplication {
 	bool tarminate_;
 
 public:
-	TApplication() : is_attach_console_(false), tarminate_(false) {}
+	tTVPApplication() : is_attach_console_(false), tarminate_(false) {}
 	void CheckConsole();
 	void CloseConsole();
 	void PrintConsole( const wchar_t* mes, unsigned long len );
@@ -151,27 +139,9 @@ public:
 	void DeleteAcceleratorKeyTable( HWND hWnd );
 };
 std::vector<std::string>* LoadLinesFromFile( const std::wstring& path );
-/*
-// スタブ、正しくは動作しないはず。
-inline HWND AllocateHWnd( LRESULT (CALLBACK *UtilWndProc)(HWND,UINT,WPARAM,LPARAM) ) {
-	
-	const wchar_t* classname = TJS_W("TPUtilWindow");
-	WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC, UtilWndProc, 0L, 0L,
-						GetModuleHandle(NULL), NULL, NULL, NULL, NULL,
-						classname, NULL };
-	::RegisterClassEx( &wc );
-	HWND hWnd = ::CreateWindow( classname, _T(""),
-						WS_OVERLAPPEDWINDOW, 0, 0, 0, 0,
-						NULL, NULL, wc.hInstance, NULL );
-	return hWnd;
-}
-inline bool DeallocateHWnd( HWND hWnd ) {
-	return 0 != ::DestroyWindow( hWnd );
-}
-*/
 
 inline HINSTANCE GetHInstance() { return ((HINSTANCE)GetModuleHandle(0)); }
-extern class TApplication* Application;
+extern class tTVPApplication* Application;
 
 
 #endif // __T_APPLICATION_H__
