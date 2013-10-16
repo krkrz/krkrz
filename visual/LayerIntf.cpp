@@ -26,7 +26,7 @@
 #include "LayerManager.h"
 #include "BitmapIntf.h"
 
-#include "TColor.h"
+#include "TVPColor.h"
 
 extern void TVPSetFontRasterizer( tjs_int index );
 extern tjs_int TVPGetFontRasterizer();

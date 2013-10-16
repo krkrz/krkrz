@@ -4,7 +4,7 @@
 #include "MsgIntf.h"
 #include "LayerBitmapIntf.h"
 #include "GraphicsLoaderIntf.h"
-#include "TColor.h"
+#include "TVPColor.h"
 #include "LayerIntf.h"
 
 tTJSNI_Bitmap::tTJSNI_Bitmap() : Bitmap(NULL), Loading(false) {
