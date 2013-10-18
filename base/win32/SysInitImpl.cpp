@@ -51,7 +51,6 @@
 std::wstring TVPNativeProjectDir;
 std::wstring TVPNativeDataPath;
 bool TVPProjectDirSelected = false;
-bool TVPSystemIsBasedOnNT = false; // is system NT based ?
 //---------------------------------------------------------------------------
 
 
@@ -810,7 +809,7 @@ void TVPInitializeBaseSystems()
 //---------------------------------------------------------------------------
 // system initializer / uninitializer
 //---------------------------------------------------------------------------
-static tjs_uint TVPTotalPhysMemory = 0;
+static tjs_uint64 TVPTotalPhysMemory = 0;
 static void TVPInitProgramArgumentsAndDataPath(bool stop_after_datapath_got);
 void TVPBeforeSystemInit()
 {
@@ -836,16 +835,15 @@ void TVPBeforeSystemInit()
 
 	// memory usage
 	{
-		MEMORYSTATUS status;
-		status.dwLength = sizeof(status);
-		GlobalMemoryStatus(&status);
+		MEMORYSTATUSEX status = { sizeof(MEMORYSTATUSEX) };
+		::GlobalMemoryStatusEx(&status);
 
 		TVPPushEnvironNoise(&status, sizeof(status));
 
-		TVPTotalPhysMemory = status.dwTotalPhys;
+		TVPTotalPhysMemory = status.ullTotalPhys;
 
-		TVPAddImportantLog(TJS_W("(info) Total physical memory : ") +
-			ttstr((int)TVPTotalPhysMemory) );
+		ttstr memstr( std::to_wstring(TVPTotalPhysMemory).c_str() );
+		TVPAddImportantLog(TJS_W("(info) Total physical memory : ") + memstr );
 
 		tTJSVariant opt;
 		if(TVPGetCommandLine(TJS_W("-memusage"), &opt))
@@ -861,7 +859,7 @@ void TVPBeforeSystemInit()
 			TVPTotalPhysMemory = 0;
 		}
 
-		if(TVPTotalPhysMemory < 48*1024*1024)
+		if(TVPTotalPhysMemory < 48*1024*1024ULL)
 		{
 			// extra low memory
 			if(TJSObjectHashBitsLimit > 0)
@@ -1123,30 +1121,18 @@ void TVPAfterSystemInit()
 	// check CPU type
 	TVPDetectCPU();
 
-	// determine OS type
-	OSVERSIONINFO osinfo;
-	osinfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-	GetVersionEx(&osinfo);
-	TVPPushEnvironNoise(&osinfo, sizeof(osinfo));
-
-
-	bool nt = osinfo.dwPlatformId == VER_PLATFORM_WIN32_NT;
-
-	TVPSystemIsBasedOnNT = nt;
-
-
 	TVPAllocGraphicCacheOnHeap = false; // always false since beta 20
 
 	// determine maximum graphic cache limit
 	tTJSVariant opt;
-	tjs_int limitmb = -1;
+	tjs_int64 limitmb = -1;
 	if(TVPGetCommandLine(TJS_W("-gclim"), &opt))
 	{
 		ttstr str(opt);
 		if(str == TJS_W("auto"))
 			limitmb = -1;
 		else
-			limitmb = (tjs_int)opt;
+			limitmb = opt.AsInteger();
 	}
 
 
@@ -1169,13 +1155,16 @@ void TVPAfterSystemInit()
 		else if(TVPTotalPhysMemory <= 512*1024*1024)
 			TVPGraphicCacheSystemLimit = 40;
 		else
-			TVPGraphicCacheSystemLimit = int(TVPTotalPhysMemory / (1024*1024*10));	// cachemem = physmem / 10
+			TVPGraphicCacheSystemLimit = tjs_uint64(TVPTotalPhysMemory / (1024*1024*10));	// cachemem = physmem / 10
 		TVPGraphicCacheSystemLimit *= 1024*1024;
 	}
 	else
 	{
 		TVPGraphicCacheSystemLimit = limitmb * 1024*1024;
 	}
+	// 32bit ‚È‚Ì‚Å 1GB ‚Ü‚Å‚É§ŒÀ
+	if( TVPGraphicCacheSystemLimit >= 1024*1024*1024 )
+		TVPGraphicCacheSystemLimit = 1024*1024*1024;
 
 
 	if(TVPTotalPhysMemory <= 64*1024*1024)
@@ -1227,9 +1216,6 @@ void TVPAfterSystemInit()
 
 	// initilaize x86 graphic routines
 	TVPGL_IA32_Init();
-
-	// load HBeam cursor
-	// Screen->Cursors[1] = LoadCursor(GetHInstance(), "HBEAM");
 
 	// timer precision
 	UINT prectick = 1;
