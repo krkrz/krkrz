@@ -1156,9 +1156,9 @@ tTJSHashTable<tTVPGraphicsSearchData, tTVPGraphicImageHolder, tTVPGraphicsSearch
 	tTVPGraphicCache;
 tTVPGraphicCache TVPGraphicCache;
 static bool TVPGraphicCacheEnabled = false;
-static tjs_uint TVPGraphicCacheLimit = 0;
-static tjs_uint TVPGraphicCacheTotalBytes = 0;
-tjs_uint TVPGraphicCacheSystemLimit = 0; // maximum possible value of  TVPGraphicCacheLimit
+static tjs_uint64 TVPGraphicCacheLimit = 0;
+static tjs_uint64 TVPGraphicCacheTotalBytes = 0;
+tjs_uint64 TVPGraphicCacheSystemLimit = 0; // maximum possible value of  TVPGraphicCacheLimit
 //---------------------------------------------------------------------------
 static void TVPCheckGraphicCacheLimit()
 {
@@ -1509,7 +1509,7 @@ void TVPLoadGraphic(tTVPBaseBitmap *dest, const ttstr &name, tjs_int32 keyidx,
 //---------------------------------------------------------------------------
 // TVPTouchImages
 //---------------------------------------------------------------------------
-void TVPTouchImages(const std::vector<ttstr> & storages, tjs_int limit,
+void TVPTouchImages(const std::vector<ttstr> & storages, tjs_int64 limit,
 	tjs_uint64 timeout)
 {
 	// preload graphic files into the cache.
@@ -1520,10 +1520,10 @@ void TVPTouchImages(const std::vector<ttstr> & storages, tjs_int limit,
 
 	if(!TVPGraphicCacheLimit) return;
 
-	tjs_uint limitbytes;
+	tjs_uint64 limitbytes;
 	if(limit >= 0)
 	{
-		if((tjs_uint)limit > TVPGraphicCacheLimit || limit == 0)
+		if( (tjs_uint64)limit > TVPGraphicCacheLimit || limit == 0)
 			limitbytes = TVPGraphicCacheLimit;
 		else
 			limitbytes = limit;
@@ -1531,12 +1531,12 @@ void TVPTouchImages(const std::vector<ttstr> & storages, tjs_int limit,
 	else
 	{
 		// negative value of limit indicates remaining bytes after loading
-		if((tjs_uint)-limit >= TVPGraphicCacheLimit) return;
+		if((tjs_uint64)-limit >= TVPGraphicCacheLimit) return;
 		limitbytes = TVPGraphicCacheLimit + limit;
 	}
 
 	tjs_int count = 0;
-	tjs_uint bytes = 0;
+	tjs_uint64 bytes = 0;
 	tjs_uint64 starttime = TVPGetTickCount();
 	tjs_uint64 limittime = starttime + timeout;
 	tTVPBaseBitmap tmp(32, 32, 32);
@@ -1607,7 +1607,7 @@ void TVPTouchImages(const std::vector<ttstr> & storages, tjs_int limit,
 		TVPGraphicCache.FindAndTouchWithHash(searchdata, hash);
 	}
 
-	statusstr += TJS_W(" (elapsed "); // Fixed spelling by W.Dee, 20031105
+	statusstr += TJS_W(" (elapsed ");
 	statusstr += ttstr((tjs_int)(TVPGetTickCount() - starttime));
 	statusstr += TJS_W("ms)");
 
@@ -1624,7 +1624,7 @@ void TVPTouchImages(const std::vector<ttstr> & storages, tjs_int limit,
 //---------------------------------------------------------------------------
 // TVPSetGraphicCacheLimit
 //---------------------------------------------------------------------------
-void TVPSetGraphicCacheLimit(tjs_uint limit)
+void TVPSetGraphicCacheLimit(tjs_uint64 limit)
 {
 	// set limit of graphic cache by total bytes.
 	if(limit == 0 )
@@ -1648,7 +1648,7 @@ void TVPSetGraphicCacheLimit(tjs_uint limit)
 	TVPCheckGraphicCacheLimit();
 }
 //---------------------------------------------------------------------------
-tjs_uint TVPGetGraphicCacheLimit()
+tjs_uint64 TVPGetGraphicCacheLimit()
 {
 	return TVPGraphicCacheLimit;
 }

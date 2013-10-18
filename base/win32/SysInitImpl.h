@@ -16,15 +16,10 @@ extern void TVPDumpHWException();
 
 extern void TVPInitializeBaseSystems();
 
-/*
-extern AnsiString TVPNativeProjectDir;
-extern AnsiString TVPNativeDataPath;
-*/
 extern std::wstring TVPNativeProjectDir;
 extern std::wstring TVPNativeDataPath;
 
 extern bool TVPProjectDirSelected;
-extern bool TVPSystemIsBasedOnNT;
 extern bool TVPCheckCmdDescription(void);
 extern void TVPEnsureDataPathDirectory();
 
