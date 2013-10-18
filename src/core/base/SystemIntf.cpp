@@ -218,10 +218,10 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/touchImages)
 		count++;
 	}
 
-	tjs_int limit = 0;
+	tjs_int64 limit = 0;
 	tjs_uint64 timeout = 0;
 
-	if(numparams >= 2 && param[1]->Type() != tvtVoid) limit = *param[1];
+	if(numparams >= 2 && param[1]->Type() != tvtVoid) limit = (tjs_int64)*param[1];
 	if(numparams >= 3 && param[2]->Type() != tvtVoid) timeout = (tjs_int64)*param[2];
 
 	TVPTouchImages(storages, limit, timeout);

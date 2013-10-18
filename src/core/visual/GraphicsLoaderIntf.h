@@ -155,20 +155,20 @@ extern bool TVPAllocGraphicCacheOnHeap;
 	// shareing bitmap object. ( since sucking win9x cannot have so many bitmap
 	// object at once, WinNT/2000 is ok. )
 	// this will take more time for memory copying.
-extern void TVPSetGraphicCacheLimit(tjs_uint limit);
+extern void TVPSetGraphicCacheLimit(tjs_uint64 limit);
 	// set graphic cache size limit by bytes.
 	// limit == 0 disables the cache system.
 	// limit == -1 sets the limit to TVPGraphicCacheSystemLimit
-extern tjs_uint TVPGetGraphicCacheLimit();
+extern tjs_uint64 TVPGetGraphicCacheLimit();
 
-extern tjs_uint TVPGraphicCacheSystemLimit;
+extern tjs_uint64 TVPGraphicCacheSystemLimit;
 	// maximum possible value of Graphic Cache Limit
 
 TJS_EXP_FUNC_DEF(void, TVPClearGraphicCache, ());
 	// clear graphic cache
 
 
-extern void TVPTouchImages(const std::vector<ttstr> & storages, tjs_int limit,
+extern void TVPTouchImages(const std::vector<ttstr> & storages, tjs_int64 limit,
 	tjs_uint64 timeout);
 
 //---------------------------------------------------------------------------
