@@ -192,7 +192,3 @@ void tTVPSystemControl::SystemWatchTimerTimer() {
 	}
 }
 
-#if 0
-bool InputQuery( const std::string& caption, const std::string& prompt, std::string& value ) {
-}
-#endif

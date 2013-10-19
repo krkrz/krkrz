@@ -21,6 +21,8 @@
 #include "SystemControl.h"
 #include "MouseCursor.h"
 
+#include "resource.h"
+
 #pragma comment( lib, "winmm.lib" )
 #pragma comment( lib, "dxguid.lib" )
 #pragma comment( lib, "dsound.lib" )
@@ -327,7 +329,6 @@ void tTVPApplication::ShowException( class Exception* e ) {
 void tTVPApplication::Run() {
 	MSG msg;
 	HACCEL hAccelTable;
-	//hAccelTable = LoadAccelerators( (HINSTANCE)GetModuleHandle(0), MAKEINTRESOURCE(IDC_TVPWIN32));
 
 	// メイン メッセージ ループ:
 	HWND mainWnd = INVALID_HANDLE_VALUE;

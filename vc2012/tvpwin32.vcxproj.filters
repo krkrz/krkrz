@@ -936,9 +936,6 @@
     <ClCompile Include="..\visual\win32\TVPScreen.cpp">
       <Filter>visual\win32</Filter>
     </ClCompile>
-    <ClCompile Include="..\environ\win32\InputStringForm.cpp">
-      <Filter>environ\win32</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="tvpwin32.rc">

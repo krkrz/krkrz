@@ -52,29 +52,6 @@ static void TVPShowSimpleMessageBox(const ttstr & text, const ttstr & caption)
 
 
 
-
-#if 0
-//---------------------------------------------------------------------------
-// TVPInputQuery
-//---------------------------------------------------------------------------
-bool TVPInputQuery(const ttstr & caption, const ttstr &prompt,
-	ttstr &value)
-{
-	std::string v = value.AsStdString();
-	bool res = InputQuery(caption.AsStdString(), prompt.AsStdString(),
-		v);
-	if(res)
-		value = v.c_str();
-	return res;
-}
-//---------------------------------------------------------------------------
-#endif
-
-
-
-
-
-
 //---------------------------------------------------------------------------
 // TVPGetAsyncKeyState
 //---------------------------------------------------------------------------
