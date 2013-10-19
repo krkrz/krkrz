@@ -70,30 +70,33 @@ void GDIFontRasterizer::Release() {
 }
 void GDIFontRasterizer::ApplyFont( tTVPNativeBaseBitmap *bmp, bool force ) {
 	if( bmp != LastBitmap || force ) {
-		const tTVPFont &font = bmp->GetFont();
-		LOGFONT LogFont={0};
-		LogFont.lfHeight = -std::abs(font.Height);
-		LogFont.lfItalic = (font.Flags & TVP_TF_ITALIC) ? TRUE:FALSE;
-		LogFont.lfWeight = (font.Flags & TVP_TF_BOLD) ? 700 : 400;
-		LogFont.lfUnderline = (font.Flags & TVP_TF_UNDERLINE) ? TRUE:FALSE;
-		LogFont.lfStrikeOut = (font.Flags & TVP_TF_STRIKEOUT) ? TRUE:FALSE;
-		LogFont.lfEscapement = LogFont.lfOrientation = font.Angle;
-		LogFont.lfCharSet = SHIFTJIS_CHARSET; // TODO: i18n
-		LogFont.lfOutPrecision = OUT_DEFAULT_PRECIS;
-		LogFont.lfQuality = DEFAULT_QUALITY;
-		LogFont.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
-		std::wstring face = TVPFontSystem->GetBeingFont(font.Face.AsStdString());
-		TJS_strncpy(LogFont.lfFaceName, face.c_str(), LF_FACESIZE -1);
-		LogFont.lfFaceName[LF_FACESIZE-1] = 0;
-
-		FontDC->ApplyFont( &LogFont );
-		CurentLOGFONT = LogFont;
-		int orgweight = CurentLOGFONT.lfWeight;
-		CurentLOGFONT.lfWeight = 400;
-		NonBoldFontDC->ApplyFont( &CurentLOGFONT );
-		CurentLOGFONT.lfWeight = orgweight;
+		ApplyFont( bmp->GetFont() );
 		LastBitmap = bmp;
 	}
+}
+void GDIFontRasterizer::ApplyFont( const tTVPFont& font ) {
+	LOGFONT LogFont={0};
+	LogFont.lfHeight = -std::abs(font.Height);
+	LogFont.lfItalic = (font.Flags & TVP_TF_ITALIC) ? TRUE:FALSE;
+	LogFont.lfWeight = (font.Flags & TVP_TF_BOLD) ? 700 : 400;
+	LogFont.lfUnderline = (font.Flags & TVP_TF_UNDERLINE) ? TRUE:FALSE;
+	LogFont.lfStrikeOut = (font.Flags & TVP_TF_STRIKEOUT) ? TRUE:FALSE;
+	LogFont.lfEscapement = LogFont.lfOrientation = font.Angle;
+	LogFont.lfCharSet = SHIFTJIS_CHARSET; // TODO: i18n
+	LogFont.lfOutPrecision = OUT_DEFAULT_PRECIS;
+	LogFont.lfQuality = DEFAULT_QUALITY;
+	LogFont.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
+	std::wstring face = TVPFontSystem->GetBeingFont(font.Face.AsStdString());
+	TJS_strncpy(LogFont.lfFaceName, face.c_str(), LF_FACESIZE -1);
+	LogFont.lfFaceName[LF_FACESIZE-1] = 0;
+
+	FontDC->ApplyFont( &LogFont );
+	CurentLOGFONT = LogFont;
+	int orgweight = CurentLOGFONT.lfWeight;
+	CurentLOGFONT.lfWeight = 400;
+	NonBoldFontDC->ApplyFont( &CurentLOGFONT );
+	CurentLOGFONT.lfWeight = orgweight;
+	LastBitmap = NULL;
 }
 void GDIFontRasterizer::GetTextExtent(tjs_char ch, tjs_int &w, tjs_int &h) {
 	SIZE s;

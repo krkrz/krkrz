@@ -27,54 +27,58 @@ void FreeTypeFontRasterizer::Release() {
 //---------------------------------------------------------------------------
 void FreeTypeFontRasterizer::ApplyFont( class tTVPNativeBaseBitmap *bmp, bool force ) {
 	if( bmp != LastBitmap || force ) {
-		const tTVPFont &font = bmp->GetFont();
-		CurrentFont = font;
-		ttstr name = font.Face;
-		std::wstring stdname = name.AsStdString();
-		// TVP_FACE_OPTIONS_NO_ANTIALIASING
-		// TVP_FACE_OPTIONS_NO_HINTING
-		// TVP_FACE_OPTIONS_FORCE_AUTO_HINTING
-		tjs_uint32 opt = 0;
-		opt |= (font.Flags & TVP_TF_ITALIC) ? TVP_TF_ITALIC : 0;
-		opt |= (font.Flags & TVP_TF_BOLD) ? TVP_TF_BOLD : 0;
-		opt |= (font.Flags & TVP_TF_UNDERLINE) ? TVP_TF_UNDERLINE : 0;
-		opt |= (font.Flags & TVP_TF_STRIKEOUT) ? TVP_TF_STRIKEOUT : 0;
-		bool recreate = false;
-		if( Face ) {
-			if( Face->GetFontName() != stdname ) {
-				delete Face;
-				Face = new tFreeTypeFace( stdname, opt );
-				recreate = true;
-			}
-		} else {
+		ApplyFont( bmp->GetFont() );
+		LastBitmap = bmp;
+	}
+}
+//---------------------------------------------------------------------------
+void FreeTypeFontRasterizer::ApplyFont( const tTVPFont& font ) {
+	CurrentFont = font;
+	ttstr name = font.Face;
+	std::wstring stdname = name.AsStdString();
+	// TVP_FACE_OPTIONS_NO_ANTIALIASING
+	// TVP_FACE_OPTIONS_NO_HINTING
+	// TVP_FACE_OPTIONS_FORCE_AUTO_HINTING
+	tjs_uint32 opt = 0;
+	opt |= (font.Flags & TVP_TF_ITALIC) ? TVP_TF_ITALIC : 0;
+	opt |= (font.Flags & TVP_TF_BOLD) ? TVP_TF_BOLD : 0;
+	opt |= (font.Flags & TVP_TF_UNDERLINE) ? TVP_TF_UNDERLINE : 0;
+	opt |= (font.Flags & TVP_TF_STRIKEOUT) ? TVP_TF_STRIKEOUT : 0;
+	bool recreate = false;
+	if( Face ) {
+		if( Face->GetFontName() != stdname ) {
+			delete Face;
 			Face = new tFreeTypeFace( stdname, opt );
 			recreate = true;
 		}
-		Face->SetHeight( font.Height < 0 ? -font.Height : font.Height );
-		if( recreate == false ) {
-			if( font.Flags & TVP_TF_ITALIC ) {
-				Face->SetOption(TVP_TF_ITALIC);
-			} else {
-				Face->ClearOption(TVP_TF_ITALIC);
-			}
-			if( font.Flags & TVP_TF_BOLD ) {
-				Face->SetOption(TVP_TF_BOLD);
-			} else {
-				Face->ClearOption(TVP_TF_BOLD);
-			}
-			if( font.Flags & TVP_TF_UNDERLINE ) {
-				Face->SetOption(TVP_TF_UNDERLINE);
-			} else {
-				Face->ClearOption(TVP_TF_UNDERLINE);
-			}
-			if( font.Flags & TVP_TF_STRIKEOUT ) {
-				Face->SetOption(TVP_TF_STRIKEOUT);
-			} else {
-				Face->ClearOption(TVP_TF_STRIKEOUT);
-			}
-		}
-		LastBitmap = bmp;
+	} else {
+		Face = new tFreeTypeFace( stdname, opt );
+		recreate = true;
 	}
+	Face->SetHeight( font.Height < 0 ? -font.Height : font.Height );
+	if( recreate == false ) {
+		if( font.Flags & TVP_TF_ITALIC ) {
+			Face->SetOption(TVP_TF_ITALIC);
+		} else {
+			Face->ClearOption(TVP_TF_ITALIC);
+		}
+		if( font.Flags & TVP_TF_BOLD ) {
+			Face->SetOption(TVP_TF_BOLD);
+		} else {
+			Face->ClearOption(TVP_TF_BOLD);
+		}
+		if( font.Flags & TVP_TF_UNDERLINE ) {
+			Face->SetOption(TVP_TF_UNDERLINE);
+		} else {
+			Face->ClearOption(TVP_TF_UNDERLINE);
+		}
+		if( font.Flags & TVP_TF_STRIKEOUT ) {
+			Face->SetOption(TVP_TF_STRIKEOUT);
+		} else {
+			Face->ClearOption(TVP_TF_STRIKEOUT);
+		}
+	}
+	LastBitmap = NULL;
 }
 //---------------------------------------------------------------------------
 void FreeTypeFontRasterizer::GetTextExtent(tjs_char ch, tjs_int &w, tjs_int &h) {
