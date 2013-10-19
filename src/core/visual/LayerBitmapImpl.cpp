@@ -59,7 +59,8 @@ enum {
 };
 static FontRasterizer* TVPFontRasterizers[FONT_RASTER_EOT];
 static bool TVPFontRasterizersInit = false;
-static tjs_int TVPCurrentFontRasterizers = FONT_RASTER_FREE_TYPE;
+//static tjs_int TVPCurrentFontRasterizers = FONT_RASTER_FREE_TYPE;
+static tjs_int TVPCurrentFontRasterizers = FONT_RASTER_GDI;
 void TVPInializeFontRasterizers() {
 	if( TVPFontRasterizersInit == false ) {
 		TVPFontRasterizers[FONT_RASTER_FREE_TYPE] = new FreeTypeFontRasterizer();
@@ -685,33 +686,6 @@ void tTVPNativeBaseBitmap::SetFont(const tTVPFont &font)
 {
 	Font = font;
 	FontChanged = true;
-}
-//---------------------------------------------------------------------------
-bool tTVPNativeBaseBitmap::SelectFont(tjs_uint32 flags, const ttstr &caption,
-	const ttstr &prompt, const ttstr &samplestring, ttstr &selectedfont)
-{
-	// show font selector dialog and let user select font
-	ApplyFont();
-#if 0 // TODO フォント選択ダイアログ
-	std::string newfont;
-	TTVPFontSelectForm * form = new TTVPFontSelectForm(Application, GetFontCanvas(),
-		flags, caption.AsStdString(), prompt.AsStdString(),
-			samplestring.AsStdString());
-	int mr = form->ShowModal();
-	newfont = form->FontName;
-	delete form;
-	if(mr == mrOk)
-	{
-		selectedfont = ttstr(newfont.c_str());
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-#else
-	return false;
-#endif
 }
 //---------------------------------------------------------------------------
 void tTVPNativeBaseBitmap::GetFontList(tjs_uint32 flags, std::vector<ttstr> &list)
