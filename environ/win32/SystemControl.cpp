@@ -50,9 +50,6 @@ static bool TVPGetMainThreadPriorityControl()
 tTVPSystemControl::tTVPSystemControl() : EventEnable(true) {
 	ContinuousEventCalling = false;
 	AutoShowConsoleOnError = false;
-	ApplicationStayOnTop = false;
-	ApplicationActivating = true;
-	ApplicationNotMinimizing = true;
 
 	LastCompactedTick = 0;
 	LastCloseClickedTick = 0;
@@ -101,10 +98,7 @@ void tTVPSystemControl::NotifyEventDelivered() {
 	LastCloseClickedTick = 0;
 	// if(TVPHaltWarnForm) delete TVPHaltWarnForm, TVPHaltWarnForm = NULL;
 }
-/*
-bool tTVPSystemControl::GetApplicationStayOnTop() { return false; }
-void tTVPSystemControl::SetApplicationStayOnTop( bool ) {}
-*/
+
 bool tTVPSystemControl::ApplicationIdel() {
 	DeliverEvents();
 	bool cont = !ContinuousEventCalling;

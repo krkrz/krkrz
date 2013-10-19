@@ -69,9 +69,10 @@ class tTVPApplication {
 	std::wstring console_title_;
 	AcceleratorKeyTable accel_key_;
 	bool tarminate_;
+	bool ApplicationActivating;
 
 public:
-	tTVPApplication() : is_attach_console_(false), tarminate_(false) {}
+	tTVPApplication() : is_attach_console_(false), tarminate_(false), ApplicationActivating(true) {}
 	void CheckConsole();
 	void CloseConsole();
 	void PrintConsole( const wchar_t* mes, unsigned long len );
@@ -118,7 +119,7 @@ public:
 	void ShowException( class Exception* e );
 	void Run();
 
-	HWND GetMainWindowHandle();
+	HWND GetMainWindowHandle() const;
 
 	int ArgC;
 	char ** ArgV;
@@ -137,6 +138,11 @@ public:
 	void RegisterAcceleratorKey(HWND hWnd, char virt, short key, short cmd);
 	void UnregisterAcceleratorKey(HWND hWnd, short cmd);
 	void DeleteAcceleratorKeyTable( HWND hWnd );
+
+	void OnActivate( HWND hWnd );
+	void OnDeactivate( HWND hWnd );
+	bool GetActivating() const { return ApplicationActivating; }
+	bool GetNotMinimizing() const;
 };
 std::vector<std::string>* LoadLinesFromFile( const std::wstring& path );
 
