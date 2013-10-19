@@ -211,10 +211,11 @@ int APIENTRY WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		if(TVPCheckAbout()) return 0; // version information dialog box;
 
 		Application->SetTitle( L"‹g—¢‹g—¢" );
-		// Application->CreateForm(__classid(TTVPMainForm), &TVPMainForm);
 		TVPSystemControl = new tTVPSystemControl();
 
+#ifndef TVP_IGNORE_LOAD_TPM_PLUGIN
 		TVPLoadPluigins(); // load plugin module *.tpm
+#endif
 
 		// Check digitizer
 		Application->CheckDigitizer();

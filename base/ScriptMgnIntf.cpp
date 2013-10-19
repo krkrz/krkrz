@@ -496,25 +496,19 @@ void TVPInitScriptEngine()
 
 	/* classes */
 	REGISTER_OBJECT(Debug, TVPCreateNativeClass_Debug());
+	REGISTER_OBJECT(Font, TVPCreateNativeClass_Font());
 	REGISTER_OBJECT(Layer, TVPCreateNativeClass_Layer());
-	//REGISTER_OBJECT(CDDASoundBuffer, TVPCreateNativeClass_CDDASoundBuffer());
-	//REGISTER_OBJECT(MIDISoundBuffer, TVPCreateNativeClass_MIDISoundBuffer());
 	REGISTER_OBJECT(Timer, TVPCreateNativeClass_Timer());
 	REGISTER_OBJECT(AsyncTrigger, TVPCreateNativeClass_AsyncTrigger());
 	REGISTER_OBJECT(System, TVPCreateNativeClass_System());
 	REGISTER_OBJECT(Storages, TVPCreateNativeClass_Storages());
 	REGISTER_OBJECT(Plugins, TVPCreateNativeClass_Plugins());
-	//REGISTER_OBJECT(MenuItem, TVPCreateNativeClass_MenuItem());
 	REGISTER_OBJECT(VideoOverlay, TVPCreateNativeClass_VideoOverlay());
-	//REGISTER_OBJECT(Pad, TVPCreateNativeClass_Pad());
 	REGISTER_OBJECT(Clipboard, TVPCreateNativeClass_Clipboard());
 	REGISTER_OBJECT(Scripts, TVPCreateNativeClass_Scripts()); // declared in this file
 	REGISTER_OBJECT(Rect, TVPCreateNativeClass_Rect());
 	REGISTER_OBJECT(Bitmap, TVPCreateNativeClass_Bitmap());
 	REGISTER_OBJECT(ImageFunction, TVPCreateNativeClass_ImageFunction());
-
-	/* KAG special support */
-	//REGISTER_OBJECT(KAGParser, new tTJSNC_KAGParser());
 
 	/* WaveSoundBuffer and its filters */
 	iTJSDispatch2 * waveclass = NULL;
@@ -1089,7 +1083,7 @@ void TVPBeforeProcessUnhandledException()
 
 
 
-
+#pragma message (__LOC__ "TODO : ó·äOî≠ê∂ÇµÇƒÇªÇÃÇ‹Ç‹ìÆÇ©Ç»Ç≠Ç»ÇÈèÛë‘ÇâÒîÇ∑ÇÈïKóvÇ™Ç†ÇÈ")
 //---------------------------------------------------------------------------
 // TVPShowScriptException
 //---------------------------------------------------------------------------
@@ -1108,11 +1102,9 @@ void TVPShowScriptException(eTJS &e)
 	{
 		ttstr errstr = (ttstr(TVPScriptExceptionRaised) + TJS_W("\n") + e.GetMessage());
 		TVPAddLog(ttstr(TVPScriptExceptionRaised) + TJS_W("\n") + e.GetMessage());
-		//MessageDlg(errstr.AsStdString(), mtError, TMsgDlgButtons() << mbOK, 0);
-
 		Application->MessageDlg( errstr.AsStdString(), std::wstring(), mtError, mbOK );
 	}
-//	throw EAbort("Script Error Abortion");
+	TVPTerminateSync(1);
 }
 //---------------------------------------------------------------------------
 void TVPShowScriptException(eTJSScriptError &e)
@@ -1126,9 +1118,9 @@ void TVPShowScriptException(eTJSScriptError &e)
 		TVPAddLog(ttstr(TVPScriptExceptionRaised) + TJS_W("\n") + e.GetMessage());
 		if(e.GetTrace().GetLen() != 0)
 			TVPAddLog(ttstr(TJS_W("trace : ")) + e.GetTrace());
-		//Application->MessageBox( errstr.AsStdString().c_str(), Application->GetTitle().c_str(), MB_OK|MB_ICONSTOP );
 		Application->MessageDlg( errstr.AsStdString(), Application->GetTitle(), mtStop, mbOK );
 	}
+	TVPTerminateSync(1);
 }
 //---------------------------------------------------------------------------
 
