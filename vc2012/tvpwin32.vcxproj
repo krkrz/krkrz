@@ -285,7 +285,6 @@
     <ClCompile Include="..\environ\win32\CompatibleNativeFuncs.cpp" />
     <ClCompile Include="..\environ\win32\DetectCPU.cpp" />
     <ClCompile Include="..\environ\win32\EmergencyExit.cpp" />
-    <ClCompile Include="..\environ\win32\InputStringForm.cpp" />
     <ClCompile Include="..\environ\win32\MouseCursor.cpp" />
     <ClCompile Include="..\environ\win32\SystemControl.cpp" />
     <ClCompile Include="..\environ\win32\TouchPoint.cpp" />
