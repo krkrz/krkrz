@@ -12,7 +12,6 @@
 
 #include <mmsystem.h>
 #include <mmreg.h>
-//#include <syncobjs.hpp>
 #include <math.h>
 #include <algorithm>
 #include "SystemControl.h"
@@ -3058,26 +3057,21 @@ void tTJSNI_WaveSoundBuffer::SetVolumeToSoundBuffer()
 			tTVPSoundGlobalFocusMode mode =
 				GlobalFocusMode > TVPSoundGlobalFocusModeByOption ?
 				GlobalFocusMode : TVPSoundGlobalFocusModeByOption;
-				
-#pragma message ( __LOC__ "TODO 仕様として、最小化や非アクティブでの無音化を削除するか" )
-			/*
+
 			switch(mode)
 			{
 			case sgfmNeverMute:
 				;
 				break;
 			case sgfmMuteOnMinimize:
-				if(!  TVPMainForm->GetApplicationNotMinimizing())
+				if(!  Application->GetNotMinimizing())
 					mutevol = TVPSoundGlobalFocusMuteVolume;
 				break;
 			case sgfmMuteOnDeactivate:
-				if(!
-					(  TVPMainForm->GetApplicationActivating() &&
-					   TVPMainForm->GetApplicationNotMinimizing()))
+				if(! (  Application->GetActivating() && Application->GetNotMinimizing()))
 					mutevol = TVPSoundGlobalFocusMuteVolume;
 				break;
 			}
-			*/
 		}
 
 		// compute volume for each buffer
