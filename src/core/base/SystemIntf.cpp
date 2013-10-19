@@ -121,28 +121,6 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/exit)
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_STATIC_METHOD_DECL(/*func. name*/exit)
-#pragma message( __LOC__ "TODO inputString –³Œø‰»‚·‚é" )
-#if 0
-//----------------------------------------------------------------------
-TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/inputString)
-{
-	if(numparams < 3) return TJS_E_BADPARAMCOUNT;
-
-	ttstr value = *param[2];
-	bool b = TVPInputQuery(*param[0], *param[1], value);
-
-	if(result)
-	{
-		if(b)
-			*result = value;
-		else
-			result->Clear();
-	}
-
-	return TJS_S_OK;
-}
-TJS_END_NATIVE_STATIC_METHOD_DECL(/*func. name*/inputString)
-#endif
 //---------------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/addContinuousHandler)
 {

@@ -31,11 +31,6 @@ extern tTJSNativeClass * TVPCreateNativeClass_System();
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-extern bool TVPInputQuery(const ttstr & caption, const ttstr &prompt,
-	ttstr &value);
-		// this shows a dialog box which let user to input a string.
-		// return false if the user selects "cancel", otherwise return true.
-		// implement in each platform.
 TJS_EXP_FUNC_DEF(ttstr, TVPGetPlatformName, ());
 		// retrieve platform name (eg. "Win32")
 		// implement in each platform.
