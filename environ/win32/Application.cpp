@@ -20,6 +20,8 @@
 #include "Resource.h"
 #include "SystemControl.h"
 #include "MouseCursor.h"
+#include "SystemImpl.h"
+#include "WaveImpl.h"
 
 #include "resource.h"
 
@@ -292,10 +294,16 @@ void tTVPApplication::CloseConsole() {
 	}
 }
 void tTVPApplication::PrintConsole( const wchar_t* mes, unsigned long len ) {
-	DWORD wlen;
-	HANDLE hStdOutput = ::GetStdHandle(STD_OUTPUT_HANDLE);
-	::WriteConsoleW( hStdOutput, mes, len, &wlen, NULL );
-	::WriteConsoleW( hStdOutput, "\n", 1, &wlen, NULL );
+	if( is_attach_console_ ) {
+		DWORD wlen;
+		HANDLE hStdOutput = ::GetStdHandle(STD_OUTPUT_HANDLE);
+		::WriteConsoleW( hStdOutput, mes, len, &wlen, NULL );
+		::WriteConsoleW( hStdOutput, L"\n", 1, &wlen, NULL );
+	}
+#ifdef _DEBUG
+	::OutputDebugString( mes );
+	::OutputDebugString( L"\n" );
+#endif
 }
 HWND tTVPApplication::GetHandle() {
 	if( windows_list_.size() > 0 ) {
@@ -412,7 +420,7 @@ void tTVPApplication::SetTitle( const std::wstring& caption ) {
 		::SetConsoleTitle( caption.c_str() );
 	}
 }
-HWND tTVPApplication::GetMainWindowHandle() {
+HWND tTVPApplication::GetMainWindowHandle() const {
 	if( windows_list_.size() > 0 ) {
 		return windows_list_[0]->GetHandle();
 	}
@@ -495,6 +503,43 @@ void tTVPApplication::CheckDigitizer() {
 	if( value & NID_READY ) {
 		TVPAddLog(TJS_W("入力デジタイザーで入力の準備ができています。"));
 	}
+}
+void tTVPApplication::OnActivate( HWND hWnd )
+{
+	if( hWnd != GetMainWindowHandle() ) return;
+
+	ApplicationActivating = true;
+	
+	TVPRestoreFullScreenWindowAtActivation();
+	TVPResetVolumeToAllSoundBuffer();
+
+	// trigger System.onActivate event
+	TVPPostApplicationActivateEvent();
+}
+void tTVPApplication::OnDeactivate( HWND hWnd )
+{
+	if( hWnd != GetMainWindowHandle() ) return;
+
+	ApplicationActivating = false;
+	
+	TVPMinimizeFullScreenWindowAtInactivation();
+	
+	// fire compact event
+	TVPDeliverCompactEvent(TVP_COMPACT_LEVEL_DEACTIVATE);
+
+	// set sound volume
+	TVPResetVolumeToAllSoundBuffer();
+
+	// trigger System.onDeactivate event
+	TVPPostApplicationDeactivateEvent();
+}
+bool tTVPApplication::GetNotMinimizing() const
+{
+	HWND hWnd = GetMainWindowHandle();
+	if( hWnd != INVALID_HANDLE_VALUE && hWnd != NULL ) {
+		return ::IsIconic( hWnd ) == 0;
+	}
+	return true; // メインがない時は最小化されているとみなす
 }
 /**
  仮実装 TODO

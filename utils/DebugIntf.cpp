@@ -294,15 +294,11 @@ void TVPAddLog(const ttstr &line, bool appendtoimportant)
 	OutputDebugStringW( buf.c_str() );
 	OutputDebugStringW( L"\n" );
 #endif	// ENABLE_DEBUGGER
+
 #ifdef TVP_LOG_TO_COMMANDLINE_CONSOLE
-	if( Application->IsAttachConsole() ) {
-		/*
-		wprintf( buf.c_str() );
-		wprintf( L"\n" );
-		*/
-		Application->PrintConsole( buf.c_str(), buf.length() );
-	}
+	Application->PrintConsole( buf.c_str(), buf.length() );
 #endif
+
 	if(TVPLoggingToFile) TVPLogStreamHolder.Log(buf);
 }
 //---------------------------------------------------------------------------

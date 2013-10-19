@@ -19,9 +19,6 @@ class tTVPSystemControl
 private:	// ÉÜÅ[ÉUÅ[êÈåæ
 	bool ContinuousEventCalling;
 	bool AutoShowConsoleOnError;
-	bool ApplicationStayOnTop;
-	bool ApplicationActivating;
-	bool ApplicationNotMinimizing;
 
 	bool EventEnable;
 
@@ -48,12 +45,6 @@ public:
 		EventEnable = b;
 	}
 	bool GetEventEnabled() const { return EventEnable; }
-
-	//bool GetApplicationStayOnTop();
-	//void SetApplicationStayOnTop( bool );
-
-	//bool GetApplicationActivating() const { return ApplicationActivating; }
-	//bool GetApplicationNotMinimizing() const { return ApplicationNotMinimizing; }
 
 	bool ApplicationIdel();
 

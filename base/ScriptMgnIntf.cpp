@@ -1083,7 +1083,6 @@ void TVPBeforeProcessUnhandledException()
 
 
 
-#pragma message (__LOC__ "TODO : —áŠO”­¶‚µ‚Ä‚»‚Ì‚Ü‚Ü“®‚©‚È‚­‚È‚éó‘Ô‚ð‰ñ”ð‚·‚é•K—v‚ª‚ ‚é")
 //---------------------------------------------------------------------------
 // TVPShowScriptException
 //---------------------------------------------------------------------------
@@ -1103,8 +1102,8 @@ void TVPShowScriptException(eTJS &e)
 		ttstr errstr = (ttstr(TVPScriptExceptionRaised) + TJS_W("\n") + e.GetMessage());
 		TVPAddLog(ttstr(TVPScriptExceptionRaised) + TJS_W("\n") + e.GetMessage());
 		Application->MessageDlg( errstr.AsStdString(), std::wstring(), mtError, mbOK );
+		TVPTerminateSync(1);
 	}
-	TVPTerminateSync(1);
 }
 //---------------------------------------------------------------------------
 void TVPShowScriptException(eTJSScriptError &e)
@@ -1119,8 +1118,8 @@ void TVPShowScriptException(eTJSScriptError &e)
 		if(e.GetTrace().GetLen() != 0)
 			TVPAddLog(ttstr(TJS_W("trace : ")) + e.GetTrace());
 		Application->MessageDlg( errstr.AsStdString(), Application->GetTitle(), mtStop, mbOK );
+		TVPTerminateSync(1);
 	}
-	TVPTerminateSync(1);
 }
 //---------------------------------------------------------------------------
 

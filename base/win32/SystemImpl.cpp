@@ -479,27 +479,16 @@ bool TVPCreateAppLock(const ttstr &lockname)
 //---------------------------------------------------------------------------
 static void TVPGetDesktopRect(tTVPRect &dest)
 {
-#if 0
-	RECT r;
-	SystemParametersInfo(SPI_GETWORKAREA, 0, &r, 0);
-	dest.left = r.left;
-	dest.top = r.top;
-	dest.right = r.right;
-	dest.bottom = r.bottom;
-#else
 	dest.top = ::GetSystemMetrics(SM_XVIRTUALSCREEN);
 	dest.left = ::GetSystemMetrics(SM_XVIRTUALSCREEN);
 	dest.bottom = dest.top + ::GetSystemMetrics(SM_CYVIRTUALSCREEN);
 	dest.right = dest.left + ::GetSystemMetrics(SM_CXVIRTUALSCREEN);
-#endif
 }
 //---------------------------------------------------------------------------
 
 
 
 
-// アプリのアクティブ、非アクティブはなくなった
-#if 0
 //---------------------------------------------------------------------------
 // System.onActivate and System.onDeactivate related
 //---------------------------------------------------------------------------
@@ -532,19 +521,17 @@ static void TVPOnApplicationActivate(bool activate_or_deactivate)
 {
 	// called by event system, to fire System.onActivate or
 	// System.onDeactivate event
-	if(!TVPMainFormAlive) return;
+	if(!TVPSystemControlAlive) return;
 
 	// check the state again (because the state may change during the event delivering).
 	// but note that this implementation might fire activate events even in the application
 	// is already activated (the same as deactivation).
-	if(activate_or_deactivate != TVPMainForm->GetApplicationActivating()) return;
+	if(activate_or_deactivate != Application->GetActivating()) return;
 
 	// fire the event
 	TVPFireOnApplicationActivateEvent(activate_or_deactivate);
 }
 //---------------------------------------------------------------------------
-#endif
-
 
 
 //---------------------------------------------------------------------------

@@ -1605,11 +1605,15 @@ void TTVPWindowForm::OnMultiTouch() {
 void TTVPWindowForm::OnActive( HWND preactive ) {
 	if( TVPFullScreenedWindow == this )
 		TVPShowModalAtAppActivate();
+
+	Application->OnActivate( GetHandle() );
 }
 void TTVPWindowForm::OnDeactive( HWND postactive ) {
 	if( TJSNativeInstance ) {
 		TVPPostInputEvent( new tTVPOnReleaseCaptureInputEvent(TJSNativeInstance) );
 	}
+
+	Application->OnDeactivate( GetHandle() );
 }
 void TTVPWindowForm::OnMove( int x, int y ) {
 	if(TJSNativeInstance) {
