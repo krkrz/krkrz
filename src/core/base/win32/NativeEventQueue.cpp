@@ -5,18 +5,10 @@
 int NativeEventQueueImplement::CreateUtilWindow() {
 	::ZeroMemory( &wc_, sizeof(wc_) );
 	wc_.cbSize = sizeof(WNDCLASSEX);
-	//wc_.style = 0;
-	//wc_.lpfnWndProc = NativeEventQueueImplement::WndProc;
 	wc_.lpfnWndProc = ::DefWindowProc;
-	//wc_.cbClsExtra = 0;
-	//wc_.cbWndExtra = 0;
 	wc_.hInstance = ::GetModuleHandle(NULL);
-	//wc_.hIcon = 0;
-	//wc_.hCursor = 0;
-	//wc_.hbrBackground = 0;
-	//wc_.lpszMenuName = NULL;
-	wc_.lpszClassName = L"TVPUtilWindow"; //L"TVPQueueWindow";
-	//wc_.hIconSm = NULL;
+	//wc_.lpszClassName = L"TVPUtilWindow";
+	wc_.lpszClassName = L"TVPQueueWindow";
 
 	BOOL ClassRegistered = ::GetClassInfoEx( wc_.hInstance, wc_.lpszClassName, &wc_ );
 	if( ClassRegistered == 0 ) {

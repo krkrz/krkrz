@@ -38,30 +38,7 @@
 //---------------------------------------------------------------------------
 // Graphics Format Management
 //---------------------------------------------------------------------------
-struct tTVPGraphicHandlerType
-{
-	ttstr Extension;
-	tTVPGraphicLoadingHandler Handler;
-	void * FormatData;
 
-	tTVPGraphicHandlerType(const ttstr &ext,
-		tTVPGraphicLoadingHandler handler, void * data)
-	{ Extension = ext, Handler = handler, FormatData = data; }
-
-	tTVPGraphicHandlerType(const tTVPGraphicHandlerType & ref)
-	{
-		Extension = ref.Extension;
-		Handler = ref.Handler;
-		FormatData = ref.FormatData;
-	}
-
-	bool operator == (const tTVPGraphicHandlerType & ref) const
-	{
-		return FormatData == ref.FormatData &&
-			Handler == ref.Handler &&
-			Extension == ref.Extension;
-	}
-};
 class tTVPGraphicType
 {
 public:
@@ -168,8 +145,11 @@ void TVPUnregisterGraphicLoadingHandler(const ttstr & name,
 	}
 }
 //---------------------------------------------------------------------------
-
-
+tTVPGraphicHandlerType* TVPGetGraphicLoadHandler( const ttstr& ext )
+{
+	return TVPGraphicType.Hash.Find(ext);
+}
+//---------------------------------------------------------------------------
 
 
 /*
@@ -694,13 +674,6 @@ enum tTVPLoadGraphicType
 	lgtPalGray, // palettized or grayscale
 	lgtMask // mask
 };
-struct tTVPGraphicMetaInfoPair
-{
-	ttstr Name;
-	ttstr Value;
-	tTVPGraphicMetaInfoPair(const ttstr &name, const ttstr &value) :
-		Name(name), Value(value) {;}
-};
 struct tTVPLoadGraphicData
 {
 	ttstr Name;
@@ -981,7 +954,7 @@ static void TVPDoAlphaColorMat(tTVPBaseBitmap *dest, tjs_uint32 color)
 
 
 //---------------------------------------------------------------------------
-static iTJSDispatch2 * TVPMetaInfoPairsToDictionary(
+iTJSDispatch2 * TVPMetaInfoPairsToDictionary(
 	std::vector<tTVPGraphicMetaInfoPair> *vec)
 {
 	if(!vec) return NULL;
@@ -1199,10 +1172,73 @@ struct tTVPClearGraphicCacheCallback : public tTVPCompactEventCallbackIntf
 } static TVPClearGraphicCacheCallback;
 static bool TVPClearGraphicCacheCallbackInit = false;
 //---------------------------------------------------------------------------
+void TVPPushGraphicCache( const ttstr& nname, tTVPBaseBitmap* bmp, std::vector<tTVPGraphicMetaInfoPair>* meta )
+{
+	if( TVPGraphicCacheEnabled ) {
+		tTVPGraphicImageData* data = NULL;
+		try {
+			tjs_uint32 hash;
+			tTVPGraphicsSearchData searchdata;
 
+			searchdata.Name = nname;
+			searchdata.KeyIdx = -1;
+			searchdata.Mode = glmNormal;
+			searchdata.DesW = 0;
+			searchdata.DesH = 0;
 
+			hash = tTVPGraphicCache::MakeHash(searchdata);
 
+			data = new tTVPGraphicImageData();
+			data->AssignBitmap( bmp );
+			data->ProvinceName = TJS_W("");
+			data->MetaInfo = meta;
+			meta = NULL;
 
+			// check size limit
+			TVPCheckGraphicCacheLimit();
+
+			// push into hash table
+			tjs_uint datasize = data->GetSize();
+			TVPGraphicCacheTotalBytes += datasize;
+			tTVPGraphicImageHolder holder(data);
+			TVPGraphicCache.AddWithHash(searchdata, hash, holder);
+		} catch(...) {
+			if(meta) delete meta;
+			if(data) data->Release();
+			throw;
+		}
+	} else {
+		if( meta ) delete meta;
+	}
+}
+//---------------------------------------------------------------------------
+bool TVPCheckImageCache( const ttstr& nname, tTVPBaseBitmap* dest, tTVPGraphicLoadMode mode, tjs_uint dw, tjs_uint dh, tjs_int32 keyidx, iTJSDispatch2** metainfo )
+{
+	tjs_uint32 hash;
+	tTVPGraphicsSearchData searchdata;
+	if(TVPGraphicCacheEnabled)
+	{
+		searchdata.Name = nname;
+		searchdata.KeyIdx = keyidx;
+		searchdata.Mode = mode;
+		searchdata.DesW = dw;
+		searchdata.DesH = dh;
+
+		hash = tTVPGraphicCache::MakeHash(searchdata);
+
+		tTVPGraphicImageHolder * ptr =
+			TVPGraphicCache.FindAndTouchWithHash(searchdata, hash);
+		if(ptr)
+		{
+			// found in cache
+			ptr->GetObjectNoAddRef()->AssignToBitmap(dest);
+			if(metainfo)
+				*metainfo = TVPMetaInfoPairsToDictionary(ptr->GetObjectNoAddRef()->MetaInfo);
+			return true;
+		}
+	}
+	return false;
+}
 //---------------------------------------------------------------------------
 static bool TVPInternalLoadGraphic(tTVPBaseBitmap *dest, const ttstr &_name,
 	tjs_uint32 keyidx, tjs_uint desw, tjs_int desh, std::vector<tTVPGraphicMetaInfoPair> * * MetaInfo,

@@ -14,7 +14,7 @@ class FreeTypeFontRasterizer : public FontRasterizer {
 
 public:
 	FreeTypeFontRasterizer();
-	~FreeTypeFontRasterizer();
+	virtual ~FreeTypeFontRasterizer();
 	void AddRef();
 	void Release();
 	void ApplyFont( class tTVPNativeBaseBitmap *bmp, bool force );

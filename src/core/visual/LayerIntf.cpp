@@ -7617,7 +7617,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/dump)
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/dump)
 //----------------------------------------------------------------------
-TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/copyToMainImage)
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/copyToBitmapFromMainImage)
 {
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
 
@@ -7634,9 +7634,9 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/copyToMainImage)
 
 	return TJS_S_OK;
 }
-TJS_END_NATIVE_METHOD_DECL(/*func. name*/copyToMainImage)
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/copyToBitmapFromMainImage)
 //----------------------------------------------------------------------
-TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/copyFromMainImage)
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/copyFromBitmapToMainImage)
 {
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
 
@@ -7653,7 +7653,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/copyFromMainImage)
 
 	return TJS_S_OK;
 }
-TJS_END_NATIVE_METHOD_DECL(/*func. name*/copyFromMainImage)
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/copyFromBitmapToMainImage)
 //----------------------------------------------------------------------
 
 //-- events

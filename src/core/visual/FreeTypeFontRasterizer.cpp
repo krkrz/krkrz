@@ -7,6 +7,7 @@
 #include "MsgIntf.h"
 
 FreeTypeFontRasterizer::FreeTypeFontRasterizer() : RefCount(0), Face(NULL), LastBitmap(NULL) {
+	AddRef();
 }
 FreeTypeFontRasterizer::~FreeTypeFontRasterizer() {
 	if( Face ) delete Face;
@@ -22,6 +23,8 @@ void FreeTypeFontRasterizer::Release() {
 	if( RefCount == 0 ) {
 		if( Face ) delete Face;
 		Face = NULL;
+
+		delete this;
 	}
 }
 //---------------------------------------------------------------------------

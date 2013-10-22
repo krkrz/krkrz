@@ -42,6 +42,7 @@ protected:
 	bool		in_window_;
 	bool		ignore_touch_mouse_;
 
+	bool InMode;
 	int ModalResult;
 
 	static const UINT SIZE_CHANGE_FLAGS;
@@ -113,10 +114,8 @@ public:
 		min_size_.cx = min_size_.cy = 0;
 		max_size_.cx = max_size_.cy = 0;
 	}
-	virtual ~tTVPWindow() {
-		if( ime_control_ ) delete ime_control_;
-		// UnregisterWindow();
-	}
+	virtual ~tTVPWindow();
+
 	bool HasFocus() {
 		return window_handle_ == ::GetFocus();
 	}
@@ -240,6 +239,7 @@ public:
 	virtual void OnActive( HWND preactive ) {}
 	virtual void OnDeactive( HWND postactive ) {}
 	virtual void OnClose( CloseAction& action ){}
+	virtual bool OnCloseQuery() { return true; }
 	virtual void OnFocus(HWND hFocusLostWnd) {}
 	virtual void OnFocusLost(HWND hFocusingWnd) {}
 	virtual void OnMouseDown( int button, int shift, int x, int y ){}

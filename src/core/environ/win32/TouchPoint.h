@@ -88,6 +88,10 @@ public:
 		count_ = INIT_COUNT;
 		touch_points_ = new TouchPoint[count_];
 	}
+	~TouchPointList() {
+		if( touch_points_ ) delete[] touch_points_;
+		touch_points_ = NULL;
+	}
 	
 	void TouchDown( double x, double y, double cx, double cy, DWORD id ) {
 		int idx = FindEnptyEntry();
