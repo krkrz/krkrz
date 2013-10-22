@@ -15,7 +15,7 @@ class Bitmap2Layer extends Bitmap {
 	}
 	function onLoaded(meta,async,error,message) {
 		Debug.message("Exit load async:"+async+", error:"+error+", message:"+message);
-		if( !error ) {
+		if( !error && isvalid(target) ) { // 非同期なので、既に無効化されいないことを確認する
 			target.copyFromBitmapToMainImage(this);
 			target.setSizeToImageSize();
 		}
