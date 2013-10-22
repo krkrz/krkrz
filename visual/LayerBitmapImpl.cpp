@@ -65,6 +65,21 @@ void TVPInializeFontRasterizers() {
 	if( TVPFontRasterizersInit == false ) {
 		TVPFontRasterizers[FONT_RASTER_FREE_TYPE] = new FreeTypeFontRasterizer();
 		TVPFontRasterizers[FONT_RASTER_GDI] = new GDIFontRasterizer();
+
+		TVPFontSystem = new FontSystem();
+		TVPFontRasterizersInit = true;
+	}
+}
+void TVPUninitializeFontRasterizers() {
+	for( tjs_int i = 0; i < FONT_RASTER_EOT; i++ ) {
+		if( TVPFontRasterizers[i] ) {
+			TVPFontRasterizers[i]->Release();
+			TVPFontRasterizers[i] = NULL;
+		}
+	}
+	if( TVPFontSystem ) {
+		delete TVPFontSystem;
+		TVPFontSystem = NULL;
 	}
 }
 // ‚±‚±‚ÅØ‚èŠ·‚¦‚é‚±‚Æl‚¦‚é‚Æ AddRef ˆÓ–¡‚È‚¢‚ÈB‚à‚¤ˆê‚ÂãˆÊ‚Åˆ—‚µ‚È‚¢‚Æ
@@ -453,9 +468,6 @@ tTVPNativeBaseBitmap::tTVPNativeBaseBitmap(tjs_uint w, tjs_uint h, tjs_uint bpp)
 	TVPInializeFontRasterizers();
 	// TVPFontRasterizer->AddRef(); TODO
 
-	if( TVPFontSystem == NULL ) {
-		TVPFontSystem = new FontSystem();
-	}
 	// TVPConstructDefaultFont();
 	Font = TVPFontSystem->GetDefaultFont();
 	PrerenderedFont = NULL;

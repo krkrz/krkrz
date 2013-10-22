@@ -92,6 +92,11 @@ void tTVPSystemControl::EndContinuousEvent() {
 		}
 	}
 }
+//---------------------------------------------------------------------------
+void tTVPSystemControl::NotifyCloseClicked() {
+	// close Button is clicked
+	LastCloseClickedTick = GetTickCount();
+}
 
 void tTVPSystemControl::NotifyEventDelivered() {
 	// called from event system, notifying the event is delivered.

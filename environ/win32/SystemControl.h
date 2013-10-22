@@ -39,6 +39,7 @@ public:
 	void BeginContinuousEvent();
 	void EndContinuousEvent();
 
+	void NotifyCloseClicked();
 	void NotifyEventDelivered();
 
 	void SetEventEnabled( bool b ) {

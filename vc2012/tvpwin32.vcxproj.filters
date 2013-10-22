@@ -529,6 +529,9 @@
     <ClInclude Include="..\visual\win32\TVPSysFont.h">
       <Filter>visual\win32</Filter>
     </ClInclude>
+    <ClInclude Include="..\visual\GraphicsLoadThread.h">
+      <Filter>visual</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\tjs2\tjs.cpp">
@@ -935,6 +938,9 @@
     </ClCompile>
     <ClCompile Include="..\visual\win32\TVPScreen.cpp">
       <Filter>visual\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\GraphicsLoadThread.cpp">
+      <Filter>visual</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

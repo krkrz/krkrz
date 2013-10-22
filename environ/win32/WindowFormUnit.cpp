@@ -200,6 +200,7 @@ TTVPWindowForm::TTVPWindowForm( tTVPApplication* app, tTJSNI_Window* ni ) : tTVP
 	InMode = false;
 	Closing = false;
 	ProgramClosing = false;
+	ModalResult = 0;
 	InnerWidthSave = GetInnerWidth();
 	InnerHeightSave = GetInnerHeight();
 
@@ -239,7 +240,24 @@ TTVPWindowForm::TTVPWindowForm( tTVPApplication* app, tTJSNI_Window* ni ) : tTVP
 	LastRecheckInputStateSent = 0;
 }
 TTVPWindowForm::~TTVPWindowForm() {
-	if( HintTimer ) delete HintTimer;
+	if( HintTimer ) {
+		delete HintTimer;
+		HintTimer = NULL;
+	}
+	if( AttentionFont ) {
+		delete AttentionFont;
+		AttentionFont = NULL;
+	}
+	if( DIWheelDevice ) {
+		delete DIWheelDevice;
+		DIWheelDevice = NULL;
+	}
+#ifndef DISABLE_EMBEDDED_GAME_PAD
+	if( DIPadDevice ) {
+		delete DIPadDevice;
+		DIPadDevice = NULL;
+	}
+#endif
 	Application->RemoveWindow(this);
 }
 tjs_uint32 TVPGetCurrentShiftKeyState() {
@@ -930,7 +948,11 @@ void TTVPWindowForm::RegisterWindowMessageReceiver(tTVPWMRRegMode mode, void * p
 	}
 }
 void TTVPWindowForm::OnClose( CloseAction& action ) {
-	//if(ModalResult == 0) Action = caNone; else Action = caHide;
+	if(ModalResult == 0)
+		action = caNone;
+	else
+		action = caHide;
+
 	if( ProgramClosing ) {
 		if( TJSNativeInstance ) {
 			if( TJSNativeInstance->IsMainWindow() ) {
@@ -948,6 +970,49 @@ void TTVPWindowForm::OnClose( CloseAction& action ) {
 			obj->Invalidate(0, NULL, NULL, obj);
 			TJSNativeInstance = NULL;
 		}
+	}
+}
+bool TTVPWindowForm::OnCloseQuery() {
+	// closing actions are 3 patterns;
+	// 1. closing action by the user
+	// 2. "close" method
+	// 3. object invalidation
+
+	if( TVPGetBreathing() ) {
+		return false;
+	}
+
+	// the default event handler will invalidate this object when an onCloseQuery
+	// event reaches the handler.
+	if(TJSNativeInstance && (ModalResult == 0 ||
+		ModalResult == mrCancel/* mrCancel=when close button is pushed in modal window */  )) {
+		iTJSDispatch2 * obj = TJSNativeInstance->GetOwnerNoAddRef();
+		if(obj) {
+			tTJSVariant arg[1] = {true};
+			static ttstr eventname(TJS_W("onCloseQuery"));
+
+			if(!ProgramClosing) {
+				// close action does not happen immediately
+//				TVPPostEvent(obj, obj, eventname, 0, TVP_EPT_POST, 1, arg);
+				if(TJSNativeInstance) {
+					TVPPostInputEvent( new tTVPOnCloseInputEvent(TJSNativeInstance) );
+				}
+
+				Closing = true; // waiting closing...
+				TVPSystemControl->NotifyCloseClicked();
+				return false;
+			} else {
+				CanCloseWork = true;
+				TVPPostEvent(obj, obj, eventname, 0, TVP_EPT_IMMEDIATE, 1, arg);
+					// this event happens immediately
+					// and does not return until done
+				return CanCloseWork; // CanCloseWork is set by the event handler
+			}
+		} else {
+			return true;
+		}
+	} else {
+		return true;
 	}
 }
 void TTVPWindowForm::Close() {

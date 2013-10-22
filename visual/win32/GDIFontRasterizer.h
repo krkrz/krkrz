@@ -23,7 +23,7 @@ class GDIFontRasterizer : public FontRasterizer {
 	void InitChAntialiasMethod();
 public:
 	GDIFontRasterizer();
-	~GDIFontRasterizer();
+	virtual ~GDIFontRasterizer();
 	void AddRef();
 	void Release();
 	void ApplyFont( class tTVPNativeBaseBitmap *bmp, bool force );

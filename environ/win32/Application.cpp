@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <string>
 #include <vector>
+#include <assert.h>
 
 #include "Application.h"
 #include "SysInitIntf.h"
@@ -22,13 +23,14 @@
 #include "MouseCursor.h"
 #include "SystemImpl.h"
 #include "WaveImpl.h"
+#include "GraphicsLoadThread.h"
 
 #include "resource.h"
 
+/*
 #pragma comment( lib, "winmm.lib" )
 #pragma comment( lib, "dxguid.lib" )
 #pragma comment( lib, "dsound.lib" )
-#pragma comment( lib, "ddraw.lib" )
 #pragma comment( lib, "version.lib" )
 #pragma comment( lib, "mpr.lib" )
 #pragma comment( lib, "shlwapi.lib" )
@@ -37,9 +39,31 @@
 
 #pragma comment( lib, "tvpgl_ia32.lib" )
 #pragma comment( lib, "tvpsnd_ia32.lib" )
+*/
 
-HINSTANCE hInst;
+/*
+kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;dxguid.lib;dsound.lib;version.lib;mpr.lib;shlwapi.lib;vfw32.lib;imm32.lib;zlib_d.lib;jpeg-6bx_d.lib;libpng_d.lib;onig_s_d.lib;freetype250MT_D.lib;tvpgl_ia32.lib;tvpsnd_ia32.lib;%(AdditionalDependencies)
+kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;dxguid.lib;dsound.lib;version.lib;mpr.lib;shlwapi.lib;vfw32.lib;imm32.lib;zlib.lib;jpeg-6bx.lib;libpng.lib;onig_s.lib;freetype250MT.lib;tvpgl_ia32.lib;tvpsnd_ia32.lib;%(AdditionalDependencies)
+*/
+
+//HINSTANCE hInst;
 tTVPApplication* Application;
+
+// アプリケーションの開始時に呼ぶ
+inline void CheckMemoryLeaksStart()
+{
+#ifdef  _DEBUG
+   _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF);
+#endif  // _DEBUG
+}
+
+inline void DumpMemoryLeaks()
+{
+#ifdef  _DEBUG
+	int is_leak = _CrtDumpMemoryLeaks();
+	assert( !is_leak );
+#endif  // _DEBUG
+}
 
 #if 0
 tstring ParamStr( int index ) {
@@ -64,6 +88,7 @@ void TVPOnError();
 int _argc;
 char ** _argv;
 extern void TVPInitCompatibleNativeFunctions();
+extern void TVPUninitializeFontRasterizers();
 
 AcceleratorKeyTable::AcceleratorKeyTable() {
 	// デフォルトを読み込む
@@ -172,27 +197,53 @@ void AcceleratorKey::DelKey( WORD id ) {
 	keys_ = table;
 }
 int APIENTRY WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow ) {
-	TVPInitCompatibleNativeFunctions();
+	try {
+		CheckMemoryLeaksStart();
+		//_CrtSetBreakAlloc(20441);
 
-	hInst = hInstance;
+		TVPInitCompatibleNativeFunctions();
 
-	_argc = __argc;
-	_argv = __argv;
+		_argc = __argc;
+		_argv = __argv;
 
-	MouseCursor::Initialize();
+		MouseCursor::Initialize();
+		Application = new tTVPApplication();
+		Application->StartApplication( __argc, __argv );
+	
+		// delete application and exit forcely
+		// this prevents ugly exception message on exit
+		// アプリケーションを削除し強制終了させる。
+		// これは終了時の醜い例外メッセージを抑止する
+		delete Application;
 
-	Application = new tTVPApplication();
-	Application->ArgC = __argc;
-	Application->ArgV = __argv;
-	for( int i = 0; i < __argc; i++ ) {
-		Application->CommandLines.push_back( std::string(__argv[i]) );
+#ifndef _DEBUG
+		::ExitProcess(TVPTerminateCode); // ここで終了させるとメモリリーク表示が行われない
+#endif
+	} catch (...) {
+		return 2;
 	}
-	Application->CheckConsole();
+	return TVPTerminateCode;
+}
+
+tTVPApplication::tTVPApplication() : is_attach_console_(false), tarminate_(false), ApplicationActivating(true)
+	 , ImageLoadThread(NULL), oldstdin_(NULL), oldstdout_(NULL), oldstderr(NULL) {
+}
+bool tTVPApplication::StartApplication( int argc, char* argv[] ) {
+	ArgC = argc;
+	ArgV = argv;
+	for( int i = 0; i < argc; i++ ) {
+		CommandLines.push_back( std::string(argv[i]) );
+	}
+	TVPTerminateCode = 0;
+
+	CheckConsole();
 
 	// try starting the program!
 	bool engine_init = false;
 	try {
-		if(TVPCheckProcessLog()) return 0; // sub-process for processing object hash map log
+		if(TVPCheckProcessLog()) return true; // sub-process for processing object hash map log
+
+		ImageLoadThread = new tTVPAsyncImageLoader();
 
 		TVPInitScriptEngine();
 		engine_init = true;
@@ -204,17 +255,17 @@ int APIENTRY WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		// TVPInitializeBaseSystems
 		TVPInitializeBaseSystems();
 
-		Application->Initialize();
+		Initialize();
 
-		if(TVPCheckPrintDataPath()) return 0;
-		if(TVPCheckCmdDescription()) return 0;
-		//if(TVPExecuteUserConfig()) return 0; // userconf エンジン設定起動はしない TODO
+		if(TVPCheckPrintDataPath()) return true;
+		if(TVPCheckCmdDescription()) return true;
+		//if(TVPExecuteUserConfig()) return true; // userconf エンジン設定起動はしない TODO
 
 		TVPSystemInit();
 
-		if(TVPCheckAbout()) return 0; // version information dialog box;
+		if(TVPCheckAbout()) return true; // version information dialog box;
 
-		Application->SetTitle( L"吉里吉里" );
+		SetTitle( L"吉里吉里" );
 		TVPSystemControl = new tTVPSystemControl();
 
 #ifndef TVP_IGNORE_LOAD_TPM_PLUGIN
@@ -222,12 +273,22 @@ int APIENTRY WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 #endif
 
 		// Check digitizer
-		Application->CheckDigitizer();
+		CheckDigitizer();
+
+		// start image load thread
+		ImageLoadThread->Resume();
 
 		if(TVPProjectDirSelected) TVPInitializeStartupScript();
 
-		Application->Run();
+		Run();
 
+		try {
+			// ImageLoadThread->ExitRequest();
+			delete ImageLoadThread;
+			ImageLoadThread = NULL;
+		} catch(...) {
+			// ignore errors
+		}
 		try {
 			TVPSystemUninit();
 		} catch(...) {
@@ -238,31 +299,28 @@ int APIENTRY WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	} catch (Exception &exception) {
 		TVPOnError();
 		if(!TVPSystemUninitCalled)
-			Application->ShowException(&exception);
+			ShowException(&exception);
 	} catch (eTJSScriptError &e) {
 		TVPOnError();
 		if(!TVPSystemUninitCalled)
-			Application->ShowException(&Exception(e.GetMessage().AsStdString()));
+			ShowException(&Exception(e.GetMessage().AsStdString()));
 	} catch (eTJS &e) {
 		TVPOnError();
 		if(!TVPSystemUninitCalled)
-			Application->ShowException(&Exception(e.GetMessage().AsStdString()));
+			ShowException(&Exception(e.GetMessage().AsStdString()));
 	} catch(...) {
-		Application->ShowException(&Exception(L"Unknown error!"));
+		ShowException(&Exception(L"Unknown error!"));
 	}
 
 	if(engine_init) TVPUninitScriptEngine();
 
-	Application->CloseConsole();
+	if(TVPSystemControl) delete TVPSystemControl;
+	TVPSystemControl = NULL;
+	TVPUninitializeFontRasterizers();
 
-#ifndef _DEBUG
-	// delete application and exit forcely
-	// this prevents ugly exception message on exit
+	CloseConsole();
 
-	delete Application;
-	::ExitProcess(TVPTerminateCode);
-#endif
-	return TVPTerminateCode;
+	return false;
 }
 /**
  * コンソールからの起動か確認し、コンソールからの起動の場合は、標準出力を割り当てる
@@ -272,6 +330,8 @@ void tTVPApplication::CheckConsole() {
 	if( ::AttachConsole(ATTACH_PARENT_PROCESS) ) {
 		_wfreopen_s( &oldstdin_, L"CON", L"r", stdin );     // 標準入力の割り当て
 		_wfreopen_s( &oldstdout_, L"CON", L"w", stdout);    // 標準出力の割り当て
+		_wfreopen_s( &oldstderr, L"CON", L"w", stderr);
+		
 		is_attach_console_ = true;
 
 		wchar_t console[256];
@@ -279,7 +339,7 @@ void tTVPApplication::CheckConsole() {
 		console_title_ = std::wstring( console );
 
 		//printf( __argv[0] );
-		printf("\n");
+		//printf("\n");
 	}
 #endif
 }
@@ -288,7 +348,8 @@ void tTVPApplication::CloseConsole() {
 		printf("Exit code: %d\n",TVPTerminateCode);
 		FILE *tmpout, *tmpin;
 		_wfreopen_s( &tmpin, L"CON", L"r", oldstdin_ );
-		_wfreopen_s( &tmpout, L"CON", L"w", oldstdout_);
+		_wfreopen_s( &tmpout, L"CON", L"w", oldstderr );
+		_wfreopen_s( &tmpout, L"CON", L"w", oldstdout_ );
 		::SetConsoleTitle( console_title_.c_str() );
 		::FreeConsole();
 	}
@@ -540,6 +601,12 @@ bool tTVPApplication::GetNotMinimizing() const
 		return ::IsIconic( hWnd ) == 0;
 	}
 	return true; // メインがない時は最小化されているとみなす
+}
+
+void tTVPApplication::LoadImageRequest( class iTJSDispatch2 *owner, class tTJSNI_Bitmap* bmp, const ttstr &name ) {
+	if( ImageLoadThread ) {
+		ImageLoadThread->LoadRequest( owner, bmp, name );
+	}
 }
 /**
  仮実装 TODO

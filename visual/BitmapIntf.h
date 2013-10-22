@@ -11,6 +11,7 @@ class tTJSNI_Bitmap : public tTJSNativeInstance
 	typedef tTJSNativeInstance inherited;
 
 protected:
+	iTJSDispatch2 *Owner;
 	tTVPBaseBitmap* Bitmap;
 	bool Loading;
 
@@ -34,7 +35,7 @@ public:
 	void Independ(bool copy = true);
 
 	iTJSDispatch2* Load(const ttstr &name, tjs_uint32 colorkey);
-	void LoadAsync(const ttstr &name, tjs_uint32 colorkey);
+	void LoadAsync(const ttstr &name);
 	void Save(const ttstr &name, const ttstr &type, iTJSDispatch2* meta = NULL);
 
 	void SetSize(tjs_uint width, tjs_uint height);
