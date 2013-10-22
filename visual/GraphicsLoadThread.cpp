@@ -88,6 +88,16 @@ tTVPAsyncImageLoader::~tTVPAsyncImageLoader() {
 	ExitRequest();
 	WaitFor();
 	EventQueue.Deallocate();
+	while( CommandQueue.size() > 0 ) {
+		tTVPImageLoadCommand* cmd = CommandQueue.front();
+		CommandQueue.pop();
+		delete cmd;
+	}
+	while( LoadedQueue.size() > 0 ) {
+		tTVPImageLoadCommand* cmd = LoadedQueue.front();
+		LoadedQueue.pop();
+		delete cmd;
+	}
 }
 void tTVPAsyncImageLoader::ExitRequest() {
 	Terminate();
@@ -133,7 +143,9 @@ void tTVPAsyncImageLoader::HandleLoadedImage() {
 				param[2] = 1; // true error
 				param[3] = cmd->result_; // error_mes
 				static ttstr eventname(TJS_W("onLoaded"));
-				TVPPostEvent(cmd->owner_, cmd->owner_, eventname, 0, TVP_EPT_IMMEDIATE, 4, param);
+				if( cmd->owner_->IsValid(0,NULL,NULL,cmd->owner_) == TJS_S_TRUE ) {
+					TVPPostEvent(cmd->owner_, cmd->owner_, eventname, 0, TVP_EPT_IMMEDIATE, 4, param);
+				}
 
 				if( cmd->dest_->MetaInfo ) {
 					delete cmd->dest_->MetaInfo;
@@ -144,7 +156,7 @@ void tTVPAsyncImageLoader::HandleLoadedImage() {
 
 				tjs_uint w = cmd->dest_->w;
 				tjs_uint h = cmd->dest_->h;
-				cmd->bmp_->SetSize(w,h);
+				cmd->bmp_->SetSize(w,h,false);
 				tjs_int stride = cmd->bmp_->GetPixelBufferPitch();
 				tjs_uint8* dest = reinterpret_cast<tjs_uint8*>( cmd->bmp_->GetPixelBufferForWrite() );
 				tjs_uint pitch = w*4;
@@ -163,7 +175,9 @@ void tTVPAsyncImageLoader::HandleLoadedImage() {
 				param[2] = 0; // false error
 				param[3] = TJS_W(""); // error_mes
 				static ttstr eventname(TJS_W("onLoaded"));
-				TVPPostEvent(cmd->owner_, cmd->owner_, eventname, 0, TVP_EPT_IMMEDIATE, 4, param);
+				if( cmd->owner_->IsValid(0,NULL,NULL,cmd->owner_) == TJS_S_TRUE ) {
+					TVPPostEvent(cmd->owner_, cmd->owner_, eventname, 0, TVP_EPT_IMMEDIATE, 4, param);
+				}
 			}
 			delete cmd;
 		}

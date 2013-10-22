@@ -357,6 +357,8 @@ TVP_MSG_DECL(TVPInvalidWindowSizeMustBeIn64to32768,
 TVP_MSG_DECL(TVPInvalidOverlapCountMustBeIn2to32,
 	TJS_W("overlap は 2～32 の範囲の 2 の累乗で無ければなりません"));
 
+TVP_MSG_DECL(TVPCurrentlyAsyncLoadBitmap,
+	TJS_W("Bitmap を非同期読込み中のため、このメソッドは呼び出せません"));
 //---------------------------------------------------------------------------
 // 埋め込まれていたメッセージをコピー
 

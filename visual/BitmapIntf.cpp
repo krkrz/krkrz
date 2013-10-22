@@ -44,30 +44,35 @@ void TJS_INTF_METHOD tTJSNI_Bitmap::Invalidate() {
 }
 //----------------------------------------------------------------------
 tjs_uint32 tTJSNI_Bitmap::GetPixel(tjs_int x, tjs_int y) const {
+	if( Loading ) TVPThrowExceptionMessage(TVPCurrentlyAsyncLoadBitmap);
 	if(!Bitmap) TVPThrowExceptionMessage(TVPNotDrawableLayerType);
 
 	return TVPFromActualColor(Bitmap->GetPoint(x, y) & 0xffffff);
 }
 //----------------------------------------------------------------------
 void tTJSNI_Bitmap::SetPixel(tjs_int x, tjs_int y, tjs_uint32 color) {
+	if( Loading ) TVPThrowExceptionMessage(TVPCurrentlyAsyncLoadBitmap);
 	if(!Bitmap) TVPThrowExceptionMessage(TVPNotDrawableLayerType);
 
 	Bitmap->SetPointMain(x, y, TVPToActualColor(color));
 }
 //----------------------------------------------------------------------
 tjs_int tTJSNI_Bitmap::GetMaskPixel(tjs_int x, tjs_int y) const {
+	if( Loading ) TVPThrowExceptionMessage(TVPCurrentlyAsyncLoadBitmap);
 	if(!Bitmap) TVPThrowExceptionMessage(TVPNotDrawableLayerType);
 
 	return (Bitmap->GetPoint(x, y) & 0xff000000) >> 24;
 }
 //----------------------------------------------------------------------
 void tTJSNI_Bitmap::SetMaskPixel(tjs_int x, tjs_int y, tjs_int mask) {
+	if( Loading ) TVPThrowExceptionMessage(TVPCurrentlyAsyncLoadBitmap);
 	if(!Bitmap) TVPThrowExceptionMessage(TVPNotDrawableLayerType);
 
 	Bitmap->SetPointMask(x, y, mask);
 }
 //----------------------------------------------------------------------
 void tTJSNI_Bitmap::Independ(bool copy) {
+	if( Loading ) TVPThrowExceptionMessage(TVPCurrentlyAsyncLoadBitmap);
 	if(Bitmap) {
 		if(copy)
 			Bitmap->Independ();
@@ -77,6 +82,7 @@ void tTJSNI_Bitmap::Independ(bool copy) {
 }
 //----------------------------------------------------------------------
 iTJSDispatch2 * tTJSNI_Bitmap::Load(const ttstr &name, tjs_uint32 colorkey) {
+	if( Loading ) TVPThrowExceptionMessage(TVPCurrentlyAsyncLoadBitmap);
 	if( !Bitmap ) Bitmap = new tTVPBaseBitmap( TVPGetInitialBitmap() );
 
 	iTJSDispatch2* metainfo = NULL;
@@ -85,11 +91,13 @@ iTJSDispatch2 * tTJSNI_Bitmap::Load(const ttstr &name, tjs_uint32 colorkey) {
 }
 //----------------------------------------------------------------------
 void tTJSNI_Bitmap::LoadAsync( const ttstr &name) {
+	if( Loading ) TVPThrowExceptionMessage(TVPCurrentlyAsyncLoadBitmap);
 	Loading = true;
 	Application->LoadImageRequest( Owner, this, name );
 }
 //----------------------------------------------------------------------
 void tTJSNI_Bitmap::Save(const ttstr &name, const ttstr &type, iTJSDispatch2* meta ) {
+	if( Loading ) TVPThrowExceptionMessage(TVPCurrentlyAsyncLoadBitmap);
 	if(!Bitmap) TVPThrowExceptionMessage(TVPNotDrawableLayerType);
 
 	if( type.StartsWith(TJS_W("bmp")) )
@@ -133,7 +141,7 @@ void tTJSNI_Bitmap::Save(const ttstr &name, const ttstr &type, iTJSDispatch2* me
 	}
 }
 //----------------------------------------------------------------------
-void tTJSNI_Bitmap::SetSize(tjs_uint width, tjs_uint height) {
+void tTJSNI_Bitmap::SetSize(tjs_uint width, tjs_uint height, bool keepimage) {
 	if(!Bitmap) TVPThrowExceptionMessage(TVPNotDrawableLayerType);
 
 	if(width == Bitmap->GetWidth() && height == Bitmap->GetHeight()) return;
@@ -142,10 +150,15 @@ void tTJSNI_Bitmap::SetSize(tjs_uint width, tjs_uint height) {
 	if(!width || !height)
 		TVPThrowExceptionMessage(TVPCannotCreateEmptyLayerImage);
 
-	Bitmap->SetSizeWithFill(width, height, 0);
+	if(keepimage) {
+		Bitmap->SetSizeWithFill(width, height, 0);
+	} else {
+		Bitmap->SetSize(width, height, false);
+	}
 }
 //----------------------------------------------------------------------
 void tTJSNI_Bitmap::SetWidth(tjs_uint width) {
+	if( Loading ) TVPThrowExceptionMessage(TVPCurrentlyAsyncLoadBitmap);
 	if(!Bitmap) TVPThrowExceptionMessage(TVPNotDrawableLayerType);
 
 	if(width == Bitmap->GetWidth()) return;
@@ -154,11 +167,13 @@ void tTJSNI_Bitmap::SetWidth(tjs_uint width) {
 }
 //----------------------------------------------------------------------
 tjs_uint tTJSNI_Bitmap::GetWidth() const {
+	if( Loading ) TVPThrowExceptionMessage(TVPCurrentlyAsyncLoadBitmap);
 	if(!Bitmap) TVPThrowExceptionMessage(TVPNotDrawableLayerType);
 	return Bitmap->GetWidth();
 }
 //----------------------------------------------------------------------
 void tTJSNI_Bitmap::SetHeight(tjs_uint height) {
+	if( Loading ) TVPThrowExceptionMessage(TVPCurrentlyAsyncLoadBitmap);
 	if(!Bitmap) TVPThrowExceptionMessage(TVPNotDrawableLayerType);
 
 	if(height == Bitmap->GetHeight()) return;
@@ -166,6 +181,7 @@ void tTJSNI_Bitmap::SetHeight(tjs_uint height) {
 }
 //----------------------------------------------------------------------
 tjs_uint tTJSNI_Bitmap::GetHeight() const {
+	if( Loading ) TVPThrowExceptionMessage(TVPCurrentlyAsyncLoadBitmap);
 	if(!Bitmap) TVPThrowExceptionMessage(TVPNotDrawableLayerType);
 	return Bitmap->GetHeight();
 }
@@ -265,6 +281,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/setSize)
 {
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Bitmap);
 	if(numparams < 2) return TJS_E_BADPARAMCOUNT;
+	if( _this->IsLoading() ) TVPThrowExceptionMessage(TVPCurrentlyAsyncLoadBitmap);
 	_this->SetSize((tjs_int)*param[0], (tjs_int)*param[1]);
 	return TJS_S_OK;
 }
@@ -274,6 +291,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/copyFrom)
 {
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Bitmap);
 	if(numparams < 1) return TJS_E_BADPARAMCOUNT;
+	if( _this->IsLoading() ) TVPThrowExceptionMessage(TVPCurrentlyAsyncLoadBitmap);
 	tTJSVariantClosure clo = param[0]->AsObjectClosureNoAddRef();
 	tTJSNI_Bitmap* srcbmp = NULL;
 	if( clo.Object ) {
@@ -404,6 +422,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(buffer)
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Bitmap);
+		if( _this->IsLoading() ) TVPThrowExceptionMessage(TVPCurrentlyAsyncLoadBitmap);
 		*result = reinterpret_cast<tjs_int>(_this->GetPixelBuffer());
 		return TJS_S_OK;
 	}
@@ -418,6 +437,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(bufferForWrite)
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Bitmap);
+		if( _this->IsLoading() ) TVPThrowExceptionMessage(TVPCurrentlyAsyncLoadBitmap);
 		*result = reinterpret_cast<tjs_int>(_this->GetPixelBufferForWrite());
 		return TJS_S_OK;
 	}
@@ -432,6 +452,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(bufferPitch)
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Bitmap);
+		if( _this->IsLoading() ) TVPThrowExceptionMessage(TVPCurrentlyAsyncLoadBitmap);
 		*result = _this->GetPixelBufferPitch();
 		return TJS_S_OK;
 	}
