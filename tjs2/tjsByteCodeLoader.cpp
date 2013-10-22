@@ -6,7 +6,7 @@
 	See details of license at "license.txt"
 */
 //---------------------------------------------------------------------------
-
+#include "tjsCommHead.h"
 
 #include "tjs.h"
 #include "tjsScriptBlock.h"
