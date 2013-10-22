@@ -377,6 +377,7 @@ tTJSInterCodeContext::tTJSInterCodeContext( tTJSScriptBlock *block, const tjs_ch
 tTJSInterCodeContext::~tTJSInterCodeContext()
 {
 	if(Name) delete [] Name;
+	Name = NULL;
 }
 //---------------------------------------------------------------------------
 void tTJSInterCodeContext::Finalize(void)
@@ -389,11 +390,13 @@ void tTJSInterCodeContext::Finalize(void)
 	if(_DataArea)
 	{
 		for(tjs_int i=0; i<_DataAreaSize; i++) delete _DataArea[i];
+		//for(tjs_int i=0; i<_DataAreaSize; i++) { _DataArea[i]->Clear(); delete _DataArea[i]; }
 		TJS_free(_DataArea);
 		_DataArea = NULL;
 	}
 	if(DataArea)
 	{
+		//for(tjs_int i=0; i<_DataAreaSize; i++) { DataArea[i].Clear(); }
 		delete [] DataArea;
 		DataArea = NULL;
 	}

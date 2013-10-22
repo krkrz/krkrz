@@ -66,18 +66,28 @@ class tTVPApplication {
 	bool is_attach_console_;
 	FILE* oldstdin_;
 	FILE* oldstdout_;
+	FILE* oldstderr;
 	std::wstring console_title_;
 	AcceleratorKeyTable accel_key_;
 	bool tarminate_;
 	bool ApplicationActivating;
 
-public:
-	tTVPApplication() : is_attach_console_(false), tarminate_(false), ApplicationActivating(true) {}
+	class tTVPAsyncImageLoader* ImageLoadThread;
+
+private:
 	void CheckConsole();
 	void CloseConsole();
+	void CheckDigitizer();
+	void ShowException( class Exception* e );
+	void Initialize() {}
+	void Run();
+
+public:
+	tTVPApplication();
+	bool StartApplication( int argc, char* argv[] );
+
 	void PrintConsole( const wchar_t* mes, unsigned long len );
 	bool IsAttachConsole() { return is_attach_console_; }
-	void CheckDigitizer();
 
 	HWND GetHandle();
 	bool IsIconic() {
@@ -115,9 +125,6 @@ public:
 	void SetShowHint( bool b ) {}
 	void SetShowMainForm( bool b ) {}
 
-	void Initialize() {}
-	void ShowException( class Exception* e );
-	void Run();
 
 	HWND GetMainWindowHandle() const;
 
@@ -143,6 +150,11 @@ public:
 	void OnDeactivate( HWND hWnd );
 	bool GetActivating() const { return ApplicationActivating; }
 	bool GetNotMinimizing() const;
+
+	/**
+	 * âÊëúÇÃîÒìØä˙ì«çûÇ›óvãÅ
+	 */
+	void LoadImageRequest( class iTJSDispatch2 *owner, class tTJSNI_Bitmap* bmp, const ttstr &name );
 };
 std::vector<std::string>* LoadLinesFromFile( const std::wstring& path );
 

@@ -248,6 +248,45 @@ extern void TVPInternalLoadBMP(void *callbackdata,
 	tTVPBMPAlphaType alphatype,
 	tTVPGraphicLoadMode mode);
 
+struct tTVPGraphicHandlerType
+{
+	ttstr Extension;
+	tTVPGraphicLoadingHandler Handler;
+	void * FormatData;
+
+	tTVPGraphicHandlerType(const ttstr &ext,
+		tTVPGraphicLoadingHandler handler, void * data)
+	{ Extension = ext, Handler = handler, FormatData = data; }
+
+	tTVPGraphicHandlerType(const tTVPGraphicHandlerType & ref)
+	{
+		Extension = ref.Extension;
+		Handler = ref.Handler;
+		FormatData = ref.FormatData;
+	}
+
+	bool operator == (const tTVPGraphicHandlerType & ref) const
+	{
+		return FormatData == ref.FormatData &&
+			Handler == ref.Handler &&
+			Extension == ref.Extension;
+	}
+};
+struct tTVPGraphicMetaInfoPair
+{
+	ttstr Name;
+	ttstr Value;
+	tTVPGraphicMetaInfoPair(const ttstr &name, const ttstr &value) :
+		Name(name), Value(value) {;}
+};
+
+extern iTJSDispatch2 * TVPMetaInfoPairsToDictionary( std::vector<tTVPGraphicMetaInfoPair> *vec );
+extern void TVPPushGraphicCache( const ttstr& nname, tTVPBaseBitmap* bmp,
+	std::vector<tTVPGraphicMetaInfoPair>* meta );
+extern tTVPGraphicHandlerType* TVPGetGraphicLoadHandler( const ttstr& ext );
+extern bool TVPCheckImageCache( const ttstr& nname, tTVPBaseBitmap* dest,
+	tTVPGraphicLoadMode mode, tjs_uint dw, tjs_uint dh, tjs_int32 keyidx,
+	iTJSDispatch2** metainfo );
 //---------------------------------------------------------------------------
 
 

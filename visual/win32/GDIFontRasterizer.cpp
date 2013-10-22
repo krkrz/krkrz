@@ -66,6 +66,8 @@ void GDIFontRasterizer::Release() {
 		FontDC = NULL;
 		delete NonBoldFontDC;
 		NonBoldFontDC = NULL;
+
+		delete this;
 	}
 }
 void GDIFontRasterizer::ApplyFont( tTVPNativeBaseBitmap *bmp, bool force ) {

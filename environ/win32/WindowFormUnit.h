@@ -105,7 +105,7 @@ class TTVPWindowForm : public tTVPWindow, public TouchHandler {
 	static const int TVP_TOOLTIP_SHOW_DELAY = 500;
 private:
 
-	bool InMode;
+	//bool InMode;
 	//bool Focusable;
 
 	//-- drawdevice related
@@ -348,6 +348,7 @@ public:
 
 	virtual void OnPaint();
 	virtual void OnClose( CloseAction& action );
+	virtual bool OnCloseQuery();
 	virtual void OnMouseDown( int button, int shift, int x, int y );
 	virtual void OnMouseUp( int button, int shift, int x, int y );
 	virtual void OnMouseMove( int shift, int x, int y );

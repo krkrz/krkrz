@@ -593,17 +593,17 @@ void tTJSNI_BaseWindow::PostReleaseCaptureEvent()
 //---------------------------------------------------------------------------
 void tTJSNI_BaseWindow::RegisterLayerManager(iTVPLayerManager * manager)
 {
-	DrawDevice->AddLayerManager(manager);
+	if( DrawDevice ) DrawDevice->AddLayerManager(manager);
 }
 //---------------------------------------------------------------------------
 void tTJSNI_BaseWindow::UnregisterLayerManager(iTVPLayerManager * manager)
 {
-	DrawDevice->RemoveLayerManager(manager);
+	if( DrawDevice ) DrawDevice->RemoveLayerManager(manager);
 }
 //---------------------------------------------------------------------------
 void tTJSNI_BaseWindow::NotifyWindowExposureToLayer(const tTVPRect &cliprect)
 {
-	DrawDevice->RequestInvalidation(cliprect);
+	if( DrawDevice ) DrawDevice->RequestInvalidation(cliprect);
 }
 //---------------------------------------------------------------------------
 void tTJSNI_BaseWindow::NotifyUpdateRegionFixed(const tTVPComplexRect &updaterects)
@@ -614,18 +614,20 @@ void tTJSNI_BaseWindow::NotifyUpdateRegionFixed(const tTVPComplexRect &updaterec
 //---------------------------------------------------------------------------
 void tTJSNI_BaseWindow::UpdateContent()
 {
-	// is called from event dispatcher
-	DrawDevice->Update();
+	if( DrawDevice ) {
+		// is called from event dispatcher
+		DrawDevice->Update();
 
-	if( !WaitVSync ) DrawDevice->Show();
+		if( !WaitVSync ) DrawDevice->Show();
 
- 	EndUpdate();
+ 		EndUpdate();
+	}
 }
 //---------------------------------------------------------------------------
 void tTJSNI_BaseWindow::DeliverDrawDeviceShow()
 {
 	// call DrawDevice->Show, at VBlank
-	DrawDevice->Show();
+	if( DrawDevice ) DrawDevice->Show();
 }
 //---------------------------------------------------------------------------
 void tTJSNI_BaseWindow::BeginUpdate(const tTVPComplexRect & rects)
@@ -640,19 +642,19 @@ void tTJSNI_BaseWindow::EndUpdate()
 //---------------------------------------------------------------------------
 void tTJSNI_BaseWindow::DumpPrimaryLayerStructure()
 {
-	DrawDevice->DumpLayerStructure();
+	if( DrawDevice ) DrawDevice->DumpLayerStructure();
 }
 //---------------------------------------------------------------------------
 void tTJSNI_BaseWindow::RecheckInputState()
 {
 	// slow timer tick (about 1 sec interval, inaccurate)
-	DrawDevice->RecheckInputState();
+	if( DrawDevice ) DrawDevice->RecheckInputState();
 }
 //---------------------------------------------------------------------------
 void tTJSNI_BaseWindow::SetShowUpdateRect(bool b)
 {
 	// show update rectangle if possible
-	DrawDevice->SetShowUpdateRect(b);
+	if( DrawDevice ) DrawDevice->SetShowUpdateRect(b);
 }
 //---------------------------------------------------------------------------
 void TJS_INTF_METHOD tTJSNI_BaseWindow::RequestUpdate()
