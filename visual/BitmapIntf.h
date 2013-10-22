@@ -38,7 +38,7 @@ public:
 	void LoadAsync(const ttstr &name);
 	void Save(const ttstr &name, const ttstr &type, iTJSDispatch2* meta = NULL);
 
-	void SetSize(tjs_uint width, tjs_uint height);
+	void SetSize(tjs_uint width, tjs_uint height, bool keepimage = true);
 
 	void SetWidth(tjs_uint width);
 	tjs_uint GetWidth() const;
