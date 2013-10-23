@@ -84,6 +84,7 @@ private:
 
 public:
 	tTVPApplication();
+	~tTVPApplication();
 	bool StartApplication( int argc, char* argv[] );
 
 	void PrintConsole( const wchar_t* mes, unsigned long len );

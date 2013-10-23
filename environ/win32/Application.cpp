@@ -199,7 +199,7 @@ void AcceleratorKey::DelKey( WORD id ) {
 int APIENTRY WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow ) {
 	try {
 		CheckMemoryLeaksStart();
-		//_CrtSetBreakAlloc(347);
+		//_CrtSetBreakAlloc(6969);
 
 		TVPInitCompatibleNativeFunctions();
 
@@ -227,6 +227,14 @@ int APIENTRY WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
 tTVPApplication::tTVPApplication() : is_attach_console_(false), tarminate_(false), ApplicationActivating(true)
 	 , ImageLoadThread(NULL), oldstdin_(NULL), oldstdout_(NULL), oldstderr(NULL) {
+}
+tTVPApplication::~tTVPApplication() {
+	while( windows_list_.size() ) {
+		std::vector<class TTVPWindowForm*>::iterator i = windows_list_.begin();
+		delete (*i);
+		// TTVPWindowForm のデストラクタ内でリストから削除されるはず
+	}
+	windows_list_.clear();
 }
 bool tTVPApplication::StartApplication( int argc, char* argv[] ) {
 	ArgC = argc;
@@ -406,18 +414,17 @@ void tTVPApplication::Run() {
 	}
 	while( windows_list_.size() > 0 && tarminate_ == false ) {
 		BOOL ret = TRUE;
-		while( ::PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE) ) {
+		while( ::PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE) && tarminate_ == false ) {
 			ret = ::GetMessage( &msg, NULL, 0, 0);
 			hAccelTable = accel_key_.GetHandle(msg.hwnd);
 			if( ret && !TranslateAccelerator(msg.hwnd, hAccelTable, &msg) ) {
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
-				if( msg.message == WM_QUIT ) tarminate_ = true;
 			}
+			if( ret == 0 )  break;
 		}
-		if( ret == 0 ) {
-			if( msg.hwnd == mainWnd ) break;
-		}
+		if( ret == 0 )  break;
+
 		bool done = true;
 		if( TVPSystemControl ) {
 			done = TVPSystemControl->ApplicationIdel();
@@ -428,13 +435,11 @@ void tTVPApplication::Run() {
 			if( dret && !TranslateAccelerator(msg.hwnd, hAccelTable, &msg) ) {
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
-				if( msg.message == WM_QUIT ) tarminate_ = true;
 			}
-			if( dret == 0 ) {
-				if( msg.hwnd == mainWnd ) break;
-			}
+			if( dret == 0 )  break;
 		}
 	}
+	tarminate_ = true;
 	TVPTerminateCode = 0;
 	if( ::PeekMessage( &msg, NULL, 0, 0, PM_REMOVE) ) {
 		if( msg.message == WM_QUIT ) {

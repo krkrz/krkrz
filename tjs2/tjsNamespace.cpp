@@ -31,14 +31,12 @@ tTJSLocalSymbolList::~tTJSLocalSymbolList(void)
 {
 	if(StartWriteAddr)
 	{
-//		TJSMessageObserver(AnsiString("Start : ") + AnsiString(FLocalCountStart));
 		*StartWriteAddr = LocalCountStart;
 	}
 
 	if(CountWriteAddr)
 	{
 		tjs_int num = GetCount();
-//		TJSMessageObserver(AnsiString("Count : ") + AnsiString(num));
 		*CountWriteAddr = num;
 	}
 
@@ -107,7 +105,7 @@ void tTJSLocalSymbolList::Remove(const tjs_char *name)
 // tTJSLocalNamespace
 //---------------------------------------------------------------------------
 /*
-Å@a class for compile-time local variables look-up
+ a class for compile-time local variables look-up
 */
 #ifdef TJS_DEBUG_PROFILE_TIME
 tjs_uint time_ns_Push = 0;
@@ -130,7 +128,6 @@ tTJSLocalNamespace::~tTJSLocalNamespace(void)
 {
 	if(MaxCountWriteAddr)
 	{
-//		TJSMessageObserver(AnsiString("Max count : ")+AnsiString(FMaxCount));
 		*MaxCountWriteAddr = MaxCount;
 	}
 }
