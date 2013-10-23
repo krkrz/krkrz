@@ -503,7 +503,7 @@ protected:
 public:
 
 	tTJSCustomObject(tjs_int hashbits = TJS_NAMESPACE_DEFAULT_HASH_BITS);
-	~tTJSCustomObject();
+	virtual ~tTJSCustomObject();
 
 private:
 	void BeforeDestruction(void);

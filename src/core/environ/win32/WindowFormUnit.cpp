@@ -240,6 +240,25 @@ TTVPWindowForm::TTVPWindowForm( tTVPApplication* app, tTJSNI_Window* ni ) : tTVP
 	LastRecheckInputStateSent = 0;
 }
 TTVPWindowForm::~TTVPWindowForm() {
+	CallWindowDetach(true);
+
+	TJSNativeInstance = NULL;
+	// CleanupFullScreen();
+	TVPRemoveModalWindow(this);
+
+	FreeDirectInputDevice();
+
+	delete AttentionFont, AttentionFont = NULL;
+
+	tjs_int count = WindowMessageReceivers.GetCount();
+	for(tjs_int i = 0 ; i < count; i++)
+	{
+		tTVPMessageReceiverRecord * item = WindowMessageReceivers[i];
+		if(!item) continue;
+		delete item;
+		WindowMessageReceivers.Remove(i);
+	}
+
 	if( HintTimer ) {
 		delete HintTimer;
 		HintTimer = NULL;
@@ -1021,8 +1040,7 @@ void TTVPWindowForm::Close() {
 
 	ProgramClosing = true;
 	try {
-		//::DestroyWindow( GetHandle() );
-		SendCloseMessage();
+		tTVPWindow::Close();
 	} catch(...) {
 		ProgramClosing = false;
 		throw;
@@ -1034,7 +1052,10 @@ void TTVPWindowForm::InvalidateClose() {
 	// this will not cause any user confirmation of closing the window.
 	TJSNativeInstance = NULL;
 	SetVisible( false );
-	delete this;
+	BOOL ret = ::DestroyWindow( GetHandle() );
+	if( ret == FALSE ) {
+		// error
+	}
 }
 void TTVPWindowForm::OnCloseQueryCalled( bool b ) {
 	// closing is allowed by onCloseQuery event handler
@@ -1052,7 +1073,7 @@ void TTVPWindowForm::OnCloseQueryCalled( bool b ) {
 					// this is the main window
 					iTJSDispatch2 * obj = TJSNativeInstance->GetOwnerNoAddRef();
 					obj->Invalidate(0, NULL, NULL, obj);
-					TJSNativeInstance = NULL;
+					// TJSNativeInstance = NULL; この段階では既にthisが削除されているため、メンバーへアクセスしてはいけない
 				}
 			} else {
 				delete this;

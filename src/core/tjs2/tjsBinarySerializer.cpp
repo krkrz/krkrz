@@ -86,16 +86,6 @@ tTJSDictionaryObject* tTJSBinarySerializer::CreateDictionary( tjs_uint count ) {
 }
 tTJSArrayObject* tTJSBinarySerializer::CreateArray( tjs_uint count ) {
 	tTJSArrayObject* array = (tTJSArrayObject*)TJSCreateArrayObject();
-
-	/*
-	// ダミーを入れて、強制的に数を増やす
-	tTJSArrayNI* ni = NULL;
-	tjs_error hr = array->NativeInstanceSupport(TJS_NIS_GETINSTANCE, TJSGetArrayClassID(), (iTJSNativeInstance**)&ni );
-	if( TJS_SUCCEEDED(hr) ) {
-		tTJSVariant val;
-		array->Insert( ni, val, count );
-	}
-	*/
 	return array;
 }
 void tTJSBinarySerializer::AddDictionary( tTJSDictionaryObject* dic, tTJSVariantString* name, tTJSVariant* value ) {
@@ -232,7 +222,7 @@ tTJSVariant* tTJSBinarySerializer::ReadBasicType( const tjs_uint8* buff, const t
 			tjs_int value = type;
 			return new tTJSVariant(value);
 		} else if( type >= TYPE_FIX_RAW_MIN && type <= TYPE_FIX_RAW_MAX ) { // octet
-			tjs_int len = buff[index] - TYPE_FIX_RAW_MIN;
+			tjs_int len = type - TYPE_FIX_RAW_MIN;
 			if( (len*sizeof(tjs_uint8)+index) > size ) TJS_eTJSError( TJSReadError );
 			return ReadOctetVarint( buff, len, index );
 		} else if( type >= TYPE_FIX_STRING_MIN && type <= TYPE_FIX_STRING_MAX ) {
@@ -308,16 +298,7 @@ tTJSVariant* tTJSBinarySerializer::ReadDictionary( const tjs_uint8* buff, const 
 		AddDictionary( dic, name, value );
 		name->Release();
 	}
-#if 0
-	tTJSDictionaryNI* ni = NULL;
-	tjs_error hr = dic->NativeInstanceSupport(TJS_NIS_GETINSTANCE, TJSGetDictionaryClassID(), (iTJSNativeInstance**)&ni );
-	if( TJS_SUCCEEDED(hr) ) {
-		std::vector<iTJSDispatch2 *> stack;
-		stack.push_back(dic);
-		iTJSTextWriteStream* stream = TJSCreateTextStreamForWrite(TJS_W("array_data.txt"),TJS_W(""));
-		ni->SaveStructuredData( stack, *stream, TJS_W("") );
-	}
-#endif
+
 	return new tTJSVariant( dic, dic );
 }
 tTJSVariant* tTJSBinarySerializer::Read( tTJSBinaryStream* stream )
