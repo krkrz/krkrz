@@ -20,7 +20,7 @@ protected:
 	void ExtendsClass( iTJSDispatch2* global, const ttstr& classname );
 public:
 	tTJSExtendableObject() : SuperClass(NULL) {}
-	~tTJSExtendableObject();
+	virtual ~tTJSExtendableObject();
 
 	iTJSDispatch2* GetSuper() { return SuperClass; }
 	const iTJSDispatch2* GetSuper() const { return SuperClass; }

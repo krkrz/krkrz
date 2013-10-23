@@ -37,23 +37,7 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		return 0;
 	}
 	case WM_CLOSE: {
-		if( OnCloseQuery() ) {
-			CloseAction action = caFree;
-			OnClose(action);
-			switch( action ) {
-			case caNone:
-				break;
-			case caHide:
-				::ShowWindow( GetHandle(), SW_HIDE );
-				break;
-			case caFree:
-				::DestroyWindow( GetHandle() );
-				break;
-			case caMinimize:
-				::ShowWindow( GetHandle(), SW_MINIMIZE );
-				break;
-			}
-		}
+		Close();
 		return 0;
 	}
 
@@ -295,7 +279,7 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		return ::DefWindowProc(hWnd,msg,wParam,lParam);
 	case WM_DESTROY:
 		OnDestroy();
-		PostQuitMessage( 0 );
+		// ::PostQuitMessage( 0 );
 		return 0;
 	case WM_MOVE:
 		OnMove( GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
@@ -800,6 +784,25 @@ void tTVPWindow::GetClientRect( struct tTVPRect& rt ) {
 	rt.right = r.right;
 }
 
+void tTVPWindow::Close() {
+	if( OnCloseQuery() ) {
+		CloseAction action = caFree;
+		OnClose(action);
+		switch( action ) {
+		case caNone:
+			break;
+		case caHide:
+			::ShowWindow( GetHandle(), SW_HIDE );
+			break;
+		case caFree:
+			::DestroyWindow( GetHandle() );
+			break;
+		case caMinimize:
+			::ShowWindow( GetHandle(), SW_MINIMIZE );
+			break;
+		}
+	}
+}
 int tTVPWindow::ShowModal() {
 	if( GetVisible() || !GetEnable() ) {
 		throw Exception(TJS_W("Cannot Show Modal."));

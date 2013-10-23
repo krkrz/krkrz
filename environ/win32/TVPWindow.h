@@ -116,12 +116,14 @@ public:
 	}
 	virtual ~tTVPWindow();
 
-	bool HasFocus() {
+	bool HasFocus() const {
 		return window_handle_ == ::GetFocus();
+	}
+	bool IsValidHandle() const {
+		return ( window_handle_ != NULL && window_handle_ != INVALID_HANDLE_VALUE && ::IsWindow(window_handle_) );
 	}
 
 	virtual bool Initialize();
-	//virtual int MainLoop();
 
 	void SetWidnowTitle( const std::wstring& title );
 	void SetScreenSize( int width, int height );
@@ -232,6 +234,7 @@ public:
 	}
 
 	int ShowModal();
+	void Close();
 
 	void GetClientRect( struct tTVPRect& rt );
 

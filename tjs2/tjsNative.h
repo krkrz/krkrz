@@ -188,7 +188,7 @@ class tTJSNativeClass : public tTJSExtendableObject
 
 public:
 	tTJSNativeClass(const ttstr &name);
-	~tTJSNativeClass();
+	virtual ~tTJSNativeClass();
 
 	void RegisterNCM(const tjs_char *name,
 		iTJSDispatch2 *dsp,
