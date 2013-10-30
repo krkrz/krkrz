@@ -243,8 +243,7 @@ public:
 	bool GetShowScrollBars() const{return false;}
 */
 
-	void SetFullScreen(bool b){}
-	bool GetFullScreen() const{return false;}
+	void CleanupFullScreen();
 
 	void SetUseMouseKey(bool b);
 	bool GetUseMouseKey() const;

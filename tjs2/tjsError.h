@@ -317,10 +317,15 @@ namespace TJS
 {
 #ifdef TJS_DECL_MESSAGE_BODY
 	#define TJS_MSG_DECL(name, msg) tTJSMessageHolder name(TJS_W(#name), msg);
+	#define TJS_MSG_DECL_NULL(name) tTJSMessageHolder name(TJS_W(#name), NULL);
 #else
 	#define TJS_MSG_DECL(name, msg) extern tTJSMessageHolder name;
+	#define TJS_MSG_DECL_NULL(name) extern tTJSMessageHolder name;
 #endif
 //---------------------------------------------------------------------------
+#include "tjsErrorInc.h"
+
+#if 0
 #ifdef TJS_JP_LOCALIZED
 	#include "tjsError_jp.h"
 #else
@@ -386,8 +391,10 @@ TJS_MSG_DECL(TJSSeekError, TJS_W("Seek error"))
 
 TJS_MSG_DECL(TJSByteCodeBroken, TJS_W("Bytecode read error. File is broken or it's not bytecode file."))
 #endif
+#endif
 
 #undef TJS_MSG_DECL
+#undef TJS_MSG_DECL_NULL
 //---------------------------------------------------------------------------
 
 }

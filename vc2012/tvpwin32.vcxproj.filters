@@ -532,6 +532,9 @@
     <ClInclude Include="..\visual\GraphicsLoadThread.h">
       <Filter>visual</Filter>
     </ClInclude>
+    <ClInclude Include="..\environ\win32\WindowsUtil.h">
+      <Filter>environ\win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\tjs2\tjs.cpp">
@@ -941,6 +944,12 @@
     </ClCompile>
     <ClCompile Include="..\visual\GraphicsLoadThread.cpp">
       <Filter>visual</Filter>
+    </ClCompile>
+    <ClCompile Include="..\environ\win32\WindowsUtil.cpp">
+      <Filter>environ\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\msg\win32\MsgLoad.cpp">
+      <Filter>msg\win32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

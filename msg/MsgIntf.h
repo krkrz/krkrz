@@ -17,10 +17,11 @@
 #ifndef TVP_MSG_DECL
 	#define TVP_MSG_DECL(name, msg) extern tTJSMessageHolder name;
 	#define TVP_MSG_DECL_CONST(name, msg) extern tTJSMessageHolder name;
+	#define TVP_MSG_DECL_NULL(name) extern tTJSMessageHolder name;
 #endif
 
 #include "MsgImpl.h"
-#include "svn_revision.h"
+//#include "svn_revision.h"
 
 #define WIDEN2(x) L ## x
 #define WIDEN(x) WIDEN2(x)
@@ -40,7 +41,7 @@ TVP_MSG_DECL_CONST(TVPAboutString,
 	
 TJS_W("吉里吉里[きりきり] Z 実行コア version %1 ( TJS version %2 )") RETURN_CODE
 TJS_W("Compiled on ") WIDEN(__DATE__) TJS_W(" ") WIDEN(__TIME__) RETURN_CODE
-TJS_W("SVN Revision: ") TVP_SVN_REVISION RETURN_CODE
+// TJS_W("SVN Revision: ") TVP_SVN_REVISION RETURN_CODE
 TJS_W("Copyright (C) 1997-2012 W.Dee and contributors All rights reserved.") RETURN_CODE
 TJS_W("Contributors in alphabetical order:") RETURN_CODE
 TJS_W("  Go Watanabe, Kenjo, Kiyobee, Kouhei Yanagita, mey, MIK, Takenori Imoto, yun") RETURN_CODE
@@ -89,6 +90,9 @@ TJS_W("環境情報") RETURN_CODE
 );
 #undef RETURN_CODE
 
+#include "MsgIntfInc.h"
+
+#if 0
 TVP_MSG_DECL_CONST(TVPVersionInformation,
 	
 TJS_W("吉里吉里[きりきり] Z 実行コア/%1 ")
@@ -360,11 +364,9 @@ TVP_MSG_DECL(TVPInvalidOverlapCountMustBeIn2to32,
 TVP_MSG_DECL(TVPCurrentlyAsyncLoadBitmap,
 	TJS_W("Bitmap を非同期読込み中のため、このメソッドは呼び出せません"));
 //---------------------------------------------------------------------------
-// 埋め込まれていたメッセージをコピー
-
 TVP_MSG_DECL(TVPFaildClipboardCopy,
 	TJS_W("copying to clipboard failed."));
-
+#endif
 
 //---------------------------------------------------------------------------
 // Utility Functions

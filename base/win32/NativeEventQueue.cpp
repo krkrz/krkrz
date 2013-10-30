@@ -1,6 +1,7 @@
 
 #include "tjsCommHead.h"
 #include "NativeEventQueue.h"
+#include "WindowsUtil.h"
 
 int NativeEventQueueImplement::CreateUtilWindow() {
 	::ZeroMemory( &wc_, sizeof(wc_) );
@@ -14,11 +15,7 @@ int NativeEventQueueImplement::CreateUtilWindow() {
 	if( ClassRegistered == 0 ) {
 		if( ::RegisterClassEx( &wc_ ) == 0 ) {
 #ifdef _DEBUG
-			LPVOID lpMsgBuf;
-			::FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-				NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, NULL );
-			::OutputDebugString( (LPCWSTR)lpMsgBuf );
-			::LocalFree(lpMsgBuf);
+			TVPOutputWindowsErrorToDebugMessage();
 #endif
 			return HRESULT_FROM_WIN32(::GetLastError());
 		}
@@ -28,11 +25,7 @@ int NativeEventQueueImplement::CreateUtilWindow() {
 
 	if( window_handle_ == NULL ) {
 #ifdef _DEBUG
-		LPVOID lpMsgBuf;
-		::FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-			NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, NULL );
-		::OutputDebugString( (LPCWSTR)lpMsgBuf );
-		::LocalFree(lpMsgBuf);
+			TVPOutputWindowsErrorToDebugMessage();
 #endif
 		return HRESULT_FROM_WIN32(::GetLastError());
 	}

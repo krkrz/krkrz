@@ -133,6 +133,7 @@
     <ClInclude Include="..\environ\win32\TVPWindow.h" />
     <ClInclude Include="..\environ\win32\VersionFormUnit.h" />
     <ClInclude Include="..\environ\win32\WindowFormUnit.h" />
+    <ClInclude Include="..\environ\win32\WindowsUtil.h" />
     <ClInclude Include="..\msg\MsgIntf.h" />
     <ClInclude Include="..\msg\svn_revision.h" />
     <ClInclude Include="..\msg\win32\MsgImpl.h" />
@@ -292,8 +293,10 @@
     <ClCompile Include="..\environ\win32\TVPWindow.cpp" />
     <ClCompile Include="..\environ\win32\VersionFormUnit.cpp" />
     <ClCompile Include="..\environ\win32\WindowFormUnit.cpp" />
+    <ClCompile Include="..\environ\win32\WindowsUtil.cpp" />
     <ClCompile Include="..\msg\MsgIntf.cpp" />
     <ClCompile Include="..\msg\win32\MsgImpl.cpp" />
+    <ClCompile Include="..\msg\win32\MsgLoad.cpp" />
     <ClCompile Include="..\msg\win32\OptionsDesc.cpp" />
     <ClCompile Include="..\sound\PhaseVocoderDSP.cpp" />
     <ClCompile Include="..\sound\PhaseVocoderFilter.cpp" />

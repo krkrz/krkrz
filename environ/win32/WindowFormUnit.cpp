@@ -26,6 +26,7 @@
 #include "Application.h"
 #include "TVPSysFont.h"
 #include "TickCount.h"
+#include "WindowsUtil.h"
 
 tjs_uint32 TVP_TShiftState_To_uint32(TShiftState state) {
 	tjs_uint32 result = 0;
@@ -242,8 +243,8 @@ TTVPWindowForm::TTVPWindowForm( tTVPApplication* app, tTJSNI_Window* ni ) : tTVP
 TTVPWindowForm::~TTVPWindowForm() {
 	CallWindowDetach(true);
 
+	CleanupFullScreen();
 	TJSNativeInstance = NULL;
-	// CleanupFullScreen();
 	TVPRemoveModalWindow(this);
 
 	FreeDirectInputDevice();
@@ -279,6 +280,13 @@ TTVPWindowForm::~TTVPWindowForm() {
 #endif
 	Application->RemoveWindow(this);
 }
+void TTVPWindowForm::CleanupFullScreen() {
+	// called at destruction
+	if(TVPFullScreenedWindow != this) return;
+	// TVPRevertFromFullScreen( GetHandle(), GetWidth(), GetHeight(), TJSNativeInstance->GetDrawDevice() );
+	TVPFullScreenedWindow = NULL;
+}
+
 tjs_uint32 TVPGetCurrentShiftKeyState() {
 	tjs_uint32 f = 0;
 
@@ -861,7 +869,7 @@ void TTVPWindowForm::SetFullScreenMode( bool b ) {
 	CurrentMouseCursor.SetCursor();
 }
 bool TTVPWindowForm::GetFullScreenMode() const { 
-	return false;
+	return TVPFullScreenedWindow == this;
 }
 
 void TTVPWindowForm::CallWindowDetach(bool close) {
@@ -1054,7 +1062,7 @@ void TTVPWindowForm::InvalidateClose() {
 	SetVisible( false );
 	BOOL ret = ::DestroyWindow( GetHandle() );
 	if( ret == FALSE ) {
-		// error
+		TVPThrowWindowsErrorException();
 	}
 }
 void TTVPWindowForm::OnCloseQueryCalled( bool b ) {

@@ -11,6 +11,8 @@
 #include "Application.h"
 #include "Resource.h"
 #include "CompatibleNativeFuncs.h"
+#include "WindowsUtil.h"
+#include "MsgIntf.h"
 
 
 tTVPWindow::~tTVPWindow() {
@@ -41,8 +43,8 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		return 0;
 	}
 
-// Mouse ハンドラ
-		/* wParam
+	// Mouse ハンドラ
+	/* wParam
 		0x0001 (MK_LBUTTON) 	マウスの左ボタンが押されています。
 		0x0002 (MK_RBUTTON) 	マウスの右ボタンが押されています。
 		0x0004 (MK_SHIFT) 		[Shift] キーが押されています。
@@ -50,7 +52,7 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		0x0010 (MK_MBUTTON) 	マウスの中央ボタンが押されています。
 		0x0020 (MK_XBUTTON1) 	Windows 2000/XP： 1番目の X ボタンが押されています。
 		0x0040 (MK_XBUTTON2)	Windows 2000/XP： 2番目の X ボタンが押されています。
-		*/
+	*/
 	case WM_MOUSELEAVE:
 		OnMouseLeave();
 		in_window_ = false;
@@ -74,7 +76,6 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		return 0;
 
 	case WM_LBUTTONDOWN:
-		// ::SetTimer( GetHandle(), msg, ::GetDoubleClickTime(), NULL );
 		if( ignore_touch_mouse_ == false ) {
 			LeftDoubleClick = false;
 			OnMouseDown( mbLeft, GetShiftState(wParam), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
@@ -144,43 +145,50 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 			UINT cInputs = LOWORD(wParam);
 			PTOUCHINPUT pInputs = new TOUCHINPUT[cInputs];
 			if( NULL != pInputs ) {
-				if( procGetTouchInputInfo( (HTOUCHINPUT)lParam, cInputs, pInputs, sizeof(TOUCHINPUT)) ) {
-					// process pInputs
-					for( UINT i = 0; i < cInputs; i++ ) {
-						int x = pInputs[i].x / 100;
-						int y = pInputs[i].y / 100;
-						POINT pt = {x,y};
-						::ClientToScreen( GetHandle(), &pt );
-						int lx = pInputs[i].x % 100;
-						int ly = pInputs[i].y % 100;
-						double vx = x + static_cast<double>(lx)/100.0;
-						double vy = y + static_cast<double>(ly)/100.0;
-						double cx = 1;
-						double cy = 1;
-						if( pInputs[i].dwMask & TOUCHINPUTMASKF_CONTACTAREA ) {
-							cx = static_cast<double>(pInputs[i].cxContact) / 100.0;
-							cy = static_cast<double>(pInputs[i].cyContact) / 100.0;
+				try {
+					if( procGetTouchInputInfo( (HTOUCHINPUT)lParam, cInputs, pInputs, sizeof(TOUCHINPUT)) ) {
+						// process pInputs
+						for( UINT i = 0; i < cInputs; i++ ) {
+							int x = pInputs[i].x / 100;
+							int y = pInputs[i].y / 100;
+							POINT pt = {x,y};
+							::ClientToScreen( GetHandle(), &pt );
+							int lx = pInputs[i].x % 100;
+							int ly = pInputs[i].y % 100;
+							double vx = x + static_cast<double>(lx)/100.0;
+							double vy = y + static_cast<double>(ly)/100.0;
+							double cx = 1;
+							double cy = 1;
+							if( pInputs[i].dwMask & TOUCHINPUTMASKF_CONTACTAREA ) {
+								cx = static_cast<double>(pInputs[i].cxContact) / 100.0;
+								cy = static_cast<double>(pInputs[i].cyContact) / 100.0;
+							}
+							if( pInputs[i].dwFlags & TOUCHEVENTF_DOWN ) {
+								OnTouchDown( vx, vy, cx, cy, pInputs[i].dwID );
+							}
+							if( pInputs[i].dwFlags & TOUCHEVENTF_MOVE ) {
+								OnTouchMove( vx, vy, cx, cy, pInputs[i].dwID );
+							}
+							if( pInputs[i].dwFlags & TOUCHEVENTF_UP ) {
+								OnTouchUp( vx, vy, cx, cy, pInputs[i].dwID );
+							}
 						}
-						if( pInputs[i].dwFlags & TOUCHEVENTF_DOWN ) {
-							OnTouchDown( vx, vy, cx, cy, pInputs[i].dwID );
+						ignore_touch_mouse_ = true;
+						if( !procCloseTouchInputHandle((HTOUCHINPUT)lParam) ) {
+							// error handling
+							TVPThrowWindowsErrorException();
 						}
-						if( pInputs[i].dwFlags & TOUCHEVENTF_MOVE ) {
-							OnTouchMove( vx, vy, cx, cy, pInputs[i].dwID );
-						}
-						if( pInputs[i].dwFlags & TOUCHEVENTF_UP ) {
-							OnTouchUp( vx, vy, cx, cy, pInputs[i].dwID );
-						}
+					} else {
+						TVPThrowWindowsErrorException();
 					}
-					ignore_touch_mouse_ = true;
-					if( !procCloseTouchInputHandle((HTOUCHINPUT)lParam) ) {
-						// error handling
-					}
-				} else {
-					// GetLastError() and error handling
+				} catch(...) {
+					delete[] pInputs;
+					throw;
 				}
 				delete[] pInputs;
 			} else {
 				// error handling, presumably out of memory
+				TVPThrowExceptionMessage( TVPInsufficientMemory );
 			}
 		}
 		return DefWindowProc(hWnd, msg, wParam, lParam);
@@ -332,17 +340,13 @@ HRESULT tTVPWindow::CreateWnd( const std::wstring& classname, const std::wstring
 	WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC | CS_DBLCLKS, tTVPWindow::WndProc, 0L, 0L,
 						GetModuleHandle(NULL), NULL, NULL, NULL, NULL,
 						window_class_name_.c_str(), NULL };
-	wc.hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_TVPWIN32));
+	wc.hIcon = ::LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_TVPWIN32));
 	wc.hIconSm = ::LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_TVPWIN32));
 	BOOL ClassRegistered = ::GetClassInfoEx( wc.hInstance, wc.lpszClassName, &wc );
 	if( ClassRegistered == 0 ) {
 		if( ::RegisterClassEx( &wc ) == 0 ) {
 #ifdef _DEBUG
-			LPVOID lpMsgBuf;
-			::FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-				NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, NULL );
-			::OutputDebugString( (LPCWSTR)lpMsgBuf );
-			::LocalFree(lpMsgBuf);
+			TVPOutputWindowsErrorToDebugMessage();
 #endif
 			return HRESULT_FROM_WIN32(::GetLastError());
 		}
@@ -357,11 +361,7 @@ HRESULT tTVPWindow::CreateWnd( const std::wstring& classname, const std::wstring
 	
 	if( window_handle_ == NULL ) {
 #ifdef _DEBUG
-		LPVOID lpMsgBuf;
-		::FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-			NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, NULL );
-		::OutputDebugString( (LPCWSTR)lpMsgBuf );
-		::LocalFree(lpMsgBuf);
+			TVPOutputWindowsErrorToDebugMessage();
 #endif
 		return HRESULT_FROM_WIN32(::GetLastError());
 	}
@@ -412,29 +412,7 @@ void tTVPWindow::SetScreenSize( int width, int height ) {
 		}
 	}
 }
-/*
-int tTVPWindow::MainLoop() {
-	MSG msg;
-	ZeroMemory( &msg, sizeof(msg) );
-	// 最初に生成関係のたまっているメッセージを処理する
-	while( msg.message != WM_QUIT && PeekMessage( &msg, NULL, 0U, 0U, PM_REMOVE ) ) {
-		TranslateMessage( &msg );
-		DispatchMessage( &msg );
-	}
 
-	// アプリスレッドを始動する
-	GetApplication()->Wakeup();
-
-	// メイン処理
-	while( msg.message != WM_QUIT ) {
-		if( GetMessage( &msg, NULL, 0, 0 ) ) {
-			TranslateMessage( &msg );
-			DispatchMessage( &msg );
-		}
-	}
-	return 0;
-}
-*/
 bool tTVPWindow::Initialize() {
 	return true;
 }
@@ -453,31 +431,19 @@ void tTVPWindow::SetClientSize( HWND hWnd, SIZE& size ) {
 		RECT rect2;
 		if( ::GetWindowRect( hWnd, &rect2 ) ) {
 			if( ::SetWindowPos( hWnd, NULL, rect2.left, rect2.top, rect.right-rect.left, rect.bottom-rect.top, SIZE_CHANGE_FLAGS ) == 0 ) {
-				// error
+				TVPThrowWindowsErrorException();
 			}
 		} else {
-			// error
+			TVPThrowWindowsErrorException();
 		}
 	} else {
-		// error
+		TVPThrowWindowsErrorException();
 	}
 }
 
 
 // 表示状態
 bool tTVPWindow::GetVisible() const {
-/*
-	WINDOWPLACEMENT wndpl;
-//	::ZeroMemory( &wndpl, sizeof(wndpl) );
-	wndpl.length = sizeof(WINDOWPLACEMENT);
-	if( GetWindowPlacement( GetHandle(), &wndpl ) ) {
-		// 非表示以外の時は、表示状態
-		return wndpl.showCmd != SW_HIDE;
-	} else {
-		// error, とりあえず false を返しておく
-		return false;
-	}
-*/
 	return ::IsWindowVisible( GetHandle() ) ? true : false;
 }
 void tTVPWindow::SetVisible( bool s ) {
@@ -501,9 +467,6 @@ void tTVPWindow::GetCaption( std::wstring& v ) const {
 			v.assign( &(caption[0]) );
 		}
 	}
-
-// 内部で持っているのよりも、ちゃんと毎回取得した方がいいか
-//	v = window_title_;
 }
 void tTVPWindow::SetCaption( const std::wstring& v ) {
 	if( window_title_ != v ) {
@@ -511,34 +474,7 @@ void tTVPWindow::SetCaption( const std::wstring& v ) {
 		::SetWindowText( GetHandle(), window_title_.c_str() );
 	}
 }
-/*
-bsDialog : サイズ変更不可の、ダイアログボックスと同様の外見を持ちます。
-WS_DLGFRAME | WS_POPUP | WS_CAPTION
-WS_EX_DLGMODALFRAME | WS_EX_WINDOWEDGE;
-//WS_DLGFRAME 
-//-WS_THICKFRAME 
 
-bsSingle : サイズ変更不可のウィンドウです。
-WS_CAPTION | WS_BORDER
-//WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_BORDER
-
-bsNone : ボーダーのないウィンドウです。
-WS_POPUP
-// WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX
-
-bsSizeable : サイズ変更可の一般的なウィンドウです。デフォルトです。
-WS_CAPTION | WS_THICKFRAME
-//WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_BORDER
-
-
-bsToolWindow : サイズ変更不可のツールウィンドウ(キャプションの小さいウィンドウ) です。
-WS_CAPTION | WS_BORDER
-WS_EX_TOOLWINDOW
-
-bsSizeToolWin : bsToolWindow と似ていますが、サイズ変更が可能です。
-WS_CAPTION | WS_THICKFRAME
-WS_EX_TOOLWINDOW
-*/
 void tTVPWindow::SetBorderStyle(tTVPBorderStyle st) {
 	const DWORD notStyle = WS_POPUP | WS_CAPTION | WS_BORDER | WS_THICKFRAME | WS_DLGFRAME;
 	DWORD style = ::GetWindowLong( GetHandle(), GWL_STYLE);
@@ -607,8 +543,10 @@ void tTVPWindow::SetWidth( int w ) {
 	RECT rect;
 	if( ::GetWindowRect( GetHandle(), &rect ) ) {
 		if( ::SetWindowPos( GetHandle(), NULL, rect.left, rect.top, w, rect.bottom-rect.top, SIZE_CHANGE_FLAGS ) == 0 ) {
-			// error
+			TVPThrowWindowsErrorException();
 		}
+	} else {
+		TVPThrowWindowsErrorException();
 	}
 }
 
@@ -617,7 +555,7 @@ int tTVPWindow::GetWidth() const {
 	if( ::GetWindowRect( GetHandle(), &rect ) ) {
 		return rect.right - rect.left;
 	} else {
-		// error
+		TVPThrowWindowsErrorException();
 		return 0;
 	}
 }
@@ -626,8 +564,10 @@ void tTVPWindow::SetHeight( int h ) {
 	RECT rect;
 	if( ::GetWindowRect( GetHandle(), &rect ) ) {
 		if( ::SetWindowPos( GetHandle(), NULL, rect.left, rect.top, rect.right-rect.left, h, SIZE_CHANGE_FLAGS ) == 0 ) {
-			// error
+			TVPThrowWindowsErrorException();
 		}
+	} else {
+		TVPThrowWindowsErrorException();
 	}
 }
 
@@ -636,7 +576,7 @@ int tTVPWindow::GetHeight() const {
 	if( ::GetWindowRect( GetHandle(), &rect ) ) {
 		return rect.bottom - rect.top;
 	} else {
-		// error
+		TVPThrowWindowsErrorException();
 		return 0;
 	}
 }
@@ -645,8 +585,10 @@ void tTVPWindow::SetSize( int w, int h ) {
 	RECT rect;
 	if( ::GetWindowRect( GetHandle(), &rect ) ) {
 		if( ::SetWindowPos( GetHandle(), NULL, rect.left, rect.top, w, h, SIZE_CHANGE_FLAGS ) == 0 ) {
-			// error
+			TVPThrowWindowsErrorException();
 		}
+	} else {
+		TVPThrowWindowsErrorException();
 	}
 }
 void tTVPWindow::GetSize( int &w, int &h ) {
@@ -664,8 +606,10 @@ void tTVPWindow::SetLeft( int l ) {
 	RECT rect;
 	if( ::GetWindowRect( GetHandle(), &rect ) ) {
 		if( ::SetWindowPos( GetHandle(), NULL, l, rect.top, rect.right-rect.left, rect.bottom-rect.top, POS_CHANGE_FLAGS ) == 0 ) {
-			// error
+			TVPThrowWindowsErrorException();
 		}
+	} else {
+		TVPThrowWindowsErrorException();
 	}
 }
 int tTVPWindow::GetLeft() const {
@@ -673,7 +617,7 @@ int tTVPWindow::GetLeft() const {
 	if( ::GetWindowRect( GetHandle(), &rect ) ) {
 		return rect.left;
 	} else {
-		// error
+		TVPThrowWindowsErrorException();
 		return 0;
 	}
 }
@@ -681,8 +625,10 @@ void tTVPWindow::SetTop( int t ) {
 	RECT rect;
 	if( ::GetWindowRect( GetHandle(), &rect ) ) {
 		if( ::SetWindowPos( GetHandle(), NULL, rect.left, t, rect.right-rect.left, rect.bottom-rect.top, POS_CHANGE_FLAGS ) == 0 ) {
-			// error
+			TVPThrowWindowsErrorException();
 		}
+	} else {
+		TVPThrowWindowsErrorException();
 	}
 }
 int tTVPWindow::GetTop() const {
@@ -690,7 +636,7 @@ int tTVPWindow::GetTop() const {
 	if( ::GetWindowRect( GetHandle(), &rect ) ) {
 		return rect.top;
 	} else {
-		// error
+		TVPThrowWindowsErrorException();
 		return 0;
 	}
 }
@@ -698,12 +644,16 @@ void tTVPWindow::SetPosition( int l, int t ) {
 	RECT rect;
 	if( ::GetWindowRect( GetHandle(), &rect ) ) {
 		if( ::SetWindowPos( GetHandle(), NULL, l, t, rect.right-rect.left, rect.bottom-rect.top, POS_CHANGE_FLAGS ) == 0 ) {
-			// error
+			TVPThrowWindowsErrorException();
 		}
+	} else {
+		TVPThrowWindowsErrorException();
 	}
 }
 void tTVPWindow::SetBounds( int x, int y, int width, int height ) {
-	::SetWindowPos( GetHandle(), NULL, x, y, width, height, POS_CHANGE_FLAGS );
+	if( ::SetWindowPos( GetHandle(), NULL, x, y, width, height, POS_CHANGE_FLAGS ) == 0 ) {
+		TVPThrowWindowsErrorException();
+	}
 }
 void tTVPWindow::SetInnerWidth( int w ) {
 	RECT rect;
@@ -713,7 +663,7 @@ void tTVPWindow::SetInnerWidth( int w ) {
 		size.cy = rect.bottom - rect.top;
 		SetClientSize( GetHandle(), size );
 	} else {
-		// error
+		TVPThrowWindowsErrorException();
 	}
 }
 
@@ -722,7 +672,7 @@ int tTVPWindow::GetInnerWidth() const {
 	if( ::GetClientRect( GetHandle(), &rect ) ) {
 		return rect.right - rect.left;
 	} else {
-		// error
+		TVPThrowWindowsErrorException();
 		return 0;
 	}
 }
@@ -734,7 +684,7 @@ void tTVPWindow::SetInnerHeight( int h ) {
 		size.cy = h;
 		SetClientSize( GetHandle(), size );
 	} else {
-		// error
+		TVPThrowWindowsErrorException();
 	}
 }
 
@@ -743,7 +693,7 @@ int tTVPWindow::GetInnerHeight() const {
 	if( ::GetClientRect( GetHandle(), &rect ) ) {
 		return rect.bottom - rect.top;
 	} else {
-		// error
+		TVPThrowWindowsErrorException();
 		return 0;
 	}
 }
@@ -756,28 +706,30 @@ void tTVPWindow::SetInnerSize( int w, int h ) {
 }
 
 void tTVPWindow::BringToFront() {
-	::SetWindowPos( GetHandle(), HWND_TOP, 0, 0, 0, 0, (SWP_SHOWWINDOW|SWP_NOMOVE|SWP_NOSIZE) );
+	if( ::SetWindowPos( GetHandle(), HWND_TOP, 0, 0, 0, 0, (SWP_SHOWWINDOW|SWP_NOMOVE|SWP_NOSIZE) ) == 0 ) {
+		TVPThrowWindowsErrorException();
+	}
 }
 void tTVPWindow::SetStayOnTop( bool b ) {
 	static const UINT flags = SWP_NOSIZE | SWP_NOMOVE | SWP_NOREDRAW | SWP_NOACTIVATE | SWP_NOCOPYBITS | SWP_NOSENDCHANGING;
 	if( ::SetWindowPos( GetHandle(), b ? HWND_TOPMOST : HWND_NOTOPMOST, 0,0,0,0, flags ) == 0 ) {
-		// error
+		TVPThrowWindowsErrorException();
 	}
 }
 bool tTVPWindow::GetStayOnTop() const {
 	DWORD exStyle = ::GetWindowLong( GetHandle(), GWL_EXSTYLE );
 	if( exStyle == 0 ) {
-		// error
+		TVPThrowWindowsErrorException();
 		return false;
 	}
 	return (exStyle & WS_EX_TOPMOST) ? true : false;
 }
-void tTVPWindow::SetFullScreenMode(bool b) {
-}
 
 void tTVPWindow::GetClientRect( struct tTVPRect& rt ) {
 	RECT r;
-	::GetClientRect( GetHandle(), &r );
+	if( ::GetClientRect( GetHandle(), &r ) == 0 ) {
+		TVPThrowWindowsErrorException();
+	}
 	rt.top = r.top;
 	rt.left = r.left;
 	rt.bottom = r.bottom;
@@ -821,7 +773,7 @@ int tTVPWindow::ShowModal() {
 		Show();
 		// ::SendMessage( GetHandle(), CM_ACTIVATE, 0, 0 );
 		ModalResult = 0;
-		
+
 		MSG msg;
 		HACCEL hAccelTable = ::LoadAccelerators( (HINSTANCE)GetModuleHandle(0), MAKEINTRESOURCE(IDC_TVPWIN32));
 
@@ -844,72 +796,6 @@ int tTVPWindow::ShowModal() {
 		throw;
 	}
 	Application->ModalFinished();
-	
-/*
-function TCustomForm.ShowModal: Integer;
-var
-  WindowList: Pointer;
-  SaveFocusState: TFocusState;
-  SaveCursor: TCursor;
-  SaveCount: Integer;
-  ActiveWindow: HWnd;
-begin
-  CancelDrag;
-  if Visible or not Enabled or (fsModal in FFormState) or
-    (FormStyle = fsMDIChild) then
-    raise EInvalidOperation.Create(SCannotShowModal);
-  if GetCapture <> 0 then SendMessage(GetCapture, WM_CANCELMODE, 0, 0);
-  ReleaseCapture;
-  Application.ModalStarted;
-  try
-    Include(FFormState, fsModal);
-    if (PopupMode = pmNone) and (Application.ModalPopupMode <> pmNone) then
-    begin
-      RecreateWnd;
-      HandleNeeded;
-    end;
-    ActiveWindow := GetActiveWindow;
-    SaveFocusState := Forms.SaveFocusState;
-    Screen.SaveFocusedList.Insert(0, Screen.FocusedForm);
-    Screen.FocusedForm := Self;
-    SaveCursor := Screen.Cursor;
-    Screen.Cursor := crDefault;
-    SaveCount := Screen.CursorCount;
-    WindowList := DisableTaskWindows(0);
-    try
-      Show;
-      try
-        SendMessage(Handle, CM_ACTIVATE, 0, 0);
-        ModalResult := 0;
-        repeat
-          Application.HandleMessage;
-          if Application.Terminated then ModalResult := mrCancel else
-            if ModalResult <> 0 then CloseModal;
-        until ModalResult <> 0;
-        Result := ModalResult;
-        SendMessage(Handle, CM_DEACTIVATE, 0, 0);
-        if GetActiveWindow <> Handle then ActiveWindow := 0;
-      finally
-        Hide;
-      end;
-    finally
-      if Screen.CursorCount = SaveCount then
-        Screen.Cursor := SaveCursor
-      else Screen.Cursor := crDefault;
-      EnableTaskWindows(WindowList);
-      if Screen.SaveFocusedList.Count > 0 then
-      begin
-        Screen.FocusedForm := Screen.SaveFocusedList.First;
-        Screen.SaveFocusedList.Remove(Screen.FocusedForm);
-      end else Screen.FocusedForm := nil;
-      if ActiveWindow <> 0 then SetActiveWindow(ActiveWindow);
-      RestoreFocusState(SaveFocusState);
-      Exclude(FFormState, fsModal);
-    end;
-  finally
-    Application.ModalFinished;
-  end;
-end;
-*/
+
 	return ModalResult;
 }
