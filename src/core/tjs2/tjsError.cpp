@@ -284,6 +284,7 @@ ttstr TJSNonamedException = TJS_W("No-named exception");
 
 #define TJS_DECL_MESSAGE_BODY
 #undef tjsErrorH
+#undef __TJS_ERROR_INC_H__
 #include "tjsError.h"
 //---------------------------------------------------------------------------
 

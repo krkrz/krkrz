@@ -89,6 +89,7 @@ int _argc;
 char ** _argv;
 extern void TVPInitCompatibleNativeFunctions();
 extern void TVPUninitializeFontRasterizers();
+extern void TVPLoadMessage();
 
 AcceleratorKeyTable::AcceleratorKeyTable() {
 	// デフォルトを読み込む
@@ -201,7 +202,11 @@ int APIENTRY WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		CheckMemoryLeaksStart();
 		//_CrtSetBreakAlloc(6969);
 
+		// XP より後で使えるAPIを動的に読み込んで互換性を取る
 		TVPInitCompatibleNativeFunctions();
+
+		// メッセージ文字列をリソースから読込み
+		TVPLoadMessage();
 
 		_argc = __argc;
 		_argv = __argv;

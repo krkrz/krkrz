@@ -1,13 +1,4 @@
-//---------------------------------------------------------------------------
-/*
-	TVP2 ( T Visual Presenter 2 )  A script authoring tool
-	Copyright (C) 2000 W.Dee <dee@kikyou.info> and contributors
-
-	See details of license at "license.txt"
-*/
-//---------------------------------------------------------------------------
-// Definition of Messages and Message Related Utilities
-//---------------------------------------------------------------------------
+// generated from gentext.pl Messages.xlsx
 #ifndef MsgImplH
 #define MsgImplH
 
@@ -16,152 +7,153 @@
 
 #ifndef TVP_MSG_DECL
 	#define TVP_MSG_DECL(name, msg) extern tTJSMessageHolder name;
+	#define TVP_MSG_DECL_NULL(name) extern tTJSMessageHolder name;
 #endif
-
 //---------------------------------------------------------------------------
-// Message Strings ( these should be localized )
+// Message Strings
 //---------------------------------------------------------------------------
-// Japanese localized messages
-TVP_MSG_DECL(TVPScriptExceptionRaised,
-	TJS_W("スクリプトで例外が発生しました"));
-
-TVP_MSG_DECL(TVPHardwareExceptionRaised,
-	TJS_W("ハードウェア例外が発生しました"));
-
-TVP_MSG_DECL(TVPMainCDPName,
-	TJS_W("スクリプトエディタ (メイン)"));
-
-TVP_MSG_DECL(TVPExceptionCDPName,
-	TJS_W("スクリプトエディタ (例外通知)"));
-
-TVP_MSG_DECL(TVPCannnotLocateUIDLLForFolderSelection,
-	TJS_W("フォルダ/アーカイブの選択画面を表示しようとしましたが ")
-		TJS_W("krdevui.dll が見つからないので表示できません.\n")
-		TJS_W("実行するフォルダ/アーカイブはコマンドラインの引数として指定してください"));
-
-TVP_MSG_DECL(TVPInvalidUIDLL,
-	TJS_W("krdevui.dll が異常か、バージョンが一致しません"));
-
-TVP_MSG_DECL(TVPInvalidBPP,
-	TJS_W("無効な色深度です"));
-
-TVP_MSG_DECL(TVPCannotLoadPlugin,
-	TJS_W("プラグイン %1 を読み込めません"));
-
-TVP_MSG_DECL(TVPNotValidPlugin,
-	TJS_W("%1 は有効なプラグインではありません"));
-
-TVP_MSG_DECL(TVPPluginUninitFailed,
-	TJS_W("プラグインの解放に失敗しました"));
-
-TVP_MSG_DECL(TVPCannnotLinkPluginWhilePluginLinking,
-	TJS_W("プラグインの接続中に他のプラグインを接続することはできまません"));
-
-TVP_MSG_DECL(TVPNotSusiePlugin,
-	TJS_W("異常な Susie プラグインです"));
-
-TVP_MSG_DECL(TVPSusiePluginError,
-	TJS_W("Susie プラグインでエラーが発生しました/エラーコード %1"));
-
-TVP_MSG_DECL(TVPCannotReleasePlugin,
-	TJS_W("指定されたプラグインは使用中のため解放できません"));
-
-TVP_MSG_DECL(TVPNotLoadedPlugin,
-	TJS_W("%1 は読み込まれていません"));
-
-TVP_MSG_DECL(TVPCannotAllocateBitmapBits,
-	TJS_W("ビットマップ用メモリを確保できません/%1(size=%2)"));
-
-TVP_MSG_DECL(TVPScanLineRangeOver,
-	TJS_W("スキャンライン %1 は範囲(0～%2)を超えています"));
-
-TVP_MSG_DECL(TVPPluginError,
-	TJS_W("プラグインでエラーが発生しました/%1"));
-
-TVP_MSG_DECL(TVPInvalidCDDADrive,
-	TJS_W("指定されたドライブでは CD-DA を再生できません"));
-
-TVP_MSG_DECL(TVPCDDADriveNotFound,
-	TJS_W("CD-DA を再生できるドライブが見つかりません"));
-
-TVP_MSG_DECL(TVPMCIError,
-	TJS_W("MCI でエラーが発生しました : %1"));
-
-TVP_MSG_DECL(TVPInvalidSMF,
-	TJS_W("有効な SMF ファイルではありません : %1"));
-
-TVP_MSG_DECL(TVPMalformedMIDIMessage,
-	TJS_W("指定されたメッセージは MIDI メッセージとして有効な形式ではありません"));
-
-TVP_MSG_DECL(TVPCannotInitDirectSound,
-	TJS_W("DirectSound を初期化できません : %1"));
-
-TVP_MSG_DECL(TVPCannotCreateDSSecondaryBuffer,
-	TJS_W("DirectSound セカンダリバッファを作成できません : %1/%2"));
-
-TVP_MSG_DECL(TVPInvalidLoopInformation,
-	TJS_W("ループ情報 %1 は異常です"));
-
-TVP_MSG_DECL(TVPNotChildMenuItem,
-	TJS_W("指定されたメニュー項目はこのメニュー項目の子ではありません"));
-
-TVP_MSG_DECL(TVPCannotInitDirect3D,
-	TJS_W("Direct3D を初期化できません : %1"));
-
-TVP_MSG_DECL(TVPCannotFindDisplayMode,
-	TJS_W("適合する画面モードが見つかりません : %1"));
-
-TVP_MSG_DECL(TVPCannotSwitchToFullScreen,
-	TJS_W("フルスクリーンに切り替えられません : %1"));
-
-TVP_MSG_DECL(TVPInvalidPropertyInFullScreen,
-	TJS_W("フルスクリーン中では操作できないプロパティを設定しようとしました"));
-
-TVP_MSG_DECL(TVPInvalidMethodInFullScreen,
-	TJS_W("フルスクリーン中では操作できないメソッドを呼び出そうとしました"));
-
-TVP_MSG_DECL(TVPCannotLoadCursor,
-	TJS_W("マウスカーソル %1 の読み込みに失敗しました"));
-
-TVP_MSG_DECL(TVPCannotLoadKrMovieDLL,
-	TJS_W("ビデオ/Shockwave Flash を再生するためには krmovie.dll / krflash.dll ")
-		TJS_W("が必要ですが 読み込むことができません"));
-
-TVP_MSG_DECL(TVPInvalidKrMovieDLL,
-	TJS_W("krmovie.dll/krflash.dll が異常か 対応できないバージョンです"));
-
-TVP_MSG_DECL(TVPErrorInKrMovieDLL,
-	TJS_W("krmovie.dll/krflash.dll 内でエラーが発生しました/%1"));
-
-TVP_MSG_DECL(TVPWindowAlreadyMissing,
-	TJS_W("ウィンドウはすでに存在していません"));
-
-TVP_MSG_DECL(TVPPrerenderedFontMappingFailed,
-	TJS_W("レンダリング済みフォントのマッピングに失敗しました : %1"));
-
-TVP_MSG_DECL_CONST(TVPConfigFailOriginalFileCannotBeRewritten,
-	TJS_W("%1 に書き込みできません。ソフトウェアが実行中のままになっていないか、あるいは")
-		TJS_W("書き込み権限があるかどうかを確認してください"));
-
-TVP_MSG_DECL(TVPConfigFailTempExeNotErased,
-	TJS_W("%1 の終了を確認できないため、これを削除できませんでした(このファイルは削除して結構です)"));
-
-TVP_MSG_DECL_CONST(TVPExecutionFail,
-	TJS_W("%1 を実行できません"));
-
-TVP_MSG_DECL(TVPPluginUnboundFunctionError,
-	TJS_W("プラグインから関数 %1 を要求されましたが、その関数は本体内に存在しません。プラグインと")
-			TJS_W("本体のバージョンが正しく対応しているか確認してください"));
-
-TVP_MSG_DECL(TVPExceptionHadBeenOccured,
-	TJS_W(" = (例外発生)"));
-
-TVP_MSG_DECL(TVPConsoleResult,
-	TJS_W("コンソール : "));
-
-
-//---------------------------------------------------------------------------
-
-
-
+TVP_MSG_DECL_NULL(TVPScriptExceptionRaised)
+TVP_MSG_DECL_NULL(TVPHardwareExceptionRaised)
+TVP_MSG_DECL_NULL(TVPMainCDPName)
+TVP_MSG_DECL_NULL(TVPExceptionCDPName)
+TVP_MSG_DECL_NULL(TVPCannnotLocateUIDLLForFolderSelection)
+TVP_MSG_DECL_NULL(TVPInvalidUIDLL)
+TVP_MSG_DECL_NULL(TVPInvalidBPP)
+TVP_MSG_DECL_NULL(TVPCannotLoadPlugin)
+TVP_MSG_DECL_NULL(TVPNotValidPlugin)
+TVP_MSG_DECL_NULL(TVPPluginUninitFailed)
+TVP_MSG_DECL_NULL(TVPCannnotLinkPluginWhilePluginLinking)
+TVP_MSG_DECL_NULL(TVPNotSusiePlugin)
+TVP_MSG_DECL_NULL(TVPSusiePluginError)
+TVP_MSG_DECL_NULL(TVPCannotReleasePlugin)
+TVP_MSG_DECL_NULL(TVPNotLoadedPlugin)
+TVP_MSG_DECL_NULL(TVPCannotAllocateBitmapBits)
+TVP_MSG_DECL_NULL(TVPScanLineRangeOver)
+TVP_MSG_DECL_NULL(TVPPluginError)
+TVP_MSG_DECL_NULL(TVPInvalidCDDADrive)
+TVP_MSG_DECL_NULL(TVPCDDADriveNotFound)
+TVP_MSG_DECL_NULL(TVPMCIError)
+TVP_MSG_DECL_NULL(TVPInvalidSMF)
+TVP_MSG_DECL_NULL(TVPMalformedMIDIMessage)
+TVP_MSG_DECL_NULL(TVPCannotInitDirectSound)
+TVP_MSG_DECL_NULL(TVPCannotCreateDSSecondaryBuffer)
+TVP_MSG_DECL_NULL(TVPInvalidLoopInformation)
+TVP_MSG_DECL_NULL(TVPNotChildMenuItem)
+TVP_MSG_DECL_NULL(TVPCannotInitDirect3D)
+TVP_MSG_DECL_NULL(TVPCannotFindDisplayMode)
+TVP_MSG_DECL_NULL(TVPCannotSwitchToFullScreen)
+TVP_MSG_DECL_NULL(TVPInvalidPropertyInFullScreen)
+TVP_MSG_DECL_NULL(TVPInvalidMethodInFullScreen)
+TVP_MSG_DECL_NULL(TVPCannotLoadCursor)
+TVP_MSG_DECL_NULL(TVPCannotLoadKrMovieDLL)
+TVP_MSG_DECL_NULL(TVPInvalidKrMovieDLL)
+TVP_MSG_DECL_NULL(TVPErrorInKrMovieDLL)
+TVP_MSG_DECL_NULL(TVPWindowAlreadyMissing)
+TVP_MSG_DECL_NULL(TVPPrerenderedFontMappingFailed)
+TVP_MSG_DECL_NULL(TVPConfigFailOriginalFileCannotBeRewritten)
+TVP_MSG_DECL_NULL(TVPConfigFailTempExeNotErased)
+TVP_MSG_DECL_NULL(TVPExecutionFail)
+TVP_MSG_DECL_NULL(TVPPluginUnboundFunctionError)
+TVP_MSG_DECL_NULL(TVPExceptionHadBeenOccured)
+TVP_MSG_DECL_NULL(TVPConsoleResult)
+TVP_MSG_DECL_NULL(TVPInfoListingFiles)
+TVP_MSG_DECL_NULL(TVPInfoTotalPhysicalMemory)
+TVP_MSG_DECL_NULL(TVPInfoSelectedProjectDirectory)
+TVP_MSG_DECL_NULL(TVPTooSmallExecutableSize)
+TVP_MSG_DECL_NULL(TVPInfoLoadingExecutableEmbeddedOptionsFailed)
+TVP_MSG_DECL_NULL(TVPInfoLoadingExecutableEmbeddedOptionsSucceeded)
+TVP_MSG_DECL_NULL(TVPFileNotFound)
+TVP_MSG_DECL_NULL(TVPInfoLoadingConfigurationFileFailed)
+TVP_MSG_DECL_NULL(TVPInfoLoadingConfigurationFileSucceeded)
+TVP_MSG_DECL_NULL(TVPInfoDataPathDoesNotExistTryingToMakeIt)
+TVP_MSG_DECL_NULL(TVPOk)
+TVP_MSG_DECL_NULL(TVPFaild)
+TVP_MSG_DECL_NULL(TVPInfoDataPath)
+TVP_MSG_DECL_NULL(TVPInfoSpecifiedOptionEarlierItemHasMorePriority)
+TVP_MSG_DECL_NULL(TVPNone)
+TVP_MSG_DECL_NULL(TVPInfoCpuClockRoughly)
+TVP_MSG_DECL_NULL(TVPProgramStartedOn)
+TVP_MSG_DECL_NULL(TVPKirikiri)
+TVP_MSG_DECL_NULL(TVPUnknonwError)
+TVP_MSG_DECL_NULL(TVPExitCode)
+TVP_MSG_DECL_NULL(TVPFatalError)
+TVP_MSG_DECL_NULL(TVPEnableDigitizer)
+TVP_MSG_DECL_NULL(TVPTouchIntegratedTouch)
+TVP_MSG_DECL_NULL(TVPTouchExternalTouch)
+TVP_MSG_DECL_NULL(TVPTouchIntegratedPen)
+TVP_MSG_DECL_NULL(TVPTouchExternalPen)
+TVP_MSG_DECL_NULL(TVPTouchMultiInput)
+TVP_MSG_DECL_NULL(TVPTouchReady)
+TVP_MSG_DECL_NULL(TVPCpuCheckFailure)
+TVP_MSG_DECL_NULL(TVPCpuCheckFailureCpuFamilyOrLesserIsNotSupported)
+TVP_MSG_DECL_NULL(TVPInfoCpuNumber)
+TVP_MSG_DECL_NULL(TVPCpuCheckFailureNotSupprtedCpu)
+TVP_MSG_DECL_NULL(TVPInfoFinallyDetectedCpuFeatures)
+TVP_MSG_DECL_NULL(TVPCpuCheckFailureNotSupportedCpu)
+TVP_MSG_DECL_NULL(TVPInfoCpuClock)
+TVP_MSG_DECL_NULL(TVPLayerBitmapBufferUnderrunDetectedCheckYourDrawingCode)
+TVP_MSG_DECL_NULL(TVPLayerBitmapBufferOverrunDetectedCheckYourDrawingCode)
+TVP_MSG_DECL_NULL(TVPFaildToCreateDirect3D)
+TVP_MSG_DECL_NULL(TVPFaildToDecideBackbufferFormat)
+TVP_MSG_DECL_NULL(TVPFaildToCreateDirect3DDevice)
+TVP_MSG_DECL_NULL(TVPFaildToSetViewport)
+TVP_MSG_DECL_NULL(TVPFaildToSetRenderState)
+TVP_MSG_DECL_NULL(TVPWarningImageSizeTooLargeMayBeCannotCreateTexture)
+TVP_MSG_DECL_NULL(TVPUsePowerOfTwoSurface)
+TVP_MSG_DECL_NULL(TVPCannotAllocateD3DOffScreenSurface)
+TVP_MSG_DECL_NULL(TVPPassthroughFailedToCreateDirect3DDevices)
+TVP_MSG_DECL_NULL(TVPPassthroughFailedToCreateDirect3DDevicesUnknownReason)
+TVP_MSG_DECL_NULL(TVPPassthroughTextureHasAlreadyBeenLocked)
+TVP_MSG_DECL_NULL(TVPInternalErrorResult)
+TVP_MSG_DECL_NULL(TVPErrorDeviceLostCannotResetDevice)
+TVP_MSG_DECL_NULL(TVPErrorDeviceInternalFatalError)
+TVP_MSG_DECL_NULL(TVPErrorInvalidCall)
+TVP_MSG_DECL_NULL(TVPErrorCannotAllocateVideoMemory)
+TVP_MSG_DECL_NULL(TVPErrorCannotAllocateMemory)
+TVP_MSG_DECL_NULL(TVPPassthroughInfPolygonDrawingFailed)
+TVP_MSG_DECL_NULL(TVPPassthroughInfPrimarySurfaceDirect3DDevicePresentFailed)
+TVP_MSG_DECL_NULL(TVPChangeDisplaySettingsFailedDispChangeRestart)
+TVP_MSG_DECL_NULL(TVPChangeDisplaySettingsFailedDispChangeBadFlags)
+TVP_MSG_DECL_NULL(TVPChangeDisplaySettingsFailedDispChangeBadParam)
+TVP_MSG_DECL_NULL(TVPChangeDisplaySettingsFailedDispChangeFailed)
+TVP_MSG_DECL_NULL(TVPChangeDisplaySettingsFailedDispChangeBadMode)
+TVP_MSG_DECL_NULL(TVPChangeDisplaySettingsFailedDispChangeNotUpdated)
+TVP_MSG_DECL_NULL(TVPChangeDisplaySettingsFailedUnknownReason)
+TVP_MSG_DECL_NULL(TVPFailedToCreateScreenDC)
+TVP_MSG_DECL_NULL(TVPFailedToCreateOffscreenBitmap)
+TVP_MSG_DECL_NULL(TVPFailedToCreateOffscreenDC)
+TVP_MSG_DECL_NULL(TVPInfoSusiePluginInfo)
+TVP_MSG_DECL_NULL(TVPSusiePluginUnsupportedBitmapHeader)
+TVP_MSG_DECL_NULL(TVPPassthroughFailedToSetDestinationPosition)
+TVP_MSG_DECL_NULL(TVPPassthroughFailedToSetDestinationSize)
+TVP_MSG_DECL_NULL(TVPPassthroughFailedToCreateDrawer)
+TVP_MSG_DECL_NULL(TVPPassthroughFailedToCreateDrawerUnknownReason)
+TVP_MSG_DECL_NULL(TVPPassthroughCouldNotCreateDrawer)
+TVP_MSG_DECL_NULL(TVPPassthroughDrawerNotSupportSmoothZoom)
+TVP_MSG_DECL_NULL(TVPPassthroughDrawerNotSupportPointOnPointZoom)
+TVP_MSG_DECL_NULL(TVPPassthroughBenchmarkResult)
+TVP_MSG_DECL_NULL(TVPCouldNotCreateAnyDrawDevice)
+TVP_MSG_DECL_NULL(TVPPassthroughUsingPassthroughDrawDevice)
+TVP_MSG_DECL_NULL(TVPPassThroughDeviceDoesNotSupporteLayerManagerMoreThanOne)
+TVP_MSG_DECL_NULL(TVPInvalidVideoSize)
+TVP_MSG_DECL_NULL(TVPRoughVsyncIntervalReadFromApi)
+TVP_MSG_DECL_NULL(TVPRoughVsyncIntervalStillSeemsWrong)
+TVP_MSG_DECL_NULL(TVPInfoFoundDirect3DInterface)
+TVP_MSG_DECL_NULL(TVPInfoFaild)
+TVP_MSG_DECL_NULL(TVPInfoDirect3D)
+TVP_MSG_DECL_NULL(TVPCannotLoadD3DDLL)
+TVP_MSG_DECL_NULL(TVPNotFoundDirect3DCreate)
+TVP_MSG_DECL_NULL(TVPInfoEnvironmentUsing)
+TVP_MSG_DECL_NULL(TVPInfoSearchBestFullscreenResolution)
+TVP_MSG_DECL_NULL(TVPInfoConditionPreferredScreenMode)
+TVP_MSG_DECL_NULL(TVPInfoConditionMode)
+TVP_MSG_DECL_NULL(TVPInfoConditionZoomMode)
+TVP_MSG_DECL_NULL(TVPInfoEnvironmentDefaultScreenMode)
+TVP_MSG_DECL_NULL(TVPInfoEnvironmentDefaultScreenAspectRatio)
+TVP_MSG_DECL_NULL(TVPInfoEnvironmentAvailableDisplayModes)
+TVP_MSG_DECL_NULL(TVPInfoNotFoundScreenModeFromDriver)
+TVP_MSG_DECL_NULL(TVPInfoResultCandidates)
+TVP_MSG_DECL_NULL(TVPInfoTryScreenMode)
+TVP_MSG_DECL_NULL(TVPAllScreenModeError)
+TVP_MSG_DECL_NULL(TVPInfoChangeScreenModeSuccess)
 #endif

@@ -1,7 +1,7 @@
 
 #include "tjsCommHead.h"
 #include "TVPTimer.h"
-
+#include "WindowsUtil.h"
 
 TVPTimer::TVPTimer() : event_(NULL), interval_(1000), enabled_(true) {
 	CreateUtilWindow();
@@ -25,11 +25,7 @@ int TVPTimer::CreateUtilWindow() {
 	if( ClassRegistered == 0 ) {
 		if( ::RegisterClassEx( &wc_ ) == 0 ) {
 #ifdef _DEBUG
-			LPVOID lpMsgBuf;
-			::FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-				NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, NULL );
-			::OutputDebugString( (LPCWSTR)lpMsgBuf );
-			::LocalFree(lpMsgBuf);
+			TVPOutputWindowsErrorToDebugMessage();
 #endif
 			return HRESULT_FROM_WIN32(::GetLastError());
 		}
@@ -39,11 +35,7 @@ int TVPTimer::CreateUtilWindow() {
 	
 	if( window_handle_ == NULL ) {
 #ifdef _DEBUG
-		LPVOID lpMsgBuf;
-		::FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-			NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, NULL );
-		::OutputDebugString( (LPCWSTR)lpMsgBuf );
-		::LocalFree(lpMsgBuf);
+			TVPOutputWindowsErrorToDebugMessage();
 #endif
 		return HRESULT_FROM_WIN32(::GetLastError());
 	}
@@ -73,7 +65,7 @@ void TVPTimer::UpdateTimer() {
 	::KillTimer( window_handle_, 1 );
 	if( interval_ > 0 && enabled_ && event_ != NULL ) {
 		if( ::SetTimer( window_handle_, 1, interval_, NULL ) == 0 ) {
-			// Exception
+			TVPThrowWindowsErrorException();
 		}
 	}
 	

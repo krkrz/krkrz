@@ -228,10 +228,12 @@ public:
 	void SetStayOnTop( bool b );
 	bool GetStayOnTop() const;
 
+	/*
 	void SetFullScreenMode(bool b);
 	inline bool GetFullScreenMode() const {
 		return 0 != (flags_&FALG_FULLSCREEN);
 	}
+	*/
 
 	int ShowModal();
 	void Close();
