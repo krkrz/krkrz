@@ -115,7 +115,7 @@ tTVPCharacterData* FreeTypeFontRasterizer::GetBitmap( const tTVPFontAndCharacter
 	}
 	tTVPCharacterData* data = Face->GetGlyphFromCharcode(font.Character);
 	if( data == NULL ) {
-		TVPThrowExceptionMessage( TJS_W("Font Rasterize error.") );
+		TVPThrowExceptionMessage( TVPFontRasterizeError );
 	}
 
 	int cx = data->Metrics.CellIncX;

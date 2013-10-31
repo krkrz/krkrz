@@ -114,7 +114,7 @@ static void ParsePackTemplate( std::vector<OctPackTemplate>& result, const tjs_c
 	while( *c ) {
 		std::map<tjs_char,tjs_int>::iterator f = OctPackMap.find( *c );
 		if( f == OctPackMap.end() ) {
-			TJS_eTJSError(TJS_W("Unknown pack/unpack TEMPLATE charcter"));
+			TJS_eTJSError( TJSUnknownPackUnpackTemplateCharcter );
 		} else {
 			c++;
 			OctPackTemplate t;
@@ -149,7 +149,7 @@ static void BitStringToBin( std::vector<tjs_uint8>& bin, const ttstr& arg, bool 
 			} else if( *str == L'1' ) {
 				val |= 1;
 			} else {
-				TJS_eTJSError(TJS_W("Unknown bit string charcter"));
+				TJS_eTJSError( TJSUnknownBitStringCharacter );
 			}
 			val <<= 1;
 			if( pos == 7 ) {
@@ -168,7 +168,7 @@ static void BitStringToBin( std::vector<tjs_uint8>& bin, const ttstr& arg, bool 
 			} else if( *str == L'1' ) {
 				val |= 1 << pos;
 			} else {
-				TJS_eTJSError(TJS_W("Unknown bit string charcter"));
+				TJS_eTJSError( TJSUnknownBitStringCharacter );
 			}
 			if( pos == 7 ) {
 				bin.push_back( val );
@@ -195,7 +195,7 @@ static void HexToBin( std::vector<tjs_uint8>& bin, const ttstr& arg, bool mtol, 
 			} else if( *str >= L'A' && *str <= L'E' ) {
 				val |= *str - L'A' + 10;
 			} else {
-				TJS_eTJSError(TJS_W("Unknown Hex string charcter"));
+				TJS_eTJSError( TJSUnknownHexStringCharacter );
 			}
 			val <<= 4;
 			if( pos ) {
@@ -216,7 +216,7 @@ static void HexToBin( std::vector<tjs_uint8>& bin, const ttstr& arg, bool mtol, 
 			} else if( *str >= L'A' && *str <= L'E' ) {
 				val |= (*str - L'A' + 10) << (pos*4);
 			} else {
-				TJS_eTJSError(TJS_W("Unknown Hex string charcter"));
+				TJS_eTJSError( TJSUnknownHexStringCharacter  );
 			}
 			if( pos ) {
 				bin.push_back( val );
@@ -433,10 +433,10 @@ static tTJSVariantOctet* Pack( const std::vector<OctPackTemplate>& templ, const 
 			ReadNumberLE<tjs_uint,tjs_int64,4,tjs_uint32>( result, args, numargs, argindex, len );
 			break;
 		case OctPack_uuencode:	// u : uuencodeされた文字列
-			TJS_eTJSError(TJS_W("Not supported uudencde"));
+			TJS_eTJSError( TJSNotSupportedUuencode );
 			break;
 		case OctPack_BRE:		// w : BER圧縮された整数値
-			TJS_eTJSError(TJS_W("Not supported BER"));
+			TJS_eTJSError( TJSNotSupportedBER );
 			break;
 		case OctPack_null:		// x : ヌル文字
 			if( len < 0 ) len = numargs - argindex;
@@ -760,10 +760,10 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 			break;
 		}
 		case OctPack_pointer:	// p : 文字列へのポインタ null terminate char
-			TJS_eTJSError(TJS_W("Not supported unpack \'p\'"));
+			TJS_eTJSError( TJSNotSupportedUnpackLP );
 			break;
 		case OctPack_POINTER:	// P : 構造体(固定長文字列)へのポインタ fix length char
-			TJS_eTJSError(TJS_W("Not supported unpack \'P\'"));
+			TJS_eTJSError( TJSNotSupportedUnpackP );
 			break;
 		case OctPack_short: {	// s : 符号付きshort数値(通常2バイト) sign
 			if( len < 0 ) len = (tail - current)/2;
@@ -806,10 +806,10 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 			break;
 		}
 		case OctPack_uuencode:	// u : uuencodeされた文字列
-			TJS_eTJSError(TJS_W("Not supported uudencde"));
+			TJS_eTJSError( TJSNotSupportedUuencode );
 			break;
 		case OctPack_BRE:		// w : BER圧縮された整数値
-			TJS_eTJSError(TJS_W("Not supported BER"));
+			TJS_eTJSError( TJSNotSupportedBER );
 			break;
 		case OctPack_null:		// x : ヌル文字
 			if( len < 0 ) len = tail - current;

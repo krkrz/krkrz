@@ -337,7 +337,7 @@ void tTJSNI_VideoOverlay::Open(const ttstr &_name)
 			VideoOverlay->GetVideoSize( &width, &height );
 			
 			if( width <= 0 || height <= 0 )
-				TVPThrowExceptionMessage(TVPErrorInKrMovieDLL, L"Invalid video size");
+				TVPThrowExceptionMessage(TVPErrorInKrMovieDLL, (const tjs_char*)TVPInvalidVideoSize);
 
 			size = width * height * 4;
 			if( Bitmap[0] != NULL )

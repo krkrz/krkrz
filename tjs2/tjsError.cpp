@@ -266,7 +266,7 @@ void TJSThrowFrom_tjs_error(tjs_error hr, const tjs_char *name)
 		if(TJS_FAILED(hr))
 		{
 			tjs_char buf[256];
-			TJS_snprintf(buf, 256, TJS_W("Unknown failure : %08X"), hr);
+			TJS_snprintf(buf, 256, TJSUnknownFailure, hr);
 			TJS_eTJSError(buf);
 		}
 	}

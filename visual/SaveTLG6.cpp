@@ -103,7 +103,7 @@ public:
 				Buffer = (unsigned char *)realloc(Buffer, BufferCapacity);
 			else
 				Buffer = (unsigned char *)malloc(BufferCapacity);
-			if(!Buffer) TVPThrowExceptionMessage(TJS_W("SaveTLG6: Insufficient memory"));
+			if(!Buffer) TVPThrowExceptionMessage( TVPTlgInsufficientMemory );
 			memset(Buffer + org_cap, 0, BufferCapacity - org_cap);
 		}
 
@@ -1242,7 +1242,7 @@ void SaveTLG6( tTJSBinaryStream* stream, const tTVPBaseBitmap* bmp, bool is24 )
 #endif
 				long bitlength = bs.GetBitLength();
 				if(bitlength & 0xc0000000)
-					TVPThrowExceptionMessage( TJS_W("SaveTLG6: Too large bit length (given image may be too large)") );
+					TVPThrowExceptionMessage( TVPTlgTooLargeBitLength );
 				// two most significant bits of bitlength are
 				// entropy coding method;
 				// 00 means Golomb method,

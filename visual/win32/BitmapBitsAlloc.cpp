@@ -58,11 +58,9 @@ void tTVPBitmapBitsAlloc::Free( void* ptr ) {
 
 		// check sentinel
 		if(~(*(tjs_uint32*)(bptr - sizeof(tjs_uint32))) != record->sentinel_backup1)
-			TVPThrowExceptionMessage(
-				TJS_W("Layer bitmap: Buffer underrun detected. Check your drawing code!"));
+			TVPThrowExceptionMessage( TVPLayerBitmapBufferUnderrunDetectedCheckYourDrawingCode );
 		if(~(*(tjs_uint32*)(bptr + record->size      )) != record->sentinel_backup2)
-			TVPThrowExceptionMessage(
-				TJS_W("Layer bitmap: Buffer overrun detected. Check your drawing code!"));
+			TVPThrowExceptionMessage( TVPLayerBitmapBufferOverrunDetectedCheckYourDrawingCode );
 
 #ifdef TVP_ALLOC_GBUF_MALLOC
 		free((HGLOBAL)record->alloc_ptr);

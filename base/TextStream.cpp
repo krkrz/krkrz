@@ -53,7 +53,7 @@ public:
 
 #ifndef TVP_NO_CHECK_WIDE_CHAR_SIZE
 		if(sizeof(tjs_char)  != 2)
-			TVPThrowExceptionMessage(TJS_W("The host is not a 16-bit unicode system."));
+			TVPThrowExceptionMessage( TVPTheHostIsNotA16BitUnicodeSystem );
 #endif
 
 		Stream = NULL;

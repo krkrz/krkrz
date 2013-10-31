@@ -1,11 +1,13 @@
 
+
+#include "tjsCommHead.h"
+
 #include "FontSystem.h"
 #include "StringUtil.h"
+#include "MsgIntf.h"
 #include <vector>
 
 extern void TVPGetAllFontList( std::vector<std::wstring>& list );
-
-const wchar_t * const FontSystem::TVPDefaultFontName = TJS_W("‚l‚r ‚oƒSƒVƒbƒN"); // TODO: i18n
 
 void FontSystem::InitFontNames() {
 	// enumlate all fonts
@@ -104,8 +106,8 @@ std::wstring FontSystem::GetBeingFont(std::wstring fonts) {
 	}
 
 	if(vfont) {
-		return std::wstring(TJS_W("@")) + TVPDefaultFontName;
+		return std::wstring(TJS_W("@")) + std::wstring(TVPDefaultFontName);
 	} else {
-		return TVPDefaultFontName;
+		return std::wstring(TVPDefaultFontName);
 	}
 }

@@ -263,7 +263,7 @@ void TVPDumpDirect3DDriverInformation()
 		if(dumped) return;
 		dumped = true;
 
-		TVPAddImportantLog(TJS_W("(info) IDirect3D9 or higher detected. Retrieving current Direct3D driver information..."));
+		TVPAddImportantLog( (const tjs_char*)TVPInfoFoundDirect3DInterface );
 
 		try
 		{
@@ -372,7 +372,7 @@ void TVPDumpDirect3DDriverInformation()
 					log = infostart + TJS_W("WHQL level : ")  + tmp;
 					TVPAddImportantLog(log);
 				} else {
-					TVPAddImportantLog(TJS_W("(info) Failed."));
+					TVPAddImportantLog( (const tjs_char*)TVPInfoFaild );
 				}
 			}
 		}
@@ -388,11 +388,11 @@ static void TVPInitDirect3D()
 {
 	if(!TVPDirect3DDLLHandle)
 	{
-		// load ddraw.dll
-		TVPAddLog(TJS_W("(info) Loading Direct3D ..."));
+		// load d3d9.dll
+		TVPAddLog( (const tjs_char*)TVPInfoDirect3D );
 		TVPDirect3DDLLHandle = ::LoadLibrary( L"d3d9.dll" );
 		if(!TVPDirect3DDLLHandle)
-			TVPThrowExceptionMessage(TVPCannotInitDirect3D, TJS_W("Cannot load d3d9.dll"));
+			TVPThrowExceptionMessage(TVPCannotInitDirect3D, (const tjs_char*)TVPCannotLoadD3DDLL );
 	}
 
 	if(!TVPDirect3D)
@@ -402,11 +402,11 @@ static void TVPInitDirect3D()
 			// get Direct3DCreaet function
 			TVPDirect3DCreate = (IDirect3D9*(WINAPI * )(UINT))GetProcAddress(TVPDirect3DDLLHandle, "Direct3DCreate9");
 			if(!TVPDirect3DCreate)
-				TVPThrowExceptionMessage(TVPCannotInitDirect3D, TJS_W("Missing Direct3DCreate9 in d3d9.dll"));
+				TVPThrowExceptionMessage(TVPCannotInitDirect3D, (const tjs_char*)TVPNotFoundDirect3DCreate );
 
 			TVPDirect3D = TVPDirect3DCreate( D3D_SDK_VERSION );
 			if( NULL == TVPDirect3D )
-				TVPThrowExceptionMessage(TJS_W("Faild to create Direct3D9."));
+				TVPThrowExceptionMessage( TVPFaildToCreateDirect3D );
 		}
 		catch(...)
 		{
@@ -570,8 +570,8 @@ void TVPEnumerateAllDisplayModes(std::vector<tTVPScreenMode> & modes)
 		} while(true);
 	}
 
-	TVPAddLog(ttstr(TJS_W("(info) environment: using ")) +
-		(TVPUseChangeDisplaySettings?TJS_W("ChangeDisplaySettings API"):TJS_W("Direct3D")));
+	TVPAddLog( TVPFormatMessage(TVPInfoEnvironmentUsing,
+		(TVPUseChangeDisplaySettings?TJS_W("ChangeDisplaySettings API"):TJS_W("Direct3D"))) );
 }
 //---------------------------------------------------------------------------
 //! @brief		make full screen mode candidates
@@ -587,13 +587,13 @@ static void TVPMakeFullScreenModeCandidates(
 		// fszmInner is ignored (as always be fszmInner) if mode == fsrAuto && zoom_mode == fszmNone
 
 	// print debug information
-	TVPAddLog(TJS_W("(info) Searching best fullscreen resolution ..."));
-	TVPAddLog(TJS_W("(info) condition: preferred screen mode: ") + preferred.Dump());
-	TVPAddLog(TJS_W("(info) condition: mode: " ) + TVPGetGetFullScreenResolutionModeString(mode));
-	TVPAddLog(TJS_W("(info) condition: zoom mode: ") + ttstr(
+	TVPAddLog((const tjs_char*)TVPInfoSearchBestFullscreenResolution);
+	TVPAddLog(TVPFormatMessage(TVPInfoConditionPreferredScreenMode, preferred.Dump()));
+	TVPAddLog(TVPFormatMessage(TVPInfoConditionMode, TVPGetGetFullScreenResolutionModeString(mode)));
+	TVPAddLog(TVPFormatMessage(TVPInfoConditionZoomMode, ttstr(
 		zoom_mode == fszmInner ? TJS_W("inner") :
 		zoom_mode == fszmOuter ? TJS_W("outer") :
-			TJS_W("none")));
+			TJS_W("none"))));
 
 	// get original screen metrics
 	TVPGetOriginalScreenMetrics();
@@ -606,9 +606,9 @@ static void TVPMakeFullScreenModeCandidates(
 	tjs_int screen_aspect_numer = TVPDefaultScreenMode.Width;
 	tjs_int screen_aspect_denom = TVPDefaultScreenMode.Height;
 	TVPDoReductionNumerAndDenom(screen_aspect_numer, screen_aspect_denom); // do reduction
-	TVPAddLog(TJS_W("(info) environment: default screen mode: ") + TVPDefaultScreenMode.Dump());
-	TVPAddLog(TJS_W("(info) environment: default screen aspect ratio: ") +
-		ttstr(screen_aspect_numer) + TJS_W(":") + ttstr(screen_aspect_denom));
+	TVPAddLog(TVPFormatMessage(TVPInfoEnvironmentDefaultScreenMode, TVPDefaultScreenMode.Dump()));
+	TVPAddLog(TVPFormatMessage(TVPInfoEnvironmentDefaultScreenAspectRatio,
+		ttstr(screen_aspect_numer),ttstr(screen_aspect_denom)) );
 
 	// clear destination array
 	candidates.clear();
@@ -625,7 +625,7 @@ static void TVPMakeFullScreenModeCandidates(
 	{
 		tjs_int last_width = -1, last_height = -1;
 		ttstr last_line;
-		TVPAddLog(TJS_W("(info) environment: available display modes:"));
+		TVPAddLog( (const tjs_char*)TVPInfoEnvironmentAvailableDisplayModes );
 		for(std::vector<tTVPScreenMode>::iterator i = modes.begin(); i != modes.end(); i++)
 		{
 			if(last_width != i->Width || last_height != i->Height)
@@ -722,7 +722,7 @@ static void TVPMakeFullScreenModeCandidates(
 		// this could be if the driver does not provide the screen
 		// mode which is the same size as the default screen...
 		// push the default screen mode
-		TVPAddImportantLog(TJS_W("(info) Panic! There is no reasonable candidate screen mode provided from the driver ... trying to use the default screen size and color depth ..."));
+		TVPAddImportantLog( (const tjs_char*)TVPInfoNotFoundScreenModeFromDriver );
 		tTVPScreenMode mode;
 		mode.Width  = TVPDefaultScreenMode.Width;
 		mode.Height = TVPDefaultScreenMode.Height;
@@ -820,7 +820,7 @@ static void TVPMakeFullScreenModeCandidates(
 	std::sort(candidates.begin(), candidates.end());
 
 	// dump all candidates to log
-	TVPAddLog(TJS_W("(info) result: candidates:"));
+	TVPAddLog( (const tjs_char*)TVPInfoResultCandidates );
 	for(std::vector<tTVPScreenModeCandidate>::iterator i = candidates.begin();
 		i != candidates.end(); i++)
 	{
@@ -887,7 +887,7 @@ void TVPSwitchToFullScreen(HWND window, tjs_int w, tjs_int h, iTVPDrawDevice* dr
 	for(std::vector<tTVPScreenModeCandidate>::iterator i = candidates.begin();
 		i != candidates.end(); i++)
 	{
-		TVPAddLog(TJS_W("(info) Trying screen mode: ") + i->Dump());
+		TVPAddLog( TVPFormatMessage(TVPInfoTryScreenMode, i->Dump()) );
 		success = drawdevice->SwitchToFullScreen( window, i->Width, i->Height, i->BitsPerPixel, TVPDisplayColorFormat, TVPPreferredFullScreenResolutionMode == fsrNoChange );
 		if( success )
 		{
@@ -897,11 +897,10 @@ void TVPSwitchToFullScreen(HWND window, tjs_int w, tjs_int h, iTVPDrawDevice* dr
 
 	if(!success)
 	{
-		TVPThrowExceptionMessage(TVPCannotSwitchToFullScreen,
-			TJS_W("All screen mode has been tested, but no modes available at all."));
+		TVPThrowExceptionMessage(TVPCannotSwitchToFullScreen, (const tjs_char*)TVPAllScreenModeError );
 	}
 
-	TVPAddLog(TJS_W("(info) Changing screen mode succeeded"));
+	TVPAddLog( (const tjs_char*)TVPInfoChangeScreenModeSuccess );
 
 	TVPInFullScreen = true;
 

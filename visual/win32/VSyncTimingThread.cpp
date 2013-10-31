@@ -8,6 +8,7 @@
 #include "EventIntf.h"
 #include "UserEvent.h"
 #include "DebugIntf.h"
+#include "MsgIntf.h"
 
 //---------------------------------------------------------------------------
 tTVPVSyncTimingThread::tTVPVSyncTimingThread(tTJSNI_Window* owner)
@@ -170,12 +171,12 @@ void tTVPVSyncTimingThread::MeasureVSyncInterval()
 	else
 		vsync_interval = 0;
 
-	TVPAddLog(TJS_W("Rough VSync interval read from API : " + ttstr((int)vsync_interval)));
+	TVPAddLog( TVPFormatMessage(TVPRoughVsyncIntervalReadFromApi,ttstr((int)vsync_interval)) );
 
 	// vsync é¸ä˙ÇÕìKêÿÇ¡Ç€Ç¢ÅH
 	if(vsync_interval < 6 || vsync_interval > 66)
 	{
-		TVPAddLog(TJS_W("Rough VSync interval still seems wrong, assuming default value (16)"));
+		TVPAddLog( (const tjs_char*)TVPRoughVsyncIntervalStillSeemsWrong );
 		vsync_interval = 16;
 	}
 

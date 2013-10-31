@@ -90,7 +90,7 @@ tGenericFreeTypeFace::tGenericFreeTypeFace(const ttstr &fontname, tjs_uint32 opt
 		// ファイルを開く
 		File = TVPCreateBinaryStreamForWrite(fontname,TJS_W("") );
 		if( File == NULL ) {
-			TVPThrowExceptionMessage( TJS_W("Can't open font file '%1$s'"), fontname );
+			TVPThrowExceptionMessage( TVPCannotOpenFontFile, fontname );
 		}
 
 		// FT_StreamRec の各フィールドを埋める
@@ -131,7 +131,7 @@ tGenericFreeTypeFace::tGenericFreeTypeFace(const ttstr &fontname, tjs_uint32 opt
 		tjs_uint index = TVP_GET_FACE_INDEX_FROM_OPTIONS(options);
 		if(!OpenFaceByIndex(index, Face)) {
 			// フォントを開けなかった
-			TVPThrowExceptionMessage( TJS_W("Font '%1$s' cannot be used"), fontname );
+			TVPThrowExceptionMessage(TVPFontCannotBeUsed, fontname );
 		}
 	}
 	catch(...)

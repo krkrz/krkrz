@@ -89,7 +89,7 @@ ttstr TVPStringFromBMPUnicode(const tjs_uint16 *src, tjs_int maxlen)
 		ret.FixLen();
 		return ret;
 	}
-	return TJS_W("sizeof(tjs_char) must be 2 or 4.");
+	return (const tjs_char*)TVPTjsCharMustBeTwoOrFour;
 }
 //---------------------------------------------------------------------------
 
@@ -228,8 +228,7 @@ void tTVPStorageMediaManager::Register(iTVPStorageMedia * media)
 
 	tMediaRecord *rec = HashTable.Find(*(tMediaNameString*)&medianame);
 	if(rec)
-		TVPThrowExceptionMessage((TJS_W("Media name \"") + medianame +
-			TJS_W("\" had already been registered")).c_str());
+		TVPThrowExceptionMessage( TVPMediaNameHadAlreadyBeenRegistered, medianame );
 
 	tMediaRecord new_rec(media);
 
@@ -243,8 +242,7 @@ void tTVPStorageMediaManager::Unregister(iTVPStorageMedia * media)
 
 	tMediaRecord *rec = HashTable.Find(*(tMediaNameString*)&medianame);
 	if(!rec)
-		TVPThrowExceptionMessage((TJS_W("Media name \"") + medianame +
-			TJS_W("\" is not registered")).c_str());
+		TVPThrowExceptionMessage( TVPMediaNameIsNotRegistered, medianame );
 	HashTable.Delete(*(tMediaNameString*)&medianame);
 }
 //---------------------------------------------------------------------------
@@ -1044,7 +1042,7 @@ static tjs_uint TVPRebuildAutoPathTable()
 	TVPAutoPathTable.Clear();
 
 	tjs_uint64 tick = TVPGetTickCount();
-	TVPAddLog(TJS_W("(info) Rebuilding Auto Path Table ..."));
+ 	TVPAddLog( (const tjs_char*)TVPInfoRebuildingAutoPath );
 
 	tjs_uint totalcount = 0;
 

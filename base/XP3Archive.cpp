@@ -352,9 +352,7 @@ tTVPXP3Archive::tTVPXP3Archive(const ttstr & name) : tTVPArchive(name)
 	static tjs_uint8 cn_adlr[] =
 		{ 0x61/*'a'*/, 0x64/*'d'*/, 0x6c/*'l'*/, 0x72/*'r'*/ };
 
-	TVPAddLog(TJS_W("(info) Trying to read XP3 virtual file system ")
-		TJS_W("information from : ") +
-		name);
+	TVPAddLog( TVPFormatMessage(TVPInfoTryingToReadXp3VirtualFileSystemInformationFrom, name) );
 
 	int segmentcount = 0;
 	try
@@ -450,7 +448,7 @@ tTVPXP3Archive::tTVPXP3Archive(const ttstr & name) : tTVPArchive(name)
 				tArchiveItem item;
 				tjs_uint32 flags = ReadI32FromMem(indexdata + ch_info_start + 0);
 				if(!TVPAllowExtractProtectedStorage && (flags & TVP_XP3_FILE_PROTECTED))
-					TVPThrowExceptionMessage(TJS_W("Specified storage had been protected!"));
+					TVPThrowExceptionMessage( TVPSpecifiedStorageHadBeenProtected );
 				item.OrgSize = ReadI64FromMem(indexdata + ch_info_start + 4);
 				item.ArcSize = ReadI64FromMem(indexdata + ch_info_start + 12);
 
@@ -527,14 +525,13 @@ tTVPXP3Archive::tTVPXP3Archive(const ttstr & name) : tTVPArchive(name)
 	{
 		if(indexdata) delete [] indexdata;
 		delete st;
-		TVPAddLog(TJS_W("(info) Failed."));
+ 		TVPAddLog( (const tjs_char*)TVPInfoFailed );
 		throw;
 	}
 	if(indexdata) delete [] indexdata;
 	delete st;
 
-	TVPAddLog(TJS_W("(info) Done. (contains ") + ttstr(Count) +
-		TJS_W(" file(s), ") + ttstr(segmentcount) + TJS_W(" segment(s))"));
+	TVPAddLog( TVPFormatMessage( TVPInfoDoneWithContains, ttstr(Count), ttstr(segmentcount) ) );
 }
 //---------------------------------------------------------------------------
 tTVPXP3Archive::~tTVPXP3Archive()

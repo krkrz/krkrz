@@ -190,11 +190,11 @@ void tTVPDrawer_GDIDoubleBuffering::CreateBitmap()
 		try
 		{
 			HDC screendc = GetDC(TargetWindow);
-			if(!screendc) TVPThrowExceptionMessage(TJS_W("Failed to create screen DC"));
+			if(!screendc) TVPThrowExceptionMessage( TVPFailedToCreateScreenDC );
 			OffScreenBitmap = CreateCompatibleBitmap(screendc, SrcWidth, SrcHeight);
-			if(!OffScreenBitmap) TVPThrowExceptionMessage(TJS_W("Failed to create offscreen bitmap"));
+			if(!OffScreenBitmap) TVPThrowExceptionMessage( TVPFailedToCreateOffscreenBitmap );
 			OffScreenDC     = CreateCompatibleDC(screendc);
-			if(!OffScreenDC) TVPThrowExceptionMessage(TJS_W("Failed to create offscreen DC"));
+			if(!OffScreenDC) TVPThrowExceptionMessage( TVPFailedToCreateOffscreenDC );
 			ReleaseDC(TargetWindow, screendc);
 			OldOffScreenBitmap = SelectObject(OffScreenDC, OffScreenBitmap);
 		}

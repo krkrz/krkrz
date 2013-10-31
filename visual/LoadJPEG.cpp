@@ -30,7 +30,7 @@ METHODDEF(void)
 my_error_exit(j_common_ptr cinfo)
 {
 	TVPThrowExceptionMessage(TVPJPEGLoadError,
-		ttstr(TJS_W("error code : ")) + ttstr(cinfo->err->msg_code));
+		ttstr(TVPErrorCode) + ttstr(cinfo->err->msg_code));
 }
 //---------------------------------------------------------------------------
 METHODDEF(void)
@@ -159,7 +159,7 @@ void TVPLoadJPEG(void* formatdata, void *callbackdata, tTVPGraphicSizeCallback s
 	// JPEG does not support palettized image
 	if(mode == glmPalettized)
 		TVPThrowExceptionMessage(TVPJPEGLoadError,
-			ttstr(TJS_W("JPEG does not support palettized image")));
+			ttstr(TVPUnsupportedJpegPalette));
 
 	// prepare variables
 	jpeg_decompress_struct cinfo;

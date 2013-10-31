@@ -4735,7 +4735,7 @@ iTJSDispatch2 * tTJSNI_BaseLayer::GetFontObjectNoAddRef()
 	if(FontObject) return FontObject;
 
 	// create font object if the object is not yet created.
-	if(!Owner) TVPThrowExceptionMessage(TJS_W("Panic! Layer object is not properly constructed. The constructor was not called??"));
+	if(!Owner) TVPThrowExceptionMessage(TVPLayerObjectIsNotProperlyConstructed);
 	FontObject = TVPCreateFontObject(Owner);
 
 	return FontObject;
@@ -6179,17 +6179,14 @@ void tTJSNI_BaseLayer::StartTransition(const ttstr &name, bool withchildren,
 
 		if(TransUpdateType != tutDivisibleFade && TransUpdateType != tutDivisible
 			&& TransUpdateType != tutGiveUpdate)
-			TVPThrowExceptionMessage(TVPTransHandlerError,
-				TJS_W("Unknown update type"));
+			TVPThrowExceptionMessage(TVPTransHandlerError, (const tjs_char*)TVPUnknownUpdateType );
 
 		if(TransType != ttSimple && TransType != ttExchange)
-			TVPThrowExceptionMessage(TVPTransHandlerError,
-				TJS_W("Unknown transition type"));
+			TVPThrowExceptionMessage(TVPTransHandlerError, (const tjs_char*)TVPUnknownTransitionType );
 
 		// check update type
 		if(TransUpdateType == tutGiveUpdate)
-			TVPThrowExceptionMessage(TVPTransHandlerError,
-				TJS_W("Update type of tutGiveUpdate is not yet supported"));
+			TVPThrowExceptionMessage(TVPTransHandlerError, (const tjs_char*)TVPUnsupportedUpdateTypeTutGiveUpdate );
 					// sorry for inconvinience
 		if(TransType == ttExchange && !transsource)
 			TVPThrowExceptionMessage(TVPSpecifyTransitionSource);
