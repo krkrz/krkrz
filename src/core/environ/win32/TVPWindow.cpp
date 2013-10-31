@@ -33,7 +33,7 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 	switch( msg ) {
 	case WM_PAINT: {
 		PAINTSTRUCT ps;
-		HDC	hDC = BeginPaint( hWnd, &ps );
+		HDC hDC = BeginPaint( hWnd, &ps );
 		EndPaint( hWnd, &ps );
 		if( created_ ) OnPaint();
 		return 0;

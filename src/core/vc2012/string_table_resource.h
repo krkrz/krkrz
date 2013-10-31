@@ -369,4 +369,5 @@
 #define IDS_TVP_INFO_TRY_SCREEN_MODE                                              10365
 #define IDS_TVP_ALL_SCREEN_MODE_ERROR                                             10366
 #define IDS_TVP_INFO_CHANGE_SCREEN_MODE_SUCCESS                                   10367
+#define IDS_TVP_SELECT_XP3FILE_OR_FOLDER                                          10368
 #endif

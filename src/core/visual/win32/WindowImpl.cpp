@@ -1874,13 +1874,25 @@ tjs_int tTJSNI_Window::GetTouchPointCount() {
 void tTJSNI_Window::SetHintDelay( tjs_int delay )
 {
 	if(!Form) return;
-	return Form->SetHintDelay(delay);
+	Form->SetHintDelay(delay);
 }
 //---------------------------------------------------------------------------
 tjs_int tTJSNI_Window::GetHintDelay() const
 {
 	if(!Form) return 0;
 	return Form->GetHintDelay();
+}
+//---------------------------------------------------------------------------
+void tTJSNI_Window::SetEnableTouch( bool b )
+{
+	if(!Form) return;
+	Form->SetEnableTouch(b);
+}
+//---------------------------------------------------------------------------
+bool tTJSNI_Window::GetEnableTouch() const
+{
+	if(!Form) return 0;
+	return Form->GetEnableTouch();
 }
 //---------------------------------------------------------------------------
 bool tTJSNI_Window::WaitForVBlank( tjs_int* in_vblank, tjs_int* delayed )
@@ -2117,6 +2129,26 @@ TJS_BEGIN_NATIVE_PROP_DECL(hintDelay)
 	TJS_END_NATIVE_PROP_SETTER
 }
 TJS_END_NATIVE_PROP_DECL_OUTER(cls, hintDelay)
+//---------------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(enableTouch)
+{
+	TJS_BEGIN_NATIVE_PROP_GETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
+		*result = _this->GetEnableTouch()?1:0;
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_GETTER
+
+	TJS_BEGIN_NATIVE_PROP_SETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
+		_this->SetEnableTouch( ((tjs_int)*param) ? true : false );
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_PROP_DECL_OUTER(cls, enableTouch)
 //---------------------------------------------------------------------------
 
 	TVPGetDisplayColorFormat(); // this will be ran only once here

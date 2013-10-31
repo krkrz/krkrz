@@ -28,6 +28,9 @@
 #include "TickCount.h"
 #include "WindowsUtil.h"
 
+#include "CompatibleNativeFuncs.h"
+
+
 tjs_uint32 TVP_TShiftState_To_uint32(TShiftState state) {
 	tjs_uint32 result = 0;
 	if( state & MK_SHIFT ) {
@@ -1582,6 +1585,28 @@ void TTVPWindowForm::DeliverPopupHide() {
 	}
 }
 
+void TTVPWindowForm::SetEnableTouch( bool b ) {
+	if( b != GetEnableTouch() ) {
+		if( procRegisterTouchWindow && procUnregisterTouchWindow ) {
+			int value= ::GetSystemMetrics( SM_DIGITIZER );
+			if( (value & (NID_MULTI_INPUT|NID_READY)) == (NID_MULTI_INPUT|NID_READY) ) {
+				if( b ) {
+					procRegisterTouchWindow( GetHandle(), 0 );
+				} else {
+					procUnregisterTouchWindow( GetHandle() );
+				}
+			}
+		}
+	}
+}
+
+bool TTVPWindowForm::GetEnableTouch() const {
+	if( procIsTouchWindow ) {
+		BOOL ret = procIsTouchWindow( GetHandle(), NULL );
+		return ret != 0;
+	}
+	return false;
+}
 void TTVPWindowForm::InvokeShowVisible() {
 	// this posts window message which invokes WMShowVisible
 	::PostMessage( GetHandle(), TVP_WM_SHOWVISIBLE, 0, 0);

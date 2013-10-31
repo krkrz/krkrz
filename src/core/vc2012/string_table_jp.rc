@@ -368,4 +368,5 @@ BEGIN
     IDS_TVP_INFO_TRY_SCREEN_MODE                                              "(info) スクリーンモードの %1 を試みる"
     IDS_TVP_ALL_SCREEN_MODE_ERROR                                             "全スクリーンモードを試しましたが、使用可能なモードはありませんでした"
     IDS_TVP_INFO_CHANGE_SCREEN_MODE_SUCCESS                                   "(info) スクリーンモード変更に成功しました"
+    IDS_TVP_SELECT_XP3FILE_OR_FOLDER                                          "XP3ファイルかフォルダを選択してください"
 END
