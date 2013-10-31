@@ -15,6 +15,7 @@
 #include <delayimp.h>
 #include <mmsystem.h>
 #include <objbase.h>
+#include <commdlg.h>
 
 #include "SysInitImpl.h"
 #include "StorageIntf.h"
@@ -41,8 +42,6 @@
 #include "Exception.h"
 #include "ApplicationSpecialPath.h"
 #include "resource.h"
-
-#define TVP_NEED_UI_VERSION (((0x0001)<<16)+ 4) // needed development UI DLL version
 
 
 //---------------------------------------------------------------------------
@@ -809,6 +808,16 @@ void TVPInitializeBaseSystems()
 //---------------------------------------------------------------------------
 // system initializer / uninitializer
 //---------------------------------------------------------------------------
+// フォルダ選択ダイアログのコールバック関数
+static int CALLBACK TVPBrowseCallbackProc(HWND hwnd,UINT uMsg,LPARAM lParam,LPARAM lpData)
+{
+    if(uMsg==BFFM_INITIALIZED){
+		wchar_t exeDir[MAX_PATH];
+		TJS_strcpy(exeDir, IncludeTrailingBackslash(ExtractFileDir(ExePath())).c_str());
+        ::SendMessage(hwnd,BFFM_SETSELECTION,(WPARAM)TRUE,(LPARAM)exeDir);
+    }
+    return 0;
+}
 static tjs_uint64 TVPTotalPhysMemory = 0;
 static void TVPInitProgramArgumentsAndDataPath(bool stop_after_datapath_got);
 void TVPBeforeSystemInit()
@@ -1017,73 +1026,41 @@ void TVPBeforeSystemInit()
 		if(buf[curdirlen-1] != TJS_W('\\')) buf[curdirlen] = TJS_W('\\'), buf[curdirlen+1] = 0;
 	}
 
-#pragma message (__LOC__ "TODO : 選択ダイアログを出す")
+#ifndef TVP_DISABLE_SELECT_XP3_OR_FOLDER
 	if(!forcedataxp3 && (!nosel || forcesel))
 	{
-#if 0
-		// load krdevui.dll ( TVP[KiRikiri] Development User Interface )
-		HMODULE krdevui = LoadLibrary(_T("krdevui.dll"));
-		if(!krdevui)
-		{
-			tstring toolspath = (IncludeTrailingBackslash( ExtractFilePath(ExePath())) + _T("tools\\krdevui.dll"));
-			krdevui = LoadLibrary(toolspath.c_str());
+		BOOL			bRes;
+		wchar_t			chPutFolder[MAX_PATH];
+		LPITEMIDLIST	pidlRetFolder;
+		BROWSEINFO		stBInfo;
+		::ZeroMemory( &stBInfo, sizeof(stBInfo) );
+
+		stBInfo.pidlRoot = NULL;
+		stBInfo.hwndOwner = NULL;
+		stBInfo.pszDisplayName = chPutFolder;
+		stBInfo.lpszTitle = TVPSelectXP3FileOrFolder;
+		stBInfo.ulFlags = BIF_BROWSEINCLUDEFILES|BIF_RETURNFSANCESTORS|BIF_DONTGOBELOWDOMAIN|BIF_RETURNONLYFSDIRS;
+		stBInfo.lpfn = TVPBrowseCallbackProc;
+		stBInfo.lParam = NULL;
+
+		pidlRetFolder = ::SHBrowseForFolder( &stBInfo );
+		if( pidlRetFolder != NULL ) {
+			bRes = ::SHGetPathFromIDList( pidlRetFolder, chPutFolder );
+			if( bRes != FALSE ) {
+				wcsncpy( buf, chPutFolder, MAX_PATH );
+				tjs_int buflen = TJS_strlen(buf);
+				if( buflen >= 1 ) {
+					if( buf[buflen-1] != TJS_W('\\') && buflen < (MAX_PATH-2) ) {
+						buf[buflen] = TJS_W('\\');
+						buf[buflen+1] = TJS_W('\0');
+					}
+				}
+				TVPProjectDirSelected = true;
+			}
+			::CoTaskMemFree( pidlRetFolder );
 		}
-
-		if(!krdevui)
-		{
-			// cannot locate the dll
-			throw Exception( ttstr(TVPCannnotLocateUIDLLForFolderSelection).AsStdString());
-		}
-
-		typedef int (PASCAL *UIShowFolderSelectorForm_t)(void *reserved, char *buf);
-		typedef void (PASCAL *UIGetVersion_t)(DWORD *hi, DWORD *low);
-
-		UIShowFolderSelectorForm_t	UIShowFolderSelectorForm;
-		UIGetVersion_t				UIGetVersion;
-
-		UIShowFolderSelectorForm =
-			(UIShowFolderSelectorForm_t)GetProcAddress(krdevui, "UIShowFolderSelectorForm");
-		UIGetVersion =
-			(UIGetVersion_t)GetProcAddress(krdevui, "UIGetVersion");
-
-		if(!UIShowFolderSelectorForm || !UIGetVersion)
-		{
-			FreeLibrary(krdevui);
-			throw Exception(ttstr(TVPInvalidUIDLL).AsStdString());
-		}
-
-		DWORD h, l;
-		UIGetVersion(&h, &l);
-		if(h != TVP_NEED_UI_VERSION)
-		{
-			FreeLibrary(krdevui);
-			throw Exception(ttstr(TVPInvalidUIDLL).AsStdString());
-		}
-
-
-		int result = UIShowFolderSelectorForm(Application->GetHandle(), buf);
-
-//		FreeLibrary(krdevui);
-		// FIXME: the library should be freed as soon as finishing to use it.
-
-		if(result == mrAbort)
-		{
-			// display the main window
-		}
-		else
-		if(result == mrCancel)
-		{
-			// cancel
-			throw EAbort("Canceled");
-		}
-		else
-		if(result == mrOk)
-		{
-			// ok, prepare to execute the script
-			TVPProjectDirSelected = true;
-		}
-#endif
 	}
+#endif
 
 	// check project dir and store some environmental variables
 	if(TVPProjectDirSelected)

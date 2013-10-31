@@ -596,11 +596,9 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/replace)
 	*/
 
 	if(numparams < 2) return TJS_E_BADPARAMCOUNT;
-#pragma message ( __LOC__ "TODO" )
+	// TODO ƒeƒXƒg‚·‚é‚±‚Æ
 #if 0
 	tTJSReplacePredicator predicate(param, numparams, _this, objthis);
-
-
 	if(result) *result = predicate.GetRes();
 #else
 	ttstr res;

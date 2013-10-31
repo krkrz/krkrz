@@ -66,6 +66,11 @@ TVP_NATIVE_FUNC_REG(
 	BOOL, WINAPI, UnregisterTouchWindow,
 	(HWND hWnd),
 	L"USER32.DLL")
+
+TVP_NATIVE_FUNC_REG(
+	BOOL, WINAPI, IsTouchWindow,
+	(HWND hWnd, PULONG pulFlags),
+	L"USER32.DLL")
 /////
 //---------------------------------------------------------------------------
 #if defined(TVP_WNF_B)

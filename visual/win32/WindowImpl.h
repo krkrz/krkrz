@@ -422,6 +422,9 @@ public:
 	void SetHintDelay( tjs_int delay );
 	tjs_int GetHintDelay() const;
 
+	void SetEnableTouch( bool b );
+	bool GetEnableTouch() const;
+
 	bool WaitForVBlank( tjs_int* in_vblank, tjs_int* delayed );
 
 protected:
