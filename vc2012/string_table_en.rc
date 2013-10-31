@@ -368,4 +368,5 @@ BEGIN
     IDS_TVP_INFO_TRY_SCREEN_MODE                                              "(info) Trying screen mode: %1"
     IDS_TVP_ALL_SCREEN_MODE_ERROR                                             "All screen mode has been tested, but no modes available at all."
     IDS_TVP_INFO_CHANGE_SCREEN_MODE_SUCCESS                                   "(info) Changing screen mode succeeded"
+    IDS_TVP_SELECT_XP3FILE_OR_FOLDER                                          "Select XP3 file or folder"
 END

@@ -405,6 +405,9 @@ public:
 
 	void SetHintDelay( tjs_int delay ) { HintDelay = delay; }
 	tjs_int GetHintDelay() const { return HintDelay; }
+
+	void SetEnableTouch( bool b );
+	bool GetEnableTouch() const;
 };
 
 #endif // __WINDOW_FORM_UNIT_H__

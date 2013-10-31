@@ -278,7 +278,7 @@ bool tTVPApplication::StartApplication( int argc, char* argv[] ) {
 
 		if(TVPCheckAbout()) return true; // version information dialog box;
 
-		SetTitle( L"‹g—¢‹g—¢" );
+		SetTitle( std::wstring(TVPKirikiri) );
 		TVPSystemControl = new tTVPSystemControl();
 
 #ifndef TVP_IGNORE_LOAD_TPM_PLUGIN

@@ -156,4 +156,5 @@ TVP_MSG_DECL_NULL(TVPInfoResultCandidates)
 TVP_MSG_DECL_NULL(TVPInfoTryScreenMode)
 TVP_MSG_DECL_NULL(TVPAllScreenModeError)
 TVP_MSG_DECL_NULL(TVPInfoChangeScreenModeSuccess)
+TVP_MSG_DECL_NULL(TVPSelectXP3FileOrFolder)
 #endif
