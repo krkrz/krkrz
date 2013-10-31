@@ -181,8 +181,7 @@ void tTVPPassThroughDrawDevice::CreateDrawer(tDrawerType type)
 		{
 			if(!Drawer->SetDestPos(DestRect.left, DestRect.top))
 			{
-				TVPAddImportantLog(
-					TJS_W("Passthrough: Failed to set destination position to draw device drawer"));
+				TVPAddImportantLog( (const tjs_char*)TVPPassthroughFailedToSetDestinationPosition );
 				delete Drawer, Drawer = NULL;
 			}
 		}
@@ -193,8 +192,7 @@ void tTVPPassThroughDrawDevice::CreateDrawer(tDrawerType type)
 			GetSrcSize(srcw, srch);
 			if(!Drawer->SetDestSizeAndNotifyLayerResize(DestRect.get_width(), DestRect.get_height(), srcw, srch))
 			{
-				TVPAddImportantLog(
-					TJS_W("Passthrough: Failed to set destination size and source layer size to draw device drawer"));
+				TVPAddImportantLog( (const tjs_char*)TVPPassthroughFailedToSetDestinationSize );
 				delete Drawer, Drawer = NULL;
 			}
 		}
@@ -205,12 +203,12 @@ void tTVPPassThroughDrawDevice::CreateDrawer(tDrawerType type)
 	}
 	catch(const eTJS & e)
 	{
-		TVPAddImportantLog(TJS_W("Passthrough: Failed to create drawer: ") + e.GetMessage());
+		TVPAddImportantLog( TVPFormatMessage(TVPPassthroughFailedToCreateDrawer,e.GetMessage()) );
 		DestroyDrawer();
 	}
 	catch(...)
 	{
-		TVPAddImportantLog(TJS_W("Passthrough: Failed to create drawer: unknown reason"));
+		TVPAddImportantLog( (const tjs_char*)TVPPassthroughFailedToCreateDrawerUnknownReason );
 		DestroyDrawer();
 	}
 }
@@ -308,7 +306,7 @@ void tTVPPassThroughDrawDevice::CreateDrawer(bool zoom_required, bool should_ben
 				CreateDrawer(results[i].type);
 				if(!Drawer)
 				{
-					TVPAddImportantLog(TJS_W("Passthrough: Could not create drawer object ") + ttstr(type_names[i]));
+					TVPAddImportantLog( TVPFormatMessage(TVPPassthroughCouldNotCreateDrawer,ttstr(type_names[i])) );
 					continue;
 				}
 
@@ -316,14 +314,12 @@ void tTVPPassThroughDrawDevice::CreateDrawer(bool zoom_required, bool should_ben
 				int caps = Drawer->GetInterpolationCapability();
 				if(TVPZoomInterpolation && !(caps & 2))
 				{
-					TVPAddImportantLog(TJS_W("Passthrough: Drawer object ") + ttstr(type_names[i]) +
-						TJS_W(" does not have smooth zooming functionality"));
+					TVPAddImportantLog( TVPFormatMessage(TVPPassthroughDrawerNotSupportSmoothZoom,ttstr(type_names[i])) );
 					continue;
 				}
 				else if(!TVPZoomInterpolation && !(caps & 1))
 				{
-					TVPAddImportantLog(TJS_W("Passthrough: Drawer object ") + ttstr(type_names[i]) +
-						TJS_W(" does not have point-on-point zooming functionality"));
+					TVPAddImportantLog( TVPFormatMessage(TVPPassthroughDrawerNotSupportPointOnPointZoom,ttstr(type_names[i])) );
 					continue;
 				}
 
@@ -348,8 +344,7 @@ void tTVPPassThroughDrawDevice::CreateDrawer(bool zoom_required, bool should_ben
 				results[i].score = count * 1000 / (float)(end_tick - start_tick);
 				char msg[80];
 				TJS_nsprintf(msg, "%.2f fps", (float)results[i].score);
-				TVPAddImportantLog(TJS_W("Passthrough: benchmark result: ") + ttstr(type_names[i]) + TJS_W(" : ") +
-					msg);
+				TVPAddImportantLog( TVPFormatMessage(TVPPassthroughBenchmarkResult, ttstr(type_names[i]), msg) );
 
 				// GDI は最後の手段
 				// 結果だけは計っておくが、これが候補になるのは
@@ -416,13 +411,13 @@ void tTVPPassThroughDrawDevice::CreateDrawer(bool zoom_required, bool should_ben
 		// Drawer を全く作成できなかった
 		// これはヤバい
 		// まずあり得ないが致命的。
-		TVPThrowExceptionMessage(TJS_W("Fatal: Could not create any drawer objects."));
+		TVPThrowExceptionMessage( TVPCouldNotCreateAnyDrawDevice );
 	}
 
 	if(Drawer)
 	{
 		if(IsMainWindow)
-			TVPAddImportantLog(TJS_W("Passthrough: Using passthrough draw device: ") + Drawer->GetName());
+			TVPAddImportantLog( TVPFormatMessage(TVPPassthroughUsingPassthroughDrawDevice,Drawer->GetName()) );
 	}
 }
 //---------------------------------------------------------------------------
@@ -484,8 +479,7 @@ void TJS_INTF_METHOD tTVPPassThroughDrawDevice::AddLayerManager(iTVPLayerManager
 	if(inherited::Managers.size() > 0)
 	{
 		// "Pass Through" デバイスでは２つ以上のLayer Managerを登録できない
-		TVPThrowExceptionMessage(TJS_W("\"passthrough\" device does not support layer manager more than 1"));
-			// TODO: i18n
+		TVPThrowExceptionMessage(TVPPassThroughDeviceDoesNotSupporteLayerManagerMoreThanOne);
 	}
 	inherited::AddLayerManager(manager);
 

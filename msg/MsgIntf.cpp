@@ -21,6 +21,7 @@
 
 #include "MsgIntf.h"
 #include "DebugIntf.h"
+#include "ApplicationSpecialPath.h"
 
 //---------------------------------------------------------------------------
 // TVPFormatMessage
@@ -150,8 +151,10 @@ tjs_int TVPVersionRelease;
 tjs_int TVPVersionBuild;
 //---------------------------------------------------------------------------
 
-
-
+#define WIDEN2(x) L ## x
+#define WIDEN(x) WIDEN2(x)
+static const tjs_char* TVPCompileDate = WIDEN(__DATE__);
+static const tjs_char* TVPCompileTime = WIDEN(__TIME__);
 
 //---------------------------------------------------------------------------
 // version information related functions
@@ -184,7 +187,10 @@ ttstr TVPGetVersionInformation(void)
 	TJS_snprintf(tjsverstr, sizeof(tjsverstr)/sizeof(tjs_char), TJS_W("%d.%d.%d"),
 		TJSVersionMajor, TJSVersionMinor, TJSVersionRelease);
 
-	return TVPFormatMessage(TVPVersionInformation, verstr, tjsverstr);
+	ttstr version = TVPFormatMessage(TVPVersionInformation, verstr, tjsverstr);
+	std::wstring str = ApplicationSpecialPath::ReplaceStringAll( version.AsStdString(), std::wstring(L"%DATE%"), std::wstring(TVPCompileDate) );
+	str = ApplicationSpecialPath::ReplaceStringAll( str, std::wstring(L"%TIME%"), std::wstring(TVPCompileTime) );
+	return ttstr(str);
 }
 //---------------------------------------------------------------------------
 ttstr TVPGetVersionString()

@@ -60,17 +60,17 @@ void tTVPDrawer_D3DDoubleBuffering::GetDirect3D9Device() {
 	TVPEnsureDirect3DObject();
 
 	if( NULL == ( Direct3D = TVPGetDirect3DObjectNoAddRef() ) )
-		TVPThrowExceptionMessage(TJS_W("Faild to create Direct3D9."));
+		TVPThrowExceptionMessage( TVPFaildToCreateDirect3D );
 
 	HRESULT hr;
 	D3DPRESENT_PARAMETERS	d3dpp;
 	if( FAILED( hr = DecideD3DPresentParameters( d3dpp ) ) )
-		TVPThrowExceptionMessage(TJS_W("Faild to decide backbuffer format."));
+		TVPThrowExceptionMessage( TVPFaildToDecideBackbufferFormat );
 
 	UINT iCurrentMonitor = GetMonitorNumber( TargetWindow );
 	DWORD	BehaviorFlags = D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_MULTITHREADED;
 	if( D3D_OK != ( hr = Direct3D->CreateDevice( iCurrentMonitor, D3DDEVTYPE_HAL, NULL, BehaviorFlags, &d3dpp, &Direct3DDevice ) ) )
-		TVPThrowExceptionMessage(TJS_W("Faild to create Direct3D9 Device."));
+		TVPThrowExceptionMessage( TVPFaildToCreateDirect3DDevice );
 
 	D3DVIEWPORT9 vp;
 	vp.X  = 0;
@@ -80,7 +80,7 @@ void tTVPDrawer_D3DDoubleBuffering::GetDirect3D9Device() {
 	vp.MinZ  = 0.0f;
 	vp.MaxZ  = 1.0f;
 	if( FAILED(hr = Direct3DDevice->SetViewport(&vp)) )
-		TVPThrowExceptionMessage(TJS_W("Faild to set viewport."));
+		TVPThrowExceptionMessage( TVPFaildToSetViewport );
 	/*
 	if( RenderTarget ) RenderTarget->Release(), RenderTarget = NULL;
 	if( FAILED( hr = Direct3DDevice->GetRenderTarget( 0, &RenderTarget ) ) )
@@ -88,7 +88,7 @@ void tTVPDrawer_D3DDoubleBuffering::GetDirect3D9Device() {
 	*/
 
 	if( FAILED( hr = InitializeDirect3DState() ) )
-		TVPThrowExceptionMessage(TJS_W("Faild to set render state."));
+ 		TVPThrowExceptionMessage( TVPFaildToSetRenderState );
 
 	int refreshrate;
 	HDC hdc;
@@ -280,10 +280,10 @@ void tTVPDrawer_D3DDoubleBuffering::CreateOffScreenSurface()
 			while( dwHeight < TextureHeight ) dwHeight = dwHeight << 1;
 
 			if( dwWidth > d3dcaps.MaxTextureWidth || dwHeight > d3dcaps.MaxTextureHeight ) {
-				TVPAddLog( TJS_W("warning : Image size too large. May be cannot create texture.") );
+				TVPAddLog( (const tjs_char*)TVPWarningImageSizeTooLargeMayBeCannotCreateTexture );
 			}
 
-			TVPAddLog( TJS_W("Use power of two surface.") );
+			TVPAddLog( (const tjs_char*)TVPUsePowerOfTwoSurface );
 		} else {
 			dwWidth = TextureWidth;
 			dwHeight = TextureHeight;
@@ -291,7 +291,7 @@ void tTVPDrawer_D3DDoubleBuffering::CreateOffScreenSurface()
 
 		//if( D3D_OK != ( hr = Direct3DDevice->CreateTexture( dwWidth, dwHeight, 1, D3DUSAGE_DYNAMIC, D3DFMT_X8B8G8R8, D3DPOOL_DEFAULT, &Texture, NULL) ) )
 		if( D3D_OK != ( hr = Direct3DDevice->CreateTexture( dwWidth, dwHeight, 1, D3DUSAGE_DYNAMIC, D3DFMT_X8R8G8B8, D3DPOOL_DEFAULT, &Texture, NULL) ) )
-			TVPThrowExceptionMessage(TJS_W("Cannot allocate D3D off-screen surface/HR=%1"),TJSInt32ToHex(hr, 8));
+			TVPThrowExceptionMessage(TVPCannotAllocateD3DOffScreenSurface,TJSInt32ToHex(hr, 8));
 		//Texture->GetSurfaceLevel(0, &Surface);
 		//Texture->GetLevelDesc(0, &SurfaceDesc);
 	}
@@ -307,12 +307,12 @@ bool tTVPDrawer_D3DDoubleBuffering::SetDestSize(tjs_int width, tjs_int height)
 		}
 		catch(const eTJS & e)
 		{
-			TVPAddImportantLog(TJS_W("Passthrough: Failed to create Direct3D devices: ") + e.GetMessage());
+			TVPAddImportantLog( TVPFormatMessage(TVPPassthroughFailedToCreateDirect3DDevices,e.GetMessage() ) );
 			return false;
 		}
 		catch(...)
 		{
-			TVPAddImportantLog(TJS_W("Passthrough: Failed to create Direct3D devices: unknown reason"));
+			TVPAddImportantLog( (const tjs_char*)TVPPassthroughFailedToCreateDirect3DDevicesUnknownReason );
 			return false;
 		}
 		return true;
@@ -330,12 +330,12 @@ bool tTVPDrawer_D3DDoubleBuffering::NotifyLayerResize(tjs_int w, tjs_int h)
 		}
 		catch(const eTJS & e)
 		{
-			TVPAddImportantLog(TJS_W("Passthrough: Failed to create Direct3D devices: ") + e.GetMessage());
+			TVPAddImportantLog( TVPFormatMessage(TVPPassthroughFailedToCreateDirect3DDevices,e.GetMessage() ) );
 			return false;
 		}
 		catch(...)
 		{
-			TVPAddImportantLog(TJS_W("Passthrough: Failed to create Direct3D devices: unknown reason"));
+			TVPAddImportantLog( (const tjs_char*)TVPPassthroughFailedToCreateDirect3DDevicesUnknownReason );
 			return false;
 		}
 		return true;
@@ -353,12 +353,12 @@ bool tTVPDrawer_D3DDoubleBuffering::SetDestSizeAndNotifyLayerResize(tjs_int widt
 		}
 		catch(const eTJS & e)
 		{
-			TVPAddImportantLog(TJS_W("Passthrough: Failed to create Direct3D devices: ") + e.GetMessage());
+			TVPAddImportantLog( TVPFormatMessage(TVPPassthroughFailedToCreateDirect3DDevices,e.GetMessage() ) );
 			return false;
 		}
 		catch(...)
 		{
-			TVPAddImportantLog(TJS_W("Passthrough: Failed to create Direct3D devices: unknown reason"));
+			TVPAddImportantLog( (const tjs_char*)TVPPassthroughFailedToCreateDirect3DDevicesUnknownReason );
 			return false;
 		}
 		return true;
@@ -402,7 +402,7 @@ StartTick = timeGetTime();
 #endif
 		if(TextureBuffer)
 		{
-			TVPAddImportantLog(TJS_W("Passthrough: Texture has already been locked (StartBitmapCompletion() has been called twice without EndBitmapCompletion()), unlocking the texture."));
+			TVPAddImportantLog( (const tjs_char*)TVPPassthroughTextureHasAlreadyBeenLocked );
 			Texture->UnlockRect(0), TextureBuffer = NULL;
 		}
 
@@ -410,7 +410,7 @@ StartTick = timeGetTime();
 		HRESULT hr = Texture->LockRect( 0, &rt, NULL, D3DLOCK_NO_DIRTY_UPDATE );
 
 		if(hr == D3DERR_INVALIDCALL ) {
-			TVPThrowExceptionMessage(TJS_W("Internal error/HR=%1"),TJSInt32ToHex(hr, 8));
+			TVPThrowExceptionMessage( TVPInternalErrorResult, TJSInt32ToHex(hr, 8));
 		}
 
 		if(hr != D3D_OK) {
@@ -563,26 +563,24 @@ got_error:
 		} else {
 			hr = Direct3DDevice->Reset(&d3dpp);
 			if( hr == D3DERR_DEVICELOST ) {
-				TVPAddLog( TJS_W("error : Device lost. Cannot reset device.") );
+				TVPAddLog( (const tjs_char*)TVPErrorDeviceLostCannotResetDevice );
 				InvalidateAll();
 			} else if( hr == D3DERR_DRIVERINTERNALERROR ) {
-				TVPAddLog( TJS_W("error : Device internal fatal error.") );
+				TVPAddLog( (const tjs_char*)TVPErrorDeviceInternalFatalError );
 				InvalidateAll();
 			} else if( hr == D3DERR_INVALIDCALL ) {
-				TVPAddLog( TJS_W("error : Invalid call.") );
+				TVPAddLog( (const tjs_char*)TVPErrorInvalidCall );
 				InvalidateAll();
 			} else if( hr  == D3DERR_OUTOFVIDEOMEMORY ) {
-				TVPAddLog( TJS_W("error : Cannot allocate video memory.") );
+				TVPAddLog( (const tjs_char*)TVPErrorCannotAllocateVideoMemory );
 				InvalidateAll();
 			} else if( hr == E_OUTOFMEMORY  ) {
-				TVPAddLog( TJS_W("error : Cannot allocate memory.") );
+				TVPAddLog( (const tjs_char*)TVPErrorCannotAllocateMemory );
 				InvalidateAll();
 			}
 		}
 	} else if(hr != D3D_OK) {
-		TVPAddImportantLog(
-			TJS_W("Passthrough: (inf) Polygon drawing failed/HR=") +
-			TJSInt32ToHex(hr, 8));
+		TVPAddImportantLog( TVPFormatMessage(TVPPassthroughInfPolygonDrawingFailed,TJSInt32ToHex(hr, 8)) );
 	}
 }
 
@@ -636,9 +634,7 @@ BltTime += timeGetTime() - StartTick;
 	if(hr == D3DERR_DEVICELOST) {
 		InvalidateAll();  // causes reconstruction of off-screen image
 	} else if(hr != D3D_OK) {
-		TVPAddImportantLog(
-			TJS_W("Passthrough: (inf) Primary surface, IDirect3DDevice::Present failed/HR=") +
-			TJSInt32ToHex(hr, 8));
+		TVPAddImportantLog( TVPFormatMessage(TVPPassthroughInfPrimarySurfaceDirect3DDevicePresentFailed,TJSInt32ToHex(hr, 8)) );
 	}
 }
 

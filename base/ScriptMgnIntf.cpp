@@ -862,9 +862,9 @@ void TVPExecuteStartupScript()
 	{
 		try
 		{
-			TVPAddLog(TJS_W("(info) Loading startup script : ") + TVPStartupScriptName);
+			TVPAddLog( TVPInfoLoadingStartupScript + TVPStartupScriptName );
 			TVPExecuteStorage(TVPStartupScriptName);
-			TVPAddLog(TJS_W("(info) Startup script ended."));
+			TVPAddLog( (const tjs_char*)TVPInfoStartupScriptEnded );
 		}
 		TJS_CONVERT_TO_TJS_EXCEPTION
 	}

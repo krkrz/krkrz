@@ -262,8 +262,7 @@ bool tTVPApplication::StartApplication( int argc, char* argv[] ) {
 		engine_init = true;
 
 		// banner
-		TVPAddImportantLog(TJS_W("Program started on ") + TVPGetOSName() +
-			TJS_W(" (") + TVPGetPlatformName() + TJS_W(")"));
+		TVPAddImportantLog( TVPFormatMessage(TVPProgramStartedOn, TVPGetOSName(), TVPGetPlatformName()) );
 
 		// TVPInitializeBaseSystems
 		TVPInitializeBaseSystems();
@@ -322,7 +321,7 @@ bool tTVPApplication::StartApplication( int argc, char* argv[] ) {
 		if(!TVPSystemUninitCalled)
 			ShowException(&Exception(e.GetMessage().AsStdString()));
 	} catch(...) {
-		ShowException(&Exception(L"Unknown error!"));
+		ShowException(&Exception((const tjs_char*)TVPUnknonwError));
 	}
 
 	if(engine_init) TVPUninitScriptEngine();
@@ -358,7 +357,7 @@ void tTVPApplication::CheckConsole() {
 }
 void tTVPApplication::CloseConsole() {
 	if( is_attach_console_ ) {
-		printf("Exit code: %d\n",TVPTerminateCode);
+		wprintf(TVPExitCode, TVPTerminateCode);
 		FILE *tmpout, *tmpin;
 		_wfreopen_s( &tmpin, L"CON", L"r", oldstdin_ );
 		_wfreopen_s( &tmpout, L"CON", L"w", oldstderr );
@@ -406,7 +405,7 @@ void tTVPApplication::BringToFront() {
 	}
 }
 void tTVPApplication::ShowException( class Exception* e ) {
-	::MessageBox( NULL, e->what(), L"致命的なエラー", MB_OK );
+	::MessageBox( NULL, e->what(), TVPFatalError, MB_OK );
 }
 void tTVPApplication::Run() {
 	MSG msg;
@@ -551,28 +550,27 @@ void tTVPApplication::DeleteAcceleratorKeyTable( HWND hWnd ) {
 	accel_key_.DelTable( hWnd );
 }
 void tTVPApplication::CheckDigitizer() {
-// TODO メッセージはリソースへ
 	int value = ::GetSystemMetrics(SM_DIGITIZER);
 	if( value == 0 ) return;
 
-	TVPAddLog(TJS_W("Enable Digitizer"));
+	TVPAddLog( (const tjs_char*)TVPEnableDigitizer );
 	if( value & NID_INTEGRATED_TOUCH ) {
-		TVPAddLog(TJS_W("統合型のタッチ デジタイザーが入力に使用されています。"));
+		TVPAddLog( (const tjs_char*)TVPTouchIntegratedTouch );
 	}
 	if( value & NID_EXTERNAL_TOUCH ) {
-		TVPAddLog(TJS_W("外付けのタッチ デジタイザーが入力に使用されています。"));
+		TVPAddLog( (const tjs_char*)TVPTouchExternalTouch );
 	}
 	if( value & NID_INTEGRATED_PEN ) {
-		TVPAddLog(TJS_W("統合型のペン デジタイザーが入力に使用されています。"));
+		TVPAddLog( (const tjs_char*)TVPTouchIntegratedPen );
 	}
 	if( value & NID_EXTERNAL_PEN ) {
-		TVPAddLog(TJS_W("外付けのペン デジタイザーが入力に使用されています。"));
+		TVPAddLog( (const tjs_char*)TVPTouchExternalPen );
 	}
 	if( value & NID_MULTI_INPUT ) {
-		TVPAddLog(TJS_W("複数入力がサポートされた入力デジタイザーが入力に使用されています。"));
+		TVPAddLog( (const tjs_char*)TVPTouchMultiInput );
 	}
 	if( value & NID_READY ) {
-		TVPAddLog(TJS_W("入力デジタイザーで入力の準備ができています。"));
+		TVPAddLog( (const tjs_char*)TVPTouchReady );
 	}
 }
 void tTVPApplication::OnActivate( HWND hWnd )

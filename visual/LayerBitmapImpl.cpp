@@ -1058,7 +1058,7 @@ void tTVPNativeBaseBitmap::DrawGlyph(iTJSDispatch2* glyph, const tTVPRect &destr
 	else
 		itemcount = 0;
 
-	if( itemcount < 8 ) TVPThrowExceptionMessage(TJS_W("Faild glyph for DrawGlyph."));
+	if( itemcount < 8 ) TVPThrowExceptionMessage( TVPFaildGlyphForDrawGlyph );
 
 	enum {
 		GLYPH_WIDTH,
@@ -1075,17 +1075,17 @@ void tTVPNativeBaseBitmap::DrawGlyph(iTJSDispatch2* glyph, const tTVPRect &destr
 	tjs_int glyphitem[7];
 	for( tjs_int i = 0; i < 7; i++ ) {
 		if(TJS_FAILED(glyph->PropGetByNum(TJS_MEMBERMUSTEXIST, i, &tmp, glyph)))
-			TVPThrowExceptionMessage(TJS_W("Faild glyph for DrawGlyph."));
+			TVPThrowExceptionMessage( TVPFaildGlyphForDrawGlyph );
 		glyphitem[i] = tmp;
 	}
 
 	if(TJS_FAILED(glyph->PropGetByNum(TJS_MEMBERMUSTEXIST, GLYPH_BITMAP, &tmp, glyph)))
-		TVPThrowExceptionMessage(TJS_W("Faild glyph for DrawGlyph."));
+		TVPThrowExceptionMessage( TVPFaildGlyphForDrawGlyph );
 
 	tjs_int numcolor = 256;
 	if( itemcount >= 9 ) {
 		if(TJS_FAILED(glyph->PropGetByNum(TJS_MEMBERMUSTEXIST, GLYPH_COLORS, &tmp, glyph)))
-			TVPThrowExceptionMessage(TJS_W("Faild glyph for DrawGlyph."));
+			TVPThrowExceptionMessage( TVPFaildGlyphForDrawGlyph );
 		numcolor = tmp;
 	}
 	tTJSVariantOctet *o = tmp.AsOctetNoAddRef();

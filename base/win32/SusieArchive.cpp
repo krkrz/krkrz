@@ -114,7 +114,7 @@ void tTVPSusieArchivePlugin::GetFileList(std::wstring localname,
 	std::vector<tTVPSusieFileRecord> &dest)
 {
 	// retrieve file list
-	TVPAddLog(TJS_W("(info) Listing files in ") + ttstr(localname.c_str()) + TJS_W(" ..."));
+	TVPAddLog( TVPFormatMessage(TVPInfoListingFiles, ttstr(localname.c_str()) ) );
 
 	HLOCAL infohandle = NULL;
 	int errorcode = 0xff&GetArchiveInfo(const_cast<LPSTR>(ttstr(localname).AsNarrowStdString().c_str()), 0, 0x00, &infohandle);

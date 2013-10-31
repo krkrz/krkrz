@@ -20,31 +20,31 @@ tTVPPrerenderedFont::tTVPPrerenderedFont(const ttstr &storage) :
 	try {
 		FileLength = stream->GetSize();
 		if( FileLength == 0 ) {
-			TVPThrowExceptionMessage( TVPPrerenderedFontMappingFailed, TJS_W("File size is zero.") );
+			TVPThrowExceptionMessage( TVPPrerenderedFontMappingFailed, (const tjs_char*)TVPFileSizeIsZero );
 		}
 		Image = new tjs_uint8[(tjs_uint)FileLength];
 		if( Image == NULL ) {
-			TVPThrowExceptionMessage( TVPPrerenderedFontMappingFailed, TJS_W("Memory allocation error.") );
+			TVPThrowExceptionMessage( TVPPrerenderedFontMappingFailed, (const tjs_char*)TVPMemoryAllocationError );
 		}
 		tjs_uint readsize = stream->Read( const_cast<tjs_uint8*>(Image), (tjs_uint)FileLength );
 		if( readsize != FileLength ) {
-			TVPThrowExceptionMessage( TVPPrerenderedFontMappingFailed, TJS_W("File read error.") );
+			TVPThrowExceptionMessage( TVPPrerenderedFontMappingFailed, (const tjs_char*)TVPFileReadError );
 		}
 		delete stream;
 		stream = NULL;
 
 		// check header
 		if( memcmp("TVP pre-rendered font\x1a", Image, 22) ) {
-			TVPThrowExceptionMessage(TVPPrerenderedFontMappingFailed, TJS_W("Signature not found or invalid pre-rendered font file."));
+			TVPThrowExceptionMessage(TVPPrerenderedFontMappingFailed, (const tjs_char*)TVPInvalidPrerenderedFontFile );
 		}
 
 		if( Image[23] != 2 ) {
-			TVPThrowExceptionMessage(TVPPrerenderedFontMappingFailed, TJS_W("Not a 16-bit UNICODE font file."));
+			TVPThrowExceptionMessage(TVPPrerenderedFontMappingFailed, (const tjs_char*)TVPNot16BitUnicodeFontFile );
 		}
 
 		Version = Image[22];
 		if( Version != 0 && Version != 1 ) {
-			TVPThrowExceptionMessage(TVPPrerenderedFontMappingFailed, TJS_W("Invalid header version."));
+			TVPThrowExceptionMessage(TVPPrerenderedFontMappingFailed, (const tjs_char*)TVPInvalidHeaderVersion );
 		}
 
 		// read index offset
