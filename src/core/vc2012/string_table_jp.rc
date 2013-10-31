@@ -171,7 +171,7 @@ BEGIN
     IDS_TVP_MEDIA_NAME_HAD_ALREADY_BEEN_REGISTERED                            "メディア名 ""%1"" は既に登録されています"
     IDS_TVP_MEDIA_NAME_IS_NOT_REGISTERED                                      "メディア名 ""%1"" は登録されていません"
     IDS_TVP_INFO_REBUILDING_AUTO_PATH                                         "(info) 自動検索パステーブルを再構築しています ..."
-    IDS_TVP_INFO_TOTAL_FILE_FOUND_AND_ACTIVATED                               "(info) 全 %1 ファイルが見つかりました, %2 file(s) activated. (%3ms)"
+    IDS_TVP_INFO_TOTAL_FILE_FOUND_AND_ACTIVATED                               "(info) Total %1 file(s) found, %2 file(s) activated. (%3ms)"
     IDS_TVP_ERROR_IN_RETRIEVING_SYSTEM_ON_ACTIVATE_ON_DEACTIVATE              "Error in retrieving System.onActivate/onDeactivate : %1"
     IDS_TVP_THE_HOST_IS_NOT_A16BIT_UNICODE_SYSTEM                             "The host is not a 16-bit unicode system."
     IDS_TVP_INFO_TRYING_TO_READ_XP3VIRTUAL_FILE_SYSTEM_INFORMATION_FROM       "(info) Trying to read XP3 virtual file system information from : %1"

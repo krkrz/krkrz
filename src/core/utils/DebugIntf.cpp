@@ -148,15 +148,9 @@ void tTVPLogStreamHolder::Open(const wchar_t *mode)
 			}
 
 #ifdef TJS_TEXT_OUT_CRLF
-			ttstr separator(TJS_W("\r\n\r\n\r\n")
-TJS_W("==============================================================================\r\n")
-TJS_W("==============================================================================\r\n"
-				));
+			ttstr separator( TVPSeparatorCRLF );
 #else
-			ttstr separator(TJS_W("\n\n\n")
-TJS_W("==============================================================================\n")
-TJS_W("==============================================================================\n"
-				));
+			ttstr separator( TVPSeparatorCR );
 #endif
 			Log(separator);
 

@@ -71,7 +71,7 @@ tTVPSusiePlugin::tTVPSusiePlugin(HINSTANCE inst, const char *api)
 
 	memset(buffer, 0, 256);
 	GetPluginInfo(1, buffer, 255);
-	if(buffer[0]) TVPAddImportantLog(TJS_W("(info) Susie plugin info : ") + ttstr(buffer));
+	if(buffer[0]) TVPAddImportantLog( TVPFormatMessage(TVPInfoSusiePluginInfo,ttstr(buffer)) );
 
 	// retrieve format information
 	tjs_int i;
@@ -205,8 +205,7 @@ void tTVPSusiePicturePlugin::Load(void *callbackdata,
 		else
 		{
 			// not supported bitmap format
-			TVPThrowExceptionMessage(TVPImageLoadError,
-				TJS_W("Non-supported bitmap header was given from susie plug-in."));
+			TVPThrowExceptionMessage(TVPImageLoadError, (const tjs_char*)TVPSusiePluginUnsupportedBitmapHeader );
 
 		}
 

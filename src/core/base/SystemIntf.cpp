@@ -69,8 +69,7 @@ void TVPFireOnApplicationActivateEvent(bool activate_or_deactivate)
 	catch(const eTJS &e)
 	{
 		// the system should not throw exceptions during retrieving the function
-		TVPAddLog(TJS_W("Error in retrieving System.onActivate/onDeactivate : ") +
-			e.GetMessage() );
+		TVPAddLog( TVPFormatMessage( TVPErrorInRetrievingSystemOnActivateOnDeactivate, e.GetMessage() ) );
 		return;
 	}
 

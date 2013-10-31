@@ -204,12 +204,10 @@ void TVPInternalLoadBMP(void *callbackdata,
 		// fall through -- read the RGB masks
 */
 	case BI_BITFIELDS:
-		TVPThrowExceptionMessage(TVPImageLoadError,
-			TJS_W("BITFIELDS not supported."));
+		TVPThrowExceptionMessage(TVPImageLoadError, (const tjs_char*)TVPBitFieldsNotSupported );
 
 	default:
-		TVPThrowExceptionMessage(TVPImageLoadError,
-			TJS_W("Compressed BMP not supported."));
+ 		TVPThrowExceptionMessage(TVPImageLoadError, (const tjs_char*)TVPCompressedBmpNotSupported );
 	}
 
 	// load palette
@@ -254,8 +252,7 @@ void TVPInternalLoadBMP(void *callbackdata,
 	else
 	{
 		if(mode == glmPalettized)
-			TVPThrowExceptionMessage(TVPImageLoadError,
-				TJS_W("Unsupported color mode for palettized image."));
+			TVPThrowExceptionMessage(TVPImageLoadError, (const tjs_char*)TVPUnsupportedColorModeForPalettImage );
 	}
 
 	tjs_int height;
@@ -463,8 +460,7 @@ void TVPLoadBMP(void* formatdata, void *callbackdata, tTVPGraphicSizeCallback si
 	tjs_uint8 magic[2];
 	src->ReadBuffer(magic, 2);
 	if(magic[0] != TJS_N('B') || magic[1] != TJS_N('M'))
-		TVPThrowExceptionMessage(TVPImageLoadError,
-			TJS_W("This is not a Windows BMP file or an OS/2 BMP file."));
+		TVPThrowExceptionMessage(TVPImageLoadError, (const tjs_char*)TVPNotWindowsBmp );
 
 	// read the BITMAPFILEHEADER
 	TVP_WIN_BITMAPFILEHEADER bf;
@@ -502,8 +498,7 @@ void TVPLoadBMP(void* formatdata, void *callbackdata, tTVPGraphicSizeCallback si
 	}
 	else
 	{
-		TVPThrowExceptionMessage(TVPImageLoadError,
-			TJS_W("Non-supported header version."));
+		TVPThrowExceptionMessage(TVPImageLoadError, (const tjs_char*)TVPUnsupportedHeaderVersion );
 	}
 
 
@@ -1576,18 +1571,18 @@ void TVPTouchImages(const std::vector<ttstr> & storages, tjs_int64 limit,
 	tjs_uint64 starttime = TVPGetTickCount();
 	tjs_uint64 limittime = starttime + timeout;
 	tTVPBaseBitmap tmp(32, 32, 32);
-	ttstr statusstr(TJS_W("(info) Touching "));
+ 	ttstr statusstr( (const tjs_char*)TVPInfoTouching );
 	bool first = true;
 	while((tjs_uint)count < storages.size())
 	{
 		if(timeout && TVPGetTickCount() >= limittime)
 		{
-			statusstr += TJS_W(" ... aborted [timed out]");
+			statusstr += (const tjs_char*)TVPAbortedTimeOut;
 			break;
 		}
 		if(bytes >= limitbytes)
 		{
-			statusstr += TJS_W(" ... aborted [limit bytes exceeded]");
+			statusstr += (const tjs_char*)TVPAbortedLimitByte;
 			break;
 		}
 

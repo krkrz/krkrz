@@ -633,26 +633,25 @@ bool TJS_INTF_METHOD tTVPDrawDevice::SwitchToFullScreen( HWND window, tjs_uint w
 		success = true;
 		break;
 	case DISP_CHANGE_RESTART:
-		TVPAddLog(TJS_W("ChangeDisplaySettings failed: DISP_CHANGE_RESTART"));
+		TVPAddLog( (const tjs_char*)TVPChangeDisplaySettingsFailedDispChangeRestart );
 		break;
 	case DISP_CHANGE_BADFLAGS:
-		TVPAddLog(TJS_W("ChangeDisplaySettings failed: DISP_CHANGE_BADFLAGS"));
+		TVPAddLog( (const tjs_char*)TVPChangeDisplaySettingsFailedDispChangeBadFlags );
 		break;
 	case DISP_CHANGE_BADPARAM:
-		TVPAddLog(TJS_W("ChangeDisplaySettings failed: DISP_CHANGE_BADPARAM"));
+		TVPAddLog( (const tjs_char*)TVPChangeDisplaySettingsFailedDispChangeBadParam );
 		break;
 	case DISP_CHANGE_FAILED:
-		TVPAddLog(TJS_W("ChangeDisplaySettings failed: DISP_CHANGE_FAILED"));
+		TVPAddLog( (const tjs_char*)TVPChangeDisplaySettingsFailedDispChangeFailed );
 		break;
 	case DISP_CHANGE_BADMODE:
-		TVPAddLog(TJS_W("ChangeDisplaySettings failed: DISP_CHANGE_BADMODE"));
+		TVPAddLog( (const tjs_char*)TVPChangeDisplaySettingsFailedDispChangeBadMode );
 		break;
 	case DISP_CHANGE_NOTUPDATED:
-		TVPAddLog(TJS_W("ChangeDisplaySettings failed: DISP_CHANGE_NOTUPDATED"));
+ 		TVPAddLog( (const tjs_char*)TVPChangeDisplaySettingsFailedDispChangeNotUpdated );
 		break;
 	default:
-		TVPAddLog(TJS_W("ChangeDisplaySettings failed: unknown reason (") +
-						ttstr((tjs_int)ret) + TJS_W(")"));
+		TVPAddLog( TVPFormatMessage(TVPChangeDisplaySettingsFailedUnknownReason,ttstr((tjs_int)ret)) );
 		break;
 	}
 	return success;

@@ -48,8 +48,7 @@ void TVPLoadTLG5(void* formatdata, void *callbackdata,
 {
 	// load TLG v5.0 lossless compressed graphic
 	if(mode != glmNormal)
-		TVPThrowExceptionMessage(TVPTLGLoadError,
-			TJS_W("TLG cannot be used as universal transition rule, province(_p) or mask(_m) images."));
+		TVPThrowExceptionMessage(TVPTLGLoadError, (const tjs_char*)TVPTlgUnsupportedUniversalTransitionRule );
 
 	unsigned char mark[12];
 	tjs_int width, height, colors, blockheight;
@@ -60,7 +59,7 @@ void TVPLoadTLG5(void* formatdata, void *callbackdata,
 	blockheight = src->ReadI32LE();
 
 	if(colors != 3 && colors != 4)
-		TVPThrowExceptionMessage(TVPTLGLoadError, TJS_W("Unsupported color type."));
+		TVPThrowExceptionMessage(TVPTLGLoadError, (const tjs_char*)TVPUnsupportedColorType );
 
 	int blockcount = (int)((height - 1) / blockheight) + 1;
 
@@ -212,8 +211,7 @@ void TVPLoadTLG6(void* formatdata, void *callbackdata,
 {
 	// load TLG v6.0 lossless/near-lossless compressed graphic
 	if(palettized)
-		TVPThrowExceptionMessage(TVPTLGLoadError,
-			TJS_W("TLG cannot be used as universal transition rule, province(_p) or mask(_m) images."));
+		TVPThrowExceptionMessage(TVPTLGLoadError, (const tjs_char*)TVPTlgUnsupportedUniversalTransitionRule );
 
 	unsigned char buf[12];
 
@@ -223,19 +221,18 @@ void TVPLoadTLG6(void* formatdata, void *callbackdata,
 
 	if(colors != 1 && colors != 4 && colors != 3)
 		TVPThrowExceptionMessage(TVPTLGLoadError,
-			ttstr(TJS_W("Unsupported color count : ")) + ttstr((int)colors)  );
+			ttstr(TVPUnsupportedColorCount) + ttstr((int)colors)  );
 
 	if(buf[1] != 0) // data flag
 		TVPThrowExceptionMessage(TVPTLGLoadError,
-			TJS_W("Data flag must be 0 (any flags are not yet supported)"));
+			(const tjs_char*)TVPDataFlagMustBeZero );
 
 	if(buf[2] != 0) // color type  (currently always zero)
 		TVPThrowExceptionMessage(TVPTLGLoadError,
-			ttstr(TJS_W("Unsupported color type : ")) + ttstr((int)buf[1])  );
+			ttstr(TVPUnsupportedColorTypeColon) + ttstr((int)buf[1])  );
 
 	if(buf[3] != 0) // external golomb table (currently always zero)
-		TVPThrowExceptionMessage(TVPTLGLoadError,
-			TJS_W("External golomb bit length table is not yet supported."));
+		TVPThrowExceptionMessage(TVPTLGLoadError, (const tjs_char*)TVPUnsupportedExternalGolombBitLengthTable );
 
 	tjs_int width, height;
 
@@ -351,8 +348,7 @@ void TVPLoadTLG6(void* formatdata, void *callbackdata,
 							pixel_count, bit_pool);
 					break;
 				default:
-					TVPThrowExceptionMessage(TVPTLGLoadError,
-						TJS_W("Unsupported entropy coding method"));
+					TVPThrowExceptionMessage(TVPTLGLoadError, (const tjs_char*)TVPUnsupportedEntropyCodingMethod );
 				}
 			}
 
@@ -448,8 +444,7 @@ static void TVPInternalLoadTLG(void* formatdata, void *callbackdata, tTVPGraphic
 	}
 	else
 	{
-		TVPThrowExceptionMessage(TVPTLGLoadError,
-			TJS_W("Invalid TLG header or unsupported TLG version."));
+		TVPThrowExceptionMessage(TVPTLGLoadError, (const tjs_char*)TVPInvalidTlgHeaderOrVersion );
 	}
 }
 //---------------------------------------------------------------------------
@@ -510,28 +505,24 @@ void TVPLoadTLG(void* formatdata, void *callbackdata, tTVPGraphicSizeCallback si
 							tjs_uint namelen = 0;
 							while(*tagp >= '0' && *tagp <= '9')
 								namelen = namelen * 10 + *tagp - '0', tagp++;
-							if(*tagp != ':') TVPThrowExceptionMessage(TVPTLGLoadError,
-								TJS_W("Malformed TLG SDS tag structure, missing colon after name length"));
+							if(*tagp != ':') TVPThrowExceptionMessage(TVPTLGLoadError, (const tjs_char*)TVPTlgMalformedTagMissionColonAfterNameLength );
 							tagp ++;
 							name = new char [namelen + 1];
 							memcpy(name, tagp, namelen);
 							name[namelen] = '\0';
 							tagp += namelen;
-							if(*tagp != '=') TVPThrowExceptionMessage(TVPTLGLoadError,
-								TJS_W("Malformed TLG SDS tag structure, missing equals after name"));
+							if(*tagp != '=') TVPThrowExceptionMessage(TVPTLGLoadError, (const tjs_char*)TVPTlgMalformedTagMissionEqualsAfterName );
 							tagp++;
 							tjs_uint valuelen = 0;
 							while(*tagp >= '0' && *tagp <= '9')
 								valuelen = valuelen * 10 + *tagp - '0', tagp++;
-							if(*tagp != ':') TVPThrowExceptionMessage(TVPTLGLoadError,
-								TJS_W("Malformed TLG SDS tag structure, missing colon after value length"));
+							if(*tagp != ':') TVPThrowExceptionMessage(TVPTLGLoadError, (const tjs_char*)TVPTlgMalformedTagMissionColonAfterVaueLength );
 							tagp++;
 							value = new char [valuelen + 1];
 							memcpy(value, tagp, valuelen);
 							value[valuelen] = '\0';
 							tagp += valuelen;
-							if(*tagp != ',') TVPThrowExceptionMessage(TVPTLGLoadError,
-								TJS_W("Malformed TLG SDS tag structure, missing comma after a tag"));
+ 							if(*tagp != ',') TVPThrowExceptionMessage(TVPTLGLoadError, (const tjs_char*)TVPTlgMalformedTagMissionCommaAfterTag );
 							tagp++;
 
 							// insert into name-value pairs ... TODO: utf-8 decode

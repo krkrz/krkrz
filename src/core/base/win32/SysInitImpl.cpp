@@ -852,7 +852,7 @@ void TVPBeforeSystemInit()
 		TVPTotalPhysMemory = status.ullTotalPhys;
 
 		ttstr memstr( std::to_wstring(TVPTotalPhysMemory).c_str() );
-		TVPAddImportantLog(TJS_W("(info) Total physical memory : ") + memstr );
+		TVPAddImportantLog( TVPFormatMessage(TVPInfoTotalPhysicalMemory, memstr) );
 
 		tTJSVariant opt;
 		if(TVPGetCommandLine(TJS_W("-memusage"), &opt))
@@ -1080,8 +1080,7 @@ void TVPBeforeSystemInit()
 
 	if(TVPProjectDirSelected)
 	{
-		TVPAddImportantLog(TJS_W("(info) Selected project directory : ") +
-			TVPProjectDir);
+		TVPAddImportantLog( TVPFormatMessage(TVPInfoSelectedProjectDirectory, TVPProjectDir) );
 	}
 }
 //---------------------------------------------------------------------------
@@ -1344,9 +1343,9 @@ static std::vector<std::string> * TVPGetEmbeddedOptions()
 	}
 
 	if(errmsg)
-		TVPAddImportantLog(ttstr(TJS_W("(info) Loading executable embedded options failed (ignoring) : ")) + errmsg);
+		TVPAddImportantLog( TVPFormatMessage(TVPInfoLoadingExecutableEmbeddedOptionsFailed, errmsg) );
 	else
-		TVPAddImportantLog(TJS_W("(info) Loading executable embedded options succeeded."));
+		TVPAddImportantLog( (const tjs_char*)TVPInfoLoadingExecutableEmbeddedOptionsSucceeded );
 	return ret;
 }
 //---------------------------------------------------------------------------
@@ -1355,7 +1354,7 @@ static std::vector<std::string> * TVPGetConfigFileOptions(const std::wstring& fi
 	// load .cf file
 	std::wstring errmsg;
 	if(!FileExists(filename))
-		errmsg = TJS_W("file not found.");
+		errmsg = (const tjs_char*)TVPFileNotFound;
 
 	std::vector<std::string> * ret = NULL; // new std::vector<std::string>();
 	if(errmsg == TJS_W(""))
@@ -1376,11 +1375,9 @@ static std::vector<std::string> * TVPGetConfigFileOptions(const std::wstring& fi
 	}
 
 	if(errmsg != TJS_W(""))
-		TVPAddImportantLog(ttstr(TJS_W("(info) Loading configuration file \"")) + filename.c_str() +
-			TJS_W("\" failed (ignoring) : ") + errmsg.c_str());
+		TVPAddImportantLog( TVPFormatMessage(TVPInfoLoadingConfigurationFileFailed, filename.c_str(), errmsg.c_str()) );
 	else
-		TVPAddImportantLog(ttstr(TJS_W("(info) Loading configuration file \"")) + filename.c_str() +
-			TJS_W("\" succeeded."));
+		TVPAddImportantLog( TVPFormatMessage(TVPInfoLoadingConfigurationFileSucceeded, filename.c_str()) );
 
 	return ret;
 }
@@ -1432,11 +1429,10 @@ void TVPEnsureDataPathDirectory()
 		// ensure data path existence
 		if(!TVPCheckExistentLocalFolder(TVPNativeDataPath.c_str()))
 		{
-			ttstr msg("(info) Data path does not exist, trying to make it ... ");
 			if(TVPCreateFolders(TVPNativeDataPath.c_str()))
-				TVPAddImportantLog(msg + "ok.");
+				TVPAddImportantLog( TVPFormatMessage( TVPInfoDataPathDoesNotExistTryingToMakeIt, (const tjs_char*)TVPOk ) );
 			else
-				TVPAddImportantLog(msg + "failed.");
+				TVPAddImportantLog( TVPFormatMessage( TVPInfoDataPathDoesNotExistTryingToMakeIt, (const tjs_char*)TVPFaild ) );
 		}
 	}
 }
@@ -1544,7 +1540,7 @@ static void TVPInitProgramArgumentsAndDataPath(bool stop_after_datapath_got)
 
 		// set data path
 		TVPDataPath = TVPNormalizeStorageName(TVPNativeDataPath);
-		TVPAddImportantLog(ttstr("(info) Data path : ") + TVPDataPath);
+		TVPAddImportantLog( TVPFormatMessage( TVPInfoDataPath, TVPDataPath) );
 
 		// set log output directory
 		TVPSetLogLocation(TVPNativeDataPath);
@@ -1557,7 +1553,7 @@ static void TVPInitProgramArgumentsAndDataPath(bool stop_after_datapath_got)
 static void TVPDumpOptions()
 {
 	std::vector<ttstr>::const_iterator i;
-	ttstr options(TJS_W("(info) Specified option(s) (earlier item has more priority) :"));
+ 	ttstr options( TVPInfoSpecifiedOptionEarlierItemHasMorePriority );
 	if(TVPProgramArguments.size())
 	{
 		for(i = TVPProgramArguments.begin(); i != TVPProgramArguments.end(); i++)
@@ -1568,7 +1564,7 @@ static void TVPDumpOptions()
 	}
 	else
 	{
-		options += TJS_W(" (none)");
+		options += (const tjs_char*)TVPNone;
 	}
 	TVPAddImportantLog(options);
 }
@@ -1703,7 +1699,7 @@ bool TVPCheckAbout(void)
 	{
 		Sleep(600);
 		tjs_char msg[80];
-		TJS_snprintf(msg, sizeof(msg)/sizeof(tjs_char), TJS_W("(info) CPU clock (roughly) : %dMHz"), (int)TVPCPUClock);
+		TJS_snprintf(msg, sizeof(msg)/sizeof(tjs_char), TVPInfoCpuClockRoughly, (int)TVPCPUClock);
 		TVPAddImportantLog(msg);
 
 		TVPShowVersionForm();

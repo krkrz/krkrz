@@ -142,7 +142,7 @@ void TVPLoadPNG(void* formatdata, void *callbackdata, tTVPGraphicSizeCallback si
 			(png_voidp)NULL, (png_error_ptr)PNG_error, (png_error_ptr)PNG_warning,
 			(png_voidp)NULL, (png_malloc_ptr)PNG_malloc, (png_free_ptr)PNG_free);
 		//png_ptr = png_create_read_struct( PNG_LIBPNG_VER_STRING, (png_voidp)NULL, (png_error_ptr)PNG_error, (png_error_ptr)PNG_warning );
-		if( !png_ptr ) TVPThrowExceptionMessage(TVPPNGLoadError, TJS_W("libpng error.") );
+		if( !png_ptr ) TVPThrowExceptionMessage(TVPPNGLoadError, (const tjs_char*)TVPLibpngError );
 
 		// set read_chunk_callback
 		PNG_read_chunk_callback_user_struct read_chunk_callback_user_struct;
@@ -156,11 +156,11 @@ void TVPLoadPNG(void* formatdata, void *callbackdata, tTVPGraphicSizeCallback si
 
 		// create png_info
 		info_ptr=png_create_info_struct(png_ptr);
-		if( !info_ptr ) TVPThrowExceptionMessage(TVPPNGLoadError, TJS_W("libpng error.") );
+		if( !info_ptr ) TVPThrowExceptionMessage(TVPPNGLoadError, (const tjs_char*)TVPLibpngError );
 
 		// create end_info
 		end_info=png_create_info_struct(png_ptr);
-		if( !end_info ) TVPThrowExceptionMessage(TVPPNGLoadError, TJS_W("libpng error.") );
+		if( !end_info ) TVPThrowExceptionMessage(TVPPNGLoadError, (const tjs_char*)TVPLibpngError );
 
 		// set stream interface
 		png_set_read_fn(png_ptr,(png_voidp)src, (png_rw_ptr)PNG_read_data);
@@ -229,7 +229,7 @@ void TVPLoadPNG(void* formatdata, void *callbackdata, tTVPGraphicSizeCallback si
 			// convert the image to palettized one if needed
 			if(bit_depth > 8)
 				TVPThrowExceptionMessage(
-					TVPPNGLoadError, TJS_W("Unsupported color type for palattized image"));
+					TVPPNGLoadError, (const tjs_char*)TVPUnsupportedColorTypePalette );
 
 			if(color_type == PNG_COLOR_TYPE_PALETTE)
 			{
@@ -314,7 +314,7 @@ void TVPLoadPNG(void* formatdata, void *callbackdata, tTVPGraphicSizeCallback si
 				break;
 			default:
 				TVPThrowExceptionMessage(
-					TVPPNGLoadError, TJS_W("Unsupported color type"));
+ 					TVPPNGLoadError, (const tjs_char*)TVPUnsupportedColorType );
 			}
 		}
 
@@ -324,7 +324,7 @@ void TVPLoadPNG(void* formatdata, void *callbackdata, tTVPGraphicSizeCallback si
 		{
 			// too large image to handle
 			TVPThrowExceptionMessage(
-					TVPPNGLoadError, TJS_W("Too large image"));
+				TVPPNGLoadError, (const tjs_char*)TVPTooLargeImage );
 		}
 
 
@@ -489,12 +489,12 @@ void TVPSaveAsPNG( const ttstr & storagename, const ttstr & mode, const tTVPBase
 
 		png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,NULL,NULL,NULL);
 		if( !png_ptr ) {
-			TVPThrowExceptionMessage(TJS_W("PNG save error."));
+			TVPThrowExceptionMessage( TVPPngSaveError );
 		}
 		png_infop info_ptr = png_create_info_struct(png_ptr);
 		if( !info_ptr ) {
 			png_destroy_write_struct(&png_ptr,NULL);
-			TVPThrowExceptionMessage(TJS_W("PNG save error."));
+			TVPThrowExceptionMessage( TVPPngSaveError );
 		}
 
 		png_set_write_fn( png_ptr, (png_voidp)stream, (png_rw_ptr)PNG_write_write, (png_flush_ptr)PNG_write_flash );

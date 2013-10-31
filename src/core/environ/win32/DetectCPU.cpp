@@ -19,6 +19,7 @@
 
 #include "Exception.h"
 #include <intrin.h>
+#include "MsgIntf.h"
 
 #pragma intrinsic(__rdtsc)
 
@@ -52,7 +53,7 @@ static void TVPGetCPUTypeForOne()
 		TVPCheckCPU(); // in detect_cpu.nas
 	} __except(EXCEPTION_EXECUTE_HANDLER) {
 		// exception had been ocured
-		throw Exception("CPU check failure.");
+		throw Exception( TVPCpuCheckFailure );
 	}
 #endif
 
@@ -148,8 +149,7 @@ static ttstr TVPDumpCPUFeatures(tjs_uint32 features)
 static ttstr TVPDumpCPUInfo(tjs_int cpu_num)
 {
 	// dump detected cpu type
-	ttstr features(TJS_W("(info) CPU #") + ttstr(cpu_num) +
-		TJS_W(" : "));
+	ttstr features( TVPFormatMessage(TVPInfoCpuNumber,ttstr(cpu_num)) );
 
 	features += TVPDumpCPUFeatures(TVPCPUFeatures);
 
@@ -183,8 +183,7 @@ static ttstr TVPDumpCPUInfo(tjs_int cpu_num)
 	TVPAddImportantLog(features);
 
 	if(((TVPCPUID1_EAX >> 8) & 0x0f) <= 4)
-		throw Exception(L"CPU check failure: CPU family 4 or lesser is not supported\r\n"+
-		features.AsStdString());
+		throw Exception( TVPFormatMessage( TVPCpuCheckFailureCpuFamilyOrLesserIsNotSupported, features).c_str() );
 
 	return features;
 }
@@ -268,11 +267,9 @@ void TVPDetectCPU()
 	TVPDisableCPU(TVP_CPU_HAS_SSE2, TJS_W("-cpusse2"));
 
 	if(TVPCPUType == 0)
-		throw Exception(L"CPU check failure: Not supported CPU\r\n" +
-		cpuinfo.AsStdString());
+		throw Exception( TVPFormatMessage(TVPCpuCheckFailureNotSupprtedCpu, cpuinfo).c_str() );
 
-	TVPAddImportantLog(TJS_W("(info) finally detected CPU features : ") +
-    	TVPDumpCPUFeatures(TVPCPUType));
+	TVPAddImportantLog( TVPFormatMessage(TVPInfoFinallyDetectedCpuFeatures,TVPDumpCPUFeatures(TVPCPUType)) );
 }
 //---------------------------------------------------------------------------
 
