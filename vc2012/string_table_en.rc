@@ -286,7 +286,7 @@ BEGIN
     IDS_TVP_INFO_CPU_CLOCK_ROUGHLY                                            "(info) CPU clock (roughly) : %dMHz"
     IDS_TVP_PROGRAM_STARTED_ON                                                "Program started on %1 (%2)"
     IDS_TVP_KIRIKIRI                                                          "Kirikiri"
-    IDS_TVP_UNKNONW_ERROR                                                     "Unknown error!"
+    IDS_TVP_UNKNOWN_ERROR                                                     "Unknown error!"
     IDS_TVP_EXIT_CODE                                                         "Exit code: %d\n"
     IDS_TVP_FATAL_ERROR                                                       "Fatal Error"
     IDS_TVP_ENABLE_DIGITIZER                                                  "Enable Digitizer"

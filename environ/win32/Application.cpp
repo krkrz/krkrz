@@ -1,10 +1,13 @@
-
+#define INITGUID // XP 有効にするとdxguid.libが使用できないため
 #include "tjsCommHead.h"
 
 #include <algorithm>
 #include <string>
 #include <vector>
 #include <assert.h>
+
+#define DIRECTINPUT_VERSION 0x0500
+#include <dinput.h>
 
 #include "Application.h"
 #include "SysInitIntf.h"
@@ -28,25 +31,10 @@
 #include "resource.h"
 
 /*
-#pragma comment( lib, "winmm.lib" )
-#pragma comment( lib, "dxguid.lib" )
-#pragma comment( lib, "dsound.lib" )
-#pragma comment( lib, "version.lib" )
-#pragma comment( lib, "mpr.lib" )
-#pragma comment( lib, "shlwapi.lib" )
-#pragma comment( lib, "vfw32.lib" )
-#pragma comment( lib, "imm32.lib" )
-
-#pragma comment( lib, "tvpgl_ia32.lib" )
-#pragma comment( lib, "tvpsnd_ia32.lib" )
+kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;dsound.lib;version.lib;mpr.lib;shlwapi.lib;vfw32.lib;imm32.lib;zlib_d.lib;jpeg-6bx_d.lib;libpng_d.lib;onig_s_d.lib;freetype250MT_D.lib;tvpgl_ia32.lib;tvpsnd_ia32.lib;%(AdditionalDependencies)
+kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;dsound.lib;version.lib;mpr.lib;shlwapi.lib;vfw32.lib;imm32.lib;zlib.lib;jpeg-6bx.lib;libpng.lib;onig_s.lib;freetype250MT.lib;tvpgl_ia32.lib;tvpsnd_ia32.lib;%(AdditionalDependencies)
 */
 
-/*
-kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;dxguid.lib;dsound.lib;version.lib;mpr.lib;shlwapi.lib;vfw32.lib;imm32.lib;zlib_d.lib;jpeg-6bx_d.lib;libpng_d.lib;onig_s_d.lib;freetype250MT_D.lib;tvpgl_ia32.lib;tvpsnd_ia32.lib;%(AdditionalDependencies)
-kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;dxguid.lib;dsound.lib;version.lib;mpr.lib;shlwapi.lib;vfw32.lib;imm32.lib;zlib.lib;jpeg-6bx.lib;libpng.lib;onig_s.lib;freetype250MT.lib;tvpgl_ia32.lib;tvpsnd_ia32.lib;%(AdditionalDependencies)
-*/
-
-//HINSTANCE hInst;
 tTVPApplication* Application;
 
 // アプリケーションの開始時に呼ぶ
@@ -197,6 +185,7 @@ void AcceleratorKey::DelKey( WORD id ) {
 	delete[] keys_;
 	keys_ = table;
 }
+
 int APIENTRY WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow ) {
 	try {
 		CheckMemoryLeaksStart();
@@ -229,7 +218,6 @@ int APIENTRY WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	}
 	return TVPTerminateCode;
 }
-
 tTVPApplication::tTVPApplication() : is_attach_console_(false), tarminate_(false), ApplicationActivating(true)
 	 , ImageLoadThread(NULL), oldstdin_(NULL), oldstdout_(NULL), oldstderr(NULL) {
 }
@@ -254,6 +242,7 @@ bool tTVPApplication::StartApplication( int argc, char* argv[] ) {
 	// try starting the program!
 	bool engine_init = false;
 	try {
+
 		if(TVPCheckProcessLog()) return true; // sub-process for processing object hash map log
 
 		ImageLoadThread = new tTVPAsyncImageLoader();
@@ -279,11 +268,9 @@ bool tTVPApplication::StartApplication( int argc, char* argv[] ) {
 
 		SetTitle( std::wstring(TVPKirikiri) );
 		TVPSystemControl = new tTVPSystemControl();
-
 #ifndef TVP_IGNORE_LOAD_TPM_PLUGIN
 		TVPLoadPluigins(); // load plugin module *.tpm
 #endif
-
 		// Check digitizer
 		CheckDigitizer();
 
@@ -320,8 +307,10 @@ bool tTVPApplication::StartApplication( int argc, char* argv[] ) {
 		TVPOnError();
 		if(!TVPSystemUninitCalled)
 			ShowException(&Exception(e.GetMessage().AsStdString()));
+	} catch( std::exception &e ) {
+		ShowException(&Exception( ttstr(e.what()).c_str() ));
 	} catch(...) {
-		ShowException(&Exception((const tjs_char*)TVPUnknonwError));
+		ShowException(&Exception((const tjs_char*)TVPUnknownError));
 	}
 
 	if(engine_init) TVPUninitScriptEngine();
@@ -550,27 +539,35 @@ void tTVPApplication::DeleteAcceleratorKeyTable( HWND hWnd ) {
 	accel_key_.DelTable( hWnd );
 }
 void tTVPApplication::CheckDigitizer() {
-	int value = ::GetSystemMetrics(SM_DIGITIZER);
-	if( value == 0 ) return;
+	// Windows 7 以降でのみ有効
+	OSVERSIONINFOEX ovi;
+	ovi.dwOSVersionInfoSize = sizeof(ovi);
+	::GetVersionEx((OSVERSIONINFO*)&ovi);
+	if( ovi.dwPlatformId == VER_PLATFORM_WIN32_NT &&
+		ovi.dwMajorVersion >= 6 && ovi.dwMinorVersion >= 1 ) {
 
-	TVPAddLog( (const tjs_char*)TVPEnableDigitizer );
-	if( value & NID_INTEGRATED_TOUCH ) {
-		TVPAddLog( (const tjs_char*)TVPTouchIntegratedTouch );
-	}
-	if( value & NID_EXTERNAL_TOUCH ) {
-		TVPAddLog( (const tjs_char*)TVPTouchExternalTouch );
-	}
-	if( value & NID_INTEGRATED_PEN ) {
-		TVPAddLog( (const tjs_char*)TVPTouchIntegratedPen );
-	}
-	if( value & NID_EXTERNAL_PEN ) {
-		TVPAddLog( (const tjs_char*)TVPTouchExternalPen );
-	}
-	if( value & NID_MULTI_INPUT ) {
-		TVPAddLog( (const tjs_char*)TVPTouchMultiInput );
-	}
-	if( value & NID_READY ) {
-		TVPAddLog( (const tjs_char*)TVPTouchReady );
+		int value = ::GetSystemMetrics(SM_DIGITIZER);
+		if( value == 0 ) return;
+
+		TVPAddLog( (const tjs_char*)TVPEnableDigitizer );
+		if( value & NID_INTEGRATED_TOUCH ) {
+			TVPAddLog( (const tjs_char*)TVPTouchIntegratedTouch );
+		}
+		if( value & NID_EXTERNAL_TOUCH ) {
+			TVPAddLog( (const tjs_char*)TVPTouchExternalTouch );
+		}
+		if( value & NID_INTEGRATED_PEN ) {
+			TVPAddLog( (const tjs_char*)TVPTouchIntegratedPen );
+		}
+		if( value & NID_EXTERNAL_PEN ) {
+			TVPAddLog( (const tjs_char*)TVPTouchExternalPen );
+		}
+		if( value & NID_MULTI_INPUT ) {
+			TVPAddLog( (const tjs_char*)TVPTouchMultiInput );
+		}
+		if( value & NID_READY ) {
+			TVPAddLog( (const tjs_char*)TVPTouchReady );
+		}
 	}
 }
 void tTVPApplication::OnActivate( HWND hWnd )

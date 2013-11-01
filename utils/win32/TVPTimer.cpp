@@ -14,19 +14,17 @@ TVPTimer::~TVPTimer() {
 	}
 }
 int TVPTimer::CreateUtilWindow() {
-	::ZeroMemory( &wc_, sizeof(wc_) );
+	::ZeroMemory( &wc_, sizeof(WNDCLASSEX) );
 	wc_.cbSize = sizeof(WNDCLASSEX);
 	wc_.lpfnWndProc = ::DefWindowProc;
 	wc_.hInstance = ::GetModuleHandle(NULL);
-	//wc_.lpszClassName = L"TVPUtilWindow";
 	wc_.lpszClassName = L"TVPTimerWindow";
 
-	BOOL ClassRegistered = ::GetClassInfoEx( wc_.hInstance, wc_.lpszClassName, &wc_ );
+	WNDCLASSEX tmpwc = { sizeof(WNDCLASSEX) };
+	BOOL ClassRegistered = ::GetClassInfoEx( wc_.hInstance, wc_.lpszClassName, &tmpwc );
 	if( ClassRegistered == 0 ) {
 		if( ::RegisterClassEx( &wc_ ) == 0 ) {
-#ifdef _DEBUG
-			TVPOutputWindowsErrorToDebugMessage();
-#endif
+			TVP_WINDOWS_ERROR_LOG;
 			return HRESULT_FROM_WIN32(::GetLastError());
 		}
 	}
@@ -34,9 +32,7 @@ int TVPTimer::CreateUtilWindow() {
 						WS_POPUP, 0, 0, 0, 0, NULL, NULL, wc_.hInstance, NULL );
 	
 	if( window_handle_ == NULL ) {
-#ifdef _DEBUG
-			TVPOutputWindowsErrorToDebugMessage();
-#endif
+		TVP_WINDOWS_ERROR_LOG;
 		return HRESULT_FROM_WIN32(::GetLastError());
 	}
     ::SetWindowLongPtr( window_handle_, GWLP_WNDPROC, (LONG_PTR)TVPTimer::WndProc );
@@ -62,12 +58,15 @@ LRESULT WINAPI TVPTimer::WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 	return ::DefWindowProc(hWnd,msg,wParam,lParam);
 }
 void TVPTimer::UpdateTimer() {
-	::KillTimer( window_handle_, 1 );
+	if( ::KillTimer( window_handle_, 1 ) == 0 ) {
+#ifdef _DEBUG
+		TVP_WINDOWS_ERROR_LOG;
+#endif
+	}
 	if( interval_ > 0 && enabled_ && event_ != NULL ) {
 		if( ::SetTimer( window_handle_, 1, interval_, NULL ) == 0 ) {
 			TVPThrowWindowsErrorException();
 		}
 	}
-	
 }
 

@@ -342,7 +342,9 @@ HRESULT tTVPWindow::CreateWnd( const std::wstring& classname, const std::wstring
 						window_class_name_.c_str(), NULL };
 	wc.hIcon = ::LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_TVPWIN32));
 	wc.hIconSm = ::LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_TVPWIN32));
-	BOOL ClassRegistered = ::GetClassInfoEx( wc.hInstance, wc.lpszClassName, &wc );
+
+	WNDCLASSEX tmpwc = { sizeof(WNDCLASSEX) };
+	BOOL ClassRegistered = ::GetClassInfoEx( wc.hInstance, wc.lpszClassName, &tmpwc );
 	if( ClassRegistered == 0 ) {
 		if( ::RegisterClassEx( &wc ) == 0 ) {
 #ifdef _DEBUG
