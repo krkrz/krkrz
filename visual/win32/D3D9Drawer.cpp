@@ -278,6 +278,8 @@ void tTVPDrawer_D3DDoubleBuffering::CreateOffScreenSurface()
 			// 2ÇÃó›èÊÇÃÇ›ãñâ¬Ç∑ÇÈÇ©Ç«Ç§Ç©îªíË
 			while( dwWidth < TextureWidth ) dwWidth = dwWidth << 1;
 			while( dwHeight < TextureHeight ) dwHeight = dwHeight << 1;
+			TextureWidth = dwWidth;
+			TextureHeight = dwHeight;
 
 			if( dwWidth > d3dcaps.MaxTextureWidth || dwHeight > d3dcaps.MaxTextureHeight ) {
 				TVPAddLog( (const tjs_char*)TVPWarningImageSizeTooLargeMayBeCannotCreateTexture );
@@ -577,6 +579,9 @@ got_error:
 			} else if( hr == E_OUTOFMEMORY  ) {
 				TVPAddLog( (const tjs_char*)TVPErrorCannotAllocateMemory );
 				InvalidateAll();
+			} else if( hr == D3D_OK ) {
+				if( FAILED( hr = InitializeDirect3DState() ) )
+ 					TVPThrowExceptionMessage( TVPFaildToSetRenderState );
 			}
 		}
 	} else if(hr != D3D_OK) {
