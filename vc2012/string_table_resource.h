@@ -287,7 +287,7 @@
 #define IDS_TVP_INFO_CPU_CLOCK_ROUGHLY                                            10283
 #define IDS_TVP_PROGRAM_STARTED_ON                                                10284
 #define IDS_TVP_KIRIKIRI                                                          10285
-#define IDS_TVP_UNKNONW_ERROR                                                     10286
+#define IDS_TVP_UNKNOWN_ERROR                                                     10286
 #define IDS_TVP_EXIT_CODE                                                         10287
 #define IDS_TVP_FATAL_ERROR                                                       10288
 #define IDS_TVP_ENABLE_DIGITIZER                                                  10289
