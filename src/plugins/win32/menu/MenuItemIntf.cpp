@@ -494,7 +494,7 @@ void tTJSNI_MenuItem::SetVisible(bool b)
 {
 	if(!MenuItem) return;
 	if(OwnerWindow) {
-		if( b ) {
+		if( !b ) {
 			::SetMenu( HWnd, NULL );
 		} else {
 			::SetMenu( HWnd, GetRootMenuItem()->GetMenuItemHandleForPlugin() );
@@ -509,7 +509,7 @@ bool tTJSNI_MenuItem::GetVisible() const
 {
 	if(!MenuItem) return false;
 	if(OwnerWindow) {
-		
+
 		return ::GetMenu(HWnd) != NULL; // Window->GetMenuBarVisible(); 
 	} else return MenuItem->GetVisible();
 }
