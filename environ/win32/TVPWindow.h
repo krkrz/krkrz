@@ -30,6 +30,14 @@ protected:
 	  caFree,
 	  caMinimize
 	};
+	enum FormState {
+		fsCreating,
+		fsVisible,
+		fsShowing,
+		fsModal,
+		fsCreatedMDIChild,
+		fsActivated
+	};
 
 	HWND				window_handle_;
 
@@ -236,6 +244,7 @@ public:
 	*/
 
 	int ShowModal();
+	void closeModal();
 	void Close();
 
 	void GetClientRect( struct tTVPRect& rt );
