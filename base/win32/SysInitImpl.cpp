@@ -181,6 +181,7 @@ extern "C"
 		__dee_hacked_getExceptionObjectHook(ErrorCode, P, osEsp, osERR, ctx);
 */
 //---------------------------------------------------------------------------
+/*
 typedef void __cdecl (*__dee_hacked_getExceptionObjectHook_type)(int ErrorCode,
 		EXCEPTION_RECORD *P, unsigned long osEsp, unsigned long osERR, PCONTEXT ctx);
 extern "C"
@@ -189,7 +190,7 @@ extern "C"
 		__cdecl __dee_hacked_set_getExceptionObjectHook(
 		__dee_hacked_getExceptionObjectHook_type handler);
 }
-
+*/
 
 //---------------------------------------------------------------------------
 // data
@@ -207,7 +208,7 @@ struct tTVPHWExceptionData
 	int AccessFlag; // for EAccessViolation (0=read, 1=write, 8=execute)
 	void *AccessTarget; // for EAccessViolation
 	CONTEXT Context; // OS exception context
-	char Module[MAX_PATH]; // module name which caused the exception
+	wchar_t Module[MAX_PATH]; // module name which caused the exception
 
 	tjs_uint8 CodesAtEIP[TVP_HWE_MAX_CODES_AT_EIP];
 	tjs_int CodesAtEIPLen;
@@ -225,13 +226,13 @@ static tTVPHWExceptionData TVPLastHWExceptionData;
 
 HANDLE TVPHWExceptionLogHandle = NULL;
 //---------------------------------------------------------------------------
-static char TVPHWExceptionLogFilename[MAX_PATH];
+static wchar_t TVPHWExceptionLogFilename[MAX_PATH];
 
 static void TVPWriteHWELogFile()
 {
 	TVPEnsureDataPathDirectory();
-	TJS_nstrcpy(TVPHWExceptionLogFilename, TVPNativeDataPath.c_str());
-	TJS_nstrcat(TVPHWExceptionLogFilename, "hwexcept.log");
+	TJS_strcpy(TVPHWExceptionLogFilename, TVPNativeDataPath.c_str());
+	TJS_strcat(TVPHWExceptionLogFilename, L"hwexcept.log");
 	TVPHWExceptionLogHandle = CreateFile(TVPHWExceptionLogFilename, GENERIC_WRITE,
 		FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
@@ -241,16 +242,16 @@ static void TVPWriteHWELogFile()
 	SetFilePointer(TVPHWExceptionLogHandle, filesize, NULL, FILE_BEGIN);
 
 	// write header
-	const char headercomment[] =
-		"THIS IS A HARDWARE EXCEPTION LOG FILE OF KIRIKIRI. "
-		"PLEASE SEND THIS FILE TO THE AUTHOR WITH *.console.log FILE. ";
+	const wchar_t headercomment[] =
+		L"THIS IS A HARDWARE EXCEPTION LOG FILE OF KIRIKIRI. "
+		L"PLEASE SEND THIS FILE TO THE AUTHOR WITH *.console.log FILE. ";
 	DWORD written = 0;
 	for(int i = 0; i < 4; i++)
-		WriteFile(TVPHWExceptionLogHandle, "----", 4, &written, NULL);
+		WriteFile(TVPHWExceptionLogHandle, L"----", 4*sizeof(wchar_t), &written, NULL);
 	WriteFile(TVPHWExceptionLogHandle, headercomment, sizeof(headercomment)-1,
 		&written, NULL);
 	for(int i = 0; i < 4; i++)
-		WriteFile(TVPHWExceptionLogHandle, "----", 4, &written, NULL);
+		WriteFile(TVPHWExceptionLogHandle, L"----", 4*sizeof(wchar_t), &written, NULL);
 		
 
 	// write version
@@ -274,8 +275,9 @@ static void TVPWriteHWELogFile()
 
 }
 //---------------------------------------------------------------------------
-void __cdecl TVP__dee_hacked_getExceptionObjectHook(int ErrorCode,
-		EXCEPTION_RECORD *P, unsigned long osEsp, unsigned long osERR, PCONTEXT ctx)
+//void __cdecl TVP__dee_hacked_getExceptionObjectHook(int ErrorCode,
+//		EXCEPTION_RECORD *P, unsigned long osEsp, unsigned long osERR, PCONTEXT ctx)
+void TVPHandleSEHException( int ErrorCode, EXCEPTION_RECORD *P, unsigned long osEsp, PCONTEXT ctx)
 {
 	// exception hook function
 	int len;
@@ -377,9 +379,8 @@ void __cdecl TVP__dee_hacked_getExceptionObjectHook(int ErrorCode,
 			VirtualQuery((void*)d->ESP[p], &mbi, sizeof(mbi));
 			if(mbi.State == MEM_COMMIT)
 			{
-				char module[MAX_PATH];
-				if(GetModuleFileName((HMODULE)mbi.AllocationBase, module,
-					MAX_PATH))
+				wchar_t module[MAX_PATH];
+				if(::GetModuleFileName((HMODULE)mbi.AllocationBase, module, MAX_PATH))
 				{
 					tjs_uint8 buf[16];
 					if((DWORD)d->ESP[p] >= 16 &&
@@ -448,14 +449,15 @@ static void TVPDumpCPUFlags(ttstr &line, DWORD flags, DWORD bit, tjs_char *name)
 void TVPDumpOSContext(const CONTEXT &ctx)
 {
 	// dump OS context block
-	tjs_char buf[256];
+	static const int BUF_SIZE = 256;
+	tjs_char buf[BUF_SIZE];
 
 	// mask FP exception
 	TJSSetFPUE();
 
 	// - context flags
 	ttstr line;
-	TJS_sprintf(buf, TJS_W("Context Flags : 0x%08X [ "), ctx.ContextFlags);
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("Context Flags : 0x%08X [ "), ctx.ContextFlags);
 	line += buf;
 	if(ctx.ContextFlags & CONTEXT_DEBUG_REGISTERS)
 		line += TJS_W("CONTEXT_DEBUG_REGISTERS ");
@@ -475,40 +477,40 @@ void TVPDumpOSContext(const CONTEXT &ctx)
 
 
 	// - debug registers
-	TJS_sprintf(buf, TJS_W(
-		"Debug Registers   : "
-		"0:0x%08X  "
-		"1:0x%08X  "
-		"2:0x%08X  "
-		"3:0x%08X  "
-		"6:0x%08X  "
-		"7:0x%08X  "),
+	TJS_snprintf(buf, BUF_SIZE,
+		TJS_W("Debug Registers   : ")
+		TJS_W("0:0x%08X  ")
+		TJS_W("1:0x%08X  ")
+		TJS_W("2:0x%08X  ")
+		TJS_W("3:0x%08X  ")
+		TJS_W("6:0x%08X  ")
+		TJS_W("7:0x%08X  "),
 			ctx.Dr0, ctx.Dr1, ctx.Dr2, ctx.Dr3, ctx.Dr6, ctx.Dr7);
 	TVPAddLog(buf);
 
 
 	// - Segment registers
-	TJS_sprintf(buf, TJS_W("Segment Registers : GS:0x%04X  FS:0x%04X  ES:0x%04X  DS:0x%04X  CS:0x%04X  SS:0x%04X"),
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("Segment Registers : GS:0x%04X  FS:0x%04X  ES:0x%04X  DS:0x%04X  CS:0x%04X  SS:0x%04X"),
 		ctx.SegGs, ctx.SegFs, ctx.SegEs, ctx.SegDs, ctx.SegCs, ctx.SegSs);
 	TVPAddLog(buf);
 
 	// - Generic Integer Registers
-	TJS_sprintf(buf, TJS_W("Integer Registers : EAX:0x%08X  EBX:0x%08X  ECX:0x%08X  EDX:0x%08X"),
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("Integer Registers : EAX:0x%08X  EBX:0x%08X  ECX:0x%08X  EDX:0x%08X"),
 		ctx.Eax, ctx.Ebx, ctx.Ecx, ctx.Edx);
 	TVPAddLog(buf);
 
 	// - Index Registers
-	TJS_sprintf(buf, TJS_W("Index Registers   : ESI:0x%08X  EDI:0x%08X"),
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("Index Registers   : ESI:0x%08X  EDI:0x%08X"),
 		ctx.Esi, ctx.Edi);
 	TVPAddLog(buf);
 
 	// - Pointer Registers
-	TJS_sprintf(buf, TJS_W("Pointer Registers : EBP:0x%08X  ESP:0x%08X  EIP:0x%08X"),
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("Pointer Registers : EBP:0x%08X  ESP:0x%08X  EIP:0x%08X"),
 		ctx.Ebp, ctx.Esp, ctx.Eip);
 	TVPAddLog(buf);
 
 	// - Flag Register
-	TJS_sprintf(buf, TJS_W("Flag Register     : 0x%08X [ "),
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("Flag Register     : 0x%08X [ "),
 		ctx.EFlags);
 	line = buf;
 	TVPDumpCPUFlags(line, ctx.EFlags, (1<< 0), TJS_W("CF"));
@@ -520,7 +522,7 @@ void TVPDumpOSContext(const CONTEXT &ctx)
 	TVPDumpCPUFlags(line, ctx.EFlags, (1<< 9), TJS_W("IF"));
 	TVPDumpCPUFlags(line, ctx.EFlags, (1<<10), TJS_W("DF"));
 	TVPDumpCPUFlags(line, ctx.EFlags, (1<<11), TJS_W("OF"));
-	TJS_sprintf(buf, TJS_W("IO%d "), (ctx.EFlags >> 12) & 0x03);
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("IO%d "), (ctx.EFlags >> 12) & 0x03);
 	line += buf;
 	TVPDumpCPUFlags(line, ctx.EFlags, (1<<14), TJS_W("NF"));
 	TVPDumpCPUFlags(line, ctx.EFlags, (1<<16), TJS_W("RF"));
@@ -535,28 +537,28 @@ void TVPDumpOSContext(const CONTEXT &ctx)
 	// - FP registers
 
 	// -- control words
-	TJS_sprintf(buf, TJS_W("FP Control Word : 0x%08X   FP Status Word : 0x%08X   FP Tag Word : 0x%08X"),
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("FP Control Word : 0x%08X   FP Status Word : 0x%08X   FP Tag Word : 0x%08X"),
 		ctx.FloatSave.ControlWord, ctx.FloatSave.StatusWord, ctx.FloatSave.TagWord);
 	TVPAddLog(buf);
 
 	// -- offsets/selectors
-	TJS_sprintf(buf, TJS_W("FP Error Offset : 0x%08X   FP Error Selector : 0x%08X"),
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("FP Error Offset : 0x%08X   FP Error Selector : 0x%08X"),
 		ctx.FloatSave.ErrorOffset, ctx.FloatSave.ErrorSelector);
-	TJS_sprintf(buf, TJS_W("FP Data Offset  : 0x%08X   FP Data Selector  : 0x%08X"),
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("FP Data Offset  : 0x%08X   FP Data Selector  : 0x%08X"),
 		ctx.FloatSave.DataOffset, ctx.FloatSave.DataSelector);
 
 	// -- registers
 	long double *ptr = (long double *)&(ctx.FloatSave.RegisterArea[0]);
 	for(tjs_int i = 0; i < 8; i++)
 	{
-		TJS_sprintf(buf, TJS_W("FP ST(%d) : %28.20Lg 0x%04X%016I64X"), i,
+		TJS_snprintf(buf, BUF_SIZE, TJS_W("FP ST(%d) : %28.20Lg 0x%04X%016I64X"), i,
 			ptr[i], (unsigned int)*(tjs_uint16*)(((tjs_uint8*)(ptr + i)) + 8),
 			*(tjs_uint64*)(ptr + i));
 		TVPAddLog(buf);
 	}
 
 	// -- Cr0NpxState
-	TJS_sprintf(buf, TJS_W("FP CR0 NPX State  : 0x%08X"), ctx.FloatSave.Cr0NpxState);
+	TJS_snprintf(buf, BUF_SIZE,TJS_W("FP CR0 NPX State  : 0x%08X"), ctx.FloatSave.Cr0NpxState);
 	TVPAddLog(buf);
 
 	// -- SSE/SSE2 registers
@@ -588,7 +590,7 @@ void TVPDumpOSContext(const CONTEXT &ctx)
 		for(tjs_int i = 0; i < 8; i++)
 		{
 			xmm_t * xmm = (xmm_t *)(ctx.ExtendedRegisters + i * 16+ 0xa0);
-			TJS_sprintf(buf,
+			TJS_snprintf(buf, BUF_SIZE,
 				TJS_W("XMM %d : [ %15.8g %15.8g %15.8g %15.8g ] [ %24.16lg %24.16lg ] [ 0x%016I64X-0x%016I64X ]"),
 				i,
 				xmm->sD, xmm->sC, xmm->sB, xmm->sA,
@@ -596,7 +598,7 @@ void TVPDumpOSContext(const CONTEXT &ctx)
 				xmm->i64B, xmm->i64A);
 			TVPAddLog(buf);
 		}
-		TJS_sprintf(buf, TJS_W("MXCSR : 0x%08X"),
+		TJS_snprintf(buf,BUF_SIZE,  TJS_W("MXCSR : 0x%08X"),
 			*(DWORD*)(ctx.ExtendedRegisters + 0x18));
 		TVPAddLog(buf);
 	}
@@ -610,8 +612,9 @@ void TVPDumpHWException()
 	TVPHWExcRaised = false;
 
 	TVPOnError();
-
-	tjs_char buf[256];
+	
+	static const int BUF_SIZE = 256;
+	tjs_char buf[BUF_SIZE];
 	tTVPHWExceptionData * d = &TVPLastHWExceptionData;
 
 	TVPAddLog(ttstr(TVPHardwareExceptionRaised));
@@ -649,11 +652,11 @@ void TVPDumpHWException()
 			mode = TJS_W("write");
 		else if(d->AccessFlag == 8)
 			mode = TJS_W("execute");
-		TJS_sprintf(buf, TJS_W("(%ls access to 0x%p)"), mode, d->AccessTarget);
+		TJS_snprintf(buf, BUF_SIZE, TJS_W("(%ls access to 0x%p)"), mode, d->AccessTarget);
 		line += buf;
 	}
 
-	TJS_sprintf(buf, TJS_W("  at  EIP = 0x%p   ESP = 0x%p"), d->EIP, d->ESP);
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("  at  EIP = 0x%p   ESP = 0x%p"), d->EIP, d->ESP);
 	line += buf;
 	if(d->Module[0])
 	{
@@ -669,7 +672,7 @@ void TVPDumpHWException()
 	line = TJS_W("Codes at EIP : ");
 	for(tjs_int i = 0; i<d->CodesAtEIPLen; i++)
 	{
-		TJS_sprintf(buf, TJS_W("0x%02X "), d->CodesAtEIP[i]);
+		TJS_snprintf(buf, BUF_SIZE, TJS_W("0x%02X "), d->CodesAtEIP[i]);
 		line += buf;
 	}
 	TVPAddLog(line);
@@ -679,14 +682,14 @@ void TVPDumpHWException()
 	// dump stack and data
 	for(tjs_int s = 0; s<d->StackAtESPLen; s++)
 	{
-		TJS_sprintf(buf, TJS_W("0x%p (ESP+%3d) : 0x%p : "),
+		TJS_snprintf(buf, BUF_SIZE, TJS_W("0x%p (ESP+%3d) : 0x%p : "),
 			(DWORD)d->ESP + s*sizeof(tjs_uint32),
 			s*sizeof(tjs_uint32), d->StackAtESP[s]);
 		line = buf;
 
 		for(tjs_int i = 0; i<d->StackDumpsLen[s]; i++)
 		{
-			TJS_sprintf(buf, TJS_W("0x%02X "), d->StackDumps[s][i]);
+			TJS_snprintf(buf, BUF_SIZE, TJS_W("0x%02X "), d->StackDumps[s][i]);
 			line += buf;
 		}
 		TVPAddLog(line);
@@ -696,25 +699,24 @@ void TVPDumpHWException()
 	TVPAddLog(TJS_W("Call Trace :"));
 	for(tjs_int s = 0; s<d->CallTraceLen; s++)
 	{
-		TJS_sprintf(buf, TJS_W("0x%p : "),
+		TJS_snprintf(buf, BUF_SIZE, TJS_W("0x%p : "),
 			d->CallTrace[s]);
 		line = buf;
 
 		for(tjs_int i = 0; i<d->CallTraceDumpsLen[s]; i++)
 		{
-			TJS_sprintf(buf, TJS_W("0x%02X "), d->CallTraceDumps[s][i]);
+			TJS_snprintf(buf, BUF_SIZE, TJS_W("0x%02X "), d->CallTraceDumps[s][i]);
 			line += buf;
 		}
 		MEMORY_BASIC_INFORMATION mbi;
 		VirtualQuery((void*)d->CallTrace[s], &mbi, sizeof(mbi));
 		if(mbi.State == MEM_COMMIT)
 		{
-			char module[MAX_PATH];
-			if(GetModuleFileName((HMODULE)mbi.AllocationBase, module,
-				MAX_PATH))
+			wchar_t module[MAX_PATH];
+			if(::GetModuleFileName((HMODULE)mbi.AllocationBase, module, MAX_PATH))
 			{
 				line += ttstr(ExtractFileName(module).c_str());
-				TJS_sprintf(buf, TJS_W(" base 0x%p"), mbi.AllocationBase);
+				TJS_snprintf(buf, BUF_SIZE, TJS_W(" base 0x%p"), mbi.AllocationBase);
 				line += buf;
 			}
 		}
@@ -828,7 +830,7 @@ void TVPBeforeSystemInit()
 	TVPInitProgramArgumentsAndDataPath(false); // ensure command line
 
 #ifdef TVP_REPORT_HW_EXCEPTION
-	__dee_hacked_set_getExceptionObjectHook(TVP__dee_hacked_getExceptionObjectHook);
+	// __dee_hacked_set_getExceptionObjectHook(TVP__dee_hacked_getExceptionObjectHook);
 		// register hook function for hardware exceptions
 #endif
 
@@ -1236,7 +1238,7 @@ void TVPAfterSystemInit()
 //---------------------------------------------------------------------------
 void TVPBeforeSystemUninit()
 {
-	TVPDumpHWException(); // dump cached hw exceptoin
+	// TVPDumpHWException(); // dump cached hw exceptoin
 }
 //---------------------------------------------------------------------------
 void TVPAfterSystemUninit()
