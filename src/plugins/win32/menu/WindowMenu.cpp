@@ -37,7 +37,7 @@ WindowMenuItem::WindowMenuItem( tTJSNI_MenuItem* owner, HWND hWnd, HMENU hMenu )
 	ZeroMemory( &menu_item_info_, sizeof(MENUITEMINFO) );
 	menu_item_info_.cbSize = sizeof(MENUITEMINFO);
 	menu_item_info_.dwItemData = (ULONG_PTR)this;
-	menu_item_info_.fMask = MIIM_DATA|MIIM_ID;
+	menu_item_info_.fMask = MIIM_DATA|MIIM_ID|MIIM_STATE;
 	menu_item_info_.fType = MFT_STRING;
 	menu_item_info_.wID = GetNewMenuId(this);
 	if( hMenu == NULL ) {
@@ -223,9 +223,11 @@ void WindowMenuItem::SetChecked( bool b ) {
 		}
 	} else {
 		if( b ) {
+			menu_item_info_.fState &= ~MFS_UNCHECKED;
 			menu_item_info_.fState |= MFS_CHECKED;
 		} else {
 			menu_item_info_.fState &= ~MFS_CHECKED;
+			menu_item_info_.fState |= MFS_UNCHECKED;
 		}
 	}
 	UpdateMenu();
