@@ -739,7 +739,9 @@ void tTVPWindow::GetClientRect( struct tTVPRect& rt ) {
 }
 
 void tTVPWindow::Close() {
-	if( OnCloseQuery() ) {
+	if( InMode ) {
+		ModalResult = mrCancel;
+	} else if( OnCloseQuery() ) {
 		CloseAction action = caFree;
 		OnClose(action);
 		switch( action ) {
@@ -755,6 +757,27 @@ void tTVPWindow::Close() {
 			::ShowWindow( GetHandle(), SW_MINIMIZE );
 			break;
 		}
+	}
+}
+
+void tTVPWindow::closeModal() {
+	try {
+		CloseAction action = caNone;
+		if( OnCloseQuery() ) {
+			action = caHide;
+			OnClose(action);
+		}
+		switch( action ) {
+		case caNone:
+			ModalResult = 0;
+			break;
+		case caFree:
+			::DestroyWindow( GetHandle() );
+			break;
+		}
+	} catch(...) {
+		ModalResult = 0;
+		throw;
 	}
 }
 int tTVPWindow::ShowModal() {
@@ -773,7 +796,7 @@ int tTVPWindow::ShowModal() {
 		Application->DisableWindows();
 		SetEnable( true );
 		Show();
-		// ::SendMessage( GetHandle(), CM_ACTIVATE, 0, 0 );
+		SetActiveWindow( GetHandle() );
 		ModalResult = 0;
 
 		MSG msg;
@@ -781,12 +804,35 @@ int tTVPWindow::ShowModal() {
 
 		HWND hSelfWnd = GetHandle();
 		BOOL ret = TRUE;
-		while( ModalResult == 0 && ::PeekMessage( &msg, hSelfWnd, 0, 0, PM_NOREMOVE) ) {
+		while( ModalResult == 0 ) {
+#if 0
+			ret = TRUE;
+			while( ModalResult == 0 && ::PeekMessage( &msg, hSelfWnd, 0, 0, PM_NOREMOVE) ) {
+				ret = ::GetMessage( &msg, hSelfWnd, 0, 0);
+				if( ret && !TranslateAccelerator(msg.hwnd, hAccelTable, &msg) ) {
+					TranslateMessage(&msg);
+					DispatchMessage(&msg);
+				}
+				if( ret == 0 ) break;
+			}
+			if( ret == 0 ) break;
+			if( ModalResult != 0 ) {
+				closeModal();
+			}
 			ret = ::GetMessage( &msg, hSelfWnd, 0, 0);
 			if( ret && !TranslateAccelerator(msg.hwnd, hAccelTable, &msg) ) {
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
 			}
+			if( ret == 0 ) break;
+#else
+			Application->HandleMessage();
+			if( Application->IsTarminate() ) {
+				ModalResult = mrCancel;
+			} else if( ModalResult != 0 ) {
+				closeModal();
+			}
+#endif
 		}
 		Application->EnableWindows( disablewins );
 		disablewins.clear();

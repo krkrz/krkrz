@@ -78,7 +78,7 @@ private:
 	void CheckConsole();
 	void CloseConsole();
 	void CheckDigitizer();
-	void ShowException( class Exception* e );
+	void ShowException( const wchar_t* e );
 	void Initialize() {}
 	void Run();
 
@@ -89,6 +89,8 @@ public:
 
 	void PrintConsole( const wchar_t* mes, unsigned long len );
 	bool IsAttachConsole() { return is_attach_console_; }
+
+	bool IsTarminate() const { return tarminate_; }
 
 	HWND GetHandle();
 	bool IsIconic() {
@@ -112,6 +114,7 @@ public:
 	bool ProcessMessage( MSG &msg );
 	void ProcessMessages();
 	void HandleMessage();
+	void HandleIdle(MSG &msg);
 
 	std::wstring GetTitle() const { return title_; }
 	void SetTitle( const std::wstring& caption );

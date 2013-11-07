@@ -129,7 +129,6 @@ void tTVPSystemControl::SystemWatchTimerTimer() {
 
 	// call events
 	DWORD tick = TVPGetRoughTickCount32();
-
 	// push environ noise
 	TVPPushEnvironNoise(&tick, sizeof(tick));
 	TVPPushEnvironNoise(&LastCompactedTick, sizeof(LastCompactedTick));
@@ -174,13 +173,11 @@ void tTVPSystemControl::SystemWatchTimerTimer() {
 		// fire compact event
 		TVPDeliverCompactEvent(TVP_COMPACT_LEVEL_IDLE);
 	}
-
 	if( !ContinuousEventCalling && tick > LastRehashedTick + 1500 ) {
 		// TJS2 object rehash
 		LastRehashedTick = tick;
 		TJSDoRehash();
 	}
-
 	// ensure modal window visible
 	if( tick > LastShowModalWindowSentTick + 4100 ) {
 		//	::PostMessage(Handle, WM_USER+0x32, 0, 0);
