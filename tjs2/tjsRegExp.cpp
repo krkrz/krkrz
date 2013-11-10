@@ -228,16 +228,14 @@ iTJSDispatch2* split_regex( const ttstr &target, iTJSDispatch2 * array, tTJSNI_R
 	const tjs_char* send = s + targlen;
 	int r = onig_search( _this->RegEx, (UChar*)s, (UChar*)send, (UChar*)s, (UChar*)send, region, ONIG_OPTION_NONE );
 	int storecount = 0;
-	int lastm = 0;
 	if( r >= 0 ) { // match
 		do {
-			int len = region->beg[0] - lastm;
+			int len = region->beg[0] / sizeof(tjs_char);
 			if( !purgeempty || len > 0 ) {
 				tTJSVariant val = ttstr( s, len );
 				array->PropSetByNum(TJS_MEMBERENSURE, storecount++, &val, array);
 			}
-			s += region->end[0];
-			lastm = region->end[0];
+			s += region->end[0] / sizeof(tjs_char);
 			onig_region_free( region, 0  );
 		} while( onig_search( _this->RegEx, (UChar*)s, (UChar*)send, (UChar*)s, (UChar*)send, region, ONIG_OPTION_NONE ) >= 0 );
 		if( !purgeempty || s <= send ) {
