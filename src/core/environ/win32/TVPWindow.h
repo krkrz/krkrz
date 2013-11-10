@@ -263,8 +263,8 @@ public:
 	virtual void OnMouseClick( int button, int shift, int x, int y ){}
 	virtual void OnMouseWheel( int delta, int shift, int x, int y ){}
 	virtual void OnKeyUp( WORD vk, int shift ){}
-	virtual void OnKeyDown( WORD vk, int shift, int repreat, bool prevkeystate ){}
-	virtual void OnKeyPress( WORD vk, int repreat, bool prevkeystate, bool convertkey ){}
+	virtual void OnKeyDown( WORD vk, int shift, int repeat, bool prevkeystate ){}
+	virtual void OnKeyPress( WORD vk, int repeat, bool prevkeystate, bool convertkey ){}
 	virtual void OnMove( int x, int y ) {}
 	virtual void OnDropFile( HDROP hDrop ) {}
 	virtual int OnMouseActivate( HWND hTopLevelParentWnd, WORD hitTestCode, WORD MouseMsg ) { return MA_ACTIVATE; }

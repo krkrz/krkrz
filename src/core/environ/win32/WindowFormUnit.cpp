@@ -1516,17 +1516,18 @@ void TTVPWindowForm::FreeDirectInputDevice() {
 #endif
 }
 
-void TTVPWindowForm::OnKeyDown( WORD vk, int shift, int repreat, bool prevkeystate ) {
+void TTVPWindowForm::OnKeyDown( WORD vk, int shift, int repeat, bool prevkeystate ) {
 	if(TJSNativeInstance) {
 		tjs_uint32 s = TVP_TShiftState_To_uint32( shift );
-		InternalKeyDown( vk, repreat > 0 ? s|TVP_SS_REPEAT : s );
+		if( prevkeystate && repeat > 0 ) s |= TVP_SS_REPEAT;
+		InternalKeyDown( vk, s );
 	}
 }
 void TTVPWindowForm::OnKeyUp( WORD vk, int shift ) {
 	tjs_uint32 s = TVP_TShiftState_To_uint32(shift);
 	InternalKeyUp(vk, s );
 }
-void TTVPWindowForm::OnKeyPress( WORD vk, int repreat, bool prevkeystate, bool convertkey ) {
+void TTVPWindowForm::OnKeyPress( WORD vk, int repeat, bool prevkeystate, bool convertkey ) {
 	if( TJSNativeInstance && vk ) {
 		if(UseMouseKey && (vk == 0x1b || vk == 13 || vk == 32)) return;
 		if( PendingKeyCodes.empty() != true ) {
