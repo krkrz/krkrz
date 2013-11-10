@@ -183,18 +183,17 @@ void replace_regex( tTJSVariant **param, tjs_int numparams, tTJSNI_RegExp *_this
 	const tjs_char* s = target.c_str();
 	const tjs_char* send = s + target.GetLen();
 	int r = onig_search( _this->RegEx, (UChar*)s, (UChar*)send, (UChar*)s, (UChar*)send, region, ONIG_OPTION_NONE );
+	int offset = 0;
 	if( r >= 0 ) { // match
 		do {
 			tjs_int pos = region->beg[0]/sizeof(tjs_char);
 			tjs_int end = region->end[0]/sizeof(tjs_char);
+			if( pos > 0 ) {
+				res += ttstr(s,pos);
+			}
 			if( !func ) {
-				res = ttstr(s,pos);
 				res += to;
-				if( (s+end) < send ) {
-					res += ttstr(s+end);
-				}
 			} else {
-				res = ttstr(s,pos);
 				// call the callback function descripted as param[1]
 				tTJSVariant result;
 				tjs_error hr;
@@ -209,16 +208,13 @@ void replace_regex( tTJSVariant **param, tjs_int numparams, tTJSNI_RegExp *_this
 				}
 				result.ToString();
 				res += result.GetString();
-				if( (s+end) < send ) {
-					res += ttstr(s+end);
-				}
 			}
-			if( isreplaceall ) {
-				s = res.c_str();
-				send = s + res.GetLen();
-			}
+			s += end;
 			onig_region_free( region, 0  );
-		} while( isreplaceall && onig_search( _this->RegEx, (UChar*)s, (UChar*)send, (UChar*)s, (UChar*)send, region, ONIG_OPTION_NONE ) >= 0 );
+		} while( isreplaceall && s < send && onig_search( _this->RegEx, (UChar*)s, (UChar*)send, (UChar*)s, (UChar*)send, region, ONIG_OPTION_NONE ) >= 0 );
+		if( s < send ) {
+			res += ttstr(s,send-s);
+		}
 	}
 	onig_region_free( region, 1  );
 }
