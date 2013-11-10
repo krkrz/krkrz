@@ -1831,6 +1831,7 @@ void TTVPWindowForm::OnFocus(HWND hFocusLostWnd) {
 	::PostMessage( GetHandle(), TVP_WM_ACQUIREIMECONTROL, 0, 0);
 
 	//if(PaintBox) CreateCaret(PaintBox->Parent->Handle, NULL, 1, 1);
+	::CreateCaret( GetHandle(), NULL, 1, 1);
 
 #ifndef DISABLE_EMBEDDED_GAME_PAD
 	if(DIPadDevice && TJSNativeInstance ) DIPadDevice->WindowActivated();

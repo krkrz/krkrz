@@ -4,6 +4,7 @@
 #include "tjsError.h"
 #include "Application.h"
 #include "DebugIntf.h"
+#include "WindowsUtil.h"
 
 void TVPThrowWindowsErrorException() {
 	ttstr mes;
