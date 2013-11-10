@@ -341,9 +341,9 @@ public:
 	virtual void OnActive( HWND preactive );
 	virtual void OnDeactive( HWND postactive );
 
-	virtual void OnKeyDown( WORD vk, int shift, int repreat, bool prevkeystate );
+	virtual void OnKeyDown( WORD vk, int shift, int repeat, bool prevkeystate );
 	virtual void OnKeyUp( WORD vk, int shift );
-	virtual void OnKeyPress( WORD vk, int repreat, bool prevkeystate, bool convertkey );
+	virtual void OnKeyPress( WORD vk, int repeat, bool prevkeystate, bool convertkey );
 
 	virtual void OnPaint();
 	virtual void OnClose( CloseAction& action );
