@@ -108,6 +108,9 @@ public:
 		windows_list_.push_back( win );
 	}
 	void RemoveWindow( class TTVPWindowForm* win );
+	unsigned int GetWindowCount() const {
+		return (unsigned int)windows_list_.size();
+	}
 
 	void FreeDirectInputDeviceForWindows();
 
@@ -142,8 +145,9 @@ public:
 	void ModalStarted() {}
 	void ModalFinished() {}
 	void DisableWindows();
-	void EnableWindows( const std::vector<class TTVPWindowForm*>& ignores );
+	void EnableWindows( const std::vector<class TTVPWindowForm*>& win );
 	void GetDisableWindowList( std::vector<class TTVPWindowForm*>& win );
+	void GetEnableWindowList( std::vector<class TTVPWindowForm*>& win, class TTVPWindowForm* activeWindow );
 
 	
 	void RegisterAcceleratorKey(HWND hWnd, char virt, short key, short cmd);

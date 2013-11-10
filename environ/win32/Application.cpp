@@ -11,6 +11,9 @@
 #define DIRECTINPUT_VERSION 0x0500
 #include <dinput.h>
 
+#include <DbgHelp.h>
+#include <Strsafe.h>
+
 #include "tjsError.h"
 #include "tjsDebug.h"
 
@@ -35,12 +38,14 @@
 
 #include "resource.h"
 
+#pragma comment(lib,"dbghelp.lib")
 /*
 kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;dsound.lib;version.lib;mpr.lib;shlwapi.lib;vfw32.lib;imm32.lib;zlib_d.lib;jpeg-6bx_d.lib;libpng_d.lib;onig_s_d.lib;freetype250MT_D.lib;tvpgl_ia32.lib;tvpsnd_ia32.lib;%(AdditionalDependencies)
 kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;dsound.lib;version.lib;mpr.lib;shlwapi.lib;vfw32.lib;imm32.lib;zlib.lib;jpeg-6bx.lib;libpng.lib;onig_s.lib;freetype250MT.lib;tvpgl_ia32.lib;tvpsnd_ia32.lib;%(AdditionalDependencies)
 */
 
 tTVPApplication* Application;
+extern void TVPHandleSEHException( int ErrorCode, EXCEPTION_RECORD *P, unsigned long osEsp, PCONTEXT ctx);
 
 // アプリケーションの開始時に呼ぶ
 inline void CheckMemoryLeaksStart()
@@ -216,7 +221,7 @@ int APIENTRY WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		delete Application;
 
 #ifndef _DEBUG
-		::ExitProcess(TVPTerminateCode); // ここで終了させるとメモリリーク表示が行われない
+//		::ExitProcess(TVPTerminateCode); // ここで終了させるとメモリリーク表示が行われない
 #endif
 	} catch (...) {
 		return 2;
@@ -241,55 +246,89 @@ struct SEHException {
 		: Code(code), ExceptionPointers(ep)
 	{}
 };
+
+int TVPWriteHWEDumpFile( EXCEPTION_POINTERS* pExceptionPointers ) {
+	BOOL bMiniDumpSuccessful;
+	WCHAR szPath[MAX_PATH]; 
+	WCHAR szFileName[MAX_PATH]; 
+	const wchar_t* szAppName = TVPKirikiri;
+	const wchar_t* szVersion = TVPGetVersionString().c_str();
+
+	TVPEnsureDataPathDirectory();
+
+	SYSTEMTIME stLocalTime;
+	::GetLocalTime( &stLocalTime );
+	StringCchPrintf( szFileName, MAX_PATH, L"%s%s%s-%04d%02d%02d-%02d%02d%02d-%ld-%ld.dmp",
+				szPath, szAppName, szVersion,
+				stLocalTime.wYear, stLocalTime.wMonth, stLocalTime.wDay,
+				stLocalTime.wHour, stLocalTime.wMinute, stLocalTime.wSecond,
+				GetCurrentProcessId(), GetCurrentThreadId());
+	HANDLE hDumpFile = ::CreateFile(szFileName, GENERIC_READ|GENERIC_WRITE,
+				FILE_SHARE_WRITE|FILE_SHARE_READ, 0, CREATE_ALWAYS, 0, 0);
+
+	MINIDUMP_EXCEPTION_INFORMATION ExpParam;
+	ExpParam.ThreadId = ::GetCurrentThreadId();
+	ExpParam.ExceptionPointers = pExceptionPointers;
+	ExpParam.ClientPointers = TRUE;
+	bMiniDumpSuccessful = MiniDumpWriteDump( ::GetCurrentProcess(), ::GetCurrentProcessId(), hDumpFile, MiniDumpWithDataSegs, &ExpParam, NULL, NULL);
+	return EXCEPTION_EXECUTE_HANDLER;
+}
+static bool TVPIsHandledHWException = false;
 void se_translator_function(unsigned int code, struct _EXCEPTION_POINTERS* ep) {
+	if( !TVPIsHandledHWException ) {
+		//ShowStackTrace( ep->ContextRecord );
+		TVPWriteHWEDumpFile( ep );
+		TVPHandleSEHException( code, ep->ExceptionRecord, ep->ContextRecord->Esp, ep->ContextRecord );
+		TVPIsHandledHWException = true;
+	}
 	throw SEHException(code,ep);
 }
 const wchar_t* SECodeToMessage( unsigned int code ) {
 	switch(code){
-	case EXCEPTION_ACCESS_VIOLATION: return L"ACCESS_VIOLATION: スレッドが適切なアクセス権を持たない仮想アドレスに対して、読み取りまたは書き込みを試みました。";
-	case EXCEPTION_BREAKPOINT: return L"ブレークポイントに到達しました。";
-	case EXCEPTION_DATATYPE_MISALIGNMENT: return L"境界整列をサポートしないハードウェア上で、スレッドが境界に整列していないデータの読み取りまたは書き込みを試みました。たとえば、16 ビットの値は 2 バイトの境界線上に、32 ビットの値は 4 バイトの境界線上に整列していなければなりません。";
-	case EXCEPTION_SINGLE_STEP: return L"トレーストラップなどの単一命令メカニズムから 1 つの命令の実行が通知されました。";
-	case EXCEPTION_ARRAY_BOUNDS_EXCEEDED: return L"スレッドが範囲外の配列要素にアクセスしようとしました。使用中のハードウェアは境界チェックをサポートしています。";
-	case EXCEPTION_FLT_DENORMAL_OPERAND: return L"浮動小数点演算のオペランドの 1 つが不正規化値です。不正規化値とは、小さすぎて標準の浮動小数点値として表現できない値です。";
-	case EXCEPTION_FLT_DIVIDE_BY_ZERO: return L"スレッドが浮動小数点値を 0 の浮動小数点除数で除算しようとしました。";
-	case EXCEPTION_FLT_INEXACT_RESULT: return L"浮動小数点演算の結果を 10 進小数で正確に表現できません。";
-	case EXCEPTION_FLT_INVALID_OPERATION: return L"このリストに含まれていない例外が発生しました。";
-	case EXCEPTION_FLT_OVERFLOW: return L"浮動小数点演算の指数が大きく、対応する型によって表現できません。";
-	case EXCEPTION_FLT_STACK_CHECK: return L"浮動小数点演算の結果、スタックのオーバーフローまたはアンダーフローが発生しました。";
-	case EXCEPTION_FLT_UNDERFLOW: return L"浮動小数点演算の指数が小さく、対応する型によって表現できません。";
-	case EXCEPTION_INT_DIVIDE_BY_ZERO: return L"スレッドが整数値を 0 の整数除数で除算しようとしました。";
-	case EXCEPTION_INT_OVERFLOW: return L"整数演算結果の最上位ビットが繰り上がりました。";
-	case EXCEPTION_PRIV_INSTRUCTION: return L"現在のマシンモードで許可されていない演算を行う命令をスレッドが実行しようとしました。";
-	case EXCEPTION_NONCONTINUABLE_EXCEPTION: return L"継続不可能な例外が発生した後、スレッドが実行を継続しようとしました。";
-
+	case EXCEPTION_ACCESS_VIOLATION: return L"Access Violation: スレッドが適切なアクセス権を持たない仮想アドレスに対して、読み取りまたは書き込みを試みました。";
 	// case EXCEPTION_ACCESS_VIOLATION: return L"The thread attempts to read from or write to a virtual address for which it does not have access.";
-	// case EXCEPTION_ARRAY_BOUNDS_EXCEEDED: return L"The thread attempts to access an array element that is out of bounds, and the underlying hardware supports bounds checking.";
+	case EXCEPTION_BREAKPOINT: return L"Break Point: ブレークポイントに到達しました。";
 	// case EXCEPTION_BREAKPOINT: return L"A breakpoint is encountered.";
+	case EXCEPTION_DATATYPE_MISALIGNMENT: return L"Data Type Misalignment: 境界整列をサポートしないハードウェア上で、スレッドが境界に整列していないデータの読み取りまたは書き込みを試みました。たとえば、16 ビットの値は 2 バイトの境界線上に、32 ビットの値は 4 バイトの境界線上に整列していなければなりません。";
 	// case EXCEPTION_DATATYPE_MISALIGNMENT: return L"The thread attempts to read or write data that is misaligned on hardware that does not provide alignment. For example, 16-bit values must be aligned on 2-byte boundaries, 32-bit values on 4-byte boundaries, and so on.";
-	// case EXCEPTION_FLT_DENORMAL_OPERAND: return L"One of the operands in a floating point operation is denormal. A denormal value is one that is too small to represent as a standard floating point value.";
-	// case EXCEPTION_FLT_DIVIDE_BY_ZERO return L"The thread attempts to divide a floating point value by a floating point divisor of 0 (zero).";
-	// case EXCEPTION_FLT_INEXACT_RESULT: return L"The result of a floating point operation cannot be represented exactly as a decimal fraction.";
-	// case EXCEPTION_FLT_INVALID_OPERATION: return L"A floating point exception that is not included in this list.";
-	// case EXCEPTION_FLT_OVERFLOW: return L"The exponent of a floating point operation is greater than the magnitude allowed by the corresponding type.";
-	// case EXCEPTION_FLT_STACK_CHECK: return L"The stack has overflowed or underflowed, because of a floating point operation.";
-	// case EXCEPTION_FLT_UNDERFLOW: return L"The exponent of a floating point operation is less than the magnitude allowed by the corresponding type.";
-	case EXCEPTION_GUARD_PAGE: return L"The thread accessed memory allocated with the PAGE_GUARD modifier.";
-	case EXCEPTION_ILLEGAL_INSTRUCTION: return L"The thread tries to execute an invalid instruction.";
-	case EXCEPTION_IN_PAGE_ERROR: return L"The thread tries to access a page that is not present, and the system is unable to load the page. For example, this exception might occur if a network connection is lost while running a program over a network.";
-	// case EXCEPTION_INT_DIVIDE_BY_ZERO: return L"The thread attempts to divide an integer value by an integer divisor of 0 (zero).";
-	// case EXCEPTION_INT_OVERFLOW: return L"The result of an integer operation creates a value that is too large to be held by the destination register. In some cases, this will result in a carry out of the most significant bit of the result. Some operations do not set the carry flag.";
-	case EXCEPTION_INVALID_DISPOSITION: return L"An exception handler returns an invalid disposition to the exception dispatcher. Programmers using a high-level language such as C should never encounter this exception.";
-	case EXCEPTION_INVALID_HANDLE: return L"The thread used a handle to a kernel object that was invalid (probably because it had been closed.)";
-	// case EXCEPTION_NONCONTINUABLE_EXCEPTION: return L"The thread attempts to continue execution after a non-continuable exception occurs.";
-	// case EXCEPTION_PRIV_INSTRUCTION: return L"The thread attempts to execute an instruction with an operation that is not allowed in the current computer mode.";
+	case EXCEPTION_SINGLE_STEP: return L"Single Step: トレーストラップなどの単一命令メカニズムから 1 つの命令の実行が通知されました。";
 	// case EXCEPTION_SINGLE_STEP: return L"A trace trap or other single instruction mechanism signals that one instruction is executed.";
-	case EXCEPTION_STACK_OVERFLOW: return L"The thread uses up its stack.";
-	case STATUS_UNWIND_CONSOLIDATE: return L"A frame consolidation has been executed.";
+	case EXCEPTION_ARRAY_BOUNDS_EXCEEDED: return L"Array Bounds Exceede: スレッドが範囲外の配列要素にアクセスしようとしました。使用中のハードウェアは境界チェックをサポートしています。";
+	// case EXCEPTION_ARRAY_BOUNDS_EXCEEDED: return L"The thread attempts to access an array element that is out of bounds, and the underlying hardware supports bounds checking.";
+	case EXCEPTION_FLT_DENORMAL_OPERAND: return L"Denormal Operand: 浮動小数点演算のオペランドの 1 つが不正規化値です。不正規化値とは、小さすぎて標準の浮動小数点値として表現できない値です。";
+	// case EXCEPTION_FLT_DENORMAL_OPERAND: return L"One of the operands in a floating point operation is denormal. A denormal value is one that is too small to represent as a standard floating point value.";
+	case EXCEPTION_FLT_DIVIDE_BY_ZERO: return L"Divide By Zero: スレッドが浮動小数点値を 0 の浮動小数点除数で除算しようとしました。";
+	// case EXCEPTION_FLT_DIVIDE_BY_ZERO return L"The thread attempts to divide a floating point value by a floating point divisor of 0 (zero).";
+	case EXCEPTION_FLT_INEXACT_RESULT: return L"Inexact Result: 浮動小数点演算の結果を 10 進小数で正確に表現できません。";
+	// case EXCEPTION_FLT_INEXACT_RESULT: return L"The result of a floating point operation cannot be represented exactly as a decimal fraction.";
+	case EXCEPTION_FLT_INVALID_OPERATION: return L"Invalid Operation: このリストに含まれていない例外が発生しました。";
+	// case EXCEPTION_FLT_INVALID_OPERATION: return L"A floating point exception that is not included in this list.";
+	case EXCEPTION_FLT_OVERFLOW: return L"Overflow: 浮動小数点演算の指数が大きく、対応する型によって表現できません。";
+	// case EXCEPTION_FLT_OVERFLOW: return L"The exponent of a floating point operation is greater than the magnitude allowed by the corresponding type.";
+	case EXCEPTION_FLT_STACK_CHECK: return L"Stack Check: 浮動小数点演算の結果、スタックのオーバーフローまたはアンダーフローが発生しました。";
+	// case EXCEPTION_FLT_STACK_CHECK: return L"The stack has overflowed or underflowed, because of a floating point operation.";
+	case EXCEPTION_FLT_UNDERFLOW: return L"Underflow: 浮動小数点演算の指数が小さく、対応する型によって表現できません。";
+	// case EXCEPTION_FLT_UNDERFLOW: return L"The exponent of a floating point operation is less than the magnitude allowed by the corresponding type.";
+	case EXCEPTION_INT_DIVIDE_BY_ZERO: return L"Divide By Zero: スレッドが整数値を 0 の整数除数で除算しようとしました。";
+	// case EXCEPTION_INT_DIVIDE_BY_ZERO: return L"The thread attempts to divide an integer value by an integer divisor of 0 (zero).";
+	case EXCEPTION_INT_OVERFLOW: return L"Overflow: 整数演算結果の最上位ビットが繰り上がりました。";
+	// case EXCEPTION_INT_OVERFLOW: return L"The result of an integer operation creates a value that is too large to be held by the destination register. In some cases, this will result in a carry out of the most significant bit of the result. Some operations do not set the carry flag.";
+	case EXCEPTION_PRIV_INSTRUCTION: return L"Priv Instruction: 現在のマシンモードで許可されていない演算を行う命令をスレッドが実行しようとしました。";
+	// case EXCEPTION_PRIV_INSTRUCTION: return L"The thread attempts to execute an instruction with an operation that is not allowed in the current computer mode.";
+	case EXCEPTION_NONCONTINUABLE_EXCEPTION: return L"Noncontinuable Exception: 継続不可能な例外が発生した後、スレッドが実行を継続しようとしました。";
+	// case EXCEPTION_NONCONTINUABLE_EXCEPTION: return L"The thread attempts to continue execution after a non-continuable exception occurs.";
+
+	case EXCEPTION_GUARD_PAGE: return L"Guard Page: The thread accessed memory allocated with the PAGE_GUARD modifier.";
+	case EXCEPTION_ILLEGAL_INSTRUCTION: return L"Illegal Instruction: The thread tries to execute an invalid instruction.";
+	case EXCEPTION_IN_PAGE_ERROR: return L"In Page Error: The thread tries to access a page that is not present, and the system is unable to load the page. For example, this exception might occur if a network connection is lost while running a program over a network.";
+	case EXCEPTION_INVALID_DISPOSITION: return L"Invalid Disposition: An exception handler returns an invalid disposition to the exception dispatcher. Programmers using a high-level language such as C should never encounter this exception.";
+	case EXCEPTION_INVALID_HANDLE: return L"Invalid Handle: The thread used a handle to a kernel object that was invalid (probably because it had been closed.)";
+	case EXCEPTION_STACK_OVERFLOW: return L"Stack Overflow: The thread uses up its stack.";
+	case STATUS_UNWIND_CONSOLIDATE: return L"Unwind Consolidate: A frame consolidation has been executed.";
 	}
 	return L"Unknown";
 }
-extern void TVPHandleSEHException( int ErrorCode, EXCEPTION_RECORD *P, unsigned long osEsp, PCONTEXT ctx);
+
 bool tTVPApplication::StartApplication( int argc, char* argv[] ) {
 	_set_se_translator(se_translator_function);
 
@@ -378,11 +417,9 @@ bool tTVPApplication::StartApplication( int argc, char* argv[] ) {
 	} catch( const SEHException& e ) {
 		PEXCEPTION_RECORD rec = e.ExceptionPointers->ExceptionRecord;
 		std::wstring text(SECodeToMessage(e.Code));
-		
 		ttstr result = TJSGetStackTraceString( 10 );
 		PrintConsole( result.c_str(), result.length() );
 
-		TVPHandleSEHException( e.Code, e.ExceptionPointers->ExceptionRecord, e.ExceptionPointers->ContextRecord->Esp, e.ExceptionPointers->ContextRecord );
 		TVPDumpHWException();
 		ShowException( text.c_str() );
 	} catch(...) {
@@ -525,7 +562,6 @@ bool tTVPApplication::ProcessMessage( MSG &msg ) {
 		}
 		result = true;
 		if( msg.message != WM_QUIT ) {
-//			wprintf(L"0x%08x\n",msg.message);
 			HACCEL hAccelTable = accel_key_.GetHandle(msg.hwnd);
 			if( !TranslateAccelerator(msg.hwnd, hAccelTable, &msg) ) {
 				TranslateMessage(&msg);
@@ -584,6 +620,14 @@ void tTVPApplication::GetDisableWindowList( std::vector<class TTVPWindowForm*>& 
 		}
 	}
 }
+void tTVPApplication::GetEnableWindowList( std::vector<class TTVPWindowForm*>& win, class TTVPWindowForm* activeWindow ) {
+	size_t count = windows_list_.size();
+	for( size_t i = 0; i < count; i++ ) {
+		if( activeWindow != windows_list_[i] && windows_list_[i]->GetEnable() ) {
+			win.push_back( windows_list_[i] );
+		}
+	}
+}
 
 void tTVPApplication::DisableWindows() {
 	size_t count = windows_list_.size();
@@ -591,7 +635,12 @@ void tTVPApplication::DisableWindows() {
 		windows_list_[i]->SetEnable( false );
 	}
 }
-void tTVPApplication::EnableWindows( const  std::vector<TTVPWindowForm*>& ignores ) {
+void tTVPApplication::EnableWindows( const std::vector<TTVPWindowForm*>& win ) {
+	size_t count = win.size();
+	for( size_t i = 0; i < count; i++ ) {
+		win[i]->SetEnable( true );
+	}
+	/*
 	size_t count = windows_list_.size();
 	for( size_t i = 0; i < count; i++ ) {
 		TTVPWindowForm* win = windows_list_[i];
@@ -600,6 +649,7 @@ void tTVPApplication::EnableWindows( const  std::vector<TTVPWindowForm*>& ignore
 			windows_list_[i]->SetEnable( true );
 		}
 	}
+	*/
 }
 void tTVPApplication::FreeDirectInputDeviceForWindows() {
 	size_t count = windows_list_.size();
