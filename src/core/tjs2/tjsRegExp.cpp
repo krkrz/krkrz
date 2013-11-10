@@ -178,24 +178,23 @@ void replace_regex( tTJSVariant **param, tjs_int numparams, tTJSNI_RegExp *_this
 		func = true;
 	}
 	// grep thru target string
-	tjs_int lastpos = 0;
-	tjs_int targlen = target.GetLen();
+	bool isreplaceall = (_this->Flags & globalsearch) != 0;
 	OnigRegion* region = onig_region_new();
 	const tjs_char* s = target.c_str();
-	const tjs_char* send = s + targlen;
+	const tjs_char* send = s + target.GetLen();
 	int r = onig_search( _this->RegEx, (UChar*)s, (UChar*)send, (UChar*)s, (UChar*)send, region, ONIG_OPTION_NONE );
-	int lastm = 0;
 	if( r >= 0 ) { // match
-		//ttstr res;
 		do {
-			tjs_int pos = region->beg[0];
-			tjs_int len = region->end[0] - region->beg[0];
-			if( pos > lastpos )
-				res += ttstr(target.c_str() + lastpos, pos - lastpos);
-
+			tjs_int pos = region->beg[0]/sizeof(tjs_char);
+			tjs_int end = region->end[0]/sizeof(tjs_char);
 			if( !func ) {
+				res = ttstr(s,pos);
 				res += to;
+				if( (s+end) < send ) {
+					res += ttstr(s+end);
+				}
 			} else {
+				res = ttstr(s,pos);
 				// call the callback function descripted as param[1]
 				tTJSVariant result;
 				tjs_error hr;
@@ -210,13 +209,16 @@ void replace_regex( tTJSVariant **param, tjs_int numparams, tTJSNI_RegExp *_this
 				}
 				result.ToString();
 				res += result.GetString();
+				if( (s+end) < send ) {
+					res += ttstr(s+end);
+				}
 			}
-			lastpos = pos + len;
-			s += region->end[0];
-			lastm = region->end[0];
+			if( isreplaceall ) {
+				s = res.c_str();
+				send = s + res.GetLen();
+			}
 			onig_region_free( region, 0  );
-		} while( onig_search( _this->RegEx, (UChar*)s, (UChar*)send, (UChar*)s, (UChar*)send, region, ONIG_OPTION_NONE ) >= 0 );
-
+		} while( isreplaceall && onig_search( _this->RegEx, (UChar*)s, (UChar*)send, (UChar*)s, (UChar*)send, region, ONIG_OPTION_NONE ) >= 0 );
 	}
 	onig_region_free( region, 1  );
 }
@@ -911,7 +913,7 @@ iTJSDispatch2 * tTJSNC_RegExp::GetResultArray( bool matched, const ttstr& target
 			try {
 				for( tjs_uint i = 0; i < size; i++ ) {
 					tTJSVariant val;
-					val = ttstr( target.c_str()+region->beg[i], region->end[i] - region->beg[i] );
+					val = ttstr( target.c_str()+(region->beg[i]/sizeof(tjs_char)), (region->end[i] - region->beg[i])/sizeof(tjs_char) );
 					array->PropSetByNum(TJS_MEMBERENSURE|TJS_IGNOREPROP, i, &val, array);
 				}
 			} catch(...) {
