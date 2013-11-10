@@ -650,9 +650,17 @@ void tTJSVariantArrayStack::InternalCompact(void)
 		if(NumArraysUsing == 0)
 		{
 			if(Arrays) TJS_free(Arrays), Arrays = NULL;
+			Current = NULL;
 		}
 		else
 		{
+			bool availableoffset = false;
+			size_t offset = 0;
+			if( Current != NULL && Arrays != NULL ) {
+				offset = (size_t)Current - (size_t)Arrays;
+				availableoffset = true;
+			}
+
 			tVariantArray* arraytmp = (tVariantArray*)
 				TJS_realloc(Arrays, sizeof(tVariantArray)*(NumArraysUsing));
 			if( arraytmp != NULL ) {
@@ -660,7 +668,12 @@ void tTJSVariantArrayStack::InternalCompact(void)
 			} else if( NumArraysUsing > 0 ) {
 				TJS_eTJSError(TJSInternalError);
 			}
-			Current = NULL;
+
+			if( availableoffset && Arrays != NULL ) {
+				Current = Arrays + offset;
+			} else {
+				Current = NULL;
+			}
 		}
 	}
 	catch(...)
