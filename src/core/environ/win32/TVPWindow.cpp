@@ -244,10 +244,12 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		
 	case WM_SETFOCUS:
 		OnFocus( reinterpret_cast<HWND>(wParam) );
-		return ::DefWindowProc(hWnd,msg,wParam,lParam);
+		//return ::DefWindowProc(hWnd,msg,wParam,lParam);
+		return 0;
 	case WM_KILLFOCUS:
 		OnFocusLost( reinterpret_cast<HWND>(wParam) );
-		return ::DefWindowProc(hWnd,msg,wParam,lParam);
+		//return ::DefWindowProc(hWnd,msg,wParam,lParam);
+		return 0;
 	case WM_GETMINMAXINFO:
 		if( min_size_.cx != 0 ||  min_size_.cy != 0 || max_size_.cx != 0 || max_size_.cy != 0 ) {
 			MINMAXINFO* lpmmi = (LPMINMAXINFO)lParam;
@@ -784,66 +786,47 @@ int tTVPWindow::ShowModal() {
 	if( GetVisible() || !GetEnable() ) {
 		throw Exception(TJS_W("Cannot Show Modal."));
 	}
+	if( Application->GetWindowCount() == 1 ) {
+		// 1個しか Windowがない時はModal化する意味がないのと、不具合の元なので例外発生
+		throw Exception(TJS_W("Cannot Show Modal. When it is single window."));
+	}
+	if( InMode == false ) InMode = true;
 	if( ::GetCapture() != 0 ) {
 		::SendMessage( ::GetCapture(), WM_CANCELMODE, 0, 0 );
 	}
 	::ReleaseCapture();
 	Application->ModalStarted();
-	std::vector<class TTVPWindowForm*> disablewins; // TODO アクティブウィンドウを得て処理する方がスマートか？
+	std::vector<class TTVPWindowForm*> enableWindows;
 	try {
-		//HWND hActiveWnd = ::GetActiveWindow();
-		Application->GetDisableWindowList( disablewins );
+		Application->GetEnableWindowList( enableWindows, NULL );
 		Application->DisableWindows();
-		SetEnable( true );
+		//SetEnable( true );
 		Show();
-		SetActiveWindow( GetHandle() );
+		::SetActiveWindow( GetHandle() );
+		SetEnable( true );
 		ModalResult = 0;
-
-		MSG msg;
-		HACCEL hAccelTable = ::LoadAccelerators( (HINSTANCE)GetModuleHandle(0), MAKEINTRESOURCE(IDC_TVPWIN32));
-
-		HWND hSelfWnd = GetHandle();
-		BOOL ret = TRUE;
 		while( ModalResult == 0 ) {
-#if 0
-			ret = TRUE;
-			while( ModalResult == 0 && ::PeekMessage( &msg, hSelfWnd, 0, 0, PM_NOREMOVE) ) {
-				ret = ::GetMessage( &msg, hSelfWnd, 0, 0);
-				if( ret && !TranslateAccelerator(msg.hwnd, hAccelTable, &msg) ) {
-					TranslateMessage(&msg);
-					DispatchMessage(&msg);
-				}
-				if( ret == 0 ) break;
-			}
-			if( ret == 0 ) break;
-			if( ModalResult != 0 ) {
-				closeModal();
-			}
-			ret = ::GetMessage( &msg, hSelfWnd, 0, 0);
-			if( ret && !TranslateAccelerator(msg.hwnd, hAccelTable, &msg) ) {
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
-			if( ret == 0 ) break;
-#else
 			Application->HandleMessage();
 			if( Application->IsTarminate() ) {
 				ModalResult = mrCancel;
 			} else if( ModalResult != 0 ) {
 				closeModal();
 			}
-#endif
 		}
-		Application->EnableWindows( disablewins );
-		disablewins.clear();
+		Application->EnableWindows( enableWindows );
+		enableWindows.clear();
 	} catch(...) {
-		if( disablewins.size() > 0 ) {
-			Application->EnableWindows( disablewins );
+		if( enableWindows.size() > 0 ) {
+			Application->EnableWindows( enableWindows );
 		}
+		enableWindows.clear();
 		Application->ModalFinished();
+		InMode = false;
+		Hide();
 		throw;
 	}
 	Application->ModalFinished();
-
+	InMode = false;
+	Hide();
 	return ModalResult;
 }

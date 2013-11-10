@@ -147,7 +147,7 @@ public:
 //-- properties
 	bool GetVisible() const;
 	void SetVisible(bool s);
-	void Show() { SetVisible( true ); }
+	void Show() { SetVisible( true ); BringToFront(); }
 	void Hide() { SetVisible( false ); }
 
 	bool GetEnable() const;

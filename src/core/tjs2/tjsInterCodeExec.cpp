@@ -653,8 +653,14 @@ void tTJSVariantArrayStack::InternalCompact(void)
 		}
 		else
 		{
-			Arrays = (tVariantArray*)
+			tVariantArray* arraytmp = (tVariantArray*)
 				TJS_realloc(Arrays, sizeof(tVariantArray)*(NumArraysUsing));
+			if( arraytmp != NULL ) {
+				Arrays = arraytmp;
+			} else if( NumArraysUsing > 0 ) {
+				TJS_eTJSError(TJSInternalError);
+			}
+			Current = NULL;
 		}
 	}
 	catch(...)
