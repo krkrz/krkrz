@@ -27,12 +27,14 @@ private:
 	HWND hWnd_;
 	HIMC hOldImc_;
 	bool default_open_;
+	int mode_;
 
 public:
 	ImeControl( HWND hWnd ) {
 		hWnd_ = hWnd;
-		default_open_ = IsOpen();
 		hOldImc_ = INVALID_HANDLE_VALUE;
+		mode_ = ModeDontCare;
+		default_open_ = IsOpen();
 	}
 	~ImeControl() {
 	}
@@ -76,11 +78,16 @@ public:
 		y = pt.y;
 	}
 	void Reset() {
+		if( mode_ == ModeDisable ) {
+			Open();
+		}
+		/*
 		if( default_open_ ) {
 			Open();
 		} else {
 			Close();
 		}
+		*/
 	}
 	/**
 	 このスレッドのIMEを無効にする
@@ -181,6 +188,7 @@ imHanguel を指定すると、IMEは有効になり、2バイト韓国語入力を受け付けるモードにな
 	}
 	*/
 	void SetIme( int mode ) {
+		mode_ = mode;
 		HIMC hImc = ::ImmGetContext(hWnd_);
 		DWORD conversion, sentence;
 		::ImmGetConversionStatus( hImc, &conversion, &sentence );
