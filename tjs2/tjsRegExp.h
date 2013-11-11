@@ -70,6 +70,7 @@ public:
 };
 //---------------------------------------------------------------------------
 extern iTJSDispatch2 * TJSCreateRegExpClass();
+extern void TJSReleaseRegex();
 //---------------------------------------------------------------------------
 
 } // namespace TJS
