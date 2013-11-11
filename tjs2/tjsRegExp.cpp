@@ -215,6 +215,8 @@ void replace_regex( tTJSVariant **param, tjs_int numparams, tTJSNI_RegExp *_this
 		if( s < send ) {
 			res += ttstr(s,send-s);
 		}
+	} else {
+		res += ttstr(s,send-s);
 	}
 	onig_region_free( region, 1  );
 }
@@ -240,6 +242,9 @@ iTJSDispatch2* split_regex( const ttstr &target, iTJSDispatch2 * array, tTJSNI_R
 			tTJSVariant val = ttstr( s, send-s );
 			array->PropSetByNum(TJS_MEMBERENSURE, storecount++, &val, array);
 		}
+	} else {
+		tTJSVariant val = ttstr( s, send-s );
+		array->PropSetByNum(TJS_MEMBERENSURE, storecount++, &val, array);
 	}
 	onig_region_free( region, 1  );
 	return array;
