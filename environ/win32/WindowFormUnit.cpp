@@ -208,8 +208,12 @@ TTVPWindowForm::TTVPWindowForm( tTVPApplication* app, tTJSNI_Window* ni ) : tTVP
 	InnerWidthSave = GetInnerWidth();
 	InnerHeightSave = GetInnerHeight();
 
+
+	AttentionPointEnabled = false;
+	AttentionPoint.x = 0;
+	AttentionPoint.y = 0;
 	AttentionFont = new tTVPSysFont();
-	
+
 	ZoomDenom = ActualZoomDenom = 1;
 	ZoomNumer = ActualZoomNumer = 1;
 
@@ -1479,7 +1483,7 @@ void TTVPWindowForm::ResetImeMode() {
 }
 
 void TTVPWindowForm::SetAttentionPoint(tjs_int left, tjs_int top, const tTVPFont * font) {
-	OffsetClientPoint( left, top );
+	// OffsetClientPoint( left, top );
 
 	// set attention point information
 	AttentionPoint.x = left;
@@ -1530,6 +1534,9 @@ void TTVPWindowForm::OnKeyUp( WORD vk, int shift ) {
 void TTVPWindowForm::OnKeyPress( WORD vk, int repeat, bool prevkeystate, bool convertkey ) {
 	if( TJSNativeInstance && vk ) {
 		if(UseMouseKey && (vk == 0x1b || vk == 13 || vk == 32)) return;
+		// UNICODE ‚È‚Ì‚Å‚»‚Ì‚Ü‚Ü“n‚µ‚Ä‚µ‚Ü‚¤
+		TVPPostInputEvent(new tTVPOnKeyPressInputEvent(TJSNativeInstance, vk));
+#if 0
 		if( PendingKeyCodes.empty() != true ) {
 			// pending keycode
 			PendingKeyCodes += static_cast<char>(vk);
@@ -1553,6 +1560,7 @@ void TTVPWindowForm::OnKeyPress( WORD vk, int repeat, bool prevkeystate, bool co
 				PendingKeyCodes = std::string(key);
 			}
 		}
+#endif
 	}
 }
 void TTVPWindowForm::TranslateWindowToPaintBox(int &x, int &y) {
