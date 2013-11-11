@@ -483,46 +483,42 @@ void tTVPWindow::SetCaption( const std::wstring& v ) {
 }
 
 void tTVPWindow::SetBorderStyle(tTVPBorderStyle st) {
-	const DWORD notStyle = WS_POPUP | WS_CAPTION | WS_BORDER | WS_THICKFRAME | WS_DLGFRAME;
+	const DWORD notStyle = WS_POPUP | WS_CAPTION | WS_BORDER | WS_THICKFRAME | WS_DLGFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU;
 	DWORD style = ::GetWindowLong( GetHandle(), GWL_STYLE);
+	style &= ~notStyle;
 	DWORD exStyle = ::GetWindowLong( GetHandle(), GWL_EXSTYLE);
+	exStyle &= ~DEFAULT_EX_STYLE;
 	border_style_ = static_cast<int>(st);
 	switch( st ) {
 	case bsDialog:
-		style = ~notStyle;
-		style = WS_DLGFRAME | WS_POPUP | WS_CAPTION;
-		exStyle &= ~DEFAULT_EX_STYLE;
+		style |= WS_DLGFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU;
 		exStyle |= WS_EX_DLGMODALFRAME | WS_EX_WINDOWEDGE;
 		break;
 	case bsSingle:
-		style = ~notStyle;
-		style = WS_CAPTION | WS_BORDER;
-		style |= WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU | WS_EX_CONTEXTHELP; // 必要みたい
-		exStyle &= ~DEFAULT_EX_STYLE;
+		style |= WS_CAPTION | WS_BORDER;
+		style |= WS_MINIMIZEBOX | WS_SYSMENU;
 		break;
 	case bsNone:
-		style = ~notStyle;
-		style = WS_POPUP;
-		style |= WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU | WS_EX_CONTEXTHELP; // 必要みたい
-		exStyle &= ~DEFAULT_EX_STYLE;
+		style |= WS_POPUP;
+		style |= WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU;
 		break;
 	case bsSizeable:
-		style = ~notStyle;
-		style = WS_OVERLAPPED;
-		style |= WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU | WS_EX_CONTEXTHELP; // 必要みたい
-		exStyle &= ~DEFAULT_EX_STYLE;
+		style |= WS_CAPTION | WS_THICKFRAME;
+		style |= WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU;
 		break;
 	case bsToolWindow:
-		style = ~notStyle;
-		style = WS_CAPTION | WS_BORDER;
-		exStyle &= ~DEFAULT_EX_STYLE;
+		style |= WS_CAPTION | WS_BORDER;
+		style |= WS_SYSMENU;
 		exStyle |= WS_EX_TOOLWINDOW;
 		break;
 	case bsSizeToolWin:
-		style = ~notStyle;
-		style = WS_CAPTION | WS_THICKFRAME;
-		exStyle &= ~DEFAULT_EX_STYLE;
+		style |= WS_CAPTION | WS_THICKFRAME;
+		style |= WS_SYSMENU;
 		exStyle |= WS_EX_TOOLWINDOW;
+		break;
+	default:
+		style = ::GetWindowLong( GetHandle(), GWL_STYLE);
+		exStyle = ::GetWindowLong( GetHandle(), GWL_EXSTYLE);
 		break;
 	}
 	::SetWindowLong( GetHandle(), GWL_STYLE, style );
