@@ -29,7 +29,7 @@
 #include "tjsDebug.h"
 #include "tjsByteCodeLoader.h"
 #include "tjsBinarySerializer.h"
-
+#include "tjsRegExp.h"
 
 namespace TJS
 {
@@ -221,6 +221,8 @@ void tTJS::Cleanup()
 	TJSReservedWordsHashRelease();
 
 	TJSReleaseGlobalStringMap();
+
+	TJSReleaseRegex();
 
 	if(TJSEnableDebugMode)
 	{
