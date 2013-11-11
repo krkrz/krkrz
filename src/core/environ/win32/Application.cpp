@@ -199,7 +199,7 @@ void AcceleratorKey::DelKey( WORD id ) {
 int APIENTRY WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow ) {
 	try {
 		CheckMemoryLeaksStart();
-		//_CrtSetBreakAlloc(6969);
+		// ウォッチで _crtBreakAlloc にセットする
 
 		// XP より後で使えるAPIを動的に読み込んで互換性を取る
 		TVPInitCompatibleNativeFunctions();

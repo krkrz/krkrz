@@ -232,12 +232,15 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		}
 		return ::DefWindowProc(hWnd,msg,wParam,lParam);	
 		*/
+	case WM_SYSKEYDOWN:
 	case WM_KEYDOWN:
 		OnKeyDown( (WORD)wParam, GetShiftState(), lParam&0xffff, (lParam&(1<<30))?true:false );
 		return ::DefWindowProc(hWnd,msg,wParam,lParam);
+	case WM_SYSKEYUP:
 	case WM_KEYUP:
 		OnKeyUp( (WORD)wParam, GetShiftState() );
 		return ::DefWindowProc(hWnd,msg,wParam,lParam);
+	case WM_SYSCHAR:
 	case WM_CHAR:
 		OnKeyPress( (WORD)wParam, lParam&0xffff, (lParam&(1<<30))?true:false, (lParam&(1<<31))?true:false );
 		return 0;

@@ -89,7 +89,7 @@ protected:
 	virtual void OnPaint();
 
 	inline int GetAltKeyState() const {
-		if( ::GetKeyState( VK_MENU  ) ) {
+		if( ::GetKeyState( VK_MENU  ) < 0 ) {
 			return MK_ALT;
 		} else {
 			return 0;
@@ -102,9 +102,9 @@ protected:
 	}
 	inline int GetShiftState() const {
 		int shift = 0;
-		if( ::GetKeyState( VK_MENU  ) ) shift |= MK_ALT;
-		if( ::GetKeyState( VK_SHIFT ) ) shift |= MK_SHIFT;
-		if( ::GetKeyState( VK_CONTROL ) ) shift |= MK_CONTROL;
+		if( ::GetKeyState( VK_MENU  ) < 0 ) shift |= MK_ALT;
+		if( ::GetKeyState( VK_SHIFT ) < 0 ) shift |= MK_SHIFT;
+		if( ::GetKeyState( VK_CONTROL ) < 0 ) shift |= MK_CONTROL;
 		return shift;
 	}
 	
