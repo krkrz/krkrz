@@ -418,7 +418,7 @@ bool tTVPApplication::StartApplication( int argc, char* argv[] ) {
 		PEXCEPTION_RECORD rec = e.ExceptionPointers->ExceptionRecord;
 		std::wstring text(SECodeToMessage(e.Code));
 		ttstr result = TJSGetStackTraceString( 10 );
-		PrintConsole( result.c_str(), result.length() );
+		PrintConsole( result.c_str(), result.length(), true );
 
 		TVPDumpHWException();
 		ShowException( text.c_str() );
@@ -445,6 +445,28 @@ void tTVPApplication::CheckConsole() {
 	if (_fileno(stdin)  == -2 || ::GetStdHandle(STD_INPUT_HANDLE) == 0) state |= 0x01;
 	if (_fileno(stdout) == -2 || ::GetStdHandle(STD_OUTPUT_HANDLE) == 0) state |= 0x02;
 	if (_fileno(stderr) == -2 || ::GetStdHandle(STD_ERROR_HANDLE) == 0) state |= 0x04;
+	DWORD mode;
+	if( (state&0x01)==0 ) {
+		mode = 0;
+		BOOL ret = ::GetConsoleMode( ::GetStdHandle(STD_INPUT_HANDLE), &mode );
+		if( ret == 0 || mode == 0 ) { // ENABLE_LINE_INPUT とのマスクのほう良い？
+			state |= 0x01;
+		}
+	}
+	if( (state&0x02)==0 ) {
+		mode = 0;
+		BOOL ret = ::GetConsoleMode( ::GetStdHandle(STD_OUTPUT_HANDLE), &mode );
+		if( ret == 0 || mode == 0 ) { // ENABLE_PROCESSED_OUTPUT とのマスクのほう良い？
+			state |= 0x02;
+		}
+	}
+	if( (state&0x04)==0 ) {
+		mode = 0;
+		BOOL ret = ::GetConsoleMode( ::GetStdHandle(STD_ERROR_HANDLE), &mode );
+		if( ret == 0 || mode == 0 ) { // ENABLE_PROCESSED_OUTPUT とのマスクのほう良い？
+			state |= 0x04;
+		}
+	}
 
 	if( state && ::AttachConsole(ATTACH_PARENT_PROCESS) ) {
 		if ((state & 0x01)) _wfreopen_s( &newstdin_, L"CON", L"r", stdin );     // 標準入力の割り当て
@@ -456,9 +478,6 @@ void tTVPApplication::CheckConsole() {
 		wchar_t console[256];
 		::GetConsoleTitle( console, 256 );
 		console_title_ = std::wstring( console );
-
-		//printf( __argv[0] );
-		//printf("\n");
 	}
 #endif
 }
@@ -472,32 +491,57 @@ void tTVPApplication::CloseConsole() {
 		::FreeConsole();
 	}
 }
-void tTVPApplication::PrintConsole( const wchar_t* mes, unsigned long len ) {
-	HANDLE hStdError = ::GetStdHandle(STD_ERROR_HANDLE);
-	if (hStdError > 0) {
-#if 0
-		fwprintf(stderr, L"%.*s\n", len, mes);
-#else
-		// wprintf だと適切に処理されない
-		ttstr str = mes;
-		tjs_int len = str.GetNarrowStrLen();
-		tjs_nchar *dat = new tjs_nchar[len+1];
-		try {
-			str.ToNarrowStr(dat, len+1);
-		}
-		catch(...)	{
+void tTVPApplication::PrintConsole( const wchar_t* mes, unsigned long len, bool iserror ) {
+	if( iserror ) {
+		HANDLE hStdError = ::GetStdHandle(STD_ERROR_HANDLE);
+		if (hStdError > 0) {
+			// wprintf だと適切に処理されない
+			ttstr str = mes;
+			tjs_int len = str.GetNarrowStrLen();
+			tjs_nchar *dat = new tjs_nchar[len+1];
+			try {
+				str.ToNarrowStr(dat, len+1);
+			}
+			catch(...)	{
+				delete [] dat;
+				throw;
+			} 
+			fprintf(stderr, "%s\n", dat);
 			delete [] dat;
-			throw;
-		} 
-		fprintf(stderr, "%s\n", dat);
-		delete [] dat;
-#endif
-		fflush(stderr);
 
-		// WriteConsole だとファイルや mintty でうまく動かない
-		//DWORD wlen;
-		//::WriteConsoleW( hStdOutput, mes, len, &wlen, NULL );
-		//::WriteConsoleW( hStdOutput, L"\n", 1, &wlen, NULL );
+			fflush(stderr);
+
+			// WriteConsole だとファイルや mintty でうまく動かない
+			/*
+			DWORD wlen;
+			::WriteConsoleW( hStdError, mes, len, &wlen, NULL );
+			::WriteConsoleW( hStdError, L"\n", 1, &wlen, NULL );
+			*/
+		}
+	} else {
+		HANDLE hStdOut = ::GetStdHandle(STD_OUTPUT_HANDLE);
+		if (hStdOut > 0) {
+			// wprintf だと適切に処理されない
+			ttstr str = mes;
+			tjs_int len = str.GetNarrowStrLen();
+			tjs_nchar *dat = new tjs_nchar[len+1];
+			try {
+				str.ToNarrowStr(dat, len+1);
+			}
+			catch(...)	{
+				delete [] dat;
+				throw;
+			} 
+			fprintf(stdout, "%s\n", dat);
+			delete [] dat;
+			fflush(stdout);
+			
+			/*
+			DWORD wlen;
+			::WriteConsoleW( hStdOut, mes, len, &wlen, NULL );
+			::WriteConsoleW( hStdOut, L"\n", 1, &wlen, NULL );
+			*/
+		}
 	}
 #ifdef _DEBUG
 	::OutputDebugString( mes );
