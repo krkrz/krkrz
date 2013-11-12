@@ -84,7 +84,7 @@ public:
 	~tTVPApplication();
 	bool StartApplication( int argc, char* argv[] );
 
-	void PrintConsole( const wchar_t* mes, unsigned long len );
+	void PrintConsole( const wchar_t* mes, unsigned long len, bool iserror = false );
 	bool IsAttachConsole() { return is_attach_console_; }
 
 	bool IsTarminate() const { return tarminate_; }
