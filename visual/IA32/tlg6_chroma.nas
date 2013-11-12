@@ -290,19 +290,19 @@ proc_start	FUNCTION_LABEL
 	test	byte [%$dir],	1
 	IF	nz
 		; forward processing
-	mov	dword [%$step],	8
-	mov	eax,	[%$skipblockbytes]
+	mov	dword [%$$step],	8
+	mov	eax,	[%$$skipblockbytes]
 	lea	eax,	[eax*4-(TVP_TLG6_W_BLOCK_SIZE)*4]
-	mov	[%$skipblockbytes],	eax
+	mov	[%$$skipblockbytes],	eax
 	ELSE
 		; backward processing
-	mov	dword [%$step],	-8
-	mov	eax,	[%$skipblockbytes]
+	mov	dword [%$$step],	-8
+	mov	eax,	[%$$skipblockbytes]
 	lea	eax,	[eax*4+(TVP_TLG6_W_BLOCK_SIZE)*4]
-	mov	[%$skipblockbytes],	eax
-	mov	eax,	[%$input]
+	mov	[%$$skipblockbytes],	eax
+	mov	eax,	[%$$input]
 	add	eax,	byte (TVP_TLG6_W_BLOCK_SIZE - 1)*4
-	mov	[%$input],	eax
+	mov	[%$$input],	eax
 	ENDIF
 
 	%if   TVP_TLG6_W_BLOCK_SIZE == 16
@@ -331,10 +331,10 @@ proc_start	FUNCTION_LABEL
 	xor	[%$phase],	byte 1
 	IF	z
 		; odd phase
-	add	eax,	[%$oddskip]
+	add	eax,	[%$$oddskip]
 	ELSE
 		; even phase
-	sub	eax,	[%$oddskip]
+	sub	eax,	[%$$oddskip]
 	ENDIF
 	inc	dword [%$filtertypes]
 	test	byte [%$dir],	1
