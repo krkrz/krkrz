@@ -444,8 +444,23 @@ void tTVPApplication::CheckConsole() {
 	HANDLE hin  = ::GetStdHandle(STD_INPUT_HANDLE);
 	HANDLE hout = ::GetStdHandle(STD_OUTPUT_HANDLE);
 	HANDLE herr = ::GetStdHandle(STD_ERROR_HANDLE);
-	// ハンドルが割り当てられてなければコンソールをアタッチする
-	if( (hin==0||hout==0||herr==0) && ::AttachConsole(ATTACH_PARENT_PROCESS) ) {
+
+	DWORD curProcId = ::GetCurrentProcessId();
+	DWORD processList[256];
+	DWORD count = ::GetConsoleProcessList( processList, 256 );
+	bool thisProcHasConsole = false;
+	for( DWORD i = 0; i < count; i++ ) {
+		if( processList[i] == curProcId ) {
+			thisProcHasConsole = true;
+			break;
+		}
+	}
+	bool attachedConsole = true;
+	if( thisProcHasConsole == false ) {
+		attachedConsole = ::AttachConsole(ATTACH_PARENT_PROCESS) != 0;
+	}
+
+	if( (hin==0||hout==0||herr==0) && attachedConsole ) {
 		is_attach_console_ = true;
 		wchar_t console[256];
 		::GetConsoleTitle( console, 256 );
@@ -458,11 +473,9 @@ void tTVPApplication::CheckConsole() {
 #endif
 }
 
-#include <Shlwapi.h>
-
 void tTVPApplication::CloseConsole() {
 	wchar_t buf[100];
-	DWORD len = wnsprintf(buf, 100, TVPExitCode, TVPTerminateCode);
+	DWORD len = TJS_snprintf(buf, 100, TVPExitCode, TVPTerminateCode);
 	PrintConsole(buf, len);
 	if( is_attach_console_ ) {
 		::SetConsoleTitle( console_title_.c_str() );
