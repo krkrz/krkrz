@@ -475,8 +475,26 @@ void tTVPApplication::CloseConsole() {
 void tTVPApplication::PrintConsole( const wchar_t* mes, unsigned long len ) {
 	HANDLE hStdError = ::GetStdHandle(STD_ERROR_HANDLE);
 	if (hStdError > 0) {
+#if 0
 		fwprintf(stderr, L"%.*s\n", len, mes);
+#else
+		// wprintf だと適切に処理されない
+		ttstr str = mes;
+		tjs_int len = str.GetNarrowStrLen();
+		tjs_nchar *dat = new tjs_nchar[len+1];
+		try {
+			str.ToNarrowStr(dat, len+1);
+		}
+		catch(...)	{
+			delete [] dat;
+			throw;
+		} 
+		fprintf(stderr, "%s\n", dat);
+		delete [] dat;
+#endif
 		fflush(stderr);
+
+		// WriteConsole だとファイルや mintty でうまく動かない
 		//DWORD wlen;
 		//::WriteConsoleW( hStdOutput, mes, len, &wlen, NULL );
 		//::WriteConsoleW( hStdOutput, L"\n", 1, &wlen, NULL );
