@@ -418,7 +418,7 @@ bool tTVPApplication::StartApplication( int argc, char* argv[] ) {
 		PEXCEPTION_RECORD rec = e.ExceptionPointers->ExceptionRecord;
 		std::wstring text(SECodeToMessage(e.Code));
 		ttstr result = TJSGetStackTraceString( 10 );
-		PrintConsole( result.c_str(), result.length() );
+		PrintConsole( result.c_str(), result.length(), true );
 
 		TVPDumpHWException();
 		ShowException( text.c_str() );
@@ -470,15 +470,15 @@ void tTVPApplication::CloseConsole() {
 	}
 }
 
-void tTVPApplication::PrintConsole( const wchar_t* mes, unsigned long len ) {
-	HANDLE hStdError = ::GetStdHandle(STD_ERROR_HANDLE);
-	if (hStdError > 0) {
+void tTVPApplication::PrintConsole( const wchar_t* mes, unsigned long len, bool iserror ) {
+	HANDLE hStdOutput = ::GetStdHandle(iserror ? STD_ERROR_HANDLE : STD_OUTPUT_HANDLE);
+	if (hStdOutput > 0) {
 		DWORD mode;
-		if (GetConsoleMode(hStdError, &mode)) {
+		if (GetConsoleMode(hStdOutput, &mode)) {
 			// 実コンソール
 			DWORD wlen;
-			::WriteConsoleW( hStdError, mes, len, &wlen, NULL );
-			::WriteConsoleW( hStdError, L"\n", 1, &wlen, NULL );
+			::WriteConsoleW( hStdOutput, mes, len, &wlen, NULL );
+			::WriteConsoleW( hStdOutput, L"\n", 1, &wlen, NULL );
 		} else {
 			// その他のハンドル
 			ttstr str = mes;
@@ -492,8 +492,8 @@ void tTVPApplication::PrintConsole( const wchar_t* mes, unsigned long len ) {
 				throw;
 			} 
 			DWORD wlen;
-			::WriteFile( hStdError, dat, len, &wlen, NULL );
-			::WriteFile( hStdError, "\n", 1, &wlen, NULL );
+			::WriteFile( hStdOutput, dat, len, &wlen, NULL );
+			::WriteFile( hStdOutput, "\n", 1, &wlen, NULL );
 			//fprintf(stderr, "%s\n", dat);
 			delete [] dat;
 		}
