@@ -64,9 +64,6 @@ class tTVPApplication {
 	std::wstring title_;
 
 	bool is_attach_console_;
-	FILE* newstdin_;
-	FILE* newstdout_;
-	FILE* newstderr_;
 	std::wstring console_title_;
 	AcceleratorKeyTable accel_key_;
 	bool tarminate_;
