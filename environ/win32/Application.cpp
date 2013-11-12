@@ -229,7 +229,7 @@ int APIENTRY WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	return TVPTerminateCode;
 }
 tTVPApplication::tTVPApplication() : is_attach_console_(false), tarminate_(false), ApplicationActivating(true)
-	 , ImageLoadThread(NULL), newstdin_(NULL), newstdout_(NULL), newstderr_(NULL) {
+	 , ImageLoadThread(NULL) {
 }
 tTVPApplication::~tTVPApplication() {
 	while( windows_list_.size() ) {
@@ -441,63 +441,62 @@ bool tTVPApplication::StartApplication( int argc, char* argv[] ) {
  */
 void tTVPApplication::CheckConsole() {
 #ifdef TVP_LOG_TO_COMMANDLINE_CONSOLE
-	int state = 0;
-	if (_fileno(stdin)  == -2 || ::GetStdHandle(STD_INPUT_HANDLE) == 0) state |= 0x01;
-	if (_fileno(stdout) == -2 || ::GetStdHandle(STD_OUTPUT_HANDLE) == 0) state |= 0x02;
-	if (_fileno(stderr) == -2 || ::GetStdHandle(STD_ERROR_HANDLE) == 0) state |= 0x04;
-
-	if( state && ::AttachConsole(ATTACH_PARENT_PROCESS) ) {
-		if ((state & 0x01)) _wfreopen_s( &newstdin_, L"CON", L"r", stdin );     // 標準入力の割り当て
-		if ((state & 0x02)) _wfreopen_s( &newstdout_, L"CON", L"w", stdout);    // 標準出力の割り当て
-		if ((state & 0x04)) _wfreopen_s( &newstderr_, L"CON", L"w", stderr);    // 標準エラー出力の割り当て
-		
+	HANDLE hin  = ::GetStdHandle(STD_INPUT_HANDLE);
+	HANDLE hout = ::GetStdHandle(STD_OUTPUT_HANDLE);
+	HANDLE herr = ::GetStdHandle(STD_ERROR_HANDLE);
+	// ハンドルが割り当てられてなければコンソールをアタッチする
+	if( (hin==0||hout==0||herr==0) && ::AttachConsole(ATTACH_PARENT_PROCESS) ) {
 		is_attach_console_ = true;
-
 		wchar_t console[256];
 		::GetConsoleTitle( console, 256 );
 		console_title_ = std::wstring( console );
-
-		//printf( __argv[0] );
-		//printf("\n");
+		// 元のハンドルを再割り当て
+		if (hin)  ::SetStdHandle(STD_INPUT_HANDLE, hin);
+		if (hout) ::SetStdHandle(STD_OUTPUT_HANDLE, hout);
+		if (herr) ::SetStdHandle(STD_ERROR_HANDLE, herr);
 	}
 #endif
 }
+
+#include <Shlwapi.h>
+
 void tTVPApplication::CloseConsole() {
+	wchar_t buf[100];
+	DWORD len = wnsprintf(buf, 100, TVPExitCode, TVPTerminateCode);
+	PrintConsole(buf, len);
 	if( is_attach_console_ ) {
-		fwprintf(stderr, TVPExitCode, TVPTerminateCode);
-		if (newstdin_)  fclose(newstdin_);
-		if (newstdout_) fclose(newstdout_);
-		if (newstderr_) fclose(newstderr_);
 		::SetConsoleTitle( console_title_.c_str() );
 		::FreeConsole();
 	}
 }
+
 void tTVPApplication::PrintConsole( const wchar_t* mes, unsigned long len ) {
 	HANDLE hStdError = ::GetStdHandle(STD_ERROR_HANDLE);
 	if (hStdError > 0) {
-#if 0
-		fwprintf(stderr, L"%.*s\n", len, mes);
-#else
-		// wprintf だと適切に処理されない
-		ttstr str = mes;
-		tjs_int len = str.GetNarrowStrLen();
-		tjs_nchar *dat = new tjs_nchar[len+1];
-		try {
-			str.ToNarrowStr(dat, len+1);
-		}
-		catch(...)	{
+		DWORD mode;
+		if (GetConsoleMode(hStdError, &mode)) {
+			// 実コンソール
+			DWORD wlen;
+			::WriteConsoleW( hStdError, mes, len, &wlen, NULL );
+			::WriteConsoleW( hStdError, L"\n", 1, &wlen, NULL );
+		} else {
+			// その他のハンドル
+			ttstr str = mes;
+			tjs_int len = str.GetNarrowStrLen();
+			tjs_nchar *dat = new tjs_nchar[len+1];
+			try {
+				str.ToNarrowStr(dat, len+1);
+			}
+			catch(...)	{
+				delete [] dat;
+				throw;
+			} 
+			DWORD wlen;
+			::WriteFile( hStdError, dat, len, &wlen, NULL );
+			::WriteFile( hStdError, "\n", 1, &wlen, NULL );
+			//fprintf(stderr, "%s\n", dat);
 			delete [] dat;
-			throw;
-		} 
-		fprintf(stderr, "%s\n", dat);
-		delete [] dat;
-#endif
-		fflush(stderr);
-
-		// WriteConsole だとファイルや mintty でうまく動かない
-		//DWORD wlen;
-		//::WriteConsoleW( hStdOutput, mes, len, &wlen, NULL );
-		//::WriteConsoleW( hStdOutput, L"\n", 1, &wlen, NULL );
+		}
 	}
 #ifdef _DEBUG
 	::OutputDebugString( mes );
