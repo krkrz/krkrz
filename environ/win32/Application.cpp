@@ -229,7 +229,7 @@ int APIENTRY WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	return TVPTerminateCode;
 }
 tTVPApplication::tTVPApplication() : is_attach_console_(false), tarminate_(false), ApplicationActivating(true)
-	 , ImageLoadThread(NULL), oldstdin_(NULL), oldstdout_(NULL), oldstderr(NULL) {
+	 , ImageLoadThread(NULL), newstdin_(NULL), newstdout_(NULL), newstderr_(NULL) {
 }
 tTVPApplication::~tTVPApplication() {
 	while( windows_list_.size() ) {
@@ -441,10 +441,15 @@ bool tTVPApplication::StartApplication( int argc, char* argv[] ) {
  */
 void tTVPApplication::CheckConsole() {
 #ifdef TVP_LOG_TO_COMMANDLINE_CONSOLE
-	if( ::AttachConsole(ATTACH_PARENT_PROCESS) ) {
-		_wfreopen_s( &oldstdin_, L"CON", L"r", stdin );     // 標準入力の割り当て
-		_wfreopen_s( &oldstdout_, L"CON", L"w", stdout);    // 標準出力の割り当て
-		_wfreopen_s( &oldstderr, L"CON", L"w", stderr);
+	int state = 0;
+	if (_fileno(stdin)  == -2 || ::GetStdHandle(STD_INPUT_HANDLE) == 0) state |= 0x01;
+	if (_fileno(stdout) == -2 || ::GetStdHandle(STD_OUTPUT_HANDLE) == 0) state |= 0x02;
+	if (_fileno(stderr) == -2 || ::GetStdHandle(STD_ERROR_HANDLE) == 0) state |= 0x04;
+
+	if( state && ::AttachConsole(ATTACH_PARENT_PROCESS) ) {
+		if ((state & 0x01)) _wfreopen_s( &newstdin_, L"CON", L"r", stdin );     // 標準入力の割り当て
+		if ((state & 0x02)) _wfreopen_s( &newstdout_, L"CON", L"w", stdout);    // 標準出力の割り当て
+		if ((state & 0x04)) _wfreopen_s( &newstderr_, L"CON", L"w", stderr);    // 標準エラー出力の割り当て
 		
 		is_attach_console_ = true;
 
@@ -459,21 +464,22 @@ void tTVPApplication::CheckConsole() {
 }
 void tTVPApplication::CloseConsole() {
 	if( is_attach_console_ ) {
-		wprintf(TVPExitCode, TVPTerminateCode);
-		FILE *tmpout, *tmpin;
-		_wfreopen_s( &tmpin, L"CON", L"r", oldstdin_ );
-		_wfreopen_s( &tmpout, L"CON", L"w", oldstderr );
-		_wfreopen_s( &tmpout, L"CON", L"w", oldstdout_ );
+		fwprintf(stderr, TVPExitCode, TVPTerminateCode);
+		if (newstdin_)  fclose(newstdin_);
+		if (newstdout_) fclose(newstdout_);
+		if (newstderr_) fclose(newstderr_);
 		::SetConsoleTitle( console_title_.c_str() );
 		::FreeConsole();
 	}
 }
 void tTVPApplication::PrintConsole( const wchar_t* mes, unsigned long len ) {
-	if( is_attach_console_ ) {
-		DWORD wlen;
-		HANDLE hStdOutput = ::GetStdHandle(STD_OUTPUT_HANDLE);
-		::WriteConsoleW( hStdOutput, mes, len, &wlen, NULL );
-		::WriteConsoleW( hStdOutput, L"\n", 1, &wlen, NULL );
+	HANDLE hStdError = ::GetStdHandle(STD_ERROR_HANDLE);
+	if (hStdError > 0) {
+		fwprintf(stderr, L"%.*s\n", len, mes);
+		fflush(stderr);
+		//DWORD wlen;
+		//::WriteConsoleW( hStdOutput, mes, len, &wlen, NULL );
+		//::WriteConsoleW( hStdOutput, L"\n", 1, &wlen, NULL );
 	}
 #ifdef _DEBUG
 	::OutputDebugString( mes );
