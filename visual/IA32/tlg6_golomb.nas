@@ -285,8 +285,8 @@ proc_start			FUNCTION_LABEL
 	pop	edi
 
 	IF	s		; if n < 0
-		shr	dword [%$a],	1
-		mov	dword [%$n],	(TVP_TLG6_GOLOMB_N_COUNT - 1)
+		shr	dword [%$$a],	1
+		mov	dword [%$$n],	(TVP_TLG6_GOLOMB_N_COUNT - 1)
 	ENDIF
 
 %ifdef	FOR_FIRST_COLOR_COMPONENT
