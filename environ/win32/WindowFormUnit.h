@@ -137,7 +137,9 @@ private:
 	int OrgTop;
 	int OrgWidth;
 	int OrgHeight;
-	
+	int OrgClientWidth;
+	int OrgClientHeight;
+
 	//-- keyboard input
 	std::string PendingKeyCodes;
 	
