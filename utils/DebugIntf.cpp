@@ -129,55 +129,67 @@ static tTVPAtExit TVPDestroyLoggingHandlerAtExit
 static bool TVPInDeliverLoggingEvent = false;
 static void _TVPDeliverLoggingEvent(const ttstr & line) // internal
 {
-	if(TVPLoggingHandlerVector.size())
+	if(!TVPInDeliverLoggingEvent)
 	{
-		bool emptyflag = false;
-		tTJSVariant vline(line);
-		tTJSVariant *pvline[] = { &vline };
-		for(tjs_uint i = 0; i < TVPLoggingHandlerVector.size(); i++)
+		TVPInDeliverLoggingEvent = true;
+		try
 		{
-			if (TVPLoggingHandlerVector[i].Object)
+			if(TVPLoggingHandlerVector.size())
 			{
-				tjs_error er;
-				try
+				bool emptyflag = false;
+				tTJSVariant vline(line);
+				tTJSVariant *pvline[] = { &vline };
+				for(tjs_uint i = 0; i < TVPLoggingHandlerVector.size(); i++)
 				{
-					TVPInDeliverLoggingEvent = true;
-					er = TVPLoggingHandlerVector[i].FuncCall(0, NULL, NULL, NULL, 1, pvline, NULL);
-					TVPInDeliverLoggingEvent = false;
+					if(TVPLoggingHandlerVector[i].Object)
+					{
+						tjs_error er;
+						try
+						{
+							er =
+								TVPLoggingHandlerVector[i].FuncCall(0, NULL, NULL, NULL, 1, pvline, NULL);
+						}
+						catch(...)
+						{
+							// failed
+							TVPLoggingHandlerVector[i].Release();
+							TVPLoggingHandlerVector[i].Object =
+							TVPLoggingHandlerVector[i].ObjThis = NULL;
+							throw;
+						}
+						if(TJS_FAILED(er))
+						{
+							// failed
+							TVPLoggingHandlerVector[i].Release();
+							TVPLoggingHandlerVector[i].Object =
+							TVPLoggingHandlerVector[i].ObjThis = NULL;
+							emptyflag = true;
+						}
+					}
+					else
+					{
+						emptyflag = true;
+					}
 				}
-				catch(...)
+
+				if(emptyflag)
 				{
-					TVPInDeliverLoggingEvent = false;
-					TVPLoggingHandlerVector[i].Release();
-					TVPLoggingHandlerVector[i].Object =
-						TVPLoggingHandlerVector[i].ObjThis = NULL;
-					throw;
-				}
-				if(TJS_FAILED(er))
-				{
-					// failed
-					TVPLoggingHandlerVector[i].Release();
-					TVPLoggingHandlerVector[i].Object =
-					TVPLoggingHandlerVector[i].ObjThis = NULL;
-					emptyflag = true;
+					// the array has empty cell
+					TVPCleanupLoggingHandlerVector();
 				}
 			}
-			else
+
+			if(!TVPLoggingHandlerVector.size())
 			{
-				emptyflag = true;
+				TVPSetOnLog(NULL);
 			}
 		}
-
-		if(emptyflag)
+		catch(...)
 		{
-			// the array has empty cell
-			TVPCleanupLoggingHandlerVector();
+			TVPInDeliverLoggingEvent = false;
+			throw;
 		}
-	}
-
-	if(!TVPLoggingHandlerVector.size())
-	{
-		TVPSetOnLog(NULL);
+		TVPInDeliverLoggingEvent = false;
 	}
 }
 //---------------------------------------------------------------------------
@@ -205,7 +217,7 @@ static void TVPRemoveLoggingHandler(tTJSVariantClosure clo)
 		i->Object = i->ObjThis = NULL;
 	}
 
-	if (!TVPInDeliverLoggingEvent)
+	if(!TVPInDeliverLoggingEvent)
 	{
 		TVPCleanupLoggingHandlerVector();
 		if(!TVPLoggingHandlerVector.size())
@@ -625,8 +637,6 @@ TJS_END_NATIVE_CONSTRUCTOR_DECL(/*TJS class name*/Debug)
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/message)
 {
-	if (TVPInDeliverLoggingEvent) return TJS_E_FAIL;
-
 	if(numparams<1) return TJS_E_BADPARAMCOUNT;
 
 	if(numparams == 1)
@@ -651,8 +661,6 @@ TJS_END_NATIVE_STATIC_METHOD_DECL(/*func. name*/message)
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/notice)
 {
-	if (TVPInDeliverLoggingEvent) return TJS_E_FAIL;
-
 	if(numparams<1) return TJS_E_BADPARAMCOUNT;
 
 	if(numparams == 1)
