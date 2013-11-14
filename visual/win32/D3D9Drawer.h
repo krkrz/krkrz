@@ -18,6 +18,9 @@ class tTVPDrawer_D3DDoubleBuffering : public tTVPDrawer
 	IDirect3DDevice9*	Direct3DDevice;
 	IDirect3DTexture9*	Texture;
 	//IDirect3DSurface9*	RenderTarget;
+	D3DPRESENT_PARAMETERS	D3dPP;
+	bool	IsInitd3dpp;
+	UINT	CurrentMonitor;
 
 	void * TextureBuffer; //!< テクスチャのサーフェースへのメモリポインタ
 	long TexturePitch; //!< テクスチャのピッチ
@@ -30,11 +33,13 @@ class tTVPDrawer_D3DDoubleBuffering : public tTVPDrawer
 	tjs_uint VsyncInterval;
 
 private:
-	HRESULT DecideD3DPresentParameters( D3DPRESENT_PARAMETERS& d3dpp );
-	HRESULT DecideD3DPresentParameters( D3DPRESENT_PARAMETERS& d3dpp, HWND window, bool iswindow=true, tjs_uint width=0, tjs_uint height=0, tjs_uint bpp=32, tjs_uint color=0 );
-	HRESULT DecideD3DPresentParametersForFullScreen( D3DPRESENT_PARAMETERS& d3dpp, HWND window );
+	HRESULT DecideD3DPresentParameters();
+	HRESULT DecideD3DPresentParameters( UINT monitor, HWND window, bool iswindow=true, tjs_uint width=0, tjs_uint height=0, tjs_uint bpp=32, tjs_uint color=0, bool changeresolution=true );
 	UINT GetMonitorNumber( HWND window );
 	HRESULT InitializeDirect3DState();
+	void ErrorToLog( HRESULT hr );
+	void DestroyTexture();
+	void CreateTexture();
 
 public:
 	//! @brief	コンストラクタ
@@ -49,6 +54,7 @@ public:
 	void InvalidateAll();
 	void GetDirect3D9Device();
 	void CreateOffScreenSurface();
+	bool SetDestPos(tjs_int left, tjs_int top);
 	bool SetDestSize(tjs_int width, tjs_int height);
 	bool NotifyLayerResize(tjs_int w, tjs_int h);
 	bool SetDestSizeAndNotifyLayerResize(tjs_int width, tjs_int height, tjs_int w, tjs_int h);
@@ -74,6 +80,7 @@ public:
 	bool WaitForVBlank( tjs_int* in_vblank, tjs_int* delayed );
 	virtual int GetInterpolationCapability();
 
+	bool SupportFullScreenChange() const { return true; }
 	bool SwitchToFullScreen( HWND window, tjs_uint w, tjs_uint h, tjs_uint bpp, tjs_uint color, bool changeresolution );
 	void RevertFromFullScreen( HWND window, tjs_uint w, tjs_uint h, tjs_uint bpp, tjs_uint color );
 };

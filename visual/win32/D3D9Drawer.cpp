@@ -9,6 +9,7 @@
 #include "WindowImpl.h"
 
 #include <d3d9.h>
+//#include <dxerr9.h>
 
 extern bool TVPZoomInterpolation;
 //---------------------------------------------------------------------------
@@ -17,7 +18,8 @@ extern bool TVPZoomInterpolation;
 //!			修正を行う場合は、互いによく見比べ、似たようなところがあればともに修正を試みること。
 //---------------------------------------------------------------------------
 //! @brief	コンストラクタ
-tTVPDrawer_D3DDoubleBuffering::tTVPDrawer_D3DDoubleBuffering(tTVPPassThroughDrawDevice * device) : tTVPDrawer(device)
+tTVPDrawer_D3DDoubleBuffering::tTVPDrawer_D3DDoubleBuffering(tTVPPassThroughDrawDevice * device)
+ : tTVPDrawer(device), IsInitd3dpp( false )
 {
 	Direct3D = NULL;
 	Direct3DDevice = NULL;
@@ -28,32 +30,39 @@ tTVPDrawer_D3DDoubleBuffering::tTVPDrawer_D3DDoubleBuffering(tTVPPassThroughDraw
 	TextureBuffer = NULL;
 	TextureWidth = TextureHeight = 0;
 	VsyncInterval = 16;
+	ZeroMemory( &D3dPP, sizeof(D3dPP) );
 }
 
+//---------------------------------------------------------------------------
 //! @brief	デストラクタ
 tTVPDrawer_D3DDoubleBuffering::~tTVPDrawer_D3DDoubleBuffering()
 {
 	DestroyOffScreenSurface();
 }
-
-ttstr tTVPDrawer_D3DDoubleBuffering::GetName() { return TJS_W("Direct3D9 double buffering"); }
-
-void tTVPDrawer_D3DDoubleBuffering::DestroyOffScreenSurface()
-{
-	if(TextureBuffer && Texture) Texture->UnlockRect(0), TextureBuffer = NULL;
-	if(Texture) Texture->Release(), Texture = NULL;
-	//if(RenderTarget) RenderTarget->Release(), RenderTarget = NULL;
+//---------------------------------------------------------------------------
+ttstr tTVPDrawer_D3DDoubleBuffering::GetName() {
+	return TJS_W("Direct3D9 double buffering");
+}
+//---------------------------------------------------------------------------
+void tTVPDrawer_D3DDoubleBuffering::DestroyOffScreenSurface() {
+	DestroyTexture();
 	if(Direct3DDevice) Direct3DDevice->Release(), Direct3DDevice = NULL;
 	if(Direct3D) Direct3D = NULL;
 }
-
+//---------------------------------------------------------------------------
+void tTVPDrawer_D3DDoubleBuffering::DestroyTexture() {
+	if(TextureBuffer && Texture) Texture->UnlockRect(0), TextureBuffer = NULL;
+	if(Texture) Texture->Release(), Texture = NULL;
+	//if(RenderTarget) RenderTarget->Release(), RenderTarget = NULL;
+}
+//---------------------------------------------------------------------------
 void tTVPDrawer_D3DDoubleBuffering::InvalidateAll()
 {
 	// レイヤ演算結果をすべてリクエストする
 	// サーフェースが lost した際に内容を再構築する目的で用いる
 	Device->RequestInvalidation(tTVPRect(0, 0, DestWidth, DestHeight));
 }
-
+//---------------------------------------------------------------------------
 void tTVPDrawer_D3DDoubleBuffering::GetDirect3D9Device() {
 	DestroyOffScreenSurface();
 
@@ -63,32 +72,43 @@ void tTVPDrawer_D3DDoubleBuffering::GetDirect3D9Device() {
 		TVPThrowExceptionMessage( TVPFaildToCreateDirect3D );
 
 	HRESULT hr;
-	D3DPRESENT_PARAMETERS	d3dpp;
-	if( FAILED( hr = DecideD3DPresentParameters( d3dpp ) ) )
-		TVPThrowExceptionMessage( TVPFaildToDecideBackbufferFormat );
+	if( IsInitd3dpp == false ) {
+		if( FAILED( hr = DecideD3DPresentParameters() ) ) {
+			ErrorToLog( hr );
+			TVPThrowExceptionMessage( TVPFaildToDecideBackbufferFormat );
+		}
+		IsInitd3dpp = true;
+	}
 
 	UINT iCurrentMonitor = GetMonitorNumber( TargetWindow );
 	DWORD	BehaviorFlags = D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_MULTITHREADED;
-	if( D3D_OK != ( hr = Direct3D->CreateDevice( iCurrentMonitor, D3DDEVTYPE_HAL, NULL, BehaviorFlags, &d3dpp, &Direct3DDevice ) ) )
+	if( D3D_OK != ( hr = Direct3D->CreateDevice( iCurrentMonitor, D3DDEVTYPE_HAL, TargetWindow, BehaviorFlags, &D3dPP, &Direct3DDevice ) ) ) {
+		ErrorToLog( hr );
 		TVPThrowExceptionMessage( TVPFaildToCreateDirect3DDevice );
+	}
+	CurrentMonitor = iCurrentMonitor;
 
 	D3DVIEWPORT9 vp;
-	vp.X  = 0;
-	vp.Y  = 0;
-	vp.Width = d3dpp.BackBufferWidth;
-	vp.Height = d3dpp.BackBufferHeight;
+	vp.X  = DestLeft;
+	vp.Y  = DestTop;
+	vp.Width = DestWidth != 0 ? DestWidth : D3dPP.BackBufferWidth;
+	vp.Height = DestHeight != 0 ? DestHeight : D3dPP.BackBufferHeight;
 	vp.MinZ  = 0.0f;
 	vp.MaxZ  = 1.0f;
-	if( FAILED(hr = Direct3DDevice->SetViewport(&vp)) )
+	if( FAILED(hr = Direct3DDevice->SetViewport(&vp)) ) {
+		ErrorToLog( hr );
 		TVPThrowExceptionMessage( TVPFaildToSetViewport );
+	}
 	/*
 	if( RenderTarget ) RenderTarget->Release(), RenderTarget = NULL;
 	if( FAILED( hr = Direct3DDevice->GetRenderTarget( 0, &RenderTarget ) ) )
 		TVPThrowExceptionMessage(TJS_W("Faild to get render target."));
 	*/
 
-	if( FAILED( hr = InitializeDirect3DState() ) )
+	if( FAILED( hr = InitializeDirect3DState() ) ) {
+		ErrorToLog( hr );
  		TVPThrowExceptionMessage( TVPFaildToSetRenderState );
+	}
 
 	int refreshrate;
 	HDC hdc;
@@ -98,6 +118,7 @@ void tTVPDrawer_D3DDoubleBuffering::GetDirect3D9Device() {
 	::ReleaseDC( TargetWindow, hdc );
 	VsyncInterval = 1000 / refreshrate;
 }
+//---------------------------------------------------------------------------
 HRESULT tTVPDrawer_D3DDoubleBuffering::InitializeDirect3DState() {
 	HRESULT	hr;
 	D3DCAPS9	d3dcaps;
@@ -141,6 +162,7 @@ HRESULT tTVPDrawer_D3DDoubleBuffering::InitializeDirect3DState() {
 
 	return S_OK;
 }
+//---------------------------------------------------------------------------
 UINT tTVPDrawer_D3DDoubleBuffering::GetMonitorNumber( HWND window )
 {
 	if( Direct3D == NULL || window == NULL ) return D3DADAPTER_DEFAULT;
@@ -155,7 +177,8 @@ UINT tTVPDrawer_D3DDoubleBuffering::GetMonitorNumber( HWND window )
 		iCurrentMonitor = D3DADAPTER_DEFAULT;
 	return iCurrentMonitor;
 }
-HRESULT tTVPDrawer_D3DDoubleBuffering::DecideD3DPresentParameters( D3DPRESENT_PARAMETERS& d3dpp ) {
+//---------------------------------------------------------------------------
+HRESULT tTVPDrawer_D3DDoubleBuffering::DecideD3DPresentParameters() {
 	HRESULT			hr;
 	D3DDISPLAYMODE	dm;
 	UINT iCurrentMonitor = GetMonitorNumber(TargetWindow);
@@ -170,27 +193,25 @@ HRESULT tTVPDrawer_D3DDoubleBuffering::DecideD3DPresentParameters( D3DPRESENT_PA
 		height = clientRect.bottom - clientRect.top;
 	}
 
-	ZeroMemory( &d3dpp, sizeof(d3dpp) );
-	d3dpp.Windowed = TRUE;
-	d3dpp.SwapEffect = D3DSWAPEFFECT_COPY;
-	d3dpp.BackBufferFormat = dm.Format;
-	d3dpp.BackBufferHeight = height;
-	d3dpp.BackBufferWidth = width;
-	d3dpp.hDeviceWindow = TargetWindow;
-	d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
+	ZeroMemory( &D3dPP, sizeof(D3dPP) );
+	D3dPP.Windowed = TRUE;
+	D3dPP.SwapEffect = D3DSWAPEFFECT_COPY;
+	D3dPP.BackBufferFormat = D3DFMT_UNKNOWN;
+	D3dPP.BackBufferHeight = height;
+	D3dPP.BackBufferWidth = width;
+	D3dPP.hDeviceWindow = TargetWindow;
+	D3dPP.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
 
 	return S_OK;
 }
-
 //---------------------------------------------------------------------------
-HRESULT tTVPDrawer_D3DDoubleBuffering::DecideD3DPresentParameters( D3DPRESENT_PARAMETERS& d3dpp, HWND window, bool iswindow, tjs_uint width, tjs_uint height, tjs_uint bpp, tjs_uint color )
+HRESULT tTVPDrawer_D3DDoubleBuffering::DecideD3DPresentParameters( UINT monitor, HWND window, bool iswindow, tjs_uint width, tjs_uint height, tjs_uint bpp, tjs_uint color, bool changeresolution )
 {
 	if( Direct3D == NULL ) return false;
 
 	HRESULT			hr;
 	D3DDISPLAYMODE	dm;
-	tjs_uint iCurrentMonitor = GetMonitorNumber(window);
-	if( FAILED( hr = Direct3D->GetAdapterDisplayMode( iCurrentMonitor, &dm ) ) )
+	if( FAILED( hr = Direct3D->GetAdapterDisplayMode( monitor, &dm ) ) )
 		return hr;
 
 	if( width == 0 || height == 0 ) {
@@ -203,66 +224,67 @@ HRESULT tTVPDrawer_D3DDoubleBuffering::DecideD3DPresentParameters( D3DPRESENT_PA
 		}
 	}
 
-	ZeroMemory( &d3dpp, sizeof(d3dpp) );
-	d3dpp.Windowed = iswindow ? TRUE : FALSE;
-	d3dpp.SwapEffect = D3DSWAPEFFECT_COPY;
+	// 解像度変更なしで現在の幅と高さbppが一致するのならwindowモードとする
+	if( iswindow == false && changeresolution == false ) {
+		if( dm.Width == width && dm.Height == height ) {
+			if( bpp == 16 ) {
+				if( dm.Format == D3DFMT_X1R5G5B5 || dm.Format == D3DFMT_R5G6B5 ) {
+					iswindow = true;
+				}
+			} else if( dm.Format == D3DFMT_X8R8G8B8 ) {
+				iswindow = true;
+			}
+		}
+	}
+
+	ZeroMemory( &D3dPP, sizeof(D3dPP) );
+	D3dPP.Windowed = iswindow ? TRUE : FALSE;
+	D3dPP.SwapEffect = D3DSWAPEFFECT_COPY;
+	D3dPP.BackBufferHeight = height;
+	D3dPP.BackBufferWidth = width;
+	D3dPP.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
+	D3dPP.hDeviceWindow = window;
 	if( iswindow ) {
-		//d3dpp.BackBufferFormat = dm.Format;
-		d3dpp.BackBufferFormat = D3DFMT_UNKNOWN;
+		D3dPP.BackBufferFormat = D3DFMT_UNKNOWN;
 	} else {
 		if( bpp == 16 ) {
 			if( dm.Format == D3DFMT_X1R5G5B5 || dm.Format == D3DFMT_R5G6B5 ) {
-				d3dpp.BackBufferFormat = dm.Format;
+				D3dPP.BackBufferFormat = dm.Format;
 			} else if( color == 565 ) {
-				d3dpp.BackBufferFormat = D3DFMT_R5G6B5;
+				D3dPP.BackBufferFormat = D3DFMT_R5G6B5;
 			} else {
-				d3dpp.BackBufferFormat = D3DFMT_X1R5G5B5;
+				D3dPP.BackBufferFormat = D3DFMT_X1R5G5B5;
 			}
 		} else {
-			d3dpp.BackBufferFormat = D3DFMT_X8R8G8B8;
+			D3dPP.BackBufferFormat = D3DFMT_X8R8G8B8;
 		}
+		D3dPP.FullScreen_RefreshRateInHz = dm.RefreshRate;
+		//D3dPP.SwapEffect = D3DSWAPEFFECT_DISCARD;
+		//D3dPP.BackBufferCount = 1;
+		//D3dPP.Flags = D3DPRESENTFLAG_LOCKABLE_BACKBUFFER;
 	}
-	d3dpp.BackBufferHeight = height;
-	d3dpp.BackBufferWidth = width;
-	d3dpp.hDeviceWindow = window;
-	d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
 
 	return S_OK;
 }
 //---------------------------------------------------------------------------
-HRESULT tTVPDrawer_D3DDoubleBuffering::DecideD3DPresentParametersForFullScreen( D3DPRESENT_PARAMETERS& d3dpp, HWND window )
-{
-	if( Direct3D == NULL ) return false;
-
-	HRESULT			hr;
-	D3DDISPLAYMODE	dm;
-	tjs_uint iCurrentMonitor = GetMonitorNumber(window);
-	if( FAILED( hr = Direct3D->GetAdapterDisplayMode( iCurrentMonitor, &dm ) ) )
-		return hr;
-
-	ZeroMemory( &d3dpp, sizeof(d3dpp) );
-	d3dpp.Windowed = TRUE;
-	d3dpp.SwapEffect = D3DSWAPEFFECT_COPY;
-	d3dpp.BackBufferFormat = dm.Format;
-	d3dpp.BackBufferHeight = dm.Width;
-	d3dpp.BackBufferWidth = dm.Height;
-	d3dpp.hDeviceWindow = window;
-	d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
-
-	return S_OK;
-}
 void tTVPDrawer_D3DDoubleBuffering::CreateOffScreenSurface()
 {
 	// Direct3D デバイス、テクスチャなどを作成する
 	DestroyOffScreenSurface();
-	if(TargetWindow && SrcWidth > 0 && SrcHeight > 0)
-	{
-		HRESULT hr = S_OK;
-
+	if(TargetWindow && SrcWidth > 0 && SrcHeight > 0) {
 		// get Direct3D9 interface
 		GetDirect3D9Device();
 
-		D3DCAPS9	d3dcaps;
+		CreateTexture();
+	}
+}
+//---------------------------------------------------------------------------
+void tTVPDrawer_D3DDoubleBuffering::CreateTexture() {
+	DestroyTexture();
+	if(TargetWindow && SrcWidth > 0 && SrcHeight > 0) {
+		HRESULT hr = S_OK;
+
+		D3DCAPS9 d3dcaps;
 		Direct3DDevice->GetDeviceCaps( &d3dcaps );
 
 		TextureWidth = SrcWidth;
@@ -272,8 +294,9 @@ void tTVPDrawer_D3DDoubleBuffering::CreateOffScreenSurface()
 			TextureWidth = std::max(TextureHeight, TextureWidth);
 			TextureHeight = TextureWidth;
 		}
-		DWORD		dwWidth = 64;
-		DWORD		dwHeight = 64;
+
+		DWORD dwWidth = 64;
+		DWORD dwHeight = 64;
 		if( d3dcaps.TextureCaps & D3DPTEXTURECAPS_POW2 ) {
 			// 2の累乗のみ許可するかどうか判定
 			while( dwWidth < TextureWidth ) dwWidth = dwWidth << 1;
@@ -284,21 +307,38 @@ void tTVPDrawer_D3DDoubleBuffering::CreateOffScreenSurface()
 			if( dwWidth > d3dcaps.MaxTextureWidth || dwHeight > d3dcaps.MaxTextureHeight ) {
 				TVPAddLog( (const tjs_char*)TVPWarningImageSizeTooLargeMayBeCannotCreateTexture );
 			}
-
 			TVPAddLog( (const tjs_char*)TVPUsePowerOfTwoSurface );
 		} else {
 			dwWidth = TextureWidth;
 			dwHeight = TextureHeight;
 		}
 
-		//if( D3D_OK != ( hr = Direct3DDevice->CreateTexture( dwWidth, dwHeight, 1, D3DUSAGE_DYNAMIC, D3DFMT_X8B8G8R8, D3DPOOL_DEFAULT, &Texture, NULL) ) )
-		if( D3D_OK != ( hr = Direct3DDevice->CreateTexture( dwWidth, dwHeight, 1, D3DUSAGE_DYNAMIC, D3DFMT_X8R8G8B8, D3DPOOL_DEFAULT, &Texture, NULL) ) )
+		if( D3D_OK != ( hr = Direct3DDevice->CreateTexture( dwWidth, dwHeight, 1, D3DUSAGE_DYNAMIC, D3DFMT_X8R8G8B8, D3DPOOL_DEFAULT, &Texture, NULL) ) ) {
+			ErrorToLog( hr );
 			TVPThrowExceptionMessage(TVPCannotAllocateD3DOffScreenSurface,TJSInt32ToHex(hr, 8));
-		//Texture->GetSurfaceLevel(0, &Surface);
-		//Texture->GetLevelDesc(0, &SurfaceDesc);
+		}
 	}
 }
-
+//---------------------------------------------------------------------------
+bool tTVPDrawer_D3DDoubleBuffering::SetDestPos(tjs_int left, tjs_int top)
+{
+	if(inherited::SetDestPos(left, top))
+	{
+		if( Direct3DDevice ) {
+			D3DVIEWPORT9 vp;
+			vp.X  = DestLeft;
+			vp.Y  = DestTop;
+			vp.Width = DestWidth != 0 ? DestWidth : D3dPP.BackBufferWidth;
+			vp.Height = DestHeight != 0 ? DestHeight : D3dPP.BackBufferHeight;
+			vp.MinZ  = 0.0f;
+			vp.MaxZ  = 1.0f;
+			Direct3DDevice->SetViewport(&vp);
+		}
+		return true;
+	}
+	return false;
+}
+//---------------------------------------------------------------------------
 bool tTVPDrawer_D3DDoubleBuffering::SetDestSize(tjs_int width, tjs_int height)
 {
 	if(inherited::SetDestSize(width, height))
@@ -306,6 +346,15 @@ bool tTVPDrawer_D3DDoubleBuffering::SetDestSize(tjs_int width, tjs_int height)
 		try
 		{
 			CreateOffScreenSurface();
+
+			D3DVIEWPORT9 vp;
+			vp.X  = DestLeft;
+			vp.Y  = DestTop;
+			vp.Width = DestWidth != 0 ? DestWidth : D3dPP.BackBufferWidth;
+			vp.Height = DestHeight != 0 ? DestHeight : D3dPP.BackBufferHeight;
+			vp.MinZ  = 0.0f;
+			vp.MaxZ  = 1.0f;
+			Direct3DDevice->SetViewport(&vp);
 		}
 		catch(const eTJS & e)
 		{
@@ -321,7 +370,7 @@ bool tTVPDrawer_D3DDoubleBuffering::SetDestSize(tjs_int width, tjs_int height)
 	}
 	return false;
 }
-
+//---------------------------------------------------------------------------
 bool tTVPDrawer_D3DDoubleBuffering::NotifyLayerResize(tjs_int w, tjs_int h)
 {
 	if(inherited::NotifyLayerResize(w, h))
@@ -344,7 +393,7 @@ bool tTVPDrawer_D3DDoubleBuffering::NotifyLayerResize(tjs_int w, tjs_int h)
 	}
 	return false;
 }
-
+//---------------------------------------------------------------------------
 bool tTVPDrawer_D3DDoubleBuffering::SetDestSizeAndNotifyLayerResize(tjs_int width, tjs_int height, tjs_int w, tjs_int h)
 {
 	if(inherited::SetDestSize(width, height) && inherited::NotifyLayerResize(w, h))
@@ -367,12 +416,13 @@ bool tTVPDrawer_D3DDoubleBuffering::SetDestSizeAndNotifyLayerResize(tjs_int widt
 	}
 	return false;
 }
-
+//---------------------------------------------------------------------------
 void tTVPDrawer_D3DDoubleBuffering::SetTargetWindow(HWND wnd)
 {
 	inherited::SetTargetWindow(wnd);
 	CreateOffScreenSurface();
 }
+//---------------------------------------------------------------------------
 //#define TVPD3DTIMING
 #ifdef TVPD3DTIMING
 void tTVPDrawer_D3DDoubleBuffering::InitTimings()
@@ -383,7 +433,7 @@ void tTVPDrawer_D3DDoubleBuffering::InitTimings()
 	DrawPrimitiveTime = 0;
 	BltTime = 0;
 }
-
+//---------------------------------------------------------------------------
 void tTVPDrawer_D3DDoubleBuffering::ReportTimings()
 {
 	TVPAddLog(TJS_W("GetDC / Lock : ") + ttstr((int)GetDCTime));
@@ -393,7 +443,7 @@ void tTVPDrawer_D3DDoubleBuffering::ReportTimings()
 	TVPAddLog(TJS_W("Blt : ") + ttstr((int)BltTime));
 }
 #endif
-
+//---------------------------------------------------------------------------
 void tTVPDrawer_D3DDoubleBuffering::StartBitmapCompletion()
 {
 	// retrieve DC
@@ -416,6 +466,7 @@ StartTick = timeGetTime();
 		}
 
 		if(hr != D3D_OK) {
+			ErrorToLog( hr );
 			TextureBuffer = NULL;
 			InvalidateAll();  // causes reconstruction of off-screen image
 		} else /*if(hr == DD_OK) */ {
@@ -428,7 +479,7 @@ GetDCTime += timeGetTime() - StartTick;
 #endif
 	}
 }
-
+//---------------------------------------------------------------------------
 void tTVPDrawer_D3DDoubleBuffering::NotifyBitmapCompleted(tjs_int x, tjs_int y, const void * bits, const BITMAPINFO * bitmapinfo,
 	const tTVPRect &cliprect)
 {
@@ -480,7 +531,7 @@ StartTick = timeGetTime();
 DrawDibDrawTime += timeGetTime() - StartTick;
 #endif
 }
-
+//---------------------------------------------------------------------------
 void tTVPDrawer_D3DDoubleBuffering::EndBitmapCompletion()
 {
 	if(!TargetWindow) return;
@@ -522,6 +573,13 @@ ReleaseDCTime += timeGetTime() - StartTick;
 		{0.0f - 0.5f, dh   - 0.5f, 1.0f, 1.0f, 0.0f, sh  },
 		{dw   - 0.5f, dh   - 0.5f, 1.0f, 1.0f, sw  , sh  }
 	};
+	
+	/*
+	TVPAddLog(	TJS_W("Dst W:") + ttstr((int)DestWidth) + TJS_W(", Dst H:") + ttstr((int)DestHeight) + 
+				TJS_W(", Src W:") + ttstr((int)SrcWidth) + TJS_W(", Src H:") + ttstr((int)SrcHeight) +
+				TJS_W(", Tex W:") + ttstr((int)TextureWidth) + TJS_W(", Tex H:") + ttstr((int)TextureHeight)
+		);
+	*/
 
 	HRESULT hr;
 
@@ -559,37 +617,143 @@ got_error:
 	if( hr == D3DERR_DEVICELOST ) {
 		InvalidateAll();  // causes reconstruction of off-screen image
 	} else if(hr == D3DERR_DEVICENOTRESET ) {
-		D3DPRESENT_PARAMETERS	d3dpp;
-		if( FAILED( hr = DecideD3DPresentParameters( d3dpp ) ) ) {
-			InvalidateAll();  // causes reconstruction of off-screen image
-		} else {
-			hr = Direct3DDevice->Reset(&d3dpp);
-			if( hr == D3DERR_DEVICELOST ) {
-				TVPAddLog( (const tjs_char*)TVPErrorDeviceLostCannotResetDevice );
-				InvalidateAll();
-			} else if( hr == D3DERR_DRIVERINTERNALERROR ) {
-				TVPAddLog( (const tjs_char*)TVPErrorDeviceInternalFatalError );
-				InvalidateAll();
-			} else if( hr == D3DERR_INVALIDCALL ) {
-				TVPAddLog( (const tjs_char*)TVPErrorInvalidCall );
-				InvalidateAll();
-			} else if( hr  == D3DERR_OUTOFVIDEOMEMORY ) {
-				TVPAddLog( (const tjs_char*)TVPErrorCannotAllocateVideoMemory );
-				InvalidateAll();
-			} else if( hr == E_OUTOFMEMORY  ) {
-				TVPAddLog( (const tjs_char*)TVPErrorCannotAllocateMemory );
-				InvalidateAll();
-			} else if( hr == D3D_OK ) {
-				if( FAILED( hr = InitializeDirect3DState() ) )
- 					TVPThrowExceptionMessage( TVPFaildToSetRenderState );
+		hr = Direct3DDevice->Reset(&D3dPP);
+		if( hr == D3DERR_DEVICELOST ) {
+			TVPAddLog( (const tjs_char*)TVPErrorDeviceLostCannotResetDevice );
+			InvalidateAll();
+		} else if( hr == D3DERR_DRIVERINTERNALERROR ) {
+			TVPAddLog( (const tjs_char*)TVPErrorDeviceInternalFatalError );
+			InvalidateAll();
+		} else if( hr == D3DERR_INVALIDCALL ) {
+			TVPAddLog( (const tjs_char*)TVPErrorInvalidCall );
+			InvalidateAll();
+		} else if( hr  == D3DERR_OUTOFVIDEOMEMORY ) {
+			TVPAddLog( (const tjs_char*)TVPErrorCannotAllocateVideoMemory );
+			InvalidateAll();
+		} else if( hr == E_OUTOFMEMORY  ) {
+			TVPAddLog( (const tjs_char*)TVPErrorCannotAllocateMemory );
+			InvalidateAll();
+		} else if( hr == D3D_OK ) {
+			if( FAILED( hr = InitializeDirect3DState() ) ) {
+				ErrorToLog( hr );
+				TVPThrowExceptionMessage( TVPFaildToSetRenderState );
 			}
 		}
 	} else if(hr != D3D_OK) {
+		ErrorToLog( hr );
 		TVPAddImportantLog( TVPFormatMessage(TVPPassthroughInfPolygonDrawingFailed,TJSInt32ToHex(hr, 8)) );
 	}
 }
-
-
+//---------------------------------------------------------------------------
+void tTVPDrawer_D3DDoubleBuffering::ErrorToLog( HRESULT hr ) {
+	switch( hr ) {
+	case D3DERR_DEVICELOST:
+		TVPAddLog( (const tjs_char*)TVPErrorDeviceLostCannotResetDevice );
+		break;
+	case D3DERR_DRIVERINTERNALERROR:
+		TVPAddLog( (const tjs_char*)TVPErrorDeviceInternalFatalError );
+		break;
+	case D3DERR_INVALIDCALL:
+		TVPAddLog( (const tjs_char*)TVPErrorInvalidCall );
+		break;
+	case D3DERR_OUTOFVIDEOMEMORY:
+		TVPAddLog( (const tjs_char*)TVPErrorCannotAllocateVideoMemory );
+		break;
+	case E_OUTOFMEMORY:
+		TVPAddLog( (const tjs_char*)TVPErrorCannotAllocateMemory );
+		break;
+	case D3DERR_WRONGTEXTUREFORMAT:
+		TVPAddLog( TJS_W("D3D : テクスチャ サーフェイスのピクセル フォーマットが無効です") );
+		break;
+	case D3DERR_UNSUPPORTEDCOLOROPERATION:
+		TVPAddLog( TJS_W("D3D : 色値に対して指定されているテクスチャ ブレンディング処理を、デバイスがサポートしていません") );
+		break;
+	case D3DERR_UNSUPPORTEDCOLORARG:
+		TVPAddLog( TJS_W("D3D : 色値に対して指定されているテクスチャ ブレンディング引数を、デバイスがサポートしていません") );
+		break;
+	case D3DERR_UNSUPPORTEDALPHAOPERATION:
+		TVPAddLog( TJS_W("D3D : アルファ チャンネルに対して指定されているテクスチャ ブレンディング処理を、デバイスがサポートしていません") );
+		break;
+	case D3DERR_UNSUPPORTEDALPHAARG:
+		TVPAddLog( TJS_W("D3D : アルファ チャンネルに対して指定されているテクスチャ ブレンディング引数を、デバイスがサポートしていません") );
+		break;
+	case D3DERR_TOOMANYOPERATIONS:
+		TVPAddLog( TJS_W("D3D : デバイスがサポートしている数より多くのテクスチャ フィルタリング処理を、アプリケーションが要求しています") );
+		break;
+	case D3DERR_CONFLICTINGTEXTUREFILTER:
+		TVPAddLog( TJS_W("D3D : 現在のテクスチャ フィルタは同時には使えません") );
+		break;
+	case D3DERR_UNSUPPORTEDFACTORVALUE:
+		TVPAddLog( TJS_W("D3D : デバイスが指定されたテクスチャ係数値をサポートしていません") );
+		break;
+	case D3DERR_CONFLICTINGRENDERSTATE:
+		TVPAddLog( TJS_W("D3D : 現在設定されているレンダリング ステートは同時には使えません") );
+		break;
+	case D3DERR_UNSUPPORTEDTEXTUREFILTER:
+		TVPAddLog( TJS_W("D3D : デバイスが指定されたテクスチャ フィルタをサポートしていません") );
+		break;
+	case D3DERR_CONFLICTINGTEXTUREPALETTE:
+		TVPAddLog( TJS_W("D3D : 現在のテクスチャは同時には使えません") );
+		break;
+	case D3DERR_NOTFOUND:
+		TVPAddLog( TJS_W("D3D : 要求された項目が見つかりませんでした") );
+		break;
+	case D3DERR_MOREDATA:
+		TVPAddLog( TJS_W("D3D : 指定されたバッファ サイズに保持できる以上のデータが存在します") );
+		break;
+	case D3DERR_DEVICENOTRESET:
+		TVPAddLog( TJS_W("D3D : デバイスは、消失していますが、現在リセットできます") );
+		break;
+	case D3DERR_NOTAVAILABLE:
+		TVPAddLog( TJS_W("D3D : このデバイスは、照会されたテクニックをサポートしていません") );
+		break;
+	case D3DERR_INVALIDDEVICE:
+		TVPAddLog( TJS_W("D3D : 要求されたデバイスの種類が無効です") );
+		break;
+	case D3DERR_DRIVERINVALIDCALL:
+		TVPAddLog( TJS_W("D3D : 使用されません") );
+		break;
+	case D3DERR_WASSTILLDRAWING:
+		TVPAddLog( TJS_W("D3D : このサーフェスとの間で情報を転送している以前のビット演算が不完全です") );
+		break;
+	case D3DERR_DEVICEHUNG:
+		TVPAddLog( TJS_W("D3D : このコードを返したデバイスが原因で、ハードウェア アダプターが OS によってリセットされました") );
+		break;
+	case D3DERR_UNSUPPORTEDOVERLAY:
+		TVPAddLog( TJS_W("D3D : D3DERR_UNSUPPORTEDOVERLAY") );
+		break;
+	case D3DERR_UNSUPPORTEDOVERLAYFORMAT:
+		TVPAddLog( TJS_W("D3D : D3DERR_UNSUPPORTEDOVERLAYFORMAT") );
+		break;
+	case D3DERR_CANNOTPROTECTCONTENT:
+		TVPAddLog( TJS_W("D3D : D3DERR_CANNOTPROTECTCONTENT") );
+		break;
+	case D3DERR_UNSUPPORTEDCRYPTO:
+		TVPAddLog( TJS_W("D3D : D3DERR_UNSUPPORTEDCRYPTO") );
+		break;
+	case D3DERR_PRESENT_STATISTICS_DISJOINT:
+		TVPAddLog( TJS_W("D3D : D3DERR_PRESENT_STATISTICS_DISJOINT") );
+		break;
+	case D3DERR_DEVICEREMOVED:
+		TVPAddLog( TJS_W("D3D : ハードウェア アダプターが削除されています") );
+		break;
+	case D3D_OK:
+		break;
+	case D3DOK_NOAUTOGEN:
+		TVPAddLog( TJS_W("D3D : 成功しましたが、このフォーマットに対するミップマップの自動生成はサポートされていません") );
+		break;
+	case E_FAIL:
+		TVPAddLog( TJS_W("D3D : Direct3D サブシステム内で原因不明のエラーが発生しました") );
+		break;
+	case E_INVALIDARG:
+		TVPAddLog( TJS_W("D3D : 無効なパラメータが関数に渡されました") );
+		break;
+	default:
+		TVPAddLog( TJS_W("D3D : Unknown Error") );
+		break;
+	}
+}
+//---------------------------------------------------------------------------
 void tTVPDrawer_D3DDoubleBuffering::Show()
 {
 	if(!TargetWindow) return;
@@ -637,12 +801,14 @@ BltTime += timeGetTime() - StartTick;
 
 //	got_error:
 	if(hr == D3DERR_DEVICELOST) {
+		ErrorToLog( hr );
 		InvalidateAll();  // causes reconstruction of off-screen image
 	} else if(hr != D3D_OK) {
+		ErrorToLog( hr );
 		TVPAddImportantLog( TVPFormatMessage(TVPPassthroughInfPrimarySurfaceDirect3DDevicePresentFailed,TJSInt32ToHex(hr, 8)) );
 	}
 }
-
+//---------------------------------------------------------------------------
 bool tTVPDrawer_D3DDoubleBuffering::WaitForVBlank( tjs_int* in_vblank, tjs_int* delayed )
 {
 	if( Direct3DDevice == NULL ) return false;
@@ -678,6 +844,7 @@ bool tTVPDrawer_D3DDoubleBuffering::WaitForVBlank( tjs_int* in_vblank, tjs_int* 
 	*in_vblank = inVsync ? 1 : 0;
 	return true;
 }
+//---------------------------------------------------------------------------
 int tTVPDrawer_D3DDoubleBuffering::GetInterpolationCapability() {
 	// bit 0 for point-on-point, bit 1 for bilinear interpolation
 	GetDirect3D9Device();
@@ -702,28 +869,44 @@ bool tTVPDrawer_D3DDoubleBuffering::SwitchToFullScreen( HWND window, tjs_uint w,
 {
 	bool success = false;
 	HRESULT hr;
-	D3DPRESENT_PARAMETERS d3dpp = {0};
-	if( changeresolution ) {
-		hr = DecideD3DPresentParametersForFullScreen( d3dpp, window );
-	} else {
-		hr = DecideD3DPresentParameters( d3dpp, window, false, w, h, bpp, color );
-	}
 
-	if(FAILED(hr))
-	{
+	UINT iMonitor = GetMonitorNumber( window );
+	DestroyTexture();
+	hr = DecideD3DPresentParameters( iMonitor, window, false, w, h, bpp, color, changeresolution );
+
+	if(FAILED(hr)) {
 		TVPAddLog(TJS_W("TVPDecideD3DPresentParameters failed/hr=") + TJSInt32ToHex(hr) );
-	}
-	else
-	{
-		hr = Direct3DDevice->Reset(&d3dpp);
-		if(FAILED(hr))
-		{
-			TVPAddLog(
-				ttstr(TJS_W("IDirect3DDevice::Reset failed/hr=")) + TJSInt32ToHex(hr));
-		}
-		else
-		{
-			success = true;
+		ErrorToLog( hr );
+	} else {
+		if( iMonitor != CurrentMonitor ) {
+			 // 最初に生成された時からモニタが移動している、デバイス破棄して生成からやり直す
+			try {
+				CreateOffScreenSurface();
+				Direct3DDevice->SetDialogBoxMode( TRUE );
+				success = true;
+			} catch(...) {
+				success = false;
+			}
+		} else {
+			hr = Direct3DDevice->Reset(&D3dPP);
+			if(FAILED(hr)) {
+				// リセットに失敗したら再生成を試みる
+				try {
+					CreateOffScreenSurface();
+					Direct3DDevice->SetDialogBoxMode( TRUE );
+					success = true;
+				} catch(...) {
+					success = false;
+				} 
+			} else {
+				try {
+					CreateTexture();
+					Direct3DDevice->SetDialogBoxMode( TRUE );
+					success = true;
+				} catch(...) {
+					success = false;
+				}
+			}
 		}
 	}
 	return success;
@@ -731,13 +914,28 @@ bool tTVPDrawer_D3DDoubleBuffering::SwitchToFullScreen( HWND window, tjs_uint w,
 //---------------------------------------------------------------------------
 void tTVPDrawer_D3DDoubleBuffering::RevertFromFullScreen( HWND window, tjs_uint w, tjs_uint h, tjs_uint bpp, tjs_uint color )
 {
-	D3DPRESENT_PARAMETERS	d3dpp = {0};
-	HRESULT hr = DecideD3DPresentParameters( d3dpp, window, true, w, h, bpp );
-	if( SUCCEEDED(hr) )
-	{
-		if( Direct3DDevice ) hr = Direct3DDevice->Reset(&d3dpp);
-		else hr = E_FAIL;
+	// ウィンドウに戻す時にはモニタ移動は発生していないはず
+	bool iswindowed = D3dPP.Windowed != 0;
+	UINT iMonitor = GetMonitorNumber( window );
+	HRESULT hr = DecideD3DPresentParameters( iMonitor, window, true, w, h, bpp );
+	if( SUCCEEDED(hr) ) {
+		if( Direct3DDevice ) {
+			hr = Direct3DDevice->Reset(&D3dPP);
+			if( FAILED(hr) ) {
+				// リセットに失敗したら再生成を試みる
+				CreateOffScreenSurface();
+				hr = S_OK;
+			} else {
+				if( FAILED( hr = InitializeDirect3DState() ) ) {
+					ErrorToLog( hr );
+				}
+			}
+		} else {
+			hr = E_FAIL;
+		}
 	}
-	if( FAILED(hr) ) ::ChangeDisplaySettings(NULL, 0);
+	if( iswindowed != true && FAILED(hr) ) {
+		::ChangeDisplaySettings(NULL, 0);
+	}
 }
 //---------------------------------------------------------------------------

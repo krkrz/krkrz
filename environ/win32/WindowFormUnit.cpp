@@ -752,10 +752,11 @@ void TTVPWindowForm::SetZoom( tjs_int numer, tjs_int denom, bool set_logical ) {
 }
 void TTVPWindowForm::SetFullScreenMode( bool b ) {
 	// note that we should not change the display mode when showing overlay videos.
-	CallWindowDetach(false); // notify to plugin
+	CallWindowDetach(false); // notify to plugin デタッチは行われないようになったので、フルスクリーン切り換え通知の方が良い
 	try {
 		if(TJSNativeInstance) TJSNativeInstance->DetachVideoOverlay();
-		FreeDirectInputDevice();
+
+		// FreeDirectInputDevice();
 		// due to re-create window (but current implementation may not re-create the window)
 
 		if( b ) {
@@ -769,19 +770,16 @@ void TTVPWindowForm::SetFullScreenMode( bool b ) {
 			OrgHeight = GetHeight();
 
 			// determin desired full screen size
-			tjs_int desired_fs_w = InnerWidthSave;
-			tjs_int desired_fs_h = InnerHeightSave;
-
-			// set ScrollBox' border invisible
-			//OrgInnerSunken = GetInnerSunken();
-			//ScrollBox->BorderStyle = Forms::bsNone;
+			tjs_int desired_fs_w = GetInnerWidth();
+			tjs_int desired_fs_h = GetInnerHeight();
+			OrgClientWidth = desired_fs_w;
+			OrgClientHeight = desired_fs_h;
 
 			// set BorderStyle
-			OrgStyle = GetWindowLong(GetHandle(), GWL_STYLE);
-			OrgExStyle = GetWindowLong(GetHandle(), GWL_EXSTYLE);
-			//OrgScrollBoxBorderStyle = ScrollBox->BorderStyle;
-			SetWindowLong( GetHandle(), GWL_STYLE, WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_OVERLAPPED );
-			//ScrollBox->BorderStyle = Forms::bsNone;
+			OrgStyle = ::GetWindowLong(GetHandle(), GWL_STYLE);
+			OrgExStyle = ::GetWindowLong(GetHandle(), GWL_EXSTYLE);
+			//::SetWindowLong( GetHandle(), GWL_STYLE, WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_OVERLAPPED );
+			::SetWindowLong( GetHandle(), GWL_STYLE, WS_POPUP | WS_VISIBLE);
 
 			// try to switch to fullscreen
 			try {
@@ -790,12 +788,13 @@ void TTVPWindowForm::SetFullScreenMode( bool b ) {
 				SetFullScreenMode(false);
 				return;
 			}
+			::SetWindowLong( GetHandle(), GWL_STYLE, WS_POPUP | WS_VISIBLE);
 
 			// get resulted screen size
 			tjs_int fs_w = TVPFullScreenMode.Width;
 			tjs_int fs_h = TVPFullScreenMode.Height;
 
-			// determine fullscreen zoom factor and ScrollBox size
+			// determine fullscreen zoom factor and client size
 			int sb_w, sb_h, zoom_d, zoom_n;
 			zoom_d = TVPFullScreenMode.ZoomDenom;
 			zoom_n = TVPFullScreenMode.ZoomNumer;
@@ -808,37 +807,34 @@ void TTVPWindowForm::SetFullScreenMode( bool b ) {
 			TVPFullScreenedWindow = this;
 
 			// reset window size
-			SetLeft( 0 );
-			SetTop( 0 );
-			SetWidth( fs_w );
-			SetHeight( fs_h );
-
-			// reset ScrollBox size
-			/*
-			ScrollBox->Align = alNone;
-			ScrollBox->Left = (fs_w - sb_w)/2;
-			ScrollBox->Top = (fs_h - sb_h)/2;
-			ScrollBox->Width = sb_w;
-			ScrollBox->Height = sb_h;
-			*/
-
+			HMONITOR hMonitor = ::MonitorFromWindow( GetHandle(), MONITOR_DEFAULTTOPRIMARY );
+			MONITORINFO mi = {sizeof(MONITORINFO)};
+			int ml = 0, mt = 0;
+			if( ::GetMonitorInfo( hMonitor, &mi ) ) {
+				ml = mi.rcWork.left;
+				mt = mi.rcWork.top;
+			}
+			SetBounds( ml, mt, fs_w, fs_h );
 
 			// re-adjust video rect
 			if(TJSNativeInstance) TJSNativeInstance->ReadjustVideoRect();
 
 			// activate self
-			//Application->BringToFront();
 			BringToFront();
 			::SetFocus(GetHandle());
 
 			// activate self (again) // Added by W.Dee 2003/11/02
+			/*
 			Sleep(200);
 			SetWindowPos( GetHandle(), HWND_TOP, 0, 0, 0, 0, SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOREPOSITION|SWP_NOSIZE|SWP_SHOWWINDOW );
+			*/
 		} else {
 			if(TVPFullScreenedWindow != this) return;
 
+			SetBounds(OrgLeft, OrgTop, OrgWidth, OrgHeight);
+
 			// revert from fullscreen
-			if(TJSNativeInstance) TVPRevertFromFullScreen( GetHandle(), OrgWidth, OrgHeight, TJSNativeInstance->GetDrawDevice() );
+			if(TJSNativeInstance) TVPRevertFromFullScreen( GetHandle(), OrgClientWidth, OrgClientHeight, TJSNativeInstance->GetDrawDevice() );
 			TVPFullScreenedWindow = NULL;
 
 			// revert zooming factor
@@ -850,21 +846,13 @@ void TTVPWindowForm::SetFullScreenMode( bool b ) {
 			// set BorderStyle
 			SetWindowLong(GetHandle(), GWL_STYLE, OrgStyle);
 			SetWindowLong(GetHandle(), GWL_EXSTYLE, OrgExStyle);
-			//ScrollBox->BorderStyle = OrgScrollBoxBorderStyle;
-
-			// set ScrollBox visible
-			//SetInnerSunken(OrgInnerSunken);
-			//ScrollBox->Align = alClient;
-			// SetWindowPos(ScrollBox->Handle, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE|SWP_NOACTIVATE);
 
 			// revert the position and size
 			SetBounds(OrgLeft, OrgTop, OrgWidth, OrgHeight);
+			SetInnerSize( OrgClientWidth, OrgClientHeight );
 
 			// re-adjust video rect
 			if(TJSNativeInstance) TJSNativeInstance->ReadjustVideoRect();
-
-			// restore
-			// WindowState = wsNormal;
 		}
 	} catch(...) {
 		CallWindowAttach();
@@ -872,7 +860,6 @@ void TTVPWindowForm::SetFullScreenMode( bool b ) {
 	}
 	CallWindowAttach();
 
-	//SetMouseCursor(CurrentMouseCursor);
 	CurrentMouseCursor.SetCursor();
 }
 bool TTVPWindowForm::GetFullScreenMode() const { 
@@ -880,7 +867,7 @@ bool TTVPWindowForm::GetFullScreenMode() const {
 }
 
 void TTVPWindowForm::CallWindowDetach(bool close) {
-	if( TJSNativeInstance ) TJSNativeInstance->GetDrawDevice()->SetTargetWindow( NULL, false );
+	// if( TJSNativeInstance ) TJSNativeInstance->GetDrawDevice()->SetTargetWindow( NULL, false );
 
 	tTVPWindowMessage msg;
 	msg.Msg = TVP_WM_DETACH;
