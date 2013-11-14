@@ -80,7 +80,8 @@ enum tTVPFullScreenResolutionMode
 								//!< preserving the original aspect ratio
 	fsrNearest, //!< let screen resolution fitting neaest to the preferred resolution.
 				//!< There is no guarantee that the aspect ratio is preserved
-	fsrNoChange //!< no change resolution
+	fsrNoChange,//!< no change resolution
+	fsrExpandWindow	//!< expand window
 };
 static IDirect3D9 *TVPDirect3D=NULL;
 
@@ -231,6 +232,8 @@ static void TVPInitFullScreenOptions()
 			TVPPreferredFullScreenResolutionMode = fsrNearest;
 		else if(str == TJS_W("nochange"))
 			TVPPreferredFullScreenResolutionMode = fsrNoChange;
+		else if(str == TJS_W("expandwindow"))
+			TVPPreferredFullScreenResolutionMode = fsrExpandWindow;
 	}
 
 	if(TVPGetCommandLine(TJS_W("-fszoom"), &val) )
@@ -467,6 +470,7 @@ static ttstr TVPGetGetFullScreenResolutionModeString(tTVPFullScreenResolutionMod
 	case fsrProportional:		return TJS_W("fsrProportional");
 	case fsrNearest:			return TJS_W("fsrNearest");
 	case fsrNoChange:			return TJS_W("fsrNoChange");
+	case fsrExpandWindow:		return TJS_W("fsrExpandWindow");
 	}
 	return ttstr();
 }
@@ -646,7 +650,7 @@ static void TVPMakeFullScreenModeCandidates(
 		if(!last_line.IsEmpty()) TVPAddLog(last_line);
 	}
 
-	if(mode != fsrNoChange)
+	if(mode != fsrNoChange && mode != fsrExpandWindow )
 	{
 
 		if(mode != fsrNearest)
@@ -888,10 +892,11 @@ void TVPSwitchToFullScreen(HWND window, tjs_int w, tjs_int h, iTVPDrawDevice* dr
 		i != candidates.end(); i++)
 	{
 		TVPAddLog( TVPFormatMessage(TVPInfoTryScreenMode, i->Dump()) );
-		success = drawdevice->SwitchToFullScreen( window, i->Width, i->Height, i->BitsPerPixel, TVPDisplayColorFormat, TVPPreferredFullScreenResolutionMode == fsrNoChange );
+		success = drawdevice->SwitchToFullScreen( window, i->Width, i->Height, i->BitsPerPixel, TVPDisplayColorFormat, TVPPreferredFullScreenResolutionMode != fsrExpandWindow );
 		if( success )
 		{
 			TVPFullScreenMode = *i;
+			break;
 		}
 	}
 

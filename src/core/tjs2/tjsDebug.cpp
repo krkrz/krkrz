@@ -808,7 +808,7 @@ public:
 		Initialize();
 	}
 	void Initialize() {
-		DebuggerHwnd = ::FindWindow(_T("TScriptDebuggerForm"),NULL);	//!< –¼‘OŒˆ‚ß‘Å‚¿
+		DebuggerHwnd = ::FindWindow(L"TScriptDebuggerForm",NULL);	//!< –¼‘OŒˆ‚ß‘Å‚¿
 		if( DebuggerHwnd == 0 ) {
 			DebuggerHwnd = INVALID_HANDLE_VALUE;
 		}
