@@ -18,12 +18,13 @@ data/win32dialog.tjs	win32dialog.dllのヘルパーTJSです
 data/fontselect.tjs	フォント選択ダイアログの本体です
 data/inputstring.tjs	System.inputString 互換のスクリプト本体です
 
+	※各tjsファイルは utf16le-bom エンコードになっています
 
 ●動作確認方法
 
 動作確認には足りないファイルを用意していただく必要があります。
 
-tvpwin32.exe		krkrz_20130702.zipのバージョンで動作確認しております
+tvpwin32.exe		β３で確認
 plugin/menu.dll		〃
 plugin/win32dialog.dll	吉里吉里本家レポジトリからバイナリを取得してください
 			⇒ https://sv.kikyou.info/svn/kirikiri2/trunk/kirikiri2/bin/win32/plugin/win32dialog.dll
@@ -44,17 +45,9 @@ GDI/FreeTypeはラスタライザのバージョンの違いによるものです。
 
 ●既知の不具合
 
-krkrz_20130702のバイナリでは下記の不具合があります。
-
-・GDIラスタライザの場合，一部の文字が半透明表示になる
-＞どういう法則でそうなるかは不明。一度FreeType版を開いた後にこちらを開くとなりやすい模様
-
-・FreeTypeは一部フォントのレンダリングで例外が発生して正しく表示されない
-＞drawTextで「Font Rasterize error.」というエラーが出ます
-
-・Window.menu.visible = true にするとメニューが表示されない
-＞menu.dllをリンクして少なくとも1つaddされた時点で表示されるようなので問題はないのですが，
-＞互換の観点から見ると少々問題のように思います。
+・TrueType以外のフォント（System,Terminal等）が描画されない（GDI/FreeTypeとも）
+＞Optionで「fsfTrueTypeOnly」を外すと確認できます
+　freetypeは仕様としてもfont.getListから外す等の対応があっても良いのでは
 
 
 ●APIについて
