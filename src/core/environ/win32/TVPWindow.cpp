@@ -243,8 +243,8 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 	case WM_SYSCHAR:
 	case WM_CHAR:
 		OnKeyPress( (WORD)wParam, lParam&0xffff, (lParam&(1<<30))?true:false, (lParam&(1<<31))?true:false );
-		return 0;
-		
+		return ::DefWindowProc(hWnd,msg,wParam,lParam);
+
 	case WM_SETFOCUS:
 		OnFocus( reinterpret_cast<HWND>(wParam) );
 		//return ::DefWindowProc(hWnd,msg,wParam,lParam);
