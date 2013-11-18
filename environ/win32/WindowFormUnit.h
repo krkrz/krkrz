@@ -139,6 +139,7 @@ private:
 	int OrgHeight;
 	int OrgClientWidth;
 	int OrgClientHeight;
+	tTVPRect FullScreenDestRect;
 
 	//-- keyboard input
 	std::string PendingKeyCodes;
@@ -203,6 +204,8 @@ private:
 
 	void CallWindowDetach(bool close);
 	void CallWindowAttach();
+	void CallFullScreenChanged();
+	void CallFullScreenChanging();
 	
 	bool InternalDeliverMessageToReceiver(tTVPWindowMessage &msg);
 	bool DeliverMessageToReceiver(tTVPWindowMessage &msg) {
@@ -223,6 +226,7 @@ private:
 	
 	static bool FindKeyTrapper(LRESULT &result, UINT msg, WPARAM wparam, LPARAM lparam);
 	bool ProcessTrappedKeyMessage(LRESULT &result, UINT msg, WPARAM wparam, LPARAM lparam);
+
 protected:
 	LRESULT WINAPI Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
 

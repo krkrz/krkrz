@@ -280,9 +280,6 @@
     <ClInclude Include="..\visual\win32\LayerImpl.h">
       <Filter>visual\win32</Filter>
     </ClInclude>
-    <ClInclude Include="..\visual\win32\PassThroughDrawDevice.h">
-      <Filter>visual\win32</Filter>
-    </ClInclude>
     <ClInclude Include="..\visual\win32\VideoOvlImpl.h">
       <Filter>visual\win32</Filter>
     </ClInclude>
@@ -448,15 +445,6 @@
     <ClInclude Include="..\visual\win32\BitmapBitsAlloc.h">
       <Filter>visual\win32</Filter>
     </ClInclude>
-    <ClInclude Include="..\visual\win32\D3D9Drawer.h">
-      <Filter>visual\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="..\visual\win32\Drawer.h">
-      <Filter>visual\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="..\visual\win32\GDIDrawer.h">
-      <Filter>visual\win32</Filter>
-    </ClInclude>
     <ClInclude Include="..\tjs2\tjsObjectExtendable.h">
       <Filter>tjs2</Filter>
     </ClInclude>
@@ -534,6 +522,9 @@
     </ClInclude>
     <ClInclude Include="..\environ\win32\WindowsUtil.h">
       <Filter>environ\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\win32\BasicDrawDevice.h">
+      <Filter>visual\win32</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -738,9 +729,6 @@
     <ClCompile Include="..\visual\win32\LayerImpl.cpp">
       <Filter>visual\win32</Filter>
     </ClCompile>
-    <ClCompile Include="..\visual\win32\PassThroughDrawDevice.cpp">
-      <Filter>visual\win32</Filter>
-    </ClCompile>
     <ClCompile Include="..\visual\win32\VideoOvlImpl.cpp">
       <Filter>visual\win32</Filter>
     </ClCompile>
@@ -876,12 +864,6 @@
     <ClCompile Include="..\visual\win32\BitmapBitsAlloc.cpp">
       <Filter>visual\win32</Filter>
     </ClCompile>
-    <ClCompile Include="..\visual\win32\D3D9Drawer.cpp">
-      <Filter>visual\win32</Filter>
-    </ClCompile>
-    <ClCompile Include="..\visual\win32\GDIDrawer.cpp">
-      <Filter>visual\win32</Filter>
-    </ClCompile>
     <ClCompile Include="..\tjs2\tjsObjectExtendable.cpp">
       <Filter>tjs2</Filter>
     </ClCompile>
@@ -950,6 +932,9 @@
     </ClCompile>
     <ClCompile Include="..\msg\win32\MsgLoad.cpp">
       <Filter>msg\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\win32\BasicDrawDevice.cpp">
+      <Filter>visual\win32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -141,7 +141,7 @@ void TVPStartObjectHashMapLog(void)
 		si.cb = sizeof(si);
 		si.dwFlags = STARTF_USESHOWWINDOW;
 		si.wShowWindow = SW_SHOWNORMAL;
-		
+
 		wchar_t szFull[_MAX_PATH];
 		::GetModuleFileName(NULL, szFull, sizeof(szFull) / sizeof(wchar_t));
 		std::wstring exepath(szFull);

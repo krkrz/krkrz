@@ -22,7 +22,7 @@
 #include "SysInitIntf.h"
 #include "VideoOvlIntf.h"
 #include "LayerManager.h"
-#include "PassThroughDrawDevice.h"
+#include "BasicDrawDevice.h"
 #include "EventImpl.h"
 
 #include "Application.h"
@@ -166,7 +166,7 @@ tTJSNI_BaseWindow::Construct(tjs_int numparams, tTJSVariant **param,
 		iTJSDispatch2 * newobj = NULL;
 		try
 		{
-			cls = new tTJSNC_PassThroughDrawDevice();
+			cls = new tTJSNC_BasicDrawDevice();
 			if(TJS_FAILED(cls->CreateNew(0, NULL, NULL, &newobj, 0, NULL, cls)))
 				TVPThrowExceptionMessage(TVPInternalError,
 					TJS_W("tTJSNI_Window::Construct"));
