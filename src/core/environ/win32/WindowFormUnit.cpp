@@ -817,8 +817,8 @@ void TTVPWindowForm::SetFullScreenMode( bool b ) {
 			MONITORINFO mi = {sizeof(MONITORINFO)};
 			int ml = 0, mt = 0;
 			if( ::GetMonitorInfo( hMonitor, &mi ) ) {
-				ml = mi.rcWork.left;
-				mt = mi.rcWork.top;
+				ml = mi.rcMonitor.left;
+				mt = mi.rcMonitor.top;
 			}
 			SetBounds( ml, mt, fs_w, fs_h );
 			SetInnerSize( fs_w, fs_h );
