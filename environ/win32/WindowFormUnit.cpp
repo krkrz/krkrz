@@ -190,7 +190,8 @@ void TVPInitWindowOptions()
 
 TTVPWindowForm::TTVPWindowForm( tTVPApplication* app, tTJSNI_Window* ni ) : tTVPWindow(), CurrentMouseCursor(crDefault), touch_points_(this),
 	LayerLeft(0), LayerTop(0), LayerWidth(32), LayerHeight(32),
-	HintX(0), HintY(0), HintTimer(NULL), HintDelay(TVP_TOOLTIP_SHOW_DELAY), LastHintSender(NULL) {
+	HintX(0), HintY(0), HintTimer(NULL), HintDelay(TVP_TOOLTIP_SHOW_DELAY), LastHintSender(NULL),
+	FullScreenDestRect(0,0,0,0) {
 	CreateWnd( L"TVPMainWindow", Application->GetTitle(), 10, 10 );
 	TVPInitWindowOptions();
 	
@@ -582,12 +583,13 @@ bool TTVPWindowForm::GetWindowActive() {
 }
 void TTVPWindowForm::SetDrawDeviceDestRect()
 {
-	tjs_int x_ofs = 0;
-	tjs_int y_ofs = 0;
-	tTVPRect rt;
-	GetClientRect( rt );
-
-	tTVPRect destrect( rt.left + x_ofs, rt.top + y_ofs, rt.right + x_ofs, rt.bottom + y_ofs);
+	tTVPRect destrect;
+	if( GetFullScreenMode() ) {
+		destrect = FullScreenDestRect;
+	} else {
+		GetClientRect( destrect );
+	}
+	//GetClientRect( destrect );
 
 	if( LastSentDrawDeviceDestRect != destrect ) {
 		if( TJSNativeInstance ) TJSNativeInstance->GetDrawDevice()->SetDestRectangle(destrect);
@@ -752,7 +754,7 @@ void TTVPWindowForm::SetZoom( tjs_int numer, tjs_int denom, bool set_logical ) {
 }
 void TTVPWindowForm::SetFullScreenMode( bool b ) {
 	// note that we should not change the display mode when showing overlay videos.
-	CallWindowDetach(false); // notify to plugin デタッチは行われないようになったので、フルスクリーン切り換え通知の方が良い
+	CallFullScreenChanging(); // notify to plugin
 	try {
 		if(TJSNativeInstance) TJSNativeInstance->DetachVideoOverlay();
 
@@ -794,12 +796,16 @@ void TTVPWindowForm::SetFullScreenMode( bool b ) {
 			tjs_int fs_w = TVPFullScreenMode.Width;
 			tjs_int fs_h = TVPFullScreenMode.Height;
 
+
 			// determine fullscreen zoom factor and client size
 			int sb_w, sb_h, zoom_d, zoom_n;
 			zoom_d = TVPFullScreenMode.ZoomDenom;
 			zoom_n = TVPFullScreenMode.ZoomNumer;
 			sb_w = desired_fs_w * zoom_n / zoom_d;
 			sb_h = desired_fs_h * zoom_n / zoom_d;
+
+			FullScreenDestRect.set_size( sb_w, sb_h );
+			FullScreenDestRect.set_offsets( (fs_w - sb_w)/2, (fs_h - sb_h)/2 );
 
 			SetZoom(zoom_n, zoom_d, false);
 
@@ -815,6 +821,16 @@ void TTVPWindowForm::SetFullScreenMode( bool b ) {
 				mt = mi.rcWork.top;
 			}
 			SetBounds( ml, mt, fs_w, fs_h );
+			SetInnerSize( fs_w, fs_h );
+
+			/*
+			// reset ScrollBox size
+			ScrollBox->Align = alNone;
+			ScrollBox->Left = (fs_w - sb_w)/2;
+			ScrollBox->Top = (fs_h - sb_h)/2;
+			ScrollBox->Width = sb_w;
+			ScrollBox->Height = sb_h;
+			*/
 
 			// re-adjust video rect
 			if(TJSNativeInstance) TJSNativeInstance->ReadjustVideoRect();
@@ -828,6 +844,7 @@ void TTVPWindowForm::SetFullScreenMode( bool b ) {
 			Sleep(200);
 			SetWindowPos( GetHandle(), HWND_TOP, 0, 0, 0, 0, SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOREPOSITION|SWP_NOSIZE|SWP_SHOWWINDOW );
 			*/
+			::SetWindowPos( GetHandle(), HWND_TOP, 0, 0, 0, 0, SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOREPOSITION|SWP_NOSIZE|SWP_SHOWWINDOW );
 		} else {
 			if(TVPFullScreenedWindow != this) return;
 
@@ -836,6 +853,7 @@ void TTVPWindowForm::SetFullScreenMode( bool b ) {
 			// revert from fullscreen
 			if(TJSNativeInstance) TVPRevertFromFullScreen( GetHandle(), OrgClientWidth, OrgClientHeight, TJSNativeInstance->GetDrawDevice() );
 			TVPFullScreenedWindow = NULL;
+			FullScreenDestRect.set_offsets( 0, 0 );
 
 			// revert zooming factor
 			ActualZoomDenom = ZoomDenom;
@@ -850,15 +868,16 @@ void TTVPWindowForm::SetFullScreenMode( bool b ) {
 			// revert the position and size
 			SetBounds(OrgLeft, OrgTop, OrgWidth, OrgHeight);
 			SetInnerSize( OrgClientWidth, OrgClientHeight );
+			::SetWindowPos( GetHandle(), HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOREPOSITION|SWP_NOSIZE|SWP_SHOWWINDOW );
 
 			// re-adjust video rect
 			if(TJSNativeInstance) TJSNativeInstance->ReadjustVideoRect();
 		}
 	} catch(...) {
-		CallWindowAttach();
+		CallFullScreenChanged();
 		throw;
 	}
-	CallWindowAttach();
+	CallFullScreenChanged();
 
 	CurrentMouseCursor.SetCursor();
 }
@@ -866,8 +885,9 @@ bool TTVPWindowForm::GetFullScreenMode() const {
 	return TVPFullScreenedWindow == this;
 }
 
+//---------------------------------------------------------------------------
 void TTVPWindowForm::CallWindowDetach(bool close) {
-	// if( TJSNativeInstance ) TJSNativeInstance->GetDrawDevice()->SetTargetWindow( NULL, false );
+	if( TJSNativeInstance ) TJSNativeInstance->GetDrawDevice()->SetTargetWindow( NULL, false );
 
 	tTVPWindowMessage msg;
 	msg.Msg = TVP_WM_DETACH;
@@ -889,6 +909,28 @@ void TTVPWindowForm::CallWindowAttach() {
 
 	DeliverMessageToReceiver(msg);
 }
+//---------------------------------------------------------------------------
+void TTVPWindowForm::CallFullScreenChanged() {
+	LastSentDrawDeviceDestRect.clear();
+	::InvalidateRect( GetHandle(), NULL, FALSE );
+
+	tTVPWindowMessage msg;
+	msg.Msg = TVP_WM_FULLSCREEN_CHANGED;
+	msg.LParam = 0;
+	msg.WParam = 0;
+	msg.Result = 0;
+	DeliverMessageToReceiver(msg);
+}
+//---------------------------------------------------------------------------
+void TTVPWindowForm::CallFullScreenChanging() {
+	tTVPWindowMessage msg;
+	msg.Msg = TVP_WM_FULLSCREEN_CHANGING;
+	msg.LParam = reinterpret_cast<int>(GetWindowHandleForPlugin());
+	msg.WParam = 0;
+	msg.Result = 0;
+	DeliverMessageToReceiver(msg);
+}
+
 
 bool TTVPWindowForm::InternalDeliverMessageToReceiver(tTVPWindowMessage &msg) {
 	if( !TJSNativeInstance ) return false;

@@ -1,65 +1,67 @@
-//---------------------------------------------------------------------------
-/*
-	TVP2 ( T Visual Presenter 2 )  A script authoring tool
-	Copyright (C) 2000 W.Dee <dee@kikyou.info> and contributors
 
-	See details of license at "license.txt"
-*/
-//---------------------------------------------------------------------------
-//!@file "PassThrough" 描画デバイス管理
-//---------------------------------------------------------------------------
-#ifndef PASSTHROUGHDRAWDEVICE_H
-#define PASSTHROUGHDRAWDEVICE_H
+#ifndef BASIC_DRAW_DEVICE_H
+#define BASIC_DRAW_DEVICE_H
 
 #include "DrawDevice.h"
+#include <d3d9.h>
 
-class tTVPDrawer;
 //---------------------------------------------------------------------------
-//! @brief		「Pass Through」デバイス(もっとも基本的な描画を行うのみのデバイス)
+//! @brief		「Basic」デバイス(もっとも基本的な描画を行うのみのデバイス)
 //---------------------------------------------------------------------------
-class tTVPPassThroughDrawDevice : public tTVPDrawDevice
+class tTVPBasicDrawDevice : public tTVPDrawDevice
 {
 	typedef tTVPDrawDevice inherited;
+
 	HWND TargetWindow;
 	bool IsMainWindow;
-	tTVPDrawer * Drawer; //!< 描画を行うもの
+	bool DrawUpdateRectangle;
+
+	IDirect3D9*				Direct3D;
+	IDirect3DDevice9*		Direct3DDevice;
+	IDirect3DTexture9*		Texture;
+	D3DPRESENT_PARAMETERS	D3dPP;
+	D3DDISPLAYMODE			DispMode;
+
+	UINT	CurrentMonitor;
+	void*	TextureBuffer; //!< テクスチャのサーフェースへのメモリポインタ
+	long	TexturePitch; //!< テクスチャのピッチ
+
+	tjs_uint TextureWidth; //!< テクスチャの横幅
+	tjs_uint TextureHeight; //!< テクスチャの縦幅
+
+	bool ShouldShow; //!< show で実際に画面に画像を転送すべきか
+
+	tjs_uint VsyncInterval;
 
 public:
-	//! @brief	drawerのタイプ
-	enum tDrawerType
-	{
-		dtNone, //!< drawer なし
-		dtDrawDib, //!< もっとも単純なdrawer
-		dtDBGDI, // GDI によるダブルバッファリングを行うdrawer
-		//dtDBDD, // DirectDraw によるダブルバッファリングを行うdrawer
-		dtDBD3D // Direct3D によるダブルバッファリングを行うdrawer
-	};
+	tTVPBasicDrawDevice(); //!< コンストラクタ
 
 private:
-	tDrawerType DrawerType; //!< drawer のタイプ
-	tDrawerType PreferredDrawerType; //!< 使って欲しい drawer のタイプ
+	~tTVPBasicDrawDevice(); //!< デストラクタ
 
-	bool DestSizeChanged; //!< DestRect のサイズに変更があったか
-	bool SrcSizeChanged; //!< SrcSize に変更があったか
+	void InvalidateAll();
+
+	UINT GetMonitorNumber( HWND window );
+
+	void GetDirect3D9Device();
+	HRESULT InitializeDirect3DState();
+	HRESULT DecideD3DPresentParameters();
+
+	void CreateD3DDevice();
+	void DestroyD3DDevice();
+
+	void CreateTexture();
+	void DestroyTexture();
+
+	void TryRecreateWhenDeviceLost();
+	void ErrorToLog( HRESULT hr );
+	void CheckMonitorMoved();
 
 public:
-	tTVPPassThroughDrawDevice(); //!< コンストラクタ
-private:
-	~tTVPPassThroughDrawDevice(); //!< デストラクタ
+	void SetToRecreateDrawer() { DestroyD3DDevice(); }
 
 public:
-	void SetToRecreateDrawer() { DestroyDrawer(); }
-	void DestroyDrawer();
-private:
-	void CreateDrawer(tDrawerType type);
-	void CreateDrawer(bool zoom_required, bool should_benchmark);
-
-public:
-	void EnsureDrawer();
-
-	tDrawerType GetDrawerType() const { return DrawerType; }
-	void SetPreferredDrawerType(tDrawerType type) { PreferredDrawerType = type; }
-	tDrawerType GetPreferredDrawerType() const { return PreferredDrawerType; }
+	void EnsureDevice();
 
 //---- LayerManager の管理関連
 	virtual void TJS_INTF_METHOD AddLayerManager(iTVPLayerManager * manager);
@@ -92,25 +94,25 @@ public:
 
 
 //---------------------------------------------------------------------------
-// tTJSNI_PassThroughDrawDevice
+// tTJSNI_BasicDrawDevice
 //---------------------------------------------------------------------------
-class tTJSNI_PassThroughDrawDevice :
+class tTJSNI_BasicDrawDevice :
 	public tTJSNativeInstance
 {
 	typedef tTJSNativeInstance inherited;
 
-	tTVPPassThroughDrawDevice * Device;
+	tTVPBasicDrawDevice * Device;
 
 public:
-	tTJSNI_PassThroughDrawDevice();
-	~tTJSNI_PassThroughDrawDevice();
+	tTJSNI_BasicDrawDevice();
+	~tTJSNI_BasicDrawDevice();
 	tjs_error TJS_INTF_METHOD
 		Construct(tjs_int numparams, tTJSVariant **param,
 			iTJSDispatch2 *tjs_obj);
 	void TJS_INTF_METHOD Invalidate();
 
 public:
-	tTVPPassThroughDrawDevice * GetDevice() const { return Device; }
+	tTVPBasicDrawDevice * GetDevice() const { return Device; }
 
 };
 //---------------------------------------------------------------------------
@@ -118,12 +120,12 @@ public:
 
 
 //---------------------------------------------------------------------------
-// tTJSNC_PassThroughDrawDevice
+// tTJSNC_BasicDrawDevice
 //---------------------------------------------------------------------------
-class tTJSNC_PassThroughDrawDevice : public tTJSNativeClass
+class tTJSNC_BasicDrawDevice : public tTJSNativeClass
 {
 public:
-	tTJSNC_PassThroughDrawDevice();
+	tTJSNC_BasicDrawDevice();
 
 	static tjs_uint32 ClassID;
 
@@ -133,4 +135,4 @@ private:
 //---------------------------------------------------------------------------
 
 
-#endif
+#endif // BASIC_DRAW_DEVICE_H

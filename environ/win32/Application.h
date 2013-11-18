@@ -68,6 +68,7 @@ class tTVPApplication {
 	AcceleratorKeyTable accel_key_;
 	bool tarminate_;
 	bool ApplicationActivating;
+	bool HasMapReportProcess;
 
 	class tTVPAsyncImageLoader* ImageLoadThread;
 

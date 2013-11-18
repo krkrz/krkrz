@@ -26,7 +26,6 @@
 #include "DebugIntf.h"
 #include "PluginImpl.h"
 #include "LayerManager.h"
-#include "PassThroughDrawDevice.h"
 #include "EventImpl.h"
 
 #include "Application.h"
