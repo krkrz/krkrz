@@ -229,7 +229,8 @@ int APIENTRY WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	return TVPTerminateCode;
 }
 tTVPApplication::tTVPApplication() : is_attach_console_(false), tarminate_(false), ApplicationActivating(true)
-	 , ImageLoadThread(NULL) {
+	 , ImageLoadThread(NULL), HasMapReportProcess(false)
+{
 }
 tTVPApplication::~tTVPApplication() {
 	while( windows_list_.size() ) {
@@ -255,6 +256,7 @@ int TVPWriteHWEDumpFile( EXCEPTION_POINTERS* pExceptionPointers ) {
 	const wchar_t* szVersion = TVPGetVersionString().c_str();
 
 	TVPEnsureDataPathDirectory();
+	TJS_strcpy(szPath, TVPNativeDataPath.c_str());
 
 	SYSTEMTIME stLocalTime;
 	::GetLocalTime( &stLocalTime );
@@ -336,6 +338,9 @@ bool tTVPApplication::StartApplication( int argc, char* argv[] ) {
 	ArgV = argv;
 	for( int i = 0; i < argc; i++ ) {
 		CommandLines.push_back( std::string(argv[i]) );
+		if(!strcmp(argv[i], "-@processohmlog")) {
+			HasMapReportProcess = true;
+		}
 	}
 	TVPTerminateCode = 0;
 
@@ -441,6 +446,7 @@ bool tTVPApplication::StartApplication( int argc, char* argv[] ) {
  */
 void tTVPApplication::CheckConsole() {
 #ifdef TVP_LOG_TO_COMMANDLINE_CONSOLE
+	if( HasMapReportProcess ) return; // 書き出し用子プロセスして起動されていた時はコンソール接続しない
 	HANDLE hin  = ::GetStdHandle(STD_INPUT_HANDLE);
 	HANDLE hout = ::GetStdHandle(STD_OUTPUT_HANDLE);
 	HANDLE herr = ::GetStdHandle(STD_ERROR_HANDLE);
@@ -461,7 +467,6 @@ void tTVPApplication::CheckConsole() {
 	}
 
 	if( (hin==0||hout==0||herr==0) && attachedConsole ) {
-		is_attach_console_ = true;
 		wchar_t console[256];
 		::GetConsoleTitle( console, 256 );
 		console_title_ = std::wstring( console );
@@ -470,6 +475,7 @@ void tTVPApplication::CheckConsole() {
 		if (hout) ::SetStdHandle(STD_OUTPUT_HANDLE, hout);
 		if (herr) ::SetStdHandle(STD_ERROR_HANDLE, herr);
 	}
+	is_attach_console_ = attachedConsole;
 #endif
 }
 
@@ -480,6 +486,7 @@ void tTVPApplication::CloseConsole() {
 	if( is_attach_console_ ) {
 		::SetConsoleTitle( console_title_.c_str() );
 		::FreeConsole();
+		is_attach_console_ = false;
 	}
 }
 

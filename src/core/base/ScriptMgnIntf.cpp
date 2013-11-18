@@ -37,7 +37,7 @@
 #include "tjsRandomGenerator.h"
 #include "SysInitIntf.h"
 #include "PhaseVocoderFilter.h"
-#include "PassThroughDrawDevice.h"
+#include "BasicDrawDevice.h"
 #include "BinaryStream.h"
 #include "SysInitImpl.h"
 #include "SystemControl.h"
@@ -522,12 +522,11 @@ void TVPInitScriptEngine()
 	/* Window and its drawdevices */
 	iTJSDispatch2 * windowclass = NULL;
 	REGISTER_OBJECT(Window, (windowclass = TVPCreateNativeClass_Window()));
-	dsp = new tTJSNC_PassThroughDrawDevice();
+	dsp = new tTJSNC_BasicDrawDevice();
 	val = tTJSVariant(dsp);
 	dsp->Release();
 	windowclass->PropSet(TJS_MEMBERENSURE|TJS_IGNOREPROP|TJS_STATICMEMBER,
-		TJS_W("PassThroughDrawDevice"), NULL, &val, windowclass);
-
+		TJS_W("BasicDrawDevice"), NULL, &val, windowclass);
 	// Garbage Collection Hook
 	TVPAddCompactEventHook(&TVPTJSGCCallback);
 }
