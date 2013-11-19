@@ -15,6 +15,9 @@
 
 #include <d3d9.h>
 #include <mmsystem.h>
+#if (_MSC_VER==1800)
+	#include <algorithm>
+#endif
 
 //---------------------------------------------------------------------------
 // ƒIƒvƒVƒ‡ƒ“
