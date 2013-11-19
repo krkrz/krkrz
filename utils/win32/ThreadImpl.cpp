@@ -12,6 +12,7 @@
 #include "tjsCommHead.h"
 
 #include <process.h>
+#include <algorithm>
 
 #include "ThreadIntf.h"
 #include "ThreadImpl.h"
