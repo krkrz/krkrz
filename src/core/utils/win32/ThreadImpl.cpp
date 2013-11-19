@@ -12,6 +12,9 @@
 #include "tjsCommHead.h"
 
 #include <process.h>
+#if (_MSC_VER==1800)
+	#include <algorithm>
+#endif
 
 #include "ThreadIntf.h"
 #include "ThreadImpl.h"
