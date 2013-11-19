@@ -1117,6 +1117,13 @@ void tTJSNI_Window::ResetDrawDevice()
 	if(Form) Form->ResetDrawDevice();
 }
 //---------------------------------------------------------------------------
+void tTJSNI_Window::FullScreenGuard() const {
+	if( Form ) {
+		if(Form->GetFullScreenMode())
+			TVPThrowExceptionMessage(TVPInvalidPropertyInFullScreen);
+	}
+}
+//---------------------------------------------------------------------------
 void tTJSNI_Window::PostInputEvent(const ttstr &name, iTJSDispatch2 * params)
 {
 	// posts input event
@@ -1413,8 +1420,7 @@ void tTJSNI_Window::OnCloseQueryCalled(bool b)
 #ifdef USE_OBSOLETE_FUNCTIONS
 void tTJSNI_Window::BeginMove()
 {
-	if(Form->GetFullScreenMode())
-		TVPThrowExceptionMessage(TVPInvalidMethodInFullScreen);
+	FullScreenGuard();
 	if(Form) Form->BeginMove();
 }
 #endif
@@ -1431,8 +1437,7 @@ void tTJSNI_Window::Update(tTVPUpdateType type)
 //---------------------------------------------------------------------------
 void tTJSNI_Window::ShowModal()
 {
-	if(Form && Form->GetFullScreenMode())
-		TVPThrowExceptionMessage(TVPInvalidMethodInFullScreen);
+	FullScreenGuard();
 	if(Form)
 	{
 		TVPClearAllWindowInputEvents();
@@ -1454,9 +1459,8 @@ bool tTJSNI_Window::GetVisible() const
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetVisible(bool s)
 {
-	if(Form->GetFullScreenMode())
-		TVPThrowExceptionMessage(TVPInvalidPropertyInFullScreen);
-	if(Form) Form->SetVisible(s);
+	FullScreenGuard();
+	if( Form ) Form->SetVisible(s);
 }
 //---------------------------------------------------------------------------
 void tTJSNI_Window::GetCaption(ttstr & v) const
@@ -1471,9 +1475,8 @@ void tTJSNI_Window::SetCaption(const ttstr & v)
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetWidth(tjs_int w)
 {
-	if(Form->GetFullScreenMode())
-		TVPThrowExceptionMessage(TVPInvalidPropertyInFullScreen);
-	if(Form) Form->SetWidth( w );
+	FullScreenGuard();
+	if( Form ) Form->SetWidth( w );
 }
 //---------------------------------------------------------------------------
 tjs_int tTJSNI_Window::GetWidth() const
@@ -1484,9 +1487,8 @@ tjs_int tTJSNI_Window::GetWidth() const
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetHeight(tjs_int h)
 {
-	if(Form->GetFullScreenMode())
-		TVPThrowExceptionMessage(TVPInvalidPropertyInFullScreen);
-	if(Form) Form->SetHeight( h );
+	FullScreenGuard();
+	if( Form ) Form->SetHeight( h );
 }
 //---------------------------------------------------------------------------
 tjs_int tTJSNI_Window::GetHeight() const
@@ -1497,8 +1499,7 @@ tjs_int tTJSNI_Window::GetHeight() const
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetLeft(tjs_int l)
 {
-	if(Form->GetFullScreenMode())
-		TVPThrowExceptionMessage(TVPInvalidPropertyInFullScreen);
+	FullScreenGuard();
 	if(Form) Form->SetLeft( l );
 }
 //---------------------------------------------------------------------------
@@ -1510,8 +1511,7 @@ tjs_int tTJSNI_Window::GetLeft() const
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetTop(tjs_int t)
 {
-	if(Form->GetFullScreenMode())
-		TVPThrowExceptionMessage(TVPInvalidPropertyInFullScreen);
+	FullScreenGuard();
 	if(Form) Form->SetTop( t );
 }
 //---------------------------------------------------------------------------
@@ -1523,15 +1523,13 @@ tjs_int tTJSNI_Window::GetTop() const
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetSize(tjs_int w, tjs_int h)
 {
-	if(Form->GetFullScreenMode())
-		TVPThrowExceptionMessage(TVPInvalidPropertyInFullScreen);
+	FullScreenGuard();
 	if(Form) Form->SetBounds(Form->GetLeft(), Form->GetTop(), w, h);
 }
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetMinWidth(int v)
 {
-	if(Form->GetFullScreenMode())
-		TVPThrowExceptionMessage(TVPInvalidPropertyInFullScreen);
+	FullScreenGuard();
 	if(Form) Form->SetMinWidth( v );
 }
 //---------------------------------------------------------------------------
@@ -1542,8 +1540,7 @@ int  tTJSNI_Window::GetMinWidth() const
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetMinHeight(int v)
 {
-	if(Form->GetFullScreenMode())
-		TVPThrowExceptionMessage(TVPInvalidPropertyInFullScreen);
+	FullScreenGuard();
 	if(Form) Form->SetMinHeight( v );
 }
 //---------------------------------------------------------------------------
@@ -1554,18 +1551,13 @@ int  tTJSNI_Window::GetMinHeight() const
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetMinSize(int w, int h)
 {
-	if(Form->GetFullScreenMode())
-		TVPThrowExceptionMessage(TVPInvalidPropertyInFullScreen);
-	if(Form)
-	{
-		Form->SetMinSize( w, h );
-	}
+	FullScreenGuard();
+	if(Form) Form->SetMinSize( w, h );
 }
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetMaxWidth(int v)
 {
-	if(Form->GetFullScreenMode())
-		TVPThrowExceptionMessage(TVPInvalidPropertyInFullScreen);
+	FullScreenGuard();
 	if(Form) Form->SetMaxWidth( v );
 }
 //---------------------------------------------------------------------------
@@ -1576,8 +1568,7 @@ int  tTJSNI_Window::GetMaxWidth() const
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetMaxHeight(int v)
 {
-	if(Form->GetFullScreenMode())
-		TVPThrowExceptionMessage(TVPInvalidPropertyInFullScreen);
+	FullScreenGuard();
 	if(Form) Form->SetMaxHeight( v );
 }
 //---------------------------------------------------------------------------
@@ -1588,18 +1579,13 @@ int  tTJSNI_Window::GetMaxHeight() const
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetMaxSize(int w, int h)
 {
-	if(Form->GetFullScreenMode())
-		TVPThrowExceptionMessage(TVPInvalidPropertyInFullScreen);
-	if(Form)
-	{
-		Form->SetMaxSize( w, h );
-	}
+	FullScreenGuard();
+	if(Form) Form->SetMaxSize( w, h );
 }
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetPosition(tjs_int l, tjs_int t)
 {
-	if(Form->GetFullScreenMode())
-		TVPThrowExceptionMessage(TVPInvalidPropertyInFullScreen);
+	FullScreenGuard();
 	if(Form) Form->SetBounds(l, t, Form->GetWidth(), Form->GetHeight());
 }
 //---------------------------------------------------------------------------
@@ -1633,8 +1619,7 @@ void tTJSNI_Window::SetLayerPosition(tjs_int l, tjs_int t)
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetInnerSunken(bool b)
 {
-	if(Form->GetFullScreenMode())
-		TVPThrowExceptionMessage(TVPInvalidPropertyInFullScreen);
+	FullScreenGuard();
 	if(Form) Form->SetInnerSunken(b);
 }
 //---------------------------------------------------------------------------
@@ -1647,8 +1632,7 @@ bool tTJSNI_Window::GetInnerSunken() const
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetInnerWidth(tjs_int w)
 {
-	if(Form->GetFullScreenMode())
-		TVPThrowExceptionMessage(TVPInvalidPropertyInFullScreen);
+	FullScreenGuard();
 	if(Form) Form->SetInnerWidth(w);
 }
 //---------------------------------------------------------------------------
@@ -1660,8 +1644,7 @@ tjs_int tTJSNI_Window::GetInnerWidth() const
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetInnerHeight(tjs_int h)
 {
-	if(Form->GetFullScreenMode())
-		TVPThrowExceptionMessage(TVPInvalidPropertyInFullScreen);
+	FullScreenGuard();
 	if(Form) Form->SetInnerHeight(h);
 }
 //---------------------------------------------------------------------------
@@ -1673,15 +1656,13 @@ tjs_int tTJSNI_Window::GetInnerHeight() const
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetInnerSize(tjs_int w, tjs_int h)
 {
-	if(Form->GetFullScreenMode())
-		TVPThrowExceptionMessage(TVPInvalidPropertyInFullScreen);
+	FullScreenGuard();
 	if(Form) Form->SetInnerSize(w, h);
 }
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetBorderStyle(tTVPBorderStyle st)
 {
-	if(Form->GetFullScreenMode())
-		TVPThrowExceptionMessage(TVPInvalidPropertyInFullScreen);
+	FullScreenGuard();
 	if(Form) Form->SetBorderStyle(st);
 }
 //---------------------------------------------------------------------------

@@ -262,6 +262,10 @@ public:
 private:
 	bool GetWindowActive();
 	void UpdateVSyncThread();
+	/**
+	 * フルスクリーン時に操作できない値を変えようとした時に確認のため呼び出し、フルスクリーンの時例外を出す
+	 */
+	void FullScreenGuard() const;
 
 public:
 //-- draw device
