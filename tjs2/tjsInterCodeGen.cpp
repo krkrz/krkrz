@@ -234,6 +234,7 @@ tTJSInterCodeContext::tTJSInterCodeContext(tTJSInterCodeContext *parent,
 
 #ifdef ENABLE_DEBUGGER
 	DebuggerRegisterArea = NULL;
+	if( Parent ) Parent->AddRef();
 #endif	// ENABLE_DEBUGGER
 
 	if(name)
@@ -408,7 +409,13 @@ void tTJSInterCodeContext::Finalize(void)
 	ClearNodesToDelete();
 
 	if(SourcePosArray) TJS_free(SourcePosArray), SourcePosArray = NULL;
-
+	
+#ifdef ENABLE_DEBUGGER
+	if( Parent ) {
+		Parent->Release();
+		Parent = NULL;
+	}
+#endif	// ENABLE_DEBUGGER
 	inherited::Finalize();
 }
 //---------------------------------------------------------------------------
