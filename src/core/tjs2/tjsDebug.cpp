@@ -21,7 +21,7 @@
 #include <list>
 #include "Debugger.h"
 #include "Application.h"
-extern HWND TVPGetApplicationWindowHandle();
+#include "NativeEventQueue.h"
 #endif // ENABLE_DEBUGGER
 
 namespace TJS
@@ -778,6 +778,8 @@ private:
 	bool	IsHandleException;	//!< 例外発生時に停止して、デバッガからの再実行要求を待つかどうか
 	int		StackTraceDepth;
 
+	NativeEventQueue<Debugger> DummyWindow;
+
 	// 現在の実行状態
 	enum {
 		EXEC_STOP,	//!< 実行されていない(braek)
@@ -800,12 +802,22 @@ private:
 		int				NumOfCommand;
 		DebuggerCommand	Commands;
 	};
+	
+	void Proc( NativeEvent& ev ) {
+		DummyWindow.HandlerDefault(ev);
+		return;
+	}
 public:
 	Debugger()
 	 : DebuggerHwnd(INVALID_HANDLE_VALUE), LastLineNo(-1), TypeOfExec(EXEC_RUN)
 	 , IsInitialConnect(false), StackTraceDepth(10)
+	 , DummyWindow(this,&Debugger::Proc)
 	{
 		Initialize();
+		DummyWindow.Allocate();
+	}
+	~Debugger() {
+		DummyWindow.Deallocate();
 	}
 	void Initialize() {
 		DebuggerHwnd = ::FindWindow(L"TScriptDebuggerForm",NULL);	//!< 名前決め打ち
@@ -815,7 +827,7 @@ public:
 	}
 	void PrintLog( const tjs_char* mes, bool important ) {
 		if( DebuggerHwnd != INVALID_HANDLE_VALUE ) {
-			HWND hwnd = TVPGetApplicationWindowHandle();
+			HWND hwnd = DummyWindow.GetOwner();
 			DebuggerMessage	message( DBGEV_GEE_LOG, (void*)mes, (TJS_strlen(mes) + 1) * sizeof(tjs_char) );
 			::SendMessage( DebuggerHwnd, WM_COPYDATA, (WPARAM)hwnd, (LPARAM)&message );
 		}
@@ -896,7 +908,7 @@ private:
 	}
 	void SendBreak() {
 		if( DebuggerHwnd != INVALID_HANDLE_VALUE ) {
-			HWND hwnd = TVPGetApplicationWindowHandle();
+			HWND hwnd = DummyWindow.GetOwner();
 			size_t len = sizeof(int) + (BreakScriptFileName.size() + 1) * sizeof(wchar_t);
 			std::vector<char>	buff(len);
 			(*(int*)&(buff[0])) = BreakLineNo;
@@ -907,7 +919,7 @@ private:
 	}
 	void SendStackTrace() {
 		if( DebuggerHwnd != INVALID_HANDLE_VALUE && StackTraceDepth > 0 ) {
-			HWND hwnd = TVPGetApplicationWindowHandle();
+			HWND hwnd = DummyWindow.GetOwner();
 			ttstr result = TJSGetStackTraceString( StackTraceDepth );
 			DebuggerMessage	message( DBGEV_GEE_STACK_TRACE, (void*)result.c_str(), (result.GetLen()+1) * sizeof(tjs_char) );
 			::SendMessage( DebuggerHwnd, WM_COPYDATA, (WPARAM)hwnd, (LPARAM)&message );
@@ -943,16 +955,17 @@ private:
 				strbuff += wstr_len;
 			}
 			if( DebuggerHwnd != INVALID_HANDLE_VALUE ) {
-				HWND hwnd = TVPGetApplicationWindowHandle();
+				HWND hwnd = DummyWindow.GetOwner();
 				DebuggerMessage	message( command, &(buff[0]), bufflen );
 				::SendMessage( DebuggerHwnd, WM_COPYDATA, (WPARAM)hwnd, (LPARAM)&message );
 			}
 		}
 	}
-
+	/*
 	HWND GetSelfWindowHandle() {
 		return Application->GetHandle();
 	}
+	*/
 	//! ブレーク発生
 	void BreakOccur( tTJSInterCodeContext* ctx ) {
 		SendBreak();
@@ -963,7 +976,7 @@ private:
 	// 初期情報を送ってくれるように要求すると同時に書き込み対象アドレスを通知する
 	void RequestSetting() {
 		if( DebuggerHwnd != INVALID_HANDLE_VALUE ) {
-			HWND hwnd = TVPGetApplicationWindowHandle();
+			HWND hwnd = DummyWindow.GetOwner();
 			int buff[2] = { (int)&DubuggerCommArea, DEBUGGER_COMM_AREA_MAX };
 			DebuggerMessage	message( DBGEV_GEE_REQUEST_SETTINGS, buff, sizeof(int)*2 );
 			::SendMessage( DebuggerHwnd, WM_COPYDATA, (WPARAM)hwnd, (LPARAM)&message );
