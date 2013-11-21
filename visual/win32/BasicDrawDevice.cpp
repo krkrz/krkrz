@@ -92,7 +92,12 @@ void tTVPBasicDrawDevice::CheckMonitorMoved() {
 	}
 }
 //---------------------------------------------------------------------------
-void tTVPBasicDrawDevice::GetDirect3D9Device() {
+bool tTVPBasicDrawDevice::IsTargetWindowActive() const {
+	if( TargetWindow == NULL ) return false;
+	return ::GetForegroundWindow() == TargetWindow;
+}
+//---------------------------------------------------------------------------
+bool tTVPBasicDrawDevice::GetDirect3D9Device() {
 	DestroyD3DDevice();
 
 	TVPEnsureDirect3DObject();
@@ -102,15 +107,21 @@ void tTVPBasicDrawDevice::GetDirect3D9Device() {
 
 	HRESULT hr;
 	if( FAILED( hr = DecideD3DPresentParameters() ) ) {
-		ErrorToLog( hr );
-		TVPThrowExceptionMessage( TVPFaildToDecideBackbufferFormat );
+		if( IsTargetWindowActive() ) {
+			ErrorToLog( hr );
+			TVPThrowExceptionMessage( TVPFaildToDecideBackbufferFormat );
+		}
+		return false;
 	}
 
 	UINT iCurrentMonitor = GetMonitorNumber( TargetWindow );
 	DWORD	BehaviorFlags = D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_MULTITHREADED;
 	if( D3D_OK != ( hr = Direct3D->CreateDevice( iCurrentMonitor, D3DDEVTYPE_HAL, TargetWindow, BehaviorFlags, &D3dPP, &Direct3DDevice ) ) ) {
-		ErrorToLog( hr );
-		TVPThrowExceptionMessage( TVPFaildToCreateDirect3DDevice );
+		if( IsTargetWindowActive() ) {
+			ErrorToLog( hr );
+			TVPThrowExceptionMessage( TVPFaildToCreateDirect3DDevice );
+		}
+		return false;
 	}
 	CurrentMonitor = iCurrentMonitor;
 
@@ -130,13 +141,19 @@ void tTVPBasicDrawDevice::GetDirect3D9Device() {
 	vp.MinZ  = 0.0f;
 	vp.MaxZ  = 1.0f;
 	if( FAILED(hr = Direct3DDevice->SetViewport(&vp)) ) {
-		ErrorToLog( hr );
-		TVPThrowExceptionMessage( TVPFaildToSetViewport );
+		if( IsTargetWindowActive() ) {
+			ErrorToLog( hr );
+			TVPThrowExceptionMessage( TVPFaildToSetViewport );
+		}
+		return false;
 	}
 
 	if( FAILED( hr = InitializeDirect3DState() ) ) {
-		ErrorToLog( hr );
- 		TVPThrowExceptionMessage( TVPFaildToSetRenderState );
+		if( IsTargetWindowActive() ) {
+			ErrorToLog( hr );
+ 			TVPThrowExceptionMessage( TVPFaildToSetRenderState );
+		}
+		return false;
 	}
 
 	int refreshrate = DispMode.RefreshRate;
@@ -147,6 +164,7 @@ void tTVPBasicDrawDevice::GetDirect3D9Device() {
 		::ReleaseDC( TargetWindow, hdc );
 	}
 	VsyncInterval = 1000 / refreshrate;
+	return true;
 }
 //---------------------------------------------------------------------------
 HRESULT tTVPBasicDrawDevice::InitializeDirect3DState() {
@@ -226,22 +244,24 @@ HRESULT tTVPBasicDrawDevice::DecideD3DPresentParameters() {
 	return S_OK;
 }
 //---------------------------------------------------------------------------
-void tTVPBasicDrawDevice::CreateD3DDevice()
+bool tTVPBasicDrawDevice::CreateD3DDevice()
 {
 	// Direct3D デバイス、テクスチャなどを作成する
 	DestroyD3DDevice();
-	if(TargetWindow ) {
+	if( TargetWindow ) {
 		tjs_int w, h;
 		GetSrcSize( w, h );
 		if( w > 0 && h > 0 ) {
 			// get Direct3D9 interface
-			GetDirect3D9Device();
-			CreateTexture();
+			if( GetDirect3D9Device() ) {
+				return CreateTexture();
+			}
 		}
 	}
+	return false;
 }
 //---------------------------------------------------------------------------
-void tTVPBasicDrawDevice::CreateTexture() {
+bool tTVPBasicDrawDevice::CreateTexture() {
 	DestroyTexture();
 	tjs_int w, h;
 	GetSrcSize( w, h );
@@ -278,10 +298,14 @@ void tTVPBasicDrawDevice::CreateTexture() {
 		}
 
 		if( D3D_OK != ( hr = Direct3DDevice->CreateTexture( dwWidth, dwHeight, 1, D3DUSAGE_DYNAMIC, D3DFMT_X8R8G8B8, D3DPOOL_DEFAULT, &Texture, NULL) ) ) {
-			ErrorToLog( hr );
-			TVPThrowExceptionMessage(TVPCannotAllocateD3DOffScreenSurface,TJSInt32ToHex(hr, 8));
+			if( IsTargetWindowActive() ) {
+				ErrorToLog( hr );
+				TVPThrowExceptionMessage(TVPCannotAllocateD3DOffScreenSurface,TJSInt32ToHex(hr, 8));
+			}
+			return false;
 		}
 	}
+	return true;
 }
 //---------------------------------------------------------------------------
 void tTVPBasicDrawDevice::EnsureDevice()
@@ -291,11 +315,15 @@ void tTVPBasicDrawDevice::EnsureDevice()
 		try {
 			bool recreate = false;
 			if( Direct3D == NULL || Direct3DDevice == NULL ) {
-				GetDirect3D9Device();
+				if( GetDirect3D9Device() == false ) {
+					return;
+				}
 				recreate = true;
 			}
 			if( Texture == NULL ) {
-				CreateTexture();
+				if( CreateTexture() == false ) {
+					return;
+				}
 				recreate = true;
 			}
 			if( recreate ) {
@@ -313,6 +341,7 @@ void tTVPBasicDrawDevice::EnsureDevice()
 //---------------------------------------------------------------------------
 void tTVPBasicDrawDevice::TryRecreateWhenDeviceLost()
 {
+	bool success = false;
 	if( Direct3DDevice ) {
 		DestroyTexture();
 		HRESULT hr = Direct3DDevice->TestCooperativeLevel();
@@ -320,12 +349,17 @@ void tTVPBasicDrawDevice::TryRecreateWhenDeviceLost()
 			hr = Direct3DDevice->Reset(&D3dPP);
 		}
 		if( FAILED(hr) ) {
-			CreateD3DDevice();
+			success = CreateD3DDevice();
 		} else {
-			InitializeDirect3DState();
+			if( D3D_OK == InitializeDirect3DState() ) {
+				success = true;
+			}
 		}
 	} else {
-		CreateD3DDevice();
+		success = CreateD3DDevice();
+	}
+	if( success ) {
+		InvalidateAll();	// 画像の再描画(Layer Update)を要求する
 	}
 }
 //---------------------------------------------------------------------------
@@ -501,25 +535,28 @@ void TJS_INTF_METHOD tTVPBasicDrawDevice::Show()
 
 	ShouldShow = false;
 
-	RECT drect;
-	drect.left   = 0;
-	drect.top    = 0;
-	drect.right  = DestRect.right;
-	drect.bottom = DestRect.bottom;
+	HRESULT hr;
+	if( DestRect.left != 0 || DestRect.top != 0 ) {
+		hr = Direct3DDevice->Present( NULL, NULL, TargetWindow, NULL );
+	} else {
+		RECT drect;
+		drect.left   = 0;
+		drect.top    = 0;
+		drect.right  = DestRect.right;
+		drect.bottom = DestRect.bottom;
 
-	RECT srect;
-	srect.left   = 0;
-	srect.top    = 0;
-	srect.right  = DestRect.right;
-	srect.bottom = DestRect.bottom;
+		RECT srect;
+		srect.left   = 0;
+		srect.top    = 0;
+		srect.right  = DestRect.right;
+		srect.bottom = DestRect.bottom;
 
-	//HRESULT hr = Direct3DDevice->Present( &srect, &drect, TargetWindow, NULL );
-	HRESULT hr = Direct3DDevice->Present( &srect, &drect, TargetWindow, NULL );
+		hr = Direct3DDevice->Present( &srect, &drect, TargetWindow, NULL );
+	}
 
 	if(hr == D3DERR_DEVICELOST) {
-		ErrorToLog( hr );
+		if( IsTargetWindowActive() ) ErrorToLog( hr );
 		TryRecreateWhenDeviceLost();
-		InvalidateAll();  // causes reconstruction of off-screen image
 	} else if(hr != D3D_OK) {
 		ErrorToLog( hr );
 		TVPAddImportantLog( TVPFormatMessage(TVPPassthroughInfPrimarySurfaceDirect3DDevicePresentFailed,TJSInt32ToHex(hr, 8)) );
@@ -575,7 +612,7 @@ void TJS_INTF_METHOD tTVPBasicDrawDevice::StartBitmapCompletion(iTVPLayerManager
 		D3DLOCKED_RECT rt;
 		HRESULT hr = Texture->LockRect( 0, &rt, NULL, D3DLOCK_NO_DIRTY_UPDATE );
 
-		if(hr == D3DERR_INVALIDCALL ) {
+		if(hr == D3DERR_INVALIDCALL && IsTargetWindowActive() ) {
 			TVPThrowExceptionMessage( TVPInternalErrorResult, TJSInt32ToHex(hr, 8));
 		}
 
@@ -583,7 +620,6 @@ void TJS_INTF_METHOD tTVPBasicDrawDevice::StartBitmapCompletion(iTVPLayerManager
 			ErrorToLog( hr );
 			TextureBuffer = NULL;
 			TryRecreateWhenDeviceLost();
-			InvalidateAll();  // causes reconstruction of off-screen image
 		} else /*if(hr == DD_OK) */ {
 			TextureBuffer = rt.pBits;
 			TexturePitch = rt.Pitch;
@@ -731,33 +767,31 @@ void TJS_INTF_METHOD tTVPBasicDrawDevice::EndBitmapCompletion(iTVPLayerManager *
 got_error:
 	if( hr == D3DERR_DEVICELOST ) {
 		TryRecreateWhenDeviceLost();
-		InvalidateAll();  // causes reconstruction of off-screen image
 	} else if(hr == D3DERR_DEVICENOTRESET ) {
 		hr = Direct3DDevice->Reset(&D3dPP);
 		if( hr == D3DERR_DEVICELOST ) {
 			TVPAddLog( (const tjs_char*)TVPErrorDeviceLostCannotResetDevice );
 			TryRecreateWhenDeviceLost();
-			InvalidateAll();
 		} else if( hr == D3DERR_DRIVERINTERNALERROR ) {
 			TVPAddLog( (const tjs_char*)TVPErrorDeviceInternalFatalError );
 			TryRecreateWhenDeviceLost();
-			InvalidateAll();
 		} else if( hr == D3DERR_INVALIDCALL ) {
 			TVPAddLog( (const tjs_char*)TVPErrorInvalidCall );
 			TryRecreateWhenDeviceLost();
-			InvalidateAll();
 		} else if( hr  == D3DERR_OUTOFVIDEOMEMORY ) {
 			TVPAddLog( (const tjs_char*)TVPErrorCannotAllocateVideoMemory );
 			TryRecreateWhenDeviceLost();
-			InvalidateAll();
 		} else if( hr == E_OUTOFMEMORY  ) {
 			TVPAddLog( (const tjs_char*)TVPErrorCannotAllocateMemory );
 			TryRecreateWhenDeviceLost();
-			InvalidateAll();
 		} else if( hr == D3D_OK ) {
 			if( FAILED( hr = InitializeDirect3DState() ) ) {
-				ErrorToLog( hr );
-				TVPThrowExceptionMessage( TVPFaildToSetRenderState );
+				if( IsTargetWindowActive() ) {
+					ErrorToLog( hr );
+					TVPThrowExceptionMessage( TVPFaildToSetRenderState );
+				} else {
+					DestroyD3DDevice();
+				}
 			}
 		}
 	} else if(hr != D3D_OK) {
