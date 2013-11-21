@@ -43,14 +43,16 @@ private:
 
 	UINT GetMonitorNumber( HWND window );
 
-	void GetDirect3D9Device();
+	bool IsTargetWindowActive() const;
+
+	bool GetDirect3D9Device();
 	HRESULT InitializeDirect3DState();
 	HRESULT DecideD3DPresentParameters();
 
-	void CreateD3DDevice();
+	bool CreateD3DDevice();
 	void DestroyD3DDevice();
 
-	void CreateTexture();
+	bool CreateTexture();
 	void DestroyTexture();
 
 	void TryRecreateWhenDeviceLost();
