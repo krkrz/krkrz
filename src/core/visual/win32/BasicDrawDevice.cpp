@@ -330,10 +330,10 @@ void tTVPBasicDrawDevice::EnsureDevice()
 				InvalidateAll();
 			}
 		} catch(const eTJS & e) {
-			TVPAddImportantLog( TVPFormatMessage(TVPPassthroughFailedToCreateDrawer,e.GetMessage()) );
+			TVPAddImportantLog( TVPFormatMessage(TVPBasicDrawDeviceFailedToCreateDirect3DDevice,e.GetMessage()) );
 			DestroyD3DDevice();
-		} 	catch(...) 	{
-			TVPAddImportantLog( (const tjs_char*)TVPPassthroughFailedToCreateDrawerUnknownReason );
+		} catch(...) {
+			TVPAddImportantLog( (const tjs_char*)TVPBasicDrawDeviceFailedToCreateDirect3DDeviceUnknownReason );
 			DestroyD3DDevice();
 		}
 	}
@@ -366,108 +366,108 @@ void tTVPBasicDrawDevice::TryRecreateWhenDeviceLost()
 void tTVPBasicDrawDevice::ErrorToLog( HRESULT hr ) {
 	switch( hr ) {
 	case D3DERR_DEVICELOST:
-		TVPAddLog( (const tjs_char*)TVPErrorDeviceLostCannotResetDevice );
+		TVPAddLog( (const tjs_char*)TVPD3dErrDeviceLost );
 		break;
 	case D3DERR_DRIVERINTERNALERROR:
-		TVPAddLog( (const tjs_char*)TVPErrorDeviceInternalFatalError );
+		TVPAddLog( (const tjs_char*)TVPD3dErrDriverIinternalError );
 		break;
 	case D3DERR_INVALIDCALL:
-		TVPAddLog( (const tjs_char*)TVPErrorInvalidCall );
+		TVPAddLog( (const tjs_char*)TVPD3dErrInvalidCall );
 		break;
 	case D3DERR_OUTOFVIDEOMEMORY:
-		TVPAddLog( (const tjs_char*)TVPErrorCannotAllocateVideoMemory );
+		TVPAddLog( (const tjs_char*)TVPD3dErrOutOfVideoMemory );
 		break;
 	case E_OUTOFMEMORY:
-		TVPAddLog( (const tjs_char*)TVPErrorCannotAllocateMemory );
+		TVPAddLog( (const tjs_char*)TVPD3dErrOutOfMemory );
 		break;
 	case D3DERR_WRONGTEXTUREFORMAT:
-		TVPAddLog( TJS_W("D3D : テクスチャ サーフェイスのピクセル フォーマットが無効です") );
+		TVPAddLog( (const tjs_char*)TVPD3dErrWrongTextureFormat );
 		break;
 	case D3DERR_UNSUPPORTEDCOLOROPERATION:
-		TVPAddLog( TJS_W("D3D : 色値に対して指定されているテクスチャ ブレンディング処理を、デバイスがサポートしていません") );
+		TVPAddLog( (const tjs_char*)TVPD3dErrUnsuportedColorOperation );
 		break;
 	case D3DERR_UNSUPPORTEDCOLORARG:
-		TVPAddLog( TJS_W("D3D : 色値に対して指定されているテクスチャ ブレンディング引数を、デバイスがサポートしていません") );
+		TVPAddLog( (const tjs_char*)TVPD3dErrUnsuportedColorArg );
 		break;
 	case D3DERR_UNSUPPORTEDALPHAOPERATION:
-		TVPAddLog( TJS_W("D3D : アルファ チャンネルに対して指定されているテクスチャ ブレンディング処理を、デバイスがサポートしていません") );
+		TVPAddLog( (const tjs_char*)TVPD3dErrUnsuportedAalphtOperation );
 		break;
 	case D3DERR_UNSUPPORTEDALPHAARG:
-		TVPAddLog( TJS_W("D3D : アルファ チャンネルに対して指定されているテクスチャ ブレンディング引数を、デバイスがサポートしていません") );
+		TVPAddLog( (const tjs_char*)TVPD3dErrUnsuportedAlphaArg );
 		break;
 	case D3DERR_TOOMANYOPERATIONS:
-		TVPAddLog( TJS_W("D3D : デバイスがサポートしている数より多くのテクスチャ フィルタリング処理を、アプリケーションが要求しています") );
+		TVPAddLog( (const tjs_char*)TVPD3dErrTooManyOperations );
 		break;
 	case D3DERR_CONFLICTINGTEXTUREFILTER:
-		TVPAddLog( TJS_W("D3D : 現在のテクスチャ フィルタは同時には使えません") );
+		TVPAddLog( (const tjs_char*)TVPD3dErrConflictioningTextureFilter );
 		break;
 	case D3DERR_UNSUPPORTEDFACTORVALUE:
-		TVPAddLog( TJS_W("D3D : デバイスが指定されたテクスチャ係数値をサポートしていません") );
+		TVPAddLog( (const tjs_char*)TVPD3dErrUnsuportedFactorValue );
 		break;
 	case D3DERR_CONFLICTINGRENDERSTATE:
-		TVPAddLog( TJS_W("D3D : 現在設定されているレンダリング ステートは同時には使えません") );
+		TVPAddLog( (const tjs_char*)TVPD3dErrConflictioningRenderState );
 		break;
 	case D3DERR_UNSUPPORTEDTEXTUREFILTER:
-		TVPAddLog( TJS_W("D3D : デバイスが指定されたテクスチャ フィルタをサポートしていません") );
+		TVPAddLog( (const tjs_char*)TVPD3dErrUnsupportedTextureFilter );
 		break;
 	case D3DERR_CONFLICTINGTEXTUREPALETTE:
-		TVPAddLog( TJS_W("D3D : 現在のテクスチャは同時には使えません") );
+		TVPAddLog( (const tjs_char*)TVPD3dErrConflictioningTexturePalette );
 		break;
 	case D3DERR_NOTFOUND:
-		TVPAddLog( TJS_W("D3D : 要求された項目が見つかりませんでした") );
+		TVPAddLog( (const tjs_char*)TVPD3dErrNotFound );
 		break;
 	case D3DERR_MOREDATA:
-		TVPAddLog( TJS_W("D3D : 指定されたバッファ サイズに保持できる以上のデータが存在します") );
+		TVPAddLog( (const tjs_char*)TVPD3dErrMoreData );
 		break;
 	case D3DERR_DEVICENOTRESET:
-		TVPAddLog( TJS_W("D3D : デバイスは、消失していますが、現在リセットできます") );
+		TVPAddLog( (const tjs_char*)TVPD3dErrDeviceNotReset );
 		break;
 	case D3DERR_NOTAVAILABLE:
-		TVPAddLog( TJS_W("D3D : このデバイスは、照会されたテクニックをサポートしていません") );
+		TVPAddLog( (const tjs_char*)TVPD3dErrNotAvailable );
 		break;
 	case D3DERR_INVALIDDEVICE:
-		TVPAddLog( TJS_W("D3D : 要求されたデバイスの種類が無効です") );
+		TVPAddLog( (const tjs_char*)TVPD3dErrInvalidDevice );
 		break;
 	case D3DERR_DRIVERINVALIDCALL:
-		TVPAddLog( TJS_W("D3D : 使用されません") );
+		TVPAddLog( (const tjs_char*)TVPD3dErrDriverInvalidCall );
 		break;
 	case D3DERR_WASSTILLDRAWING:
-		TVPAddLog( TJS_W("D3D : このサーフェスとの間で情報を転送している以前のビット演算が不完全です") );
+		TVPAddLog( (const tjs_char*)TVPD3dErrWasStillDrawing );
 		break;
 	case D3DERR_DEVICEHUNG:
-		TVPAddLog( TJS_W("D3D : このコードを返したデバイスが原因で、ハードウェア アダプターが OS によってリセットされました") );
+		TVPAddLog( (const tjs_char*)TVPD3dErrDeviceHung );
 		break;
 	case D3DERR_UNSUPPORTEDOVERLAY:
-		TVPAddLog( TJS_W("D3D : D3DERR_UNSUPPORTEDOVERLAY") );
+		TVPAddLog( (const tjs_char*)TVPD3dErrUnsupportedOverlay );
 		break;
 	case D3DERR_UNSUPPORTEDOVERLAYFORMAT:
-		TVPAddLog( TJS_W("D3D : D3DERR_UNSUPPORTEDOVERLAYFORMAT") );
+		TVPAddLog( (const tjs_char*)TVPD3dErrUnsupportedOverlayFormat );
 		break;
 	case D3DERR_CANNOTPROTECTCONTENT:
-		TVPAddLog( TJS_W("D3D : D3DERR_CANNOTPROTECTCONTENT") );
+		TVPAddLog( (const tjs_char*)TVPD3dErrCannotProtectContent );
 		break;
 	case D3DERR_UNSUPPORTEDCRYPTO:
-		TVPAddLog( TJS_W("D3D : D3DERR_UNSUPPORTEDCRYPTO") );
+		TVPAddLog( (const tjs_char*)TVPD3dErrUnsupportedCrypto );
 		break;
 	case D3DERR_PRESENT_STATISTICS_DISJOINT:
-		TVPAddLog( TJS_W("D3D : D3DERR_PRESENT_STATISTICS_DISJOINT") );
+		TVPAddLog( (const tjs_char*)TVPD3dErrPresentStatisticsDisJoint );
 		break;
 	case D3DERR_DEVICEREMOVED:
-		TVPAddLog( TJS_W("D3D : ハードウェア アダプターが削除されています") );
+		TVPAddLog( (const tjs_char*)TVPD3dErrDeviceRemoved );
 		break;
 	case D3D_OK:
 		break;
 	case D3DOK_NOAUTOGEN:
-		TVPAddLog( TJS_W("D3D : 成功しましたが、このフォーマットに対するミップマップの自動生成はサポートされていません") );
+		TVPAddLog( (const tjs_char*)TVPD3dOkNoAutoGen );
 		break;
 	case E_FAIL:
-		TVPAddLog( TJS_W("D3D : Direct3D サブシステム内で原因不明のエラーが発生しました") );
+		TVPAddLog( (const tjs_char*)TVPD3dErrFail );
 		break;
 	case E_INVALIDARG:
-		TVPAddLog( TJS_W("D3D : 無効なパラメータが関数に渡されました") );
+		TVPAddLog( (const tjs_char*)TVPD3dErrInvalidArg );
 		break;
 	default:
-		TVPAddLog( TJS_W("D3D : Unknown Error") );
+		TVPAddLog( (const tjs_char*)TVPD3dUnknownError );
 		break;
 	}
 }
@@ -477,7 +477,7 @@ void TJS_INTF_METHOD tTVPBasicDrawDevice::AddLayerManager(iTVPLayerManager * man
 	if(inherited::Managers.size() > 0)
 	{
 		// "Basic" デバイスでは２つ以上のLayer Managerを登録できない
-		TVPThrowExceptionMessage(TVPPassThroughDeviceDoesNotSupporteLayerManagerMoreThanOne);
+		TVPThrowExceptionMessage(TVPBasicDrawDeviceDoesNotSupporteLayerManagerMoreThanOne);
 	}
 	inherited::AddLayerManager(manager);
 
@@ -506,10 +506,10 @@ void TJS_INTF_METHOD tTVPBasicDrawDevice::SetDestRectangle(const tTVPRect & rect
 		try {
 			EnsureDevice();
 		} catch(const eTJS & e) {
-			TVPAddImportantLog( TVPFormatMessage(TVPPassthroughFailedToCreateDirect3DDevices,e.GetMessage() ) );
+			TVPAddImportantLog( TVPFormatMessage(TVPBasicDrawDeviceFailedToCreateDirect3DDevices,e.GetMessage() ) );
 			success = false;
 		} catch(...) {
-			TVPAddImportantLog( (const tjs_char*)TVPPassthroughFailedToCreateDirect3DDevicesUnknownReason );
+			TVPAddImportantLog( (const tjs_char*)TVPBasicDrawDeviceFailedToCreateDirect3DDevicesUnknownReason );
 			success = false;
 		}
 		if( success == false ) {
@@ -559,7 +559,7 @@ void TJS_INTF_METHOD tTVPBasicDrawDevice::Show()
 		TryRecreateWhenDeviceLost();
 	} else if(hr != D3D_OK) {
 		ErrorToLog( hr );
-		TVPAddImportantLog( TVPFormatMessage(TVPPassthroughInfPrimarySurfaceDirect3DDevicePresentFailed,TJSInt32ToHex(hr, 8)) );
+		TVPAddImportantLog( TVPFormatMessage(TVPBasicDrawDeviceInfDirect3DDevicePresentFailed,TJSInt32ToHex(hr, 8)) );
 	}
 }
 //---------------------------------------------------------------------------
@@ -605,7 +605,7 @@ void TJS_INTF_METHOD tTVPBasicDrawDevice::StartBitmapCompletion(iTVPLayerManager
 
 	if( Texture && TargetWindow ) {
 		if(TextureBuffer) {
-			TVPAddImportantLog( (const tjs_char*)TVPPassthroughTextureHasAlreadyBeenLocked );
+			TVPAddImportantLog( (const tjs_char*)TVPBasicDrawDeviceTextureHasAlreadyBeenLocked );
 			Texture->UnlockRect(0), TextureBuffer = NULL;
 		}
 
@@ -770,19 +770,19 @@ got_error:
 	} else if(hr == D3DERR_DEVICENOTRESET ) {
 		hr = Direct3DDevice->Reset(&D3dPP);
 		if( hr == D3DERR_DEVICELOST ) {
-			TVPAddLog( (const tjs_char*)TVPErrorDeviceLostCannotResetDevice );
+			TVPAddLog( (const tjs_char*)TVPD3dErrDeviceLost );
 			TryRecreateWhenDeviceLost();
 		} else if( hr == D3DERR_DRIVERINTERNALERROR ) {
-			TVPAddLog( (const tjs_char*)TVPErrorDeviceInternalFatalError );
+			TVPAddLog( (const tjs_char*)TVPD3dErrDriverIinternalError );
 			TryRecreateWhenDeviceLost();
 		} else if( hr == D3DERR_INVALIDCALL ) {
-			TVPAddLog( (const tjs_char*)TVPErrorInvalidCall );
+			TVPAddLog( (const tjs_char*)TVPD3dErrInvalidCall );
 			TryRecreateWhenDeviceLost();
 		} else if( hr  == D3DERR_OUTOFVIDEOMEMORY ) {
-			TVPAddLog( (const tjs_char*)TVPErrorCannotAllocateVideoMemory );
+			TVPAddLog( (const tjs_char*)TVPD3dErrOutOfVideoMemory );
 			TryRecreateWhenDeviceLost();
 		} else if( hr == E_OUTOFMEMORY  ) {
-			TVPAddLog( (const tjs_char*)TVPErrorCannotAllocateMemory );
+			TVPAddLog( (const tjs_char*)TVPD3dErrOutOfMemory );
 			TryRecreateWhenDeviceLost();
 		} else if( hr == D3D_OK ) {
 			if( FAILED( hr = InitializeDirect3DState() ) ) {
@@ -796,7 +796,7 @@ got_error:
 		}
 	} else if(hr != D3D_OK) {
 		ErrorToLog( hr );
-		TVPAddImportantLog( TVPFormatMessage(TVPPassthroughInfPolygonDrawingFailed,TJSInt32ToHex(hr, 8)) );
+		TVPAddImportantLog( TVPFormatMessage(TVPBasicDrawDeviceInfPolygonDrawingFailed,TJSInt32ToHex(hr, 8)) );
 	}
 }
 //---------------------------------------------------------------------------
