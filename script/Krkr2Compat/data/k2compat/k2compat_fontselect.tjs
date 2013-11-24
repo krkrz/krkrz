@@ -1,0 +1,229 @@
+Krkr2CompatUtils.requireWIN32Dialog();
+
+class FontSelectDialog extends WIN32GenericDialogEX
+{
+	var fontList;						//< フォント名一覧配列
+	var initialSelect;					//< 初期選択フォント（fontListインデックス番号）
+	var itemHeight;						//< ListBoxの１行の高さ
+	var itemPadding;					//< ListBoxの隙間
+	var fontHeight;						//< フォントの高さ
+	var fontRasterizer;					//< ラスタライザ
+	var sampleText;						//< サンプルテキスト
+	var useFontFace;					//< fsfUseFontFaceオプション指定の有無
+
+	var fontLayer;						//< フォント描画レイヤ（使い回し用）
+	var layerCreated;					//< フォント描画済みのフラグ配列
+	var selectLayer, selectBitmap;		//< ListSelect描画用レイヤ・Bitmap
+	var sampleLayer, sampleBitmap;		//< サンプル描画用レイヤ・Bitmap
+
+	// [TODO] リソースなどでボタンの文言/数値を差し替えられるようにする
+	function getResourceString (name, def) { return def; }
+	function getResourceInteger(name, def) { return def; }
+
+	function finalize() {
+		invalidate selectBitmap if (selectBitmap);
+		invalidate sampleBitmap if (selectBitmap);
+		invalidate selectLayer  if (selectLayer);
+		invalidate sampleLayer  if (sampleLayer);
+		invalidate fontLayer    if (fontLayer);
+		super.finalize(...);
+	}
+	function FontSelectDialog(lay, face, flags, caption, prompt, sample) {
+		// ボタン名称を取得
+		var tagOK = getResourceString("ButtonOK",     "&OK");
+		var tagNG = getResourceString("ButtonCancel", "キャンセル");
+
+		// ダイアログ生成
+		super.WIN32GenericDialogEX(%[ title:caption, width:200, itemtexts:%[ IDOK=>tagOK, IDCANCEL=>tagNG ] ]);
+
+		// 作業用レイヤ・Bitmap
+		fontLayer    = new Layer(lay.window, lay);
+		selectLayer  = new Layer(lay.window, lay);
+		selectBitmap = new global.WIN32Dialog.Bitmap(selectLayer);
+
+		// 変数初期化
+		useFontFace = flags & fsfUseFontFace;
+		fontList = getFontList(lay, flags);
+		initialSelect = getInitialSelect(face);
+		initialSelect = 0 if (initialSelect < 0);
+
+		fontHeight = lay.font.height;
+		fontRasterizer = lay.font.rasterizer if (typeof lay.font.rasterizer != "undefined");
+		itemPadding = getResourceInteger("FontDialogListPadding", 4);
+		itemHeight = (fontHeight < 0 ? -fontHeight : fontHeight) + itemPadding;
+
+		// ListSelectの高さを決定
+		var selheight = getResourceInteger("FontDialogListHeight", 150);
+		if (selheight <= 0) selheight = 150;
+
+		// ダイアログの子アイテムを追加
+		addLText(prompt);
+		nextLine();
+		addListSelect("Select", selheight, void, void, fontList);
+		if (useFontFace) {
+			addInit("Select", "setItemHeight", itemHeight);
+			getLastItem().style |= LBS_OWNERDRAWFIXED;
+		}
+		nextLine();
+		if (sample != "") {
+			sampleLayer  = new Layer(lay.window, lay);
+			sampleBitmap = new global.WIN32Dialog.Bitmap(sampleLayer);
+			sampleText = sample;
+			addIcon("Sample", itemHeight);
+			nextLine();
+		}
+		addDefPush(IDOK,    makeStepRight(1, 60), 8);
+		addButton(IDCANCEL, makeStepRight(0, 60), 8);
+	}
+
+	// フォント一覧を取得
+	function getFontList(lay, flags) {
+		var list = [];
+		list.assign(lay.font.getList(flags));
+//		list.sort(); // ソート不要？
+		return list;
+	}
+
+	// 現在選択中のフォントを調べる
+	function getInitialSelect(face) {
+		face = (string)face;
+		if (face.indexOf(",") < 0) return fontList.find(face);
+		var div = face.split(",",, true);
+		for (var i = 0; i < div.count; i++) {
+			var r = getInitialSelect(div[i]);
+			if (r >= 0) return r;
+		}
+		return -1;
+	}
+
+	// ダイアログ表示開始時処理
+	function onInit() {
+		super.onInit(...);
+		setCenterPosition();
+		setItemFocus( "Select");
+		selectListBox("Select", initialSelect);
+		onSelectChanged();
+	}
+	// ListBox高さ指定用
+	function setItemHeight(id, h) {
+		sendItemMessage(id, LB_SETITEMHEIGHT, 0, h);
+	}
+
+	// ダイアログイベント処理
+	function onCommand(msg, wp, lp) {
+		var proc, notify = wp >>16;
+		switch (getNamedId(wp & 0xFFFF)) {
+		case "Select": proc = onSelectCommand(notify, lp); break;
+		}
+		return proc ? true : super.onCommand(...);
+	}
+	function onSelectCommand(notify, lp) {
+		switch (notify) {
+		case LBN_DBLCLK:
+			close(IDOK);
+			return true;
+		case LBN_SELCHANGE:
+			onSelectChanged();
+			break;
+		}
+	}
+	function onSelectChanged() {
+		// 選択が変更された
+		if (sampleText != "" && sampleLayer) with (sampleLayer) {
+			// [TODO]
+			var id = "Sample";
+			var index = getResult("Select");
+			var face = fontList[index];
+			var numId = getNumberdId(id);
+			var w = getItemWidth(numId);
+			var h = getItemHeight(numId);
+			.setSize(w, h);
+			.fillRect(0, 0, w, h, getActualColor(clBtnFace) | 0xFF000000);
+			setFontFace(sampleLayer, face, fontHeight);
+			var sz = fontHeight < 0 ? -fontHeight : fontHeight;
+			try {
+				.drawText(itemPadding, (h - sz)\2, sampleText, getActualColor(clBtnText), 255, true);
+			} catch (e) {
+				Debug.notice("drawTextFailed:", face, e.message);
+			}
+
+			setItemBitmap(id, sampleBitmap);
+			allBitmaps.clear(); // [XXX]
+		}
+	}
+	function onDrawItem(id, info) {
+		if (!useFontFace) return false;
+		if (getNamedId(id) == "Select") try {
+			var x, y, w, h;
+			with (info.itemRect) x=.x, y=.y, w=.w, h=.h;
+			var selected = info.itemState & ODS_SELECTED;
+
+			createFontLayer(w);
+			var y2 = y + sendItemMessage(id, LB_GETTOPINDEX, 0, 0) * itemHeight;
+			var getcol = getActualColor;
+			with (selectLayer) {
+				.setImageSize(w, h);
+				.fillRect(0, 0, w, h,           getcol(selected ? clHighlight : clWindow) | 0xFF000000);
+				drawFontLayer(y2, h);
+				fontLayer.fillRect(x, y2, w, h, getcol(selected ? clHighlightText : clWindowText));
+				.operateRect(0, 0, fontLayer, x, y2, w, h);
+			}
+			info.draw(selectBitmap, x, y);
+		} catch (e) {}
+		return true;
+	}
+	function getActualColor(tag) { return System.toActualColor(tag); }
+	function createFontLayer(width) {
+		if (layerCreated) return;
+		/**/layerCreated = [];
+		var cnt = fontList.count;
+		with (fontLayer) {
+			.setImageSize(width, cnt * itemHeight);
+			.fillRect(0, 0, .imageWidth, .imageHeight, 0);
+		}
+	}
+	function drawFontLayer(y2, h) {
+		for (var s = y2\itemHeight, e = (y2+h-1)\itemHeight; s <= e; s++) {
+			if(!layerCreated[s]) {
+				layerCreated[s] = true;
+				with (fontLayer) .holdAlpha = false, .face = dfBoth;
+				drawFontLayerOne(s);
+			}
+		}
+		with (fontLayer) .holdAlpha = true, .face = dfOpaque;
+	}
+	function drawFontLayerOne(i) {
+		var h = fontHeight < 0 ? -fontHeight : fontHeight;
+		with (fontLayer) {
+			var face = setFontFace(fontLayer, fontList[i], fontHeight);
+			.font.height = fontHeight;
+			try {
+				.drawText(itemPadding, i*itemHeight + itemPadding\2, face, 0xFFFFFF, 255, true);
+			} catch (e) {
+				Debug.notice("drawTextFailed:", face, e.message);
+			}
+		}
+	}
+	function setFontFace(lay, face, height) {
+		with (lay.font) {
+			.face = face;
+			.height = height if (height !== void);
+			.rasterizer = fontRasterizer if (fontRasterizer !== void);
+		}
+		return face;
+	}
+
+	function open() {
+		var r = super.open(...);
+		if (r.result == IDOK) return fontList[r.items.Select];
+	}
+}
+
+&System.doFontSelect = function (layer, *) { // flags, caption, prompt, sample) {
+	if (typeof layer != "Object" || !layer || !(layer instanceof "Layer"))
+		throw new Exception("System.doFontSelect: Specify a Layer object");
+	var dialog = new FontSelectDialog(layer, layer.font.face, *);
+	var result = dialog.open(layer.window);
+	invalidate dialog;
+	return result;
+} incontextof global;

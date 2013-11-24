@@ -1,0 +1,224 @@
+// for command line
+switch (System.getArgument("-export")) {
+case "sjis":     return ExportShiftJIS(false);
+case "utf16le":  return ExportUTF16LE (false);
+case "k2compat": return ExportK2Compat();
+}
+
+@set (K2COMPAT_VERBOSE = 1)
+
+@set (K2COMPAT_SPEC_DESKTOPINFO = -1)
+//@set (K2COMPAT_SPEC_SCREENINFO = 1)
+
+@if (kirikiriz)
+{
+	var base = "k2compat/"; // System.exePath + "k2compat.xp3>";
+	Scripts.execStorage(base+"k2compat.tjs");
+	Krkr2CompatUtils.scriptBase = base;
+}
+@endif
+
+class        TestWindow extends Window {
+	function TestWindow { super.Window(); setup(...); }
+	function finalize {
+		invalidateAllPad();
+		delete global.win;
+		super.finalize(...);
+	}
+	function onCloseQuery {
+//		System.terminate(); // [XXX] プロセスが残る？
+		return super.onCloseQuery(true);
+	}
+	function setup(w, h) {
+		caption = "吉里吉里２互換ウィンドウサンプル";
+
+		borderStyle = bsSingle;
+		showScrollBars  = false;
+
+		setInnerSize(w, h);
+
+		var prim = new Layer(this, null);
+		with (prim) {
+			.setSize(w, h);
+			.visible = true;
+			redrawSampleText("ＭＳ Ｐゴシック");
+		}
+		add(prim);
+
+		createMenuTree(menu, [
+			"&File" => [
+				@if (kirikiriz)	
+				"Export &UTF16LE Scripts"  => global.ExportUTF16LE,
+				"Export &ShiftJIS Scripts" => global.ExportShiftJIS,
+				"-" => void,
+				@endif
+				"E&xit" => this.onExit,
+				],
+			"Font&Select" => [
+				@if (kirikiriz)
+				"FontSelect(&GDI)"      => onFontSelect1,
+				"FontSelect(&FreeType)" => onFontSelect2,
+				@endif
+				@if(! kirikiriz)
+				"&FontSelect"           => onFontSelect3,
+				@endif
+				"-" => void,
+				"FontSelect &Option"    => onEvalInput,
+				],
+			"&Pad" => %[ name:"PadMenu", children:[
+				"Create Pad"            => onCreatePad,
+				"Remove All Pad"        => onRemoveAllPad,
+				"-" => void,
+				"(empty)"            => %[ name:"PadEmptyMenuItem", enabled:false ],
+				] ],
+			"&Debug" => [
+				"Toggle &Console"    => function { with (Debug.console)    .visible = !.visible; } incontextof global,
+//				"Toggle &Controller" => function { with (Debug.controller) .visible = !.visible; } incontextof global,
+				@if (kirikiriz)	
+//				"Toggle &WatchExp"   => function { with (Debug.watchexp)   .visible = !.visible; } incontextof global,
+				"Toggle &ScriptEdit" => function { with (Debug.scripted)   .visible = !.visible; } incontextof global,
+				@endif
+				],
+			]);
+	}
+	function createMenuTree(parent, tree) {
+		for (var i = 0, cnt = tree.count; i < cnt; i+=2) {
+			var caption = tree[i], onClick = tree[i+1];
+			if (caption == "") break;
+			var shortcut = caption.indexOf(":");
+			var item = new MenuItem(this, shortcut > 0 ? caption.substr(0, shortcut) : caption);
+			if (shortcut > 0) item.shortcut = caption.substr(shortcut+1);
+			if (onClick && typeof onClick == "Object") {
+				//Debug.message(caption, onClick);
+				if (onClick instanceof "Array") {
+					createMenuTree(item, onClick);
+				} else if (onClick instanceof "Dictionary") with (onClick) {
+					this[.name]   = item      if (.name     !=  "");
+					item.onClick  = .onClick  if (.onClick  !== void);
+					item.shortcut = .shortcut if (.shortcut !== void);
+					item.enabled  = .enabled  if (.enabled  !== void);
+					item.visible  = .visible  if (.visible  !== void);
+					if (typeof .children == "Object" && .children && .children instanceof "Array") {
+						createMenuTree(item, .children);
+					}
+				} else item.onClick = onClick;
+			}
+			parent.add(item);
+		}
+	}
+	function redrawSampleText(fontface) {
+		with (primaryLayer) {
+			.fillRect(0, 0, .width, .height, 0);
+			.font.face = fontface if (fontface != "");
+			.font.height = 32;
+			.drawText(0, 0, "abcdefghijk日本語", 0xFFFFFF);
+		}
+	}
+
+	function onExit { close(); }
+
+	function onFontSelect1() { setFontRasterizer("frGDI");      onFontSelect(); }
+	function onFontSelect2() { setFontRasterizer("frFreeType"); onFontSelect(); }
+	function onFontSelect3() { onFontSelect(); }
+	function setFontRasterizer(fr) {
+		if (fr != "" && typeof global[fr] != "undefined") {
+			var font = global.Font;
+			Debug.message("FontRasterizerChange", font.rasterizer, "=>", global[fr]);
+			font.rasterizer = global[fr];
+		}
+	}
+	function onFontSelect(fr) {
+		var lay = this.primaryLayer;
+		var sel = lay.font.doUserSelect(_defaultFontFlags, "フォントの選択", "フォントを選択してください", "ABCDEFGHIあいうえお亜胃宇絵御");
+		if (!sel) {
+			System.inform("キャンセルされました");
+		} else {
+			System.inform("選択されました:"+lay.font.face);
+			redrawSampleText();
+		}
+	}
+	var _defaultFontFlagsText = "fsfNoVertical | fsfTrueTypeOnly | fsfUseFontFace";
+	var _defaultFontFlags = Scripts.eval(_defaultFontFlagsText);
+
+	function onEvalInput {
+		var input = System.inputString(System.title, "Option:", _defaultFontFlagsText);
+		if (input !== void) {
+			try {
+				var flags = Scripts.eval(input);
+				if (typeof flags == "void" || typeof flags == "Integer") {
+					_defaultFontFlagsText = input;
+					_defaultFontFlags = (int)+flags;
+					System.inform("Option: 0x%X".sprintf(_defaultFontFlags));
+				}
+			} catch (e) {
+				System.inform("Exception:"+e.message);
+			}
+		}
+	}
+
+	var padList = [];
+	function onCreatePad {
+		var pad = new Pad();
+		/**/pad.visible = true;
+		padList.add(pad);
+		recreatePadMenuList();
+	}
+	function onRemoveAllPad {
+		invalidateAllPad();
+		recreatePadMenuList();
+	}
+	function invalidateAllPad() {
+		for (var i = 0; i < padList.count; i++) {
+			var pad = padList[i];
+			invalidate pad;
+		}
+		padList.clear();
+	}
+	function recreatePadMenuList() {
+		PadEmptyMenuItem.visible = !padList.count;
+		var list = PadMenu.children, map = %[], ext = [];
+		// 手抜き実装につき...
+		for (var i = 0; i < padList.count; i++) map[padList[i]] = padList[i];
+		for (var i = 0; i < list.count; i++) {
+			var item = list[i];
+			if (typeof item.pad == "undefined") continue;
+			var pad = item.pad;
+			if (!isvalid pad || !map[pad]) {
+				PadMenu.remove(item);
+				invalidate item;
+			} else delete map[pad];
+		}
+		ext.assign(map);
+		for (var i = 0; i < ext.count; i+=2) {
+			var pad = ext[i+1];
+			if (pad) {
+				var item = new MenuItem(this, "Pad"+pad);
+				item.pad = pad;
+				item.onClick = function {
+					visible = !visible if (isvalid this);
+				} incontextof pad;
+				PadMenu.add(item);
+			}
+		}
+	}
+	
+}
+
+
+if (System.getArgument("-consoleonly") == "yes") {
+	System.exitOnNoWindowStartup = false; // [???] 機能しない？
+	Debug.console.visible = true;
+	return;
+}
+var win = new TestWindow(320, 240);
+win.visible = true;
+
+
+property ExportScript { getter {
+	Scripts.execStorage("export.tjs");
+	return global.ExportScript;
+} }
+function ExportUTF16LE(inform)  { ExportScript("data", "data_utf16le", "save",  inform); }
+function ExportShiftJIS(inform) { ExportScript("data", "data_sjis",    "save2", inform); }
+function ExportK2Compat         { ExportScript("data/k2compat", "k2compat", "save", false); }
+

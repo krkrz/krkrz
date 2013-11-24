@@ -1,0 +1,244 @@
+Krkr2CompatUtils.requireWIN32Dialog();
+
+//=============================================================
+
+class        WIN32ModelessDialogEX      extends WIN32DialogEX {
+	function WIN32ModelessDialogEX(elm) { super.WIN32DialogEX(...);
+		modeless = true;
+		(Dictionary.assignStruct incontextof (_initialParam = %[]))(elm) if (typeof elm == "Object" && elm);
+		createAsyncTrigger("onAsyncUpdate");
+	}
+	function finalize {
+		deleteAsyncTrigger();
+		super.finalize(...);
+	}
+
+	// visibleでmodeless dialogをopen/closeする
+	var _visible = false, _stored = false, _initialParam;
+	property visible {
+		getter { return _visible; }
+		setter(v) {
+			if (_visible == !!v) return;
+			if (_visible) {
+				onClose();
+				_visible = false;
+				super.close(-1);
+			} else {
+				var first = false;
+				if(!_stored) {
+					_stored = first = true;
+					store(getDialogTemplate(_initialParam));
+				}
+				_visible = true;
+				open(Window.mainWindow ? null : void); // ※ZではMainWindowがないとTVPGetApplicationWindowが失敗する
+				onOpen(first);
+			}
+		}
+	}
+	function close() { visible = false; }
+	/*virtusl*/function onOpen(first) { _syncPos(true); }
+	/*virtusl*/function onClose()     { _resetPos(); }
+
+	/*virtual*/function onResized(w, h) {}
+	/*virtual*/function getDialogTemplate(elmov) {
+		var cx, cy;
+		if (_width !== void || _height !== void) {
+			// フォントサイズに影響されるので実サイズとは異なるが表示時にリサイズすることで対応する
+			var units = getBaseUnits();
+			cx = _width  * 4 \ units.h if (_width  !== void);
+			cy = _height * 8 \ units.v if (_height !== void);
+		}
+		var style = getWindowStyle();
+		var dlgsty = getDialogStyle();
+		return %[ items:[], style: style[0] | dlgsty, exStyle: style[1],
+				  /**/title: _title, x:_left, y:_top, cx:cx, cy:cy ];
+	}
+	/*virtual*/function getDialogStyle() { return DS_SHELLFONT/*DS_SETFONT*/ | WS_VISIBLE; }
+
+	// borderStyleからSTYLE/EXSTYLEを決定する
+	function getWindowStyle(style = WS_OVERLAPPEDWINDOW, exStyle = 0) {
+		var origStyle   = style;
+		var origExStyle = exStyle;
+		/**/style   &= ~(WS_POPUP | WS_CAPTION | WS_BORDER | WS_THICKFRAME | WS_DLGFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU);
+		/**/exStyle &= ~(WS_EX_TOOLWINDOW | /*WS_EX_ACCEPTFILES |*/WS_EX_APPWINDOW);
+		switch (_borderStyle) {
+		case bsDialog:
+			style   |= WS_DLGFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU;
+			exStyle |= WS_EX_DLGMODALFRAME | WS_EX_WINDOWEDGE;
+			break;
+		case bsSingle:
+			style   |= WS_CAPTION | WS_BORDER;
+			style   |= WS_MINIMIZEBOX | WS_SYSMENU;
+			break;
+		case bsNone:
+		case bsSizeable:
+			style   |= (_borderStyle == bsNone) ? WS_POPUP : (WS_CAPTION | WS_THICKFRAME);
+			style   |= WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU;
+			break;
+		case bsToolWindow:
+		case bsSizeToolWin:
+			style   |= WS_CAPTION;
+			style   |= (_borderStyle == bsToolWindow) ? WS_BORDER : WS_THICKFRAME;
+			style   |= WS_SYSMENU;
+			exStyle |= WS_EX_TOOLWINDOW;
+			break;
+		default:
+			// revert
+			style   = origStyle;
+			exStyle = origExStyle;
+			break;
+		}
+		return [ style, exStyle ];
+	}
+
+	// ダイアログアイテムのコールバックを onCommand/onNotify_アイテム名 で呼び返す
+	function onCommand(msg, wp, lp) {
+		super.onCommand(...);
+		_invokeCallback("onCommand", getNamedId(wp & 0xFFFF), wp>>16, lp);
+	}
+	function onNotify(wp, nm) {
+		super.onNotify(...);
+		var id = getNamedId(wp);
+		if (id == "") id = getNamedId(nm.idFrom);
+		_invokeCallback("onNotify", id, nm);
+	}
+	function _invokeCallback(cbname, id, *) {
+		if (id != "") {
+			var method = @"${cbname}_${id}";
+			if (typeof this[method] == "Object") try {
+				this[method](id, *);
+			} catch (e) {
+				Debug.notice(@"${cbname}Exception", id, e.message);
+			}
+		}
+	}
+
+	// 複数個のAsyncTriggerを汎用に生成する処理（callback method名をキーに保存）
+	var _asyncTriggers;
+	function createAsyncTrigger(cbmethod, mode = atmAtIdle, cached = true) {
+		if (cbmethod == "") return;
+		var trig = new AsyncTrigger(this, cbmethod);
+		with (trig) .mode=mode, .cached=cached;
+		if (_asyncTriggers === void) 
+			_asyncTriggers = %[];
+		var old = trig;
+		_asyncTriggers[cbmethod] <-> old;
+		if (old) invalidate old;
+		return trig;
+	}
+	function deleteAsyncTrigger(cbmethod) {
+		if (_asyncTriggers === void) return;
+		if (cbmethod != "") {
+			var target = _asyncTriggers[cbmethod];
+			delete       _asyncTriggers[cbmethod];
+			if (target) invalidate target;
+		} else {
+			var ext = [];
+			ext.assign(_asyncTriggers);
+			for (var i = 0, cnt = ext.count; i < cnt; i+=2) {
+				var target = ext[i+1];
+				if (target) invalidate target;
+			}
+			(Dictionary.clear incontextof _asyncTriggers)();
+			_asyncTriggers = void;
+		}
+	}
+	function kickAsyncTrigger(cbmethod, autogen = true, *) {
+		if (cbmethod == "" || _asyncTriggers === void) return;
+		var trig = _asyncTriggers[cbmethod];
+		if (trig === void) {
+			if (!autogen) return;
+			trig = createAsyncTrigger(cbmethod, *);
+		}
+		trig.trigger();
+		return trig;
+	}
+
+	//-------------------------------------------------------------
+
+	var _title = System.title;
+	property title {
+		getter { return _title; }
+		setter(v) {     _title = v; _updateTitle(); }
+	}
+	function _updateTitle() {
+		if (_visible) setItemText(0, _title);
+	}
+	var _borderStyle = bsSingle;
+	property borderStyle {
+		getter { return _borderStyle; }
+		setter(v) {     _borderStyle = v; _updateBorderStyle(); }
+	}
+	function _updateBorderStyle {
+		if (_visible) {
+			var   style = getItemLong(0, GWL_STYLE);
+			var exstyle = getItemLong(0, GWL_EXSTYLE);
+			var gws = getWindowStyle(style, exstyle);
+			setItemLong(0, GWL_STYLE,   gws[0]) if (gws[0] !=   style);
+			setItemLong(0, GWL_EXSTYLE, gws[1]) if (gws[1] != exstyle);
+			invalidateAll(true);
+		}
+	}
+
+	//-------------------------------------------------------------
+
+	function onSize(msg, wp, lp) {
+		var w = (lp&0xFFFF), h = (lp>>16)&0xFFFF;
+		onResized(w, h) if (_visible && (wp == 0/*SIZE_RESTORED*/ || wp == 2/*SIZE_MAXIMIZED*/));
+	}
+
+	var _left, _top, _width, _height;
+	function _syncPos(force) {
+		if (!_visible) return;
+		if (_left   === void) _left   = super.left;
+		if (_top    === void) _top    = super.top;
+		if (_width  === void) _width  = super.width;
+		if (_height === void) _height = super.height;
+		if (force) onAsyncUpdate();
+	}
+	function _resetPos() {
+		if (_visible) {
+			_left = _top = _width = _height = void;
+			_syncPos(false);
+		}
+	}
+	function _updatePos()  { _asyncUpdate(); }
+	function _updateSize() { _asyncUpdate(); }
+	function _asyncUpdate() { _syncedPosSize = false; kickAsyncTrigger("onAsyncUpdate"); }
+	function onAsyncUpdate() {
+		if (isvalid this && _visible) {
+			super.setPos( _left,  _top)    if (_left  != super.left  || _top    != super.top);
+			super.setSize(_width, _height) if (_width != super.width || _height != super.height);
+			_syncedPosSize = true;
+		}
+	}
+	var _syncedPosSize = true;
+	property left {
+		getter { return _visible && _syncedPosSize ? super.left : _left; }
+		setter(v) { _left = (int)+v; _updatePos(); }
+	}
+	property top {
+		getter { return _visible && _syncedPosSize ? super.top :_top; }
+		setter(v) { _top  = (int)+v; _updatePos(); }
+	}
+	property width {
+		getter { return _visible && _syncedPosSize ? super.width : _width; }
+		setter(v) { _width  = (int)+v; _updateSize(); }
+	}
+	property height {
+		getter { return _visible && _syncedPosSize ? super.height : _height; }
+		setter(v) { _height = (int)+v; _updateSize(); }
+	}
+	function setPos(x, y, w, h) {
+		_left = (int)+x if (x !== void);
+		_top  = (int)+y if (y !== void);
+		_updatePos();
+		setSize(w, h) if (w !== void || h !== void);
+	}
+	function setSize(w, h) {
+		_width  = (int)+w if (w !== void);
+		_height = (int)+h if (h !== void);
+		_updateSize();
+	}
+}
+

@@ -1,0 +1,357 @@
+Krkr2CompatUtils.require("modeless");
+
+//=============================================================
+
+// テキスト編集（エディットコントロール）のあるモードレスダイアログ汎用
+class        TextContentModelessDialog extends WIN32ModelessDialogEX {
+	function TextContentModelessDialog { super.WIN32ModelessDialogEX(...); }
+	function finalize {
+		invalidate _brush if (_brush);
+		super.finalize(...);
+	}
+
+	function getDialogTemplate(elmov) {
+		var r = super.getDialogTemplate(...);
+		(Dictionary.assign incontextof r)(elmov, false) if (elmov);
+		if (r) with (r) {
+			.pointSize = _fontSize;
+			.typeFace  = _fontFace;
+			.weight    = _fontBold ? FW_BOLD : FW_NORMAL;
+
+			.items = getItemTemplate(r);
+		}
+		return r;
+	}
+	function getDialogStyle() { return DS_SETFONT | WS_VISIBLE; }
+
+	var _editID;
+	function onInit() {
+		_editID = getNumberdId("edit");
+		_updateText();
+		return super.onInit(...);
+	}
+	function onClose() {
+		_syncText(true);
+		return super.onClose(...);
+	}
+
+	var _bottomContentSize;
+	function getItemTemplate(elm) {
+		var w = elm.cx, h = elm.cy;
+		var bh = _bottomContentSize = getBottomContentSize();
+
+		var r = [], rect = %[ x:0, y:0, w:w, h:h-bh ];
+		setMainContent(elm, r.push, rect);
+		if (bh > 0) {
+			rect.y = rect.h;
+			rect.h = bh;
+			setBottomContent(elm, r.push, rect);
+		}
+		return r;
+	}
+	function setMainContent(elm, add, rect) {
+		with (rect) add(EditText("edit", .x, .y, .w, .h, getEditStyle(), WS_EX_CLIENTEDGE));
+		if (_bottomContentSize > 0) _addAutoMapRect("edit", 0, 0, 0, _bottomContentSize);
+	}
+
+	// 最下行に何か表示させる場合の拡張用
+	/*virtual*/function getBottomContentSize() { return 0; } //fontSize + 4, etc.
+	/*virtual*/function setBottomContent(elm, add, rect) {}
+	/*virtual*/function  onBottomContentResized(w, h, bh) {}
+
+	// 現在の状態からエディットコントロールのSTYLEを決定
+	function getEditStyle(style = ES_LEFT|ES_MULTILINE|ES_WANTRETURN|ES_NOHIDESEL|WS_BORDER|WS_TABSTOP) {
+		style = getWordWrapStyle (style);
+		style = getScrollBarStyle(style);
+		if (_readOnly) style |=  ES_READONLY;
+		else           style &= ~ES_READONLY;
+		return style;
+	}
+	function getScrollBarStyle(style = 0) {
+		style &= ~(WS_VSCROLL|WS_HSCROLL);
+		switch (_showScrollBars) {
+		case ssNone: break;
+		case ssHorizontal: style |= WS_HSCROLL; break;
+		case ssVertical:   style |= WS_VSCROLL; break;
+		default:
+		case ssBoth:       style |= WS_VSCROLL|WS_HSCROLL; break;
+		}
+		return style;
+	}
+	function getWordWrapStyle(style = 0) {
+		if (!_wordWrap) style |=  ES_AUTOHSCROLL;
+		else            style &= ~ES_AUTOHSCROLL;
+		return          style |   ES_AUTOVSCROLL; // always on
+	}
+
+	//-------------------------------------------------------------
+
+	function _updateFont() {
+		if (_visible) unsupport("ondemand font change.");
+	}
+	function resetEditStyle(cb) {
+		var now = getItemLong(_editID, GWL_STYLE);
+		var set = cb(now);
+		setItemLong(_editID, GWL_STYLE, set) if (set != now);
+	}
+	function _updateScrollBars() {
+		if (_visible) resetEditStyle(getScrollBarStyle);
+	}
+	function _updateFontColor() {
+		if (_visible) invalidateAll(true);
+	}
+	function _updateReadOnly() {
+		if (_visible) sendItemMessage(_editID, EM_SETREADONLY, _readOnly, 0);
+	}
+	function _updateWordWrap() {
+		if (_visible) unsupport("ondemand word wrap change.");
+	}
+	function _updateText() {
+		if (_visible) {
+			var cvtext = _convertTextToDialog(_text);
+			setItemText(_editID, cvtext);
+		}
+	}
+	var _modified;
+	function _syncText(force) {
+		if (_visible && (_modified || force)) {
+			var cvtext = getItemText(_editID);
+			_text = _convertDialogToText(cvtext);
+			//Debug.message("syncText", cvtext, _text);
+			_modified = false;
+		}
+	}
+
+	//-------------------------------------------------------------
+
+	var _autoMapRects, _autoMapRectTargets = [];
+	function _addAutoMapRect(name, left, right, top, bottom) {
+		if (name != "") _autoMapRectTargets.add(%[
+			/**/name:name, left:(int)+left, right:(int)+right, top:(int)+top, bottom:(int)+bottom
+			]);
+	}
+	function _makeAutoMapRectList(list) {
+		try {
+			var map = %[];
+			for (var i = list.count-1; i >= 0; i--) {
+				var target = list[i], name;
+				if (target && (name = target.name) != "") {
+					var rect = mapRect(target);
+					if(!rect) with (target) {
+						// fail safe
+						var cv = _convertPointToPixel;
+						rect = %[
+							/**/left:  cv(.left),
+							/**/right: cv(.right),
+							/**/top:   cv(.top),
+							/**/bottom:cv(.bottom),
+							];
+					}
+					map[name] = rect;
+				}
+			}
+			return map;
+		} catch (e) {
+			Debug.notice(e.message);
+		}
+		return null;
+	}
+
+	/*virtual*/function onResized(w, h) {
+		if (_autoMapRects === void)
+			_autoMapRects = _makeAutoMapRectList(_autoMapRectTargets);
+		if (_autoMapRects) with (_autoMapRects) try {
+			var bh = .edit ? .edit.bottom : 0;
+			setItemSize("edit", w, h-bh);
+			onBottomContentResized(w, h, _autoMapRects, bh);
+			invalidateAll(false);
+		} catch (e) {
+			Debug.notice(e.message);
+		}
+	}
+
+	function onCommand_edit(id, msg, lp) {
+		if (msg == EN_CHANGE) _modified = true;
+	}
+
+	// テキスト／背景色変更に関する細工
+	var _brush, _brushColor;
+	function onCtrlColorEdit   { return onCtrlColor(...); }
+	function onCtrlColorStatic { return onCtrlColor(...); }
+	function onCtrlColor(id) {
+		if (id == _editID) {
+			if (_brush !== void && _brushColor !== _color) {
+				// 古いブラシを破棄
+				invalidate _brush if (typeof _brush == "Object");
+				_brush = void;
+			}
+			if (_brush === void) {
+				// 背景色ブラシを作成(白,黒はStockObject使用)
+				_brush = !_color ? BLACK_BRUSH :
+				/**/     (_color == 0xFFFFFF) ? WHITE_BRUSH :
+				/**/     new global.WIN32Dialog.SolidBrush(_color);
+			}
+			return %[ fgcolor:_fontColor, bgcolor:_color, bgbrush:_brush ];
+		}
+	}
+
+	//-------------------------------------------------------------
+
+	// default props.
+	var _fontFace = "ＭＳ ゴシック";
+	var _fontSize = 9;
+	var _fontBold = false; // ※boldのみweight値で参照される
+	var _fontItalic = false; // unsupported
+	var _fontUnderline = false; // unsupported
+	var _fontStrikeOut = false; // unsupported
+	var _fontColor = 0xFFFFFF;
+	var _color = 0x000080;
+	var _text = "";
+	var _readOnly = false;
+	var _wordWrap = false;
+	var _showScrollBars = ssBoth;
+
+	// Pad compatible font properties.
+	property fontFace      { getter { return _fontFace;      } setter(v) { _fontFace      =   v; _updateFont(); } }
+	property fontSize      { getter { return _fontSize;      } setter(v) { _fontSize  = (int)+v; _updateFont(); } }
+	property fontHeight    {
+		getter { return        _convertPointToPixel(_fontSize); }
+		setter(v) { fontSize = _convertPixelToPoint((int)+v);   }
+	}
+	property fontBold      { getter { return _fontBold;      } setter(v) { _fontBold      = !!v; _updateFont(); } }
+
+	// unsupported properties
+	property fontItalic    { getter { return _fontItalic;    } setter(v) { _fontItalic    = !!v; _updateFont(); } }
+	property fontStrikeOut { getter { return _fontStrikeOut; } setter(v) { _fontStrikeOut = !!v; _updateFont(); } }
+	property fontUnderline { getter { return _fontUnderline; } setter(v) { _fontUnderline = !!v; _updateFont(); } }
+
+	property  fontColor    { getter { return _fontColor;     } setter(v) { _fontColor = _normalizeColor(v); _updateFontColor(); } }
+	property      color    { getter { return     _color;     } setter(v) {     _color = _normalizeColor(v); _updateFontColor(); } }
+
+	property text {
+		getter { _syncText(); return _text; }
+		setter(v) { _text = v; _updateText(); }
+	}
+
+	property readOnly      { getter { return _readOnly;      } setter(v) { _readOnly = !!v;     _updateReadOnly(); } }
+	property wordWrap      { getter { return _wordWrap;      } setter(v) { _wordWrap = !!v;     _updateWordWrap(); } }
+	property showScrollBars{ getter { return _showScrollBars;} setter(v) { _showScrollBars = v; _updateScrollBars(); } }
+
+	//-------------------------------------------------------------
+	// utils.
+
+	// [XXX] pixel <-> point method: force 96dpi calc.
+	function _convertPointToPixel(pt, dispdpi=96, basedpi=72) { return (int)Math.round(dispdpi * pt / basedpi); }
+	function _convertPixelToPoint(px, dispdpi=96, basedpi=72) { return (int)Math.round(basedpi * px / dispdpi); }
+
+	function _convertTextToDialog(str) { return str.replace(/[\r]?\n/g, "\r\n"); }
+	function _convertDialogToText(str) { return str.replace(/\r\n/g, "\n"); }
+
+	function _normalizeColor(col) { return ((int)+col) & 0xFFFFFF; }
+
+	function unsupport(keyword) {
+		var trace = Scripts.getTraceString();
+		Debug.notice(@"k2debugui.unsupported: ${keyword}" + (trace != "" ? "\n"+trace : ""));
+	}
+}
+
+//=============================================================
+
+class        DebugPadCompatDialog extends TextContentModelessDialog {
+	function DebugPadCompatDialog { super.TextContentModelessDialog(...); }
+	function finalize { super.finalize(...); }
+
+	// [XXX] super class defaults
+	var _width  = 640;
+	var _height = 480;
+	var _borderStyle = bsSizeable;
+	var _fontFace = "ＭＳ 明朝";
+
+	//-------------------------------------------------------------
+	// 最下部ライン表示対応
+
+	var _execMark = $9654; /* &#9654 (U+25B6): 右向き三角 */
+	var _execEnabled = true;
+	var _execName = "exec";
+	var _lineName = "status";
+
+	function onInit() {
+		setItemEnabled("exec", _execEnabled);
+		return super.onInit(...);
+	}
+	function getBottomContentSize() { return fontSize + 4; } // [XXX]4pt padding.
+	function setBottomContent(elm, add, rect) {
+		addExecButtonParts(...);
+		addLineTextParts  (...);
+	}
+	function  onBottomContentResized(w, h, rects, bh) {
+		resizeExecButtonParts(...);
+		resizeLineTextParts  (...);
+	}
+
+	function addExecButtonParts(elm, add, rect) {
+		with (rect) add(PushButton(_execMark, _execName, .x, .y, .h, .h,  BS_FLAT)); // ※BS_FLATはVisualStyle適用時は効かないっぽい
+	}
+	function resizeExecButtonParts(w, h, rects, bh) {
+		setItemPos(_execName, 0, h-bh);
+	}
+
+	function addLineTextParts(elm, add, rect) {
+		with (rect) {
+			add(LText(getStatusText(), _lineName, .x+.h, .y, .w-.h, .h, SS_SUNKEN|SS_CENTERIMAGE));
+			_addAutoMapRect(_lineName, 0, .h, 0, 0);
+		}
+	}
+	function resizeLineTextParts(w, h, rects, bh) {
+		if (rects[_lineName]) with (rects[_lineName]) {
+			var ox = .right, sw = w-.right;
+			setItemPos(_lineName, ox, h-bh);
+			setItemSize(_lineName, sw <= 0 ? 1 : sw, bh);
+		}
+	}
+
+	//-------------------------------------------------------------
+
+	function getStatusText() { return _showStatusBar ? (string)_statusText : ""; }
+
+	function _updateStatusText() {
+		if (_visible) setItemText(_lineName, getStatusTex());
+	}
+
+	//-------------------------------------------------------------
+	// Callbacks
+
+	function onCommand_exec(id, msg, lp) {
+		if (msg == BN_CLICKED && _execEnabled) kickAsyncTrigger("onExecute");
+	}
+	function onExecute {
+		if (!isvalid this) return;
+		var exec = this.text;
+		try {
+			Scripts.exec(exec);
+		} catch (e) {
+			System.inform(e.message);
+		}
+	}
+
+	//-------------------------------------------------------------
+	// Pad互換プロパティ群
+
+	var      _statusText = "";
+	property  statusText {
+		getter { return _statusText; }
+		setter(v) {     _statusText = v; _updateStatusText(); }
+	}
+	var      _showStatusBar = true;
+	property  showStatusBar {
+		getter { return _showStatusBar; }
+		setter(v) {     _showStatusBar = !!v; _updateStatusText(); }
+	}
+
+	var     _fileName;
+	property fileName {
+		getter { return _fileName; }
+		setter(v) {     _fileName = v; unsupport("fileName prop not implemented."); }
+	}
+
+}
