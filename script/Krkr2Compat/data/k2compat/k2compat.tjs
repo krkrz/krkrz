@@ -1,0 +1,354 @@
+//=============================================================
+// k2compat - 吉里吉里２専用クラス／関数の吉里吉里Ｚ向け互換実装
+
+//-------------------------------------------------------------
+// k2compat.tjsをロードする前に下記条件コンパイル式が定義可能です
+
+//// 各種互換実装を無効化します
+//
+//	@set (K2COMPAT_PURGE_MENU = 1) // MenuItem, Window.menu (menu.dll)
+//	@set (K2COMPAT_PURGE_KAGPARSER = 1) // KAGParser (KAGParrser.dll
+//	@set (K2COMPAT_PURGE_FONTSELECT = 1) // Layer.font.doUserSelect
+//	@set (K2COMPAT_PURGE_INPUTSTRING = 1) // System.inputString
+//	@set (K2COMPAT_PURGE_WINDOWPROP = 1) // Window.innerSunken, Window.showScrollBars
+//	@set (K2COMPAT_PURGE_PTDRAWDEVICE = 1) // Window.PassThroughDrawDevice
+//	@set (K2COMPAT_PURGE_PAD = 1) // Pad
+//	@set (K2COMPAT_PURGE_DEBUG = 1) // 下記のDebugクラス周りの実装一括
+//		@set (K2COMPAT_PURGE_CONSOLE = 1) // コンソール (Debug.console)
+//		@set (K2COMPAT_PURGE_CONTROLLER = 1) // コントローラ (Debug.controller)
+//		@set (K2COMPAT_PURGE_SCRIPTEDITOR = 1) // スクリプトエディタ (Debug.scripted)
+//		@set (K2COMPAT_PURGE_WATCH = 1) // 監視式 (Debug.watchexp)
+//		@set (K2COMPAT_PURGE_HOTKEY = 1) // Shift+F1～F4のホットキー
+
+//// System.desktop{Left,Top,Width,Height} の仕様を変更します(要windowEx.dllプラグイン)
+//	@set (K2COMPAT_SPEC_DESKTOPINFO =  1) // 常にプライマリモニタのDesktop情報を返します
+//	@set (K2COMPAT_SPEC_DESKTOPINFO = -1) // Window.mainWindowのあるDesktop情報を返します
+//  ※未指定の場合はZ本来の仕様(全モニタ統合した座標情報)のままになります
+
+//// System.screen{Width,Height} の仕様を変更します(要windowEx.dllプラグイン)
+//	@set (K2COMPAT_SPEC_SCREENINFO = 1) // 常にプライマリモニタのDesktop情報を返します
+//  ※未指定の場合はZ本来の仕様(mainWindowのあるScreenサイズを返す)のままになります
+
+
+//// k2compat.tjsのデバッグログ表示を有効にします
+//	@set (K2COMPAT_VERBOSE = 1)
+
+//// ダミープロパティ(Window.innerSunken等)に書き込まれた場合のログ出力を抑制します
+//	@set (K2COMPAT_PURGE_DUMMYPROP_LOG = 1)
+
+
+class Krkr2CompatUtils {
+	var scriptBase = "k2compat/";
+	var scriptLoaded = %[];
+	var messageTag = "Krkr2CompatUtils";
+
+	function trace {
+		@if (K2COMPAT_VERBOSE)
+		Debug.message(...);
+		@endif
+	}
+	function error(message) {
+		throw new Exception(messageTag + ": " +message);
+	}
+	function include(file) {
+		trace(messageTag+".include", file);
+		Scripts.execStorage(file);
+	}
+	function require(module) {
+		if (module == "" || scriptLoaded[module]) return;
+		trace(messageTag+".require", module);
+		scriptLoaded[module] = true;
+		include(scriptBase + @"k2compat_${module}.tjs");
+	}
+	function requireWIN32Dialog() {
+		if (typeof global.WIN32GenericDialogEX == "Object") return;
+		trace(messageTag+".requireWIN32Dialog");
+		if (typeof global.WIN32Dialog != "Object") {
+			delete global.WIN32Dialog;
+			loadPlugin("win32dialog.dll");
+		}
+		var file = @"win32dialog.tjs";
+		if (Storages.isExistentStorage(scriptBase + file)) {
+			include(scriptBase + file);
+		} else if (Storages.isExistentStorage(file)) {
+			include(file);
+		} else {
+			error(file+" not found.");
+		}
+	}
+	function requireWindowEx() {
+		if (typeof global.Window.registerExEvent == "Object") return;
+		trace(messageTag+".requireWindowEx");
+		onBeforeWindowExLink();
+		loadPlugin("windowEx.dll");
+	}
+	function onBeforeWindowExLink() {
+		// [XXX] typeof 参照で遅延読み込みが入る／ない場合はダミーを作成
+		if (typeof global.MenuItem == "undefined")
+			/**/   global.MenuItem  = %[];
+
+		if (typeof global.Pad      == "undefined")
+			/**/   global.Pad       = %[];
+
+		if (typeof Debug.console   == "undefined")
+			/**/   Debug.console    = %[];
+	}
+
+	var _inPluginLink;
+	function loadPlugin(plugin, raiseerror = true) {
+		trace(messageTag+".loadPlugin", plugin);
+		try {
+			Plugins.link(plugin);
+		} catch(e) {
+			Debug.notice(e.message, Scripts.getTraceString());
+			if (raiseerror) throw e;
+		}
+	}
+	function hookPluginLink(orig, dll, *) {
+		var r, target;
+		with (Storages) target=.chopStorageExt(.extractStorageName(((string)dll).toLowerCase()));
+		trace(messageTag+".hookPluginLink", target);
+		if (target == "windowex") {
+			onBeforeWindowExLink();
+		} else if (target.indexOf("kagparser") == 0) {
+			delete global.KAGParser;
+		}
+		_inPluginLink = true;
+		try {
+			r = orig(dll, *);
+		} catch (e) {
+			_inPluginLink = false;
+			throw e;
+		}
+		_inPluginLink = false;
+		return r;
+	}
+
+	function delayLoadPlugin   (plugin, ref, pre) { return makeDelay(@"${pre} loadPlugin('${plugin}'); return ${ref};"); }
+	function delayLoadFunction (module, ref)      { return makeDelay(@"require('${module}'); return ${ref};"); }
+	function delayLoadSingleton(module, cls, ovr) { return makeDelay(@"require('${module}'); return ${ovr} = new ${cls}();"); }
+	function delayLoadProperty { return delayLoadFunction(...); }
+
+	function makeDelay(funcstr, context = this) {
+		var unnamed = %[], eval = @"property _ { getter { ${funcstr} } }";
+		(function (eval) { eval!; } incontextof unnamed)(eval);
+		return (&unnamed._) incontextof context;
+	}
+
+	function makeDummyProperty(cls, key, value) {
+		var chk;
+		try { chk = typeof cls[key]; } catch {} // [XXX] クラスのプロパティを直接typeofすると実行コンテキストが違う例外が飛ぶ場合がある
+		if (chk == "undefined") {
+			(function (key, value, prefix) {
+				(@"property ${key} { getter { return typeof this.${prefix}${key} != 'undefined' ? this.${prefix}${key} : ${value}; }" +
+				 @"setter(v) { this.${prefix}${key} = v;"
+				 @if (! K2COMPAT_PURGE_DUMMYPROP_LOG)
+				 + @"global.Debug.message('Krkr2CompatUtils: dummy property ${key} set', v, Scripts.getTraceString()); } }"
+				 @endif
+				 )!;
+			} incontextof cls)(key, value, "_k2compat_");
+		}
+	}
+
+	function hookInjection(cls, func, injection, context = null) {
+		var hook = @"_${func}_k2compat";
+		while (typeof cls[hook] != "undefined") hook+="_";
+		var orig = cls[func];
+		cls[func] = @"function(*) { return (${hook}[0] incontextof this)(${hook}[1] incontextof this, *); }"! incontextof context;
+		cls[hook] = [ injection, orig ];
+	}
+
+	function createDebugShortcutMenuItem(win, exp, shortcut, sysarg) {
+		//trace("createDebugShortcutMenuItem", sysarg);
+		var ovr = System.getArgument("-"+sysarg);
+		if (ovr !== void) shortcut=ovr; // -hkXXX= 指定がある場合は上書き
+		if (shortcut == "") return; // -hkXXX="" ならショートカット無効
+
+		var item = new MenuItem(win, sysarg);
+		with (item) {
+			.exp = exp;
+			.onClick = function {
+				if (isvalid this) try { this.exp(); } catch {}
+				//Debug.notice(caption, "clicked", typeof exp);
+			} incontextof item;
+			.shortcut = shortcut;
+			.visible = false;
+		}
+		win.add(item);
+		win.menu.add(item);
+		return item;
+	}
+
+	function toString(target, level=0, sep="\t") {
+		var key = @"(${(typeof target).toLowerCase()})", value;
+		switch (typeof target) {
+		case "Object":
+			value = target ? (string)target : "null";
+			/**/ if (target instanceof "Function") key = "(Function)";
+			else if (target instanceof "Property") key = "(Property)";
+			else if (target instanceof "Class")    key = "(Class)"; // [MEMO] Scripts.getClassNames はインスタンスにしか効かない
+			else if (target instanceof "Array" || target instanceof "Dictionary") {
+				var isdic = target instanceof "Dictionary", ext = [];
+				ext.assign(target);
+				var n = isdic ? ext.count\2 : ext.count;
+				value = isdic ? @"(Dictionary:${n})%[" : @"(Array:${n})[";
+				var step = isdic ? 2 : 1;
+				var large =  n >= 10; // [XXX]自動改行対応の閾値
+				var showkey = isdic || large;
+				var cr = (sep != "" && large);
+				if (cr) value += "\n";
+				for (var i=0, cnt=ext.count; i < cnt; i+=step) {
+					var name = isdic ? @'"${ext[i]}"' : (string)i;
+					var item = toString(ext[isdic ? (i+1) : i], level+1, sep);
+					if (level>0 && cr) value += ((string)sep).repeat(level);
+					if (showkey) value += name + "=>";
+					value += item;
+					if (i+step < cnt) {
+						value += ",";
+						if (cr) value += "\n";
+					}
+				}
+				value += "]";
+			}
+			break;
+		case "Integer": key = "(int)"; value = "%d".sprintf(target); break;
+		case "String":  value = '"'+target.escape()+'"'; break;
+		case "Octet":
+			var oct = "<% ";
+			for (var i = 0, cnt = target.length; i < cnt; i++) oct+="%02X ".sprintf(target[i]);
+			oct += "%>";
+			return "(octet)"+oct;
+		default:
+			value = (string)target;
+			break;
+		}
+		return key + value;
+	}
+}
+//=============================================================
+with (global.Krkr2CompatUtils = new Krkr2CompatUtils()) // replace singleton instance
+{
+	var delaylink = false;
+
+	@if (! K2COMPAT_PURGE_MENU)
+	if (typeof global.MenuItem == "undefined") {
+		// [MEMO] 遅延読み込みに若干問題あり？(WindowExとの相性）
+		var del = "delete global.MenuItem; delete global.Window.menu;";
+		&global.MenuItem = .delayLoadPlugin("menu.dll", "MenuItem", del);
+		&Window.menu = .makeDelay("var ref = global.MenuItem; return &this.menu = (global.Window.menu incontextof this);", null);
+		delaylink = true;
+	}
+	@endif
+
+	@if (! K2COMPAT_PURGE_KAGPARSER)
+	if (typeof global.KAGParser == "undefined") {
+		// [MEMO] 遅延読み込みに若干問題あり？(KAGParserExとの相性）
+		&global.KAGParser = .delayLoadPlugin("KAGParser.dll", "KAGParser", "delete global.KAGParser;");
+		delaylink = true;
+	}
+	@endif
+
+	// Plugins.linkフック
+	if (delaylink) {
+		.hookInjection(Plugins, "link", function {
+			return global.Krkr2CompatUtils.hookPluginLink(...);
+		} incontextof null, Plugins);
+	}
+
+	@if (! K2COMPAT_PURGE_FONTSELECT)
+	&System.doFontSelect = .delayLoadFunction("fontselect",  "System.doFontSelect");
+	Layer.k2compat_doUserSelect = function(*) {
+		var face = System.doFontSelect(this, *);
+		if (face !== void) this.font.face = face;
+		return face !== void;
+	} incontextof null;
+	.hookInjection(Layer, "Layer", function (orig, *) {
+		var r = orig(*);
+		this.font.doUserSelect = (this.k2compat_doUserSelect);
+		return r;
+	} incontextof null);
+	@endif
+
+	@if (! K2COMPAT_PURGE_INPUTSTRING)
+	&System.inputString  = .delayLoadFunction("inputstring", "System.inputString");
+	@endif
+
+	@if (! K2COMPAT_PURGE_WINDOWPROP)
+	.makeDummyProperty(Window, "innerSunken",    /*default value*/true);
+	.makeDummyProperty(Window, "showScrollBars", /*default value*/true);
+	@endif
+
+	@if (! K2COMPAT_PURGE_PTDRAWDEVICE)
+	if (typeof global.Window.PassThroughDrawDevice == "undefined") {
+		/**/   global.Window.PassThroughDrawDevice =
+			%[ recreate:function{}, dtNone:0, dtDrawDib:1, dtDBGDI:2, dtDBDD:3, dtDBD3D:4 ];
+	}
+	@endif
+
+	@if (K2COMPAT_SPEC_DESKTOPINFO)
+	{
+		var sel = "primary_", props = ["Left", "Top", "Width", "Height"], amp = "&";
+		@if (K2COMPAT_SPEC_DESKTOPINFO < 0)
+			sel = "mainwin_";
+		@endif
+		for (var i = props.count-1; i >= 0; i--) {
+			var name = props[i];
+			&System["desktop"+name] = .delayLoadProperty("deskinfo", @"*(${amp}System.desktop${name} = ${amp}_System_${sel}desktop${name})");
+		}
+	}
+	@endif
+	@if (K2COMPAT_SPEC_SCREENINFO)
+	&System.screenWidth  = .delayLoadProperty("scrinfo", "System.screenWidth");
+	&System.screenHeight = .delayLoadProperty("scrinfo", "System.screenHeight");
+	@endif
+
+	@if (! K2COMPAT_PURGE_PAD)
+	&global.Pad = .delayLoadProperty("pad", "Pad");
+	@endif
+
+	@if (! K2COMPAT_PURGE_DEBUG)
+	if (System.getArgument("-debugwin") != "no") {
+		@if (! K2COMPAT_PURGE_CONSOLE)
+		&Debug.console = .delayLoadSingleton("console", "DebugConsoleCompatDialog", "&Debug.console");
+		@endif
+		@if (! K2COMPAT_PURGE_CONTROLLER)
+		&Debug.controller = %[]; //.delayLoadSingleton("controller", "DebugControllerCompatDialog", "&Debug.controller");
+		@endif
+		@if (! K2COMPAT_PURGE_SCRIPTEDITOR)
+		&Debug.scripted = .delayLoadSingleton("pad", "DebugScriptEditorCompatPad", "&Debug.scripted");
+		@endif
+		@if (! K2COMPAT_PURGE_WATCH)
+		&Debug.watchexp = %[]; //.delayLoadSingleton("watch", "DebugWatchExpressionCompatDialog", "&Debug.watchexp");
+		@endif
+		@if (! K2COMPAT_PURGE_HOTKEY && !(K2COMPAT_PURGE_CONSOLE && K2COMPAT_PURGE_CONTROLLER && K2COMPAT_PURGE_SCRIPTEDITOR && K2COMPAT_PURGE_WATCH))
+		.hookInjection(Window, "Window", function (orig, *) {
+			var r = orig(*);
+			if (typeof this.menu == "Object") {
+				var create = global.Krkr2CompatUtils.createDebugShortcutMenuItem;
+				@if (! K2COMPAT_PURGE_CONSOLE)
+				create(this, function { with (console)    .visible=!.visible; } incontextof Debug, "Shift+F4", "hkconsole");
+				@endif
+				@if (! K2COMPAT_PURGE_CONTROLLER)
+				create(this, function { with (controller) .visible=!.visible; } incontextof Debug, "Shift+F1", "hkcontroller");
+				@endif
+				@if (! K2COMPAT_PURGE_SCRIPTEDITOR)
+				create(this, function { with (scripted)   .visible=!.visible; } incontextof Debug, "Shift+F2", "hkeditor");
+				@endif
+				@if (! K2COMPAT_PURGE_WATCH)
+				create(this, function { with (watchexp)   .visible=!.visible; } incontextof Debug, "Shift+F3", "hkwatch");
+				@endif
+			}
+			return r;
+		} incontextof null);
+		@endif
+	} else {
+		var dummyObject = %[];
+		@if (! K2COMPAT_PURGE_CONSOLE)
+		&Debug.console = dummyObject;
+		@endif
+		@if (! K2COMPAT_PURGE_CONTROLLER)
+		&Debug.controller = dummyObject;
+		@endif
+	}
+	@endif // !K2COMPAT_PURGE_DEBUG
+}

@@ -1,0 +1,55 @@
+// System.desktop{Left,Top,Width,Height}の仕様を変更する
+
+Krkr2CompatUtils.requireWindowEx();
+
+property _System_primary_desktopLeft   { getter { return _System_primary_getMonitorInfo("desktopLeft",   "work", "x"); } }
+property _System_primary_desktopTop    { getter { return _System_primary_getMonitorInfo("desktopTop",    "work", "y"); } }
+property _System_primary_desktopWidth  { getter { return _System_primary_getMonitorInfo("desktopWidth",  "work", "w"); } }
+property _System_primary_desktopHeight { getter { return _System_primary_getMonitorInfo("desktopHeight", "work", "h"); } }
+
+property _System_mainwin_desktopLeft   { getter { return _System_mainwin_getMonitorInfo("desktopLeft",   "work", "x"); } }
+property _System_mainwin_desktopTop    { getter { return _System_mainwin_getMonitorInfo("desktopTop",    "work", "y"); } }
+property _System_mainwin_desktopWidth  { getter { return _System_mainwin_getMonitorInfo("desktopWidth",  "work", "w"); } }
+property _System_mainwin_desktopHeight { getter { return _System_mainwin_getMonitorInfo("desktopHeight", "work", "h"); } }
+
+function _System_primary_getMonitorInfo(tag, ref1, ref2) {
+	//with (Krkr2CompatUtils) .trace("primary_getMonitorInfo", tag, ref1, ref2);
+	var err;
+	try {
+		if (typeof System.getDisplayMonitors != "Object")
+			throw "System.getDisplayMonitors not found. (link windowEx.dll)";
+		
+		var list = System.getDisplayMonitors();
+		for (var i = 0, cnt = list.count; i < cnt; i++) {
+			//with (Krkr2CompatUtils) .trace(.toString(list[i]));
+			if (list[i].primary) return list[i][ref1][ref2];
+		}
+		err = "PrimaryMonitor not found.";
+	} catch (e) {
+		err = typeof e == "String" ? e : e.message;
+	}
+	Krkr2CompatUtils.error(@"System.${tag}: ${err}");
+}
+function _System_mainwin_getMonitorInfo(tag, ref1, ref2) {
+	//with (Krkr2CompatUtils) .trace("mainwin_getMonitorInfo", tag, ref1, ref2);
+	// メインウィンドウが無い場合はプライマリを返す
+	if (!global.Window.mainWindow) return _System_primary_getMonitorInfo(...);
+
+	var err;
+	try {
+		if (typeof System.getMonitorInfo != "Object")
+			throw "System.getMonitorInfo not found. (link windowEx.dll)";
+
+		var mon = System.getMonitorInfo(true, global.Window.mainWindow);
+		if (mon !== void) {
+			//with (Krkr2CompatUtils) .trace(.toString(mon));
+			return mon[ref1][ref2];
+		}
+
+		err = "Monitor not found.";
+	} catch (e) {
+		err = typeof e == "String" ? e : e.message;
+	}
+	Krkr2CompatUtils.error(@"System.${tag}: ${err}");
+}
+

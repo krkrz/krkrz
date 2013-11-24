@@ -1,0 +1,34 @@
+// System.inputStringの互換実装
+
+Krkr2CompatUtils.requireWIN32Dialog();
+
+class        _System_inputString_Dialog extends WIN32GenericDialogEX {
+	function _System_inputString_Dialog(caption, prompt, initialString, width = 200) {
+		var tagOK = getResourceString("ButtonOK",     "&OK");
+		var tagNG = getResourceString("ButtonCancel", "キャンセル");
+		super.WIN32GenericDialogEX(%[ title:caption, width:width, itemtexts:%[ IDOK=>tagOK, IDCANCEL=>tagNG ] ]);
+
+		addLText(prompt);
+		nextLine();
+		addLineInput(%[ id:"Input", nolabel:true ], void, (string)initialString);
+		nextLine();
+		addDefPush(IDOK,    makeStepRight(1, 60), 8);
+		addButton(IDCANCEL, makeStepRight(0, 60), 8);
+	}
+	function finalize() {
+		super.finalize(...);
+	}
+	function getResourceString (name, def) { return def; } // [TODO] リソースなどでボタンの文言を差し替えられるようにする
+	function getResourceInteger(name, def) { return def; } // [TODO] リソースなどでボタンの文言を差し替えられるようにする
+	function open() {
+		var r = super.open(...);
+		if (r.result == IDOK) return (string)r.items.Input;
+	}
+}
+&System.inputString = function { // caption, prompt, initialString
+	var dialog = new _System_inputString_Dialog(...);
+	var result = dialog.open(null);
+	invalidate dialog;
+	return result;
+} incontextof global;
+

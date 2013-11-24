@@ -1,0 +1,44 @@
+function ExportRecursive(src, dst, save) {
+	if (typeof Storages.dirlist != "Object") {
+		try {
+			Plugins.link("fstat.dll");
+		} catch (e) {
+			System.inform("fstat.dllプラグインが必要です\n"+e.message);
+			return;
+		}
+	}
+	var dirRecursive = function(target, self, list = []) {
+		var dir = dirlist(target);
+		for (var i = 0, cnt = dir.count; i < cnt; i++) {
+			var item = (string)dir[i];
+			if (item.charAt(0) == ".") continue;
+			if (item.charAt(item.length-1) == "/") {
+				self(target + item, self, list);
+			} else list.add(target + item);
+		}
+		return list;
+	} incontextof Storages;
+	var list = dirRecursive(src, dirRecursive);
+	for (var i = 0, cnt = list.count; i < cnt; i++) {
+		var file = list[i];
+		var dstfile = dst + file.substr(src.length);
+		var script = [];
+		script.load(file);
+		script[save](dstfile);
+	}
+	return true;
+}
+function ExportScript(src, dst, save, doneInform = true) {
+	if (save == "save2" && typeof Array[save] != "Object") {
+		try {
+			Plugins.link("saveStruct.dll");
+		} catch (e) {
+			System.inform("saveStruct.dllプラグインが必要です\n"+e.message);
+			return;
+		}
+	}
+	if (ExportRecursive(System.exePath + src + "/",
+						System.exePath + dst + "/",
+						save) && doneInform)
+		System.inform(@"${dst}へ出力しました");
+}
