@@ -391,4 +391,27 @@
 #define IDS_TVP_D3D_ERR_FAIL                                                      10387
 #define IDS_TVP_D3D_ERR_INVALID_ARG                                               10388
 #define IDS_TVP_D3D_UNKNOWN_ERROR                                                 10389
+#define IDS_TVP_EXCEPTION_ACCESS_VIOLATION                                        10390
+#define IDS_TVP_EXCEPTION_BREAKPOINT                                              10391
+#define IDS_TVP_EXCEPTION_DATATYPE_MISALIGNMENT                                   10392
+#define IDS_TVP_EXCEPTION_SINGLE_STEP                                             10393
+#define IDS_TVP_EXCEPTION_ARRAY_BOUNDS_EXCEEDED                                   10394
+#define IDS_TVP_EXCEPTION_FLT_DENORMAL_OPERAND                                    10395
+#define IDS_TVP_EXCEPTION_FLT_DIVIDE_BY_ZERO                                      10396
+#define IDS_TVP_EXCEPTION_FLT_INEXACT_RESULT                                      10397
+#define IDS_TVP_EXCEPTION_FLT_INVALID_OPERATION                                   10398
+#define IDS_TVP_EXCEPTION_FLT_OVERFLOW                                            10399
+#define IDS_TVP_EXCEPTION_FLT_STACK_CHECK                                         10400
+#define IDS_TVP_EXCEPTION_FLT_UNDERFLOW                                           10401
+#define IDS_TVP_EXCEPTION_INT_DIVIDE_BY_ZERO                                      10402
+#define IDS_TVP_EXCEPTION_INT_OVERFLOW                                            10403
+#define IDS_TVP_EXCEPTION_PRIV_INSTRUCTION                                        10404
+#define IDS_TVP_EXCEPTION_NONCONTINUABLE_EXCEPTION                                10405
+#define IDS_TVP_EXCEPTION_GUARD_PAGE                                              10406
+#define IDS_TVP_EXCEPTION_ILLEGAL_INSTRUCTION                                     10407
+#define IDS_TVP_EXCEPTION_IN_PAGE_ERROR                                           10408
+#define IDS_TVP_EXCEPTION_INVALID_DISPOSITION                                     10409
+#define IDS_TVP_EXCEPTION_INVALID_HANDLE                                          10410
+#define IDS_TVP_EXCEPTION_STACK_OVERFLOW                                          10411
+#define IDS_TVP_EXCEPTION_UNWIND_CCONSOLIDATE                                     10412
 #endif
