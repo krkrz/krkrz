@@ -1,0 +1,802 @@
+Plugins.link("win32dialog.dll") if (typeof global.WIN32Dialog == "undefined");
+
+class WIN32DialogEX extends WIN32Dialog {
+	// コンストラクタ
+	function WIN32DialogEX(owner) {
+		this.owner = owner if (typeof owner == "Object");
+		super.WIN32Dialog(null); // 必ず自分自身にイベントを投げる
+	}
+	function finalize() {
+		removeAllBitmap();
+		super.finalize(...);
+	}
+	// オーナーへのイベント投げは自分
+	var owner;
+
+	// テンプレート情報保持用クラス
+	var Header = global.WIN32Dialog.Header;
+	var Items  = global.WIN32Dialog.Items;
+
+	var itemMap   = %[];
+	var itemNames = [];
+	var itemAlias = %[];
+
+	// 各コントロールの結果保持用
+	var itemResults;
+
+	// 文字列ID割り当てる番号
+	var namedIDnumber = 10000;
+
+	property dm { getter { return global.Debug.message; } }
+
+	property results { getter { return itemResults; } }
+
+	// テンプレートを流し込む
+	function store(elm) {
+		if (typeof elm != 'Object') return false;
+
+		var head = new Header();
+		var items = [];
+		var cnt = 0, n = (typeof elm.items == "Object") ? elm.items.count : 0;
+
+		head.store(elm);
+		for (var i = 0; i < n; i++) {
+			if (typeof elm.items[i] != 'Object') continue;
+			var tmp = %[];
+			(global.Dictionary.assign incontextof tmp)(elm.items[i], true);
+
+			// パラメータのエイリアス
+			makeAlias(tmp, "id", "ID");
+			makeAlias(tmp, "cx", "w");
+			makeAlias(tmp, "cy", "h");
+			makeAlias(tmp, "windowClass", "class");
+
+			var origID;
+			switch (typeof tmp.id) {
+			case "String":
+				if (tmp.id != "") {
+					origID = tmp.id;
+					tmp.id = namedIDnumber++; // 文字列のIDは数値に置き換える
+					itemAlias[tmp.id] = origID;
+				}
+				break;
+			case "Integer":
+				origID = tmp.id;
+				break;
+			default:
+				tmp.id = -1;
+				break;
+			}
+
+			// itemMap / itemNames を設定
+			//dm(i, origID);
+			if (origID != "" && origID != -1) {
+				if (typeof itemMap[origID] == "undefined") itemNames.add(origID);
+				else if (!tmp.multipleid) throw new Exception(@"IDが重複しています: ${i}, ${origID}, ${tmp.id}");
+				itemMap[origID] = tmp;
+				itemMap[tmp.id] = tmp if (origID != tmp.id);
+			}
+
+			var item = new Items();
+			items.add(item);
+			item.store(tmp);
+			cnt++;
+		}
+		head.dlgItems = cnt;
+
+		// プラグインにテンプレ情報を渡す
+		makeTemplate(head, items*);
+
+		invalidate head;
+		for (var i = 0; i < cnt; i++) invalidate items[i];
+	}
+
+	// エイリアス生成
+	function makeAlias(dict, orig, alias) {
+		if (typeof dict[alias] != "undefined" && typeof tmp[orig] == "undefined") {
+			tmp[orig] = tmp[alias];
+			delete tmp[alias];
+		}
+	}
+
+	// 文字列IDを渡せるように
+	function getNumberdId(id, raiseException = true) {
+		var item = itemMap[id];
+		var r = (typeof item == "Object" && typeof item.id != "undefined") ? item.id : id;
+		if (typeof r != "Integer") {
+			var text = @"コントロールID(${id})が見つかりません";
+			if (raiseException) throw new Exception(text);
+			else {
+				Debug.notice(text);
+				r = -1;
+			}
+		}
+		return r;
+	}
+	function getNamedId(id) {
+		return (id != "" && itemAlias[id] != "") ? itemAlias[id] : id;
+	}
+	function getItem(id)               { return super.getItem(        getNumberdId(id)); }
+	function setItemInt(id, value)     { return super.setItemInt(     getNumberdId(id), value); }
+	function getItemInt(id)            { return super.getItemInt(     getNumberdId(id)); }
+	function setItemText(id, value)    { return super.setItemText(    getNumberdId(id), value); }
+	function getItemText(id)           { return super.getItemText(    getNumberdId(id)); }
+	function setItemEnabled(id, value) { return super.setItemEnabled( getNumberdId(id), value); }
+	function getItemEnabled(id)        { return super.getItemEnabled( getNumberdId(id)); }
+	function setItemFocus(id)          { return super.setItemFocus(   getNumberdId(id)); }
+	function setItemPos(id, x, y)      { return super.setItemPos(     getNumberdId(id), x, y); }
+	function setItemSize(id, w, h)     { return super.setItemSize(    getNumberdId(id), w, h); }
+	function setItemBitmap(id, layer)  {
+		var bmp;
+		if (typeof   layer == "Object" && layer) {
+			if (     layer instanceof "Layer" ) bmp = new global.WIN32Dialog.Bitmap(layer);
+			else if (layer instanceof "Bitmap") bmp = layer;
+		}
+		if (bmp === void) return;
+		allBitmaps.add(bmp);
+		return super.setItemBitmap(getNumberdId(id), bmp);
+	}
+	var allBitmaps = [];
+	function removeAllBitmap() {
+		for (var i = allBitmaps.count-1; i >= 0; i--) invalidate allBitmaps[i];
+		allBitmaps.clear();
+	}
+	function sendItemMessage(id, msg, *) {
+		id = getNumberdId(id);
+		var sim = super.sendItemMessage;
+		switch (typeof msg) {
+		case "Integer": return sim(id, msg, *);
+		case "String":  return sim(id, this[msg], *);
+		case "Object":  return sim(id, msg.message, msg.wparam, msg.lparam);
+		}
+	}
+	function getCheckBox(id)        { return sendItemMessage(id, BM_GETCHECK, 0, 0); }
+	function setCheckBox(id, value) { return sendItemMessage(id, BM_SETCHECK, +value, 0); }
+
+	// 初期化処理用
+	function setListBoxTexts( *) { return addItemStrings(LB_ADDSTRING, *); }
+	function setComboBoxTexts(*) { return addItemStrings(CB_ADDSTRING, *); }
+	function selectListBox( *)   { return selectItem(LB_SETCURSEL, *); }
+	function selectComboBox(*)   { return selectItem(CB_SETCURSEL, *); }
+
+	function addItemStrings(msg, id, list) {
+		for (var i = 0; i < list.count; i++) sendItemMessage(id, msg, 0, list[i]);
+	}
+	function selectItem(msg, id, value) {
+		sendItemMessage(id, msg, +value, 0) if (msg !== void);
+	}
+
+	function setTrackBarPos(id, pos) { return sendItemMessage(id, TBM_SETPOS, true, pos); }
+	function getTrackBarPos(id)      { return sendItemMessage(id, TBM_GETPOS, 0, 0); }
+
+
+	var parent;
+
+	// リソース読み込み上書き
+	function loadResource(dll, res) {
+		if (dll != "")  with (Storages) {
+			var path = .getPlacedPath(dll);
+			if (path == "") throw new Exception(@"${dll} が見つかりません");
+			dll = .getLocalName(path);
+		} else dll = void;
+		//dm("loadResource", dll, res);
+		super.loadResource(dll, res);
+	}
+
+	// オープン処理上書き
+	function open(win) {
+		parent = win;
+		var r = super.open(...);
+		//結果辞書を返す
+		return %[ result:r, items:itemResults ];
+	}
+
+	// クローズ処理上書き
+	function close() {
+		if (!modeless) makeResults();
+		var r = super.close(...);
+		removeAllBitmap();
+		return r;
+	}
+	// 結果を保持する
+	function makeResults() {
+		itemResults = %[];
+		for (var i = 0; i < itemNames.count; i++) {
+			var name = itemNames[i];
+			itemResults[name] = getResult(name);
+		}
+	}
+
+	// イベントフック
+	function onInit(*) {
+		super.onInit(...);
+		initItems();
+		throwEvent("onInit", *);
+		return true;
+	}
+	function onCommand(*) {
+		super.onCommand(...);
+		throwEvent("onCommand", *);
+		return defaultCommand(...);
+	}
+	function onSize(*)    { super.onSize(   ...); return throwEvent("onSize",    *); }
+	function onHScroll(*) { super.onHScroll(...); return throwEvent("onHScroll", *); }
+	function onVScroll(*) { super.onVScroll(...); return throwEvent("onVScroll", *); }
+	function onNotify( *) { super.onNotify( ...); return throwEvent("onNotify",  *); }
+	function throwEvent(tag, *) {
+		if (typeof owner == "Object" && typeof owner[tag] != "undefined") return owner[tag](*);
+		return false;
+	}
+
+	// 指定ウィンドウの中央に配置（ただし画面外にならないこと）
+	function setCenterPosition(win = parent) {
+		// モニタ情報の取得
+		var x1, y1, x2, y2, monitor;
+		if (typeof System.getMonitorInfo != "undefined") {
+			var info = System.getMonitorInfo(true, win);
+			monitor = info.work if (typeof info == "Object");
+		}
+		monitor = %[ x:0, y:0, w:System.screenWidth, h:System.screenHeight ] if (monitor === void);
+		with (monitor) x1=.x, y1=.y, x2=.w+x1, y2=.h+y1;
+
+		// 位置決定
+		var w = width, h = height;
+		var x = (x1+x2 - w)\2, y = (y1+y2 - h)\2;
+		if (win && typeof win == "Object" && isvalid win &&
+			(win instanceof "Window" || win instanceof "WIN32Dialog")) with (win) {
+			x = ((.width  - w)\2) + .left;
+			y = ((.height - h)\2) + .top;
+		}
+		// モニタからはみ出ていたら内側へ移動
+		x = x2 - width  if (x + w > x2);
+		y = y2 - height if (y + h > y2);
+		x = x1          if (x < x1);
+		y = y1          if (y < y1);
+		setPos(x, y);
+	}
+
+	// 初期パラメータを設定する
+	function initItems() {
+		for (var i = 0; i < itemNames.count; i++) {
+			var name = itemNames[i];
+			var item = itemMap[name];
+			setParams(name, item.init) if (item.init != void);
+		}
+	}
+
+	// デフォルトコマンドイベント
+	function defaultCommand(msg, wp, lp) {
+		switch (wp) {
+		case IDOK:
+		case IDCANCEL:
+		case IDABORT:
+			close(wp);
+			return true;
+		}
+		return false;
+	}
+
+	function setParams(id, elm) {
+		if (typeof elm != "Object") return;
+		if (elm instanceof "Array") {
+			for (var i = 0; i < elm.count; i++) setParams(id, elm[i]);
+		} else {
+			var ext = [];
+			ext.assign(elm);
+			for (var i = 0; i < ext.count; i+=2) {
+				var key = ext[i], value = ext[i+1];
+				//dm("setParams", key, value);
+				if (typeof this[key] == "Object" && this[key] instanceof "Function") this[key](id, value);
+				else throw new Exception(@"不明な initParam: ${key}");
+			}
+		}
+	}
+	function setInitParams(elm, forced = false) {
+		var ext = [];
+		ext.assign(elm);
+		for (var i = 0; i < ext.count; i+=2) {
+			var item, key = ext[i], value = ext[i+1];
+			if (key == "") continue;
+			if (forced && typeof itemMap[key] == "undefined") {
+				itemNames.add(key);
+				itemMap[key] = %[];
+			}
+			var item = itemMap[key];
+			if (item !== void) item.init = value;
+		}
+	}
+	function getItemClass(itemOrId) {
+		var item = itemOrId;
+		item = itemMap[itemOrId] if (typeof itemOrId != "Object" && itemOrId != "");
+		if (typeof item == "Object") {
+			var cls = item.windowClass;
+			cls = cls.toLowerCase() if (typeof cls == "String");
+			switch (cls) {
+			case 0x80: case "button":    return BUTTON;
+			case 0x81: case "edit":      return EDIT;
+			case 0x82: case "static":    return STATIC;
+			case 0x83: case "listbox":   return LISTBOX;
+			case 0x85: case "combobox":  return COMBOBOX;
+			case 0x84: case "scrollbar": return SCROLLBAR;
+			case "msctls_trackbar32":    return TRACKBAR;
+			}
+		}
+	}
+	function getResult(id) {
+		var item = (id != "") ? itemMap[id] : void;
+		if (item === void) return;
+		var style = item.style;
+
+		switch (getItemClass(item)) {
+
+		case BUTTON:
+			// ラジオボタンの場合はその状態
+			if (style & BS_AUTOCHECKBOX ||
+				style & BS_CHECKBOX ||
+				style & BS_AUTORADIOBUTTON ||
+				style & BS_RADIOBUTTON) return getCheckBox(id);
+			// それ以外はステート
+			return sendItemMessage(id, BM_GETSTATE, 0, 0);
+
+		case EDIT:
+		case STATIC:
+			return getItemText(id);
+
+		case LISTBOX:
+			// 複数選択できるか
+			if (style & LBS_MULTIPLESEL) {
+				var cnt = sendItemMessage(id, LB_GETCOUNT, 0, 0);
+				var rslt = [];
+				for (var i = 0; i < cnt; i++)
+					rslt.add(sendItemMessage(id, LB_GETSEL, i, 0));
+				return rslt;
+			}
+			// それ以外は選択インデックス
+			return sendItemMessage(id, LB_GETCURSEL, 0, 0);
+
+		case COMBOBOX:
+			// ドロップダウンリストでは選択インデックスを返す
+			if (style & CBS_DROPDOWNLIST)
+				return sendItemMessage(id, CB_GETCURSEL, 0, 0);
+
+			// それ以外はテキスト
+			return getItemText(id);
+
+		case SCROLLBAR:
+			return sendItemMessage(id, SBM_GETPOS, 0, 0);
+
+		case TRACKBAR:
+			return getTrackBarPos(id);
+		}
+	}
+
+	function printOCT(oct, text) {
+		text += " = ";
+		for (var i = 0, len = oct.length; i < len; i++) text += "%02x".sprintf(oct[i]);
+		Debug.message(text);
+	}
+	function getPtrOCT(oct) { return               global.WIN32Dialog.getOctetAddress(oct); }
+	function getPtrSTR(str) {
+		with (global.WIN32Dialog) Debug.message(.getStringFromAddress(.getStringAddress(str)));
+
+		return getHexLSB(4,  global.WIN32Dialog.getStringAddress(str));
+	}
+	function getHexLSB(bc, val, ret) {
+		for (var i = 0; i < bc; i++, val>>=8) ret += "%02x".sprintf(val & 0xFF);
+		return ret;
+	}
+	function makeStructOctet(list) {
+		var oct;
+		for (var i = 0; i < list.count; i++) {
+			var item = list[i];
+			switch (typeof item) {
+			case "String":  oct += getPtrSTR(item); break;
+			case "Integer": oct += getHexLSB(4, item); break;
+			case "Object":
+				if (item instanceof "Array") {
+					var keta = item[0] * 2;
+					oct += (@"%0${keta}x").sprintf(item[1] & 0xFFFFFFFF);
+				} else with (item) {
+					switch (.type) {
+					case "string": oct += getPtrSTR(.value);   break;
+					case "byte":   oct += getHexLSB(1, .value); break;
+					case "word":   oct += getHexLSB(2, .value); break;
+					case "dword":  oct += getHexLSB(4, .value); break;
+					default:
+						throw new Exception("unknwon type:" + .type);
+					}
+				}
+				break;
+			}
+		}
+		var exp = "<% "+oct+" %>";
+		return exp!;
+	}
+	function listViewClearAllItems(id) {
+		sendItemMessage(id, LVM_DELETEALLITEMS, 0, 0);
+	}
+	function listViewSetColumns(id, list) {
+		sendItemMessage(id, LVM_DELETECOLUMN, 0, 0);
+		for  (var i = 0; i < list.count; i++) {
+			var info = list[i];
+			if (info === void) continue;
+			info = %[ text:info, width:100 ]; if (typeof info == "String");
+			with (info) {
+				var mask = 0x0004; // LVCF_TEXT
+				var text = .text != "" ? .text : "";
+				var fmt = 0, width = 0;
+				if (.align != "") {
+					switch(.align) {
+					case "right":  fmt |= 0x0001; break; // LVCFMT_RIGHT
+					case "center": fmt |= 0x0002; break; // LVCFMT_CENTER
+					}
+					mask |= 0x0001; // LVCF_FMT
+				}
+				if (.width !== void) {
+					width = (int).width;
+					mask |= 0x0002; // LVCF_WIDTH
+				}
+				var col = makeStructOctet([ mask, fmt, width, getPtrSTR(text), /*cchTextMax*/0, /*iSubItem*/0, /*iImage*/0, /*iOrder*/0 ]);
+				printOCT(col);
+				Debug.message(sendItemMessage(id, LVM_INSERTCOLUMNW, i, getPtrOCT(col)));
+			}
+		}
+	}
+
+	function Control(text, id, wndcls, style, x, y, width, height, exStyle = 0) {
+		return %[ windowClass:wndcls, x:x, y:y, cx:width, cy:height, title:text, style:style|WS_VISIBLE, exStyle:exStyle, id:id ];
+	}
+
+	// 各種テンプレートを生成する関数
+
+	// ボタン系列
+	function DefPushButton(  text, id,    x, y, w, h, style=WS_TABSTOP, ex=0) { return Control(text, id, BUTTON, style|BS_DEFPUSHBUTTON,   x, y, w, h, ex); }
+	function    PushButton(  text, id,    x, y, w, h, style=WS_TABSTOP, ex=0) { return Control(text, id, BUTTON, style|BS_PUSHBUTTON,      x, y, w, h, ex); }
+	function AutoCheckBox(   text, id,    x, y, w, h, style=WS_TABSTOP, ex=0) { return Control(text, id, BUTTON, style|BS_AUTOCHECKBOX,    x, y, w, h, ex); }
+	function     CheckBox(   text, id,    x, y, w, h, style=WS_TABSTOP, ex=0) { return Control(text, id, BUTTON, style|BS_CHECKBOX,        x, y, w, h, ex); }
+	function AutoRadioButton(text, id,    x, y, w, h, style=WS_TABSTOP, ex=0) { return Control(text, id, BUTTON, style|BS_AUTORADIOBUTTON, x, y, w, h, ex); }
+	function     RadioButton(text, id,    x, y, w, h, style=WS_TABSTOP, ex=0) { return Control(text, id, BUTTON, style|BS_RADIOBUTTON,     x, y, w, h, ex); }
+	function GroupBox(       text, id=-1, x, y, w, h, style=WS_GROUP,   ex=0) { return Control(text, id, BUTTON, style|BS_GROUPBOX,        x, y, w, h, ex); }
+
+	// スタティック系列
+	function LText(          text, id,    x, y, w, h, style=WS_GROUP,   ex=0) { return Control(text, id, STATIC, style|SS_LEFT,            x, y, w, h, ex); }
+	function CText(          text, id,    x, y, w, h, style=WS_GROUP,   ex=0) { return Control(text, id, STATIC, style|SS_CENTER,          x, y, w, h, ex); }
+	function RText(          text, id,    x, y, w, h, style=WS_GROUP,   ex=0) { return Control(text, id, STATIC, style|SS_RIGHT,           x, y, w, h, ex); }
+	function Icon(           text, id,    x, y, w, h, style=0,          ex=0) { return Control(text, id, STATIC, style|SS_ICON,            x, y, 0, 0, ex); } // w,h は無視される
+
+	var DefaultStyles = %[
+	EditText: ES_LEFT     |WS_BORDER           |WS_TABSTOP,
+	ListBox:  LBS_NOTIFY  |WS_BORDER|WS_VSCROLL|WS_TABSTOP,
+	ComboBox: CBS_DROPDOWN          |WS_VSCROLL|WS_TABSTOP,
+	ListView: LVS_REPORT  |WS_BORDER,
+	TrackBar: TBS_HORZ    |TBS_AUTOTICKS       |WS_TABSTOP,
+		];
+
+	// エディット系列 EDITTEXT, BEDIT, HEDIT, or IEDIT. 
+	function EditText(             id,    x, y, w, h, style=DefaultStyles.EditText, ex=0) { return Control(, id, EDIT,      style, x, y, w, h, ex); } // ES_*,  WS_TABSTOP, WS_GROUP, WS_VSCROLL, WS_HSCROLL, WS_DISABLED
+	// リストボックス系列
+	function ListBox(              id,    x, y, w, h, style=DefaultStyles.ListBox,  ex=0) { return Control(, id, LISTBOX,   style, x, y, w, h, ex); } // LBS_*, WS_BORDER, WS_VSCROLL
+	// コンボボックス系列
+	function ComboBox(             id,    x, y, w, h, style=DefaultStyles.ComboBox, ex=0) { return Control(, id, COMBOBOX,  style, x, y, w, h, ex); } // CBS_*, WS_TABSTOP, WS_GROUP, WS_VSCROLL, WS_DISABLED
+
+	// リストビュー（要initCommonControlsEx(ICC_LISTVIEW_CLASSES);）
+	function ListView(             id,    x, y, w, h, style=DefaultStyles.ListView, ex=0) { return Control(, id, LISTVIEW,  style, x, y, w, h, ex); } // LVS_*, WS_TABSTOP, WS_GROUP, WS_VSCROLL
+
+	// スクロールバー系列
+	function TrackBar(             id,    x, y, w, h, style=DefaultStyles.TrackBar, ex=0) { return Control(, id, TRACKBAR,  style, x, y, w, h, ex); } // TBS_*, ...
+}
+
+// もう少し使いやすくしたバージョン
+class WIN32GenericDialogEX extends WIN32DialogEX
+{
+	var _templ, _padding, _ptSz, _cx, _cury, _curh, _maxy, _curband, _id2text;
+	function WIN32GenericDialogEX(elm) {
+		super.WIN32DialogEX();
+		elm = %[] if (typeof elm != "Object");
+		with (elm) {
+			_padding = .padding !== void ? (int).padding : 4;
+
+			var style = .style !== void ? .style : DS_MODALFRAME|DS_CENTER|WS_POPUP|WS_CAPTION|WS_SYSMENU|DS_SETFONT;
+			/**/style = style! if (typeof style == "String");
+
+			var fw = .fontWeight != "" ? .fontWeight : FW_NORMAL;
+			/**/fw = fw! if (typeof fw == "String");
+
+			var cx = _cx = .width !== void ? +.width : 100;
+			var pt = _ptSz = .fontSize !== void ? (int).fontSize : 9;
+			_templ = %[
+				/**/style:style, x:0, y:0, cx:cx, cy:0,
+				/**/title:.title != "" ? .title : "GenericDialog",
+				/**/pointSize:pt, typeFace:.fontFace != "" ? .fontFace : "ＭＳ Ｐゴシック",
+				/**/weight:fw, items:[]
+				];
+			_id2text = .itemtexts !== void ? .itemtexts : %[];
+		}
+		_curband = %[ x:_padding, w:_cx - _padding*2 ];
+		_maxy = _cury = _padding;
+		_curh = 0;
+	}
+	function finalize() {
+		super.finalize(...);
+	}
+	function throwError() {
+		throw new Exception(...);
+	}
+
+	function addItem(item) { _templ.items.add(item); }
+	function getLastItem() { with (_templ) return .items[.items.count-1]; }
+	function nextLine(ofs = _padding) {
+		_cury += _curh + ofs;
+		_curh = 0;
+		_maxy = _cury if (_maxy < _cury);
+	}
+
+	function divRectPos(rect, pos, align = 1) {
+		with (rect) {
+			var ofs = (!align ? .w\2 : align > 0 ? 0 : .w) + pos;
+			return %[
+			left:  %[ x:.x,     y:.y, w:ofs,    h:.h ],
+			right: %[ x:.x+ofs, y:.y, w:.w-ofs, h:.h ] ];
+		}
+	}
+	function divRectPer(rect, div, pad = _padding) {
+		if (div <= 1) return rect;
+		var ret = [], w = (rect.w - (pad * (div-1))) / div, step = w + pad;
+		for (var i = 0; i < div; i++) {
+			with (rect) ret[i] = %[ x:.x + (int)(step*i), w:(int)w, y:.y, h:.h ];
+		}
+		return ret;
+	}
+	function makeDiv(pos, per, pad) {
+		if (per < 1 || pos < 0 || pos >= per) throwError("makeDiv: invalid divisions");
+		return %[ type:"per", per:per, pos:pos, padding:pad ];
+	}
+	function makeSpan(pos, span, per, pad) {
+		if (pos === void) throwError("makeSpan: invalid pos");
+		var r = makeDiv(pos, per, pad);
+		if (span <= 0 || pos+span > per) throwError("makeSpan: invalid span");
+		if (span == 1) return r;
+		r.type = "span";
+		r.span = span;
+		return r;
+	}
+	function makeStep(align,  index, step, width, pad) {
+		return %[ type:"step", align:align, step:step, index:index, width:width, padding:pad ];
+	}
+	function makeStepLeft (*) { return makeStep("left",  *); }
+	function makeStepRight(*) { return makeStep("right", *); }
+
+	function makeCut(sel, pos, align) {
+		return %[ type:sel, align:align, sel => pos ];
+	}
+	function makeCutLeft  (*) { return makeCut ("left",  *); }
+	function makeCutRight (*) { return makeCut ("right", *); }
+
+	function getCurrentRect(div, height) {
+		_curh = height if (_curh < height);
+		var rect = %[ x:_curband.x, y:_cury, w:_curband.w, h:height ];
+		if (typeof div != "Object" || !div) return rect;
+		switch (div.type) {
+		case "per":
+			var per = divRectPer(rect, div.per, div.padding);
+			rect = per[div.pos] if (div.pos !== void && per[(int)div.pos] !== void);
+			break;
+		case "span":
+			var per = divRectPer(rect, div.per, div.padding), x2;
+			rect = per[div.pos];
+			with ( per[div.pos + div.span-1]) x2 = .x+.w;
+			with ( rect) .w = x2-.x;
+			break;
+		case "left":  rect = divRectPos(rect, div.left,  div.align).left;  break;
+		case "right": rect = divRectPos(rect, div.right, div.align).right; break;
+		case "step":
+			var pad = div.padding !== void ? div.padding : _padding;
+			switch (div.align) {
+			case "right": rect.x = rect.w - (div.step + pad) * (div.index+1) + pad*2; break;
+			default: case "left": rect.x += (div.step + pad) * div.index; break;
+			}
+			rect.w = (div.width !== void) ? div.width : div.step;
+			break;
+		case "fixed":
+			rect.x = div.x;
+			rect.w = div.width;
+			break;
+		}
+		return rect;
+	}
+
+	function getNameInfo(name, initMethod, initValue) {
+		var ret;
+		switch (typeof name) {
+		case "Integer": ret = %[ id:name, text:"ID"+name ]; break;
+		case "String":  ret = %[ id:name, text:name ]; break;
+		case "Object":  ret = name; break;
+		default: throwError("getNameInfo: unkonw name type "+name);
+		}
+		with (ret) {
+			if (.id == "" || (.text == "" && !.nolabel)) throwError("getNameInfo: invalid name value");
+			if (_id2text[.id] != "") .text = _id2text[.id];
+			addInit(.id, initMethod, initValue) if (initMethod != "" && initValue !== void);
+		}
+		return ret;
+	}
+
+	var _inits = %[];
+	function addInit(id, method, value) {
+		if (id == "" || method == "") throwError("addInit: invalid ID/method");
+		_inits[id] = [] if (_inits[id] === void);
+		_inits[id].add(%[ method => value ]);
+	}
+
+	function _addText(sel, text, div, height = _ptSz, id = -1)  {
+		var rect = getCurrentRect(div, height);
+		with (rect) addItem(sel(text, id, .x, .y, .w, .h));
+	}
+	function addLText(*) /*text, div, height=_ptSz, id=-1*/ { _addText(LText, *); }
+	function addRText(*) /*text, div, height=_ptSz, id=-1*/ { _addText(RText, *); }
+	function addCText(*) /*text, div, height=_ptSz, id=-1*/ { _addText(CText, *); }
+
+	function addIcon(id, height, div, style = SS_BITMAP|SS_CENTERIMAGE|SS_SUNKEN)  {
+		var rect = getCurrentRect(div, height);
+		with (rect) addItem(Control("", id, STATIC, style, .x, .y, .w, .h, 0));
+	}
+
+	function _addLineEditDrop(method, info, div, style) {
+		var ofs  = _ptSz <= 9 ? 2 : 0;
+		var p    = 2; //_ptSz > 9 ? 2 : 2;
+		var rect = getCurrentRect(div, _ptSz + ofs*2);
+		if (info.nolabel) {
+			with (rect) addItem(this[method](info.id, .x, .y, .w, .h, style|WS_TABSTOP));
+		} else {
+			var div  = divRectPos(rect, info.text.length * _ptSz);
+			with (div.left)  addItem(LText(info.text, -1, .x, .y+p, .w, .h-p));
+			with (div.right) addItem(this[method](info.id,    .x, .y, .w, .h, style|WS_TABSTOP));
+		}
+	}
+	function addLineInput(name, div, initial)  {
+		var info = getNameInfo(name, "setItemText", initial);
+		_addLineEditDrop("EditText", info, div, ES_LEFT|ES_AUTOHSCROLL|WS_BORDER);
+	}
+	function addDropSelect(name, height, div, initial, list)  {
+		var info = getNameInfo(name, "setComboBoxTexts", list);
+		if (typeof initial == "String") initial = list.find(initial);
+		addInit(info.id, "selectComboBox", initial);
+		_addLineEditDrop("ComboBox", info, div, CBS_DROPDOWNLIST|WS_VSCROLL);
+		getLastItem().cy = height;
+	}
+	function addDropInput(name, height, div, initial, list)  {
+		var info = getNameInfo(name, "setComboBoxTexts", list);
+		if (typeof initial == "Integer") initial = list[i];
+		addInit(info.id, "setItemText", initial);
+		_addLineEditDrop("ComboBox", info, div);
+		getLastItem().cy = height;
+	}
+	function addListSelect(name, height, div, initial, list) {
+		var info = getNameInfo(name, "setListBoxTexts", list);
+		if (typeof initial == "String") initial = list.find(initial);
+		var   rect = getCurrentRect(div, height);
+		with (rect) addItem(ListBox(info.id, .x, .y, .w, .h));
+	}
+/*
+	function addFileSelect  (name, div, initial) {}
+	function addFolderSelect(name, div, initial) {}
+	function addListInput (name, div, initial, list) {}
+*/
+	function addListView (name, height, div, columns) {
+		var info = getNameInfo(name, "listViewSetColumns", columns);
+		var rect = getCurrentRect(div, height);
+		with (rect) addItem(ListView(info.id, .x, .y, .w, .h,, LVS_EX_GRIDLINES));
+	}
+
+	function addTextInput(name, height, div, initial) {
+		var rect, info = getNameInfo(name, "setItemText", initial);
+		if (!info.nolabel) {
+			/**/  rect = getCurrentRect(div, _ptSz);
+			with (rect) addItem(LText(info.text, -1, .x, .y, .w, .h));
+			nextLine(0);
+		}
+		/**/  rect = getCurrentRect(div, height);
+		with (rect) addItem(EditText(info.id, .x, .y, .w, .h,
+									 ES_LEFT|ES_MULTILINE|ES_WANTRETURN|
+									 ES_AUTOVSCROLL|ES_AUTOHSCROLL|
+									 WS_VSCROLL|WS_HSCROLL|
+									 WS_BORDER|WS_TABSTOP));
+	}
+	function _addAnyTypeButton(type, pad, name, div, pad2) {
+		var info = getNameInfo(name);
+		var rect = getCurrentRect(div, _ptSz + (pad2 !== void ? pad2 : pad));
+		with (rect) addItem(this[type](info.text, info.id, .x, .y, .w, .h));
+	}
+	function addDefPush(*) { _addAnyTypeButton("DefPushButton", _padding, *); }
+	function addButton(*)  { _addAnyTypeButton("PushButton", _padding, *); }
+	function addToggle(*)  { _addAnyTypeButton("AutoCheckBox", 0, *); }
+	function addRadio (*)  { _addAnyTypeButton("AutoRadioButton", 0, *); }
+
+	function addTrackBar(name, div, min=0, max=100, pos=0, step, height = _ptSz * 2) {
+		var info = getNameInfo(name);
+		var rect = getCurrentRect(div, height);
+		with (rect) addItem(TrackBar(info.id, .x, .y, .w, .h));
+		if (min > max) throwError("addTrackBar:invalid min/max.");
+		if (pos < min) pos = min;
+		if (pos > max) pos = max;
+		if (step === void) step = (max-min)\4;
+		addInit(info.id, "initTrackBarParam", [min, max, pos, step]);
+	}
+	function initTrackBarParam(id, list) {
+		var min = (int)+list[0];
+		var max = (int)+list[1];
+		var pos = (int)+list[2];
+		var step =      list[3];
+		dm("initTrackBarParam", min, max, pos, step);
+		sendItemMessage(id, TBM_SETRANGEMIN, 0, min);
+		sendItemMessage(id, TBM_SETRANGEMAX, 0, max);
+		sendItemMessage(id, TBM_SETTICFREQ,  (int)+step, 0) if (step !== void);
+		setTrackBarPos(id, pos);
+	}
+
+	var _groupStack = [];
+	function beginGroup(grp, id=-1, nogrp=false) {
+		nextLine(0);
+		var rect = getCurrentRect(void, _ptSz), item;
+		with (rect) item = GroupBox(grp, id, .x, .y, .w, .h, nogrp ? 0 : void);
+		var stack = %[ band:%[], y:_cury, item:item ];
+		(Dictionary.assign incontextof stack.band)(_curband, true);
+		_groupStack.push(stack);
+		addItem(item);
+		_curband.x += _padding*2;
+		_curband.w -= _padding*4;
+		nextLine(0);
+	}
+	function endGroup() {
+		nextLine(0);
+		var stack = _groupStack.pop();
+		if (stack === void) return;
+		(Dictionary.assign incontextof _curband)(stack.band, true);
+		stack.item.cy = _cury - stack.y + _padding\2;
+		nextLine();
+	}
+	var _frameStack = [];
+	function beginFrame(div) {
+		nextLine(0);
+		var band = %[];
+		(Dictionary.assign incontextof band)(_curband, true);
+		_frameStack.unshift(%[ band:band, y1:_cury, y2:_cury ]);
+		setFrame(div) if (div !== void);
+	}
+	function _resetFrame(pop) {
+		var info = pop ? _frameStack.shift() : _frameStack[0];
+		(Dictionary.assign incontextof _curband)(info.band, true);
+		_curh = 0;
+		return info;
+	}
+	function setFrame(div) {
+		nextLine(0);
+		var info = _resetFrame(false);
+		info.y2 = _cury if (info.y2 < _cury);
+		_cury = info.y1;
+		var rect = getCurrentRect(div, 0);
+		_curband.x = rect.x;
+		_curband.w = rect.w;
+	}
+	function endFrame() {
+		nextLine(0);
+		var info = _resetFrame(true);
+		_cury = info.y2 if (info.y2 > _cury);
+	}
+
+	var _heightStack = [];
+	function pushCurrentHeight() { _heightStack.push(_curh);  }
+	function popCurrentHeight() { _curh = _heightStack.pop(); }
+
+	var _stored;
+	function open() {
+		if (!_stored) {
+			nextLine();
+			_templ.cy = _maxy;
+			_stored = true;
+			store(_templ);
+			setInitParams(_inits);
+		}
+		return super.open(...);
+	}
+}

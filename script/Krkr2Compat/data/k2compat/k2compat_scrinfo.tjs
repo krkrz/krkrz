@@ -1,0 +1,10 @@
+// System.screen{Width,Height}の仕様を変更する
+
+Krkr2CompatUtils.require("deskinfo");
+
+property _System_screenWidth  { getter { return _System_primary_getMonitorInfo("screenWidth",  "monitor", "w"); } }
+property _System_screenHeight { getter { return _System_primary_getMonitorInfo("screenHeight", "monitor", "h"); } }
+
+&System.screenWidth  = &_System_screenWidth;
+&System.screenHeight = &_System_screenHeight;
+

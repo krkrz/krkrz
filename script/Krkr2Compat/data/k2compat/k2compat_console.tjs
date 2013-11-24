@@ -1,0 +1,203 @@
+Krkr2CompatUtils.require("padcommon");
+
+class        DebugConsoleCompatDialog extends DebugPadCompatDialog {
+	function DebugConsoleCompatDialog { super.DebugPadCompatDialog();
+		try {
+			Debug.addLoggingHandler(this.onLog);
+			setupInitialLog(Debug.getLastLog());
+		} catch(e) {
+			var log = "LoggingHandler not found:"+e.message;
+			unsupport(log);
+			_textLogs.add(log);
+			@if (!kirikiriz)
+			_textLogs.add("吉里吉里２ではコンソール互換ウィンドウはサポートされません");
+			@endif
+		}
+		initComboBoxEx();
+	}
+	function finalize {
+		try { Debug.removeLoggingHandler(this.onLog); } catch {}
+		super.finalize(...);
+	}
+
+	var _title = "Console";
+	var _fontColor = 0xFFFFFF;
+	var _color = 0x000000;
+	var _wordWrap = true;
+	var _showScrollBars = ssVertical;
+	var _readOnly = true;
+
+	var _lineName = "eval";
+
+	var _maxTextLogs = 1024; // [XXX]
+	var _textLogs = [];
+	var _focusEval = false;
+
+	function onInit() {
+		setupEvalComboBox();
+		var r = super.onInit(...);
+		_focusEval = true;
+		return r;
+	}
+
+	property text {
+		getter { return _textLogs.join("\n"); }
+//		setter(v) { /* text log is read only */ }
+	}
+	function _syncText {}
+	function onCommand_edit(id, msg, lp) {}
+
+	// LoggingHandler callback
+	function onLog(line) {
+		if (!isvalid this) return;
+
+		// 行数上限対応
+		_textLogs.add(line);
+		while (_textLogs.count > _maxTextLogs) _textLogs.shift();
+
+		_updateText() if (_visible);
+	}
+
+	// getLastLog を登録
+	function setupInitialLog(text) {
+		var div = ((string)text).split(/[\r]?\n/g);
+		// 末尾空行を削除
+		while (div.count > 0 && div[div.count-1] == "") div.pop();
+		_textLogs.assign(div);
+	}
+
+	// ログテキストを更新（遅延対応）
+	function _updateText() {
+		if (_visible) kickAsyncTrigger("onUpdateLog");
+	}
+	function onUpdateLog {
+		if (!isvalid this || !_visible) return;
+		lockItemUpdate(0);
+		try {
+			setItemText    (_editID, _textLogs.join("\n").replace(/[\r]?\n/g, "\r\n")); // [TOOD]もっとスマートな方法があれば…
+			sendItemMessage(_editID, EM_SETSEL, -2, -2);
+			sendItemMessage(_editID, EM_SCROLLCARET, 0, 0);
+		} catch (e) {
+			unlockItemUpdate();
+			throw e;
+		}
+		unlockItemUpdate();
+		//invalidateAll(false);
+		if (_focusEval) {
+			_focusEval = false;
+			setItemFocus(_lineName);
+		}
+	}
+	// optional method
+	function   lockItemUpdate { return typeof super.  lockItemUpdate == "Object" ? super.  lockItemUpdate(...) : void; }
+	function unlockItemUpdate { return typeof super.unlockItemUpdate == "Object" ? super.unlockItemUpdate(...) : void; }
+
+
+	//-------------------------------------------------------------
+
+	function addLineTextParts(elm, add, rect) {
+		with (rect) {
+			add(ComboBoxEx(_lineName, .x+.h, .y, .w-.h, .h*8));
+			_addAutoMapRect(_lineName, 0, .h, 0, 0);
+		}
+	}
+	function initComboBoxEx() {
+		// for use ComboBoxEx
+		global.WIN32Dialog.initCommonControlsEx(ICC_USEREX_CLASSES);
+		var set = function (key, value) {
+			if (typeof this[key] == "undefined") this[key] = value & 0xFFFFFFFF;
+		} incontextof this;
+		// [XXX] CBEN_* が登録されていない場合自前で対応
+		set("CBEN_ENDEDITA", -800 - 5);
+		set("CBEN_ENDEDITW", -800 - 6);
+//		set("CBEM_DELETEITEM",  CB_DELETESTRING);
+		set("CBEM_INSERTITEMW", 0x0400 + 11);
+	}
+	function ComboBoxEx() {
+		var r = ComboBox(...);
+		r.windowClass = COMBOBOXEX; // WC_COMBOBOXEX
+		return r;
+	}
+	// ComboBox の CBEN_ENDEDIT 通知から ENTERキー入力を取得
+	function onNotify_eval(id, nm) {
+		var sz = 0;
+		switch (nm.code) {
+		case CBEN_ENDEDITA: sz = 1; break;
+		case CBEN_ENDEDITW: sz = 2; break;
+		}
+		if (sz > 0) {
+			var sztext = /*CBEMAXSTRLEN*/260 * sz;
+			var iWhy = nm.getDWord(/*NMHDR hdr*/4*3 + /*bool fChanged*/4+ /*int iNewSelection*/4+ sztext);
+			if (iWhy == /*CBENF_RETURN*/2) {
+				onExecute();
+			}
+		}
+	}
+	var _evalID;
+	function setupEvalComboBox() {
+		_evalID = getNumberdId(_lineName);
+		/*
+		setComboBoxTexts(_evalID, [
+			"ああああああ",
+			"bbbbbbbbbbbb",
+			"cccccccccccc" ]);
+		 */
+	}
+	function clearEvalComboBox() {
+		while (sendItemMessage(_evalID, CB_DELETESTRING, 0, 0) > 0);
+	}
+	// ComboBoxExの場合はCB_ADDSTRINGが効かない（代わりにCBEM_INSERTITEMを使う）
+	function setComboBoxTexts(id, array) {
+		clearEvalComboBox();
+		for (var i = 0; i < array.count; i++) {
+			addComboBoxText(id, (string)array[i]);
+		}
+	}
+	function addComboBoxText(id, str) {
+		// CBEM_INSERTITEMW用構造体をBlobで作成orz
+		var sz = 4*9;
+		var blob = new global.WIN32Dialog.Blob(sz);
+		blob.setDWord(/*mask*/0, /*CBEIF_TEXT*/1);
+		blob.setDWord(/*iItem*/4, -1);
+		blob.setText (/*pszText*/8, str);
+		blob.setDWord(/*pszText*/12, str.length);
+		var idx = sendItemMessage(id, CBEM_INSERTITEMW, 0, blob.pointer);
+		invalidate blob;
+		return idx;
+	}
+
+	var _historyMaxCount = 100; // [XXX]履歴上限
+
+	function _updateStatusText() {}
+	function onExecute {
+		if (!isvalid this) return;
+		var _toString = Krkr2CompatUtils.toString;
+		var result, eval = ((string)getItemText(_lineName)).trim();
+		var store;
+		if (eval != "") {
+			try {
+				result = (string)_toString(Scripts.eval(eval));
+				store = true;
+			} catch (e) {
+				result = "(Exception)";
+				if (typeof e == "Object" && typeof e.message == "String")
+					result += e.message;
+				else result += _toString(e);
+			}
+			var cr = result.indexOf("\n") >= 0 ? "\n" : "";
+			Debug.message(@"${_title}: ${eval} = ${cr}"+result);
+		}
+		if (store) {
+			// 履歴に追加
+			var id = _evalID;
+			var cnt = sendItemMessage(id, CB_GETCOUNT, 0, 0);
+			if (cnt >= _historyMaxCount) {
+				while (sendItemMessage(id, CB_DELETESTRING, 0, 0) >= _historyMaxCount);
+			}
+			var idx = addComboBoxText(id, eval);
+			sendItemMessage(id, CB_SETCURSEL, idx, 0);
+			setItemText(id, "");
+		}
+	}
+
+}
