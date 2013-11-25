@@ -113,6 +113,7 @@ static char TVPObjectHashMapLogStream[sizeof(tTVPPipeStream)];
 //---------------------------------------------------------------------------
 void TVPStartObjectHashMapLog(void)
 {
+#ifndef ENABLE_DEBUGGER
 	if(TJSObjectHashMapEnabled())
 	{
 		// begin logging
@@ -182,6 +183,7 @@ void TVPStartObjectHashMapLog(void)
 		// end object mapping
 		TJSReleaseObjectHashMap();
 	}
+#endif
 }
 //---------------------------------------------------------------------------
 static tTVPAtExit TVPReportUnfreedObjectsAtExit

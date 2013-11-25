@@ -424,8 +424,8 @@ void TVPAddLog(const ttstr &line, bool appendtoimportant)
 	if(TVPOnLog) TVPOnLog(buf);
 #ifdef ENABLE_DEBUGGER
 	if( TJSEnableDebugMode ) TJSDebuggerLog(buf,appendtoimportant);
-	OutputDebugStringW( buf.c_str() );
-	OutputDebugStringW( L"\n" );
+	//OutputDebugStringW( buf.c_str() );
+	//OutputDebugStringW( L"\n" );
 #endif	// ENABLE_DEBUGGER
 
 #ifdef TVP_LOG_TO_COMMANDLINE_CONSOLE
