@@ -5575,7 +5575,7 @@ onig_init(void)
   return 0;
 }
 
-
+extern void onigenc_unicode_free_case_fold_table(void);
 extern int
 onig_end(void)
 {
@@ -5592,6 +5592,8 @@ onig_end(void)
 #ifdef USE_PARSE_TREE_NODE_RECYCLE
   onig_free_node_list();
 #endif
+
+  onigenc_unicode_free_case_fold_table();
 
   onig_inited = 0;
 

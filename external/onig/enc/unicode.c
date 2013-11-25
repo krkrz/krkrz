@@ -10956,7 +10956,18 @@ static int init_case_fold_table(void)
   THREAD_ATOMIC_END;
   return 0;
 }
-
+////////////////////////////
+extern void onigenc_unicode_free_case_fold_table(void)
+{
+	if( CaseFoldInited ) {
+		st_free_table(Unfold3Table);
+		st_free_table(Unfold2Table);
+		st_free_table(Unfold1Table);
+		st_free_table(FoldTable);
+		CaseFoldInited = 0;
+	}
+}
+////////////////////////////
 extern int
 onigenc_unicode_mbc_case_fold(OnigEncoding enc,
     OnigCaseFoldType flag ARG_UNUSED, const UChar** pp, const UChar* end,
