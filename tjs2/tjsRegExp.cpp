@@ -115,8 +115,7 @@ void replace_regex( tTJSVariant **param, tjs_int numparams, tTJSNI_RegExp *_this
 				res += result.GetString();
 			}
 			s += end;
-			onig_region_clear( region );
-			// onig_region_free( region, 0  );
+			onig_region_free( region, 0  );
 		} while( isreplaceall && s < send && onig_search( _this->RegEx, (UChar*)s, (UChar*)send, (UChar*)s, (UChar*)send, region, ONIG_OPTION_NONE ) >= 0 );
 		if( s < send ) {
 			res += ttstr(s,send-s);
@@ -124,7 +123,6 @@ void replace_regex( tTJSVariant **param, tjs_int numparams, tTJSNI_RegExp *_this
 	} else {
 		res += ttstr(s,send-s);
 	}
-	onig_region_clear( region );
 	onig_region_free( region, 1  );
 }
 //---------------------------------------------------------------------------
