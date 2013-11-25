@@ -136,7 +136,9 @@ extern "C" __declspec(dllexport) HRESULT _stdcall V2Link(iTVPFunctionExporter *e
 		if( TJS_SUCCEEDED(global->PropGet(0,TJS_W("Window"),NULL,&win,global)) ) {
 			iTJSDispatch2* obj = win.AsObjectNoAddRef();
 			obj->PropSet(TJS_MEMBERENSURE,TJS_W("menu"),NULL,&val,obj);
+			win.Clear();
 		}
+		val.Clear();
 
 		//-----------------------------------------------------------------------
 		iTJSDispatch2 * tjsclass = TVPCreateNativeClass_MenuItem();
