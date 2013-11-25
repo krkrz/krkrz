@@ -107,6 +107,7 @@ void __fastcall DebuggeeCheckThread::Execute()
 		Synchronize(&WakeupDebugee);
 #endif
 		{
+			BOOL ret;
 			// 実行中
 			while( Terminated == false && result ) {
 				DEBUG_EVENT deb_ev;
@@ -115,10 +116,11 @@ void __fastcall DebuggeeCheckThread::Execute()
 				if( result ) {
 					int breakev = HandleDebugEvent( deb_ev );
 					if( breakev == 0 ) {
+						::ContinueDebugEvent( proc_info_.dwProcessId, deb_ev.dwThreadId, DBG_CONTINUE );
 						break;
 					} else if( breakev > 0 ) {
 						// デバッグを続行する
-						::ContinueDebugEvent( proc_info_.dwProcessId, deb_ev.dwThreadId, debug_continue_status_ );
+						ret = ::ContinueDebugEvent( proc_info_.dwProcessId, deb_ev.dwThreadId, debug_continue_status_ );
 					} else if( breakev < 0 ) {
 						// ブレイク発生
 						bool is_break_called = false;
@@ -138,7 +140,7 @@ void __fastcall DebuggeeCheckThread::Execute()
 									break;
 								}
 								command_.size_ = 0;
-								::ContinueDebugEvent( proc_info_.dwProcessId, deb_ev.dwThreadId, debug_continue_status_ );
+								ret = ::ContinueDebugEvent( proc_info_.dwProcessId, deb_ev.dwThreadId, debug_continue_status_ );
 								break;
 							} else {
 								if( is_break_called == false ) {
@@ -295,7 +297,9 @@ int __fastcall DebuggeeCheckThread::HandleDebugException( DEBUG_EVENT& debug )
 			debug_continue_status_ = DBG_CONTINUE;
 			if( is_first_break_ ) {
 				is_first_break_ = false;
-			} else {
+			}
+			else
+			{
 				// 1回目のブレークポイントはエントリーポイントで発生する模様
 //				debug_string_ = theadStr + AnsiString("が、ブレークポイントで停止しました") + epiStr;
 //				Synchronize(&SetDebugString);
