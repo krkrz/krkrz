@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2010/04/11 02:36:08.640.cpp,C:\Documents and Settings\Takenori\My Documents\RAD Studio\Projects\Unit1.cpp=E:\krkr\krkr2\kirikiri2\src\tools\win32\debugger\MainUnit.cpp</Transaction>
+    <Transaction>2010/04/11 02:36:08.640.h,C:\Documents and Settings\Takenori\My Documents\RAD Studio\Projects\Unit1.h=E:\krkr\krkr2\kirikiri2\src\tools\win32\debugger\MainUnit.h</Transaction>
+    <Transaction>2010/04/11 02:36:08.640.dfm,C:\Documents and Settings\Takenori\My Documents\RAD Studio\Projects\Unit1.dfm=E:\krkr\krkr2\kirikiri2\src\tools\win32\debugger\MainUnit.dfm</Transaction>
+    <Transaction>2010/04/11 02:36:22.734.cbproj,C:\Documents and Settings\Takenori\My Documents\RAD Studio\Projects\Project1.cbproj=E:\krkr\krkr2\kirikiri2\src\tools\win32\debugger\krdebugger.cbproj</Transaction>
+    <Transaction>2010/04/11 03:22:50.875.cbproj,E:\krkr\krkr2\kirikiri2\src\tools\win32\debugger\krdebugger.cbproj=E:\krkr\krkr2\kirikiri2\src\tools\win32\debugger\scriptbugger.cbproj</Transaction>
+    <Transaction>2010/04/12 17:36:02.843.cpp,E:\krkr\krkr2\kirikiri2\src\tools\win32\debugger\Unit1.cpp=E:\krkr\krkr2\kirikiri2\src\tools\win32\debugger\CheckDebuggeeUnit.cpp</Transaction>
+    <Transaction>2010/04/12 17:36:02.843.h,E:\krkr\krkr2\kirikiri2\src\tools\win32\debugger\Unit1.h=E:\krkr\krkr2\kirikiri2\src\tools\win32\debugger\CheckDebuggeeUnit.h</Transaction>
+    <Transaction>2010/04/12 21:54:30.796.cpp,E:\krkr\krkr2\kirikiri2\src\tools\win32\debugger\Unit1.cpp=E:\krkr\krkr2\kirikiri2\src\tools\win32\debugger\ProjectSettingUnit.cpp</Transaction>
+    <Transaction>2010/04/12 21:54:30.796.h,E:\krkr\krkr2\kirikiri2\src\tools\win32\debugger\Unit1.h=E:\krkr\krkr2\kirikiri2\src\tools\win32\debugger\ProjectSettingUnit.h</Transaction>
+    <Transaction>2010/04/12 21:54:30.796.dfm,E:\krkr\krkr2\kirikiri2\src\tools\win32\debugger\Unit1.dfm=E:\krkr\krkr2\kirikiri2\src\tools\win32\debugger\ProjectSettingUnit.dfm</Transaction>
+    <Transaction>2010/04/18 16:01:39.359.cpp,E:\krkr\krkr2\kirikiri2\src\tools\win32\debugger\Unit1.cpp=E:\krkr\krkr2\kirikiri2\src\tools\win32\debugger\DubbggerSettingUnit.cpp</Transaction>
+    <Transaction>2010/04/18 16:01:39.359.h,E:\krkr\krkr2\kirikiri2\src\tools\win32\debugger\Unit1.h=E:\krkr\krkr2\kirikiri2\src\tools\win32\debugger\DubbggerSettingUnit.h</Transaction>
+    <Transaction>2010/04/18 16:01:39.359.dfm,E:\krkr\krkr2\kirikiri2\src\tools\win32\debugger\Unit1.dfm=E:\krkr\krkr2\kirikiri2\src\tools\win32\debugger\DubbggerSettingUnit.dfm</Transaction>
+    <Transaction>2010/04/19 03:01:46.984.cbproj,E:\krkr\krkr2\kirikiri2\src\tools\win32\debugger\scriptbugger.cbproj=E:\krkr\krkr2\kirikiri2\src\tools\win32\debugger\Emphasis.cbproj</Transaction>
+    <Transaction>2010/08/24 23:56:53.750.cbproj,E:\krkr\krkr2\kirikiri2\src\tools\win32\debugger\Emphasis.cbproj=E:\krkr\krkr2\kirikiri2\src\tools\win32\debugger\krkrdebg.cbproj</Transaction>
+  </Transactions>
+</BorlandProject>
