@@ -57,7 +57,7 @@ TJS_N("const\
 /* constants */\
  /* tTVPBorderStyle */ bsNone=0,  bsSingle=1,  bsSizeable=2,  bsDialog=3,  bsToolWindow=4,  bsSizeToolWin=5,\
  /* tTVPUpdateType */ utNormal=0,  utEntire =1,\
- /* tTVPMouseButton */  mbLeft=0,  mbRight=1,  mbMiddle =2,\
+ /* tTVPMouseButton */  mbLeft=0,  mbRight=1,  mbMiddle =2, mbX1 =3, mbX2=4\
  /* tTVPMouseCursorState */ mcsVisible=0, mcsTempHidden=1, mcsHidden=2,\
  /* tTVPImeMode */ imDisable=0, imClose=1, imOpen=2, imDontCare=3, imSAlpha=4, imAlpha=5, imHira=6, imSKata=7, imKata=8, imChinese=9, imSHanguel=10, imHanguel=11,\
  /* Set of shift state */  ssShift=(1<<0),  ssAlt=(1<<1),  ssCtrl=(1<<2),  ssLeft=(1<<3),  ssRight=(1<<4),  ssMiddle=(1<<5),  ssDouble =(1<<6),  ssRepeat = (1<<7),\
