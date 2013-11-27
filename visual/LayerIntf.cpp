@@ -9928,7 +9928,7 @@ struct tFontClassHolder {
 		Obj = obj;
 		Obj->AddRef();
 	}
-	~tFontClassHolder() { Obj->Release(); Obj = NULL; }
+	~tFontClassHolder() { if( Obj ) Obj->Release(), Obj = NULL; }
 } static fontclassholder;
 //---------------------------------------------------------------------------
 tTJSNativeClass * TVPCreateNativeClass_Font()
