@@ -16,6 +16,9 @@
 #pragma resource "*.dfm"
 TScriptDebuggerForm *ScriptDebuggerForm;
 //---------------------------------------------------------------------------
+const char TScriptDebuggerForm::UTF_8[] = "UTF-8";
+const char TScriptDebuggerForm::SHIFT_JIS[] = "Shift_JIS";
+//---------------------------------------------------------------------------
 __fastcall TScriptDebuggerForm::TScriptDebuggerForm(TComponent* Owner)
 	: TForm(Owner)
 {
@@ -28,6 +31,7 @@ __fastcall TScriptDebuggerForm::TScriptDebuggerForm(TComponent* Owner)
 	is_break_ = false;
 	is_break_point_dirty_ = false;
 	is_request_break_ = false;
+	is_script_utf8_ = true;
 
 	debuggee_comm_area_addr_ = NULL;
 	debuggee_comm_area_size_ = 0;
@@ -493,7 +497,8 @@ void __fastcall TScriptDebuggerForm::OpenScriptFile( const AnsiString& path, int
 		}
 	}
 
-	SourceLineListBox->Items->LoadFromFile( path );
+	// SourceLineListBox->Items->LoadFromFile( path );
+	SourceLineListBox->Items->Text = LoadTextFile( path );
 	FileTabSheet->Caption = ExtractFileName(path);
 	if( line >= 0 ) {
 		SourceLineListBox->ItemIndex = line;
@@ -502,6 +507,72 @@ void __fastcall TScriptDebuggerForm::OpenScriptFile( const AnsiString& path, int
 	WideString wfilename( filename );
 	curfile_breakpoints_ = breakpoints_.GetBreakPointLines( std::wstring(wfilename.data()) );
 	SourceLineListBox->Repaint();
+}
+//---------------------------------------------------------------------------
+AnsiString __fastcall TScriptDebuggerForm::LoadTextFile( const AnsiString& path )
+{
+	TFileStream* stream = new TFileStream(path,fmOpenRead);
+	if( stream ) {
+		try {
+			unsigned char mark[2] = {0,0};
+			stream->Read(mark, 2);
+			if(mark[0] == 0xff && mark[1] == 0xfe) {
+				// unicode
+				size_t size = stream->Size-2;
+				size_t count = size/sizeof(wchar_t);
+				std::vector<wchar_t> wbuf(count + 1);
+				try {
+					stream->ReadBuffer((void*)&(wbuf[0]), size);
+					wbuf[count] = 0;
+				} catch(...) {
+					throw;
+				}
+				WideString wstring(&(wbuf[0]));
+				delete stream;
+				return AnsiString(wstring);
+			} else {
+				// sjis or utf-8
+				stream->Position = 0;
+				size_t size = stream->Size;
+				std::vector<char> nbuf(size + 1);
+				try {
+					stream->ReadBuffer(&(nbuf[0]), size);
+					nbuf[size] = 0; // terminater
+					if( is_script_utf8_ == false ) {
+						AnsiString astring(&(nbuf[0]));
+						delete stream;
+						return astring;
+					} else {
+						int count = ::MultiByteToWideChar(CP_UTF8,MB_PRECOMPOSED|MB_ERR_INVALID_CHARS, &(nbuf[0]), -1, NULL, 0);
+						if( count > 0 ) {
+							std::vector<wchar_t> tmp(count);
+							int ret = ::MultiByteToWideChar(CP_UTF8,MB_PRECOMPOSED|MB_ERR_INVALID_CHARS, &(nbuf[0]), -1, &(tmp[0]), count);
+							if( ret > 0 ) {
+								int sjiscount = ::WideCharToMultiByte(CP_ACP, 0, &(tmp[0]), count, NULL, 0, NULL, NULL );
+								if( sjiscount > 0 ) {
+									std::vector<char> retchar(sjiscount+1);
+									ret = ::WideCharToMultiByte(CP_ACP, 0, &(tmp[0]), count, &(retchar[0]), sjiscount, NULL, NULL );
+									if( ret > 0 ) {
+										retchar[sjiscount] = 0;
+										AnsiString astring(&(retchar[0]));
+										delete stream;
+										return astring;
+									}
+								}
+							}
+						}
+					}
+				} catch(...) {
+					throw;
+				}
+			}
+		} catch(...) {
+			delete stream;
+			throw;
+		}
+		delete stream;
+	}
+	return AnsiString();
 }
 //---------------------------------------------------------------------------
 void __fastcall TScriptDebuggerForm::SetBreakPoint( int lineno )
@@ -746,6 +817,12 @@ void __fastcall TScriptDebuggerForm::ReadProjectFile()
 
 		AnsiString scriptExts = projFile->ReadString( "Debugee", "ScriptExt", "" );
 		ReadStringListFromString( scriptExts, script_exts_ );
+		AnsiString scriptCode = projFile->ReadString( "Debugee", "ScriptEncoding", UTF_8 );
+		if( scriptCode == AnsiString(UTF_8) ) {
+			is_script_utf8_ = true;
+		} else {
+			is_script_utf8_ = false;
+		}
 
 		UpdateAll();
 		ExecuteDebugAction->Enabled = true;
@@ -785,6 +862,11 @@ void __fastcall TScriptDebuggerForm::WriteProjectFile()
 		AnsiString scriptExts;
 		WriteStringListFromString( scriptExts, script_exts_ );
 		projFile->WriteString( "Debugee", "ScriptExt", scriptExts );
+		if( is_script_utf8_ ) {
+			projFile->WriteString( "Debugee", "ScriptEncoding", UTF_8 );
+		} else {
+			projFile->WriteString( "Debugee", "ScriptEncoding", SHIFT_JIS );
+		}
 
 		OverWriteAction->Enabled = true;
 		Caption = AnsiString("krkrdebg - スクリプト デバッガ - ") + project_file_path_;
@@ -864,6 +946,11 @@ void __fastcall TScriptDebuggerForm::SetProjectActionExecute(TObject *Sender)
 	AnsiString scriptExts;
 	WriteStringListFromString( scriptExts, script_exts_ );
 	ProjectSettingForm->ScriptExt = scriptExts;
+	if( is_script_utf8_ ) {
+		ProjectSettingForm->ScriptEncoding = UTF_8;
+	} else {
+		ProjectSettingForm->ScriptEncoding = SHIFT_JIS;
+	}
 
 	ProjectSettingForm->ShowModal();
 	if( ProjectSettingForm->ModalResult == mrOk ) {
@@ -873,6 +960,11 @@ void __fastcall TScriptDebuggerForm::SetProjectActionExecute(TObject *Sender)
 		debuggee_working_folder_ = ProjectSettingForm->WorkingFolder;
 		scriptExts = ProjectSettingForm->ScriptExt;
 		ReadStringListFromString( scriptExts, script_exts_ );
+		if( ProjectSettingForm->ScriptEncoding == AnsiString(UTF_8) ) {
+			is_script_utf8_ = true;
+		} else {
+			is_script_utf8_ = false;
+		}
 
 		breakpoints_.ClearAll();
 		curfile_breakpoints_ = NULL;

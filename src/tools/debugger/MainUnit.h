@@ -131,6 +131,7 @@ private:	// ユーザー宣言
 	BreakpointLine*			curfile_breakpoints_;
 	bool					is_break_;
 	bool					is_request_break_;
+	bool					is_script_utf8_;
 
 	
 	HIMAGELIST				system_image_list_;
@@ -174,6 +175,7 @@ private:	// ユーザー宣言
 	void __fastcall WriteStringListFromString( AnsiString& input, const std::vector<AnsiString>& vals );
 
 	void __fastcall OpenScriptFile( const AnsiString& path, int line = 0, bool force = false );
+	AnsiString __fastcall LoadTextFile( const AnsiString& path );
 
 	void __fastcall SetBreakPoint( int lineno );
 	void __fastcall ClearBreakPoint( int lineno );
@@ -297,6 +299,9 @@ public:		// ユーザー宣言
 	void __fastcall CancelBreak();
 
 	void __fastcall SetBreakCommand();
+
+	static const char UTF_8[];
+	static const char SHIFT_JIS[];
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TScriptDebuggerForm *ScriptDebuggerForm;

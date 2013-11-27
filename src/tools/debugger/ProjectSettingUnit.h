@@ -28,6 +28,8 @@ __published:	// IDE 管理のコンポーネント
 	TOpenDialog *ExeOpenDialog;
 	TLabel *ScriptExtLabel;
 	TEdit *ScriptrExtEdit;
+	TLabel *ScriptEncodingLabel;
+	TComboBox *ScriptEncodingComboBox;
 	void __fastcall BrowseExeButtonClick(TObject *Sender);
 	void __fastcall BrowseProjectFolderButtonClick(TObject *Sender);
 	void __fastcall BrowseWorkingFolderButtonClick(TObject *Sender);
@@ -40,9 +42,11 @@ private:	// ユーザー宣言
 	void __fastcall SetProjectFolder( const AnsiString& val );
 	AnsiString __fastcall GetProjectFolder() const;
 	void __fastcall SetWorkingFolder( const AnsiString& val );
-	AnsiString __fastcall GetWorkingFolder() const;            
+	AnsiString __fastcall GetWorkingFolder() const;
 	void __fastcall SetScriptExt( const AnsiString& val );
-	AnsiString __fastcall GetScriptExt() const;
+	AnsiString __fastcall GetScriptExt() const;            
+	void __fastcall SetScriptEncoding( const AnsiString& val );
+	AnsiString __fastcall GetScriptEncoding() const;
 
 
 public:		// ユーザー宣言
@@ -53,6 +57,7 @@ public:		// ユーザー宣言
 	__property AnsiString ProjectFolder = { write=SetProjectFolder,read=GetProjectFolder };
 	__property AnsiString WorkingFolder = { write=SetWorkingFolder,read=GetWorkingFolder };
 	__property AnsiString ScriptExt = { write=SetScriptExt,read=GetScriptExt };
+	__property AnsiString ScriptEncoding = { write=SetScriptEncoding,read=GetScriptEncoding };
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TProjectSettingForm *ProjectSettingForm;

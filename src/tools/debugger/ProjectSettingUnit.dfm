@@ -2,8 +2,8 @@ object ProjectSettingForm: TProjectSettingForm
   Left = 0
   Top = 0
   Caption = #12503#12525#12472#12455#12463#12488#35373#23450
-  ClientHeight = 247
-  ClientWidth = 521
+  ClientHeight = 273
+  ClientWidth = 520
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -47,6 +47,13 @@ object ProjectSettingForm: TProjectSettingForm
     Width = 77
     Height = 13
     Caption = #12473#12463#12522#12503#12488#25313#24373#23376
+  end
+  object ScriptEncodingLabel: TLabel
+    Left = 16
+    Top = 208
+    Width = 92
+    Height = 13
+    Caption = #12473#12463#12522#12503#12488#25991#23383#12467#12540#12489
   end
   object ExeEdit: TEdit
     Left = 108
@@ -104,8 +111,8 @@ object ProjectSettingForm: TProjectSettingForm
     OnClick = BrowseWorkingFolderButtonClick
   end
   object OKButton: TButton
-    Left = 324
-    Top = 204
+    Left = 330
+    Top = 240
     Width = 75
     Height = 25
     Caption = 'OK'
@@ -115,7 +122,7 @@ object ProjectSettingForm: TProjectSettingForm
   end
   object CancelButton: TButton
     Left = 416
-    Top = 204
+    Top = 240
     Width = 75
     Height = 25
     Cancel = True
@@ -130,11 +137,25 @@ object ProjectSettingForm: TProjectSettingForm
     Height = 21
     TabOrder = 9
   end
+  object ScriptEncodingComboBox: TComboBox
+    Left = 176
+    Top = 205
+    Width = 229
+    Height = 21
+    Style = csDropDownList
+    ItemHeight = 13
+    ItemIndex = 0
+    TabOrder = 10
+    Text = 'UTF-8'
+    Items.Strings = (
+      'UTF-8'
+      'Shift_JIS')
+  end
   object ExeOpenDialog: TOpenDialog
     DefaultExt = '*.exe'
     Filter = '*.exe|*.exe'
     Title = #23455#34892#12501#12449#12452#12523#12434#36984#25246#12375#12390#12367#12384#12373#12356
-    Left = 52
-    Top = 200
+    Left = 12
+    Top = 240
   end
 end

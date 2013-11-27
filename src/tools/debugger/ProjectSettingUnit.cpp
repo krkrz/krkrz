@@ -3,7 +3,8 @@
 #include <vcl.h>
 #pragma hdrstop
 
-#include "ProjectSettingUnit.h"  
+#include "ProjectSettingUnit.h"
+#include "MainUnit.h"  
 #include <FileCtrl.hpp>
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
@@ -63,6 +64,26 @@ void __fastcall TProjectSettingForm::SetScriptExt( const AnsiString& val )
 AnsiString __fastcall TProjectSettingForm::GetScriptExt() const
 {
 	return ScriptrExtEdit->Text;
+}
+//---------------------------------------------------------------------------
+void __fastcall TProjectSettingForm::SetScriptEncoding( const AnsiString& val )
+{
+	if( val == AnsiString(TScriptDebuggerForm::UTF_8) ) {
+		ScriptEncodingComboBox->ItemIndex = 0;
+	} else {
+		ScriptEncodingComboBox->ItemIndex = 1;
+	}
+}
+//---------------------------------------------------------------------------
+AnsiString __fastcall TProjectSettingForm::GetScriptEncoding() const
+{
+	if( ScriptEncodingComboBox->ItemIndex == 0 ) {
+		return AnsiString(TScriptDebuggerForm::UTF_8);
+	} else if( ScriptEncodingComboBox->ItemIndex == 1 ) {
+		return AnsiString(TScriptDebuggerForm::SHIFT_JIS);
+	} else {
+		return AnsiString(TScriptDebuggerForm::UTF_8);
+	}
 }
 //---------------------------------------------------------------------------
 void __fastcall TProjectSettingForm::BrowseExeButtonClick(TObject *Sender)
