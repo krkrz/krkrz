@@ -1198,7 +1198,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/onCloseQuery)
 	TVP_ACTION_INVOKE_MEMBER("canClose");
 	TVP_ACTION_INVOKE_END(tTJSVariantClosure(objthis, objthis));
 */
-	_this->OnCloseQueryCalled( 0 != (tjs_int)*param[0]); // TODO ƒeƒXƒg
+	_this->OnCloseQueryCalled( 0 != (tjs_int)*param[0]);
 
 	return TJS_S_OK;
 }

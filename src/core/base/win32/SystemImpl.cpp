@@ -28,6 +28,7 @@
 
 #include "Application.h"
 #include "TVPScreen.h"
+#include "CompatibleNativeFuncs.h"
 
 //---------------------------------------------------------------------------
 static ttstr TVPAppTitle;
@@ -486,8 +487,43 @@ static void TVPGetDesktopRect(tTVPRect &dest)
 }
 //---------------------------------------------------------------------------
 
+//---------------------------------------------------------------------------
+enum tTVPTouchDevice {
+	tdNone				= 0,
+	tdIntegratedTouch	= 0x00000001,
+	tdExternalTouch		= 0x00000002,
+	tdIntegratedPen		= 0x00000004,
+	tdExternalPen		= 0x00000008,
+	tdMultiInput		= 0x00000040,
+	tdDigitizerReady	= 0x00000080,
+	tdMouse				= 0x00000100,
+	tdMouseWheel		= 0x00000200
+};
+/**
+ * タッチデバイス(とマウス)の接続状態を取得する
+ **/
+static int TVPGetSupportTouchDevice()
+{
+	int result = 0;
+	if( procRegisterTouchWindow ) {
+		int value = ::GetSystemMetrics( SM_DIGITIZER );
 
-
+		if( value & NID_INTEGRATED_TOUCH ) result |= tdIntegratedTouch;
+		if( value & NID_EXTERNAL_TOUCH ) result |= tdExternalTouch;
+		if( value & NID_INTEGRATED_PEN ) result |= tdIntegratedPen;
+		if( value & NID_EXTERNAL_PEN ) result |= tdExternalPen;
+		if( value & NID_MULTI_INPUT ) result |= tdMultiInput;
+		if( value & NID_READY ) result |= tdDigitizerReady;
+	}
+	int value = ::GetSystemMetrics( SM_MOUSEPRESENT );
+	if( value ) {
+		result |= tdMouse;
+		value = ::GetSystemMetrics( SM_MOUSEWHEELPRESENT );
+		if( value ) result |= tdMouseWheel;
+	}
+	return result;
+}
+//---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
 // System.onActivate and System.onDeactivate related
@@ -886,26 +922,20 @@ TJS_BEGIN_NATIVE_PROP_DECL(desktopHeight)
 }
 TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, desktopHeight)
 //----------------------------------------------------------------------
-#if 0 // アプリ最前面はなくなった
-TJS_BEGIN_NATIVE_PROP_DECL(stayOnTop)
+TJS_BEGIN_NATIVE_PROP_DECL(touchDevice)
 {
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
-		if(TVPMainForm) *result = TVPMainForm->GetApplicationStayOnTop();
+		*result = TVPGetSupportTouchDevice();
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_GETTER
 
-	TJS_BEGIN_NATIVE_PROP_SETTER
-	{
-		TVPMainForm->SetApplicationStayOnTop(0!=(tjs_int)*param);
-		return TJS_S_OK;
-	}
-	TJS_END_NATIVE_PROP_SETTER
+	TJS_DENY_NATIVE_PROP_SETTER
 }
-TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, stayOnTop)
+TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, touchDevice)
 //----------------------------------------------------------------------
-#endif
+
 
 	return cls;
 
