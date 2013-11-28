@@ -209,7 +209,7 @@ tTVPCharacterData* GDIFontRasterizer::GetBitmap( const tTVPFontAndCharacterData 
 			data->Metrics.CellIncY = static_cast<tjs_int>(- sin(angle) * s.cx);
 		}
 	}
-
+	data->Gray = 65;
 	data->BlackBoxX = gm.gmBlackBoxX;
 	data->BlackBoxY = gm.gmBlackBoxY;
 	data->OriginX =
