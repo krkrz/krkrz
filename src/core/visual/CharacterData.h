@@ -44,7 +44,7 @@ public:
 	bool FullColored;
 
 public:
-	tTVPCharacterData() : FullColored(false){ RefCount = 1; Data = NULL; }
+	tTVPCharacterData() : Gray(65), FullColored(false) { RefCount = 1; Data = NULL; }
 	tTVPCharacterData( const tjs_uint8 * indata,
 		tjs_int inpitch,
 		tjs_int originx, tjs_int originy,
