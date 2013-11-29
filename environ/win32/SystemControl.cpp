@@ -104,7 +104,7 @@ void tTVPSystemControl::NotifyEventDelivered() {
 	// if(TVPHaltWarnForm) delete TVPHaltWarnForm, TVPHaltWarnForm = NULL;
 }
 
-bool tTVPSystemControl::ApplicationIdel() {
+bool tTVPSystemControl::ApplicationIdle() {
 	DeliverEvents();
 	bool cont = !ContinuousEventCalling;
 	MixedIdleTick += TVPGetRoughTickCount32();

@@ -13,11 +13,12 @@
 #include "CompatibleNativeFuncs.h"
 #include "WindowsUtil.h"
 #include "MsgIntf.h"
-
+#include "UserEvent.h"
 
 tTVPWindow::~tTVPWindow() {
 	if( ime_control_ ) delete ime_control_;
 	// UnregisterWindow();
+	::SetWindowLongPtr( window_handle_, GWLP_WNDPROC, (LONG_PTR)::DefWindowProc );
 	::SetWindowLongPtr( window_handle_, GWLP_USERDATA, (LONG_PTR)NULL );
 }
 LRESULT WINAPI tTVPWindow::WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
@@ -203,14 +204,24 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 			switch (gi.dwID){
 			case GID_ZOOM:
 				// Code for zooming goes here
+				// gi.ullArguments distance
 				bHandled = TRUE;
 				break;
 			case GID_PAN:
+				// gi.ullArguments distance
 				bHandled = TRUE;
 				break;
-			case GID_ROTATE:
+			case GID_ROTATE: {
+				// double rot = GID_ROTATE_ANGLE_FROM_ARGUMENT(gi.ullArguments)
+				/*
+				POINT cpt;
+				cpt.x = gi.ptsLocation.x;
+				cpt.y = gi.ptsLocation.y;
+				::ScreenToClient(gi.hwndTarget,&cpt);
+				*/
 				bHandled = TRUE;
 				break;
+			}
 			case GID_TWOFINGERTAP:
 				bHandled = TRUE;
 				break;
@@ -327,6 +338,10 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 			OnHide( lParam );
 		}
 		break;
+	case TVP_EV_WINDOW_RELEASE:
+		::DestroyWindow( GetHandle() );
+		delete this;
+		break;
 	default:
 		return ::DefWindowProc(hWnd,msg,wParam,lParam);
 	}
@@ -424,8 +439,9 @@ bool tTVPWindow::Initialize() {
 	return true;
 }
 void tTVPWindow::OnDestroy() {
+	::SetWindowLongPtr( window_handle_, GWLP_WNDPROC, (LONG_PTR)::DefWindowProc );
 	::SetWindowLongPtr( window_handle_, GWLP_USERDATA, (LONG_PTR)NULL );
-	delete this;
+	// delete this;
 }
 
 void tTVPWindow::SetClientSize( HWND hWnd, SIZE& size ) {
@@ -749,13 +765,15 @@ void tTVPWindow::Close() {
 		case caNone:
 			break;
 		case caHide:
-			::ShowWindow( GetHandle(), SW_HIDE );
-			break;
-		case caFree:
-			::DestroyWindow( GetHandle() );
+			Hide();
 			break;
 		case caMinimize:
 			::ShowWindow( GetHandle(), SW_MINIMIZE );
+			break;
+		case caFree:
+		default:
+			::PostMessage( GetHandle(), TVP_EV_WINDOW_RELEASE, 0, 0 );
+			// ::DestroyWindow( GetHandle() );
 			break;
 		}
 	}
@@ -773,7 +791,9 @@ void tTVPWindow::closeModal() {
 			ModalResult = 0;
 			break;
 		case caFree:
-			::DestroyWindow( GetHandle() );
+			::PostMessage( GetHandle(), TVP_EV_WINDOW_RELEASE, 0, 0 );
+			//::DestroyWindow( GetHandle() );
+			//delete this;
 			break;
 		}
 	} catch(...) {
@@ -790,42 +810,47 @@ int tTVPWindow::ShowModal() {
 		throw Exception(TJS_W("Cannot Show Modal. When it is single window."));
 	}
 	if( InMode == false ) InMode = true;
-	if( ::GetCapture() != 0 ) {
-		::SendMessage( ::GetCapture(), WM_CANCELMODE, 0, 0 );
-	}
-	::ReleaseCapture();
-	Application->ModalStarted();
-	std::vector<class TTVPWindowForm*> enableWindows;
 	try {
-		Application->GetEnableWindowList( enableWindows, NULL );
-		Application->DisableWindows();
-		//SetEnable( true );
-		Show();
-		::SetActiveWindow( GetHandle() );
-		SetEnable( true );
-		ModalResult = 0;
-		while( ModalResult == 0 ) {
-			Application->HandleMessage();
-			if( Application->IsTarminate() ) {
-				ModalResult = mrCancel;
-			} else if( ModalResult != 0 ) {
-				closeModal();
+		if( ::GetCapture() != 0 ) {
+			::SendMessage( ::GetCapture(), WM_CANCELMODE, 0, 0 );
+		}
+		::ReleaseCapture();
+		Application->ModalStarted();
+		std::vector<class TTVPWindowForm*> enableWindows;
+		try {
+			Application->GetEnableWindowList( enableWindows, NULL );
+			Application->DisableWindows();
+			//SetEnable( true );
+			Show();
+			::SetActiveWindow( GetHandle() );
+			SetEnable( true );
+			ModalResult = 0;
+			while( ModalResult == 0 ) {
+				Application->HandleMessage();
+				if( Application->IsTarminate() ) {
+					ModalResult = mrCancel;
+				} else if( ModalResult != 0 ) {
+					closeModal();
+				}
 			}
-		}
-		Application->EnableWindows( enableWindows );
-		enableWindows.clear();
-	} catch(...) {
-		if( enableWindows.size() > 0 ) {
 			Application->EnableWindows( enableWindows );
+			enableWindows.clear();
+		} catch(...) {
+			if( enableWindows.size() > 0 ) {
+				Application->EnableWindows( enableWindows );
+			}
+			enableWindows.clear();
+			Application->ModalFinished();
+			InMode = false;
+			Hide();
+			throw;
 		}
-		enableWindows.clear();
 		Application->ModalFinished();
 		InMode = false;
 		Hide();
+		return ModalResult;
+	} catch(...) {
+		InMode = false;
 		throw;
 	}
-	Application->ModalFinished();
-	InMode = false;
-	Hide();
-	return ModalResult;
 }

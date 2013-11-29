@@ -47,7 +47,7 @@ public:
 	}
 	bool GetEventEnabled() const { return EventEnable; }
 
-	bool ApplicationIdel();
+	bool ApplicationIdle();
 
 private:
 	void DeliverEvents();

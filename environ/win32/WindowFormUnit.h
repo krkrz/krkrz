@@ -385,6 +385,7 @@ public:
 	virtual void OnTouchRotate( double startangle, double currentangle, double distance, double cx, double cy, int flag );
 	virtual void OnMultiTouch();
 
+	virtual void OnDestroy();
 	void WMShowVisible();
 	void WMShowTop( WPARAM wParam );
 	void WMRetrieveFocus();
