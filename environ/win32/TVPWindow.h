@@ -118,7 +118,7 @@ protected:
 public:
 	tTVPWindow()
 	: window_handle_(NULL), created_(false), LeftDoubleClick(false), ime_control_(NULL), border_style_(0), ModalResult(0),
-		in_window_(false), ignore_touch_mouse_(false) {
+		in_window_(false), ignore_touch_mouse_(false), InMode(false) {
 		min_size_.cx = min_size_.cy = 0;
 		max_size_.cx = max_size_.cy = 0;
 	}
@@ -245,6 +245,7 @@ public:
 
 	int ShowModal();
 	void closeModal();
+	bool IsModal() const { return InMode; }
 	void Close();
 
 	void GetClientRect( struct tTVPRect& rt );

@@ -536,48 +536,13 @@ void tTVPApplication::ShowException( const wchar_t* e ) {
 	::MessageBox( NULL, e, TVPFatalError, MB_OK );
 }
 void tTVPApplication::Run() {
-	MSG msg;
-	HACCEL hAccelTable;
+	TVPTerminateCode = 0;
 
 	// メイン メッセージ ループ:
-	HWND mainWnd = INVALID_HANDLE_VALUE;
-	if( ( windows_list_.size() > 0 ) ) {
-		mainWnd = windows_list_[0]->GetHandle();
-	}
 	while( windows_list_.size() > 0 && tarminate_ == false ) {
-		BOOL ret = TRUE;
-		while( ::PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE) && tarminate_ == false ) {
-			ret = ::GetMessage( &msg, NULL, 0, 0);
-			hAccelTable = accel_key_.GetHandle(msg.hwnd);
-			if( ret && !TranslateAccelerator(msg.hwnd, hAccelTable, &msg) ) {
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
-			if( ret == 0 )  break;
-		}
-		if( ret == 0 )  break;
-
-		bool done = true;
-		if( TVPSystemControl ) {
-			done = TVPSystemControl->ApplicationIdel();
-		}
-		if( done ) { // idle 処理が終わったら、メッセージ待ちへ
-			BOOL dret = ::GetMessage( &msg, NULL, 0, 0 );
-			hAccelTable = accel_key_.GetHandle(msg.hwnd);
-			if( dret && !TranslateAccelerator(msg.hwnd, hAccelTable, &msg) ) {
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
-			if( dret == 0 )  break;
-		}
+		HandleMessage();
 	}
 	tarminate_ = true;
-	TVPTerminateCode = 0;
-	if( ::PeekMessage( &msg, NULL, 0, 0, PM_REMOVE) ) {
-		if( msg.message == WM_QUIT ) {
-			TVPTerminateCode = msg.wParam;
-		}
-	}
 }
 bool tTVPApplication::ProcessMessage( MSG &msg ) {
 	bool result = false;
@@ -594,6 +559,7 @@ bool tTVPApplication::ProcessMessage( MSG &msg ) {
 				DispatchMessage(&msg);
 			}
 		} else {
+			TVPTerminateCode = msg.wParam;
 			tarminate_ = true;
 		}
 	}
@@ -610,7 +576,11 @@ void tTVPApplication::HandleMessage() {
 	}
 }
 void tTVPApplication::HandleIdle(MSG &) {
-	::WaitMessage();
+	bool done = true;
+	if( TVPSystemControl ) {
+		done = TVPSystemControl->ApplicationIdle();
+	}
+	if( done ) ::WaitMessage();
 }
 void tTVPApplication::SetTitle( const std::wstring& caption ) {
 	title_ = caption;
@@ -630,7 +600,9 @@ HWND tTVPApplication::GetMainWindowHandle() const {
 
 void tTVPApplication::RemoveWindow( TTVPWindowForm* win ) {
 	std::vector<class TTVPWindowForm*>::iterator it = std::remove( windows_list_.begin(), windows_list_.end(), win );
-	windows_list_.erase( it, windows_list_.end() );
+	if( it != windows_list_.end() ) {
+		windows_list_.erase( it, windows_list_.end() );
+	}
 }
 
 void tTVPApplication::PostMessageToMainWindow(UINT message, WPARAM wParam, LPARAM lParam) {
