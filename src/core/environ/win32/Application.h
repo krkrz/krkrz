@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <map>
+#include <stack>
 
 std::wstring ExePath();
 
@@ -71,6 +72,8 @@ class tTVPApplication {
 	bool HasMapReportProcess;
 
 	class tTVPAsyncImageLoader* ImageLoadThread;
+
+	std::stack<class tTVPWindow*> ModalWindowStack;
 
 private:
 	void CheckConsole();
@@ -140,8 +143,11 @@ public:
 	void PostMessageToMainWindow(UINT message, WPARAM wParam, LPARAM lParam);
 
 
-	void ModalStarted() {}
-	void ModalFinished() {}
+	void ModalStarted( class tTVPWindow* form ) {
+		ModalWindowStack.push(form);
+	}
+	void ModalFinished();
+	void OnActiveAnyWindow();
 	void DisableWindows();
 	void EnableWindows( const std::vector<class TTVPWindowForm*>& win );
 	void GetDisableWindowList( std::vector<class TTVPWindowForm*>& win );

@@ -815,7 +815,7 @@ int tTVPWindow::ShowModal() {
 			::SendMessage( ::GetCapture(), WM_CANCELMODE, 0, 0 );
 		}
 		::ReleaseCapture();
-		Application->ModalStarted();
+		Application->ModalStarted( this );
 		std::vector<class TTVPWindowForm*> enableWindows;
 		try {
 			Application->GetEnableWindowList( enableWindows, NULL );
