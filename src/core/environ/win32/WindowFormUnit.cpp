@@ -249,25 +249,6 @@ TTVPWindowForm::TTVPWindowForm( tTVPApplication* app, tTJSNI_Window* ni ) : tTVP
 	LastRecheckInputStateSent = 0;
 }
 TTVPWindowForm::~TTVPWindowForm() {
-	CallWindowDetach(true);
-
-	CleanupFullScreen();
-	TJSNativeInstance = NULL;
-	TVPRemoveModalWindow(this);
-
-	FreeDirectInputDevice();
-
-	delete AttentionFont, AttentionFont = NULL;
-
-	tjs_int count = WindowMessageReceivers.GetCount();
-	for(tjs_int i = 0 ; i < count; i++)
-	{
-		tTVPMessageReceiverRecord * item = WindowMessageReceivers[i];
-		if(!item) continue;
-		delete item;
-		WindowMessageReceivers.Remove(i);
-	}
-
 	if( HintTimer ) {
 		delete HintTimer;
 		HintTimer = NULL;
@@ -286,7 +267,32 @@ TTVPWindowForm::~TTVPWindowForm() {
 		DIPadDevice = NULL;
 	}
 #endif
+	Application->RemoveWindow( this );
+}
+void TTVPWindowForm::OnDestroy() {
+	CallWindowDetach(true);
+
+	CleanupFullScreen();
+	TJSNativeInstance = NULL;
+	TVPRemoveModalWindow(this);
+
+	FreeDirectInputDevice();
+
+	if( AttentionFont ) {
+		delete AttentionFont, AttentionFont = NULL;
+	}
+
+	tjs_int count = WindowMessageReceivers.GetCount();
+	for(tjs_int i = 0 ; i < count; i++)
+	{
+		tTVPMessageReceiverRecord * item = WindowMessageReceivers[i];
+		if(!item) continue;
+		delete item;
+		WindowMessageReceivers.Remove(i);
+	}
+	
 	Application->RemoveWindow(this);
+	tTVPWindow::OnDestroy();
 }
 void TTVPWindowForm::CleanupFullScreen() {
 	// called at destruction
@@ -964,17 +970,14 @@ void TTVPWindowForm::UpdateWindow(tTVPUpdateType type ) {
 void TTVPWindowForm::ShowWindowAsModal() {
 	// TODO: what's modalwindowlist ?
 	ModalResult = 0;
-	InMode = true;
 	TVPAddModalWindow(this); // add to modal window list
 	try {
 		ShowModal();
 	} catch(...) {
 		TVPRemoveModalWindow(this);
-		InMode = false;
 		throw;
 	}
 	TVPRemoveModalWindow(this);
-	InMode = false;
 }
 
 
@@ -1100,6 +1103,7 @@ void TTVPWindowForm::InvalidateClose() {
 	if( ret == FALSE ) {
 		TVPThrowWindowsErrorException();
 	}
+	delete this;
 }
 void TTVPWindowForm::OnCloseQueryCalled( bool b ) {
 	// closing is allowed by onCloseQuery event handler
@@ -1117,7 +1121,7 @@ void TTVPWindowForm::OnCloseQueryCalled( bool b ) {
 					// this is the main window
 					iTJSDispatch2 * obj = TJSNativeInstance->GetOwnerNoAddRef();
 					obj->Invalidate(0, NULL, NULL, obj);
-					// TJSNativeInstance = NULL; この段階では既にthisが削除されているため、メンバーへアクセスしてはいけない
+					// TJSNativeInstance = NULL; // この段階では既にthisが削除されているため、メンバーへアクセスしてはいけない
 				}
 			} else {
 				delete this;
