@@ -700,6 +700,8 @@ void tTVPApplication::CheckDigitizer() {
 }
 void tTVPApplication::OnActivate( HWND hWnd )
 {
+	OnActiveAnyWindow();
+
 	if( hWnd != GetMainWindowHandle() ) return;
 
 	ApplicationActivating = true;
@@ -736,11 +738,29 @@ bool tTVPApplication::GetNotMinimizing() const
 	return true; // ƒƒCƒ“‚ª‚È‚¢Žž‚ÍÅ¬‰»‚³‚ê‚Ä‚¢‚é‚Æ‚Ý‚È‚·
 }
 
+void tTVPApplication::OnActiveAnyWindow() {
+	if( ModalWindowStack.empty() != true ) {
+		tTVPWindow* win = ModalWindowStack.top();
+		if( win->GetVisible() && win->GetEnable() ) {
+			win->BringToFront();
+		}
+	}
+}
+void tTVPApplication::ModalFinished() {
+	ModalWindowStack.pop();
+	if( ModalWindowStack.empty() != true ) {
+		tTVPWindow* win = ModalWindowStack.top();
+		if( win->GetVisible() && win->GetEnable() ) {
+			win->BringToFront();
+		}
+	}
+}
 void tTVPApplication::LoadImageRequest( class iTJSDispatch2 *owner, class tTJSNI_Bitmap* bmp, const ttstr &name ) {
 	if( ImageLoadThread ) {
 		ImageLoadThread->LoadRequest( owner, bmp, name );
 	}
 }
+
 /**
  ‰¼ŽÀ‘• TODO
 */
