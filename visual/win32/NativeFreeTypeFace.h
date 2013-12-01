@@ -35,6 +35,7 @@ private:
 	HFONT OldFont;	//!< デバイスコンテキストに元々登録されていた古いフォント
 	bool IsTTC;		//!< TTC(TrueTypeCollection)ファイルを扱っている場合に真
 	FT_StreamRec Stream;
+	TEXTMETRIC TextMetric;
 
 public:
 	tNativeFreeTypeFace(const std::wstring &fontname, tjs_uint32 options);
@@ -44,6 +45,7 @@ public:
 	virtual void GetFaceNameList(std::vector<std::wstring> & dest) const; 
 
 	bool GetIsTTC() const { return IsTTC; }
+	wchar_t GetDefaultChar() const;
 
 private:
 	void Clear();

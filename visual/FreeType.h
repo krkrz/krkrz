@@ -71,6 +71,9 @@ public:
 	bool GetOption( tjs_uint32 opt ) const {
 		return (Options&opt) == opt;
 	}
+	wchar_t GetDefaultChar() const {
+		return Face->GetDefaultChar();
+	}
 
 	tjs_int GetAscent() const {
 		tjs_int ppem = FTFace->size->metrics.y_ppem;
@@ -82,8 +85,9 @@ public:
 		tjs_int upe = FTFace->units_per_EM;
 		tjs_int liney = 0; //‰ºü‚ÌˆÊ’u
 		tjs_int height = FT_PosToInt( FTFace->size->metrics.height );
-		liney = ((FTFace->ascender-FTFace->underline_position+FTFace->underline_thickness/2) * ppem + upe/2) / upe;
-		thickness = (FTFace->underline_thickness * ppem + upe/2) / upe;
+		liney = ((FTFace->ascender-FTFace->underline_position) * ppem) / upe;
+		thickness = (FTFace->underline_thickness * ppem) / upe;
+		if( thickness < 1 ) thickness = 1;
 		if( liney > height ) {
 			liney = height - 1;
 		}
@@ -94,8 +98,7 @@ public:
 		tjs_int upe = FTFace->units_per_EM;
 		thickness = FTFace->underline_thickness * ppem / upe;
 		if( thickness < 1 ) thickness = 1;
-		pos = FTFace->ascender * 4 * ppem / (5 * upe);
-		//pos = FTFace->ascender * ppem / upe;
+		pos = FTFace->ascender * 7 * ppem / (10 * upe);
 	}
 	tTVPCharacterData * GetGlyphFromCharcode(tjs_char code);
 	bool GetGlyphMetricsFromCharcode(tjs_char code, tGlyphMetrics & metrics);

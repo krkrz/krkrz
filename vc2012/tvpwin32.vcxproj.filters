@@ -936,6 +936,9 @@
     <ClCompile Include="..\visual\win32\BasicDrawDevice.cpp">
       <Filter>visual\win32</Filter>
     </ClCompile>
+    <ClCompile Include="..\visual\win32\TVPSysFont.cpp">
+      <Filter>visual\win32</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="tvpwin32.rc">

@@ -42,23 +42,6 @@ FontSystem::FontSystem() : FontNamesInit(false), DefaultLOGFONTCreated(false) {
 void FontSystem::ConstructDefaultFont() {
 	if( !DefaultLOGFONTCreated ) {
 		DefaultLOGFONTCreated = true;
-		/*
-		LOGFONT &l = DefaultLOGFONT;
-		l.lfHeight = -12;
-		l.lfWidth = 0;
-		l.lfEscapement = 0;
-		l.lfOrientation = 0;
-		l.lfWeight = 400;
-		l.lfItalic = FALSE;
-		l.lfUnderline = FALSE;
-		l.lfStrikeOut = FALSE;
-		l.lfCharSet = SHIFTJIS_CHARSET; // TODO: i18n
-		l.lfOutPrecision = OUT_DEFAULT_PRECIS;
-		l.lfQuality = DEFAULT_QUALITY;
-		l.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
-		_tcscpy(l.lfFaceName, TVPDefaultFontName); // TODO: i18n
-		*/
-
 		DefaultFont.Height = -12;
 		DefaultFont.Flags = 0;
 		DefaultFont.Angle = 0;

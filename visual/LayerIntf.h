@@ -799,6 +799,8 @@ public:
 	bool GetFontStrikeout() const;
 	void SetFontUnderline(bool b);
 	bool GetFontUnderline() const;
+	void SetFontFaceIsFileName(bool b);
+	bool GetFontFaceIsFileName() const;
 
 
 	tjs_int GetTextWidth(const ttstr & text);
@@ -1043,6 +1045,8 @@ public:
 	bool GetFontStrikeout() const;
 	void SetFontUnderline(bool b);
 	bool GetFontUnderline() const;
+	void SetFontFaceIsFileName(bool b);
+	bool GetFontFaceIsFileName() const;
 
 	tjs_int GetTextWidth(const ttstr & text);
 	tjs_int GetTextHeight(const ttstr & text);
