@@ -51,6 +51,9 @@ void TVPClearFontCache();
 // default FONT retrieve function
 //---------------------------------------------------------------------------
 FontSystem* TVPFontSystem = NULL;
+static tjs_int TVPGlobalFontStateMagic = 0;
+	// this is for checking global font status' change
+
 
 enum {
 	FONT_RASTER_FREE_TYPE,
@@ -89,6 +92,7 @@ void TVPSetFontRasterizer( tjs_int index ) {
 	if( TVPCurrentFontRasterizers != index && index >= 0 && index < FONT_RASTER_EOT ) {
 		TVPCurrentFontRasterizers = index;
 		TVPClearFontCache(); // ラスタライザが切り替わる時、キャッシュはクリアしてしまう
+		TVPGlobalFontStateMagic++; // ApplyFont が走るようにする
 	}
 }
 tjs_int TVPGetFontRasterizer() {
@@ -111,9 +115,6 @@ FontRasterizer* GetCurrentRasterizer() {
 //---------------------------------------------------------------------------
 // Pre-rendered font management
 //---------------------------------------------------------------------------
-static tjs_int TVPGlobalFontStateMagic = 0;
-	// this is for checking global font status' change
-
 tTJSHashTable<ttstr, tTVPPrerenderedFont *> TVPPrerenderedFonts;
 
 
