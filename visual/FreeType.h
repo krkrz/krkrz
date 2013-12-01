@@ -102,6 +102,7 @@ public:
 	}
 	tTVPCharacterData * GetGlyphFromCharcode(tjs_char code);
 	bool GetGlyphMetricsFromCharcode(tjs_char code, tGlyphMetrics & metrics);
+	bool GetGlyphSizeFromCharcode(tjs_char code, tGlyphMetrics & metrics);
 
 private:
 	bool LoadGlyphSlotFromCharcode(tjs_char code);
