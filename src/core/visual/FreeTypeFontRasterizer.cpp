@@ -6,12 +6,15 @@
 #include <math.h>
 #include "MsgIntf.h"
 
+extern void TVPUninitializeFreeFont();
+
 FreeTypeFontRasterizer::FreeTypeFontRasterizer() : RefCount(0), Face(NULL), LastBitmap(NULL) {
 	AddRef();
 }
 FreeTypeFontRasterizer::~FreeTypeFontRasterizer() {
 	if( Face ) delete Face;
 	Face = NULL;
+	TVPUninitializeFreeFont();
 }
 void FreeTypeFontRasterizer::AddRef() {
 	RefCount++;
@@ -47,6 +50,7 @@ void FreeTypeFontRasterizer::ApplyFont( const tTVPFont& font ) {
 	opt |= (font.Flags & TVP_TF_BOLD) ? TVP_TF_BOLD : 0;
 	opt |= (font.Flags & TVP_TF_UNDERLINE) ? TVP_TF_UNDERLINE : 0;
 	opt |= (font.Flags & TVP_TF_STRIKEOUT) ? TVP_TF_STRIKEOUT : 0;
+	opt |= (font.Flags & TVP_TF_FONTFILE) ? TVP_FACE_OPTIONS_FILE : 0;
 	bool recreate = false;
 	if( Face ) {
 		if( Face->GetFontName() != stdname ) {
@@ -115,7 +119,10 @@ tTVPCharacterData* FreeTypeFontRasterizer::GetBitmap( const tTVPFontAndCharacter
 	}
 	tTVPCharacterData* data = Face->GetGlyphFromCharcode(font.Character);
 	if( data == NULL ) {
-		TVPThrowExceptionMessage( TVPFontRasterizeError );
+		data = Face->GetGlyphFromCharcode( Face->GetDefaultChar() );
+		if( data == NULL ) {
+			TVPThrowExceptionMessage( TVPFontRasterizeError );
+		}
 	}
 
 	int cx = data->Metrics.CellIncX;

@@ -19,6 +19,7 @@
 
 #include "BinaryStream.h"
 #include "MsgIntf.h"
+#include "SysInitIntf.h"
 
 #include <algorithm>
 
@@ -35,6 +36,12 @@ FT_Library FreeTypeLibrary = NULL;	//!< FreeType ライブラリ
 void TVPInitializeFont() {
 	if( FreeTypeLibrary == NULL ) {
 		FT_Error err = FT_Init_FreeType( &FreeTypeLibrary );
+	}
+}
+void TVPUninitializeFreeFont() {
+	if( FreeTypeLibrary ) {
+		FT_Done_FreeType( FreeTypeLibrary );
+		FreeTypeLibrary = NULL;
 	}
 }
 
@@ -58,6 +65,7 @@ public:
 
 	virtual FT_Face GetFTFace() const;
 	virtual void GetFaceNameList(std::vector<std::wstring> & dest) const;
+	virtual wchar_t GetDefaultChar() const { return L' '; }
 
 private:
 	void Clear();
@@ -88,7 +96,7 @@ tGenericFreeTypeFace::tGenericFreeTypeFace(const ttstr &fontname, tjs_uint32 opt
 		} 
 
 		// ファイルを開く
-		File = TVPCreateBinaryStreamForWrite(fontname,TJS_W("") );
+		File = TVPCreateBinaryStreamForRead(fontname,TJS_W("") );
 		if( File == NULL ) {
 			TVPThrowExceptionMessage( TVPCannotOpenFontFile, fontname );
 		}
@@ -490,11 +498,14 @@ tTVPCharacterData * tFreeTypeFace::GetGlyphFromCharcode(tjs_char code)
 		metrics.CellIncY = FT_PosToInt( metrics.CellIncY );
 
 		// tGlyphBitmap を作成して返す
+		//int baseline = (int)(FTFace->height + FTFace->descender) * FTFace->size->metrics.y_ppem / FTFace->units_per_EM;
+		int baseline = (int)( FTFace->ascender ) * FTFace->size->metrics.y_ppem / FTFace->units_per_EM;
+
 		glyph_bmp = new tTVPCharacterData(
 			ft_bmp->buffer,
 			ft_bmp->pitch,
 			  FTFace->glyph->bitmap_left,
-			(Height - 1) - FTFace->glyph->bitmap_top, // slot->bitmap_top は下方向が負なので注意
+			  baseline - FTFace->glyph->bitmap_top,
 			  ft_bmp->width,
 			  ft_bmp->rows,
 			metrics);

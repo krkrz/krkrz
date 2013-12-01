@@ -86,7 +86,6 @@ void TVPOnError();
 int _argc;
 char ** _argv;
 extern void TVPInitCompatibleNativeFunctions();
-extern void TVPUninitializeFontRasterizers();
 extern void TVPLoadMessage();
 
 AcceleratorKeyTable::AcceleratorKeyTable() {
@@ -418,7 +417,6 @@ bool tTVPApplication::StartApplication( int argc, char* argv[] ) {
 
 	if(TVPSystemControl) delete TVPSystemControl;
 	TVPSystemControl = NULL;
-	TVPUninitializeFontRasterizers();
 
 	CloseConsole();
 

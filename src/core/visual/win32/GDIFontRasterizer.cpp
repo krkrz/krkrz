@@ -84,7 +84,7 @@ void GDIFontRasterizer::ApplyFont( const tTVPFont& font ) {
 	LogFont.lfUnderline = (font.Flags & TVP_TF_UNDERLINE) ? TRUE:FALSE;
 	LogFont.lfStrikeOut = (font.Flags & TVP_TF_STRIKEOUT) ? TRUE:FALSE;
 	LogFont.lfEscapement = LogFont.lfOrientation = font.Angle;
-	LogFont.lfCharSet = SHIFTJIS_CHARSET; // TODO: i18n
+	LogFont.lfCharSet = DEFAULT_CHARSET;
 	LogFont.lfOutPrecision = OUT_DEFAULT_PRECIS;
 	LogFont.lfQuality = DEFAULT_QUALITY;
 	LogFont.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;

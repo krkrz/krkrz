@@ -55,8 +55,6 @@ tNativeFreeTypeFace::tNativeFreeTypeFace(const std::wstring &fontname,
 	try
 	{
 		// 指定のフォントを持ったデバイスコンテキストを作成する
-		// TODO: Italic, Bold handling
-
 		DC = GetDC(0);
 		LOGFONT l;
 		l.lfHeight = -12;
@@ -76,6 +74,8 @@ tNativeFreeTypeFace::tNativeFreeTypeFace(const std::wstring &fontname,
 
 		HFONT newfont = CreateFontIndirect(&l);
 		OldFont = static_cast<HFONT>(SelectObject(DC, newfont));
+		ZeroMemory( &TextMetric, sizeof(TextMetric) );
+		::GetTextMetrics( DC, &TextMetric );
 
 		// このフォントが GetFontData API で扱えるかどうかを
 		// 'name' タグの内容を取得しようとすることでチェックする
@@ -236,6 +236,23 @@ FT_Face tNativeFreeTypeFace::GetFTFace() const
 }
 //---------------------------------------------------------------------------
 
+//---------------------------------------------------------------------------
+/**
+ * 描画できない文字の時に描画する文字コード
+ */
+wchar_t tNativeFreeTypeFace::GetDefaultChar() const
+{
+	if( TextMetric.tmDefaultChar < L' ' ) {
+		if( TextMetric.tmBreakChar < L' ' ) {
+			return L' ';
+		} else {
+			return TextMetric.tmBreakChar;
+		}
+	} else {
+		return TextMetric.tmDefaultChar;
+	}
+}
+//---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
 /**
