@@ -92,9 +92,13 @@ void WindowMenuItem::UpdateChildren() {
 	}
 	::DrawMenuBar( hWnd_ );
 }
-void WindowMenuItem::UpdateMenu() {
+void WindowMenuItem::UpdateMenu( bool rebuild ) {
 	if( parent_ ) {
-		parent_->UpdateChildren();
+		if( rebuild ) {
+			parent_->UpdateChildren();
+		} else {
+			::SetMenuItemInfo( parent_->hMenu_, menu_item_info_.wID, FALSE, &menu_item_info_ );
+		}
 	}
 }
 
@@ -211,7 +215,7 @@ void WindowMenuItem::SetCaption( const TCHAR* caption ) {
 			menu_item_info_.fMask |= MIIM_TYPE;
 		}
 	}
-	UpdateMenu();
+	UpdateMenu(false);
 }
 
 void WindowMenuItem::SetChecked( bool b ) {
@@ -221,6 +225,7 @@ void WindowMenuItem::SetChecked( bool b ) {
 		} else {
 			menu_item_info_.fState &= ~MFS_CHECKED;
 		}
+		UpdateMenu();
 	} else {
 		if( b ) {
 			menu_item_info_.fState &= ~MFS_UNCHECKED;
@@ -229,8 +234,8 @@ void WindowMenuItem::SetChecked( bool b ) {
 			menu_item_info_.fState &= ~MFS_CHECKED;
 			menu_item_info_.fState |= MFS_UNCHECKED;
 		}
+		UpdateMenu( false );
 	}
-	UpdateMenu();
 }
 void WindowMenuItem::SetEnabled( bool b ) {
 	if( b == GetEnabled() ) return;
@@ -240,7 +245,7 @@ void WindowMenuItem::SetEnabled( bool b ) {
 	} else {
 		menu_item_info_.fState |= MFS_DISABLED;
 	}
-	UpdateMenu();
+	UpdateMenu( false );
 }
 void WindowMenuItem::SetGroupIndex( int group ) {
 	group_no_ = group;

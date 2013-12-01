@@ -43,7 +43,7 @@ private:
 	 * ‘S‚Ä‚Ì€–Ú‚ğíœ‚µ‚Ä‚©‚ç’Ç‰Á‚µ’¼‚·
 	 */
 	void UpdateChildren();
-	void UpdateMenu();
+	void UpdateMenu( bool rebuild = true );
 
 	void CheckRadioItem( WindowMenuItem* item );
 
