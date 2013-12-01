@@ -453,6 +453,7 @@
     <ClCompile Include="..\visual\win32\LayerImpl.cpp" />
     <ClCompile Include="..\visual\win32\NativeFreeTypeFace.cpp" />
     <ClCompile Include="..\visual\win32\TVPScreen.cpp" />
+    <ClCompile Include="..\visual\win32\TVPSysFont.cpp" />
     <ClCompile Include="..\visual\win32\VideoOvlImpl.cpp" />
     <ClCompile Include="..\visual\win32\VSyncTimingThread.cpp" />
     <ClCompile Include="..\visual\win32\WindowImpl.cpp" />

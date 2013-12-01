@@ -46,14 +46,16 @@ struct tTVPFont
 #define TVP_TF_BOLD      0x0200
 #define TVP_TF_UNDERLINE 0x0400
 #define TVP_TF_STRIKEOUT 0x0800
+#define TVP_TF_FONTFILE  0x1000
 
 
 //---------------------------------------------------------------------------
-#define TVP_FSF_FIXEDPITCH   1      // fsfFixedPitch
-#define TVP_FSF_SAMECHARSET  2      // fsfSameCharSet
-#define TVP_FSF_NOVERTICAL   4      // fsfNoVertical
-#define TVP_FSF_TRUETYPEONLY 8      // fsfTrueTypeOnly
-#define TVP_FSF_USEFONTFACE  0x100  // fsfUseFontFace
+#define TVP_FSF_FIXEDPITCH    0x01      // fsfFixedPitch
+#define TVP_FSF_SAMECHARSET   0x02      // fsfSameCharSet
+#define TVP_FSF_NOVERTICAL    0x04      // fsfNoVertical
+#define TVP_FSF_TRUETYPEONLY  0x08      // fsfTrueTypeOnly
+#define TVP_FSF_IGNORESYMBOL  0x10      // fsfIgnoreSymbol
+#define TVP_FSF_USEFONTFACE   0x100  // fsfUseFontFace
 
 /*]*/
 

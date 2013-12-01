@@ -399,25 +399,29 @@ void tTVPCharacterData::AddHorizontalLine( tjs_int liney, tjs_int thickness, tjs
 
 	tjs_int newwidth = BlackBoxX;
 	tjs_int newheight = BlackBoxY;
-	if( BlackBoxX != Metrics.CellIncX ) {
-		newwidth = Metrics.CellIncX;
+	tjs_int overlapx = 0;
+	if( OriginX < 0 ) overlapx = -OriginX;	// ‘O‚Ì•¶Žš‚É‚©‚Ô‚é‚æ‚¤‚É•`‰æ‚³‚ê‚é‚±‚Æ‚ª‚ ‚é
+	if( BlackBoxX != (Metrics.CellIncX+overlapx) ) {
+		newwidth = Metrics.CellIncX+overlapx;
 	}
 	int top = OriginY;
 	int bottom = top + BlackBoxY;
 	if( linetop < top ) { // ã‰ß‚¬‚é
 		top = linetop;
-	} else if( linebottom >= bottom ) { // ‰º‰ß‚¬‚é
+	} else if( linebottom > bottom ) { // ‰º‰ß‚¬‚é
 		bottom = linebottom;
 	}
 	newheight = bottom - top;
 	// ‘å‚«‚³‚ª•Ï‰»‚·‚éŽž‚Íì‚è’¼‚·
 	if( newwidth != BlackBoxX || newheight != BlackBoxY ) {
-		tjs_int newpitch =  (((newwidth -1)>>2)+1)<<2;
+		//tjs_int newpitch =  (((newwidth -1)>>2)+1)<<2;
+		tjs_int newpitch =  (((newwidth*4 - 1) >> 3) + 1) << 3;
 		tjs_uint8 *newdata = new tjs_uint8[newpitch * newheight];
 		memset( newdata, 0, sizeof(tjs_uint8)*newpitch*newheight );
 		// x ‚Í OriginX •ª‚¸‚ê‚é
 		// y ‚Í OriginY - top•ª‚¸‚ê‚é
 		tjs_int offsetx = OriginX;
+		if( offsetx < 0 ) offsetx =0;
 		tjs_int offsety = OriginY - top;
 		tjs_uint8 *sp = Data;
 		tjs_uint8 *dp = newdata + offsety*newpitch + offsetx;
@@ -432,7 +436,7 @@ void tTVPCharacterData::AddHorizontalLine( tjs_int liney, tjs_int thickness, tjs
 		Data = newdata;
 		BlackBoxX = newwidth;
 		BlackBoxY = newheight;
-		OriginX = 0;
+		if( OriginX > 0 ) OriginX = 0;
 		OriginY = top;
 		Pitch = newpitch;
 	}

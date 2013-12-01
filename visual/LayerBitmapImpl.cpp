@@ -82,8 +82,9 @@ void TVPUninitializeFontRasterizers() {
 		TVPFontSystem = NULL;
 	}
 }
-// ここで切り換えること考えると AddRef 意味ないな。もう一つ上位で処理しないと
-// ここに書かれたメソッドをクラス化して
+static tTVPAtExit
+	TVPUninitializeFontRaster(TVP_ATEXIT_PRI_RELEASE, TVPUninitializeFontRasterizers);
+
 void TVPSetFontRasterizer( tjs_int index ) {
 	if( TVPCurrentFontRasterizers != index && index >= 0 && index < FONT_RASTER_EOT ) {
 		TVPCurrentFontRasterizers = index;

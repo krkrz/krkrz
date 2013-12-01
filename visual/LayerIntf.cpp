@@ -4649,6 +4649,21 @@ bool tTJSNI_BaseLayer::GetFontUnderline() const
 	return 0!=(Font.Flags & TVP_TF_UNDERLINE);
 }
 //---------------------------------------------------------------------------
+void tTJSNI_BaseLayer::SetFontFaceIsFileName(bool b)
+{
+	if( (0!=(Font.Flags & TVP_TF_FONTFILE)) != b)
+	{
+		Font.Flags &= ~TVP_TF_FONTFILE;
+		if(b) Font.Flags |= TVP_TF_FONTFILE;
+		FontChanged = true;
+	}
+}
+//---------------------------------------------------------------------------
+bool tTJSNI_BaseLayer::GetFontFaceIsFileName() const
+{
+	return 0!=(Font.Flags & TVP_TF_FONTFILE);
+}
+//---------------------------------------------------------------------------
 tjs_int tTJSNI_BaseLayer::GetTextWidth(const ttstr & text)
 {
 	if(!MainImage) TVPThrowExceptionMessage(TVPUnsupportedLayerType,
@@ -9533,6 +9548,25 @@ bool tTJSNI_Font::GetFontUnderline() const
 	else return 0!=(Font.Flags & TVP_TF_UNDERLINE);
 }
 //---------------------------------------------------------------------------
+void tTJSNI_Font::SetFontFaceIsFileName(bool b)
+{
+	if( Layer ) Layer->SetFontFaceIsFileName(b);
+	else
+	{
+		if( (0!=(Font.Flags & TVP_TF_FONTFILE)) != b)
+		{
+			Font.Flags &= ~TVP_TF_FONTFILE;
+			if(b) Font.Flags |= TVP_TF_FONTFILE;
+		}
+	}
+}
+//---------------------------------------------------------------------------
+bool tTJSNI_Font::GetFontFaceIsFileName() const
+{
+	if( Layer ) return Layer->GetFontFaceIsFileName();
+	else return 0!=(Font.Flags & TVP_TF_FONTFILE);
+}
+//---------------------------------------------------------------------------
 tjs_int tTJSNI_Font::GetTextWidthDirect(const ttstr & text)
 {
 	GetCurrentRasterizer()->ApplyFont( Font );
@@ -9891,6 +9925,27 @@ TJS_BEGIN_NATIVE_PROP_DECL(angle)
 	TJS_END_NATIVE_PROP_SETTER
 }
 TJS_END_NATIVE_PROP_DECL(angle)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(faceIsFileName)
+{
+	// Face名をファイル名として開く、FreeTypeでのみ有効。ただし、そのレイヤーでIMEを有効した場合動作は不定
+	TJS_BEGIN_NATIVE_PROP_GETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Font);
+		*result = _this->GetFontFaceIsFileName();
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_GETTER
+
+	TJS_BEGIN_NATIVE_PROP_SETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Font);
+		_this->SetFontFaceIsFileName(*param);
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_PROP_DECL(faceIsFileName)
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_PROP_DECL(rasterizer)
 {
