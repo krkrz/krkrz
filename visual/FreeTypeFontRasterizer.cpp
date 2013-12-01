@@ -91,13 +91,10 @@ void FreeTypeFontRasterizer::ApplyFont( const tTVPFont& font ) {
 void FreeTypeFontRasterizer::GetTextExtent(tjs_char ch, tjs_int &w, tjs_int &h) {
 	if( Face ) {
 		tGlyphMetrics metrics;
-		if( Face->GetGlyphMetricsFromCharcode( ch, metrics) ) {
-			w = metrics.CellIncX >> 6;
-			h = metrics.CellIncX >> 6;
+		if( Face->GetGlyphSizeFromCharcode( ch, metrics) ) {
+			w = metrics.CellIncX;
+			h = metrics.CellIncY;
 		}
-	}
-	if( CurrentFont.Flags & TVP_TF_BOLD ) {
-		w += (int)(h / 50) + 1; // calculate bold font size
 	}
 }
 tjs_int FreeTypeFontRasterizer::GetAscentHeight() {
