@@ -541,7 +541,7 @@ tTVPCharacterData * tFreeTypeFace::GetGlyphFromCharcode(tjs_char code)
 
 //---------------------------------------------------------------------------
 /**
- * 指定した文字コードに対するグリフの寸法を得る
+ * 指定した文字コードに対するグリフの寸法を得る(文字を進めるためのサイズ)
  * @param code		文字コード
  * @param metrics	寸法
  * @return	成功の場合真、失敗の場合偽
@@ -555,7 +555,6 @@ bool tFreeTypeFace::GetGlyphMetricsFromCharcode(tjs_char code,
 	// CellIncX や CellIncY は ピクセル値が 64 倍された値なので注意
 	// これはもともと FreeType の仕様だけれども、Risaでも内部的には
 	// この精度で CellIncX や CellIncY を扱う
-	// TODO: 文字のサブピクセル単位での位置調整とレンダリング
 	metrics.CellIncX =  FTFace->glyph->advance.x;
 	metrics.CellIncY =  FTFace->glyph->advance.y;
 
@@ -563,6 +562,24 @@ bool tFreeTypeFace::GetGlyphMetricsFromCharcode(tjs_char code,
 }
 //---------------------------------------------------------------------------
 
+//---------------------------------------------------------------------------
+/**
+ * 指定した文字コードに対するグリフのサイズを得る(文字の大きさ)
+ * @param code		文字コード
+ * @param metrics	サイズ
+ * @return	成功の場合真、失敗の場合偽
+ */
+bool tFreeTypeFace::GetGlyphSizeFromCharcode(tjs_char code, tGlyphMetrics & metrics)
+{
+	if(!LoadGlyphSlotFromCharcode(code)) return false;
+
+	// メトリック構造体を作成
+	metrics.CellIncX = FT_PosToInt( FTFace->glyph->metrics.horiAdvance );
+	metrics.CellIncY = FT_PosToInt( FTFace->glyph->metrics.vertAdvance );
+
+	return true;
+}
+//---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
 /**
