@@ -68,7 +68,7 @@ std::wstring FontSystem::GetBeingFont(std::wstring fonts) {
 		int pos = fonts.find_first_of(TJS_W(","));
 		if( pos != std::string::npos ) {
 			fontname = Trim( fonts.substr( 0, pos) );
-			fonts = fonts.c_str()+pos;
+			fonts = fonts.c_str()+pos+1;
 		} else {
 			fontname = Trim(fonts);
 			fonts=TJS_W("");
