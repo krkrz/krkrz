@@ -1701,6 +1701,15 @@ void TTVPWindowForm::OnMove( int x, int y ) {
 		TJSNativeInstance->WindowMoved();
 	}
 }
+void TTVPWindowForm::OnResize( int state, int w, int h ) {
+	if( state == SIZE_MINIMIZED || state == SIZE_MAXSHOW || state == SIZE_MAXHIDE ) return;
+	// state == SIZE_RESTORED, SIZE_MAXIMIZED, 
+	// on resize
+	if(TJSNativeInstance) {
+		// here specifies TVP_EPT_REMOVE_POST, to remove redundant onResize events.
+		TVPPostInputEvent( new tTVPOnResizeInputEvent(TJSNativeInstance), TVP_EPT_REMOVE_POST );
+	}
+}
 void TTVPWindowForm::OnDropFile( HDROP hDrop ) {
 	wchar_t filename[MAX_PATH];
 	tjs_int filecount= ::DragQueryFile(hDrop, 0xFFFFFFFF, NULL, MAX_PATH);

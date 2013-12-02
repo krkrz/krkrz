@@ -1524,7 +1524,7 @@ tjs_int tTJSNI_Window::GetTop() const
 void tTJSNI_Window::SetSize(tjs_int w, tjs_int h)
 {
 	FullScreenGuard();
-	if(Form) Form->SetBounds(Form->GetLeft(), Form->GetTop(), w, h);
+	if(Form) Form->SetSize( w, h );
 }
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetMinWidth(int v)
@@ -1586,7 +1586,7 @@ void tTJSNI_Window::SetMaxSize(int w, int h)
 void tTJSNI_Window::SetPosition(tjs_int l, tjs_int t)
 {
 	FullScreenGuard();
-	if(Form) Form->SetBounds(l, t, Form->GetWidth(), Form->GetHeight());
+	if(Form) Form->SetPosition( l, t );
 }
 //---------------------------------------------------------------------------
 #ifdef USE_OBSOLETE_FUNCTIONS

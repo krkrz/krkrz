@@ -308,6 +308,9 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 	case WM_MOVE:
 		OnMove( GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
 		break;
+	case WM_SIZE:
+		OnResize( wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
+		break;
 	case WM_DROPFILES:
 		OnDropFile( reinterpret_cast<HDROP>(wParam) );
 		return 0;
@@ -670,7 +673,7 @@ void tTVPWindow::SetPosition( int l, int t ) {
 	}
 }
 void tTVPWindow::SetBounds( int x, int y, int width, int height ) {
-	if( ::SetWindowPos( GetHandle(), NULL, x, y, width, height, POS_CHANGE_FLAGS ) == 0 ) {
+	if( ::SetWindowPos( GetHandle(), NULL, x, y, width, height, SWP_DEFERERASE | SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER ) == 0 ) {
 		TVPThrowWindowsErrorException();
 	}
 }
