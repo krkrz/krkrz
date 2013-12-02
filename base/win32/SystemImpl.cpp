@@ -472,21 +472,6 @@ bool TVPCreateAppLock(const ttstr &lockname)
 //---------------------------------------------------------------------------
 
 
-
-
-
-//---------------------------------------------------------------------------
-// TVPGetDesktopRect
-//---------------------------------------------------------------------------
-static void TVPGetDesktopRect(tTVPRect &dest)
-{
-	dest.top = ::GetSystemMetrics(SM_XVIRTUALSCREEN);
-	dest.left = ::GetSystemMetrics(SM_XVIRTUALSCREEN);
-	dest.bottom = dest.top + ::GetSystemMetrics(SM_CYVIRTUALSCREEN);
-	dest.right = dest.left + ::GetSystemMetrics(SM_CXVIRTUALSCREEN);
-}
-//---------------------------------------------------------------------------
-
 //---------------------------------------------------------------------------
 enum tTVPTouchDevice {
 	tdNone				= 0,
@@ -866,9 +851,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(desktopLeft)
 {
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
-		tTVPRect r;
-		TVPGetDesktopRect(r);
-		*result = r.left;
+		*result = tTVPScreen::GetDesktopLeft();
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_GETTER
@@ -881,9 +864,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(desktopTop)
 {
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
-		tTVPRect r;
-		TVPGetDesktopRect(r);
-		*result = r.top;
+		*result = tTVPScreen::GetDesktopTop();
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_GETTER
@@ -896,9 +877,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(desktopWidth)
 {
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
-		tTVPRect r;
-		TVPGetDesktopRect(r);
-		*result = r.get_width();
+		*result = tTVPScreen::GetDesktopWidth();
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_GETTER
@@ -911,9 +890,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(desktopHeight)
 {
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
-		tTVPRect r;
-		TVPGetDesktopRect(r);
-		*result = r.get_height();
+		*result = tTVPScreen::GetDesktopHeight();
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_GETTER
