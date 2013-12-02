@@ -362,6 +362,7 @@ public:
 	virtual void OnMouseWheel( int delta, int shift, int x, int y );
 
 	virtual void OnMove( int x, int y );
+	virtual void OnResize( int state, int w, int h );
 	virtual void OnDropFile( HDROP hDrop );
 	// virtual int OnMouseActivate( HWND hTopLevelParentWnd, WORD hitTestCode, WORD MouseMsg );
 	virtual void OnEnable( bool enabled );

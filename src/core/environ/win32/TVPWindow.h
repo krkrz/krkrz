@@ -267,6 +267,7 @@ public:
 	virtual void OnKeyDown( WORD vk, int shift, int repeat, bool prevkeystate ){}
 	virtual void OnKeyPress( WORD vk, int repeat, bool prevkeystate, bool convertkey ){}
 	virtual void OnMove( int x, int y ) {}
+	virtual void OnResize( int state, int w, int h ) {}
 	virtual void OnDropFile( HDROP hDrop ) {}
 	virtual int OnMouseActivate( HWND hTopLevelParentWnd, WORD hitTestCode, WORD MouseMsg ) { return MA_ACTIVATE; }
 	virtual void OnEnable( bool enabled ) {}
