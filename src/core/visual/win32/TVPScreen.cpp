@@ -21,4 +21,38 @@ int tTVPScreen::GetHeight() {
 	return ::GetSystemMetrics(SM_CYSCREEN);
 }
 
-//tTVPScreen* Screen;
+void tTVPScreen::GetDesktopRect( RECT& r ) {
+	HWND hWnd = Application->GetMainWindowHandle();
+	if( hWnd != INVALID_HANDLE_VALUE ) {
+		HMONITOR hMonitor = ::MonitorFromWindow( hWnd, MONITOR_DEFAULTTOPRIMARY );
+		if( hMonitor != NULL ) {
+			MONITORINFO monitorinfo = {sizeof(MONITORINFO)};
+			if( ::GetMonitorInfo( hMonitor, &monitorinfo ) != FALSE ) {
+				r = monitorinfo.rcWork;
+				return;
+			}
+		}
+	}
+	::SystemParametersInfo( SPI_GETWORKAREA, 0, &r, 0 );
+}
+int tTVPScreen::GetDesktopLeft() {
+	RECT r;
+	GetDesktopRect(r);
+	return r.left;
+}
+int tTVPScreen::GetDesktopTop() {
+	RECT r;
+	GetDesktopRect(r);
+	return r.top;
+}
+int tTVPScreen::GetDesktopWidth() {
+	RECT r;
+	GetDesktopRect(r);
+	return r.right - r.left;
+}
+int tTVPScreen::GetDesktopHeight() {
+	RECT r;
+	GetDesktopRect(r);
+	return r.bottom - r.top;
+}
+
