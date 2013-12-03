@@ -293,7 +293,14 @@ tTJSVariantString * TJSRealToHexString(tjs_real r)
 
 	*(p++) = TJS_W('p');
 	//TJS_sprintf(p, TJS_W("%d"), exp);
-	TJS_snprintf(p, (sizeof(tmp)-(p-tmp))/sizeof(tjs_char), TJS_W("%d"), exp);
+	//TJS_snprintf(p, (sizeof(tmp)-(p-tmp))/sizeof(tjs_char), TJS_W("%d"), exp);
+	tjs_char t2[128];
+	TJS_snprintf( t2, 128, TJS_W("%d"), exp);
+	for( tjs_int i = 0; t2[i] != 0 && p != (tmp+128); i++ ) {
+		*(p++) = t2[i];
+	}
+	if( p != (tmp+128) ) *p = 0;
+	else tmp[127] = 0;
 
 	return TJSAllocVariantString(tmp);
 }
