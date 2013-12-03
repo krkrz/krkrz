@@ -776,12 +776,12 @@ void __fastcall TScriptDebuggerForm::ExecDebuggee()
 //---------------------------------------------------------------------------
 AnsiString __fastcall TScriptDebuggerForm::GetDebuggeeCommandLine() const
 {
-	AnsiString arg( debuggee_path_ );
+	AnsiString arg( AnsiString("\"") + debuggee_path_ + AnsiString("\"") );
 	if( debuggee_args_.Length() ) {
 		arg += AnsiString(" ") + debuggee_args_;
 	}
 	if( debuggee_data_.Length() ) {
-		arg += AnsiString(" ") + debuggee_data_;
+		arg += AnsiString(" \"") + debuggee_data_ + AnsiString("\"");
 	}
 	return arg;
 }
