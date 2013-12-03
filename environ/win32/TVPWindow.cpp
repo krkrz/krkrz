@@ -449,6 +449,12 @@ void tTVPWindow::OnDestroy() {
 
 void tTVPWindow::SetClientSize( HWND hWnd, SIZE& size ) {
 	HMENU hMenu = ::GetMenu( hWnd );
+	if( hMenu ) {
+		int count = ::GetMenuItemCount(hMenu);
+		if( count <= 0 ) {
+			hMenu = NULL;
+		}
+	}
 	DWORD style = ::GetWindowLong( hWnd, GWL_STYLE );
 	DWORD exStyle = ::GetWindowLong( hWnd, GWL_EXSTYLE );
 	RECT rect;
