@@ -45,7 +45,7 @@ public:
 	virtual void GetFaceNameList(std::vector<std::wstring> & dest) const; 
 
 	bool GetIsTTC() const { return IsTTC; }
-	wchar_t GetDefaultChar() const;
+	tjs_char GetDefaultChar() const;
 
 private:
 	void Clear();

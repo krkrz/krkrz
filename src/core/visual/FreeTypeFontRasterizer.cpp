@@ -118,9 +118,12 @@ tTVPCharacterData* FreeTypeFontRasterizer::GetBitmap( const tTVPFontAndCharacter
 	tTVPCharacterData* data = Face->GetGlyphFromCharcode(font.Character);
 	if( data == NULL ) {
 		data = Face->GetGlyphFromCharcode( Face->GetDefaultChar() );
-		if( data == NULL ) {
-			TVPThrowExceptionMessage( TVPFontRasterizeError );
-		}
+	}
+	if( data == NULL ) {
+		data = Face->GetGlyphFromCharcode( Face->GetFirstChar() );
+	}
+	if( data == NULL ) {
+		TVPThrowExceptionMessage( TVPFontRasterizeError );
 	}
 
 	int cx = data->Metrics.CellIncX;

@@ -71,8 +71,12 @@ public:
 	bool GetOption( tjs_uint32 opt ) const {
 		return (Options&opt) == opt;
 	}
-	wchar_t GetDefaultChar() const {
+	tjs_char GetDefaultChar() const {
 		return Face->GetDefaultChar();
+	}
+	tjs_char GetFirstChar() {
+		FT_UInt gindex;
+		return static_cast<tjs_char>( FT_Get_First_Char( FTFace, &gindex ) );
 	}
 
 	tjs_int GetAscent() const {

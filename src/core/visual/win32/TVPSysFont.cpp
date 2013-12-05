@@ -81,6 +81,7 @@ int tTVPSysFont::GetAscentHeight() {
 	OUTLINETEXTMETRIC *otm = (OUTLINETEXTMETRIC*)otmBuf;
 	::GetOutlineTextMetrics( hMemDC_, otmSize, otm );
 	int result = otm->otmAscent;
+	//int result = otm->otmMacAscent;
 	delete[] otmBuf;
 	return result;
 }

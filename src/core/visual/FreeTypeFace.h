@@ -31,7 +31,7 @@ public:
 	virtual FT_Face GetFTFace() const = 0; //!< FreeType の Face オブジェクトを返す
 	virtual void GetFaceNameList(std::vector<std::wstring> & dest) const = 0; //!< このフォントファイルが持っているフォントを配列として返す
 	virtual ~tBaseFreeTypeFace() {;}
-	virtual wchar_t GetDefaultChar() const = 0; //!< 描画できない時に描画する文字コードを返す
+	virtual tjs_char GetDefaultChar() const = 0; //!< 描画できない時に描画する文字コードを返す
 };
 //---------------------------------------------------------------------------
 
