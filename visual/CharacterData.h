@@ -27,8 +27,8 @@ private:
 	tjs_int RefCount;
 
 public:
-	tjs_int OriginX; //!< 文字幅
-	tjs_int OriginY; //!< 文字高さ
+	tjs_int OriginX; //!< 文字Bitmapを描画するascent位置との横オフセット
+	tjs_int OriginY; //!< 文字Bitmapを描画するascent位置との縦オフセット
 	tGlyphMetrics	Metrics; //!< メトリック、送り幅と高さを保持
 	//tjs_int CellIncX;
 	//tjs_int CellIncY;

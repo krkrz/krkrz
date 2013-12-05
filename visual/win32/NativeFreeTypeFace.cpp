@@ -240,17 +240,13 @@ FT_Face tNativeFreeTypeFace::GetFTFace() const
 /**
  * •`‰æ‚Å‚«‚È‚¢•¶š‚Ì‚É•`‰æ‚·‚é•¶šƒR[ƒh
  */
-wchar_t tNativeFreeTypeFace::GetDefaultChar() const
+tjs_char tNativeFreeTypeFace::GetDefaultChar() const
 {
-	if( TextMetric.tmDefaultChar < L' ' ) {
-		if( TextMetric.tmBreakChar < L' ' ) {
-			return L' ';
-		} else {
-			return TextMetric.tmBreakChar;
-		}
-	} else {
-		return TextMetric.tmDefaultChar;
-	}
+	FT_UInt ret = FT_Get_Char_Index( Face, TextMetric.tmDefaultChar );
+	if( ret != 0 ) return TextMetric.tmDefaultChar;
+	ret = FT_Get_Char_Index( Face, TextMetric.tmBreakChar );
+	if( ret != 0 ) return TextMetric.tmBreakChar;
+	return L' ';
 }
 //---------------------------------------------------------------------------
 
