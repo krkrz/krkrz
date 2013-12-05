@@ -65,7 +65,7 @@ public:
 
 	virtual FT_Face GetFTFace() const;
 	virtual void GetFaceNameList(std::vector<std::wstring> & dest) const;
-	virtual wchar_t GetDefaultChar() const { return L' '; }
+	virtual tjs_char GetDefaultChar() const { return L' '; }
 
 private:
 	void Clear();
@@ -310,6 +310,21 @@ tFreeTypeFace::tFreeTypeFace(const std::wstring &fontname, tjs_uint32 options)
 			// •ÏŠ·ŠÖ”‚ðƒZƒbƒg‚·‚é
 			UnicodeToLocalChar = UnicodeToSJIS;
 			LocalCharToUnicode = SJISToUnicode;
+		}
+		else
+		{
+			int numcharmap = FTFace->num_charmaps;
+			for( int i = 0; i < numcharmap; i++ )
+			{
+				FT_Encoding enc = FTFace->charmaps[i]->encoding;
+				if( enc != FT_ENCODING_NONE && enc != FT_ENCODING_APPLE_ROMAN )
+				{
+					err = FT_Select_Charmap(FTFace, enc);
+					if(!err) {
+						break;
+					}
+				}
+			}
 		}
 	}
 }
