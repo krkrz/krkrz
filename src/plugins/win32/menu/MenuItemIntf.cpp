@@ -165,6 +165,9 @@ tjs_error TJS_INTF_METHOD tTJSNI_MenuItem::Construct(tjs_int numparams, tTJSVari
 	} else {
 		tTJSVariant var;
 		iTJSDispatch2* win = param[0]->AsObjectNoAddRef();
+		if( win == NULL ) {
+			TVPThrowExceptionMessage(TVPSpecifyWindow);
+		}
 		if( TJS_FAILED(win->PropGet(0, TJS_W("HWND"), NULL, &var, win)) ) {
 			TVPThrowExceptionMessage(TVPSpecifyWindow);
 		}
