@@ -22,6 +22,7 @@ public:
 	void GetTextExtent(tjs_char ch, tjs_int &w, tjs_int &h);
 	tjs_int GetAscentHeight();
 	tTVPCharacterData* GetBitmap( const tTVPFontAndCharacterData & font, tjs_int aofsx, tjs_int aofsy );
+	void GetGlyphDrawRect( const ttstr & text, struct tTVPRect& area );
 };
 
 #endif // __FREE_TYPE_FONT_RASTERIZER_H__

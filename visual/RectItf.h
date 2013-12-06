@@ -40,8 +40,20 @@ public:
 	void SetOffset( tjs_int x, tjs_int y ) {
 		Rect.set_offsets( x, y );
 	}
+	void AddOffset( tjs_int x, tjs_int y ) {
+		Rect.add_offsets( x, y );
+	}
 	void SetSize(tjs_int width, tjs_int height) {
 		Rect.set_size( width, height );
+	}
+	void Clear() {
+		Rect.clear();
+	}
+	void Set( tjs_int left, tjs_int top, tjs_int right, tjs_int bottom ) {
+		Rect.left = left;
+		Rect.top = top;
+		Rect.right = right;
+		Rect.bottom = bottom;
 	}
 
 	bool IsEmpty() const {

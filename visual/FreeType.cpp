@@ -20,6 +20,7 @@
 #include "BinaryStream.h"
 #include "MsgIntf.h"
 #include "SysInitIntf.h"
+#include "ComplexRect.h"
 
 #include <algorithm>
 
@@ -553,6 +554,57 @@ tTVPCharacterData * tFreeTypeFace::GetGlyphFromCharcode(tjs_char code)
 }
 //---------------------------------------------------------------------------
 
+//---------------------------------------------------------------------------
+/**
+ * 指定した文字コードに対する描画領域を得る
+ * @param code	文字コード
+ * @return	レンダリング領域矩形へのポインタ
+ *			NULL の場合は変換に失敗した場合
+ */
+bool tFreeTypeFace::GetGlyphRectFromCharcode( tTVPRect& rt, tjs_char code, tjs_int& advancex, tjs_int& advancey )
+{
+	advancex = advancey = 0;
+	if( !LoadGlyphSlotFromCharcode(code) )
+		return false;
+
+	int baseline = (int)( FTFace->ascender ) * FTFace->size->metrics.y_ppem / FTFace->units_per_EM;
+	/*
+	FT_Render_Glyph でレンダリングしないと以下の各値は取得できない
+	tjs_int t = baseline - FTFace->glyph->bitmap_top;
+	tjs_int l = FTFace->glyph->bitmap_left;
+	tjs_int w = FTFace->glyph->bitmap.width;
+	tjs_int h = FTFace->glyph->bitmap.rows;
+	*/
+	tjs_int t = baseline - FT_PosToInt( FTFace->glyph->metrics.horiBearingY );
+	tjs_int l = FT_PosToInt( FTFace->glyph->metrics.horiBearingX );
+	tjs_int w = FT_PosToInt( FTFace->glyph->metrics.width );
+	tjs_int h = FT_PosToInt( FTFace->glyph->metrics.height );
+	advancex = FT_PosToInt( FTFace->glyph->advance.x );
+	advancey = FT_PosToInt( FTFace->glyph->advance.y );
+	rt = tTVPRect(l,t,l+w,t+h);
+	if( Options & TVP_TF_UNDERLINE ) {
+		tjs_int pos = -1, thickness = -1;
+		GetUnderline( pos, thickness );
+		if( pos >= 0 && thickness > 0 ) {
+			if( rt.left > 0 ) rt.left = 0;
+			if( rt.right < advancex ) rt.right = advancex;
+			if( pos < rt.top ) rt.top = pos;
+			if( (pos+thickness) >= rt.bottom ) rt.bottom = pos+thickness+1;
+
+		}
+	}
+	if( Options & TVP_TF_STRIKEOUT ) {
+		tjs_int pos = -1, thickness = -1;
+		GetStrikeOut( pos, thickness );
+		if( pos >= 0 && thickness > 0 ) {
+			if( rt.left > 0 ) rt.left = 0;
+			if( rt.right < advancex ) rt.right = advancex;
+			if( pos < rt.top ) rt.top = pos;
+			if( (pos+thickness) >= rt.bottom ) rt.bottom = pos+thickness+1;
+		}
+	}
+	return true;
+}
 
 //---------------------------------------------------------------------------
 /**

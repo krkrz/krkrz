@@ -324,6 +324,68 @@ tTVPCharacterData* GDIFontRasterizer::GetBitmap( const tTVPFontAndCharacterData 
 	}
 	return data;
 }
+void GDIFontRasterizer::GetGlyphDrawRect( const ttstr & text, tTVPRect& area )
+{
+	static MAT2 no_transform_matrix = { {0,1}, {0,0}, {0,0}, {0,1} };
+	GLYPHMETRICS gm;
 
+	tjs_int ascent = GetAscentHeight();
+
+	LOGFONT LogFont;
+	FontDC->GetFont( &LogFont );
+	OUTLINETEXTMETRIC otm = { sizeof(OUTLINETEXTMETRIC) };
+	if( LogFont.lfUnderline || LogFont.lfStrikeOut ) {
+		::GetOutlineTextMetrics( FontDC->GetDC(), otm.otmSize, &otm );
+	}
+
+	area.left = area.top = area.right = area.bottom = 0;
+	tjs_int offsetx = 0;
+	tjs_int offsety = 0;
+	tjs_uint len = text.length();
+	for( tjs_uint i = 0; i < len; i++ ) {
+		tjs_char code = text[i];
+		ZeroMemory(&gm, sizeof(gm));
+		int err = ::GetGlyphOutline( FontDC->GetDC(), code, GGO_METRICS, &gm, 0, NULL, &no_transform_matrix );
+		SIZE s = {0,0};
+		if( err != GDI_ERROR ) {
+			::GetTextExtentPoint32( NonBoldFontDC->GetDC(), &code, 1, &s );
+			tjs_int w = gm.gmBlackBoxX;
+			tjs_int h = gm.gmBlackBoxY;
+			tjs_int l = gm.gmptGlyphOrigin.x;
+			tjs_int t = ascent - gm.gmptGlyphOrigin.y;
+			tTVPRect rt( l, t, l+w, t+h );
+			if( LogFont.lfUnderline ) {
+				tjs_int liney = ascent - otm.otmsUnderscorePosition;
+				tjs_int height = otm.otmTextMetrics.tmHeight;
+				tjs_int thickness = otm.otmsUnderscoreSize;
+				if( liney >= height ) liney = height - 1;
+				if( liney >= 0 && thickness > 0 ) {
+					if( rt.left > 0 ) rt.left = 0;
+					if( rt.right < s.cx ) rt.right = s.cx;
+					if( liney < rt.top ) rt.top = liney;
+					if( (liney+thickness) >= rt.bottom ) rt.bottom = liney+thickness+1;
+				}
+			}
+			if( LogFont.lfStrikeOut ) {
+				tjs_int liney = ascent - otm.otmsStrikeoutPosition;
+				tjs_int thickness =  otm.otmsStrikeoutSize;
+				if( liney >= 0 && thickness > 0 ) {
+					if( rt.left > 0 ) rt.left = 0;
+					if( rt.right < s.cx ) rt.right = s.cx;
+					if( liney < rt.top ) rt.top = liney;
+					if( (liney+thickness) >= rt.bottom ) rt.bottom = liney+thickness+1;
+				}
+			}
+			rt.add_offsets( offsetx, offsety );
+			if( i != 0 ) {
+				area.do_union( rt );
+			} else {
+				area = rt;
+			}
+		}
+		offsetx += s.cx;
+		offsety = 0;
+	}
+}
 
 
