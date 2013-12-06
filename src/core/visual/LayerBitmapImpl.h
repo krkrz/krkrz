@@ -236,7 +236,7 @@ public:
 	double GetEscWidthY(const ttstr & text);
 	double GetEscHeightX(const ttstr & text);
 	double GetEscHeightY(const ttstr & text);
-
+	void GetFontGlyphDrawRect( const ttstr & text, struct tTVPRect& area );
 
 protected:
 private:

@@ -80,6 +80,32 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/setOffset)
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/setOffset)
 //----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/addOffset)
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Rect);
+	if(numparams < 2) return TJS_E_BADPARAMCOUNT;
+	_this->AddOffset( *param[0], *param[1] );
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/addOffset)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/clear)
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Rect);
+	_this->Clear();
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/clear)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/set)
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Rect);
+	if(numparams < 4) return TJS_E_BADPARAMCOUNT;
+	_this->Set( *param[0], *param[1], *param[2], *param[3] );
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/set)
+//----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/clip)
 {
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Rect);

@@ -223,6 +223,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/operateAffine)
 		if( updated ) {
 			iTJSDispatch2 *ret = TVPCreateRectObject( updaterect.left, updaterect.top, updaterect.right, updaterect.bottom );
 			*result = tTJSVariant(ret, ret);
+			ret->Release();
 		} else {
 			result->Clear();
 		}
@@ -311,6 +312,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/operateRect)
 			ur.set_offsets(dleft, dtop);
 			iTJSDispatch2 *ret = TVPCreateRectObject( ur.left, ur.top, ur.right, ur.bottom );
 			*result = tTJSVariant(ret, ret);
+			ret->Release();
 		} else {
 			result->Clear();
 		}
@@ -415,6 +417,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/operateStretch)
 		if( updated ) {
 			iTJSDispatch2 *ret = TVPCreateRectObject( ur.left, ur.top, ur.right, ur.bottom );
 			*result = tTJSVariant(ret, ret);
+			ret->Release();
 		} else {
 			result->Clear();
 		}
@@ -452,6 +455,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/flipLR)
 	if( result ) {
 		iTJSDispatch2 *ret = TVPCreateRectObject( dstRect.left, dstRect.top, dstRect.right, dstRect.bottom );
 		*result = tTJSVariant(ret, ret);
+		ret->Release();
 	}
 
 	return TJS_S_OK;
@@ -487,6 +491,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/flipUD)
 	if( result ) {
 		iTJSDispatch2 *ret = TVPCreateRectObject( dstRect.left, dstRect.top, dstRect.right, dstRect.bottom );
 		*result = tTJSVariant(ret, ret);
+		ret->Release();
 	}
 
 	return TJS_S_OK;
@@ -554,6 +559,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/adjustGamma)
 	if( result ) {
 		iTJSDispatch2 *ret = TVPCreateRectObject( clipRect.left, clipRect.top, clipRect.right, clipRect.bottom );
 		*result = tTJSVariant(ret, ret);
+		ret->Release();
 	}
 
 	return TJS_S_OK;
@@ -607,6 +613,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/doBoxBlur)
 		if( updated ) {
 			iTJSDispatch2 *ret = TVPCreateRectObject( clipRect.left, clipRect.top, clipRect.right, clipRect.bottom );
 			*result = tTJSVariant(ret, ret);
+			ret->Release();
 		} else {
 			result->Clear();
 		}
@@ -644,6 +651,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/doGrayScale)
 	if( result ) {
 		iTJSDispatch2 *ret = TVPCreateRectObject( clipRect.left, clipRect.top, clipRect.right, clipRect.bottom );
 		*result = tTJSVariant(ret, ret);
+		ret->Release();
 	}
 
 	return TJS_S_OK;
@@ -709,6 +717,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/fillRect)
 		if( updated ) {
 			iTJSDispatch2 *ret = TVPCreateRectObject( destrect.left, destrect.top, destrect.right, destrect.bottom );
 			*result = tTJSVariant(ret, ret);
+			ret->Release();
 		} else {
 			result->Clear();
 		}
@@ -799,6 +808,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/colorRect)
 		if( updated ) {
 			iTJSDispatch2 *ret = TVPCreateRectObject( destrect.left, destrect.top, destrect.right, destrect.bottom );
 			*result = tTJSVariant(ret, ret);
+			ret->Release();
 		} else {
 			result->Clear();
 		}
@@ -874,6 +884,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/drawText)
 			const tTVPRect& ur = r.GetBound();
 			iTJSDispatch2 *ret = TVPCreateRectObject( ur.left, ur.top, ur.right, ur.bottom );
 			*result = tTJSVariant(ret, ret);
+			ret->Release();
 		} else {
 			result->Clear();
 		}
@@ -949,6 +960,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/drawGlyph)
 			const tTVPRect& ur = r.GetBound();
 			iTJSDispatch2 *ret = TVPCreateRectObject( ur.left, ur.top, ur.right, ur.bottom );
 			*result = tTJSVariant(ret, ret);
+			ret->Release();
 		} else {
 			result->Clear();
 		}

@@ -1623,4 +1623,10 @@ double tTVPNativeBaseBitmap::GetEscHeightY(const ttstr & text)
 	return cos(RadianAngle) * TextHeight;
 }
 //---------------------------------------------------------------------------
+void tTVPNativeBaseBitmap::GetFontGlyphDrawRect( const ttstr & text, struct tTVPRect& area )
+{
+	ApplyFont();
+	GetCurrentRasterizer()->GetGlyphDrawRect( text, area );
+}
+//---------------------------------------------------------------------------
 

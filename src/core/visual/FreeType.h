@@ -105,6 +105,7 @@ public:
 		pos = FTFace->ascender * 7 * ppem / (10 * upe);
 	}
 	tTVPCharacterData * GetGlyphFromCharcode(tjs_char code);
+	bool GetGlyphRectFromCharcode(struct tTVPRect& rt, tjs_char code, tjs_int& advancex, tjs_int& advancey );
 	bool GetGlyphMetricsFromCharcode(tjs_char code, tGlyphMetrics & metrics);
 	bool GetGlyphSizeFromCharcode(tjs_char code, tGlyphMetrics & metrics);
 
