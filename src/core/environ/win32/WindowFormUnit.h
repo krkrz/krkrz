@@ -192,6 +192,7 @@ private:
 private:
 	void SetDrawDeviceDestRect();
 	void TranslateWindowToPaintBox(int &x, int &y);
+	void TranslateWindowToPaintBox(double&x, double &y);
 
 	void FirePopupHide();
 	bool CanSendPopupHide() const { return /*!Focusable &&*/ GetVisible() && GetStayOnTop(); }
