@@ -190,6 +190,7 @@ void TVPInitWindowOptions()
 
 TTVPWindowForm::TTVPWindowForm( tTVPApplication* app, tTJSNI_Window* ni ) : tTVPWindow(), CurrentMouseCursor(crDefault), touch_points_(this),
 	LayerLeft(0), LayerTop(0), LayerWidth(32), LayerHeight(32),
+	LastMouseDownX(0), LastMouseDownY(0),
 	HintX(0), HintY(0), HintTimer(NULL), HintDelay(TVP_TOOLTIP_SHOW_DELAY), LastHintSender(NULL),
 	FullScreenDestRect(0,0,0,0) {
 	CreateWnd( L"TVPMainWindow", Application->GetTitle(), 10, 10 );
@@ -1526,6 +1527,9 @@ void TTVPWindowForm::TranslateWindowToPaintBox(int &x, int &y) {
 	*/
 }
 
+void TTVPWindowForm::TranslateWindowToPaintBox(double&x, double &y) {
+	
+}
 void TTVPWindowForm::FirePopupHide() {
 	// fire "onPopupHide" event
 	if(!CanSendPopupHide()) return;
@@ -1629,16 +1633,17 @@ void TTVPWindowForm::OnMouseUp( int button, int shift, int x, int y ) {
 void TTVPWindowForm::OnMouseDoubleClick( int button, int x, int y ) {
 	// fire double click event
 	if( TJSNativeInstance ) {
-		TVPPostInputEvent( new tTVPOnDoubleClickInputEvent(TJSNativeInstance, x, y));
+		TVPPostInputEvent( new tTVPOnDoubleClickInputEvent(TJSNativeInstance, LastMouseDownX, LastMouseDownY));
 	}
 }
 void TTVPWindowForm::OnMouseClick( int button, int shift, int x, int y ) {
 	// fire click event
 	if( TJSNativeInstance ) {
-		TVPPostInputEvent( new tTVPOnClickInputEvent(TJSNativeInstance, x, y));
+		TVPPostInputEvent( new tTVPOnClickInputEvent(TJSNativeInstance, LastMouseDownX, LastMouseDownY));
 	}
 }
 void TTVPWindowForm::OnMouseWheel( int delta, int shift, int x, int y ) {
+	TranslateWindowToPaintBox( x, y);
 	if( TVPWheelDetectionType == wdtWindowMessage ) {
 		// wheel
 		if( TJSNativeInstance ) {
@@ -1649,19 +1654,21 @@ void TTVPWindowForm::OnMouseWheel( int delta, int shift, int x, int y ) {
 }
 
 void TTVPWindowForm::OnTouchDown( double x, double y, double cx, double cy, DWORD id ) {
-	// TranslateWindowToPaintBox(x, y);
+	 TranslateWindowToPaintBox(x, y);
 	if(TJSNativeInstance) {
 		TVPPostInputEvent( new tTVPOnTouchDownInputEvent(TJSNativeInstance, x, y, cx, cy, id));
 	}
 	touch_points_.TouchDown( x, y ,cx, cy, id );
 }
 void TTVPWindowForm::OnTouchMove( double x, double y, double cx, double cy, DWORD id ) {
+	TranslateWindowToPaintBox( x, y);
 	if(TJSNativeInstance) {
 		TVPPostInputEvent( new tTVPOnTouchMoveInputEvent(TJSNativeInstance, x, y, cx, cy, id));
 	}
 	touch_points_.TouchMove( x, y, cx, cy, id );
 }
 void TTVPWindowForm::OnTouchUp( double x, double y, double cx, double cy, DWORD id ) {
+	TranslateWindowToPaintBox( x, y);
 	if(TJSNativeInstance) {
 		TVPPostInputEvent( new tTVPOnTouchUpInputEvent(TJSNativeInstance, x, y, cx, cy, id));
 	}
