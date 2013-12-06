@@ -98,10 +98,12 @@ void FreeTypeFontRasterizer::GetTextExtent(tjs_char ch, tjs_int &w, tjs_int &h) 
 		}
 	}
 }
+//---------------------------------------------------------------------------
 tjs_int FreeTypeFontRasterizer::GetAscentHeight() {
 	if( Face ) return Face->GetAscent();
 	return 0;
 }
+//---------------------------------------------------------------------------
 tTVPCharacterData* FreeTypeFontRasterizer::GetBitmap( const tTVPFontAndCharacterData & font, tjs_int aofsx, tjs_int aofsy ) {
 	if( font.Antialiased ) {
 		Face->ClearOption( TVP_FACE_OPTIONS_NO_ANTIALIASING );
@@ -147,5 +149,33 @@ tTVPCharacterData* FreeTypeFontRasterizer::GetBitmap( const tTVPFontAndCharacter
 	data->BlurLevel = font.BlurLevel;
 	return data;
 }
+//---------------------------------------------------------------------------
+void FreeTypeFontRasterizer::GetGlyphDrawRect( const ttstr & text, tTVPRect& area ) {
+	// アンチエイリアスとヒンティングは有効にする
+	Face->ClearOption( TVP_FACE_OPTIONS_NO_ANTIALIASING );
+	Face->ClearOption( TVP_FACE_OPTIONS_NO_HINTING );
 
+	area.left = area.top = area.right = area.bottom = 0;
+	tjs_int offsetx = 0;
+	tjs_int offsety = 0;
+	tjs_uint len = text.length();
+	for( tjs_uint i = 0; i < len; i++ ) {
+		tjs_char ch = text[i];
+		tjs_int ax, ay;
+		tTVPRect rt(0,0,0,0);
+		bool result = Face->GetGlyphRectFromCharcode(rt,ch,ax,ay);
+		if( result == false ) result = Face->GetGlyphRectFromCharcode(rt,Face->GetDefaultChar(),ax,ay);
+		if( result == false ) result = Face->GetGlyphRectFromCharcode(rt,Face->GetFirstChar(),ax,ay);
+		if( result ) {
+			rt.add_offsets( offsetx, offsety );
+			if( i != 0 ) {
+				area.do_union( rt );
+			} else {
+				area = rt;
+			}
+		}
+		offsetx += ax;
+		offsety = 0;
+	}
+}
 

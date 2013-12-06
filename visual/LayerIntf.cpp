@@ -31,6 +31,7 @@
 #include "TVPColor.h"
 #include "TVPSysFont.h"
 #include "FontRasterizer.h"
+#include "RectItf.h"
 
 extern void TVPSetFontRasterizer( tjs_int index );
 extern tjs_int TVPGetFontRasterizer();
@@ -4722,6 +4723,16 @@ double tTJSNI_BaseLayer::GetEscHeightY(const ttstr & text)
 	ApplyFont();
 
 	return MainImage->GetEscHeightY(text);
+}
+//---------------------------------------------------------------------------
+void tTJSNI_BaseLayer::GetFontGlyphDrawRect( const ttstr & text, tTVPRect& area )
+{
+	if(!MainImage) TVPThrowExceptionMessage(TVPUnsupportedLayerType,
+						TJS_W("getGlyphDrawRect"));
+
+	ApplyFont();
+
+	MainImage->GetFontGlyphDrawRect(text,area);
 }
 //---------------------------------------------------------------------------
 void tTJSNI_BaseLayer::GetFontList(tjs_uint32 flags, std::vector<ttstr> & list)
@@ -9618,6 +9629,19 @@ double tTJSNI_Font::GetEscHeightY(const ttstr & text)
 	else return std::cos(Font.Angle * (M_PI/1800)) * std::abs(Font.Height);
 }
 //---------------------------------------------------------------------------
+void tTJSNI_Font::GetFontGlyphDrawRect( const ttstr & text, tTVPRect& area )
+{
+	if( Layer )
+	{
+		Layer->GetFontGlyphDrawRect(text,area);
+	}
+	else
+	{
+		GetCurrentRasterizer()->ApplyFont( Font );
+		GetCurrentRasterizer()->GetGlyphDrawRect( text, area );
+	}
+}
+//---------------------------------------------------------------------------
 void tTJSNI_Font::GetFontList(tjs_uint32 flags, std::vector<ttstr> & list)
 {
 	if( Layer ) Layer->GetFontList(flags,list);
@@ -9729,6 +9753,23 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/getEscHeightY)
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/getEscHeightY)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/getGlyphDrawRect)
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Font);
+	if(numparams < 1) return TJS_E_BADPARAMCOUNT;
+
+	if(result) {
+		tTVPRect rt;
+		_this->GetFontGlyphDrawRect( *param[0], rt );
+		iTJSDispatch2 *disp = TVPCreateRectObject( rt.left, rt.top, rt.right, rt.bottom );
+		*result = tTJSVariant(disp, disp);
+		disp->Release();
+	}
+
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/getGlyphDrawRect)
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/getList)
 {

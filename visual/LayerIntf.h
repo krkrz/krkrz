@@ -809,6 +809,7 @@ public:
 	double GetEscWidthY(const ttstr & text);
 	double GetEscHeightX(const ttstr & text);
 	double GetEscHeightY(const ttstr & text);
+	void GetFontGlyphDrawRect( const ttstr & text, tTVPRect& area );
 
 	void GetFontList(tjs_uint32 flags, std::vector<ttstr> & list);
 
@@ -1054,6 +1055,7 @@ public:
 	double GetEscWidthY(const ttstr & text);
 	double GetEscHeightX(const ttstr & text);
 	double GetEscHeightY(const ttstr & text);
+	void GetFontGlyphDrawRect( const ttstr & text, tTVPRect& area );
 
 	void GetFontList(tjs_uint32 flags, std::vector<ttstr> & list);
 	
