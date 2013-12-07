@@ -46,6 +46,9 @@
 #include "RectItf.h"
 #include "ImageFunction.h"
 #include "BitmapIntf.h"
+#include "tjsScriptBlock.h"
+#include "ApplicationSpecialPath.h"
+#include "SystemImpl.h"
 //---------------------------------------------------------------------------
 // Script system initialization script
 //---------------------------------------------------------------------------
@@ -1118,6 +1121,51 @@ void TVPShowScriptException(eTJSScriptError &e)
 		if(e.GetTrace().GetLen() != 0)
 			TVPAddLog(ttstr(TJS_W("trace : ")) + e.GetTrace());
 		Application->MessageDlg( errstr.AsStdString(), Application->GetTitle(), mtStop, mbOK );
+
+#ifdef TVP_ENABLE_EXECUTE_AT_EXCEPTION
+		const tjs_char* scriptName = e.GetBlockNoAddRef()->GetName();
+		if( scriptName != NULL && scriptName[0] != 0 ) {
+			ttstr path(scriptName);
+			try {
+				path = TVPNormalizeStorageName(path);
+				TVPGetLocalName( path );
+				std::wstring scriptPath( path.AsStdString() );
+				tjs_int lineno = 1+e.GetBlockNoAddRef()->SrcPosToLine(e.GetPosition() )- e.GetBlockNoAddRef()->GetLineOffset();
+
+#if defined(WIN32) && defined(_DEBUG) && !defined(ENABLE_DEBUGGER)
+// デバッガ実行されている時、Visual Studio で行ジャンプする時の指定をデバッグ出力に出して、break で停止する
+				if( ::IsDebuggerPresent() ) {
+					std::wstring debuglile( std::wstring(L"2>")+path.AsStdString()+L"("+std::to_wstring(lineno)+L"): error :" + errstr.AsStdString() );
+					::OutputDebugString( debuglile.c_str() );
+					// ここで breakで停止した時、直前の出力行をダブルクリックすれば、例外箇所のスクリプトをVisual Studioで開ける
+					::DebugBreak();
+				}
+#endif
+				scriptPath = std::wstring(L"\"") + scriptPath + std::wstring(L"\"");
+				tTJSVariant val;
+				if( TVPGetCommandLine(TJS_W("-exceptionexe"), &val) )
+				{
+					ttstr exepath(val);
+					//exepath = ttstr(TJS_W("\"")) + exepath + ttstr(TJS_W("\""));
+					if( TVPGetCommandLine(TJS_W("-exceptionarg"), &val) )
+					{
+						ttstr arg(val);
+						if( !exepath.IsEmpty() && !arg.IsEmpty() ) {
+							std::wstring str( arg.AsStdString() );
+							str = ApplicationSpecialPath::ReplaceStringAll( str, std::wstring(L"%filepath%"), scriptPath );
+							str = ApplicationSpecialPath::ReplaceStringAll( str, std::wstring(L"%line%"), std::to_wstring(lineno) );
+							//exepath = exepath + ttstr(str);
+							//_wsystem( exepath.c_str() );
+							arg = ttstr(str);
+							TVPAddLog( ttstr(TJS_W("(execute) "))+exepath+ttstr(TJS_W(" "))+arg);
+							TVPShellExecute( exepath, arg );
+						}
+					}
+				}
+			} catch(...) {
+			}
+		}
+#endif
 		TVPTerminateSync(1);
 	}
 }
