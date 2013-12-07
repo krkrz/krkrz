@@ -192,7 +192,7 @@ ttstr TVPGetOSName()
 //---------------------------------------------------------------------------
 // TVPShellExecute
 //---------------------------------------------------------------------------
-static bool TVPShellExecute(const ttstr &target, const ttstr &param)
+bool TVPShellExecute(const ttstr &target, const ttstr &param)
 {
 	// open or execute target file
 //	ttstr file = TVPGetNativeName(TVPNormalizeStorageName(target));
