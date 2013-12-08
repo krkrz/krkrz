@@ -407,7 +407,8 @@ HRESULT tTVPWindow::CreateWnd( const std::wstring& classname, const std::wstring
 		int value= ::GetSystemMetrics( SM_DIGITIZER );
 		if( (value & (NID_MULTI_INPUT|NID_READY)) == (NID_MULTI_INPUT|NID_READY) ) {
 			// マルチタッチサポート & 準備できている
-			BOOL ret = procRegisterTouchWindow( window_handle_, 0/*TWF_WANTPALM|TWF_FINETOUCH*/ );
+			//BOOL ret = procRegisterTouchWindow( window_handle_, 0/*TWF_WANTPALM|TWF_FINETOUCH*/ );
+			procRegisterTouchWindow( window_handle_, TWF_WANTPALM|TWF_FINETOUCH );
 		}
 	}
 	return S_OK;
