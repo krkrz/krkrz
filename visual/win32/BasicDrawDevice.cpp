@@ -535,7 +535,21 @@ void TJS_INTF_METHOD tTVPBasicDrawDevice::Show()
 
 	ShouldShow = false;
 
-	HRESULT hr;
+	HRESULT hr = D3D_OK;
+	RECT client;
+	if( ::GetClientRect( TargetWindow, &client ) ) {
+		RECT drect;
+		drect.left   = 0;
+		drect.top    = 0;
+		drect.right  = client.right - client.left;
+		drect.bottom = client.bottom - client.top;
+
+		RECT srect = drect;
+		hr = Direct3DDevice->Present( &srect, &drect, TargetWindow, NULL );
+	} else {
+		ShouldShow = true;
+	}
+#if 0
 	if( DestRect.left != 0 || DestRect.top != 0 ) {
 		hr = Direct3DDevice->Present( NULL, NULL, TargetWindow, NULL );
 	} else {
@@ -553,7 +567,7 @@ void TJS_INTF_METHOD tTVPBasicDrawDevice::Show()
 
 		hr = Direct3DDevice->Present( &srect, &drect, TargetWindow, NULL );
 	}
-
+#endif
 	if(hr == D3DERR_DEVICELOST) {
 		if( IsTargetWindowActive() ) ErrorToLog( hr );
 		TryRecreateWhenDeviceLost();
