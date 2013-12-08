@@ -515,9 +515,15 @@ void TTVPWindowForm::SetDrawDeviceDestRect()
 	if( GetFullScreenMode() ) {
 		destrect = FullScreenDestRect;
 	} else {
-		GetClientRect( destrect );
+		//GetClientRect( destrect );
+		tjs_int w = MulDiv(LayerWidth,  ActualZoomNumer, ActualZoomDenom);
+		tjs_int h = MulDiv(LayerHeight, ActualZoomNumer, ActualZoomDenom);
+		if( w < 1 ) w = 1;
+		if( h < 1 ) h = 1;
+		destrect.left = destrect.top = 0;
+		destrect.right = w;
+		destrect.bottom = h;
 	}
-	//GetClientRect( destrect );
 
 	if( LastSentDrawDeviceDestRect != destrect ) {
 		if( TJSNativeInstance ) TJSNativeInstance->GetDrawDevice()->SetDestRectangle(destrect);
@@ -645,12 +651,13 @@ void TTVPWindowForm::SetMouseCursorToWindow( MouseCursor& cursor ) {
 void TTVPWindowForm::InternalSetPaintBoxSize() {
 	//tjs_int l = MulDiv(LayerLeft,   ActualZoomNumer, ActualZoomDenom);
 	//tjs_int t = MulDiv(LayerTop,    ActualZoomNumer, ActualZoomDenom);
+	/*
 	tjs_int w = MulDiv(LayerWidth,  ActualZoomNumer, ActualZoomDenom);
 	tjs_int h = MulDiv(LayerHeight, ActualZoomNumer, ActualZoomDenom);
 	if( w < 1 ) w = 1;
 	if( h < 1 ) h = 1;
-	//PaintBox->SetBounds(l, t, w, h);
-	SetInnerSize( w, h );
+	*/
+	//SetInnerSize( w, h );
 	SetDrawDeviceDestRect();
 }
 void TTVPWindowForm::AdjustNumerAndDenom(tjs_int &n, tjs_int &d){
