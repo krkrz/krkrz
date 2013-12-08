@@ -59,8 +59,8 @@ bool tTVPDrawDevice::TransformToPrimaryLayerManager(tjs_int &x, tjs_int &y)
 	// x , y は DestRect の 0, 0 を原点とした座標として渡されてきている
 	tjs_int w = DestRect.get_width();
 	tjs_int h = DestRect.get_height();
-	x = w ? ((x-DestRect.left) * pl_w / w) : 0;
-	y = h ? ((y-DestRect.top) * pl_h / h) : 0;
+	x = w ? (x * pl_w / w) : 0;
+	y = h ? (y * pl_h / h) : 0;
 
 	return true;
 }
@@ -78,8 +78,8 @@ bool tTVPDrawDevice::TransformFromPrimaryLayerManager(tjs_int &x, tjs_int &y)
 	if(!manager->GetPrimaryLayerSize(pl_w, pl_h)) return false;
 
 	// x , y は DestRect の 0, 0 を原点とした座標として渡されてきている
-	x = pl_w ? (x * DestRect.get_width()  / pl_w)+DestRect.left : 0;
-	y = pl_h ? (y * DestRect.get_height() / pl_h)+DestRect.top : 0;
+	x = pl_w ? (x * DestRect.get_width()  / pl_w) : 0;
+	y = pl_h ? (y * DestRect.get_height() / pl_h) : 0;
 
 	return true;
 }
@@ -96,8 +96,8 @@ bool tTVPDrawDevice::TransformToPrimaryLayerManager(tjs_real &x, tjs_real &y)
 	if(!manager->GetPrimaryLayerSize(pl_w, pl_h)) return false;
 
 	// x , y は DestRect の 0, 0 を原点とした座標として渡されてきている
-	x = pl_w ? ((x-DestRect.left) * DestRect.get_width()  / pl_w) : 0.0;
-	y = pl_h ? ((y-DestRect.top) * DestRect.get_height() / pl_h) : 0.0;
+	x = pl_w ? (x * DestRect.get_width()  / pl_w) : 0.0;
+	y = pl_h ? (y * DestRect.get_height() / pl_h) : 0.0;
 
 	return true;
 }
