@@ -77,11 +77,10 @@ static UINT APIENTRY TVPOFNHookProc(HWND hdlg, UINT uiMsg, WPARAM wParam,
 static void TVPPushFilterPair(std::vector<std::wstring> &filters, std::wstring filter)
 {
 	int vpos = filter.find_first_of(L"|");
-	if(vpos)
+	if( vpos != std::wstring::npos )
 	{
-		//AnsiString name = filter.SubString(1, vpos - 1);
 		std::wstring name = filter.substr(0, vpos);
-		std::wstring wild = filter.c_str() + vpos;
+		std::wstring wild = filter.c_str() + vpos+1;
 		filters.push_back(name);
 		filters.push_back(wild);
 	}
@@ -112,6 +111,9 @@ bool TVPSelectFile(iTJSDispatch2 *params)
 		memset(&ofn, 0, sizeof(ofn));
 		ofn.lStructSize = sizeof(ofn);
 		ofn.hwndOwner = TVPGetModalWindowOwnerHandle();
+		if( ofn.hwndOwner == INVALID_HANDLE_VALUE ) {
+			ofn.hwndOwner = NULL;
+		}
 		ofn.hInstance = NULL;
 
 		// set application window position to current window position
