@@ -1313,41 +1313,33 @@ static std::vector<std::string> * TVPGetEmbeddedOptions()
 	if( buf == NULL ) return NULL;
 
 	std::vector<std::string> *ret = NULL;
-	const char * errmsg = NULL;
 	try {
 		ret = new std::vector<std::string>();
-		if( size < 1 ) errmsg = "too small executable size."; // too small
-
-		if(!errmsg) {
-			const char *tail = buf + size;
-			const char *start = buf;
-			while( buf < tail ) {
-				if( buf[0] == 0x0D && buf[1] == 0x0A ) {
-					ret->push_back( std::string(start,buf) );
-					start = buf + 2;
-//				} else if( buf[0] == ',' ) {
-//					ret->push_back( std::string(start,buf) );
-//					start = buf + 1;
-				} else if( buf[0] == '\0' ) {
-					ret->push_back( std::string(start,buf) );
-					start = buf + 1;
-					break;
-				}
-				buf++;
-			}
-			if( start < buf ) {
+		const char *tail = buf + size;
+		const char *start = buf;
+		while( buf < tail ) {
+			if( buf[0] == 0x0D && buf[1] == 0x0A ) {	// CR LF
 				ret->push_back( std::string(start,buf) );
+				start = buf + 2;
+				buf++;
+			} else if( buf[0] == 0x0D || buf[0] == 0x0A ) {	// CR or LF
+				ret->push_back( std::string(start,buf) );
+				start = buf + 1;
+			} else if( buf[0] == '\0' ) {
+				ret->push_back( std::string(start,buf) );
+				start = buf + 1;
+				break;
 			}
+			buf++;
+		}
+		if( start < buf ) {
+			ret->push_back( std::string(start,buf) );
 		}
 	} catch(...) {
 		if(ret) delete ret;
 		throw;
 	}
-
-	if(errmsg)
-		TVPAddImportantLog( TVPFormatMessage(TVPInfoLoadingExecutableEmbeddedOptionsFailed, errmsg) );
-	else
-		TVPAddImportantLog( (const tjs_char*)TVPInfoLoadingExecutableEmbeddedOptionsSucceeded );
+	TVPAddImportantLog( (const tjs_char*)TVPInfoLoadingExecutableEmbeddedOptionsSucceeded );
 	return ret;
 }
 //---------------------------------------------------------------------------
