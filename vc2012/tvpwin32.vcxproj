@@ -200,6 +200,7 @@
     <ClInclude Include="..\msg\svn_revision.h" />
     <ClInclude Include="..\msg\win32\MsgImpl.h" />
     <ClInclude Include="..\msg\win32\OptionsDesc.h" />
+    <ClInclude Include="..\msg\win32\ReadOptionDesc.h" />
     <ClInclude Include="..\sound\PhaseVocoderDSP.h" />
     <ClInclude Include="..\sound\PhaseVocoderFilter.h" />
     <ClInclude Include="..\sound\RingBuffer.h" />
@@ -357,6 +358,7 @@
     <ClCompile Include="..\msg\win32\MsgImpl.cpp" />
     <ClCompile Include="..\msg\win32\MsgLoad.cpp" />
     <ClCompile Include="..\msg\win32\OptionsDesc.cpp" />
+    <ClCompile Include="..\msg\win32\ReadOptionDesc.cpp" />
     <ClCompile Include="..\sound\PhaseVocoderDSP.cpp" />
     <ClCompile Include="..\sound\PhaseVocoderFilter.cpp" />
     <ClCompile Include="..\sound\SoundBufferBaseIntf.cpp" />
@@ -465,6 +467,9 @@
   <ItemGroup>
     <Image Include="small.ico" />
     <Image Include="tvpwin32.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="option_desc_ja.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
