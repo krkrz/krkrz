@@ -526,6 +526,9 @@
     <ClInclude Include="..\visual\win32\BasicDrawDevice.h">
       <Filter>visual\win32</Filter>
     </ClInclude>
+    <ClInclude Include="..\msg\win32\ReadOptionDesc.h">
+      <Filter>msg\win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\tjs2\tjs.cpp">
@@ -939,6 +942,9 @@
     <ClCompile Include="..\visual\win32\TVPSysFont.cpp">
       <Filter>visual\win32</Filter>
     </ClCompile>
+    <ClCompile Include="..\msg\win32\ReadOptionDesc.cpp">
+      <Filter>msg\win32</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="tvpwin32.rc">
@@ -952,5 +958,8 @@
     <Image Include="tvpwin32.ico">
       <Filter>リソース ファイル</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="option_desc_ja.json" />
   </ItemGroup>
 </Project>
