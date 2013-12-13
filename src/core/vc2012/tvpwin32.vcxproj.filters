@@ -529,6 +529,9 @@
     <ClInclude Include="..\msg\win32\ReadOptionDesc.h">
       <Filter>msg\win32</Filter>
     </ClInclude>
+    <ClInclude Include="..\environ\win32\ConfigFormUnit.h">
+      <Filter>environ\win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\tjs2\tjs.cpp">
@@ -944,6 +947,9 @@
     </ClCompile>
     <ClCompile Include="..\msg\win32\ReadOptionDesc.cpp">
       <Filter>msg\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\environ\win32\ConfigFormUnit.cpp">
+      <Filter>environ\win32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
