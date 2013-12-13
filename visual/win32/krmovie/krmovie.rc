@@ -1,4 +1,4 @@
-//Microsoft Developer Studio generated resource script.
+// Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
 
@@ -27,18 +27,18 @@ LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE DISCARDABLE 
+1 TEXTINCLUDE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE DISCARDABLE 
+2 TEXTINCLUDE 
 BEGIN
     "#include ""afxres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE DISCARDABLE 
+3 TEXTINCLUDE 
 BEGIN
     "\r\n"
     "\0"
@@ -47,7 +47,6 @@ END
 #endif    // APSTUDIO_INVOKED
 
 
-#ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
@@ -70,18 +69,15 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "Comments", "TVP(kirikiri) needs this dll for playing movie storages.\0"
-            VALUE "CompanyName", " \0"
-            VALUE "FileDescription", "TVP Movie Playback Support DLL\0"
-            VALUE "FileVersion", "1, 4, 0, 3\0"
-            VALUE "InternalName", "krmovie\0"
-            VALUE "LegalCopyright", "Copyright (C)2001-2009 W.Dee / T.Imoto All rights reserved.\0"
-            VALUE "LegalTrademarks", "\0"
-            VALUE "OriginalFilename", "krmovie.dll\0"
-            VALUE "PrivateBuild", "\0"
-            VALUE "ProductName", "  krmovie\0"
-            VALUE "ProductVersion", "1, 4, 0, 3\0"
-            VALUE "SpecialBuild", "\0"
+            VALUE "Comments", "TVP(kirikiri) needs this dll for playing movie storages."
+            VALUE "CompanyName", " "
+            VALUE "FileDescription", "TVP Movie Playback Support DLL"
+            VALUE "FileVersion", "1, 4, 0, 3"
+            VALUE "InternalName", "krmovie"
+            VALUE "LegalCopyright", "Copyright (C)2001-2009 W.Dee / T.Imoto All rights reserved."
+            VALUE "OriginalFilename", "krmovie.dll"
+            VALUE "ProductName", "  krmovie"
+            VALUE "ProductVersion", "1, 4, 0, 3"
         END
     END
     BLOCK "VarFileInfo"
@@ -90,7 +86,13 @@ BEGIN
     END
 END
 
-#endif    // !_MAC
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXT
+//
+
+IDR_OPTION_DESC_JSON    TEXT                    "option_desc_ja.json"
 
 #endif    // “ú–{Œê resources
 /////////////////////////////////////////////////////////////////////////////

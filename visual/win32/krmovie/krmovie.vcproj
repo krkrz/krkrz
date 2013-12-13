@@ -80,7 +80,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/COMMENT:&quot;(--has-option--)&quot;"
 				AdditionalDependencies="odbc32.lib odbccp32.lib version.lib winmm.lib strmiids.lib quartz.lib &quot;$(BASECLASSES)\Release\strmbase.lib&quot; dmoguids.lib"
 				OutputFile=".\..\..\..\..\..\bin\win32/krmovie.dll"
 				LinkIncremental="1"
@@ -179,7 +178,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/COMMENT:&quot;(--has-option--)&quot;"
 				AdditionalDependencies="odbc32.lib odbccp32.lib version.lib winmm.lib strmiids.lib quartz.lib &quot;$(BASECLASSES)\Debug\strmbasd.lib&quot; dmoguids.lib dsogg_d.lib"
 				OutputFile=".\..\..\..\..\..\bin\win32/krmovie.dll"
 				LinkIncremental="1"
@@ -488,6 +486,10 @@
 			Name="Resource Files"
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 			>
+			<File
+				RelativePath=".\option_desc_ja.json"
+				>
+			</File>
 		</Filter>
 		<File
 			RelativePath="ReadMe.txt"
