@@ -333,8 +333,6 @@ bool tTVPApplication::StartApplication( int argc, char* argv[] ) {
 	try {
 		if(TVPCheckProcessLog()) return true; // sub-process for processing object hash map log
 
-		ImageLoadThread = new tTVPAsyncImageLoader();
-
 		TVPInitScriptEngine();
 		engine_init = true;
 
@@ -348,7 +346,9 @@ bool tTVPApplication::StartApplication( int argc, char* argv[] ) {
 
 		if(TVPCheckPrintDataPath()) return true;
 		if(TVPCheckCmdDescription()) return true;
-		//if(TVPExecuteUserConfig()) return true; // userconf ÉGÉìÉWÉìê›íËãNìÆÇÕÇµÇ»Ç¢ TODO
+		if(TVPExecuteUserConfig()) return true;
+		
+		ImageLoadThread = new tTVPAsyncImageLoader();
 
 		TVPSystemInit();
 
