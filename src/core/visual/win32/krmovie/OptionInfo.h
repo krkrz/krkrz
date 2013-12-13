@@ -10,35 +10,6 @@
 
 
 //---------------------------------------------------------------------------
-// GetOptionInfoString: returns option information string for kirikiri conf.
-//---------------------------------------------------------------------------
-static inline const wchar_t * GetOptionInfoString()
-{
-	if(GetACP() == 932) // 932 = Japan
-	{
-		return
-L"デバッグ:ROTテーブルへの登録;ムービー再生時に"
-L"ROT(Running Object Table)へ登録するかどうかの設定です。"
-L"「する」を選択すると、DirectX SDK付属のGraphEditを用いて"
-L"ムービー再生トラブルの解析を行うことができます。「ポーズ」を選択すると、さらに"
-L"グラフの構築直後にメッセージボックスを表示して一時停止するようになります。|"
-L"movie_reg_rot|select,*no;いいえ,yes;はい,pause;ポーズ\n";
-	}
-	else
-	{
-		return
-		// for other languages; currently only English information is available.
-L"Debug:ROT registration;Whether to register into ROT(Running Object Table) when "
-L"playbacking movies. Choosing 'Yes' enables you to inspect the trouble related with movies, "
-L"using GraphEdit(available from DirectX SDK). 'Pause' not only enables ROT registeration, "
-L"but makes the program also displaying message-box (this interrupts the program and makes a pause) "
-L"after the graph is built.|"
-L"movie_reg_rot|select,*no;No,yes;Yes,pause;Pause\n";
-	}
-}
-
-
-//---------------------------------------------------------------------------
 // GetShouldRegisterToROT: returns whether to register the process into ROT
 //---------------------------------------------------------------------------
 static inline bool GetShouldRegisterToROT()
