@@ -42,7 +42,7 @@
 #include "Exception.h"
 #include "ApplicationSpecialPath.h"
 #include "resource.h"
-
+#include "ConfigFormUnit.h"
 
 //---------------------------------------------------------------------------
 // global data
@@ -1786,7 +1786,7 @@ static void TVPShowUserConfig(std::string orgexe)
 	delete form;
 }
 //---------------------------------------------------------------------------
-
+#endif
 
 //---------------------------------------------------------------------------
 // TVPExecuteUserConfig
@@ -1806,13 +1806,14 @@ bool TVPExecuteUserConfig()
 	if(!process) return false;
 
 	// execute user config mode
-	TVPShowUserConfig(ExePath());
+	//TVPShowUserConfig(ExePath());
+	TVPShowUserConfig();
 
 	// exit
 	return true;
 }
 //---------------------------------------------------------------------------
-#endif
+
 
 
 

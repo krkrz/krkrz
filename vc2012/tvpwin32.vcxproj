@@ -187,6 +187,7 @@
     <ClInclude Include="..\environ\win32\Application.h" />
     <ClInclude Include="..\environ\win32\ApplicationSpecialPath.h" />
     <ClInclude Include="..\environ\win32\CompatibleNativeFuncs.h" />
+    <ClInclude Include="..\environ\win32\ConfigFormUnit.h" />
     <ClInclude Include="..\environ\win32\DetectCPU.h" />
     <ClInclude Include="..\environ\win32\EmergencyExit.h" />
     <ClInclude Include="..\environ\win32\MouseCursor.h" />
@@ -345,6 +346,7 @@
     <ClCompile Include="..\base\XP3Archive.cpp" />
     <ClCompile Include="..\environ\win32\Application.cpp" />
     <ClCompile Include="..\environ\win32\CompatibleNativeFuncs.cpp" />
+    <ClCompile Include="..\environ\win32\ConfigFormUnit.cpp" />
     <ClCompile Include="..\environ\win32\DetectCPU.cpp" />
     <ClCompile Include="..\environ\win32\EmergencyExit.cpp" />
     <ClCompile Include="..\environ\win32\MouseCursor.cpp" />

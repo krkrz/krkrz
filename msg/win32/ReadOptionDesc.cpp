@@ -1,10 +1,12 @@
 
 #include "tjsCommHead.h"
 #include "picojson.h"
-
+#include "MsgIntf.h"
+#include "DebugIntf.h"
 #include "resource.h"
 #include "CharacterSet.h"
 #include "ReadOptionDesc.h"
+#include "WindowsUtil.h"
 
 class OptionDescReader {
 	static const char* CATEGORY;
@@ -167,6 +169,22 @@ bool TVPUtf8ToUtf16( std::wstring& out, const std::string& in ) {
 	}
 	return len > 0;
 }
+bool TVPUtf16ToUtf8( std::string& out, const std::wstring& in ) {
+	tjs_int len = TVPWideCharToUtf8String( in.c_str(), NULL );
+	if( len < 0 ) return false;
+	char* buf = new char[len];
+	if( buf ) {
+		try {
+			len = TVPWideCharToUtf8String( in.c_str(), buf );
+			if( len > 0 ) out.assign( buf, len );
+			delete[] buf;
+		} catch(...) {
+			delete[] buf;
+			throw;
+		}
+	}
+	return len > 0;
+}
 tTVPCommandOptionList* ParseCommandDesc( const char *buf, unsigned int size ) {
 	if( buf == NULL || size <= 0 ) return NULL;
 
@@ -174,20 +192,40 @@ tTVPCommandOptionList* ParseCommandDesc( const char *buf, unsigned int size ) {
 	std::string errorstr;
 	picojson::parse( v, buf, buf+size, &errorstr );
 	if( errorstr.empty() != true ) {
+		std::wstring errmessage;
+		if( TVPUtf8ToUtf16( errmessage, errorstr ) ) 	
+			TVPAddImportantLog( errmessage.c_str() );
 		return NULL;
 	}
 	OptionDescReader reader;
 	tTVPCommandOptionList* opt = reader.Parse( v );
 	return opt;
 }
+extern "C" {
+static BOOL CALLBACK EnumResTypeProc( HMODULE hModule, LPTSTR lpszType, LONG_PTR lParam ) {
+	if( !IS_INTRESOURCE(lpszType) ) {
+		OutputDebugString( lpszType );
+	}
+	return TRUE;
+}
+static BOOL CALLBACK TVPEnumResNameProc( HMODULE hModule, LPCTSTR lpszType, LPTSTR lpszName, LONG_PTR lParam ) {
+	if( !IS_INTRESOURCE(lpszName) ) {
+		OutputDebugString( lpszName );
+	}
+	return TRUE;
+}
+};
 tTVPCommandOptionList* TVPGetPluginCommandDesc( const wchar_t* name ) {
-	HMODULE hModule = ::LoadLibrary( name );
+	HMODULE hModule = ::LoadLibraryEx( name, NULL, LOAD_LIBRARY_AS_DATAFILE );
 	if( hModule == NULL ) return NULL;
 	const char *buf = NULL;
 	unsigned int size = 0;
 	tTVPCommandOptionList* ret = NULL;
 	try {
-		HRSRC hRsrc = ::FindResource(NULL, TEXT("IDR_OPTION_DESC_JSON"), TEXT("TEXT"));
+		//BOOL typeret = ::EnumResourceTypes( hModule, (ENUMRESTYPEPROC)EnumResTypeProc,  NULL );
+		//BOOL resret = ::EnumResourceNames( hModule, L"TEXT", (ENUMRESNAMEPROC)TVPEnumResNameProc, NULL );
+
+		HRSRC hRsrc = ::FindResource(hModule, L"IDR_OPTION_DESC_JSON", L"TEXT" );
 		if( hRsrc != NULL ) {
 			size = ::SizeofResource( hModule, hRsrc );
 			HGLOBAL hGlobal = ::LoadResource( hModule, hRsrc );
@@ -195,7 +233,7 @@ tTVPCommandOptionList* TVPGetPluginCommandDesc( const wchar_t* name ) {
 				buf = reinterpret_cast<const char*>(::LockResource(hGlobal));
 			}
 		}
-		tTVPCommandOptionList* ret = ParseCommandDesc( buf, size );
+		ret = ParseCommandDesc( buf, size );
 	} catch(...) {
 		::FreeLibrary( hModule );
 		throw;
@@ -208,7 +246,7 @@ tTVPCommandOptionList* TVPGetEngineCommandDesc() {
 	if( hModule == NULL ) return NULL;
 	const char *buf = NULL;
 	unsigned int size = 0;
-	HRSRC hRsrc = ::FindResource(NULL, MAKEINTRESOURCE(IDR_OPTION_DESC_JSON), TEXT("TEXT"));
+	HRSRC hRsrc = ::FindResource(hModule, MAKEINTRESOURCE(IDR_OPTION_DESC_JSON), TEXT("TEXT"));
 	if( hRsrc != NULL ) {
 		size = ::SizeofResource( hModule, hRsrc );
 		HGLOBAL hGlobal = ::LoadResource( hModule, hRsrc );
@@ -217,4 +255,34 @@ tTVPCommandOptionList* TVPGetEngineCommandDesc() {
 		}
 	}
 	return ParseCommandDesc( buf, size );
+}
+
+void TVPMargeCommandDesc( tTVPCommandOptionList& dest, const tTVPCommandOptionList& src ) {
+	tjs_uint count = src.Categories.size();
+	std::vector<tjs_uint> addcat;
+	addcat.reserve( count );
+	for( tjs_uint i = 0; i < count; i++ ) {
+		const tTVPCommandOptionCategory& srccat = src.Categories[i];
+		tjs_uint dcnt = dest.Categories.size();
+		bool found = false;
+		for( tjs_uint j = 0; j < dcnt; j++ ) {
+			tTVPCommandOptionCategory& dstcat = dest.Categories[j];
+			if( dstcat.Name == srccat.Name ) {
+				found = true;
+				tjs_uint optcount = srccat.Options.size();
+				dstcat.Options.reserve( dstcat.Options.size() + optcount );
+				for( tjs_uint k = 0; k < optcount; k++ ) {
+					dstcat.Options.push_back( srccat.Options[k] );
+				}
+				break;
+			}
+		}
+		if( found == false ) {
+			addcat.push_back( i );
+		}
+	}
+	for( std::vector<tjs_uint>::const_iterator i = addcat.begin(); i != addcat.end(); i++ ) {
+		tjs_uint idx = *i;
+		dest.Categories.push_back( src.Categories[idx] );
+	}
 }
