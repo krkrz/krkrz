@@ -15,6 +15,8 @@
 #include "PluginImpl.h"
 
 #include "Application.h"
+#include "CharacterSet.h"
+#include "resource.h"
 
 //---------------------------------------------------------------------------
 // version retrieving
@@ -36,5 +38,66 @@ void TVPGetVersion(void)
 	}
 }
 //---------------------------------------------------------------------------
+// about string retrieving
+//---------------------------------------------------------------------------
+extern const tjs_char* TVPCompileDate;
+extern const tjs_char* TVPCompileTime;
+ttstr TVPReadAboutStringFromResource() {
+	HMODULE hModule = ::GetModuleHandle(NULL);
+	const char *buf = NULL;
+	unsigned int size = 0;
+	HRSRC hRsrc = ::FindResource(NULL, MAKEINTRESOURCE(IDR_LICENSE_TEXT), TEXT("TEXT"));
+	if( hRsrc != NULL ) {
+		size = ::SizeofResource( hModule, hRsrc );
+		HGLOBAL hGlobal = ::LoadResource( hModule, hRsrc );
+		if( hGlobal != NULL ) {
+			buf = reinterpret_cast<const char*>(::LockResource(hGlobal));
+		}
+	}
+	if( buf == NULL ) ttstr(L"Resource Read Error.");
 
+	// UTF-8 to UTF-16
+	size_t len = TVPUtf8ToWideCharString( buf, NULL );
+	if( len < 0 ) return ttstr(L"Resource Read Error.");
+	wchar_t* tmp = new wchar_t[len+1];
+	ttstr ret;
+	if( tmp ) {
+		try {
+			len = TVPUtf8ToWideCharString( buf, tmp );
+		} catch(...) {
+			delete[] tmp;
+			throw;
+		}
+		tmp[len] = 0;
+
+		size_t datelen = TJS_strlen( TVPCompileDate );
+		size_t timelen = TJS_strlen( TVPCompileTime );
+
+		// CR to CR-LF, %DATE% and %TIME% to compile data and time
+		std::vector<wchar_t> tmp2;
+		tmp2.reserve( len * 2 + datelen + timelen );
+		for( size_t i = 0; i < len; i++ ) {
+			if( tmp[i] == '%' && (i+6) < len && tmp[i+1] == 'D' && tmp[i+2] == 'A' && tmp[i+3] == 'T' && tmp[i+4] == 'E' && tmp[i+5] == '%' ) {
+				for( size_t j = 0; j < datelen; j++ ) {
+					tmp2.push_back( TVPCompileDate[j] );
+				}
+				i += 5;
+			} else if( tmp[i] == '%' && (i+6) < len && tmp[i+1] == 'T' && tmp[i+2] == 'I' && tmp[i+3] == 'M' && tmp[i+4] == 'E' && tmp[i+5] == '%' ) {
+				for( size_t j = 0; j < timelen; j++ ) {
+					tmp2.push_back( TVPCompileTime[j] );
+				}
+				i += 5;
+			} else if( tmp[i] != L'\n' ) {
+				tmp2.push_back( tmp[i] );
+			} else {
+				tmp2.push_back( L'\r' );
+				tmp2.push_back( L'\n' );
+			}
+		}
+		tmp2.push_back( 0 );
+		ret = ttstr( &(tmp2[0]) );
+		delete[] tmp;
+	}
+	return ret;
+}
 

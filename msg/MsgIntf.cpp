@@ -153,12 +153,13 @@ tjs_int TVPVersionBuild;
 
 #define WIDEN2(x) L ## x
 #define WIDEN(x) WIDEN2(x)
-static const tjs_char* TVPCompileDate = WIDEN(__DATE__);
-static const tjs_char* TVPCompileTime = WIDEN(__TIME__);
+const tjs_char* TVPCompileDate = WIDEN(__DATE__);
+const tjs_char* TVPCompileTime = WIDEN(__TIME__);
 
 //---------------------------------------------------------------------------
 // version information related functions
 //---------------------------------------------------------------------------
+extern ttstr TVPReadAboutStringFromResource();
 ttstr TVPGetAboutString(void)
 {
 	TVPGetVersion();
@@ -171,8 +172,7 @@ ttstr TVPGetAboutString(void)
 	TJS_snprintf(tjsverstr, sizeof(tjsverstr)/sizeof(tjs_char), TJS_W("%d.%d.%d"),
 		TJSVersionMajor, TJSVersionMinor, TJSVersionRelease);
 
-	return TVPFormatMessage(TVPAboutString, verstr, tjsverstr) +
-        TVPGetImportantLog();
+	return TVPFormatMessage(TVPReadAboutStringFromResource().c_str(), verstr, tjsverstr) + TVPGetImportantLog();
 }
 //---------------------------------------------------------------------------
 ttstr TVPGetVersionInformation(void)
