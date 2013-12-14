@@ -200,7 +200,6 @@
     <ClInclude Include="..\msg\MsgIntf.h" />
     <ClInclude Include="..\msg\svn_revision.h" />
     <ClInclude Include="..\msg\win32\MsgImpl.h" />
-    <ClInclude Include="..\msg\win32\OptionsDesc.h" />
     <ClInclude Include="..\msg\win32\ReadOptionDesc.h" />
     <ClInclude Include="..\sound\PhaseVocoderDSP.h" />
     <ClInclude Include="..\sound\PhaseVocoderFilter.h" />
@@ -359,7 +358,6 @@
     <ClCompile Include="..\msg\MsgIntf.cpp" />
     <ClCompile Include="..\msg\win32\MsgImpl.cpp" />
     <ClCompile Include="..\msg\win32\MsgLoad.cpp" />
-    <ClCompile Include="..\msg\win32\OptionsDesc.cpp" />
     <ClCompile Include="..\msg\win32\ReadOptionDesc.cpp" />
     <ClCompile Include="..\sound\PhaseVocoderDSP.cpp" />
     <ClCompile Include="..\sound\PhaseVocoderFilter.cpp" />
