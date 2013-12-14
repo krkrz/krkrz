@@ -1487,12 +1487,14 @@ void TTVPWindowForm::FreeDirectInputDevice() {
 void TTVPWindowForm::OnKeyDown( WORD vk, int shift, int repeat, bool prevkeystate ) {
 	if(TJSNativeInstance) {
 		tjs_uint32 s = TVP_TShiftState_To_uint32( shift );
+		s |= GetMouseButtonState();
 		if( prevkeystate && repeat > 0 ) s |= TVP_SS_REPEAT;
 		InternalKeyDown( vk, s );
 	}
 }
 void TTVPWindowForm::OnKeyUp( WORD vk, int shift ) {
 	tjs_uint32 s = TVP_TShiftState_To_uint32(shift);
+	s |= GetMouseButtonState();
 	InternalKeyUp(vk, s );
 }
 void TTVPWindowForm::OnKeyPress( WORD vk, int repeat, bool prevkeystate, bool convertkey ) {
@@ -1611,6 +1613,7 @@ void TTVPWindowForm::OnMouseMove( int shift, int x, int y ) {
 	TranslateWindowToDrawArea(x, y);
 	if( TJSNativeInstance ) {
 		tjs_uint32 s = TVP_TShiftState_To_uint32(shift);
+		s |= GetMouseButtonState();
 		TVPPostInputEvent( new tTVPOnMouseMoveInputEvent(TJSNativeInstance, x, y, s), TVP_EPT_DISCARDABLE );
 	}
 
@@ -1633,6 +1636,7 @@ void TTVPWindowForm::OnMouseDown( int button, int shift, int x, int y ) {
 
 	if(TJSNativeInstance) {
 		tjs_uint32 s = TVP_TShiftState_To_uint32(shift);
+		s |= GetMouseButtonState();
 		tTVPMouseButton b = TVP_TMouseButton_To_tTVPMouseButton(button);
 		TVPPostInputEvent( new tTVPOnMouseDownInputEvent(TJSNativeInstance, x, y, b, s));
 	}
@@ -1642,6 +1646,7 @@ void TTVPWindowForm::OnMouseUp( int button, int shift, int x, int y ) {
 	ReleaseMouseCapture();
 	if(TJSNativeInstance) {
 		tjs_uint32 s = TVP_TShiftState_To_uint32(shift);
+		s |= GetMouseButtonState();
 		tTVPMouseButton b = TVP_TMouseButton_To_tTVPMouseButton(button);
 		TVPPostInputEvent( new tTVPOnMouseUpInputEvent(TJSNativeInstance, x, y, b, s));
 	}
@@ -1664,7 +1669,8 @@ void TTVPWindowForm::OnMouseWheel( int delta, int shift, int x, int y ) {
 		// wheel
 		if( TJSNativeInstance ) {
 			tjs_uint32 s = TVP_TShiftState_To_uint32(shift);
-			TVPPostInputEvent(new tTVPOnMouseWheelInputEvent(TJSNativeInstance, shift, delta, x, y));
+			s |= GetMouseButtonState();
+			TVPPostInputEvent(new tTVPOnMouseWheelInputEvent(TJSNativeInstance, s, delta, x, y));
 		}
 	}
 }

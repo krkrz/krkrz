@@ -6,7 +6,7 @@
 #include <shellapi.h>
 #include <oleidl.h> // for MK_ALT
 #include "tvpinputdefs.h"
-
+#include "SystemImpl.h"
 #include "ImeControl.h"
 
 #ifndef MK_ALT 
@@ -14,9 +14,14 @@
 #endif
 
 enum {
-	 ssShift = (1<<0),
-	 ssAlt=(1<<1),
-	 ssCtrl=(1<<2),
+	 ssShift = TVP_SS_SHIFT,
+	 ssAlt = TVP_SS_ALT,
+	 ssCtrl = TVP_SS_CTRL,
+	 ssLeft = TVP_SS_LEFT,
+	 ssRight = TVP_SS_RIGHT,
+	 ssMiddle = TVP_SS_MIDDLE,
+	 ssDouble = TVP_SS_DOUBLE,
+	 ssRepeat = TVP_SS_REPEAT,
 };
 
 class tTVPWindow {
@@ -106,6 +111,13 @@ protected:
 		if( ::GetKeyState( VK_SHIFT ) < 0 ) shift |= MK_SHIFT;
 		if( ::GetKeyState( VK_CONTROL ) < 0 ) shift |= MK_CONTROL;
 		return shift;
+	}
+	inline int GetMouseButtonState() const {
+		int s = 0;
+		if(TVPGetAsyncKeyState(VK_LBUTTON)) s |= ssLeft;
+		if(TVPGetAsyncKeyState(VK_RBUTTON)) s |= ssRight;
+		if(TVPGetAsyncKeyState(VK_MBUTTON)) s |= ssMiddle;
+		return s;
 	}
 	
 	void SetMouseCapture() {
