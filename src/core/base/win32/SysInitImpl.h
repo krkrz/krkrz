@@ -20,7 +20,6 @@ extern std::wstring TVPNativeProjectDir;
 extern std::wstring TVPNativeDataPath;
 
 extern bool TVPProjectDirSelected;
-extern bool TVPCheckCmdDescription(void);
 extern void TVPEnsureDataPathDirectory();
 
 
