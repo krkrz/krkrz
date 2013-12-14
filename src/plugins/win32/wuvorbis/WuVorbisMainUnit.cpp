@@ -645,49 +645,6 @@ extern "C" __declspec(dllexport) HRESULT _stdcall V2Unlink()
 	return S_OK;
 }
 //---------------------------------------------------------------------------
-extern "C" __declspec(dllexport) const wchar_t * _stdcall GetOptionDesc()
-{
-	if(GetACP() == 932) // 932 == Japan
-	{
-		return 
-L"OggVorbisデコーダ:ゲイン;OggVorbis デコーダの音量(ゲイン)の設定です。|"
-L"vorbis_gain|select,"
-L"*0;0dB,-0.1;-0.1dB,-0.2;-0.2dB,-0.3;-0.3dB,-0.4;-0.4dB,-0.5;-0.5dB,"
-L"-0.6;-0.6dB,-0.7;-0.7dB,-0.8;-0.8dB,-0.9;-0.9dB,-1;-1dB,-1.1;-1.1dB,"
-L"-1.2;-1.2dB,-1.3;-1.3dB,-1.4;-1.4dB,-1.5;-1.5dB,-1.6;-1.6dB,"
-L"-1.7;-1.7dB,-1.8;-1.8dB,-1.9;-1.9dB,-2;-2dB,-3;-3dB,-4;"
-L"-4dB,-5;-5dB,-6;-6dB,-7;-7dB,-8;-8dB,-9;-9dB,-10;-10dB\n"
-L"OggVorbisデコーダ:出力形式;OggVorbis デコーダが出力する PCM 形式の設定です。|"
-L"vorbis_pcm_format|select,*i16;16bit 整数 PCM,f32;32bit 浮動小数点数 PCM\n"
-L"OggVorbisデコーダ:ReplayGain;ReplayGainに対応するかどうかの設定です。|"
-L"vorbis_rg|select,none;対応しない,album;Album Gain を見る,*track;Track Gain を見る\n"
-/*
-L"OggVorbisデコーダ:音質;OggVorbisデコーダの音質設定です。「低い」を選択すると「通常」よりも再生の品質は低くなりますが、"
-L"OggVorbisのデコードに関するCPUへの負担が軽くなります。|"
-L"vorbis_quality,*normal;通常,low;低い\n"*/;
-	}
-	else
-	{
-		return
-L"OggVorbis decoder:Gain;Specify default gain for OggVorbis decoder.|"
-L"vorbis_gain|select,"
-L"*0;0dB,-0.1;-0.1dB,-0.2;-0.2dB,-0.3;-0.3dB,-0.4;-0.4dB,-0.5;-0.5dB,"
-L"-0.6;-0.6dB,-0.7;-0.7dB,-0.8;-0.8dB,-0.9;-0.9dB,-1;-1dB,-1.1;-1.1dB,"
-L"-1.2;-1.2dB,-1.3;-1.3dB,-1.4;-1.4dB,-1.5;-1.5dB,-1.6;-1.6dB,"
-L"-1.7;-1.7dB,-1.8;-1.8dB,-1.9;-1.9dB,-2;-2dB,-3;-3dB,-4;"
-L"-4dB,-5;-5dB,-6;-6dB,-7;-7dB,-8;-8dB,-9;-9dB,-10;-10dB\n"
-L"OggVorbis decoder:Output format;Specify PCM format that the OggVorbis decoder outputs.|"
-L"vorbis_pcm_format|select,*i16;16bit integer PCM,f32;32bit floating-point PCM\n"
-L"OggVorbis decoder:ReplayGain;Whether to apply ReplayGain tag information.|"
-L"vorbis_rg|select,none;Ignore,album;Apply Album Gain,*track;Apply Track Gain\n"
-/*
-L"OggVorbis decoder:Quality;Quality setting for the OggVorbis decoder. "
-L"\"Low\" performs faster speed and lower CPU usage than \"Normal\", but the sound quality will be degraded.|"
-L"vorbis_quality,*normal;Normal,low;Low\n"*/;
-	}
-}
-//---------------------------------------------------------------------------
-
 
 //---------------------------------------------------------------------------
 // ##########################################################################

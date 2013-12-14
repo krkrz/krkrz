@@ -1,0 +1,68 @@
+[
+	{
+		"category":"OggVorbisデコーダ",
+		"options":[
+			{
+				"caption":"ゲイン",
+				"description":"OggVorbis デコーダの音量(ゲイン)の設定です。",
+				"name":"vorbis_gain",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"0", "desc":"0dB", "default":true },
+					{ "value":"-0.1", "desc":"-0.1dB" },
+					{ "value":"-0.2", "desc":"-0.2dB" },
+					{ "value":"-0.3", "desc":"-0.3dB" },
+					{ "value":"-0.4", "desc":"-0.4dB" },
+					{ "value":"-0.5", "desc":"-0.5dB" },
+					{ "value":"-0.6", "desc":"-0.6dB" },
+					{ "value":"-0.7", "desc":"-0.7dB" },
+					{ "value":"-0.8", "desc":"-0.8dB" },
+					{ "value":"-0.9", "desc":"-0.9dB" },
+					{ "value":"-1", "desc":"-1dB" },
+					{ "value":"-1.1", "desc":"-1.1dB" },
+					{ "value":"-1.2", "desc":"-1.2dB" },
+					{ "value":"-1.3", "desc":"-1.3dB" },
+					{ "value":"-1.4", "desc":"-1.4dB" },
+					{ "value":"-1.5", "desc":"-1.5dB" },
+					{ "value":"-1.6", "desc":"-1.6dB" },
+					{ "value":"-1.7", "desc":"-1.7dB" },
+					{ "value":"-1.8", "desc":"-1.8dB" },
+					{ "value":"-1.9", "desc":"-1.9dB" },
+					{ "value":"-2", "desc":"-2dB" },
+					{ "value":"-3", "desc":"-3dB" },
+					{ "value":"-4", "desc":"-4dB" },
+					{ "value":"-5", "desc":"-5dB" },
+					{ "value":"-6", "desc":"-6dB" },
+					{ "value":"-7", "desc":"-7dB" },
+					{ "value":"-8", "desc":"-8dB" },
+					{ "value":"-9", "desc":"-9dB" },
+					{ "value":"-10", "desc":"-10dB" }
+				]
+			},
+			{
+				"caption":"出力形式",
+				"description":"OggVorbis デコーダが出力する PCM 形式の設定です。",
+				"name":"vorbis_pcm_format",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"i16", "desc":"16bit 整数 PCM", "default":true },
+					{ "value":"f32", "desc":"32bit 浮動小数点数 PCM" }
+				]
+			},
+			{
+				"caption":"ReplayGain",
+				"description":"ReplayGainに対応するかどうかの設定です。",
+				"name":"vorbis_rg",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"none", "desc":"対応しない" },
+					{ "value":"album", "desc":"Album Gain を見る" },
+					{ "value":"track", "desc":"Track Gain を見る", "default":true }
+				]
+			}
+		]
+	}
+]

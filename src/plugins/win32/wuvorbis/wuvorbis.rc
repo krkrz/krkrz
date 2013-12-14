@@ -90,6 +90,14 @@ BEGIN
     END
 END
 
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXT
+//
+
+IDR_OPTION_DESC_JSON    TEXT                    "option_desc_ja.json"
+
 #endif    // !_MAC
 
 #endif    // “ú–{Œê resources

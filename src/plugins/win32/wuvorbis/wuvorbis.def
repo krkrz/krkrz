@@ -2,7 +2,6 @@ EXPORTS
 	GetModuleInstance
 	V2Link
 	V2Unlink
-	GetOptionDesc
 	Query_sizeof_OggVorbis_File
 	wu_ov_clear
 	wu_ov_open_callbacks
