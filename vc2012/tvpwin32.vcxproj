@@ -229,7 +229,6 @@
     <ClInclude Include="..\tjs2\tjsDictionary.h" />
     <ClInclude Include="..\tjs2\tjsError.h" />
     <ClInclude Include="..\tjs2\tjsErrorDefs.h" />
-    <ClInclude Include="..\tjs2\tjsError_jp.h" />
     <ClInclude Include="..\tjs2\tjsException.h" />
     <ClInclude Include="..\tjs2\tjsGlobalStringMap.h" />
     <ClInclude Include="..\tjs2\tjsHashSearch.h" />
