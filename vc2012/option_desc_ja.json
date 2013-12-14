@@ -81,6 +81,33 @@
 					{ "value":"no", "desc":"しない", "default":true },
 					{ "value":"yes", "desc":"する" }
 				]
+			},
+			{
+				"caption":"起動スクリプト",
+				"description":"最初に実行するスクリプトファイル名を指定します。",
+				"name":"startup",
+				"type":"string",
+				"length":255,
+				"user":false,
+				"value":"startup.tjs"
+			},
+			{
+				"caption":"例外時起動エディタ",
+				"description":"例外発生時に起動するエディタを指定します。",
+				"name":"exceptionexe",
+				"type":"string",
+				"length":255,
+				"user":false,
+				"value":"notepad.exe"
+			},
+			{
+				"caption":"例外時起動エディタオプション",
+				"description":"例外発生時にエディタを起動する時に指定するオプションを指定します。\n\n%filepath% はファイルパスに、%line%は行番号に変換されます。",
+				"name":"exceptionarg",
+				"type":"string",
+				"length":255,
+				"user":false,
+				"value":"%filepath%"
 			}
 		]
 	},
@@ -171,17 +198,6 @@
 	{
 		"category":"サウンド",
 		"options":[
-			{
-				"caption":"CD-DA 音量制御方法",
-				"description":"CD-DA 音量制御方式の設定です。\n\nフェードアウトなど、CD の音量制御がうまくいかない場合は別の設定にしてみてください。",
-				"name":"cdvol",
-				"type":"select",
-				"user":true,
-				"values":[
-					{ "value":"mixer", "desc":"サウンドカードミキサ", "default":true },
-					{ "value":"direct", "desc":"CD-ROMドライブ直接制御" }
-				]
-			},
 			{
 				"caption":"PCM デコードスレッド優先順位",
 				"description":"PCMのデコードを行うスレッドの実行優先順位です。\n\n再生中に音飛びをする場合に優先順位を高くしてみてください。",
@@ -538,40 +554,16 @@
 				]
 			},
 			{
-				"caption":"フルスクリーン切り替え方法",
-				"description":"フルスクリーン切り替えに用いる方法の設定です。\n\n設定を変えるとフルスクリーン切り替えに関する問題が改善される場合があります。",
-				"name":"fsmethod",
-				"type":"select",
-				"user":true,
-				"values":[
-					{ "value":"ddraw", "desc":"DirectDraw", "default":true },
-					{ "value":"cds", "desc":"ChangeDisplaySettings API" }
-				]
-			},
-			{
-				"caption":"フルスクリーン時のカラーモード",
-				"description":"フルスクリーン時のカラーモードの設定です。\n\n「変えない」を選択すると非フルスクリーン時のカラーモードと同じになります。",
-				"name":"fsbpp",
-				"type":"select",
-				"user":true,
-				"values":[
-					{ "value":"nochange", "desc":"変えない", "default":true },
-					{ "value":"16", "desc":"16bitカラー" },
-					{ "value":"24", "desc":"24bitカラー" },
-					{ "value":"32", "desc":"32bitカラー" }
-				]
-			},
-			{
 				"caption":"フルスクリーン時の画面解像度",
 				"description":"フルスクリーン時の画面解像度の設定です。\n\n「自動」を選択すると、最も適している画面解像度を自動的に選択して使用します。この場合は、縦横比が同じ解像度のうち、プログラム内で指定されている解像度にフィットする解像度があればそれを選択しますが、そのような解像度がない場合は解像度を変えずにエンジン側で拡大表示をします。この設定の場合は、「フルスクリーン時のエンジンによる拡大表示」に「しない」が指定されていても、常に「モニタ内にフィットさせる」であるとみなされます。\n\n「縦横比が同じ解像度」を選択すると、画面の縦横比が非フルスクリーン時と同じ解像度のうち、もっとも近い解像度が選択されます。\n\n「最も近い解像度」を選択すると、プログラム内で指定されている解像度に最も近い解像度が選択されますが、非フルスクリーン時と同じ縦横比の解像度が選択される保証はありません。ブラウン管モニタや、画面のアスペクト比を保ったままでの拡大表示に対応している液晶モニタなどでは、この設定が適している場合があります。\n\n「解像度を変えない」を選択すると、非フルスクリーン時の解像度のまま、解像度を変更しなくなります。",
 				"name":"fsres",
 				"type":"select",
 				"user":true,
 				"values":[
-					{ "value":"auto", "desc":"自動", "default":true },
+					{ "value":"auto", "desc":"自動" },
 					{ "value":"proportional", "desc":"縦横比が同じ解像度" },
 					{ "value":"nearest", "desc":"最も近い解像度" },
-					{ "value":"nochange", "desc":"解像度を変えない" }
+					{ "value":"nochange", "desc":"解像度を変えない", "default":true }
 				]
 			},
 			{
@@ -608,19 +600,6 @@
 				"values":[
 					{ "value":"no", "desc":"使用しない", "default":true },
 					{ "value":"yes", "desc":"行う" }
-				]
-			},
-			{
-				"caption":"ダブルバッファリング方式",
-				"description":"ダブルバッファリングを行うかどうかの設定です。\n\n「自動」を選択すると、DirectDrawあるいはDirect3Dのどちらかパフォーマンスの良い方を自動的に選択します。\n\n「GDIを使用」や「DirectDrawを使用」や「Direct3Dを使用」は、他の設定では問題が発生する場合に選択してください。",
-				"name":"dbstyle",
-				"type":"select",
-				"user":true,
-				"values":[
-					{ "value":"auto", "desc":"自動", "default":true },
-					{ "value":"gdi", "desc":"GDIを使用" },
-					{ "value":"ddraw", "desc":"DirectDrawを使用" },
-					{ "value":"d3d", "desc":"Direct3Dを使用" }
 				]
 			},
 			{
@@ -827,83 +806,6 @@
 		]
 	},
 	{
-		"category":"ホットキー",
-		"options":[
-			{
-				"caption":"コントローラ",
-				"description":"「コントローラ」を表示するためのホットキーを指定してください。",
-				"name":"hkcontroller",
-				"type":"string",
-				"length":30,
-				"user":false,
-				"value":"Shift+F1"
-			},
-			{
-				"caption":"スクリプトエディタ",
-				"description":"「スクリプトエディタ」を表示するためのホットキーを指定してください。",
-				"name":"hkeditor",
-				"type":"string",
-				"length":30,
-				"user":false,
-				"value":"Shift+F2"
-			},
-			{
-				"caption":"監視式",
-				"description":"「監視式」を表示するためのホットキーを指定してください。",
-				"name":"hkwatch",
-				"type":"string",
-				"length":30,
-				"user":false,
-				"value":"Shift+F3"
-			},
-			{
-				"caption":"コンソール",
-				"description":"「コンソール」を表示するためのホットキーを指定してください。",
-				"name":"hkconsole",
-				"type":"string",
-				"length":30,
-				"user":false,
-				"value":"Shift+F4"
-			},
-			{
-				"caption":"環境情報のコピー",
-				"description":"環境情報をクリップボードにコピーするためのホットキーを指定してください。",
-				"name":"hkclipenvinfo",
-				"type":"string",
-				"length":30,
-				"user":false,
-				"value":"Ctrl+F11"
-			},
-			{
-				"caption":"著作権情報の表示",
-				"description":"著作権情報を表示するためのホットキーを指定してください。",
-				"name":"hkabout",
-				"type":"string",
-				"length":30,
-				"user":false,
-				"value":"Ctrl+F12"
-			},
-			{
-				"caption":"更新矩形の表示",
-				"description":"レイヤの更新矩形を表示するためのホットキーを指定してください。",
-				"name":"hkupdaterect",
-				"type":"string",
-				"length":30,
-				"user":false,
-				"value":"Shift+F11"
-			},
-			{
-				"caption":"レイヤ構造のダンプ",
-				"description":"レイヤ構造をコンソールにダンプするためのホットキーを指定してください。",
-				"name":"hkdumplayer",
-				"type":"string",
-				"length":30,
-				"user":false,
-				"value":"Shift+F12"
-			}
-		]
-	},
-	{
 		"category":"システム互換性",
 		"options":[
 			{
@@ -959,6 +861,17 @@
 				"values":[
 					{ "value":"3322", "desc":"2.31 以降の動作", "default":true },
 					{ "value":"5000", "desc":"2.31 未満と互換" }
+				]
+			},
+			{
+				"caption":"スクリプト読込み文字コード",
+				"description":"スクリプトを読み込むのに使用する文字コードです。",
+				"name":"readencoding",
+				"type":"select",
+				"user":false,
+				"values":[
+					{ "value":"Shift_JIS", "desc":"Shift-JIS" },
+					{ "value":"UTF-8", "desc":"UTF-8", "default":true }
 				]
 			}
 		]
