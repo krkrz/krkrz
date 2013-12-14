@@ -103,9 +103,6 @@
     <ClInclude Include="..\tjs2\tjsError.h">
       <Filter>tjs2</Filter>
     </ClInclude>
-    <ClInclude Include="..\tjs2\tjsError_jp.h">
-      <Filter>tjs2</Filter>
-    </ClInclude>
     <ClInclude Include="..\tjs2\tjsErrorDefs.h">
       <Filter>tjs2</Filter>
     </ClInclude>
