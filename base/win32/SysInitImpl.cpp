@@ -28,7 +28,6 @@
 #include "LayerIntf.h"
 #include "Random.h"
 #include "DetectCPU.h"
-#include "OptionsDesc.h"
 #include "XP3Archive.h"
 #include "ScriptMgnIntf.h"
 #include "XP3Archive.h"
@@ -1633,46 +1632,6 @@ bool TVPCheckPrintDataPath()
 		{
 			TVPInitProgramArgumentsAndDataPath(true);
 			printf("%s\n", TVPNativeDataPath.c_str());
-
-			return true; // processed
-		}
-	}
-
-	return false;
-}
-//---------------------------------------------------------------------------
-
-
-
-
-//---------------------------------------------------------------------------
-// TVPCheckCmdDescription
-//---------------------------------------------------------------------------
-bool TVPCheckCmdDescription(void)
-{
-	// send a command description string when commandline option is "-cmddesc"
-	tjs_int i;
-	for(i=1; i<_argc; i++)
-	{
-		if(!strcmp(_argv[i], "-@cmddesc")) // this does not refer TVPGetCommandLine
-		{
-			tTJSBinaryStream* stream = TVPCreateBinaryStreamForWrite( ttstr(_argv[i+2]), TJS_W("") );
-			try
-			{
-				ttstr str = TVPGetCommandDesc();
-				stream->WriteBuffer(str.c_str(), str.GetLen()*sizeof(tjs_char));
-			}
-			catch(...)
-			{
-				delete stream;
-				throw;
-			}
-			delete stream;
-
-			HANDLE handle = ::OpenEvent(EVENT_ALL_ACCESS, FALSE, ttstr(_argv[i+3]).c_str() );
-			if(!handle) return true; // processed but errored
-			::SetEvent(handle);
-			::CloseHandle(handle);
 
 			return true; // processed
 		}

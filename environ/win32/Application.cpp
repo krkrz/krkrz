@@ -78,7 +78,6 @@ std::wstring ExePath() {
 	return std::wstring(szFull);
 }
 
-bool TVPCheckCmdDescription();
 bool TVPCheckAbout();
 bool TVPCheckPrintDataPath();
 void TVPOnError();
@@ -345,7 +344,6 @@ bool tTVPApplication::StartApplication( int argc, char* argv[] ) {
 		Initialize();
 
 		if(TVPCheckPrintDataPath()) return true;
-		if(TVPCheckCmdDescription()) return true;
 		if(TVPExecuteUserConfig()) return true;
 		
 		ImageLoadThread = new tTVPAsyncImageLoader();

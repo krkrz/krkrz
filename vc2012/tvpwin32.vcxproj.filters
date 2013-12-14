@@ -232,9 +232,6 @@
     <ClInclude Include="..\msg\win32\MsgImpl.h">
       <Filter>msg\win32</Filter>
     </ClInclude>
-    <ClInclude Include="..\msg\win32\OptionsDesc.h">
-      <Filter>msg\win32</Filter>
-    </ClInclude>
     <ClInclude Include="..\msg\MsgIntf.h">
       <Filter>msg</Filter>
     </ClInclude>
@@ -691,9 +688,6 @@
       <Filter>base</Filter>
     </ClCompile>
     <ClCompile Include="..\msg\win32\MsgImpl.cpp">
-      <Filter>msg\win32</Filter>
-    </ClCompile>
-    <ClCompile Include="..\msg\win32\OptionsDesc.cpp">
       <Filter>msg\win32</Filter>
     </ClCompile>
     <ClCompile Include="..\msg\MsgIntf.cpp">
