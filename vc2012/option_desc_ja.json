@@ -13,7 +13,7 @@
 			},
 			{
 				"caption":"処理ウェイト",
-				"description":"トランジション(画面切り替え)時などに、各処理をウェイトをかけながら特定の時間間隔で呼び出すことによりにCPUの使用を制限し、CPU使用率を低減させるかどうかの設定です。\n\n「ウェイトをかけない」を指定するとウェイトをかけずに実行するため、トランジション(画面切り替え)時にCPUを100%使い切る事になります。\n\n12〜120(Hz)の各数値を設定すると、その周期で処理を行います。数値が小さければ小さいほどCPUへの負担は小さくなりますが、動作がなめらかで無くなる可能性があります。環境によってはあまり効果がないこともありえます。\n\nこの設定は、グラフィック-垂直同期待ちが「使用する」の設定の場合は無視されます。",
+				"description":"トランジション(画面切り替え)時などに、各処理をウェイトをかけながら特定の時間間隔で呼び出すことによりにCPUの使用を制限し、CPU使用率を低減させるかどうかの設定です。\n\n「ウェイトをかけない」を指定するとウェイトをかけずに実行するため、トランジション(画面切り替え)時にCPUを100%使い切る事になります。\n\n12～120(Hz)の各数値を設定すると、その周期で処理を行います。数値が小さければ小さいほどCPUへの負担は小さくなりますが、動作がなめらかで無くなる可能性があります。環境によってはあまり効果がないこともありえます。\n\nこの設定は、グラフィック-垂直同期待ちが「使用する」の設定の場合は無視されます。",
 				"name":"contfreq",
 				"type":"select",
 				"user":true,
@@ -783,7 +783,7 @@
 				"description":"デバッグモードを有効にするかどうかの設定です。\n\n「有効」を選択すると吉里吉里はデバッグモードで動作し、いくつかのデバッグ支援機能が有効になりますが、実行速度は低下します。",
 				"name":"debug",
 				"type":"select",
-				"user":true,
+				"user":false,
 				"values":[
 					{ "value":"no", "desc":"無効", "default":true },
 					{ "value":"yes", "desc":"有効" }
@@ -794,7 +794,7 @@
 				"description":"コンソールのログをファイルに出力するかどうかの設定です。\n\n「出力する」を選択するとファイルに追加しながらログを出力します。\n\n「クリア」を選択するとファイルの内容をクリアしてからログを開始します。",
 				"name":"forcelog",
 				"type":"select",
-				"user":true,
+				"user":false,
 				"values":[
 					{ "value":"no", "desc":"出力しない", "default":true },
 					{ "value":"yes", "desc":"出力する" },
@@ -806,7 +806,7 @@
 				"description":"エラーが発生したときに、自動的にコンソールのログをファイルへ出力するかどうかの設定です。\n\n「出力する」を選択するとファイルに追加しながらログを出力します。\n\n「クリア」を選択するとファイルの内容をクリアしてからログを開始します。",
 				"name":"logerror",
 				"type":"select",
-				"user":true,
+				"user":false,
 				"values":[
 					{ "value":"no", "desc":"出力しない" },
 					{ "value":"yes", "desc":"出力する", "default":true },
@@ -818,7 +818,7 @@
 				"description":"デバッグ支援ウィンドウ(コンソール、監視式など)を有効にするかどうかの設定です。",
 				"name":"debugwin",
 				"type":"select",
-				"user":true,
+				"user":false,
 				"values":[
 					{ "value":"yes", "desc":"有効", "default":true },
 					{ "value":"no", "desc":"無効" }
@@ -911,7 +911,7 @@
 				"description":"アーカイブ名とアーカイブ内ストレージ名を区切る文字の設定です。\n\n2.19 beta 14 より、デフォルトが '#' から '>' に変更になりました。2.19 beta 14 未満を想定しているアプリケーションでは、この設定を '#' にしないと動作しない可能性があります。",
 				"name":"arcdelim",
 				"type":"select",
-				"user":true,
+				"user":false,
 				"values":[
 					{ "value":">", "desc":"'>'を使う", "default":true },
 					{ "value":"#", "desc":"'#'を使う" }
@@ -922,7 +922,7 @@
 				"description":"後置'!'演算子(eval)の動作の設定です。\n\nTJS2の後置'!'演算子は式をglobalコンテキスト上で実行していましたが、2.21 beta 9 より、this コンテキスト上で実行するようになりました。2.21 beta 9 未満を想定しているアプリケーションでは、この設定を「global上で式を評価」にしないと動作しない可能性があります。",
 				"name":"evalcontext",
 				"type":"select",
-				"user":true,
+				"user":false,
 				"values":[
 					{ "value":"this", "desc":"this上で式を評価", "default":true },
 					{ "value":"global", "desc":"global上で式を評価" }
@@ -933,7 +933,7 @@
 				"description":"Layer.holdAlpha プロパティ(アルファチャンネルを保護するか)のデフォルトの値です。\n\n2.23 beta 5 未満を想定しているアプリケーションでは、この設定を「真」にしないと正常に動作しない可能性があります。",
 				"name":"holdalpha",
 				"type":"select",
-				"user":true,
+				"user":false,
 				"values":[
 					{ "value":"false", "desc":"偽", "default":true },
 					{ "value":"true", "desc":"真" }
@@ -944,7 +944,7 @@
 				"description":"前置'*'演算子(プロパティアクセス迂回)の設定です。\n\nTJS2の前置'*'演算子は、プロパティオブジェクトそのものを、プロパティハンドラを介さずに取り出す演算子でしたが、2.25 beta 1 より、この機能を持つ演算子は前置の'&'となり、前置'*'演算子はプロパティオブジェクトのプロパティハンドラを動作させるための演算子となりました。2.25 beta 1 未満を想定しているアプリケーションでは、この設定を「2.25未満と互換」にしないと正常に動作しない可能性があります。",
 				"name":"unaryaster",
 				"type":"select",
-				"user":true,
+				"user":false,
 				"values":[
 					{ "value":"default", "desc":"2.25以降の動作", "default":true },
 					{ "value":"compat", "desc":"2.25未満と互換" }
@@ -955,7 +955,7 @@
 				"description":"DirectSoundのボリュームカーブです。\n\nDirectSoundのボリュームカーブは、2.31 2011/6/14 より、より直感的なカーブになりました。",
 				"name":"dsvolfactor",
 				"type":"select",
-				"user":true,
+				"user":false,
 				"values":[
 					{ "value":"3322", "desc":"2.31 以降の動作", "default":true },
 					{ "value":"5000", "desc":"2.31 未満と互換" }
