@@ -366,6 +366,8 @@ tTVPXP3Archive::tTVPXP3Archive(const ttstr & name) : tTVPArchive(name)
 		// read all XP3 indices
 		while(true)
 		{
+			if(indexdata) delete [] indexdata;
+
 			tjs_uint64 index_ofs = st->ReadI64LE();
 			st->SetPosition(index_ofs + offset);
 
@@ -595,20 +597,24 @@ bool tTVPXP3Archive::FindChunk(const tjs_uint8 *data, const tjs_uint8 * name,
 //---------------------------------------------------------------------------
 tjs_int16 tTVPXP3Archive::ReadI16FromMem(const tjs_uint8 *mem)
 {
-	return (tjs_int16)mem[0] + ((tjs_int16)mem[1] << 8);
+	tjs_uint16 ret = (tjs_uint16)mem[0] | ((tjs_uint16)mem[1] << 8);
+	return (tjs_int16)ret;
 }
 //---------------------------------------------------------------------------
 tjs_int32 tTVPXP3Archive::ReadI32FromMem(const tjs_uint8 *mem)
 {
-	return (tjs_int32)mem[0] + ((tjs_int32)mem[1] << 8) +
-		((tjs_int32)mem[2] << 16) + ((tjs_int32)mem[3] << 24);
+	tjs_uint32 ret =  (tjs_uint32)mem[0] | ((tjs_uint32)mem[1] << 8) |
+		((tjs_uint32)mem[2] << 16) | ((tjs_uint32)mem[3] << 24);
+	return (tjs_int32)ret;
 }
 //---------------------------------------------------------------------------
 tjs_int64 tTVPXP3Archive::ReadI64FromMem(const tjs_uint8 *mem)
 {
-	tjs_int32 low = ReadI32FromMem(mem);
-	tjs_int32 high = ReadI32FromMem(mem + 4);
-	return ((tjs_int64)high << 32) | ((tjs_int64)low);
+	tjs_uint64 ret = (tjs_uint64)mem[0] | ((tjs_uint64)mem[1] << 8) |
+		((tjs_uint64)mem[2] << 16) | ((tjs_uint64)mem[3] << 24) |
+		((tjs_uint64)mem[4] << 32) | ((tjs_uint64)mem[5] << 40) |
+		((tjs_uint64)mem[6] << 48) | ((tjs_uint64)mem[7] << 56);
+	return (tjs_int64)ret;
 }
 //---------------------------------------------------------------------------
 
