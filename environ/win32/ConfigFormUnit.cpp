@@ -26,7 +26,6 @@ IDC_DEFAULT_BUTTON : デフォルトボタン
 IDC_OPTION_COMBO
 IDC_OPTIONS_TREE
 */
-// http://www.kumei.ne.jp/c_lang/sdk2/sdk_111.htm
 struct TreeItem {
 	HTREEITEM    ItemHandle;
 	std::wstring Text; // 項目名
@@ -124,6 +123,7 @@ private:
 			}
 		}
 	}
+	// 指定フォルダにある指定拡張子のプラグインから設定情報を読み込む
 	void LoadPluginOptionDesc( tTVPCommandOptionList* coreopt, const std::wstring& path, const std::wstring& ext ) {
 		std::wstring exename = ExePath();
 		exename = IncludeTrailingBackslash(ExtractFileDir(exename));
@@ -170,7 +170,7 @@ public:
 		::SetDlgItemText( WindowHandle, IDC_DESCRIPTION_EDIT, text.c_str() );
 	}
 	void LoadOptionTree();
-
+	// 現在のアイテムを設定し、それに従い表示を更新する
 	void SetCurrentItem( HTREEITEM hItem ) {
 		if( CurrentItem != NULL && CurrentItem->ItemHandle == hItem ) return;
 
@@ -216,6 +216,7 @@ public:
 		}
 		return ret;
 	}
+	// 設定された内容を保存する
 	void SaveSetting() {
 		tTJSVariant val;
 		std::wstring path;
@@ -300,6 +301,7 @@ public:
 };
 static ConfigFormUnit* DialogForm = NULL;
 
+// 本体とプラグインの設定情報を読込み、ツリーに反映する
 void ConfigFormUnit::LoadOptionTree() {
 	tTVPCommandOptionList* options = TVPGetEngineCommandDesc();
 	if( options ) {
@@ -394,7 +396,7 @@ void ConfigFormUnit::LoadOptionTree() {
 LRESULT ConfigFormUnit::Dispatch( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam ) {
 	switch( msg ) {
 	case WM_COMMAND:
-		if(LOWORD(wParam) == IDOK) {	// OKボタンが押されたときの処理
+		if(LOWORD(wParam) == IDOK) {
 			::EndDialog(hWnd, IDOK);
 			return TRUE;
 		} else if( LOWORD(wParam) == IDCANCEL) {
@@ -409,19 +411,9 @@ LRESULT ConfigFormUnit::Dispatch( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 	case WM_CLOSE:
 		EndDialog(hWnd, 0);
 		return TRUE;
-	case WM_LBUTTONDOWN:
-		{
-			TV_HITTESTINFO tvhtst;
-			tvhtst.pt.x = GET_X_LPARAM(lParam);
-			tvhtst.pt.y = GET_Y_LPARAM(lParam);
-			HTREEITEM hItem = TreeView_HitTest( TreeControl, &tvhtst );
-			if( hItem ) {
-				SetCurrentItem( hItem );
-			}
-		}
-		return TRUE;
 	 case WM_NOTIFY:
 		if( wParam == IDC_OPTIONS_TREE ) {
+			// ツリーコントロールの通知で現在選択されているアイテムを認識
 			NMHDR* hdr = (LPNMHDR)lParam;
 			UINT code = hdr->code;
 			if( code == NM_SETCURSOR || code == NM_CLICK || code == NM_SETFOCUS) {
