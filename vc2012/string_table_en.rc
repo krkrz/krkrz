@@ -75,7 +75,7 @@ BEGIN
     IDS_TJS_NOT_SUPPORTED_UNPACK_P                                            "Not supported unpack 'P'"
     IDS_TVP_VERSION_INFORMATION                                               "Kirikiri Z Executable core /%1 (Compiled on %DATE% %TIME%) TJS2/%2 Copyright (C) 1997-2013 W.Dee and contributors All rights reserved."
     IDS_TVP_VERSION_INFORMATION2                                              "The details of version information can be perused if -about is attached and started. "
-    IDS_TVP_DOWNLOAD_PAGE_URL                                                 "http://kirikiri.jp/"
+    IDS_TVP_DOWNLOAD_PAGE_URL                                                 "http://krkrz.github.io/"
     IDS_TVP_INTERNAL_ERROR                                                    "Internal Error: at %1 line %2"
     IDS_TVP_INVALID_PARAM                                                     "Invalid Parameter"
     IDS_TVP_WARN_DEBUG_OPTION_ENABLED                                         "Debug option enabled"

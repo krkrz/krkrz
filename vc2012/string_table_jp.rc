@@ -75,7 +75,7 @@ BEGIN
     IDS_TJS_NOT_SUPPORTED_UNPACK_P                                            "'P' unpack はサポートしていません"
     IDS_TVP_VERSION_INFORMATION                                               "吉里吉里[きりきり] Z 実行コア/%1 (Compiled on %DATE% %TIME%) TJS2/%2 Copyright (C) 1997-2013 W.Dee and contributors All rights reserved."
     IDS_TVP_VERSION_INFORMATION2                                              "バージョン情報の詳細は -about を付けて起動すると閲覧できます"
-    IDS_TVP_DOWNLOAD_PAGE_URL                                                 "http://kirikiri.jp/"
+    IDS_TVP_DOWNLOAD_PAGE_URL                                                 "http://krkrz.github.io/"
     IDS_TVP_INTERNAL_ERROR                                                    "内部エラーが発生しました: at %1 line %2"
     IDS_TVP_INVALID_PARAM                                                     "不正なパラメータです"
     IDS_TVP_WARN_DEBUG_OPTION_ENABLED                                         "-debug オプションが指定されているため,現在 吉里吉里はデバッグモードで動作しています。デバッグモードでは十分な実行速度が出ない場合があるので注意してください"
