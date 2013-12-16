@@ -57,7 +57,7 @@ static LRESULT WINAPI DlgProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 	default:
 		break;
 	}
-	return ::DefWindowProc(hWnd,msg,wParam,lParam);
+	return FALSE;
 }
 //---------------------------------------------------------------------------
 void TVPShowVersionForm()
