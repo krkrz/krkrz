@@ -791,17 +791,6 @@
 					{ "value":"yes", "desc":"出力する", "default":true },
 					{ "value":"clear", "desc":"クリア" }
 				]
-			},
-			{
-				"caption":"デバッグ支援ウィンドウ",
-				"description":"デバッグ支援ウィンドウ(コンソール、監視式など)を有効にするかどうかの設定です。",
-				"name":"debugwin",
-				"type":"select",
-				"user":false,
-				"values":[
-					{ "value":"yes", "desc":"有効", "default":true },
-					{ "value":"no", "desc":"無効" }
-				]
 			}
 		]
 	},
