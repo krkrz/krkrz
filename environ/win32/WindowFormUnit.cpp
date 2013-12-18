@@ -512,21 +512,30 @@ bool TTVPWindowForm::GetWindowActive() {
 void TTVPWindowForm::SetDrawDeviceDestRect()
 {
 	tTVPRect destrect;
+	tjs_int w = MulDiv(LayerWidth,  ActualZoomNumer, ActualZoomDenom);
+	tjs_int h = MulDiv(LayerHeight, ActualZoomNumer, ActualZoomDenom);
+	if( w < 1 ) w = 1;
+	if( h < 1 ) h = 1;
 	if( GetFullScreenMode() ) {
-		destrect = FullScreenDestRect;
+		destrect.left = FullScreenDestRect.left;
+		destrect.top = FullScreenDestRect.top;
+		destrect.right = destrect.left + w;
+		destrect.bottom = destrect.top + h;
 	} else {
-		//GetClientRect( destrect );
-		tjs_int w = MulDiv(LayerWidth,  ActualZoomNumer, ActualZoomDenom);
-		tjs_int h = MulDiv(LayerHeight, ActualZoomNumer, ActualZoomDenom);
-		if( w < 1 ) w = 1;
-		if( h < 1 ) h = 1;
 		destrect.left = destrect.top = 0;
 		destrect.right = w;
 		destrect.bottom = h;
 	}
 
 	if( LastSentDrawDeviceDestRect != destrect ) {
-		if( TJSNativeInstance ) TJSNativeInstance->GetDrawDevice()->SetDestRectangle(destrect);
+		if( TJSNativeInstance ) {
+			if( GetFullScreenMode() ) {
+				TJSNativeInstance->GetDrawDevice()->SetClipRectangle(FullScreenDestRect);
+			} else {
+				TJSNativeInstance->GetDrawDevice()->SetClipRectangle(destrect);
+			}
+			TJSNativeInstance->GetDrawDevice()->SetDestRectangle(destrect);
+		}
 		LastSentDrawDeviceDestRect = destrect;
 	}
 }
