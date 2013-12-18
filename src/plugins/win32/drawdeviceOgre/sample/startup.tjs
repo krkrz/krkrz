@@ -1,0 +1,51 @@
+Plugins.link("drawdeviceOgre.dll");
+
+Scripts.execStorage("AffineLayer.tjs");
+Scripts.execStorage("ActionLayer.tjs");
+
+var WIDTH=800;
+var HEIGHT=600;
+
+class MyWindow extends Window
+{
+	var base;
+	var layer;
+
+	function MyWindow() {
+		super.Window();
+		drawDevice = new OgreDrawDevice();
+		
+		// ベースレイヤ
+		base = new Layer(this, null);
+		base.visible = true;
+		base.setSize(WIDTH,HEIGHT);
+		base.fillRect(0,0,WIDTH,HEIGHT,0);
+		setInnerSize(base.width, base.height);
+
+		// 表示レイヤ
+		layer = new ActionLayer(this, base);
+		layer.loadImages("test.png");
+		layer.setSizeToImageSize();
+		layer.setPos((WIDTH - layer.width) / 2, (HEIGHT - layer.height) / 2);
+		layer.visible = true;
+		layer.beginAction(LayerNormalRotateModule, %[ angvel: 100]);
+	}
+
+	function finalize() {
+		invalidate layer;
+		invalidate base;
+	}
+	
+	function onKeyDown(key, shift)
+	{
+		Debug.message("キーがおされた:" + key);
+		if(key == VK_TAB) {
+			close();
+		}
+	}
+
+};
+
+// 窓
+var win = new MyWindow();
+win.visible=true;

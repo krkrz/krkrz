@@ -1,0 +1,811 @@
+/**
+ * 吉里吉里 Irrclicht プラグイン
+ *
+ */
+class Irrlicht {
+
+	// -----------------------------------------------------------------------------
+	// データ保持用クラス(newできます)
+	// -----------------------------------------------------------------------------
+	
+	class SColor {
+		function SColor(color);
+		property red;
+		property blue;
+		property green;
+		property alpha;
+		function getAverage();
+		function getInterpolated();
+		function getInterpolated_quadratic();
+		function getLuminance();
+		funciton toA1R5G5B5();
+		property color;
+	}
+
+	class SColorf {
+		function SColorf(scolor);
+		property red;
+		property blue;
+		property green;
+		property alpha;
+		function getInterpolated();
+		function getInterpolated_quadratic();
+		function setColorComponentValue();
+		function toSColor();
+	}
+
+	class position2di {
+		function position2di(x,y);
+		property x;
+		property y;
+	}
+
+	class position2df {
+		function position2df(x,y);
+		property x;
+		property y;
+	}
+
+	class dimension2di {
+		function dimension2di(width,height);
+		property area; // RO
+		property height;
+		property width;
+	}
+
+	class dimension2df {
+		function dimension2df(width,height);
+		property area; // RO
+		property height;
+		property width;
+	}
+
+	class vector2df {
+		function vector2df(x,y);
+		property x;
+		property y;
+		function equals();
+		function getAngle();
+		function getAngleTrig();
+		function getAngleWith();
+		function getDistanceFrom();
+		function getDistanceFromSQ();
+		function getInterpolated();
+		function getInterpolated_quadratic();
+		function getLength();
+		function getLengthSQ;
+		function interpolate();
+		function isBetweenPoints();
+	}
+	class vector3df {
+		function vector3df(x,y,z);
+		property x;
+		property y;
+		property z;
+		function crossProduct();
+		function dotProduct();
+		function equals();
+		function getDistanceFrom();
+		function getDistanceFromSQ();
+		function getHorizontalAngle();
+		function getInterpolated();
+		function getInterpolated_quadratic();
+		function getLength();
+		function getLengthSQ();
+		function invert();
+		function isBetweenPoints();
+		function normalize();
+		function rotateXYBy();
+		function rotateXZBy();
+		function rotateYZBy();
+	};
+
+	class recti {
+		function recti(x,y,w,h);
+		function clipAgainst();
+		function constrainTo();
+		function getArea();
+		function getcenter();
+		function getSize();
+		function isPointInside();
+		function isRectCollided();
+		function isValid();
+		function repair();
+		function getWidth();
+		function setWidth(w);
+		function getHeight();
+		function setHeight(h);
+		function getLeft();
+		function setLeft(l);
+		function getTop();
+		function setTop(t);
+	};
+
+	class matrix4 {
+		matrix4();
+		function buildCameraLookAtMatrixLH();
+		function buildCameraLookAtMatrixRH();
+		function buildNDCToDCMatrix();
+		function buildProjectionMatrixOrthoLH();
+		function buildProjectionMatrixOrthoRH();
+		function buildProjectionMatrixPerspectiveFovLH();
+		function buildProjectionMatrixPerspectiveFovRH();
+		function buildProjectionMatrixPerspectiveLH();
+		function buildProjectionMatrixPerspectiveRH();
+		function buildShadowMatrix();
+		function buildTextureTransform();
+		function getDefinitelyIdentityMatrix();
+		function getInverse();
+		function getInversePrimitive();
+		function getRotationDegrees();
+		function getScale();
+		function getTranslation();
+		function interpolate();
+		function inverseRotateVect();
+		function inverseTranslateVect();
+		function isIdentity();
+		function isIdentity_integer_base();
+		function makeIdentity();
+		function makeInverse();
+		function setbyproduct();
+		function setbyproduct_nocheck();
+		function setDefinitelyIdentityMatrix();
+		function setInverseRotationDegrees();
+		function setInverseRotationRadians();
+		function setInverseTranslation();
+		function setRotationDegrees();
+		function setRotationRadians();
+		function setTextureRotationCenter();
+		function setTextureScale();
+		function setTextureScaleCenter();
+		function setTextureTranslate();
+		function setTranslation();
+		function transformBox();
+		function transformBoxEx();
+		function transformPlane_new();
+		function translateVect();
+;	};
+
+	class triangle3df {
+		function triangle3df();
+	};
+
+	class plane3df {
+		function plane3df();
+	};
+
+	class aabbox3df {
+		function aabbox3df();
+		function addInternalBox();
+		function getCenter();
+		function getExtent();
+		function getInterpolated();
+		function intersectsWithBox();
+		function isEmpty();
+		function isFullInside();
+		function isPointInside();
+		function isPointTotalInside();
+		function repair();
+		property maxEdge;
+		property minEdge;
+	};
+
+	class SLight {
+		function SLight();
+	};
+
+	class SMaterial {
+		function SMaterial();
+	};
+
+	class SShader {
+		function SShader();
+	};
+
+	class SAttributeReadWriteOptions {
+		function SAttributeReadWriteOptions();
+	};
+
+	class SEvent {
+		function SEvent();
+	};
+
+	class SViewFrustum {
+		function SViewFrustum();
+	}
+	
+	// -----------------------------------------------------------------------------
+	// インターフェースクラス(実体をnewできません)
+	// -----------------------------------------------------------------------------
+
+	class IAttributes {
+	}
+	
+	class ISceneNodeAnimator {
+		function animateNode();
+		function createClone();
+		function getType();
+	};
+	
+	class ISceneNodeAnimatorCollisionResponse {
+		function getEllipsoidRadius();
+		function setEllipsoidRadius(e);
+		function getEllipsoidTranslation();
+		function setEllipsoidTranslation(e);
+		function getGravity();
+		function setGravity(g);
+		function getWorld();
+		function setWorld(w);
+		function isFalling();
+	};
+
+	class IMesh {
+		function getBoundingBox();
+		function setBoundingBox(box);
+		function getMeshBuffer(nr);
+		function getMeshBuffer2(material);
+		function getMeshBufferCount();
+		function setMaterialFlag(flag, newvalue);
+	}
+
+	class IMeshBuffer;
+	class IMeshCache;
+	class IMeshManipulator;
+
+	//! Irrlicht Native mesh writer, for static .irrmesh files.
+	EMWT_IRR_MESH     = MAKE_IRR_ID('i','r','r','m');
+	//! COLLADA mesh writer for .dae and .xml files
+	EMWT_COLLADA      = MAKE_IRR_ID('c','o','l','l');
+	//! STL mesh writer for .stl files
+	EMWT_STL          = MAKE_IRR_ID('s','t','l',0);
+
+	class IMeshWriter {
+
+		/*
+		 * get the type of mesh writer
+		 * @return EMESH_WRITER_TYPE
+		 */
+		function getType();
+
+		/**
+		 * write static mesh
+		 * @param file (IWriteFile)
+		 * @param mesh (IMesh)
+		 * @param flags
+		 * @return succeeded
+		 */
+		function writeMesh(file, mesh, flags);
+	}
+			
+	class IAnimatedMesh extends IMesh {
+		function getFrameCount();
+		function getMesh(frame, detailLevel, startFrameLoop, endFramLoop);
+		function getMeshType();
+	}
+
+	class IGUIFont;
+	class ITriangleSelector;
+	class ISceneNodeAnimatorFactory;
+	class ISceneNodeFactory;
+	class ISceneCollisionManager;
+	class IAnimationEndCallBack;
+
+	class ISceneNode {
+		function getAutomaticCulling();
+		function setAutomaticCulling();
+		function getID();
+		function setID();
+		function getName();
+		function setName();
+		function getParent();
+		function setParent();
+		function getPosition();
+		function setPosition();
+		function getRotation();
+		function setRotation();
+		function getScale();
+		function setScale();
+		function getTriangleSelector();
+		function setTriangleSelector();
+		function isDebugDataVisible();
+		function setDebugDataVisible();
+		function isVisible();
+		function setVisible();
+		function addAnimator();
+		function addChild();
+		function clone();
+		function deserializeAttributes();
+		function getAbsolutePosition();
+		function getAbsoluteTransformation();
+		function getBoundingBox();
+		function getMaterial();
+		function getMaterialCount();
+		function getRelativeTransformation();
+		function getTransformedBoundingBox();
+		function getType();
+		function isDebugObject();
+		function remove();
+		function removeAll();
+		function removeAnimator();
+		function removeAnimators();
+		function removeChild();
+		function render();
+		function serializeAttributes();
+		function setMaterialFlag();
+		function setMaterialTexture();
+		function setMaterialType();
+		function updateAbsolutePosition();
+	}
+	
+	class IAnimatedMeshSceneNode;
+	class IBoneSceneNode;
+
+	class ICameraSceneNode extends ISceneNode {
+		function getAspectRatio();
+		function setAspectRatio();
+		function getFarValue();
+		function setFarValue();
+		function getFOV();
+		function setFOV();
+		function getNearValue();
+		function setNearValue();
+		function getProjectionMatrix();
+		function setProjectionMatrix();
+		function getTarget();
+		function setTarget();
+		function getUpVector();
+		function setUpVector();
+		function isInputReceiverEnabled();
+		function setInputReceiverEnabled();
+		function isOrthogonal();
+		function setIsOrthogonal();
+		function getViewFrustum();
+		function getViewMatrix();
+	}
+
+	class IDummyTransformationSceneNode;
+	class ILightSceneNode;
+	class IMeshSceneNode;
+	class IParticleSystemSceneNode;
+	class ITerreinSceneNode;
+	class ITextSceneNode;
+
+	/**
+	 * 画像情報クラス
+	 */
+	class IImage {
+	};
+
+	/**
+	 * テクスチャクラス
+	 */
+	class ITexture {
+	};
+
+	// -----------------------------------------------------------------------------
+	//
+	// -----------------------------------------------------------------------------
+	
+	/**
+	 * ドライバ機能インターフェース
+	 * DrawDevice または Window のプロパティから参照する必要があります
+	 * ※ new しても正常動作しません。
+	 */
+	class IVideoDriver {
+
+		function getViewport();
+		function setViewport();
+		function addDynamicLight();
+		function addTexture(size, filename, format);
+		function addTexture2(name, image);
+		function clearZBuffer();
+		function createAttributesFromMaterial();
+		function createImage(format, size);
+		function createImage2(format, image);
+		function createImage3(image, position, dimension);
+		function createImageFromFile(filename);
+		function createRenderTargetTexture();
+		
+		/**
+		 * スクリーンショットの生成
+		 * @return スクリーンショット画像(IImage)
+		 * ※ウインドウの領域からキャプチャーしてるようなので上に
+		 * 別のウインドウが乗っているとそのままキャプチャーされます
+		 */
+		function createScreenShot();
+
+		function deleteAllDynamicLights();
+		function draw2DImage(texture, pos);
+		function draw2DImage2(texture, destPos, sourceRect, clipRect, color, useAlpha);
+		
+		function draw2DLine();
+		function draw2DPolygon();
+		function draw3DBox();
+		function draw3DLine();
+		function draw3DTriangle();
+
+		function drawMeshBuffer();
+		function drawStencilShadow();
+		function drawStencilShadowVolume();
+
+		function enableClipPlane();
+		function fillMaterialStructureFromAttributes();
+		function findTexture();
+		function getCurrentRenderTargetSize();
+		function getDriverType();
+		function getDynamicLight();
+		function getFPS();
+		function getMaximalDynamicLightAmount();
+		function getMaximalPrimitiveCount();
+		
+						 
+		
+	};
+
+	/**
+	 * シーンマネージャ機能インターフェース
+	 * DrawDevice または Window のプロパティから参照する必要があります
+	 * ※ new しても正常動作しません。
+	 */
+	class ISceneManager {
+		/**
+		 * シーンファイルの読み込み
+		 * @param filename ファイル名
+		 */
+		function loadScene(filename);
+		/**
+		 * シーンファイルの読み込み
+		 * @param file ファイル(IReadFile)
+		 */
+		function loadSceneFile(file);
+
+		/**
+		 * シーンファイルの書き出し
+		 * @param filename ファイル名
+		 */
+		function saveScene(filename);
+		/**
+		 * シーンファイルの読み込み
+		 * @param file ファイル(IWriteFile)
+		 */
+		function saveSceneFile(file);
+		
+		function getAmbientLight();
+		function setAmbientLight(light);
+
+		/**
+		 * 光源の設定
+		 * @param parent 親ノード(nullだとルート)
+		 * @param position 位置指定
+		 * @param color 色指定
+		 * @param radius 範囲指定
+		 * @param id ID指定
+		 * @return 光源情報(ILightSceneNode)
+		 */
+		function addLightSceneNode(parent, position, color, radius, id);
+		
+		/**
+		 * カメラの設定
+		 * @param parent 親ノード(nullだとルート)
+		 * @param position 位置指定
+		 * @param lookat 参照位置
+		 * @param id ID指定
+		 * @return カメラ情報(ICameraSceneNode)
+		 */
+		function addCameraSceneNode(parent, position, lookat, id);
+	}
+
+	/**
+	 * GUI環境機能インターフェース
+	 * DrawDevice または Window のプロパティから参照する必要があります
+	 * ※ new しても正常動作しません。
+	 */
+	class IGUIEnvironment {
+	};
+
+	// ELOG_LEVEL
+	ELL_INFORMATION = 0;
+	ELL_WARNING = 1;
+	ELL_ERROR = 2;
+	ELL_NONE = 3;
+	
+	/**
+	 * ログ出力機能
+	 * GUI環境機能インターフェース
+	 * DrawDevice または Window のプロパティから参照する必要があります
+	 * ※ new しても正常動作しません。
+	 */
+	class ILogger {
+		function getLogLevel();
+		function setLogLevel(level);
+		function log(text, level);
+		function logHint(text, hint, level);
+	};
+
+	/**
+	 * ファイルシステム
+	 * DrawDevice または Window のプロパティから参照する必要があります
+	 * ※ new しても正常動作しません。
+	 */
+	class IFileSystem {
+		// @return IReadFile
+		function createAndOpenFile(filename);
+		// @return IWriteFile
+		function createAndWriteFile(filename, append);
+	};
+
+	class IReadFile {
+	};
+
+	class IWriteFile {
+	};
+	
+	// -----------------------------------------------------------------------------
+	//　Irrlicht 基本機能クラス
+	// -----------------------------------------------------------------------------
+
+	// イベント指定。Base.eventMask に OR して指定する
+	EMASK_ATTACH       = 1<<0; //< アタッチ時
+	EMASK_DETACH       = 1<<1; //< デタッチ時
+	EMASK_EVENT        = 1<<2; //< Irrlichtイベント
+	EMASK_BEFORE_SCENE = 1<<3; //< シーンマネージャ描画前
+	EMASK_AFTER_SCENE  = 1<<4; //< シーンマネージャ描画後
+	EMASK_BEFORE_GUI   = 1<<5; //< GUI描画前
+	EMASK_AFTER_GUI    = 1<<6; //< GUI描画後
+	
+	/**
+	 * デバイス共通機能分（実際にはこのクラスはありません）
+	 */
+	class Base {
+		property videoDriver; //< ドライバ(IVideoDriverクラス)。読み出し専用
+		property sceneManager; //< シーンマネージャ(ISceneManagerクラス)。読み出し専用
+		property guiEnvironment; //< GUI環境（IGUIEnvironmentクラス）。読み出し専用
+		property logger; //< ログ環境 (ILoggerクラス）。読み出し専用
+		property fileSystem; //< ファイルシステム(IFileSystemクラス)。読み出し専用
+
+		/**
+		 * イベントマスク。TJS側への呼び返しイベントを指定する。
+		 * デフォルトは EMASK_ATTACH|EMASK_DETACH
+		 */
+		property eventMask;
+
+		// -------------------------------------
+		
+		/**
+		 * オブジェクト生成時やフルスクリーン化などの再構築の後で、
+		 * ドライバが初期化された直後に呼ばれるイベント
+		 * @param self デバイスオブジェクト
+		 */
+		function onAttach(self);
+
+		/**
+		 * オブジェクト破棄時や、フルスクリーン化による再構築の前で、
+		 * ドライバが破棄される直前に呼ばれるイベント
+		 * @param self デバイスオブジェクト
+		 */
+		function onDetach(self);
+
+		// -------------------------------------
+
+		/**
+		 * Irrlicht からのイベント通知
+		 * @param self デバイスオブジェクト
+		 * @param event SEvent
+		 */
+		function onEvent(self, event);
+
+		// -------------------------------------
+
+		/**
+		 * シーン描画前に呼び出されるイベント
+		 * @param self デバイスオブジェクト
+		 */
+		function onBeforeScene(self);
+
+		/**
+		 * シーン描画後に呼び出されるイベント
+		 * @param self デバイスオブジェクト
+		 */
+		function onAfterScene(self);
+
+		/**
+		 * GUI描画前に呼び出されるイベント
+		 * @param self デバイスオブジェクト
+		 */
+		function onBeforeGUI(self);
+
+		/**
+		 * GUI描画後に呼び出されるイベント
+		 * @param self デバイスオブジェクト
+		 */
+		function onAfterGUI(self);
+	};
+
+	/**
+	 * レイヤへの描画機能を提供する Irrlicht Device
+	 */
+	class SimpleDevice extends Base {
+
+		/**
+		 * コンストラクタ
+		 * @param window 親になるウインドウ
+		 * @param width バックバッファ横幅。レンダーターゲットを使う場合は 2の階乗サイズにする必要があります。
+		 * @param height バックバッファ縦幅。レンダーたーガットを使う場合は 2の階乗サイズにする必要があります。
+		 * @param useRender レンダーターゲットを使う場合は true。レンダーターゲットはα透過します。
+		 *
+		 * 生成した時点では Irrlichtのデバイスは存在しません。
+		 * 生成後の最初のイベント処理前に初期化されて、
+		 * ドライバ、シーンマネージャ、GUIが扱えるようになります。
+		 * 処理は onAttach() イベントを待ってから行う必要があります。
+		 */
+		function SimpleDevice(window, width, height);
+
+		property width; //< バックバッファ横幅
+		property height; //< バックバッファ縦幅
+
+		/**
+		 * バックバッファのサイズ設定
+		 * @param width バックバッファ横幅
+		 * @param width バックバッファ縦幅
+		 * レンダーターゲットを使ってる場合は変更できません
+		 */
+		function setSize(width, height);
+
+		/**
+		 * レイヤに対して現在の状態を描画する。
+		 * バックバッファから、指定されたレイヤの描画領域に対して拡縮コピーされます。
+		 * ※レイヤのクリッピング領域は無視されます。
+		 * @param layer 描画先レイヤ
+		 * @param sleft ソース領域の左上座標X ※以下を省略した場合は全領域
+		 * @param stop ソース領域の左上座標X
+		 * @param swidth ソース領域の横幅
+		 * @param sheight ソース領域の縦幅
+		 */
+		function updateToLayer(layer, sleft, stop, swidth, sheight);
+	};
+	
+	/**
+	 * 吉里吉里用 drawdevice クラス
+	 *
+	 * Irrlicht の画面上に吉里吉里プライマリレイヤ(複数)を配置可能な drawDevice です
+	 * Irrlicht シーン画面 → 吉里吉里プライマリレイヤ（生成順）→ Irrlicht GUI の
+	 * 順で描画が行われます。マウスイベントは、Irrlicht GUI および、最初につくった
+	 * プライマリレイヤに対して配信されます。
+	 *
+	 * プライマリレイヤは、Irrlicht から "krkr0", "krkr1", ... という名前のテクスチャ
+	 * として参照可能で、吉里吉里の描画内容が常時反映された状態になってます
+	 */
+	class DrawDevice extends Base {
+
+		property interface; //< drawdevice 情報（内部参照用）。読み出し専用
+		
+		/**
+		 * コンストラクタ
+		 * @param width バックバッファ横幅
+		 * @param width バックバッファ縦幅
+		 * 縦幅と横幅は従来的機構での primaryLayer の width/height に相当するものです。
+		 * 作成されたプライマリレイヤ(複数)はすべてここで指定した領域に対して
+		 * 引き延ばし表示されます。
+		 * 例:
+		 *     drawDevice = new Irrlicht.DrawDevice(800,400);
+		 *     base1 = new Layer(this, null); base1.setSize(800,400); // 画面と同じ解像度
+		 *     base2 = new Layer(this, null); base1.setSize(400,200); // 画面の半分の解像度
+		 *     base3 = new Layer(this, null); base1.setSize(800,200); // 縦だけ解像度半分
+		 *
+		 * 生成した時点では Irrlichtのデバイスは存在しません。
+		 * DrawDevice としての描画処理開始時 (SetTargetWindow 呼び出し時)に初期化されて、
+		 * ドライバ、シーンマネージャ、GUIが扱えるようになります。
+		 * 処理は onAttach() イベントを待ってから行う必要があります。
+		 */
+		function DrawDevice(width, height);
+
+		property width;  //< バックバッファ横幅
+		property height; //< バックバッファ縦幅
+		
+		/**
+		 * バックバッファのサイズ設定
+		 * @param width バックバッファ横幅
+		 * @param width バックバッファ縦幅
+		 */
+		function setSize(width, height);
+		
+		/**
+		 * 拡大モード: 初期値は true
+		 * true: バックバッファから画面への転送時に拡大縮小します
+		 * false: バックバッファのサイズを実際の画面上の解像度に追従させます
+		 * false にした場合、Irrlicht 側の座標系がフルスクリーン化した時や、
+		 * Window.setZoom した時に変化するので注意が必要です。
+		 */
+		property zoomMode;
+
+		property destWidth;  //< 実描画領域横幅(読み取り専用)
+		property destHeight; //< 実描画領域縦幅(読み取り専用)
+		
+		/*
+		 * プライマリレイヤの標準の visible
+		 * プライマリレイヤを生成時に表示するかどうかを指定します。
+		 */
+		property defaultVisible;
+		
+		/**
+		 * プライマリレイヤの表示状態の指定
+		 * @param id プライマリレイヤの登録ID
+		 * @param visible 表示状態
+		 */
+		function setVisible(id, visible);
+		
+		/**
+		 * プライマリレイヤの表示状態の指定
+		 * @param id プライマリレイヤの登録ID
+		 * @return visible 表示状態
+		 */
+		function getVisible(id);
+	};
+
+	/**
+	 * 子ウインドウとして機能するIrrlicht Device
+	 */
+	class Window extends Base {
+
+		/**
+		 * コンストラクタ
+		 * @param window 親になるウインドウ
+		 * @param left 配置位置X
+		 * @param top 配置位置Y
+		 * @param width 配置サイズ
+		 * @param height 配置サイズ
+		 *
+		 * 生成した時点では Irrlichtのデバイスは存在しません。
+		 * 生成後の最初のイベント処理前に初期化されて、
+		 * ドライバ、シーンマネージャ、GUIが扱えるようになります。
+		 * 処理は onAttach() イベントを待ってから行う必要があります。
+		 */
+		function Window(window, left, top, width, height);
+
+		property left; //< 配置位置X
+		property top;  //< 配置位置Y
+		property width; //< 横幅
+		property height; //< 縦幅
+
+		
+		/**
+		 * マウスイベントを親窓に透過する:デフォルト true
+		 */
+		property transparentEvent;
+
+		/**
+		 * 配置位置指定
+		 * @param left 配置位置X
+		 * @param top 配置位置Y
+		 */
+		function setPos(left, top);
+
+		/**
+		 * 配置サイズ指定
+		 * @param width 配置サイズ横幅
+		 * @param height 配置サイズ縦幅
+		 */
+		function setSize(width, height);
+	}	
+
+};
+
+
+/**
+ * レイヤに対する機能拡張
+ */
+class Layer {
+
+	/**
+	 * Irrlicht.IImage から画像をコピー。レイヤのサイズは元のIImageのサイズになります
+	 * @param src Irrlicht.IImage 画像
+	 */
+	function copyIImage(src);
+
+	/**
+	 * Irrlicht.ITexture から画像をコピー。レイヤのサイズは元のITextureのサイズになります
+	 * ※テクスチャが ARGB32 でない場合はコピーできません
+	 * @param src Irrlicht.ITexture テクスチャ
+	 */
+	function copyITexture(src);
+}

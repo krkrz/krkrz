@@ -1,0 +1,32 @@
+/**
+ * Scriptsクラスへの WSHスクリプト実行機能拡張
+ */
+class Scripts {
+
+	/**
+	 * 拡張子と ProgId の組を追加登録する
+	 * @param exe 拡張子
+	 * @param progId ProgId
+	 */
+	void addProgId(ext, progId);
+	
+	/**
+	 * WSH スクリプトの実行
+	 * @param script スクリプトが格納された文字列
+	 * @param extOrProgIdOrCLSID 言語を指定します。拡張子またはProgIdまたはCLSID
+	 * 拡張子: js, vbs, pl/pls, rb/rbs のいずれか
+	 * ProgId: JScript, VBScript, PerlScript, RubyScript など
+	 * CLSID: スクリプトエンジンのクラスIDを指定します。
+	 * script で指定された文字列を指定された言語のスクリプトとして実行します。
+	 */
+	function execWSH(script, extOrProgIdOrCLSID);
+
+	/**
+	 * WSH スクリプトのファイルからの実行
+	 * @param storage スクリプトが格納されたファイル
+	 * @param extOrProgIdOrCLSID 言語を指定します。拡張子またはProgIdまたはCLSID
+	 * 省略された場合は第一引数の拡張子から決定されます
+	 * 指定されたストレージを読み込み、その内容を、指定された言語のスクリプトとして実行します。
+	 */
+	function execStorageWSH(storage, extOrProgIdOrCLSID);
+};

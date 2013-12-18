@@ -1,0 +1,44 @@
+Known bugs and unfinished functions
+===================================
+
+* When the psd files are based on CMYK, LAB and multi-channel color spaces, Libpsd 
+  will convert the colors incorrectly, because it doesn't use the tables to convert 
+  the colors. 
+
+* The adjustment layers only support for RGB and grayscale color spaces.
+
+* The layer effects only support for RGB and grayscale color spaces.
+
+* Some of the blend modes don't blend incorrectly, we know the formula is the 
+  problem in psd_blend.h.
+
+* Can't adjust the fill opacity when the color mode isn't normal. 
+
+* Don't get the type information, includes font face, size, color, arragement, etc.
+
+* Don't support for vector mask.
+
+* Don't support for photo filter adjustment layer, because we don't know the 
+  arithmetic.
+
+* The knock out color is inaccurate.
+
+* The noise value is different from Photoshop.
+
+* Inaccurate choke and spread for inner shadow or inner glow.
+
+* We don't understand the phase of pattern overlay, then the pattern can't move.
+
+* Don't implement the bevel emboss, because we don't find the standard way to blend 
+  it correctly.
+
+
+Notice about this file
+======================
+
+Libpsd is the product of Graphest Software, copyright 2004-2007, www.graphest.com
+
+This file is the part of Libpsd project, Libpsd is under the terms of the GNU Library 
+General Public License as published by the Free Software Foundation; either version 2 
+of the License, or (at your option) any later version. See the GNU General Public 
+License for more details.

@@ -1,0 +1,74 @@
+diff -r -c agg23orig/svg/agg_svg_parser.cpp agg23/svg/agg_svg_parser.cpp
+*** agg23orig/svg/agg_svg_parser.cpp	Sun Nov 27 23:19:10 2005
+--- agg23/svg/agg_svg_parser.cpp	Sun Nov 27 23:22:21 2005
+***************
+*** 259,264 ****
+--- 259,302 ----
+          }
+      }
+  
++     void parser::parse(IStream *in)
++     {
++         char msg[1024];
++ 	    XML_Parser p = XML_ParserCreate(NULL);
++ 	    if(p == 0) 
++ 	    {
++ 		    throw exception("Couldn't allocate memory for parser");
++ 	    }
++ 
++         XML_SetUserData(p, this);
++ 	    XML_SetElementHandler(p, start_element, end_element);
++ 	    XML_SetCharacterDataHandler(p, content);
++ 
++         bool done = false;
++         do
++         {
++ 			ULONG len;
++ 			in->Read((void*)m_buf, buf_size, &len);
++             done = len < buf_size;
++             if(!XML_Parse(p, m_buf, len, done))
++             {
++                 sprintf(msg,
++                     "%s at line %d\n",
++                     XML_ErrorString(XML_GetErrorCode(p)),
++                     XML_GetCurrentLineNumber(p));
++                 throw exception(msg);
++             }
++         }
++         while(!done);
++         XML_ParserFree(p);
++ 
++         char* ts = m_title;
++         while(*ts)
++         {
++             if(*ts < ' ') *ts = ' ';
++             ++ts;
++         }
++     }
+  
+      //------------------------------------------------------------------------
+      void parser::start_element(void* data, const char* el, const char** attr)
+diff -r -c agg23orig/svg/agg_svg_parser.h agg23/svg/agg_svg_parser.h
+*** agg23orig/svg/agg_svg_parser.h	Sun Nov 27 23:19:10 2005
+--- agg23/svg/agg_svg_parser.h	Sun Nov 27 23:21:14 2005
+***************
+*** 20,25 ****
+--- 20,27 ----
+  #ifndef AGG_SVG_PARSER_INCLUDED
+  #define AGG_SVG_PARSER_INCLUDED
+  
++ // for IStream*
++ #include <windows.h>
+  #include "agg_svg_path_tokenizer.h"
+  #include "agg_svg_path_renderer.h"
+  
+***************
+*** 37,42 ****
+--- 39,45 ----
+          parser(path_renderer& path);
+  
+          void parse(const char* fname);
++         void parse(IStream *in);
+          const char* title() const { return m_title; }
+  
+      private:

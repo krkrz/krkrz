@@ -1,0 +1,316 @@
+Author: 渡邊剛(go@wamsoft.jp)
+Date: 2010/11/2
+
+●Object/Thread機能
+
+疑似スレッド処理のフレームワークのコードが追加されています。
+詳細は sqobject/readme.txt を参照してください。
+関連して sq コマンドも Object 機能が組み込まれています。
+※ Thread は対応させていません
+
+●例外差し替え機能
+
+squirrel の例外は任意のオブジェクトが利用できますが、
+システムが出す例外は全て文字列になっています。
+これを任意のオブジェクトに差し替える機能が追加されています。
+
+API sq_setexceptionclass() または、squirrel 上で setexceptionclass()
+を使って例外クラスを指定すると、sq_throwerror() で指定された例外や、
+squirrel VM内部の実行時例外は、指定されたクラスでラッピングされてから
+送出されるようになります。指定クラスのコンストラクタの引数
+として元の例外文字列が渡されます
+
+例外クラス定義例
+　例外発生時のメッセージとトレース情報を記録しています
+--------------------------------------------------
+// 例外クラスサンプル
+class Exception {
+
+	message = null; //< メッセージ記録
+	callstacks = null; //< スタック情報記録
+
+	/**
+	 * コンストラクタ
+	 * @param msg 例外メッセージ
+	 */
+	constructor(msg) {
+		message = msg;
+		callstacks = [];
+		// 0:getstackinfos
+		// 1:このコンストラクタ
+		// 2:例外が発生したポイント←ここから取得する
+		local level=2;
+		local stack;
+		while ((stack = ::getstackinfos(level++)) != null) {
+			callstacks.append(stack);
+		}
+	}
+
+	// 例外情報表示時用に文字列としての値も返せるようにしておく
+	function _tostring() {
+		return message;
+	}
+};
+
+// 例外クラスを登録
+setexceptionclass(Exception);
+--------------------------------------------------
+
+●API拡張
+
+・instanceof が、型が instance / class でなくても単に false を返すように仕様変更
+
+・in 演算子相当の APIを追加
+
+/**
+ * スタックから値を取り出して、その値が idx で示される要素中に存在するか判定する
+ * @param v VM
+ * @param idx 確認対象のインデックス
+ * @return 存在していたら SQTrue
+ */
+SQUIRREL_API SQBool sq_exists(HSQUIRRELVM v,SQInteger idx);
+
+・配列から直接値を削除するAPIを追加
+
+/**
+ * スタックから値を取り出してその値と等しい値を配列から削除する
+ * @param v VM
+ * @param idx 処理対象配列のインデックス
+ * @param all true:全要素を削除 false:最初の1つだけ削除
+ */
+SQUIRREL_API SQRESULT sq_arrayremovevalue(HSQUIRRELVM v,SQInteger idx,SQBool all);
+
+・例外クラス登録用の APIを追加
+
+/**
+ * スタックから値を取り出してそのクラスを例外クラスとして登録する
+ * @param v VM
+ */
+SQUIRREL_API SQRESULT sq_setexceptionclass(HSQUIRRELVM v);
+
+・sq_throwerror() を可変長引数対応に仕様変更
+
+SQUIRREL_API SQRESULT sq_throwerror(HSQUIRRELVM v,const SQChar *err, ...);
+
+・printf相当機能のAPIを追加
+
+/**
+ * printf処理。書式文字列とパラメータを順次pushしてから呼び出す。
+ * @param v VM
+ * @param nargs パラメータの数(書式文字列は除く)
+ * @return 表示された文字列の長さ
+ */
+SQInteger sqstd_printf(HSQUIRRELVM v, SQInteger nargs);
+
+・sq_loadclosure() でエンディアン判定を追加
+
+エンディアンが違うストリームを読み込ませようとすると 
+"invalid endian closure stream" エラーになります。
+※読み込めるエンディアンは実行環境に合致したものに限ります。
+
+・sq_writeclosure() にエンディアン指定を追加
+
+引数 endian に SQ_DEFUALT_ENDIAN, SQ_LITTLE_ENDIAN, SQ_BIG_ENDIAN
+が指定可能です。指定されたエンディアンのバイナリを出力します。
+squirrel グローバル関数 writeclosuretofile() も最後に endian 引数が追加されます。
+指定されたエンディアンでの出力を行わせることができます。
+※別環境用のバイナリを出力させる場合に使います
+
+・数値と真偽値の自動変換処理
+
+  C API 的には数値と真偽値は自動変換するように API 仕様を変更しました。
+  区別が必要な場合はあらかじめ sq_gettype() するようにしてください。
+
+  sq_getinteger() 真偽値を 0/1 として取得可能
+  sq_getfloat()   真偽値を 0.0/1.0 として取得可能
+　sq_getbool()    数値を 0:SQFalse それ以外:SQTrue として取得可能
+
+●ライブラリ拡張
+
+以下のような機能が標準delegate/標準ライブラリに拡張されています。
+
+◇グローバル関数追加
+
+setexceptionclass(class)	例外クラスを登録します
+							sq_setexceptionclass()の呼び出しです
+
+◇auxライブラリグローバル関数追加
+
+※sqstd_seterrorhandlers() 呼び出し時に併せて登録されます
+
+printCallStack()	     	スタックの内容をコンソールに表示
+						   	sqstd_printcallstack()の呼び出しです
+
+notifyAllExceptions(value)	全例外のエラー表示通知を行うかどうかを指定
+ 						   	sq_notifyallexceptions()の呼び出しです
+
+◇数学関数追加
+
+min(...) 引数で最小のものを返す (スクリプト上での < での比較と等価)
+max(...) 引数で最大のものを返す (スクリプト上での > での比較と等価)
+iabs(v)  整数専用のabs
+
+◇数学関数仕様変更
+
+abs(v)  整数なら iabs, 実数なら fabs 扱い
+
+◇文字列関数仕様変更
+
+format(fmt, ...)  %s の場合は、パラメータに対して規定の文字列
+　　　　　　　　　変換処理を行ってから処理するように仕様変更。
+　　　　　　　　　文字列以外を渡してもエラーにならず確実に実行できます。
+
+◇文字列関数追加
+
+printf(fmt, ...) 書式付きprint。print(format(fmt, ...)) と等価
+
+◇共通 delegate 追加
+
+ tonumber()   　　数値に変換する。tostring() 同様、すべての型に定義されてます。
+
+ 整数→整数
+ 実数→実数
+ 文字列→整数または実数。変換失敗の場合は例外ではなく 0 を返す
+ その他→0
+
+ tointeger() や tofloat() とは異なり、例外や null は返しません。
+
+◇数値変換 delegate 仕様変更
+
+ tointeger(), tofloat(), tonumber() での文字列からの置換の際、
+ 先頭が 0x で始まっていると、16進数、0b で始まっていると
+ 2進数として変換されます。
+
+◇文字列 delegate 追加
+
+substr(index[,length])　　部分文字列の取得(サイズ指定)
+charAt(index)		  index位置の文字を取得  ※substr(index,1)と等価
+replace(from, to)	  from を to に置換             ※正規表現不可
+split(delim)		  delimを区切り文字列として分割 ※正規表現不可
+
+mbnext(index=0)           index位置のマルチバイト文字のバイト数を返す
+                          UNICODE 版は常に1を返します。
+                          それ以外では、コンパイル時に USESJISが定義されて
+                          あればSJIS文字列、それ以外では UTF-8 文字列
+                          として処理されます。
+	                  ※SJIS版では頭から順次処理しないと値は保証されません
+mblen() 		  マルチバイト文字列の長さを返す
+mbsubstr(index[,length])  マルチバイト文字列の部分文字列を取得する
+
+◇配列 delegate 追加
+
+erase(index)		  remove(index) の別名
+removeValue(v[,all=true]) 配列中でvと値が一致するものを削除
+find(value)               要素 value を持つインデックスを返す
+findall(value)            要素 value を持つインデックスの配列を返す
+includes(value)           要素 value を含むなら true を返す
+includeCount(value)       要素 value を含む数を返す
+splice(start, cnt, ...)   start から cnt個数の要素を続く要素で置換する
+						  置換された対象が配列として返される。
+
+◇テーブル delegate 追加
+
+keys()			  キー一覧を配列で返す
+find(value)               要素 value を持つキーを返す
+findall(value)            要素 value を持つキーの配列を返す
+includes(value)           要素 value を含むなら true を返す
+includeCount(value)       要素 value を含む数を返す
+
+●sq.exe 拡張
+
+・コンパイル時に事前に読み込むファイル指定 -p オプションを追加
+
+ enum 定義など、コンパイル前に読み込ませておきたい情報を
+ 1ファイルに集約して、個別ファイルのコンパイル時に事前に
+ 読み込ませたい用途に使えます
+
+・出力エンディアン指定の -e オプションを追加
+
+ 0: 環境標準
+ 1: little endian
+ 2: bigendian
+
+●その他内部仕様変更
+
+・SJISスルー対応
+　
+　USESJIS が定義されてる場合は、SJIS の文字列を通すようになります
+
+　適切に文字分離できてるわけではありません。コンパイル時の
+  漢字の2byte目でのエスケープ処理の誤動作が防がれるだけです。
+
+  string.mb* の拡張関数を使うことで基本的なマルチバイト操作を行うことができます。
+
+・スレッド実行中の sq_call でエラーを出力するように修正
+
+　sqbaselib.c:776 の　sq_call の raiseerror を SQFalse → SQTrue
+
+・コンパイルされたスクリプトは可変長引数を持つように変更
+
+  function main(...) という扱いになっていて、
+  vargc, vargv で sq_call 時に渡された引数を参照できます
+
+ compiler.cpp:163 に funcstate._varparams = true; を追加
+
+・SQ_SUCCEEDED, SQ_FAILED のマクロが危険だったので修正
+
+・SQInstance の Finalize 処理の仕様変更
+
+　GCは Finalize を先行して呼び出す。この時、class が破棄されてしまうため、
+  その後の _hook 呼び出しの先にある sqobject::Object の destructor の呼び出しで
+　例外が生じてしまう。これを防止するため、Finalize / Release いずれか先に
+　呼ばれたほうで _hook を処理するように仕様を変更
+
+・sqvm.cpp で _OP_FOREACH の処理に以下のコードを追加
+
+-------------------------------------------------
+if (sarg1 == tojump) { // XXX stack clear code
+    int n = _stackbase + (arg2+3);
+    while (n < _top) {
+        _stack._vals[n++].Null();
+    }
+}
+-------------------------------------------------
+
+これはforeach を抜けるときにスタックの後ろを全部消去する処理です。
+
+配列/辞書中のデータの呼び出しを行った際、スタック上の
+隠し変数に参照が残るため、配列や辞書の消去を行っても、
+参照が残って関数を抜けるまでオブジェクトが残る場合があります。
+
+これはあらゆる局面でおこる可能性があるのですが、
+・配列/辞書の連続操作は foreach を使うことが多い
+・foreach は抜ける部分がプログラム的に検知可能
+ということで、専用の対策コードをいれました。
+
+※本来は、例えばスコープ単位で、コンパイラが
+　作業スタックをクリアするバイトコードを挿入するようにするのが妥当です。
+　現在は関数からの Return 時にしかクリア処理が行われません
+
+・文法追加
+
+syntax suger を一つ追加
+
+local function name() {};
+
+という記述は
+
+local name = function() {};
+
+と等価になる
+
+・内部型名変更
+
+userpointer の typeof で帰る型名を "userdata" ではなく
+"userpointer" に変更。区別がつかないと困る場合がある
+
+・OP_EXIST 用の処理を SQVM::Exist として専用に作成。
+　
+　関連して存在判定メタメソッド _exist を新設。
+　存在する場合は成功(SQ_ERROR)、そうでない場合は例外(SQ_ERROR)を返すようにする
+
+●バグ修正
+
+・se_set/sq_rawset/sq_newslot が処理に失敗したときに
+　引数をスタックから解放してないバグの修正
+

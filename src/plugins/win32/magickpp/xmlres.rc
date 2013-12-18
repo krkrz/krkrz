@@ -1,0 +1,7 @@
+colors.xml		IMAGEMAGICK DISCARDABLE "colors.xml"
+configure.xml		IMAGEMAGICK DISCARDABLE "configure.xml"
+delegates.xml		IMAGEMAGICK DISCARDABLE "delegates.xml"
+english.xml		IMAGEMAGICK DISCARDABLE "english.xml"
+locale.xml		IMAGEMAGICK DISCARDABLE "locale.xml"
+type.xml		IMAGEMAGICK DISCARDABLE "type.xml"
+type-windows.xml	IMAGEMAGICK DISCARDABLE "type-windows.xml"

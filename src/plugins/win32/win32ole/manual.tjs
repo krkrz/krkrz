@@ -1,0 +1,140 @@
+/**
+ * 擬似記述マニュアル
+ */
+
+/**
+ * OLE を操作できるオブジェクトを生成します。
+ * OLE が IDispatch で持つメソッドを直接呼び出すことができます。
+ */
+class WIN32OLE {
+
+    /**
+	 * コンストラクタ
+	 * @param progIdOrCLSID 識別名 または CLSIDを文字列で指定
+     */
+    function WIN32OLE(name);
+
+    /**
+     * メソッドの実行
+     * @param name メソッド名
+     * 以下パラメータ
+     */
+    function invoke(name, ...);
+
+    /**
+     * プロパティの設定
+     * @param name プロパティ名
+     * @parma value 設定値
+     */
+    function set(name, value);
+
+    /**
+     * プロパティの取得
+     * @param name プロパティ名
+     * @return 設定値
+     */
+    function get(name);
+    
+    /**
+     * 定数の取得
+     * @param obj 指定したオブジェクトのプロパティとして定数を取得します。
+     * 省略した場合は自分のオブジェクト内部に取得します。
+     */
+    function getConstant(obj=this);
+
+    /**
+     * イベント受信オブジェクトの登録
+     * @param eventName イベント種別名 (例: "DWebBrowser2Events2" )
+     * @param receiver イベントをうけるオブジェクト
+     * オブジェクトが持つイベント名と同じ名前のメソッドが呼び出されます。
+     * 該当するメソッドが無い場合はなにも処理されません。
+     */
+	function addEvent(eventName, receiver);
+};
+
+/**
+ * ActiveX を操作できるオブジェクトを生成します。
+ * ActiveX が IDispatch で持つメソッドを直接呼び出すことができます。
+ */
+class ActiveX extends WIN32OLE {
+
+    /**
+	 * コンストラクタ
+	 * @param progIdOrCLSID 識別名 または CLSIDを文字列で指定
+	 * @param name 識別名またはCLSID を文字列で指定。※WIN32OLE の指定とは CLSID の書式が違うので注意 CAxWindow::CreateControl の書式
+	 * @param win 指定するとそのウインドウの上に生成します。省略すると独立ウインドウになります。
+	 * @param left 表示座標 ウインドウ指定かつ省略の場合はウインドウのクライアント領域の左上
+	 * @param top 表示座標 ウインドウ指定かつ省略の場合はウインドウのクライアント領域の左上
+	 * @param width 表示サイズ   ウインドウ指定かつ省略の場合は親ウインドウのクライアント領域のサイズ
+     * @param height 表示サイズ  ウインドウ指定かつ省略の場合は親ウインドウのクライアント領域のサイズ
+	 */
+	function ActiveX(name, win=null, left=0, top=0, width=100, height=100);
+
+    /**
+	 * 座標指定
+	 * @param left 左端座標
+	 * @param top 上端座標
+	 */
+	function setPos(left, top);
+
+    /**
+	 * サイズ指定
+     * @param width 横幅
+	 * @param height 縦幅
+     */
+    function setSize(width, height);
+
+    /**
+     * 拡張UI指定
+	 * IEコンポーネントでのみ意味を持ちます。現在の版では、これ呼び出すことで
+	 * コンテキストメニューが抑制されます。
+	 */
+	function setExternalUI();
+
+	/**
+	 * ウインドウが有効かどうか(読み込み専用)
+	 */
+	property isValidWindow;
+	
+    /**
+     * 左端座標
+     */
+    property left;
+
+    /**
+     * 上端座標
+     */
+    property top;
+
+    /**
+     * 横幅
+     */
+    property width;
+
+    /**
+     * 縦幅
+     */
+    property height;
+
+    /**
+     * 表示状態
+     */
+    property visible;
+
+	// ---------------------------------------------------------
+
+	/**
+	 * ウインドウ生成完了後に呼び出されるイベント
+	 * 初期生成時やフルスクリーン処理などでウインドウが生成された後に呼ばれます
+	 * 再構築後は、登録されていたイベントはすべて破棄される他、その他もろもろが
+	 * 初期化されるので、このイベント内で必要なものを再設定する必要があります。
+	 */
+	function onCreate();
+
+	/**
+	 * ウインドウ破棄前に呼び出されるイベント
+	 * フルスクリーン処理やオブジェクトの破棄などでウインドウが破棄される前に呼ばれます。
+	 */
+	function onDestroy();
+
+};

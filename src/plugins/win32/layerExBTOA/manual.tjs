@@ -1,0 +1,50 @@
+/**
+ * 擬似コードによるマニュアル
+ */
+class Layer {
+
+	/**
+	 * レイヤ右半分の Blue CHANNEL を左半分の Alpha CHANNELに複製する
+	 * ※クリップ非対応
+	 */
+	function copyRightBlueToLeftAlpha();
+	
+	/**
+	 * レイヤ下半分の Blue CHANNEL を上半分の Alpha CHANNELに複製する
+	 * ※クリップ非対応
+	 */
+	function copyBottomBlueToTopAlpha();
+	
+	/**
+	 * レイヤの Alpha CHANNEL を0xffで埋める
+	 */
+	function fillAlpha();
+	
+	/**
+	 * レイヤの Alpha CHANNEL を Province Image（領域画像）にコピーする
+	 * @param threshold 閾値。省略時またはvoidならそのままコピーする
+	 *                  数値を指定するとAlphaが閾値以上なら1，それ以外を0に埋める
+	 */
+	function copyAlphaToProvince(threshold);
+	
+	/**
+	 * レイヤの Alpha CHANNEL を src の Alpha CHANNEL で乗算する
+	 * @param dleft   左端位置
+	 * @param dtop    上端位置
+	 * @param src     乗算用のαを持つソース画像
+	 * @param sleft   ソースの左端位置
+	 * @param stop    ソースの上端位置
+	 * @param swidth  ソースの横幅
+	 * @param sheight ソースの縦幅
+	 * @param clear   演算範囲外領域をこの値（opacity）で塗りつぶす
+	 *                省略時または0-255の値以外の場合は塗りつぶさない
+	 */
+	function clipAlphaRect(dleft, dtop, src, sleft, stop, swidth, sheight, clear);
+
+	/**
+	 * 領域画像が指定した値の場所を指定した色で塗りつぶす
+	 * @param index 領域画像のインデックス値 (0～255)
+	 * @param color 塗りつぶす色 (0xAARRGGBB)
+	 */
+	function fillByProvince(index, color);
+};

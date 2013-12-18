@@ -1,0 +1,45 @@
+/**
+ * 擬似コードによるマニュアル
+ */
+
+/**
+ * Layer拡張
+ */
+class Layer {
+
+	/**
+	 * 初期化
+	 * 現在のレイヤサイズで総和バッファを初期化
+	 */
+	function initExposure();
+
+	/**
+	 * 現在の画像を総和バッファに加算
+	 * init時と同じ画像サイズである必要があります（違う場合は例外）
+	 */
+	function snapExposure();
+
+	/**
+	 * 総和バッファの最大値／最小値を取得
+	 * @return %[ min_r, max_r,
+	 *            min_g, max_g,
+	 *            min_b, max_b,
+	 *            min_a, max_a ];
+	 */
+	function statExposure();
+
+	/**
+	 * 総和バッファから画像作成
+	 * @param stat : 足きり用の情報辞書／voidの場合は暗黙でstatExposureを実行してその値を使用する
+	 *               各要素の min～max が 0～255 の画像として自分自身が書き換わる
+	 *               各要素において min >= maxの場合は常に0xFFで返される
+	 */
+	function copyExposure(stat);
+
+	/**
+	 * 総和バッファ破棄
+	 * 確保したバッファを破棄する
+	 * invalidate時でも自動で破棄される
+	 */
+	function termExposure();
+}

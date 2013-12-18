@@ -1,0 +1,80 @@
+/**
+ * 擬似コードによるマニュアル
+ * 外部アプリを機動してその終了を待つ機構を提供します。
+ */
+class Process {
+
+	/**
+	 * 現在の状態
+	 * 0:未実行
+	 * 1:実行中
+	 */
+	property status;
+	
+	/**
+	 * バックグラウンドでの外部プログラムの実行
+	 * @param target プログラム
+	 * @param param 引数
+	 * @param folder 実行時フォルダ(未指定時はカレントフォルダ)
+	 * @return 起動成功時は true
+	 * 処理がおわったら onExecuted イベントが発生します。
+	 */
+	function execute(target, param=void, folder=void);
+
+	/**
+	 * コンソール出力取得つきコマンドラインプログラムの実行
+	 * @param target プログラム
+	 * @param param 引数
+	 * @param folder 実行時フォルダ(未指定時はカレントフォルダ)
+	 * @return 起動成功時は true
+	 * コンソールの行単位出力で onOutput イベントが発生します。
+	 * 処理がおわったら onExecuted イベントが発生します。
+	 */
+	function commandExecute(target, param=void, folder=void);
+
+	/**
+	 * 実行中の外部プログラムの強制終了
+	 * @param endCode 終了コード
+	 */
+	function terminate(endCode);
+
+	/**
+	 * Ctrl+Cイベントの送信(experimental:すべての環境で動作するとは限りません)
+	 * @param isBreak Ctrl+CではなくCtrl+Breakを送る
+	 * @return 成功したらtrue
+	 */
+	function sendSignal(isBreak);
+
+	// --------------------------------------------------------------------------
+	
+	/**
+	 * イベント:シェル実行終了
+	 * @param endCode 終了コード
+	 */
+	function onExecuted(endCode);
+
+	/**
+	 * イベント:コンソール出力
+	 * @param line 行番号
+	 * @param text 出力テキスト（１行単位）
+	 */
+	function onOutput(line, text);
+};
+
+class System {
+	/**
+	 * コンソール出力取得つきコマンドラインプログラムの実行
+	 * @param target プログラム
+	 * @param param 引数
+	 * @param timeout タイムアウト時間(ms)
+	 * @return %[
+	 *   status:   ok/error/timeoutのいずれかの文字列, 
+	 *   stdout:   コンソール出力文字列配列(改行で分離)
+	 *   exitcode: 終了コード(status=="ok"時のみ),
+	 *   message:  エラーメッセージ(status!="ok"時のみ)
+	 *   ];
+	 * バックグラウンド処理はありません。実行対象のプログラムが終了するまで吉里吉里が停止します。
+	 */
+	function commandExecute(target, param, timeout = 0);
+};
+

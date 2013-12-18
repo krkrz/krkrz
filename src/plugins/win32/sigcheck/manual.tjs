@@ -1,0 +1,53 @@
+/**
+ * 擬似コードによるマニュアル
+ * バックグラウンドで署名チェックを行います。
+ * ウインドウメッセージとして WM_APP + 2 と WM_APP + 3 を利用しています
+ */
+class Window {
+
+	/**
+	 * 署名チェックの開始
+	 * @param filename 確認対象ファイル
+	 * @param publickey 公開鍵
+	 * @param info ユーザ情報
+	 * @return handler 識別ハンドラ
+	 * 処理中に onCheckSignatureProgress、
+	 * 終了時に onCheckSignatureDone イベントが発生します。
+	 * exe や dll の場合は署名はファイルに内臓されます。xp3 などの場合は、
+	 * 元のファイルに .sig をつけた外部ファイルを署名として処理されます。
+	 */
+	function checkSignature(filename, publickey, info);
+
+	/**
+	 * 署名チェックのキャンセル
+	 * @param handler 識別ハンドラ
+	 * 実行中の署名チェックを速やかに停止させます。キャンセル終了になります。
+	 */
+	function cancelCheckSignature(handler);
+
+	/**
+	 * 署名チェックの中止
+	 * @param handler 識別ハンドラ
+	 * 実行中の署名チェックを速やかに停止させます。終了イベントは来ません。
+	 */
+	function stopCheckSignature(handler);
+
+	
+	/**
+	 * イベント:署名チェック進捗
+	 * @param handler 識別ハンドラ
+	 * @param info ユーザ情報
+	 * @param percent 進捗度合い 0～100%
+	 */
+	function onCheckSignatureProgress(handler, info, percent);
+
+	/**
+	 * イベント:署名チェック終了
+	 * @param handler 識別ハンドラ
+	 * @param info ユーザ情報
+	 * @param result 結果 -2:エラー -1:キャンセル 0:チェック失敗 1:チェック成功
+	 * @param errormsg 結果がエラーの場合のエラーメッセージ
+	 */
+	function onCheckSignatureDone(handler, info, result, errormsg);
+
+};

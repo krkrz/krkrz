@@ -1,0 +1,28 @@
+Basic Installation
+==================
+
+This file only mentions the compilation, not the installation. 
+
+1. create compilation project
+
+ Include all the *.c files in 'src' folder to your empty project, and set the 
+ 'include' folder as the include path.
+ 
+ 
+2. Customize
+ Read the COSTOMIZE document, according to the document, modify the options and 
+ parameters of your project. Be sure the file 'psd_system.c' is correct.
+ 
+ 
+3. Compile
+
+ 
+Notice about this file
+======================
+
+Libpsd is the product of Graphest Software, copyright 2004-2007, www.graphest.com
+
+This file is the part of Libpsd project, Libpsd is under the terms of the GNU Library 
+General Public License as published by the Free Software Foundation; either version 2 
+of the License, or (at your option) any later version. See the GNU General Public 
+License for more details.

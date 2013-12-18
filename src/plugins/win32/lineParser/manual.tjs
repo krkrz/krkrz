@@ -1,0 +1,61 @@
+/**
+ * 擬似コードによるマニュアル
+ *
+ * Copyright 2005-2009 GoWatanabe
+ */
+
+class LineParser {
+
+    /**
+     * コンストラクタ
+     * @param target イベントを転送するターゲット。未指定時は自分に送る
+     */
+    function LineParser(target);
+
+    /**
+     * 処理対象テキストの初期化
+     * @param text テキスト
+     */
+    function init(text);
+
+    /**
+     * 処理対象テキストの初期化
+     * @param filename テキストのファイル名
+     * @param utf8 UTF-8 のファイルを使う場合は true
+     */
+    function initStorage(filename,utf8=false);
+
+    /**
+     * 次の行の情報を文字列として取得する
+     * @return 行
+     */
+    function getNextLine();
+
+    /**
+     * 現在の処理済み行番号を取得する
+     */
+    property currentLineNumber;
+
+    /**
+     * テキストに対するパース処理を実行する。
+     * 行ごとに doLine() イベントを呼び出す。
+     * @param text テキスト。省略時は現在設定中のテキストに対して処理を行なう
+     */
+    function parse(text);
+
+    /**
+     * テキストに対するパース処理を実行する。
+     * @param filename テキストのファイル名
+     * @param utf8 UTF-8 のファイルを使う場合は true
+     */
+    function parseStorage(filename,utf8=false);
+
+    // ----------------------------------
+
+    /**
+     * parse/parseStorage で呼び出されるイベント
+     * @param text 行のテキスト情報
+     * @param lineNo 行番号(1からになる)
+     */
+    function doLine(text, lineNo);
+};

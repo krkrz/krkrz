@@ -1,0 +1,218 @@
+/**
+ * Scripts クラスへの squirrel 機能拡張
+ */
+class Scripts {
+
+	/**
+	 * Squirrel スクリプトの読み込み
+	 * @param text スクリプトが格納された文字列
+	 * @throw コンパイルに失敗
+	 * @return 読み込まれたスクリプト
+	 */
+	function loadSQ(text);
+	
+	/**
+	 * Squirrel スクリプトの実行。
+	 * このメソッドによる実行中では Object/Thread 拡張による wait は利用できません
+	 * @param text スクリプトが格納された文字列
+	 * @param ... 引数
+	 * @throw コンパイルに失敗
+	 * @throw 実行に失敗
+	 * @return スクリプトの実行結果
+	 */
+	function execSQ(text, ...);
+
+	/**
+	 * Squirrel スクリプトの読み込み
+	 * @param filename スクリプトが格納されたファイル
+	 * @throw ファイルの読み込みに失敗
+	 * @return 読み込まれたスクリプト
+	 */
+	function loadStorageSQ(filename);
+	
+	/**
+	 * Squirrel スクリプトのファイルからの実行。
+	 * このメソッドによる実行中では Object/Thread 拡張による wait は利用できません
+	 * @param filename スクリプトが格納されたファイル
+	 * @param ... 引数
+	 * @throw ファイルの読み込みに失敗
+	 * @throw 呼び出しに失敗
+	 * @return スクリプトの実行結果
+	 */
+	function execStorageSQ(filename, ...);
+
+	/**
+	 * Squirrel グローバルメソッドの呼び出し。
+	 * このメソッドによる実行中では Object/Thread 拡張による wait は利用できません
+	 * @param name メソッド名
+	 * @param ... 引数
+	 * @throw メソッドの取得に失敗
+	 * @throw メソッドの呼び出しに失敗
+	 * @return スクリプトの実行結果
+	 */
+	function callSQ(name, ...);
+	
+	/**
+	 * Squirrel スクリプトのコンパイル処理
+	 * @param text スクリプトが格納された文字列
+	 * @param store バイナリクロージャ格納先ファイル
+	 * @param endian エンディアン指定 0:デフォルト 1:little 2:big
+	 * @throw コンパイルに失敗
+	 * @throw 書き出しに失敗
+	 * @return エラー文字列または void
+	 */
+	function compileSQ(text, store, endian=0)
+
+	/**
+	 * Squirrel スクリプトのファイルからのコンパイル処理
+	 * @param filename コンパイル元ファイル
+	 * @param store バイナリクロージャ格納先ファイル
+	 * @param endian エンディアン指定 0:デフォルト 1:little 2:big
+	 * @throw ファイルの読み込みに失敗
+	 * @throw 書き出しに失敗
+	 * @return エラー文字列または void
+	 */
+	function compileStorageSQ(filename, store, endian=0)
+	
+	/**
+	 * データを Squirrel 形式で保存する。このファイルは "return" を先頭にもつので
+	 * dofile() で読みだすことができます
+	 * @param filename 格納先ファイル
+	 * @param obj 保存対象オブジェクト
+	 * @param utf8 出力エンコーディング指定。true なら UTF-8、falseなら現在のコードページ
+	 * @param newline 改行コード 0:CRLF 1:LF
+	 */
+    function saveSQ(filename, obj, utf8=false, newline=0);
+
+    /**
+	 * データを Squirrel 形式の文字列に変換する
+	 * @param obj オブジェクト
+	 * @param newline 改行コード 0:CRLF 1:LF
+	 * @return Squirrel 形式のテキスト
+	 */
+	function toSQString(obj, newline=0);
+
+    /**
+	 * Squirrel のグローバル空間に TJS2 のオブジェクト/関数を登録する
+	 * @param name 登録名称
+	 * @param obj オブジェクト（省略した場合は名称で参照されるオブジェクト）
+	 */
+	function registerSQ(name, obj);
+
+    /**
+	 * Squirrel のグローバル空間に登録されたオブジェクトを解放する
+	 * @param name 登録名称
+	 */
+	function unregisterSQ(name);
+
+	// -------------------------------------------------------
+
+	/**
+	 * Squirrel スクリプトのスレッド実行。
+	 * @param text スクリプトが格納された文字列
+	 * @param ... 引数
+	 * @throw コンパイルに失敗
+	 * @throw スレッド生成に失敗
+	 * @return Threadオブジェクト
+	 */
+	function forkSQ(text, ...);
+
+	/**
+	 * Squirrel スクリプトのファイルからのスレッド実行。
+	 * @param filename スクリプトが格納されたファイル
+	 * @param ... 引数
+	 * @throw スレッド生成に失敗
+	 * @return Threadオブジェクト
+	 */
+	function forkStorageSQ(filename, ...);
+	
+	/**
+	 * Squirrel疑似スレッド処理の稼働
+	 * @param diff 経過tick
+	 * @param onThreadDone スレッド終了時コールバック。第一引数にスレッドオブジェクトが渡ってくる
+	 * @return 動作しているスレッドの数
+	 */
+	function driveSQ(diff, onThreadDone);
+
+	/**
+	 * Squirrel疑似スレッド用のトリガ呼び出し
+	 * @param name トリガ名
+	 */
+	function triggerSQ(name);
+
+	/**
+	 * @return squirrelのスレッド数を返す
+	 */
+	property threadCountSQ;
+
+
+	// -------------------------------------------------------
+
+	/**
+	 * Squirrel用比較
+	 * 2つのオブジェクトを squirrel 的に比較します
+	 * @param obj1 オブジェクトその1
+	 * @param obj2 オブジェクトその2
+	 * @return 比較結果 >0: obj1>obj2 ==0:obj1==obj2 <0:obj1<obj2
+	 */
+	function compareSQ(obj1, obj2);
+}
+
+/**
+ * Squirrel のグローバルファンクションを直接呼び出すためのクラス
+ */
+class SQFunction {
+
+	/**
+	 * コンストラクタ
+	 * @param func squirrel のグローバルな関数の名前
+	 */
+	function SQFunction(func);
+
+    /**
+	 * 関数を呼び出す
+	 * このメソッドによる実行中では Object/Thread 拡張による wait は利用できません
+	 * @param 引数はそのまま変換してわたされます
+	 * @return 関数の返り値
+	 */
+	function call();
+};
+
+/**
+ * Squirrel 専用の Continuous ハンドラを維持するためのクラス
+ */
+class SQContinuous {
+
+	/**
+	 * コンストラクタ
+	 * このメソッドによる実行中では Object/Thread 拡張による wait は利用できません
+	 * @param func squirrel のグローバルな関数 func(tick){} の名前
+	 * ※tick は SQInteger にキャストされてから呼び出されます
+	 */
+	function SQContinuous(func);
+
+	/**
+	 * 呼び出しを開始する
+     */
+ 	function start();
+    
+    /**
+	 * 呼び出しを停止する
+	 */
+    function stop();
+};
+
+/**
+ * squirrel 側で createTJSClass して生成されたインスタンス中では
+ * 以下の特殊なメソッドが利用可能です。イベントの伝播などで活用可能です。
+ */
+class TJSObject {
+	/**
+	 * Squirrel インスタンスメソッドの呼び出し
+	 * このメソッドによる実行中では Object/Thread 拡張による wait は利用できません
+	 * @param name メソッド名
+	 * @param ... 引数
+	 * @return スクリプトの実行結果
+	 */
+	function callSQ(name, ...);
+};

@@ -1,0 +1,326 @@
+/**
+ * 擬似記述マニュアル
+ *
+ * FlashPlayerクラス
+ * FlashPlayerをレイヤ上で再生制御するオブジェクトです。
+
+ * <h2>ExternalInterface機能</h2>
+ *　
+ * <h3>◇TJSメソッドのActionScriptからの呼び出し</h3>
+ *
+ * オブジェクトの任意のメソッドが、再生中の swfの ActionScriptから ExternalInterface で呼び出し可能です
+ * <pre>
+ * -----------------------------------------------------------
+ * import flash.external.ExternalInterface;
+ * trace(ExternalInterface.call("tjsFunction", 10, "test"));
+ * -----------------------------------------------------------
+ * </pre>
+ * 吉里吉里側で例外が発生して呼び出しに失敗しても ActionScript 側では
+ * 例外になりませんので注意してください。
+ * 例外情報は getLastTJSError() で取得可能です。
+ *
+ * <h3>◇ActionScriptメソッドのTJSからの呼び出し</h3>
+ *
+ * callFunction() で､ExternalInterface で公開されている
+ * ActionScript メソッドを呼び出しできます。
+ * <pre>
+ * ActionScriptでの関数の準備
+ * -----------------------------------------------------------
+ * import flash.external.ExternalInterface;
+ * // 呼び出しメソッド
+ * function flashFunction(a:Number, b:String):String {
+ * 	return StringUtil.substitute("{0}:{1}", a, b);
+ * }
+ * // 登録
+ * ExternalInterface.addCallback("flashFunction", flashFunction);
+ * -----------------------------------------------------------
+ *
+ * TJSからの呼び出し
+ * -----------------------------------------------------------
+ * var flash = new FlashPlayer(100,100);
+ * flash.initMovie("sample.swf");
+ * Debug.message(flash.callFunction("flashFunction", 1, "test"));
+ * -----------------------------------------------------------
+ * </pre>
+ * 呼び出しに失敗すると例外になります。
+ *
+ */
+class FlashPlayer {
+
+    /**
+	 * コンストラクタ
+	 * Flash OCXの初期化に失敗した場合は例外になります
+	 * @param width プレイヤー横幅
+	 * @param height プレイヤー縦幅
+	 */
+	function FlashPlayer(width, height);
+
+	/*
+	 * 動画情報を完全にクリアする
+	 * @return 成功したら true
+	 */
+	function clearMovie()
+	
+	/*
+	 * 指定した吉里吉里のファイルを動画として初期化する
+	 * @param storage 吉里吉里のファイル
+	 * @return 読み込みに成功したら true
+	 */
+	function initMovie(storage);
+	
+	/**
+	 * プレイヤーサイズの変更
+	 * @param width
+	 * @param height
+	 */
+	function setSize(width, height);
+
+	/**
+	 * レイヤに対して現在の描画内容を出力する。レイヤのサイズが小さい場合はトリミングされます
+	 * @param layer 対象レイヤ
+	 * @param onlyUpdate true:前回からの更新領域のみ書き出す false:全画面書き出す
+	 */
+	function draw(layer, onlyUpdate=false);
+
+	/**
+	 * 指定された座標の位置に対する入力をうけつけるかどうかを返します
+	 * @param x
+	 * @param y
+	 * @return 入力をうけつけるなら true
+	 */
+	function hitTest(x, y);
+	
+	/**
+	 * キーダウンの通知
+	 * @param key キーコード
+	 * @return 処理されたら true
+	 */
+	function doKeyDown(key);
+
+	/**
+	 * キーアップの通知
+	 * @param key キーコード
+	 * @return 処理されたら true
+	 */
+	function doKeyUp(key);
+
+	/**
+	 * マウスが領域に入った通知
+	 */
+	function doMouseEnter();
+
+	/**
+	 * マウスが領域から出た通知
+	 */
+	function doMouseLeave();
+
+	/**
+	 * マウスキーおしさげ通知
+	 * @param x 座標
+	 * @param y 座標
+	 * @param button 押し下げたボタン
+	 * @param shift シフト状態
+	 * @return 処理されたら true
+	 */
+	function doMouseDown(x, y, button, shift);
+
+	/**
+	 * マウス移動通知
+	 * @param x 座標
+	 * @param y 座標
+	 * @param shift シフト状態
+	 * @return 処理されたら true
+	 */
+	function doMouseMove(x, y, shift);
+
+	/**
+	 * マウスキーおしあげ通知
+	 * @param x 座標
+	 * @param y 座標
+	 * @param button 押し上げたボタン
+	 * @param shift シフト状態
+	 * @return 処理されたら true
+	 */
+	function doMouseUp(x, y, button, shift);
+
+	/**
+	 * マウスホイール通知
+	 * @param shift シフト状態
+	 * @param delta ホイール回転量
+	 * @param x 座標
+	 * @param y 座標
+	 * @return 処理されたら true
+	 */
+	function doMouseWheel(shift, delta, x, y);
+		
+	// -------------------------------------------------
+	// イベント
+	// -------------------------------------------------
+
+	/*
+	 * 描画内容が更新された場合に呼び出されるイベント
+	 * 通常はこのイベントがきた場合に draw() で描画内容を取得します
+	 */
+	function onFrameUpdate();
+
+	// -------------------------------------------------
+	// Flash プロパティ
+	// -------------------------------------------------
+
+	property readyState; // RO
+	property totalFrames; // RO
+
+	property playing;
+
+	property quality;
+	property scaleMode;
+	property alighMode;
+	property backgroundColor;
+	property loop;
+	property movie;
+	property frameNum;
+
+	property currentFrame; // RO
+	property percentLoaded; // RO
+	property flashVersion; // RO
+
+	property sAlign;
+	property menu;
+	property base;
+	property scale;
+	property deviceFont;
+	property embedMovie;
+	property bgColor;
+	property quality2;
+
+	property swRemote;
+	property flashVars;
+	property allowScriptAccess;
+	property movieData;
+	property seamlessTabbing;
+	property profile;
+	property profileAddress;
+	property profilePort;
+	
+	// -------------------------------------------------
+	// Flash 制御コマンド
+	// -------------------------------------------------
+
+	/**
+	 * @param left
+	 * @param top
+	 * @param right
+	 * @param bottom
+	 */
+	function setZoomRect(left, top, right, bottom);
+
+	/**
+	 * @param factor
+	 */
+	function zoom(factor);
+
+	/**
+	 * @param x
+	 * @param y
+	 * @param mode
+	 */
+	function pan(x, y, mode);
+
+	/**
+	 */
+	function play();
+	
+	/**
+	 */
+	function stop();
+
+	/**
+	 */
+	function back();
+
+	/**
+	 */
+	function forward();
+
+	/**
+	 */
+	function rewind();
+
+	/**
+	 */
+	function stopPlay();
+
+	/**
+	 * @param frameNum
+	 */
+	function gotoFrame(frameNum);
+
+	function isPlaying();
+	function getFrameLoaded(frameNum);
+
+	/**
+	 * ムービーをロードする
+	 * @param layer
+	 * @param url ムービーのURL。
+	 * 吉里吉里のストレージ名ではなく、ローカルファイル名ないしネット上のファイルである必要があります。
+	 */
+	function loadMovie(layer, url);
+
+	function tGotoFrame(target, frameNum);
+	function tGotoLabel(target, label);
+	function tCurrentFrame(target);
+	function tCurrentLabel(target);
+	function tPlay(target);
+	function tStopPlay(target);
+	function setVariable(name, value);
+	function getVariable(name);
+	function tSetProperty(target, prop, value);
+	function tGetProperty(target, prop);
+	function tCallFrame(target, frameNum);
+	function tCallLabel(target, label);
+	function tSetPropertyNum(target, prop, num);
+	function tGetPropertyNum(target, prop);
+	function enforceLocalSecurity();
+	function disableLocalSecurity();
+
+	// -------------------------------------------------
+	// Flash イベント
+	// -------------------------------------------------
+	
+	/**
+	 * ReadyStateChangeイベントの通知
+	 * @param newState 新しいステート
+	 */
+	function onReadyStateChange(newState);
+
+	/**
+	 * Progressイベントの通知
+	 * @param percentDone 読み込んだドキュメントのパーセンテージ
+	 */
+	function onProgress(percentDone);
+
+	/**
+	 * FSCommandイベントの通知
+	 * @param command コマンド名パラメータ
+	 * @param arg 引数パラメータ
+	 */
+	function onFSCommand(command, arg);
+
+	// -------------------------------------------------
+	// ExternalInterface機能
+	// -------------------------------------------------
+
+	/**
+	 * Flash の ExternalInterface 登録されたメソッドを呼び出します。
+	 * @param methodName メソッド名
+	 * @param ... 引数
+	 * @throw "flash com error:*" COM実行時例外
+	 */
+	function callFunction(methodName, ...);
+
+	/**
+	 * TJS呼び出しエラーの取得。
+	 * @return 最後のActionScriptからTJS呼び出し時のエラー文字列。エラーでない場合は空文字列
+	 */
+	function getLastTJSError();
+};

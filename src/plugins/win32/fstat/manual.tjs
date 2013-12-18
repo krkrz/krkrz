@@ -1,0 +1,256 @@
+/**
+ * 擬似コードによるマニュアル
+ *
+ * Copyright 2007 GoWatanabe
+ */
+class Storages {
+
+	/**
+	 * カレントディレクトリを示すプロパティ(読み書き可能)
+	 */
+	proprety currentPath;
+	
+	/**
+	 * ファイル属性の取得
+	 * @param file 対象ファイル
+	 * @return 属性情報の入った辞書
+	 * size: ファイルサイズ
+	 * mtime: 更新日時 (Date オブジェクト)
+	 * atime: アクセス日時 (Date オブジェクト)
+	 * ctime: 作成日時 (Date オブジェクト)
+	 */
+	function fstat(filename);
+
+	/**
+	 * 吉里吉里のストレージ空間中のファイルを抽出する
+	 * @param src 保存元ファイル
+	 * @param dest 保存先ファイル
+	 */
+	function exportFile(src, dest);
+
+	/**
+	 * 吉里吉里のストレージ空間中の指定ファイルを削除する。
+	 * @param file 削除対象ファイル
+	 * @return 実際に削除されたら true
+	 * 実ファイルがある場合のみ削除されます
+	 */
+	function deleteFile(file);
+
+	/**
+	 * 吉里吉里のストレージ空間中の指定ファイルのサイズを変更する(切り捨てる)
+	 * @param file ファイル
+	 * @param size 指定サイズ
+	 * @return サイズ変更できたら true
+	 * 実ファイルがある場合のみ処理されます
+	 */
+	function truncateFile(file, size);
+	
+	/**
+	 * 指定ファイルを移動する。
+	 * @param fromFile 移動対象ファイル
+	 * @param toFile 移動先パス
+	 * @return 実際に移動されたら true
+	 * 移動対象ファイルが実在し、移動先パスにファイルが無い場合のみ移動されます
+	 */
+	function moveFile(fromFile, toFile);
+
+	/**
+	 * 指定ディレクトリのファイル一覧を取得する
+	 * @param dir ディレクトリ名
+	 * @return ファイル名一覧が格納された配列
+	 */
+	function dirlist(dir);
+
+	/**
+	 * 指定ディレクトリのファイル一覧と詳細情報を取得する
+	 * @param dir ディレクトリ名
+	 * @return ファイル情報一覧が格納された配列
+	 *         [ %[ name:ファイル名, size, attrib, mtime, atime, ctime ], ... ]
+	 * dirlistと違いnameにおいてフォルダの場合の末尾"/"追加がないので注意(attribで判定のこと)
+	 */
+	function dirlistEx(dir);
+
+	/**
+	 * 指定ディレクトリを削除する
+	 * @param dir ディレクトリ名
+	 * @return 実際に削除されたら true
+	 * 中にファイルが無い場合のみ削除されます
+	 */
+	function removeDirectory(dir);
+
+	/**
+	 * ディレクトリを作成する
+	 * @param dir ディレクトリ名
+	 * @return 実際に作成できたら true
+	 */
+	function createDirectory(dir);	// by Kiyobee
+
+	/**
+	 * カレントディレクトリを変更する
+	 * @param dir ディレクトリ名
+	 * @return 実際に変更できたら true
+	 */
+	function changeDirectory(dir);
+	
+	/**
+	 * ファイルの属性を設定する
+	 * @param fliename ファイル/ディレクトリ名
+	 * @param attr 設定する属性(FILE_ATTRIBUTE_READONLY,FILE_ATTRIBUTE_HIDDEN,...)
+	 */
+	function setFileAttributes(filename, attr);	// by Kiyobee
+
+	/**
+	 * ファイルの属性を解除する
+	 * @param fliename ファイル/ディレクトリ名
+	 * @param attr 解除する属性(FILE_ATTRIBUTE_READONLY,FILE_ATTRIBUTE_HIDDEN,...)
+	 */
+	function resetFileAttributes(filename, attr);	// by Kiyobee
+
+	/**
+	 * ファイルの属性を取得する
+	 * @param filename ファイル/ディレクトリ名
+	 * @return 取得した属性(FILE_ATTRIBUTE_READONLY,FILE_ATTRIBUTE_HIDDEN,...)
+	 */
+	function getFileAttributes(filename);	// by Kiyobee
+
+	/**
+	 * フォルダ選択ダイアログを開く
+	 * @param params selectFile と同様のパラメータを設定する
+	 * @return フォルダを選択してOKボタンを押せば真、キャンセルボタンを押せば偽
+	 * params.name フォルダ名を指定します。OKボタンを押した場合、選択されたフォルダがこのメンバに設定されます
+	 * params.title ダイアログボックスのタイトルを表示します
+	 * params.window ダイアログを開くWindowオブジェクトを指定します(void なら mainWindow が、未指定ならデスクトップがオーナーウィンドウとなります。デスクトップがオーナーの場合は、モードレス)
+	 * params.rootDir フォルダ選択のルートを指定します(このフォルダ以下のみ表示されます)
+	 */
+	function selectDirectory(params = %[name:"", title:"", window:void, rootDir:""]);	// by Kiyobee
+
+	/**
+	 * ディレクトリの存在チェック
+	 * @param dir ディレクトリ名
+	 * @return ディレクトリが存在すれば true/存在しなければ -1/ディレクトリでなければ false
+	 */
+	function isExistentDirectory(dir);	// by Kiyobee
+
+	/**
+	 * タイムスタンプ取得
+	 * @param target 対象ファイルまたはディレクトリ
+	 * @return タイムスタンプ情報の入った辞書
+	 * mtime: 更新日時 (Date オブジェクト)
+	 * atime: アクセス日時 (Date オブジェクト)
+	 * ctime: 作成日時 (Date オブジェクト)
+	 * ⇒fstatとの違いは非アーカイブファイル限定で，sizeを返さないこと
+	 */
+	function getTime(target);
+
+	/**
+	 * タイムスタンプ設定
+	 * @param target 対象ファイルまたはディレクトリ
+	 * @param times タイムスタンプ情報の入った辞書
+	 * mtime: 更新日時 (Date オブジェクト)
+	 * atime: アクセス日時 (Date オブジェクト)
+	 * ctime: 作成日時 (Date オブジェクト)
+	 * @return 成功したかどうか
+	 */
+	function setTime(target, times);
+
+
+	/**
+	 * 更新日取得（高速版）
+	 * @param target 対象ファイルまたはディレクトリ
+	 * @return 時間（WINDOWSのFILETIME 64bit値）
+	 */
+	function getLastModifiedFileTime(target);
+	/**
+	 * 更新日設定（高速版）
+	 * @param target 対象ファイルまたはディレクトリ
+	 * @param time   時間（WINDOWSのFILETIME 64bit値）
+	 * @return 成功したかどうか
+	 */
+	function setLastModifiedFileTime(target, time);
+
+	/**
+	 * 吉里吉里のストレージ空間中の指定ファイルをコピーする
+	 * @param from コピー元ファイル
+	 * @param to コピー先ファイル
+	 * @param failIfExist ファイルが存在するときに失敗するなら ture、上書きするなら false
+	 * @return 実際にコピーできたら true
+	 */
+	function copyFile(from, to, failIfExist);	//	by Kiyobee
+
+	/**
+	 * パスの正規化を行なわず吉里吉里のストレージ空間中の指定ファイルをコピーする
+     * (コピー先ファイルのファイル名が小文字に変換されない)
+	 * @param from コピー元ファイル
+	 * @param to コピー先ファイル
+	 * @param failIfExist ファイルが存在するときに失敗するなら ture、上書きするなら false
+	 * @return 実際にコピーできたら true
+	 */
+	function copyFileNoNormalize(from, to, failIfExist);
+
+	/**
+	 * パスの正規化を行なわず、autoPathからの検索も行なわずに
+	 * ファイルの存在確認を行う
+	 * @param filename ファイル名
+	 * @return ファイルが存在したらtrue
+	 */
+	function isExistentStorageNoSearchNoNormalize(filename);  // by Yun
+
+	/**
+	 * 表示名の取得
+	 * 実際にエクスプローラで表示されるファイル名を返す (SHGetFileInfoによる)
+	 * @param filename ファイル名（親ディレクトリ以上のパスは落とされるので注意)。
+	 * @return 表示名
+	 */
+	function getDisplayName(filename); // by go
+
+	/**
+	 * MD5ハッシュ値の取得
+	 * @param filename 対象ファイル名
+	 * @return ハッシュ値（32文字の16進数ハッシュ文字列（小文字））
+	 */
+	function getMD5HashString(filename); // by miahmie
+
+	/**
+	 * パスの検索
+	 * @param filename   検索対象ファイル名
+	 * @param searchpath 検索対象パス（ローカル表記(c:\～等)で";"区切り，省略時はシステムのデフォルト検索パス）
+	 * @return 見つからなかった場合はvoid，見つかった場合はファイルのフルパス(file://./～)
+	 */
+	function searchPath(filename, searchpath); // by miahmie
+
+
+	/**
+	 * テンポラリファイル名の取得
+	 * @return テンポラリファイル名（TVPGetTemporaryName()の文字列）
+	 */
+	function getTemporaryName(); // by miahmie
+};
+
+
+/**
+ * テンポラリファイルを管理するクラス
+ * あらかじめテンポラリ化したいファイルをこれにエントリして、
+ * その後このオブジェクトを破棄すると、
+ * ファイルクローズ時に自動的に消去されます
+ */
+class TemporaryFiles {
+
+	/**
+	 * コンストラクタ
+	 */
+	function TemporaryFiles();
+	
+	/**
+	 * ファイルをエントリ
+	 * @param filename ファイル名
+	 * @return 登録できたら true
+	 */
+	function entry(filename);
+
+	/**
+	 * フォルダをエントリ
+	 * @param foldername フォルダ名
+	 * @return 登録できたら true
+	 */
+	function entryFolder(foldername)
+};

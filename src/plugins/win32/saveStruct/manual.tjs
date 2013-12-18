@@ -1,0 +1,43 @@
+/**
+ * 擬似コードによるマニュアル
+ */
+class Array {
+	/**
+	 * データを save に準じる形式で保存する
+	 * @param filename 格納先ファイル
+	 * @param utf8 出力エンコーディング指定。true なら UTF-8、falseなら現在のコードページ
+	 * @param newline 改行コード 0:CRLF 1:LF
+	 */
+	function save2(filename, utf8=false, newline=0);
+	
+	/**
+	 * データを saveStruct に準じる形式で保存する
+	 * @param filename 格納先ファイル
+	 * @param utf8 出力エンコーディング指定。true なら UTF-8、falseなら現在のコードページ
+	 * @param newline 改行コード 0:CRLF 1:LF
+	 */
+	function saveStruct2(filename, utf8=false, newline=0);
+
+	/**
+	 * @param 改行コード newline 0:CRLF 1:LF
+	 * @return saveStruct に準じた形の文字列を返す
+	 */
+	function toStructString(newline=0);
+};
+
+class Dictionary {
+	/**
+	 * データを saveStruct に準じる形式で保存する
+	 * @param filename 格納先ファイル
+	 * @param utf8 出力エンコーディング指定。true なら UTF-8、falseなら現在のコードページ
+	 * @param newline 改行コード 0:CRLF 1:LF
+	 */
+	function saveStruct2(filename, utf8=false, newline=0);
+
+	/**
+	 * @param newline 改行コード 0:CRLF 1:LF
+	 * @return saveStruct に準じた形の文字列を返す
+	 */
+	function toStructString(newline=0);
+}
+

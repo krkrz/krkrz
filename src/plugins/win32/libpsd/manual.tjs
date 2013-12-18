@@ -1,0 +1,160 @@
+
+/**
+ * 擬似コードによるマニュアル
+ */
+
+class PSD {
+
+	// カラーモード定義
+	color_mode_bitmap 		= 0;
+	color_mode_grayscale 	= 1;
+	color_mode_indexed		= 2;
+	color_mode_rgb			= 3;
+	color_mode_cmyk			= 4;
+	color_mode_multichannel	= 7;
+	color_mode_duotone		= 8;
+	color_mode_lab			= 9;
+
+	// レイヤ種別定義
+	layer_type_normal = 0;
+	layer_type_hidden = 1;
+	layer_type_folder = 2;
+	layer_type_solid_color = 3;
+	layer_type_gradient_fill = 4;
+	layer_type_pattern_fill = 5;
+	layer_type_levels = 6;
+	layer_type_curves = 7;
+	layer_type_brightness_contrast = 8;
+	layer_type_color_balance = 9;
+	layer_type_hue_saturation = 10;
+	layer_type_selective_color = 11;
+	layer_type_threshold = 12;
+	layer_type_invert = 13;
+	layer_type_posterize = 14;
+	layer_type_channel_mixer = 15;
+	layer_type_gradient_map = 16;
+	layer_type_photo_filter = 17;
+
+	// 合成モード定義
+	blend_mode_normal = 0;
+	blend_mode_dissolve = 1;
+	blend_mode_darken = 2;
+	blend_mode_multiply = 3;
+	blend_mode_color_burn = 4;
+	blend_mode_linear_burn = 5;
+	blend_mode_lighten = 6;
+	blend_mode_screen = 7;
+	blend_mode_color_dodge = 8;
+	blend_mode_linear_dodge = 9;
+	blend_mode_overlay = 10;
+	blend_mode_soft_light = 11;
+	blend_mode_hard_light = 12;
+	blend_mode_vivid_light = 13;
+	blend_mode_linear_light = 14;
+	blend_mode_pin_light = 15;
+	blend_mode_hard_mix = 16;
+	blend_mode_difference = 17;
+	blend_mode_exclusion = 18;
+	blend_mode_hue = 19;
+	blend_mode_saturation = 20;
+	blend_mode_color = 21;
+	blend_mode_luminosity = 22;
+	blend_mode_pass_through = 23;
+	
+	/**
+	 * PSD画像のロード
+	 * @param filename ファイル名
+	 * @return ロードに成功したら true
+	 */
+	function load(filename);
+
+	// 画像の基本プロパティ
+	
+	property width; //< 画像横幅
+	property height; //< 画像縦幅
+	property channels; //< チャンネル数
+	property color_mode; //< カラーモード
+	property layer_count; //< レイヤ数
+
+	/**
+	 * レイヤ種別の取得
+	 * @param no レイヤ番号
+	 * @return レイヤ種別
+	 */
+	function getLayerType(no);
+
+	/**
+	 * レイヤの名前の取得
+	 * @param no レイヤ番号
+	 * @return レイヤ名称
+	 */
+	function getLayerName(no);
+
+	/**
+	 * レイヤの情報の取得
+	 * @param no レイヤ番号
+	 * @return レイヤ情報がはいった辞書
+	 * 辞書の内容
+	 * layer_type   レイヤ種別
+	 * top          上座標
+	 * left         左座標
+	 * bottom       底座標
+	 * right        右座標
+	 * width        横幅
+	 * height       縦幅
+	 * blend_mode   合成モード
+	 * opacity      不透明度
+	 * visible      表示状態
+	 * name         レイヤ名
+	 * type         合成モード（吉里吉里の対応モード)
+	 */
+	function getLayerInfo(no);
+	
+	/**
+	 * レイヤデータの読み出し
+	 * @param layer 読み出し先レイヤ
+	 * @param no レイヤ番号
+	 * layer_type が layer_type_normal の場合のみ読み込みできます
+	 * データ内容のほか以下のプロパティが自動的にレイヤに設定されます
+	 * left          左座標
+	 * top           上座標
+	 * width         横幅
+	 * height        縦幅
+	 * type          合成モード
+	 * opacity       不透明度
+	 * visible       表示状態
+	 * imageLeft     0になります
+	 * imageTop      0になります
+	 * imageWidth    width になります
+	 * imageHeight   height になります
+	 * name          name が設定されます
+	 */
+	function getLayerData(layer, no);
+
+
+	/**
+	 * スライスデータの読み出し
+	 * @return スライス情報辞書 %[ top, left, bottom, right, slices:[ %[ id, group_id, left, top, bottom, right ], ... ] ]
+	 *         スライス情報がない場合は void を返す
+	 */
+	function getSlices();
+
+	/**
+	 * ガイドデータの読み出し
+	 * @return ガイド情報辞書 %[ vertical:[ x1, x2, ... ], horizontal:[ y1, y2, ... ] ]
+	 *         ガイド情報がない場合は void を返す
+	 */
+	function getGuides();
+
+
+	/**
+	 * 合成結果の取得。取得領域は画像全体サイズ内におさまってる必要があります
+	 * @param layer 格納先レイヤ(width,heightサイズに調整される)
+	 * @param left 合成結果取得領域の左上座標
+	 * @param top 合成結果取得領域の左上座標
+	 * @param width 取得サイズ横幅
+	 * @param height 取得サイズ縦幅
+	 * @return 取得に成功したら true
+	 */
+	function getBlend(layer, left, top, width, height);
+};

@@ -1,0 +1,14 @@
+/**
+ * 擬似コードによるマニュアル
+ */
+class System
+{
+	/**
+	 * レジストリにデータを書き込みます
+	 * @param key 書き込み先のキー(readRegValue と同様に HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\hoeg\installdir と指定する)
+	 * @param value 書き込む値(文字列又は整数値)
+	 */
+	function writeRegValue(key, value);
+
+	// レジストリの読み込みは、組み込みの System.readRegValue を使用のこと
+};

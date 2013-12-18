@@ -1,0 +1,74 @@
+/**
+ * 擬似コードによるマニュアル
+ * 外部アプリを機動してその終了を待つ機構を提供します。
+ * ウインドウメッセージとして WM_APP + 1 を利用しています
+ */
+class Window {
+
+	/**
+	 * バックグラウンドでの外部プログラムの実行
+	 * @param target プログラム
+	 * @param param 引数
+	 * @return プロセスハンドル（失敗した場合は-1)。terminateProcess に渡すことができます。
+	 * 処理がおわったら onShellExecuted イベントが発生します。
+	 */
+	function shellExecute(target, param);
+
+	/**
+	 * 実行中の外部プログラムの強制終了
+	 * @param process プロセスハンドル
+	 * @param endCode 終了コード
+	 */
+	function terminateProcess(process, endCode);
+	
+	/**
+	 * イベント:シェル実行終了
+	 * @param process プロセスハンドル
+	 * @param endCode 終了コード
+	 */
+	function onShellExecuted(process, endCode);
+
+	/**
+	 * コンソール出力取得つきコマンドラインプログラムの実行
+	 * @param target プログラム
+	 * @param param 引数
+	 * @return プロセスハンドル（失敗した場合は-1)。terminateProcess に渡すことができます。
+	 * コンソールの行単位出力で onCommandLineOutput イベントが発生します。
+	 * 処理がおわったら onShellExecuted イベントが発生します。
+	 */
+	function commandExecute(target, param);
+
+	/**
+	 * Ctrl+Cイベントの送信(experimental:すべての環境で動作するとは限りません)
+	 * @param process プロセスハンドル（commandExecuteしたプロセスのみ）
+	 * @param isBreak Ctrl+CではなくCtrl+Breakを送る
+	 * @return 成功したらtrue
+	 */
+	function commandSendSignal(process, isBreak);
+
+	/**
+	 * イベント:コンソール出力
+	 * @param process プロセスハンドル
+	 * @param text    出力テキスト（１行単位）
+	 */
+	function onCommandLineOutput(process, text);
+};
+
+
+class System {
+	/**
+	 * コンソール出力取得つきコマンドラインプログラムの実行
+	 * @param target プログラム
+	 * @param param 引数
+	 * @param timeout タイムアウト時間(ms)
+	 * @return %[
+	 *   status:   ok/error/timeoutのいずれかの文字列, 
+	 *   stdout:   コンソール出力文字列配列(改行で分離)
+	 *   exitcode: 終了コード(status=="ok"時のみ),
+	 *   message:  エラーメッセージ(status!="ok"時のみ)
+	 *   ];
+	 * バックグラウンド処理はありません。実行対象のプログラムが終了するまで吉里吉里が停止します。
+	 */
+	function commandExecute(target, param, timeout = 0);
+};
+

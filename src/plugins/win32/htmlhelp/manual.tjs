@@ -1,0 +1,11 @@
+/**
+ * 疑似コードによるマニュアル
+ */
+
+
+/**
+ * HTMLヘルプを表示します。
+ * @param url URL文字列
+ */
+function HtmlHelp.displayTopic(url);
+

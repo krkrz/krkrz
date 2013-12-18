@@ -1,0 +1,43 @@
+/**
+ * 擬似コードによるマニュアル
+ */
+
+/**
+ * AGG のプリミティブ
+ */
+class AGGPrimitive {
+
+    /**
+     * コンストラクタ
+     * @param layer 表示対象レイヤ
+     * @param type プリミティブの種類
+     * @throws 第一引数がレイヤでない場合は例外
+     */
+    function AGGPrimitive(layer, type, ...);
+};
+
+/**
+ * レイヤへの AGG プリミティブ描画機能の拡張
+ */
+class Layer {
+
+    /**
+     * agg の表示原点指定
+     */
+    function aggSetPos();
+
+    /**
+     * agg プリミティブの回転指定
+     */
+    function aggRotate();
+
+    /**
+     *
+     */
+    function aggX();
+
+    /**
+     */
+    function aggY();
+
+};

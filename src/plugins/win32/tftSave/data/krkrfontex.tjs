@@ -1,0 +1,925 @@
+// 必要なプラグインをリンク
+Plugins.link("tftSave.dll") if (typeof System.savePreRenderedFont != "Object");
+Plugins.link("fstat.dll")   if (typeof Storages.selectDirectory   != "Object");
+try { Plugins.link("csvParser.dll") if (typeof global.CSVParser != "Object"); } catch {} // optional
+Scripts.execStorage("win32dialog.tjs") if (typeof global.WIN32GenericDialogEX != "Object");
+
+// ダミー辞書 (KAGParserのエンティティにて評価されることがあるので)
+global.f   = %[] if (typeof global.f   == "undefined");
+global.sf  = %[] if (typeof global.sf  == "undefined");
+global.tf  = %[] if (typeof global.tf  == "undefined");
+global.mp  = %[] if (typeof global.mp  == "undefined");
+global.kag = %[] if (typeof global.kag == "undefined");
+
+class TftSaveDialog extends WIN32GenericDialogEX
+{
+	// プログレスダイアログ
+	class WaitProgress extends WIN32DialogEX {
+		function WaitProgress(win, text, optov) {
+			super.WIN32DialogEX();
+			modeless = true;
+			var w, h, fh, pad, face, opt = %[
+			width:100, height:12, padding:1,
+			fontSize:20, fontFace:"ＭＳ Ｐゴシック",
+				];
+			(Dictionary.assign incontextof opt)(optov, false) if (typeof optov == "Object");
+			with (opt) w=.width, h=.height, fh=.fontSize, pad=.padding, face=.fontFace;
+			var cx = w+pad*2, cy = h+pad*2;
+			store(%[
+			style: WS_POPUP|WS_VISIBLE|DS_CENTER|DS_SETFONT,
+			x:0, y:0, cx:cx, cy:cy,
+			title:"",
+			pointSize:fh,
+			typeFace:face,
+			weight:FW_HEAVY,
+			items: [
+				Control("",-1,STATIC, SS_BLACKRECT, 0,0, cx, cy, 0),
+				CText(text,-1,pad,pad,w,h,SS_CENTERIMAGE|SS_SUNKEN) ] ]);
+			open(win);
+		}
+		function finalize() {
+			close(-1);
+			super.finalize(...);
+		}
+	}
+
+	var templateStrings = global.TftSaveDialog.TemplateStrings;
+	var helpText        = global.TftSaveDialog.HelpText;
+	var tempLayer, kagParser, csvParser, helpPad;
+	var fontFaceList, chListParsed = "";
+	var iniReset = %[], savefile;
+
+	// アイテムに設定するテキスト（children[].textに含まれないもの）
+	var itemTexts =
+		%[
+			IDCANCEL => "閉じる",
+		];
+
+	// 内部保持初期値（children[].iniに含まれないもの）
+	var ini =
+		%[
+		ListFlag  : "fsfNoVertical | fsfTrueTypeOnly | fsfSameCharSet",
+		SmplWidth : 396, // [XXX] 実測値：DPIにより異なる
+		SmplHeight:  46, // [XXX] 実測値：DPIにより異なる
+		SmplBGCol : 0xFFFFFF,
+		SmplColor : 0,
+
+		LastFolder: System.exePath,
+		LastOutput: System.exePath,
+		ParseList : [],
+		];
+
+
+	// アイテムのテキスト・初期値・通知関数名
+	var children =
+		%[  //         itemTextに設定           iniに設定                   通知コールバック
+		Face      : %[ text:"フォント名",       ini:"ＭＳ ゴシック",        cmd:"onFaceChanged"      ],
+		Size      : %[ text:"フォントサイズ",   ini:24,                     cmd:"onSizeChanged"      ],
+		Bold      : %[ text:"太字",             ini:false,                  cmd:"onFontStateChanged" ],
+		Italic    : %[ text:"斜体",             ini:false,                  cmd:"onFontStateChanged" ],
+
+		SmplString: %[ text:"サンプル", ini:"ABCDEFGHIあいうえお亜胃宇絵御",cmd:"onSampleTextChanged"],
+
+		ASCII     : %[ text:"半角ASCII",        ini:true,                   cmd:"onEmbChListChanged" ],
+		STDCH     : %[ text:"基本文字",         ini:true,                   cmd:"onEmbChListChanged" ],
+		KIGOU     : %[ text:"記号類",           ini:false,                  cmd:"onEmbChListChanged" ],
+		JOYOU     : %[ text:"常用漢字",         ini:false,                  cmd:"onEmbChListChanged" ],
+
+		EmbChk    : %[ text:"全選択",                                       cmd:"onAllEmbChanged"    ],
+		EmbUnchk  : %[ text:"全解除",                                       cmd:"onAllEmbChanged"    ],
+		Output    : %[ text:"",                 ini:"",                     cmd:"onOutputChanged"    ],
+		OutputBtn : %[ text:"参照",                                         cmd:"onOutputSelect"     ],
+
+		Target    : %[                                                      cmd:"onParseListSelect"  ],
+		SelALL    : %[ text:"全選択",                                       cmd:"onParseListSelALL"  ],
+		UnselALL  : %[ text:"全解除",                                       cmd:"onParseListSelALL"  ],
+		SelRemove : %[ text:"選択項目削除",                                 cmd:"onParseListRemove"  ],
+		File      : %[ text:"ファイル追加",                                 cmd:"onParseListFile"    ],
+		Folder    : %[ text:"再帰検索追加",                                 cmd:"onParseListFolder"  ],
+		Parser    : %[ text:"走査方法",         ini:"Array",                cmd:"onParseModeChanged" ],
+
+		Reload    : %[ text:"更新",                                         cmd:"onChListReload"     ],
+		Reset     : %[ text:"全初期化",                                     cmd:"onInitialize"       ],
+		Help      : %[ text:"ヘルプ",                                       cmd:"onHelp"             ],
+		OK        : %[ text:"作成",                                         cmd:"onExecute"          ],
+
+		];
+
+	// TemplateStrings との対応
+	var embList = [
+		"ASCII" => "ASCII",
+		"STDCH" => "基本文字",
+		"KIGOU" => "記号類",
+		"JOYOU" => "常用漢字" ];
+
+	var parseMethod = [ "Array", "KAGParser", "CSVParser", "CSV_UTF8" ];
+
+	// 通知関数一覧（children[].cmd からコピー）
+	var commands = %[];
+
+	// -------------------------------------------------------------
+
+	function finalize() {
+		invalidate helpPad   if (helpPad   !== void);
+		invalidate kagParser if (kagParser !== void);
+		invalidate csvParser if (csvParser !== void);
+		invalidate tempLayer if (tempLayer !== void);
+		super.finalize(...);
+	}
+
+	// コンストラクタ
+	function TftSaveDialog(sav, lay) {
+		super.WIN32GenericDialogEX(%[ title:"レンダリング済みフォント作成ツール",
+									  /**/width:480, fontSize:9, fontFace:"ＭＳ ゴシック", 
+									  /**/itemtexts:itemTexts ]);
+
+		// CSVParserがない場合は封印
+		if (typeof global.CSVParser != "Object") {
+			parseMethod.remove("CSVParser", true);
+			parseMethod.remove("CSV_UTF8",  true);
+		}
+
+		// children を他の辞書に設定する
+		initChildren();
+		(Dictionary.assignStruct incontextof iniReset)(ini);
+		if ((savefile = sav) != "" && Storages.isExistentStorage(sav)) try {
+			var exp = Scripts.evalStorage(sav);
+			if (typeof exp == "Object" && exp instanceof "Dictionary") {
+				(Dictionary.assign incontextof ini)(exp, false);
+			}
+		} catch {}
+
+		// 一時レイヤを作成
+		tempLayer = new Layer(lay.window, lay);
+
+		// フォント一覧を取得
+		var fontflag = ini.ListFlag;
+		if (typeof fontflag == "String") try { fontflag = fontflag!; } catch { fontflag = 0; }
+		fontFaceList = tempLayer.font.getList((int)fontflag);
+		fontFaceList.sort();
+
+		// ダイアログのボタン類を配置（WIN32GenericDialogEXの自動配置を使用）
+		// ※ { ～ } はグループやフレームを見やすくインデントするために入れてあるだけで，特に意味はない
+		var ts=2, tw=5;
+		beginFrame(makeSpan(0,tw-ts,tw)); {
+
+			beginGroup("字体"); {
+				nextLine();
+				var initialFace = fontFaceList.find(ini.Face);
+				if (initialFace < 0) initialFace = 0;
+				addDropSelect("Face", 300, void, initialFace, fontFaceList);
+
+				nextLine(_padding+3);
+				addLineInput( "Size",  makeSpan(0, 2, 6), (string)(int)ini.Size);
+				addInit(      "Size",  "setLimitText", (int)2);
+				setLastItemStyle("append", ES_NUMBER);
+
+				addToggle("Bold",      makeDiv(4, 6));
+				addToggle("Italic",    makeDiv(5, 6));
+				addInit(  "Bold",   "setCheckBox", (int)ini.Bold);
+				addInit(  "Italic", "setCheckBox", (int)ini.Italic);
+
+				nextLine();
+				addIcon("Sample", 32);
+				nextLine(1);
+				addInit("Sample", "updateSampleLayer");
+				nextLine();
+				addLineInput("SmplString",  void, (string)ini.SmplString);
+			} nextLine(); endGroup();
+
+			nextLine();
+			beginGroup("出力"); {
+				nextLine();
+				addLineInput(%[ id:"Output", text:"-", nolabel:true ], makeSpan(0,7,8), getLocalPath(ini.Output));
+				addButton("OutputBtn", makeDiv(7, 8));
+				nextLine();
+			} nextLine(); endGroup();
+
+			nextLine();
+			beginGroup("作成対象文字"); {
+				nextLine();
+				addTextInput(%[ id:"ChList", nolabel:true ], 128-14,, getChListString());
+				setLastItemStyle("set",
+					ES_LEFT|ES_MULTILINE|ES_READONLY|
+					ES_AUTOVSCROLL|WS_VSCROLL|
+					WS_BORDER|WS_TABSTOP);
+				nextLine();
+				addButton ("Reload", makeDiv(2, 3), 6);
+				nextLine();
+			} nextLine(); endGroup();
+
+		} setFrame(makeSpan(tw-ts,ts,tw)); {
+
+			beginGroup("作成文字選択"); {
+				beginGroup("組み込みリスト"); {
+					nextLine();
+					beginFrame(makeSpan(0,7,10)); {
+						addToggle("ASCII", makeDiv(0, 2));
+						addToggle("STDCH", makeDiv(1, 2));
+						nextLine();
+						addToggle("KIGOU", makeDiv(0, 2));
+						addToggle("JOYOU", makeDiv(1, 2));
+						addInit(  "ASCII", "setCheckBox", (int)ini.ASCII);
+						addInit(  "STDCH", "setCheckBox", (int)ini.STDCH);
+						addInit(  "KIGOU", "setCheckBox", (int)ini.KIGOU);
+						addInit(  "JOYOU", "setCheckBox", (int)ini.JOYOU);
+					} setFrame(makeSpan(7,3,10)); {
+						addButton ("EmbChk",    void);
+						nextLine();
+						addButton ("EmbUnchk",  void);
+						nextLine();
+					} endFrame();
+				} nextLine(); endGroup();
+
+				nextLine();
+				beginGroup("ファイル走査"); {
+					var sel = parseMethod.find(ini.Parser);
+					sel = 0 if (sel < 0);
+					addDropSelect("Parser", 100, makeSpan(2, 3, 5), sel, parseMethod);
+					nextLine();
+					addListSelect("Target", 147, void, void, []);
+					addInit(      "Target", "updateParseList");
+					setLastItemStyle("append", LBS_EXTENDEDSEL | WS_VSCROLL);
+					nextLine(0);
+					addLineInput(%[ id:"Fullpath", nolabel:true ],  void, "");
+					setLastItemStyle("append", ES_READONLY);
+					nextLine();
+
+					nextLine();
+					beginFrame(makeSpan(0,4,9)); {
+						addButton("SelALL",    makeDiv(0,2));
+						addButton("UnselALL",  makeDiv(1,2));
+						nextLine();
+						addButton("SelRemove", void);
+					} setFrame(makeDiv(1,2)); {
+						addButton("Folder", void);
+						nextLine();
+						addButton("File",   void);
+						nextLine();
+					} endFrame();
+				} nextLine(); endGroup();
+			} nextLine(); endGroup();
+
+		} endFrame();
+
+		nextLine();
+		addButton ("Reset",  makeStepLeft (0, 60), 8);
+		addButton ("Help",   makeStepLeft (1, 60), 8);
+		addDefPush("OK",     makeStepRight(1, 60), 8);
+		addInit(   "OK",    "updateOKButton");
+		addButton (IDCANCEL, makeStepRight(0, 60), 8);
+	}
+
+	// children を itemText, ini, commands に展開する
+	function initChildren() {
+		var ext = [];
+		ext.assign(children);
+		for (var i = 0, cnt = ext.count; i < cnt; i+=2) {
+			var tag = ext[i], nfo = ext[i+1];
+			if (tag == "" || nfo === void) continue;
+			with (nfo) {
+				itemTexts[tag] = .text      if (       .text != "");
+				ini      [tag] = .ini       if (typeof .ini  != "undefined");
+				commands [tag] = this[.cmd] if (       .cmd  != "" && typeof this[.cmd] == "Object");
+			}
+		}
+	}
+
+	// スタイル上書き用ヘルパ関数
+	function setLastItemStyle(mode, style) {
+		var items = _templ.items;
+		var target = items[items.count-1];
+		switch (mode) {
+		case "remove": target.style &= ~style;            break;
+		case "append": target.style |=  style;            break;
+		default:       target.style  =  style|WS_VISIBLE; break;
+		}
+	}
+	// テキスト入力の最大文字数を設定
+	function setLimitText(id, max) {
+		sendItemMessage(id, EM_LIMITTEXT, (int)max, 0);
+	}
+
+	function foreachEmbList(func, *) {
+		for (var i = 0, cnt = embList.count; i < cnt; i+=2) {
+			func(embList[i], embList[i+1], *) if (embList[i] != "");
+		}
+	}
+	function errorMessage(mes) {
+		Debug.console.visible = true;
+		Debug.message(mes);
+	}
+
+	function getLocalPath(path) {
+		return path == "" ? "" : Storages.getLocalName(path);
+	}
+
+	function open() {
+		var r = super.open(...);
+		if (savefile != "") try {
+			(Dictionary.saveStruct incontextof ini)(savefile);
+		} catch {}
+		return r;
+	}
+
+	// 文字一覧サンプルテキストを取得
+	function getChListString() {
+		if (chListParsed != "") return chListParsed;
+		var ret = %[ text:"" ];
+		if (ini.ParseList.count > 0) {
+			ret.text += "■※　ファイル走査されていません　※■\r\n■※　更新ボタンを押してください　※■\r\n\r\n";
+		}
+		foreachEmbList(function(tag, tmpl, ret) {
+			ret.text += templateStrings[tmpl] if (ini[tag]);
+		} incontextof this, ret);
+		return ret.text;;
+	}
+
+	// フォルダ検索
+	function appendFolderSearch(list, path) {
+		if (path.charAt(path.length-1) != "/") path += "/";
+		var dir = Storages.dirlist(path);
+		for (var i = 0; i < dir.count; i++) {
+			var name = dir[i];
+			if (name == "" || name.charAt(0) == ".") continue;
+			name = path + name;
+			if (Storages.isExistentDirectory(name+"/")) {
+				if (name.charAt(name.length-1) != "/") name += "/";
+				appendFolderSearch(list, name);
+			} else {
+				name = name.toLowerCase();
+				var ext = Storages.extractStorageExt(name);
+				switch (ext) {
+				case ".txt":
+				case ".ks":
+					list.add(name);
+					break;
+				}
+			}
+		}
+	}
+	// ファイル一覧を取得
+	function makeFileList() {
+		var map = %[], list = ini.ParseList;
+		for (var i = 0; i < list.count; i++) {
+			var target = list[i];
+			if (target == "") continue;
+			try {
+				var name = Storages.extractStorageName(target);
+				if (Storages.isExistentStorage(target)) map[target.toLowerCase()] = true;
+			} catch(e) {
+				errorMessage(e.message);
+			}
+		}
+		var ext = [], ret = [];
+		ext.assign(map);
+		for (var i = 0, cnt = ext.count; i < cnt; i+=2) ret.add(ext[i]);
+		ret.sort();
+		return ret;
+	}
+	// 使用文字を全パース
+	function parseAllTarget(force = false) {
+		if (!force && chListParsed != "") return;
+		var map = %[], ch = [], wait = new WaitProgress(this, "作成対象文字取得中...");
+		try {
+			foreachEmbList(function (tag, tmpl, map) {
+				storeUseCh(map, templateStrings[tmpl]) if (ini[tag]);
+			} incontextof this, map);
+			var files = makeFileList();
+			for (var i = 0, cnt = files.count; i < cnt; i++) {
+				var file = files[i];
+				parseFileTarget(map, file);
+			}
+			var ext = [], spc = # " ";
+			ext.assign(map);
+			for (var i = 0, cnt = ext.count; i < cnt; i+=2) {
+				var n = # ext[i];
+				ch.add(n) if (n >= spc);
+			}
+			ch.sort();
+			chListParsed = "";
+			for (var i = 0, cnt = ch.count; i < cnt; i++) chListParsed += $ ch[i];
+		} catch (e) {
+			invalidate wait;
+			throw e;
+		}
+		invalidate wait;
+		return ch;
+	}
+	function storeUseCh(map, str) {
+		if (str == "") return;
+		for (var i = 0, len = str.length; i < len; i++) map[str.charAt(i)] = true;
+	}
+
+	function parseFileTarget(map, file) {
+		try {
+			var method = "parseFile_"+ini.Parser;
+			if (typeof this[method] == "Object")
+				/**/   this[method](...);
+		} catch(e) {
+			errorMessage(e.message);
+		}
+	}
+	function parseFile_Array(map, file) {
+		var lines =[].load(file);
+		for (var i = lines.count-1; i >= 0; i--)
+			storeUseCh(map, lines[i]);
+	}
+	function parseFile_KAGParser(map, file) {
+		var elm;
+		if (  kagParser === void) kagParser = new KAGParser();
+		with (kagParser) {
+			.clear();
+			.loadScenario(file);
+			.processSpecialTags = false;
+			while ((elm = .getNextTag()) !== void) {
+				storeUseCh(map, elm.text) if (elm.tagname == "ch");
+			}
+		}
+	}
+	function parseFile_CSVParser_Common(utf8, map, file) {
+		var line;
+		if (  csvParser === void) csvParser = new CSVParser(null, #"\t", "\n");
+		with (csvParser) {
+			.initStorage(file, utf8);
+			while ((line = .getNextLine()) !== void) {
+				storeUseCh(map, line.join(""));
+			}
+		}
+	}
+	function parseFile_CSVParser(*) { return parseFile_CSVParser_Common(false, *); }
+	function parseFile_CSV_UTF8 (*) { return parseFile_CSVParser_Common(true,  *); }
+
+	// フォント作成
+	function buildRenderedFont() {
+		updateSampleLayer();
+		var allch = parseAllTarget(true);
+		var wait = new WaitProgress(this, "出力中...");
+		try {
+			System.savePreRenderedFont(ini.Output, allch, (buildGlyph incontextof this));
+		} catch (e) {
+			invalidate wait;
+			throw e;
+		}
+		invalidate wait;
+	}
+	function buildGlyph(ch) {
+		tempLayer.drawGlyph(ch);
+		return tempLayer;
+	}
+
+
+
+	// -------------------------------------------------------------
+	// 各種更新処理
+
+	// すべての項目を更新
+	function updateAllItems() {
+		// 字体
+		var initialFace = fontFaceList.find(ini.Face);
+		if (initialFace < 0) initialFace = 0;
+		selectComboBox("Face", initialFace);
+		setItemText("Size",   (string)(int)ini.Size);
+		setCheckBox("Bold",   (int)ini.Bold);
+		setCheckBox("Italic", (int)ini.Italic);
+		setItemText("SmplString", (string)ini.SmplString);
+		updateSampleLayer();
+
+		// 出力
+		updateOutput();
+
+		// 一覧
+		updateChListString();
+
+		// 組み込みリスト
+		setCheckBox("ASCII", (int)ini.ASCII);
+		setCheckBox("STDCH", (int)ini.STDCH);
+		setCheckBox("KIGOU", (int)ini.KIGOU);
+		setCheckBox("JOYOU", (int)ini.JOYOU);
+
+		// 走査一覧
+		updateParseList();
+	}
+
+	// フォントサンプルを更新
+	function updateSampleLayer(id = "Sample") {
+		with (tempLayer) try {
+			var str = ini.SmplString;
+			var lw = ini.SmplWidth, lh = ini.SmplHeight;
+			.setImageSize(lw, lh);
+			.fillRect(0, 0, lw, lh, 0xFF000000 | ini.SmplBGCol);
+			.font.face      = ini.Face;
+			.font.height    = ini.Size;
+			.font.bold      = ini.Bold;
+			.font.italic    = ini.Italic;
+			var w = .font.getTextWidth (str);
+			var h = .font.getTextHeight(str);
+			.drawText((lw-w)\2, (lh-h)\2, str, ini.SmplColor, 255, true);
+		} catch(e) {
+			return errorMessage(e.message);
+		}
+		setItemBitmap(id, tempLayer);
+		var bmp = allBitmaps.pop();
+		removeAllBitmap();
+		allBitmaps.push(bmp);
+	}
+	// 文字一覧サンプルテキストを再設定
+	function updateChListString() {
+		setItemText("ChList", getChListString());
+	}
+	// ファイル走査一覧を更新
+	function updateParseList(id = "Target") {
+		var list = ini.ParseList;
+		sendItemMessage(id, LB_RESETCONTENT, 0, 0);
+		for (var i = 0; i < list.count; i++) {
+			var name = Storages.extractStorageName(list[i]);
+			sendItemMessage(id, LB_ADDSTRING, 0, name != "" ? name : " ");
+		}
+		var en = list.count > 0;
+		setItemEnabled("SelALL",    en);
+		setItemEnabled("UnselALL",  en);
+		setItemEnabled("SelRemove", false);
+		chListParsed = "";
+		updateChListString();
+		setItemText("Fullpath", "");
+	}
+	// 削除ボタンの有効・無効状態を更新
+	function updateSelRemove() {
+		var id = "Target", list = ini.ParseList, selected = false;
+		var path = "";
+		for (var i = 0; i < list.count; i++) {
+			if (sendItemMessage(id, LB_GETSEL, i, 0)) {
+				selected = true;
+				var npath = getLocalPath(Storages.extractStoragePath(list[i]));
+				if (path == "") path = npath;
+				else if (path != npath) {
+					path = "";
+					break;
+				}
+			}
+		}
+		setItemEnabled("SelRemove", selected);
+		setItemText("Fullpath", path);
+	}
+	// 全選択・全解除処理
+	function updateSelALL(en) {
+		var id = "Target", list = ini.ParseList;
+		for (var i = 0; i < list.count; i++) {
+			sendItemMessage(id, LB_SETSEL, !!en, i);
+		}
+		updateSelRemove();
+	}
+	// 選択項目削除
+	function removeSelected() {
+		var id = "Target", list = ini.ParseList;
+		for (var i = 0; i < list.count; i++) {
+			if (sendItemMessage(id, LB_GETSEL, i, 0)) {
+				list[i] = void;
+			}
+		}
+		list.remove(void, true);
+		updateParseList();
+	}
+
+	// 出力ファイル更新
+	function updateOutput(id = "Output") {
+		setItemText(id, getLocalPath(ini.Output));
+		updateOKButton();
+	}
+	function updateOKButton(id = "OK") {
+		setItemEnabled(id, (ini.Output != ""));
+	}
+
+	// -------------------------------------------------------------
+	// 各種通知処理
+
+	// 通知処理を commands の関数別に場合わけ
+	function onCommand(msg, wp, lp) {
+		super.onCommand(...);
+		var id = getNamedId(wp & 0xFFFF);
+		if (id != "" && commands[id] !== void) {
+			commands[id](id, wp>>16, lp);
+		}
+	}
+
+	// フォント名が変更された
+	function onFaceChanged(id, notify, lp) {
+		if (notify != CBN_SELCHANGE) return;
+		var sel = getResult(id);
+		try { ini.Face = fontFaceList[sel]; } catch {}
+		updateSampleLayer();
+	}
+	// フォントサイズが変更された
+	function onSizeChanged(id, notify, lp) {
+		if (notify != EN_CHANGE) return;
+		var size = getResult(id);
+		if (size <= 0) return;
+		ini.Size = (int)size;
+		updateSampleLayer();
+	}
+	// 太字・斜体が変更された
+	function onFontStateChanged(id, notify, lp) {
+		if (notify != BN_CLICKED) return;
+		ini[id] = !!getResult(id);
+		updateSampleLayer();
+	}
+	// サンプルテキストが変更された
+	function onSampleTextChanged(id, notify, lp) {
+		if (notify != EN_CHANGE) return;
+		ini.SmplString = (string)getResult(id);
+		updateSampleLayer();
+	}
+
+	// 組み込みリストのチェックが変更された
+	function onEmbChListChanged(id, notify, lp) {
+		if (notify != BN_CLICKED) return;
+		ini[id] = !!getResult(id);
+		chListParsed = "";
+		updateChListString();
+	}
+	// 組み込みリストの全選択・全解除ボタンが押された
+	function onAllEmbChanged(id, notify, lp) {
+		if (notify != BN_CLICKED) return;
+		foreachEmbList(function (tag, tmpl, chk) {
+			ini[tag] = chk;
+			setCheckBox(tag, (int)chk);
+		} incontextof this, (id == "EmbChk"));
+		chListParsed = "";
+		updateChListString();
+	}
+
+	// 出力選択
+	function onOutputSelect(id, notify, lp) {
+		if (notify != BN_CLICKED) return;
+		var elm = %[
+		title:"出力ファイル選択", save:true,
+		initialDir:ini.LastOutput,
+		filter: [ "レンダリング済みフォントファイル(*.tft)|*.tft", "すべてのファイル(*.*)|*.*" ],
+		defaultExt: "tft",
+		filterIndex: 0,
+			];
+		if (Storages.selectFile(elm)) {
+			var target = elm.name;
+			ini.LastOutput = Storages.extractStoragePath(target);
+			ini.Output = target;
+			updateOutput();
+		}
+	}
+	// 出力のテキストが変更された
+	function onOutputChanged(id, notify, lp) {
+		if (notify != EN_CHANGE) return;
+		var text = getResult(id);
+		try { ini.Output = Storages.getFullPath(text); } catch { ini.Output = text; }
+		updateOKButton();
+	}
+
+	// ファイル走査一覧の選択状態が変更された
+	function onParseListSelect(id, notify, lp) {
+		if (notify != LBN_SELCHANGE) return;
+		updateSelRemove();
+	}
+	// ファイル走査の全選択・全解除ボタンが押された
+	function onParseListSelALL(id, notify, lp) {
+		if (notify != BN_CLICKED) return;
+		updateSelALL(id == "SelALL");
+	}
+	function onParseListRemove(id, notify, lp) {
+		if (notify != BN_CLICKED) return;
+		removeSelected();
+	}
+	// ファイル走査のフォルダ追加
+	function onParseListFolder(id, notify, lp) {
+		if (notify != BN_CLICKED) return;
+		var elm = %[
+		title:"フォルダ選択",
+		window:this,
+		name:ini.LastFolder,
+			];
+		if (Storages.selectDirectory(elm)) {
+			var target = elm.name;
+			if (target.charAt(target.length-1) != "/") target += "/";
+			ini.LastFolder = target;
+			var files = [];
+			appendFolderSearch(files, target);
+			if (files.count > 0) ini.ParseList.push(files*);
+			updateParseList();
+		}
+	}
+	// ファイル走査のファイル追加
+	function onParseListFile(id, notify, lp) {
+		if (notify != BN_CLICKED) return;
+		var elm = %[
+		title:"ファイル選択",
+		initialDir:ini.LastFolder,
+		filter: [ "シナリオファイル(*.ks;*.txt)|*.ks;*.txt", "すべてのファイル(*.*)|*.*" ],
+		filterIndex: 0,
+			];
+		if (Storages.selectFile(elm)) {
+			var target = elm.name;
+			ini.LastFolder = Storages.extractStoragePath(target);
+			ini.ParseList.add(target);
+			updateParseList();
+		}
+	}
+	// 走査方法の変更
+	function onParseModeChanged(id, notify, lp) {
+		if (notify != CBN_SELCHANGE) return;
+		var sel = getResult(id);
+		try { ini.Parser = parseMethod[sel]; } catch {}
+		chListParsed = "";
+		updateChListString();
+	}
+
+	// 文字一覧更新
+	function onChListReload(id, notify, lp) {
+		if (notify != BN_CLICKED) return;
+		parseAllTarget();
+		updateChListString();
+	}
+
+	// 作成ボタンが押された
+	function onExecute(id, notify, lp) {
+		if (notify != BN_CLICKED) return;
+		buildRenderedFont();
+	}
+
+	// 全初期化ボタンが押された
+	function onInitialize(id, notify, lp) {
+		if (notify != BN_CLICKED) return;
+		(Dictionary.assignStruct incontextof ini)(iniReset);
+		updateAllItems();
+	}
+	
+	// ヘルプボタンが押された
+	function onHelp(id, notify, lp) {
+		if (notify != BN_CLICKED) return;
+		var caption = _templ.title;
+		if (helpPad === void) {
+			helpPad = new Pad();
+			with (helpPad) {
+				.title = @"ヘルプ：${caption}";
+				.borderStyle = bsSizeToolWin;
+				.color     = clWindow;
+				.fontColor = clWindowText;
+				.fontFace = "ＭＳ ゴシック"; //chDefaultFace;
+				.fontHeight = 12;
+				.readOnly = true;
+				.wordWrap = true;
+				.showScrollBars = ssVertical;
+				.width  = 800;
+				.height = 600;
+			}
+		}
+		with (helpPad) {
+			.visible = true;
+			.text = helpText.join("\n");
+			.statusText = caption;
+		}
+	}
+}
+
+// 組み込み文字リスト
+TftSaveDialog.TemplateStrings = %[
+
+	"ASCII" => (
+		" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"),
+
+	"基本文字" => (
+		"０１２３４５６７８９ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ"
+		"ぁあぃいぅうぇえぉおかがきぎくぐけげこごさざしじすずせぜそぞただちぢっつづてでとどなにぬねのはばぱひびぴふぶぷへべぺほぼぽまみむめもゃやゅゆょよらりるれろゎわゐゑをん"
+		"ァアィイゥウェエォオカガキギクグケゲコゴサザシジスズセゼソゾタダチヂッツヅテデトドナニヌネノハバパヒビピフブプヘベペホボポマミムメモャヤュユョヨラリルレロヮワヰヱヲン"
+		"ヴヵヶ、。，．・：；？！゛゜´｀¨＾°′″ヽヾゝゞ〃仝々〆ー～…‥‘’“”〝〟（）〔〕［］｛｝〈〉《》「」『』【】＜＞"
+		"＃＄％＆＊＠￥＋－±×÷＝≠≦≧☆★○●◎◇◆□■△▲▽▼〇◯―‐／＼￣＿｜♂♀♯♭♪→←↑↓※〒"
+		),
+
+	"記号類" => (
+		"∥℃￠￡§∞∴∵∫∬Å‰†‡¶〓∈∋⊆⊇⊂⊃∪∩∧∨￢⇒⇔∀∃∠⊥⌒∂∇≡≒≪≫√∽∝∮∑∟⊿"
+		"ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ"
+		"αβγδεζηθικλμνξοπρστυφχψω"
+		"АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
+		"абвгдеёжзийклмнопрстуфхцчшщъыьэюя"
+		"─│┌┐┘└├┬┤┴┼━┃┏┓┛┗┣┳┫┻╋┠┯┨┷┿┝┰┥┸╂"
+		"①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩ"
+		"㍉㌔㌢㍍㌘㌧㌃㌶㍑㍗㌍㌦㌣㌫㍊㌻㎜㎝㎞㎎㎏㏄㎡№㏍℡"
+		"㊤㊥㊦㊧㊨㈱㈲㈹㍾㍽㍼㍻"
+		),
+
+	"常用漢字" => (
+		"一丁七万丈三上下不与且世丘丙両並中丸丹主久乏乗乙九乱乳乾了予争事"
+		"二互五井亜亡交享京亭人仁今介仏仕他付仙代令以仮仰仲件任企伏伐休会"
+		"伝伯伴伸伺似但位低住佐体何余作佳併使例侍供依価侮侯侵便係促俊俗保"
+		"信修俳俵俸倉個倍倒候借倣値倫倹偉偏停健側偵偶偽傍傑傘備催債傷傾働"
+		"像僕僚僧儀億儒償優元兄充兆先光克免児党入全八公六共兵具典兼内円冊"
+		"再冒冗写冠冬冷准凍凝凡処凶凸凹出刀刃分切刈刊刑列初判別利到制刷券"
+		"刺刻則削前剖剛剣剤副剰割創劇力功加劣助努励労効劾勅勇勉動勘務勝募"
+		"勢勤勧勲勺匁包化北匠匹区医匿十千升午半卑卒卓協南単博占印危即却卵"
+		"卸厄厘厚原厳去参又及友双反収叔取受叙口古句叫召可台史右号司各合吉"
+		"同名后吏吐向君吟否含吸吹呈呉告周味呼命和咲哀品員哲唆唇唐唯唱商問"
+		"啓善喚喜喝喪喫営嗣嘆嘱器噴嚇囚四回因団困囲図固国圏園土圧在地坂均"
+		"坊坑坪垂型垣埋城域執培基堀堂堅堕堤堪報場塀塁塊塑塔塗塚塩塾境墓増"
+		"墜墨墳墾壁壇壊壌士壮声壱売変夏夕外多夜夢大天太夫央失奇奉奏契奔奥"
+		"奨奪奮女奴好如妃妄妊妙妥妨妹妻姉始姓委姫姻姿威娘娠娯婆婚婦婿媒嫁"
+		"嫌嫡嬢子孔字存孝季孤学孫宅宇守安完宗官宙定宜宝実客宣室宮宰害宴宵"
+		"家容宿寂寄密富寒寛寝察寡寧審寮寸寺対寿封専射将尉尊尋導小少尚就尺"
+		"尼尽尾尿局居屈届屋展属層履屯山岐岩岬岳岸峠峡峰島崇崎崩川州巡巣工"
+		"左巧巨差己巻市布帆希帝帥師席帯帰帳常帽幅幕幣干平年幸幹幻幼幽幾庁"
+		"広床序底店府度座庫庭庶康庸廃廉廊延廷建弁弊式弐弓弔引弟弦弧弱張強"
+		"弾当形彩彫彰影役彼往征径待律後徐徒従得御復循微徳徴徹心必忌忍志忘"
+		"忙応忠快念怒怖思怠急性怪恋恐恒恥恨恩恭息恵悔悟悠患悦悩悪悲悼情惑"
+		"惜惨惰想愁愉意愚愛感慈態慌慎慕慢慣慨慮慰慶憂憎憤憩憲憶憾懇懐懲懸"
+		"成我戒戦戯戸戻房所扇扉手才打払扱扶批承技抄把抑投抗折抜択披抱抵抹"
+		"押抽担拍拐拒拓拘拙招拝拠拡括拷拾持指挑挙挟振挿捕捜捨据掃授掌排掘"
+		"掛採探接控推措掲描提揚換握揮援揺損搬搭携搾摂摘摩撃撤撮撲擁操擦擬"
+		"支改攻放政故敏救敗教敢散敬数整敵敷文斉斎斗料斜斤斥断新方施旅旋族"
+		"旗既日旧旨早旬昆昇明易昔星映春昨昭是昼時晩普景晴晶暁暇暑暖暗暦暫"
+		"暮暴曇曜曲更書曹替最月有服朕朗望朝期木未末本札朱朴机朽杉材村束条"
+		"来杯東松板析林枚果枝枠枢枯架柄某染柔柱柳査栄栓校株核根格栽桃案桑"
+		"桜桟梅械棄棋棒棚棟森棺植検業極楼楽概構様槽標模権横樹橋機欄欠次欧"
+		"欲欺款歌歓止正武歩歯歳歴死殉殊残殖殴段殺殻殿母毎毒比毛氏民気水氷"
+		"永汁求汗汚江池決汽沈沖没沢河沸油治沼沿況泉泊泌法泡波泣泥注泰泳洋"
+		"洗洞津洪活派流浄浅浜浦浪浮浴海浸消涙涯液涼淑淡深混添清渇済渉渋渓"
+		"減渡渦温測港湖湯湾湿満源準溝溶滅滋滑滝滞滴漁漂漆漏演漠漢漫漬漸潔"
+		"潜潟潤潮澄激濁濃濫濯瀬火灯灰災炉炊炎炭点為烈無焦然焼煙照煩煮熟熱"
+		"燃燥爆爵父片版牛牧物牲特犠犬犯状狂狩独狭猛猟猫献猶猿獄獣獲玄率玉"
+		"王珍珠班現球理琴環璽瓶甘甚生産用田由甲申男町画界畑畔留畜畝略番異"
+		"畳疎疑疫疲疾病症痘痛痢痴療癒癖発登白百的皆皇皮皿盆益盗盛盟監盤目"
+		"盲直相盾省看県真眠眺眼着睡督瞬矛矢知短矯石砂研砕砲破硝硫硬碁碑確"
+		"磁磨礁礎示礼社祈祉祖祝神祥票祭禁禅禍福秀私秋科秒秘租秩称移程税稚"
+		"種稲稼稿穀穂積穏穫穴究空突窃窒窓窮窯立竜章童端競竹笑笛符第筆等筋"
+		"筒答策箇算管箱節範築篤簡簿籍米粉粋粒粗粘粛粧精糖糧糸系糾紀約紅紋"
+		"納純紙級紛素紡索紫累細紳紹紺終組経結絞絡給統絵絶絹継続維綱網綿緊"
+		"総緑緒線締編緩緯練縁縄縛縦縫縮績繁繊織繕繭繰缶罪置罰署罷羅羊美群"
+		"義羽翁翌習翻翼老考者耐耕耗耳聖聞聴職肉肌肖肝肢肥肩肪肯育肺胃胆背"
+		"胎胞胴胸能脂脅脈脚脱脳脹腐腕腰腸腹膚膜膨臓臣臨自臭至致興舌舎舗舞"
+		"舟航般舶船艇艦良色芋芝花芳芸芽苗若苦英茂茎茶草荒荘荷菊菌菓菜華落"
+		"葉著葬蒸蓄蔵薄薦薪薫薬藩藻虐虚虜虞虫蚊蚕蛇蛍蛮融血衆行術街衛衝衡"
+		"衣表衰衷袋被裁裂装裏裕補裸製複褐褒襟襲西要覆覇見規視覚覧親観角解"
+		"触言訂計討訓託記訟訪設許訳訴診証詐詔評詞詠試詩詰話該詳誇誉誌認誓"
+		"誕誘語誠誤説読課調談請論諭諮諸諾謀謁謄謙講謝謡謹識譜警議譲護谷豆"
+		"豊豚象豪貝貞負財貢貧貨販貫責貯貴買貸費貿賀賃賄資賊賓賛賜賞賠賢賦"
+		"質購贈赤赦走赴起超越趣足距跡路跳践踊踏躍身車軌軍軒軟転軸軽較載輝"
+		"輩輪輸轄辛辞辱農辺込迅迎近返迫迭述迷追退送逃逆透逐逓途通逝速造連"
+		"逮週進逸遂遅遇遊運遍過道達違遠遣適遭遮遵遷選遺避還邦邪邸郊郎郡部"
+		"郭郵郷都酌配酒酔酢酪酬酵酷酸醜醸釈里重野量金針釣鈍鈴鉄鉛鉢鉱銀銃"
+		"銅銑銘銭鋭鋳鋼錘錠錬錯録鍛鎖鎮鏡鐘鑑長門閉開閑間関閣閥閲闘防阻附"
+		"降限陛院陣除陥陪陰陳陵陶陸険陽隅隆隊階随隔際障隠隣隷隻雄雅集雇雌"
+		"雑離難雨雪雰雲零雷電需震霊霜霧露青静非面革靴音韻響頂項順預頑頒領"
+		"頭頻頼題額顔顕願類顧風飛食飢飯飲飼飽飾養餓館首香馬駄駅駆駐騎騒験"
+		"騰驚骨髄高髪鬼魂魅魔魚鮮鯨鳥鳴鶏麗麦麻黄黒黙鼓鼻齢")
+
+	];
+TftSaveDialog.HelpText =
+[
+	"レンダリング済みフォント作成ツールヘルプ",
+	"----------------------------------------",
+	"●字体",
+	"出力するフォントのフェイス／サイズ／修飾を指定します。",
+	"",
+	"●出力",
+	"出力するファイルを指定します。参照ボタンでファイルを指定してください。",
+	"",
+	"●作成対象文字",
+	"出力する文字の一覧が表示されます。ファイル走査が必要な場合は更新ボタンを押さないと正しく表示されません。",
+	"",
+	"●作成文字選択：組み込みリスト",
+	"作成文字対象に含める文字のセット（あらかじめ組み込み済みのリスト）を選択します。",
+	"",
+	"●作成文字選択：ファイル走査",
+	"テキストファイル中に使用される文字を走査して，作成対象文字に含めます。",
+	"・走査方法",
+	"　テキストファイルの取得方法を指定します。",
+	"　* Array     : 配列のloadメソッドを使用し，コメントなども含めすべての文字が作成対象になります。",
+	"　* KAGParser : KAG形式のテキストが作成対象になります。コメントやタグで使用される文字は無視されます。",
+	"　* CSVParser : CSVParserを使用し，コメントなども含めすべての文字が作成対象になります。",
+	"　* CSV_UTF8  : CSVParserを使用し，UTF8形式としてテキストを読み込みます。",
+	"",
+	"・再帰検索追加：指定フォルダ以下にある *.txt および *.ks のすべてのファイルを走査対象に追加します。",
+	"・ファイル追加：単ファイルを走査対象に追加します。",
+	"・選択項目削除：走査対象の選択中の項目を一覧から削除します。",
+	"",
+	"●その他",
+	"・全初期化：すべての項目を初期化します",
+	"・作成　　：レンダリング済みフォントを作成します",
+	"・閉じる　：ウィンドウを閉じます",
+	"",
+	];
+
+/**
+ * レンダリング済みフォントツールダイアログを開く
+ * @param save : 設定保存ファイル名
+ * @param win  : 親ウィンドウ（非表示ウィンドウを指定した，またはウィンドウを指定しない場合はルート）
+ */
+function OpenTftSaveDialog(save = System.dataPath + "krkrfontex.sav", win) {
+	var localwin = false;
+	if (!(win && typeof win == "Object" && isvalid win)) {
+		win = new Window();
+		win.add(new Layer(win, null));
+		localwin = true;
+	}
+	//Debug.console.visible = true;
+	var dialog = new TftSaveDialog(save, win.primaryLayer);
+	dialog.open(win.visible ? win : void);
+	invalidate dialog;
+
+	if (localwin) invalidate win;
+}

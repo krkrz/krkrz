@@ -1,0 +1,56 @@
+/**
+ * 擬似コードによるマニュアル
+ * ※必要なデータ構造はこれらの拡張命令を実行したときにはじめて構築されます
+ *
+ * この機能を使うにあたっての注意点
+ * ・ムービーを開いた時点で、レイヤの imageWidth, imageHeight は
+ *   ムービーのサイズに拡大されます。
+ * ・ムービー再生後にサイズを変更してもムービーは追従しません
+ * ・動画データの更新を画面に反映するには、別途 onUpdateMovie などで
+ *   update() を行う必要があります
+ * ・動画状態の更新は Continuous ハンドラで行われています
+ */
+class Layer {
+
+	/**
+	 * 再生用のムービーファイルを開く
+	 * @param filename ファイル名
+	 * @param alpha true の場合は画面サイズ横倍でその部分をαとみなすムービー
+	 */
+	function openMovie(filename, alpha);
+
+	/**
+	 * ムービーの再生を開始する
+	 * @param loop true ならループ再生
+	 */
+	function startMovie(loop);
+
+	/**
+	 * ムービーの再生を停止する
+	 */
+	function stopMovie();
+
+	/**
+	 * ムービー再生中かどうか
+	 * @return 再生中なら true
+	 */
+	function isPlayingMovie();
+
+	// イベント
+	
+	/**
+	 * ムービーが再生開始したときに呼ばれるメソッド
+	 */
+	function onStartMovie();
+
+	/**
+	 * ムービーが再生終了したときに呼ばれるメソッド
+	 */
+	function onStopMovie();
+
+	/**
+	 * レイヤの内容が更新されたときに呼ばれるメソッド
+	 */
+	function onUpdateMovie();
+
+}

@@ -1,0 +1,94 @@
+How to customize the compilation of the Libpsd
+==============================================
+
+1. 3rd libraries
+ Libpsd depends on the other libraries, you have to download them before you compile 
+ Libpsd.
+ 
+ Libjpeg: We need libjpeg to get the thumbnail, you can download libjpeg from 
+ http://sourceforge.net/projects/libjpeg.
+ 
+ Zlib: Photoshop CS and CS2 use the zip arithmetic for data uncompression, you can 
+ download zlib from http://www.zlib.net.
+ 
+ Libxml: We need libxml to get the XMP metadata, you can download libxml from 
+ http://sourceforge.net/projects/libxml.
+ 
+ Libexif: We need libexif to get the exif info, you can download EXIF Tag Parsing 
+ Library from http://sourceforge.net/projects/libexif.
+ 
+ 
+2. Configuration macros
+
+ The file found in `include/psd_config.h' contains a list of commented configuration 
+ macros that can be toggled by developers to indicate which features should be active 
+ while building the library.
+ 
+ We invite you to read this file for more information. You can
+ change the file's content to suit your needs, or override it with
+ one of the techniques described below.
+ 
+ PSD_INCLUDE_LIBJPEG : Photoshop uses jpeg format to save the thumbnail. So, if you
+ don't want to read the thumbnail as a quick preview, you can undef this macro. 
+ Otherwise, you have to link libjpeg in your project.
+ 
+ PSD_INCLUDE_ZLIB : This is necessary and important library. From the version of 
+ Photoshop CS, it uses the zip arithmetic for data compression, to reduce the file
+ size. So, if you want to read the format of Photoshop CS or CS2, the zip 
+ uncompression should be included.
+ 
+ PSD_GET_ALL_IMAGE_RESOURCE : The most of the information is in the data block of 
+ image resource, such as resolution, names of alpha channles, thumbnail, global 
+ altitude, border, path. But not all the resource must be readed, most of them are
+ not useful for your project. Read the file image_resource.c, to undef this macro
+ will hide some information and reduce the time of parsing.
+ 
+ PSD_INCLUDE_LIBXML : XMP¡ªthe Extensible Metadata Platform¡ªis designed to provide
+ XMP metadata, it standardizes the definition, creation, and processing, and it's 
+ the XML format. We use the libxml to parse the XMP. Most of the projects don't need
+ this, to undef this macro and reduce the parsing time.
+ 
+ PSD_INCLUDDE_LIBEXIF : Exif is Exchangeable image file format for digital still 
+ cameras. We use the libexif to parse this data.
+ 
+ PSD_GET_PATH_RESOURCE : Photoshop saves the path into the image resource block, 
+ from ID 2000 to 2999. Path is the vector information to describe points. This 
+ macro depends on your project.
+ 
+ PSD_SUPPORT_LAYER_BLEND : We provide file blend.c to blend the psd file after 
+ modified. The psd file only saves the merged layer in the image data block, and
+ it's not transparent. To get the transprent merged data, you should blend it again.
+ You can change most of the parameters like layer opacity, and use the blend.c to
+ blend it.
+ 
+ PSD_SUPPORT_EFFECTS_BLEND : Layer effect is the special part that psd file doesn't
+ provide, there is only un-effected layer data. Layer effects include shadow, glow, 
+ emboss, overlay, stroke and satin. Layer blending will apply these effects.
+ 
+ PSD_SUPPORT_CMYK, PSD_SUPPORT_LAB, PSD_SUPPORT_MULTICHANNEL : 
+ These are the color spaces named CMYK, LAB and multi-channel, like RGB and grayscale. 
+ Libpsd uses the formula to convert these color to RGB color, so, there is little 
+ different with Photoshop provides, the latter uses many tables to apply these.
+ 
+3. Run on your platform
+
+ The psd_system.c file is the important file for your platform. The original file is 
+ written for standard C, the memory management and file system are the standard C 
+ usage. Maybe you should change this file to adapt for current system. Otherwise, 
+ you will compile it failed, or make the system errors.
+ 
+ There are only two types of system interface, memory management and file system. 
+ 
+ Maybe you should check the psd_types.h, there are the basic types that Libpsd often
+ uses.
+
+ 
+Notice about this file
+======================
+
+Libpsd is the product of Graphest Software, copyright 2004-2007, www.graphest.com
+
+This file is the part of Libpsd project, Libpsd is under the terms of the GNU Library 
+General Public License as published by the Free Software Foundation; either version 2 
+of the License, or (at your option) any later version. See the GNU General Public 
+License for more details.

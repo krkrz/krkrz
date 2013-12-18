@@ -1,0 +1,53 @@
+/**
+ * 擬似コードによるマニュアル
+ *
+ * Copyright 2005-2009 GoWatanabe
+ *
+ * expat による処理がおこなわれて自動的にメソッド呼び返し処理が行われます
+ * 具体的な DOM の実装例は XML.tjs 参照
+ */
+class XMLParser {
+
+    /**
+     * テキストに対するパース処理を実行する。
+     * @param text テキスト。省略時は現在設定中のテキストに対して処理を行なう
+     */
+    function parse(text);
+
+    /**
+     * テキストに対するパース処理を実行する。
+     * @param filename テキストのファイル名
+     */
+    function parseStorage(filename);
+
+	/**
+	 * エラーコード数値
+	 */
+	property errorCode;
+	
+	/**
+	 * エラーコード文字列
+	 */
+	property errorString;
+
+	/**
+	 * 現在のバイトインデックス
+	 */
+	property currentByteIndex;
+
+	/**
+	 * 現在の行番号
+	 */
+	property currentLineNumber;
+
+	/**
+	 * 現在の行番号
+	 */
+	property currentColumnNumber;
+
+	/**
+	 * 現在のバイトカウント
+	 */
+	property currentButeCount;
+	
+};

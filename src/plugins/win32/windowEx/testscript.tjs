@@ -1,0 +1,252 @@
+System.setArgument("-usedb",   "no");
+System.setArgument("-dbstyle", "gdi");
+
+Plugins.link("windowEx.dll");
+MenuItem.setBmpItem = function(bmp) {
+	switch (typeof bmp) {
+	case "Integer": case "Object": bmpItem = bmp; break;
+	case "String":
+		var lay, win = root.window;
+		try {
+			lay = new Layer(win, win.primaryLayer);
+			lay.loadImages(bmp);
+			bmpUnchecked = lay;
+		} catch {
+			bmpUnchecked = (int)bmp;
+		}
+		if (lay) invalidate lay;
+	}
+};
+//Debug.controller.visible = true;
+Debug.console.visible = true;
+var dm = Debug.message;
+
+with (Debug.console.getPlacement())
+	dm("console", .flags, .showCmd, "min", .minLeft, .minTop, "max", .maxLeft, .maxTop,
+	   "normal", .normalLeft, .normalTop, .normalRight, .normalBottom);
+
+class TestWindow extends Window {
+	var icon, mark, ex;
+	function finalize() { super.finalize(...); }
+	function TestWindow(title, ex = true) {
+		super.Window();
+
+		caption = title;
+//		borderStyle = bsNone;
+
+		add(new Layer(this, null));
+		add(icon = new Layer(this, primaryLayer));
+		setInnerSize(320, 240);
+		primaryLayer.visible = true;
+		visible = true;
+
+		if (ex) {
+			icon.loadImages("testicon"); //, 0x00FF00);
+
+			registerExEvent();
+			createMenu();
+		}
+		this.ex = ex;
+	}
+	function createMenu() {
+		var tes1 = new MenuItem(this, "test1");
+		var tes2 = new MenuItem(this, "test2");
+		
+		var min = new MenuItem(this, "");
+		var max = new MenuItem(this, "");
+		var cls = new MenuItem(this, "");
+//		var mark;
+
+		min.onClick = minimize;
+		max.onClick = maximize;
+		cls.onClick = close;
+
+		menu.add(tes1);
+		menu.add(tes2);
+		menu.add(min);
+		menu.add(max);
+		menu.add(cls);
+
+		var ref;
+		tes1.onClick = Debug.console.restoreMaximize;
+		tes2.add(ref = new MenuItem(this, "1")); ref.setBmpItem("testicon2");
+		tes2.add(ref = new MenuItem(this, "2")); ref.setBmpItem("testicon3");
+		tes2.add(new MenuItem(this, "-"));
+		tes2.add(mark = new MenuItem(this, "3"));
+		tes2.add(new MenuItem(this, "4"));
+
+		min.bmpItem = MenuItem.biPopupMinimize;
+		max.bmpItem = MenuItem.biPopupMaximize;
+		cls.bmpItem = MenuItem.biPopupClose;
+		min.rightJustify = true;
+
+		// （子を作る／子が消えるとIDが変わるのでbmpItemが表示されない）
+		var sub = new MenuItem(this, "xxx");
+		sub.onClick = function { System.inform("xxx"); focusMenuByKey(); } incontextof this;
+
+		mark.add(sub);
+		sub.setBmpItem(icon); //"testicon"); //MenuItem.biClose);
+//		mark.rightJustify = true;
+
+		dm("mark", mark.HMENU);
+		
+		// Window直下の HMENU が取得できるかテスト
+		var prop = &(MenuItem.HMENU);
+		dm("HMENU", *(prop incontextof menu));
+
+		exSystemMenu = tes2.children;
+		menu.visible = true;
+	}
+	function onCloseQuery()    { return super.onCloseQuery(true); }
+	function onShow()          { System.inform(@"${caption}:onShow"); }
+	function onHide()          { System.inform(@"${caption}:onHide"); }
+	function onMinimize()      { System.inform(@"${caption}:onMinimize"); }
+	function onMaximize()      { System.inform(@"${caption}:onMaximize"); }
+	var enableMaximize = true;
+	function onMaximizeQuery() { dm(@"${caption}:onMaxQuery"); return !enableMaximize; }
+	function onResizing(rect) {
+		dm(@"${caption}:onResizing", clientRect, windowRect, ltwh, iwh, @"WH:${rect.w-bw},${rect.h-bh}", rect.type);
+		return forceResizeRect(rect, fixw, void);
+	}
+	function forceResizeRect(rect, w, h) {
+		with (rect) {
+			w = .w if (w === void);
+			h = .h if (h === void);
+			var x = (.type   % 3 == 1) ? (.x+.w) - w : .x;
+			var y = (.type\3 % 3 == 1) ? (.y+.h) - h : .y;
+			if (.x == x && .y == y && .w == w && .h == h) return false;
+			.x = x;
+			.y = y;
+			.w = w;
+			.h = h;
+		}
+		return true;
+	}
+	function onResize() {
+		dm(@"${caption}:onResize  ", clientRect, windowRect, ltwh, iwh);
+		with (primaryLayer) {
+			.setImageSize(innerWidth, innerHeight);
+			.setSizeToImageSize();
+			.fillRect(0, 0, innerWidth, innerHeight, 0xFF000000);
+		}
+	}
+	function onMoving(rect) {
+		dm(@"${caption}:onMoving  ", clientRect, windowRect, ltwh, @"RCXY:${rect.x},${rect.y}");
+	}
+	function onMove(x, y) {
+		dm(@"${caption}:onMove    ", clientRect, windowRect, ltwh, @"XY:${x},${y}");
+	}
+	var bw, bh, fixw;
+	function updateBSize() {
+		var rect = getWindowRect();
+		bw = rect.w - innerWidth;
+		bh = rect.h - innerHeight;
+		fixw = rect.w;
+	}
+	function onMoveSizeBegin() { dm(@"${caption}:onMoveSizeBegin"); updateBSize(); }
+	function onMoveSizeEnd()   { dm(@"${caption}:onMoveSizeEnd");   }
+
+	property clientRect { getter { with (getClientRect()) return @"CLI:${.x},${.y}/${.w},${.h}"; } }
+	property windowRect { getter { with (getWindowRect()) return @"WIN:${.x},${.y}/${.w},${.h}"; } }
+	property ltwh       { getter {                        return @"TJS:${left},${top}/${width},${height}"; } }
+	property iwh        { getter {                        return @"IWH:${innerWidth},${innerHeight}"; } }
+
+	function onMouseUp(x, y, btn) {
+		if (!ex) return;
+		switch (btn) {
+		case  mbRight: menu.children[1].popup(tpmTopAlign|tpmLeftAlign, x, y); break;
+		case  mbLeft :
+			onExSystemMenuSelected(menu.children[1].popupEx(tpmTopAlign|tpmLeftAlign));
+			break;
+		}
+	}
+	function onDisplayChanged() {
+		dm("DisplayChanged", System.screenWidth, System.screenHeight);
+	}
+	function onEnterMenuLoop() { dm("onEnterMenuLoop"); }
+	function onExitMenuLoop()  { dm("onExitMenuLoop");  }
+
+	function checkTimer() {
+		dm(@"${caption}.maximized: ${maximized}");
+	}
+
+//	function onNcMouseMove(*)  { dm("ncMouseMove",  *); }
+	function onNcMouseLeave(*) { dm("ncMouseLeave", *); }
+	function onNcMouseUp(*)    { dm("ncMouseUp",    *); }
+	function onNcMouseDown(*)  { dm("ncMouseDown",  *); }
+
+	function onExSystemMenuSelected(obj) {
+		obj.onClick() if (typeof obj == "Object" && typeof obj.onClick == "Object" && obj.onClick instanceof "Function");
+	}
+}
+
+function RectToString(rect) {
+	if (rect !== void) with (rect) return @"%[ x:${.x}, y:${.y}, w:${.w}, h:${.h} ]";
+	return "void";
+}
+function MonitorToString(mon) {
+	if (mon !== void) with (mon) return (
+		@"%[ name:'${.name}', primary:${.primary?'true':'false'}, "+
+		@"monitor:${RectToString(.monitor)}, "+
+		@"work:${RectToString(.work)}"+
+		(.intersect !== void ? @", intersect:${RectToString(.intersect)}" : "")+
+		" ]");
+	return "void";
+}
+
+function TestGetDisplayMonitors(args*) {
+	dm(@"System.getDisplayMonitors(${args.join(', ')}) == [");
+	var mons = System.getDisplayMonitors(args*);
+	for (var i = 0; i < mons.count; i++) dm(MonitorToString(mons[i]));
+	dm("];");
+}
+
+function TestGetMonitorInfo(args*) {
+	dm(@"System.getMonitorInfo(${args.join(', ')}) == " + MonitorToString(System.getMonitorInfo(args*)));
+}
+
+var testWin = new TestWindow("MainWindow");
+//testWin.add(new TestWindow("SubWindow"));
+
+var subWin = new TestWindow("SubWindow"/*, false*/);
+
+var timer = new Timer(testWin, "checkTimer");
+timer.interval = 5000;
+timer.enabled = true;
+
+dm("----------------");
+dm("モニタ一覧取得テスト");
+TestGetDisplayMonitors();
+
+dm("----------------");
+dm("範囲指定つきモニタ取得テスト");
+TestGetDisplayMonitors(-100, -100, 200, 200);
+
+dm("----------------");
+dm("プライマリモニタ取得テスト");
+TestGetMonitorInfo();
+
+dm("----------------");
+dm("座標指定モニタ取得テスト");
+TestGetMonitorInfo("true",   -1, -1);
+TestGetMonitorInfo("false",  -1, -1);
+
+dm("----------------");
+dm("矩形指定モニタ取得テスト");
+TestGetMonitorInfo("true",  -100, -100, 100, 100);
+TestGetMonitorInfo("false", -100, -100, 100, 100);
+
+dm("----------------");
+dm("ウィンドウ指定モニタ取得テスト");
+TestGetMonitorInfo("true",   testWin);
+TestGetMonitorInfo("false",  testWin);
+
+var testPad = new Pad();
+testPad.onClose = function { System.inform("onClose"); };
+testPad.visible=true;
+testPad.registerExEvent();
+testPad.borderStyle = bsToolWindow;
+testPad.registerExEvent();
+
+var testPad2 = new Pad();
+testPad2.registerExEvent();

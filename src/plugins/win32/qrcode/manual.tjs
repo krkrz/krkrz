@@ -1,0 +1,15 @@
+/**
+ * 擬似コードによるマニュアル
+ */
+class Layer
+{
+	/**
+	 * レイヤーのサイズを調整して、指定の値(文字列又は整数値)に準じたQRコードを書き込みます
+	 * @param value QRコードにする値(文字列又は整数値)
+	 * @param ecLevel 誤り訂正レベル(default:0/0(最小)～3(最大))
+	 * @param qrVersion 容量サイズグループ(default:0/0～2)
+	 * @param autoExtent 自動拡張の有無(default:true(値に対してサイズが小さいときは適切なサイズに自動拡張))
+	 * @param maskPattern マスキングパターン(default:-1(自動選択))
+	 */
+	function drawQRCode(value, ecLevel=0, qrVersion=0, autoExtent=true, maskPattern=-1);
+}

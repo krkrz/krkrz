@@ -1,0 +1,1839 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Irrlicht" />
+		<Option pch_mode="0" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="..\..\bin\Win32-gcc\Irrlicht.dll" prefix_auto="0" extension_auto="0" />
+				<Option object_output="..\obj\IrrDebuggcc" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-W" />
+					<Add option="-g" />
+					<Add option="-O0" />
+					<Add option="-DWIN32" />
+					<Add option="-D_DEBUG" />
+					<Add option="-D_WINDOWS" />
+					<Add option="-D_USRDLL" />
+					<Add option="-DIRRLICHT_EXPORTS" />
+					<Add option="-D_CRT_SECURE_NO_DEPRECATE" />
+					<Add directory="..\..\include" />
+					<Add directory="zlib" />
+				</Compiler>
+				<Linker>
+					<Add library="kernel32" />
+					<Add library="user32" />
+					<Add library="gdi32" />
+					<Add library="winspool" />
+					<Add library="comdlg32" />
+					<Add library="advapi32" />
+					<Add library="shell32" />
+					<Add library="ole32" />
+					<Add library="oleaut32" />
+					<Add library="uuid" />
+					<Add library="opengl32" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="..\..\bin\Win32-gcc\Irrlicht.dll" prefix_auto="0" extension_auto="0" />
+				<Option object_output="obj\IrrReleasegcc" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-W" />
+					<Add option="-DWIN32" />
+					<Add option="-DNDEBUG" />
+					<Add option="-D_WINDOWS" />
+					<Add option="-D_USRDLL" />
+					<Add option="-DIRRLICHT_EXPORTS" />
+					<Add option="-D_CRT_SECURE_NO_DEPRECATE" />
+					<Add option="-D__GNUWIN32__" />
+					<Add directory="..\..\include" />
+					<Add directory="zlib" />
+				</Compiler>
+				<Linker>
+					<Add library="kernel32" />
+					<Add library="user32" />
+					<Add library="gdi32" />
+					<Add library="winspool" />
+					<Add library="comdlg32" />
+					<Add library="advapi32" />
+					<Add library="shell32" />
+					<Add library="ole32" />
+					<Add library="oleaut32" />
+					<Add library="uuid" />
+					<Add library="opengl32" />
+				</Linker>
+			</Target>
+			<Target title="Release - Fast FPU">
+				<Option output="..\..\bin\Win32-gcc\Irrlicht.dll" prefix_auto="0" extension_auto="0" />
+				<Option object_output="Release - Fast FPU" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O3" />
+					<Add option="-W" />
+					<Add option="-DWIN32" />
+					<Add option="-DNDEBUG" />
+					<Add option="-D_WINDOWS" />
+					<Add option="-D_USRDLL" />
+					<Add option="-DIRRLICHT_EXPORTS" />
+					<Add option="-D_CRT_SECURE_NO_DEPRECATE" />
+					<Add directory="..\..\include" />
+					<Add directory="zlib" />
+				</Compiler>
+				<Linker>
+					<Add library="kernel32" />
+					<Add library="user32" />
+					<Add library="gdi32" />
+					<Add library="winspool" />
+					<Add library="comdlg32" />
+					<Add library="advapi32" />
+					<Add library="shell32" />
+					<Add library="ole32" />
+					<Add library="oleaut32" />
+					<Add library="uuid" />
+					<Add library="opengl32" />
+				</Linker>
+			</Target>
+		</Build>
+		<VirtualTargets>
+			<Add alias="All" targets="Debug;Release;Release - Fast FPU;" />
+		</VirtualTargets>
+		<Unit filename="..\..\changes.txt">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\ECullingTypes.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\EDebugSceneTypes.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\EDriverTypes.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\EGUIElementTypes.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\EMeshWriterEnums.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\EMessageBoxFlags.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\ESceneNodeAnimatorTypes.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\ESceneNodeTypes.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IAnimatedMesh.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IAnimatedMeshMD2.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IAnimatedMeshSceneNode.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IAttributeExchangingObject.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IAttributes.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IBillboardSceneNode.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IBoneSceneNode.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\ICameraSceneNode.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\ICursorControl.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IDummyTransformationSceneNode.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IEventReceiver.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IFileList.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IFileSystem.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IGPUProgrammingServices.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IGUIButton.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IGUICheckbox.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IGUIComboBox.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IGUIContextMenu.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IGUIEditBox.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IGUIElement.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IGUIElementFactory.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IGUIEnvironment.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IGUIFileOpenDialog.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IGUIFont.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IGUIImage.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IGUIInOutFader.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IGUIListBox.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IGUIMeshViewer.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IGUIScrollBar.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IGUISkin.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IGUISpinBox.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IGUISpriteBank.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IGUIStaticText.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IGUITabControl.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IGUIToolbar.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IGUIWindow.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IImage.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IImageLoader.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\ILightSceneNode.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\ILogger.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IMaterialRenderer.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IMaterialRendererServices.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IMesh.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IMeshBuffer.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IMeshCache.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IMeshLoader.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IMeshManipulator.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IMeshSceneNode.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IMeshWriter.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IMetaTriangleSelector.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IOSOperator.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IParticleAffector.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IParticleEmitter.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IParticleSystemSceneNode.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IQ3LevelMesh.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IReadFile.H">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IReferenceCounted.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\ISceneCollisionManager.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\ISceneManager.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\ISceneNode.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\ISceneNodeAnimator.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\ISceneNodeAnimatorCollisionResponse.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\ISceneNodeAnimatorFactory.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\ISceneNodeFactory.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\ISceneNodeMeshLoader.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IShaderConstantSetCallBack.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IShadowVolumeSceneNode.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\ISkinnedMesh.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\ITerrainSceneNode.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\ITextSceneNode.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\ITexture.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\ITimer.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\ITriangleSelector.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IVideoDriver.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IVideoModeList.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IWriteFile.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IXMLReader.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IXMLWriter.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IrrCompileConfig.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\IrrlichtDevice.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\Keycodes.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\S3DVertex.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\SAnimatedMesh.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\SColor.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\SExposedVideoData.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\SIrrCreationParameters.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\SKeyMap.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\SLight.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\SMaterial.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\SMesh.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\SMeshBuffer.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\SMeshBufferLightMap.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\SMeshBufferTangents.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\SParticle.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\SViewFrustum.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\SceneParameters.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\aabbox3d.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\dimension2d.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\heapsort.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\irrAllocator.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\irrArray.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\irrList.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\irrMap.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\irrMath.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\irrString.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\irrTypes.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\irrXML.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\irrlicht.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\line2d.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\line3d.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\matrix4.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\plane3d.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\position2d.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\quaternion.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\rect.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\triangle3d.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\vector2d.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\include\vector3d.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\..\readme.txt">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="BuiltInFont.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="C3DSMeshFileLoader.cpp" />
+		<Unit filename="C3DSMeshFileLoader.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CAnimatedMeshMD2.cpp" />
+		<Unit filename="CAnimatedMeshMD2.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CAnimatedMeshMD3.cpp" />
+		<Unit filename="CAnimatedMeshMD3.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CAnimatedMeshSceneNode.cpp" />
+		<Unit filename="CAnimatedMeshSceneNode.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CAttributeImpl.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CAttributes.cpp" />
+		<Unit filename="CAttributes.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CB3DMeshFileLoader.cpp" />
+		<Unit filename="CB3DMeshFileLoader.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CBSPMeshFileLoader.cpp" />
+		<Unit filename="CBSPMeshFileLoader.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CBillboardSceneNode.cpp" />
+		<Unit filename="CBillboardSceneNode.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CBoneSceneNode.cpp" />
+		<Unit filename="CBoneSceneNode.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CCSMLoader.cpp" />
+		<Unit filename="CCSMLoader.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CCameraFPSSceneNode.cpp" />
+		<Unit filename="CCameraFPSSceneNode.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CCameraMayaSceneNode.cpp" />
+		<Unit filename="CCameraMayaSceneNode.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CCameraSceneNode.cpp" />
+		<Unit filename="CCameraSceneNode.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CColladaFileLoader.cpp" />
+		<Unit filename="CColladaFileLoader.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CColladaMeshWriter.cpp" />
+		<Unit filename="CColladaMeshWriter.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CColorConverter.cpp" />
+		<Unit filename="CColorConverter.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CCubeSceneNode.cpp" />
+		<Unit filename="CCubeSceneNode.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CD3D8Driver.cpp" />
+		<Unit filename="CD3D8Driver.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CD3D8MaterialRenderer.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CD3D8NormalMapRenderer.cpp" />
+		<Unit filename="CD3D8NormalMapRenderer.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CD3D8ParallaxMapRenderer.cpp" />
+		<Unit filename="CD3D8ParallaxMapRenderer.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CD3D8ShaderMaterialRenderer.cpp" />
+		<Unit filename="CD3D8ShaderMaterialRenderer.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CD3D8Texture.cpp" />
+		<Unit filename="CD3D8Texture.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CD3D9Driver.cpp" />
+		<Unit filename="CD3D9Driver.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CD3D9HLSLMaterialRenderer.cpp" />
+		<Unit filename="CD3D9HLSLMaterialRenderer.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CD3D9MaterialRenderer.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CD3D9NormalMapRenderer.cpp" />
+		<Unit filename="CD3D9NormalMapRenderer.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CD3D9ParallaxMapRenderer.cpp" />
+		<Unit filename="CD3D9ParallaxMapRenderer.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CD3D9ShaderMaterialRenderer.cpp" />
+		<Unit filename="CD3D9ShaderMaterialRenderer.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CD3D9Texture.cpp" />
+		<Unit filename="CD3D9Texture.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CDMFLoader.cpp" />
+		<Unit filename="CDMFLoader.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CDefaultGUIElementFactory.cpp" />
+		<Unit filename="CDefaultGUIElementFactory.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CDefaultSceneNodeAnimatorFactory.cpp" />
+		<Unit filename="CDefaultSceneNodeAnimatorFactory.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CDefaultSceneNodeFactory.cpp" />
+		<Unit filename="CDefaultSceneNodeFactory.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CDepthBuffer.cpp" />
+		<Unit filename="CDepthBuffer.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CDummyTransformationSceneNode.cpp" />
+		<Unit filename="CDummyTransformationSceneNode.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CEmptySceneNode.cpp" />
+		<Unit filename="CEmptySceneNode.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CFPSCounter.cpp" />
+		<Unit filename="CFPSCounter.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CFileList.cpp" />
+		<Unit filename="CFileList.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CFileSystem.cpp" />
+		<Unit filename="CFileSystem.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CGUIButton.cpp" />
+		<Unit filename="CGUIButton.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CGUICheckbox.cpp" />
+		<Unit filename="CGUICheckbox.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CGUIColorSelectDialog.cpp" />
+		<Unit filename="CGUIColorSelectDialog.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CGUIComboBox.cpp" />
+		<Unit filename="CGUIComboBox.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CGUIContextMenu.cpp" />
+		<Unit filename="CGUIContextMenu.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CGUIEditBox.cpp" />
+		<Unit filename="CGUIEditBox.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CGUIEnvironment.cpp" />
+		<Unit filename="CGUIEnvironment.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CGUIFileOpenDialog.cpp" />
+		<Unit filename="CGUIFileOpenDialog.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CGUIFont.cpp" />
+		<Unit filename="CGUIFont.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CGUIImage.cpp" />
+		<Unit filename="CGUIImage.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CGUIInOutFader.cpp" />
+		<Unit filename="CGUIInOutFader.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CGUIListBox.cpp" />
+		<Unit filename="CGUIListBox.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CGUIMenu.cpp" />
+		<Unit filename="CGUIMenu.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CGUIMeshViewer.cpp" />
+		<Unit filename="CGUIMeshViewer.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CGUIMessageBox.cpp" />
+		<Unit filename="CGUIMessageBox.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CGUIModalScreen.cpp" />
+		<Unit filename="CGUIModalScreen.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CGUIScrollBar.cpp" />
+		<Unit filename="CGUIScrollBar.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CGUISkin.cpp" />
+		<Unit filename="CGUISkin.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CGUISpinBox.cpp" />
+		<Unit filename="CGUISpinBox.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CGUISpriteBank.cpp" />
+		<Unit filename="CGUISpriteBank.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CGUIStaticText.cpp" />
+		<Unit filename="CGUIStaticText.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CGUITabControl.cpp" />
+		<Unit filename="CGUITabControl.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CGUIToolBar.cpp" />
+		<Unit filename="CGUIToolBar.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CGUIWindow.cpp" />
+		<Unit filename="CGUIWindow.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CGeometryCreator.cpp" />
+		<Unit filename="CGeometryCreator.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CImage.cpp" />
+		<Unit filename="CImage.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CImageLoaderBMP.cpp" />
+		<Unit filename="CImageLoaderBMP.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CImageLoaderJPG.cpp" />
+		<Unit filename="CImageLoaderJPG.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CImageLoaderPCX.cpp" />
+		<Unit filename="CImageLoaderPCX.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CImageLoaderPNG.cpp" />
+		<Unit filename="CImageLoaderPNG.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CImageLoaderPPM.cpp" />
+		<Unit filename="CImageLoaderPPM.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CImageLoaderPSD.cpp" />
+		<Unit filename="CImageLoaderPSD.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CImageLoaderTGA.cpp" />
+		<Unit filename="CImageLoaderTGA.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CImageWriterBMP.cpp" />
+		<Unit filename="CImageWriterBMP.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CImageWriterJPG.cpp" />
+		<Unit filename="CImageWriterJPG.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CImageWriterPCX.cpp" />
+		<Unit filename="CImageWriterPCX.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CImageWriterPNG.cpp" />
+		<Unit filename="CImageWriterPNG.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CImageWriterPPM.cpp" />
+		<Unit filename="CImageWriterPPM.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CImageWriterPSD.cpp" />
+		<Unit filename="CImageWriterPSD.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CImageWriterTGA.cpp" />
+		<Unit filename="CImageWriterTGA.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CIrrDeviceLinux.cpp" />
+		<Unit filename="CIrrDeviceLinux.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CIrrDeviceStub.cpp" />
+		<Unit filename="CIrrDeviceStub.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CIrrDeviceWin32.cpp" />
+		<Unit filename="CIrrDeviceWin32.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CIrrMeshFileLoader.cpp" />
+		<Unit filename="CIrrMeshFileLoader.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CIrrMeshWriter.cpp" />
+		<Unit filename="CIrrMeshWriter.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CLMTSMeshFileLoader.cpp" />
+		<Unit filename="CLMTSMeshFileLoader.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CLightSceneNode.cpp" />
+		<Unit filename="CLightSceneNode.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CLimitReadFile.cpp" />
+		<Unit filename="CLimitReadFile.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CLogger.cpp" />
+		<Unit filename="CLogger.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CMD2MeshFileLoader.cpp" />
+		<Unit filename="CMD2MeshFileLoader.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CMD3MeshFileLoader.cpp" />
+		<Unit filename="CMD3MeshFileLoader.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CMS3DMeshFileLoader.cpp" />
+		<Unit filename="CMS3DMeshFileLoader.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CMY3DHelper.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CMY3DMeshFileLoader.cpp" />
+		<Unit filename="CMY3DMeshFileLoader.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CMY3DStuff.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CMemoryReadFile.cpp" />
+		<Unit filename="CMemoryReadFile.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CMeshCache.cpp" />
+		<Unit filename="CMeshCache.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CMeshManipulator.cpp" />
+		<Unit filename="CMeshManipulator.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CMeshSceneNode.cpp" />
+		<Unit filename="CMeshSceneNode.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CMetaTriangleSelector.cpp" />
+		<Unit filename="CMetaTriangleSelector.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CNullDriver.cpp" />
+		<Unit filename="CNullDriver.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="COBJMeshFileLoader.cpp" />
+		<Unit filename="COBJMeshFileLoader.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="COCTLoader.cpp" />
+		<Unit filename="COCTLoader.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="COSOperator.cpp" />
+		<Unit filename="COSOperator.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="COctTreeSceneNode.cpp" />
+		<Unit filename="COctTreeSceneNode.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="COctTreeTriangleSelector.cpp" />
+		<Unit filename="COctTreeTriangleSelector.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="COgreMeshFileLoader.cpp" />
+		<Unit filename="COgreMeshFileLoader.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="COpenGLDriver.cpp" />
+		<Unit filename="COpenGLDriver.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="COpenGLExtensionHandler.cpp" />
+		<Unit filename="COpenGLExtensionHandler.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="COpenGLMaterialRenderer.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="COpenGLNormalMapRenderer.cpp" />
+		<Unit filename="COpenGLNormalMapRenderer.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="COpenGLParallaxMapRenderer.cpp" />
+		<Unit filename="COpenGLParallaxMapRenderer.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="COpenGLSLMaterialRenderer.cpp" />
+		<Unit filename="COpenGLSLMaterialRenderer.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="COpenGLShaderMaterialRenderer.cpp" />
+		<Unit filename="COpenGLShaderMaterialRenderer.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="COpenGLTexture.cpp" />
+		<Unit filename="COpenGLTexture.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CPakReader.cpp" />
+		<Unit filename="CPakReader.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CParticleAnimatedMeshSceneNodeEmitter.cpp" />
+		<Unit filename="CParticleAttractionAffector.cpp" />
+		<Unit filename="CParticleBoxEmitter.cpp" />
+		<Unit filename="CParticleBoxEmitter.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CParticleCylinderEmitter.cpp" />
+		<Unit filename="CParticleFadeOutAffector.cpp" />
+		<Unit filename="CParticleFadeOutAffector.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CParticleGravityAffector.cpp" />
+		<Unit filename="CParticleGravityAffector.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CParticleMeshEmitter.cpp" />
+		<Unit filename="CParticlePointEmitter.cpp" />
+		<Unit filename="CParticlePointEmitter.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CParticleRingEmitter.cpp" />
+		<Unit filename="CParticleRotationAffector.cpp" />
+		<Unit filename="CParticleSphereEmitter.cpp" />
+		<Unit filename="CParticleSystemSceneNode.cpp" />
+		<Unit filename="CParticleSystemSceneNode.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CQ3LevelMesh.cpp" />
+		<Unit filename="CQ3LevelMesh.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CQuake3ShaderSceneNode.cpp" />
+		<Unit filename="CQuake3ShaderSceneNode.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CReadFile.cpp" />
+		<Unit filename="CReadFile.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CSTLMeshFileLoader.cpp" />
+		<Unit filename="CSTLMeshFileLoader.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CSTLMeshWriter.cpp" />
+		<Unit filename="CSTLMeshWriter.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CSceneCollisionManager.cpp" />
+		<Unit filename="CSceneCollisionManager.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CSceneManager.cpp" />
+		<Unit filename="CSceneManager.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CSceneNodeAnimatorCollisionResponse.cpp" />
+		<Unit filename="CSceneNodeAnimatorCollisionResponse.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CSceneNodeAnimatorDelete.cpp" />
+		<Unit filename="CSceneNodeAnimatorDelete.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CSceneNodeAnimatorFlyCircle.cpp" />
+		<Unit filename="CSceneNodeAnimatorFlyCircle.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CSceneNodeAnimatorFlyStraight.cpp" />
+		<Unit filename="CSceneNodeAnimatorFlyStraight.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CSceneNodeAnimatorFollowSpline.cpp" />
+		<Unit filename="CSceneNodeAnimatorFollowSpline.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CSceneNodeAnimatorRotation.cpp" />
+		<Unit filename="CSceneNodeAnimatorRotation.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CSceneNodeAnimatorTexture.cpp" />
+		<Unit filename="CSceneNodeAnimatorTexture.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CShadowVolumeSceneNode.cpp" />
+		<Unit filename="CShadowVolumeSceneNode.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CSkinnedMesh.cpp" />
+		<Unit filename="CSkinnedMesh.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CSkyBoxSceneNode.cpp" />
+		<Unit filename="CSkyBoxSceneNode.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CSkyDomeSceneNode.cpp" />
+		<Unit filename="CSkyDomeSceneNode.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CSoftware2MaterialRenderer.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CSoftwareDriver.cpp" />
+		<Unit filename="CSoftwareDriver.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CSoftwareDriver2.cpp" />
+		<Unit filename="CSoftwareDriver2.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CSoftwareTexture.cpp" />
+		<Unit filename="CSoftwareTexture.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CSoftwareTexture2.cpp" />
+		<Unit filename="CSoftwareTexture2.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CSphereSceneNode.cpp" />
+		<Unit filename="CSphereSceneNode.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CTRFlat.cpp" />
+		<Unit filename="CTRFlatWire.cpp" />
+		<Unit filename="CTRGouraud.cpp" />
+		<Unit filename="CTRGouraud2.cpp" />
+		<Unit filename="CTRGouraudAlpha2.cpp" />
+		<Unit filename="CTRGouraudAlphaNoZ2.cpp" />
+		<Unit filename="CTRGouraudWire.cpp" />
+		<Unit filename="CTRTextureBlend.cpp" />
+		<Unit filename="CTRTextureDetailMap2.cpp" />
+		<Unit filename="CTRTextureFlat.cpp" />
+		<Unit filename="CTRTextureFlatWire.cpp" />
+		<Unit filename="CTRTextureGouraud.cpp" />
+		<Unit filename="CTRTextureGouraud.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CTRTextureGouraud2.cpp" />
+		<Unit filename="CTRTextureGouraudAdd.cpp" />
+		<Unit filename="CTRTextureGouraudAdd2.cpp" />
+		<Unit filename="CTRTextureGouraudAddNoZ2.cpp" />
+		<Unit filename="CTRTextureGouraudAlpha.cpp" />
+		<Unit filename="CTRTextureGouraudAlphaNoZ.cpp" />
+		<Unit filename="CTRTextureGouraudNoZ.cpp" />
+		<Unit filename="CTRTextureGouraudNoZ2.cpp" />
+		<Unit filename="CTRTextureGouraudVertexAlpha2.cpp" />
+		<Unit filename="CTRTextureGouraudWire.cpp" />
+		<Unit filename="CTRTextureLightMap2_Add.cpp" />
+		<Unit filename="CTRTextureLightMap2_M1.cpp" />
+		<Unit filename="CTRTextureLightMap2_M2.cpp" />
+		<Unit filename="CTRTextureLightMap2_M4.cpp" />
+		<Unit filename="CTRTextureLightMapGouraud2_M4.cpp" />
+		<Unit filename="CTRTextureWire2.cpp" />
+		<Unit filename="CTerrainSceneNode.cpp" />
+		<Unit filename="CTerrainSceneNode.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CTerrainTriangleSelector.cpp" />
+		<Unit filename="CTerrainTriangleSelector.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CTextSceneNode.cpp" />
+		<Unit filename="CTextSceneNode.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CTimer.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CTriangleBBSelector.cpp" />
+		<Unit filename="CTriangleBBSelector.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CTriangleSelector.cpp" />
+		<Unit filename="CTriangleSelector.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CVideoModeList.cpp" />
+		<Unit filename="CVideoModeList.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CWaterSurfaceSceneNode.cpp" />
+		<Unit filename="CWaterSurfaceSceneNode.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CWriteFile.cpp" />
+		<Unit filename="CWriteFile.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CXMLReader.cpp" />
+		<Unit filename="CXMLReader.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CXMLReaderImpl.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CXMLWriter.cpp" />
+		<Unit filename="CXMLWriter.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CXMeshFileLoader.cpp" />
+		<Unit filename="CXMeshFileLoader.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CZBuffer.cpp" />
+		<Unit filename="CZBuffer.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="CZipReader.cpp" />
+		<Unit filename="CZipReader.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="IBurningShader.cpp" />
+		<Unit filename="IBurningShader.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="IDepthBuffer.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="IImagePresenter.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="ITriangleRenderer.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="IZBuffer.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="Irrlicht.cpp" />
+		<Unit filename="OctTree.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="S2DVertex.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="S4DVertex.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="SoftwareDriver2_compile_config.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="SoftwareDriver2_helper.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="dmfsupport.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="glext.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="irrXML.cpp" />
+		<Unit filename="jpeglib\cderror.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="jpeglib\cdjpeg.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\cdjpeg.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="jpeglib\jcapimin.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jcapistd.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jccoefct.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jccolor.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jcdctmgr.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jchuff.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jchuff.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="jpeglib\jcinit.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jcmainct.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jcmarker.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jcmaster.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jcomapi.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jconfig.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="jpeglib\jcparam.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jcphuff.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jcprepct.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jcsample.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jctrans.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jdapimin.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jdapistd.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jdatadst.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jdatasrc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jdcoefct.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jdcolor.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jdct.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="jpeglib\jddctmgr.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jdhuff.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jdhuff.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="jpeglib\jdinput.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jdmainct.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jdmarker.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jdmaster.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jdmerge.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jdphuff.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jdpostct.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jdsample.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jdtrans.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jerror.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jerror.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="jpeglib\jfdctflt.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jfdctfst.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jfdctint.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jidctflt.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jidctfst.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jidctint.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jidctred.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jinclude.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="jpeglib\jmemmgr.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jmemnobs.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jmemsys.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="jpeglib\jmorecfg.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="jpeglib\jpegint.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="jpeglib\jpeglib.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="jpeglib\jquant1.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jquant2.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jutils.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="jpeglib\jversion.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="libpng\png.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="libpng\png.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="libpng\pngconf.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="libpng\pngerror.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="libpng\pngget.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="libpng\pngmem.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="libpng\pngpread.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="libpng\pngread.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="libpng\pngrio.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="libpng\pngrtran.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="libpng\pngrutil.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="libpng\pngset.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="libpng\pngtrans.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="libpng\pngwio.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="libpng\pngwrite.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="libpng\pngwtran.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="libpng\pngwutil.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="os.cpp" />
+		<Unit filename="os.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="zlib\adler32.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="zlib\compress.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="zlib\crc32.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="zlib\crc32.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="zlib\deflate.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="zlib\deflate.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="zlib\inffast.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="zlib\inffast.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="zlib\inffixed.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="zlib\inflate.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="zlib\inftrees.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="zlib\inftrees.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="zlib\trees.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="zlib\trees.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="zlib\uncompr.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="zlib\zconf.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="zlib\zlib.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="zlib\zutil.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="zlib\zutil.h">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

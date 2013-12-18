@@ -1,0 +1,7 @@
+USEUNIT("tvpsnd.c");
+USEUNIT("WUMainUnit.cpp");
+USERES("wumsadp.res");
+//---------------------------------------------------------------------------
+This file is used by the project manager only and should be treated like the project file
+
+DllEntryPoint

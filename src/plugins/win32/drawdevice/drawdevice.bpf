@@ -1,0 +1,8 @@
+USEUNIT("Main.cpp");
+USEUNIT("..\tp_stub.cpp");
+USEUNIT("PassThroughDrawDevice.cpp");
+USEUNIT("BasicDrawDevice.cpp");
+//---------------------------------------------------------------------------
+This file is used by the project manager only and should be treated like the project file
+
+DllEntryPoint

@@ -1,0 +1,992 @@
+/**
+ * 擬似コードによるマニュアル
+ */
+class GdiPlus {
+
+	// Status 定義
+	Ok = 0,
+    GenericError = 1,
+    InvalidParameter = 2,
+    OutOfMemory = 3,
+    ObjectBusy = 4,
+    InsufficientBuffer = 5,
+    NotImplemented = 6,
+    Win32Error = 7,
+    WrongState = 8,
+    Aborted = 9,
+    FileNotFound = 10,
+    ValueOverflow = 11,
+    AccessDenied = 12,
+    UnknownImageFormat = 13,
+    FontFamilyNotFound = 14,
+    FontStyleNotFound = 15,
+    NotTrueTypeFont = 16,
+    UnsupportedGdiplusVersion = 17,
+    GdiplusNotInitialized = 18,
+    PropertyNotFound = 19,
+    PropertyNotSupported = 20,
+    ProfileNotFound = 21
+	
+	// FontStyle 定義
+	FontStyleRegular = 0;
+	FontStyleBold = 1;
+	FontStyleItalic = 2;
+	FontStyleBoldItalic = 3;
+	FontStyleUnderline = 4;
+	FontStyleStrikeout = 8;
+
+	// BrushType定義
+	BrushTypeSolidColor = 0;
+    BrushTypeHatchFill = 1;
+    BrushTypeTextureFill = 2;
+    BrushTypePathGradient = 3;
+    BrushTypeLinearGradient = 4;
+
+	// DashCap定義
+	DashCapFlat = 0;
+    DashCapRound = 2;
+    DashCapTriangle = 3;
+
+	// DashStyle定義
+	DashStyleSolid = 0;
+    DashStyleDash = 1;
+    DashStyleDot = 2;
+    DashStyleDashDot = 3;
+    DashStyleDashDotDot = 4;
+
+	// HatchStyle定義
+	HatchStyleHorizontal = 0;
+    HatchStyleVertical = 1;
+    HatchStyleForwardDiagonal = 2;
+    HatchStyleBackwardDiagonal = 3;
+    HatchStyleCross = 4;
+    HatchStyleDiagonalCross = 5;
+    HatchStyle05Percent = 6;
+    HatchStyle10Percent = 7;
+    HatchStyle20Percent = 8;
+    HatchStyle25Percent = 9;
+    HatchStyle30Percent = 10;
+    HatchStyle40Percent = 11;
+    HatchStyle50Percent = 12;
+    HatchStyle60Percent = 13;
+    HatchStyle70Percent = 14;
+    HatchStyle75Percent = 15;
+    HatchStyle80Percent = 16;
+    HatchStyle90Percent = 17;
+    HatchStyleLightDownwardDiagonal = 18;
+    HatchStyleLightUpwardDiagonal = 19;
+    HatchStyleDarkDownwardDiagonal = 20;
+    HatchStyleDarkUpwardDiagonal = 21;
+    HatchStyleWideDownwardDiagonal = 22;
+    HatchStyleWideUpwardDiagonal = 23;
+    HatchStyleLightVertical = 24;
+    HatchStyleLightHorizontal = 25;
+    HatchStyleNarrowVertical = 26;
+    HatchStyleNarrowHorizontal = 27;
+    HatchStyleDarkVertical = 28;
+    HatchStyleDarkHorizontal = 29;
+    HatchStyleDashedDownwardDiagonal = 30;
+    HatchStyleDashedUpwardDiagonal = 311;
+    HatchStyleDashedHorizontal = 32;
+    HatchStyleDashedVertical = 33;
+    HatchStyleSmallConfetti = 34;
+    HatchStyleLargeConfetti = 35;
+    HatchStyleZigZag = 36;
+    HatchStyleWave = 37;
+    HatchStyleDiagonalBrick = 38;
+    HatchStyleHorizontalBrick = 39;
+    HatchStyleWeave = 40;
+    HatchStylePlaid = 41;
+    HatchStyleDivot = 42;
+    HatchStyleDottedGrid = 43;
+    HatchStyleDottedDiamond = 44;
+    HatchStyleShingle = 45;
+    HatchStyleTrellis = 46;
+    HatchStyleSphere = 47;
+    HatchStyleSmallGrid = 48;
+    HatchStyleSmallCheckerBoard = 49;
+    HatchStyleLargeCheckerBoard = 50;
+    HatchStyleOutlinedDiamond = 51;
+    HatchStyleSolidDiamond = 52;
+    HatchStyleTotal = 53;
+    HatchStyleLargeGrid = HatchStyleCross;
+    HatchStyleMin = HatchStyleHorizontal;
+    HatchStyleMax = HatchStyleTotal - 1;
+
+	// LinearGradientMode 定義
+	LinearGradientModeHorizontal = 0;
+    LinearGradientModeVertical = 1;
+    LinearGradientModeForwardDiagonal = 2;
+    LinearGradientModeBackwardDiagonal = 3;
+	
+	// LineCap 定義
+    LineCapFlat = 0;
+    LineCapSquare = 1;
+    LineCapRound = 2;
+    LineCapTriangle = 3;
+    LineCapNoAnchor = 0x10;
+    LineCapSquareAnchor = 0x11;
+    LineCapRoundAnchor = 0x12;
+    LineCapDiamondAnchor = 0x13;
+    LineCapArrowAnchor = 0x14;
+
+	// LineJoin 定義
+	LineJoinMiter = 0;
+    LineJoinBevel = 1;
+    LineJoinRound = 2;
+    LineJoinMiterClipped = 3;
+
+	// PenAligntment 定義
+	PenAlignmentCenter = 0;
+    PenAlignmentInset = 1;
+
+	// WrapMode 定義
+	WrapModeTile = 0;
+    WrapModeTileFlipX = 1;
+    WrapModeTileFlipY = 2;
+    WrapModeTileFlipXY = 3;
+    WrapModeClamp = 4;
+
+	// MatrixOrder 定義
+	MatrixOrderPrepend = 0;
+	MatrixOrderAppend = 1;
+
+	// ImageType 定義
+	ImageTypeUnknown = 0;
+	ImageTypeBitmap = 1;
+    ImageTypeMetafile = 2;
+
+	// RotateFlip 定義
+    RotateNoneFlipNone = 0;
+    Rotate90FlipNone = 1;
+    Rotate180FlipNone = 2;
+    Rotate270FlipNone = 3;
+    RotateNoneFlipX = 4;
+    Rotate90FlipX = 5;
+    Rotate180FlipX = 6;
+    Rotate270FlipX = 7;
+    RotateNoneFlipY = Rotate180FlipX;
+    Rotate90FlipY = Rotate270FlipX;
+    Rotate180FlipY = RotateNoneFlipX;
+    Rotate270FlipY = Rotate90FlipX;
+    RotateNoneFlipXY = Rotate180FlipNone;
+    Rotate90FlipXY = Rotate270FlipNone;
+    Rotate180FlipXY = RotateNoneFlipNone;
+    Rotate270FlipXY = Rotate90FlipNone;
+
+	// SmoothingMode 指定
+	SmoothingModeInvalid = -1;
+	SmoothingModeDefault = 0;
+	SmoothingModeHighSpeed = 1;
+	SmoothingModeHighQuality = 2;
+	SmoothingModeNone = 0;
+	SmoothingModeAntiAlias = 1;
+
+	// TextRenderingHint 指定
+	TextRenderingHintSystemDefault = 0;
+	TextRenderingHintSingleBitPerPixelGridFit = 1;
+    TextRenderingHintSingleBitPerPixel = 2;
+    TextRenderingHintAntiAliasGridFit = 3;
+    TextRenderingHintAntiAlias = 4;
+    TextRenderingHintClearTypeGridFit = 5;
+	
+	/**
+	 * プライベートフォントの追加(static)
+	 * @param fontFileName フォントファイル名
+	 * @throws Exception フォントファイルが開けない
+	 * アプリケーション固有のフォントを追加します。
+	 * 吉里吉里アーカイブ中にあるフォントも登録できます。
+	 */
+	function addPrivateFont(fontFileName);
+
+	/**
+	 * フォント一覧の取得
+	 * @param privateOnly true ならプライベートフォントのみ取得
+	 */
+	function getFontList(privateOnly);
+	
+	/**
+	 * フォント情報
+	 */
+	class Font {
+		/**
+		 * コンストラクタ
+		 * @param familyName フォントファミリー
+		 * @param emSize フォントのサイズ
+		 * @param style フォントスタイル
+		 */
+		function Font(familyName, emSize, style);
+		
+		property familyName; //< フォントファミリー
+		property emSize;     //< フォントのサイズ
+		property style;      //< フォントのスタイル
+                property forceSelfPathDraw; //< GDI+ のフォント描画機構を使わずに、自前でパスを取得してのフォント描画を行うかどうかを設定する。
+
+		property ascent;      //< ascent (読み出し専用)
+		property descent;     //< descent (読み出し専用)
+		property lineSpacing; //< 行間の長さ (読み出し専用)。
+                property ascentLeading; //< ascent側のinternalLeading(読み出し専用)
+                property descentLeading; //< descent側のinternalLeading(読み出し専用)
+          // ascent + descent は lineSpacing に等しい。
+          // lineSpacing - ( ascentLeading + descentLeading ) は emSize に等しい。
+	};
+
+	/**
+	 * 描画外観情報
+	 * Illustrator のアピアランスをイメージしてください。
+	 * 描画に対して、複数のブラシ（塗り）とペン（線）を指定できます。
+	 * 先に追加した方が下に入ります
+	 */
+	class Appearance {
+
+		/**
+		 * コンストラクタ
+		 */
+		function Appearance();
+
+		/**
+		 * 情報のクリア
+		 */
+		function clear();
+	
+		/**
+		 * ブラシの追加
+		 * @param colorOrBrush ARGB色指定またはブラシ情報（辞書）
+		 * @param ox 表示オフセットX
+		 * @param oy 表示オフセットY
+		 * @throws Exception ブラシ生成に失敗
+		 *
+		 * ブラシ情報定義
+		 * 基本  点指定は [x,y] の配列または %[x:x, y:y] の辞書
+		 *       矩形指定は [x,y,width,height] の配列または %[x:x, y:y, width:w, height:h] の辞書
+		 *       色指定は ARGB 32bit整数値
+		 *       パラメータについては GDI+ のドキュメントを見て研究してください
+		 *
+		 * type: ブラシ種別 BrushType で指定
+		 *
+		 *  BrushTypeSolidColor の場合 ※直接ARGBで色指定した場合と同じです
+		 *    color: 色指定(未指定時は白)
+		 *   
+		 *  BrushTypeHatchFill の場合
+		 *    hatchStyle: ハッチの種類(未指定時は HatchStyleHorizontal)
+		 *    foreColor: 前景色(未指定時は白)
+		 *    backColor: 背景色(未指定時は黒)
+		 *
+		 *  BrushTypeTextureFill の場合
+		 *   image: 画像指定
+		 *   wrapMode: 繰り返しパターン指定(未指定時は WrapModeTile)
+		 *   dstRect: テクスチャ領域矩形指定(未指定時は画像全部)
+		 *
+		 *  BrushTypePathGradient の場合
+		 *   points: 点指定の配列
+		 *   centerColor: 中心色
+		 *   centerPoint: 中心点
+		 *   focusScale: focus scales指定 [xScale,yScale] または %[xScale:, yScale:]
+		 *   surroundColors: 周囲色指定。色の配列
+		 *   ---- 以下は BrushTypeLinearGradientでも共通
+		 *   blend: ブレンドファクター指定。数値配列で [blendFactors, blendPositions] または辞書
+		 *   blendBellShape: ブレンド形状指定(bell形状) [focus, scale]
+		 *   blendTriangularShape: ブレンド形状指定(三角形状) [focus, scale]
+		 *   gammaCorrection: ガンマ補正を有効にするかどうか true/false
+		 *   interpolationColors: [presetColors(色配列), blendPositions(数値配列)]
+		 *
+		 *  BrushTypeLinearGradient の場合
+		 *   共通
+		 *     color1: 開始色指定
+		 *     color2: 終了色指定
+		 *     wrapMode: 繰り返しパターン指定(未指定時は WrapModeTile)
+		 *   ポイント指定
+		 *     point1: 開始点
+		 *     point2: 終了点
+		 *     ※角度は自動で決まる模様
+		 *   矩形指定
+		 *    rect: ポイント指定。左上が開始、右下が終了
+		 *    angle: 角度指定 (rect指定の場合だけ有効)
+		 *    isAngleScalable (角度指定がスケーラブルかどうか)
+		 *    mode: モード指定(省略時は LinearGradientModeHorizontal) angle 指定が無い場合に有効
+		 */
+		function addBrush(colorOrBrush, ox, oy);
+		
+		/**
+		 * ペンの追加
+		 * @param colorOrBrush ARGB色指定またはブラシ情報（辞書）
+		 * @param widthOrOption ペン幅またはペン情報（辞書）
+		 * @param ox 表示オフセットX
+		 * @param oy 表示オフセットY
+		 * @throws Exception ブラシ生成に失敗
+		 *
+		 * ペン情報定義: widthOrOption が辞書の場合は詳細情報定義になります
+		 * パラメータについては GDI+ のドキュメントを見て研究してください
+		 *
+		 *  width: ペン幅指定
+		 *  alignment: アラインメント：省略時は PenAlignmentCenter
+		 *  compoundArray: compound array 指定。数値配列
+		 *  dashCap: ダッシュの cap style の指定。省略時は DashCapFlat
+		 *  dashOffset: ダッシュのオフセット指定。省略時は0
+		 *  dashStyle: ダッシュスタイル。配列にするとユーザ定義(数値配列)。デフォルトは DasyStyleSolid
+		 *  startCap: 開始位置の cap style の指定。省略時は LineCapFlat，辞書時はAdjustableArrowCap
+		 *  endCap: 終了位置の cap style の指定。省略時は LineCapFlat，辞書時はAdjustableArrowCap
+		 *  lineJoin: 結合形状指定。 省略時は LineJoinMiter
+		 *  miterLimit: miter limit 指定（数値)
+		 *
+		 * AdjustableArrowCap：LineCapArrowAnchorでは不満なあなたに
+		 *  width(矢印幅), height(矢印高さ), filled(trueなら三角形，falseなら三又) が指定が可能
+		 */
+		function addPen(colorOrBrush, widthOrOption, ox, oy);
+	};
+
+	/*
+	 * 位置情報を取り扱うクラス
+	 */
+	class PointF {
+		function PointF(x, y);
+		property x;
+		property y;
+		function Equals(a);
+	}
+
+	/**
+	 * 矩形情報を取り扱うクラス
+	 */
+	class RectF {
+		function RectF(x, y, w, h);
+		property x;
+		property y;
+		property width;
+		property height;
+		property left; // read only
+		property top;  // read only
+		property right; // read only
+		property bottom; // read only
+		property location; // read only
+		property bounds; // read only
+		function Clone();
+		function Equals(a);
+		function Inflate(a,b);
+		function InflatePoint(p);
+		function IntersectsWith();
+		function IsEmptyArea();
+		function Offset(a,b);
+		function Union();
+	}
+
+	/**
+	 * マトリックス情報を取り扱うクラス
+	 */
+	class Matrix {
+
+		/**
+		 * コンストラクタ
+		 * 正規マトリックスを生成する
+		 */
+		function Matrix();
+
+		/**
+		 * コンストラクタ
+		 * @param rectF 矩形(RectFクラス) マトリックスの回転部
+		 * @param pointF ポイント(PointFクラス) マトリックスの移動部
+		 */
+		function Matrix(rectF, pointF);
+
+		/**
+		 * コンストラクタ
+		 * @param m11 第1行1列
+		 * @param m12 第1行2列
+		 * @param m21 第2行1列
+		 * @param m22 第2行2列
+		 * @param dx  第3行1列
+		 * @param dy  第3行2列
+		 */
+		function Matrix(m11, m12, m21, m22, dx, dy);
+		
+		function OffsetX();
+		function OffsetY();
+		function Equals();
+		function SetElemetns();
+		function GetLastStatus();
+		function Invert();
+		function IsIdentity();
+		function IsInvertible();
+		function Multiply();
+		function Reset();
+		function Rotate();
+		function RotateAt();
+		function Scale();
+		function Share();
+		function Translate();
+	}
+	
+	/**
+	 * 画像情報を取り扱うクラス
+	 * ※ベクトル画像データの領域は座標が負の領域にある場合もあります
+	 */
+	class Image {
+
+		/**
+		 * コンストラクタ
+		 * @param filename ファイル名。指定された場合は自動的にロードします
+		 * @throws Exception 画像ロードに失敗
+		 */
+		function Image(filename=void);
+		
+		/**
+		 * 画像をロードする
+		 * @param filename 画像ファイル名
+		 * @throws Exception 画像ロードに失敗
+		 */
+		function load(filename);
+
+		/**
+		 * @return このオブジェクトの複製(Image)
+		 */
+		function Clone();
+
+		/**
+		 * Bounds情報の取得
+		 * @return Bounds情報(RectF) 単位 pixel
+		 */
+		function GetBounds();
+
+		/**
+		 * @return 水平方向解像度(dpi)
+		 */
+		function GetHorizontalResolution();
+
+		/**
+		 * @return 垂直方向解像度(dpi)
+		 */
+		function GetVerticalResolution();
+
+		/**
+		 * @return 横幅 (pixel値：整数)
+		 */
+		function GetWidth();
+
+		/**
+		 * @return 縦幅 (pixel値:整数)
+		 */
+		function GetHeight();
+
+		function GetFlags();
+		function GetLastStatus();
+		function GetPixelFormat();
+		function GetType();
+		function RotateFlip();
+	};
+
+	class Path {
+
+		/**
+		 * パス情報クラス
+		 */
+		function Path();
+
+		/**
+		 * 現在の図形を閉じずに次の図形を開始します
+		 */
+		function startFigure();
+
+		/**
+		 * 現在の図形を閉じます
+		 */
+		function closeFigure();
+		
+		/**
+		 * 円弧の描画
+		 * @param x 左上座標
+		 * @param y 左上座標
+		 * @param width 横幅
+		 * @param height 縦幅
+		 * @param startAngle 時計方向円弧開始位置
+		 * @param sweepAngle 描画角度
+		 */
+		function drawArc(x, y, width, height, startAngle, sweepAngle);
+
+		/**
+		 * 円錐の描画
+		 * @param x 左上座標
+		 * @param y 左上座標
+		 * @param width 横幅
+		 * @param height 縦幅
+		 * @param startAngle 時計方向円弧開始位置
+		 * @param sweepAngle 描画角度
+		 */
+		function drawPie(x, y, width, height, startAngle, sweepAngle);
+
+		/**
+		 * ベジェ曲線の描画
+		 * @param x1
+		 * @param y1
+		 * @param x2
+		 * @param y2
+		 * @param x3
+		 * @param y3
+		 * @param x4
+		 * @param y4
+		 */
+		function drawBezier(x1, y1, x2, y2, x3, y3, x4, y4);
+
+		/**
+		 * 連続ベジェ曲線の描画
+		 * @param points 点の配列 [ [x1, y1], [x2, y2] .... ]
+		 */
+		function drawBeziers(points);
+
+		/**
+		 * Closed cardinal spline の描画
+		 * @param points 点の配列 [ [x1, y1], [x2, y2] .... ]
+		 */
+		function drawClosedCurve(points);
+
+		/**
+		 * Closed cardinal spline の描画
+		 * @param points 点の配列 [ [x1, y1], [x2, y2] .... ]
+		 * @param tension テンション
+		 */
+		function drawClosedCurve2(points, tension);
+
+		/**
+		 * cardinal spline の描画
+		 * @param points 点の配列 [ [x1, y1], [x2, y2] .... ]
+		 */
+		function drawCurve(points);
+
+		/**
+		 * cardinal spline の描画
+		 * @param points 点の配列 [ [x1, y1], [x2, y2] .... ]
+		 * @param tension テンション
+		 */
+		function drawCurve2(points, tension);
+
+		/**
+		 * cardinal spline の描画
+		 * @param points 点の配列 [ [x1, y1], [x2, y2] .... ]
+		 * @param offset
+		 * @param numberOfSegments
+		 * @param tension テンション
+		 */
+		function drawCurve3(points, offset, numberOfSegments, tension);
+
+		/**
+		 * 楕円の描画
+		 * @param x
+		 * @param y
+		 * @param width
+		 * @param height
+		 */
+		function drawEllipse(x, y, width, height);
+
+		/**
+		 * 線分の描画
+		 * @param x1 始点X座標
+		 * @param y1 始点Y座標
+		 * @param x2 終点X座標
+		 * @param y2 終点Y座標
+		 */
+		function drawLine(x1, y1, x2, y2);
+
+		/**
+		 * 連続線分の描画
+		 * @param points 点の配列 [ [x1, y1], [x2, y2] .... ]
+		 */
+		function drawLines(points);
+
+		/**
+		 * 多角形の描画
+		 * @param points 点の配列 [ [x1, y1], [x2, y2] .... ]
+		 */
+		function drawPolygon(points);
+			
+		/**
+		 * 矩形の描画
+		 * @param x
+		 * @param y
+		 * @param width
+		 * @param height
+		 */
+		function drawRectangle(x, y, width, height);
+		
+		/**
+		 * 複数矩形の描画
+		 * @param rects 矩形の配列 [ [x1, y1, width1, height1], [x2, y2, width2, height2] .... ]
+		 */
+		function drawRectangles(rects);
+	}
+}
+
+/**
+ * レイヤにベクタ描画メソッドが拡張されます
+ * ・描画処理はレイヤに設定されたクリッピング領域でクリップされます。
+ */
+class Layer {
+
+	/**
+	 * 描画時にその領域に対する update() 呼び出しを行うかどうか
+	 */
+	property updateWhenDraw;
+
+	// 描画のアンチエイリアス指定(SmoothingMode)
+	// デフォルト SmoothingModeAntiAlias
+	property smoothingMode;
+
+	// テキスト描画のレンダリング指定(TextRenderingHint)
+	// デフォルト TextRenderingHintAntiAlias
+	property textRenderingHint;
+
+	/**
+	 * 描画時のトランスフォームを指定
+	 */
+	function setTransform(matrix);
+	function resetTransform();
+	function rotateTransform(angle);
+	function scaleTransform(sx, sy);
+	function translateTransform(dx, dy);
+
+	/**
+	 * 解像度指定
+	 * @param resx 横方向解像度 %指定
+	 * @param resy 縦方向解像度 %指定
+	 */
+	function setResolution(resx, resy);
+	
+	/**
+	 * 画面の消去
+	 * @param argb 消去色
+	 */
+	function clear(argb);
+
+	/**
+	 * パスの描画
+	 * @param app アピアランス GdiPlus.Appearance で描画スタイルを指定します
+	 * @param path パス GdiPlus.Path を指定します
+	 * @return 更新領域情報の辞書 left, top, width, height
+	 */
+	function drawPath(app, path);
+	
+	/**
+	 * 円弧の描画
+	 * @param app アピアランス GdiPlus.Appearance で描画スタイルを指定します
+	 * @param x 左上座標
+	 * @param y 左上座標
+	 * @param width 横幅
+	 * @param height 縦幅
+	 * @param startAngle 時計方向円弧開始位置
+	 * @param sweepAngle 描画角度
+	 * @return 更新領域情報の辞書 left, top, width, height
+	 */
+	function drawArc(app, x, y, width, height, startAngle, sweepAngle);
+
+	/**
+	 * 円錐の描画
+	 * @param app アピアランス GdiPlus.Appearance で描画スタイルを指定します
+	 * @param x 左上座標
+	 * @param y 左上座標
+	 * @param width 横幅
+	 * @param height 縦幅
+	 * @param startAngle 時計方向円弧開始位置
+	 * @param sweepAngle 描画角度
+	 * @return 更新域情報(RectF)
+	 */
+	function drawPie(app, x, y, width, height, startAngle, sweepAngle);
+	
+	/**
+	 * ベジェ曲線の描画
+	 * @param app アピアランス GdiPlus.Appearance で描画スタイルを指定します
+	 * @param x1
+	 * @param y1
+	 * @param x2
+	 * @param y2
+	 * @param x3
+	 * @param y3
+	 * @param x4
+	 * @param y4
+	 * @return 更新域情報(RectF)
+	 */
+	function drawBezier(app, x1, y1, x2, y2, x3, y3, x4, y4);
+
+	/**
+	 * 連続ベジェ曲線の描画
+	 * @param app アピアランス
+	 * @param points 点の配列 [ [x1, y1], [x2, y2] .... ]
+	 * @return 更新域情報(RectF)
+	 */
+	function drawBeziers(app, points);
+
+	/**
+	 * Closed cardinal spline の描画
+	 * @param app アピアランス
+	 * @param points 点の配列 [ [x1, y1], [x2, y2] .... ]
+	 * @return 更新域情報(RectF)
+	 */
+	function drawClosedCurve(app, points);
+
+	/**
+	 * Closed cardinal spline の描画
+	 * @param app アピアランス
+	 * @param points 点の配列 [ [x1, y1], [x2, y2] .... ]
+	 * @param tension テンション
+	 * @return 更新域情報(RectF)
+	 */
+	function drawClosedCurve2(app, points, tension);
+
+	/**
+	 * cardinal spline の描画
+	 * @param app アピアランス
+	 * @param points 点の配列 [ [x1, y1], [x2, y2] .... ]
+	 * @return 更新域情報(RectF)
+	 */
+	function drawCurve(app, points);
+
+	/**
+	 * cardinal spline の描画
+	 * @param app アピアランス
+	 * @param points 点の配列 [ [x1, y1], [x2, y2] .... ]
+	 * @param tension テンション
+	 * @return 更新域情報(RectF)
+	 */
+	function drawCurve2(app, points, tension);
+
+	/**
+	 * cardinal spline の描画
+	 * @param app アピアランス
+	 * @param points 点の配列 [ [x1, y1], [x2, y2] .... ]
+	 * @param offset
+	 * @param numberOfSegments
+	 * @param tension テンション
+	 * @return 更新域情報(RectF)
+	 */
+	function drawCurve3(app, points, offset, numberOfSegments, tension);
+	
+	/**
+	 * 楕円の描画
+	 * @param app アピアランス GdiPlus.Appearance で描画スタイルを指定します
+	 * @param x
+	 * @param y
+	 * @param width
+	 * @param height
+	 * @return 更新域情報(RectF)
+	 */
+	function drawEllipse(app, x, y, width, height);
+
+	/**
+	 * 線分の描画
+	 * @param app アピアランス GdiPlus.Appearance で描画スタイルを指定します
+	 * @param x1 始点X座標
+	 * @param y1 始点Y座標
+	 * @param x2 終点X座標
+	 * @param y2 終点Y座標
+	 * @return 更新域情報(RectF)
+	 */
+	function drawLine(app, x1, y1, x2, y2);
+
+	/**
+	 * 連続線分の描画
+	 * @param app アピアランス
+	 * @param points 点の配列 [ [x1, y1], [x2, y2] .... ]
+	 * @return 更新域情報(RectF)
+	 */
+	function drawLines(app, points)
+
+	/**
+	 * 多角形の描画
+	 * @param app アピアランス
+	 * @param points 点の配列 [ [x1, y1], [x2, y2] .... ]
+	 * @return 更新域情報(RectF)
+	 */
+	function drawPolygon(app, points)
+		
+	/**
+	 * 矩形の描画
+	 * @param app アピアランス GdiPlus.Appearance で描画スタイルを指定します
+	 * @param x
+	 * @param y
+	 * @param width
+	 * @param height
+	 * @return 更新域情報(RectF)
+	 */
+	function drawRectangle(app, x, y, width, height);
+
+	/**
+	 * 複数矩形の描画
+	 * @param app アピアランス
+	 * @param rects 矩形の配列 [ [x1, y1, width1, height1], [x2, y2, width2, height2] .... ]
+	 * @return 更新域情報(RectF)
+	 */
+	function drawRectangles(app, rects);
+	
+
+	/**
+	 * 文字列のパスベースでの描画
+	 * @param font フォント GdiPlus.Font でフォントを指定します
+	 * @param app アピアランス GdiPlus.Appearance で描画スタイルを指定します
+	 * @param x 描画位置X
+	 * @param y 描画位置Y
+	 * @param text 描画テキスト
+	 * @return 更新域情報(RectF)
+	 */
+	function drawPathString(font, app, x, y, text);
+
+	
+	// -------------------------------------------------------------
+
+	/**
+	 * 文字列の描画。描画のクオリティは textRenderingHint に従います。
+	 * @param font フォント GdiPlus.Font でフォントを指定します
+	 * @param app アピアランス GdiPlus.Appearance で描画スタイルを指定します。※ブラシしか参照されません
+	 * @param x 描画位置X
+	 * @param y 描画位置Y
+	 * @param text 描画テキスト
+	 * @return 更新域情報(RectF)
+	 */
+	function drawString(font, app, x, y, text);
+
+	/**
+	 * 文字列の描画領域情報の取得。描画のクオリティは textRenderingHint に従います
+	 * @param font フォント
+	 * @param text 描画テキスト
+	 * @return 描画領域情報(RectF)
+	 */
+	function measureString(font, text);
+
+	/**
+	 * 文字列の描画領域情報の取得。measureString()で取得した領域に対して、マージンを除いて実際に文字列が存在する領域の矩形を返します。
+	 * @param font フォント
+	 * @param text 描画テキスト
+	 * @return 描画領域情報(RectF)
+	 */
+	function measureStringInternal(font, text);
+
+	// -------------------------------------------------------------
+
+	/**
+	 * 画像の描画。コピー先は元画像の Bounds を配慮した位置、サイズは Pixel 指定になります。
+	 * @param x コピー先原点X
+	 * @param y コピー先原点Y
+	 * @param image コピー元画像(Image/Layer/ファイル名)
+	 * @return 更新域情報(RectF)
+	 */
+	function drawImage(dleft, dtop, src);
+
+	/**
+	 * 画像の矩形コピー
+	 * @param dleft コピー先左端
+	 * @param dtop  コピー先上端
+	 * @param src コピー元画像(Image/Layer/ファイル名)
+	 * @param sleft 元矩形の左端
+	 * @param stop  元矩形の上端
+	 * @param swidth 元矩形の横幅
+	 * @param sheight  元矩形の縦幅
+	 * @return 更新域情報(RectF)
+	 */
+	function drawImageRect(dleft, dtop, src, sleft, stop, swidth, sheight);
+
+	/**
+	 * 画像の拡大縮小コピー
+	 * @param dleft コピー先左端
+	 * @param dtop  コピー先上端
+	 * @param dwidth コピー先の横幅
+	 * @param dheight  コピー先の縦幅
+	 * @param src コピー元画像(Image/Layer/ファイル名)
+	 * @param sleft 元矩形の左端
+	 * @param stop  元矩形の上端
+	 * @param swidth 元矩形の横幅
+	 * @param sheight  元矩形の縦幅
+	 * @return 更新域情報(RectF)
+	 */
+	function drawImageStretch(dleft, dtop, dwidth, dheight, src, sleft, stop, swidth, sheight);
+
+	/**
+	 * 画像のアフィン変換コピー
+	 * @param src コピー元画像(Image/Layer/ファイル名)
+	 * @param sleft 元矩形の左端
+	 * @param stop  元矩形の上端
+	 * @param swidth 元矩形の横幅
+	 * @param sheight  元矩形の縦幅
+	 * @param affine アフィンパラメータの種類(true:変換行列, false:座標指定), 
+	 * @return 更新域情報(RectF)
+	 */
+	function drawImageAffine(src, sleft, stop, swidth, sheight, affine, A, B, C, D, E, F);
+
+	// ------------------------------------------------
+	// メタファイル操作
+	// ------------------------------------------------
+
+	/**
+	 * このプラグインによる描画内容を記録するかどうか
+	 * record = true の状態の場合、viewTransform を指定すると
+	 * 描画内容そのままで再描画されます。
+	 */
+	property record;
+
+	/**
+	 * 記録内容の表示時のトランスフォームを指定
+	 */
+	function setViewTransform(matrix);
+	function resetViewTransform();
+	function rotateViewTransform(angle);
+	function scaleViewTransform(sx, sy);
+	function translateViewTransform(dx, dy);
+	
+	/**
+	 * 記録内容を再描画します
+	 */
+	void redrawRecord();
+
+	/**
+	 * 記録内容の保存
+	 * @param filename 保存ファイル名
+	 * @return 成功したら true
+	 */
+	function saveRecord(filename);
+
+	/**
+	 * 記録内容の読み込み
+	 * @param filename 読み込みファイル名
+	 * @return 成功したら true
+	 */
+	function loadRecord(filename);
+
+	/**
+	 * 記録内容を Image として返す
+	 * return Image オブジェクト
+	 */
+	function getRecordImage();
+
+	/**
+	 * 画像の保存
+	 * @param filename ファイル名
+	 * @param mime 保存する画像形式 image/jpeg, image/png, image/gif など
+	 * @param param エンコードパラメータ(辞書)
+	 * compression, scanmethod, version, render, transform, quality(0～100), depth(1,4,8,24,32)
+	 */
+	function saveImage(filename, mime, param=void);
+
+	// エンコードパラメータ指定用定数
+
+	// compression用
+	EncoderValueCompressionLZW;
+	EncoderValueCompressionCCITT3;
+    EncoderValueCompressionCCITT4;
+    EncoderValueCompressionRle;
+    EncoderValueCompressionNone;
+
+	// scanmethod用
+	EncoderValueScanMethodInterlaced;
+    EncoderValueScanMethodNonInterlaced;
+
+	// version用
+	EncoderValueVersionGif87;
+    EncoderValueVersionGif89;
+
+	// render用
+	EncoderValueRenderProgressive;
+    EncoderValueRenderNonProgressive;
+
+	// transform用
+	EncoderValueTransformRotate90;
+    EncoderValueTransformRotate180;
+    EncoderValueTransformRotate270;
+	EncoderValueTransformFlipHorizontal;
+	EncoderValueTransformFlipVertical;
+};
+

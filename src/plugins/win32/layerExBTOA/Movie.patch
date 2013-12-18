@@ -1,0 +1,84 @@
+Index: Movie.tjs
+===================================================================
+--- Movie.tjs	(リビジョン 4873)
++++ Movie.tjs	(作業コピー)
+@@ -10,6 +10,7 @@
+ 	var layerNumber = [];
+ 	var layerPage = [];
+ 	var storageName;
++	var useLayerAlpha; // LayerExBTOAを使用してアルファムービーを表示するフラグ
+ 
+ 	function Movie(owner,id=0)
+ 	{
+@@ -32,6 +33,7 @@
+ 		{
+ 			dic.visible = visible;
+ 			dic.loop = loop;
++			dic.useLayerAlpha = useLayerAlpha;
+ 			dic.frame = frame;
+ 
+ 			if( numberOfAudioStream > 0 ) {
+@@ -63,6 +65,7 @@
+ 		{
+ 			mode = vomLayer;
+ 			loop = dic.loop;
++			useLayerAlpha = dic.useLayerAlpha;
+ 			layerNumber[0] = dic.layerNumber[0];
+ 			layerNumber[1] = dic.layerNumber[1];
+ 			layerPage[0] = dic.layerPage[0];
+@@ -154,6 +157,35 @@
+ 		}
+ 	}
+ 
++	function onFrameUpdate(frame)
++	{
++		if( useLayerAlpha && mode == vomLayer )
++		{
++			try {
++				if( useLayerAlpha == 1 )
++				{
++					copyRightBlueToLeftAlpha(layer1) if layer1;
++					copyRightBlueToLeftAlpha(layer2) if layer2;
++				}
++				else
++				{
++					copyBottomBlueToTopAlpha(layer1) if layer1;
++					copyBottomBlueToTopAlpha(layer2) if layer2;
++				}
++			} catch {}
++		}
++	}
++	function copyRightBlueToLeftAlpha(layer)
++	{
++		(global.Layer.copyRightBlueToLeftAlpha incontextof layer)();
++		with (layer) .width = .imageWidth\2;
++	}
++	function copyBottomBlueToTopAlpha(layer)
++	{
++		(global.Layer.copyBottomBlueToTopAlpha incontextof layer)();
++		with (layer) .height = .imageHeight\2;
++	}
++
+ 	property canWaitStop
+ 	{
+ 		getter
+@@ -262,6 +294,19 @@
+ 		//
+ 		position = +elm.position if elm.position !== void;
+ 		loop = +elm.loop if elm.loop !== void;
++		if( elm.alphatype !== void )
++		{
++			useLayerAlpha = +elm.alphatype;
++			if( useLayerAlpha && typeof global.Layer.copyRightBlueToLeftAlpha == "undefined" )
++			{
++				try {
++					Plugins.link("layerExBTOA.dll");
++				} catch(e) {
++					useLayerAlpha = 0;
++					System.inform(e.message);
++				}
++			}
++		}
+ 		frame = +elm.frame if elm.frame !== void;
+ 		if( elm.mode !== void )
+ 		{

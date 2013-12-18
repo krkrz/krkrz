@@ -1,0 +1,282 @@
+System.setArgument("-usedb",   "no");
+System.setArgument("-dbstyle", "gdi");
+
+Scripts.execStorage("win32dialog.tjs");
+
+class OwnerDrawTestDialog extends WIN32GenericDialogEX {
+	var tempLayer, bitmap;
+	function OwnerDrawTestDialog(lay) {
+		super.WIN32GenericDialogEX(%[ title:"OwnerDrawTest", width:200 ]);
+		var list = [];
+		for (var i = 0; i < 30; i++) list.add((string)i);
+		addListSelect("LIST", 150, void, 0, list);
+		addInit(      "LIST", "setItemHeight", 30);
+		getLastItem().style |= LBS_OWNERDRAWFIXED | WS_VSCROLL;
+		tempLayer = new Layer(lay.window, lay);
+		bitmap = new global.WIN32Dialog.Bitmap(tempLayer);
+	}
+	function setItemHeight(id, h) {
+		sendItemMessage(id, LB_SETITEMHEIGHT, 0, h);
+	}
+	function onDrawItem(id, info) {
+		try {
+			var x, y, w, h;
+			with (info.itemRect) x=.x, y=.y, w=.w, h=.h;
+			Debug.message("onDrawItem", info.itemID, info.itemAction & ODA_DRAWENTIRE, x, y, w, h);
+			tempLayer.setImageSize(w, h);
+			with (tempLayer) {
+				.setSizeToImageSize();
+				.fillRect(0, 0, .width, .height, 0xFF000000 | (info.itemState&ODS_SELECTED ? System.toActualColor(clHighlight) : (info.itemID<<4)));
+			}
+			info.draw(bitmap, x, y);
+		} catch {}
+		return true;
+	}
+}
+
+
+class MyDialog extends WIN32DialogEX {
+	// ids
+	var ID_BTN = 1000;
+	var ID_EDT = 1001;
+	var ID_LST = 1002;
+	var ID_CMB = 1003;
+	var ID_COMCTL = 1004;
+	var ID_BITMAP = 1005;
+	var ID_PROGRESS = 1006;
+
+	var template = %[
+	helpID:0,
+	exStyle:0, //.WS_EX_TOOLWINDOW,
+	style: DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU | DS_SETFONT,
+	x:0,
+	y:0,
+	cx:100,
+	cy:100,
+	//menu:"",
+	//windowClass:"",
+	title:"テストダイアログ（テンプレート版）",
+	pointSize: 12,
+	weight: FW_NORMAL,
+	italic: false,
+	typeFace:"ＭＳ Ｐゴシック",
+	items :
+		[
+			GroupBox("グループ",,  0, 0, 100, 100),
+			Control("text", ID_COMCTL, TRACKBAR, WS_VISIBLE, 10, 8, 80, 10),
+			PushButton("ボタン１", ID_BTN, 10, 20, 80, 10),
+			EditText(              ID_EDT, 10, 30, 80, 10),
+			ListBox(               ID_LST, 10, 40, 80, 40),
+			ComboBox(              ID_CMB, 10, 80, 80, 80, CBS_DROPDOWNLIST|WS_VSCROLL|WS_TABSTOP),
+			Control("", ID_BITMAP, STATIC, SS_BITMAP|SS_CENTERIMAGE, 0, 0, 20, 20, 0),
+
+			Control("", ID_PROGRESS, PROGRESS, 0, 0, 95, 100, 5, 0),
+		]
+	];
+
+	// 初期化パラメータ辞書
+	// id : %[ params ]（単指定） または id:[ %[ params1 ], ... %[ paramsN ] ]（順序指定） の形式
+	var initParams = %[
+
+		ID_CMB => [ // list -> select の順に設定するので配列で順序を規定して渡す
+			%[  setComboBoxTexts: [
+				"そのいち",
+				"そのに",
+				"そのさん",
+				"そのよん" ]
+				],
+			%[  selectComboBox: 0 ],
+			],
+
+		ID_LST =>
+		%[  setListBoxTexts: [
+			"そのいち",
+			"そのに",
+			"そのさん",
+			"そのよん" ],
+			],
+		];
+	
+	function MyDialog(isRes) {
+		super.WIN32DialogEX();
+
+		if (isRes) {
+			// リソース読み込み
+			loadResource("testres.dll", "TEST_DIALOG");
+			// 初期化パラメータを設定（itemMap強制設定）
+			setInitParams(initParams, true);
+		} else {
+			// テンプレート生成
+			store(template);
+			// 初期化パラメータを設定
+			setInitParams(initParams);
+		}
+		icon = isRes ? null : new global.WIN32Dialog.Bitmap(global.bitmapLayer);
+	}
+	function onInit() {
+		super.onInit(...);
+		setCenterPosition();
+		setItemFocus(ID_BTN);
+		setItemBitmap(ID_BITMAP, global.bitmapLayer);
+	}
+
+	// デバグ用
+	function onCommand(msg, wp, lp) {
+		dm("onCommand", *);
+		return super.onCommand(...);
+	}
+	function onNotify(id, notify) {
+		with (notify) dm("onNotify", id, "%08x".sprintf(.hwndFrom), .idFrom, "%08x".sprintf(.code));
+		return super.onNotify(...);
+	}
+	function onVScroll(msg, wp, lp) {
+		dm( "onVScroll", *);
+		return super.onVScroll(...);
+	}
+	function onHScroll(msg, wp, lp) {
+		dm( "onHScroll", *);
+		return super.onHScroll(...);
+	}
+}
+class        TabTestDialog extends MyDialog {
+	function TabTestDialog {
+		with (template.items) {
+			.clear();
+			.add(Control("Hoge", ID_TABS, TABCONTROL, TCS_TABS, 0, 0, 100, 100, 0));
+			//.add(PushButton("ボタン１", ID_BTN, 10, 20, 80, 10));
+		}
+		super.MyDialog(...);
+	}
+	var ID_TABS = 1100;
+	function onInit() {
+		global.WIN32DialogEX.onInit(...);
+		addTab(ID_TABS, 0, "Hoge");
+		addTab(ID_TABS, 1, "Fuga");
+	}
+	function addTab(id, idx, text) {
+		var blob = new global.WIN32Dialog.Blob(SIZEOF_TC_ITEM);
+		var ptr;
+		with (blob) {
+			.setDWord(0, TCIF_TEXT);
+			.setText(12, text);
+			ptr = .pointer;
+		}
+		sendItemMessage(id, TCM_INSERTITEM, idx, ptr);
+	}
+}
+
+function createMenuItem(win, caption, onclick) {
+	var menuItem = new MenuItem(win, caption);
+	with (menuItem) {
+		.visible = true;
+		if (onclick) .onClick = onclick incontextof win;
+	}
+	return menuItem;
+}
+function testMyDialog(win, flg) {
+	var dlg = new MyDialog(flg);
+	var rslt = dlg.open(win);
+
+	var ext = [];
+	ext.assign(rslt.items);
+	dm("MyDialog:", rslt.result, ext*);
+}
+var modelessDialogs = %[];
+function testModeless(win, flg) {
+	var dlg = new MyDialog(flg);
+	modelessDialogs[dlg] = dlg;
+	dlg.modeless = true;
+	dlg.open(win);
+	dlg.show(WIN32Dialog.SW_SHOW); // style に WS_VISIBLE がない場合は自動で表示されない
+}
+
+//Debug.controller.visible=true;
+Debug.console.visible=true;
+
+// コモンコントロール初期化
+WIN32Dialog.initCommonControls();
+
+var palette = [];
+
+var dm = Debug.message;
+var win = new Window();
+with (win) {
+
+	._onCloseQuery = .onCloseQuery;
+	.onCloseQuery = function() { _onCloseQuery(true); } incontextof win;
+	.innerSunken = false;
+	.caption = "WIN32Dialog test script";
+	.menu.add((.testMenus = new MenuItem(win, "Tests")));
+	var add = .testMenus.add;
+	add(createMenuItem(win, "MyDialogTest",       function{ testMyDialog(win, 0); }));
+	add(createMenuItem(win, "LoadResourceTest",   function{ testMyDialog(win, 1); }));
+	add(createMenuItem(win, "-"));
+	add(createMenuItem(win, "ModeLess::MyDialog", function{ testModeless(win, 0); }));
+	add(createMenuItem(win, "ModeLess::LoadRes",  function{ testModeless(win, 1); }));
+	add(createMenuItem(win, "-"));
+	add(createMenuItem(win, "MessageBoxTest",     function{
+		with (WIN32Dialog) dm(.messageBox(global.win, "テキスト", "キャプション", .MB_OKCANCEL|.MB_ICONEXCLAMATION|.MB_OWNER_CENTER) == .IDOK);
+	}));
+	add(createMenuItem(win, "ChooseColorTest",    function{
+		with (WIN32Dialog) dm(.chooseColor(global.win, %[
+		palette:global.palette,
+//		color:0xFF00FF,
+//		openCustomColor:true,
+//		disableCustomColor:true,
+			]));
+	}));
+	add(createMenuItem(win, "OwnerDrawTest",      function{
+		var dlg = new OwnerDrawTestDialog(win.primaryLayer);
+		dlg.open(win);
+		invalidate dlg;
+	}));
+	add(createMenuItem(win, "-"));
+	add(createMenuItem(win, "PropSheetTest",      function{
+		var sheets = [
+			new MyDialog(0),
+			new MyDialog(1) ];
+		WIN32Dialog.openPropertySheet(null, sheets, %[ caption:"PropSheet", icon:null ]);
+		for (var i = 0; i < sheets.count; i++) {
+			invalidate sheets[i];
+		}
+	}));
+	add(createMenuItem(win, "TabSheetTest",      function{
+		var dlg = new TabTestDialog(0);
+		dlg.open(win);
+		invalidate dlg;
+	}));
+	add(createMenuItem(win, "ProgressTest",      function{
+		var test = new MyDialog(0);
+		test.parent = this; //[XXX]
+		var canceled = false;
+		var prg = test.openProgress(test.ID_PROGRESS);
+		if (prg) {
+			var max = 50000;
+			for (var i = 0; i < max; i++) {
+				test.progressValue = i/max*100;
+				if (test.progressCanceled) {
+					canceled = true;
+					break;
+				}
+			}
+			test.progressValue = -50;
+		}
+		System.inform(canceled ?"CANCEL" : prg?"OK":"NG");
+		test.closeProgress();
+		invalidate test;
+	}));
+
+	.add(new global.Layer(win, null));
+	var w = 640, h = 480;
+	.primaryLayer.setSize(w, h);
+	.setInnerSize(w, h);
+	.visible = true;
+
+	global.bitmapLayer = new Layer(win, .primaryLayer);
+	with (bitmapLayer) {
+		.loadImages("testimage");
+		.setSizeToImageSize();
+		.visible=true;
+	}
+}
+

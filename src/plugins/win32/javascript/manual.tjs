@@ -1,0 +1,48 @@
+/**
+ * Scripts クラスへの Javascript 機能拡張
+ */
+class Scripts {
+
+	/**
+	 * Javascript スクリプトの実行。
+	 * @param text スクリプトが格納された文字列
+	 * @return スクリプトの実行結果
+	 */
+	function execJS(text);
+
+	/**
+	 * Javascript スクリプトのファイルからの実行。
+	 * @param filename スクリプトが格納されたファイル
+	 * @return スクリプトの実行結果
+	 */
+	function execStorageJS(filename);
+
+	/**
+	 * デバッガの有効化
+	 * @param port ポート番号
+	 * @param wait 即実行待ちするかどうか
+	 */
+	function enableDebugJS(port=5858, wait=false);
+
+	/**
+	 * デバッガ処理駆動
+	 * javascript実行時以外にもデバッガからの処理を受け付ける場合は
+	 * タイマもしくは continuous ハンドラからメソッドを定期的に呼び出してください。
+	 */
+	function processDebugJS();
+};
+
+/**
+ * Javascript 側で createTJSClass して生成されたインスタンス中では
+ * 以下の特殊なメソッドが利用可能です。イベントの伝播などで活用可能です。
+ */
+class TJSObject {
+
+	/**
+	 * Javascript インスタンスメソッドの呼び出し
+	 * @param name メソッド名
+	 * @param ... 引数
+	 * @return スクリプトの実行結果
+	 */
+	function callJS(name, ...);
+};

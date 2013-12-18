@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sigcheck", "sigcheck.vcproj", "{64F01A91-C9D2-4AEB-91F9-358E2556615C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A36BE543-7ACC-4A26-A9CB-8E0A0657D02E} = {A36BE543-7ACC-4A26-A9CB-8E0A0657D02E}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libtomcrypt", "libtomcrypt.vcproj", "{A36BE543-7ACC-4A26-A9CB-8E0A0657D02E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{BC022E14-FB0F-448C-9018-2CD22DB818E1} = {BC022E14-FB0F-448C-9018-2CD22DB818E1}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libtommath", "libtommath.vcproj", "{BC022E14-FB0F-448C-9018-2CD22DB818E1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{64F01A91-C9D2-4AEB-91F9-358E2556615C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{64F01A91-C9D2-4AEB-91F9-358E2556615C}.Debug|Win32.Build.0 = Debug|Win32
+		{64F01A91-C9D2-4AEB-91F9-358E2556615C}.Release|Win32.ActiveCfg = Release|Win32
+		{64F01A91-C9D2-4AEB-91F9-358E2556615C}.Release|Win32.Build.0 = Release|Win32
+		{A36BE543-7ACC-4A26-A9CB-8E0A0657D02E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A36BE543-7ACC-4A26-A9CB-8E0A0657D02E}.Debug|Win32.Build.0 = Debug|Win32
+		{A36BE543-7ACC-4A26-A9CB-8E0A0657D02E}.Release|Win32.ActiveCfg = Release|Win32
+		{A36BE543-7ACC-4A26-A9CB-8E0A0657D02E}.Release|Win32.Build.0 = Release|Win32
+		{BC022E14-FB0F-448C-9018-2CD22DB818E1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BC022E14-FB0F-448C-9018-2CD22DB818E1}.Debug|Win32.Build.0 = Debug|Win32
+		{BC022E14-FB0F-448C-9018-2CD22DB818E1}.Release|Win32.ActiveCfg = Release|Win32
+		{BC022E14-FB0F-448C-9018-2CD22DB818E1}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

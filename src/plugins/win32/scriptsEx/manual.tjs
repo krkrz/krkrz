@@ -1,0 +1,91 @@
+class Scripts {
+
+	/**
+	 * オブジェクトのメンバ名一覧を返す
+	 * @param obj 対象オブジェクト
+	 * @return キーが格納された配列
+	 */
+	function getObjectKeys(obj);
+
+	/**
+	 * オブジェクトのメンバ個数を返す
+	 * @param obj 対象オブジェクト
+	 * @return 個数を返す
+	 */
+	function getObjectCount(obj);
+
+	/**
+	 * オブジェクトのコンテキストを返す
+	 * @param obj 対象オブジェクト
+	 * @return コンテキストオブジェクト
+	 */
+	function getObjectContext(obj);
+
+	/**
+	 * オブジェクトのコンテキスト判定
+	 * @param obj 対象オブジェクト
+	 * @return コンテキストが null
+	 */
+	function isNullContext(obj);
+	
+	/**
+	 * オブジェクト同士を比較する。辞書/配列の場合は中身の要素が再帰的に比較されます
+	 * @param obj1 オブジェクトその1
+	 * @param obj2 オブジェクトその2
+	 * @return 等しければ true
+	 */
+	function equalStruct(obj1, obj2);
+
+	/**
+	 * オブジェクト同士を比較する。辞書/配列の場合は中身の要素が再帰的に比較されます
+	 * 数値がゆるく比較されます(0.0 と 0 を等しいとして扱います)
+	 * @param obj1 オブジェクトその1
+	 * @param obj2 オブジェクトその2
+	 * @return 等しければ true
+	 */
+	function equalStructNumericLoose(obj1, obj2);
+
+	/**
+	 * オブジェクトのメンバの全参照
+	 * @param obj 処理対象オブジェクト(辞書または配列)
+	 * @param func 呼び出し関数。func(key, value, args*) の形で呼ばれます。
+	 * 無名関数などコンテキストが null の場合は自動的に thisコンテキストで動作します
+	 * 関数がなにかしら値を返すと処理が中断されます
+	 * @param args 追加引数
+	 * 配列の場合は単純にループによる参照になります。辞書やオブジェクトは iTJSDispatch2::EnumMebers の呼び出しになります
+	 * @return 中断時に返された値
+	 */
+	function foreach(obj, func, args*);
+
+	/**
+	 * octet の MD5ハッシュ値の取得
+	 * @param octet 対象オクテット
+	 * @return ハッシュ値（32文字の16進数ハッシュ文字列（小文字））
+	 */
+	function getMD5HashString(octet);
+	
+	/**
+	 * 値のクローンを返す。
+	 * @param obj クローン元
+	 * void/数値/文字列/octet は元の値をそのまま返します。
+	 * 辞書・配列オブジェクトは、deep copy 処理したものを返します。入れ子は再帰処理されます。
+	 * 一般オブジェクトは "clone" メソッドが存在すればその帰り値を、なければ元の値をそのまま返します
+	 */
+	function clone(obj);
+
+	/**
+	 * TJSDoRehash()を呼ぶ
+	 * TJSCustomObjectベースのオブジェクトのハッシュテーブルサイズの再構築フラグを立てます。
+	 * （辞書やほとんどのクラスおよびインスタンスのオブジェクトが対象になります）
+	 *
+	 * 解説：
+	 *  ハッシュテーブルサイズはそのオブジェクトの持つ要素数により決定されます。
+	 *  フラグが立った後，オブジェクトに何か書き込んだタイミングで再計算を行い，
+	 *  テーブルサイズが変わった場合にのみ再構築が行われます。（サイズ＝2^(要素数のビット数+2)程度？）
+	 *  普段，吉里吉里は定期的（アイドル時かつ前回から1.5秒以上経過している時）に
+	 *  TJSDoRehash()が呼ばれているので特に気にする必要はありませんが，
+	 *  アイドルを挟まずに大量に要素を追加する場合において
+	 *  カウンタで何千～万回に1回等の間隔で呼び出すようにすると効果的かと思われます。
+	 */
+	function rehash();
+}

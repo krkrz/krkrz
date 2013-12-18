@@ -1,0 +1,20 @@
+/**
+ * 擬似コードによるマニュアル
+ */
+
+/**
+ * レイヤにラスター処理風コピー描画メソッドが拡張されます
+ */
+class Layer {
+
+	/**
+	 * ラスターコピー処理
+	 * @param src 描画元レイヤ。自分と同じサイズでないと処理が行われません。
+	 * @param maxh 最大振幅(pixel)
+	 * @param line １周期あたりライン数
+	 * @param cycle 周期指定(msec)
+	 * @param time 現在時刻
+	 */
+	function copyRaster(src, maxh, lines, cycle, time);
+};
+

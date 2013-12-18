@@ -1,0 +1,682 @@
+// !$*UTF8*$!
+{
+	0867D690FE84028FC02AAC07 /* Project object */ = {
+		activeBuildConfigurationName = Release;
+		activeBuildStyle = 014CEA440018CDF011CA2923 /* Debug */;
+		activeExecutable = 13A2352B09D7E02400660BB5 /* Demo */;
+		activeTarget = B81CFEA4097FDE900057C06F /* PerPixelLightning */;
+		codeSenseManager = 13A2354309D7E02B00660BB5 /* Code sense */;
+		executables = (
+			13A2352B09D7E02400660BB5 /* Demo */,
+			13A2352C09D7E02400660BB5 /* 2DGraphics */,
+			13A2352D09D7E02400660BB5 /* Collision */,
+			13A2352E09D7E02400660BB5 /* PerPixelLightning */,
+			13A2352F09D7E02400660BB5 /* TerrainRendering */,
+			13A2353009D7E02400660BB5 /* SpecialFx */,
+			13A2353109D7E02400660BB5 /* UserInterface */,
+			13A2353209D7E02400660BB5 /* CustomSceneNode */,
+			13A2353309D7E02400660BB5 /* Quake3Map */,
+			13A2353409D7E02400660BB5 /* Shaders */,
+			13A2353509D7E02400660BB5 /* Movement */,
+			13A2353609D7E02400660BB5 /* MeshViewer */,
+			13A2353709D7E02400660BB5 /* RenderToTexture */,
+		);
+		perUserDictionary = {
+			PBXConfiguration.PBXFileTableDataSource3.PBXFileTableDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					394,
+					20,
+					48,
+					43,
+					43,
+					20,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+					PBXFileDataSource_Target_ColumnID,
+				);
+			};
+			PBXConfiguration.PBXTargetDataSource.PBXTargetDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					200,
+					214,
+					20,
+					48,
+					43,
+					43,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXTargetDataSource_PrimaryAttribute,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+				);
+			};
+			PBXPerProjectTemplateStateSaveDate = 165159288;
+			PBXWorkspaceStateSaveDate = 165159288;
+		};
+		sourceControlManager = 13A2354209D7E02B00660BB5 /* Source Control */;
+		userBuildSettings = {
+		};
+	};
+	13A2352B09D7E02400660BB5 /* Demo */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = Demo;
+		sourceDirectories = (
+		);
+	};
+	13A2352C09D7E02400660BB5 /* 2DGraphics */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = 2DGraphics;
+		sourceDirectories = (
+		);
+	};
+	13A2352D09D7E02400660BB5 /* Collision */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = Collision;
+		sourceDirectories = (
+		);
+	};
+	13A2352E09D7E02400660BB5 /* PerPixelLightning */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = PerPixelLightning;
+		sourceDirectories = (
+		);
+	};
+	13A2352F09D7E02400660BB5 /* TerrainRendering */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = TerrainRendering;
+		sourceDirectories = (
+		);
+	};
+	13A2353009D7E02400660BB5 /* SpecialFx */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = SpecialFx;
+		sourceDirectories = (
+		);
+	};
+	13A2353109D7E02400660BB5 /* UserInterface */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = UserInterface;
+		sourceDirectories = (
+		);
+	};
+	13A2353209D7E02400660BB5 /* CustomSceneNode */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = CustomSceneNode;
+		sourceDirectories = (
+		);
+	};
+	13A2353309D7E02400660BB5 /* Quake3Map */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = Quake3Map;
+		sourceDirectories = (
+		);
+	};
+	13A2353409D7E02400660BB5 /* Shaders */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = Shaders;
+		sourceDirectories = (
+		);
+	};
+	13A2353509D7E02400660BB5 /* Movement */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = Movement;
+		sourceDirectories = (
+		);
+	};
+	13A2353609D7E02400660BB5 /* MeshViewer */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = MeshViewer;
+		sourceDirectories = (
+		);
+	};
+	13A2353709D7E02400660BB5 /* RenderToTexture */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = RenderToTexture;
+		sourceDirectories = (
+		);
+	};
+	13A2354209D7E02B00660BB5 /* Source Control */ = {
+		isa = PBXSourceControlManager;
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		scmConfiguration = {
+		};
+		scmType = "";
+	};
+	13A2354309D7E02B00660BB5 /* Code sense */ = {
+		isa = PBXCodeSenseManager;
+		indexTemplatePath = "";
+	};
+	32DBCF5E0370ADEE00C91783 /* MacOSX_Prefix.pch */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {727, 319}}";
+			sepNavSelRange = "{72, 6}";
+			sepNavVisRect = "{{0, 0}, {727, 319}}";
+		};
+	};
+	B81CFDFE097FD9F50057C06F /* 2DGraphics */ = {
+		activeExec = 0;
+		executables = (
+			13A2352C09D7E02400660BB5 /* 2DGraphics */,
+		);
+	};
+	B81CFE13097FDA590057C06F /* CMainMenu.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {746, 3486}}";
+			sepNavSelRange = "{257, 0}";
+			sepNavVisRect = "{{0, 0}, {592, 419}}";
+		};
+	};
+	B81CFE14097FDA590057C06F /* main.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {592, 686}}";
+			sepNavSelRange = "{522, 6}";
+			sepNavVisRect = "{{0, 183}, {592, 419}}";
+		};
+	};
+	B81CFE21097FDAE40057C06F /* main.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {727, 2478}}";
+			sepNavSelRange = "{770, 6}";
+			sepNavVisRect = "{{0, 233}, {727, 319}}";
+		};
+	};
+	B81CFE82097FDDE20057C06F /* Collision */ = {
+		activeExec = 0;
+		executables = (
+			13A2352D09D7E02400660BB5 /* Collision */,
+		);
+	};
+	B81CFE93097FDE0A0057C06F /* main.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {727, 4102}}";
+			sepNavSelRange = "{832, 6}";
+			sepNavVisRect = "{{0, 226}, {727, 319}}";
+		};
+	};
+	B81CFEA4097FDE900057C06F /* PerPixelLightning */ = {
+		activeExec = 0;
+		executables = (
+			13A2352E09D7E02400660BB5 /* PerPixelLightning */,
+		);
+	};
+	B81CFEB6097FDEC10057C06F /* main.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {727, 6454}}";
+			sepNavSelRange = "{4570, 6}";
+			sepNavVisRect = "{{0, 2116}, {727, 319}}";
+		};
+	};
+	B81CFEC2097FDF020057C06F /* TerrainRendering */ = {
+		activeExec = 0;
+		executables = (
+			13A2352F09D7E02400660BB5 /* TerrainRendering */,
+		);
+	};
+	B81CFED4097FDF2E0057C06F /* main.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {727, 3332}}";
+			sepNavSelRange = "{1676, 6}";
+			sepNavVisRect = "{{0, 730}, {727, 319}}";
+		};
+	};
+	B81CFEE8097FE05F0057C06F /* SpecialFx */ = {
+		activeExec = 0;
+		executables = (
+			13A2353009D7E02400660BB5 /* SpecialFx */,
+		);
+	};
+	B81CFEFA097FE0900057C06F /* main.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {727, 3808}}";
+			sepNavSelRange = "{757, 6}";
+			sepNavVisRect = "{{0, 149}, {727, 319}}";
+		};
+	};
+	B81CFF07097FE13E0057C06F /* UserInterface */ = {
+		activeExec = 0;
+		executables = (
+			13A2353109D7E02400660BB5 /* UserInterface */,
+		);
+	};
+	B81CFF19097FE17F0057C06F /* main.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {727, 3374}}";
+			sepNavSelRange = "{3624, 6}";
+			sepNavVisRect = "{{0, 1822}, {727, 319}}";
+		};
+	};
+	B81CFF1E097FE1E00057C06F /* CustomSceneNode */ = {
+		activeExec = 0;
+		executables = (
+			13A2353209D7E02400660BB5 /* CustomSceneNode */,
+		);
+	};
+	B81CFF33097FE25F0057C06F /* Quake3Map */ = {
+		activeExec = 0;
+		executables = (
+			13A2353309D7E02400660BB5 /* Quake3Map */,
+		);
+	};
+	B81CFF45097FE2920057C06F /* main.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {727, 2604}}";
+			sepNavSelRange = "{1788, 6}";
+			sepNavVisRect = "{{0, 576}, {727, 319}}";
+		};
+	};
+	B81CFF4A097FE3050057C06F /* Shaders */ = {
+		activeExec = 0;
+		executables = (
+			13A2353409D7E02400660BB5 /* Shaders */,
+		);
+	};
+	B81CFF5C097FE33B0057C06F /* main.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {727, 5838}}";
+			sepNavSelRange = "{4941, 6}";
+			sepNavVisRect = "{{0, 1864}, {727, 319}}";
+		};
+	};
+	B81CFF78097FE3DC0057C06F /* Movement */ = {
+		activeExec = 0;
+		executables = (
+			13A2353509D7E02400660BB5 /* Movement */,
+		);
+	};
+	B81CFF91097FE45E0057C06F /* MeshViewer */ = {
+		activeExec = 0;
+		executables = (
+			13A2353609D7E02400660BB5 /* MeshViewer */,
+		);
+	};
+	B81CFFA3097FE4A40057C06F /* main.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {727, 7420}}";
+			sepNavSelRange = "{8220, 6}";
+			sepNavVisRect = "{{0, 3726}, {727, 319}}";
+		};
+	};
+	B81CFFAF097FE5F80057C06F /* RenderToTexture */ = {
+		activeExec = 0;
+		executables = (
+			13A2353709D7E02400660BB5 /* RenderToTexture */,
+		);
+	};
+	B81CFFC1097FE6420057C06F /* main.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {727, 2926}}";
+			sepNavSelRange = "{518, 6}";
+			sepNavVisRect = "{{0, 0}, {727, 319}}";
+		};
+	};
+	B81CFFC6097FE9980057C06F /* ALL */ = {
+		activeExec = 0;
+	};
+	B8D46264094C6E5300898A14 /* CNullDriver.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {824, 19558}}";
+			sepNavSelRange = "{17450, 14}";
+			sepNavVisRect = "{{0, 10712}, {727, 319}}";
+		};
+	};
+	B8D4626D094C6E5300898A14 /* COpenGLTexture.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {740, 4396}}";
+			sepNavSelRange = "{4523, 14}";
+			sepNavVisRect = "{{0, 2620}, {727, 319}}";
+			sepNavWindowFrame = "{{292, 67}, {861, 780}}";
+		};
+	};
+	B8D46272094C6E5300898A14 /* COpenGLDriver.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1100, 36106}}";
+			sepNavSelRange = "{75498, 6}";
+			sepNavVisRect = "{{0, 35632}, {727, 319}}";
+		};
+	};
+	B8D46280094C6E5300898A14 /* CGUIFont.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {926, 4858}}";
+			sepNavSelRange = "{1916, 14}";
+			sepNavVisRect = "{{0, 1332}, {727, 319}}";
+		};
+	};
+	B8D46282094C6E5300898A14 /* CGUIEnvironment.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {860, 9576}}";
+			sepNavSelRange = "{2026, 14}";
+			sepNavVisRect = "{{0, 1262}, {727, 319}}";
+		};
+	};
+	B8D46298094C6E5300898A14 /* CQ3LevelMesh.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {908, 10290}}";
+			sepNavSelRange = "{8402, 14}";
+			sepNavVisRect = "{{0, 4020}, {727, 319}}";
+		};
+	};
+	B8D4629C094C6E5300898A14 /* CImageLoaderTGA.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {727, 2968}}";
+			sepNavSelRange = "{2496, 14}";
+			sepNavVisRect = "{{0, 1389}, {727, 319}}";
+		};
+	};
+	B8D462A1094C6E5300898A14 /* CImageLoaderBmp.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {818, 5348}}";
+			sepNavSelRange = "{5715, 14}";
+			sepNavVisRect = "{{0, 3810}, {727, 319}}";
+		};
+	};
+	B8D462A4094C6E5300898A14 /* CColorConverter.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {884, 4858}}";
+			sepNavSelRange = "{6872, 14}";
+			sepNavVisRect = "{{0, 4384}, {727, 319}}";
+		};
+	};
+	B8D462AF094C6E5300898A14 /* CAnimatedMeshMD2.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {908, 11816}}";
+			sepNavSelRange = "{16355, 14}";
+			sepNavVisRect = "{{0, 8136}, {727, 319}}";
+		};
+	};
+	B8D462B2094C6E5300898A14 /* CFileSystem.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {727, 3304}}";
+			sepNavSelRange = "{2600, 6}";
+			sepNavVisRect = "{{0, 1654}, {727, 319}}";
+		};
+	};
+	B8D462C7094C6E5300898A14 /* C3DSMeshFileLoader.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {727, 9786}}";
+			sepNavSelRange = "{14875, 14}";
+			sepNavVisRect = "{{0, 8906}, {727, 319}}";
+		};
+	};
+	B8D462D1094C6E5300898A14 /* CFileList.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {727, 2422}}";
+			sepNavSelRange = "{1285, 6}";
+			sepNavVisRect = "{{0, 786}, {727, 319}}";
+		};
+	};
+	B8D462D9094C6E5300898A14 /* CZipReader.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {866, 4872}}";
+			sepNavSelRange = "{3788, 14}";
+			sepNavVisRect = "{{0, 1836}, {727, 319}}";
+		};
+	};
+	B8DEF35C0950229200FDEA7E /* Demo */ = {
+		activeExec = 0;
+		executables = (
+			13A2352B09D7E02400660BB5 /* Demo */,
+		);
+	};
+	B8E30CD3094ED594002CB3A0 /* CIrrDeviceMacOSX.mm */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1358, 8736}}";
+			sepNavSelRange = "{16625, 6}";
+			sepNavVisRect = "{{0, 8262}, {727, 319}}";
+		};
+	};
+	B8F68273097AA76A00537976 /* AppDelegate.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {727, 319}}";
+			sepNavSelRange = "{346, 6}";
+			sepNavVisRect = "{{0, 0}, {727, 319}}";
+		};
+	};
+	B8F68274097AA76A00537976 /* AppDelegate.mm */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {727, 868}}";
+			sepNavSelRange = "{257, 6}";
+			sepNavVisRect = "{{0, 0}, {727, 319}}";
+		};
+	};
+	D2AAC07D0554694100DB518D /* MacOSX */ = {
+		activeExec = 0;
+	};
+}

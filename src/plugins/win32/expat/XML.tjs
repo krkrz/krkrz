@@ -1,0 +1,634 @@
+// libexpat
+// XMLParser クラス
+Plugins.link("expat.dll");
+
+/**
+ * W3C DOM Level1 準拠実装 for TJS
+ */
+
+/**
+ * ノード
+ */
+class DOMNode {
+    
+    property nodeName {
+        getter() {
+            return null;
+        }
+    };
+    
+    property nodeValue {
+        getter() {
+            return null;
+        }
+    }
+    
+    var _nodeType;
+    property nodeType {
+        getter() {
+            return _nodeType;
+        }
+    }
+    
+    var _parentNode;
+    property parentNode {
+        getter() {
+            return _parentNode;
+        }
+    }
+    
+    var _childNodes;
+    property childNodes {
+        getter() {
+            return _childNodes;
+        }
+    }
+    
+    property firstChild {
+        getter() {
+            return (_childNodes.length > 0) ? _childNodes[0] : null;
+        }
+    }
+    
+    property lastChild {
+        getter() {
+            return (_childNodes.length > 0) ? _childNodes[_childNode.count - 1] : null;
+        }
+    }
+    
+    var _attributes;
+    property attributes {
+        getter() {
+            return _attributes;
+        }
+    }
+    
+    var _ownerDocument;
+    property ownerDocument {
+        getter() {
+            return _ownerDocument;
+        }
+    }
+    
+    function DOMNode(doc) {
+        _ownerDocument = doc;
+        _parentNode    = null;
+        _childNodes    = new DOMNodeList();
+        _attributes    = null;
+    }
+
+    function finalize() {
+        _ownerDocument = null;
+        _parentNode    = null;
+        invalidate _childNodes;
+        if (_attributes) {
+            invalidate _attributes;
+        }
+    }
+    
+    function cloneNode(deep) {
+        var ret = new DOMNode(_ownerDocument);
+        ret._parentNode = _parentNode;
+        if (deep) {
+            for (var i=0;i<_childNodes.length;i++) {
+                ret.appendChild(_childNodes.item(i).cloneNode(deep));
+            }
+        }
+        return ret;
+    }
+    
+    function insertBefore(newnode, refnode) {
+        for (i = 0; i<_childNodes.length;i++) {
+            if (_childNodes[i] === refnode) {
+                _childNodes.insert(i, newnode);
+                newnode._parentNode = this;
+            }
+        }
+    }
+    
+    function replaceChild(newnode, oldnode) {
+        for (i = 0; i<_childNodes.length;i++) {
+            if (_childNodes[i] === oldnode) {
+                _childNodes[i] = newnode;
+                newnode._parentNode = this;
+            }
+        }
+    }
+    
+    function removeChild(node) {
+        _childNodes.remove(node, false);
+        return node;
+    }
+    
+    function appendChild(newnode) {
+        _childNodes.add(newnode);
+        newnode._parentNode = this;
+    }
+    
+    function hasChildNodes() {
+        return _childNodes.length > 0;
+    }
+};
+
+/**
+ * ノードのリスト
+ */
+class DOMNodeList {
+
+    var _array;
+    
+    function item(index) {
+        return (index < _array.count) ? _array[index] : null;
+    }
+
+    property length {
+        getter() {
+            return _array.count;
+        }
+    }
+
+    function find(name) {
+      for (var i = 0; i < _array.count; i++)
+        if (_array[i].nodeName == name)
+          return _array[i];
+      return null;
+    }
+
+    function add(obj) {
+        _array.add(obj);
+    }
+
+    function remove(obj) {
+        _array.remove(obj);
+    }
+    
+    function DOMNodeList() {
+        _array = [];
+    }
+};
+
+/**
+ * ノードのマップ
+ */
+class DOMNamedNodeMap {
+    
+    var _array;
+    var _map;
+    
+    function DOMNamedNodeMap() {
+        _array = [];
+        _map = %[];
+    }
+
+    function finalize() {
+        invalidate _array;
+        invalidate _map;
+    }
+    
+    function getNamedItem(name) {
+        if (_map[name] != void) {
+            return _map[name];
+        } else {
+            return null;
+        }
+    }
+    
+    function setNamedItem(arg) {
+        var ret = removeNamedItem(arg.nodeName);
+        _array.add(arg);
+        _map[arg.nodeName] = arg;
+        return ret;
+    }
+    
+    function removeNamedItem(name) {
+        if (_map[name] != void) {
+            var ret = _map[name];
+            _array.remove(ret, false);
+            delete _map[name];
+        } else {
+            return null;
+        }
+    }
+    
+    function item(index) {
+        return (index < _array.count) ? _array[index] : null;
+    }
+    
+    property length {
+        getter() {
+            return _array.count;
+        }
+    }
+};
+
+DOMNode.ELEMENT_NODE                = 1;
+DOMNode.ATTRIBUTE_NODE              = 2;
+DOMNode.TEXT_NODE                   = 3;
+DOMNode.CDATA_SECTION_NODE           = 4;
+DOMNode.ENTITY_REFERENCE_NODE        = 5;
+DOMNode.ENTITY_NODE                 = 6;
+DOMNode.PROCESSING_INSTRUCTION_NODE = 7;
+DOMNode.COMMENT_NODE                 = 8;
+DOMNode.DOCUMENT_NODE               = 9;
+DOMNode.DOCUMENT_TYPE_NODE          = 10;
+DOMNode.DOCUMENT_FRAGMENT_NODE      = 11;
+DOMNode.NOTATION_NODE               = 12;
+
+/**
+ * 属性値
+ */
+class DOMAttr extends DOMNode {
+    
+    var _name;
+    var _specified;
+    var _value;
+    
+    property name {
+        getter() {
+            return _name;
+        }
+    }
+
+    property nodeName {
+        getter() {
+            return _name;
+        }
+    }
+    
+    property specified {
+        getter() {
+            return _specified;
+        }
+    }
+    
+    property value {
+        getter() {
+            return _value;
+        }
+        setter(v) {
+            _value = v;
+            _specified = false;
+        }
+    }
+
+    property nodeValue {
+        getter() {
+            return _value;
+        }
+        setter(v) {
+            _value = v;
+            _specified = false;
+        }
+    }
+    
+    /**
+     * アトリビュート情報用ノード
+     */
+    function DOMAttr(doc, n, v, specified) {
+        super.DOMNode(doc);
+        _name  = n;
+        _value = v;
+        if (specified) {
+            _specified = specified;
+        } else {
+            _specified = false;
+        }
+        _nodeType = global.DOMNode.ATTRIBUTE_NODE;
+    }
+
+    function cloneNode(deep) {
+        return new DOMAttr(_ownerDocument, _name, _value);
+    }
+};
+
+/**
+ * DOM Element
+ */
+class DOMElement extends DOMNode {
+    
+    var _tagName;
+
+    property tagName {
+        getter() {
+            return _tagName;
+        }
+    }
+
+    property nodeName {
+        getter() {
+            return _tagName;
+        }
+    }
+    
+    function setAttribute(name, value) {
+        _attributes.setNamedItem(new DOMAttr(this, name, value));
+    }
+    
+    function removeAttribute(name) {
+        _attributes.removeNamedItem(name);
+    }
+    
+    function getAttributeNode(name) {
+        return _attributes.getNamedItem(name);
+    }
+    
+    function setAttributeNode(newattr) {
+        return _attributes.setnamedItem(newattr);
+    }
+    
+    function removeAttributeNode(oldattr) {
+        return _attributes.removeNamdItem(oldattr.nodeName);
+    }
+    
+    function getElementsByTagName(name) {
+        var ret = new DOMNodeList();
+        for (var i=0;i<_childNodes.length;i++) {
+            var node = childNodes[i];
+            if (node &&
+                node.nodeType == global.DOMNode.ELEMENT_NODE &&
+                node.tagName == name) {
+                ret.add(node);
+            }
+        }
+        return ret;
+    }
+    
+    /**
+     * @param docunment ベースドキュメント
+     * @param parent 親ノード
+     * @param t タグ名
+     */
+    function DOMElement(doc, t) {
+        super.DOMNode(doc);
+        _tagName = t;
+        _attributes = new DOMNamedNodeMap();
+
+        // プロパティ初期化
+        _nodeType = global.DOMNode.ELEMENT_NODE;
+    }
+
+    function cloneNode(deep) {
+        var ret = new DOMElement(_ownerDocument, _tagName);
+        // 属性のコピー
+        for (var i=0;i<_attributes.length;i++) {
+            ret.setAttributeNode(_attributes.item(i).cloneNode(deep));
+        }
+    }
+
+    // ------------------------------------------
+    
+    function setAttributes(dict) {
+        // 属性値の展開
+        if (dict) {
+            var keys = [];
+            keys.assign(dict);
+            for (var i=0;i<keys.count;i+=2) {
+                setAttribute(keys[i], keys[i+1]);
+            }
+            delete keys;
+        }
+    }
+};
+
+/**
+ * DOM 文字列データ
+ */
+class DOMCharacterData extends DOMNode {
+
+    var _data;
+
+    property data {
+        getter() {
+            return _data;
+        }
+        setter(d) {
+            _data = (string)d;
+        }
+    };
+
+    property nodeValue {
+        getter() {
+            return _data;
+        }
+        setter(d) {
+            _data = (string)d;
+        }
+    };
+    
+    property length {
+        getter() {
+            return _data.length;
+        }
+    }
+
+    function substringData(offset, count) {
+        return _data.substring(offset, count);
+    }
+
+    function appendData(arg) {
+        _data +=  arg;
+    }
+
+    function insertData(offset, arg) {
+        _data = _data.substring(0,offset) + arg + _data.substring(offset);
+    }
+
+    function deleteData(offset, count) {
+        _data = _data.substring(0,offset) + _data.substring(offset+count);
+    }
+
+    function replaceData(offset, count, arg) {
+        _data = _data.substring(0,offset) + arg + _data.substring(offset+count);
+    }
+
+    property nodeName {
+        getter() {
+            if (_parentNode) {
+                var ret = 0;
+                var list = parentNode.childNodes;
+                // テキスト番号のカウント
+                for (var i=0;i<list.length;i++) {
+                    if (list.item(i) === this) {
+                        break;
+                    } else {
+                        if (list.item(i).nodeType == _nodeType) {
+                            ret++;
+                        }
+                    }
+                }
+                return ret;
+                
+            }
+        }
+    }
+    
+    function DOMCharacterData(doc, data) {
+        super.DOMNode(doc);
+        _data = (string)data;
+    }
+
+    function cloneNode(deep) {
+        return new DOMCharacterData(_ownerDocument, _data);
+    }
+};
+
+/**
+ * DOM テキスト
+ */
+class DOMText extends DOMCharacterData {
+    
+    function DOMText(doc, d) {
+        super.DOMCharacterData(doc, d);
+        _nodeType = global.DOMNode.TEXT_NODE;
+    };
+
+    function cloneNode(deep) {
+        return new DOMText(_ownerDocument, _data);
+    }
+};
+
+/**
+ * DOM コメント
+ */
+class DOMComment extends DOMCharacterData {
+    
+    function DOMComment(doc, d) {
+        super.DOMCharacterData(doc, d);
+        _nodeType = global.DOMNode.COMMENT_NODE;
+    };
+
+    function cloneNode(deep) {
+        return new DOMComment(_ownerDocument, _data);
+    }
+};
+
+
+/**
+ * DOM ドキュメント
+ * パース処理つき
+ */
+class DOMDocument extends DOMNode, XMLParser {
+
+    property ownerDocument {
+        getter() {
+            return this;
+        }
+    }
+    
+    var _documentElement;
+    property documentElement {
+        getter() {
+            return _documentElement;
+        }
+    }
+    
+    function createElement(tagName) {
+        return new DOMElement(this, tagName);
+    }
+    
+    function createTextNode(data) {
+        return new DOMText(this, data);
+    }
+
+    function createComment(data) {
+        return new DOMComment(this, data);
+    }
+
+    function getElementsByTagName(name) {
+        return _documentElement ? _documentElement.getElementByTagName(name) : null;
+    }
+    
+    function DOMDocument() {
+        global.XMLParser.XMLParser();
+        global.DOMNode.DOMNode(null);
+        _documentElement = null;
+        _nodeType = global.DOMNode.ELEMENT_NODE;
+    }
+
+    function finalize() {
+        if (_documentElement) {
+            invalidate _documentElement;
+            _documentElement = null;
+        }
+    }
+    
+    function cloneNode(deep) {
+        var ret = new Document();
+        if (_documentElement) {
+            Document._documentElement = _documentElement.cloneNode(deep);
+        }
+    }
+    
+    // -----------------------------------
+    // パース処理
+
+    // 現在処理中のエレメント
+    var _currentElement;
+
+    /**
+     * 初期化処理
+     */
+    function parseInit() {
+        _currentElement = null;
+        if (_documentElement) {
+            invalidate _documentElement;
+            _documentElement = null;
+        }
+    }
+
+    /**
+     * パース処理の実行
+     * @param xml XML文書
+     */
+    function parse(xml) {
+        parseInit();
+        return global.XMLParser.parse(xml);
+    }
+
+    /**
+     * パース処理の実行
+     * @param file XML文書ファイル名
+     */
+    function parseStorage(file) {
+        parseInit();
+        return global.XMLParser.parseStorage(file);
+    }
+
+    // 要素開始
+    function startElement(name, attributes) {
+        var element = createElement(name);
+        element.setAttributes(attributes);
+        if (_currentElement == null) {
+            _documentElement = _currentElement = element;
+        } else {
+            _currentElement.appendChild(element);
+        }
+        _currentElement = element;
+    }
+
+    // 要素終了
+    function endElement(name) {
+        // 親階層にもどる
+        if (_currentElement) {
+            _currentElement = _currentElement.parentNode;
+        }
+    }
+
+    // 文字列データ
+    function characterData(data) {
+        var text = createTextNode(data);
+        if (_currentElement == null) {
+            _documentElement = _currentElement = createElement("root");
+        }
+        _currentElement.appendChild(text);
+    }
+
+    // コメント
+    function comment(data) {
+        var comment = createComment(data);
+        if (_currentElement == null) {
+            _documentElement = _currentElement = createElement("root");
+        }
+        _currentElement.appendChild(comment);
+    }
+};

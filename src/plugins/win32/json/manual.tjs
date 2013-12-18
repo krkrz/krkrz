@@ -1,0 +1,38 @@
+/**
+ * 擬似コードによるマニュアル
+ */
+class Scripts {
+
+    /**
+     * JSON の文字列を解析して Array または Dictionary を返す
+     * @param jsonText JSON が格納されたテキスト
+     * @return Array または Dictionary
+     */
+    function evalJSON(jsonText);
+
+    /**
+     * JSON のファイルを解析して Array または Dictionary を返す
+     * @param jsonFile JSON が格納されたテキストファイルのファイル名
+     * @param utf8 入力エンコーディング指定。true なら UTF-8、falseなら現在のコードページ
+     * @return Array または Dictionary
+     */
+    function evalJSONStorage(jsonFile, utf8=false);
+
+    /**
+	 * データを JSON 形式で保存する
+	 * @param jsonFile 格納先ファイル
+	 * @param obj 保存対象オブジェクト
+	 * @param utf8 出力エンコーディング指定。true なら UTF-8、falseなら現在のコードページ
+	 * @param newline 改行コード 0:CRLF 1:LF
+	 */
+	function saveJSON(jsonFile, obj, utf8=false, newline=0);
+
+    /**
+     * データを JSON 形式の文字列に変換する
+     * @param オブジェクト
+	 * @param newline 改行コード 0:CRLF 1:LF
+     * @return JSON 形式のテキスト
+     */
+    function toJSONString(obj, newline=0);
+    
+}

@@ -1,0 +1,21 @@
+#include <windows.h>
+
+#define ID_BTN 1000
+#define ID_EDT 1001
+#define ID_LST 1002
+#define ID_CMB 1003
+
+TEST_DIALOG	DIALOG 0, 0, 100, 100
+
+STYLE		DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU | DS_SETFONT
+LANGUAGE	LANG_JAPANESE, SUBLANG_DEFAULT
+FONT		12, "ＭＳ Ｐゴシック"
+CAPTION		"テストダイアログ（リソース版）"
+{
+	GROUPBOX	"グループ", -1,    0,  0, 100, 100
+	PUSHBUTTON	"ボタン１", ID_BTN, 10, 20,  80,  10
+	EDITTEXT	            ID_EDT, 10, 30,  80,  10
+	LISTBOX		            ID_LST, 10, 40,  80,  40
+	COMBOBOX	            ID_CMB, 10, 80,  80,  80, CBS_DROPDOWNLIST|WS_VSCROLL|WS_TABSTOP
+}
+

@@ -1,0 +1,826 @@
+/**
+ * アクション機能を拡張したレイヤ
+ */
+class ActionLayer extends AffineLayer {
+
+    var _modules;  ///< モジュール保持用配列
+    var _actionTimer;    ///< アクション駆動用タイマ
+    
+    /**
+     * コンストラクタ
+     */
+    function ActionLayer(win,par=null) {
+        super.AffineLayer(win,par);
+        _modules = new Array();
+        _actionTimer = new Timer(actionHandler, '');
+        _actionTimer.capacity = 1;
+        _actionTimer.interval = 10;
+        _actionTimer.enabled  = false;
+    }
+
+    /**
+     * ファイナライザ
+     */
+    function finalize() {
+        stopAction();
+        invalidate _actionTimer;
+        invalidate _modules;
+        super.finalize();
+    }
+
+    /**
+     * 初期化処理
+     */
+    function reset() {
+        stopAction();
+        _modules = new Array();
+        super.reset();
+    }
+
+    /**
+     * アクションをスキップするかどうかの指定
+     * 標準ではスキップしない。適宜継承すること。
+     */
+    function isSkip() {
+        return false;
+    }
+
+    /**
+     * アクション処理用
+     */
+    function actionHandler() {
+        var now = System.getTickCount();
+        var done = true;
+        for (var i=0;i<6; i++) {
+            if (_modules[i] != void) {
+                _modules[i].run(now, isSkip());
+                if (_modules[i].done) {
+                    _modules[i] = void;
+                } else {
+                    done = false;
+                }
+            }
+        }
+        if (done) {
+            stopAction();
+        }
+    }
+    
+    /**
+     * アクションを開始する
+     * 複数回呼び出し可能。モジュールの type が異なるものは同時に適用可能
+     * @param moduleTyep モジュール種別。LayerModule クラスの子クラスのクラスオブジェクトを指定する
+     * @param options パラメータ連想配列
+     */
+    function beginAction(moduleType, options=void) {
+        if (typeof moduleType == "Object" && moduleType.LayerModule != void) {
+            // モジュールの生成と登録
+            var module = new moduleType(this, options);
+            _modules[module.type] = module;
+        } else if (moduleType instanceof "Dictionary") {
+            options = moduleType;
+            var moduleName = options["module"];
+            var moduleType;
+            if (typeof moduleName == "String") {
+                moduleType = global[moduleName];
+            } else {
+                moduleType = moduleName;
+            }
+            if (typeof moduleType == "Object" && moduleType.LayerModule != void) {
+                // モジュールの生成と登録
+                var module = new moduleType(this, options);
+                _modules[module.type] = module;
+            } else {
+                throw new Exception("指定されたモジュール" + moduleName + "は存在しないか LayerModule ではありません");
+            }
+
+        } else {
+            throw new Exception("LayerModule を継承したクラスを渡す必要があります");
+        }
+        if (!_actionTimer.enabled) {
+            _actionTimer.enabled = true;
+        }
+    }
+
+    /**
+     * アクションの強制終了
+     */
+    function stopAction() {
+        //Debug.message("stop");
+        if (_actionTimer.enabled) {
+            _actionTimer.enabled = false;
+            invalidate _modules;
+            _modules = new Array();
+            onActionCompleted();
+        }
+    }
+
+    /**
+     * アクション終了時に呼び出されるイベント
+     */
+    function onActionCompleted() {
+    }
+
+    /**
+     * アクション実行中か
+     */
+    property inAction {
+        getter() {
+            return _actionTimer.enabled;
+        }
+    }
+    
+    // --------------------------------------------
+    // コンビニエントメソッド
+    // --------------------------------------------
+
+    /**
+     * 不透明度を指定する
+     * @param opacity 不透明度
+     * @time 変更にかかる時間
+     */
+    function setOpacity(o, time) {
+        if (time) {
+            beginAction(LayerFadeToModeModule, %["opacity" => o, "time" => time]);
+        } else {
+            opacity = o;
+        }
+    }
+
+    /**
+     * 回転量を指定する
+     * @param r 回転量
+     * @time 変更にかかる時間
+     */
+    function setRotate(r, time) {
+        if (time) {
+            beginAction(LayerToRotateModule, %["angle" => r, "time" => time]);
+        } else {
+            rotate = r;
+        }
+    }
+    
+    /**
+     * ズーム量を指定する
+     * @param zoom 回転量
+     * @time 変更にかかる時間
+     */
+    function setZoom(z, time) {
+        if (time) {
+            beginAction(LayerNormalZoomModule, %["zoom" => z, "time" => time]);
+        } else {
+            zoom = z;
+        }
+    }
+
+    /**
+     * 自動移動を指定する
+     * @param x X位置
+     * @param y Y位置
+     * @param accele 負:減速 0:線形 正:加速
+     * @time 変更にかかる時間
+     */
+    function setMove(x, y, accel, time) {
+        if (time) {
+            var elm = %[ "x" => x, "y" => y, "time" => time];
+            if (accel > 0) {
+                beginAction(LayerAccelMoveModule, elm);
+            } else if (accel == 0) {
+                beginAction(LayerNormalMoveModule, elm);
+            } else {
+                beginAction(LayerDecelMoveModule, elm);
+            }
+        } else {
+            // 他のアクションを停止
+            _modules[0] = void;
+            setPos(x, y);
+        }
+    }
+    
+};
+
+/**
+ * レイヤアクションモジュール基底クラス
+ */
+class LayerModule {
+
+    var type;   /// アクション種別
+    var layer;  /// 操作対象レイヤ
+    var first;  
+    var startTime;
+    var time;   // 処理時間
+    var delay;  // 開始遅延
+    var options;
+    var done;
+
+    /**
+     * コンストラクタ
+     * @param layer レイヤ
+     * @param params パラメータ
+     */
+    function LayerModule(layer, options) {
+        this.layer = layer;
+        this.options = options;
+        delay = (int)options.delay if options.delay;
+        time  = (int)options.time if options.time;
+        first = true;
+        startTime = 0;
+        done = false;
+    }
+
+    /**
+     * 処理実行
+     * @param now 現在時刻(tick)
+     * @param skip スキップ指定
+     */
+    function run(now, skip) {
+        if (first) {
+            startTime = now;
+            first = false;
+        }
+        now -= startTime;
+        if (delay) {
+            now -= delay;
+            if (now < 0) {
+                return;
+            }
+        }
+        if (time) {
+            if (now >= time || skip) {
+                now = time;
+                done = true;
+            }
+        }
+        action(now);
+    }
+
+    /**
+     * 処理実行（個別実装)
+     * @param now 現在時刻(tick)
+     */
+    function action(now) {}
+};
+
+// -------------------------------------------------------------------------
+
+/**
+ * 移動モジュール
+ * パラメータ: x 移動先位置
+ * パラメータ: y 移動先位置
+ */
+class LayerMoveModule extends LayerModule {
+    var start_x;
+    var start_y;
+    var diff_x;
+    var diff_y;
+    function LayerMoveModule(layer, options) {
+        super.LayerModule(layer, options);
+        type = 0;
+        start_x = layer.left;
+        start_y = layer.top;
+        diff_x  = (int)options["x"] - start_x;
+        diff_y  = (int)options["y"] - start_y;
+    }
+}
+
+/**
+ * 線形移動
+ */
+class LayerNormalMoveModule extends LayerMoveModule {
+    function LayerNormalMoveModule(layer, options) {
+        super.LayerMoveModule(layer, options);
+    }
+    function action(now) {
+        if (time) {
+            layer.setPos(start_x + diff_x * now / time,
+                              start_y + diff_y * now / time);
+        } else {
+            layer.setPos(start_x + diff_x, start_y + diff_y);
+            done = true;
+        }
+    }
+};
+
+/**
+ * 加速移動
+ */
+class LayerAccelMoveModule extends LayerMoveModule {
+    function LayerAccelMoveModule(layer, options) {
+        super.LayerMoveModule(layer, options);
+    }
+    function action(now) {
+        if (time) {
+            var t = now/time;
+            var n = t*t;
+            layer.setPos(start_x + diff_x*n, start_y + diff_y*n);
+        } else {
+            layer.setPos(start_x + diff_x, start_y + diff_y);
+            done = true;
+        }
+    }
+};
+
+/**
+ * 減速移動
+ */
+class LayerDecelMoveModule extends LayerMoveModule {
+    function LayerDecelMoveModule(layer, options) {
+        super.LayerMoveModule(layer, options);
+    }
+    function action(now) {
+        if (time) {
+            var t = now/time;
+            var n = ( 1-(1-t)*(1-t) );
+            layer.setPos(start_x + diff_x*n, start_y + diff_y*n);
+        } else {
+            layer.setPos(start_x + diff_x, start_y + diff_y);
+            done = true;
+        }
+    }
+};
+
+/**
+ * 放物線移動
+ * x/y: 放物線頂点（最終点ではないことに注意）
+ * topTime: 頂点通過時間（総時間の1/2を指定すると丁度落下しきる 途中で止めたい場合は総時間と調整）
+ */
+class LayerParabolaMoveModule extends LayerMoveModule {
+    var t0;    // 頂点通過時間（の2倍値）
+    function LayerParabolaMoveModule(layer, options) {
+        super.LayerMoveModule(layer, options);
+        var topTime = (int)options["topTime"];
+        t0 = topTime ? (topTime * 2) : time;
+    }
+    function action(now) {
+        if ( t0 ) {
+            // X軸は等速移動、Y軸は2次関数移動
+            var t = now*2/t0;
+            // 原点と(1,1)を通り、逆U字型のカーブを描く2次関数
+            var n = ( 1-(1-t)*(1-t) );
+            layer.setPos(start_x + diff_x*t, start_y + diff_y*n);
+        } else {
+            // 時間指定の省略は不可だが、一応落下したものとみなしてX軸だけ移動する
+            layer.setPos(start_x + diff_x, start_y);
+            done = true;
+        }
+    }
+};
+
+// -------------------------------------------------------------------------
+
+/**
+ * アクションモジュール
+ */
+class LayerActionModule extends LayerModule {
+    function LayerActionModule(layer, options) {
+        super.LayerModule(layer, options);
+        type = 1;
+    }
+    function run(now, skip) {
+        super.run(now, skip);
+        if (done) {
+            layer.setActionOffset(0, 0);
+		}
+	};
+};
+
+/**
+ * 振動アクション
+ * vibration 振動量(pixel)
+ * waitTime 振動間の待ち時間(ms)
+ */
+class LayerVibrateActionModule extends LayerActionModule {
+    var vibration;
+    var waitTime;
+    var nextTime;
+    function LayerVibrateActionModule(layer, options) {
+        super.LayerActionModule(layer, options);
+        vibration  = (int)options["vibration"];
+        waitTime   = (int)options["waitTime"];
+        nextTime = 0;
+    }
+    function action(now) {
+        if (now >= nextTime) {
+            layer.setActionOffset(Math.random() * vibration - vibration/2,
+                                  Math.random() * vibration - vibration/2);
+            if (waitTime) {
+                nextTime += waitTime;
+            }
+        }
+    }
+};
+
+/**
+ * 縦ゆれアクション
+ * vibration 上下振動量(pixel)
+ * cycle 周期(ms)
+ */
+class LayerJumpActionModule extends LayerActionModule {
+    var vibration;
+    var cycle;
+    function LayerJumpActionModule(layer, options) {
+        super.LayerActionModule(layer, options);
+        vibration = (int)options["vibration"];
+        cycle     = (int)options["cycle"];
+    }
+    function action(now) {
+        layer.setActionOffset(0, vibration * Math.sin(Math.PI * 2 * now / cycle));
+    }
+};
+
+/**
+ * 縦ゆれアクション(単発)
+ * vibration 上下振動量(pixel)
+ * cycle 周期(ms)
+ */
+class LayerJumpOnceActionModule extends LayerActionModule {
+    var vibration;
+    var cycle;
+    function LayerJumpOnceActionModule(layer, options) {
+        super.LayerActionModule(layer, options);
+        vibration = (int)options["vibration"];
+        cycle     = (int)options["cycle"];
+    }
+    function action(now) {
+        if (now >= cycle/2) {
+            now = cycle/2;
+            done = true;
+        }
+        layer.setActionOffset(0, vibration * Math.sin(Math.PI + Math.PI * 2 * now / cycle));
+    }
+};
+
+/**
+ * 横ゆれアクション
+ * vibration 上下振動量(pixel)
+ * cycle 周期(ms)
+ */
+class LayerWaveActionModule extends LayerActionModule {
+    var vibration;
+    var cycle;
+    function LayerWaveActionModule(layer, options) {
+        super.LayerActionModule(layer, options);
+        vibration = (int)options["vibration"];
+        cycle     = (int)options["cycle"];
+    }
+    function action(now) {
+        layer.setActionOffset(vibration * Math.sin(Math.PI * 2 * now / cycle), 0);
+    }
+};
+
+/**
+ * 横ゆれアクション(単発)
+ * vibration 上下振動量(pixel)
+ * cycle 周期(ms)
+ */
+class LayerWaveOnceActionModule extends LayerActionModule {
+    var vibration;
+    var cycle;
+    function LayerWaveOnceActionModule(layer, options) {
+        super.LayerActionModule(layer, options);
+        vibration = (int)options["vibration"];
+        cycle     = (int)options["cycle"];
+    }
+    function action(now) {
+        if (now >= cycle/2) {
+            now = cycle/2;
+            done = true;
+        }
+        layer.setActionOffset(vibration * Math.sin(Math.PI + Math.PI * 2 * now / cycle), 0);
+    }
+};
+
+/**
+ * 落下アクション
+ * distance 落下距離
+ * fallTime 落下時間
+ */
+class LayerFallActionModule extends LayerActionModule {
+    var distance;
+    var fallTime;
+    function LayerFallActionModule(layer, options) {
+        super.LayerActionModule(layer, options);
+        distance = (int)options["distance"];
+        fallTime = (int)options["fallTime"];
+        if (fallTime == void) {
+            fallTime = time;
+        }
+    }
+    function action(now) {
+        if (now >= fallTime) {
+            now = fallTime;
+            done = true;
+        }
+        layer.setActionOffset(0, - distance + distance * now / fallTime);
+    }
+};
+
+// -------------------------------------------------------------------------
+
+/**
+ * 拡大縮小モジュール
+ */
+class LayerZoomModule extends LayerModule {
+    var startZoomX;
+    var startZoomY;
+    function LayerZoomModule(layer, options) {
+        super.LayerModule(layer, options);
+        type = 3;
+        startZoomX = layer.zoomx;
+        startZoomY = layer.zoomy;
+    }
+};
+
+/**
+ * 単純拡大
+ * zoom: 最終サイズ（縦長・横長になっている状態からの変更は考慮しない）
+ */
+class LayerNormalZoomModule extends LayerZoomModule {
+    var zoom;
+    var diff;
+    function LayerNormalZoomModule(layer, options) {
+        super.LayerZoomModule(layer, options);
+        zoom = (int)options["zoom"];
+        diff = zoom - startZoomX;
+    }
+    function action(now) {
+        if (time) {
+            var t = now/time;
+            // 拡大時は加速、縮小時は減速
+            var n = (diff<0)?( 1-(1-t)*(1-t) ):( t*t );
+            layer.zoom = startZoomX + diff*n;
+        } else {
+            layer.zoom = zoom;
+            done = true;
+        }
+    }
+};
+
+/**
+ * 拡縮を使った擬似3D回転（縦軸）
+ * angvel: 角速度（度/sec）
+ */
+class LayerVRotateZoomModule extends LayerZoomModule {
+    var angvel;
+    function LayerVRotateZoomModule(layer, options) {
+        super.LayerZoomModule(layer, options);
+        angvel = (int)options["angvel"];
+    }
+    function action(now) {
+        var angle = ( (angvel*now*2*Math.PI) / 360000.0/*= 360*1000*/ );
+        layer.setZoom(startZoomX*Math.cos(angle), startZoomY);
+    }
+};
+
+/**
+ * 拡縮を使った擬似3D回転（横軸）
+ * angvel: 角速度（度/sec）
+ */
+class LayerHRotateZoomModule extends LayerZoomModule {
+    var angvel;
+    function LayerHRotateZoomModule(layer, options) {
+        super.LayerZoomModule(layer, options);
+        angvel = (int)options["angvel"];
+    }
+    function action(now) {
+        var angle = ( (angvel*now*2*Math.PI) / 360000.0/*= 360*1000*/ );
+        layer.setZoom(startZoomX, startZoomY*Math.cos(angle));
+    }
+};
+
+/**
+ * ハートビート
+ * zoom: 最大拡大率
+ */
+class LayerHeartBeatZoomModule extends LayerZoomModule {
+    var diff;
+    function LayerHeartBeatZoomModule(layer, options) {
+        super.LayerZoomModule(layer, options);
+        diff = (int)options["zoom"] - startZoomX;
+    }
+    function action(now) {
+        if (time) {
+            var n = Math.sin( (now*Math.PI) / time );
+            layer.zoom = startZoomX + diff*n;
+        } else {
+            done = true;
+        }
+    }
+};
+
+/**
+ * ズーム振動
+ * vibration 振動量(％)
+ * waitTime 振動間の待ち時間(ms)
+ */
+class LayerVibrateZoomModule extends LayerZoomModule {
+    var vibration;
+    var waitTime;
+    var nextTime;
+    function LayerVibrateZoomModule(layer, options) {
+        super.LayerZoomModule(layer, options);
+        vibration  = (int)options["vibration"];
+        waitTime   = (int)options["waitTime"];
+        nextTime = 0;
+    }
+    function action(now) {
+        if (done) {
+            layer.setZoom(startZoomX, startZoomY);
+        } else {
+            if (now >= nextTime) {
+                layer.setZoom(
+                    startZoomX + Math.random() * vibration - vibration/2,
+                    startZoomY + Math.random() * vibration - vibration/2);
+                if (waitTime) {
+                    nextTime += waitTime;
+                }
+            }
+        }
+    }
+};
+
+// -------------------------------------------------------------------------
+
+class LayerRotateModule extends LayerModule {
+    var startRotateAngle;
+    function LayerRotateModule(layer, options) {
+        super.LayerModule(layer, options);
+        type = 2;
+        startRotateAngle = layer.rotate;
+    }
+};
+
+/**
+ * 単純回転
+ * angvel: 角速度（度/sec）
+ */
+class LayerNormalRotateModule extends LayerRotateModule {
+    var angvel;
+    function LayerNormalRotateModule(layer, options) {
+        super.LayerRotateModule(layer, options);
+        angvel = (int)options["angvel"];
+    }
+    function action(now) {
+        layer.rotate = (startRotateAngle + angvel * now / 1000) % 360;
+    }
+};
+
+/**
+ * 回転振動（起き上がりこぼし／振り子）
+ * vibration: 振幅(度)
+ * cycle: 周期(ms)
+ */
+class LayerVibrateRotateModule extends LayerRotateModule {
+    var vibration;
+    var cycle;;
+    function LayerVibrateRotateModule(layer, options) {
+        super.LayerRotateModule(layer, options);
+        vibration = (int)options["vibration"];
+        cycle     = (int)options["cycle"];
+    }
+    function action(now) {
+        layer.rotate = (startRotateAngle + (vibration * Math.sin(Math.PI * 2 * now / cycle))) % 360;
+    }
+};
+
+/**
+ * 転倒
+ * angle: 転倒時最大角（-90～90が適正 正で左、負で右に転倒）
+ */
+class LayerFalldownRotateModule extends LayerRotateModule {
+    var angle;
+    function LayerFalldownRotateModule(layer, options) {
+        super.LayerRotateModule(layer, options);
+        angle = (int)options["angle"];
+    }
+    function action(now) {
+        if (time) {
+            var a = (angle*now*now/(time*time));
+            layer.rotate = (startRotateAngle + a) % 360;
+        } else {
+            layer.rotate = (startRotateAngle + angle) % 360;
+            done = true;
+        }
+    }
+};
+
+/**
+ * 指定角度へ
+ * angle: 指定角度
+ */
+class LayerToRotateModule extends LayerRotateModule {
+    var angle;
+    function LayerToRotateModule(layer, options) {
+        super.LayerRotateModule(layer, options);
+        angle = (int)options["angle"];
+    }
+    function action(now) {
+        if (time) {
+            layer.rotate = startRotateAngle + (angle - startRotateAngle) * now / time;
+        } else {
+            layer.rotate= angle;
+            done = true;
+        }
+    }
+};
+
+// -------------------------------------------------------------------------
+
+/**
+ * アクションモジュール
+ */
+class LayerModeModule extends LayerModule {
+    function LayerModeModule(layer, options) {
+        super.LayerModule(layer, options);
+        type = 4;
+    }
+};
+
+/**
+ * 点滅処理用
+ * showTime 表示時間
+ * hideTime 消去時間
+ */
+class LayerBlinkModeModule extends LayerModeModule {
+    var showFlag;
+    var showTime;
+    var hideTime;
+    function LayerBlinkModeModule(layer, options) {
+        super.LayerModeModule(layer, options);
+        showFlag = true;
+        showTime = (int)options["showTime"];
+        hideTime = (int)options["hideTime"];
+    }
+    function action(now) {
+        if (done) {
+            layer.visible = true;
+        } else {
+            if (now % (showTime + hideTime) < showTime) {
+                layer.visible = true;
+            } else {
+                layer.visible = false;
+            }
+        }
+    }
+};
+
+/**
+ * フェード処理用
+ * intime  フェードイン時間   (0の場合フェードインしない)
+ * outtime フェードアウト時間 (0の場合フェードアウトしない)
+ */
+class LayerFadeModeModule extends LayerModeModule {
+    var opacity;
+    var inTime;
+    var outTime;
+    function LayerFadeModeModule(layer, options) {
+        super.LayerModeModule(layer, options);
+        opacity = layer.opacity;
+        inTime  = (int)options["intime"];
+        outTime = (int)options["outtime"];
+        if (outTime === void) {
+            outTime = 0;
+        }
+        if (inTime == 0 && outTime == 0) {
+            done = true;
+        }
+    }
+    function action(now) {
+        if (done) {
+            layer.opacity = opacity;
+        } else {
+            now = now % (inTime + outTime);
+            if (now <= inTime) {
+                layer.opacity = now * opacity / inTime;
+            } else {
+                if (outTime > 0) {
+                    layer.opacity = (outTime - (now - inTime)) * opacity / outTime;
+                } else {
+                    layer.opacity = opacity;
+                }
+            }
+        }
+    }
+};
+
+/**
+ * 指定された不透明度に変更
+ * opacity 不透明度
+ */
+class LayerFadeToModeModule extends LayerModeModule {
+    var opacity;
+    var toOpacity;
+    function LayerFadeToModeModule(layer, options) {
+        super.LayerModeModule(layer, options);
+        opacity = layer.opacity;
+        toOpacity = (int)options["opacity"];
+    }
+    function action(now) {
+        if (time) {
+            layer.opacity = opacity + (toOpacity - opacity) * now / time;
+        } else {
+            layer.opacity = toOpacity;
+            done = true;
+        }
+    }
+};

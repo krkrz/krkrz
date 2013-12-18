@@ -1,0 +1,67 @@
+/**
+ * 擬似コードによるマニュアル
+ */
+class System
+{
+	/**
+	 * レジストリにデータを書き込みます
+	 * @param key 書き込み先のキー(readRegValue と同様に HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\hoeg\installdir と指定する)
+	 * @param value 書き込む値(文字列又は整数値)
+	 */
+	function writeRegValue(key, value);
+
+	// レジストリの読み込みは、組み込みの System.readRegValue を使用のこと
+
+	/**
+	 * 環境変数を取得
+	 * @param name 環境変数名
+	 * @return 環境変数値（未定義の場合はvoid）
+	 */
+	function readEnvValue(name);
+
+	/**
+	 * 環境変数を設定
+	 * @param name 環境変数名
+	 * @param value 設定する値
+	 * @return 元の環境変数値（未定義の場合はvoid）
+	 */
+	function writeEnvValue(name, value);
+	
+	/**
+	 * 文字列内の「%～%」を環境変数で展開
+	 * @param text 展開する文字列
+	 * @return 展開後文字列
+	 */
+	function expandEnvString(text);
+	
+	/**
+	 * URLEncode処理を行う
+	 * @param str 元文字列
+	 * @param utf8 UTF8で出力する場合はtrue
+	 * @return URLEncodeされた文字列
+	 */
+	function urlencode(str, utf8=true);
+
+	/**
+	 * URLDecode処理を行う
+	 * @param str 元文字列
+	 * @param utf8 UTF8として処理する場合はtrue
+	 * @return URLDecodeされた文字列
+	 */
+	function urldecode(str, utf8=true);
+
+	/**
+	 * Ctrl+F12で表示される環境情報テキストを取得する
+	 * @return テキスト(TVPGetAboutString)
+	 */
+	function getAboutString();
+
+	/**
+	 * 確認用メッセージ窓を表示します。ウインドウはモーダルで表示されます。
+	 * @param text 表示するメッセージ
+	 * @param caption ウインドウのキャプション文字列
+	 * @param window 指定があった場合はそのウインドウを親として表示します
+	 * @return YESがおされたら true
+	 */
+	function confirm(text, caption="", window=void);
+};

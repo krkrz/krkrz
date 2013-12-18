@@ -1,0 +1,114 @@
+/**
+ * 擬似コードによるマニュアル
+ */
+
+/**
+ * ZIP 圧縮クラス
+ */
+class Zip {
+
+	/**
+	 * コンストラクタ
+	 */
+	function Zip();
+
+	/**
+	 * ZIPアーカイブを書き込み用にオープンします
+	 * @param filename ファイル名
+	 * @param overwrite 0:通常作成 1:上書き 2:追記
+	 * @throw overwriteが0でファイルが存在している場合
+	 * @throw Exception ファイルのオープンに失敗した場合
+	 */
+	function open(filename, overwrite=0);
+
+	/**
+	 * アーカイブにファイルを追加します
+	 * @param srcfile 追加するファイル（吉里吉里ストレージ名）
+	 * @param destfile アーカイブ中での名前(アーカイブ内パス名）
+	 * @param deflateLevel 圧縮レベル 0(無圧縮) ～ 9(最大圧縮) 省略時は 6になる
+	 * @param password 暗号化パスワード指定
+	 * @return 追加に成功したら true
+	 * @throw Exception ZIPファイルが開かれてない場合
+	 * @throw Exception 追加するファイルが存在しない場合
+	 */
+	function add(srcfile, destfile, commpressLevel=void, password=void);
+
+	/**
+	 * ZIPアーカイブをクローズします
+	 */
+	function close();
+};
+
+/**
+ * ZIP 展開クラス
+ */
+class Unzip {
+
+	/**
+	 * コンストラクタ
+	 */
+	function Unzip();
+
+	/**
+	 * ZIPアーカイブを展開用にオープンします
+	 * @param filename ファイル名
+	 * @param overwrite 0:存在してたらエラー 1:上書き 2:追記
+	 * @throw Exception ファイルのオープンに失敗した場合
+	 */
+	function open(filename, overwrite=0);
+
+	/**
+	 * ZIPアーカイブ中に含まれるファイルの情報を取得します
+	 * @return ファイル一覧(ファイル情報の配列)
+	 * ファイル情報は辞書の形で、以下の情報を含みます
+	 * <dl>
+	 *  <dt>filename <dd>アーカイブ内パス名
+	 *  <dt>uncompressed_size <dd>展開サイズ
+	 *  <dt>compressed_size <dd>圧縮サイズ
+	 *  <dt>crypted <dd>暗号化されているか
+	 *  <dt>deflated <dd>圧縮されているか
+	 *  <dt>deflateLevel <dd>圧縮レベル
+	 *  <dt>crc <dd>ファイルのCRD
+	 * </dl>
+	 * @throw Exception ZIPファイルが開かれてない場合
+	 */
+	function list();
+
+	/**
+	 * ファイルの展開
+	 * @param srcname 展開元ファイル(アーカイブ内パス名）
+	 * @param destfile 展開先ファイル（吉里吉里ストレージ名）
+	 * @param password パスワード指定
+	 * @return 展開に成功したら true
+	 * @throw Exception ZIPファイルが開かれてない場合
+	 * @throw Exception 書き込みファイルが開けなかった場合
+	 */	
+	function extract(srcname, destfile, password=void)
+	
+	/**
+	 * ZIPアーカイブをクローズします
+	 */
+	function close();
+}
+
+/**
+ * Storages クラス機能拡張
+ */
+class Storages {
+
+	/**
+	 * zipファイルをファイルシステムとして mount します
+	 * zip://ドメイン名/ファイル名 でアクセス可能になります。読み込み専用になります。
+	 * @param name ドメイン名
+	 * @param zipfile マウントするZIPファイル名
+	 * @return マウントに成功したら true
+	 */
+	function mountZip(name, zipfile);
+
+	/**
+	 * zipファイルを unmount します
+	 * @param name ドメイン名
+	 * @return アンマウントに成功したら true
+	 */
+	function unmountZip(name);
+}

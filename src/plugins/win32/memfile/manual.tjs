@@ -1,0 +1,57 @@
+/**
+ * 擬似コードによるマニュアル
+ *
+ * mem://./ファイル名 でオンメモリ確保されたファイルとしてアクセス可能になります。
+ *
+ */
+class Storages {
+
+	/**
+	 * メモリファイルの存在確認
+	 * @param filename 対象ファイル名 (mem:///はつけない)
+	 * @return 存在したら true
+	 */
+	function isExistMemoryFile(filename);
+
+	/**
+	 * メモリディレクトリの存在確認
+	 * @param dirname 対象ディレクトリ名 (mem:///はつけない)
+	 * @return 存在したら true
+	 */
+	function isExistMemoryDirectory(filename);
+	
+	/**
+	 * メモリファイルを削除する
+	 * @param filename 対象ファイル名 (mem:///はつけない)
+	 * @return ファイルが削除されたら true
+	 */
+	function deleteMemoryFile(filename);
+
+	/**
+	 * メモリディレクトリを削除する
+	 * @param dirname 対象ディレクトリ名 (mem:///はつけない)
+	 * @return ディレクトリが削除されたら true
+	 */
+	function deleteMemoryDirectory(dirname);
+
+	/**
+	 * メモリファイル情報を取得する
+	 * @param filename 対象ファイル名 (mem:///はつけない)
+	 * @return ファイル情報 %[name:名前, size:サイズ, isDirectory:ディレクトリならtrue]
+	 */
+	function getMemoryFileInfo(filename);
+	
+	/**
+	 * メモリファイル情報を取得する
+	 * @param filename 対象ファイル名 (mem:///はつけない)
+	 * @return ファイルが存在したら内容を octet で返す。なければ void
+	 */
+	function getMemoryFileData(filename);
+
+	/**
+	 * メモリディレクトリ情報を取得する
+	 * @param dirname 対象ディレクトリ名 (mem:///はつけない)
+	 * @return ファイル情報の配列 %[name:名前, size:サイズ, isDirectory:ディレクトリならtrue]
+	 */
+	function getMemoryDirectory(dirname);
+};

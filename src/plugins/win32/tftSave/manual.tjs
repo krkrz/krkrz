@@ -1,0 +1,60 @@
+/**
+ * システム拡張
+ */
+class System
+{
+	/**
+	 * レンダリング済みフォントデータをファイルに保存する
+	 *
+	 * @param storage    保存するファイル名
+	 * @param characters 保存する文字（キャラクタコード）の入った配列
+	 * @param callback   情報とイメージを取得するコールバック
+	 *                   キャラクタコードを引数に取り，レイヤ(PreRenderedFontImage)を返す関数であること
+	 *                   function(ch) { return layer; }
+	 */
+	function savePreRenderedFont(storage, characters, callback);
+}
+
+/**
+ * フォントイメージ（※このクラスは実際には存在しません！）
+ *
+ * callbackで返すレイヤオブジェクトに付加する追加情報を定義します。
+ * 普通のレイヤオブジェクトに対して，値を代入して渡してください。
+ * レイヤの画像は(0,0)-(blackbox_x-1,blackbox_y-1)の領域のα情報のみ参照され，65段階（0～64）にリサンプルされます。
+ *
+ * callbackの返り値として同じインスタンスを何度も使いまわしても問題ありません。
+ */
+class PreRenderedFontImage extends Layer
+{
+	var blackbox_x; //< GLYPHMETRICS.gmBlackBoxX
+	var blackbox_y; //< GLYPHMETRICS.gmBlackBoxY
+	var origin_x;   //< GLYPHMETRICS.gmptGlyphOrigin.x
+	var origin_y;   //< GLYPHMETRICS.gmptGlyphOrigin.y
+	var inc_x;      //< GLYPHMETRICS.gmCellIncX
+	var inc_y;      //< GLYPHMETRICS.gmCellIncY
+	var inc;        //< GetTextExtentPoint32 の返すサイズの SIZE.cx
+}
+
+/**
+ * レイヤ拡張
+ */
+class Layer
+{
+	/**
+	 * System.savePreRenderedFont用の文字を描画する
+	 * @param ch   キャラクタコード
+	 *
+	 * 自分自身のオブジェクトの PreRenderedFontImage のプロパティを更新します
+	 */
+	function drawGlyph(ch);
+
+	/**
+	 * グリフ情報を設定する
+	 * @param ch   キャラクタコード
+	 *
+	 * 自身のオブジェクトの PreRenderedFontImage のプロパティのみを更新します
+	 * （drawGlyph のグリフ画像を描画しない関数です）
+	 */
+	function setGlyphInfo(ch);
+}
+

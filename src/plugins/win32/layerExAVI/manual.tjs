@@ -1,0 +1,57 @@
+/**
+ * 擬似コードによるマニュアル
+ */
+class Layer {
+
+	/**
+	 * AVI ファイルを準備する
+	 * @param filename ファイル名
+	 * @param fps FPS指定
+	 */
+	function openAVI(filename, fps);
+
+	/**
+	 * ダイアログを開いて 圧縮設定を行なってから、AVIファイルを準備する
+	 * @param filename ファイル名
+	 * @param fps FPS指定
+         * @return 圧縮設定ダイアログでキャンセルを押して抜けた場合はfalse
+	 */
+	function openAVI(filename, fps);
+
+	/**
+	 * AVIファイルに1フレーム記録する
+	 * @param frame フレーム番号
+	 */
+	function recordAVI(frame);
+	
+	/**
+	 * AVI ファイルを閉じる
+	 */
+	function closeAVI();
+
+	/**
+	 * WAV録音準備
+	 * @param filename 保存ファイル名
+	 * @param channel チャンネル
+	 * @param rate レート
+	 * @param bits ビット数
+	 * @param interval 取得タイミング
+	 */
+	function openWAV(filename, channel, rate, bits, interval);
+
+	/**
+	 * WAV録音開始
+	 */
+	function startWAV();
+
+	/**
+	 * WAV録音停止
+	 */
+	function stopWAV();
+
+	/**
+	 * WAV録音終了
+	 */
+	function closeWAV() {
+};
+

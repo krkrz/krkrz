@@ -1,0 +1,57 @@
+/**
+ * 吉里吉里用 Direct3D drawdevice クラス
+ *
+ * Direct3D で複数の吉里吉里プライマリレイヤを配置可能な drawdevice です
+ */
+class DrawDeviceD3D {
+
+	property interface; //< drawdevice 情報（内部参照用）。読み出し専用
+	
+	/**
+	 * コンストラクタ
+	 * @param width 描画領域横幅
+	 * @param width 描画領域縦幅
+	 * 縦幅と横幅は従来的機構での primaryLayer の width/height に相当するものです。
+	 * 作成されたプライマリレイヤ(複数)はすべてここで指定した領域に対して
+	 * 引き延ばし表示されます。
+	 * 例:
+	 *     drawDevice = new DrawDeviceD3D(800,400);
+	 *     base1 = new Layer(this, null); base1.setSize(800,400); // 画面と同じ解像度
+	 *     base2 = new Layer(this, null); base1.setSize(400,200); // 画面の半分の解像度
+	 *     base3 = new Layer(this, null); base1.setSize(800,200); // 縦だけ解像度半分
+	 */
+	function DrawDeviceD3D(width, height);
+
+	property width;  //< 描画領域横幅
+	property height; //< 描画領域縦幅
+
+	/**
+	 * 描画領域の設定
+	 * @param width 描画領域横幅
+	 * @param width 描画領域縦幅
+	 */
+	function setSize(width, height);
+	
+	property destWidth;  //< 実描画領域横幅
+	property destHeight; //< 実描画領域縦幅
+
+	/*
+	 * プライマリレイヤの標準の visible
+	 * プライマリレイヤを生成時に表示するかどうかを指定します。
+	 */
+	property defaultVisible;
+	
+	/**
+	 * プライマリレイヤの表示状態の指定
+	 * @param id プライマリレイヤの登録ID
+	 * @param visible 表示状態
+	 */
+	function setVisible(id, visible);
+	
+	/**
+	 * プライマリレイヤの表示状態の指定
+	 * @param id プライマリレイヤの登録ID
+	 * @return visible 表示状態
+	 */
+	function getVisible(id);
+};

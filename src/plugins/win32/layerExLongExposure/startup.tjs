@@ -1,0 +1,36 @@
+Debug.console.visible = true;
+Debug.controller.visible = true;
+var dm = Debug.message;
+try {
+	Plugins.link("bin/layerExLongExposure-d.dll");
+} catch {
+	Plugins.link("bin/layerExLongExposure.dll");
+}
+
+var win = new Window(), lay;
+win.add(lay = new Layer(win, null));
+
+var w = 640, h = 480;
+lay.setImageSize(w, h);
+lay.initExposure();
+
+for (var i = 1; i <= 4; i++) {
+	lay.loadImages("snap"+i);
+	lay.snapExposure();
+}
+
+var stat = lay.statExposure();
+with (stat) {
+	dm(.min_r, .max_r);
+	dm(.min_g, .max_g);
+	dm(.min_b, .max_b);
+	dm(.min_a, .max_a);
+
+//	.min_r = .max_r = 0;
+//	.min_g = .max_g = 0;
+//	.min_b = .max_b = 0;
+}
+
+lay.copyExposure(stat);
+lay.saveLayerImage("result.bmp", "bmp24");
+

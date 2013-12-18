@@ -1,0 +1,178 @@
+class BinaryStream
+{
+	/**
+	 * コンストラクタ／デストラクタ
+	 */
+	function BinaryStream(storage, mode) { if (storage != "") open(storage, mode); }
+	function finalize() { if (isvalid this) close(), setFilter(); }
+
+	/**
+	 * ストレージを開く
+	 * @param storage 対象ストレージ
+	 * @param mode    モード指定(bsRead, bsWrite, bsAppend, bsUpdate)
+	 */
+	function open(storage, mode);
+
+	/**
+	 * オープン中のストレージを閉じる
+	 */
+	function close();
+
+	/**
+	 * 指定バイト読み込む
+	 * @param size 読み込むサイズ（バイト）
+	 * @return     読み込んだデータ（octet形式） 終端などで読めなかった場合はvoid（length=0のoctetではないので注意）
+	 */
+	function read(size);
+	/**
+	 * データを書き込む
+	 * @param data 書き込むデータ（octet形式または文字列）
+	 * @return     書き込んだバイト数
+	 *
+	 * dataが文字列の場合は wchar で書き込まれます（コード変換はサポートされません）
+	 */
+	function write(data);
+
+	/**
+	 * {1,2,4,8}バイトを数値として読み込む
+	 * @return     読み込んだ数値 / 終端などで読めなかった場合はvoid
+	 * ※数値は8byte以外はunsigned読み込みになります（符号拡張されません）
+	 * ※voidを返すのは1byteも読めなかった場合のみとなります
+	 *   1byte以上指定byte未満しか読めなかった場合は足りない部分を0で埋めた値が返されるので注意
+	 */
+	function readI8();			//< 1byte 読み込み
+
+	function readI16LE();		//< 2byte 読み込み (Little Endian)
+	function readI32LE();		//< 4byte 読み込み (Little Endian)
+	function readI64LE();		//< 8byte 読み込み (Little Endian)
+
+	function readI16BE();		//< 2byte 読み込み (Big Endian)
+	function readI32BE();		//< 4byte 読み込み (Big Endian)
+	function readI64BE();		//< 8byte 読み込み (Big Endian)
+
+
+	/**
+	 * {1,2,4,8}バイトで数値を書き込む
+	 * @param num 書き込む数値
+	 * @return    書き込んだバイト数
+	 */
+	function writeI8(num);			//< 1byte 書き込み
+
+	function writeI16LE(num);		//< 2byte 書き込み (Little Endian)
+	function writeI32LE(num);		//< 4byte 書き込み (Little Endian)
+	function writeI64LE(num);		//< 8byte 書き込み (Little Endian)
+
+	function writeI16BE(num);		//< 2byte 書き込み (Big Endian)
+	function writeI32BE(num);		//< 4byte 書き込み (Big Endian)
+	function writeI64BE(num);		//< 8byte 書き込み (Big Endian)
+
+	/**
+	 * 別のストレージからデータをコピー
+	 * @param storage コピー元のストレージ（現在開いているストレージと同じ場合は例外）
+	 * @param elm     動作指定用の辞書（in/out）内容は下記：（省略時は単純コピー，[out]なし）
+	 *        offset  :[in] コピー元ストレージの読み込み開始オフセット（省略時先頭）
+	 *        length  :[in] コピー元ストレージの最大読み込みサイズ（省略時ファイルサイズ）
+	 *
+	 *        filter  :[in] フィルタ処理を行う関数名（省略時はフィルタ処理なし）
+	 *        fparam  :[in] フィルタに渡すパラメータ値(int)
+	 *
+	 *        nocopy  :[in] trueを指定すると出力を書き込まない（省略時はfalse，hashのみ取得したい場合などに指定）
+	 *        md5     :[in] trueを指定すると出力のMD5ダイジェストを返す
+	 *
+	 *        hash    :[out]読み込んだファイルのハッシュ値（Adler32）
+	 *        read    :[out]読み込んだバイト数
+	 *        digest  :[out]書き込んだデータのMD5ダイジェスト（octet） ※md5がtrueの場合にのみ有効
+	 * @return              書き込んだバイト数
+	 *
+	 * 対象ストレージのoffsetからlength分の内容が，現在のストリームのポジションから書き込まれます
+	 * フィルタの詳細は setFilter() の説明を参照してください
+	 */
+	function copy(storage, elm = void);
+
+	/**
+	 * 別のストレージからデータを圧縮しつつコピー
+	 * @param storage コピー元のストレージ（現在開いているストレージと同じ場合は例外）
+	 * @param elm     動作指定用の辞書（in/out）内容は copy() と同じものに加えて下記：
+	 *        comp_lv :[in] zlibによる圧縮レベル（1～9）省略時，またはelmそのものの指定がない場合は 9
+	 * @return              書き込んだバイト数
+	 *
+	 * 対象ストレージを zlib/deflate で圧縮しつつ，現在のストリームのポジションから書き込みます
+	 * フィルタ関数は圧縮前のバイナリに対して適用されます
+	 */
+	function compress(storage, elm = void);
+
+	/**
+	 * 別のストレージからデータを展開しつつコピー
+	 * @param storage コピー元のストレージ（現在開いているストレージと同じ場合は例外）
+	 * @param elm     動作指定用の辞書（in/out）内容は copy() と同じ
+	 * @return        書き込んだバイト数
+	 *
+	 * 対象ストレージを zlib/inflate で展開しつつ，現在のストリームのポジションから書き込みます
+	 * 展開に失敗すると例外が発生します
+	 * フィルタ関数は展開後のバイナリに対して適用されます
+	 * hash[out] は展開後／フィルタ後のバイナリに対して計算されます
+	 */
+	function decompress(storage, elm = void);
+
+	/**
+	 * プログレスコールバックを設定する
+	 * @param callback コールバック関数 function(storage, read_size) { return true_if_cancel; }
+	 *                 voidの場合は解除
+	 *
+	 * copy/compress/decompress の処理中からコールバックする関数を設定します。
+	 * コールバックは（現在の実装では） 1MiB 読む毎時および最後まで読んだ時に呼び返されます。
+	 * コールバックから true を返すと処理がキャンセルできます。
+	 * ※コールバックの間隔は変更される場合があります
+	 *
+	 * TJS的には処理が固まってしまうのは仕様ですが，別途 windowExProgress プラグインなどを
+	 * 使用することで，ユーザーからのキャンセルを受け付けられるようになります。
+	 */
+	function setProgressCallback(callback);
+
+	/**
+	 * フィルタDLLを設定する
+	 * @param dll 対象のDLLファイル（voidの場合は設定解除）
+	 *
+	 * copy/compress/decompressのデータに対して外部DLLを使用したフィルタを設定します
+	 * elm.filter に関数名を指定た場合に，このDLL中の下記の形式でエクスポートされた関数をフィルタとして使用します
+	 * void (__stdcall *FilterProc)(uint32 hash, uint64 offset, void *buffer, uint32 length);
+	 */
+	function setFilter(dll);
+
+	
+	/**
+	 * ストリームのポジションを変更する
+	 * @param pos    位置
+	 * @param whence 基準位置(bsSeekSet, bsSeekCur, bsSeekEnd)
+	 * @return       移動後の位置
+	 */
+	function seek(pos, whence);
+
+	/**
+	 * ストリームの現在のポジションを取得する
+	 * @return 位置
+	 */
+	function tell();
+
+	/**
+	 * 現在開いているストレージ（開いていない場合はvoid）
+	 */
+	property storage { getter; }
+
+	/**
+	 * 現在のモード（開いていない場合は-1）
+	 */
+	property mode    { getter; }
+}
+
+// 定数
+
+BinaryStream.bsRead   = 0;
+BinaryStream.bsWrite  = 1;
+BinaryStream.bsAppend = 2;
+BinaryStream.bsUpdate = 3;
+
+BinaryStream.bsSeekSet = 0;
+BinaryStream.bsSeekCur = 1;
+BinaryStream.bsSeekEnd = 2;
+

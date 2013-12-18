@@ -1,0 +1,692 @@
+/* ---------------------------------------------------------------
+ * アフィン状態を保持できるレイヤ
+ * loadImages または assignImages で割り当てた画像を回転・拡大指定して表示できる。
+ * 回転・拡大指定を行なった場合、ぼかしなどの他の画像面の操作は
+ * キャンセルされるので注意が必要である。
+ *
+ * 以下の操作は読み込まれている内部画像に対して作用する
+ *
+ * adjustGamma()
+ * affineBlend()
+ * affineCopy()
+ * affinePile()
+ * assignImages()
+ * blendRect()
+ * colorRect()
+ * copyRect()
+ * doBoxBlur()
+ * doGrayScale()
+ * drawText()
+ * fillRect()
+ * flipLR()
+ * flipUD()
+ * independMainImage()
+ * independProvinceImage()
+ * loadImages()
+ * operateRect();
+ * operateStretch();
+ * setPos();
+ * setSize();
+ * setSizeToImageSize();
+ * setImageSize();
+ * setImagePos();
+ *
+ * 以下のプロパティも内部画像に対して作用する
+ * face
+ * font
+ * holdAlpha
+ */
+class AffineLayer extends Layer {
+
+    var _image;    ///< イメージ画像ロード用
+
+    var _initOpacity; ///< 標準のopacity
+    var _initType;    ///< 標準のtype
+    
+    var _afn_offx; ///< アフィン変換中心座標X
+    var _afn_offy; ///< アフィン変換中心座標Y 
+    var _rotate;   ///< 回転角度
+    var _zoomx;    ///< X方向ズーム値
+    var _zoomy;    ///< Y方向ズーム値
+    var _doOffset; ///< オフセット変換実行
+    var _doAffine; ///< アフィン変換実行
+    var _ax;       ///< アフィン変換後X位置補正
+    var _ay;       ///< アフィン変換後Y位置補正
+
+    var _act_x;    ///< アクション系モジュール用座標補正
+    var _act_y;    ///< アクション系モジュール用座標補正
+
+    function AffineLayer(win,par=null) {
+        super.Layer(win,par);
+        _image = new global.Layer(win,this);
+        _afn_offx = AFFINEOFFSET_CENTER;
+        _afn_offy = AFFINEOFFSET_CENTER;
+        _doAffine = false;
+        _doOffset = false;
+        _initOpacity = opacity;
+        _initType    = type;
+        _rotate = 0;
+        _zoomx = 100;
+        _zoomy = 100;
+        _act_x = 0;
+        _act_y = 0;
+    }
+    
+    /**
+     * ファイナライザのっとり
+     */
+    function finalize() {
+        invalidate _image;
+        super.finalize();
+    }
+    
+    /**
+     * オフセット位置の再計算指示
+     */
+    function calcOffset() {
+        _doOffset = true;
+        update();
+    }
+    
+    /**
+     * アフィンの再計算指示
+     */
+    function calcAffine() {
+        _doAffine = true;
+        _doOffset = true;
+        update();
+    }
+    
+    /**
+     * 初期化処理
+     * 登録済み画像の状態に戻す
+     */
+    function reset() {
+        opacity = _initOpacity;
+        type    = _initType;
+        _afn_offx = AFFINEOFFSET_CENTER;
+        _afn_offy = AFFINEOFFSET_CENTER;
+        _rotate = 0;
+        _zoomx = 100;
+        _zoomy = 100;
+        _act_x = 0;
+        _act_y = 0;
+        calcAffine();
+    }
+
+    /**
+     * アフィン変換のオフセット基準を指定
+     * @param x オフセット位置X
+     * @param y オフセット位置Y
+     * AFFINEOFFSET_CENTER/TOP/BOTTOM/RIGHT/LEFT が指定可能。デフォルトは AFFINEOFFSET_CENTER
+     */
+    function setAffineOffset(x,y) {
+        afx = x;
+        afy = y;
+    }
+    
+    /**
+     * ペイント前処理
+     */
+    function onPaint() {
+        super.onPaint(...);
+        if (_doAffine || _doOffset) {
+            if (_doAffine) {
+                
+                if (_rotate == 0 && _zoomx == 100 && _zoomy == 100) {
+                    //Debug.message("no affine:" + width + ":" + height);
+                    _ax = 0;
+                    _ay = 0;
+                    super.assignImages(_image);
+                    super.setSize(_image.width, _image.height);
+                } else {
+                    //Debug.message("do affine:" + _rotate + " : " + _zoomx + " : " + _zoomy);
+                    // 回転角と拡大率からAffine値計算
+                    var rad, sn, cs, rad, stepx, stepy;
+                    rad = (Math.PI * _rotate)/180.0;
+                    sn = Math.sin(rad);
+                    cs = Math.cos(rad);
+                    stepx = _zoomx/100.0;
+                    stepy = _zoomy/100.0;
+                    
+                    var dxh = stepx*cs;
+                    var dxv = stepx*sn;
+                    var dyh = -stepy*sn;
+                    var dyv = stepy*cs;
+                    
+                    var w, h;
+                    switch (_afn_offx) {
+                    case AFFINEOFFSET_CENTER: w = _image.width/2; break;
+                    case AFFINEOFFSET_LEFT:   w = 0;              break;
+                    case AFFINEOFFSET_RIGHT:  w = _image.width;   break;
+                    default:                  w = _afn_offx;      break;
+                    }
+                    switch (_afn_offy) {
+                    case AFFINEOFFSET_CENTER: h = _image.height/2; break;
+                    case AFFINEOFFSET_TOP:    h = 0;               break;
+                    case AFFINEOFFSET_BOTTOM: h = _image.height;   break;
+                    default:                  h = _afn_offy;       break;
+                    }
+                    
+                    // 更新エリア4隅の座標を求める
+                    var x = new Array();
+                    var y = new Array();
+                    var x0 = x[0] = Math.round((-w)*dxh+(-h)*dxv+w);
+                    var y0 = y[0] = Math.round((-w)*dyh+(-h)*dyv+h);
+                    x[1] = Math.round((_image.width-w)*dxh+(_image.height-h)*dxv+w);
+                    y[1] = Math.round((_image.width-w)*dyh+(_image.height-h)*dyv+h);
+                    x[2] = Math.round((-w)*dxh+(_image.height-h)*dxv+w);
+                    y[2] = Math.round((-w)*dyh+(_image.height-h)*dyv+h);
+                    x[3] = Math.round((_image.width-w)*dxh+(-h)*dxv+w);
+                    y[3] = Math.round((_image.width-w)*dyh+(-h)*dyv+h);
+                    
+                    // 最大値と最小値を取得
+                    for (var i=3; i>0; i--) {
+                        for (var j=0; j<i; j++) {
+                            if ( x[j]>x[j+1] ) { x[j] <-> x[j+1]; }
+                            if ( y[j]>y[j+1] ) { y[j] <-> y[j+1]; }
+                        }
+                    }
+                    
+                    // 座標補正
+                    // 最大値と最小値でできる四角形を返す
+                    _ax = x[0];
+                    _ay = y[0];
+                    
+                    //Debug.message(dxh,dyh,dxv,dyv);
+                    
+                    w = x[3] - x[0];
+                    h = y[3] - y[0];
+                    if (w == 0 || h == 0) {
+                        super.fillRect(0,0,super.width,super.height,neutralColor);
+                    } else {
+                        // 画像コピー
+                        super.setImageSize(w, h);
+                        super.setSize(w, h);
+                        var tx = x0 - x[0];
+                        var ty = y0 - y[0];
+                        super.affineCopy(_image,0,0,_image.width,_image.height,true,dxh,dyh,dxv,dyv,tx,ty,stCubic|stRefNoClip,true);
+                        //super.affineCopy(_image,0,0,_image.width,_image.height,true,dxh,dyh,dxv,dyv,tx,ty,stNearest,true);
+                    }
+                }
+                _doAffine = false;
+            }
+            if (_doOffset) {
+                super.setPos(_image.left + _ax + _act_x, _image.top + _ay + _act_y);
+                _doOffset = false;
+            }
+        }
+    }
+    
+    /// 回転量（度）
+    property rotate {
+        setter(v) {
+            _rotate = v;
+            calcAffine();
+        }
+        getter() {
+            return _rotate;
+        }
+    }
+    
+    /// ズームX（％指定）
+    property zoomx {
+        setter(v) {
+            _zoomx = v;
+            calcAffine();
+        }
+        getter() {
+            return _zoomx;
+        }
+    }
+    
+    /// ズームY（％指定）
+    property zoomy {
+        setter(v) {
+            _zoomx = v;
+            calcAffine();
+        }
+        getter() {
+            return _zoomy;
+        }
+    }
+    
+    // ズーム（％指定）
+    property zoom {
+        setter(v) {
+            _zoomx = v;
+            _zoomy = v;
+            calcAffine();
+        }
+    }
+
+    property afx {
+        setter(v) {
+            if (typeof v == "String") {
+                if (v == "center" || v == "void") {
+                    _afn_offx = AFFINEOFFSET_CENTER;
+                } else if (v == "left" || v == "top") {
+                    _afn_offx = AFFINEOFFSET_LEFT;
+                } else if (v == "right" || v == "bottom") {
+                    _afn_offx = AFFINEOFFSET_RIGHT;
+                } else {
+                    _afn_offx = (int)v;
+                }
+            } else if (typeof v == "void") {
+                _afn_offx = AFFINEOFFSET_CENTER;
+            } else {
+                _afn_offx = (int)v;
+            }
+            calcAffine();
+        }
+        getter() {
+            return _afn_offx;
+        }
+    }
+
+    property afy {
+        setter(v) {
+            if (typeof v == "String") {
+                if (v == "center" || v == "void") {
+                    _afn_offy = AFFINEOFFSET_CENTER;
+                } else if (v == "left" || v == "top") {
+                    _afn_offy = AFFINEOFFSET_LEFT;
+                } else if (v == "right" || v == "bottom") {
+                    _afn_offy = AFFINEOFFSET_RIGHT;
+                } else {
+                    _afn_offy = (int)v;
+                }
+            } else if (typeof v == "void") {
+                _afn_offy = AFFINEOFFSET_CENTER;
+            } else {
+                _afn_offy = (int)v;
+            }
+            calcAffine();
+        }
+        getter() {
+            return _afn_offy;
+        }
+    }
+    
+    /**
+     * ズーム量を指定する
+     * @param zx 横ズーム
+     * @parma zy 縦ズーム。省略すると横と同じ値
+     */
+    function setZoom(zx, zy=void) {
+        //Debug.message("setZoom:" + zx + ":" + zy);
+        if (zy == void) {
+            zy = zx;
+        }
+        _zoomx = zx;
+        _zoomy = zy;
+        calcAffine();
+    }
+    
+    /**
+     * アクション用移動差分指定
+     * @param x アクション移動差分X方向
+     * @param y アクション移動差分Y方向
+     */
+    function setActionOffset(x, y) {
+        this._act_x = x;
+        this._act_y = y;
+        calcOffset();
+    }
+
+    // ------------------------------------------------------------------------
+
+    function adjustGamma(rgamma=1.0, rfloor=0, rceil=255, ggamma=1.0, gfloor=0, gceil=255, bgamma=1.0, bfloor=0, bceil=255) {
+        _image.adjustGamma(...);
+        calcAffine();
+    }
+
+    function affineBlend(src, sleft, stop, swidth, sheight, affine, A, B, C, D, E, F, opa=255, type=stNearest) {
+        _image.affineBlend(...);
+        calcAffine();
+    }
+
+    function affineCopy(src, sleft, stop, swidth, sheight, affine, A, B, C, D, E, F, type=stNearest, clear=false) {
+        _image.affineCopy(...);
+        calcAffine();
+    }
+
+    function affinePile(src, sleft, stop, swidth, sheight, affine, A, B, C, D, E, F, opa=255, type=stNearest) {
+        _image.affinePile(...);
+        calcAffine();
+    }
+
+    function blendRect(dleft, dtop, src, sleft, stop, swidth, sheight, opa=255) {
+        _image.blendRect(...);
+        calcAffine();
+    }
+    
+    /**
+     * 画像のコピー(Layerの機能をオーバライド)
+     * @param src コピー元のレイヤ
+     */
+    function assignImages(src) {
+        if (src instanceof AffineLayer) {
+            _image.assignImages(src._image);
+            _rotate = src._rotate;
+            _zoomx  = src._zoomx;
+            _zoomy  = src._zoomy;
+            _act_x  = src._act_x;
+            _act_y  = src._act_y;
+            calcAffine();
+        } else {
+            _image.assignImages(src);
+            reset();
+        }
+    }
+
+    function colorRect(left, top, width, height, value, opa=255) {
+        _image.colorRect(...);
+        calcAffine();
+    }
+
+    function copyRect(dleft, dtop, src, sleft, stop, swidth, sheight) {
+        _image.copyRect(...);
+        calcAffine();
+    }
+
+    function doBoxBlur(xblur=1, yblur=1) {
+        _image.doBoxBlur(...);
+        calcAffine();
+    }
+
+    function doGrayScale() {
+        _image.doGrayScale();
+        calcAffine();
+    }
+    
+    function drawText(x, y, text, color, opa=255, aa=true, shadowlevel=0, shadowcolor=0x000000, shadowwidth=0, shadowofsx=0, shadowofsy=0) {
+        _image.drawText(...);
+        calcAffine();
+    }
+
+    function fillRect(left, top, width, height, value) {
+        _image.fillRect(...);
+        calcAffine();
+    }
+
+    function flipLR() {
+        _image.flipLR();
+        calcAffine();
+    }
+
+    function flipUD() {
+        _image.flipUD();
+        calcAffine();
+    }
+
+    function independMainImage() {
+        _image.independMainImage();
+    }
+
+    function independProvinceImage() {
+        _image.independProvinceImage();
+    }
+    
+    /**
+     * 画像の読み込み(Layerの機能をオーバライド)
+     * @param image 読み込む画像ストレージ
+     * @param colorKey 読み込む画像のカラーキー
+     * @return タグ情報の辞書配列
+     */
+    function loadImages(image,colorKey=clNone) {
+        var ret = _image.loadImages(...);
+        if (ret != null) {
+            if (ret.mode !== void) {
+                _initType = global.imageTagLayerType[ret.mode];
+            }
+            if (ret.opacity !== void) {
+                _initOpacity = ret.opacity;
+            }
+        }
+        reset();
+        return ret;
+    }
+
+    function operateAffine(src, sleft, stop, swidth, sheight, affine, A, B, C, D, E, F, mode=omAuto, opa=255, type=stNearest) {
+        _image.operateAffine(...);
+        calcAffine();
+    }
+    
+    function operateRect(dleft, dtop, src, sleft, stop, swidth, sheight, mode=omAuto, opa=255) {
+        _image.operateRect(...);
+        calcAffine();
+    }
+
+    function operateStretch(dleft, dtop, dwidth, dheight, src, sleft, stop, swidth, sheight, mode=omAuto, opa=255, type=stNearest) {
+        _image.operateStretch(...);
+        calcAffine();
+    }
+
+    function pileRect(dleft, dtop, src, sleft, stop, swidth, sheight, opa=255) {
+        _image.pileRect(...);
+        calcAffine();
+    }
+
+    function piledCopy(dleft, dtop, src, sleft, stop, swidth, sheight) {
+        _image.piledCopy(...);
+        calcAffine();
+    }
+
+    /**
+     * 配置位置指定
+     */
+    function setImagePos(l, t, w, h) {
+        _image.setImagePos(...);
+        calcOffset();
+    }
+
+    /**
+     * サイズの指定(Layerの機能をオーバライド)
+     * @param w 横幅
+     * @param h 縦幅
+     */
+    function setImageSize(w, h) {
+        _image.setImageSize(...);
+    }
+    
+    /**
+     * 配置位置指定
+     */
+    function setPos(l, t, w, h) {
+        _image.setPos(l,t,w,h);
+        calcOffset();
+    }
+
+    /**
+     * サイズの指定(Layerの機能をオーバライド)
+     * @param w 横幅
+     * @param h 縦幅
+     */
+    function setSize(w, h) {
+        _image.setSize(w, h);
+    }
+
+    /**
+     * サイズをイメージにあわせる(Layerの機能をオーバライド)
+     */
+    function setSizeToImageSize() {
+        _image.setSizeToImageSize();
+    }
+
+    function stretchBlend(dleft, dtop, dwidth, dheight, src, sleft, stop, swidth, sheight, opa=255, type=stNearest) {
+        _image.stretchBlend(...);
+        calcAffine();
+    }
+
+    function stretchCopy(dleft, dtop, dwidth, dheight, src, sleft, stop, swidth, sheight, type=stNearest) {
+        _image.stretchCopy(...);
+        calcAffine();
+    }
+
+    function stretchPile(dleft, dtop, dwidth, dheight, src, sleft, stop, swidth, sheight, opa=255, type=stNearest) {
+        _image.stretchPile(...);
+        calcAffine();
+    }
+    
+    property left {
+        setter(v) {
+            _image.left = v;
+            calcOffset();
+        }
+        getter() {
+            return _image.left;
+        }
+    }
+    
+    property top {
+        setter(v) {
+            _image.top = v;
+            calcOffset();
+        }
+        getter() {
+            return _image.top;
+        }
+    }
+
+    property width {
+        setter(v) {
+            _image.width = v;
+            calcOffset();
+        }
+        getter() {
+            return _image.width;
+        }
+    }
+    
+    property height {
+        setter(v) {
+            _image.height = v;
+            calcOffset();
+        }
+        getter() {
+            return _image.height;
+        }
+    }
+
+    property imageLeft {
+        setter(v) {
+            _image.imageLeft = v;
+            calcOffset();
+        }
+        getter() {
+            return _image.imageLeft;
+        }
+    }
+    
+    property imageTop {
+        setter(v) {
+            _image.imageTop = v;
+            calcOffset();
+        }
+        getter() {
+            return _image.imageTop;
+        }
+    }
+
+    property imageWidth {
+        setter(v) {
+            _image.imageWidth = v;
+            calcOffset();
+        }
+        getter() {
+            return _image.imageWidth;
+        }
+    }
+    
+    property imageHeight {
+        setter(v) {
+            _image.imageHeight = v;
+            calcOffset();
+        }
+        getter() {
+            return _image.imageHeight;
+        }
+    }
+
+    property face {
+        setter(v) {
+            _image.face = v;
+        }
+        getter() {
+            return _image.face;
+        }
+    }
+
+    property font {
+        setter(v) {
+            _image.font = v;
+        }
+        getter() {
+            return _image.font;
+        }
+    }
+
+    property holdAlpha {
+        setter(v) {
+            _image.holdAlpha = v;
+        }
+        getter() {
+            return _image.holdAlpha;
+        }
+    }
+
+    property neutralColor {
+        setter(v) {
+            _image.neutralColor = v;
+        }
+        getter() {
+            return _image.neutralColor;
+        }
+    }
+
+    // ----------------------------------------------------------------
+    // LayerEx 対応
+
+    function light(brightness, contrast) {
+        _image.light(...);
+        calcAffine();
+    }
+
+    function colorize(hue, sat, blend) {
+        _image.colorize(...);
+        calcAffine();
+    }
+    
+    function noise(level) {
+        _image.noise(...);
+        calcAffine();
+    }
+    
+    function doDropShadow(dx=10, dy=10, blur=3, shadowColor=0x000000, shadowOpacity=200) {
+        _image.doDropShadow(...);
+        calcAffine();
+    }
+
+    function doBlurLight(blur=10, blurOpacity=128, lightOpacity=200, lightType=ltPsHardLight) {
+        _image.doBlurLight(...);
+        calcAffine();
+    }
+
+    function tileRect(left, top, width, height, tile, x=0, y=0) {
+        _image.tileRect(...);
+        calcAffine();
+    }
+
+    function fillOperateRect(left, top, width, height, color, mode) {
+        _image.fillOperateRect(...);
+        calcAffine();
+    }
+};
+
+// 定数定義
+AffineLayer.AFFINEOFFSET_CENTER = -100000;
+AffineLayer.AFFINEOFFSET_TOP    = -100001;
+AffineLayer.AFFINEOFFSET_BOTTOM = -100002;
+AffineLayer.AFFINEOFFSET_LEFT   = -100001;
+AffineLayer.AFFINEOFFSET_RIGHT  = -100002;

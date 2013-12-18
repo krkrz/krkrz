@@ -1,0 +1,81 @@
+/**
+ * 疑似コードによるマニュアル
+ */
+
+/// 拡張されたクリップボードフォーマット定数
+global.cbfText = 1;     //> テキスト
+global.cbfBitmap = 2;   //> ビットマップ
+global.cbfTJS = 3;      //> TJS式
+
+
+/// クリップボードクラスの拡張
+class Clipboard
+{
+  /**
+   * 指定のフォーマットがクリップボードに格納されているかチェックする
+   * @param format フォーマット定数
+   * @return 格納されていればtrue
+   */
+  function hasFormat(format);
+
+  /**
+   * クリップボードにテキストを登録する、もしくは取り出す
+   * 取得に失敗したらvoidを返す。
+   * @param text 登録するテキスト
+   * @return 取り出したテキスト
+   */
+  property asText;
+
+  /**
+   * クリップボードにTJS式を登録する、もしくは取り出す
+   * 取得に失敗したらvoidを返す。
+   * TJS式は、メンバー「type」(文字列)および「body」(型を問わない)を持った辞書で無ければならない。
+   * それ以外の形式のデータを登録しようとすると登録が失敗する。
+   * @param exp 登録するTJS式
+   * @return 取り出したTJS式
+   */
+  property asTJS;
+
+  /**
+   * レイヤの内容をビットマップとしてクリップボードにセットする。
+   * 吉里吉里以外のアプリへ引き渡す場合、α値は255にクリアされる。(事前にレイヤを合成してαを無くしておくことを推奨)
+   * 吉里吉里へ引き渡す場合、α値はそのまま受け継がれる。
+   * @param layer レイヤ
+   */
+  function setAsBitmap(layer);
+
+  /**
+   * クリップボードの内容をビットマップとしてレイヤから取得する
+   * @param layer レイヤ
+   * @return 取得に成功したらtrueを返す
+   */
+  function getAsBitmap(layer);
+
+  /**
+   * クリップボードに複数形式のデータを一括登録する
+   * データは複数の「データ形式:データ本体」の対を辞書で指定する。
+   * 対応しているデータは以下の通り
+   * - text: テキストデータ
+   * - tjs: TJS式
+   * - bitmap: レイヤ
+   * @param data データを辞書形式で指定する。
+   */
+  function setMultipleData(data);
+}
+
+
+/// Windowクラスの拡張
+class Window
+{
+  /**
+   * クリップボード更新の監視をするかどうか設定する(デフォルトはオフ)
+   * @param s 監視する？
+   * @return 監視する？
+   */
+  property clipboardWatchEnabled;
+
+  /**
+   * クリップボードが更新された時に呼び出されるフック関数
+   */
+  function onDrawClipboard();
+}

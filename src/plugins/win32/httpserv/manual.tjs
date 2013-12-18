@@ -1,0 +1,59 @@
+/**
+ * 擬似コードによるマニュアル
+ */
+
+class SimpleHTTPServer {
+	/**
+	 * コンストラクタ
+	 * @param port    使用するポート番号（0で自動割り当て）
+	 * @param timeout onRequestコールバックのタイムアウト時間(sec)
+	 */
+	function SimpleHTTPServer(port = 0, timeout = 10, codepage);
+
+	property port { getter; }
+	property timeout { getter; }
+	property codepage { getter; setter; } // セッション毎のコードページ変更ができないので途中変更は推奨されない
+
+	/**
+	 * サービス開始
+	 * @return ポート番号
+	 */
+	function start();
+
+	/**
+	 * サービス停止
+	 */
+	function start();
+
+	/**
+	 * リクエスト処理（イベント）
+	 * @param request = %[
+	 *     method:  メソッドの種類（GET/POST/...）
+	 *     path:    リクエストパス
+	 *     request: 生リクエスト（%xx未デコード，?以降も含む）
+	 *     header:  %[ リクエストヘッダ（ブラウザの情報等） ]
+	 *     form:    %[ フォームデータ ]
+	 *         ];
+	 * @return response = %[
+	 *     status:ステータスコード（省略可能，エラーが無ければ自動で200）
+	 *     content_type: Content-Type名
+	 *     error_type:エラーの種類（text/file/binaryが無い場合に有効）
+	 *     error_desc:エラーの説明（text/file/binaryが無い場合に有効）
+	 *     redirect: リダイレクトする場合のURI（省略可能）
+	 *
+	 *   以下は排他（どれかひとつ，上から優先）
+	 *     text:返すテキスト（codepageで自動エンコードされる）
+	 *     file:返すファイル
+	 *     binary:返すバイナリ（ArrayまたはOctet）
+	 *         ];
+	 */
+	function onRequest();
+}
+// コードページ（static value）
+SimpleHTTPServer.cpACP  = CP_ACP;
+SimpleHTTPServer.cpOEM  = CP_OEMCP;
+SimpleHTTPServer.cpUTF8 = CP_UTF8;
+SimpleHTTPServer.cpSJIS = CP_932;
+SimpleHTTPServer.cpEUC  = CP_20932; //51932
+SimpleHTTPServer.cpJIS  = CP_50220;
+

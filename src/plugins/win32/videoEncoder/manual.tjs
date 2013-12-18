@@ -1,0 +1,57 @@
+/**
+ * 擬似コードによるマニュアル
+ */
+class videoEncoder {
+
+	/**
+	 * 動画圧縮クオリティ
+	 * 0-100 デフォルト 50
+	 */
+	property videoQuality;
+
+	/**
+	 * 最大キーフレーム間隔(秒)
+	 * デフォルト 5
+	 */
+	property secondPerKey;
+
+	/**
+	 * フレームスケール
+	 * videoTimeScale / videoTimeRate が1フレームの時間
+	  * デフォルト 1
+	 */
+	property videoTimeScale;
+	/**
+	 * フレームレート
+	 * videoTimeScale / videoTimeRate が1フレームの時間
+	 * デフォルト 30
+	 */
+	property videoTimeRate;
+	/**
+	 * 画像幅
+	 * デフォルト 640
+	 */
+	property videoWidth;
+	/**
+	 * 画像高さ
+	 * デフォルト 480
+	 */
+	property videoHeight;
+
+	//! オープン後のプロパティの変更は受け付けない
+
+	function open( filename );
+	function close();
+	function encodeVideoSample( layer );
+};
+
+// 使用例
+Plugins.link("videoEncoder.dll");
+encoder = new videoEncoder;
+encoder.open("c:\test.wmv");
+for( var i = 0; i < 120; i++ ) {
+	kag.fore.layers[0].XXXX; // レイヤに何かする
+	encoder.encodeVideoSample( kag.fore.layers[0] );
+}
+encoder.close();
+

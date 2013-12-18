@@ -1,0 +1,545 @@
+/**
+ * 擬似記述マニュアル
+ */
+
+/**
+ * Windows ネイティブダイアログを操作するためのクラスです。
+ * APIのラッパ程度の機能しかないので非常に使いにくいですが，
+ * 後述のtjsで記述された WIN32DialogEX を使うと幸せになれます。
+ */
+class WIN32Dialog {
+	/**
+	 * ダイアログテンプレートデータ保持クラス
+	 */
+	class Header {
+		/**
+		 * 内容を設定する
+		 * @param elm 辞書配列
+		 * elm = %[ helpID, exStyle, style, x, y, cx, cy, menu, windowClass, title, pointSize, weight, italic, charset, typeFace ];
+		 * 詳細は DLGTEMPLATEEX の定義を参照のこと
+		 */
+		function store(elm);
+
+		/**
+		 * ダイアログアイテムの個数
+		 */
+		property dlgItems { getter; setter; }
+	}
+	/**
+	 * ダイアログテンプレートアイテムデータ保持クラス
+	 */
+	class Items {
+		/**
+		 * 内容を設定する
+		 * @param elm 辞書配列
+		 * elm = %[ helpID, exStyle, style, x, y, cx, cy, id, windowClass, title ];
+		 * 詳細は DLGITEMTEMPLATEEX の定義を参照のこと
+		 * extraCount と付属データは未実装につき定義できません。
+		 */
+		function store(elm);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param owner イベントコールバック用のオーナーを設定。nullかthisで自分自身へ送る。
+	 */
+	function WIN32Dialog(owner);
+
+	/**
+	 * ダイアログリソースを読み込む
+	 * @param dllfile  dllファイル（ローカルストレージ形式）
+	 * @param resource ダイアログリソース名
+	 */
+	function loadResource(dllfile, resource);
+
+	/**
+	 * ダイアログテンプレートを生成する
+	 * @param header ダイアログテンプレートヘッダ  （WIN32Dialog.Headerクラスのインスタンスであること）
+	 * @param items* ダイアログテンプレートアイテム（WIN32Dialog.Items クラスのインスタンスであること）
+	 */
+	function makeTemplate(header, items*);
+
+	/**
+	 * ダイアログを開く
+	 * @param window 親ウィンドウ(吉里吉里の Window クラス)，省略時またはvoid時は親なし
+	 * あらかじめ makeTemplate でダイアログテンプレートが生成されているか
+	 * または loadResource でダイアログリソースの読み込んでいること
+	 * makeTemplate より loadResource のデータ優先されるので注意
+	 */
+	function open(window);
+	
+	/**
+	 * ダイアログを閉じる
+	 * @param result EndDialog APIに渡す結果値
+	 */
+	function close(result);
+
+	/**
+	 * GetDlgItem のラッパー
+	 * @param id ダイアログアイテムのID
+	 * @return ダイアログアイテムのHWND
+	 */
+	function getItem(id);
+
+	/**
+	 * GetDlgCtrlID のラッパー
+	 * @param hwnd ダイアログアイテムのHWND
+	 * @return ダイアログアイテムのID
+	 */
+	function getItemID(hwnd);
+
+	/**
+	 * GetClassName のラッパー
+	 * @param id ダイアログアイテムのID
+	 * @return ダイアログアイテムのクラス名
+	 */
+	function getItemClassName(id);
+
+	/**
+	 * Get/SetDlgItemInt/Text のラッパー
+	 * @param id    ダイアログアイテムのID
+	 * @param value 設定する値（setの場合のみ）
+	 * @return      取得結果（getの場合のみ）
+	 */
+	function setItemInt(id, value);
+	function getItemInt(id);
+	function setItemText(id, value);
+	function getItemText(id);
+
+	/**
+	 * アイテムの有効・無効を設定・取得する
+	 * @param id    ダイアログアイテムのID
+	 * @param value 有効・無効の設定（setの場合のみ）
+	 * @return      取得結果（getの場合のみ）
+	 */
+	function setItemEnabled(id, value);
+	function getItemEnabled(id);
+
+	/**
+	 * アイテムにフォーカスを設定する
+	 * @param id    ダイアログアイテムのID
+	 */
+	function setItemFocus(id);
+
+	/**
+	 * アイテムの位置・大きさを変更・取得する
+	 * @param id    ダイアログアイテムのID
+	 * @param x     ダイアログアイテムのX座標
+	 * @param y     ダイアログアイテムのY座標
+	 * @param w     ダイアログアイテムの幅
+	 * @param h     ダイアログアイテムの高さ
+	 */
+	function setItemPos( id, x, y);
+	function setItemSize(id, w, h);
+	function getItemLeft(id);
+	function getItemTop(id);
+	function getItemWidth(id);
+	function getItemHeight(id);
+
+	/**
+	 * アイテムにBitmapを設定する
+	 * @param id    ダイアログアイテムのID
+	 * @param bmp   ビットマップに設定するWIN32Dialog.Bitmapのインスタンス
+	 *              WIN32DialogEXではLayerインスタンスが指定可能
+	 */
+	function setItemBitmap(id, bmp);
+
+	/**
+	 * SendDlgItemMessage のラッパー
+	 * @param id     ダイアログアイテムのID
+	 * @param msg    送るメッセージ
+	 * @param wparam 送るwparam
+	 * @param lparam 送るlparam
+	 * @return LRESULT
+	 */
+	function sendItemMessage(id, msg, wparam, lparam);
+
+	/**
+	 * GetDialogBaseUnit のラッパー
+	 * @return 結果辞書(%[ h:水平単位, v:垂直単位 ])
+	 */
+	function getBaseUnits();
+
+	/**
+	 * MapDialogRect のラッパー
+	 * @param rect 矩形領域辞書配列(%[ left, top, right, bottom ])
+	 * @return 結果辞書配列(%[ left, top, right, bottom ])
+	 */
+	function mapRect(rect);
+
+	/**
+	 * InvalidateRect のラッパー
+	 * @param rect 矩形領域辞書配列(%[ left, top, right, bottom ])
+	 * @param erase 消去するかどうかフラグ
+	 * @return 成功ならtrue
+	 */
+	function invalidateRect(rect, erase);
+
+	/**
+	 * ダイアログ座標を設定
+	 * @param x x座標
+	 * @param y y座標
+	 * ダイアログ表示中以外はエラーになるので注意。onInitなどにて座標を変更すること
+	 */
+	function setPos(x, y);
+
+	/**
+	 * ダイアログの大きさを設定
+	 * @param w width
+	 * @param h height
+	 * ダイアログ表示中以外はエラーになるので注意。
+	 */
+	function setSize(w, h);
+
+	/**
+	 * ダイアログサイズの取得
+	 * 読み取り専用。サイズの変更はできないので注意
+	 */
+	property left   { getter; }
+	property top    { getter; }
+	property width  { getter; }
+	property height { getter; }
+
+	/**
+	 * WM_INITDIALOG のコールバック
+	 * @param msg    DlgProc のメッセージ == WM_INITDIALOG
+	 * @param wparam DlgProc のWPARAM
+	 * @param lparam DlgProc のLPARAM
+	 * コールバックはownerに対して呼ばれるので注意してください
+	 * owner.onInitが未定義なら何もしません。
+	 */
+	function onInit(msg, wparam, lparam);
+
+	/**
+	 * WM_COMMAND のコールバック
+	 * @param msg    DlgProc のメッセージ == WM_COMMAND
+	 * @param wparam DlgProc のWPARAM
+	 * @param lparam DlgProc のLPARAM
+	 * コールバックはownerに対して呼ばれるので注意してください。
+	 * owner.onCommandが未定義なら何もしません。
+	 */
+	function onCommand(msg, wparam, lparam);
+
+	/**
+	 * WM_HSCROLL のコールバック
+	 * @param msg    DlgProc のメッセージ == WM_HSCROLL
+	 * @param wparam DlgProc のWPARAM
+	 * @param lparam DlgProc のLPARAM
+	 */
+	function onHScroll(msg, wparam, lparam);
+
+	/**
+	 * WM_VSCROLL のコールバック
+	 * @param msg    DlgProc のメッセージ == WM_VSCROLL
+	 * @param wparam DlgProc のWPARAM
+	 * @param lparam DlgProc のLPARAM
+	 */
+	function onVScroll(msg, wparam, lparam);
+
+	/**
+	 * WM_NOTIFY のコールバック
+	 * @param wparam DlgProc のWPARAM
+	 * @param notify HMHDRアクセス用クラス
+	 */
+	function onNotify(msg, wparam, lparam);
+
+	/**
+	 * WM_KEYDOWN のコールバック
+	 * @param wparam DlgProc のWPARAM
+	 * @param lparam DlgProc のLPARAM
+	 */
+	function onKeyDown(wparam, lparam)
+	{
+	}
+
+	/**
+	 * WM_KEYUP のコールバック
+	 * @param wparam DlgProc のWPARAM
+	 * @param lparam DlgProc のLPARAM
+	 */
+	function onKeyUp(wparam, lparam)
+	{
+	}
+
+	/**
+	 * MessageBox のラッパー
+	 * @param window  オーナーwindow（指定しない場合はnullを渡すこと）
+	 * @param text    メッセージテキスト
+	 * @param caption ダイアログボックスのキャプション
+	 * @param type    表示するボタンやアイコンのフラグの組み合わせ
+	 * @return        押されたボタンのID
+	 * type に独自フラグ MB_OWNER_CENTER を設定するとオーナーウィンドウの中央に表示しようとする
+	 * （ただしダイアログが画面外になる場合はデスクトップの中央になる）
+	 */
+	/*static*/function messageBox(window, text, caption, type);
+
+	/**
+	 * ChooseColor のラッパー
+	 * @param window  オーナーwindow（指定しない場合はnullを渡すこと）
+	 * @param elm     オプション（辞書または省略可能）
+	 *                %[ color:初期選択色, palette:[ パレット色1, ... , パレット色16 ],
+	 *                   disableCustomColor:色の作成を無効にする, openCustomColor:色作成を最初から開いた状態にする ]
+	 * @return        選択された色(0xRRGGBB) キャンセル時はvoid
+	 *                elm.palette が渡された場合は，その内容も更新される
+	 */
+	/*static*/function chooseColor(window, elm);
+
+	/**
+	 * モードレスダイアログ用のフラグ
+	 * trueならばモードレス状態でダイアログを開きます。
+	 * モードレスではダイアログのstyleにWS_VISIBLEを指定しない場合は
+	 * open()時に自動で表示されないので注意してください。
+	 */
+	property modeless { getter; setter; }
+
+	/**
+	 * ダイアログのウィンドウハンドル
+	 */
+	property HWND { getter; }
+
+	/**
+	 * ダイアログのアイコン画像
+	 *   WIN32Dialog.Bitmapクラスのインスタンス:その画像
+	 *   null:実行ファイルのアイコン
+	 *   void:アイコンなし
+	 */
+	property icon { setter; getter; }
+
+	/**
+	 * ダイアログを open しているかどうか
+	 */
+	property isValid { getter; }
+
+	/**
+	 * ShowWindow のラッパー
+	 * @param nCmdShow SW_*フラグ
+	 * 主にモードレスダイアログ用です。
+	 */
+	function show(nCmdShow);
+
+	/**
+	 * InitCommonControls, InitCommonControlsEx のラッパー
+	 * @param icc 初期化フラグ ICC_*(～Exのみ)
+	 * @return    成功したか(～Exのみ)
+	 */
+	function InitCommonControls();
+	function InitCommonControlsEx(icc);
+
+	/**
+	 * プロパティシートを表示する（常にモーダル：モードレスは未実装）
+	 * @param window  オーナーwindow（指定しない場合はnullを渡すこと）
+	 * @param sheets  シート情報（WIN32Dialogインスタンスの配列）
+	 * @param elm     オプション（辞書または省略可能）
+	 *                %[ caption:プロパティシートタイトル, page:初期ページ番号, icon:アイコン ]
+	 * @return        ::PropertySheetの返り値
+	 */
+	/*static*/function openPropertySheet(window, sheets, elm);
+
+	function propSheetMessage(msg, wparam, lparam); //< PSM_* メッセージをプロパティシートウィンドウに送信する
+	function setMessageResult(value); //< DWL_MSGRESULTの値を設定する
+	property propsheet { getter; } //< プロパティシートとして表示中かどうか
+
+	/**
+	 * プログレスダイアログを表示する
+	 * @param id      プログレスバーのダイアログアイテムID（progressValueプロパティで更新される対象）
+	 * @param window  [optional] オーナーwindow (void=オーナーなし,null=Application)
+	 * @param dsapp   [optional] プログレス表示中はアプリケーションウィンドウを無効にするか
+	 * @param breathe [optional] progressValueのsetterでbreatheするかどうか
+	 * @return        成功したらtrue
+	 *
+	 * プログレスダイアログのstyleにはWS_VISIBLEを指定しないこと
+	 * 閉じるときは必ず closeProgress() を使用すること
+	 * プログレス表示の場合，onInit以外のコールバックは来ないので注意
+	 */
+	function openProgress(id, window, dsapp, breathe);
+
+	function closeProgress();                     //< プログレスダイアログを閉じる
+	property progress         {         getter; } //< プログレス状態かどうか
+	property progressValue    { setter; getter; } //< プログレスバーを更新する（0-100の数値 or 負数の場合マーキー状態の速度）
+	property progressCanceled { setter; getter; } //< プログレスがキャンセルされたかどうか（※対象ボタンはIDCANCEL固定）
+
+	/**
+	 * タブコントロールを利用する.
+
+//	利用手順を検討中
+	 * insertTab(IDC_TAB, 0, "基本"); // タブを追加
+	 * // deleteTab(IDC_TAB, 0); // タブを削除
+	 * // deleteAllTab(IDC_TAB); // タブをすべて削除
+	 * var dlg = new WIN32Dialog(); dlg.loadResource("resource.dll", "INNER"); // Border=None, Style=Child にしたダイアログ
+	 * selectTab(IDC_TAB, dlg); // 表示
+	 * insertTab(IDC_TAB, 1, "拡張");
+	 * var dlg2 = new WIN32Dialog(); dlg2.loadResource("resource.dll", "INNER2");
+	 * dlg.show(SW_HIDE);
+	 * selectTab(IDC_TAB, dlg2); // 切り替え
+	 * // onNotify で notify->code == TCN_SELCHANGE かつ notify->idFrom == IDC_TAB の場合にユーザーによるタブの切り替え
+	 * // getCurSel(tab_id) でタブの番号を取得し、対応するダイアログを SW_SHOW、それ以外を SW_HIDE する
+	 * // タブ番号と対応するダイアログは自分で管理すること
+	 * ※ dlg,dlg2 の open は selectTab されたときに行われるので、show(SW_HIDE) するときは isValid で open されているか確認のこと
+
+	 */
+	function insertTab(tab_id, pos, label);
+	function deleteTab(tab_id, pos);
+	function deleteAllTab(tab_id);
+	function getCurSel(tab_id);
+	function selectTab(tab_id, dialog);
+
+	/**
+	 * ScrollInfo の設定
+	 * @param id スクロールバーのダイアログアイテムID
+	 * @param pos スライダーの位置
+	 * @param min 取りうる最小の値
+	 * @param max 取りうる最大の値
+	 * @param page ページの値
+	 */
+	function setScrollInfo(id, pos, min, max, page);
+
+	/**
+	 * ScrollInfo の取得
+	 * @param id スクロールバーのダイアログアイテムID
+	 * @return %[pos, min, max, page]
+	 */
+	function getScrollInfo(id);
+
+	/**
+	 * ウィンドウスタイル等の定数
+	 * 詳細は API マニュアルなどを参照のこと
+	 */
+	// Window Styles
+	var WS_*;
+	var WS_EX_*;
+	// Dialog Box Command IDs
+	var ID*
+	// Edit Control Styles
+	var ES_*;
+	// Edit Control Notification Codes
+	var EN_*;
+	// Edit control EM_SETMARGIN parameters
+	var EC_*;
+	// Edit Control Messages
+	var EM_*;
+	// EDITWORDBREAKPROC code values
+	var WB_*;
+	// Button Control Styles
+	var BS_*;
+	// User Button Notification Codes
+	var BN_*;
+	// Button Control Messages
+	var BM_*;
+	// Static Control Constants
+	var SS_*;
+	// Static Control Mesages
+	var STM_*;
+	// Dialog Styles
+	var DS_*;
+	// Dialog Control Messages
+	var DM_*;
+	// Dialog Codes
+	var DLG_*;
+	// Listbox Return Values
+	var LB_*;
+	// Listbox Notification Codes
+	var LBN_*;
+	// Listbox Styles
+	var LBS_*;
+	// Combo Box return Values
+	var CB_*;
+	// Combo Box Notification Codes
+	var CBN_*;
+	// Combo Box styles
+	var CBS_*;
+	// Combo Box messages
+	var CB_*;
+	// Scroll Bar Styles
+	var SBS_*;
+	// Scroll bar messages
+	var SBM_*;
+	var SIF_*;
+	// Scroll bar option
+	var SB_*;
+	// Font Weights
+	var FW_*;
+	// ShowWindow options
+	var SW_*;
+	// MessageBox arguments
+	var MB_*;
+	// InitCommonControlsEx parameters
+	var ICC_*;
+
+	// PropertySheet notifications/messages
+	var PSN_*;
+	var PSM_*;
+
+	// TabControl messages
+	var TCN_*;
+}
+
+/**
+ * WIN32Dialog を吉里吉里向けにもう少し使いやすくしたクラス
+ * Scripts.execStorage("win32dialog.tjs")として使います。
+ * 詳細は当該ソースやサンプルなどを参照してください。
+ */
+class WIN32DialogEX extends WIN32Dialog {
+	/**
+	 * テンプレートを流し込む
+	 * @param elm テンプレート用辞書配列
+	 * elm = %[ helpID, exStyle, style, x, y, cx, cy, menu, windowClass, title, pointSize, weight, italic, charset, typeFace,
+	 *          items: [ コントロール1, コントロール2, ... ] ];
+	 * コントロールは，コントロール生成用の関数を呼びます。
+	 */
+	function store(elm);
+
+	/**
+	 * アイテムの初期化パラメータを設定する
+	 * @param elm パラメータ辞書
+	 * 必ず store() の後で呼ぶこと。パラメータ詳細は win32dialog.tjs や testscript.tjs を参照
+	 */
+	function setInitParams(elm);
+
+	/**
+	 * ダイアログを表示する
+	 * @return %[ result:EndDialogのnResult値, items:アイテムの状態辞書 ];
+	 * WIN32Dialog.open と返り値が異なるので注意のこと
+	 */
+	function open(parent);
+
+	/**
+	 * 指定ウィンドウの中央位置にダイアログを移動
+	 * @param win ウィンドウ（省略時はopen時の引数ウィンドウに対して）
+	 * nullを渡すと画面に対して中央になる
+	 */
+	function setCenterPosition(win = parent);
+
+	/**
+	 * ダイアログリソースを読み込む（オーバーライド）
+	 * @param dllfile  dllファイル（自動的にStorages.getPlacedPath/getLocalName処理される）
+	 * @param resource ダイアログリソース名
+	 */
+	function loadResource(dllfile, resource);
+
+	/**
+	 * 各種コントロールを生成するための関数
+	 * @param  text テキスト
+	 * @param    id コントロールID
+	 * @param     x x座標（ダイアログ座標単位）
+	 * @param     y y座標（ダイアログ座標単位）
+	 * @param     w 横幅 （ダイアログ座標単位）
+	 * @param     h 高さ （ダイアログ座標単位）
+	 * @param style スタイル
+	 * @param    ex 拡張スタイル
+	 */
+	function DefPushButton(  text, id, x, y, w, h, style, ex);
+	function    PushButton(  text, id, x, y, w, h, style, ex);
+	function AutoCheckBox(   text, id, x, y, w, h, style, ex);
+	function     CheckBox(   text, id, x, y, w, h, style, ex);
+	function AutoRadioButton(text, id, x, y, w, h, style, ex);
+	function     RadioButton(text, id, x, y, w, h, style, ex);
+	function GroupBox(       text, id, x, y, w, h, style, ex);
+	function LText(          text, id, x, y, w, h, style, ex);
+	function CText(          text, id, x, y, w, h, style, ex);
+	function RText(          text, id, x, y, w, h, style, ex);
+	function Icon(           text, id, x, y, w, h, style, ex);
+	function EditText(             id, x, y, w, h, style, ex);
+	function ListBox(              id, x, y, w, h, style, ex);
+	function ComboBox(             id, x, y, w, h, style, ex);
+}
+

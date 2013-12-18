@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual C++ Express 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "qrcode", "qrcode.vcproj", "{829F4C70-ADA4-4681-8CF4-938A504E9079}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{829F4C70-ADA4-4681-8CF4-938A504E9079}.Debug|Win32.ActiveCfg = Debug|Win32
+		{829F4C70-ADA4-4681-8CF4-938A504E9079}.Debug|Win32.Build.0 = Debug|Win32
+		{829F4C70-ADA4-4681-8CF4-938A504E9079}.Release|Win32.ActiveCfg = Release|Win32
+		{829F4C70-ADA4-4681-8CF4-938A504E9079}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,45 @@
+/**
+ * 擬似コードによるマニュアル
+ */
+
+/**
+ * Layer拡張
+ */
+
+class Layer {
+	/**
+	 * 縮小コピー
+	 *
+	 * @param dleft   コピー先の矩形の左端。小数点指定可。
+	 * @param dtop    コピー先の矩形の上端。小数点指定可。
+	 * @param dwidth  コピー先の矩形の横幅。小数点指定可。
+	 * @param dheight コピー先の矩形の縦幅。小数点指定可。
+	 * @param src     コピー元レイヤ
+	 * @param sleft   コピー元の矩形の左端。ピクセル単位。小数点指定不可。
+	 * @param stop    コピー元の矩形の上端。ピクセル単位。小数点指定不可。
+	 * @param swidth  コピー元の矩形の横幅。ピクセル単位。小数点指定不可。
+	 * @param sheight コピー元の矩形の縦幅。ピクセル単位。小数点指定不可。
+	 *
+	 * 拡大される（dwidth > swidth || dheight > sheight）場合はエラー。
+	 * 縮小アルゴリズムは面積平均法。1/2以下の縮小で affineCopyより高品質。
+	 * stretchCopyと違い Layer.face, holdAlpha は無視。
+	 *
+	 * ※透明と不透明の境目の部分で偽色（完全透明部分の裏にある色）が出ることがあるので
+	 *   あらかじめ layerExSave.dll の Layer.oozeColor() などを使っておくことを推奨
+	 */
+	function shrinkCopy(dleft, dtop, dwidth, dheight, src, sleft, stop, swidth, sheight);
+
+	/**
+	 * 限定縮小コピー（整数分の一の縮小＆α成分無視で処理）
+	 *
+	 * @param shrink_x 横方向の縮小係数(1 以上）
+	 * @param shrink_y 縦方向の縮小係数(1 以上）省略時または 0 の場合は shrink_x の値を使用
+	 *
+	 * 透明部分は無視されて常に不透明になる
+	 * 右端，下端の 1dot の部分で割り切れない場合の端数分で伸びたように見える場合がある
+	 *
+	 * ※自分自身のサイズが強制で変更されるので注意
+	 * ⇒ setImageSize(Math.ceil(src.imageWidth / shrink_x), Math.ceil(src.imageHeight / shrink_y)) 相当
+	 */
+	function shrinkCopyFast(src, shrink_x, shrink_y);
+}

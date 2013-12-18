@@ -1,0 +1,39 @@
+/**
+ * 擬似コードによるマニュアル
+ *
+ * 俺の能力がおっつかないので AGG の trans_perspective つかってます。
+ * だれか同じような処理をアセンブリで書き起こしてくれないかなー
+ *
+ * The Anti-Grain Geometry Project
+ * A high quality rendering engine for C++
+ * http://antigrain.com
+ * 
+ * Anti-Grain Geometry - Version 2.3 
+ * Copyright (C) 2002-2005 Maxim Shemanarev (McSeem) 
+ * 
+ * Permission to copy, use, modify, sell and distribute this software 
+ * is granted provided this copyright notice appears in all copies. 
+ * This software is provided "as is" without express or implied
+ * warranty, and with no claim as to its suitability for any purpose.
+ */
+
+class Layer {
+
+    /**
+     * 透視変形コピー
+     * @param src コピー元レイヤ
+     * @param left コピー元 left
+     * @param top コピー元 top
+     * @param width コピー元 width
+     * @param height コピー元 height
+     * @param x1 左上コピー先
+     * @param y1 左上コピー先
+     * @param x2 右上コピー先
+     * @param y2 右上コピー先
+     * @param x3 左下コピー先
+     * @param y3 左下コピー先
+     * @param x4 右下コピー先
+     * @param y4 右下コピー先
+     */
+    function perspectiveCopy(src, left, top, width, height, x1, y1, x2, y2, x3, y3, x4, y4);
+};
