@@ -709,39 +709,36 @@ void TJS_INTF_METHOD tTVPBasicDrawDevice::EndBitmapCompletion(iTVPLayerManager *
 		float x, y, z, rhw;
 		float tu, tv;
 	};
-#if 0
-	float dw = (float)DestWidth;
-	float dh = (float)DestHeight;
 
-	float sw = (float)SrcWidth  / (float)TextureWidth;
-	float sh = (float)SrcHeight / (float)TextureHeight;
+	// 転送先をクリッピング矩形に基づきクリッピング
+	float dl = (float)( DestRect.left < ClipRect.left ? ClipRect.left : DestRect.left );
+	float dt = (float)( DestRect.top < ClipRect.top ? ClipRect.top : DestRect.top );
+	float dr = (float)( DestRect.right > ClipRect.right ? ClipRect.right : DestRect.right );
+	float db = (float)( DestRect.bottom > ClipRect.bottom ? ClipRect.bottom : DestRect.bottom );
+	float dw = DestRect.get_width();
+	float dh = DestRect.get_height();
 
-	tVertices vertices[] =
-	{
-		{0.0f - 0.5f, 0.0f - 0.5f, 1.0f, 1.0f, 0.0f, 0.0f},
-		{dw   - 0.5f, 0.0f - 0.5f, 1.0f, 1.0f, sw  , 0.0f},
-		{0.0f - 0.5f, dh   - 0.5f, 1.0f, 1.0f, 0.0f, sh  },
-		{dw   - 0.5f, dh   - 0.5f, 1.0f, 1.0f, sw  , sh  }
-	};
-#else
-	float dl = (float)DestRect.left;
-	float dt = (float)DestRect.top;
-	float dr = (float)DestRect.right;
-	float db = (float)DestRect.bottom;
+	// はみ出している幅を求める
+	float cl = dl - (float)DestRect.left;
+	float ct = dt - (float)DestRect.top;
+	float cr = (float)DestRect.right - dr;
+	float cb = (float)DestRect.bottom - db;
 
+	// はみ出している幅を考慮して、転送元画像をクリッピング
 	tjs_int w, h;
 	GetSrcSize( w, h );
-	float sw = (float)w  / (float)TextureWidth;
-	float sh = (float)h / (float)TextureHeight;
+	float sl = (float)(cl * w / dw ) / (float)TextureWidth;
+	float st = (float)(ct * h / dh ) / (float)TextureHeight;
+	float sr = (float)(w - (cr * w / dw) ) / (float)TextureWidth;
+	float sb = (float)(h - (cb * h / dh) ) / (float)TextureHeight;
 
 	tVertices vertices[] =
 	{
-		{dl - 0.5f, dt - 0.5f, 1.0f, 1.0f, 0.0f, 0.0f},
-		{dr - 0.5f, dt - 0.5f, 1.0f, 1.0f, sw  , 0.0f},
-		{dl - 0.5f, db - 0.5f, 1.0f, 1.0f, 0.0f, sh  },
-		{dr - 0.5f, db - 0.5f, 1.0f, 1.0f, sw  , sh  }
+		{dl - 0.5f, dt - 0.5f, 1.0f, 1.0f, sl, st },
+		{dr - 0.5f, dt - 0.5f, 1.0f, 1.0f, sr, st },
+		{dl - 0.5f, db - 0.5f, 1.0f, 1.0f, sl, sb },
+		{dr - 0.5f, db - 0.5f, 1.0f, 1.0f, sr, sb }
 	};
-#endif
 
 	HRESULT hr;
 

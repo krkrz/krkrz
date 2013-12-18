@@ -4713,14 +4713,16 @@ struct IDirectSound;
 #define TVP_TF_BOLD      0x0200
 #define TVP_TF_UNDERLINE 0x0400
 #define TVP_TF_STRIKEOUT 0x0800
+#define TVP_TF_FONTFILE  0x1000
 
 
 //---------------------------------------------------------------------------
-#define TVP_FSF_FIXEDPITCH   1      // fsfFixedPitch
-#define TVP_FSF_SAMECHARSET  2      // fsfSameCharSet
-#define TVP_FSF_NOVERTICAL   4      // fsfNoVertical
-#define TVP_FSF_TRUETYPEONLY 8      // fsfTrueTypeOnly
-#define TVP_FSF_USEFONTFACE  0x100  // fsfUseFontFace
+#define TVP_FSF_FIXEDPITCH    0x01      // fsfFixedPitch
+#define TVP_FSF_SAMECHARSET   0x02      // fsfSameCharSet
+#define TVP_FSF_NOVERTICAL    0x04      // fsfNoVertical
+#define TVP_FSF_TRUETYPEONLY  0x08      // fsfTrueTypeOnly
+#define TVP_FSF_IGNORESYMBOL  0x10      // fsfIgnoreSymbol
+#define TVP_FSF_USEFONTFACE   0x100  // fsfUseFontFace
 
 
 
@@ -5547,6 +5549,15 @@ public:
 	//!				描画デバイス側で再描画を行う必要はない(必要があれば別メソッドにより
 	//!				再描画の必要性が通知されるため)。
 	virtual void TJS_INTF_METHOD SetDestRectangle(const tTVPRect & rect) = 0;
+
+	//! @brief		(Window->DrawDevice) クリッピング矩形の設定
+	//! @note		ウィンドウから、描画先をクリッピングするための矩形を設定するために呼ばれる。
+	//!				描画デバイスは、SetDestRectangleで指定された領域を、このメソッドで指定された矩形
+	//!				でクリッピングを行い表示を行う必要がある。
+	//!				このメソッドによって描画領域が変わったとしても、このタイミングで
+	//!				描画デバイス側で再描画を行う必要はない(必要があれば別メソッドにより
+	//!				再描画の必要性が通知されるため)。
+	virtual void TJS_INTF_METHOD SetClipRectangle(const tTVPRect & rect) = 0;
 
 	//! @brief		(Window->DrawDevice) 元画像のサイズを得る
 	//! @note		ウィンドウから、描画矩形のサイズを決定するために元画像のサイズが
