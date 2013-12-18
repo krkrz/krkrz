@@ -26,6 +26,7 @@ tTVPDrawDevice::tTVPDrawDevice()
 	Window = NULL;
 	PrimaryLayerManagerIndex = 0;
 	DestRect.clear();
+	ClipRect.clear();
 }
 //---------------------------------------------------------------------------
 
@@ -146,6 +147,14 @@ void TJS_INTF_METHOD tTVPDrawDevice::RemoveLayerManager(iTVPLayerManager * manag
 void TJS_INTF_METHOD tTVPDrawDevice::SetDestRectangle(const tTVPRect & rect)
 {
 	DestRect = rect;
+}
+//---------------------------------------------------------------------------
+
+
+//---------------------------------------------------------------------------
+void TJS_INTF_METHOD tTVPDrawDevice::SetClipRectangle(const tTVPRect & rect)
+{
+	ClipRect = rect;
 }
 //---------------------------------------------------------------------------
 
