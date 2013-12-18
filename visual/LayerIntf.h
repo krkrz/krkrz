@@ -816,6 +816,8 @@ public:
 	void MapPrerenderedFont(const ttstr & storage);
 	void UnmapPrerenderedFont();
 
+	const tTVPFont& GetFont() const;
+
 	iTJSDispatch2 * GetFontObjectNoAddRef();
 
 
@@ -1061,6 +1063,8 @@ public:
 	
 	void MapPrerenderedFont(const ttstr & storage);
 	void UnmapPrerenderedFont();
+
+	const tTVPFont& GetFont() const;
 };
 //---------------------------------------------------------------------------
 
