@@ -819,8 +819,8 @@ TJS_END_NATIVE_STATIC_METHOD_DECL(/*func. name*/colorRect)
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/drawText)
 {
-	// bmp, x, y, text, color, opa=255, aa=true, face=dfAlpha, shadowlevel=0, shadowcolor=0x000000, shadowwidth=0, shadowofsx=0, shadowofsy=0, hda=false, clipRect=null
-	if(numparams < 5) return TJS_E_BADPARAMCOUNT;
+	// bmp, font, x, y, text, color, opa=255, aa=true, face=dfAlpha, shadowlevel=0, shadowcolor=0x000000, shadowwidth=0, shadowofsx=0, shadowofsy=0, hda=false, clipRect=null
+	if(numparams < 6) return TJS_E_BADPARAMCOUNT;
 
 	tTJSNI_Bitmap * dst = NULL;
 	tTJSVariantClosure clo = param[0]->AsObjectClosureNoAddRef();
@@ -831,24 +831,33 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/drawText)
 	}
 	if( !dst ) return TJS_E_INVALIDPARAM;
 
-	tjs_int x = *param[1];
-	tjs_int y = *param[2];
-	ttstr text = *param[3];
-	tjs_uint32 color = static_cast<tjs_uint32>((tjs_int64)*param[4]);
-	tjs_int opa = (numparams >= 6 && param[5]->Type() != tvtVoid)?(tjs_int)*param[5] : (tjs_int)255;
-	bool aa = (numparams >= 7 && param[6]->Type() != tvtVoid)? param[6]->operator bool() : true;
-	tTVPDrawFace face = (numparams >= 8 && param[7]->Type() != tvtVoid)? (tTVPDrawFace)(tjs_int)(*param[7]) : dfAlpha;
-	tjs_int shadowlevel = (numparams >= 9 && param[8]->Type() != tvtVoid)? (tjs_int)*param[8] : 0;
-	tjs_uint32 shadowcolor = (numparams >= 10 && param[9]->Type() != tvtVoid)? static_cast<tjs_uint32>((tjs_int64)*param[9]) : 0;
-	tjs_int shadowwidth = (numparams >= 11 && param[10]->Type() != tvtVoid)? (tjs_int)*param[10] : 0;
-	tjs_int shadowofsx = (numparams >=12 && param[11]->Type() != tvtVoid)? (tjs_int)*param[11] : 0;
-	tjs_int shadowofsy = (numparams >=13 && param[12]->Type() != tvtVoid)? (tjs_int)*param[12] : 0;
-	bool hda = (numparams >=14 && param[13]->Type() != tvtVoid)? param[13]->operator bool() : false;
+	tTJSNI_Font* font = NULL;
+	clo = param[1]->AsObjectClosureNoAddRef();
+	if(clo.Object) {
+		if(TJS_FAILED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE,
+			tTJSNC_Font::ClassID, (iTJSNativeInstance**)&font)))
+			return TJS_E_INVALIDPARAM;
+	}
+	if( !font ) return TJS_E_INVALIDPARAM;
+
+	tjs_int x = *param[2];
+	tjs_int y = *param[3];
+	ttstr text = *param[4];
+	tjs_uint32 color = static_cast<tjs_uint32>((tjs_int64)*param[5]);
+	tjs_int opa = (numparams >= 7 && param[6]->Type() != tvtVoid)?(tjs_int)*param[6] : (tjs_int)255;
+	bool aa = (numparams >= 8 && param[7]->Type() != tvtVoid)? param[7]->operator bool() : true;
+	tTVPDrawFace face = (numparams >= 9 && param[8]->Type() != tvtVoid)? (tTVPDrawFace)(tjs_int)(*param[8]) : dfAlpha;
+	tjs_int shadowlevel = (numparams >= 10 && param[9]->Type() != tvtVoid)? (tjs_int)*param[9] : 0;
+	tjs_uint32 shadowcolor = (numparams >= 11 && param[10]->Type() != tvtVoid)? static_cast<tjs_uint32>((tjs_int64)*param[10]) : 0;
+	tjs_int shadowwidth = (numparams >= 12 && param[11]->Type() != tvtVoid)? (tjs_int)*param[11] : 0;
+	tjs_int shadowofsx = (numparams >=13 && param[12]->Type() != tvtVoid)? (tjs_int)*param[12] : 0;
+	tjs_int shadowofsy = (numparams >=14 && param[13]->Type() != tvtVoid)? (tjs_int)*param[13] : 0;
+	bool hda = (numparams >=15 && param[14]->Type() != tvtVoid)? param[14]->operator bool() : false;
 
 	tTVPRect clipRect( 0, 0, dst->GetWidth(), dst->GetHeight() );
-	if(numparams >= 15 && param[14]->Type() == tvtObject ) {
+	if(numparams >= 16 && param[15]->Type() == tvtObject ) {
 		tTJSNI_Rect * rect = NULL;
-		clo = param[14]->AsObjectClosureNoAddRef();
+		clo = param[15]->AsObjectClosureNoAddRef();
 		if(clo.Object) {
 			if(TJS_FAILED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE,
 				tTJSNC_Rect::ClassID, (iTJSNativeInstance**)&rect)))
@@ -876,6 +885,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/drawText)
 	}
 	color = TVPToActualColor(color);
 	tTVPComplexRect r;
+	dst->GetBitmap()->SetFont( font->GetFont() );
 	dst->GetBitmap()->DrawText(clipRect, x, y, text, color, met, opa, hda, aa, shadowlevel, shadowcolor, shadowwidth,
 		shadowofsx, shadowofsy, &r);
 

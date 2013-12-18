@@ -32,6 +32,7 @@
 #include "TVPSysFont.h"
 #include "FontRasterizer.h"
 #include "RectItf.h"
+#include "FontSystem.h"
 
 extern void TVPSetFontRasterizer( tjs_int index );
 extern tjs_int TVPGetFontRasterizer();
@@ -4756,6 +4757,11 @@ void tTJSNI_BaseLayer::UnmapPrerenderedFont()
 	MainImage->UnmapPrerenderedFont();
 }
 //---------------------------------------------------------------------------
+const tTVPFont&  tTJSNI_BaseLayer::GetFont() const
+{
+	return Font;
+}
+//---------------------------------------------------------------------------
 iTJSDispatch2 * tTJSNI_BaseLayer::GetFontObjectNoAddRef()
 {
 	if(FontObject) return FontObject;
@@ -9384,7 +9390,7 @@ TJS_END_NATIVE_PROP_DECL(provinceImageBufferPitch)
 
 
 
-
+extern FontSystem* TVPFontSystem;
 //---------------------------------------------------------------------------
 // tTJSNI_Font : Font Native Object
 //---------------------------------------------------------------------------
@@ -9414,6 +9420,7 @@ tjs_error TJS_INTF_METHOD tTJSNI_Font::Construct(tjs_int numparams,
 	else
 	{
 		Layer = NULL;
+		Font = TVPFontSystem->GetDefaultFont();
 	}
 
 	return TJS_S_OK;
@@ -9664,6 +9671,12 @@ void tTJSNI_Font::UnmapPrerenderedFont()
 {
 	if( Layer ) Layer->UnmapPrerenderedFont();
 	else TVPUnmapPrerenderedFont(Font);
+}
+//---------------------------------------------------------------------------
+const tTVPFont& tTJSNI_Font::GetFont() const
+{
+	if( Layer ) return Layer->GetFont();
+	else return Font;
 }
 //---------------------------------------------------------------------------
 
