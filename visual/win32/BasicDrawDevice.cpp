@@ -715,8 +715,8 @@ void TJS_INTF_METHOD tTVPBasicDrawDevice::EndBitmapCompletion(iTVPLayerManager *
 	float dt = (float)( DestRect.top < ClipRect.top ? ClipRect.top : DestRect.top );
 	float dr = (float)( DestRect.right > ClipRect.right ? ClipRect.right : DestRect.right );
 	float db = (float)( DestRect.bottom > ClipRect.bottom ? ClipRect.bottom : DestRect.bottom );
-	float dw = DestRect.get_width();
-	float dh = DestRect.get_height();
+	float dw = (float)DestRect.get_width();
+	float dh = (float)DestRect.get_height();
 
 	// ‚Í‚İo‚µ‚Ä‚¢‚é•‚ğ‹‚ß‚é
 	float cl = dl - (float)DestRect.left;
