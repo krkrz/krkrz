@@ -1,0 +1,5 @@
+EXPORTS
+	GetModuleInstance
+	V2Link
+	V2Unlink
+
