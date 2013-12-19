@@ -88,7 +88,7 @@ protected:
 
 	virtual LRESULT WINAPI Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
 
-	HRESULT CreateWnd( const std::wstring& classname, const std::wstring& title, int width, int height );
+	HRESULT CreateWnd( const std::wstring& classname, const std::wstring& title, int width, int height, HWND hParent=NULL );
 
 	virtual void OnDestroy();
 	virtual void OnPaint();

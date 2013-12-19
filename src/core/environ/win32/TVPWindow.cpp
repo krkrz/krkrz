@@ -353,7 +353,7 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 void tTVPWindow::OnPaint() {
 }
 const DWORD tTVPWindow::DEFAULT_EX_STYLE = WS_EX_ACCEPTFILES | WS_EX_APPWINDOW;
-HRESULT tTVPWindow::CreateWnd( const std::wstring& classname, const std::wstring& title, int width, int height )
+HRESULT tTVPWindow::CreateWnd( const std::wstring& classname, const std::wstring& title, int width, int height, HWND hParent )
 {
 	window_class_name_ = classname;
 	window_title_ = title;
@@ -382,7 +382,7 @@ HRESULT tTVPWindow::CreateWnd( const std::wstring& classname, const std::wstring
 	::AdjustWindowRectEx( &winRc, WS_OVERLAPPEDWINDOW, NULL, DEFAULT_EX_STYLE );
 	window_handle_ = ::CreateWindowEx( DEFAULT_EX_STYLE, window_class_name_.c_str(), window_title_.c_str(),
 						WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, winRc.right-winRc.left, winRc.bottom-winRc.top,
-						NULL, NULL, wc.hInstance, NULL );
+						hParent, NULL, wc.hInstance, NULL );
 	
 	if( window_handle_ == NULL ) {
 #ifdef _DEBUG

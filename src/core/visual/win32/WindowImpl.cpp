@@ -1059,7 +1059,17 @@ tTJSNI_Window::Construct(tjs_int numparams, tTJSVariant **param,
 {
 	tjs_error hr = tTJSNI_BaseWindow::Construct(numparams, param, tjs_obj);
 	if(TJS_FAILED(hr)) return hr;
-	Form = new TTVPWindowForm(Application, this);
+	if( numparams >= 1 ) {
+		tTJSVariantClosure clo = param[0]->AsObjectClosureNoAddRef();
+		if(clo.Object == NULL) TVPThrowExceptionMessage(TVPSpecifyWindow);
+		tTJSNI_Window *win = NULL;
+		if(TJS_FAILED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE,tTJSNC_Window::ClassID, (iTJSNativeInstance**)&win)))
+			TVPThrowExceptionMessage(TVPSpecifyWindow);
+		if(!win) TVPThrowExceptionMessage(TVPSpecifyWindow);
+		Form = new TTVPWindowForm(Application, this, win);
+	} else {
+		Form = new TTVPWindowForm(Application, this);
+	}
 	return TJS_S_OK;
 }
 //---------------------------------------------------------------------------

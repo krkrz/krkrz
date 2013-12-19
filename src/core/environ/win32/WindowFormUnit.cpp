@@ -188,12 +188,14 @@ void TVPInitWindowOptions()
 //---------------------------------------------------------------------------
 
 
-TTVPWindowForm::TTVPWindowForm( tTVPApplication* app, tTJSNI_Window* ni ) : tTVPWindow(), CurrentMouseCursor(crDefault), touch_points_(this),
+TTVPWindowForm::TTVPWindowForm( tTVPApplication* app, tTJSNI_Window* ni, tTJSNI_Window* parent ) : tTVPWindow(), CurrentMouseCursor(crDefault), touch_points_(this),
 	LayerLeft(0), LayerTop(0), LayerWidth(32), LayerHeight(32),
 	LastMouseDownX(0), LastMouseDownY(0),
 	HintX(0), HintY(0), HintTimer(NULL), HintDelay(TVP_TOOLTIP_SHOW_DELAY), LastHintSender(NULL),
 	FullScreenDestRect(0,0,0,0) {
-	CreateWnd( L"TVPMainWindow", Application->GetTitle(), 10, 10 );
+	HWND hParent = NULL;
+	if( parent ) hParent = parent->GetSurfaceWindowHandle();
+	CreateWnd( L"TVPMainWindow", Application->GetTitle(), 10, 10, hParent );
 	TVPInitWindowOptions();
 	
 	// initialize members
@@ -248,6 +250,7 @@ TTVPWindowForm::TTVPWindowForm( tTVPApplication* app, tTJSNI_Window* ni ) : tTVP
 	ReloadDeviceTick = 0;
 	
 	LastRecheckInputStateSent = 0;
+	SetBorderStyle( bsSizeable );
 }
 TTVPWindowForm::~TTVPWindowForm() {
 	if( HintTimer ) {
