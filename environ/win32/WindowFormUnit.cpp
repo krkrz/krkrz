@@ -1823,6 +1823,11 @@ void TTVPWindowForm::OnNonClientMouseDown( int button, int hittest, int x, int y
 }
 void TTVPWindowForm::OnMouseEnter() {
 	// mouse entered in client area
+	if( MouseCursorState == mcsVisible ) {
+		CurrentMouseCursor.SetCursor();
+	} else {
+		SetMouseCursorToWindow( MouseCursor(crNone) );
+	}
 	DWORD tick = GetTickCount();
 	TVPPushEnvironNoise(&tick, sizeof(tick));
 	if(TJSNativeInstance) {
@@ -1830,6 +1835,8 @@ void TTVPWindowForm::OnMouseEnter() {
 	}
 }
 void TTVPWindowForm::OnMouseLeave() {
+	SetMouseCursorToWindow( MouseCursor(crDefault) );
+
 	// mouse leaved from client area
 	DWORD tick = GetTickCount();
 	TVPPushEnvironNoise(&tick, sizeof(tick));
