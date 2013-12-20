@@ -202,4 +202,6 @@ TVP_MSG_DECL_NULL(TVPExceptionInvalidDisposition)
 TVP_MSG_DECL_NULL(TVPExceptionInvalidHandle)
 TVP_MSG_DECL_NULL(TVPExceptionStackOverflow)
 TVP_MSG_DECL_NULL(TVPExceptionUnwindCconsolidate)
+TVP_MSG_DECL_NULL(TVPCannotShowModalAreadyShowed)
+TVP_MSG_DECL_NULL(TVPCannotShowModalSingleWindow)
 #endif

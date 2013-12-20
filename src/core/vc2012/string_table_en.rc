@@ -413,4 +413,6 @@ BEGIN
     IDS_TVP_EXCEPTION_INVALID_HANDLE                                          "Invalid Handle: The thread used a handle to a kernel object that was invalid (probably because it had been closed.)"
     IDS_TVP_EXCEPTION_STACK_OVERFLOW                                          "Stack Overflow: The thread uses up its stack."
     IDS_TVP_EXCEPTION_UNWIND_CCONSOLIDATE                                     "Unwind Consolidate: A frame consolidation has been executed."
+    IDS_TVP_CANNOT_SHOW_MODAL_AREADY_SHOWED                                   "Cannot Show Modal."
+    IDS_TVP_CANNOT_SHOW_MODAL_SINGLE_WINDOW                                   "Cannot Show Modal. When it is single window."
 END
