@@ -207,7 +207,16 @@ const tTVPBaseBitmap & TVPGetInitialBitmap()
 	return bmp;
 }
 //---------------------------------------------------------------------------
-
+void TVPTempBitmapHolderAddRef()
+{
+	tTVPTempBitmapHolder::AddRef(); // ensure default bitmap
+}
+//---------------------------------------------------------------------------
+void TVPTempBitmapHolderRelease()
+{
+	tTVPTempBitmapHolder::Release();
+}
+//---------------------------------------------------------------------------
 
 
 //---------------------------------------------------------------------------

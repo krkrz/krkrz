@@ -9,6 +9,10 @@
 #include "Application.h"
 
 tTJSNI_Bitmap::tTJSNI_Bitmap() : Owner(NULL), Bitmap(NULL), Loading(false) {
+	TVPTempBitmapHolderAddRef();
+}
+tTJSNI_Bitmap::~tTJSNI_Bitmap() {
+	TVPTempBitmapHolderRelease();
 }
 //----------------------------------------------------------------------
 // string, [uint] ファイル名、カラーキーの順で指定
