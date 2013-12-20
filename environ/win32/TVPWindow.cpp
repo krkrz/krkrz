@@ -813,11 +813,11 @@ void tTVPWindow::closeModal() {
 }
 int tTVPWindow::ShowModal() {
 	if( GetVisible() || !GetEnable() ) {
-		throw Exception(TJS_W("Cannot Show Modal."));
+		throw Exception( (const tjs_char*)TVPCannotShowModalAreadyShowed );
 	}
 	if( Application->GetWindowCount() == 1 ) {
 		// 1ŒÂ‚µ‚© Window‚ª‚È‚¢‚ÍModal‰»‚·‚éˆÓ–¡‚ª‚È‚¢‚Ì‚ÆA•s‹ï‡‚ÌŒ³‚È‚Ì‚Å—áŠO”­¶
-		throw Exception(TJS_W("Cannot Show Modal. When it is single window."));
+		throw Exception( (const tjs_char*)TVPCannotShowModalSingleWindow );
 	}
 	if( InMode == false ) InMode = true;
 	try {

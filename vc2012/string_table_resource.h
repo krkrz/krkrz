@@ -414,4 +414,6 @@
 #define IDS_TVP_EXCEPTION_INVALID_HANDLE                                          10410
 #define IDS_TVP_EXCEPTION_STACK_OVERFLOW                                          10411
 #define IDS_TVP_EXCEPTION_UNWIND_CCONSOLIDATE                                     10412
+#define IDS_TVP_CANNOT_SHOW_MODAL_AREADY_SHOWED                                   10413
+#define IDS_TVP_CANNOT_SHOW_MODAL_SINGLE_WINDOW                                   10414
 #endif
