@@ -71,6 +71,9 @@ public:
 	bool Included( const tTJSNI_Rect& r ) const {
 		return Rect.included_in( r.Rect );
 	}
+	bool Included( tjs_int x, tjs_int y  ) const {
+		return ( x >= Rect.left && x < Rect.right ) && ( y >= Rect.top && y < Rect.bottom );
+	}
 	bool Equal( const tTJSNI_Rect& r ) {
 		return Rect == r.Rect;
 	}
