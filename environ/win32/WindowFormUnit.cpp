@@ -684,11 +684,15 @@ void TTVPWindowForm::AdjustNumerAndDenom(tjs_int &n, tjs_int &d){
 	d = d / a;
 }
 void TTVPWindowForm::SetZoom( tjs_int numer, tjs_int denom, bool set_logical ) {
+	bool ischanged = false;
 	// set layer zooming factor;
 	// the zooming factor is passed in numerator/denoiminator style.
 	// we must find GCM to optimize numer/denium via Euclidean algorithm.
 	AdjustNumerAndDenom(numer, denom);
 	if( set_logical ) {
+		if( ZoomNumer != numer || ZoomDenom != denom ) {
+			ischanged = true;
+		}
 		ZoomNumer = numer;
 		ZoomDenom = denom;
 	}
@@ -698,6 +702,7 @@ void TTVPWindowForm::SetZoom( tjs_int numer, tjs_int denom, bool set_logical ) {
 		ActualZoomNumer = numer;
 	}
 	InternalSetPaintBoxSize();
+	if( ischanged ) ::InvalidateRect( GetHandle(), NULL, FALSE );
 }
 void TTVPWindowForm::SetFullScreenMode( bool b ) {
 	// note that we should not change the display mode when showing overlay videos.
