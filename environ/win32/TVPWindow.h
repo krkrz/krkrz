@@ -229,7 +229,7 @@ public:
 	void SetMaxSize( int w, int h ) {
 		int dw, dh;
 		GetSize( dw, dh );
-		if( dw < w || dh < h ) {
+		if( dw > w || dh > h ) {
 			if( dw > w ) dw = w;
 			if( dh > h ) dh = h;
 			SetSize( dw, dh );
