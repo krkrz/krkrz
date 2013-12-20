@@ -35,6 +35,12 @@ extern bool TVPFreeUnusedLayerCache;
 const tTVPBaseBitmap & TVPGetInitialBitmap();
 //---------------------------------------------------------------------------
 
+//---------------------------------------------------------------------------
+// bitmap holder refcont control ( for Bitmap class )
+//---------------------------------------------------------------------------
+void TVPTempBitmapHolderAddRef();
+void TVPTempBitmapHolderRelease();
+//---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
 // global options

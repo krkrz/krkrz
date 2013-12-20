@@ -17,6 +17,7 @@ protected:
 
 public:
 	tTJSNI_Bitmap();
+	virtual ~tTJSNI_Bitmap();
 	tjs_error TJS_INTF_METHOD
 		Construct(tjs_int numparams, tTJSVariant **param,
 			iTJSDispatch2 *tjs_obj);
