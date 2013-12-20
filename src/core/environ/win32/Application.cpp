@@ -512,13 +512,17 @@ HWND tTVPApplication::GetHandle() {
 void tTVPApplication::Minimize() {
 	size_t size = windows_list_.size();
 	for( size_t i = 0; i < size; i++ ) {
-		::ShowWindow( windows_list_[i]->GetHandle(), SW_MINIMIZE );
+		if( windows_list_[i]->GetVisible() ) {
+			::ShowWindow( windows_list_[i]->GetHandle(), SW_MINIMIZE );
+		}
 	}
 }
 void tTVPApplication::Restore() {
 	size_t size = windows_list_.size();
 	for( size_t i = 0; i < size; i++ ) {
-		::ShowWindow( windows_list_[i]->GetHandle(), SW_RESTORE );
+		if( windows_list_[i]->GetVisible() ) {
+			::ShowWindow( windows_list_[i]->GetHandle(), SW_RESTORE );
+		}
 	}
 }
 
