@@ -174,6 +174,16 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/included)
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/included)
 //----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/includedPos)
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Rect);
+	if(numparams < 2) return TJS_E_BADPARAMCOUNT;
+	tjs_int ret = _this->Included( *param[0], *param[1] ) ? 1 : 0;
+	if(result) *result = ret;
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/includedPos)
+//----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/equal)
 {
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Rect);
