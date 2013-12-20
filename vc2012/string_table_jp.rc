@@ -413,4 +413,6 @@ BEGIN
     IDS_TVP_EXCEPTION_INVALID_HANDLE                                          "Invalid Handle: 無効な(おそらく既に閉じられている)カーネルオブジェクトのハンドルを使用しました。"
     IDS_TVP_EXCEPTION_STACK_OVERFLOW                                          "Stack Overflow: スタックを使い果たしました。"
     IDS_TVP_EXCEPTION_UNWIND_CCONSOLIDATE                                     "Unwind Consolidate: フレーム結合が実行されました。"
+    IDS_TVP_CANNOT_SHOW_MODAL_AREADY_SHOWED                                   "既に表示、もしくは無効になっているウィンドウをモーダル表示することは出来ません。"
+    IDS_TVP_CANNOT_SHOW_MODAL_SINGLE_WINDOW                                   "ウィンドウが1個の時モーダル表示することは出来ません。"
 END
