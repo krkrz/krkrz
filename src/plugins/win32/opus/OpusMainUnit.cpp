@@ -299,16 +299,16 @@ HRESULT __stdcall OpusWaveDecoder::Render(void *buf, unsigned long bufsamplelen,
 
 	int res;
 	int pos = 0; // decoded PCM (in bytes)
-	int remain = bufsamplelen;
-
+	const int ch = Format.dwChannels;
+	int remain = bufsamplelen*ch;
 	if( FloatExtraction ) {
 		while( remain ) {
 			do {
 				res = op_read_float( InputFile, (float*)((char*)buf + pos), remain, &CurrentSection );
 			} while(res<0);
 			if(res==0) break;
-			pos += res * Format.dwChannels * pcmsize;
-			remain -= res;
+			pos += res * ch * pcmsize;
+			remain -= res * ch;
 		}
 	} else {
 		while( remain ) {
@@ -317,8 +317,8 @@ HRESULT __stdcall OpusWaveDecoder::Render(void *buf, unsigned long bufsamplelen,
 			} while(res<0); // ov_read would return a negative number
 							// if the decoding is not ready
 			if(res==0) break;
-			pos += res * Format.dwChannels * pcmsize;
-			remain -= res;
+			pos += res * ch * pcmsize;
+			remain -= res * ch;
 		}
 	}
 
