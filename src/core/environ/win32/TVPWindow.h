@@ -187,55 +187,52 @@ public:
 	void SetBounds( int x, int y, int width, int height );
 
 	void SetMinWidth( int v ) {
-		if( GetWidth() < v ) {
-			SetWidth( v );
-		}
 		min_size_.cx = v;
+		CheckMinMaxSize();
 	}
 	int GetMinWidth() const{ return min_size_.cx; }
 	void SetMinHeight( int v ) {
-		if( GetHeight() < v ) {
-			SetHeight( v );
-		}
 		min_size_.cy = v;
+		CheckMinMaxSize();
 	}
 	int GetMinHeight() const { return min_size_.cy; }
 	void SetMinSize( int w, int h ) {
-		int dw, dh;
-		GetSize( dw, dh );
-		if( dw < w || dh < h ) {
-			if( dw < w ) dw = w;
-			if( dh < h ) dh = h;
-			SetSize( dw, dh );
-		}
 		min_size_.cx = w;
 		min_size_.cy = h;
+		CheckMinMaxSize();
 	}
 
 	void SetMaxWidth( int v ) {
-		if( GetWidth() > v ) {
-			SetWidth( v );
-		}
 		max_size_.cx = v;
+		CheckMinMaxSize();
 	}
 	int GetMaxWidth() const{ return max_size_.cx; }
 	void SetMaxHeight( int v ) {
-		if( GetHeight() > v ) {
-			SetHeight( v );
-		}
 		max_size_.cy = v;
+		CheckMinMaxSize();
 	}
 	int GetMaxHeight() const{ return max_size_.cy; }
 	void SetMaxSize( int w, int h ) {
-		int dw, dh;
-		GetSize( dw, dh );
-		if( dw > w || dh > h ) {
-			if( dw > w ) dw = w;
-			if( dh > h ) dh = h;
-			SetSize( dw, dh );
-		}
 		max_size_.cx = w;
 		max_size_.cy = h;
+		CheckMinMaxSize();
+	}
+	void CheckMinMaxSize() {
+		int maxw = max_size_.cx;
+		int maxh = max_size_.cy;
+		int minw = min_size_.cx;
+		int minh = min_size_.cy;
+		int dw, dh;
+		GetSize( dw, dh );
+		int sw = dw;
+		int sh = dh;
+		if( maxw > 0 && dw > maxw ) dw = maxw;
+		if( maxh > 0 && dh > maxh ) dh = maxh;
+		if( minw > 0 && dw < minw ) dw = minw;
+		if( minh > 0 && dh < minh ) dh = minh;
+		if( sw != dw || sh != dh ) {
+			SetSize( dw, dh );
+		}
 	}
 
 	void SetInnerWidth( int w );
