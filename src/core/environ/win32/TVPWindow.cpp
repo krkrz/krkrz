@@ -71,6 +71,7 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
             tme.cbSize = sizeof(TRACKMOUSEEVENT);
             tme.dwFlags = TME_LEAVE;
             tme.hwndTrack = hWnd;
+			tme.dwHoverTime = HOVER_DEFAULT;
             ::TrackMouseEvent( &tme ); // エラーはハンドリングしてもあまり意味無いので無視
 		}
 		OnMouseMove( GetShiftState(wParam), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
@@ -299,6 +300,10 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 	case WM_SYSCOMMAND:
 		if( wParam == SC_CLOSE ) {
 			if( InMode ) ModalResult = mrCancel;
+		} else if( wParam == SC_KEYMENU ) {
+			if( HasMenu( hWnd ) == false ) {
+				return 0; // メニューがない時は、コマンドを消費して、マウスカーソル入力のロストを防ぐ
+			}
 		}
 		return ::DefWindowProc(hWnd,msg,wParam,lParam);
 	case WM_DESTROY:
@@ -448,7 +453,7 @@ void tTVPWindow::OnDestroy() {
 	// delete this;
 }
 
-void tTVPWindow::SetClientSize( HWND hWnd, SIZE& size ) {
+bool tTVPWindow::HasMenu( HWND hWnd ) {
 	HMENU hMenu = ::GetMenu( hWnd );
 	if( hMenu ) {
 		int count = ::GetMenuItemCount(hMenu);
@@ -456,11 +461,14 @@ void tTVPWindow::SetClientSize( HWND hWnd, SIZE& size ) {
 			hMenu = NULL;
 		}
 	}
+	return hMenu != NULL;
+}
+void tTVPWindow::SetClientSize( HWND hWnd, SIZE& size ) {
 	DWORD style = ::GetWindowLong( hWnd, GWL_STYLE );
 	DWORD exStyle = ::GetWindowLong( hWnd, GWL_EXSTYLE );
 	RECT rect;
 	::SetRect( &rect, 0, 0, size.cx, size.cy );
-	if( ::AdjustWindowRectEx( &rect, style, hMenu ? TRUE : FALSE, exStyle ) ) {
+	if( ::AdjustWindowRectEx( &rect, style, HasMenu( hWnd ) ? TRUE : FALSE, exStyle ) ) {
 		RECT rect2;
 		if( ::GetWindowRect( hWnd, &rect2 ) ) {
 			if( ::SetWindowPos( hWnd, NULL, rect2.left, rect2.top, rect.right-rect.left, rect.bottom-rect.top, SIZE_CHANGE_FLAGS ) == 0 ) {
