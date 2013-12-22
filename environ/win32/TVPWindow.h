@@ -127,6 +127,8 @@ protected:
 		::ReleaseCapture();
 	}
 	HICON GetBigIcon();
+
+	static bool HasMenu( HWND hWnd );
 public:
 	tTVPWindow()
 	: window_handle_(NULL), created_(false), LeftDoubleClick(false), ime_control_(NULL), border_style_(0), ModalResult(0),
