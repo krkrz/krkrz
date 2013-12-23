@@ -143,10 +143,7 @@ static bool TVPControlImeState = true;
 void TVPInitWindowOptions()
 {
 	// initialize various options around window/graphics
-
 	if(TVPWindowOptionsInit) return;
-
-	//bool initd3d = false;
 
 	tTJSVariant val;
 
@@ -167,8 +164,6 @@ void TVPInitWindowOptions()
 		ttstr str(val);
 		if(str == TJS_W("dinput"))
 			TVPJoyPadDetectionType = jdtDirectInput;
-/*		else if(str == TJS_W("message"))
-			TVPJoyPadDetectionType = wdtWindowMessage; */
 		else
 			TVPJoyPadDetectionType = jdtNone;
 	}
@@ -180,8 +175,6 @@ void TVPInitWindowOptions()
 		if(str == TJS_W("no"))
 			TVPControlImeState = false;
 	}
-
-	//if(initd3d) TVPEnsureDirect3DObject();
 
 	TVPWindowOptionsInit = true;
 }
@@ -205,10 +198,10 @@ TTVPWindowForm::TTVPWindowForm( tTVPApplication* app, tTJSNI_Window* ni, tTJSNI_
 	NextSetWindowHandleToDrawDevice = true;
 	LastSentDrawDeviceDestRect.clear();
 	
-	InMode = false;
+	in_mode_ = false;
 	Closing = false;
 	ProgramClosing = false;
-	ModalResult = 0;
+	modal_result_ = 0;
 	InnerWidthSave = GetInnerWidth();
 	InnerHeightSave = GetInnerHeight();
 
@@ -301,7 +294,6 @@ void TTVPWindowForm::OnDestroy() {
 void TTVPWindowForm::CleanupFullScreen() {
 	// called at destruction
 	if(TVPFullScreenedWindow != this) return;
-	// TVPRevertFromFullScreen( GetHandle(), GetWidth(), GetHeight(), TJSNativeInstance->GetDrawDevice() );
 	TVPFullScreenedWindow = NULL;
 }
 
@@ -417,7 +409,6 @@ void TTVPWindowForm::WMShowVisible() {
 }
 void TTVPWindowForm::WMShowTop( WPARAM wParam ) {
 	if( GetVisible() ) {
-		//if( wParam ) SetZOrder(true);
 		::SetWindowPos( GetHandle(), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOREPOSITION|SWP_NOSIZE|SWP_SHOWWINDOW);
 	}
 }
@@ -454,13 +445,11 @@ void TTVPWindowForm::TickBeat(){
 	tjs_uint32 shift = TVPGetCurrentShiftKeyState();
 	if( TVPWheelDetectionType == wdtDirectInput ) {
 		CreateDirectInputDevice();
-		if( focused && TJSNativeInstance && DIWheelDevice /*&& PaintBox*/ ) {
+		if( focused && TJSNativeInstance && DIWheelDevice ) {
 			tjs_int delta = DIWheelDevice->GetWheelDelta();
 			if( delta ) {
 				POINT origin = {0,0};
 				::ClientToScreen( GetHandle(), &origin );
-				//TPoint origin;
-				//origin = PaintBox->ClientToScreen(TPoint(0, 0));
 
 				POINT mp = {0, 0};
 				::GetCursorPos(&mp);
@@ -476,7 +465,7 @@ void TTVPWindowForm::TickBeat(){
 	// pad detection
 	if( TVPJoyPadDetectionType == jdtDirectInput ) {
 		CreateDirectInputDevice();
-		if( DIPadDevice && TJSNativeInstance /*&& PaintBox*/ ) {
+		if( DIPadDevice && TJSNativeInstance ) {
 			if( focused )
 				DIPadDevice->UpdateWithCurrentState();
 			else
@@ -661,15 +650,6 @@ void TTVPWindowForm::SetMouseCursorToWindow( MouseCursor& cursor ) {
 	cursor.SetCursor();
 }
 void TTVPWindowForm::InternalSetPaintBoxSize() {
-	//tjs_int l = MulDiv(LayerLeft,   ActualZoomNumer, ActualZoomDenom);
-	//tjs_int t = MulDiv(LayerTop,    ActualZoomNumer, ActualZoomDenom);
-	/*
-	tjs_int w = MulDiv(LayerWidth,  ActualZoomNumer, ActualZoomDenom);
-	tjs_int h = MulDiv(LayerHeight, ActualZoomNumer, ActualZoomDenom);
-	if( w < 1 ) w = 1;
-	if( h < 1 ) h = 1;
-	*/
-	//SetInnerSize( w, h );
 	SetDrawDeviceDestRect();
 }
 void TTVPWindowForm::AdjustNumerAndDenom(tjs_int &n, tjs_int &d){
@@ -710,7 +690,6 @@ void TTVPWindowForm::SetFullScreenMode( bool b ) {
 	try {
 		if(TJSNativeInstance) TJSNativeInstance->DetachVideoOverlay();
 
-		// FreeDirectInputDevice();
 		// due to re-create window (but current implementation may not re-create the window)
 
 		if( b ) {
@@ -732,7 +711,7 @@ void TTVPWindowForm::SetFullScreenMode( bool b ) {
 			// set BorderStyle
 			OrgStyle = ::GetWindowLong(GetHandle(), GWL_STYLE);
 			OrgExStyle = ::GetWindowLong(GetHandle(), GWL_EXSTYLE);
-			//::SetWindowLong( GetHandle(), GWL_STYLE, WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_OVERLAPPED );
+
 			::SetWindowLong( GetHandle(), GWL_STYLE, WS_POPUP | WS_VISIBLE);
 
 			// try to switch to fullscreen
@@ -775,15 +754,6 @@ void TTVPWindowForm::SetFullScreenMode( bool b ) {
 			SetBounds( ml, mt, fs_w, fs_h );
 			SetInnerSize( fs_w, fs_h );
 
-			/*
-			// reset ScrollBox size
-			ScrollBox->Align = alNone;
-			ScrollBox->Left = (fs_w - sb_w)/2;
-			ScrollBox->Top = (fs_h - sb_h)/2;
-			ScrollBox->Width = sb_w;
-			ScrollBox->Height = sb_h;
-			*/
-
 			// re-adjust video rect
 			if(TJSNativeInstance) TJSNativeInstance->ReadjustVideoRect();
 
@@ -791,11 +761,7 @@ void TTVPWindowForm::SetFullScreenMode( bool b ) {
 			BringToFront();
 			::SetFocus(GetHandle());
 
-			// activate self (again) // Added by W.Dee 2003/11/02
-			/*
-			Sleep(200);
-			SetWindowPos( GetHandle(), HWND_TOP, 0, 0, 0, 0, SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOREPOSITION|SWP_NOSIZE|SWP_SHOWWINDOW );
-			*/
+			// activate self (again)
 			::SetWindowPos( GetHandle(), HWND_TOP, 0, 0, 0, 0, SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOREPOSITION|SWP_NOSIZE|SWP_SHOWWINDOW );
 		} else {
 			if(TVPFullScreenedWindow != this) return;
@@ -915,7 +881,7 @@ void TTVPWindowForm::UpdateWindow(tTVPUpdateType type ) {
 
 void TTVPWindowForm::ShowWindowAsModal() {
 	// TODO: what's modalwindowlist ?
-	ModalResult = 0;
+	modal_result_ = 0;
 	TVPAddModalWindow(this); // add to modal window list
 	try {
 		ShowModal();
@@ -960,7 +926,7 @@ void TTVPWindowForm::RegisterWindowMessageReceiver(tTVPWMRRegMode mode, void * p
 	}
 }
 void TTVPWindowForm::OnClose( CloseAction& action ) {
-	if(ModalResult == 0)
+	if(modal_result_ == 0)
 		action = caNone;
 	else
 		action = caHide;
@@ -996,8 +962,8 @@ bool TTVPWindowForm::OnCloseQuery() {
 
 	// the default event handler will invalidate this object when an onCloseQuery
 	// event reaches the handler.
-	if(TJSNativeInstance && (ModalResult == 0 ||
-		ModalResult == mrCancel/* mrCancel=when close button is pushed in modal window */  )) {
+	if(TJSNativeInstance && (modal_result_ == 0 ||
+		modal_result_ == mrCancel/* mrCancel=when close button is pushed in modal window */  )) {
 		iTJSDispatch2 * obj = TJSNativeInstance->GetOwnerNoAddRef();
 		if(obj) {
 			tTJSVariant arg[1] = {true};
@@ -1005,7 +971,6 @@ bool TTVPWindowForm::OnCloseQuery() {
 
 			if(!ProgramClosing) {
 				// close action does not happen immediately
-//				TVPPostEvent(obj, obj, eventname, 0, TVP_EPT_POST, 1, arg);
 				if(TJSNativeInstance) {
 					TVPPostInputEvent( new tTVPOnCloseInputEvent(TJSNativeInstance) );
 				}
@@ -1056,8 +1021,8 @@ void TTVPWindowForm::OnCloseQueryCalled( bool b ) {
 	if( !ProgramClosing ) {
 		// closing action by the user
 		if( b ) {
-			if( InMode )
-				ModalResult = 1; // when modal
+			if( in_mode_ )
+				modal_result_ = 1; // when modal
 			else
 				SetVisible( false );  // just hide
 
@@ -1095,14 +1060,6 @@ HWND TTVPWindowForm::GetSurfaceWindowHandle() {
 	return GetHandle();
 }
 HWND TTVPWindowForm::GetWindowHandle(tjs_int &ofsx, tjs_int &ofsy) {
-	/*
-	if( ScrollBox ) {
-		SetWindowPos(ScrollBox->Handle, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE|SWP_NOACTIVATE);
-	}
-	ofsx = ofsy = GetInnerSunken()?2:0;
-	ofsx += ScrollBox->Align == alClient ? 0 : ScrollBox->Left;
-	ofsy += ScrollBox->Align == alClient ? 0 : ScrollBox->Top;
-	*/
 	RECT rt;
 	::GetWindowRect( GetHandle(), &rt );
 	POINT pt = { rt.left, rt.top };
@@ -1118,7 +1075,6 @@ HWND TTVPWindowForm::GetWindowHandleForPlugin() {
 void TTVPWindowForm::ResetDrawDevice() {
 	NextSetWindowHandleToDrawDevice = true;
 	LastSentDrawDeviceDestRect.clear();
-	// if(PaintBox) PaintBox->Invalidate();
 	::InvalidateRect( GetHandle(), NULL, FALSE );
 }
 
@@ -1132,23 +1088,16 @@ void TTVPWindowForm::InternalKeyUp(WORD key, tjs_uint32 shift) {
 			if( key == VK_RETURN || key == VK_SPACE || key == VK_ESCAPE || key == VK_PAD1 || key == VK_PAD2) {
 				POINT p;
 				::GetCursorPos(&p);
-				//TPoint tp;
-				//tp.x = p.x; tp.y = p.y;
-				//tp = ScrollBox->ScreenToClient(tp);
-				//if(tp.x >= 0 && tp.y >= 0 && tp.x < ScrollBox->Width && tp.y < ScrollBox->Height) {
 				::ScreenToClient( GetHandle(), &p );
 				if( p.x >= 0 && p.y >= 0 && p.x < GetInnerWidth() && p.y < GetInnerHeight() ) {
 					if( key == VK_RETURN || key == VK_SPACE || key == VK_PAD1 ) {
-						//PaintBoxClick(PaintBox);
 						OnMouseClick( mbLeft, 0, p.x, p.y );
 						MouseLeftButtonEmulatedPushed = false;
-						//PaintBoxMouseUp(PaintBox, Controls::mbLeft, TShiftState(), tp.x, tp.y);
 						OnMouseUp( mbLeft, 0, p.x, p.y );
 					}
 
 					if( key == VK_ESCAPE || key == VK_PAD2 ) {
 						MouseRightButtonEmulatedPushed = false;
-						//PaintBoxMouseUp(PaintBox, Controls::mbRight, TShiftState(), tp.x, tp.y);
 						OnMouseUp( mbRight, 0, p.x, p.y );
 					}
 				}
@@ -1170,21 +1119,15 @@ void TTVPWindowForm::InternalKeyDown(WORD key, tjs_uint32 shift) {
 			if(key == VK_RETURN || key == VK_SPACE || key == VK_ESCAPE || key == VK_PAD1 || key == VK_PAD2) {
 				POINT p;
 				::GetCursorPos(&p);
-				//TPoint tp;
-				//tp.x = p.x; tp.y = p.y;
-				//tp = ScrollBox->ScreenToClient(tp);
-				//if( tp.x >= 0 && tp.y >= 0 && tp.x < ScrollBox->Width && tp.y < ScrollBox->Height) {
 				::ScreenToClient( GetHandle(), &p );
 				if( p.x >= 0 && p.y >= 0 && p.x < GetInnerWidth() && p.y < GetInnerHeight() ) {
 					if( key == VK_RETURN || key == VK_SPACE || key == VK_PAD1 ) {
 						MouseLeftButtonEmulatedPushed = true;
-						//PaintBoxMouseDown(PaintBox, Controls::mbLeft, TShiftState(), tp.x, tp.y);
 						OnMouseDown( mbLeft, 0, p.x, p.y );
 					}
 
 					if(key == VK_ESCAPE || key == VK_PAD2) {
 						MouseRightButtonEmulatedPushed = true;
-						//PaintBoxMouseDown(PaintBox, Controls::mbRight, TShiftState(), tp.x, tp.y);
 						OnMouseDown( mbLeft, 0, p.x, p.y );
 					}
 				}
@@ -1229,8 +1172,6 @@ void TTVPWindowForm::InternalKeyDown(WORD key, tjs_uint32 shift) {
 	}
 }
 void TTVPWindowForm::GenerateMouseEvent(bool fl, bool fr, bool fu, bool fd) {
-	//if(!PaintBox) return;
-
 	if( !fl && !fr && !fu && !fd ) {
 		if(GetTickCount() - 45 < LastMouseKeyTick) return;
 	}
@@ -1519,31 +1460,6 @@ void TTVPWindowForm::OnKeyPress( WORD vk, int repeat, bool prevkeystate, bool co
 		if(UseMouseKey && (vk == 0x1b || vk == 13 || vk == 32)) return;
 		// UNICODE ‚È‚Ì‚Å‚»‚Ì‚Ü‚Ü“n‚µ‚Ä‚µ‚Ü‚¤
 		TVPPostInputEvent(new tTVPOnKeyPressInputEvent(TJSNativeInstance, vk));
-#if 0
-		if( PendingKeyCodes.empty() != true ) {
-			// pending keycode
-			PendingKeyCodes += static_cast<char>(vk);
-			wchar_t dest;
-			int res = TJS_mbtowc(&dest, PendingKeyCodes.c_str(), PendingKeyCodes.length());
-			if( res > 0 ) {
-				// convertion succeeded
-				TVPPostInputEvent(new tTVPOnKeyPressInputEvent(TJSNativeInstance, dest));
-				PendingKeyCodes.clear();
-			}
-		} else 		{
-			char key[2];
-			key[0] = static_cast<char>(vk);
-			key[1] = 0;
-			wchar_t dest;
-			int res = TJS_mbtowc(&dest, key, 1);
-			if( res > 0 ) {
-				// convertion succeeded
-				TVPPostInputEvent(new tTVPOnKeyPressInputEvent(TJSNativeInstance, dest));
-			} else {
-				PendingKeyCodes = std::string(key);
-			}
-		}
-#endif
 	}
 }
 void TTVPWindowForm::TranslateWindowToDrawArea(int &x, int &y) {
@@ -1803,12 +1719,6 @@ void TTVPWindowForm::OnEnable( bool enabled ) {
 		TVPPostInputEvent( new tTVPOnReleaseCaptureInputEvent(TJSNativeInstance));
 	}
 }
-/*
-void TTVPWindowForm::OnEnterMenuLoop( bool entered ) {
-}
-void TTVPWindowForm::OnExitMenuLoop( bool isShortcutMenu ) {
-}
-*/
 void TTVPWindowForm::OnDeviceChange( int event, void *data ) {
 	if( event == DBT_DEVNODES_CHANGED ) {
 		// reload DInput device
@@ -1854,7 +1764,6 @@ void TTVPWindowForm::OnHide( int status ) {
 void TTVPWindowForm::OnFocus(HWND hFocusLostWnd) {
 	::PostMessage( GetHandle(), TVP_WM_ACQUIREIMECONTROL, 0, 0);
 
-	//if(PaintBox) CreateCaret(PaintBox->Parent->Handle, NULL, 1, 1);
 	::CreateCaret( GetHandle(), NULL, 1, 1);
 
 #ifndef DISABLE_EMBEDDED_GAME_PAD

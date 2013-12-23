@@ -63,15 +63,6 @@ inline void DumpMemoryLeaks()
 #endif  // _DEBUG
 }
 
-#if 0
-tstring ParamStr( int index ) {
-	if( index < (int)Application->CommandLines.size() ) {
-		return tstring(Application->CommandLines[index]);
-	} else {
-		return tstring();
-	}
-}
-#endif
 std::wstring ExePath() {
 	wchar_t szFull[_MAX_PATH];
 	::GetModuleFileName(NULL, szFull, sizeof(szFull) / sizeof(wchar_t));
@@ -226,8 +217,8 @@ int APIENTRY WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	}
 	return TVPTerminateCode;
 }
-tTVPApplication::tTVPApplication() : is_attach_console_(false), tarminate_(false), ApplicationActivating(true)
-	 , ImageLoadThread(NULL), HasMapReportProcess(false)
+tTVPApplication::tTVPApplication() : is_attach_console_(false), tarminate_(false), application_activating_(true)
+	 , image_load_thread_(NULL), has_map_report_process_(false)
 {
 }
 tTVPApplication::~tTVPApplication() {
@@ -318,9 +309,8 @@ bool tTVPApplication::StartApplication( int argc, char* argv[] ) {
 	ArgC = argc;
 	ArgV = argv;
 	for( int i = 0; i < argc; i++ ) {
-		CommandLines.push_back( std::string(argv[i]) );
 		if(!strcmp(argv[i], "-@processohmlog")) {
-			HasMapReportProcess = true;
+			has_map_report_process_ = true;
 		}
 	}
 	TVPTerminateCode = 0;
@@ -346,7 +336,7 @@ bool tTVPApplication::StartApplication( int argc, char* argv[] ) {
 		if(TVPCheckPrintDataPath()) return true;
 		if(TVPExecuteUserConfig()) return true;
 		
-		ImageLoadThread = new tTVPAsyncImageLoader();
+		image_load_thread_ = new tTVPAsyncImageLoader();
 
 		TVPSystemInit();
 
@@ -361,16 +351,16 @@ bool tTVPApplication::StartApplication( int argc, char* argv[] ) {
 		CheckDigitizer();
 
 		// start image load thread
-		ImageLoadThread->Resume();
+		image_load_thread_->Resume();
 
 		if(TVPProjectDirSelected) TVPInitializeStartupScript();
 
 		Run();
 
 		try {
-			// ImageLoadThread->ExitRequest();
-			delete ImageLoadThread;
-			ImageLoadThread = NULL;
+			// image_load_thread_->ExitRequest();
+			delete image_load_thread_;
+			image_load_thread_ = NULL;
 		} catch(...) {
 			// ignore errors
 		}
@@ -425,7 +415,7 @@ bool tTVPApplication::StartApplication( int argc, char* argv[] ) {
  */
 void tTVPApplication::CheckConsole() {
 #ifdef TVP_LOG_TO_COMMANDLINE_CONSOLE
-	if( HasMapReportProcess ) return; // 書き出し用子プロセスして起動されていた時はコンソール接続しない
+	if( has_map_report_process_ ) return; // 書き出し用子プロセスして起動されていた時はコンソール接続しない
 	HANDLE hin  = ::GetStdHandle(STD_INPUT_HANDLE);
 	HANDLE hout = ::GetStdHandle(STD_OUTPUT_HANDLE);
 	HANDLE herr = ::GetStdHandle(STD_ERROR_HANDLE);
@@ -704,7 +694,7 @@ void tTVPApplication::OnActivate( HWND hWnd )
 
 	if( hWnd != GetMainWindowHandle() ) return;
 
-	ApplicationActivating = true;
+	application_activating_ = true;
 	
 	TVPRestoreFullScreenWindowAtActivation();
 	TVPResetVolumeToAllSoundBuffer();
@@ -716,7 +706,7 @@ void tTVPApplication::OnDeactivate( HWND hWnd )
 {
 	if( hWnd != GetMainWindowHandle() ) return;
 
-	ApplicationActivating = false;
+	application_activating_ = false;
 	
 	TVPMinimizeFullScreenWindowAtInactivation();
 	
@@ -739,31 +729,28 @@ bool tTVPApplication::GetNotMinimizing() const
 }
 
 void tTVPApplication::OnActiveAnyWindow() {
-	if( ModalWindowStack.empty() != true ) {
-		tTVPWindow* win = ModalWindowStack.top();
+	if( modal_window_stack_.empty() != true ) {
+		tTVPWindow* win = modal_window_stack_.top();
 		if( win->GetVisible() && win->GetEnable() ) {
 			win->BringToFront();
 		}
 	}
 }
 void tTVPApplication::ModalFinished() {
-	ModalWindowStack.pop();
-	if( ModalWindowStack.empty() != true ) {
-		tTVPWindow* win = ModalWindowStack.top();
+	modal_window_stack_.pop();
+	if( modal_window_stack_.empty() != true ) {
+		tTVPWindow* win = modal_window_stack_.top();
 		if( win->GetVisible() && win->GetEnable() ) {
 			win->BringToFront();
 		}
 	}
 }
 void tTVPApplication::LoadImageRequest( class iTJSDispatch2 *owner, class tTJSNI_Bitmap* bmp, const ttstr &name ) {
-	if( ImageLoadThread ) {
-		ImageLoadThread->LoadRequest( owner, bmp, name );
+	if( image_load_thread_ ) {
+		image_load_thread_->LoadRequest( owner, bmp, name );
 	}
 }
 
-/**
- 仮実装 TODO
-*/
 std::vector<std::string>* LoadLinesFromFile( const std::wstring& path ) {
 	FILE *fp = NULL;
 	_wfopen_s( &fp, path.c_str(), L"r");

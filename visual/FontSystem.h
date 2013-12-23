@@ -29,23 +29,12 @@ public:
 	}
 };
 
-/*
-struct tTVPFontSearchStruct
-{
-	const char *Face;
-	bool Found;
-};
-*/
 class FontSystem {
 	bool FontNamesInit;
 	tTJSHashTable<std::wstring, tjs_int, tTVPWStringHash> TVPFontNames;
 
 	tTVPFont DefaultFont;
 	bool DefaultLOGFONTCreated;
-
-	// win32
-	//LOGFONT DefaultLOGFONT;
-	// win32
 
 	void InitFontNames();
 	//---------------------------------------------------------------------------

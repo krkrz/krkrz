@@ -13,7 +13,6 @@ void TVPThrowWindowsErrorException() {
 		NULL, ::GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, NULL );
 	mes = ttstr( (LPCWSTR)lpMsgBuf );
 	::LocalFree(lpMsgBuf);
-	// GetLastError ÇÃÉRÅ[ÉhÇ‡í«â¡ÇµÇΩï˚Ç™Ç¢Ç¢Ç©Ç»
 	throw new TJS::eTJSError( mes );
 }
 
@@ -33,7 +32,6 @@ void TVPOutputWindowsErrorToConsole( const char* file, int line ) {
 #ifdef _DEBUG
 		ttstr str(ttstr(L"(error) Windows Error : ") + ttstr(L"file : ") + ttstr(file) + ttstr(L", line : ") + ttstr(line) + ttstr(L", message : ") + ttstr((LPCWSTR)lpMsgBuf));
 #else
-		//ttstr str(ttstr(L"(error) Windows Error : ") + ttstr(L"file : ") + ttstr(file) + ttstr(L", line : ") + ttstr(line) + ttstr(L", message : ") + ttstr((LPCWSTR)lpMsgBuf));
 		ttstr str(ttstr(L"(error) Windows Error : ") + ttstr((LPCWSTR)lpMsgBuf));
 #endif
 		TVPAddImportantLog( str );

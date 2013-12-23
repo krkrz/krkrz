@@ -81,13 +81,6 @@ public:
 		if( mode_ == ModeDisable ) {
 			Open();
 		}
-		/*
-		if( default_open_ ) {
-			Open();
-		} else {
-			Close();
-		}
-		*/
 	}
 	/**
 	 このスレッドのIMEを無効にする
@@ -131,62 +124,47 @@ public:
 	}
 	/**
 	 * conversion : 入力モードの値を指定します。
-	 * 		IME_CMODE_ALPHANUMERIC(0x0000) 	英数モード
-	 * 		IME_CMODE_NATIVE(0x0001) 	対応言語入力(ON)・英数入力(OFF) モード
+	 * 		IME_CMODE_ALPHANUMERIC(0x0000)	英数モード
+	 * 		IME_CMODE_NATIVE(0x0001)		対応言語入力(ON)・英数入力(OFF) モード
 	 * 		IME_CMODE_CHINESE
 	 * 		IME_CMODE_HANGEUL
 	 * 		IME_CMODE_JAPANESE でも定義してある
-	 * 		IME_CMODE_KATAKANA(0x0002) 	カタカナ(ON)・ひらがな(OFF) モード
-	 * 		IME_CMODE_FULLSHAPE(0x0008) 	全角モード
-	 * 		IME_CMODE_ROMAN(0x0010) 	ローマ字モード
-	 * 		IME_CMODE_CHARCODE(0x0020) 	キャラクタ入力モード
-	 * 		IME_CMODE_HANJACONVERT(0x0040) 	ハングル文字変換モード
-	 * 		IME_CMODE_SOFTKBD(0x0080) 	ソフトキーボードモード
-	 * 		IME_CMODE_NOCONVERSION(0x0100) 	無変換モード
-	 * 		IME_CMODE_EUDC(0x0200) 	EUD変換モード
-	 * 		IME_CMODE_SYMBOL(0x0400) 	シンボルモード
+	 * 		IME_CMODE_KATAKANA(0x0002)		カタカナ(ON)・ひらがな(OFF) モード
+	 * 		IME_CMODE_FULLSHAPE(0x0008)		全角モード
+	 * 		IME_CMODE_ROMAN(0x0010)			ローマ字モード
+	 * 		IME_CMODE_CHARCODE(0x0020)		キャラクタ入力モード
+	 * 		IME_CMODE_HANJACONVERT(0x0040)	ハングル文字変換モード
+	 * 		IME_CMODE_SOFTKBD(0x0080)		ソフトキーボードモード
+	 * 		IME_CMODE_NOCONVERSION(0x0100)	無変換モード
+	 * 		IME_CMODE_EUDC(0x0200)			EUD変換モード
+	 * 		IME_CMODE_SYMBOL(0x0400)		シンボルモード
 	 * sentence : 変換モードの値を指定します。
-	 * 		IME_SMODE_NONE(0x0000) 	無変換
-	 * 		IME_SMODE_PLURALCLAUSE(0x0001) 	複合語優先
-	 * 		IME_SMODE_SINGLECONVERT(0x0002) 	単変換
-	 * 		IME_SMODE_AUTOMATIC(0x0004) 	自動変換
-	 * 		IME_SMODE_PHRASEPREDICT(0x0008) 	連文節変換
-
-imDisable を指定すると、IMEは無効になります。IMEを使用した入力はできませんし、ユーザの操作でもIMEを有効にすることはできません。
-	Disable
-	
-imClose を指定すると、IMEは無効になります。imDisableと異なり、ユーザの操作でIMEを有効にすることができます。
-	Close
-	
-imOpen を指定すると、IMEは有効になります。
-	Open
-	
-imDontCare を指定すると、IMEの有効/無効の状態は、前の状態を引き継ぎます。ユーザの操作によってIMEを有効にしたり無効にしたりすることができます。日本語入力においては、半角/全角文字をユーザに自由に入力させる場合の一般的なモードです。
-	
-	
-imSAlpha を指定すると、IMEは有効になり、半角アルファベット入力モードになります。
-	IME_CMODE_ALPHANUMERIC
-	
-imAlpha を指定すると、IMEは有効になり、全角アルファベット入力モードになります。
-	IME_CMODE_FULLSHAPE
-	
-imHira を指定すると、IMEは有効になり、ひらがな入力モードになります。
-imSKata を指定すると、IMEは有効になり、半角カタカナ入力モードになります。
-	IME_CMODE_KATAKANA
-imKata を指定すると、IMEは有効になり、全角カタカナ入力モードになります。
-	IME_CMODE_KATAKANA IME_CMODE_NATIVE
-imChinese を指定すると、IMEは有効になり、2バイト中国語入力を受け付けるモードになります。日本語環境では使用できません。
-	IME_CMODE_CHINESE
-imSHanguel を指定すると、IMEは有効になり、1バイト韓国語入力を受け付けるモードになります。日本語環境では使用できません。
-	IME_CMODE_HANJACONVERT
-imHanguel を指定すると、IMEは有効になり、2バイト韓国語入力を受け付けるモードになります。日本語環境では使用できません。
-	IME_CMODE_HANGEUL
+	 * 		IME_SMODE_NONE(0x0000)			無変換
+	 * 		IME_SMODE_PLURALCLAUSE(0x0001)	複合語優先
+	 * 		IME_SMODE_SINGLECONVERT(0x0002)	単変換
+	 * 		IME_SMODE_AUTOMATIC(0x0004)		自動変換
+	 * 		IME_SMODE_PHRASEPREDICT(0x0008)	連文節変換
 	 */
 	/*
 	bool SetConversionStatus( int conversion, int sentence ) {
 		return 0!=::ImmSetConversionStatus( hImc_, conversion, sentence );
 	}
 	*/
+	/**
+	 * @param mode : 
+ModeDisable を指定すると、IMEは無効になります。IMEを使用した入力はできませんし、ユーザの操作でもIMEを有効にすることはできません。 : Disable
+ModeClose を指定すると、IMEは無効になります。imDisableと異なり、ユーザの操作でIMEを有効にすることができます。 : Close
+ModeOpen を指定すると、IMEは有効になります。 : Open
+ModeDontCare を指定すると、IMEの有効/無効の状態は、前の状態を引き継ぎます。ユーザの操作によってIMEを有効にしたり無効にしたりすることができます。日本語入力においては、半角/全角文字をユーザに自由に入力させる場合の一般的なモードです。
+ModeSAlpha を指定すると、IMEは有効になり、半角アルファベット入力モードになります。 : IME_CMODE_ALPHANUMERIC
+ModeAlpha を指定すると、IMEは有効になり、全角アルファベット入力モードになります。 : IME_CMODE_FULLSHAPE
+ModeHira を指定すると、IMEは有効になり、ひらがな入力モードになります。
+ModeSKata を指定すると、IMEは有効になり、半角カタカナ入力モードになります。 : IME_CMODE_KATAKANA
+ModeKata を指定すると、IMEは有効になり、全角カタカナ入力モードになります。 : IME_CMODE_KATAKANA IME_CMODE_NATIVE
+ModeChinese を指定すると、IMEは有効になり、2バイト中国語入力を受け付けるモードになります。日本語環境では使用できません。 : IME_CMODE_CHINESE
+ModeSHanguel を指定すると、IMEは有効になり、1バイト韓国語入力を受け付けるモードになります。日本語環境では使用できません。 : IME_CMODE_HANJACONVERT
+ModeHanguel を指定すると、IMEは有効になり、2バイト韓国語入力を受け付けるモードになります。日本語環境では使用できません。 : IME_CMODE_HANGEUL
+	 */
 	void SetIme( int mode ) {
 		mode_ = mode;
 		HIMC hImc = ::ImmGetContext(hWnd_);

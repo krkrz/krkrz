@@ -17,7 +17,6 @@
 
 tTVPWindow::~tTVPWindow() {
 	if( ime_control_ ) delete ime_control_;
-	// UnregisterWindow();
 	::SetWindowLongPtr( window_handle_, GWLP_WNDPROC, (LONG_PTR)::DefWindowProc );
 	::SetWindowLongPtr( window_handle_, GWLP_USERDATA, (LONG_PTR)NULL );
 }
@@ -44,16 +43,6 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		return 0;
 	}
 
-	// Mouse ハンドラ
-	/* wParam
-		0x0001 (MK_LBUTTON) 	マウスの左ボタンが押されています。
-		0x0002 (MK_RBUTTON) 	マウスの右ボタンが押されています。
-		0x0004 (MK_SHIFT) 		[Shift] キーが押されています。
-		0x0008 (MK_CONTROL) 	[Ctrl] キーが押されています。
-		0x0010 (MK_MBUTTON) 	マウスの中央ボタンが押されています。
-		0x0020 (MK_XBUTTON1) 	Windows 2000/XP： 1番目の X ボタンが押されています。
-		0x0040 (MK_XBUTTON2)	Windows 2000/XP： 2番目の X ボタンが押されています。
-	*/
 	case WM_MOUSELEAVE:
 		OnMouseLeave();
 		in_window_ = false;
@@ -79,23 +68,23 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 
 	case WM_LBUTTONDOWN:
 		if( ignore_touch_mouse_ == false ) {
-			LeftDoubleClick = false;
+			left_double_click_ = false;
 			OnMouseDown( mbLeft, GetShiftState(wParam), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
 		}
 		return 0;
 	case WM_LBUTTONUP:
 		if( ignore_touch_mouse_ == false ) {
-			if( LeftDoubleClick == false ) {
+			if( left_double_click_ == false ) {
 				OnMouseClick( mbLeft, GetShiftState(wParam), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
 			}
-			LeftDoubleClick = false;
+			left_double_click_ = false;
 			OnMouseUp( mbLeft, GetShiftState(wParam), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) ); 
 		}
 		ignore_touch_mouse_ = false;
 		return 0;
 	case WM_LBUTTONDBLCLK:
 		if( ignore_touch_mouse_ == false ) {
-			LeftDoubleClick = true;
+			left_double_click_ = true;
 			OnMouseDoubleClick( mbLeft, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
 			OnMouseDown( mbLeft, GetShiftState(wParam), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
 		}
@@ -237,13 +226,6 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 			if( bHandled ) return 0;
 		}
 		return DefWindowProc(hWnd, msg, wParam, lParam);
-	 /*
-	case WM_IDLE:
-		if( TVPMainForm ) {
-			return TVPMainForm->ApplicationIdel();
-		}
-		return ::DefWindowProc(hWnd,msg,wParam,lParam);	
-		*/
 	case WM_SYSKEYDOWN:
 	case WM_KEYDOWN:
 		OnKeyDown( (WORD)wParam, GetShiftState(), lParam&0xffff, (lParam&(1<<30))?true:false );
@@ -259,11 +241,9 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 
 	case WM_SETFOCUS:
 		OnFocus( reinterpret_cast<HWND>(wParam) );
-		//return ::DefWindowProc(hWnd,msg,wParam,lParam);
 		return 0;
 	case WM_KILLFOCUS:
 		OnFocusLost( reinterpret_cast<HWND>(wParam) );
-		//return ::DefWindowProc(hWnd,msg,wParam,lParam);
 		return 0;
 	case WM_GETMINMAXINFO:
 		if( min_size_.cx != 0 ||  min_size_.cy != 0 || max_size_.cx != 0 || max_size_.cy != 0 ) {
@@ -299,7 +279,7 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 	}
 	case WM_SYSCOMMAND:
 		if( wParam == SC_CLOSE ) {
-			if( InMode ) ModalResult = mrCancel;
+			if( in_mode_ ) modal_result_ = mrCancel;
 		} else if( wParam == SC_KEYMENU ) {
 			if( HasMenu( hWnd ) == false ) {
 				return 0; // メニューがない時は、コマンドを消費して、マウスカーソル入力のロストを防ぐ
@@ -308,7 +288,6 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		return ::DefWindowProc(hWnd,msg,wParam,lParam);
 	case WM_DESTROY:
 		OnDestroy();
-		// ::PostQuitMessage( 0 );
 		return 0;
 	case WM_MOVE:
 		OnMove( GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
@@ -402,7 +381,6 @@ HRESULT tTVPWindow::CreateWnd( const std::wstring& classname, const std::wstring
     ::SetWindowLongPtr( window_handle_, GWLP_WNDPROC, (LONG_PTR)tTVPWindow::WndProc );
 	::SetWindowLongPtr( window_handle_, GWLP_USERDATA, (LONG_PTR)this );
 
-	//::ShowWindow(window_handle_,SW_SHOWDEFAULT);
 	::ShowWindow(window_handle_,SW_HIDE);
 	if( ::UpdateWindow(window_handle_) == 0 )
 		return HRESULT_FROM_WIN32(::GetLastError());
@@ -412,7 +390,6 @@ HRESULT tTVPWindow::CreateWnd( const std::wstring& classname, const std::wstring
 		int value= ::GetSystemMetrics( SM_DIGITIZER );
 		if( (value & (NID_MULTI_INPUT|NID_READY)) == (NID_MULTI_INPUT|NID_READY) ) {
 			// マルチタッチサポート & 準備できている
-			//BOOL ret = procRegisterTouchWindow( window_handle_, 0/*TWF_WANTPALM|TWF_FINETOUCH*/ );
 			procRegisterTouchWindow( window_handle_, TWF_WANTPALM|TWF_FINETOUCH );
 		}
 	}
@@ -450,7 +427,6 @@ bool tTVPWindow::Initialize() {
 void tTVPWindow::OnDestroy() {
 	::SetWindowLongPtr( window_handle_, GWLP_WNDPROC, (LONG_PTR)::DefWindowProc );
 	::SetWindowLongPtr( window_handle_, GWLP_USERDATA, (LONG_PTR)NULL );
-	// delete this;
 }
 
 bool tTVPWindow::HasMenu( HWND hWnd ) {
@@ -774,8 +750,8 @@ void tTVPWindow::GetClientRect( struct tTVPRect& rt ) {
 }
 
 void tTVPWindow::Close() {
-	if( InMode ) {
-		ModalResult = mrCancel;
+	if( in_mode_ ) {
+		modal_result_ = mrCancel;
 	} else if( OnCloseQuery() ) {
 		CloseAction action = caFree;
 		OnClose(action);
@@ -791,7 +767,6 @@ void tTVPWindow::Close() {
 		case caFree:
 		default:
 			::PostMessage( GetHandle(), TVP_EV_WINDOW_RELEASE, 0, 0 );
-			// ::DestroyWindow( GetHandle() );
 			break;
 		}
 	}
@@ -806,16 +781,14 @@ void tTVPWindow::closeModal() {
 		}
 		switch( action ) {
 		case caNone:
-			ModalResult = 0;
+			modal_result_ = 0;
 			break;
 		case caFree:
 			::PostMessage( GetHandle(), TVP_EV_WINDOW_RELEASE, 0, 0 );
-			//::DestroyWindow( GetHandle() );
-			//delete this;
 			break;
 		}
 	} catch(...) {
-		ModalResult = 0;
+		modal_result_ = 0;
 		throw;
 	}
 }
@@ -827,7 +800,7 @@ int tTVPWindow::ShowModal() {
 		// 1個しか Windowがない時はModal化する意味がないのと、不具合の元なので例外発生
 		throw Exception( (const tjs_char*)TVPCannotShowModalSingleWindow );
 	}
-	if( InMode == false ) InMode = true;
+	if( in_mode_ == false ) in_mode_ = true;
 	try {
 		if( ::GetCapture() != 0 ) {
 			::SendMessage( ::GetCapture(), WM_CANCELMODE, 0, 0 );
@@ -838,16 +811,15 @@ int tTVPWindow::ShowModal() {
 		try {
 			Application->GetEnableWindowList( enableWindows, NULL );
 			Application->DisableWindows();
-			//SetEnable( true );
 			Show();
 			::SetActiveWindow( GetHandle() );
 			SetEnable( true );
-			ModalResult = 0;
-			while( ModalResult == 0 ) {
+			modal_result_ = 0;
+			while( modal_result_ == 0 ) {
 				Application->HandleMessage();
 				if( Application->IsTarminate() ) {
-					ModalResult = mrCancel;
-				} else if( ModalResult != 0 ) {
+					modal_result_ = mrCancel;
+				} else if( modal_result_ != 0 ) {
 					closeModal();
 				}
 			}
@@ -859,16 +831,16 @@ int tTVPWindow::ShowModal() {
 			}
 			enableWindows.clear();
 			Application->ModalFinished();
-			InMode = false;
+			in_mode_ = false;
 			Hide();
 			throw;
 		}
 		Application->ModalFinished();
-		InMode = false;
+		in_mode_ = false;
 		Hide();
-		return ModalResult;
+		return modal_result_;
 	} catch(...) {
-		InMode = false;
+		in_mode_ = false;
 		throw;
 	}
 }
