@@ -37,22 +37,7 @@ enum {
 	crSizeAll = -22,
 	crHBeam = 1,
 };
-/*
-enum TImeMode {
-	imDisable,
-	imClose,
-	imOpen,
-	imDontCare,
-	imSAlpha,
-	imAlpha,
-	imHira,
-	imSKata,
-	imKata,
-	imChinese,
-	imSHanguel,
-	imHanguel
-};
-*/
+
 typedef unsigned long TShiftState;
 //---------------------------------------------------------------------------
 // Options
@@ -104,10 +89,6 @@ class TTVPWindowForm : public tTVPWindow, public TouchHandler {
 	static const int TVP_MOUSE_SHIFT_ACCEL = 40;
 	static const int TVP_TOOLTIP_SHOW_DELAY = 500;
 private:
-
-	//bool InMode;
-	//bool Focusable;
-
 	//-- drawdevice related
 	bool NextSetWindowHandleToDrawDevice;
 	tTVPRect LastSentDrawDeviceDestRect;
@@ -245,12 +226,6 @@ public:
 		return ret;
 	}
 
-/*
-
-	void SetShowScrollBars(bool b){}
-	bool GetShowScrollBars() const{return false;}
-*/
-
 	void CleanupFullScreen();
 
 	void SetUseMouseKey(bool b);
@@ -268,11 +243,6 @@ public:
 	void SetMouseCursorState(tTVPMouseCursorState mcs);
     tTVPMouseCursorState GetMouseCursorState() const { return MouseCursorState; }
 
-	/*
-	void SetFocusable(bool b){}
-	bool GetFocusable() { return Focusable; }
-	*/
-	
 	void AdjustNumerAndDenom(tjs_int &n, tjs_int &d);
 	void SetZoom(tjs_int numer, tjs_int denom, bool set_logical = true);
 	void SetZoomNumer( tjs_int n ) { SetZoom(n, ZoomDenom); }
@@ -285,7 +255,6 @@ public:
 	bool GetFullScreenMode() const;
 
 	//-- methods/properties
-	//void BeginMove(){}
 	void UpdateWindow(tTVPUpdateType type = utNormal);
 	void ShowWindowAsModal();
 
@@ -368,8 +337,6 @@ public:
 	virtual void OnDropFile( HDROP hDrop );
 	// virtual int OnMouseActivate( HWND hTopLevelParentWnd, WORD hitTestCode, WORD MouseMsg );
 	virtual void OnEnable( bool enabled );
-	//virtual void OnEnterMenuLoop( bool entered );
-	//virtual void OnExitMenuLoop( bool isShortcutMenu );
 	virtual void OnDeviceChange( int event, void *data );
 	virtual void OnNonClientMouseDown( int button, int hittest, int x, int y );
 	virtual void OnMouseEnter();

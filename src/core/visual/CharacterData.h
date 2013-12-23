@@ -30,8 +30,6 @@ public:
 	tjs_int OriginX; //!< 文字Bitmapを描画するascent位置との横オフセット
 	tjs_int OriginY; //!< 文字Bitmapを描画するascent位置との縦オフセット
 	tGlyphMetrics	Metrics; //!< メトリック、送り幅と高さを保持
-	//tjs_int CellIncX;
-	//tjs_int CellIncY;
 	tjs_int Pitch; //!< 保持している画像ピッチ
 	tjs_uint BlackBoxX; //!< 保持している画像幅
 	tjs_uint BlackBoxY; //!< 保持している画像高さ
