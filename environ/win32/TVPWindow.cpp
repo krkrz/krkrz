@@ -30,6 +30,20 @@ LRESULT WINAPI tTVPWindow::WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM l
 }
 
 LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam ) {
+	// マウスメッセージがきた時、Mouse Enter の判定を行う
+	if( (msg >= WM_MOUSEFIRST && msg <= WM_MOUSELAST) && msg != WM_MOUSELEAVE ) {
+		if( in_window_ == false ) {
+			OnMouseEnter();
+			in_window_ = true;
+			TRACKMOUSEEVENT tme;
+            tme.cbSize = sizeof(TRACKMOUSEEVENT);
+            tme.dwFlags = TME_LEAVE;
+            tme.hwndTrack = hWnd;
+			tme.dwHoverTime = HOVER_DEFAULT;
+            ::TrackMouseEvent( &tme ); // ここでエラーをハンドリングしてもあまり意味無いので無視
+		}
+	}
+
 	switch( msg ) {
 	case WM_PAINT: {
 		PAINTSTRUCT ps;
@@ -44,8 +58,10 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 	}
 
 	case WM_MOUSELEAVE:
-		OnMouseLeave();
-		in_window_ = false;
+		if( in_window_ ) {
+			OnMouseLeave();
+			in_window_ = false;
+		}
 		return 0;
 
 	case WM_MOUSEWHEEL:
@@ -53,16 +69,6 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		return 0;
 
 	case WM_MOUSEMOVE:
-		if( in_window_ == false ) {
-			OnMouseEnter();
-			in_window_ = true;
-			TRACKMOUSEEVENT tme;
-            tme.cbSize = sizeof(TRACKMOUSEEVENT);
-            tme.dwFlags = TME_LEAVE;
-            tme.hwndTrack = hWnd;
-			tme.dwHoverTime = HOVER_DEFAULT;
-            ::TrackMouseEvent( &tme ); // エラーはハンドリングしてもあまり意味無いので無視
-		}
 		OnMouseMove( GetShiftState(wParam), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
 		return 0;
 
