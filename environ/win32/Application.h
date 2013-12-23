@@ -8,7 +8,7 @@
 
 std::wstring ExePath();
 
-// 後で見通しのよう方法に変更する
+// 見通しのよい方法に変更した方が良い
 extern int _argc;
 extern char ** _argv;
 
@@ -68,12 +68,12 @@ class tTVPApplication {
 	std::wstring console_title_;
 	AcceleratorKeyTable accel_key_;
 	bool tarminate_;
-	bool ApplicationActivating;
-	bool HasMapReportProcess;
+	bool application_activating_;
+	bool has_map_report_process_;
 
-	class tTVPAsyncImageLoader* ImageLoadThread;
+	class tTVPAsyncImageLoader* image_load_thread_;
 
-	std::stack<class tTVPWindow*> ModalWindowStack;
+	std::stack<class tTVPWindow*> modal_window_stack_;
 
 private:
 	void CheckConsole();
@@ -138,13 +138,12 @@ public:
 
 	int ArgC;
 	char ** ArgV;
-	std::vector<std::string> CommandLines;
 
 	void PostMessageToMainWindow(UINT message, WPARAM wParam, LPARAM lParam);
 
 
 	void ModalStarted( class tTVPWindow* form ) {
-		ModalWindowStack.push(form);
+		modal_window_stack_.push(form);
 	}
 	void ModalFinished();
 	void OnActiveAnyWindow();
@@ -160,7 +159,7 @@ public:
 
 	void OnActivate( HWND hWnd );
 	void OnDeactivate( HWND hWnd );
-	bool GetActivating() const { return ApplicationActivating; }
+	bool GetActivating() const { return application_activating_; }
 	bool GetNotMinimizing() const;
 
 	/**

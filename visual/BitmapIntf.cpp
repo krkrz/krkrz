@@ -25,7 +25,6 @@ tjs_error TJS_INTF_METHOD tTJSNI_Bitmap::Construct(tjs_int numparams, tTJSVarian
 			if( numparams > 1 ) {
 				colorkey = (tjs_uint32)(tjs_int64)*param[1];
 			}
-			// Bitmap = new tTVPBaseBitmap( TVPGetInitialBitmap() );
 			iTJSDispatch2 *ret = Load( *param[0], colorkey );
 			if( ret ) ret->Release(); // ignore
 		} else if( numparams > 1 ) {

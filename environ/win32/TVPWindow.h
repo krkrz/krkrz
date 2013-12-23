@@ -25,8 +25,8 @@ enum {
 };
 
 class tTVPWindow {
-	WNDCLASSEX			wc_;
-	bool	created_;
+	WNDCLASSEX	wc_;
+	bool		created_;
 
 protected:
 	enum CloseAction {
@@ -55,14 +55,14 @@ protected:
 	bool		in_window_;
 	bool		ignore_touch_mouse_;
 
-	bool InMode;
-	int ModalResult;
+	bool in_mode_;
+	int modal_result_;
 
 	static const UINT SIZE_CHANGE_FLAGS;
 	static const UINT POS_CHANGE_FLAGS;
 	static const DWORD DEFAULT_EX_STYLE;
 
-	bool LeftDoubleClick;
+	bool left_double_click_;
 
 	ImeControl* ime_control_;
 
@@ -131,8 +131,8 @@ protected:
 	static bool HasMenu( HWND hWnd );
 public:
 	tTVPWindow()
-	: window_handle_(NULL), created_(false), LeftDoubleClick(false), ime_control_(NULL), border_style_(0), ModalResult(0),
-		in_window_(false), ignore_touch_mouse_(false), InMode(false) {
+	: window_handle_(NULL), created_(false), left_double_click_(false), ime_control_(NULL), border_style_(0), modal_result_(0),
+		in_window_(false), ignore_touch_mouse_(false), in_mode_(false) {
 		min_size_.cx = min_size_.cy = 0;
 		max_size_.cx = max_size_.cy = 0;
 	}
@@ -247,16 +247,9 @@ public:
 	void SetStayOnTop( bool b );
 	bool GetStayOnTop() const;
 
-	/*
-	void SetFullScreenMode(bool b);
-	inline bool GetFullScreenMode() const {
-		return 0 != (flags_&FALG_FULLSCREEN);
-	}
-	*/
-
 	int ShowModal();
 	void closeModal();
-	bool IsModal() const { return InMode; }
+	bool IsModal() const { return in_mode_; }
 	void Close();
 
 	void GetClientRect( struct tTVPRect& rt );
