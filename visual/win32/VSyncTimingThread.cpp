@@ -12,7 +12,7 @@
 
 //---------------------------------------------------------------------------
 tTVPVSyncTimingThread::tTVPVSyncTimingThread(tTJSNI_Window* owner)
-	 : tTVPThread(true), EventQueue(this,&tTVPVSyncTimingThread::Proc)
+	 : tTVPThread(true), EventQueue(this,&tTVPVSyncTimingThread::Proc), OwnerWindow(owner)
 {
 	SleepTime = 1;
 	LastVBlankTick = 0;
