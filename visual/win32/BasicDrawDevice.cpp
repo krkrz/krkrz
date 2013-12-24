@@ -580,20 +580,22 @@ bool TJS_INTF_METHOD tTVPBasicDrawDevice::WaitForVBlank( tjs_int* in_vblank, tjs
 		// vblank から抜けるまで待つ
 		DWORD timeout_target_tick = ::timeGetTime() + 1;
 		rs.InVBlank = FALSE;
+		HRESULT hr = D3D_OK;
 		do {
-			Direct3DDevice->GetRasterStatus(0,&rs);
-		} while(rs.InVBlank == TRUE && (long)(::timeGetTime() - timeout_target_tick) <= 0);
+			hr = Direct3DDevice->GetRasterStatus(0,&rs);
+		} while( D3D_OK == hr && rs.InVBlank == TRUE && (long)(::timeGetTime() - timeout_target_tick) <= 0);
 
 		// vblank に入るまで待つ
 		rs.InVBlank = TRUE;
 		do {
-			Direct3DDevice->GetRasterStatus(0,&rs);
-		} while(rs.InVBlank == FALSE && (long)(::timeGetTime() - timeout_target_tick) <= 0);
+			hr = Direct3DDevice->GetRasterStatus(0,&rs);
+		} while( D3D_OK == hr && rs.InVBlank == FALSE && (long)(::timeGetTime() - timeout_target_tick) <= 0);
 
 		if((int)(::timeGetTime() - timeout_target_tick) > 0) {
 			// フレームスキップが発生したと考えてよい
 			isdelayed  = true;
 		}
+		inVsync = rs.InVBlank == TRUE;
 	}
 	*delayed = isdelayed ? 1 : 0;
 	*in_vblank = inVsync ? 1 : 0;
