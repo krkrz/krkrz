@@ -373,8 +373,7 @@ void tTJSNI_VideoOverlay::Close()
 	if(VideoOverlay)
 	{
 		VideoOverlay->Release(), VideoOverlay = NULL;
-		tjs_int ofsx, ofsy;
-		::SetFocus(Window->GetWindowHandle(ofsx, ofsy));
+		::SetFocus(Window->GetWindowHandle());
 	}
 	if(LocalTempStorageHolder)
 		delete LocalTempStorageHolder, LocalTempStorageHolder = NULL;
@@ -496,7 +495,7 @@ void tTJSNI_VideoOverlay::SetRectangleToVideoOverlay()
 	if(VideoOverlay && OwnerWindow)
 	{
 		tjs_int ofsx, ofsy;
-		Window->GetWindowHandle(ofsx, ofsy);
+		Window->GetVideoOffset(ofsx, ofsy);
 		tjs_int l = Rect.left;
 		tjs_int t = Rect.top;
 		tjs_int r = Rect.right;
@@ -609,8 +608,7 @@ void tTJSNI_VideoOverlay::ResetOverlayParams()
 	// also sets rectangle and visible state.
 	if(VideoOverlay && Window && (Mode == vomOverlay || Mode == vomMixer) )
 	{
-		tjs_int ofsx, ofsy;
-		OwnerWindow = Window->GetWindowHandle(ofsx, ofsy);
+		OwnerWindow = Window->GetWindowHandle();
 		VideoOverlay->SetWindow(OwnerWindow);
 
 		VideoOverlay->SetMessageDrainWindow(Window->GetSurfaceWindowHandle());

@@ -270,10 +270,11 @@ public:
 	void SendCloseMessage();
 	
 	void ZoomRectangle( tjs_int & left, tjs_int & top, tjs_int & right, tjs_int & bottom);
+	void GetVideoOffset(tjs_int &ofsx, tjs_int &ofsy);
 
-	HWND GetSurfaceWindowHandle();
-	HWND GetWindowHandle(tjs_int &ofsx, tjs_int &ofsy);
-	HWND GetWindowHandleForPlugin();
+	HWND GetSurfaceWindowHandle() { return GetHandle(); }
+	HWND GetWindowHandle() { return GetHandle(); }
+	HWND GetWindowHandleForPlugin() { return GetHandle(); }
 
 	//-- form mode
 	bool GetFormEnabled();

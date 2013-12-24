@@ -298,7 +298,8 @@ public:
 //-- interface to VideoOverlay object
 public:
 	HWND GetSurfaceWindowHandle();
-	HWND GetWindowHandle(tjs_int &ofsx, tjs_int &ofsy);
+	HWND GetWindowHandle();
+	void GetVideoOffset(tjs_int &ofsx, tjs_int &ofsy);
 
 	void ReadjustVideoRect();
 	void WindowMoved();

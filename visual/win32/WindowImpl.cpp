@@ -1347,10 +1347,20 @@ void tTJSNI_Window::ZoomRectangle(
 	Form->ZoomRectangle(left, top, right, bottom);
 }
 //---------------------------------------------------------------------------
-HWND tTJSNI_Window::GetWindowHandle(tjs_int &ofsx, tjs_int &ofsy)
+HWND tTJSNI_Window::GetWindowHandle()
 {
 	if(!Form) return NULL;
-	return Form->GetWindowHandle(ofsx, ofsy);
+	return Form->GetWindowHandle();
+}
+//---------------------------------------------------------------------------
+void tTJSNI_Window::GetVideoOffset(tjs_int &ofsx, tjs_int &ofsy)
+{
+	if(!Form) {
+		ofsx = 0;
+		ofsy = 0;
+	} else {
+		Form->GetVideoOffset(ofsx,ofsy);
+	}
 }
 //---------------------------------------------------------------------------
 void tTJSNI_Window::ReadjustVideoRect()
