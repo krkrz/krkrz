@@ -1055,7 +1055,16 @@ void TTVPWindowForm::ZoomRectangle( tjs_int& left, tjs_int& top, tjs_int& right,
 	right =  MulDiv(right ,  ActualZoomNumer, ActualZoomDenom);
 	bottom = MulDiv(bottom,  ActualZoomNumer, ActualZoomDenom);
 }
-
+void TTVPWindowForm::GetVideoOffset(tjs_int &ofsx, tjs_int &ofsy) {
+	if( GetFullScreenMode() ) {
+		ofsx = FullScreenDestRect.left;
+		ofsy = FullScreenDestRect.top;
+	} else {
+		ofsx = 0;
+		ofsy = 0;
+	}
+}
+/*
 HWND TTVPWindowForm::GetSurfaceWindowHandle() {
 	return GetHandle();
 }
@@ -1071,6 +1080,7 @@ HWND TTVPWindowForm::GetWindowHandle(tjs_int &ofsx, tjs_int &ofsy) {
 HWND TTVPWindowForm::GetWindowHandleForPlugin() {
 	return GetHandle();
 }
+*/
 
 void TTVPWindowForm::ResetDrawDevice() {
 	NextSetWindowHandleToDrawDevice = true;
