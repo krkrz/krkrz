@@ -49,6 +49,7 @@ tTVPBasicDrawDevice::tTVPBasicDrawDevice()
 	TVPInitBasicDrawDeviceOptions(); // read and initialize options
 	TargetWindow = NULL;
 	DrawUpdateRectangle = false;
+	BackBufferDirty = true;
 
 	Direct3D = NULL;
 	Direct3DDevice = NULL;
@@ -124,6 +125,7 @@ bool tTVPBasicDrawDevice::GetDirect3D9Device() {
 		return false;
 	}
 	CurrentMonitor = iCurrentMonitor;
+	BackBufferDirty = true;
 
 	/*
 	D3DVIEWPORT9 vp;
@@ -494,6 +496,7 @@ void TJS_INTF_METHOD tTVPBasicDrawDevice::SetTargetWindow(HWND wnd, bool is_main
 //---------------------------------------------------------------------------
 void TJS_INTF_METHOD tTVPBasicDrawDevice::SetDestRectangle(const tTVPRect & rect)
 {
+	BackBufferDirty = true;
 	// 位置だけの変更の場合かどうかをチェックする
 	if(rect.get_width() == DestRect.get_width() && rect.get_height() == DestRect.get_height()) {
 		// 位置だけの変更だ
@@ -522,6 +525,8 @@ void TJS_INTF_METHOD tTVPBasicDrawDevice::NotifyLayerResize(iTVPLayerManager * m
 {
 	inherited::NotifyLayerResize(manager);
 
+	BackBufferDirty = true;
+
 	// テクスチャを捨てて作り直す。
 	CreateTexture();
 }
@@ -549,25 +554,7 @@ void TJS_INTF_METHOD tTVPBasicDrawDevice::Show()
 	} else {
 		ShouldShow = true;
 	}
-#if 0
-	if( DestRect.left != 0 || DestRect.top != 0 ) {
-		hr = Direct3DDevice->Present( NULL, NULL, TargetWindow, NULL );
-	} else {
-		RECT drect;
-		drect.left   = 0;
-		drect.top    = 0;
-		drect.right  = DestRect.right;
-		drect.bottom = DestRect.bottom;
 
-		RECT srect;
-		srect.left   = 0;
-		srect.top    = 0;
-		srect.right  = DestRect.right;
-		srect.bottom = DestRect.bottom;
-
-		hr = Direct3DDevice->Present( &srect, &drect, TargetWindow, NULL );
-	}
-#endif
 	if(hr == D3DERR_DEVICELOST) {
 		if( IsTargetWindowActive() ) ErrorToLog( hr );
 		TryRecreateWhenDeviceLost();
@@ -759,7 +746,10 @@ void TJS_INTF_METHOD tTVPBasicDrawDevice::EndBitmapCompletion(iTVPLayerManager *
 			~CAutoEndSceneCall() { m_Device->EndScene(); }
 		} autoEnd(Direct3DDevice);
 
-		Direct3DDevice->Clear( 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0,0,0), 1.0, 0 );
+		if( BackBufferDirty ) {
+			Direct3DDevice->Clear( 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0,0,0), 1.0, 0 );
+			BackBufferDirty = false;
+		}
 
 		//- draw as triangles
 		if( FAILED(hr = Direct3DDevice->SetTexture(0, Texture)) )
@@ -822,6 +812,7 @@ bool TJS_INTF_METHOD tTVPBasicDrawDevice::SwitchToFullScreen( HWND window, tjs_u
 	// Direct3D9 でフルスクリーン化するとフォーカスを失うとデバイスをロストするので、そのたびにリセットor作り直しが必要になる。
 	// モーダルウィンドウを使用するシステムでは、これは困るので常にウィンドウモードで行う。
 	// モーダルウィンドウを使用しないシステムにするのなら、フルスクリーンを使用するDrawDeviceを作ると良い。
+	BackBufferDirty = true;
 	ShouldShow = true;
 	CheckMonitorMoved();
 	return true;
@@ -829,6 +820,7 @@ bool TJS_INTF_METHOD tTVPBasicDrawDevice::SwitchToFullScreen( HWND window, tjs_u
 //---------------------------------------------------------------------------
 void TJS_INTF_METHOD tTVPBasicDrawDevice::RevertFromFullScreen( HWND window, tjs_uint w, tjs_uint h, tjs_uint bpp, tjs_uint color )
 {
+	BackBufferDirty = true;
 	ShouldShow = true;
 	CheckMonitorMoved();
 }
