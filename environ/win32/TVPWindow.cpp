@@ -343,6 +343,7 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 void tTVPWindow::OnPaint() {
 }
 const DWORD tTVPWindow::DEFAULT_EX_STYLE = WS_EX_ACCEPTFILES | WS_EX_APPWINDOW;
+const ULONG tTVPWindow::REGISTER_TOUCH_FLAG = TWF_WANTPALM|TWF_FINETOUCH;
 HRESULT tTVPWindow::CreateWnd( const std::wstring& classname, const std::wstring& title, int width, int height, HWND hParent )
 {
 	window_class_name_ = classname;
@@ -396,7 +397,7 @@ HRESULT tTVPWindow::CreateWnd( const std::wstring& classname, const std::wstring
 		int value= ::GetSystemMetrics( SM_DIGITIZER );
 		if( (value & (NID_MULTI_INPUT|NID_READY)) == (NID_MULTI_INPUT|NID_READY) ) {
 			// マルチタッチサポート & 準備できている
-			procRegisterTouchWindow( window_handle_, TWF_WANTPALM|TWF_FINETOUCH );
+			procRegisterTouchWindow( window_handle_, REGISTER_TOUCH_FLAG );
 		}
 	}
 	return S_OK;
