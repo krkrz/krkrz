@@ -1544,7 +1544,7 @@ void TTVPWindowForm::SetEnableTouch( bool b ) {
 			int value= ::GetSystemMetrics( SM_DIGITIZER );
 			if( (value & NID_READY ) == NID_READY ) {
 				if( b ) {
-					procRegisterTouchWindow( GetHandle(), TWF_WANTPALM|TWF_FINETOUCH );
+					procRegisterTouchWindow( GetHandle(), REGISTER_TOUCH_FLAG );
 				} else {
 					procUnregisterTouchWindow( GetHandle() );
 				}
