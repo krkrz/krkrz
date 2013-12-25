@@ -402,11 +402,9 @@ public:
 
 	void SetMouseCursorState(tTVPMouseCursorState mcs);
     tTVPMouseCursorState GetMouseCursorState() const;
-	
-#ifdef USE_OBSOLETE_FUNCTIONS
+
 	void SetFocusable(bool b);
 	bool GetFocusable();
-#endif
 
 	void SetZoom(tjs_int numer, tjs_int denom);
 	void SetZoomNumer(tjs_int n);
