@@ -1442,7 +1442,6 @@ TJS_BEGIN_NATIVE_PROP_DECL(top)
 }
 TJS_END_NATIVE_PROP_DECL(top)
 //----------------------------------------------------------------------
-#ifdef USE_OBSOLETE_FUNCTIONS
 TJS_BEGIN_NATIVE_PROP_DECL(focusable)
 {
 	TJS_BEGIN_NATIVE_PROP_GETTER
@@ -1462,7 +1461,6 @@ TJS_BEGIN_NATIVE_PROP_DECL(focusable)
 	TJS_END_NATIVE_PROP_SETTER
 }
 TJS_END_NATIVE_PROP_DECL(focusable)
-#endif
 //----------------------------------------------------------------------
 #ifdef USE_OBSOLETE_FUNCTIONS
 TJS_BEGIN_NATIVE_PROP_DECL(layerLeft)

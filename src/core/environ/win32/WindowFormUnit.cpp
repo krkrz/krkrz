@@ -197,8 +197,9 @@ TTVPWindowForm::TTVPWindowForm( tTVPApplication* app, tTJSNI_Window* ni, tTJSNI_
 	
 	NextSetWindowHandleToDrawDevice = true;
 	LastSentDrawDeviceDestRect.clear();
-	
+
 	in_mode_ = false;
+	Focusable = true;
 	Closing = false;
 	ProgramClosing = false;
 	modal_result_ = 0;
@@ -649,6 +650,16 @@ void TTVPWindowForm::SetForceMouseCursorVisible(bool s) {
 void TTVPWindowForm::SetMouseCursorToWindow( MouseCursor& cursor ) {
 	cursor.SetCursor();
 }
+
+//---------------------------------------------------------------------------
+void TTVPWindowForm::SetFocusable(bool b)
+{
+	// set focusable state to 'b'.
+	// note that currently focused window does not automatically unfocus by
+	// setting false to this flag.
+	Focusable = b;
+}
+//---------------------------------------------------------------------------
 void TTVPWindowForm::InternalSetPaintBoxSize() {
 	SetDrawDeviceDestRect();
 }
@@ -890,6 +901,21 @@ void TTVPWindowForm::ShowWindowAsModal() {
 		throw;
 	}
 	TVPRemoveModalWindow(this);
+}
+//---------------------------------------------------------------------------
+void TTVPWindowForm::SetVisibleFromScript(bool b)
+{
+	if(Focusable) {
+		SetVisible( b );
+	} else {
+		if( !GetVisible() ) {
+			// just show window, not activate
+			SetWindowPos(GetHandle(), GetStayOnTop()?HWND_TOPMOST:HWND_TOP, 0, 0, 0, 0, SWP_NOACTIVATE|SWP_NOMOVE|SWP_NOSIZE|SWP_SHOWWINDOW);
+			SetVisible( true );
+		} else {
+			SetVisible( false );
+		}
+	}
 }
 
 
@@ -1710,7 +1736,7 @@ void TTVPWindowForm::OnDropFile( HDROP hDrop ) {
 	}
 	array->Release();
 }
-/*
+
 int TTVPWindowForm::OnMouseActivate( HWND hTopLevelParentWnd, WORD hitTestCode, WORD MouseMsg ) {
 	if(!Focusable) {
 		// override default action (which activates the window)
@@ -1722,7 +1748,7 @@ int TTVPWindowForm::OnMouseActivate( HWND hTopLevelParentWnd, WORD hitTestCode, 
 		return MA_ACTIVATE;
 	}
 }
-*/
+
 void TTVPWindowForm::OnEnable( bool enabled ) {
 	// enabled status has changed
 	if(TJSNativeInstance) {
