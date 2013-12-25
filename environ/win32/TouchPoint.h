@@ -122,8 +122,8 @@ public:
 				dy = (target.y - y);
 				double currentdistance = std::sqrt( dx*dx +dy*dy );
 				double curentangle = std::atan2( dy, dx );
-				double cx = dx*0.5;
-				double cy = dy*0.5;
+				double cx = (target.x + x) * 0.5;
+				double cy = (target.y + y) * 0.5;
 
 				double distance = std::abs(currentdistance-startdistance);
 				bool scale_started = (self.flag & TouchPoint::START_SCALING) != 0;
