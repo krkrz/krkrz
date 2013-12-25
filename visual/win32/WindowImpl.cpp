@@ -1481,7 +1481,7 @@ bool tTJSNI_Window::GetVisible() const
 void tTJSNI_Window::SetVisible(bool s)
 {
 	FullScreenGuard();
-	if( Form ) Form->SetVisible(s);
+	if( Form ) Form->SetVisibleFromScript(s);
 }
 //---------------------------------------------------------------------------
 void tTJSNI_Window::GetCaption(ttstr & v) const
@@ -1782,7 +1782,6 @@ tTVPMouseCursorState tTJSNI_Window::GetMouseCursorState() const
 	return Form->GetMouseCursorState();
 }
 //---------------------------------------------------------------------------
-#ifdef USE_OBSOLETE_FUNCTIONS
 void tTJSNI_Window::SetFocusable(bool b)
 {
 	if(!Form) return;
@@ -1794,7 +1793,6 @@ bool tTJSNI_Window::GetFocusable()
 	if(!Form) return true;
 	return Form->GetFocusable();
 }
-#endif
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetZoom(tjs_int numer, tjs_int denom)
 {

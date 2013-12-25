@@ -89,6 +89,8 @@ class TTVPWindowForm : public tTVPWindow, public TouchHandler {
 	static const int TVP_MOUSE_SHIFT_ACCEL = 40;
 	static const int TVP_TOOLTIP_SHOW_DELAY = 500;
 private:
+	bool Focusable;
+
 	//-- drawdevice related
 	bool NextSetWindowHandleToDrawDevice;
 	tTVPRect LastSentDrawDeviceDestRect;
@@ -177,7 +179,7 @@ private:
 	void TranslateDrawAreaToWindow(int &x, int &y);
 
 	void FirePopupHide();
-	bool CanSendPopupHide() const { return /*!Focusable &&*/ GetVisible() && GetStayOnTop(); }
+	bool CanSendPopupHide() const { return !Focusable && GetVisible() && GetStayOnTop(); }
 	
 	void RestoreMouseCursor();
 	void SetMouseCursorVisibleState(bool b);
@@ -243,6 +245,9 @@ public:
 	void SetMouseCursorState(tTVPMouseCursorState mcs);
     tTVPMouseCursorState GetMouseCursorState() const { return MouseCursorState; }
 
+	void SetFocusable(bool b);
+	bool GetFocusable() const { return Focusable; }
+
 	void AdjustNumerAndDenom(tjs_int &n, tjs_int &d);
 	void SetZoom(tjs_int numer, tjs_int denom, bool set_logical = true);
 	void SetZoomNumer( tjs_int n ) { SetZoom(n, ZoomDenom); }
@@ -257,6 +262,8 @@ public:
 	//-- methods/properties
 	void UpdateWindow(tTVPUpdateType type = utNormal);
 	void ShowWindowAsModal();
+
+	void SetVisibleFromScript(bool b);
 
 	void RegisterWindowMessageReceiver(tTVPWMRRegMode mode, void * proc, const void *userdata);
 
@@ -336,7 +343,7 @@ public:
 	virtual void OnMove( int x, int y );
 	virtual void OnResize( int state, int w, int h );
 	virtual void OnDropFile( HDROP hDrop );
-	// virtual int OnMouseActivate( HWND hTopLevelParentWnd, WORD hitTestCode, WORD MouseMsg );
+	virtual int OnMouseActivate( HWND hTopLevelParentWnd, WORD hitTestCode, WORD MouseMsg );
 	virtual void OnEnable( bool enabled );
 	virtual void OnDeviceChange( int event, void *data );
 	virtual void OnNonClientMouseDown( int button, int hittest, int x, int y );
