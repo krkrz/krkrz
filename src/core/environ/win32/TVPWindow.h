@@ -61,6 +61,7 @@ protected:
 	static const UINT SIZE_CHANGE_FLAGS;
 	static const UINT POS_CHANGE_FLAGS;
 	static const DWORD DEFAULT_EX_STYLE;
+	static const ULONG REGISTER_TOUCH_FLAG;
 
 	bool left_double_click_;
 
