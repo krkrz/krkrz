@@ -1042,6 +1042,7 @@ static void TVPUninitDirectSound()
 static void TVPUninitDirectSoundAtExitProc()
 {
 	TVPUninitDirectSound();
+	if( TVPPrimaryDelayedStopperTimer ) delete TVPPrimaryDelayedStopperTimer, TVPPrimaryDelayedStopperTimer = NULL;
 	TVPDirectSoundShutdown = true;
 }
 static tTVPAtExit TVPUninitDirectSoundAtExit
