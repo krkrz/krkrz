@@ -732,7 +732,7 @@ void TTVPWindowForm::SetFullScreenMode( bool b ) {
 				SetFullScreenMode(false);
 				return;
 			}
-			::SetWindowLong( GetHandle(), GWL_STYLE, WS_POPUP | WS_VISIBLE);
+			::SetWindowLong( GetHandle(), GWL_STYLE, WS_POPUP | WS_VISIBLE | WS_CLIPCHILDREN);
 
 			// get resulted screen size
 			tjs_int fs_w = TVPFullScreenMode.Width;

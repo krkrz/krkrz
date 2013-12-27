@@ -372,7 +372,7 @@ HRESULT tTVPWindow::CreateWnd( const std::wstring& classname, const std::wstring
 	RECT	winRc = { 0, 0, window_client_size_.cx, window_client_size_.cy };
 	::AdjustWindowRectEx( &winRc, WS_OVERLAPPEDWINDOW, NULL, DEFAULT_EX_STYLE );
 	window_handle_ = ::CreateWindowEx( DEFAULT_EX_STYLE, window_class_name_.c_str(), window_title_.c_str(),
-						WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, winRc.right-winRc.left, winRc.bottom-winRc.top,
+						WS_OVERLAPPEDWINDOW|WS_CLIPCHILDREN, CW_USEDEFAULT, CW_USEDEFAULT, winRc.right-winRc.left, winRc.bottom-winRc.top,
 						hParent, NULL, wc.hInstance, NULL );
 	
 	if( window_handle_ == NULL ) {
