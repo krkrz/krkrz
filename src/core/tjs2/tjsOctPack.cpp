@@ -143,26 +143,28 @@ static void BitStringToBin( std::vector<tjs_uint8>& bin, const ttstr& arg, bool 
 	tjs_uint8 val = 0;
 	tjs_int pos = 0;
 	if( mtol ) {
-		for( tjs_int i = 0; i < len && *str != NULL; str++, i++, pos++ ) {
+		pos = 7;
+		for( tjs_int i = 0; i < len && *str != NULL; str++, i++ ) {
 			if( *str == L'0' ) {
 				// val |= 0;
 			} else if( *str == L'1' ) {
-				val |= 1;
+				val |= 1 << pos;
 			} else {
 				TJS_eTJSError( TJSUnknownBitStringCharacter );
 			}
-			val <<= 1;
-			if( pos == 7 ) {
+			if( pos == 0 ) {
 				bin.push_back( val );
-				pos = val = 0;
+				pos = 7;
+				val = 0;
+			} else {
+				pos--;
 			}
 		}
-		if( pos ) {
-			val <<= (7-pos);
+		if( pos < 7 ) {
 			bin.push_back( val );
 		}
 	} else {
-		for( tjs_int i = 0; i < len && *str != NULL; str++, i++, pos++ ) {
+		for( tjs_int i = 0; i < len && *str != NULL; str++, i++ ) {
 			if( *str == L'0' ) {
 				// val |= 0;
 			} else if( *str == L'1' ) {
@@ -173,6 +175,8 @@ static void BitStringToBin( std::vector<tjs_uint8>& bin, const ttstr& arg, bool 
 			if( pos == 7 ) {
 				bin.push_back( val );
 				pos = val = 0;
+			} else {
+				pos++;
 			}
 		}
 		if( pos ) {
@@ -187,28 +191,30 @@ static void HexToBin( std::vector<tjs_uint8>& bin, const ttstr& arg, bool mtol, 
 	tjs_uint8 val = 0;
 	tjs_int pos = 0;
 	if( mtol ) { // 上位ニブルが先
-		for( tjs_int i = 0; i < len && *str != NULL; str++, i++, pos++ ) {
+		pos = 1;
+		for( tjs_int i = 0; i < len && *str != NULL; str++, i++ ) {
 			if( *str >= L'0' && *str <= L'9' ) {
-				val |= *str - L'0';
+				val |= (*str - L'0') << (pos*4);
 			} else if( *str >= L'a' && *str <= L'f' ) {
-				val |= *str - L'a' + 10;
+				val |= (*str - L'a' + 10) << (pos*4);
 			} else if( *str >= L'A' && *str <= L'E' ) {
-				val |= *str - L'A' + 10;
+				val |= (*str - L'A' + 10) << (pos*4);
 			} else {
-				TJS_eTJSError( TJSUnknownHexStringCharacter );
+				TJS_eTJSError( TJSUnknownHexStringCharacter  );
 			}
-			val <<= 4;
-			if( pos ) {
+			if( pos == 0 ) {
 				bin.push_back( val );
-				pos = val = 0;
+				pos = 1;
+				val = 0;
+			} else {
+				pos--;
 			}
 		}
-		if( pos ) {
-			val <<= 4;
+		if( pos < 1 ) {
 			bin.push_back( val );
 		}
 	} else { // 下位ニブルが先
-		for( tjs_int i = 0; i < len && *str != NULL; str++, i++, pos++ ) {
+		for( tjs_int i = 0; i < len && *str != NULL; str++, i++ ) {
 			if( *str >= L'0' && *str <= L'9' ) {
 				val |= (*str - L'0') << (pos*4);
 			} else if( *str >= L'a' && *str <= L'f' ) {
@@ -221,6 +227,8 @@ static void HexToBin( std::vector<tjs_uint8>& bin, const ttstr& arg, bool mtol, 
 			if( pos ) {
 				bin.push_back( val );
 				pos = val = 0;
+			} else {
+				pos++;
 			}
 		}
 		if( pos ) {
@@ -236,12 +244,15 @@ static void ReadNumberLE( std::vector<tjs_uint8>& result, const std::vector<tTJS
 	if( (len+argindex) > numargs ) len = numargs - argindex;
 	for( tjs_int a = 0; a < len; a++ ) {
 		TRet c = (TRet)(TTmp)args[argindex+a];
+		TRetTmp val = *(TRetTmp*)&c;
 		for( int i = 0; i < NBYTE; i++ ) {
-			result.push_back( ((TRetTmp)c&(0xFF<<i))>>i ); // little endian
+			TRetTmp tmp = ( val >> (i*8) ) & 0xFF;
+			result.push_back( (tjs_uint8)tmp ); // little endian
 		}
 	}
-	argindex += len;
+	argindex += len-1;
 }
+
 template<typename TRet, typename TTmp, int NBYTE, typename TRetTmp>
 static void ReadNumberBE( std::vector<tjs_uint8>& result, const std::vector<tTJSVariant>& args, tjs_int numargs, tjs_int& argindex, tjs_int len ) {
 	if( len < 0 ) len = numargs - argindex;
@@ -249,34 +260,17 @@ static void ReadNumberBE( std::vector<tjs_uint8>& result, const std::vector<tTJS
 	for( tjs_int a = 0; a < len; a++ ) {
 		TRet c = (TRet)(TTmp)args[argindex+a];
 		for( int i = 0; i < NBYTE; i++ ) {
-			result.push_back( ((TRetTmp)c&(0xFF<<(NBYTE-1-i)))>>(NBYTE-1-i) ); // big endian
+			result.push_back( ((*(TRetTmp*)&c)&(0xFF<<((NBYTE-1-i)*8)))>>((NBYTE-1-i)*8) ); // big endian
 		}
 	}
-	argindex += len;
+	argindex += len-1;
 }
 #if TJS_HOST_IS_BIG_ENDIAN
 #	define ReadNumber ReadNumberBE
 #else
 #	define ReadNumber ReadNumberLE
 #endif
-/*
-template<typename TRet, typename TTmp, int NBYTE>
-static void ReadNumber( std::vector<tjs_uint8>& result, tTJSVariant **args, tjs_int numargs, tjs_int& argindex, tjs_int len ) {
-	if( len < 0 ) len = numargs - argindex;
-	if( (len+argindex) > numargs ) len = numargs - argindex;
-	for( tjs_int a = 0; a < len; a++ ) {
-		TRet c = (TRet)(TTmp)*args[argindex+a];
-		for( int i = 0; i < NBYTE; i++ ) {
-#if TJS_HOST_IS_BIG_ENDIAN
-			result.push_back( (c&(0xFF<<(NBYTE-1-i)))>>(NBYTE-1-i) ); // bit endian
-#else
-			result.push_back( (c&(0xFF<<i))>>i ); // little endian
-#endif
-		}
-	}
-	argindex += len;
-}
-*/
+
 // from base64 plug-in (C) 2009 Kiyobee
 // 扱いやすいように一部書き換えている
 //	inbuf の内容を base64 エンコードして、outbuf に文字列として出力
@@ -284,7 +278,7 @@ static void ReadNumber( std::vector<tjs_uint8>& result, tTJSVariant **args, tjs_
 // outbuf のサイズは、(insize+2)/3 * 4 必要
 static void encodeBase64( const tjs_uint8* inbuf, tjs_uint insize, std::wstring& outbuf) {
 	outbuf.reserve( outbuf.size() + ((insize+2)/3) * 4 );
-	const char* base64str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+	static const char* base64str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 	tjs_int	insize_3	= insize - 3;
 	tjs_int outptr		= 0;
 	tjs_int i;
@@ -313,9 +307,12 @@ static void encodeBase64( const tjs_uint8* inbuf, tjs_uint insize, std::wstring&
 }
 static void decodeBase64( const std::wstring& inbuf, std::vector<tjs_uint8>& outbuf ) {
 	tjs_int len = inbuf.length();
-	outbuf.reserve( len / 4 * 3 );
 	const tjs_char* data = inbuf.c_str();
-	const tjs_int base64tonum[] = {
+	if( len < 4 ) { // too short
+		return;
+	}
+	outbuf.reserve( len / 4 * 3 );
+	static const tjs_int base64tonum[] = {
 		   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 
 		   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 
 		   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  62,   0,   0,   0,  63, 
@@ -336,15 +333,14 @@ static void decodeBase64( const std::wstring& inbuf, std::vector<tjs_uint8>& out
 
 	tjs_int dptr = 0;
 	tjs_int len_4 = len - 4;
-	do {
+	while( dptr < len_4 ) {
 		outbuf.push_back( static_cast<tjs_uint8>( (base64tonum[data[dptr]] << 2) | (base64tonum[data[dptr+1]] >> 4) ) );
 		dptr++;
 		outbuf.push_back( static_cast<tjs_uint8>( (base64tonum[data[dptr]] << 4) | (base64tonum[data[dptr+1]] >> 2) ) );
 		dptr++;
 		outbuf.push_back( static_cast<tjs_uint8>( (base64tonum[data[dptr]] << 6) | (base64tonum[data[dptr+1]]) ) );
 		dptr+=2;
-	} while( dptr < len_4 );
-
+	}
 	outbuf.push_back( static_cast<tjs_uint8>( (base64tonum[data[dptr]] << 2) | (base64tonum[data[dptr+1]] >> 4) )) ;
 	dptr++;
 	tjs_uint8 tmp = static_cast<tjs_uint8>( base64tonum[data[dptr++]] << 4 );
@@ -355,11 +351,7 @@ static void decodeBase64( const std::wstring& inbuf, std::vector<tjs_uint8>& out
 		if( data[dptr] != L'=' ) {
 			tmp |= base64tonum[data[dptr]];
 			outbuf.push_back( tmp );
-		} else {
-			outbuf.push_back( tmp );
 		}
-	} else {
-		outbuf.push_back( tmp );
 	}
 }
 
@@ -439,26 +431,23 @@ static tTJSVariantOctet* Pack( const std::vector<OctPackTemplate>& templ, const 
 			TJS_eTJSError( TJSNotSupportedBER );
 			break;
 		case OctPack_null:		// x : ヌル文字
-			if( len < 0 ) len = numargs - argindex;
-			if( (len+argindex) > numargs ) len = numargs - argindex;
 			for( tjs_int a = 0; a < len; a++ ) {
 				result.push_back( 0 );
 			}
-			argindex += len;
+			argindex--;
 			break;
 		case OctPack_NULL:		// X : back up a byte
-			if( len < 0 ) len = numargs - argindex;
-			if( (len+argindex) > numargs ) len = numargs - argindex;
 			for( tjs_int a = 0; a < len; a++ ) {
 				result.pop_back();
 			}
-			argindex += len;
+			argindex--;
 			break;
 		case OctPack_fill: {		// @ : 絶対位置までヌル文字を埋める
 			tjs_int count = result.size();
 			for( tjs_int i = count; i < len; i++ ) {
 				result.push_back( 0 );
 			}
+			argindex--;
 			break;
 		}
 		case OctPack_base64: {	// m : Base64 encode / decode
@@ -471,11 +460,16 @@ static tTJSVariantOctet* Pack( const std::vector<OctPackTemplate>& templ, const 
 			i++;
 		}
 	}
-	return TJSAllocVariantOctet( &(result[0]), result.size() );
+	if( result.size() > 0 )
+		return TJSAllocVariantOctet( &(result[0]), result.size() );
+	else
+		return NULL;
 }
 
 static void BinToAscii( const tjs_uint8 *data, const tjs_uint8 *tail, tjs_uint len, ttstr& result ) {
-	std::vector<tjs_nchar> tmp(len+1);
+	//std::vector<tjs_nchar> tmp(len+1);
+	std::vector<tjs_nchar> tmp;
+	tmp.reserve(len+1);
 	for( tjs_int i = 0; i < static_cast<tjs_int>(len) && data != tail; data++, i++ ) {
 		if( (*data) != '\0' ) {
 			tmp.push_back( (tjs_nchar)*data );
@@ -487,7 +481,9 @@ static void BinToAscii( const tjs_uint8 *data, const tjs_uint8 *tail, tjs_uint l
 // mtol : true : 上位ビットから下位ビット, false : 下位ビットから上位ビット
 // 指定した数値の方が大きくても、その分は無視
 static void BinToBitString( const tjs_uint8 *data, const tjs_uint8 *tail, tjs_uint len, ttstr& result, bool mtol ) {
-	std::vector<tjs_char> tmp(len+1);
+	//std::vector<tjs_char> tmp(len+1);
+	std::vector<tjs_char> tmp;
+	tmp.reserve(len+1);
 	tjs_int pos = 0;
 	if( mtol ) {
 		for( ; data < tail; data++ ) {
@@ -520,15 +516,17 @@ static void BinToBitString( const tjs_uint8 *data, const tjs_uint8 *tail, tjs_ui
 template<typename TRet, int NBYTE>
 static void BinToNumberLE( std::vector<TRet>& result, const tjs_uint8 *data, const tjs_uint8 *tail, tjs_uint len ) {
 	if( len < 0 ) len = ((tail - data)+NBYTE-1)/NBYTE;
-	if( (data+len) < tail ) tail = data+len;
+	if( (data+len*NBYTE) < tail ) tail = data+len*NBYTE;
 	TRet val = 0;
 	tjs_uint bytes = 0;
-	for( ; data < tail; data++, bytes++ ) {
-		val |= (*data) << bytes;
+	for( ; data < tail; data++ ) {
+		val |= (*data) << (bytes*8);
 		if( bytes >= (NBYTE-1) ) { // little endian
 			bytes = 0;
 			result.push_back( val );
 			val = 0;
+		} else {
+			bytes++;
 		}
 	}
 	if( bytes ) {
@@ -539,15 +537,17 @@ static void BinToNumberLE( std::vector<TRet>& result, const tjs_uint8 *data, con
 template<typename TRet, typename TTmp, int NBYTE>
 static void BinToNumberLEReal( std::vector<TRet>& result, const tjs_uint8 *data, const tjs_uint8 *tail, tjs_uint len ) {
 	if( len < 0 ) len = ((tail - data)+NBYTE-1)/NBYTE;
-	if( (data+len) < tail ) tail = data+len;
+	if( (data+len*NBYTE) < tail ) tail = data+len*NBYTE;
 	TTmp val = 0;
 	tjs_uint bytes = 0;
-	for( ; data < tail; data++, bytes++ ) {
-		val |= (*data) << bytes;
+	for( ; data < tail; data++ ) {
+		val |= (TTmp)(*data) << (bytes*8);
 		if( bytes >= (NBYTE-1) ) { // little endian
 			bytes = 0;
 			result.push_back( *(TRet*)&val );
 			val = 0;
+		} else {
+			bytes++;
 		}
 	}
 	if( bytes ) {
@@ -557,18 +557,20 @@ static void BinToNumberLEReal( std::vector<TRet>& result, const tjs_uint8 *data,
 template<typename TRet, int NBYTE>
 static void BinToNumberBE( std::vector<TRet>& result, const tjs_uint8 *data, const tjs_uint8 *tail, tjs_uint len ) {
 	if( len < 0 ) len = ((tail - data)+NBYTE-1)/NBYTE;
-	if( (data+len) < tail ) tail = data+len;
+	if( (data+len*NBYTE) < tail ) tail = data+len*NBYTE;
 	TRet val = 0;
-	tjs_uint bytes = 0;
-	for( ; data < tail; data++, bytes++ ) {
-		val |= (*data) << bytes;
-		if( bytes >= (NBYTE-1) ) { // big endian
-			bytes = 0;
+	tjs_uint bytes = NBYTE-1;
+	for( ; data < tail; data++ ) {
+		val |= (*data) << (bytes*8);
+		if( bytes == 0 ) { // big endian
+			bytes = NBYTE-1;
 			result.push_back( val );
 			val = 0;
+		} else {
+			bytes--;
 		}
 	}
-	if( bytes ) {
+	if( bytes < (NBYTE-1) ) {
 		result.push_back( val );
 	}
 }
@@ -577,30 +579,36 @@ static void BinToNumberBE( std::vector<TRet>& result, const tjs_uint8 *data, con
 #	define BinToNumber BinToNumberBE
 #else
 #	define BinToNumber BinToNumberLE
+#	define BinToReal BinToNumberLEReal
 #endif
 
 // mtol
 static void BinToHex( const tjs_uint8 *data, const tjs_uint8 *tail, tjs_uint len, ttstr& result, bool mtol ) {
 	if( (data+len) < tail ) tail = data+(len+1)/2;
-	std::vector<tjs_char> tmp(len+1);
+	//std::vector<tjs_char> tmp(len+1);
+	std::vector<tjs_char> tmp;
+	tmp.reserve(len+1);
 	tjs_int pos = 0;
 	if( mtol ) { // 上位ニブルが先
-		for( tjs_int i = 0; i < static_cast<tjs_int>(len) && data < tail; i++, pos++ ) {
-			tjs_char ch = ((*data)&(0xF<<(1-pos)))>>(1-pos);
+		pos = 1;
+		for( tjs_int i = 0; i < static_cast<tjs_int>(len) && data < tail; i++ ) {
+			tjs_char ch = ((*data)&(0xF<<(pos*4)))>>(pos*4);
 			if( ch > 9 ) {
 				ch = L'A' + (ch-10);
 			} else {
 				ch = L'0' + ch;
 			}
 			tmp.push_back( ch );
-			if( pos ) {
-				pos = 0;
+			if( pos == 0 ) {
+				pos = 1;
 				data++;
+			} else {
+				pos--;
 			}
 		}
 	} else { // 下位ニブルが先
-		for( tjs_int i = 0; i < static_cast<tjs_int>(len) && data < tail; i++, pos++ ) {
-			tjs_char ch = ((*data)&(0xF<<pos))>>pos;
+		for( tjs_int i = 0; i < static_cast<tjs_int>(len) && data < tail; i++ ) {
+			tjs_char ch = ((*data)&(0xF<<(pos*4)))>>(pos*4);
 			if( ch > 9 ) {
 				ch = L'A' + (ch-10);
 			} else {
@@ -610,9 +618,13 @@ static void BinToHex( const tjs_uint8 *data, const tjs_uint8 *tail, tjs_uint len
 			if( pos ) {
 				pos = 0;
 				data++;
+			} else {
+				pos++;
 			}
 		}
 	}
+	tmp.push_back( L'\0' );
+	result = tTJSString( &(tmp[0]) );
 }
 static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const tjs_uint8 *data, tjs_uint length ) {
 	tTJSArrayObject* result = reinterpret_cast<tTJSArrayObject*>( TJSCreateArrayObject() );
@@ -684,7 +696,7 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 		case OctPack_double: {	// d : 倍精度浮動小数点
 			if( len < 0 ) len = (tail - current)/8;
 			std::vector<tjs_real> ret;
-			BinToNumberLEReal<tjs_real,tjs_uint64,8>( ret, current, tail, len );
+			BinToReal<tjs_real,tjs_uint64,8>( ret, current, tail, len );
 			for( std::vector<tjs_real>::const_iterator iter = ret.begin(); iter != ret.end(); iter++ ) {
 				result->Add( ni, tTJSVariant( (tjs_real)*iter ) );
 			}
@@ -694,7 +706,7 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 		case OctPack_float: {		// f : 単精度浮動小数点
 			if( len < 0 ) len = (tail - current)/4;
 			std::vector<float> ret;
-			BinToNumberLEReal<float,tjs_uint32,4>( ret, current, tail, len );
+			BinToReal<float,tjs_uint32,4>( ret, current, tail, len );
 			for( std::vector<float>::const_iterator iter = ret.begin(); iter != ret.end(); iter++ ) {
 				result->Add( ni, tTJSVariant( (tjs_real)*iter ) );
 			}
@@ -723,7 +735,7 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 			std::vector<tjs_int> ret;
 			BinToNumber<tjs_int,4>( ret, current, tail, len );
 			for( std::vector<tjs_int>::const_iterator iter = ret.begin(); iter != ret.end(); iter++ ) {
-				result->Add( ni, tTJSVariant( (tjs_real)*iter ) );
+				result->Add( ni, tTJSVariant( (tjs_int)*iter ) );
 			}
 			current += len*4;
 			break;
@@ -734,7 +746,7 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 			std::vector<tjs_uint> ret;
 			BinToNumber<tjs_uint,4>( ret, current, tail, len );
 			for( std::vector<tjs_uint>::const_iterator iter = ret.begin(); iter != ret.end(); iter++ ) {
-				result->Add( ni, tTJSVariant( (tjs_real)*iter ) );
+				result->Add( ni, tTJSVariant( (tjs_int64)*iter ) );
 			}
 			current += len*4;
 			break;
@@ -744,7 +756,7 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 			std::vector<tjs_uint16> ret;
 			BinToNumberBE<tjs_uint16,2>( ret, current, tail, len );
 			for( std::vector<tjs_uint16>::const_iterator iter = ret.begin(); iter != ret.end(); iter++ ) {
-				result->Add( ni, tTJSVariant( (tjs_real)*iter ) );
+				result->Add( ni, tTJSVariant( (tjs_int)*iter ) );
 			}
 			current += len*2;
 			break;
@@ -754,7 +766,7 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 			std::vector<tjs_uint> ret;
 			BinToNumberBE<tjs_uint,4>( ret, current, tail, len );
 			for( std::vector<tjs_uint>::const_iterator iter = ret.begin(); iter != ret.end(); iter++ ) {
-				result->Add( ni, tTJSVariant( (tjs_real)*iter ) );
+				result->Add( ni, tTJSVariant( (tjs_int64)*iter ) );
 			}
 			current += len*4;
 			break;
@@ -770,7 +782,7 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 			std::vector<tjs_int16> ret;
 			BinToNumber<tjs_int16,2>( ret, current, tail, len );
 			for( std::vector<tjs_int16>::const_iterator iter = ret.begin(); iter != ret.end(); iter++ ) {
-				result->Add( ni, tTJSVariant( (tjs_real)*iter ) );
+				result->Add( ni, tTJSVariant( (tjs_int)*iter ) );
 			}
 			current += len*2;
 			break;
@@ -780,7 +792,7 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 			std::vector<tjs_uint16> ret;
 			BinToNumber<tjs_uint16,2>( ret, current, tail, len );
 			for( std::vector<tjs_uint16>::const_iterator iter = ret.begin(); iter != ret.end(); iter++ ) {
-				result->Add( ni, tTJSVariant( (tjs_real)*iter ) );
+				result->Add( ni, tTJSVariant( (tjs_int)*iter ) );
 			}
 			current += len*2;
 			break;
@@ -790,7 +802,7 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 			std::vector<tjs_uint16> ret;
 			BinToNumberLE<tjs_uint16,2>( ret, current, tail, len );
 			for( std::vector<tjs_uint16>::const_iterator iter = ret.begin(); iter != ret.end(); iter++ ) {
-				result->Add( ni, tTJSVariant( (tjs_real)*iter ) );
+				result->Add( ni, tTJSVariant( (tjs_int)*iter ) );
 			}
 			current += len*2;
 			break;
@@ -800,7 +812,7 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 			std::vector<tjs_uint> ret;
 			BinToNumberLE<tjs_uint,4>( ret, current, tail, len );
 			for( std::vector<tjs_uint>::const_iterator iter = ret.begin(); iter != ret.end(); iter++ ) {
-				result->Add( ni, tTJSVariant( (tjs_real)*iter ) );
+				result->Add( ni, tTJSVariant( (tjs_int64)*iter ) );
 			}
 			current += len*4;
 			break;
@@ -853,7 +865,8 @@ tjs_error TJSOctetPack( tTJSVariant **args, tjs_int numargs, const std::vector<t
 		ParsePackTemplate( templ, ((ttstr)*args[0]).c_str() );
 		tTJSVariantOctet* oct = Pack( templ, items );
 		*result = oct;
-		oct->Release();
+		if( oct ) oct->Release();
+		else *result = tTJSVariant((iTJSDispatch2*)NULL,(iTJSDispatch2*)NULL);
 	}
 	return TJS_S_OK;
 }
@@ -867,7 +880,7 @@ tjs_error TJSOctetUnpack( const tTJSVariantOctet * target, tTJSVariant **args, t
 		ParsePackTemplate( templ, ((ttstr)*args[0]).c_str() );
 		iTJSDispatch2* disp = Unpack( templ, target->GetData(), target->GetLength() );
 		*result = tTJSVariant(disp,disp);
-		disp->Release();
+		if( disp ) disp->Release();
 	}
 	return TJS_S_OK;
 }
