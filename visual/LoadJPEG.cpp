@@ -419,10 +419,6 @@ void TVPSaveAsJPG( const ttstr & storagename, const ttstr & mode, const tTVPBase
 			jpeg_write_scanlines( &cinfo, row_pointer, 1 );
 		}
 		jpeg_finish_compress(&cinfo);
-		if( cinfo.dest ) {
-			delete cinfo.dest;
-			cinfo.dest = NULL;
-		}
 		jpeg_destroy_compress(&cinfo);
 		stream->WriteBuffer( dest_buf, num_write_bytes );
 	} catch(...) {
