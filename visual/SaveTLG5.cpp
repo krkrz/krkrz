@@ -339,7 +339,9 @@ static void Compress( const tTVPBaseBitmap *bmp, tTJSBinaryStream * out, bool is
 						cmpinbuf[0][inp] = val[0] - val[1];
 						cmpinbuf[1][inp] = val[1];
 						cmpinbuf[2][inp] = val[2] - val[1];
-						current++; upper++;
+						// skip alpha
+						current++;
+						if( upper ) upper++;
 						break;
 					case 4:
 						cmpinbuf[0][inp] = val[0] - val[1];
