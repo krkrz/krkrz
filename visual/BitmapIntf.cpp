@@ -32,7 +32,7 @@ tjs_error TJS_INTF_METHOD tTJSNI_Bitmap::Construct(tjs_int numparams, tTJSVarian
 			tjs_uint32 height = (tjs_uint32)(tjs_int64)*param[1];
 			tjs_uint32 bpp = 32;
 			if( numparams > 2 ) {
-				bpp = (tjs_int)param[2];
+				bpp = (tjs_int)*param[2];
 			}
 			Bitmap = new tTVPBaseBitmap( width, height, bpp );
 		}
