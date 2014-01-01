@@ -118,6 +118,8 @@ BEGIN
     IDS_TVP_INVALID_OPERATION_FOR32BPP                                        "Invalid operation for 32bpp"
     IDS_TVP_SPECIFY_WINDOW                                                    "Specify Window class object"
     IDS_TVP_SPECIFY_LAYER                                                     "Specify Layer class object"
+    IDS_TVP_SPECIFY_LAYER_OR_BITMAP                                           "Specify Layer or Bitmap class object"
+    IDS_TVP_CANNOT_ACCEPT_MODE_AUTO                                           "Cannot accept omAuto mode"
     IDS_TVP_CANNOT_CREATE_EMPTY_LAYER_IMAGE                                   "Cannot create empty layer image"
     IDS_TVP_CANNOT_SET_PRIMARY_INVISIBLE                                      "Cannot set primary layer invisible"
     IDS_TVP_CANNOT_MOVE_PRIMARY                                               "Cannot move primary layer"
