@@ -118,6 +118,8 @@ BEGIN
     IDS_TVP_INVALID_OPERATION_FOR32BPP                                        "32bpp 画像に対しては行えない操作を行おうとしました"
     IDS_TVP_SPECIFY_WINDOW                                                    "Window クラスのオブジェクトを指定してください"
     IDS_TVP_SPECIFY_LAYER                                                     "Layer クラスのオブジェクトを指定してください"
+    IDS_TVP_SPECIFY_LAYER_OR_BITMAP                                           "Layer クラスか Bitmap クラスのオブジェクトを指定してください"
+    IDS_TVP_CANNOT_ACCEPT_MODE_AUTO                                           "この操作で mode に omAuto を指定することは出来ません"
     IDS_TVP_CANNOT_CREATE_EMPTY_LAYER_IMAGE                                   "画像サイズの横幅あるいは縦幅を 0 以下の数に設定することはできません"
     IDS_TVP_CANNOT_SET_PRIMARY_INVISIBLE                                      "プライマリレイヤは不可視にできません"
     IDS_TVP_CANNOT_MOVE_PRIMARY                                               "プライマリレイヤは移動できません"

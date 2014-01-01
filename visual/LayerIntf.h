@@ -345,7 +345,7 @@ private:
 	void NotifyLayerTypeChange();
 
 	void UpdateDrawFace(); // set DrawFace from Face and Type
-
+public:
 	tTVPBlendOperationMode GetOperationModeFromType() const;
 		// returns corresponding blend operation mode from layer type
 
@@ -742,31 +742,31 @@ public:
 	void PiledCopy(tjs_int dx, tjs_int dy, tTJSNI_BaseLayer *src,
 		const tTVPRect &rect);
 
-	void CopyRect(tjs_int dx, tjs_int dy, tTJSNI_BaseLayer *src,
+	void CopyRect(tjs_int dx, tjs_int dy, tTVPBaseBitmap *src, tTVPBaseBitmap *provincesrc,
 		const tTVPRect &rect);
 
-	void StretchCopy(const tTVPRect &destrect, tTJSNI_BaseLayer *src,
+	void StretchCopy(const tTVPRect &destrect, tTVPBaseBitmap *src,
 		const tTVPRect &rect, tTVPBBStretchType mode = stNearest);
 
-	void AffineCopy(const t2DAffineMatrix &matrix, tTJSNI_BaseLayer *src,
+	void AffineCopy(const t2DAffineMatrix &matrix, tTVPBaseBitmap *src,
 		const tTVPRect &srcrect, tTVPBBStretchType mode = stNearest, bool clear = false);
 
-	void AffineCopy(const tTVPPointD *points, tTJSNI_BaseLayer *src,
+	void AffineCopy(const tTVPPointD *points, tTVPBaseBitmap *src,
 		const tTVPRect &srcrect, tTVPBBStretchType mode = stNearest, bool clear = false);
 
-	void OperateRect(tjs_int dx, tjs_int dy, tTJSNI_BaseLayer *src,
+	void OperateRect(tjs_int dx, tjs_int dy, tTVPBaseBitmap *src,
 		const tTVPRect &rect, tTVPBlendOperationMode mode = omAuto,
 			tjs_int opacity = 255);
 
-	void OperateStretch(const tTVPRect &destrect, tTJSNI_BaseLayer *src,
+	void OperateStretch(const tTVPRect &destrect, tTVPBaseBitmap *src,
 		const tTVPRect &srcrect, tTVPBlendOperationMode mode = omAuto, tjs_int opacity = 255,
 			tTVPBBStretchType type = stNearest);
 
-	void OperateAffine(const t2DAffineMatrix &matrix, tTJSNI_BaseLayer *src,
+	void OperateAffine(const t2DAffineMatrix &matrix, tTVPBaseBitmap *src,
 		const tTVPRect &srcrect, tTVPBlendOperationMode mode = omAuto, tjs_int opacity = 255,
 		tTVPBBStretchType type = stNearest);
 
-	void OperateAffine(const tTVPPointD *points, tTJSNI_BaseLayer *src,
+	void OperateAffine(const tTVPPointD *points, tTVPBaseBitmap *src,
 		const tTVPRect &srcrect, tTVPBlendOperationMode mode = omAuto, tjs_int opacity = 255,
 		tTVPBBStretchType type = stNearest);
 
