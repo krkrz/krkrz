@@ -59,6 +59,7 @@
   <ItemGroup>
     <Text Include="ReadMe.txt" />
     <Text Include="optionarea.txt" />
+    <Text Include="license.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Resource.h">

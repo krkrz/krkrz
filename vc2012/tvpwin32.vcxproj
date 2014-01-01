@@ -160,6 +160,7 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <Text Include="license.txt" />
     <Text Include="optionarea.txt" />
     <Text Include="ReadMe.txt" />
   </ItemGroup>

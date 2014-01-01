@@ -4125,7 +4125,7 @@ void tTJSNI_BaseLayer::PiledCopy(tjs_int dx, tjs_int dy, tTJSNI_BaseLayer *src,
 	}
 }
 //---------------------------------------------------------------------------
-void tTJSNI_BaseLayer::CopyRect(tjs_int dx, tjs_int dy, tTJSNI_BaseLayer *src,
+void tTJSNI_BaseLayer::CopyRect(tjs_int dx, tjs_int dy, tTVPBaseBitmap *src, tTVPBaseBitmap *provincesrc,
 	const tTVPRect &srcrect)
 {
 	// copy rectangle
@@ -4141,27 +4141,27 @@ void tTJSNI_BaseLayer::CopyRect(tjs_int dx, tjs_int dy, tTJSNI_BaseLayer *src,
 	case dfAlpha:
 	case dfAddAlpha:
 		if(!MainImage) TVPThrowExceptionMessage(TVPNotDrawableLayerType);
-		if(!src->MainImage) TVPThrowExceptionMessage(TVPSourceLayerHasNoImage);
-		ImageModified = MainImage->CopyRect(dx, dy, src->MainImage, rect,
+		if(!src) TVPThrowExceptionMessage(TVPSourceLayerHasNoImage);
+		ImageModified = MainImage->CopyRect(dx, dy, src, rect,
 			TVP_BB_COPY_MAIN|TVP_BB_COPY_MASK) || ImageModified;
 		break;
 
 	case dfOpaque:
 		if(!MainImage) TVPThrowExceptionMessage(TVPNotDrawableLayerType);
-		if(!src->MainImage) TVPThrowExceptionMessage(TVPSourceLayerHasNoImage);
-		ImageModified = MainImage->CopyRect(dx, dy, src->MainImage, rect,
+		if(!src) TVPThrowExceptionMessage(TVPSourceLayerHasNoImage);
+		ImageModified = MainImage->CopyRect(dx, dy, src, rect,
 			HoldAlpha?TVP_BB_COPY_MAIN:(TVP_BB_COPY_MAIN|TVP_BB_COPY_MASK)) || ImageModified;
 		break;
 
 	case dfMask:
 		if(!MainImage) TVPThrowExceptionMessage(TVPNotDrawableLayerType);
-		if(!src->MainImage) TVPThrowExceptionMessage(TVPSourceLayerHasNoImage);
-		ImageModified = MainImage->CopyRect(dx, dy, src->MainImage, rect,
+		if(!src) TVPThrowExceptionMessage(TVPSourceLayerHasNoImage);
+		ImageModified = MainImage->CopyRect(dx, dy, src, rect,
 			TVP_BB_COPY_MASK) || ImageModified;
 		break;
 
 	case dfProvince:
-		if(!src->ProvinceImage)
+		if(!provincesrc)
 		{
 			// source province image is null;
 			// fill destination with zero
@@ -4174,7 +4174,7 @@ void tTJSNI_BaseLayer::CopyRect(tjs_int dx, tjs_int dy, tTJSNI_BaseLayer *src,
 			// allocate province image
 			if(!ProvinceImage) AllocateProvinceImage();
 			// then copy
-			ImageModified = ProvinceImage->CopyRect(dx, dy, src->ProvinceImage, rect) || ImageModified;
+			ImageModified = ProvinceImage->CopyRect(dx, dy, provincesrc, rect) || ImageModified;
 		}
 		break;
 	}
@@ -4193,7 +4193,7 @@ void tTJSNI_BaseLayer::CopyRect(tjs_int dx, tjs_int dy, tTJSNI_BaseLayer *src,
 	}
 }
 //---------------------------------------------------------------------------
-void tTJSNI_BaseLayer::StretchCopy(const tTVPRect &destrect, tTJSNI_BaseLayer *src,
+void tTJSNI_BaseLayer::StretchCopy(const tTVPRect &destrect, tTVPBaseBitmap *src,
 		const tTVPRect &srcrect, tTVPBBStretchType type)
 {
 	// stretching copy
@@ -4207,17 +4207,17 @@ void tTJSNI_BaseLayer::StretchCopy(const tTVPRect &destrect, tTJSNI_BaseLayer *s
 	case dfAlpha:
 	case dfAddAlpha:
 		if(!MainImage) TVPThrowExceptionMessage(TVPNotDrawableLayerType);
-		if(!src->MainImage) TVPThrowExceptionMessage(TVPSourceLayerHasNoImage);
+		if(!src) TVPThrowExceptionMessage(TVPSourceLayerHasNoImage);
 		ImageModified =
-			MainImage->StretchBlt(ClipRect, destrect, src->MainImage, srcrect, bmCopy, 255, false,
+			MainImage->StretchBlt(ClipRect, destrect, src, srcrect, bmCopy, 255, false,
 				type) || ImageModified;
 		break;
 
 	case dfOpaque:
 		if(!MainImage) TVPThrowExceptionMessage(TVPNotDrawableLayerType);
-		if(!src->MainImage) TVPThrowExceptionMessage(TVPSourceLayerHasNoImage);
+		if(!src) TVPThrowExceptionMessage(TVPSourceLayerHasNoImage);
 		ImageModified =
-			MainImage->StretchBlt(ClipRect, destrect, src->MainImage, srcrect,
+			MainImage->StretchBlt(ClipRect, destrect, src, srcrect,
 				bmCopy, 255, HoldAlpha, type) || ImageModified;
 		break;
 
@@ -4236,7 +4236,7 @@ void tTJSNI_BaseLayer::StretchCopy(const tTVPRect &destrect, tTJSNI_BaseLayer *s
 	}
 }
 //---------------------------------------------------------------------------
-void tTJSNI_BaseLayer::AffineCopy(const t2DAffineMatrix &matrix, tTJSNI_BaseLayer *src,
+void tTJSNI_BaseLayer::AffineCopy(const t2DAffineMatrix &matrix, tTVPBaseBitmap *src,
 		const tTVPRect &srcrect, tTVPBBStretchType type, bool clear)
 {
 	// affine copy
@@ -4249,8 +4249,8 @@ void tTJSNI_BaseLayer::AffineCopy(const t2DAffineMatrix &matrix, tTJSNI_BaseLaye
 	case dfAddAlpha:
 	  {
 		if(!MainImage) TVPThrowExceptionMessage(TVPNotDrawableLayerType);
-		if(!src->MainImage) TVPThrowExceptionMessage(TVPSourceLayerHasNoImage);
-		updated = MainImage->AffineBlt(ClipRect, src->MainImage, srcrect, matrix,
+		if(!src) TVPThrowExceptionMessage(TVPSourceLayerHasNoImage);
+		updated = MainImage->AffineBlt(ClipRect, src, srcrect, matrix,
 			bmCopy, 255, &updaterect, false, type, clear, NeutralColor);
 		break;
 	  }
@@ -4258,8 +4258,8 @@ void tTJSNI_BaseLayer::AffineCopy(const t2DAffineMatrix &matrix, tTJSNI_BaseLaye
 	case dfOpaque:
 	  {
 		if(!MainImage) TVPThrowExceptionMessage(TVPNotDrawableLayerType);
-		if(!src->MainImage) TVPThrowExceptionMessage(TVPSourceLayerHasNoImage);
-		updated = MainImage->AffineBlt(ClipRect, src->MainImage, srcrect, matrix,
+		if(!src) TVPThrowExceptionMessage(TVPSourceLayerHasNoImage);
+		updated = MainImage->AffineBlt(ClipRect, src, srcrect, matrix,
 			bmCopy, 255, &updaterect, HoldAlpha, type, clear, NeutralColor);
 		break;
 	  }
@@ -4277,7 +4277,7 @@ void tTJSNI_BaseLayer::AffineCopy(const t2DAffineMatrix &matrix, tTJSNI_BaseLaye
 	}
 }
 //---------------------------------------------------------------------------
-void tTJSNI_BaseLayer::AffineCopy(const tTVPPointD *points, tTJSNI_BaseLayer *src,
+void tTJSNI_BaseLayer::AffineCopy(const tTVPPointD *points, tTVPBaseBitmap *src,
 		const tTVPRect &srcrect, tTVPBBStretchType type, bool clear)
 {
 	// affine copy
@@ -4290,8 +4290,8 @@ void tTJSNI_BaseLayer::AffineCopy(const tTVPPointD *points, tTJSNI_BaseLayer *sr
 	case dfAddAlpha:
 	  {
 		if(!MainImage) TVPThrowExceptionMessage(TVPNotDrawableLayerType);
-		if(!src->MainImage) TVPThrowExceptionMessage(TVPSourceLayerHasNoImage);
-		updated = MainImage->AffineBlt(ClipRect, src->MainImage, srcrect, points,
+		if(!src) TVPThrowExceptionMessage(TVPSourceLayerHasNoImage);
+		updated = MainImage->AffineBlt(ClipRect, src, srcrect, points,
 			bmCopy, 255, &updaterect, false, type, clear, NeutralColor);
 		break;
 	  }
@@ -4299,8 +4299,8 @@ void tTJSNI_BaseLayer::AffineCopy(const tTVPPointD *points, tTJSNI_BaseLayer *sr
 	case dfOpaque:
 	  {
 		if(!MainImage) TVPThrowExceptionMessage(TVPNotDrawableLayerType);
-		if(!src->MainImage) TVPThrowExceptionMessage(TVPSourceLayerHasNoImage);
-		updated = MainImage->AffineBlt(ClipRect, src->MainImage, srcrect, points,
+		if(!src) TVPThrowExceptionMessage(TVPSourceLayerHasNoImage);
+		updated = MainImage->AffineBlt(ClipRect, src, srcrect, points,
 			bmCopy, 255, &updaterect, HoldAlpha, type, clear, NeutralColor);
 		break;
 	  }
@@ -4318,7 +4318,7 @@ void tTJSNI_BaseLayer::AffineCopy(const tTVPPointD *points, tTJSNI_BaseLayer *sr
 	}
 }
 //---------------------------------------------------------------------------
-void tTJSNI_BaseLayer::OperateRect(tjs_int dx, tjs_int dy, tTJSNI_BaseLayer *src,
+void tTJSNI_BaseLayer::OperateRect(tjs_int dx, tjs_int dy, tTVPBaseBitmap *src,
 		const tTVPRect &srcrect, tTVPBlendOperationMode mode,
 			tjs_int opacity)
 {
@@ -4326,8 +4326,8 @@ void tTJSNI_BaseLayer::OperateRect(tjs_int dx, tjs_int dy, tTJSNI_BaseLayer *src
 	tTVPRect rect;
 	if(!ClipDestPointAndSrcRect(dx, dy, rect, srcrect)) return; // out of the clipping rect
 
-	// get correct blend mode if the mode is omAuto
-	if(mode == omAuto) mode = src->GetOperationModeFromType();
+	// It does not throw an exception in this case perhaps
+	if(mode == omAuto) TVPThrowExceptionMessage( TVPCannotAcceptModeAuto );
 
 	// convert tTVPBlendOperationMode to tTVPBBBltMethod
 	tTVPBBBltMethod met;
@@ -4338,10 +4338,10 @@ void tTJSNI_BaseLayer::OperateRect(tjs_int dx, tjs_int dy, tTJSNI_BaseLayer *src
 	}
 
 	if(!MainImage) TVPThrowExceptionMessage(TVPNotDrawableLayerType);
-	if(!src->MainImage) TVPThrowExceptionMessage(TVPSourceLayerHasNoImage);
+	if(!src) TVPThrowExceptionMessage(TVPSourceLayerHasNoImage);
 
 	ImageModified =
-		MainImage->Blt(dx, dy, src->MainImage, rect, met, opacity, HoldAlpha) || ImageModified;
+		MainImage->Blt(dx, dy, src, rect, met, opacity, HoldAlpha) || ImageModified;
 
 	tTVPRect ur = rect;
 	ur.set_offsets(dx, dy);
@@ -4357,7 +4357,7 @@ void tTJSNI_BaseLayer::OperateRect(tjs_int dx, tjs_int dy, tTJSNI_BaseLayer *src
 }
 //---------------------------------------------------------------------------
 void tTJSNI_BaseLayer::OperateStretch(const tTVPRect &destrect,
-	tTJSNI_BaseLayer *src, const tTVPRect &srcrect, tTVPBlendOperationMode mode, tjs_int opacity,
+	tTVPBaseBitmap *src, const tTVPRect &srcrect, tTVPBlendOperationMode mode, tjs_int opacity,
 			tTVPBBStretchType type)
 {
 	// stretching operation (add/mul/sub etc.)
@@ -4366,9 +4366,9 @@ void tTJSNI_BaseLayer::OperateStretch(const tTVPRect &destrect,
 	if(ur.right < ur.left) std::swap(ur.right, ur.left);
 	if(ur.bottom < ur.top) std::swap(ur.bottom, ur.top);
 	if(!TVPIntersectRect(&ur, ur, ClipRect)) return; // out of the clipping rectangle
-
-	// get correct blend mode if the mode is omAuto
-	if(mode == omAuto) mode = src->GetOperationModeFromType();
+	
+	// It does not throw an exception in this case perhaps
+	if(mode == omAuto) TVPThrowExceptionMessage( TVPCannotAcceptModeAuto );
 
 	// convert tTVPBlendOperationMode to tTVPBBBltMethod
 	tTVPBBBltMethod met;
@@ -4379,8 +4379,8 @@ void tTJSNI_BaseLayer::OperateStretch(const tTVPRect &destrect,
 	}
 
 	if(!MainImage) TVPThrowExceptionMessage(TVPNotDrawableLayerType);
-	if(!src->MainImage) TVPThrowExceptionMessage(TVPSourceLayerHasNoImage);
-	ImageModified = MainImage->StretchBlt(ClipRect, destrect, src->MainImage, srcrect, met,
+	if(!src) TVPThrowExceptionMessage(TVPSourceLayerHasNoImage);
+	ImageModified = MainImage->StretchBlt(ClipRect, destrect, src, srcrect, met,
 		opacity, HoldAlpha, type) || ImageModified;
 
 	if(ImageLeft != 0 || ImageTop != 0)
@@ -4395,16 +4395,16 @@ void tTJSNI_BaseLayer::OperateStretch(const tTVPRect &destrect,
 }
 //---------------------------------------------------------------------------
 void tTJSNI_BaseLayer::OperateAffine(const t2DAffineMatrix &matrix,
-	tTJSNI_BaseLayer *src,
+	tTVPBaseBitmap *src,
 		const tTVPRect &srcrect, tTVPBlendOperationMode mode, tjs_int opacity,
 		tTVPBBStretchType type)
 {
 	// affine operation
 	tTVPRect updaterect;
 	bool updated;
-
-	// get correct blend mode if the mode is omAuto
-	if(mode == omAuto) mode = src->GetOperationModeFromType();
+	
+	// It does not throw an exception in this case perhaps
+	if(mode == omAuto) TVPThrowExceptionMessage( TVPCannotAcceptModeAuto );
 
 	// convert tTVPBlendOperationMode to tTVPBBBltMethod
 	tTVPBBBltMethod met;
@@ -4415,8 +4415,8 @@ void tTJSNI_BaseLayer::OperateAffine(const t2DAffineMatrix &matrix,
 	}
 
 	if(!MainImage) TVPThrowExceptionMessage(TVPNotDrawableLayerType);
-	if(!src->MainImage) TVPThrowExceptionMessage(TVPSourceLayerHasNoImage);
-	updated = MainImage->AffineBlt(ClipRect, src->MainImage, srcrect, matrix,
+	if(!src) TVPThrowExceptionMessage(TVPSourceLayerHasNoImage);
+	updated = MainImage->AffineBlt(ClipRect, src, srcrect, matrix,
 		met, opacity, &updaterect, HoldAlpha, type);
 
 	ImageModified = updated || ImageModified;
@@ -4429,16 +4429,16 @@ void tTJSNI_BaseLayer::OperateAffine(const t2DAffineMatrix &matrix,
 
 }
 //---------------------------------------------------------------------------
-void tTJSNI_BaseLayer::OperateAffine(const tTVPPointD *points, tTJSNI_BaseLayer *src,
+void tTJSNI_BaseLayer::OperateAffine(const tTVPPointD *points, tTVPBaseBitmap *src,
 		const tTVPRect &srcrect, tTVPBlendOperationMode mode, tjs_int opacity,
 		tTVPBBStretchType type)
 {
 	// affine operation
 	tTVPRect updaterect;
 	bool updated;
-
-	// get correct blend mode if the mode is omAuto
-	if(mode == omAuto) mode = src->GetOperationModeFromType();
+	
+	// It does not throw an exception in this case perhaps
+	if(mode == omAuto) TVPThrowExceptionMessage( TVPCannotAcceptModeAuto );
 
 	// convert tTVPBlendOperationMode to tTVPBBBltMethod
 	tTVPBBBltMethod met;
@@ -4449,8 +4449,8 @@ void tTJSNI_BaseLayer::OperateAffine(const tTVPPointD *points, tTJSNI_BaseLayer 
 	}
 
 	if(!MainImage) TVPThrowExceptionMessage(TVPNotDrawableLayerType);
-	if(!src->MainImage) TVPThrowExceptionMessage(TVPSourceLayerHasNoImage);
-	updated = MainImage->AffineBlt(ClipRect, src->MainImage, srcrect, points,
+	if(!src) TVPThrowExceptionMessage(TVPSourceLayerHasNoImage);
+	updated = MainImage->AffineBlt(ClipRect, src, srcrect, points,
 		met, opacity, &updaterect, HoldAlpha, type);
 
 	ImageModified = updated || ImageModified;
@@ -7086,21 +7086,38 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/copyRect)
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
 	if(numparams < 7) return TJS_E_BADPARAMCOUNT;
 
-	tTJSNI_BaseLayer * src = NULL;
+	tTVPBaseBitmap* src = NULL;
+	tTVPBaseBitmap* provinceSrc = NULL;
 	tTJSVariantClosure clo = param[2]->AsObjectClosureNoAddRef();
 	if(clo.Object)
 	{
+		tTJSNI_BaseLayer * srclayer = NULL;
 		if(TJS_FAILED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE,
-			tTJSNC_Layer::ClassID, (iTJSNativeInstance**)&src)))
-			TVPThrowExceptionMessage(TVPSpecifyLayer);
+			tTJSNC_Layer::ClassID, (iTJSNativeInstance**)&srclayer)))
+			src = provinceSrc = NULL;
+		else
+		{
+			src = srclayer->GetMainImage();
+			provinceSrc = srclayer->GetProvinceImage();
+		}
+
+		if( src == NULL )
+		{	// try to get bitmap interface
+			tTJSNI_Bitmap * srcbmp = NULL;
+			if(TJS_FAILED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE,
+				tTJSNC_Bitmap::ClassID, (iTJSNativeInstance**)&srcbmp)))
+				src = provinceSrc = NULL;
+			else
+				src = provinceSrc = srcbmp->GetBitmap();
+		}
 	}
-	if(!src) TVPThrowExceptionMessage(TVPSpecifyLayer);
+	if(!src && !provinceSrc) TVPThrowExceptionMessage(TVPSpecifyLayerOrBitmap);
 
 	tTVPRect rect(*param[3], *param[4], *param[5], *param[6]);
 	rect.right += rect.left;
 	rect.bottom += rect.top;
 
-	_this->CopyRect(*param[0], *param[1], src, rect);
+	_this->CopyRect(*param[0], *param[1], src, provinceSrc, rect);
 
 	return TJS_S_OK;
 }
@@ -7111,15 +7128,29 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/operateRect)
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
 	if(numparams < 7) return TJS_E_BADPARAMCOUNT;
 
-	tTJSNI_BaseLayer * src = NULL;
+	tTVPBaseBitmap* src = NULL;
 	tTJSVariantClosure clo = param[2]->AsObjectClosureNoAddRef();
+	tTVPBlendOperationMode automode = omAlpha;
 	if(clo.Object)
 	{
+		tTJSNI_BaseLayer * srclayer = NULL;
 		if(TJS_FAILED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE,
-			tTJSNC_Layer::ClassID, (iTJSNativeInstance**)&src)))
-			TVPThrowExceptionMessage(TVPSpecifyLayer);
+			tTJSNC_Layer::ClassID, (iTJSNativeInstance**)&srclayer)))
+			src = NULL;
+		else
+			src = srclayer->GetMainImage(), automode = srclayer->GetOperationModeFromType();
+
+		if( src == NULL )
+		{	// try to get bitmap interface
+			tTJSNI_Bitmap * srcbmp = NULL;
+			if(TJS_FAILED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE,
+				tTJSNC_Bitmap::ClassID, (iTJSNativeInstance**)&srcbmp)))
+				src = NULL;
+			else
+				src = srcbmp->GetBitmap();
+		}
 	}
-	if(!src) TVPThrowExceptionMessage(TVPSpecifyLayer);
+	if(!src) TVPThrowExceptionMessage(TVPSpecifyLayerOrBitmap);
 
 	tTVPRect rect(*param[3], *param[4], *param[5], *param[6]);
 	rect.right += rect.left;
@@ -7137,6 +7168,8 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/operateRect)
 			TJS_W("Layer.operateRect"), TJS_W("10")));
 	}
 
+	// get correct blend mode if the mode is omAuto
+	if(mode == omAuto) mode = automode;
 
 	_this->OperateRect(*param[0], *param[1], src, rect, mode,
 		(numparams>=9 && param[8]->Type() != tvtVoid)?(tjs_int)*param[8]:255);
@@ -7151,15 +7184,28 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/stretchCopy)
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
 	if(numparams < 9) return TJS_E_BADPARAMCOUNT;
 
-	tTJSNI_BaseLayer * src = NULL;
+	tTVPBaseBitmap* src = NULL;
 	tTJSVariantClosure clo = param[4]->AsObjectClosureNoAddRef();
 	if(clo.Object)
 	{
+		tTJSNI_BaseLayer * srclayer = NULL;
 		if(TJS_FAILED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE,
-			tTJSNC_Layer::ClassID, (iTJSNativeInstance**)&src)))
-			TVPThrowExceptionMessage(TVPSpecifyLayer);
+			tTJSNC_Layer::ClassID, (iTJSNativeInstance**)&srclayer)))
+			src = NULL;
+		else
+			src = srclayer->GetMainImage();
+
+		if( src == NULL )
+		{	// try to get bitmap interface
+			tTJSNI_Bitmap * srcbmp = NULL;
+			if(TJS_FAILED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE,
+				tTJSNC_Bitmap::ClassID, (iTJSNativeInstance**)&srcbmp)))
+				src = NULL;
+			else
+				src = srcbmp->GetBitmap();
+		}
 	}
-	if(!src) TVPThrowExceptionMessage(TVPSpecifyLayer);
+	if(!src) TVPThrowExceptionMessage(TVPSpecifyLayerOrBitmap);
 
 	tTVPRect destrect(*param[0], *param[1], *param[2], *param[3]);
 	destrect.right += destrect.left;
@@ -7185,15 +7231,29 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/operateStretch)
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
 	if(numparams < 9) return TJS_E_BADPARAMCOUNT;
 
-	tTJSNI_BaseLayer * src = NULL;
+	tTVPBaseBitmap* src = NULL;
 	tTJSVariantClosure clo = param[4]->AsObjectClosureNoAddRef();
+	tTVPBlendOperationMode automode = omAlpha;
 	if(clo.Object)
 	{
+		tTJSNI_BaseLayer * srclayer = NULL;
 		if(TJS_FAILED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE,
-			tTJSNC_Layer::ClassID, (iTJSNativeInstance**)&src)))
-			TVPThrowExceptionMessage(TVPSpecifyLayer);
+			tTJSNC_Layer::ClassID, (iTJSNativeInstance**)&srclayer)))
+			src = NULL;
+		else
+			src = srclayer->GetMainImage(), automode = srclayer->GetOperationModeFromType();
+
+		if( src == NULL )
+		{	// try to get bitmap interface
+			tTJSNI_Bitmap * srcbmp = NULL;
+			if(TJS_FAILED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE,
+				tTJSNC_Bitmap::ClassID, (iTJSNativeInstance**)&srcbmp)))
+				src = NULL;
+			else
+				src = srcbmp->GetBitmap();
+		}
 	}
-	if(!src) TVPThrowExceptionMessage(TVPSpecifyLayer);
+	if(!src) TVPThrowExceptionMessage(TVPSpecifyLayerOrBitmap);
 
 	tTVPRect destrect(*param[0], *param[1], *param[2], *param[3]);
 	destrect.right += destrect.left;
@@ -7218,6 +7278,9 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/operateStretch)
 	if(numparams >= 12 && param[11]->Type() != tvtVoid)
 		type = (tTVPBBStretchType)(tjs_int)*param[11];
 
+	// get correct blend mode if the mode is omAuto
+	if(mode == omAuto) mode = automode;
+
 	_this->OperateStretch(destrect, src, srcrect, mode, opa, type);
 
 	return TJS_S_OK;
@@ -7230,15 +7293,28 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/affineCopy)
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
 	if(numparams < 12) return TJS_E_BADPARAMCOUNT;
 
-	tTJSNI_BaseLayer * src = NULL;
+	tTVPBaseBitmap* src = NULL;
 	tTJSVariantClosure clo = param[0]->AsObjectClosureNoAddRef();
 	if(clo.Object)
 	{
+		tTJSNI_BaseLayer * srclayer = NULL;
 		if(TJS_FAILED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE,
-			tTJSNC_Layer::ClassID, (iTJSNativeInstance**)&src)))
-			TVPThrowExceptionMessage(TVPSpecifyLayer);
+			tTJSNC_Layer::ClassID, (iTJSNativeInstance**)&srclayer)))
+			src = NULL;
+		else
+			src = srclayer->GetMainImage();
+
+		if( src == NULL )
+		{	// try to get bitmap interface
+			tTJSNI_Bitmap * srcbmp = NULL;
+			if(TJS_FAILED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE,
+				tTJSNC_Bitmap::ClassID, (iTJSNativeInstance**)&srcbmp)))
+				src = NULL;
+			else
+				src = srcbmp->GetBitmap();
+		}
 	}
-	if(!src) TVPThrowExceptionMessage(TVPSpecifyLayer);
+	if(!src) TVPThrowExceptionMessage(TVPSpecifyLayerOrBitmap);
 
 	tTVPRect srcrect(*param[1], *param[2], *param[3], *param[4]);
 	srcrect.right += srcrect.left;
@@ -7290,15 +7366,29 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/operateAffine)
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
 	if(numparams < 12) return TJS_E_BADPARAMCOUNT;
 
-	tTJSNI_BaseLayer * src = NULL;
+	tTVPBaseBitmap* src = NULL;
 	tTJSVariantClosure clo = param[0]->AsObjectClosureNoAddRef();
+	tTVPBlendOperationMode automode = omAlpha;
 	if(clo.Object)
 	{
+		tTJSNI_BaseLayer * srclayer = NULL;
 		if(TJS_FAILED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE,
-			tTJSNC_Layer::ClassID, (iTJSNativeInstance**)&src)))
-			TVPThrowExceptionMessage(TVPSpecifyLayer);
+			tTJSNC_Layer::ClassID, (iTJSNativeInstance**)&srclayer)))
+			src = NULL;
+		else
+			src = srclayer->GetMainImage(), automode = srclayer->GetOperationModeFromType();
+
+		if( src == NULL )
+		{	// try to get bitmap interface
+			tTJSNI_Bitmap * srcbmp = NULL;
+			if(TJS_FAILED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE,
+				tTJSNC_Bitmap::ClassID, (iTJSNativeInstance**)&srcbmp)))
+				src = NULL;
+			else
+				src = srcbmp->GetBitmap();
+		}
 	}
-	if(!src) TVPThrowExceptionMessage(TVPSpecifyLayer);
+	if(!src) TVPThrowExceptionMessage(TVPSpecifyLayerOrBitmap);
 
 	tTVPRect srcrect(*param[1], *param[2], *param[3], *param[4]);
 	srcrect.right += srcrect.left;
@@ -7323,6 +7413,8 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/operateAffine)
 	else
 		mode = omAuto;
 
+	// get correct blend mode if the mode is omAuto
+	if(mode == omAuto) mode = automode;
 
 	if(param[5]->operator bool())
 	{
