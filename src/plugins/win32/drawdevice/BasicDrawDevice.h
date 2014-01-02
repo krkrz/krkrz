@@ -25,6 +25,7 @@ protected:
 	size_t PrimaryLayerManagerIndex; //!< プライマリレイヤマネージャ
 	std::vector<iTVPLayerManager *> Managers; //!< レイヤマネージャの配列
 	tTVPRect DestRect; //!< 描画先位置
+	tTVPRect ClipRect; //!< クリッピング矩形
 
 protected:
 	tTVPDrawDevice(); //!< コンストラクタ
@@ -49,6 +50,7 @@ public:
 	//!				レイヤマネージャがなければ偽が返る
 	//! @note		x, y は DestRectの (0,0) を原点とする座標として渡されると見なす
 	bool TransformToPrimaryLayerManager(tjs_int &x, tjs_int &y);
+	bool TransformToPrimaryLayerManager(tjs_real &x, tjs_real &y);
 
 	//! @brief		LayerManager→Device方向の座標の変換を行う
 	//! @param		x		X位置
@@ -70,6 +72,7 @@ public:
 
 //---- 描画位置・サイズ関連
 	virtual void TJS_INTF_METHOD SetDestRectangle(const tTVPRect & rect);
+	virtual void TJS_INTF_METHOD SetClipRectangle(const tTVPRect & rect);
 	virtual void TJS_INTF_METHOD GetSrcSize(tjs_int &w, tjs_int &h);
 	virtual void TJS_INTF_METHOD NotifyLayerResize(iTVPLayerManager * manager);
 	virtual void TJS_INTF_METHOD NotifyLayerImageChange(iTVPLayerManager * manager);
@@ -87,6 +90,12 @@ public:
 	virtual void TJS_INTF_METHOD OnKeyUp(tjs_uint key, tjs_uint32 shift);
 	virtual void TJS_INTF_METHOD OnKeyPress(tjs_char key);
 	virtual void TJS_INTF_METHOD OnMouseWheel(tjs_uint32 shift, tjs_int delta, tjs_int x, tjs_int y);
+	virtual void TJS_INTF_METHOD OnTouchDown( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id );
+	virtual void TJS_INTF_METHOD OnTouchUp( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id );
+	virtual void TJS_INTF_METHOD OnTouchMove( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id );
+	virtual void TJS_INTF_METHOD OnTouchScaling( tjs_real startdist, tjs_real curdist, tjs_real cx, tjs_real cy, tjs_int flag );
+	virtual void TJS_INTF_METHOD OnTouchRotate( tjs_real startangle, tjs_real curangle, tjs_real dist, tjs_real cx, tjs_real cy, tjs_int flag );
+	virtual void TJS_INTF_METHOD OnMultiTouch();
 	virtual void TJS_INTF_METHOD RecheckInputState();
 
 	// layer manager → drawdevice
@@ -94,7 +103,7 @@ public:
 	virtual void TJS_INTF_METHOD SetMouseCursor(iTVPLayerManager * manager, tjs_int cursor);
 	virtual void TJS_INTF_METHOD GetCursorPos(iTVPLayerManager * manager, tjs_int &x, tjs_int &y);
 	virtual void TJS_INTF_METHOD SetCursorPos(iTVPLayerManager * manager, tjs_int x, tjs_int y);
-	virtual void TJS_INTF_METHOD SetHintText(iTVPLayerManager * manager, const ttstr & text);
+	virtual void TJS_INTF_METHOD SetHintText(iTVPLayerManager * manager, iTJSDispatch2* sender, const ttstr & text);
 	virtual void TJS_INTF_METHOD WindowReleaseCapture(iTVPLayerManager * manager);
 
 	virtual void TJS_INTF_METHOD SetAttentionPoint(iTVPLayerManager * manager, tTJSNI_BaseLayer *layer,
@@ -112,10 +121,15 @@ public:
 	virtual void TJS_INTF_METHOD RequestInvalidation(const tTVPRect & rect);
 	virtual void TJS_INTF_METHOD Update();
 	virtual void TJS_INTF_METHOD Show() = 0;
+	virtual bool TJS_INTF_METHOD WaitForVBlank( tjs_int* in_vblank, tjs_int* delayed );
 
 //---- デバッグ支援
 	virtual void TJS_INTF_METHOD DumpLayerStructure();
 	virtual void TJS_INTF_METHOD SetShowUpdateRect(bool b);
+
+//---- フルスクリーン
+	virtual bool TJS_INTF_METHOD SwitchToFullScreen( HWND window, tjs_uint w, tjs_uint h, tjs_uint bpp, tjs_uint color, bool changeresolution );
+	virtual void TJS_INTF_METHOD RevertFromFullScreen( HWND window, tjs_uint w, tjs_uint h, tjs_uint bpp, tjs_uint color );
 
 // ほかのメソッドについては実装しない
 };

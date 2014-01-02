@@ -3,21 +3,22 @@
 
 //---------------------------------------------------------------------------
 #include <windows.h>
+#include <vfw.h>
 #include "tp_stub.h"
-#include "PassThroughDrawDevice.h"
+#include "GDIDrawDevice.h"
 
 //---------------------------------------------------------------------------
 
 
 //---------------------------------------------------------------------------
-class NI_PluggedDrawDevice : public tTJSNativeInstance // ネイティブインスタンス
+class NI_GDIDrawDevice : public tTJSNativeInstance // ネイティブインスタンス
 {
 	iTVPDrawDevice * Device;
 public:
-	NI_PluggedDrawDevice()
+	NI_GDIDrawDevice()
 	{
 		// コンストラクタ
-		Device = new tTVPPassThroughDrawDevice();
+		Device = new tTVPGDIDrawDevice();
 	}
 
 	tjs_error TJS_INTF_METHOD
@@ -32,15 +33,17 @@ public:
 	{
 		// オブジェクトが無効化されるときに呼ばれる
 	}
+
+	iTVPDrawDevice * GetDevice() const { return Device; }
 };
 //---------------------------------------------------------------------------
 /*
-	これは NI_PluggedDrawDevice のオブジェクトを作成して返すだけの関数です。
+	これは NI_GDIDrawDevice のオブジェクトを作成して返すだけの関数です。
 	後述の TJSCreateNativeClassForPlugin の引数として渡します。
 */
-static iTJSNativeInstance * TJS_INTF_METHOD Create_NI_PluggedDrawDevice()
+static iTJSNativeInstance * TJS_INTF_METHOD Create_NI_GDIDrawDevice()
 {
-	return new NI_PluggedDrawDevice();
+	return new NI_GDIDrawDevice();
 }
 //---------------------------------------------------------------------------
 /*
@@ -49,13 +52,13 @@ static iTJSNativeInstance * TJS_INTF_METHOD Create_NI_PluggedDrawDevice()
 	その ID を格納する変数名と、その変数をここで宣言します。
 	初期値には無効な ID を表す -1 を指定してください。
 */
-#define TJS_NATIVE_CLASSID_NAME ClassID_PluggedDrawDevice
+#define TJS_NATIVE_CLASSID_NAME ClassID_GDIDrawDevice
 static tjs_int32 TJS_NATIVE_CLASSID_NAME = -1;
 //---------------------------------------------------------------------------
 /*
 	TJS2 用の「クラス」を作成して返す関数です。
 */
-static iTJSDispatch2 * Create_NC_PluggedDrawDevice()
+static iTJSDispatch2 * Create_NC_GDIDrawDevice()
 {
 	/*
 		まず、クラスのベースとなるクラスオブジェクトを作成します。
@@ -66,7 +69,7 @@ static iTJSDispatch2 * Create_NC_PluggedDrawDevice()
 		classobj である必要があります。
 	*/
 	tTJSNativeClassForPlugin * classobj =
-		TJSCreateNativeClassForPlugin(TJS_W("PluggedDrawDevice"), Create_NI_PluggedDrawDevice);
+		TJSCreateNativeClassForPlugin(TJS_W("GDIDrawDevice"), Create_NI_GDIDrawDevice);
 
 
 	/*
@@ -75,7 +78,7 @@ static iTJSDispatch2 * Create_NC_PluggedDrawDevice()
 		このマクロと TJS_END_NATIVE_MEMBERS マクロで挟まれた場所に、クラスの
 		メンバとなるべきメソッドやプロパティの記述をします。
 	*/
-	TJS_BEGIN_NATIVE_MEMBERS(/*TJS class name*/PluggedDrawDevice)
+	TJS_BEGIN_NATIVE_MEMBERS(/*TJS class name*/GDIDrawDevice)
 
 		/*
 			空の finalize メソッドを宣言します。finalize に相当する処理は
@@ -90,7 +93,7 @@ static iTJSDispatch2 * Create_NC_PluggedDrawDevice()
 
 			TJS_BEGIN_NATIVE_CONSTRUCTOR_DECL マクロの１番目の引数はネイティブ
 			インスタンスに割り当てる変数名で、２場面目の引数はその変数の型名です。
-			この例でのこのブロック内では NI_PluggedDrawDevice * _this という変数が利用可能で、
+			この例でのこのブロック内では NI_GDIDrawDevice * _this という変数が利用可能で、
 			ネイティブインスタンスにアクセスすることができます。
 			マクロの３番目の引数は、TJS 内で使用するクラス名を指定します。
 			TJS_END_NATIVE_CONSTRUCTOR_DECL マクロの引数も同様です。
@@ -100,14 +103,14 @@ static iTJSDispatch2 * Create_NC_PluggedDrawDevice()
 		*/
 		TJS_BEGIN_NATIVE_CONSTRUCTOR_DECL(
 			/*var.name*/_this,
-			/*var.type*/NI_PluggedDrawDevice,
-			/*TJS class name*/PluggedDrawDevice)
+			/*var.type*/NI_GDIDrawDevice,
+			/*TJS class name*/GDIDrawDevice)
 		{
-			// NI_PluggedDrawDevice::Construct にも内容を記述できるので
+			// NI_GDIDrawDevice::Construct にも内容を記述できるので
 			// ここでは何もしない
 			return TJS_S_OK;
 		}
-		TJS_END_NATIVE_CONSTRUCTOR_DECL(/*TJS class name*/PluggedDrawDevice)
+		TJS_END_NATIVE_CONSTRUCTOR_DECL(/*TJS class name*/GDIDrawDevice)
 
 		/*
 			print メソッドを宣言します。メソッド名は
@@ -116,7 +119,7 @@ static iTJSDispatch2 * Create_NC_PluggedDrawDevice()
 			tjs_int numparams と tTJSVariant **param があって、それぞれ、渡され
 			た引数の数と引数を示しています。このメソッドではそれらは使用していま
 			せん。20～21行目は、オブジェクトからネイティブインスタンスを取り出す
-			ためのマクロです。この例では _this という NI_PluggedDrawDevice * 型の変数にネイ
+			ためのマクロです。この例では _this という NI_GDIDrawDevice * 型の変数にネイ
 			ティブインスタンスを取り出す、という意味になります。以降、_this とい
 			う変数でネイティブインスタンスにアクセスできます。23行目で、その
 			ネイティブインスタンスの Print メソッドを呼び出しています。
@@ -126,7 +129,7 @@ static iTJSDispatch2 * Create_NC_PluggedDrawDevice()
 		{
 			TJS_BEGIN_NATIVE_PROP_GETTER
 			{
-				TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_PassThroughDrawDevice);
+				TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/NI_GDIDrawDevice);
 				*result = reinterpret_cast<tjs_int64>(_this->GetDevice());
 				return TJS_S_OK;
 			}
@@ -158,15 +161,13 @@ static iTJSDispatch2 * Create_NC_PluggedDrawDevice()
 
 
 //---------------------------------------------------------------------------
-#pragma argsused
-int WINAPI DllEntryPoint(HINSTANCE hinst, unsigned long reason,
-	void* lpReserved)
+int WINAPI DllEntryPoint(HINSTANCE hinst, unsigned long reason, void* lpReserved)
 {
 	return 1;
 }
 //---------------------------------------------------------------------------
 static tjs_int GlobalRefCountAtInit = 0;
-extern "C" HRESULT _stdcall _export V2Link(iTVPFunctionExporter *exporter)
+extern "C" __declspec(dllexport) HRESULT _stdcall V2Link(iTVPFunctionExporter *exporter)
 {
 	// スタブの初期化(必ず記述する)
 	TVPInitImportStub(exporter);
@@ -179,7 +180,7 @@ extern "C" HRESULT _stdcall _export V2Link(iTVPFunctionExporter *exporter)
 
 	//-----------------------------------------------------------------------
 	// 1 まずクラスオブジェクトを作成
-	iTJSDispatch2 * tjsclass = Create_NC_PluggedDrawDevice();
+	iTJSDispatch2 * tjsclass = Create_NC_GDIDrawDevice();
 
 	// 2 tjsclass を tTJSVariant 型に変換
 	val = tTJSVariant(tjsclass);
@@ -192,7 +193,7 @@ extern "C" HRESULT _stdcall _export V2Link(iTVPFunctionExporter *exporter)
 	// 4 global の PropSet メソッドを用い、オブジェクトを登録する
 	global->PropSet(
 		TJS_MEMBERENSURE, // メンバがなかった場合には作成するようにするフラグ
-		TJS_W("PluggedDrawDevice"), // メンバ名 ( かならず TJS_W( ) で囲む )
+		TJS_W("GDIDrawDevice"), // メンバ名 ( かならず TJS_W( ) で囲む )
 		NULL, // ヒント ( 本来はメンバ名のハッシュ値だが、NULL でもよい )
 		&val, // 登録する値
 		global // コンテキスト ( global でよい )
@@ -223,7 +224,7 @@ extern "C" HRESULT _stdcall _export V2Link(iTVPFunctionExporter *exporter)
 	return S_OK;
 }
 //---------------------------------------------------------------------------
-extern "C" HRESULT _stdcall _export V2Unlink()
+extern "C" __declspec(dllexport) HRESULT _stdcall V2Unlink()
 {
 	// 吉里吉里側から、プラグインを解放しようとするときに呼ばれる関数。
 
@@ -242,7 +243,7 @@ extern "C" HRESULT _stdcall _export V2Unlink()
 		でプラグインを解放せず、プログラム終了と同時に自動的に解放させるのが吉)。
 	*/
 
-	// TJS のグローバルオブジェクトに登録した PluggedDrawDevice クラスなどを削除する
+	// TJS のグローバルオブジェクトに登録した GDIDrawDevice クラスなどを削除する
 
 	// - まず、TJS のグローバルオブジェクトを取得する
 	iTJSDispatch2 * global = TVPGetScriptDispatch();
@@ -256,7 +257,7 @@ extern "C" HRESULT _stdcall _export V2Unlink()
 
 		global->DeleteMember(
 			0, // フラグ ( 0 でよい )
-			TJS_W("PluggedDrawDevice"), // メンバ名
+			TJS_W("GDIDrawDevice"), // メンバ名
 			NULL, // ヒント
 			global // コンテキスト
 			);

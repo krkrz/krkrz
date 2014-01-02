@@ -22,6 +22,7 @@ tTVPDrawDevice::tTVPDrawDevice()
 	Window = NULL;
 	PrimaryLayerManagerIndex = 0;
 	DestRect.clear();
+	ClipRect.clear();
 }
 //---------------------------------------------------------------------------
 
@@ -81,6 +82,23 @@ bool tTVPDrawDevice::TransformFromPrimaryLayerManager(tjs_int &x, tjs_int &y)
 }
 //---------------------------------------------------------------------------
 
+//---------------------------------------------------------------------------
+bool tTVPDrawDevice::TransformToPrimaryLayerManager(tjs_real &x, tjs_real &y)
+{
+	iTVPLayerManager * manager = GetLayerManagerAt(PrimaryLayerManagerIndex);
+	if(!manager) return false;
+
+	// プライマリレイヤマネージャのプライマリレイヤのサイズを得る
+	tjs_int pl_w, pl_h;
+	if(!manager->GetPrimaryLayerSize(pl_w, pl_h)) return false;
+
+	// x , y は DestRect の 0, 0 を原点とした座標として渡されてきている
+	x = pl_w ? (x * DestRect.get_width()  / pl_w) : 0.0;
+	y = pl_h ? (y * DestRect.get_height() / pl_h) : 0.0;
+
+	return true;
+}
+//---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
 void TJS_INTF_METHOD tTVPDrawDevice::Destruct()
@@ -125,6 +143,14 @@ void TJS_INTF_METHOD tTVPDrawDevice::RemoveLayerManager(iTVPLayerManager * manag
 void TJS_INTF_METHOD tTVPDrawDevice::SetDestRectangle(const tTVPRect & rect)
 {
 	DestRect = rect;
+}
+//---------------------------------------------------------------------------
+
+
+//---------------------------------------------------------------------------
+void TJS_INTF_METHOD tTVPDrawDevice::SetClipRectangle(const tTVPRect & rect)
+{
+	ClipRect = rect;
 }
 //---------------------------------------------------------------------------
 
@@ -291,6 +317,73 @@ void TJS_INTF_METHOD tTVPDrawDevice::OnMouseWheel(tjs_uint32 shift, tjs_int delt
 }
 //---------------------------------------------------------------------------
 
+//---------------------------------------------------------------------------
+void TJS_INTF_METHOD tTVPDrawDevice::OnTouchDown( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id )
+{
+	if(!TransformToPrimaryLayerManager(x, y)) return;
+	iTVPLayerManager * manager = GetLayerManagerAt(PrimaryLayerManagerIndex);
+	if(!manager) return;
+
+	manager->NotifyTouchDown(x, y, cx, cy, id);
+}
+//---------------------------------------------------------------------------
+
+
+//---------------------------------------------------------------------------
+void TJS_INTF_METHOD tTVPDrawDevice::OnTouchUp( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id )
+{
+	if(!TransformToPrimaryLayerManager(x, y)) return;
+	iTVPLayerManager * manager = GetLayerManagerAt(PrimaryLayerManagerIndex);
+	if(!manager) return;
+
+	manager->NotifyTouchUp(x, y, cx, cy, id);
+}
+//---------------------------------------------------------------------------
+
+
+//---------------------------------------------------------------------------
+void TJS_INTF_METHOD tTVPDrawDevice::OnTouchMove( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id )
+{
+	if(!TransformToPrimaryLayerManager(x, y)) return;
+	iTVPLayerManager * manager = GetLayerManagerAt(PrimaryLayerManagerIndex);
+	if(!manager) return;
+
+	manager->NotifyTouchMove(x, y, cx, cy, id);
+}
+//---------------------------------------------------------------------------
+
+
+//---------------------------------------------------------------------------
+void TJS_INTF_METHOD tTVPDrawDevice::OnTouchScaling( tjs_real startdist, tjs_real curdist, tjs_real cx, tjs_real cy, tjs_int flag )
+{
+	iTVPLayerManager * manager = GetLayerManagerAt(PrimaryLayerManagerIndex);
+	if(!manager) return;
+
+	manager->NotifyTouchScaling(startdist, curdist, cx, cy, flag);
+}
+//---------------------------------------------------------------------------
+
+
+//---------------------------------------------------------------------------
+void TJS_INTF_METHOD tTVPDrawDevice::OnTouchRotate( tjs_real startangle, tjs_real curangle, tjs_real dist, tjs_real cx, tjs_real cy, tjs_int flag )
+{
+	iTVPLayerManager * manager = GetLayerManagerAt(PrimaryLayerManagerIndex);
+	if(!manager) return;
+
+	manager->NotifyTouchRotate(startangle, curangle, dist, cx, cy, flag);
+}
+//---------------------------------------------------------------------------
+
+
+//---------------------------------------------------------------------------
+void TJS_INTF_METHOD tTVPDrawDevice::OnMultiTouch()
+{
+	iTVPLayerManager * manager = GetLayerManagerAt(PrimaryLayerManagerIndex);
+	if(!manager) return;
+
+	manager->NotifyMultiTouch();
+}
+//---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
 void TJS_INTF_METHOD tTVPDrawDevice::RecheckInputState()
@@ -373,13 +466,13 @@ void TJS_INTF_METHOD tTVPDrawDevice::WindowReleaseCapture(iTVPLayerManager * man
 
 
 //---------------------------------------------------------------------------
-void TJS_INTF_METHOD tTVPDrawDevice::SetHintText(iTVPLayerManager * manager, const ttstr & text)
+void TJS_INTF_METHOD tTVPDrawDevice::SetHintText(iTVPLayerManager * manager, iTJSDispatch2* sender, const ttstr & text)
 {
 	iTVPLayerManager * primary_manager = GetLayerManagerAt(PrimaryLayerManagerIndex);
 	if(!primary_manager) return;
 	if(primary_manager == manager)
 	{
-		Window->SetHintText(text);
+		Window->SetHintText(sender,text);
 	}
 }
 //---------------------------------------------------------------------------
@@ -503,7 +596,10 @@ void TJS_INTF_METHOD tTVPDrawDevice::Show()
 	// なにもしない
 }
 //---------------------------------------------------------------------------
-
+bool TJS_INTF_METHOD tTVPDrawDevice::WaitForVBlank( tjs_int* in_vblank, tjs_int* delayed )
+{
+	return false;
+}
 
 //---------------------------------------------------------------------------
 void TJS_INTF_METHOD tTVPDrawDevice::DumpLayerStructure()
@@ -521,5 +617,54 @@ void TJS_INTF_METHOD tTVPDrawDevice::DumpLayerStructure()
 void TJS_INTF_METHOD tTVPDrawDevice::SetShowUpdateRect(bool b)
 {
 	// なにもしない
+}
+//---------------------------------------------------------------------------
+bool TJS_INTF_METHOD tTVPDrawDevice::SwitchToFullScreen( HWND window, tjs_uint w, tjs_uint h, tjs_uint bpp, tjs_uint color, bool changeresolution )
+{
+	// ChangeDisplaySettings を使用したフルスクリーン化
+	bool success = false;
+	DEVMODE dm;
+	ZeroMemory(&dm, sizeof(DEVMODE));
+	dm.dmSize = sizeof(DEVMODE);
+	dm.dmPelsWidth = w;
+	dm.dmPelsHeight = h;
+	dm.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL;
+	dm.dmBitsPerPel = bpp;
+	LONG ret = ::ChangeDisplaySettings((DEVMODE*)&dm, CDS_FULLSCREEN);
+	switch(ret)
+	{
+	case DISP_CHANGE_SUCCESSFUL:
+		::SetWindowPos(window, HWND_TOP, 0, 0, w, h, SWP_SHOWWINDOW);
+		success = true;
+		break;
+	case DISP_CHANGE_RESTART:
+		TVPAddLog( TJS_W("ChangeDisplaySettings failed: DISP_CHANGE_RESTART") );
+		break;
+	case DISP_CHANGE_BADFLAGS:
+		TVPAddLog( TJS_W("ChangeDisplaySettings failed: DISP_CHANGE_BADFLAGS") );
+		break;
+	case DISP_CHANGE_BADPARAM:
+		TVPAddLog( TJS_W("ChangeDisplaySettings failed: DISP_CHANGE_BADPARAM") );
+		break;
+	case DISP_CHANGE_FAILED:
+		TVPAddLog( TJS_W("ChangeDisplaySettings failed: DISP_CHANGE_FAILED") );
+		break;
+	case DISP_CHANGE_BADMODE:
+		TVPAddLog( TJS_W("ChangeDisplaySettings failed: DISP_CHANGE_BADMODE") );
+		break;
+	case DISP_CHANGE_NOTUPDATED:
+ 		TVPAddLog( TJS_W("ChangeDisplaySettings failed: DISP_CHANGE_NOTUPDATED") );
+		break;
+	default:
+		TVPAddLog( TVPFormatMessage(TJS_W("ChangeDisplaySettings 失敗: 不明な理由 (%1)"),ttstr((tjs_int)ret)) );
+		break;
+	}
+	return success;
+}
+//---------------------------------------------------------------------------
+void TJS_INTF_METHOD tTVPDrawDevice::RevertFromFullScreen( HWND window, tjs_uint w, tjs_uint h, tjs_uint bpp, tjs_uint color )
+{
+	// ChangeDisplaySettings を使用したフルスクリーン解除
+	::ChangeDisplaySettings(NULL, 0);
 }
 //---------------------------------------------------------------------------
