@@ -4,11 +4,11 @@
 #include <windows.h>
 #include <stdio.h>
 #include <ddraw.h>
-#include <d3d.h>
+#include <d3d9.h>
 #include "BasicDrawDevice.h"
 
 /**
- * Irrlicht ベースの DrawDevice
+ * D3D ベースの DrawDevice
  */
 class DrawDeviceD3D : public tTVPDrawDevice
 {
@@ -21,15 +21,22 @@ protected:
 	tjs_int destLeft;     //< 実描画領域の縦幅
 	tjs_int destWidth;    //< 実描画領域の横幅
 	tjs_int destHeight;   //< 実描画領域の縦幅
+	
+	HWND targetWindow;
+	bool isMainWindow;
+	bool drawUpdateRectangle;
+	bool backBufferDirty;
 
 	HWND hWnd;
 	
-	IDirectDraw7 *DirectDraw7;
-	IDirect3D7 *Direct3D7;
-	IDirect3DDevice7 *Direct3DDevice7;
-	IDirectDrawClipper *Clipper;
-	IDirectDrawSurface7 *Surface;
+	IDirect3D9*				direct3D;
+	IDirect3DDevice9*		direct3DDevice;
+	D3DPRESENT_PARAMETERS	d3dPP;
+	D3DDISPLAYMODE			dispMode;
 	
+	UINT		currentMonitor;
+	bool		shouldShow; //!< show で実際に画面に画像を転送すべきか
+	tjs_uint	vsyncInterval;
 public:
 	// コンストラクタ
 	DrawDeviceD3D(int width, int height);
@@ -37,6 +44,17 @@ public:
 	virtual ~DrawDeviceD3D();
 
 protected:
+	
+	void InvalidateAll();
+	UINT GetMonitorNumber( HWND window );
+
+	bool IsTargetWindowActive() const;
+
+	HRESULT DecideD3DPresentParameters();
+
+	void DestroyD3DDevice();
+	void TryRecreateWhenDeviceLost();
+
 	// デバイス割り当て
 	void attach(HWND hwnd);
 
@@ -98,6 +116,7 @@ public:
 	
 	//---- 再描画関連
 	virtual void TJS_INTF_METHOD Show();
+	virtual bool TJS_INTF_METHOD WaitForVBlank( tjs_int* in_vblank, tjs_int* delayed );
 	
 	//---- LayerManager からの画像受け渡し関連
 	virtual void TJS_INTF_METHOD StartBitmapCompletion(iTVPLayerManager * manager);
@@ -105,7 +124,10 @@ public:
 		tjs_int x, tjs_int y, const void * bits, const BITMAPINFO * bitmapinfo,
 		const tTVPRect &cliprect, tTVPLayerType type, tjs_int opacity);
 	virtual void TJS_INTF_METHOD EndBitmapCompletion(iTVPLayerManager * manager);
-
+	
+//---- フルスクリーン
+	virtual bool TJS_INTF_METHOD SwitchToFullScreen( HWND window, tjs_uint w, tjs_uint h, tjs_uint bpp, tjs_uint color, bool changeresolution );
+	virtual void TJS_INTF_METHOD RevertFromFullScreen( HWND window, tjs_uint w, tjs_uint h, tjs_uint bpp, tjs_uint color );
 	// -----------------------------------------------------------------------
 	// 固有メソッド
 	// -----------------------------------------------------------------------

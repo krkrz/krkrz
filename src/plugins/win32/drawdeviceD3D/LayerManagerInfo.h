@@ -3,9 +3,7 @@
 
 #include <windows.h>
 #include <stdio.h>
-#include <ddraw.h>
-#include <d3d.h>
-#include <vfw.h>
+#include <d3d9.h>
 
 /**
  * レイヤマネージャ用付随情報
@@ -21,17 +19,12 @@ protected:
 	int srcHeight;
 
 	// 割り当てテクスチャ
-	IDirectDrawSurface7 *texture;
+	IDirect3DTexture9 *texture;
 	tjs_uint textureWidth; //< テクスチャの横幅
 	tjs_uint textureHeight; //< テクスチャの縦幅
 
-	bool useDirectTransfer; //< メモリ直接転送を行うかどうか
-	
 	void *textureBuffer; //< テクスチャのサーフェースへのメモリポインタ
 	long texturePitch; //< テクスチャのピッチ
-
-	HDC offScreenDC; //< DIB描画用の HDC
-	HDRAWDIB drawDibHandle; //< DIB描画用ハンドル
 
 	bool lastOK;     //< 前回の処理は成功したか
 	
@@ -51,7 +44,7 @@ public:
 	/**
 	 * テクスチャ割り当て処理
 	 */
-	void alloc(iTVPLayerManager *manager, IDirectDraw7 *directDraw, IDirect3DDevice7 *direct3DDevice);
+	void alloc(iTVPLayerManager *manager, IDirect3DDevice9 *direct3DDevice);
 
 	/*
 	 * テクスチャ解放
@@ -67,7 +60,7 @@ public:
 	/**
 	 * 描画
 	 */
-	void draw(IDirect3DDevice7 *direct3DDevice7, int destWidth, int destHeight);
+	void draw(IDirect3DDevice9 *direct3DDevice9, int destWidth, int destHeight);
 };
 
 #endif

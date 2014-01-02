@@ -1,4 +1,4 @@
-#pragma comment(lib, "d3dx.lib")
+
 #include "DrawDeviceD3D.h"
 #include "LayerManagerInfo.h"
 
@@ -7,9 +7,20 @@
  */
 DrawDeviceD3D::DrawDeviceD3D(int width, int height)
 	: width(width), height(height), destWidth(0), destHeight(0), defaultVisible(true),
-	  DirectDraw7(NULL), Direct3D7(NULL), Direct3DDevice7(NULL), Surface(NULL), Clipper(NULL)
+	  direct3D(NULL), direct3DDevice(NULL)
 {
-	TVPEnsureDirectDrawObject();
+	targetWindow = NULL;
+	drawUpdateRectangle = false;
+	backBufferDirty = true;
+
+	direct3D = NULL;
+	direct3DDevice = NULL;
+	shouldShow = false;
+	vsyncInterval = 16;
+	ZeroMemory( &d3dPP, sizeof(d3dPP) );
+	ZeroMemory( &dispMode, sizeof(dispMode) );
+
+	TVPEnsureDirect3DObject();
 }
 
 /**
@@ -19,50 +30,147 @@ DrawDeviceD3D::~DrawDeviceD3D()
 {
 	detach();
 }
+//---------------------------------------------------------------------------
+void DrawDeviceD3D::DestroyD3DDevice() {
+	if(direct3DDevice) direct3DDevice->Release(), direct3DDevice = NULL;
+	if(direct3D) direct3D = NULL;
+}
+//---------------------------------------------------------------------------
+bool DrawDeviceD3D::IsTargetWindowActive() const {
+	if( targetWindow == NULL ) return false;
+	return ::GetForegroundWindow() == targetWindow;
+}
+//---------------------------------------------------------------------------
+UINT DrawDeviceD3D::GetMonitorNumber( HWND window )
+{
+	if( direct3D == NULL || window == NULL ) return D3DADAPTER_DEFAULT;
+	HMONITOR windowMonitor = ::MonitorFromWindow( window, MONITOR_DEFAULTTOPRIMARY );
+	UINT iCurrentMonitor = 0;
+	UINT numOfMonitor = direct3D->GetAdapterCount();
+	for( ; iCurrentMonitor < numOfMonitor; ++iCurrentMonitor ) 	{
+		if( direct3D->GetAdapterMonitor(iCurrentMonitor) == windowMonitor )
+			break;
+	}
+	if( iCurrentMonitor == numOfMonitor )
+		iCurrentMonitor = D3DADAPTER_DEFAULT;
+	return iCurrentMonitor;
+}
+//---------------------------------------------------------------------------
+HRESULT DrawDeviceD3D::DecideD3DPresentParameters() {
+	HRESULT			hr;
+	UINT iCurrentMonitor = GetMonitorNumber(targetWindow);
+	if( FAILED( hr = direct3D->GetAdapterDisplayMode( iCurrentMonitor, &dispMode ) ) )
+		return hr;
 
+	ZeroMemory( &d3dPP, sizeof(d3dPP) );
+	d3dPP.Windowed = TRUE;
+	d3dPP.SwapEffect = D3DSWAPEFFECT_COPY;
+	d3dPP.BackBufferFormat = D3DFMT_UNKNOWN;
+	d3dPP.BackBufferHeight = dispMode.Height;
+	d3dPP.BackBufferWidth = dispMode.Width;
+	d3dPP.hDeviceWindow = targetWindow;
+	d3dPP.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
+
+	return S_OK;
+}
+//---------------------------------------------------------------------------
+void DrawDeviceD3D::TryRecreateWhenDeviceLost()
+{
+	bool success = false;
+	if( direct3DDevice ) {
+		for (std::vector<iTVPLayerManager *>::iterator i = Managers.begin(); i != Managers.end(); i++) {
+			LayerManagerInfo *info = (LayerManagerInfo*)(*i)->GetDrawDeviceData();
+			if (info) {
+				info->free();
+			}
+		}
+		HRESULT hr = direct3DDevice->TestCooperativeLevel();
+		if( hr == D3DERR_DEVICENOTRESET ) {
+			hr = direct3DDevice->Reset(&d3dPP);
+		}
+		if( FAILED(hr) ) {
+			attach( targetWindow );
+			success = direct3DDevice != NULL;
+		}
+	} else {
+		attach( targetWindow );
+		success = direct3DDevice != NULL;
+	}
+	if( success ) {
+		if (direct3DDevice) {
+			for (std::vector<iTVPLayerManager *>::iterator i = Managers.begin(); i != Managers.end(); i++) {
+				iTVPLayerManager *manager = *i;
+				LayerManagerInfo *info = (LayerManagerInfo*)manager->GetDrawDeviceData();
+				if (info != NULL) {
+					info->alloc( manager, direct3DDevice );
+				}
+			}
+		}
+		InvalidateAll();	// 画像の再描画(Layer Update)を要求する
+	}
+}
+//---------------------------------------------------------------------------
+void DrawDeviceD3D::InvalidateAll()
+{
+	// レイヤ演算結果をすべてリクエストする
+	// サーフェースが lost した際に内容を再構築する目的で用いる
+	RequestInvalidation(tTVPRect(0, 0, DestRect.get_width(), DestRect.get_height()));
+}
 /**
  * ウインドウの解除
  */
 void
 DrawDeviceD3D::attach(HWND hWnd)
 {
+	DestroyD3DDevice();
 	this->hWnd = hWnd;
 	try {
 		// Direct3D デバイス、テクスチャなどを作成する
 		HRESULT hr;
-		// get DirectDraw7/Direct3D7 interface
-		if ((DirectDraw7 = TVPGetDirectDraw7ObjectNoAddRef())) {
-			DirectDraw7->AddRef();
-		} else {
-			TVPThrowExceptionMessage(TJS_W("DirectDraw7 not available"));
+		// get Direct3D9 interface
+		if( NULL == ( direct3D = TVPGetDirect3DObjectNoAddRef() ) )
+			TVPThrowExceptionMessage( TJS_W("Direct3D9 not available") );
+		// direct3D->AddRef();
+
+		if( FAILED( hr = DecideD3DPresentParameters() ) ) {
+			if( IsTargetWindowActive() ) {
+				TVPThrowExceptionMessage( TJS_W("Faild to decide backbuffer format.") );
+			}
 		}
-		if (FAILED(DirectDraw7->QueryInterface(IID_IDirect3D7, (void**)&Direct3D7))) {
-			TVPThrowExceptionMessage(TJS_W("Direct3D7 not available"));
+
+		UINT iCurrentMonitor = GetMonitorNumber( targetWindow );
+		DWORD	BehaviorFlags = D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_MULTITHREADED;
+		if( D3D_OK != ( hr = direct3D->CreateDevice( iCurrentMonitor, D3DDEVTYPE_HAL, targetWindow, BehaviorFlags, &d3dPP, &direct3DDevice ) ) ) {
+			if( IsTargetWindowActive() ) {
+				TVPThrowExceptionMessage( TJS_W("Faild to create Direct3D9 Device.") );
+			}
 		}
-		
-		// check display mode
-		DDSURFACEDESC2 ddsd;
-		ZeroMemory(&ddsd, sizeof(ddsd));
-		ddsd.dwSize = sizeof(ddsd);
-		hr = DirectDraw7->GetDisplayMode(&ddsd);
-		if (FAILED(hr) || ddsd.ddpfPixelFormat.dwRGBBitCount <= 8) {
-			TVPThrowExceptionMessage(TJS_W("Too less display color depth"));
+		currentMonitor = iCurrentMonitor;
+		backBufferDirty = true;
+
+		D3DVIEWPORT9 vp;
+		vp.X  = 0;
+		vp.Y  = 0;
+		vp.Width = d3dPP.BackBufferWidth;
+		vp.Height = d3dPP.BackBufferHeight;
+		vp.MinZ  = 0.0f;
+		vp.MaxZ  = 1.0f;
+		if( FAILED(hr = direct3DDevice->SetViewport(&vp)) ) {
+			if( IsTargetWindowActive() ) {
+				TVPThrowExceptionMessage( TJS_W("Faild to set viewport.") );
+			}
 		}
-		
-		// create clipper object
-		hr = DirectDraw7->CreateClipper(0, &Clipper, NULL);
-		if (hr != DD_OK) {
-			TVPThrowExceptionMessage(TJS_W("Cannot create a clipper object/HR=%1"),
-									 TJSInt32ToHex(hr, 8));
+
+		int refreshrate = dispMode.RefreshRate;
+		if( refreshrate == 0 ) {
+			HDC hdc;
+			hdc = ::GetDC(targetWindow);
+			refreshrate = GetDeviceCaps( hdc, VREFRESH );
+			::ReleaseDC( targetWindow, hdc );
 		}
-		hr = Clipper->SetHWnd(0, hWnd);
-		if (hr != DD_OK) {
-			TVPThrowExceptionMessage(TJS_W("Cannot set the window handle to the clipper object/HR=%1"),
-									 TJSInt32ToHex(hr, 8));
-		}
-		
+		vsyncInterval = 1000 / refreshrate;
 	} catch(...) {
-		TVPAddImportantLog(TJS_W("Passthrough: Failed to create Direct3D devices: unknown reason"));
+		TVPAddImportantLog(TJS_W("D3DDrawDevice: Failed to create Direct3D devices: unknown reason"));
 	}
 }
 
@@ -80,12 +188,7 @@ DrawDeviceD3D::detach()
 		}
 	}
 	// 解放処理
-	if (Direct3DDevice7) Direct3DDevice7->Release(), Direct3DDevice7 = NULL;
-	if (Surface) Surface->Release(), Surface = NULL;
-	if (Direct3D7) Direct3D7->Release(), Direct3D7 = NULL;
-	if (DirectDraw7) DirectDraw7->Release(), DirectDraw7 = NULL;
-	TVPReleaseDDPrimarySurface();
-	if (Clipper) Clipper->Release(), Clipper = NULL;
+	DestroyD3DDevice();
 }
 
 /**
@@ -156,6 +259,7 @@ DrawDeviceD3D::AddLayerManager(iTVPLayerManager * manager)
 	tTVPDrawDevice::AddLayerManager(manager);
 	LayerManagerInfo *info = new LayerManagerInfo(id, defaultVisible);
 	manager->SetDrawDeviceData((void*)info);
+	//manager->SetDesiredLayerType(ltAlpha); // ltAlpha な出力を受け取りたい
 }
 
 /**
@@ -181,16 +285,18 @@ void TJS_INTF_METHOD
 DrawDeviceD3D::SetTargetWindow(HWND wnd, bool is_main)
 {
 	detach();
+	targetWindow = wnd;
+	isMainWindow = is_main;
 	if (wnd != NULL) {
 		attach(wnd);
 		Window->NotifySrcResize(); // これを呼ぶことで GetSrcSize(), SetDestRectangle() の呼び返しが来る
 		// マネージャに対するテクスチャの割り当て
-		if (Surface) {
+		if (direct3DDevice) {
 			for (std::vector<iTVPLayerManager *>::iterator i = Managers.begin(); i != Managers.end(); i++) {
 				iTVPLayerManager *manager = *i;
 				LayerManagerInfo *info = (LayerManagerInfo*)manager->GetDrawDeviceData();
 				if (info != NULL) {
-					info->alloc(manager, DirectDraw7, Direct3DDevice7);
+					info->alloc( manager, direct3DDevice );
 				}
 			}
 		}
@@ -204,55 +310,15 @@ DrawDeviceD3D::SetDestRectangle(const tTVPRect &dest)
 	destTop  = dest.Top;
 	destWidth = dest.get_width();
 	destHeight = dest.get_height();
-
-	try {
-		if (Direct3DDevice7) Direct3DDevice7->Release(), Direct3DDevice7 = NULL;
-		if (Surface) Surface->Release(), Surface = NULL;
-		
-		DDSURFACEDESC2 ddsd;
-		// allocate secondary off-screen buffer
-		ZeroMemory(&ddsd, sizeof(ddsd));
-		ddsd.dwSize = sizeof(ddsd);
-		ddsd.dwFlags = DDSD_WIDTH | DDSD_HEIGHT | DDSD_CAPS;
-		ddsd.dwWidth  = destWidth;
-		ddsd.dwHeight = destHeight;
-		ddsd.ddsCaps.dwCaps =
-			/*DDSCAPS_OFFSCREENPLAIN |*/ DDSCAPS_VIDEOMEMORY /*| DDSCAPS_LOCALVIDMEM*/ | DDSCAPS_3DDEVICE;
-		
-		HRESULT hr = DirectDraw7->CreateSurface(&ddsd, &Surface, NULL);
-		
-		if (hr != DD_OK) {
-			TVPThrowExceptionMessage(TJS_W("Cannot allocate D3D off-screen surface/HR=%1"),
-									 TJSInt32ToHex(hr, 8));
-		}
-		
-		// check whether the surface is on video memory
-		ZeroMemory(&ddsd, sizeof(ddsd));
-		ddsd.dwSize = sizeof(ddsd);
-		
-		hr = Surface->GetSurfaceDesc(&ddsd);
-		if (hr != DD_OK) {
-			TVPThrowExceptionMessage(TJS_W("Cannot get D3D surface description/HR=%1"),
-									 TJSInt32ToHex(hr, 8));
-		}
-			
-		if(ddsd.ddsCaps.dwCaps & DDSCAPS_VIDEOMEMORY &&
-		   ddsd.ddsCaps.dwCaps & DDSCAPS_LOCALVIDMEM){
-			// ok
-		} else {
-			TVPThrowExceptionMessage(TJS_W("Cannot allocate the D3D surface on the local video memory"),
-									 TJSInt32ToHex(hr, 8));
-		}
-
-		// create Direct3D Device
-		hr = Direct3D7->CreateDevice(IID_IDirect3DHALDevice, Surface, &Direct3DDevice7);
-		if (FAILED(hr)) {
-			TVPThrowExceptionMessage(TJS_W("Cannot create Direct3D device/HR=%1"),
-									 TJSInt32ToHex(hr, 8));
-		}
-
-	} catch(...) {
-		TVPAddImportantLog(TJS_W("Passthrough: Failed to create Direct3D devices: unknown reason"));
+	
+	backBufferDirty = true;
+	// 位置だけの変更の場合かどうかをチェックする
+	if(dest.get_width() == DestRect.get_width() && dest.get_height() == DestRect.get_height()) {
+		// 位置だけの変更だ
+		inherited::SetDestRectangle(dest);
+	} else {
+		// サイズも違う
+		inherited::SetDestRectangle(dest);
 	}
 }
 
@@ -269,8 +335,8 @@ DrawDeviceD3D::NotifyLayerResize(iTVPLayerManager * manager)
 	LayerManagerInfo *info = (LayerManagerInfo*)manager->GetDrawDeviceData();
 	if (info != NULL) {
 		info->free();
-		if (Surface) {
-			info->alloc(manager, DirectDraw7, Direct3DDevice7);
+		if (direct3DDevice) {
+			info->alloc(manager, direct3DDevice);
 		}
 	}
 }
@@ -368,58 +434,103 @@ DrawDeviceD3D::RequestInvalidation(const tTVPRect & rect)
 void
 DrawDeviceD3D::Show()
 {
-	// Blt to the primary surface
-	if (!Surface) return;
+	if(!targetWindow) return;
+	if(!direct3DDevice) return;
+	if(!shouldShow) return;
+
+	shouldShow = false;
 
 	// 画面消去
-	Direct3DDevice7->Clear(0, NULL, D3DCLEAR_TARGET, 0xff000000, 0.0, 0);
+	direct3DDevice->Clear( 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0,0,0), 1.0, 0 );
 	// 個別レイヤマネージャの描画
 	for (std::vector<iTVPLayerManager *>::iterator i = Managers.begin(); i != Managers.end(); i++) {
 		LayerManagerInfo *info = (LayerManagerInfo*)(*i)->GetDrawDeviceData();
 		if (info) {
-			info->draw(Direct3DDevice7, destWidth, destHeight);
+			info->draw(direct3DDevice, destWidth, destHeight);
 		}
 	}
-	
-	// retrieve the primary surface
-	IDirectDrawSurface *pri = TVPGetDDPrimarySurfaceNoAddRef();
-	if (!pri) {
-		TVPThrowExceptionMessage(TJS_W("Cannot retrieve primary surface object"));
+
+	HRESULT hr = D3D_OK;
+	RECT client;
+	if( ::GetClientRect( targetWindow, &client ) ) {
+		RECT drect;
+		drect.left   = 0;
+		drect.top    = 0;
+		drect.right  = client.right - client.left;
+		drect.bottom = client.bottom - client.top;
+
+		RECT srect = drect;
+		hr = direct3DDevice->Present( &srect, &drect, targetWindow, NULL );
+	} else {
+		shouldShow = true;
 	}
-		
-	// set clipper
-	TVPSetDDPrimaryClipper(Clipper);
 
-	// get PaintBox's origin
-	POINT origin; origin.x = destLeft, origin.y = destTop;
-	ClientToScreen(hWnd, &origin);
-	// entire of the bitmap is to be transfered (this is not optimal. FIX ME!)
-	RECT drect;
-	drect.left   = origin.x;
-	drect.top    = origin.y;
-	drect.right  = origin.x + destWidth;
-	drect.bottom = origin.y + destHeight;
-
-	RECT srect;
-	srect.left   = 0;
-	srect.top    = 0;
-	srect.right  = destWidth;
-	srect.bottom = destHeight;
-	
-	HRESULT hr = pri->Blt(&drect, (IDirectDrawSurface*)Surface, &srect, DDBLT_WAIT, NULL);
-	
-	if(hr == DDERR_SURFACELOST || hr == DDERR_SURFACEBUSY) {
-		pri->Restore();
-		Surface->Restore();
-		RequestInvalidation(tTVPRect(0, 0, destWidth, destHeight));
-	} else if(hr == DDERR_INVALIDRECT) {
-		// ignore this error
-	} else if(hr != DD_OK) {
-		TVPAddImportantLog(
-			TJS_W("Passthrough: (inf) Primary surface, IDirectDrawSurface::Blt failed/HR=") +
-			TJSInt32ToHex(hr, 8));
+	if(hr == D3DERR_DEVICELOST) {
+		TryRecreateWhenDeviceLost();
+	} else if(hr != D3D_OK) {
+		TVPAddImportantLog( TVPFormatMessage( TJS_W("D3DDrawDevice: (inf) IDirect3DDevice::Present failed/HR=%1"),TJSInt32ToHex(hr, 8)) );
 	}
 }
+//---------------------------------------------------------------------------
+bool TJS_INTF_METHOD DrawDeviceD3D::WaitForVBlank( tjs_int* in_vblank, tjs_int* delayed )
+{
+	if( direct3DDevice == NULL ) return false;
+
+	bool inVsync = false;
+	D3DRASTER_STATUS rs;
+	if( D3D_OK == direct3DDevice->GetRasterStatus(0,&rs) ) {
+		inVsync = rs.InVBlank == TRUE;
+	}
+
+	// VSync 待ちを行う
+	bool isdelayed = false;
+	if(!inVsync) {
+		// vblank から抜けるまで待つ
+		DWORD timeout_target_tick = ::timeGetTime() + 1;
+		rs.InVBlank = FALSE;
+		HRESULT hr = D3D_OK;
+		do {
+			hr = direct3DDevice->GetRasterStatus(0,&rs);
+		} while( D3D_OK == hr && rs.InVBlank == TRUE && (long)(::timeGetTime() - timeout_target_tick) <= 0);
+
+		// vblank に入るまで待つ
+		rs.InVBlank = TRUE;
+		do {
+			hr = direct3DDevice->GetRasterStatus(0,&rs);
+		} while( D3D_OK == hr && rs.InVBlank == FALSE && (long)(::timeGetTime() - timeout_target_tick) <= 0);
+
+		if((int)(::timeGetTime() - timeout_target_tick) > 0) {
+			// フレームスキップが発生したと考えてよい
+			isdelayed  = true;
+		}
+		inVsync = rs.InVBlank == TRUE;
+	}
+	*delayed = isdelayed ? 1 : 0;
+	*in_vblank = inVsync ? 1 : 0;
+	return true;
+}
+//---------------------------------------------------------------------------
+bool TJS_INTF_METHOD DrawDeviceD3D::SwitchToFullScreen( HWND window, tjs_uint w, tjs_uint h, tjs_uint bpp, tjs_uint color, bool changeresolution )
+{
+	// フルスクリーン化の処理はなにも行わない、互換性のためにウィンドウを全画面化するのみで処理する
+	// Direct3D9 でフルスクリーン化するとフォーカスを失うとデバイスをロストするので、そのたびにリセットor作り直しが必要になる。
+	// モーダルウィンドウを使用するシステムでは、これは困るので常にウィンドウモードで行う。
+	// モーダルウィンドウを使用しないシステムにするのなら、フルスクリーンを使用するDrawDeviceを作ると良い。
+	backBufferDirty = true;
+	shouldShow = true;
+	//CheckMonitorMoved();
+	return true;
+}
+//---------------------------------------------------------------------------
+void TJS_INTF_METHOD DrawDeviceD3D::RevertFromFullScreen( HWND window, tjs_uint w, tjs_uint h, tjs_uint bpp, tjs_uint color )
+{
+	backBufferDirty = true;
+	shouldShow = true;
+	//CheckMonitorMoved();
+}
+//---------------------------------------------------------------------------
+
+
 
 // -------------------------------------------------------------------------------------
 // LayerManagerからの画像うけわたし
@@ -449,6 +560,7 @@ DrawDeviceD3D::NotifyBitmapCompleted(iTVPLayerManager * manager,
 	if (info) {
 		info->copy(x, y, bits, bitmapinfo, cliprect, type, opacity);
 	}
+	shouldShow = true;
 }
 
 /**
