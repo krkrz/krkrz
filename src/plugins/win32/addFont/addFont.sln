@@ -1,7 +1,7 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "addFont", "addFont.vcproj", "{AE883A21-9840-44B9-969F-3E263F2D9282}"
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "addFont", "addFont.vcxproj", "{AE883A21-9840-44B9-969F-3E263F2D9282}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
