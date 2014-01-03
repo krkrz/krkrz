@@ -176,7 +176,7 @@ LayerManagerInfo::unlock()
  * 画面への描画
  */
 void
-LayerManagerInfo::draw(IDirect3DDevice9 *direct3DDevice, int destWidth, int destHeight)
+LayerManagerInfo::draw(IDirect3DDevice9 *direct3DDevice, const tTVPRect &destrect, const tTVPRect &cliprect)
 {
 	// Blt texture to surface
 
@@ -187,7 +187,37 @@ LayerManagerInfo::draw(IDirect3DDevice9 *direct3DDevice, int destWidth, int dest
 			float x, y, z, rhw;
 			float tu, tv;
 		};
-		
+#if 1
+		// 転送先をクリッピング矩形に基づきクリッピング
+		float dl = (float)( destrect.left < cliprect.left ? cliprect.left : destrect.left );
+		float dt = (float)( destrect.top < cliprect.top ? cliprect.top : destrect.top );
+		float dr = (float)( destrect.right > cliprect.right ? cliprect.right : destrect.right );
+		float db = (float)( destrect.bottom > cliprect.bottom ? cliprect.bottom : destrect.bottom );
+		float dw = (float)destrect.get_width();
+		float dh = (float)destrect.get_height();
+
+		// はみ出している幅を求める
+		float cl = dl - (float)destrect.left;
+		float ct = dt - (float)destrect.top;
+		float cr = (float)destrect.right - dr;
+		float cb = (float)destrect.bottom - db;
+
+		// はみ出している幅を考慮して、転送元画像をクリッピング
+		tjs_int w = srcWidth;
+		tjs_int h = srcHeight;
+		float sl = (float)(cl * w / dw ) / (float)textureWidth;
+		float st = (float)(ct * h / dh ) / (float)textureHeight;
+		float sr = (float)(w - (cr * w / dw) ) / (float)textureWidth;
+		float sb = (float)(h - (cb * h / dh) ) / (float)textureHeight;
+
+		tVertices vertices[] =
+		{
+			{dl - 0.5f, dt - 0.5f, 1.0f, 1.0f, sl, st },
+			{dr - 0.5f, dt - 0.5f, 1.0f, 1.0f, sr, st },
+			{dl - 0.5f, db - 0.5f, 1.0f, 1.0f, sl, sb },
+			{dr - 0.5f, db - 0.5f, 1.0f, 1.0f, sr, sb }
+		};
+#else
 		float dw = (float)destWidth;
 		float dh = (float)destHeight;
 		
@@ -200,7 +230,7 @@ LayerManagerInfo::draw(IDirect3DDevice9 *direct3DDevice, int destWidth, int dest
 			{0.0f - 0.5f, dh   - 0.5f, 1.0f, 1.0f, 0.0f, sh  },
 			{dw   - 0.5f, dh   - 0.5f, 1.0f, 1.0f, sw  , sh  }
 		};
-
+#endif
 		HRESULT hr;
 		
 		//- draw as triangles

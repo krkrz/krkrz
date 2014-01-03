@@ -17,11 +17,7 @@ class DrawDeviceD3D : public tTVPDrawDevice
 protected:
 	tjs_int width;        //< ƒ†[ƒUŽw’è‚Ì‰æ–Ê‰¡•
 	tjs_int height;       //< ƒ†[ƒUŽw’è‚Ì‰æ–Êc•
-	tjs_int destTop;      //< ŽÀ•`‰æ—Ìˆæ‚Ì‰¡•
-	tjs_int destLeft;     //< ŽÀ•`‰æ—Ìˆæ‚Ìc•
-	tjs_int destWidth;    //< ŽÀ•`‰æ—Ìˆæ‚Ì‰¡•
-	tjs_int destHeight;   //< ŽÀ•`‰æ—Ìˆæ‚Ìc•
-	
+
 	HWND targetWindow;
 	bool isMainWindow;
 	bool drawUpdateRectangle;
@@ -165,11 +161,11 @@ public:
 	}
 
 	tjs_int getDestWidth() {
-		return destWidth;
+		return DestRect.get_width();
 	}
 
 	tjs_int getDestHeight() {
-		return destHeight;
+		return DestRect.get_height();
 	}
 	
 protected:

@@ -60,7 +60,7 @@ public:
 	/**
 	 * •`‰æ
 	 */
-	void draw(IDirect3DDevice9 *direct3DDevice9, int destWidth, int destHeight);
+	void draw(IDirect3DDevice9 *direct3DDevice9, const tTVPRect &destrect, const tTVPRect &cliprect);
 };
 
 #endif

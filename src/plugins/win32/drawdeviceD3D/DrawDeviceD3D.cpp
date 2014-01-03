@@ -6,7 +6,7 @@
  * コンストラクタ
  */
 DrawDeviceD3D::DrawDeviceD3D(int width, int height)
-	: width(width), height(height), destWidth(0), destHeight(0), defaultVisible(true),
+	: width(width), height(height), defaultVisible(true),
 	  direct3D(NULL), direct3DDevice(NULL)
 {
 	targetWindow = NULL;
@@ -203,8 +203,8 @@ DrawDeviceD3D::transformToManager(iTVPLayerManager * manager, tjs_int &x, tjs_in
 	// プライマリレイヤマネージャのプライマリレイヤのサイズを得る
 	tjs_int pl_w, pl_h;
 	manager->GetPrimaryLayerSize(pl_w, pl_h);
-	x = destWidth  ? (x * pl_w / destWidth) : 0;
-	y = destHeight ? (y * pl_h / destHeight) : 0;
+	x = DestRect.get_width()  ? (x * pl_w / DestRect.get_width()) : 0;
+	y = DestRect.get_height() ? (y * pl_h / DestRect.get_height()) : 0;
 }
 
 /** プライマリレイヤ→Device方向の座標の変換を行う
@@ -218,8 +218,8 @@ DrawDeviceD3D::transformFromManager(iTVPLayerManager * manager, tjs_int &x, tjs_
 	// プライマリレイヤマネージャのプライマリレイヤのサイズを得る
 	tjs_int pl_w, pl_h;
 	manager->GetPrimaryLayerSize(pl_w, pl_h);
-	x = pl_w ? (x * destWidth  / pl_w) : 0;
-	y = pl_h ? (y * destHeight / pl_h) : 0;
+	x = pl_w ? (x * DestRect.get_width()  / pl_w) : 0;
+	y = pl_h ? (y * DestRect.get_height() / pl_h) : 0;
 }
 
 /**
@@ -231,8 +231,8 @@ DrawDeviceD3D::transformFromManager(iTVPLayerManager * manager, tjs_int &x, tjs_
 void
 DrawDeviceD3D::transformTo(tjs_int &x, tjs_int &y)
 {
-	x = destWidth  ? (x * width / destWidth) : 0;
-	y = destHeight ? (y * height / destHeight) : 0;
+	x = DestRect.get_width()  ? (x * width / DestRect.get_width()) : 0;
+	y = DestRect.get_height() ? (y * height / DestRect.get_height()) : 0;
 }
 
 /** 標準画面→Device方向の座標の変換を行う
@@ -244,8 +244,8 @@ void
 DrawDeviceD3D::transformFrom(tjs_int &x, tjs_int &y)
 {
 	// プライマリレイヤマネージャのプライマリレイヤのサイズを得る
-	x = width ? (x * destWidth  / width) : 0;
-	y = height ? (y * destHeight / height) : 0;
+	x = width ? (x * DestRect.get_width()  / width) : 0;
+	y = height ? (y * DestRect.get_height() / height) : 0;
 }
 
 /**
@@ -306,11 +306,6 @@ DrawDeviceD3D::SetTargetWindow(HWND wnd, bool is_main)
 void TJS_INTF_METHOD
 DrawDeviceD3D::SetDestRectangle(const tTVPRect &dest)
 {
-	destLeft = dest.Left;
-	destTop  = dest.Top;
-	destWidth = dest.get_width();
-	destHeight = dest.get_height();
-	
 	backBufferDirty = true;
 	// 位置だけの変更の場合かどうかをチェックする
 	if(dest.get_width() == DestRect.get_width() && dest.get_height() == DestRect.get_height()) {
@@ -446,7 +441,7 @@ DrawDeviceD3D::Show()
 	for (std::vector<iTVPLayerManager *>::iterator i = Managers.begin(); i != Managers.end(); i++) {
 		LayerManagerInfo *info = (LayerManagerInfo*)(*i)->GetDrawDeviceData();
 		if (info) {
-			info->draw(direct3DDevice, destWidth, destHeight);
+			info->draw(direct3DDevice, DestRect, ClipRect );
 		}
 	}
 
