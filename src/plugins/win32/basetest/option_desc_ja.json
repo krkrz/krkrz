@@ -1,0 +1,28 @@
+[
+	{
+		"category":"テストカテゴリ",
+		"options":[
+			{
+				"caption":"テスト設定項目1",
+				"description":"これはテスト用のオプション設定項目です。",
+				"name":"testoption1",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"default", "desc":"デフォルトの値", "default":true },
+					{ "value":"1", "desc":"選択可能な値1" },
+					{ "value":"2", "desc":"選択可能な値2" }
+				]
+			},
+			{
+				"caption":"テスト設定項目2",
+				"description":"これはテスト用のオプション設定項目です。",
+				"name":"testoption2",
+				"type":"string",
+				"length":64,
+				"user":false,
+				"value":"デフォルトの文字列"
+			},
+		]
+	}
+]

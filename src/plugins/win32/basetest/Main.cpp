@@ -305,26 +305,15 @@ tjs_error TJS_INTF_METHOD tMessageBoxFunction::FuncCall(
 			// この関数を呼ぶと、もうここへは戻らないので注意
 
 	ttstr str(*param[0]); // いったん ttstr 型に代入する
-	tjs_int narrow_len = str.GetNarrowStrLen(); // ナロー文字列変換後のサイズ
-	if(narrow_len == -1)
-		TVPThrowExceptionMessage(TJS_W("文字列の変換に失敗しました"));
-			// GetNarrowStrLen は文字列中に変換できない文字を見つけると
-			// -1 を返す
 
-	char *narrow_str = new char [narrow_len + 1];
-			// narrow_len はnullターミネータの文字数を含んでいないので、
-			// 文字列バッファを確保する場合には +1 を忘れないように
 	try
 	{
 		// いつどこで例外が発生するかわからないので
 		// できるかぎり 例外保護を行う
 
-		// 文字列を変換
-		str.ToNarrowStr(narrow_str, narrow_len);
-
 		// メッセージボックスを表示
-		MessageBox(TVPGetApplicationWindowHandle(), narrow_str,
-			"メッセージ", MB_OK);
+		MessageBox(TVPGetApplicationWindowHandle(), str.c_str(),
+			TJS_W("メッセージ"), MB_OK);
 
 			// TVPGetApplicationWindowHandle は吉里吉里のウィンドウのすべて
 			// の owner であるウィンドウハンドルを返す。ダイアログボックス
@@ -334,11 +323,8 @@ tjs_error TJS_INTF_METHOD tMessageBoxFunction::FuncCall(
 	catch(...)
 	{
 		// 例外が発生した場合
-		delete [] narrow_str; // 確保したバッファを解放
 		throw; // 例外を再び投げる
 	}
-
-	delete [] narrow_str; // 確保したバッファを解放
 
 	if(result) result->Clear(); // result->Clear() をすると void を返す
 
@@ -388,7 +374,7 @@ tjs_error TJS_INTF_METHOD tGetUserNameFunction::FuncCall(
 	GetUserNameW_t pGetUserNameW = NULL; // UNICODE 版 API
 	HMODULE advapi_handle = NULL; // ADVAPI32.DLL のモジュールハンドル
 
-	if(is_nt) advapi_handle = LoadLibrary("advapi32.dll");
+	if(is_nt) advapi_handle = LoadLibrary(L"advapi32.dll");
 		// ADVAPI32.DLL を読みこむ
 
 	try
@@ -451,7 +437,6 @@ tjs_error TJS_INTF_METHOD tGetUserNameFunction::FuncCall(
 
 
 //---------------------------------------------------------------------------
-#pragma argsused
 int WINAPI DllEntryPoint(HINSTANCE hinst, unsigned long reason,
 	void* lpReserved)
 {
@@ -459,7 +444,7 @@ int WINAPI DllEntryPoint(HINSTANCE hinst, unsigned long reason,
 }
 //---------------------------------------------------------------------------
 static tjs_int GlobalRefCountAtInit = 0;
-extern "C" HRESULT _stdcall _export V2Link(iTVPFunctionExporter *exporter)
+extern "C" __declspec(dllexport) HRESULT _stdcall V2Link(iTVPFunctionExporter *exporter)
 {
 	// スタブの初期化(必ず記述する)
 	TVPInitImportStub(exporter);
@@ -591,7 +576,7 @@ extern "C" HRESULT _stdcall _export V2Link(iTVPFunctionExporter *exporter)
 	return S_OK;
 }
 //---------------------------------------------------------------------------
-extern "C" HRESULT _stdcall _export V2Unlink()
+extern "C" __declspec(dllexport) HRESULT _stdcall V2Unlink()
 {
 	// 吉里吉里側から、プラグインを解放しようとするときに呼ばれる関数。
 
@@ -650,86 +635,6 @@ extern "C" HRESULT _stdcall _export V2Unlink()
 	return S_OK;
 }
 //---------------------------------------------------------------------------
-static tjs_char option_message[] =
-L"テストカテゴリ:テスト設定項目1;これはテスト用のオプション設定項目です。|"
-L"testoption1|select,*default;デフォルトの値,1;選択可能な値1,2;選択可能な値2\n"
-L"テストカテゴリ:テスト設定項目2;これはテスト用のオプション設定項目です。|"
-L"testoption2|string(64),*デフォルトの文字列\n";
-//---------------------------------------------------------------------------
-extern "C" const wchar_t* _stdcall _export GetOptionDesc()
-{
-	// GetOptionDesc は、吉里吉里設定ツールに渡すオプションの情報を返すための
-	// 関数。
-	// 一行につき一つのオプションに関する情報を書く。
-	// 書式は
-	// カテゴリ:設定名;説明|オプション名|オプションとして設定可能な値
-	// (区切り記号に注意)
-	// 「オプション名」には '-' (ハイフン) はつけない。
-	// 「オプションとして設定可能な値」は以下の書式である。
-	// タイプ,値の値;簡単な説明[,値;値の簡単な説明 ...]
-	// 「タイプ」は現バージョンでは select と string のみ使用可能。
-
-	// 「タイプ」に select を指定すると、コンボボックスから値を選択することが
-	// できるようになる。
-	// 「値;値の簡単な説明」の先頭に * をつけるとそれがデフォルトのオプション
-	// であることを示す。デフォルトのオプションは必ず一つは無くてはならない。
-	// 「値」は実際に吉里吉里本体へのオプションとして渡されるものを、
-	// 「値の簡単な説明」は人間が読んで理解できるものを書く。
-
-	// 「タイプ」に string を指定すると、エディットボックスでユーザが任意の文
-	// 字列を入力できるようになる。
-	// 「タイプ」に string を指定する場合は、string(n),*デフォルト文字列 の
-	// 形で n には最大文字数を記述する。0 で文字数制限はなくなるが、できれば
-	// 制限をつけたほうがよい。
-	// 「デフォルト文字列」にはデフォルトの文字列を記述する。string(n) のあと
-	// の , (カンマ) も * (アステリスク) も省略できない。
-
-	// 例は /msg/win32/option_desc_ja.txt にもある。
-
-
-	return option_message;
-
-	// 各オプション末や、最後の改行記号を忘れると大変なことになる。
-
-
-	// 吉里吉里設定などは、そのプラグインに設定可能な項目があるかどうかを
-	// プラグインDLLの
-	// 先頭2KB以内に "(--has-option--)" という文字列があるかどうか
-	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	// (２重引用符は含めず)
-	// で判断するため、先頭2KB以内にこれを書かなければならない。
-	// bcc の場合はリンカオプション /GC で /GC"(--has-option--)"
-	// と記述し、VC++ の場合もリンカオプション /COMMENT で
-	// /COMMENT:"(--has-option--)" と記述する。
-	// BCB の IDE からは プロジェクトオプションの「リンカ(詳細)」の
-	// 「イメージのコメント」に "(--has-option--)" と書く。
-	// (２重引用符で囲まないとエラーになるかもしれない)
-
-	// UPX などで圧縮するとここの部分が消されてしまうので、
-	// ヘッダの未使用領域 (0x80～0x1ff の 00 で埋まっている所など) に
-	// 無理矢理書くなどする。
-
-	// 本体に渡されたオプションは TVPGetCommandLine 関数で取得できる。
-	// tTJSVariant val;
-	// if(TVPGetCommandLine(TJS_W("-testoption1"), &val))
-	// {
-	//      // ここに オプション "-testoption1" が渡されていたときの
-	//      // 処理を書く。val にはその値が入っている。
-	//      // /environ/win32/wuvorbis/WuVorbisMainUnit.cpp 等参照
-	// }
-	// TVPGetcommandLine の実行は現バージョンでは高価なのでできれば
-	// この関数の呼び出しの結果はキャッシュした方がよい。
-
-	// 吉里吉里設定は、プラグインを「吉里吉里本体と同じフォルダ」と
-	// 「吉里吉里本体のと同じフォルダにある plugin というフォルダ」から
-	// しか検索しない。従って設定可能なオプションを含むプラグインは
-	// Releaser などでアーカイブ中に含めてはならない(もともとReleaserで
-	// プラグインを中に含めることは推奨されていない)。
-
-	// この GetOptionDesc 関数内では tp_stub に記述されているような
-	// 各吉里吉里本体内の関数は利用できない。
-}
-//---------------------------------------------------------------------------
 /*
 	V2Link と V2Unlink は DLL からエクスポートされている必要がある。
 	従って、.def ファイルを作成し
@@ -739,8 +644,6 @@ EXPORTS
 	V2Unlink
 
 	と記述してプロジェクトに追加する。
-
-	GetOptionsDesc を使う場合はそれも追加する。
 */
 //---------------------------------------------------------------------------
 
