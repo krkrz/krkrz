@@ -42,46 +42,30 @@ class tGetDirListFunction : public tTJSDispatch
 
 		try
 		{
-			//
-			char nfile[MAX_PATH + 1];
-			char ndir[MAX_PATH + 1];
-			char nwildcard[MAX_PATH + 1];
-
-			// dir を ndir に変換
-			int dir_narrow_len = dir.GetNarrowStrLen();
-			if(dir_narrow_len >= MAX_PATH - 3)
-				TVPThrowExceptionMessage(TJS_W("Too long directory name."));
-
-			dir.ToNarrowStr(ndir, MAX_PATH);
-
 			// FindFirstFile を使ってファイルを列挙
-			strcpy(nwildcard, ndir);
-			strcat(nwildcard, "*.*");
+			ttstr wildcard( dir + TJS_W("*.*") );
 
 			WIN32_FIND_DATA data;
-			HANDLE handle = FindFirstFile(nwildcard, &data);
+			HANDLE handle = FindFirstFile(wildcard.c_str(), &data);
 			if(handle != INVALID_HANDLE_VALUE)
 			{
 				tjs_int count = 0;
 				do
 				{
-					strcpy(nfile, ndir);
-					strcat(nfile, data.cFileName);
-
-					if(GetFileAttributes(nfile) & FILE_ATTRIBUTE_DIRECTORY)
+					ttstr filepah( dir + data.cFileName );
+					if(GetFileAttributes(filepah.c_str()) & FILE_ATTRIBUTE_DIRECTORY)
 					{
 						// ディレクトリの場合は最後に / をつける
-						strcpy(nfile, data.cFileName);
-						strcat(nfile, "/");
+						filepah = ttstr(data.cFileName) + TJS_W("/");
 					}
 					else
 					{
 						// 普通のファイルの場合はそのまま
-						strcpy(nfile, data.cFileName);
+						filepah = ttstr(data.cFileName);
 					}
 
 					// 配列に追加する
-					tTJSVariant val((ttstr)(nfile));
+					tTJSVariant val(filepah);
 					array->PropSetByNum(0, count++, &val, array);
 
 				} while(FindNextFile(handle, &data));
@@ -113,14 +97,13 @@ class tGetDirListFunction : public tTJSDispatch
 
 
 //---------------------------------------------------------------------------
-#pragma argsused
 int WINAPI DllEntryPoint(HINSTANCE hinst, unsigned long reason, void* lpReserved)
 {
 	return 1;
 }
 //---------------------------------------------------------------------------
 static tjs_int GlobalRefCountAtInit = 0;
-extern "C" HRESULT _stdcall _export V2Link(iTVPFunctionExporter *exporter)
+extern "C" __declspec(dllexport) HRESULT _stdcall V2Link(iTVPFunctionExporter *exporter)
 {
 	// スタブの初期化(必ず記述する)
 	TVPInitImportStub(exporter);
@@ -173,7 +156,7 @@ extern "C" HRESULT _stdcall _export V2Link(iTVPFunctionExporter *exporter)
 	return S_OK;
 }
 //---------------------------------------------------------------------------
-extern "C" HRESULT _stdcall _export V2Unlink()
+extern "C" __declspec(dllexport) HRESULT _stdcall V2Unlink()
 {
 	// 吉里吉里側から、プラグインを解放しようとするときに呼ばれる関数。
 
