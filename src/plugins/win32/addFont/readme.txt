@@ -41,7 +41,9 @@ System.addFont(fontfilename, extract);
 
 
 ●メモ
-吉里吉里Z で VC2012 に対応。
+吉里吉里Z で VC2012 ビルド対応。
+テストは行っていない。
+
 
 
 ●ライセンス
