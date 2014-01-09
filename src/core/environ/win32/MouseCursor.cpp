@@ -87,8 +87,10 @@ void MouseCursor::UpdateCurrentCursor() {
 	int oldindex = cursor_index_;
 	cursor_index_ = INVALID_CURSOR_INDEX;
 	HCURSOR hCursor = ::GetCursor();
+	int size = CURSOR_HANDLES_FOR_INDEXES.size();
+	int handleIndex = oldindex+CURSOR_OFFSET;
 
-	if( oldindex >= 0 && CURSOR_HANDLES_FOR_INDEXES[oldindex] == hCursor ) {
+	if( handleIndex >= 0 && handleIndex < size && CURSOR_HANDLES_FOR_INDEXES[handleIndex] == hCursor ) {
 		// まずは旧カーソルと比較
 		cursor_index_ = oldindex; // 変更されていない
 	} else if( CURSOR_HANDLES[CURSOR_ARROW] == hCursor ) {
@@ -96,9 +98,9 @@ void MouseCursor::UpdateCurrentCursor() {
 		cursor_index_ = crDefault;
 	} else {
 		// 以前と異なり、デフォルトでもない時は、全てと比較する
-		for( int i = 0; i < CURSOR_EOT; i++ ) {
+		for( int i = 0; i < size; i++ ) {
 			if( CURSOR_HANDLES_FOR_INDEXES[i] == hCursor ) {
-				cursor_index_ = i;
+				cursor_index_ = i - CURSOR_OFFSET;
 				break;
 			}
 		}
