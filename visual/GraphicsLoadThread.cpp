@@ -170,7 +170,7 @@ void tTVPAsyncImageLoader::HandleLoadedImage() {
 
 				tTJSVariant param[4];
 				param[0] = tTJSVariant(metainfo,metainfo);
-				metainfo->Release();
+				if( metainfo ) metainfo->Release();
 				param[1] = 1; // true async
 				param[2] = 0; // false error
 				param[3] = TJS_W(""); // error_mes
