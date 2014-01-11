@@ -640,6 +640,35 @@
 					{ "value":"4", "desc":"4スレッド" },
 					{ "value":"8", "desc":"8スレッド" }
 				]
+			},
+			{
+				"caption":"ビットマップメモリ確保方式",
+				"description":"ビットマップ用のメモリをどのようにして確保するかを指定します。\n\n通常はglobalallocのままで問題ありません。",
+				"name":"bitmapallocator",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"globalalloc", "desc":"GlobalAllocで確保", "default":true },
+					{ "value":"separateheap", "desc":"分割ヒープを使用" },
+					{ "value":"malloc", "desc":"mallocを使用" }
+				]
+			},
+			{
+				"caption":"初期分割ヒープサイズ",
+				"description":"ビットマップメモリ確保方式で分割ヒープを使用を選んだ場合の初期サイズを指定します。",
+				"name":"bitmapheapsize",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"auto", "desc":"自動(推奨)", "default":true },
+					{ "value":"0", "desc":"自動的に拡大" },
+					{ "value":"64", "desc":"64MB" },
+					{ "value":"128", "desc":"128MB" },
+					{ "value":"256", "desc":"256MB" },
+					{ "value":"512", "desc":"512MB" },
+					{ "value":"1024", "desc":"1GMB" },
+					{ "value":"2048", "desc":"2GB" }
+				]
 			}
 		]
 	},
