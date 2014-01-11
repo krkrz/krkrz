@@ -3,6 +3,15 @@
 #define __BITMAP_BITS_ALLOC_H__
 
 //---------------------------------------------------------------------------
+// memory allocation class
+//---------------------------------------------------------------------------
+class iTVPMemoryAllocator {
+public:
+	virtual ~iTVPMemoryAllocator() {};
+	virtual void* allocate( size_t size ) = 0;
+	virtual void free( void* mem ) = 0;
+};
+//---------------------------------------------------------------------------
 // heap allocation functions for bitmap bits
 //---------------------------------------------------------------------------
 class tTVPBitmapBitsAlloc {
@@ -19,7 +28,11 @@ class tTVPBitmapBitsAlloc {
 		tjs_uint32 sentinel_backup2; // sentinel value 2
 	};
 	#pragma pack(pop)
+	static iTVPMemoryAllocator* Allocator;
 public:
+	static void InitializeAllocator();
+	static void FreeAllocator();
+
 	static void* Alloc( tjs_uint size, tjs_uint width, tjs_uint height );
 	static void Free( void* ptr );
 };
