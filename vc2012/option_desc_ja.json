@@ -108,6 +108,17 @@
 				"length":255,
 				"user":false,
 				"value":"%filepath%"
+			},
+			{
+				"caption":"LFHを使用する",
+				"description":"メモリの断片化を抑止する機能を有効化します。\n\nメモリ不足等のエラーが発生した場合、有効にすると解消される可能性があります。Vista以降ではどちらを指定しても有効になります。",
+				"name":"uselfh",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"no", "desc":"しない", "default":true },
+					{ "value":"yes", "desc":"する" }
+				]
 			}
 		]
 	},

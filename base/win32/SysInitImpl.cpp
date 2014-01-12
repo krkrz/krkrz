@@ -1233,6 +1233,19 @@ void TVPAfterSystemInit()
 
 	TVPPushEnvironNoise(&TVPCPUType, sizeof(TVPCPUType));
 
+	// set LFH
+	if(TVPGetCommandLine(TJS_W("-uselfh"), &opt)) {
+		ttstr str(opt);
+		if(str == TJS_W("yes") || str == TJS_W("true")) {
+			ULONG HeapInformation = 2;
+			BOOL lfhenable = ::HeapSetInformation( GetProcessHeap(), HeapCompatibilityInformation, &HeapInformation, sizeof(HeapInformation) );
+			if( lfhenable ) {
+				TVPAddLog( TJS_W("(info) Enable LFH") );
+			} else {
+				TVPAddLog( TJS_W("(info) Cannot Enable LFH") );
+			}
+		}
+	}
 }
 //---------------------------------------------------------------------------
 void TVPBeforeSystemUninit()
