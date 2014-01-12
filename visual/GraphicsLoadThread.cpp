@@ -150,7 +150,7 @@ void tTVPAsyncImageLoader::HandleLoadedImage() {
 				cmd->bmp_->SetSizeAndImageBuffer( cmd->dest_->w, cmd->dest_->h, cmd->dest_->buf );
 				cmd->dest_->buf = NULL;
 				// 読込み完了時にもキャッシュチェック(非同期なので完了前に読み込まれている可能性あり)
-				if( TVPHasImageCache( cmd->path_, glmNormal, 0, 0, -1 ) == false ) {
+				if( TVPHasImageCache( cmd->path_, glmNormal, 0, 0, TVP_clNone ) == false ) {
 					TVPPushGraphicCache( cmd->path_, cmd->bmp_->GetBitmap(), cmd->dest_->MetaInfo );
 					cmd->dest_->MetaInfo = NULL;
 				} else {
@@ -182,7 +182,7 @@ void tTVPAsyncImageLoader::LoadRequest( iTJSDispatch2 *owner, tTJSNI_Bitmap* bmp
 	tTVPBaseBitmap dest( TVPGetInitialBitmap() );
 	iTJSDispatch2* metainfo = NULL;
 	ttstr nname = TVPNormalizeStorageName(name);
-	if( TVPCheckImageCache(nname,&dest,glmNormal,0,0,-1,&metainfo) ) {
+	if( TVPCheckImageCache(nname,&dest,glmNormal,0,0,TVP_clNone,&metainfo) ) {
 		// キャッシュ内に発見、即座に読込みを完了する
 		bmp->CopyFrom( &dest );
 		bmp->SetLoading( false );
