@@ -45,6 +45,9 @@ private:
 
 public:
 	tTVPBitmap(tjs_uint width, tjs_uint height, tjs_uint bpp);
+	// for async load
+	// @param bits : tTVPBitmapBitsAlloc::Allocで確保したものを使用すること
+	tTVPBitmap(tjs_uint width, tjs_uint height, tjs_uint bpp, void* bits);
 
 	tTVPBitmap(const tTVPBitmap & r);
 
@@ -117,6 +120,9 @@ public:
 	void SetHeight(tjs_uint h);
 
 	void SetSize(tjs_uint w, tjs_uint h, bool keepimage = true);
+	// for async load
+	// @param bits : tTVPBitmapBitsAlloc::Allocで確保したものを使用すること
+	void SetSizeAndImageBuffer( tjs_uint width, tjs_uint height, void* bits );
 
 	/* color depth */
 	tjs_uint GetBPP() const;

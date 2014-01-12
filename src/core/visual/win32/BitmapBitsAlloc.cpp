@@ -1,5 +1,6 @@
 #include "tjsCommHead.h"
 //---------------------------------------------------------------------------
+#include "tjsUtils.h"
 #include "MsgIntf.h"
 #include "BitmapBitsAlloc.h"
 #include "SysInitIntf.h"
@@ -20,6 +21,8 @@ public:
 };
 class HeapAllocAllocator : public iTVPMemoryAllocator
 {
+	static const DWORD HeapFlag = HEAP_NO_SERIALIZE;	// alloc/freeŽž‚ÉƒƒbƒN‚·‚é‚æ‚¤‚É‚µ‚½‚Ì‚Å
+
 	HANDLE HeapHandle;
 public:
 	HeapAllocAllocator() : HeapHandle(NULL) {
@@ -32,7 +35,7 @@ public:
 			} else {
 				size = (tjs_int64)val;
 				if( size == 0 ) {
-					HeapHandle = ::HeapCreate( 0, 0, 0 );
+					HeapHandle = ::HeapCreate( HeapFlag, 0, 0 );
 					if(HeapHandle) return;
 				}
 				size *= 1024*1024;
@@ -49,7 +52,7 @@ public:
 			}
 		}
 		while( HeapHandle == NULL && size > (1024*1024) ) {
-			HeapHandle = ::HeapCreate( 0, (SIZE_T)size, 0 );
+			HeapHandle = ::HeapCreate( HeapFlag, (SIZE_T)size, 0 );
 			if( HeapHandle == NULL ) {
 				if( size > (128LL*1024*1024) ) {
 					size -= (128LL*1024*1024);
@@ -65,24 +68,24 @@ public:
 	}
 	void* allocate( size_t size ) {
 		if( HeapHandle == NULL ) return NULL;
-		void* result = ::HeapAlloc( HeapHandle, 0, size );
+		void* result = ::HeapAlloc( HeapHandle, HeapFlag, size );
 		if( result == NULL ) {
-			TVPDeliverCompactEvent(TVP_COMPACT_LEVEL_MAX);	// DoCompact
-			::HeapCompact( HeapHandle, 0);	// try compact
-			result = ::HeapAlloc( HeapHandle, 0, size ); // retry
+			::HeapCompact( HeapHandle, HeapFlag );	// try compact
+			result = ::HeapAlloc( HeapHandle, HeapFlag, size ); // retry
 		}
 		return result;
 	}
 	void free( void* mem ) {
 		if( HeapHandle ) {
-			BOOL ret = ::HeapFree( HeapHandle, 0, mem );
-			::HeapCompact( HeapHandle, 0);
+			BOOL ret = ::HeapFree( HeapHandle, HeapFlag, mem );
+			::HeapCompact( HeapHandle, HeapFlag );
 		}
 	}
 };
 #endif
 
 iTVPMemoryAllocator* tTVPBitmapBitsAlloc::Allocator = NULL;
+tTJSCriticalSection tTVPBitmapBitsAlloc::AllocCS;
 
 void tTVPBitmapBitsAlloc::InitializeAllocator() {
 	if( Allocator == NULL ) {
@@ -111,10 +114,12 @@ void tTVPBitmapBitsAlloc::FreeAllocator() {
 	Allocator = NULL;
 }
 static tTVPAtExit
-	TVPUninitMessageLoad(TVP_ATEXIT_PRI_RELEASE, tTVPBitmapBitsAlloc::FreeAllocator);
+	TVPUninitMessageLoad(TVP_ATEXIT_PRI_CLEANUP, tTVPBitmapBitsAlloc::FreeAllocator);
 
 void* tTVPBitmapBitsAlloc::Alloc( tjs_uint size, tjs_uint width, tjs_uint height ) {
 	if(size == 0) return NULL;
+	tTJSCriticalSectionHolder Lock(AllocCS);	// Lock
+
 	InitializeAllocator();
 	tjs_uint8 * ptrorg, * ptr;
 	tjs_uint allocbytes = 16 + size + sizeof(tTVPLayerBitmapMemoryRecord) + sizeof(tjs_uint32)*2;
@@ -153,6 +158,8 @@ void* tTVPBitmapBitsAlloc::Alloc( tjs_uint size, tjs_uint width, tjs_uint height
 void tTVPBitmapBitsAlloc::Free( void* ptr ) {
 	if(ptr)
 	{
+		tTJSCriticalSectionHolder Lock(AllocCS);	// Lock
+
 		// get memory allocation record pointer
 		tjs_uint8 *bptr = (tjs_uint8*)ptr;
 		tTVPLayerBitmapMemoryRecord * record =

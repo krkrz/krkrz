@@ -377,6 +377,39 @@ tTVPBitmap::tTVPBitmap(tjs_uint width, tjs_uint height, tjs_uint bpp)
 	Allocate(width, height, bpp); // allocate initial bitmap
 }
 //---------------------------------------------------------------------------
+tTVPBitmap::tTVPBitmap(tjs_uint width, tjs_uint height, tjs_uint bpp, void* bits)
+{
+	// tTVPBitmap constructor
+	TVPInitWindowOptions(); // ensure window/bitmap usage options are initialized
+
+	RefCount = 1;
+
+	BitmapInfo = new BitmapInfomation( width, height, bpp );
+	Width = width;
+	Height = height;
+	PitchBytes = BitmapInfo->GetPitchBytes();
+	PitchStep = -PitchBytes;
+
+	// set bitmap bits
+	try
+	{
+		Bits = bits;
+		if( bpp == 8 ) {
+			Palette = new tjs_uint[DEFAULT_PALETTE_COUNT];
+			ActualPalCount = 0;
+		} else {
+			Palette = NULL;
+			ActualPalCount = 0;
+		}
+	}
+	catch(...)
+	{
+		delete BitmapInfo;
+		BitmapInfo = NULL;
+		throw;
+	}
+}
+//---------------------------------------------------------------------------
 tTVPBitmap::~tTVPBitmap()
 {
 	tTVPBitmapBitsAlloc::Free(Bits);
@@ -555,6 +588,15 @@ void tTVPNativeBaseBitmap::SetSize(tjs_uint w, tjs_uint h, bool keepimage)
 
 		FontChanged = true;
 	}
+}
+//---------------------------------------------------------------------------
+void tTVPNativeBaseBitmap::SetSizeAndImageBuffer( tjs_uint width, tjs_uint height, void* bits )
+{
+	// create a new bitmap and copy existing bitmap
+	tTVPBitmap *newbitmap = new tTVPBitmap(width, height, Bitmap->GetBPP(), bits );
+	Bitmap->Release();
+	Bitmap = newbitmap;
+	FontChanged = true;
 }
 //---------------------------------------------------------------------------
 tjs_uint tTVPNativeBaseBitmap::GetBPP() const

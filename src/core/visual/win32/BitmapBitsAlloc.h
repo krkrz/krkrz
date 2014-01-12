@@ -29,10 +29,11 @@ class tTVPBitmapBitsAlloc {
 	};
 	#pragma pack(pop)
 	static iTVPMemoryAllocator* Allocator;
-public:
+	static tTJSCriticalSection AllocCS;
 	static void InitializeAllocator();
-	static void FreeAllocator();
 
+public:
+	static void FreeAllocator();
 	static void* Alloc( tjs_uint size, tjs_uint width, tjs_uint height );
 	static void Free( void* ptr );
 };

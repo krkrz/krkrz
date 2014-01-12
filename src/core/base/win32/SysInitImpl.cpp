@@ -1139,9 +1139,9 @@ void TVPAfterSystemInit()
 	{
 		TVPGraphicCacheSystemLimit = limitmb * 1024*1024;
 	}
-	// 32bit ‚È‚Ì‚Å 1GB ‚Ü‚Å‚É§ŒÀ
-	if( TVPGraphicCacheSystemLimit >= 1024*1024*1024 )
-		TVPGraphicCacheSystemLimit = 1024*1024*1024;
+	// 32bit ‚È‚Ì‚Å 512MB ‚Ü‚Å‚É§ŒÀ
+	if( TVPGraphicCacheSystemLimit >= 512*1024*1024 )
+		TVPGraphicCacheSystemLimit = 512*1024*1024;
 
 
 	if(TVPTotalPhysMemory <= 64*1024*1024)
