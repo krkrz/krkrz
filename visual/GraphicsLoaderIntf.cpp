@@ -1153,6 +1153,8 @@ void TVPClearGraphicCache()
 	TVPGraphicCache.Clear();
 	TVPGraphicCacheTotalBytes = 0;
 }
+static tTVPAtExit
+	TVPUninitMessageLoad(TVP_ATEXIT_PRI_RELEASE, TVPClearGraphicCache);
 //---------------------------------------------------------------------------
 struct tTVPClearGraphicCacheCallback : public tTVPCompactEventCallbackIntf
 {
@@ -1170,13 +1172,20 @@ static bool TVPClearGraphicCacheCallbackInit = false;
 void TVPPushGraphicCache( const ttstr& nname, tTVPBaseBitmap* bmp, std::vector<tTVPGraphicMetaInfoPair>* meta )
 {
 	if( TVPGraphicCacheEnabled ) {
+		// graphic compact initialization
+		if(!TVPClearGraphicCacheCallbackInit)
+		{
+			TVPAddCompactEventHook(&TVPClearGraphicCacheCallback);
+			TVPClearGraphicCacheCallbackInit = true;
+		}
+
 		tTVPGraphicImageData* data = NULL;
 		try {
 			tjs_uint32 hash;
 			tTVPGraphicsSearchData searchdata;
 
 			searchdata.Name = nname;
-			searchdata.KeyIdx = -1;
+			searchdata.KeyIdx = TVP_clNone;
 			searchdata.Mode = glmNormal;
 			searchdata.DesW = 0;
 			searchdata.DesH = 0;
@@ -1202,6 +1211,7 @@ void TVPPushGraphicCache( const ttstr& nname, tTVPBaseBitmap* bmp, std::vector<t
 			if(data) data->Release();
 			throw;
 		}
+		if(data) data->Release();
 	} else {
 		if( meta ) delete meta;
 	}
@@ -1229,6 +1239,31 @@ bool TVPCheckImageCache( const ttstr& nname, tTVPBaseBitmap* dest, tTVPGraphicLo
 			ptr->GetObjectNoAddRef()->AssignToBitmap(dest);
 			if(metainfo)
 				*metainfo = TVPMetaInfoPairsToDictionary(ptr->GetObjectNoAddRef()->MetaInfo);
+			return true;
+		}
+	}
+	return false;
+}
+//---------------------------------------------------------------------------
+// åüçıÇæÇØÇ∑ÇÈ
+bool TVPHasImageCache( const ttstr& nname, tTVPGraphicLoadMode mode, tjs_uint dw, tjs_uint dh, tjs_int32 keyidx )
+{
+	tjs_uint32 hash;
+	tTVPGraphicsSearchData searchdata;
+	if(TVPGraphicCacheEnabled)
+	{
+		searchdata.Name = nname;
+		searchdata.KeyIdx = keyidx;
+		searchdata.Mode = mode;
+		searchdata.DesW = dw;
+		searchdata.DesH = dh;
+
+		hash = tTVPGraphicCache::MakeHash(searchdata);
+
+		tTVPGraphicImageHolder * ptr =
+			TVPGraphicCache.FindAndTouchWithHash(searchdata, hash);
+		if(ptr)
+		{
 			return true;
 		}
 	}

@@ -287,6 +287,8 @@ extern tTVPGraphicHandlerType* TVPGetGraphicLoadHandler( const ttstr& ext );
 extern bool TVPCheckImageCache( const ttstr& nname, tTVPBaseBitmap* dest,
 	tTVPGraphicLoadMode mode, tjs_uint dw, tjs_uint dh, tjs_int32 keyidx,
 	iTJSDispatch2** metainfo );
+extern bool TVPHasImageCache( const ttstr& nname, tTVPGraphicLoadMode mode,
+	tjs_uint dw, tjs_uint dh, tjs_int32 keyidx );
 //---------------------------------------------------------------------------
 
 

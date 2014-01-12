@@ -11,17 +11,15 @@
 #include "LayerBitmapIntf.h"
 #include "MsgIntf.h"
 #include "UtilStreams.h"
+#include "BitmapBitsAlloc.h"
+#include "LayerIntf.h"
 
 tTVPTmpBitmapImage::tTVPTmpBitmapImage()
-	: w(0), h(0), imglen(0), img(NULL), buf(NULL), MetaInfo(NULL)
+	: w(0), h(0), pitch(0), buf(NULL), MetaInfo(NULL)
 {}
 tTVPTmpBitmapImage::~tTVPTmpBitmapImage() {
-	if(img) {
-		delete[] img;
-		img = NULL;
-	}
 	if(buf) {
-		delete[] buf;
+		tTVPBitmapBitsAlloc::Free( buf );
 		buf = NULL;
 	}
 	if( MetaInfo ) {
@@ -47,14 +45,9 @@ static void TVPLoadGraphicAsync_SizeCallback(void *callbackdata, tjs_uint w, tjs
 	tTVPTmpBitmapImage* img = (tTVPTmpBitmapImage*)callbackdata;
 	img->h = h;
 	img->w = w;
-	img->imglen = h * w;
-	img->buf = new tjs_uint32[img->imglen];
-	img->img = new tjs_uint32*[h];
-	tjs_uint32* pos = img->buf;
-	for( tjs_uint i = 0; i < h; i++ ) {
-		img->img[i] = pos;
-		pos += w;
-	}
+	BitmapInfomation info( w, h, 32 );
+	img->buf = (tjs_uint32*)tTVPBitmapBitsAlloc::Alloc( info.GetImageSize(), w, h );
+	img->pitch = info.GetPitchBytes();
 }
 //---------------------------------------------------------------------------
 static void* TVPLoadGraphicAsync_ScanLineCallback(void *callbackdata, tjs_int y)
@@ -62,7 +55,7 @@ static void* TVPLoadGraphicAsync_ScanLineCallback(void *callbackdata, tjs_int y)
 	tTVPTmpBitmapImage* img = (tTVPTmpBitmapImage*)callbackdata;
 	if( y >= 0 ) {
 		if( y < (tjs_int)img->h ) {
-			return img->img[y];
+			return (img->h - y -1 ) * img->pitch + (tjs_uint8*)img->buf;
 		} else {
 			return NULL;
 		}
@@ -154,19 +147,16 @@ void tTVPAsyncImageLoader::HandleLoadedImage() {
 			} else {
 				iTJSDispatch2* metainfo = TVPMetaInfoPairsToDictionary(cmd->dest_->MetaInfo);
 
-				tjs_uint w = cmd->dest_->w;
-				tjs_uint h = cmd->dest_->h;
-				cmd->bmp_->SetSize(w,h,false);
-				tjs_int stride = cmd->bmp_->GetPixelBufferPitch();
-				tjs_uint8* dest = reinterpret_cast<tjs_uint8*>( cmd->bmp_->GetPixelBufferForWrite() );
-				tjs_uint pitch = w*4;
-				for( tjs_uint i = 0; i < h; i++ ) {
-					memcpy( dest, cmd->dest_->img[i], pitch );
-					dest += stride;
+				cmd->bmp_->SetSizeAndImageBuffer( cmd->dest_->w, cmd->dest_->h, cmd->dest_->buf );
+				cmd->dest_->buf = NULL;
+				// 読込み完了時にもキャッシュチェック(非同期なので完了前に読み込まれている可能性あり)
+				if( TVPHasImageCache( cmd->path_, glmNormal, 0, 0, -1 ) == false ) {
+					TVPPushGraphicCache( cmd->path_, cmd->bmp_->GetBitmap(), cmd->dest_->MetaInfo );
+					cmd->dest_->MetaInfo = NULL;
+				} else {
+					delete cmd->dest_->MetaInfo;
+					cmd->dest_->MetaInfo = NULL;
 				}
-
-				TVPPushGraphicCache( cmd->path_, cmd->bmp_->GetBitmap(), cmd->dest_->MetaInfo );
-				cmd->dest_->MetaInfo = NULL;
 
 				tTJSVariant param[4];
 				param[0] = tTJSVariant(metainfo,metainfo);
@@ -188,18 +178,18 @@ void tTVPAsyncImageLoader::HandleLoadedImage() {
 // onLoaded( dic, is_async, is_error, error_mes ); エラーは
 // sync ( main thead )
 void tTVPAsyncImageLoader::LoadRequest( iTJSDispatch2 *owner, tTJSNI_Bitmap* bmp, const ttstr &name ) {
-	tTVPBaseBitmap* dest = new tTVPBaseBitmap(32,32,32);
+	//tTVPBaseBitmap* dest = new tTVPBaseBitmap( 32, 32, 32 );
+	tTVPBaseBitmap dest( TVPGetInitialBitmap() );
 	iTJSDispatch2* metainfo = NULL;
 	ttstr nname = TVPNormalizeStorageName(name);
-	if( TVPCheckImageCache(nname,dest,glmNormal,0,0,-1,&metainfo) ) {
+	if( TVPCheckImageCache(nname,&dest,glmNormal,0,0,-1,&metainfo) ) {
 		// キャッシュ内に発見、即座に読込みを完了する
-		bmp->CopyFrom( dest );
-		if( dest ) delete dest;
+		bmp->CopyFrom( &dest );
 		bmp->SetLoading( false );
 
 		tTJSVariant param[4];
 		param[0] = tTJSVariant(metainfo,metainfo);
-		metainfo->Release();
+		if( metainfo ) metainfo->Release();
 		param[1] = 0; // false
 		param[2] = 0; // false
 		param[3] = TJS_W(""); // error_mes
@@ -207,8 +197,6 @@ void tTVPAsyncImageLoader::LoadRequest( iTJSDispatch2 *owner, tTJSNI_Bitmap* bmp
 		TVPPostEvent(owner, owner, eventname, 0, TVP_EPT_IMMEDIATE, 4, param);
 		return;
 	}
-	if( dest ) delete dest;
-	dest = NULL;
 	if( TVPIsExistentStorage(name) == false ) {
 		TVPThrowExceptionMessage(TVPCannotFindStorage, name);
 	}
