@@ -5,10 +5,14 @@
 #include "BitmapBitsAlloc.h"
 #include "SysInitIntf.h"
 #include "EventIntf.h"
+#include "DebugIntf.h"
 
 class BasicAllocator : public iTVPMemoryAllocator
 {
 public:
+	BasicAllocator() {
+		TVPAddLog( TJS_W("(info) Use malloc for Bitmap") );
+	}
 	void* allocate( size_t size ) { return malloc(size); }
 	void free( void* mem ) { ::free( mem ); }
 };
@@ -16,12 +20,15 @@ public:
 class GlobalAllocAllocator : public iTVPMemoryAllocator
 {
 public:
+	GlobalAllocAllocator() {
+		TVPAddLog( TJS_W("(info) Use GlobalAlloc allocater for Bitmap") );
+	}
 	void* allocate( size_t size ) { return GlobalAlloc(GMEM_FIXED,size); }
 	void free( void* mem ) { GlobalFree((HGLOBAL)mem ); }
 };
 class HeapAllocAllocator : public iTVPMemoryAllocator
 {
-	static const DWORD HeapFlag = HEAP_NO_SERIALIZE;	// alloc/freeŽž‚ÉƒƒbƒN‚·‚é‚æ‚¤‚É‚µ‚½‚Ì‚Å
+	static const DWORD HeapFlag = 0;
 
 	HANDLE HeapHandle;
 public:
@@ -36,31 +43,38 @@ public:
 				size = (tjs_int64)val;
 				if( size == 0 ) {
 					HeapHandle = ::HeapCreate( HeapFlag, 0, 0 );
-					if(HeapHandle) return;
 				}
 				size *= 1024*1024;
 			}
 		}
-		if( size == 0 ) {
-			MEMORYSTATUSEX status = { sizeof(MEMORYSTATUSEX) };
-			::GlobalMemoryStatusEx(&status);
-			size = status.ullAvailVirtual;
-			if( size > (512LL*1024*1024) ) {
-				size -= (128LL*1024*1024);
-			} else {
-				size /= 2;
-			}
-		}
-		while( HeapHandle == NULL && size > (1024*1024) ) {
-			HeapHandle = ::HeapCreate( HeapFlag, (SIZE_T)size, 0 );
-			if( HeapHandle == NULL ) {
-				if( size > (128LL*1024*1024) ) {
+		if( HeapHandle == NULL ) {
+			if( size == 0 ) {
+				MEMORYSTATUSEX status = { sizeof(MEMORYSTATUSEX) };
+				::GlobalMemoryStatusEx(&status);
+				size = status.ullAvailVirtual;
+				if( size > (512LL*1024*1024) ) {
 					size -= (128LL*1024*1024);
 				} else {
 					size /= 2;
 				}
 			}
+			while( HeapHandle == NULL && size > (1024*1024) ) {
+				HeapHandle = ::HeapCreate( HeapFlag, (SIZE_T)size, 0 );
+				if( HeapHandle == NULL ) {
+					if( size > (128LL*1024*1024) ) {
+						size -= (128LL*1024*1024);
+					} else {
+						size /= 2;
+					}
+				}
+			} 
 		}
+
+		if( HeapHandle ) {
+			ULONG HeapInformation = 2;
+			BOOL lfhenable = ::HeapSetInformation( HeapHandle, HeapCompatibilityInformation, &HeapInformation, sizeof(HeapInformation) );
+		}
+		TVPAddLog( TJS_W("(info) Use separate heap allocater for Bitmap") );
 	}
 	virtual ~HeapAllocAllocator() {
 		if( HeapHandle ) ::HeapDestroy(HeapHandle);
