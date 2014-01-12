@@ -160,6 +160,16 @@ void tTJSNI_Bitmap::SetSize(tjs_uint width, tjs_uint height, bool keepimage) {
 	}
 }
 //----------------------------------------------------------------------
+void tTJSNI_Bitmap::SetSizeAndImageBuffer( tjs_uint width, tjs_uint height, void* bits ) {
+	if(!Bitmap) TVPThrowExceptionMessage(TVPNotDrawableLayerType);
+	
+	// be called from geographical management
+	if(!width || !height)
+		TVPThrowExceptionMessage(TVPCannotCreateEmptyLayerImage);
+
+	Bitmap->SetSizeAndImageBuffer( width, height, bits );
+}
+//----------------------------------------------------------------------
 void tTJSNI_Bitmap::SetWidth(tjs_uint width) {
 	if( Loading ) TVPThrowExceptionMessage(TVPCurrentlyAsyncLoadBitmap);
 	if(!Bitmap) TVPThrowExceptionMessage(TVPNotDrawableLayerType);

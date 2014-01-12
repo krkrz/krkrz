@@ -40,6 +40,9 @@ public:
 	void Save(const ttstr &name, const ttstr &type, iTJSDispatch2* meta = NULL);
 
 	void SetSize(tjs_uint width, tjs_uint height, bool keepimage = true);
+	// for async load
+	// @param bits : tTVPBitmapBitsAlloc::Alloc‚ÅŠm•Û‚µ‚½‚à‚Ì‚ðŽg—p‚·‚é‚±‚Æ
+	void SetSizeAndImageBuffer( tjs_uint width, tjs_uint height, void* bits );
 
 	void SetWidth(tjs_uint width);
 	tjs_uint GetWidth() const;

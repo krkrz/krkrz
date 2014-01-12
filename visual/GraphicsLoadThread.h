@@ -12,8 +12,7 @@
 struct tTVPTmpBitmapImage {
 	tjs_uint32 w;
 	tjs_uint32 h;
-	tjs_uint32 imglen;
-	tjs_uint32** img;
+	tjs_int pitch;
 	tjs_uint32* buf;
 	std::vector<tTVPGraphicMetaInfoPair> * MetaInfo;
 	tTVPTmpBitmapImage();
