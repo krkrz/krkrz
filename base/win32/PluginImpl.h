@@ -46,7 +46,7 @@ struct IWaveUnpacker;
 struct ITSSStorageProvider;
 extern "C"
 {
-	__declspec(dllexport) iTVPFunctionExporter * __stdcall TVPGetFunctionExporter();
+	iTVPFunctionExporter * __stdcall TVPGetFunctionExporter();
 
 	// V2 plug-in
 	typedef HRESULT (_stdcall * tTVPV2LinkProc)(iTVPFunctionExporter *);
