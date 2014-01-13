@@ -1087,6 +1087,7 @@ void TVPBeforeSystemInit()
 //---------------------------------------------------------------------------
 static void TVPDumpOptions();
 //---------------------------------------------------------------------------
+extern bool TVPEnableGlobalHeapCompaction;
 static bool TVPHighTimerPeriod = false;
 static UINT TVPTimeBeginPeriodRes = 0;
 //---------------------------------------------------------------------------
@@ -1244,6 +1245,13 @@ void TVPAfterSystemInit()
 			} else {
 				TVPAddLog( TJS_W("(info) Cannot Enable LFH") );
 			}
+		}
+	}
+	// Global Heap Compact
+	if(TVPGetCommandLine(TJS_W("-ghcompact"), &opt)) {
+		ttstr str(opt);
+		if(str == TJS_W("yes") || str == TJS_W("true")) {
+			TVPEnableGlobalHeapCompaction = true;
 		}
 	}
 }

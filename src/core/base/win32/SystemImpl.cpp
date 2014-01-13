@@ -29,6 +29,7 @@
 #include "Application.h"
 #include "TVPScreen.h"
 #include "CompatibleNativeFuncs.h"
+#include "DebugIntf.h"
 
 //---------------------------------------------------------------------------
 static ttstr TVPAppTitle;
@@ -554,6 +555,83 @@ static void TVPOnApplicationActivate(bool activate_or_deactivate)
 }
 //---------------------------------------------------------------------------
 
+//---------------------------------------------------------------------------
+static void TVPHeapDump()
+{
+	tjs_char buff[128];
+	HANDLE heaps[100];
+	DWORD c = ::GetProcessHeaps (100, heaps);
+	TJS_sprintf( buff, 128, TJS_W("The process has %d heaps."), c );
+	TVPAddLog( buff );
+
+	const HANDLE default_heap = ::GetProcessHeap();
+	const HANDLE crt_heap = (HANDLE)_get_heap_handle();
+	for( unsigned int i = 0; i < c; i++ ) {
+		ULONG heap_info = 0;
+		SIZE_T ret_size = 0;
+		bool isdefault = false;
+		bool isCRT = false;
+		if( ::HeapQueryInformation( heaps[i], HeapCompatibilityInformation, &heap_info, sizeof(heap_info), &ret_size) ) {
+			tjs_char* type = NULL;
+			switch( heap_info ) {
+			case 0:
+				type = TJS_W("standard");
+				break;
+			case 1:
+				type = TJS_W("LAL");
+				break;
+			case 2:
+				type = TJS_W("LFH");
+				break;
+			default:
+				type = TJS_W("unknown");
+				break;
+			}
+			if( heaps[i] == default_heap ) {
+				isdefault = true;
+			}
+			if( heaps [i] == crt_heap ) {
+				isCRT = true;
+			}
+
+			PROCESS_HEAP_ENTRY entry;
+			memset( &entry, 0, sizeof (entry) );
+			struct Info {
+				int count;
+				tjs_int64 total;
+				tjs_int64 overhead;
+				Info() : count(0), total(0), overhead(0) {}
+			} use, uncommit, unused;
+			while( ::HeapWalk( heaps[i], &entry) ) {
+				if( entry.wFlags & PROCESS_HEAP_ENTRY_BUSY ) {
+					use.count++;
+					use.total += entry.cbData;
+					use.overhead += entry.cbOverhead;
+				} else if( entry.wFlags & PROCESS_HEAP_UNCOMMITTED_RANGE ) {
+					uncommit.count++;
+					uncommit.total += entry.cbData;
+					uncommit.overhead += entry.cbOverhead;
+				} else {
+					unused.count++;
+					unused.total += entry.cbData;
+					unused.overhead += entry.cbOverhead;
+				}
+			}
+			ttstr mes( TJS_W("#") );
+			mes += ttstr((tjs_int)(i+1)) + TJS_W(" type: ") + type;
+			if( isdefault ) mes += TJS_W(" [default]");
+			if( isCRT ) mes += TJS_W(" [CRT]");
+			TVPAddLog( mes );
+			TJS_sprintf( buff, 128, L"  Allocated: %d, size: %lld, overhead: %lld", use.count, use.total, use.overhead );
+			TVPAddLog( buff );
+			TJS_sprintf( buff, 128, L"  Uncommitted: %d, size: %lld, overhead: %lld", uncommit.count, uncommit.total, uncommit.overhead );
+			TVPAddLog( buff );
+			TJS_sprintf( buff, 128, L"  Unused: %d, size: %lld, overhead: %lld", unused.count, unused.total, unused.overhead );
+			TVPAddLog( buff );
+		}
+	}
+}
+//---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
 // TVPCreateNativeClass_System
@@ -714,6 +792,14 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/createAppLock)
 }
 TJS_END_NATIVE_STATIC_METHOD_DECL_OUTER(/*object to register*/cls,
 	/*func. name*/createAppLock)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/dumpHeap)
+{
+	TVPHeapDump();
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_STATIC_METHOD_DECL_OUTER(/*object to register*/cls,
+	/*func. name*/dumpHeap)
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/nullpo)
 {
