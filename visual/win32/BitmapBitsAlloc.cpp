@@ -57,6 +57,9 @@ public:
 				} else {
 					size /= 2;
 				}
+				if( size > (512LL*1024*1024) ) {
+					size = (512LL*1024*1024); // 512MB‚É§ŒÀ
+				}
 			}
 			while( HeapHandle == NULL && size > (1024*1024) ) {
 				HeapHandle = ::HeapCreate( HeapFlag, (SIZE_T)size, 0 );
