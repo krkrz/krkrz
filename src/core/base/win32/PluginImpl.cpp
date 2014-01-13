@@ -115,7 +115,7 @@ bool TJS_INTF_METHOD tTVPFunctionExporter::QueryFunctionsByNarrowString(
 	return ret;
 }
 //---------------------------------------------------------------------------
-extern "C" __declspec(dllexport) iTVPFunctionExporter * __stdcall TVPGetFunctionExporter()
+extern "C" iTVPFunctionExporter * __stdcall TVPGetFunctionExporter()
 {
 	// for external applications
 	TVPInitExportFuncs();
