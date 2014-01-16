@@ -245,6 +245,9 @@ TTVPWindowForm::TTVPWindowForm( tTVPApplication* app, tTJSNI_Window* ni, tTJSNI_
 	
 	LastRecheckInputStateSent = 0;
 	SetBorderStyle( bsSizeable );
+
+	DisplayOrientation = orientUnknown;
+	DisplayRotate = -1;
 }
 TTVPWindowForm::~TTVPWindowForm() {
 	if( HintTimer ) {
@@ -1816,3 +1819,75 @@ void TTVPWindowForm::OnFocusLost(HWND hFocusingWnd) {
 #endif
 	if(TJSNativeInstance) TJSNativeInstance->FireOnActivate(false);
 }
+void TTVPWindowForm::UpdateOrientation() {
+	if( DisplayOrientation == orientUnknown || DisplayRotate < 0 ) {
+		int orient, rot;
+		if( GetOrientation( orient, rot ) ) {
+			if( DisplayOrientation != orient || DisplayRotate != rot ) {
+				DisplayOrientation = orient;
+				DisplayRotate = rot;
+			}
+		}
+	}
+}
+bool TTVPWindowForm::GetOrientation( int& orientation, int& rotate ) const {
+	DEVMODE mode = {0};
+	mode.dmSize = sizeof(DEVMODE);
+	mode.dmDriverExtra = 0;
+	mode.dmFields |= DM_DISPLAYORIENTATION | DM_PELSWIDTH | DM_PELSHEIGHT;
+
+	BOOL ret = ::EnumDisplaySettingsEx( NULL, ENUM_CURRENT_SETTINGS, &mode, EDS_ROTATEDMODE );
+	if( ret ) {
+		if( mode.dmPelsWidth > mode.dmPelsHeight ) {
+			orientation = orientLandscape;
+		} else if( mode.dmPelsWidth < mode.dmPelsHeight ) {
+			orientation = orientPortrait;
+		} else {
+			orientation = orientUnknown;
+		}
+		/* dmDisplayOrientation ‚Æ‹¤—L(union‚È‚Ì‚Å)‚³‚ê‚Ä‚¢‚é‚Ì‚ÅAˆÈ‰º‚Å‚ÍŽæ“¾‚Å‚«‚È‚¢
+		if( mode.dmOrientation == DMORIENT_PORTRAIT ) {	// ‰¡
+			orientation = orientPortrait;
+		} else if( mode.dmOrientation == DMORIENT_LANDSCAPE ) {	// c
+			orientation = orientLandscape;
+		} else {	// unknown
+			orientation = orientUnknown;
+		}
+		*/
+		switch( mode.dmDisplayOrientation ) {
+		case DMDO_DEFAULT:
+			rotate = 0;
+			break;
+		case DMDO_90:
+			rotate = 90;
+			break;
+		case DMDO_180:
+			rotate = 180;
+			break;
+		case DMDO_270:
+			rotate = 270;
+			break;
+		default:
+			rotate = -1;
+		}
+	}
+	return ret != FALSE;
+}
+void TTVPWindowForm::OnDisplayChange( DWORD bpp, WORD hres, WORD vres ) {
+	int orient;
+	int rot;
+	if( GetOrientation( orient, rot ) ) {
+		if( DisplayOrientation != orient || DisplayRotate != rot ) {
+			DisplayOrientation = orient;
+			DisplayRotate = rot;
+			OnDisplayRotate( orient, rot, bpp, hres, vres );
+		}
+	}
+}
+void TTVPWindowForm::OnDisplayRotate( int orientation, int rotate, int bpp, int hresolution, int vresolution ) {
+	if(TJSNativeInstance) {
+		TVPPostInputEvent( new tTVPOnDisplayRotateInputEvent(TJSNativeInstance, orientation, rotate, bpp, hresolution, vresolution));
+	}
+}
+
+

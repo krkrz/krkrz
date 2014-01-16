@@ -214,6 +214,8 @@ public:
 
 	void OnHintChange( const ttstr& text, tjs_int x, tjs_int y, bool isshow );
 
+	void OnDisplayRotate( tjs_int orientation, tjs_int rotate, tjs_int bpp, tjs_int hresolution, tjs_int vresolution );
+
 	void ClearInputEvents();
 
 	void PostReleaseCaptureEvent();
@@ -634,6 +636,22 @@ public:
 
 	void Deliver() const
 	{ ((tTJSNI_BaseWindow*)GetSource())->OnHintChange( HintMessage, HintX, HintY, IsShow ); }
+};
+//---------------------------------------------------------------------------
+class tTVPOnDisplayRotateInputEvent : public tTVPBaseInputEvent
+{
+	static tTVPUniqueTagForInputEvent Tag;
+	tjs_int Orientation;
+	tjs_int Rotate;
+	tjs_int BPP;
+	tjs_int HorizontalResolution;
+	tjs_int VerticalResolution;
+public:
+	tTVPOnDisplayRotateInputEvent(tTJSNI_BaseWindow *win, tjs_int orientation, tjs_int rotate, tjs_int bpp, tjs_int hresolution, tjs_int vresolution ) :
+		tTVPBaseInputEvent(win, Tag), Orientation(orientation), Rotate(rotate), BPP(bpp),
+		HorizontalResolution(hresolution), VerticalResolution(vresolution) {};
+	void Deliver() const
+	{ ((tTJSNI_BaseWindow*)GetSource())->OnDisplayRotate( Orientation, Rotate, BPP, HorizontalResolution, VerticalResolution ); }
 };
 
 

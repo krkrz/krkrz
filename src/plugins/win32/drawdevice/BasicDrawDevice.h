@@ -96,6 +96,7 @@ public:
 	virtual void TJS_INTF_METHOD OnTouchScaling( tjs_real startdist, tjs_real curdist, tjs_real cx, tjs_real cy, tjs_int flag );
 	virtual void TJS_INTF_METHOD OnTouchRotate( tjs_real startangle, tjs_real curangle, tjs_real dist, tjs_real cx, tjs_real cy, tjs_int flag );
 	virtual void TJS_INTF_METHOD OnMultiTouch();
+	virtual void TJS_INTF_METHOD OnDisplayRotate( tjs_int orientation, tjs_int rotate, tjs_int bpp, tjs_int width, tjs_int height );
 	virtual void TJS_INTF_METHOD RecheckInputState();
 
 	// layer manager Å® drawdevice

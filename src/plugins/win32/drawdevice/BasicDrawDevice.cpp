@@ -376,6 +376,14 @@ void TJS_INTF_METHOD tTVPDrawDevice::OnTouchRotate( tjs_real startangle, tjs_rea
 
 
 //---------------------------------------------------------------------------
+void TJS_INTF_METHOD tTVPDrawDevice::OnDisplayRotate( tjs_int orientation, tjs_int rotate, tjs_int bpp, tjs_int width, tjs_int height )
+{
+	// ‰½‚à‚µ‚È‚¢
+}
+//---------------------------------------------------------------------------
+
+
+//---------------------------------------------------------------------------
 void TJS_INTF_METHOD tTVPDrawDevice::OnMultiTouch()
 {
 	iTVPLayerManager * manager = GetLayerManagerAt(PrimaryLayerManagerIndex);

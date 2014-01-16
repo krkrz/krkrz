@@ -5686,6 +5686,14 @@ public:
 	//! @brief		(Window→DrawDevice) マルチタッチ状態が更新された
 	virtual void TJS_INTF_METHOD OnMultiTouch() = 0;
 
+	//! @brief		(Window->DrawDevice) 画面の回転が行われた
+	//! @param		orientation	画面の向き ( 横向き、縦向き、不明 )
+	//! @param		rotate		回転角度。Degree。負の値の時不明
+	//! @param		bpp			Bits per pixel
+	//! @param		width		画面幅
+	//! @param		height		画面高さ
+	virtual void TJS_INTF_METHOD OnDisplayRotate( tjs_int orientation, tjs_int rotate, tjs_int bpp, tjs_int width, tjs_int height ) = 0;
+
 	//! @brief		(Window->DrawDevice) 入力状態のチェック
 	//! @note		ウィンドウから約1秒おきに、レイヤマネージャがユーザからの入力の状態を
 	//!				再チェックするために呼ばれる。レイヤ状態の変化がユーザの入力とは

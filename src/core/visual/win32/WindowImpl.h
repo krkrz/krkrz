@@ -430,6 +430,9 @@ public:
 	void SetEnableTouch( bool b );
 	bool GetEnableTouch() const;
 
+	int GetDisplayOrientation();
+	int GetDisplayRotate();
+	
 	bool WaitForVBlank( tjs_int* in_vblank, tjs_int* delayed );
 
 protected:
