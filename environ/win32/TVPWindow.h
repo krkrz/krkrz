@@ -288,6 +288,8 @@ public:
 	virtual void OnTouchDown( double x, double y, double cx, double cy, DWORD id ) {}
 	virtual void OnTouchMove( double x, double y, double cx, double cy, DWORD id ) {}
 	virtual void OnTouchUp( double x, double y, double cx, double cy, DWORD id ) {}
+
+	virtual void OnDisplayChange( DWORD bpp, WORD hres, WORD vres ) {}
 };
 
 #endif // __TVP_WINDOW_H__

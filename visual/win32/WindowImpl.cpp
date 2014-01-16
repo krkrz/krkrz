@@ -1898,6 +1898,18 @@ bool tTJSNI_Window::GetEnableTouch() const
 	return Form->GetEnableTouch();
 }
 //---------------------------------------------------------------------------
+int tTJSNI_Window::GetDisplayOrientation()
+{
+	if(!Form) return orientUnknown;
+	return Form->GetDisplayOrientation();
+}
+//---------------------------------------------------------------------------
+int tTJSNI_Window::GetDisplayRotate()
+{
+	if(!Form) return -1;
+	return Form->GetDisplayRotate();
+}
+//---------------------------------------------------------------------------
 bool tTJSNI_Window::WaitForVBlank( tjs_int* in_vblank, tjs_int* delayed )
 {
 	if( DrawDevice ) return DrawDevice->WaitForVBlank( in_vblank, delayed );
@@ -2152,6 +2164,34 @@ TJS_BEGIN_NATIVE_PROP_DECL(enableTouch)
 	TJS_END_NATIVE_PROP_SETTER
 }
 TJS_END_NATIVE_PROP_DECL_OUTER(cls, enableTouch)
+//---------------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(displayOrientation)
+{
+	TJS_BEGIN_NATIVE_PROP_GETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
+		*result = _this->GetDisplayOrientation();
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_GETTER
+
+	TJS_DENY_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_PROP_DECL_OUTER(cls, displayOrientation)
+//---------------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(displayRotate)
+{
+	TJS_BEGIN_NATIVE_PROP_GETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
+		*result = _this->GetDisplayRotate();
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_GETTER
+
+	TJS_DENY_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_PROP_DECL_OUTER(cls, displayRotate)
 //---------------------------------------------------------------------------
 
 	TVPGetDisplayColorFormat(); // this will be ran only once here
