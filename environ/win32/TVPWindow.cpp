@@ -335,6 +335,10 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		::DestroyWindow( GetHandle() );
 		delete this;
 		break;
+	case WM_DISPLAYCHANGE:
+		// bpp, h resolution, v resolution
+		OnDisplayChange( wParam, LOWORD(lParam), HIWORD(lParam) );
+		break;
 	default:
 		return ::DefWindowProc(hWnd,msg,wParam,lParam);
 	}

@@ -389,6 +389,14 @@ void TJS_INTF_METHOD tTVPDrawDevice::OnMultiTouch()
 }
 //---------------------------------------------------------------------------
 
+
+//---------------------------------------------------------------------------
+void TJS_INTF_METHOD tTVPDrawDevice::OnDisplayRotate( tjs_int orientation, tjs_int rotate, tjs_int bpp, tjs_int width, tjs_int height )
+{
+	// ‰½‚à‚µ‚È‚¢
+}
+//---------------------------------------------------------------------------
+
 //---------------------------------------------------------------------------
 void TJS_INTF_METHOD tTVPDrawDevice::RecheckInputState()
 {

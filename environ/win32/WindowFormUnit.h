@@ -37,6 +37,11 @@ enum {
 	crSizeAll = -22,
 	crHBeam = 1,
 };
+enum {
+	orientUnknown,
+	orientPortrait,
+	orientLandscape,
+};
 
 typedef unsigned long TShiftState;
 //---------------------------------------------------------------------------
@@ -172,6 +177,8 @@ private:
 	tjs_int HintDelay;
 	iTJSDispatch2* LastHintSender;
 
+	tjs_int DisplayOrientation;
+	tjs_int DisplayRotate;
 private:
 	void SetDrawDeviceDestRect();
 	void TranslateWindowToDrawArea(int &x, int &y);
@@ -322,6 +329,9 @@ public:
 	void CreateDirectInputDevice();
 	void FreeDirectInputDevice();
 
+	int GetDisplayOrientation() { UpdateOrientation(); return DisplayOrientation; }
+	int GetDisplayRotate() { UpdateOrientation(); return DisplayRotate; }
+
 	// message hander
 	virtual void OnActive( HWND preactive );
 	virtual void OnDeactive( HWND postactive );
@@ -363,6 +373,9 @@ public:
 	virtual void OnTouchRotate( double startangle, double currentangle, double distance, double cx, double cy, int flag );
 	virtual void OnMultiTouch();
 
+	virtual void OnDisplayChange( DWORD bpp, WORD hres, WORD vres );
+	virtual void OnDisplayRotate( int orientation, int rotate, int bpp, int hresolution, int vresolution );
+
 	virtual void OnDestroy();
 	void WMShowVisible();
 	void WMShowTop( WPARAM wParam );
@@ -393,6 +406,9 @@ public:
 
 	void SetEnableTouch( bool b );
 	bool GetEnableTouch() const;
+
+	void UpdateOrientation();
+	bool GetOrientation( int& orientation, int& rotate ) const;
 };
 
 #endif // __WINDOW_FORM_UNIT_H__

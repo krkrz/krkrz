@@ -129,6 +129,7 @@ tTVPUniqueTagForInputEvent tTVPOnTouchScalingInputEvent       ::Tag;
 tTVPUniqueTagForInputEvent tTVPOnTouchRotateInputEvent        ::Tag;
 tTVPUniqueTagForInputEvent tTVPOnMultiTouchInputEvent         ::Tag;
 tTVPUniqueTagForInputEvent tTVPOnHintChangeInputEvent         ::Tag;
+tTVPUniqueTagForInputEvent tTVPOnDisplayRotateInputEvent      ::Tag;
 //---------------------------------------------------------------------------
 
 
@@ -578,6 +579,17 @@ void tTJSNI_BaseWindow::OnHintChange( const ttstr& text, tjs_int x, tjs_int y, b
 		static ttstr eventname(TJS_W("onHintChanged"));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 4, arg);
 	}
+}
+//---------------------------------------------------------------------------
+void tTJSNI_BaseWindow::OnDisplayRotate( tjs_int orientation, tjs_int rotate, tjs_int bpp, tjs_int hresolution, tjs_int vresolution ) {
+	if(!CanDeliverEvents()) return;
+	if(Owner)
+	{
+		tTJSVariant arg[5] = { orientation, rotate, bpp, hresolution, vresolution };
+		static ttstr eventname(TJS_W("onDisplayRotate"));
+		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 5, arg);
+	}
+	if(DrawDevice) DrawDevice->OnDisplayRotate(orientation, rotate, bpp, hresolution, vresolution);
 }
 //---------------------------------------------------------------------------
 void tTJSNI_BaseWindow::ClearInputEvents()
@@ -1237,7 +1249,22 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/onDeactivate)
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/onDeactivate)
 //----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/onDisplayRotate)
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
 
+	TVP_ACTION_INVOKE_BEGIN(5, "onDisplayRotate", objthis);
+	TVP_ACTION_INVOKE_MEMBER("orientation");
+	TVP_ACTION_INVOKE_MEMBER("angle");
+	TVP_ACTION_INVOKE_MEMBER("bpp");
+	TVP_ACTION_INVOKE_MEMBER("width");
+	TVP_ACTION_INVOKE_MEMBER("height");
+	TVP_ACTION_INVOKE_END(tTJSVariantClosure(objthis, objthis));
+
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/onDisplayRotate)
+//----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_PROP_DECL(visible)

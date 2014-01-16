@@ -83,6 +83,7 @@ TJS_N("const\
  /* tTVPSoundGlobalFocusMode */ sgfmNeverMute = 0, sgfmMuteOnMinimize = 1, sgfmMuteOnDeactivate = 2,\
  /* tTVPTouchDevice */ tdNone=0, tdIntegratedTouch=0x01, tdExternalTouch=0x02, tdIntegratedPen=0x04, tdExternalPen=0x08, tdMultiInput=0x40, tdDigitizerReady=0x80,\
     tdMouse=0x0100, tdMouseWheel=0x0200,\
+ /* Display Orientation */ oriUnknown=0, oriPortrait=1, oriLandscape=2,\
 \
 /* file attributes */\
  faReadOnly=0x01, faHidden=0x02, faSysFile=0x04, faVolumeID=0x08, faDirectory=0x10, faArchive=0x20, faAnyFile=0x3f,\
