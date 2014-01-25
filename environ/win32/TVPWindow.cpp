@@ -149,11 +149,11 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 							int x = pInputs[i].x / 100;
 							int y = pInputs[i].y / 100;
 							POINT pt = {x,y};
-							::ClientToScreen( GetHandle(), &pt );
+							::ScreenToClient( GetHandle(), &pt );
 							int lx = pInputs[i].x % 100;
 							int ly = pInputs[i].y % 100;
-							double vx = x + static_cast<double>(lx)/100.0;
-							double vy = y + static_cast<double>(ly)/100.0;
+							double vx = pt.x + static_cast<double>(lx)/100.0;
+							double vy = pt.y + static_cast<double>(ly)/100.0;
 							double cx = 1;
 							double cy = 1;
 							if( pInputs[i].dwMask & TOUCHINPUTMASKF_CONTACTAREA ) {
