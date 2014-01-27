@@ -1930,6 +1930,87 @@ void tTJSNI_Window::UpdateVSyncThread()
 	}
 }
 //---------------------------------------------------------------------------
+void TJS_INTF_METHOD tTJSNI_Window::StartBitmapCompletion(iTVPLayerManager * manager)
+{
+	if( DrawDevice ) DrawDevice->StartBitmapCompletion(manager);
+}
+//---------------------------------------------------------------------------
+void TJS_INTF_METHOD tTJSNI_Window::NotifyBitmapCompleted(class iTVPLayerManager * manager,
+	tjs_int x, tjs_int y, const void * bits, const class BitmapInfomation * bitmapinfo,
+	const tTVPRect &cliprect, tTVPLayerType type, tjs_int opacity)
+{
+	if( DrawDevice ) {
+		DrawDevice->NotifyBitmapCompleted(manager,x,y,bits,bitmapinfo->GetBITMAPINFO(), cliprect, type, opacity );
+	}
+}
+//---------------------------------------------------------------------------
+void TJS_INTF_METHOD tTJSNI_Window::EndBitmapCompletion(iTVPLayerManager * manager)
+{
+	if( DrawDevice ) DrawDevice->EndBitmapCompletion(manager);
+}
+//---------------------------------------------------------------------------
+void TJS_INTF_METHOD tTJSNI_Window::SetMouseCursor(class iTVPLayerManager* manager, tjs_int cursor)
+{
+	if( DrawDevice ) {
+		if(cursor == 0)
+			DrawDevice->SetDefaultMouseCursor(manager);
+		else
+			DrawDevice->SetMouseCursor(manager, cursor);
+	}
+}
+//---------------------------------------------------------------------------
+void TJS_INTF_METHOD tTJSNI_Window::GetCursorPos(class iTVPLayerManager* manager, tjs_int &x, tjs_int &y)
+{
+	if( DrawDevice ) DrawDevice->GetCursorPos(manager, x, y);
+}
+//---------------------------------------------------------------------------
+void TJS_INTF_METHOD tTJSNI_Window::SetCursorPos(class iTVPLayerManager* manager, tjs_int x, tjs_int y)
+{
+	if( DrawDevice ) DrawDevice->SetCursorPos(manager, x, y);
+}
+//---------------------------------------------------------------------------
+void TJS_INTF_METHOD tTJSNI_Window::ReleaseMouseCapture(class iTVPLayerManager* manager)
+{
+	if( DrawDevice ) DrawDevice->WindowReleaseCapture(manager);
+}
+//---------------------------------------------------------------------------
+void TJS_INTF_METHOD tTJSNI_Window::SetHint(class iTVPLayerManager* manager, iTJSDispatch2* sender, const ttstr &hint)
+{
+	if( DrawDevice ) DrawDevice->SetHintText(manager, sender, hint);
+}
+//---------------------------------------------------------------------------
+void TJS_INTF_METHOD tTJSNI_Window::NotifyLayerResize(class iTVPLayerManager* manager)
+{
+	if( DrawDevice ) DrawDevice->NotifyLayerResize(manager);
+}
+//---------------------------------------------------------------------------
+void TJS_INTF_METHOD tTJSNI_Window::NotifyLayerImageChange(class iTVPLayerManager* manager)
+{
+	if( DrawDevice ) DrawDevice->NotifyLayerImageChange(manager);
+}
+//---------------------------------------------------------------------------
+void TJS_INTF_METHOD tTJSNI_Window::SetAttentionPoint(class iTVPLayerManager* manager, tTJSNI_BaseLayer *layer, tjs_int x, tjs_int y)
+{
+	if( DrawDevice ) DrawDevice->SetAttentionPoint(manager, layer, x, y);
+}
+//---------------------------------------------------------------------------
+void TJS_INTF_METHOD tTJSNI_Window::DisableAttentionPoint(class iTVPLayerManager* manager)
+{
+	if( DrawDevice ) DrawDevice->DisableAttentionPoint(manager);
+}
+//---------------------------------------------------------------------------
+void TJS_INTF_METHOD tTJSNI_Window::SetImeMode( class iTVPLayerManager* manager, tjs_int mode ) // mode == tTVPImeMode
+{
+	if( DrawDevice ) DrawDevice->SetImeMode(manager, (tTVPImeMode)mode);
+}
+//---------------------------------------------------------------------------
+void TJS_INTF_METHOD tTJSNI_Window::ResetImeMode( class iTVPLayerManager* manager )
+{
+	if( DrawDevice ) DrawDevice->ResetImeMode(manager);
+}
+//---------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
 // tTJSNC_Window::CreateNativeInstance : returns proper instance object

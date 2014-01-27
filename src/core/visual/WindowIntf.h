@@ -18,7 +18,7 @@
 #include "EventIntf.h"
 #include "ObjectList.h"
 #include "DrawDevice.h"
-
+#include "LayerTreeOwner.h"
 
 
 
@@ -141,7 +141,7 @@ public:
 class tTVPBaseBitmap;
 class tTJSNI_BaseLayer;
 class tTJSNI_BaseVideoOverlay;
-class tTJSNI_BaseWindow : public tTJSNativeInstance, public iTVPWindow
+class tTJSNI_BaseWindow : public tTJSNativeInstance, public iTVPWindow, public iTVPLayerTreeOwner
 {
 	typedef tTJSNativeInstance inherited;
 
@@ -152,7 +152,7 @@ private:
 protected:
 	iTJSDispatch2 *Owner;
 public:
-	iTJSDispatch2 * GetOwnerNoAddRef() const { return Owner; }
+	iTJSDispatch2 * TJS_INTF_METHOD GetOwnerNoAddRef() const { return Owner; }
 
 public:
 	tTJSNI_BaseWindow();
@@ -222,8 +222,8 @@ public:
 
 	//----- layer managermant
 public:
-	void RegisterLayerManager(iTVPLayerManager * manager);
-	void UnregisterLayerManager(iTVPLayerManager * manager);
+	void TJS_INTF_METHOD RegisterLayerManager(iTVPLayerManager * manager);
+	void TJS_INTF_METHOD UnregisterLayerManager(iTVPLayerManager * manager);
 
 
 protected:

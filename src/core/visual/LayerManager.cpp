@@ -15,23 +15,22 @@
 #include "LayerManager.h"
 #include "MsgIntf.h"
 #include "LayerBitmapIntf.h"
-#include "WindowIntf.h"
 #include "StorageIntf.h"
 #include "EventIntf.h"
 #include "SysInitIntf.h"
 #include "TickCount.h"
 #include "DebugIntf.h"
-
+#include "LayerTreeOwner.h"
 
 
 
 //---------------------------------------------------------------------------
 // tTVPLayerManager
 //---------------------------------------------------------------------------
-tTVPLayerManager::tTVPLayerManager(tTJSNI_BaseWindow *window)
+tTVPLayerManager::tTVPLayerManager(iTVPLayerTreeOwner *owner)
 {
 	RefCount = 1;
-	Window = window;
+	LayerTreeOwner = owner;
 	DrawDeviceData = NULL;
 	DrawBuffer = NULL;
 	DesiredLayerType = ltOpaque;
@@ -69,12 +68,12 @@ void TJS_INTF_METHOD tTVPLayerManager::Release()
 //---------------------------------------------------------------------------
 void tTVPLayerManager::RegisterSelfToWindow()
 {
-	Window->RegisterLayerManager(this);
+	LayerTreeOwner->RegisterLayerManager(this);
 }
 //---------------------------------------------------------------------------
 void tTVPLayerManager::UnregisterSelfFromWindow()
 {
-	Window->UnregisterLayerManager(this);
+	LayerTreeOwner->UnregisterLayerManager(this);
 }
 //---------------------------------------------------------------------------
 tTVPBaseBitmap * tTVPLayerManager::GetDrawTargetBitmap(const tTVPRect &rect,
@@ -118,9 +117,8 @@ void tTVPLayerManager::DrawCompleted(const tTVPRect &destrect,
 		tTVPBaseBitmap *bmp, const tTVPRect &cliprect,
 		tTVPLayerType type, tjs_int opacity)
 {
-	// TODO: cross platform
-	Window->GetDrawDevice()->NotifyBitmapCompleted(this, destrect.left, destrect.top,
-		bmp->GetBitmap()->GetBits(), bmp->GetBitmap()->GetBITMAPINFO(), cliprect, type, opacity);
+	LayerTreeOwner->NotifyBitmapCompleted(this, destrect.left, destrect.top,
+		bmp->GetBitmap()->GetBits(), bmp->GetBitmap()->GetBitmapInfomation(), cliprect, type, opacity);
 }
 //---------------------------------------------------------------------------
 void tTVPLayerManager::AttachPrimary(tTJSNI_BaseLayer *pri)
@@ -236,24 +234,21 @@ void tTVPLayerManager::NotifyMouseCursorChange(
 //---------------------------------------------------------------------------
 void tTVPLayerManager::SetMouseCursor(tjs_int cursor)
 {
-	if(!Window) return;
+	if(!LayerTreeOwner) return;
 
-	if(cursor == 0)
-		Window->GetDrawDevice()->SetDefaultMouseCursor(this);
-	else
-		Window->GetDrawDevice()->SetMouseCursor(this, cursor);
+	LayerTreeOwner->SetMouseCursor(this, cursor);
 }
 //---------------------------------------------------------------------------
 void tTVPLayerManager::GetCursorPos(tjs_int &x, tjs_int &y)
 {
-	if(!Window) return;
-	Window->GetDrawDevice()->GetCursorPos(this, x, y);
+	if(!LayerTreeOwner) return;
+	LayerTreeOwner->GetCursorPos(this, x, y);
 }
 //---------------------------------------------------------------------------
 void tTVPLayerManager::SetCursorPos(tjs_int x, tjs_int y)
 {
-	if(!Window) return;
-	Window->GetDrawDevice()->SetCursorPos(this, x, y);
+	if(!LayerTreeOwner) return;
+	LayerTreeOwner->SetCursorPos(this, x, y);
 }
 //---------------------------------------------------------------------------
 void tTVPLayerManager::NotifyHintChange(tTJSNI_BaseLayer *layer, const ttstr & hint)
@@ -284,30 +279,30 @@ void tTVPLayerManager::NotifyHintChange(tTJSNI_BaseLayer *layer, const ttstr & h
 //---------------------------------------------------------------------------
 void tTVPLayerManager::SetHint(iTJSDispatch2* sender, const ttstr &hint)
 {
-	if(!Window) return;
-	Window->GetDrawDevice()->SetHintText(this, sender, hint);
+	if(!LayerTreeOwner) return;
+	LayerTreeOwner->SetHint(this, sender, hint);
 }
 //---------------------------------------------------------------------------
 void tTVPLayerManager::NotifyLayerResize()
 {
-	// notifies layer resizing to the window
-	if(!Window) return;
+	// notifies layer resizing to the LayerTreeOwner
+	if(!LayerTreeOwner) return;
 
-	Window->GetDrawDevice()->NotifyLayerResize(this);
+	LayerTreeOwner->NotifyLayerResize(this);
 }
 //---------------------------------------------------------------------------
 void tTVPLayerManager::NotifyWindowInvalidation()
 {
-	// notifies layer surface is invalidated and should be transfered to window.
-	if(!Window) return;
+	// notifies layer surface is invalidated and should be transfered to LayerTreeOwner.
+	if(!LayerTreeOwner) return;
 
-	Window->GetDrawDevice()->NotifyLayerImageChange(this);
+	LayerTreeOwner->NotifyLayerImageChange(this);
 }
 //---------------------------------------------------------------------------
-void tTVPLayerManager::SetWindow(tTJSNI_BaseWindow *window)
+void tTVPLayerManager::SetLayerTreeOwner(class iTVPLayerTreeOwner* owner)
 {
-	// sets window
-	Window = window;
+	// sets LayerTreeOwner
+	LayerTreeOwner = owner;
 }
 //---------------------------------------------------------------------------
 void tTVPLayerManager::NotifyResizeFromWindow(tjs_uint w, tjs_uint h)
@@ -611,7 +606,7 @@ void TJS_INTF_METHOD tTVPLayerManager::ReleaseCapture()
 		if(lay->Owner) lay->Owner->Release();
 			// release TJS object
 
-		Window->GetDrawDevice()->WindowReleaseCapture(this);
+		LayerTreeOwner->ReleaseMouseCapture(this);
 	}
 }
 //---------------------------------------------------------------------------
@@ -889,17 +884,17 @@ bool tTVPLayerManager::SearchAttentionPoint(tTJSNI_BaseLayer *target,
 //---------------------------------------------------------------------------
 void tTVPLayerManager::SetAttentionPointOf(tTJSNI_BaseLayer *layer)
 {
-	if(!Window) return;
+	if(!LayerTreeOwner) return;
 	tjs_int x, y;
 	if(SearchAttentionPoint(layer, x, y))
-		Window->GetDrawDevice()->SetAttentionPoint(this, layer, x, y);
+		LayerTreeOwner->SetAttentionPoint(this, layer, x, y);
 	else
-		Window->GetDrawDevice()->DisableAttentionPoint(this);
+		LayerTreeOwner->DisableAttentionPoint(this);
 }
 //---------------------------------------------------------------------------
 void tTVPLayerManager::DisableAttentionPoint()
 {
-	if(Window) Window->GetDrawDevice()->DisableAttentionPoint(this);
+	if(LayerTreeOwner) LayerTreeOwner->DisableAttentionPoint(this);
 }
 //---------------------------------------------------------------------------
 void tTVPLayerManager::NotifyAttentionStateChanged(tTJSNI_BaseLayer *from)
@@ -912,13 +907,14 @@ void tTVPLayerManager::NotifyAttentionStateChanged(tTJSNI_BaseLayer *from)
 //---------------------------------------------------------------------------
 void tTVPLayerManager::SetImeModeOf(tTJSNI_BaseLayer *layer)
 {
-	if(!Window) return;
-	Window->GetDrawDevice()->SetImeMode(this, layer->ImeMode);
+	if(!LayerTreeOwner) return;
+	LayerTreeOwner->SetImeMode(this, layer->ImeMode);
 }
 //---------------------------------------------------------------------------
 void tTVPLayerManager::ResetImeMode()
 {
-	Window->GetDrawDevice()->ResetImeMode(this);
+	if(!LayerTreeOwner) return;
+	LayerTreeOwner->ResetImeMode(this);
 }
 //---------------------------------------------------------------------------
 void tTVPLayerManager::NotifyImeModeChanged(tTJSNI_BaseLayer *from)
