@@ -17,7 +17,7 @@
 #include "LayerIntf.h"
 #include "MsgIntf.h"
 #include "LayerBitmapIntf.h"
-#include "WindowIntf.h"
+#include "LayerTreeOwner.h"
 #include "GraphicsLoaderIntf.h"
 #include "StorageIntf.h"
 #include "tvpgl.h"
@@ -39,7 +39,7 @@ extern tjs_int TVPGetFontRasterizer();
 extern FontRasterizer* GetCurrentRasterizer();
 extern void TVPMapPrerenderedFont(const tTVPFont & font, const ttstr & storage);
 extern void TVPUnmapPrerenderedFont(const tTVPFont & font);
-
+extern tjs_int TVPGetCursor(const ttstr & name);
 //---------------------------------------------------------------------------
 // global flags
 //---------------------------------------------------------------------------
@@ -427,12 +427,14 @@ tTJSNI_BaseLayer::Construct(tjs_int numparams, tTJSVariant **param,
 
 	// get the window native instance
 	tTJSVariantClosure clo = param[0]->AsObjectClosureNoAddRef();
-	if(clo.Object == NULL) TVPThrowExceptionMessage(TVPSpecifyWindow);
-	tTJSNI_Window *win = NULL;
-	if(TJS_FAILED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE,
-		tTJSNC_Window::ClassID, (iTJSNativeInstance**)&win)))
-		TVPThrowExceptionMessage(TVPSpecifyWindow);
-	if(!win) TVPThrowExceptionMessage(TVPSpecifyWindow);
+	//if(clo.Object == NULL) TVPThrowExceptionMessage(TVPSpecifyWindow);
+	if(clo.Object == NULL) TVPThrowExceptionMessage(TJS_W("layerTreeOwnerInterfaceを持つオブジェクトを指定してください"));
+
+	class iTVPLayerTreeOwner* lto = NULL;
+	tTJSVariant iface_v;
+	if(TJS_FAILED(clo.PropGet(0, TJS_W("layerTreeOwnerInterface"), NULL, &iface_v, NULL)))
+		TVPThrowExceptionMessage( TJS_W("Cannot Retrive Layer Tree Owner Interface.") );
+	lto = reinterpret_cast<iTVPLayerTreeOwner *>((long)(tjs_int64)iface_v);
 
 	// get the layer native instance
 	clo = param[1]->AsObjectClosureNoAddRef();
@@ -459,7 +461,7 @@ tTJSNI_BaseLayer::Construct(tjs_int numparams, tTJSVariant **param,
 	// ask window to create layer manager 
 	if(!lay)
 	{
-		Manager = new tTVPLayerManager(win);
+		Manager = new tTVPLayerManager(lto);
 		Manager->AttachPrimary(this);
 		Manager->RegisterSelfToWindow();
 
@@ -559,10 +561,10 @@ void TJS_INTF_METHOD tTJSNI_BaseLayer::OnCompact(tjs_int level)
 //---------------------------------------------------------------------------
 // Interface to Manager
 //---------------------------------------------------------------------------
-tTJSNI_BaseWindow * tTJSNI_BaseLayer::GetWindow() const
+iTVPLayerTreeOwner * tTJSNI_BaseLayer::GetLayerTreeOwner() const
 {
 	if(!Manager) return NULL;
-	return Manager->GetWindow();
+	return Manager->GetLayerTreeOwner();
 }
 //---------------------------------------------------------------------------
 
@@ -6048,17 +6050,17 @@ void tTJSNI_BaseLayer::CompleteForWindow(tTVPDrawable *drawable)
 
 	InCompletion = true;
 
-	if(Manager) Manager->GetWindow()->GetDrawDevice()->StartBitmapCompletion(Manager);
+	if(Manager) Manager->GetLayerTreeOwner()->StartBitmapCompletion(Manager);
 	try
 	{
 		InternalComplete2(Manager->GetUpdateRegionForCompletion(), drawable);
 	}
 	catch(...)
 	{
-		if(Manager) Manager->GetWindow()->GetDrawDevice()->EndBitmapCompletion(Manager);
+		if(Manager) Manager->GetLayerTreeOwner()->EndBitmapCompletion(Manager);
 		throw;
 	}
-	if(Manager) Manager->GetWindow()->GetDrawDevice()->EndBitmapCompletion(Manager);
+	if(Manager) Manager->GetLayerTreeOwner()->EndBitmapCompletion(Manager);
 
 	InCompletion = false;
 	AfterCompletion();
@@ -8561,14 +8563,14 @@ TJS_BEGIN_NATIVE_PROP_DECL(window)
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
-		tTJSNI_BaseWindow *window = _this->GetWindow();
-		if(!window)
+		iTVPLayerTreeOwner* lto = _this->GetLayerTreeOwner();
+		if(!lto)
 		{
 			*result = tTJSVariant((iTJSDispatch2*)NULL);
 		}
 		else
 		{
-			iTJSDispatch2 *dsp = window->GetOwnerNoAddRef();
+			iTJSDispatch2 *dsp = lto->GetOwnerNoAddRef();
 			*result = tTJSVariant(dsp, dsp);
 		}
 		return TJS_S_OK;

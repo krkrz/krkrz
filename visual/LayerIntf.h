@@ -212,7 +212,7 @@ private:
 	tTVPLayerManager *Manager;
 public:
 	tTVPLayerManager *GetManager() const { return Manager; }
-	tTJSNI_BaseWindow * GetWindow() const;
+	class iTVPLayerTreeOwner * GetLayerTreeOwner() const;
 
 	//---------------------------------------------------- tree management --
 private:

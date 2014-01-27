@@ -603,12 +603,12 @@ void tTJSNI_BaseWindow::PostReleaseCaptureEvent()
 		new tTVPOnReleaseCaptureInputEvent(this));
 }
 //---------------------------------------------------------------------------
-void tTJSNI_BaseWindow::RegisterLayerManager(iTVPLayerManager * manager)
+void TJS_INTF_METHOD tTJSNI_BaseWindow::RegisterLayerManager(iTVPLayerManager * manager)
 {
 	if( DrawDevice ) DrawDevice->AddLayerManager(manager);
 }
 //---------------------------------------------------------------------------
-void tTJSNI_BaseWindow::UnregisterLayerManager(iTVPLayerManager * manager)
+void TJS_INTF_METHOD tTJSNI_BaseWindow::UnregisterLayerManager(iTVPLayerManager * manager)
 {
 	if( DrawDevice ) DrawDevice->RemoveLayerManager(manager);
 }
@@ -1893,6 +1893,20 @@ TJS_BEGIN_NATIVE_PROP_DECL(waitVSync)
 }
 TJS_END_NATIVE_PROP_DECL(waitVSync)
 //---------------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(layerTreeOwnerInterface)
+{
+	TJS_BEGIN_NATIVE_PROP_GETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
+		*result = reinterpret_cast<tjs_int64>(static_cast<iTVPLayerTreeOwner*>(_this));
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_GETTER
+
+	TJS_DENY_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_PROP_DECL(layerTreeOwnerInterface)
+//----------------------------------------------------------------------
 
 	TJS_END_NATIVE_MEMBERS
 

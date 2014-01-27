@@ -435,6 +435,36 @@ public:
 	
 	bool WaitForVBlank( tjs_int* in_vblank, tjs_int* delayed );
 
+public: // for iTVPLayerTreeOwner
+	// LayerManager -> LTO
+	/*
+	implements on tTJSNI_BaseWindow
+	virtual void TJS_INTF_METHOD RegisterLayerManager( class iTVPLayerManager* manager );
+	virtual void TJS_INTF_METHOD UnregisterLayerManager( class iTVPLayerManager* manager );
+	*/
+
+	virtual void TJS_INTF_METHOD StartBitmapCompletion(iTVPLayerManager * manager);
+	virtual void TJS_INTF_METHOD NotifyBitmapCompleted(class iTVPLayerManager * manager,
+		tjs_int x, tjs_int y, const void * bits, const class BitmapInfomation * bitmapinfo,
+		const tTVPRect &cliprect, tTVPLayerType type, tjs_int opacity);
+	virtual void TJS_INTF_METHOD EndBitmapCompletion(iTVPLayerManager * manager);
+
+	virtual void TJS_INTF_METHOD SetMouseCursor(class iTVPLayerManager* manager, tjs_int cursor);
+	virtual void TJS_INTF_METHOD GetCursorPos(class iTVPLayerManager* manager, tjs_int &x, tjs_int &y);
+	virtual void TJS_INTF_METHOD SetCursorPos(class iTVPLayerManager* manager, tjs_int x, tjs_int y);
+	virtual void TJS_INTF_METHOD ReleaseMouseCapture(class iTVPLayerManager* manager);
+
+	virtual void TJS_INTF_METHOD SetHint(class iTVPLayerManager* manager, iTJSDispatch2* sender, const ttstr &hint);
+
+	virtual void TJS_INTF_METHOD NotifyLayerResize(class iTVPLayerManager* manager);
+	virtual void TJS_INTF_METHOD NotifyLayerImageChange(class iTVPLayerManager* manager);
+
+	virtual void TJS_INTF_METHOD SetAttentionPoint(class iTVPLayerManager* manager, tTJSNI_BaseLayer *layer, tjs_int x, tjs_int y);
+	virtual void TJS_INTF_METHOD DisableAttentionPoint(class iTVPLayerManager* manager);
+
+	virtual void TJS_INTF_METHOD SetImeMode( class iTVPLayerManager* manager, tjs_int mode ); // mode == tTVPImeMode
+	virtual void TJS_INTF_METHOD ResetImeMode( class iTVPLayerManager* manager );
+
 protected:
 };
 //---------------------------------------------------------------------------
