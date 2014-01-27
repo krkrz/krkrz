@@ -213,7 +213,7 @@ public:
 class tTVPLayerManager : public iTVPLayerManager, public tTVPDrawable
 {
 	tjs_int RefCount; //!< reference count
-	tTJSNI_BaseWindow * Window;
+	class iTVPLayerTreeOwner* LayerTreeOwner;
 
 	void * DrawDeviceData; //!< draw device specific information
 
@@ -247,7 +247,7 @@ class tTVPLayerManager : public iTVPLayerManager, public tTVPDrawable
 	bool InNotifyingHintOrCursorChange;
 
 public:
-	tTVPLayerManager(tTJSNI_BaseWindow *window);
+	tTVPLayerManager(class iTVPLayerTreeOwner *owner);
 
 private:
 	virtual ~tTVPLayerManager();
@@ -322,8 +322,8 @@ public:
 	void NotifyWindowInvalidation(); // layer -> window
 
 public:
-	tTJSNI_BaseWindow * GetWindow() const { return Window; }
-	void SetWindow(tTJSNI_BaseWindow *window);
+	class iTVPLayerTreeOwner* GetLayerTreeOwner() const { return LayerTreeOwner; }
+	void SetLayerTreeOwner(class iTVPLayerTreeOwner* owner);
 	void NotifyResizeFromWindow(tjs_uint w, tjs_uint h); // draw device -> layer
 	virtual void TJS_INTF_METHOD RequestInvalidation(const tTVPRect &r); // draw device -> layer
 
