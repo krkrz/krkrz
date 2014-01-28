@@ -15,6 +15,7 @@
 #include "LayerIntf.h"
 
 #include "BitmapLayerTreeOwner.h"
+#include "MsgIntf.h"
 
 #include <assert.h>
 
@@ -519,6 +520,65 @@ TJS_BEGIN_NATIVE_PROP_DECL(layerTreeOwnerInterface)
 	TJS_DENY_NATIVE_PROP_SETTER
 }
 TJS_END_NATIVE_PROP_DECL(layerTreeOwnerInterface)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(focusedLayer)
+{
+	TJS_BEGIN_NATIVE_PROP_GETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_BitmapLayerTreeOwner);
+		tTJSNI_BaseLayer *lay = _this->GetFocusedLayer();
+		if(lay && lay->GetOwnerNoAddRef())
+			*result = tTJSVariant(lay->GetOwnerNoAddRef(), lay->GetOwnerNoAddRef());
+		else
+			*result = tTJSVariant((iTJSDispatch2*)NULL);
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_GETTER
+
+	TJS_BEGIN_NATIVE_PROP_SETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_BitmapLayerTreeOwner);
+
+		tTJSNI_BaseLayer *to = NULL;
+
+		if(param->Type() != tvtVoid)
+		{
+			tTJSVariantClosure clo = param->AsObjectClosureNoAddRef();
+			if(clo.Object)
+			{
+				if(TJS_FAILED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE,
+					tTJSNC_Layer::ClassID, (iTJSNativeInstance**)&to)))
+					TVPThrowExceptionMessage(TVPSpecifyLayer);
+			}
+		}
+
+		_this->SetFocusedLayer(to);
+
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_PROP_DECL(focusedLayer)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(primaryLayer)
+{
+	TJS_BEGIN_NATIVE_PROP_GETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_BitmapLayerTreeOwner);
+		tTJSNI_BaseLayer *pri = _this->GetPrimaryLayer();
+		if(!pri) TVPThrowExceptionMessage(TJS_W("Not have primary layer"));
+
+		if(pri && pri->GetOwnerNoAddRef())
+			*result = tTJSVariant(pri->GetOwnerNoAddRef(), pri->GetOwnerNoAddRef());
+		else
+			*result = tTJSVariant((iTJSDispatch2*)NULL);
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_GETTER
+
+	TJS_DENY_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_PROP_DECL(primaryLayer)
 //----------------------------------------------------------------------
 
 	TJS_END_NATIVE_MEMBERS
