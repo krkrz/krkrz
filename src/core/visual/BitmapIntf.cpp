@@ -521,7 +521,7 @@ tTJSNativeClass * TVPCreateNativeClass_Bitmap()
 		bmpclass->AddRef();
 		return bmpclass;
 	}
-	tTJSNativeClass* bmpclass = new tTJSNC_Font();
+	tTJSNativeClass* bmpclass = new tTJSNC_Bitmap();
 	bitmapclassholder.Set( bmpclass );
 	return bmpclass;
 }
