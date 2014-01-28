@@ -49,6 +49,7 @@
 #include "tjsScriptBlock.h"
 #include "ApplicationSpecialPath.h"
 #include "SystemImpl.h"
+#include "BitmapLayerTreeOwner.h"
 //---------------------------------------------------------------------------
 // Script system initialization script
 //---------------------------------------------------------------------------
@@ -514,6 +515,7 @@ void TVPInitScriptEngine()
 	REGISTER_OBJECT(Rect, TVPCreateNativeClass_Rect());
 	REGISTER_OBJECT(Bitmap, TVPCreateNativeClass_Bitmap());
 	REGISTER_OBJECT(ImageFunction, TVPCreateNativeClass_ImageFunction());
+	REGISTER_OBJECT(BitmapLayerTreeOwner, TVPCreateNativeClass_BitmapLayerTreeOwner());
 
 	/* WaveSoundBuffer and its filters */
 	iTJSDispatch2 * waveclass = NULL;

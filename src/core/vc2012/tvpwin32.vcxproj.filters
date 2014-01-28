@@ -527,6 +527,12 @@
     <ClInclude Include="..\environ\win32\ConfigFormUnit.h">
       <Filter>environ\win32</Filter>
     </ClInclude>
+    <ClInclude Include="..\visual\BitmapLayerTreeOwner.h">
+      <Filter>visual</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\LayerTreeOwnerImpl.h">
+      <Filter>visual</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\tjs2\tjs.cpp">
@@ -942,6 +948,12 @@
     </ClCompile>
     <ClCompile Include="..\environ\win32\ConfigFormUnit.cpp">
       <Filter>environ\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\BitmapLayerTreeOwner.cpp">
+      <Filter>visual</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\LayerTreeOwnerImpl.cpp">
+      <Filter>visual</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

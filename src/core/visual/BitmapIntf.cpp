@@ -493,13 +493,49 @@ TJS_END_NATIVE_PROP_DECL(loading)
 	TJS_END_NATIVE_MEMBERS
 }
 
+//---------------------------------------------------------------------------
+// TVPCreateNativeClass_Bitmap
+//---------------------------------------------------------------------------
+struct tBitmapClassHolder {
+	tTJSNativeClass * Obj;
+	tBitmapClassHolder() : Obj(NULL) {}
+	void Set( tTJSNativeClass* obj ) {
+		if( Obj ) {
+			Obj->Release();
+			Obj = NULL;
+		}
+		Obj = obj;
+		Obj->AddRef();
+	}
+	~tBitmapClassHolder() { if( Obj ) Obj->Release(), Obj = NULL; }
+} static bitmapclassholder;
+//---------------------------------------------------------------------------
 tTJSNativeInstance *tTJSNC_Bitmap::CreateNativeInstance() {
 	return new tTJSNI_Bitmap();
 }
-
-
+//---------------------------------------------------------------------------
 tTJSNativeClass * TVPCreateNativeClass_Bitmap()
 {
-	tTJSNativeClass *cls = new tTJSNC_Bitmap();
-	return cls;
+	if( bitmapclassholder.Obj ) {
+		tTJSNativeClass* bmpclass = bitmapclassholder.Obj;
+		bmpclass->AddRef();
+		return bmpclass;
+	}
+	tTJSNativeClass* bmpclass = new tTJSNC_Font();
+	bitmapclassholder.Set( bmpclass );
+	return bmpclass;
 }
+//---------------------------------------------------------------------------
+iTJSDispatch2 * TVPCreateBitmapObject()
+{
+	if( bitmapclassholder.Obj == NULL ) {
+		TVPThrowInternalError;
+	}
+	iTJSDispatch2 *out;
+	if(TJS_FAILED(bitmapclassholder.Obj->CreateNew(0, NULL, NULL, &out, 0, NULL, bitmapclassholder.Obj)))
+		TVPThrowInternalError;
+
+	return out;
+}
+//---------------------------------------------------------------------------
+
