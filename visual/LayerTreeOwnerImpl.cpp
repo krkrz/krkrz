@@ -137,6 +137,11 @@ void TJS_INTF_METHOD tTVPLayerTreeOwner::NotifyLayerResize(class iTVPLayerManage
 	}
 }
 void TJS_INTF_METHOD tTVPLayerTreeOwner::NotifyLayerImageChange(class iTVPLayerManager* manager) {
+	// change layer image
+	for(std::vector<iTVPLayerManager *>::iterator i = Managers.begin(); i != Managers.end(); i++) {
+		(*i)->UpdateToDrawDevice();
+	}
+
 	iTVPLayerManager * primary_manager = GetLayerManagerAt(PrimaryLayerManagerIndex);
 	if(primary_manager == manager)
 		OnChangeLayerImage();

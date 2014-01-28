@@ -61,10 +61,13 @@ void TJS_INTF_METHOD tTJSNI_BitmapLayerTreeOwner::NotifyBitmapCompleted(class iT
 	const tTVPRect &cliprect, tTVPLayerType type, tjs_int opacity) {
 	assert(BitmapNI);
 
-	tjs_uint8* dstbits = (tjs_uint8*)BitmapNI->GetPixelBufferForWrite();
-	tjs_int dstpitch = BitmapNI->GetPixelBufferPitch();
 	tjs_int w, h;
 	GetPrimaryLayerSize( w, h );
+	if( BitmapNI ) {
+		BitmapNI->SetSize( w, h );
+	}
+	tjs_uint8* dstbits = (tjs_uint8*)BitmapNI->GetPixelBufferForWrite();
+	tjs_int dstpitch = BitmapNI->GetPixelBufferPitch();
 	// cliprect ‚ª‚Í‚İo‚µ‚Ä‚¢‚¢‚È‚¢‚±‚Æ‚ğŠm”F
 	if( !(x < 0 || y < 0 || x + cliprect.get_width() > w || y + cliprect.get_height() > h) &&
 		!(cliprect.left < 0 || cliprect.top < 0 ||
