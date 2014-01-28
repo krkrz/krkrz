@@ -77,4 +77,5 @@ protected:
 };
 
 extern tTJSNativeClass * TVPCreateNativeClass_Bitmap();
+extern iTJSDispatch2 * TVPCreateBitmapObject();
 #endif // BitmapIntfH
