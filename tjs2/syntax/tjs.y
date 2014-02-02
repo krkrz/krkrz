@@ -198,6 +198,7 @@ int __yyerror(char * msg, void *pm);
 %token <num>		T_CONSTVAL
 %token <num>		T_SYMBOL
 %token <num>		T_REGEXP
+%token <num>		T_VARIANT
 
 
 %type <np>
@@ -349,11 +350,22 @@ variable_id_list
 
 /* a variable id and an optional initializer expression */
 variable_id
-	: T_SYMBOL								{ cc->AddLocalVariable(
+	: T_SYMBOL variable_type				{ cc->AddLocalVariable(
 												lx->GetString($1)); }
-	| T_SYMBOL "=" expr_no_comma			{ cc->InitLocalVariable(
-											  lx->GetString($1), $3); }
+	| T_SYMBOL variable_type "=" expr_no_comma	{ cc->InitLocalVariable(
+											  lx->GetString($1), $4); }
 ;
+
+/* a variable type. It is not currently effect. Ignore types. */
+variable_type
+	: /* empty */
+	| ":" T_SYMBOL
+	| ":" T_VOID
+	| ":" T_INT
+	| ":" T_REAL
+	| ":" T_STRING
+	| ":" T_OCTET
+
 
 /* a function definition */
 func_def
@@ -361,7 +373,7 @@ func_def
 												lx->GetString($2),
 											  ctFunction);
 											  cc->EnterBlock();}
-	  func_decl_arg_opt
+	  func_decl_arg_opt variable_type
 	  block									{ cc->ExitBlock(); sb->PopContextStack(); }
 ;
 
@@ -371,7 +383,7 @@ func_expr_def
 												TJS_W("(anonymous)"),
 											  ctExprFunction);
 											  cc->EnterBlock(); }
-	  func_decl_arg_opt
+	  func_decl_arg_opt variable_type
 	  block									{ cc->ExitBlock();
 											  tTJSVariant v(cc);
 											  sb->PopContextStack();
@@ -399,16 +411,16 @@ func_decl_arg_at_least_one
 ;
 
 func_decl_arg
-	: T_SYMBOL								{ cc->AddFunctionDeclArg(
+	: T_SYMBOL variable_type				{ cc->AddFunctionDeclArg(
 												lx->GetString($1), NULL); }
-	| T_SYMBOL "=" expr_no_comma			{ cc->AddFunctionDeclArg(
-												lx->GetString($1), $3); }
+	| T_SYMBOL variable_type "=" expr_no_comma	{ cc->AddFunctionDeclArg(
+												lx->GetString($1), $4); }
 ;
 
 func_decl_arg_collapse
 	: "*"									{ cc->AddFunctionDeclArgCollapse(
 												NULL); }
-	| T_SYMBOL "*"							{ cc->AddFunctionDeclArgCollapse(
+	| T_SYMBOL variable_type "*"			{ cc->AddFunctionDeclArgCollapse(
 												lx->GetString($1)); }
 /*
 	These are currently not supported
@@ -435,7 +447,7 @@ property_handler_def_list
 ;
 
 property_handler_setter
-	: "setter" "(" T_SYMBOL ")"				{ sb->PushContextStack(
+	: "setter" "(" T_SYMBOL variable_type ")"	{ sb->PushContextStack(
 												TJS_W("(setter)"),
 												ctPropertySetter);
 											  cc->EnterBlock();
@@ -455,8 +467,8 @@ property_handler_getter
 ;
 
 property_getter_handler_head
-	: "getter" "(" ")"
-	| "getter"
+	: "getter" "(" ")" variable_type
+	| "getter" variable_type
 ;
 
 
