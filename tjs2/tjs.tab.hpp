@@ -169,7 +169,8 @@ namespace TJS {
      T_WITHDOT_PROXY = 384,
      T_CONSTVAL = 385,
      T_SYMBOL = 386,
-     T_REGEXP = 387
+     T_REGEXP = 387,
+     T_VARIANT = 388
    };
 #endif
 
@@ -188,7 +189,7 @@ typedef union YYSTYPE
 
 
 /* Line 1676 of yacc.c  */
-#line 191 "tjs.tab.hpp"
+#line 192 "tjs.tab.hpp"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
