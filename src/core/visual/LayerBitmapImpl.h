@@ -82,6 +82,7 @@ public:
 
 	bool IsIndependent() const { return RefCount == 1; }
 
+	const BitmapInfomation* GetBitmapInfomation() const { return BitmapInfo; }
 #ifdef _WIN32
 	const BITMAPINFO * GetBITMAPINFO() const { return BitmapInfo->GetBITMAPINFO(); }
 	const BITMAPINFOHEADER * GetBITMAPINFOHEADER() const { return (const BITMAPINFOHEADER*)( BitmapInfo->GetBITMAPINFO() ); }

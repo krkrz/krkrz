@@ -274,6 +274,7 @@
     <ClInclude Include="..\utils\win32\TVPTimer.h" />
     <ClInclude Include="..\visual\argb.h" />
     <ClInclude Include="..\visual\BitmapIntf.h" />
+    <ClInclude Include="..\visual\BitmapLayerTreeOwner.h" />
     <ClInclude Include="..\visual\CharacterData.h" />
     <ClInclude Include="..\visual\ComplexRect.h" />
     <ClInclude Include="..\visual\drawable.h" />
@@ -290,6 +291,7 @@
     <ClInclude Include="..\visual\LayerBitmapIntf.h" />
     <ClInclude Include="..\visual\LayerIntf.h" />
     <ClInclude Include="..\visual\LayerManager.h" />
+    <ClInclude Include="..\visual\LayerTreeOwnerImpl.h" />
     <ClInclude Include="..\visual\LoadTLG.h" />
     <ClInclude Include="..\visual\PrerenderedFont.h" />
     <ClInclude Include="..\visual\RectItf.h" />
@@ -421,6 +423,7 @@
     <ClCompile Include="..\utils\win32\ThreadImpl.cpp" />
     <ClCompile Include="..\utils\win32\TVPTimer.cpp" />
     <ClCompile Include="..\visual\BitmapIntf.cpp" />
+    <ClCompile Include="..\visual\BitmapLayerTreeOwner.cpp" />
     <ClCompile Include="..\visual\CharacterData.cpp" />
     <ClCompile Include="..\visual\ComplexRect.cpp" />
     <ClCompile Include="..\visual\FontSystem.cpp" />
@@ -434,6 +437,7 @@
     <ClCompile Include="..\visual\LayerBitmapIntf.cpp" />
     <ClCompile Include="..\visual\LayerIntf.cpp" />
     <ClCompile Include="..\visual\LayerManager.cpp" />
+    <ClCompile Include="..\visual\LayerTreeOwnerImpl.cpp" />
     <ClCompile Include="..\visual\LoadJPEG.cpp" />
     <ClCompile Include="..\visual\LoadPNG.cpp" />
     <ClCompile Include="..\visual\LoadTLG.cpp" />
