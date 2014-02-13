@@ -1130,7 +1130,12 @@ void TVPShowScriptException(eTJSScriptError &e)
 		if( scriptName != NULL && scriptName[0] != 0 ) {
 			ttstr path(scriptName);
 			try {
-				path = TVPNormalizeStorageName(path);
+				ttstr newpath = TVPGetPlacedPath(path);
+				if( newpath.IsEmpty() ) {
+					path = TVPNormalizeStorageName(path);
+				} else {
+					path = newpath;
+				}
 				TVPGetLocalName( path );
 				std::wstring scriptPath( path.AsStdString() );
 				tjs_int lineno = 1+e.GetBlockNoAddRef()->SrcPosToLine(e.GetPosition() )- e.GetBlockNoAddRef()->GetLineOffset();
