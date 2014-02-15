@@ -14,6 +14,7 @@
 #include "WindowsUtil.h"
 #include "MsgIntf.h"
 #include "UserEvent.h"
+#include "TickCount.h"
 
 tTVPWindow::~tTVPWindow() {
 	if( ime_control_ ) delete ime_control_;
@@ -142,7 +143,9 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 			UINT cInputs = LOWORD(wParam);
 			PTOUCHINPUT pInputs = new TOUCHINPUT[cInputs];
 			if( NULL != pInputs ) {
+				OnTouchSequenceStart();
 				try {
+					DWORD basetick = TVPGetRoughTickCount32();
 					if( procGetTouchInputInfo( (HTOUCHINPUT)lParam, cInputs, pInputs, sizeof(TOUCHINPUT)) ) {
 						// process pInputs
 						for( UINT i = 0; i < cInputs; i++ ) {
@@ -160,14 +163,20 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 								cx = static_cast<double>(pInputs[i].cxContact) / 100.0;
 								cy = static_cast<double>(pInputs[i].cyContact) / 100.0;
 							}
+							DWORD tick;
+							if( pInputs[i].dwMask & TOUCHINPUTMASKF_TIMEFROMSYSTEM ) {
+								tick = pInputs[i].dwTime;
+							} else {
+								tick = basetick;
+							}
 							if( pInputs[i].dwFlags & TOUCHEVENTF_DOWN ) {
-								OnTouchDown( vx, vy, cx, cy, pInputs[i].dwID );
+								OnTouchDown( vx, vy, cx, cy, pInputs[i].dwID, tick );
 							}
 							if( pInputs[i].dwFlags & TOUCHEVENTF_MOVE ) {
-								OnTouchMove( vx, vy, cx, cy, pInputs[i].dwID );
+								OnTouchMove( vx, vy, cx, cy, pInputs[i].dwID, tick );
 							}
 							if( pInputs[i].dwFlags & TOUCHEVENTF_UP ) {
-								OnTouchUp( vx, vy, cx, cy, pInputs[i].dwID );
+								OnTouchUp( vx, vy, cx, cy, pInputs[i].dwID, tick );
 							}
 						}
 						ignore_touch_mouse_ = true;
@@ -179,9 +188,11 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 						TVPThrowWindowsErrorException();
 					}
 				} catch(...) {
+					OnTouchSequenceEnd();
 					delete[] pInputs;
 					throw;
 				}
+				OnTouchSequenceEnd();
 				delete[] pInputs;
 			} else {
 				// error handling, presumably out of memory

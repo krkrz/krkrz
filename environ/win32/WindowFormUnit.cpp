@@ -1583,6 +1583,7 @@ HDWP TTVPWindowForm::ShowTop(HDWP hdwp) {
 }
 void TTVPWindowForm::OnMouseMove( int shift, int x, int y ) {
 	TranslateWindowToDrawArea(x, y);
+	MouseVelocityTracker.addMovement( TVPGetRoughTickCount32(), (float)x, (float)y );
 	if( TJSNativeInstance ) {
 		tjs_uint32 s = TVP_TShiftState_To_uint32(shift);
 		s |= GetMouseButtonState();
@@ -1602,6 +1603,7 @@ void TTVPWindowForm::OnMouseDown( int button, int shift, int x, int y ) {
 
 	TranslateWindowToDrawArea( x, y);
 	SetMouseCapture();
+	MouseVelocityTracker.addMovement( TVPGetRoughTickCount32(), (float)x, (float)y );
 
 	LastMouseDownX = x;
 	LastMouseDownY = y;
@@ -1616,6 +1618,7 @@ void TTVPWindowForm::OnMouseDown( int button, int shift, int x, int y ) {
 void TTVPWindowForm::OnMouseUp( int button, int shift, int x, int y ) {
 	TranslateWindowToDrawArea(x, y);
 	ReleaseMouseCapture();
+	MouseVelocityTracker.addMovement( TVPGetRoughTickCount32(), (float)x, (float)y );
 	if(TJSNativeInstance) {
 		tjs_uint32 s = TVP_TShiftState_To_uint32(shift);
 		s |= GetMouseButtonState();
@@ -1647,26 +1650,38 @@ void TTVPWindowForm::OnMouseWheel( int delta, int shift, int x, int y ) {
 	}
 }
 
-void TTVPWindowForm::OnTouchDown( double x, double y, double cx, double cy, DWORD id ) {
+void TTVPWindowForm::OnTouchDown( double x, double y, double cx, double cy, DWORD id, DWORD tick ) {
 	TranslateWindowToDrawArea(x, y);
+
+	TouchVelocityTracker.start( id );
+	TouchVelocityTracker.update( id, tick, (float)x, (float)y );
+
 	if(TJSNativeInstance) {
 		TVPPostInputEvent( new tTVPOnTouchDownInputEvent(TJSNativeInstance, x, y, cx, cy, id));
 	}
-	touch_points_.TouchDown( x, y ,cx, cy, id );
+	touch_points_.TouchDown( x, y ,cx, cy, id, tick );
 }
-void TTVPWindowForm::OnTouchMove( double x, double y, double cx, double cy, DWORD id ) {
+void TTVPWindowForm::OnTouchMove( double x, double y, double cx, double cy, DWORD id, DWORD tick ) {
 	TranslateWindowToDrawArea( x, y);
+
+	TouchVelocityTracker.update( id, tick, (float)x, (float)y );
+
 	if(TJSNativeInstance) {
 		TVPPostInputEvent( new tTVPOnTouchMoveInputEvent(TJSNativeInstance, x, y, cx, cy, id));
 	}
-	touch_points_.TouchMove( x, y, cx, cy, id );
+	touch_points_.TouchMove( x, y, cx, cy, id, tick );
 }
-void TTVPWindowForm::OnTouchUp( double x, double y, double cx, double cy, DWORD id ) {
+void TTVPWindowForm::OnTouchUp( double x, double y, double cx, double cy, DWORD id, DWORD tick ) {
 	TranslateWindowToDrawArea( x, y);
+
+	TouchVelocityTracker.update( id, tick, (float)x, (float)y );
+
 	if(TJSNativeInstance) {
 		TVPPostInputEvent( new tTVPOnTouchUpInputEvent(TJSNativeInstance, x, y, cx, cy, id));
 	}
-	touch_points_.TouchUp( x, y, cx, cy, id );
+	touch_points_.TouchUp( x, y, cx, cy, id, tick );
+
+	TouchVelocityTracker.end( id );
 }
 
 void TTVPWindowForm::OnTouchScaling( double startdist, double currentdist, double cx, double cy, int flag ) {
@@ -1683,6 +1698,11 @@ void TTVPWindowForm::OnMultiTouch() {
 	if( TJSNativeInstance ) {
 		TVPPostInputEvent( new tTVPOnMultiTouchInputEvent(TJSNativeInstance) );
 	}
+}
+void TTVPWindowForm::OnTouchSequenceStart() {
+	// ‰½‚à‚µ‚È‚¢
+}
+void TTVPWindowForm::OnTouchSequenceEnd() {
 }
 void TTVPWindowForm::OnActive( HWND preactive ) {
 	if( TVPFullScreenedWindow == this )
@@ -1779,6 +1799,7 @@ void TTVPWindowForm::OnMouseEnter() {
 	}
 	DWORD tick = GetTickCount();
 	TVPPushEnvironNoise(&tick, sizeof(tick));
+	MouseVelocityTracker.clear();
 	if(TJSNativeInstance) {
 		TVPPostInputEvent(new tTVPOnMouseEnterInputEvent(TJSNativeInstance));
 	}

@@ -423,6 +423,9 @@ public:
 	tjs_real GetTouchPointY( tjs_int index );
 	tjs_real GetTouchPointID( tjs_int index );
 	tjs_int GetTouchPointCount();
+	bool GetTouchVelocity( tjs_int id, float& x, float& y, float& speed ) const;
+	bool GetMouseVelocity( float& x, float& y, float& speed ) const;
+	void ResetMouseVelocity();
 	
 	void SetHintDelay( tjs_int delay );
 	tjs_int GetHintDelay() const;
