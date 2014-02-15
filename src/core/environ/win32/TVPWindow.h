@@ -285,9 +285,11 @@ public:
 	virtual void OnShow( int status ) {}
 	virtual void OnHide( int status ) {}
 
-	virtual void OnTouchDown( double x, double y, double cx, double cy, DWORD id ) {}
-	virtual void OnTouchMove( double x, double y, double cx, double cy, DWORD id ) {}
-	virtual void OnTouchUp( double x, double y, double cx, double cy, DWORD id ) {}
+	virtual void OnTouchDown( double x, double y, double cx, double cy, DWORD id, DWORD tick ) {}
+	virtual void OnTouchMove( double x, double y, double cx, double cy, DWORD id, DWORD tick ) {}
+	virtual void OnTouchUp( double x, double y, double cx, double cy, DWORD id, DWORD tick ) {}
+	virtual void OnTouchSequenceStart() {}
+	virtual void OnTouchSequenceEnd() {}
 
 	virtual void OnDisplayChange( DWORD bpp, WORD hres, WORD vres ) {}
 };

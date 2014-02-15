@@ -10,6 +10,7 @@
 #include "MouseCursor.h"
 #include "TouchPoint.h"
 #include "TVPTimer.h"
+#include "VelocityTracker.h"
 
 enum {
 	crDefault = 0x0,
@@ -179,6 +180,9 @@ private:
 
 	tjs_int DisplayOrientation;
 	tjs_int DisplayRotate;
+
+	VelocityTrackers TouchVelocityTracker;
+	VelocityTracker MouseVelocityTracker;
 private:
 	void SetDrawDeviceDestRect();
 	void TranslateWindowToDrawArea(int &x, int &y);
@@ -365,9 +369,11 @@ public:
 	virtual void OnFocus(HWND hFocusLostWnd);
 	virtual void OnFocusLost(HWND hFocusingWnd);
 	
-	virtual void OnTouchDown( double x, double y, double cx, double cy, DWORD id );
-	virtual void OnTouchMove( double x, double y, double cx, double cy, DWORD id );
-	virtual void OnTouchUp( double x, double y, double cx, double cy, DWORD id );
+	virtual void OnTouchDown( double x, double y, double cx, double cy, DWORD id, DWORD tick );
+	virtual void OnTouchMove( double x, double y, double cx, double cy, DWORD id, DWORD tick );
+	virtual void OnTouchUp( double x, double y, double cx, double cy, DWORD id, DWORD tick );
+	virtual void OnTouchSequenceStart();
+	virtual void OnTouchSequenceEnd();
 
 	virtual void OnTouchScaling( double startdist, double currentdist, double cx, double cy, int flag );
 	virtual void OnTouchRotate( double startangle, double currentangle, double distance, double cx, double cy, int flag );
@@ -400,6 +406,19 @@ public:
 	tjs_real GetTouchPointY( tjs_int index ) const { return touch_points_.GetY(index); }
 	tjs_int GetTouchPointID( tjs_int index ) const { return touch_points_.GetID(index); }
 	tjs_int GetTouchPointCount() const { return touch_points_.CountUsePoint(); }
+	bool GetTouchVelocity( tjs_int id, float& x, float& y, float& speed ) const {
+		return TouchVelocityTracker.getVelocity( id, x, y, speed );
+	}
+	bool GetMouseVelocity( float& x, float& y, float& speed ) const {
+		if( MouseVelocityTracker.getVelocity( x, y ) ) {
+			speed = hypotf(x, y);
+			return true;
+		}
+		return false;
+	}
+	void ResetMouseVelocity() {
+		MouseVelocityTracker.clear();
+	}
 
 	void SetHintDelay( tjs_int delay ) { HintDelay = delay; }
 	tjs_int GetHintDelay() const { return HintDelay; }
