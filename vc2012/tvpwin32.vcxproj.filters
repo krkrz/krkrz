@@ -533,6 +533,9 @@
     <ClInclude Include="..\visual\LayerTreeOwnerImpl.h">
       <Filter>visual</Filter>
     </ClInclude>
+    <ClInclude Include="..\utils\VelocityTracker.h">
+      <Filter>utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\tjs2\tjs.cpp">
@@ -954,6 +957,9 @@
     </ClCompile>
     <ClCompile Include="..\visual\LayerTreeOwnerImpl.cpp">
       <Filter>visual</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utils\VelocityTracker.cpp">
+      <Filter>utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

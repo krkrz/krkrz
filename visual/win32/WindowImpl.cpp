@@ -1874,6 +1874,21 @@ tjs_int tTJSNI_Window::GetTouchPointCount() {
 	return Form->GetTouchPointCount();
 }
 //---------------------------------------------------------------------------
+bool tTJSNI_Window::GetTouchVelocity( tjs_int id, float& x, float& y, float& speed ) const {
+	if(!Form) return false;
+	return Form->GetTouchVelocity( id, x, y, speed );
+}
+//---------------------------------------------------------------------------
+bool tTJSNI_Window::GetMouseVelocity( float& x, float& y, float& speed ) const {
+	if(!Form) return false;
+	return Form->GetMouseVelocity( x, y, speed );
+}
+//---------------------------------------------------------------------------
+void tTJSNI_Window::ResetMouseVelocity() {
+	if(!Form) return;
+	return Form->ResetMouseVelocity();
+}
+//---------------------------------------------------------------------------
 void tTJSNI_Window::SetHintDelay( tjs_int delay )
 {
 	if(!Form) return;
@@ -2117,6 +2132,63 @@ TJS_BEGIN_NATIVE_METHOD_DECL(getTouchPoint)
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_METHOD_DECL_OUTER(cls, getTouchPoint)
+//---------------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(getTouchVelocity)
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
+	if(numparams < 4) return TJS_E_BADPARAMCOUNT;
+
+	tjs_int id = (tjs_int)*param[0];
+	float x, y, speed;
+	bool ret = _this->GetTouchVelocity( id, x, y, speed );
+	if( result ) {
+		*result = ret ? (tjs_int)1 : (tjs_int)0;
+	}
+	if( ret ) {
+		(*param[1]) = (tjs_real)x;
+		(*param[2]) = (tjs_real)y;
+		(*param[3]) = (tjs_real)speed;
+	} else {
+		(*param[1]) = (tjs_real)0.0;
+		(*param[2]) = (tjs_real)0.0;
+		(*param[3]) = (tjs_real)0.0;
+	}
+
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL_OUTER(cls, getTouchVelocity)
+//---------------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(getMouseVelocity)
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
+	if(numparams < 3) return TJS_E_BADPARAMCOUNT;
+
+	float x, y, speed;
+	bool ret = _this->GetMouseVelocity( x, y, speed );
+	if( result ) {
+		*result = ret ? (tjs_int)1 : (tjs_int)0;
+	}
+	if( ret ) {
+		(*param[0]) = (tjs_real)x;
+		(*param[1]) = (tjs_real)y;
+		(*param[2]) = (tjs_real)speed;
+	} else {
+		(*param[0]) = (tjs_real)0.0;
+		(*param[1]) = (tjs_real)0.0;
+		(*param[2]) = (tjs_real)0.0;
+	}
+
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL_OUTER(cls, getMouseVelocity)
+//---------------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(resetMouseVelocity)
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
+	_this->ResetMouseVelocity();
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL_OUTER(cls, resetMouseVelocity)
 //---------------------------------------------------------------------------
 TJS_BEGIN_NATIVE_PROP_DECL(HWND)
 {
