@@ -50,6 +50,8 @@
 #include "ApplicationSpecialPath.h"
 #include "SystemImpl.h"
 #include "BitmapLayerTreeOwner.h"
+#include "Extension.h"
+
 //---------------------------------------------------------------------------
 // Script system initialization script
 //---------------------------------------------------------------------------
@@ -534,6 +536,10 @@ void TVPInitScriptEngine()
 	dsp->Release();
 	windowclass->PropSet(TJS_MEMBERENSURE|TJS_IGNOREPROP|TJS_STATICMEMBER,
 		TJS_W("BasicDrawDevice"), NULL, &val, windowclass);
+
+	// Add Extension Classes
+	TVPCauseAtInstallExtensionClass( global );
+
 	// Garbage Collection Hook
 	TVPAddCompactEventHook(&TVPTJSGCCallback);
 }
