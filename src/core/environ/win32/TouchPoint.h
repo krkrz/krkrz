@@ -18,13 +18,14 @@ struct TouchPoint {
 	static const int USE_POINT = 0x01 << 0;
 	static const int START_SCALING = 0x01 << 1;
 	static const int START_ROT = 0x01 << 2;
-	DWORD id;
+	tjs_uint32 id;
 	double sx;
 	double sy;
 	double x;
 	double y;
-	DWORD flag;
-	TouchPoint() : id(0), sx(0), sy(0), x(0), y(0), flag(0) {
+	tjs_uint32 flag;
+	tjs_uint32 tick;
+	TouchPoint() : id(0), sx(0), sy(0), x(0), y(0), flag(0), tick(0) {
 	}
 };
 
@@ -42,7 +43,7 @@ class TouchPointList {
 	double rotate_threshold_;
 
 private:
-	int FindEnptyEntry() {
+	int FindEmptyEntry() {
 		for( int i = 0; i < count_; i++ ) {
 			if( (touch_points_[i].flag & TouchPoint::USE_POINT) == 0 ) {
 				return i;
@@ -52,7 +53,7 @@ private:
 		GrowPoints();
 		return idx;
 	}
-	int FindEntry( DWORD id ) {
+	int FindEntry( tjs_uint32 id ) {
 		for( int i = 0; i < count_; i++ ) {
 			if( (touch_points_[i].flag & TouchPoint::USE_POINT) && (touch_points_[i].id == id) ) {
 				return i;
@@ -60,7 +61,7 @@ private:
 		}
 		return -1;
 	}
-	int FindOtherEntry( DWORD id ) {
+	int FindOtherEntry( tjs_uint32 id ) {
 		for( int i = 0; i < count_; i++ ) {
 			if( (touch_points_[i].flag & TouchPoint::USE_POINT) && (touch_points_[i].id != id) ) {
 				return i;
@@ -82,7 +83,8 @@ private:
 		count_ = count;
 	}
 public:
-	TouchPointList( TouchHandler* handler ) : handler_(handler) {
+	TouchPointList( TouchHandler* handler )
+	: handler_(handler) {
 		scale_threshold_ = SCALE_THRESHOLD;
 		rotate_threshold_ = ROTATE_THRESHOLD;
 		count_ = INIT_COUNT;
@@ -93,18 +95,19 @@ public:
 		touch_points_ = NULL;
 	}
 	
-	void TouchDown( double x, double y, double cx, double cy, DWORD id ) {
-		int idx = FindEnptyEntry();
+	void TouchDown( double x, double y, double cx, double cy, tjs_uint32 id, tjs_uint32 tick ) {
+		int idx = FindEmptyEntry();
 		touch_points_[idx].sx = touch_points_[idx].x = x;
 		touch_points_[idx].sy = touch_points_[idx].y = y;
 		touch_points_[idx].flag = TouchPoint::USE_POINT;
 		touch_points_[idx].id = id;
+		touch_points_[idx].tick = tick;
 		int num_of_points = CountUsePoint();
 		if( num_of_points >= 2 ) {
 			handler_->OnMultiTouch();
 		}
 	}
-	void TouchMove( double x, double y, double cx, double cy, DWORD id ) {
+	void TouchMove( double x, double y, double cx, double cy, tjs_uint32 id, tjs_uint32 tick ) {
 		int num_of_points = CountUsePoint();
 		// 2点タッチのみ反応
 		if( num_of_points == 2 ) {
@@ -155,12 +158,13 @@ public:
 			TouchPoint& self = touch_points_[selfidx];
 			self.x = x;
 			self.y = y;
+			self.tick = tick;
 		}
 		if( num_of_points >= 2 ) {
 			handler_->OnMultiTouch();
 		}
 	}
-	void TouchUp( double x, double y, double cx, double cy, DWORD id ) {
+	void TouchUp( double x, double y, double cx, double cy, tjs_uint32 id, tjs_uint32 tick ) {
 		int num_of_points = CountUsePoint();
 		if( num_of_points >= 2 ) {
 			handler_->OnMultiTouch();
@@ -240,12 +244,24 @@ public:
 		}
 		return 0;
 	}
-	DWORD GetID( int index ) const {
+	tjs_uint32 GetID( int index ) const {
 		int count = 0;
 		for( int i = 0; i < count_; i++ ) {
 			if( touch_points_[i].flag & TouchPoint::USE_POINT ) {
 				if( count == index ) {
 					return touch_points_[i].id;
+				}
+				count++;
+			}
+		}
+		return 0;
+	}
+	tjs_uint32 GetTick( int index ) const {
+		int count = 0;
+		for( int i = 0; i < count_; i++ ) {
+			if( touch_points_[i].flag & TouchPoint::USE_POINT ) {
+				if( count == index ) {
+					return touch_points_[i].tick;
 				}
 				count++;
 			}

@@ -55,6 +55,9 @@
     <Filter Include="sound\win32">
       <UniqueIdentifier>{e116b75c-ed4d-47a5-9a92-ff38c939c0e5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="extension">
+      <UniqueIdentifier>{00466776-e92e-48d6-905d-db6c36ab46cc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -533,6 +536,12 @@
     <ClInclude Include="..\visual\LayerTreeOwnerImpl.h">
       <Filter>visual</Filter>
     </ClInclude>
+    <ClInclude Include="..\utils\VelocityTracker.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\extension\Extension.h">
+      <Filter>extension</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\tjs2\tjs.cpp">
@@ -954,6 +963,12 @@
     </ClCompile>
     <ClCompile Include="..\visual\LayerTreeOwnerImpl.cpp">
       <Filter>visual</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utils\VelocityTracker.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\extension\Extension.cpp">
+      <Filter>extension</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
