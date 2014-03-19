@@ -21,7 +21,7 @@
 #include "argb.h"
 #include "tjsUtils.h"
 #include "ThreadIntf.h"
-
+#include "Lanczos.h"
 
 //#define TVP_FORCE_BILINEAR
 
@@ -1658,13 +1658,20 @@ bool tTVPBaseBitmap::StretchBlt(tTVPRect cliprect,
 	if(cr.bottom > h) cr.bottom = h;
 
 	//--- check mode and other conditions
-	if((type == stLinear || type == stCubic) && !hda && opa==255 && method==bmCopy
+	//if((type == stLinear || type == stCubic) && !hda && opa==255 && method==bmCopy
+	if( (type == stLinear || type == stCubic || type == stLanczos2 || type == stLanczos3)
+		&& !hda && opa==255 && method==bmCopy
 		&& dw > 0 && dh > 0 && rw > 0 && rh > 0 &&
 		destrect.left >= cr.left && destrect.top >= cr.top &&
 		destrect.right <= cr.right && destrect.bottom <= cr.bottom)
 	{
 		// takes another routine
-		TVPResampleImage(this, destrect, ref, refrect, type==stLinear?1:2);
+		if( type == stLinear || type == stCubic )
+			TVPResampleImage(this, destrect, ref, refrect, type==stLinear?1:2);
+		else if( type == stLanczos2 )
+			TVPLanczos2(this, destrect, ref, refrect );
+		else
+			TVPLanczos3(this, destrect, ref, refrect );
 		return true;
 	}
 

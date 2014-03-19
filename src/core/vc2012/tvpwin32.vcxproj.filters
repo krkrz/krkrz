@@ -542,6 +542,9 @@
     <ClInclude Include="..\extension\Extension.h">
       <Filter>extension</Filter>
     </ClInclude>
+    <ClInclude Include="..\visual\Lanczos.h">
+      <Filter>visual</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\tjs2\tjs.cpp">
@@ -969,6 +972,9 @@
     </ClCompile>
     <ClCompile Include="..\extension\Extension.cpp">
       <Filter>extension</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\Lanczos.cpp">
+      <Filter>visual</Filter>
     </ClCompile>
     <ClCompile Include="..\visual\LoadJXR.cpp">
       <Filter>visual</Filter>

@@ -62,6 +62,8 @@ enum tTVPBBStretchType
 	stFastLinear = 1, // fast linear interpolation (does not have so much precision)
 	stLinear = 2,  // (strict) linear interpolation
 	stCubic = 3,    // cubic interpolation
+	stLanczos2 = 4,    // Lanczos 2 interpolation
+	stLanczos3 = 5,    // Lanczos 3 interpolation
 
 	stTypeMask = 0xf, // stretch type mask
 	stFlagMask = 0xf0, // flag mask

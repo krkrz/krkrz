@@ -298,6 +298,7 @@
     <ClInclude Include="..\visual\GraphicsLoadThread.h" />
     <ClInclude Include="..\visual\IA32\tvpgl_ia32_intf.h" />
     <ClInclude Include="..\visual\ImageFunction.h" />
+    <ClInclude Include="..\visual\Lanczos.h" />
     <ClInclude Include="..\visual\LayerBitmapImpl.h" />
     <ClInclude Include="..\visual\LayerBitmapIntf.h" />
     <ClInclude Include="..\visual\LayerIntf.h" />
@@ -446,6 +447,7 @@
     <ClCompile Include="..\visual\GraphicsLoadThread.cpp" />
     <ClCompile Include="..\visual\IA32\tvpgl_ia32_intf.c" />
     <ClCompile Include="..\visual\ImageFunction.cpp" />
+    <ClCompile Include="..\visual\Lanczos.cpp" />
     <ClCompile Include="..\visual\LayerBitmapImpl.cpp" />
     <ClCompile Include="..\visual\LayerBitmapIntf.cpp" />
     <ClCompile Include="..\visual\LayerIntf.cpp" />
