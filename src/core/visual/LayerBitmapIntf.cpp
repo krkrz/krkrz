@@ -1659,7 +1659,7 @@ bool tTVPBaseBitmap::StretchBlt(tTVPRect cliprect,
 
 	//--- check mode and other conditions
 	//if((type == stLinear || type == stCubic) && !hda && opa==255 && method==bmCopy
-	if( (type == stLinear || type == stCubic || type == stLanczos2 || type == stLanczos3)
+	if( (type == stLinear || type == stCubic || type == stLanczos2 || type == stLanczos3 )
 		&& !hda && opa==255 && method==bmCopy
 		&& dw > 0 && dh > 0 && rw > 0 && rh > 0 &&
 		destrect.left >= cr.left && destrect.top >= cr.top &&
@@ -1672,6 +1672,7 @@ bool tTVPBaseBitmap::StretchBlt(tTVPRect cliprect,
 			TVPLanczos2(this, destrect, ref, refrect );
 		else
 			TVPLanczos3(this, destrect, ref, refrect );
+
 		return true;
 	}
 
