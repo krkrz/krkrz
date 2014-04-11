@@ -1323,7 +1323,8 @@ void TTVPWindowForm::SetCursorPos(tjs_int x, tjs_int y) {
 }
 
 void TTVPWindowForm::SetHintText(iTJSDispatch2* sender,  const ttstr &text ) {
-	if( HintMessage != text && text.IsEmpty() != true ) {
+	bool updatetext = HintMessage != text;
+	if( updatetext && text.IsEmpty() != true ) {
 		HintMessage.Clear();
 		UpdateHint();
 	}
@@ -1340,7 +1341,7 @@ void TTVPWindowForm::SetHintText(iTJSDispatch2* sender,  const ttstr &text ) {
 		if( HintTimer ) HintTimer->SetEnabled(false);
 		UpdateHint();
 	} else {
-		if( LastHintSender != sender ) {
+		if( LastHintSender != sender || updatetext ) {
 			if( HintDelay > 0 ) {
 				if( HintTimer == NULL ) {
 					HintTimer = new TVPTimer();
