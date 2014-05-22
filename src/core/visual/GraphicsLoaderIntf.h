@@ -111,6 +111,9 @@ extern void TVPLoadERI(void* formatdata, void *callbackdata, tTVPGraphicSizeCall
 	tTVPGraphicScanLineCallback scanlinecallback, tTVPMetaInfoPushCallback metainfopushcallback,
 	tTJSBinaryStream *src, tjs_int keyidx,  tTVPGraphicLoadMode mode);
 
+extern void TVPLoadJXR(void* formatdata, void *callbackdata, tTVPGraphicSizeCallback sizecallback,
+	tTVPGraphicScanLineCallback scanlinecallback, tTVPMetaInfoPushCallback metainfopushcallback,
+	tTJSBinaryStream *src, tjs_int keyidx,  tTVPGraphicLoadMode mode);
 //---------------------------------------------------------------------------
 
 
