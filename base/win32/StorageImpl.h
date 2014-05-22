@@ -153,6 +153,9 @@ public:
 	HRESULT STDMETHODCALLTYPE Stat(STATSTG *pstatstg, DWORD grfStatFlag);
 	HRESULT STDMETHODCALLTYPE Clone(IStream **ppstm);
 
+	void ClearStream() {
+		Stream = NULL;
+	}
 };
 //---------------------------------------------------------------------------
 
