@@ -6,9 +6,9 @@
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
 // 
-// • Redistributions of source code must retain the above copyright notice,
+// ERedistributions of source code must retain the above copyright notice,
 //   this list of conditions and the following disclaimer.
-// • Redistributions in binary form must reproduce the above copyright notice,
+// ERedistributions in binary form must reproduce the above copyright notice,
 //   this list of conditions and the following disclaimer in the documentation
 //   and/or other materials provided with the distribution.
 // 
@@ -2624,7 +2624,9 @@ Int initLookupTables(CWMImageStrCodec* pSC)
     if(pII->oOrientation > O_FLIPVH) // rotated !!
         i =cStrideX, cStrideX = cStrideY, cStrideY = i;
 
-    pSC->m_Dparam->pOffsetX = (size_t *)malloc(w * sizeof(size_t));
+	if( pSC->m_Dparam->pOffsetX == NULL ) {	// fix memory leak T.Imoto
+		pSC->m_Dparam->pOffsetX = (size_t *)malloc(w * sizeof(size_t));
+	}
     if(pSC->m_Dparam->pOffsetX == NULL || w * sizeof(size_t) < w)
         return ICERR_ERROR;
     /*
@@ -2640,7 +2642,9 @@ Int initLookupTables(CWMImageStrCodec* pSC)
     (pSC->m_Dparam->cROIRightX - pSC->m_Dparam->cROILeftX + pSC->m_Dparam->cThumbnailScale) / pSC->m_Dparam->cThumbnailScale / ((pII->cfColorFormat == YUV_420 || pII->cfColorFormat == YUV_422) ? 2 : 1)) - 1 - i : i) * cStrideX;
     }
 
-    pSC->m_Dparam->pOffsetY = (size_t *)malloc(h * sizeof(size_t));
+	if( pSC->m_Dparam->pOffsetY == NULL ) { 	// fix memory leak T.Imoto
+		pSC->m_Dparam->pOffsetY = (size_t *)malloc(h * sizeof(size_t));
+	}
     if(pSC->m_Dparam->pOffsetY == NULL || h * sizeof(size_t) < h)
         return ICERR_ERROR;
     /*
@@ -2813,12 +2817,15 @@ Int StrDecTerm(CWMImageStrCodec* pSC)
             StrIODecTerm(pSC);
 
             // free lookup tables for rotation and flipping
-            if(pSC->m_Dparam->pOffsetX != NULL)
+            if(pSC->m_Dparam->pOffsetX != NULL) {
                 free(pSC->m_Dparam->pOffsetX);
-            if(pSC->m_Dparam->pOffsetY != NULL)
+				pSC->m_Dparam->pOffsetX = NULL;
+			}
+            if(pSC->m_Dparam->pOffsetY != NULL) {
                 free(pSC->m_Dparam->pOffsetY);
+				pSC->m_Dparam->pOffsetY = NULL;
+			}
         }
-
         pSC = pSC->m_pNextSC;
     }
 
@@ -3623,6 +3630,14 @@ Int ImageStrDecTerm(
     PERFTIMER_DELETE(pSC->m_fMeasurePerf, pSC->m_ptEncDecPerf);
     PERFTIMER_DELETE(pSC->m_fMeasurePerf, pSC->m_ptEndToEndPerf);
 
+	// Fix memory leak T.Imoto
+	if( pSC->m_pNextSC ) {
+		//StrDecTerm(pSC->m_pNextSC);
+		//pSC->m_pNextSC->
+		free( pSC->m_pNextSC );
+		pSC->m_pNextSC = NULL;
+	}
+	//
     free(pSC);
 
     return ICERR_OK;
