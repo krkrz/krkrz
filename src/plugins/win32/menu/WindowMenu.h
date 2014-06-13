@@ -69,7 +69,7 @@ public:
 	void Delete( int index );
 
 	void SetCaption( const TCHAR* caption );
-	const TCHAR* GetCaption() const { return menu_item_info_.dwTypeData; }
+	const TCHAR* GetCaption() const;
 
 	HMENU GetHandle() { return hMenu_; }
 	int IndexOf( const WindowMenuItem* item );

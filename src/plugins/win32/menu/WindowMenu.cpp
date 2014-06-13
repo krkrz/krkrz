@@ -225,6 +225,13 @@ void WindowMenuItem::SetCaption( const TCHAR* caption ) {
 	UpdateMenu(false);
 }
 
+const TCHAR* WindowMenuItem::GetCaption() const {
+	if ( (menu_item_info_.fType & MFT_SEPARATOR) != 0 ) {
+		return _T("-");
+	}
+	return menu_item_info_.dwTypeData;
+}
+
 void WindowMenuItem::SetChecked( bool b ) {
 	if( GetRadioItem() ) {
 		if( b ) {
