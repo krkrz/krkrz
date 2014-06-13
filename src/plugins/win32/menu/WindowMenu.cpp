@@ -69,8 +69,9 @@ int WindowMenuItem::GetMenuIndex() const {
 }
 void WindowMenuItem::SetMenuIndex( int index ) {
 	if( GetMenuIndex() != index ) {
-		parent_->Remove( this, false );
-		parent_->Insert( index, this );
+		WindowMenuItem *parent = parent_;
+		parent->Remove( this, false );
+		parent->Insert( index, this );
 	}
 }
 
