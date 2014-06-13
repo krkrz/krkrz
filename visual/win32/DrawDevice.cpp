@@ -97,8 +97,10 @@ bool tTVPDrawDevice::TransformToPrimaryLayerManager(tjs_real &x, tjs_real &y)
 	if(!manager->GetPrimaryLayerSize(pl_w, pl_h)) return false;
 
 	// x , y ‚Í DestRect ‚Ì 0, 0 ‚ğŒ´“_‚Æ‚µ‚½À•W‚Æ‚µ‚Ä“n‚³‚ê‚Ä‚«‚Ä‚¢‚é
-	x = pl_w ? (x * DestRect.get_width()  / pl_w) : 0.0;
-	y = pl_h ? (y * DestRect.get_height() / pl_h) : 0.0;
+	tjs_int w = DestRect.get_width();
+	tjs_int h = DestRect.get_height();
+	x = w ? (x * pl_w / w) : 0.0;
+	y = h ? (y * pl_h / h) : 0.0;
 
 	return true;
 }
