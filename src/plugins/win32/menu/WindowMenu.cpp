@@ -154,6 +154,9 @@ void WindowMenuItem::Add( WindowMenuItem* item ) {
 	if( AddSubMenu() ) {
 		UpdateMenu();
 	}
+	if( item->GetChecked() && item->GetRadioItem() ) {
+		CheckRadioItem( item );
+	}
 	UpdateChildren();
 }
 void WindowMenuItem::Insert( int index, WindowMenuItem* item ) {
@@ -166,6 +169,9 @@ void WindowMenuItem::Insert( int index, WindowMenuItem* item ) {
 	children_.insert( it, item );
 	if( AddSubMenu() ) {
 		UpdateMenu();
+	}
+	if( item->GetChecked() && item->GetRadioItem() ) {
+		CheckRadioItem( item );
 	}
 	UpdateChildren();
 }
@@ -221,8 +227,12 @@ void WindowMenuItem::SetCaption( const TCHAR* caption ) {
 
 void WindowMenuItem::SetChecked( bool b ) {
 	if( GetRadioItem() ) {
-		if( b && parent_ ) {
-			parent_->CheckRadioItem( this );
+		if( b ) {
+			if( parent_ ) {
+				parent_->CheckRadioItem( this );
+			} else {
+				menu_item_info_.fState |= MFS_CHECKED;
+			}
 		} else {
 			menu_item_info_.fState &= ~MFS_CHECKED;
 		}
