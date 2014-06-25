@@ -102,7 +102,7 @@ void replace_regex( tTJSVariant **param, tjs_int numparams, tTJSNI_RegExp *_this
 				// call the callback function descripted as param[1]
 				tTJSVariant result;
 				tjs_error hr;
-				iTJSDispatch2 *array = tTJSNC_RegExp::GetResultArray( true, target, _this, region );
+				iTJSDispatch2 *array = tTJSNC_RegExp::GetResultArray( true, s, _this, region );
 				tTJSVariant arrayval(array, array);
 				tTJSVariant *param = &arrayval;
 				array->Release();
@@ -639,7 +639,7 @@ void tTJSNC_RegExp::Compile(tjs_int numparams, tTJSVariant **param, tTJSNI_RegEx
 	_this->Flags = flags;
 }
 //---------------------------------------------------------------------------
-bool tTJSNC_RegExp::Match(OnigRegion* region, ttstr target, tTJSNI_RegExp *_this)
+bool tTJSNC_RegExp::Match(OnigRegion* region, const ttstr &target, tTJSNI_RegExp *_this)
 {
 	tjs_uint searchstart;
 	tjs_uint targlen = target.GetLen();
@@ -657,7 +657,7 @@ bool tTJSNC_RegExp::Match(OnigRegion* region, ttstr target, tTJSNI_RegExp *_this
 	return r >= 0;
 }
 //---------------------------------------------------------------------------
-bool tTJSNC_RegExp::Exec(OnigRegion* region, ttstr target, tTJSNI_RegExp *_this)
+bool tTJSNC_RegExp::Exec(OnigRegion* region, const ttstr &target, tTJSNI_RegExp *_this)
 {
 	bool matched = tTJSNC_RegExp::Match( region, target, _this);
 	iTJSDispatch2 *array = tTJSNC_RegExp::GetResultArray(matched, target, _this, region );
@@ -696,7 +696,7 @@ bool tTJSNC_RegExp::Exec(OnigRegion* region, ttstr target, tTJSNI_RegExp *_this)
 	return matched;
 }
 //---------------------------------------------------------------------------
-iTJSDispatch2 * tTJSNC_RegExp::GetResultArray( bool matched, const ttstr& target, tTJSNI_RegExp *_this, const OnigRegion* region ) {
+iTJSDispatch2 * tTJSNC_RegExp::GetResultArray( bool matched, const tjs_char *target, tTJSNI_RegExp *_this, const OnigRegion* region ) {
 	iTJSDispatch2 *array = TJSCreateArrayObject();
 	if( matched ) {
 		//if(_this->RegEx->.empty()) {
@@ -708,7 +708,7 @@ iTJSDispatch2 * tTJSNC_RegExp::GetResultArray( bool matched, const ttstr& target
 			try {
 				for( tjs_uint i = 0; i < size; i++ ) {
 					tTJSVariant val;
-					val = ttstr( target.c_str()+(region->beg[i]/sizeof(tjs_char)), (region->end[i] - region->beg[i])/sizeof(tjs_char) );
+					val = ttstr( target+(region->beg[i]/sizeof(tjs_char)), (region->end[i] - region->beg[i])/sizeof(tjs_char) );
 					array->PropSetByNum(TJS_MEMBERENSURE|TJS_IGNOREPROP, i, &val, array);
 				}
 			} catch(...) {
