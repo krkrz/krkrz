@@ -12,69 +12,62 @@
 
 #include "MenuItemIntf.h"
 
+extern iTJSDispatch2* textToKeycodeMap;
+extern iTJSDispatch2* keycodeToTextList;
 
-static TCHAR tempKeyText[32];
-static const wchar_t* ShortCutKeyCode( int key ) {
-	/*
-	switch( key ) {
-	case 0x08: return L"BkSp";
-	case 0x09: return L"Tab";
-	case 0x0D: return L"Enter";
-	case 0x1B: return L"Esc";
-	}
-	*/
-	int code = (::MapVirtualKey( key, 0 )<<16)|(1<<25);
-	if( ::GetKeyNameText( code, tempKeyText, 32 ) > 0 ) {
-		return tempKeyText;
-	}
-	return NULL;
-}
-static int TextToShortCut( const wchar_t* text ) {
+static int TextToShortCut( ttstr text ) {
+	// ignore case
+	text.ToLowerCase();
+
 	int virt = 0;
-	const wchar_t* tail = text;
+	const wchar_t* top  = text.c_str();
+	const wchar_t* tail = top;
 	const wchar_t* ret = NULL;
-	if( (ret = wcsstr( text, L"Shift+" )) != NULL ) {
+	if( (ret = wcsstr( top, L"shift+" )) != NULL ) {
 		virt |= FSHIFT;
 		if( tail < (ret + 6) ) tail = (ret + 6);
 	}
-	if( (ret = wcsstr( text, L"Ctrl+" )) != NULL ) {
+	if( (ret = wcsstr( top, L"ctrl+" )) != NULL ) {
 		virt |= FCONTROL;
 		if( tail < (ret + 5) ) tail = (ret + 5);
 	}
-	if( (ret = wcsstr( text, L"Alt+" )) != NULL ) {
+	if( (ret = wcsstr( top, L"alt+" )) != NULL ) {
 		virt |= FALT;
 		if( tail < (ret + 4) ) tail = (ret + 4);
 	}
-	text = tail;
-	for( int k = 8; k <= 255; k++ ) {
-		const wchar_t* name = ShortCutKeyCode(k);
-		if( name != NULL && wcscmp( text, name ) == 0 ) {
+	iTJSDispatch2 *dict = textToKeycodeMap;
+	if( dict ) {
+		tTJSVariant var;
+		if( TJS_SUCCEEDED(dict->PropGet(0, tail, NULL, &var, dict)) ) {
 			virt |= FVIRTKEY;
-			return (virt << 16) | k;
+			return (virt << 16) | (var.operator tjs_int() & 0xFFFF);
 		}
 	}
 	return (virt << 16);
 }
 static ttstr ShortCutToText( int key ) {
-	std::wstring str;
+	ttstr str;
 	int virt = key >> 16;
 	if( virt & FSHIFT ) {
-		str += L"Shift+";
+		str += TJS_W("Shift+");
 	}
 	if( virt & FCONTROL ) {
-		str += L"Ctrl+";
+		str += TJS_W("Ctrl+");
 	}
 	if( virt & FALT ) {
-		str += L"Alt+";
+		str += TJS_W("Alt+");
 	}
 	key &= 0xFFFF;
 	if( key >= 8 && key <= 255 ) {
-		const wchar_t* name = ShortCutKeyCode(key);
-		if( name != NULL ) {
-			str += std::wstring(name);
+		iTJSDispatch2 *array = keycodeToTextList;
+		if( array ) {
+			tTJSVariant var;
+			if( TJS_SUCCEEDED(array->PropGetByNum(0, key, &var, array)) ) {
+				str += var.GetString();
+			}
 		}
 	}
-	return ttstr(str.c_str()); 
+	return str;
 }
 
 extern const tjs_char* TVPSpecifyWindow;
@@ -920,6 +913,32 @@ TJS_BEGIN_NATIVE_PROP_DECL(HMENU)
 }
 TJS_END_NATIVE_PROP_DECL(HMENU)
 //---------------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(textToKeycode)
+{
+	TJS_BEGIN_NATIVE_PROP_GETTER
+	{
+		if (result) *result = tTJSVariant(textToKeycodeMap, textToKeycodeMap);
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_GETTER
+
+	TJS_DENY_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_STATIC_PROP_DECL(textToKeycode)
+//---------------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(keycodeToText)
+{
+	TJS_BEGIN_NATIVE_PROP_GETTER
+	{
+		if (result) *result = tTJSVariant(keycodeToTextList, keycodeToTextList);
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_GETTER
+
+	TJS_DENY_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_STATIC_PROP_DECL(keycodeToText)
+//----------------------------------------------------------------------
 //----------------------------------------------------------------------
 
 	TJS_END_NATIVE_MEMBERS

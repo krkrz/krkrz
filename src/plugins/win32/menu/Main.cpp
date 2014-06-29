@@ -110,6 +110,60 @@ class WindowMenuProperty : public tTJSDispatch {
 		return TJS_E_ACCESSDENYED;
 	}
 } *gWindowMenuProperty;
+
+/**
+ * キーコード文字列辞書／配列生成
+ */
+iTJSDispatch2* textToKeycodeMap = NULL;
+iTJSDispatch2* keycodeToTextList = NULL;
+static void ReleaseShortCutKeyCodeTable() {
+	if( textToKeycodeMap ) textToKeycodeMap->Release();
+	if( keycodeToTextList ) keycodeToTextList->Release();
+	textToKeycodeMap = NULL;
+	keycodeToTextList = NULL;
+}
+bool SetShortCutKeyCode(ttstr text, int key, bool force) {
+	tTJSVariant vtext(text);
+	tTJSVariant vkey(key);
+
+	text.ToLowerCase();
+	if( TJS_FAILED(textToKeycodeMap->PropSet(TJS_MEMBERENSURE, text.c_str(), NULL, &vkey, textToKeycodeMap)) )
+		return false;
+	if( force == false ) {
+		tTJSVariant var;
+		keycodeToTextList->PropGetByNum(0, key, &var, keycodeToTextList);
+		if( var.Type() == tvtString ) return true;
+	}
+	return TJS_SUCCEEDED(keycodeToTextList->PropSetByNum(TJS_MEMBERENSURE, key, &vtext, keycodeToTextList));
+}
+static void CreateShortCutKeyCodeTable() {
+	textToKeycodeMap = TJSCreateDictionaryObject();
+	keycodeToTextList = TJSCreateArrayObject();
+	if( textToKeycodeMap == NULL || keycodeToTextList == NULL ) return;
+
+	TCHAR tempKeyText[32];
+	for( int key = 8; key <= 255; key++ ) {
+		int code = (::MapVirtualKey( key, 0 )<<16)|(1<<25);
+		if( ::GetKeyNameText( code, tempKeyText, 32 ) > 0 ) {
+			ttstr text(tempKeyText);
+			// NumPadキー特殊処理
+			if( TJS_strnicmp(text.c_str(), TJS_W("Num "), 4) == 0 ) {
+				bool numpad = ( key >= VK_NUMPAD0 && key <= VK_DIVIDE );
+				if( !numpad && ::GetKeyNameText( code|(1<<24), tempKeyText, 32 ) > 0 ) {
+					text = tempKeyText;
+				}
+			}
+			SetShortCutKeyCode(text, key, true);
+		}
+	}
+
+	// 吉里吉里２互換用ショートカット文字列
+	SetShortCutKeyCode(TJS_W("BkSp"), VK_BACK, false);
+	SetShortCutKeyCode(TJS_W("PgUp"), VK_PRIOR, false);
+	SetShortCutKeyCode(TJS_W("PgDn"), VK_NEXT, false);
+}
+
+
 //---------------------------------------------------------------------------
 int WINAPI DllEntryPoint(HINSTANCE hinst, unsigned long reason, void* lpReserved) {
 	return 1;
@@ -122,6 +176,8 @@ extern "C" __declspec(dllexport) HRESULT _stdcall V2Link(iTVPFunctionExporter *e
 
 	// スタブの初期化(必ず記述する)
 	TVPInitImportStub(exporter);
+
+	CreateShortCutKeyCodeTable();
 
 	tTJSVariant val;
 
@@ -205,6 +261,8 @@ extern "C" __declspec(dllexport) HRESULT _stdcall V2Unlink()
 
 	// - global を Release する
 	if(global) global->Release();
+
+	ReleaseShortCutKeyCodeTable();
 
 	// スタブの使用終了(必ず記述する)
 	TVPUninitImportStub();
