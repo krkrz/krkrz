@@ -329,7 +329,7 @@ void tTJSNI_MenuItem::OnClick(void)
 
 	// fire event
 	static ttstr eventname(TJS_W("onClick"));
-	TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 0, NULL);
+	TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_NORMAL, 0, NULL);
 }
 //---------------------------------------------------------------------------
 tTJSNI_MenuItem * tTJSNI_MenuItem::GetRootMenuItem() const
