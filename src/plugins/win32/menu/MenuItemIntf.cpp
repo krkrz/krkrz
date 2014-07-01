@@ -497,12 +497,24 @@ void tTJSNI_MenuItem::SetVisible(bool b)
 {
 	if(!MenuItem) return;
 	if(OwnerWindow) {
-		if( !b ) {
-			::SetMenu( HWnd, NULL );
+		bool update = false;
+		if( GetVisible() ) {
+			if( !b ) {
+				::SetMenu( HWnd, NULL );
+				update = true;
+			}
 		} else {
-			::SetMenu( HWnd, GetRootMenuItem()->GetMenuItemHandleForPlugin() );
+			if( b ) {
+				::SetMenu( HWnd, GetRootMenuItem()->GetMenuItemHandleForPlugin() );
+				update = true;
+			}
 		}
-		// Window->SetMenuBarVisible(b); 
+		// Window->SetMenuBarVisible(b);
+
+		// redraw window
+		if( update ) {
+			::RedrawWindow( HWnd, NULL, NULL, RDW_NOERASE | RDW_INVALIDATE | RDW_UPDATENOW );
+		}
 	} else {
 		MenuItem->SetVisible( b );
 	}
