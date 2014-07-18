@@ -1913,6 +1913,18 @@ bool tTJSNI_Window::GetEnableTouch() const
 	return Form->GetEnableTouch();
 }
 //---------------------------------------------------------------------------
+void tTJSNI_Window::SetIgnoreTouchMouse( bool b )
+{
+	if(!Form) return;
+	Form->SetIgnoreTouchMouse(b);
+}
+//---------------------------------------------------------------------------
+bool tTJSNI_Window::GetIgnoreTouchMouse() const
+{
+	if(!Form) return 0;
+	return Form->GetIgnoreTouchMouse();
+}
+//---------------------------------------------------------------------------
 int tTJSNI_Window::GetDisplayOrientation()
 {
 	if(!Form) return orientUnknown;
@@ -2317,6 +2329,27 @@ TJS_BEGIN_NATIVE_PROP_DECL(enableTouch)
 	TJS_END_NATIVE_PROP_SETTER
 }
 TJS_END_NATIVE_PROP_DECL_OUTER(cls, enableTouch)
+//---------------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(ignoreTouchMouse)
+{
+	TJS_BEGIN_NATIVE_PROP_GETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
+		*result = _this->GetIgnoreTouchMouse()?1:0;
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_GETTER
+
+	TJS_BEGIN_NATIVE_PROP_SETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
+		_this->SetIgnoreTouchMouse( ((tjs_int)*param) ? true : false );
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_PROP_DECL_OUTER(cls, ignoreTouchMouse)
+//---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 TJS_BEGIN_NATIVE_PROP_DECL(displayOrientation)
 {
