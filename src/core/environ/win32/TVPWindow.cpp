@@ -16,6 +16,12 @@
 #include "UserEvent.h"
 #include "TickCount.h"
 
+
+// touch mouse message extraInfo (cf. http://msdn.microsoft.com/en-us/library/windows/desktop/ms703320(v=vs.85).aspx )
+#define MI_WP_SIGNATURE (0xFF515700)
+#define SIGNATURE_MASK  (0xFFFFFF00)
+#define IsTouchEvent(dw) (((dw) & SIGNATURE_MASK) == MI_WP_SIGNATURE)
+
 tTVPWindow::~tTVPWindow() {
 	if( ime_control_ ) delete ime_control_;
 	::SetWindowLongPtr( window_handle_, GWLP_WNDPROC, (LONG_PTR)::DefWindowProc );
@@ -73,29 +79,37 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		OnMouseMove( GetShiftState(wParam), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
 		return 0;
 
-	case WM_LBUTTONDOWN:
-		if( ignore_touch_mouse_ == false ) {
+	case WM_LBUTTONDOWN: {
+		bool touch = IsTouchEvent( ::GetMessageExtraInfo() );
+		if( touch == false || ignore_touch_mouse_ == false ) {
 			left_double_click_ = false;
+			if( touch != false ) left_touch_down_ = true;
 			OnMouseDown( mbLeft, GetShiftState(wParam), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
 		}
 		return 0;
-	case WM_LBUTTONUP:
-		if( ignore_touch_mouse_ == false ) {
+	}
+	case WM_LBUTTONUP: {
+		bool touch = IsTouchEvent( ::GetMessageExtraInfo() );
+		if( touch == false || ignore_touch_mouse_ == false || left_touch_down_ != false ) {
 			if( left_double_click_ == false ) {
 				OnMouseClick( mbLeft, GetShiftState(wParam), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
 			}
 			left_double_click_ = false;
+			if( touch != false ) left_touch_down_ = false;
 			OnMouseUp( mbLeft, GetShiftState(wParam), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) ); 
 		}
-		ignore_touch_mouse_ = false;
 		return 0;
-	case WM_LBUTTONDBLCLK:
-		if( ignore_touch_mouse_ == false ) {
+	}
+	case WM_LBUTTONDBLCLK: {
+		bool touch = IsTouchEvent( ::GetMessageExtraInfo() );
+		if( touch == false || ignore_touch_mouse_ == false ) {
 			left_double_click_ = true;
+			if( touch != false ) left_touch_down_ = true;
 			OnMouseDoubleClick( mbLeft, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
 			OnMouseDown( mbLeft, GetShiftState(wParam), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
 		}
 		return 0;
+	}
 
 	case WM_RBUTTONDOWN:
 		OnMouseDown( mbRight, GetShiftState(wParam), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
@@ -179,7 +193,6 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 								OnTouchUp( vx, vy, cx, cy, pInputs[i].dwID, tick );
 							}
 						}
-						ignore_touch_mouse_ = true;
 						if( !procCloseTouchInputHandle((HTOUCHINPUT)lParam) ) {
 							// error handling
 							TVPThrowWindowsErrorException();
@@ -413,6 +426,8 @@ HRESULT tTVPWindow::CreateWnd( const std::wstring& classname, const std::wstring
 		if( (value & (NID_MULTI_INPUT|NID_READY)) == (NID_MULTI_INPUT|NID_READY) ) {
 			// マルチタッチサポート & 準備できている
 			procRegisterTouchWindow( window_handle_, REGISTER_TOUCH_FLAG );
+			// タッチマウスを無視
+			SetIgnoreTouchMouse( true );
 		}
 	}
 	return S_OK;

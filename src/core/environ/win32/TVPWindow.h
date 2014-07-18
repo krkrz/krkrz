@@ -64,6 +64,7 @@ protected:
 	static const ULONG REGISTER_TOUCH_FLAG;
 
 	bool left_double_click_;
+	bool left_touch_down_;
 
 	ImeControl* ime_control_;
 
@@ -132,7 +133,7 @@ protected:
 	static bool HasMenu( HWND hWnd );
 public:
 	tTVPWindow()
-	: window_handle_(NULL), created_(false), left_double_click_(false), ime_control_(NULL), border_style_(0), modal_result_(0),
+	: window_handle_(NULL), created_(false), left_double_click_(false), left_touch_down_(false), ime_control_(NULL), border_style_(0), modal_result_(0),
 		in_window_(false), ignore_touch_mouse_(false), in_mode_(false) {
 		min_size_.cx = min_size_.cy = 0;
 		max_size_.cx = max_size_.cy = 0;
@@ -254,6 +255,9 @@ public:
 	void Close();
 
 	void GetClientRect( struct tTVPRect& rt );
+
+	bool GetIgnoreTouchMouse() const { return ignore_touch_mouse_; }
+	void SetIgnoreTouchMouse( bool b ) { ignore_touch_mouse_ = b; }
 
 	// メッセージハンドラ
 	virtual void OnActive( HWND preactive ) {}
