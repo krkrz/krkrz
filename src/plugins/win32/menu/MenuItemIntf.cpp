@@ -76,6 +76,17 @@ static ttstr ShortCutToText( int key ) {
 	}
 	return ttstr(str.c_str()); 
 }
+static ttstr MakeCaptionWithShortCut( ttstr const &caption, int key ) {
+	if( caption == TJS_W("-") ) return caption;
+
+	ttstr shortcut( ShortCutToText( key ) );
+	if( shortcut.IsEmpty() ) return caption;
+
+	const wchar_t *text = caption.c_str();
+	const wchar_t *tab  = wcschr( text, L'\t' );
+	return ( (tab != NULL) ? ttstr( text, tab-text ) : ttstr( caption ) ) + TJS_W("\t") + shortcut;
+}
+
 
 extern const tjs_char* TVPSpecifyWindow;
 extern const tjs_char* TVPSpecifyMenuItem;
@@ -424,13 +435,13 @@ void tTJSNI_MenuItem::SetCaption(const ttstr & caption)
 	if(!MenuItem) return;
 	Caption = caption;
 	//MenuItem->AutoHotkeys = maManual;
-	MenuItem->SetCaption( caption.c_str() );
+	MenuItem->SetCaption( MakeCaptionWithShortCut( caption, MenuItem->GetShortCut() ).c_str() );
 }
 //---------------------------------------------------------------------------
 void tTJSNI_MenuItem::GetCaption(ttstr & caption) const
 {
 	if(!MenuItem) caption.Clear();
-	caption = MenuItem->GetCaption();
+	else caption = Caption; //MenuItem->GetCaption();
 }
 //---------------------------------------------------------------------------
 void tTJSNI_MenuItem::SetChecked(bool b)
@@ -484,7 +495,8 @@ bool tTJSNI_MenuItem::GetRadio() const
 void tTJSNI_MenuItem::SetShortcut(const ttstr & shortcut)
 {
 	if(!MenuItem) return;
-	 MenuItem->SetShortCut( TextToShortCut(shortcut.c_str()) );
+	MenuItem->SetShortCut( TextToShortCut(shortcut.c_str()) );
+	MenuItem->SetCaption( MakeCaptionWithShortCut( Caption, MenuItem->GetShortCut() ).c_str() );
 }
 //---------------------------------------------------------------------------
 void tTJSNI_MenuItem::GetShortcut(ttstr & shortcut) const
