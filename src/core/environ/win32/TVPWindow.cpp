@@ -386,7 +386,12 @@ HRESULT tTVPWindow::CreateWnd( const std::wstring& classname, const std::wstring
 
 	RECT	winRc = { 0, 0, window_client_size_.cx, window_client_size_.cy };
 	::AdjustWindowRectEx( &winRc, WS_OVERLAPPEDWINDOW, NULL, DEFAULT_EX_STYLE );
-	window_handle_ = ::CreateWindowEx( DEFAULT_EX_STYLE, window_class_name_.c_str(), window_title_.c_str(),
+	DWORD exStyle = DEFAULT_EX_STYLE;
+	if( hParent ) {
+		exStyle |= WS_EX_CONTROLPARENT;
+		has_parent_ = true;
+	}
+	window_handle_ = ::CreateWindowEx( exStyle, window_class_name_.c_str(), window_title_.c_str(),
 						WS_OVERLAPPEDWINDOW|WS_CLIPCHILDREN, CW_USEDEFAULT, CW_USEDEFAULT, winRc.right-winRc.left, winRc.bottom-winRc.top,
 						hParent, NULL, wc.hInstance, NULL );
 	
@@ -520,6 +525,9 @@ void tTVPWindow::SetBorderStyle(tTVPBorderStyle st) {
 	style &= ~notStyle;
 	DWORD exStyle = ::GetWindowLong( GetHandle(), GWL_EXSTYLE);
 	exStyle &= ~DEFAULT_EX_STYLE;
+	if( has_parent_ ) {
+		exStyle |= WS_EX_CONTROLPARENT;
+	}
 	border_style_ = static_cast<int>(st);
 	switch( st ) {
 	case bsDialog:
@@ -532,7 +540,12 @@ void tTVPWindow::SetBorderStyle(tTVPBorderStyle st) {
 		break;
 	case bsNone:
 		style |= WS_POPUP;
-		style |= WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU;
+		style |= WS_MINIMIZEBOX;
+		if( has_parent_ ) {
+			exStyle |= WS_EX_TOOLWINDOW; // taskbar unlist
+		} else {
+			style |= WS_SYSMENU; // taskbar right click menu
+		}
 		break;
 	case bsSizeable:
 		style |= WS_CAPTION | WS_THICKFRAME;
