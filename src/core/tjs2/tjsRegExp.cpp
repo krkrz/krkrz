@@ -35,7 +35,7 @@ static tjs_uint32 TJSRegExpFlagToValue(tjs_char ch, tjs_uint32 prev)
 	// when ch is '\0', returns default flag value and prev is ignored.
 
 	if(ch == 0) {
-		return ONIG_OPTION_DEFAULT|ONIG_OPTION_CAPTURE_GROUP;
+		return ONIG_OPTION_DEFAULT|ONIG_OPTION_CAPTURE_GROUP|ONIG_OPTION_FIND_NOT_EMPTY;
 	}
 
 	switch(ch)
