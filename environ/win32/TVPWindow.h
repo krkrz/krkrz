@@ -58,6 +58,8 @@ protected:
 	bool in_mode_;
 	int modal_result_;
 
+	bool has_parent_;
+
 	static const UINT SIZE_CHANGE_FLAGS;
 	static const UINT POS_CHANGE_FLAGS;
 	static const DWORD DEFAULT_EX_STYLE;
@@ -133,7 +135,7 @@ protected:
 public:
 	tTVPWindow()
 	: window_handle_(NULL), created_(false), left_double_click_(false), ime_control_(NULL), border_style_(0), modal_result_(0),
-		in_window_(false), ignore_touch_mouse_(false), in_mode_(false) {
+		in_window_(false), ignore_touch_mouse_(false), in_mode_(false), has_parent_(false) {
 		min_size_.cx = min_size_.cy = 0;
 		max_size_.cx = max_size_.cy = 0;
 	}
