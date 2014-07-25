@@ -75,6 +75,7 @@ class Scripts {
 
 	/**
 	 * TJSDoRehash()を呼ぶ
+	 * @description
 	 * TJSCustomObjectベースのオブジェクトのハッシュテーブルサイズの再構築フラグを立てます。
 	 * （辞書やほとんどのクラスおよびインスタンスのオブジェクトが対象になります）
 	 *

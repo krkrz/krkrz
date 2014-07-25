@@ -3,7 +3,7 @@
  */
 
 /**
- * OLE を操作できるオブジェクトを生成します。
+ * @description OLE を操作できるオブジェクトを生成します。
  * OLE が IDispatch で持つメソッドを直接呼び出すことができます。
  */
 class WIN32OLE {
@@ -17,7 +17,7 @@ class WIN32OLE {
     /**
      * メソッドの実行
      * @param name メソッド名
-     * 以下パラメータ
+     * @param ... 以下パラメータ
      */
     function invoke(name, ...);
 
@@ -53,7 +53,7 @@ class WIN32OLE {
 };
 
 /**
- * ActiveX を操作できるオブジェクトを生成します。
+ * @description ActiveX を操作できるオブジェクトを生成します。
  * ActiveX が IDispatch で持つメソッドを直接呼び出すことができます。
  */
 class ActiveX extends WIN32OLE {
@@ -86,7 +86,7 @@ class ActiveX extends WIN32OLE {
 
     /**
      * 拡張UI指定
-	 * IEコンポーネントでのみ意味を持ちます。現在の版では、これ呼び出すことで
+	 * @description IEコンポーネントでのみ意味を持ちます。現在の版では、これ呼び出すことで
 	 * コンテキストメニューが抑制されます。
 	 */
 	function setExternalUI();
@@ -125,7 +125,7 @@ class ActiveX extends WIN32OLE {
 
 	/**
 	 * ウインドウ生成完了後に呼び出されるイベント
-	 * 初期生成時やフルスクリーン処理などでウインドウが生成された後に呼ばれます
+	 * @description 初期生成時やフルスクリーン処理などでウインドウが生成された後に呼ばれます
 	 * 再構築後は、登録されていたイベントはすべて破棄される他、その他もろもろが
 	 * 初期化されるので、このイベント内で必要なものを再設定する必要があります。
 	 */
@@ -133,7 +133,7 @@ class ActiveX extends WIN32OLE {
 
 	/**
 	 * ウインドウ破棄前に呼び出されるイベント
-	 * フルスクリーン処理やオブジェクトの破棄などでウインドウが破棄される前に呼ばれます。
+	 * @description フルスクリーン処理やオブジェクトの破棄などでウインドウが破棄される前に呼ばれます。
 	 */
 	function onDestroy();
 

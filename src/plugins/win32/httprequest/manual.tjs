@@ -2,7 +2,7 @@
 
 /**
  * HttpRequestクラス
- * HTTP/HTTPS による非同期通信機能を提供します。
+ * @description HTTP/HTTPS による非同期通信機能を提供します。
  * ファイルの送受信処理はバックグラウンド実行されます。
  */
 class HttpRequest {
@@ -18,7 +18,7 @@ class HttpRequest {
 
 	/**
 	 * 指定したメソッドで指定URLにリクエストする
-	 * ※常に非同期での呼び出しになります
+	 * @description ※常に非同期での呼び出しになります
 	 * @param method アクセスメソッド
 	 * @param url リクエスト先のURL
 	 * @param userName ユーザ名。指定すると認証ヘッダをつけます
@@ -38,7 +38,7 @@ class HttpRequest {
 
 	/**
 	 * リクエストの送信。送信処理は非同期実行されます。
-	 * エラー時も例外は発生しませんので、readyState と status で判定してください。
+	 * @description エラー時も例外は発生しませんので、readyState と status で判定してください。
 	 * @param data 送信するデータ
 	 * octetの場合  : そのまま送信
 	 * 文字列の場合 : 規定のエンコードで処理して送信
@@ -52,7 +52,7 @@ class HttpRequest {
 	
 	/**
 	 * リクエストの送信。送受信は非同期実行されます。
-	 * エラー時も例外は発生しませんので、readyState と status で判定してください。
+	 * @description エラー時も例外は発生しませんので、readyState と status で判定してください。
 	 * @param storage 送信するファイルデータ
 	 * @param storeStrorage レスポンス保存先ファイル。指定された場合はプロパティ responseは 設定されません
 	 * @throw "not open" openされていない
@@ -86,11 +86,16 @@ class HttpRequest {
 	 */
 	function getResponseText(encoding=void);
 
-	UNINITIALIZED = 0; ///< readyState 初期状態
-	OPEN = 1;          ///< readyState 処理開始
-	SENT = 2;          ///< readyState リクエスト送信
-	RECEIVING = 3;     ///< readyState 受信中
-	LOADED = 4;        ///< readyState 読み込み完了
+	// readyState 初期状態
+	const UNINITIALIZED = 0;
+	// readyState 処理開始
+	const OPEN = 1;
+	// readyState リクエスト送信
+	const SENT = 2;
+	// readyState 受信中
+	const RECEIVING = 3;
+	// readyState 読み込み完了
+	const LOADED = 4;
 	
 	/**
 	 * 通信状態。読み込み専用
@@ -131,14 +136,14 @@ class HttpRequest {
 
 	/**
 	 * レスポンスの Content-Type のエンコード指定
-	 * ヘッダの指定が優先されますが、未指定、かつ受信データが text/html の場合は
+	 * @description ヘッダの指定が優先されますが、未指定、かつ受信データが text/html の場合は
 	 * ファイル冒頭にある META 指定も参照します。
 	 */
 	property contentTypeEncoding;
 
 	/**
 	 * レスポンスの Content-Length
-	 * ヘッダに無い場合はファイルダウンロード完了後にサイズ確定します。
+	 * @description ヘッダに無い場合はファイルダウンロード完了後にサイズ確定します。
 	 */
 	property contentLength;
 	

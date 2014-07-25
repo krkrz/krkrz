@@ -28,27 +28,32 @@ class BinaryStream
 	 * データを書き込む
 	 * @param data 書き込むデータ（octet形式または文字列）
 	 * @return     書き込んだバイト数
-	 *
-	 * dataが文字列の場合は wchar で書き込まれます（コード変換はサポートされません）
+	 * @description dataが文字列の場合は wchar で書き込まれます（コード変換はサポートされません）
 	 */
 	function write(data);
 
 	/**
 	 * {1,2,4,8}バイトを数値として読み込む
 	 * @return     読み込んだ数値 / 終端などで読めなかった場合はvoid
-	 * ※数値は8byte以外はunsigned読み込みになります（符号拡張されません）
+	 * @description ※数値は8byte以外はunsigned読み込みになります（符号拡張されません）
 	 * ※voidを返すのは1byteも読めなかった場合のみとなります
 	 *   1byte以上指定byte未満しか読めなかった場合は足りない部分を0で埋めた値が返されるので注意
 	 */
-	function readI8();			//< 1byte 読み込み
+	function readI8();			// 1byte 読み込み
 
-	function readI16LE();		//< 2byte 読み込み (Little Endian)
-	function readI32LE();		//< 4byte 読み込み (Little Endian)
-	function readI64LE();		//< 8byte 読み込み (Little Endian)
+	// 2byte 読み込み (Little Endian)
+	function readI16LE();
+	// 4byte 読み込み (Little Endian)
+	function readI32LE();
+	// 8byte 読み込み (Little Endian)
+	function readI64LE();
 
-	function readI16BE();		//< 2byte 読み込み (Big Endian)
-	function readI32BE();		//< 4byte 読み込み (Big Endian)
-	function readI64BE();		//< 8byte 読み込み (Big Endian)
+	// 2byte 読み込み (Big Endian)
+	function readI16BE();
+	// 4byte 読み込み (Big Endian)
+	function readI32BE();
+	// 8byte 読み込み (Big Endian)
+	function readI64BE();
 
 
 	/**
@@ -58,13 +63,19 @@ class BinaryStream
 	 */
 	function writeI8(num);			//< 1byte 書き込み
 
-	function writeI16LE(num);		//< 2byte 書き込み (Little Endian)
-	function writeI32LE(num);		//< 4byte 書き込み (Little Endian)
-	function writeI64LE(num);		//< 8byte 書き込み (Little Endian)
+	// 2byte 書き込み (Little Endian)
+	function writeI16LE(num);
+	// 4byte 書き込み (Little Endian)
+	function writeI32LE(num);
+	// 8byte 書き込み (Little Endian)
+	function writeI64LE(num);
 
-	function writeI16BE(num);		//< 2byte 書き込み (Big Endian)
-	function writeI32BE(num);		//< 4byte 書き込み (Big Endian)
-	function writeI64BE(num);		//< 8byte 書き込み (Big Endian)
+	// 2byte 書き込み (Big Endian)
+	function writeI16BE(num);
+	// 4byte 書き込み (Big Endian)
+	function writeI32BE(num);
+	// 8byte 書き込み (Big Endian)
+	function writeI64BE(num);
 
 	/**
 	 * 別のストレージからデータをコピー
@@ -83,8 +94,7 @@ class BinaryStream
 	 *        read    :[out]読み込んだバイト数
 	 *        digest  :[out]書き込んだデータのMD5ダイジェスト（octet） ※md5がtrueの場合にのみ有効
 	 * @return              書き込んだバイト数
-	 *
-	 * 対象ストレージのoffsetからlength分の内容が，現在のストリームのポジションから書き込まれます
+	 * @description 対象ストレージのoffsetからlength分の内容が，現在のストリームのポジションから書き込まれます
 	 * フィルタの詳細は setFilter() の説明を参照してください
 	 */
 	function copy(storage, elm = void);
@@ -95,8 +105,7 @@ class BinaryStream
 	 * @param elm     動作指定用の辞書（in/out）内容は copy() と同じものに加えて下記：
 	 *        comp_lv :[in] zlibによる圧縮レベル（1～9）省略時，またはelmそのものの指定がない場合は 9
 	 * @return              書き込んだバイト数
-	 *
-	 * 対象ストレージを zlib/deflate で圧縮しつつ，現在のストリームのポジションから書き込みます
+	 * @description 対象ストレージを zlib/deflate で圧縮しつつ，現在のストリームのポジションから書き込みます
 	 * フィルタ関数は圧縮前のバイナリに対して適用されます
 	 */
 	function compress(storage, elm = void);
@@ -106,8 +115,7 @@ class BinaryStream
 	 * @param storage コピー元のストレージ（現在開いているストレージと同じ場合は例外）
 	 * @param elm     動作指定用の辞書（in/out）内容は copy() と同じ
 	 * @return        書き込んだバイト数
-	 *
-	 * 対象ストレージを zlib/inflate で展開しつつ，現在のストリームのポジションから書き込みます
+	 * @description 対象ストレージを zlib/inflate で展開しつつ，現在のストリームのポジションから書き込みます
 	 * 展開に失敗すると例外が発生します
 	 * フィルタ関数は展開後のバイナリに対して適用されます
 	 * hash[out] は展開後／フィルタ後のバイナリに対して計算されます
@@ -118,8 +126,7 @@ class BinaryStream
 	 * プログレスコールバックを設定する
 	 * @param callback コールバック関数 function(storage, read_size) { return true_if_cancel; }
 	 *                 voidの場合は解除
-	 *
-	 * copy/compress/decompress の処理中からコールバックする関数を設定します。
+	 * @description copy/compress/decompress の処理中からコールバックする関数を設定します。
 	 * コールバックは（現在の実装では） 1MiB 読む毎時および最後まで読んだ時に呼び返されます。
 	 * コールバックから true を返すと処理がキャンセルできます。
 	 * ※コールバックの間隔は変更される場合があります
@@ -132,8 +139,7 @@ class BinaryStream
 	/**
 	 * フィルタDLLを設定する
 	 * @param dll 対象のDLLファイル（voidの場合は設定解除）
-	 *
-	 * copy/compress/decompressのデータに対して外部DLLを使用したフィルタを設定します
+	 *  @description copy/compress/decompressのデータに対して外部DLLを使用したフィルタを設定します
 	 * elm.filter に関数名を指定た場合に，このDLL中の下記の形式でエクスポートされた関数をフィルタとして使用します
 	 * void (__stdcall *FilterProc)(uint32 hash, uint64 offset, void *buffer, uint32 length);
 	 */
@@ -155,24 +161,33 @@ class BinaryStream
 	function tell();
 
 	/**
-	 * 現在開いているストレージ（開いていない場合はvoid）
+	 * 現在開いているストレージ
+	 * @description 開いていない場合はvoid
 	 */
 	property storage { getter; }
 
 	/**
-	 * 現在のモード（開いていない場合は-1）
+	 * 現在のモード
+	 * @description 開いていない場合は-1
 	 */
 	property mode    { getter; }
+	
+	// 定数
+	// 読み込み
+	const bsRead   = 0;
+	// 書き込み
+	const bsWrite  = 1;
+	// 追記
+	const bsAppend = 2;
+	// 更新
+	const bsUpdate = 3;
+
+	// 先頭から
+	const bsSeekSet = 0;
+	// 現在位置から
+	const bsSeekCur = 1;
+	// 末尾から
+	const bsSeekEnd = 2;
 }
 
-// 定数
-
-BinaryStream.bsRead   = 0;
-BinaryStream.bsWrite  = 1;
-BinaryStream.bsAppend = 2;
-BinaryStream.bsUpdate = 3;
-
-BinaryStream.bsSeekSet = 0;
-BinaryStream.bsSeekCur = 1;
-BinaryStream.bsSeekEnd = 2;
 

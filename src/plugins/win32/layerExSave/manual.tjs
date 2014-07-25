@@ -98,7 +98,7 @@ class Layer {
 	 * @param base 差分元となるベース用の画像
 	 * @param samecol 同じ場合に塗りつぶす色(0xAARRGGBB)（voidまたは省略なら塗りつぶさない）
 	 * @param diffcol 違う場合に塗りつぶす色(0xAARRGGBB)（voidまたは省略なら塗りつぶさない）
-	 *（baseはインスタンス自身と同じサイズでないと例外を投げます）
+	 * @description（baseはインスタンス自身と同じサイズでないと例外を投げます）
 	 */
 	function getDiffPixel(base, samecol, diffcol);
 

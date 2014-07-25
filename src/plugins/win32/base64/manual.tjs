@@ -26,6 +26,7 @@ class Base64
 		Win32ole MSXML2.XMLHTTP の使用については OUTFOCUS wiki を参考にさせていただきました。
 		see. http://hpcgi1.nifty.com/gutchie/wifky/wifky.pl?p=%B5%C8%CE%A4%B5%C8%CE%A4%A5%D7%A5%E9%A5%B0%A5%A4%A5%F3%A4%CB%B4%D8%A4%B9%A4%EB%A5%E1%A5%E2+-+win32ole.dll#p1.3.4
 */
+/*
 Plugins.link("win32ole.dll");
 Plugins.link("base64.dll");
 
@@ -48,3 +49,4 @@ function onTimeout()
 		invalidate xmlhttp;
 	}
 }
+*/

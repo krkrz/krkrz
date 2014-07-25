@@ -5,13 +5,14 @@
  */
 class DrawDeviceD3D {
 
-	property interface; //< drawdevice 情報（内部参照用）。読み出し専用
+	// drawdevice 情報（内部参照用）。読み出し専用
+	property interface;
 	
 	/**
 	 * コンストラクタ
 	 * @param width 描画領域横幅
 	 * @param width 描画領域縦幅
-	 * 縦幅と横幅は従来的機構での primaryLayer の width/height に相当するものです。
+	 * @description 縦幅と横幅は従来的機構での primaryLayer の width/height に相当するものです。
 	 * 作成されたプライマリレイヤ(複数)はすべてここで指定した領域に対して
 	 * 引き延ばし表示されます。
 	 * 例:
@@ -22,8 +23,10 @@ class DrawDeviceD3D {
 	 */
 	function DrawDeviceD3D(width, height);
 
-	property width;  //< 描画領域横幅
-	property height; //< 描画領域縦幅
+	// 描画領域横幅
+	property width;
+	// 描画領域縦幅
+	property height;
 
 	/**
 	 * 描画領域の設定
@@ -32,12 +35,14 @@ class DrawDeviceD3D {
 	 */
 	function setSize(width, height);
 	
-	property destWidth;  //< 実描画領域横幅
-	property destHeight; //< 実描画領域縦幅
+	// 実描画領域横幅
+	property destWidth;
+	// 実描画領域縦幅
+	property destHeight;
 
 	/*
 	 * プライマリレイヤの標準の visible
-	 * プライマリレイヤを生成時に表示するかどうかを指定します。
+	 * @description プライマリレイヤを生成時に表示するかどうかを指定します。
 	 */
 	property defaultVisible;
 	

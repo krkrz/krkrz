@@ -5,7 +5,7 @@ class WaveSoundBuffer {
 
 	/**
 	 * サンプル値の取得（旧方式）
-	 * 現在の再生位置から指定数のサンプルを取得してその平均値を返します。
+	 * @description 現在の再生位置から指定数のサンプルを取得してその平均値を返します。
 	 * 値が負のサンプル値は無視されます。
 	 * @param n 取得するサンプルの数。省略すると 100
 	 * @return 平均値
@@ -16,7 +16,7 @@ class WaveSoundBuffer {
 
 	/**
 	 * サンプル値の取得（新方式）
-	 * getVisBuffer(buf, sampleCount, 1, sampleAhead)でサンプルを取得し，
+	 * @description getVisBuffer(buf, sampleCount, 1, sampleAhead)でサンプルを取得し，
 	 * (value/32768)^2の最大値を取得します。(0～1の実数で返ります)
 	 * ※このプロパティを読み出すと暗黙でuseVisBuffer=trueに設定されます
 	 */
@@ -24,7 +24,7 @@ class WaveSoundBuffer {
 
 	/**
 	 * 新方式のバッファ取得用パラメータプロパティ（sampleValueを参照）
-	 * デフォルトはsetDefaultCounts/setDefaultAheadsで決定されます
+	 * @description デフォルトはsetDefaultCounts/setDefaultAheadsで決定されます
 	 * ※このプロパティを読み書きする暗黙でuseVisBuffer=trueに設定されます
 	 */
 	property sampleCount { getter; setter; }
@@ -32,10 +32,12 @@ class WaveSoundBuffer {
 
 	/**
 	 * 新方式のデフォルトのパラメータ設定用関数
-	 * 以降で生成されるWaveSoundBufferのインスタンスについて
+	 * @description 以降で生成されるWaveSoundBufferのインスタンスについて
 	 * sampleCount/sampleAheadのデフォルト値を設定できます
 	 * ※未指定の場合の初期値は count=100, aheads=0 です
+	 * static
 	 */
-	/*static*/setDefaultCounts(count);
-	/*static*/setDefaultAheads(ahead);
+	setDefaultCounts(count);
+	/*static*/
+	setDefaultAheads(ahead);
 };

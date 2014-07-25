@@ -5,13 +5,13 @@ class Layer {
 
 	/**
 	 * レイヤ右半分の Blue CHANNEL を左半分の Alpha CHANNELに複製する
-	 * ※クリップ非対応
+	 * @description ※クリップ非対応
 	 */
 	function copyRightBlueToLeftAlpha();
 	
 	/**
 	 * レイヤ下半分の Blue CHANNEL を上半分の Alpha CHANNELに複製する
-	 * ※クリップ非対応
+	 * @description ※クリップ非対応
 	 */
 	function copyBottomBlueToTopAlpha();
 	

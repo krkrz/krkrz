@@ -6,60 +6,60 @@
 class PSD {
 
 	// カラーモード定義
-	color_mode_bitmap 		= 0;
-	color_mode_grayscale 	= 1;
-	color_mode_indexed		= 2;
-	color_mode_rgb			= 3;
-	color_mode_cmyk			= 4;
-	color_mode_multichannel	= 7;
-	color_mode_duotone		= 8;
-	color_mode_lab			= 9;
+	const color_mode_bitmap 		= 0;
+	const color_mode_grayscale 	= 1;
+	const color_mode_indexed		= 2;
+	const color_mode_rgb			= 3;
+	const color_mode_cmyk			= 4;
+	const color_mode_multichannel	= 7;
+	const color_mode_duotone		= 8;
+	const color_mode_lab			= 9;
 
 	// レイヤ種別定義
-	layer_type_normal = 0;
-	layer_type_hidden = 1;
-	layer_type_folder = 2;
-	layer_type_solid_color = 3;
-	layer_type_gradient_fill = 4;
-	layer_type_pattern_fill = 5;
-	layer_type_levels = 6;
-	layer_type_curves = 7;
-	layer_type_brightness_contrast = 8;
-	layer_type_color_balance = 9;
-	layer_type_hue_saturation = 10;
-	layer_type_selective_color = 11;
-	layer_type_threshold = 12;
-	layer_type_invert = 13;
-	layer_type_posterize = 14;
-	layer_type_channel_mixer = 15;
-	layer_type_gradient_map = 16;
-	layer_type_photo_filter = 17;
+	const layer_type_normal = 0;
+	const layer_type_hidden = 1;
+	const layer_type_folder = 2;
+	const layer_type_solid_color = 3;
+	const layer_type_gradient_fill = 4;
+	const layer_type_pattern_fill = 5;
+	const layer_type_levels = 6;
+	const layer_type_curves = 7;
+	const layer_type_brightness_contrast = 8;
+	const layer_type_color_balance = 9;
+	const layer_type_hue_saturation = 10;
+	const layer_type_selective_color = 11;
+	const layer_type_threshold = 12;
+	const layer_type_invert = 13;
+	const layer_type_posterize = 14;
+	const layer_type_channel_mixer = 15;
+	const layer_type_gradient_map = 16;
+	const layer_type_photo_filter = 17;
 
 	// 合成モード定義
-	blend_mode_normal = 0;
-	blend_mode_dissolve = 1;
-	blend_mode_darken = 2;
-	blend_mode_multiply = 3;
-	blend_mode_color_burn = 4;
-	blend_mode_linear_burn = 5;
-	blend_mode_lighten = 6;
-	blend_mode_screen = 7;
-	blend_mode_color_dodge = 8;
-	blend_mode_linear_dodge = 9;
-	blend_mode_overlay = 10;
-	blend_mode_soft_light = 11;
-	blend_mode_hard_light = 12;
-	blend_mode_vivid_light = 13;
-	blend_mode_linear_light = 14;
-	blend_mode_pin_light = 15;
-	blend_mode_hard_mix = 16;
-	blend_mode_difference = 17;
-	blend_mode_exclusion = 18;
-	blend_mode_hue = 19;
-	blend_mode_saturation = 20;
-	blend_mode_color = 21;
-	blend_mode_luminosity = 22;
-	blend_mode_pass_through = 23;
+	const blend_mode_normal = 0;
+	const blend_mode_dissolve = 1;
+	const blend_mode_darken = 2;
+	const blend_mode_multiply = 3;
+	const blend_mode_color_burn = 4;
+	const blend_mode_linear_burn = 5;
+	const blend_mode_lighten = 6;
+	const blend_mode_screen = 7;
+	const blend_mode_color_dodge = 8;
+	const blend_mode_linear_dodge = 9;
+	const blend_mode_overlay = 10;
+	const blend_mode_soft_light = 11;
+	const blend_mode_hard_light = 12;
+	const blend_mode_vivid_light = 13;
+	const blend_mode_linear_light = 14;
+	const blend_mode_pin_light = 15;
+	const blend_mode_hard_mix = 16;
+	const blend_mode_difference = 17;
+	const blend_mode_exclusion = 18;
+	const blend_mode_hue = 19;
+	const blend_mode_saturation = 20;
+	const blend_mode_color = 21;
+	const blend_mode_luminosity = 22;
+	const blend_mode_pass_through = 23;
 	
 	/**
 	 * PSD画像のロード
@@ -69,12 +69,16 @@ class PSD {
 	function load(filename);
 
 	// 画像の基本プロパティ
-	
-	property width; //< 画像横幅
-	property height; //< 画像縦幅
-	property channels; //< チャンネル数
-	property color_mode; //< カラーモード
-	property layer_count; //< レイヤ数
+	// 画像横幅
+	property width;
+	// 画像縦幅
+	property height;
+	// チャンネル数
+	property channels;
+	// カラーモード
+	property color_mode;
+	// レイヤ数
+	property layer_count;
 
 	/**
 	 * レイヤ種別の取得

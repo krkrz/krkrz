@@ -16,7 +16,7 @@ class System
 }
 
 /**
- * フォントイメージ（※このクラスは実際には存在しません！）
+ * @description フォントイメージ（※このクラスは実際には存在しません！）
  *
  * callbackで返すレイヤオブジェクトに付加する追加情報を定義します。
  * 普通のレイヤオブジェクトに対して，値を代入して渡してください。
@@ -26,13 +26,20 @@ class System
  */
 class PreRenderedFontImage extends Layer
 {
-	var blackbox_x; //< GLYPHMETRICS.gmBlackBoxX
-	var blackbox_y; //< GLYPHMETRICS.gmBlackBoxY
-	var origin_x;   //< GLYPHMETRICS.gmptGlyphOrigin.x
-	var origin_y;   //< GLYPHMETRICS.gmptGlyphOrigin.y
-	var inc_x;      //< GLYPHMETRICS.gmCellIncX
-	var inc_y;      //< GLYPHMETRICS.gmCellIncY
-	var inc;        //< GetTextExtentPoint32 の返すサイズの SIZE.cx
+	// GLYPHMETRICS.gmBlackBoxX
+	property blackbox_x; 
+	// GLYPHMETRICS.gmBlackBoxY
+	property blackbox_y; 
+	// GLYPHMETRICS.gmptGlyphOrigin.x
+	property origin_x;   
+	// GLYPHMETRICS.gmptGlyphOrigin.y
+	property origin_y;   
+	// GLYPHMETRICS.gmCellIncX
+	property inc_x;      
+	// GLYPHMETRICS.gmCellIncY
+	property inc_y;      
+	// GetTextExtentPoint32 の返すサイズの SIZE.cx
+	property inc;        
 }
 
 /**
@@ -44,7 +51,7 @@ class Layer
 	 * System.savePreRenderedFont用の文字を描画する
 	 * @param ch   キャラクタコード
 	 *
-	 * 自分自身のオブジェクトの PreRenderedFontImage のプロパティを更新します
+	 * @description 自分自身のオブジェクトの PreRenderedFontImage のプロパティを更新します
 	 */
 	function drawGlyph(ch);
 
@@ -52,7 +59,7 @@ class Layer
 	 * グリフ情報を設定する
 	 * @param ch   キャラクタコード
 	 *
-	 * 自身のオブジェクトの PreRenderedFontImage のプロパティのみを更新します
+	 * @description 自身のオブジェクトの PreRenderedFontImage のプロパティのみを更新します
 	 * （drawGlyph のグリフ画像を描画しない関数です）
 	 */
 	function setGlyphInfo(ch);

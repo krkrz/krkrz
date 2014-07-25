@@ -3,13 +3,13 @@
  */
 
 /**
- * Windows ネイティブダイアログを操作するためのクラスです。
+ * @description Windows ネイティブダイアログを操作するためのクラスです。
  * APIのラッパ程度の機能しかないので非常に使いにくいですが，
  * 後述のtjsで記述された WIN32DialogEX を使うと幸せになれます。
  */
 class WIN32Dialog {
 	/**
-	 * ダイアログテンプレートデータ保持クラス
+	 * @description ダイアログテンプレートデータ保持クラス
 	 */
 	class Header {
 		/**
@@ -26,7 +26,7 @@ class WIN32Dialog {
 		property dlgItems { getter; setter; }
 	}
 	/**
-	 * ダイアログテンプレートアイテムデータ保持クラス
+	 * @description ダイアログテンプレートアイテムデータ保持クラス
 	 */
 	class Items {
 		/**
@@ -62,7 +62,7 @@ class WIN32Dialog {
 	/**
 	 * ダイアログを開く
 	 * @param window 親ウィンドウ(吉里吉里の Window クラス)，省略時またはvoid時は親なし
-	 * あらかじめ makeTemplate でダイアログテンプレートが生成されているか
+	 * @description あらかじめ makeTemplate でダイアログテンプレートが生成されているか
 	 * または loadResource でダイアログリソースの読み込んでいること
 	 * makeTemplate より loadResource のデータ優先されるので注意
 	 */
@@ -193,7 +193,7 @@ class WIN32Dialog {
 
 	/**
 	 * ダイアログサイズの取得
-	 * 読み取り専用。サイズの変更はできないので注意
+	 * @description 読み取り専用。サイズの変更はできないので注意
 	 */
 	property left   { getter; }
 	property top    { getter; }
@@ -205,7 +205,7 @@ class WIN32Dialog {
 	 * @param msg    DlgProc のメッセージ == WM_INITDIALOG
 	 * @param wparam DlgProc のWPARAM
 	 * @param lparam DlgProc のLPARAM
-	 * コールバックはownerに対して呼ばれるので注意してください
+	 * @description コールバックはownerに対して呼ばれるので注意してください
 	 * owner.onInitが未定義なら何もしません。
 	 */
 	function onInit(msg, wparam, lparam);
@@ -215,7 +215,7 @@ class WIN32Dialog {
 	 * @param msg    DlgProc のメッセージ == WM_COMMAND
 	 * @param wparam DlgProc のWPARAM
 	 * @param lparam DlgProc のLPARAM
-	 * コールバックはownerに対して呼ばれるので注意してください。
+	 * @description コールバックはownerに対して呼ばれるので注意してください。
 	 * owner.onCommandが未定義なら何もしません。
 	 */
 	function onCommand(msg, wparam, lparam);
@@ -286,7 +286,7 @@ class WIN32Dialog {
 
 	/**
 	 * モードレスダイアログ用のフラグ
-	 * trueならばモードレス状態でダイアログを開きます。
+	 * @description trueならばモードレス状態でダイアログを開きます。
 	 * モードレスではダイアログのstyleにWS_VISIBLEを指定しない場合は
 	 * open()時に自動で表示されないので注意してください。
 	 */
@@ -299,7 +299,7 @@ class WIN32Dialog {
 
 	/**
 	 * ダイアログのアイコン画像
-	 *   WIN32Dialog.Bitmapクラスのインスタンス:その画像
+	 * @description WIN32Dialog.Bitmapクラスのインスタンス:その画像
 	 *   null:実行ファイルのアイコン
 	 *   void:アイコンなし
 	 */
@@ -313,7 +313,7 @@ class WIN32Dialog {
 	/**
 	 * ShowWindow のラッパー
 	 * @param nCmdShow SW_*フラグ
-	 * 主にモードレスダイアログ用です。
+	 * @description 主にモードレスダイアログ用です。
 	 */
 	function show(nCmdShow);
 
@@ -335,9 +335,12 @@ class WIN32Dialog {
 	 */
 	/*static*/function openPropertySheet(window, sheets, elm);
 
-	function propSheetMessage(msg, wparam, lparam); //< PSM_* メッセージをプロパティシートウィンドウに送信する
-	function setMessageResult(value); //< DWL_MSGRESULTの値を設定する
-	property propsheet { getter; } //< プロパティシートとして表示中かどうか
+	// PSM_* メッセージをプロパティシートウィンドウに送信する
+	function propSheetMessage(msg, wparam, lparam);
+	// DWL_MSGRESULTの値を設定する
+	function setMessageResult(value);
+	// プロパティシートとして表示中かどうか
+	property propsheet { getter; }
 
 	/**
 	 * プログレスダイアログを表示する
@@ -346,22 +349,26 @@ class WIN32Dialog {
 	 * @param dsapp   [optional] プログレス表示中はアプリケーションウィンドウを無効にするか
 	 * @param breathe [optional] progressValueのsetterでbreatheするかどうか
 	 * @return        成功したらtrue
-	 *
+	 * @description
 	 * プログレスダイアログのstyleにはWS_VISIBLEを指定しないこと
 	 * 閉じるときは必ず closeProgress() を使用すること
 	 * プログレス表示の場合，onInit以外のコールバックは来ないので注意
 	 */
 	function openProgress(id, window, dsapp, breathe);
 
-	function closeProgress();                     //< プログレスダイアログを閉じる
-	property progress         {         getter; } //< プログレス状態かどうか
-	property progressValue    { setter; getter; } //< プログレスバーを更新する（0-100の数値 or 負数の場合マーキー状態の速度）
-	property progressCanceled { setter; getter; } //< プログレスがキャンセルされたかどうか（※対象ボタンはIDCANCEL固定）
+	// プログレスダイアログを閉じる
+	function closeProgress();                     
+	// プログレス状態かどうか
+	property progress         {         getter; } 
+	// プログレスバーを更新する（0-100の数値 or 負数の場合マーキー状態の速度）
+	property progressValue    { setter; getter; } 
+	// プログレスがキャンセルされたかどうか（※対象ボタンはIDCANCEL固定）
+	property progressCanceled { setter; getter; } 
 
 	/**
 	 * タブコントロールを利用する.
-
-//	利用手順を検討中
+@description
+	利用手順を検討中
 	 * insertTab(IDC_TAB, 0, "基本"); // タブを追加
 	 * // deleteTab(IDC_TAB, 0); // タブを削除
 	 * // deleteAllTab(IDC_TAB); // タブをすべて削除
@@ -405,76 +412,76 @@ class WIN32Dialog {
 	 * 詳細は API マニュアルなどを参照のこと
 	 */
 	// Window Styles
-	var WS_*;
-	var WS_EX_*;
+	const WS_*;
+	const WS_EX_*;
 	// Dialog Box Command IDs
-	var ID*
+	const ID*
 	// Edit Control Styles
-	var ES_*;
+	const ES_*;
 	// Edit Control Notification Codes
-	var EN_*;
+	const EN_*;
 	// Edit control EM_SETMARGIN parameters
-	var EC_*;
+	const EC_*;
 	// Edit Control Messages
-	var EM_*;
+	const EM_*;
 	// EDITWORDBREAKPROC code values
-	var WB_*;
+	const WB_*;
 	// Button Control Styles
-	var BS_*;
+	const BS_*;
 	// User Button Notification Codes
-	var BN_*;
+	const BN_*;
 	// Button Control Messages
-	var BM_*;
+	const BM_*;
 	// Static Control Constants
-	var SS_*;
+	const SS_*;
 	// Static Control Mesages
-	var STM_*;
+	const STM_*;
 	// Dialog Styles
-	var DS_*;
+	const DS_*;
 	// Dialog Control Messages
-	var DM_*;
+	const DM_*;
 	// Dialog Codes
-	var DLG_*;
+	const DLG_*;
 	// Listbox Return Values
-	var LB_*;
+	const LB_*;
 	// Listbox Notification Codes
-	var LBN_*;
+	const LBN_*;
 	// Listbox Styles
-	var LBS_*;
+	const LBS_*;
 	// Combo Box return Values
-	var CB_*;
+	const CB_*;
 	// Combo Box Notification Codes
-	var CBN_*;
+	const CBN_*;
 	// Combo Box styles
-	var CBS_*;
+	const CBS_*;
 	// Combo Box messages
-	var CB_*;
+	const CB_*;
 	// Scroll Bar Styles
-	var SBS_*;
+	const SBS_*;
 	// Scroll bar messages
-	var SBM_*;
-	var SIF_*;
+	const SBM_*;
+	const SIF_*;
 	// Scroll bar option
-	var SB_*;
+	const SB_*;
 	// Font Weights
-	var FW_*;
+	const FW_*;
 	// ShowWindow options
-	var SW_*;
+	const SW_*;
 	// MessageBox arguments
-	var MB_*;
+	const MB_*;
 	// InitCommonControlsEx parameters
-	var ICC_*;
+	const ICC_*;
 
 	// PropertySheet notifications/messages
-	var PSN_*;
-	var PSM_*;
+	const PSN_*;
+	const PSM_*;
 
 	// TabControl messages
-	var TCN_*;
+	const TCN_*;
 }
 
 /**
- * WIN32Dialog を吉里吉里向けにもう少し使いやすくしたクラス
+ * @description WIN32Dialog を吉里吉里向けにもう少し使いやすくしたクラス
  * Scripts.execStorage("win32dialog.tjs")として使います。
  * 詳細は当該ソースやサンプルなどを参照してください。
  */
@@ -484,21 +491,21 @@ class WIN32DialogEX extends WIN32Dialog {
 	 * @param elm テンプレート用辞書配列
 	 * elm = %[ helpID, exStyle, style, x, y, cx, cy, menu, windowClass, title, pointSize, weight, italic, charset, typeFace,
 	 *          items: [ コントロール1, コントロール2, ... ] ];
-	 * コントロールは，コントロール生成用の関数を呼びます。
+	 * @description コントロールは，コントロール生成用の関数を呼びます。
 	 */
 	function store(elm);
 
 	/**
 	 * アイテムの初期化パラメータを設定する
 	 * @param elm パラメータ辞書
-	 * 必ず store() の後で呼ぶこと。パラメータ詳細は win32dialog.tjs や testscript.tjs を参照
+	 * @description 必ず store() の後で呼ぶこと。パラメータ詳細は win32dialog.tjs や testscript.tjs を参照
 	 */
 	function setInitParams(elm);
 
 	/**
 	 * ダイアログを表示する
 	 * @return %[ result:EndDialogのnResult値, items:アイテムの状態辞書 ];
-	 * WIN32Dialog.open と返り値が異なるので注意のこと
+	 * @description WIN32Dialog.open と返り値が異なるので注意のこと
 	 */
 	function open(parent);
 

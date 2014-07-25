@@ -3,9 +3,10 @@
  */
 
 
+class HtmlHelp {
 /**
  * HTMLƒwƒ‹ƒv‚ğ•\¦‚µ‚Ü‚·B
  * @param url URL•¶š—ñ
  */
-function HtmlHelp.displayTopic(url);
-
+function displayTopic(url);
+}

@@ -38,7 +38,7 @@ class LineParser {
 
     /**
      * テキストに対するパース処理を実行する。
-     * 行ごとに doLine() イベントを呼び出す。
+     * @description 行ごとに doLine() イベントを呼び出す。
      * @param text テキスト。省略時は現在設定中のテキストに対して処理を行なう
      */
     function parse(text);

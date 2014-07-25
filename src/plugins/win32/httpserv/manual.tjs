@@ -12,7 +12,8 @@ class SimpleHTTPServer {
 
 	property port { getter; }
 	property timeout { getter; }
-	property codepage { getter; setter; } // セッション毎のコードページ変更ができないので途中変更は推奨されない
+	// セッション毎のコードページ変更ができないので途中変更は推奨されない
+	property codepage { getter; setter; }
 
 	/**
 	 * サービス開始
@@ -48,12 +49,13 @@ class SimpleHTTPServer {
 	 *         ];
 	 */
 	function onRequest();
+
+	// コードページ（static value）
+	const cpACP  = CP_ACP;
+	const cpOEM  = CP_OEMCP;
+	const cpUTF8 = CP_UTF8;
+	const cpSJIS = CP_932;
+	const cpEUC  = CP_20932; //51932
+	const cpJIS  = CP_50220;
 }
-// コードページ（static value）
-SimpleHTTPServer.cpACP  = CP_ACP;
-SimpleHTTPServer.cpOEM  = CP_OEMCP;
-SimpleHTTPServer.cpUTF8 = CP_UTF8;
-SimpleHTTPServer.cpSJIS = CP_932;
-SimpleHTTPServer.cpEUC  = CP_20932; //51932
-SimpleHTTPServer.cpJIS  = CP_50220;
 

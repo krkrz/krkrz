@@ -1,5 +1,5 @@
 /**
- * Scripts クラスへの Javascript 機能拡張
+ * @description Scripts クラスへの Javascript 機能拡張
  */
 class Scripts {
 
@@ -26,14 +26,14 @@ class Scripts {
 
 	/**
 	 * デバッガ処理駆動
-	 * javascript実行時以外にもデバッガからの処理を受け付ける場合は
+	 * @description javascript実行時以外にもデバッガからの処理を受け付ける場合は
 	 * タイマもしくは continuous ハンドラからメソッドを定期的に呼び出してください。
 	 */
 	function processDebugJS();
 };
 
 /**
- * Javascript 側で createTJSClass して生成されたインスタンス中では
+ * @description Javascript 側で createTJSClass して生成されたインスタンス中では
  * 以下の特殊なメソッドが利用可能です。イベントの伝播などで活用可能です。
  */
 class TJSObject {

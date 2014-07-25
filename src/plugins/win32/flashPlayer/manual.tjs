@@ -1,6 +1,6 @@
 /**
  * 擬似記述マニュアル
- *
+ * @description
  * FlashPlayerクラス
  * FlashPlayerをレイヤ上で再生制御するオブジェクトです。
 
@@ -49,7 +49,7 @@ class FlashPlayer {
 
     /**
 	 * コンストラクタ
-	 * Flash OCXの初期化に失敗した場合は例外になります
+	 * @description Flash OCXの初期化に失敗した場合は例外になります
 	 * @param width プレイヤー横幅
 	 * @param height プレイヤー縦幅
 	 */
@@ -159,7 +159,7 @@ class FlashPlayer {
 
 	/*
 	 * 描画内容が更新された場合に呼び出されるイベント
-	 * 通常はこのイベントがきた場合に draw() で描画内容を取得します
+	 * @description 通常はこのイベントがきた場合に draw() で描画内容を取得します
 	 */
 	function onFrameUpdate();
 
@@ -167,8 +167,10 @@ class FlashPlayer {
 	// Flash プロパティ
 	// -------------------------------------------------
 
-	property readyState; // RO
-	property totalFrames; // RO
+	// RO
+	property readyState;
+	// RO
+	property totalFrames;
 
 	property playing;
 
@@ -180,9 +182,12 @@ class FlashPlayer {
 	property movie;
 	property frameNum;
 
-	property currentFrame; // RO
-	property percentLoaded; // RO
-	property flashVersion; // RO
+	// RO
+	property currentFrame;
+	// RO
+	property percentLoaded;
+	// RO
+	property flashVersion;
 
 	property sAlign;
 	property menu;
@@ -262,7 +267,7 @@ class FlashPlayer {
 	 * ムービーをロードする
 	 * @param layer
 	 * @param url ムービーのURL。
-	 * 吉里吉里のストレージ名ではなく、ローカルファイル名ないしネット上のファイルである必要があります。
+	 * @description 吉里吉里のストレージ名ではなく、ローカルファイル名ないしネット上のファイルである必要があります。
 	 */
 	function loadMovie(layer, url);
 
