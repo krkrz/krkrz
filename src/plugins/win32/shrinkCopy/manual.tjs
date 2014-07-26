@@ -19,7 +19,7 @@ class Layer {
 	 * @param stop    コピー元の矩形の上端。ピクセル単位。小数点指定不可。
 	 * @param swidth  コピー元の矩形の横幅。ピクセル単位。小数点指定不可。
 	 * @param sheight コピー元の矩形の縦幅。ピクセル単位。小数点指定不可。
-	 *
+	 * @description
 	 * 拡大される（dwidth > swidth || dheight > sheight）場合はエラー。
 	 * 縮小アルゴリズムは面積平均法。1/2以下の縮小で affineCopyより高品質。
 	 * stretchCopyと違い Layer.face, holdAlpha は無視。
@@ -34,7 +34,7 @@ class Layer {
 	 *
 	 * @param shrink_x 横方向の縮小係数(1 以上）
 	 * @param shrink_y 縦方向の縮小係数(1 以上）省略時または 0 の場合は shrink_x の値を使用
-	 *
+	 * @description
 	 * 透明部分は無視されて常に不透明になる
 	 * 右端，下端の 1dot の部分で割り切れない場合の端数分で伸びたように見える場合がある
 	 *

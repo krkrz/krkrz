@@ -8,14 +8,14 @@
 class Window {
 	/**
 	 * ウィンドウの最大化
-	 * 最大化ボタンを押した動作と同等
+	 * @description 最大化ボタンを押した動作と同等
 	 * サイズ固定ウィンドウでは機能しない
 	 */
 	function maximize();
 
 	/**
 	 * ウィンドウが最大化かどうか取得
-	 * setterも一応あるが使わないことを推奨
+	 * @description setterも一応あるが使わないことを推奨
 	 */
 	property maximized {
 		getter;
@@ -24,7 +24,7 @@ class Window {
 
 	/**
 	 * ウィンドウの最小化（mainWindowではタスクバー収納，それ以外は画面左下に最小化）
-	 * 最小化ボタンを押した動作と同等
+	 * @description 最小化ボタンを押した動作と同等
 	 */
 	function minimize();
 
@@ -43,7 +43,7 @@ class Window {
 
 	/**
 	 * ウィンドウのタイトルバーアイコンを再設定する
-	 *  ※ Vista でフルスクリーンから復帰するとアイコンが消える問題（吉里吉里v2.30で確認）の消極的対処メソッド
+	 * @description ※ Vista でフルスクリーンから復帰するとアイコンが消える問題（吉里吉里v2.30で確認）の消極的対処メソッド
 	 */
 	function resetWindowIcon();
 
@@ -51,18 +51,21 @@ class Window {
 	 * ウィンドウのタイトルバーアイコンを変更する
 	 * @param file アイコンファイルまたはvoid (voidか""で初期状態にリセット）
 	 * @param withapp アプリケーションウィンドウのアイコンも一緒に変更するかどうか
-	 * ※ アーカイブ内のファイル指定は不可，exeやDLLを指定した場合は一番最初のアイコンが設定される
+	 * @description ※ アーカイブ内のファイル指定は不可，exeやDLLを指定した場合は一番最初のアイコンが設定される
 	 */
 	function setWindowIcon(file, withapp);
 
 	/**
 	 * クライアント・ウィンドウ領域，非最大化通常表示の領域の取得
 	 * @return %[ x, y, w, h ] または void(取得失敗時)
-	 * ※ innerSunken枠分はクライアント領域に含まれるので注意
+	 * @description ※ innerSunken枠分はクライアント領域に含まれるので注意
+	  クライアント領域
 	 */
-	function getClientRect(); //< クライアント領域
-	function getWindowRect(); //< ウィンドウ領域
-	function getNormalRect(nofix=false); //< 非最大化通常表示領域(@param nofix true:ワークエリア補正を行わない)
+	function getClientRect();
+	 // ウィンドウ領域
+	function getWindowRect();
+	// 非最大化通常表示領域(@param nofix true:ワークエリア補正を行わない)
+	function getNormalRect(nofix=false);
 
 	/**
 	 * ウィンドウの Zオーダーを変更する
@@ -85,6 +88,7 @@ class Window {
 
 	/**
 	 * 拡張イベントを有効にする
+	 * @description
 	 * このウィンドウのインスタンスについて
 	 * 説明に「■拡張イベント：」と記述されているコールバックが有効になる
 	 *
@@ -106,44 +110,45 @@ class Window {
 
 	/**
 	 * ■拡張イベント：ウィンドウ最大化
-	 * 呼ばれた時点でウィンドウサイズは既に最大化されている
+	 * @description 呼ばれた時点でウィンドウサイズは既に最大化されている
 	 */
 	function onMaximize();
 
 	/**
 	 * ■拡張イベント：ウィンドウ最小化
-	 * フルスクリーン中にAlt+Tabなどで別のアプリを選んだ場合や，mainWindow以外が最小化されたときに呼ばれる
+	 * @description フルスクリーン中にAlt+Tabなどで別のアプリを選んだ場合や，mainWindow以外が最小化されたときに呼ばれる
 	 * タスクバーに収納された場合は onHide イベントが呼ばれるので注意
 	 */
 	function onMinimize();
 
 	/**
 	 * ■拡張イベント：ウィンドウ表示
-	 * タスクバーから復帰したときなどに呼ばれる
+	 * @description タスクバーから復帰したときなどに呼ばれる
 	 */
 	function onShow();
 
 	/**
 	 * ■拡張イベント：ウィンドウ非表示
-	 * タスクバーに収納された時などに呼ばれる
+	 * @description タスクバーに収納された時などに呼ばれる
 	 */
 	function onHide();
 
 	/**
 	 * ■拡張イベント：リサイズ・移動開始通知/終了
-	 * フレームやタイトルバーをドラッグ開始した時やAlt+SpaceでSやMを選んだ時（開始通知），
+	 * @description フレームやタイトルバーをドラッグ開始した時やAlt+SpaceでSやMを選んだ時（開始通知），
 	 * および移動やリサイズが終了した時（終了通知）にそれぞれ呼ばれる
 	 * onMovingやonResizing中に元のウィンドウ位置やサイズを参照したい時はここで保存しておくとよい
 	 * リサイズか移動かは WM_ENTERSIZEMOVE/WM_EXITSIZEMOVE の都合で判定不可
 	 */
 	function onMoveSizeBegin(); //< 開始通知
-	function onMoveSizeEnd();   //< 終了通知
+	// 終了通知
+	function onMoveSizeEnd();
 
 	/**
 	 * ■拡張イベント：ウィンドウ移動中
 	 * @param rect %[ x, y, w, h ] ウィンドウ座標
 	 * 
-	 * ※Windowsでウィンドウ内容を表示したまま移動する設定（移動枠表示なし）の場合，すぐにonMoveが呼ばれる
+	 * @description ※Windowsでウィンドウ内容を表示したまま移動する設定（移動枠表示なし）の場合，すぐにonMoveが呼ばれる
 	 */
 	function onMoving(rect); //< registerExEvent()後の追加は無効（詳細はregisterExEventの説明を参照）
 
@@ -166,7 +171,7 @@ class Window {
 	 *         この場合，つかんだ位置(rect.type)に応じてうまく書き換え内容を調整しないと
 	 *         サイズ変更中にウィンドウが動いてしまうことがあるので注意（⇒forceResizeRect()参照）
 	 * 
-	 * ※Windowsでウィンドウ内容を表示したままリサイズする設定（サイズ枠表示なし）の場合，すぐにonResizeが呼ばれる
+	 * @description ※Windowsでウィンドウ内容を表示したままリサイズする設定（サイズ枠表示なし）の場合，すぐにonResizeが呼ばれる
 	 */
 	function onResizing(rect); //< registerExEvent()後の追加は無効（詳細はregisterExEventの説明を参照）
 
@@ -195,13 +200,13 @@ class Window {
 
 	/**
 	 * ■拡張イベント：ディスプレイ構成の変更通知
-	 * 解像度や色数、マルチモニタの構成（位置変更も含む）が変更されたときに呼ばれる
+	 * @description 解像度や色数、マルチモニタの構成（位置変更も含む）が変更されたときに呼ばれる
 	 */
 	function onDisplayChanged();
 
 	/**
 	 * ■拡張イベント：メニュー処理の開始・終了通知
-	 * ウィンドウのメニュー処理（クリックやF10を押した場合など）の開始と終了の通知イベント
+	 * @description ウィンドウのメニュー処理（クリックやF10を押した場合など）の開始と終了の通知イベント
 	 * WM_ENTERMENULOOP / WM_EXITMENULOOP 通知のコールバック
 	 *
 	 * ※フルスクリーンにした場合のメニューではこのイベントは発生しないので注意！
@@ -219,7 +224,7 @@ class Window {
 
 	/**
 	 * リサイズの抑制
-	 * setter は registerExEvent() で拡張イベントを登録していないと例外が発生する
+	 * @description setter は registerExEvent() で拡張イベントを登録していないと例外が発生する
 	 * true に設定すると，borderStyle == bsSizeable の場合でも
 	 * ・ウィンドウ淵のサイズ変更カーソルが出なくなりサイズが変更できなくなる
 	 * ・システムメニュー(Alt+Space)のサイズ変更がグレーになり選択できなくなる
@@ -231,7 +236,7 @@ class Window {
 	 * ■拡張イベント：アクティブ状態変更通知
 	 * @param active 0:非アクティブ化 1:マウスクリック以外でアクティブ化 2:マウスクリックでアクティブ化
 	 * @param minimize 0:ウィンドウは最小化されていない それ以外:最小化されている
-	 *
+	 * @description
 	 * ※Window.onActivate や Window.onDeactivate と違うのは、（これは拡張イベント全般に言えることだが）
 	 * System.eventDisabled == true でもイベントコールバックが飛んでくるという点
 	 *
@@ -247,7 +252,7 @@ class Window {
 	/**
 	 * オーバーレイビットマップを表示・消去する
 	 * @param layer ビットマップ画像にコピーするレイヤ（void or省略時はオーバーレイ消去）
-	 *
+	 * @description
 	 * 指定画像でクライアント領域に子ウィンドウ（吉里吉里のではなくWindowsのそれ）をかぶせる
 	 * ・拡張イベントが有効でないと例外が発生する
 	 * ・オーバーレイ表示中は吉里吉里のレイヤ側にマウス系のメッセージが一切行かない
@@ -275,34 +280,58 @@ class Window {
 	function ncHitTest(x, y);
 
 	/// NCHITTEST定数
-	/* static */ var nchtError;					//< HTERROR
-	/* static */ var nchtTransparent;			//< HTTRANSPARENT
-	/* static */ var nchtNoWhere;				//< HTNOWHERE
-	/* static */ var nchtClient;				//< HTCLIENT
-	/* static */ var nchtCaption;				//< HTCAPTION
-	/* static */ var nchtSysMenu;				//< HTSYSMENU
-	/* static */ var nchtSize;					//< HTSIZE
-	/* static */ var nchtGrowBox;				//< HTGROWBOX
-	/* static */ var nchtMenu;					//< HTMENU
-	/* static */ var nchtHScroll;				//< HTHSCROLL
-	/* static */ var nchtVScroll;				//< HTVSCROLL
-	/* static */ var nchtMinButton;				//< HTMINBUTTON
-	/* static */ var nchtReduce;				//< HTREDUCE
-	/* static */ var nchtMaxButton;				//< HTMAXBUTTON
-	/* static */ var nchtZoom;					//< HTZOOM
-	/* static */ var nchtLeft;					//< HTLEFT
-	/* static */ var nchtRight;					//< HTRIGHT
-	/* static */ var nchtTop;					//< HTTOP
-	/* static */ var nchtTopLeft;				//< HTTOPLEFT
-	/* static */ var nchtTopRight;				//< HTTOPRIGHT
-	/* static */ var nchtBottom;				//< HTBOTTOM
-	/* static */ var nchtBottomLeft;			//< HTBOTTOMLEFT
-	/* static */ var nchtBottomRight;			//< HTBOTTOMRIGHT
-	/* static */ var nchtBorder;				//< HTBORDER
+	// HTERROR
+	const nchtError;					
+	// HTTRANSPARENT
+	const nchtTransparent;			
+	// HTNOWHERE
+	const nchtNoWhere;				
+	// HTCLIENT
+	const nchtClient;				
+	// HTCAPTION
+	const nchtCaption;				
+	// HTSYSMENU
+	const nchtSysMenu;				
+	// HTSIZE
+	const nchtSize;					
+	// HTGROWBOX
+	const nchtGrowBox;				
+	// HTMENU
+	const nchtMenu;					
+	// HTHSCROLL
+	const nchtHScroll;				
+	// HTVSCROLL
+	const nchtVScroll;				
+	// HTMINBUTTON
+	const nchtMinButton;			
+	// HTREDUCE
+	const nchtReduce;				
+	// HTMAXBUTTON
+	const nchtMaxButton;			
+	// HTZOOM
+	const nchtZoom;					
+	// HTLEFT
+	const nchtLeft;					
+	// HTRIGHT
+	const nchtRight;				
+	// HTTOP
+	const nchtTop;					
+	// HTTOPLEFT
+	const nchtTopLeft;				
+	// HTTOPRIGHT
+	const nchtTopRight;				
+	// HTBOTTOM
+	const nchtBottom;				
+	// HTBOTTOMLEFT
+	const nchtBottomLeft;			
+	// HTBOTTOMRIGHT
+	const nchtBottomRight;			
+	// HTBORDER
+	const nchtBorder;				
 
 	/**
 	 * システムメニューに追加
-	 * setter は registerExEvent() で拡張イベントを登録していないと例外が発生する
+	 * @description setter は registerExEvent() で拡張イベントを登録していないと例外が発生する
 	 * MenuItemまたは辞書の配列を指定する
 	 * このメニューが選択されると onExSystemMenuSelected(選択されたオブジェクト) コールバックが発生
 	 */
@@ -310,49 +339,72 @@ class Window {
 
 
 	// 以下特殊用途
-	property enableNCMouseEvent { getter; setter; } //< WM_SETCURSORのコールバックonNonCapMouseEventを有効にする（デフォルト：false）
-	function onNonCapMouseEvent(ht, ev); //< WM_SETCURSORコールバック：ht=LOWORD(LParam), ev=HIWORD(LParam)
-	function focusMenuByKey(key); //< SC_KEYMENUを送る
-	function onStartKeyMenu(key); //< SC_KEYMENU通知コールバック
-	function onAccelKeyMenu(key,st); //< WM_MENUCHAR通知コールバック
-	function setMessageHook(on, ev); //< メッセージフックを設定(on:有効, ev:イベント番号またはイベント名文字：省略時全部）
-	function onWindowsMessageHook(msg,wp,lp); //< setMessageHookで指定したイベント発生時のコールバック
-	/*static*/function getNotificationNum(name); //< WM_XXXイベント番号を取得（WM_は除いて渡す）
-	/*static*/function getNotificationName(num); //< イベント番号からWM_XXXを取得（WM_を除いて返る）
+	// WM_SETCURSORのコールバックonNonCapMouseEventを有効にする（デフォルト：false）
+	property enableNCMouseEvent { getter; setter; }
+	// WM_SETCURSORコールバック：ht=LOWORD(LParam), ev=HIWORD(LParam)
+	function onNonCapMouseEvent(ht, ev);
+	// SC_KEYMENUを送る
+	function focusMenuByKey(key);
+	// SC_KEYMENU通知コールバック
+	function onStartKeyMenu(key);
+	// WM_MENUCHAR通知コールバック
+	function onAccelKeyMenu(key,st);
+	// メッセージフックを設定(on:有効, ev:イベント番号またはイベント名文字：省略時全部）
+	function setMessageHook(on, ev);
+	// setMessageHookで指定したイベント発生時のコールバック
+	function onWindowsMessageHook(msg,wp,lp);
+	/*static*/
+	// WM_XXXイベント番号を取得（WM_は除いて渡す）
+	function getNotificationNum(name);
+	/*static*/
+	// イベント番号からWM_XXXを取得（WM_を除いて返る）
+	function getNotificationName(num);
 }
 
 /**
- * MenuItem拡張
+ * @description MenuItem拡張
  */
 class MenuItem {
 	/**
 	 * メニューバーの右端分け表示
-	 *  true ならその Item 以降は右端に寄せられる
+	 * @description true ならその Item 以降は右端に寄せられる
 	 * ※ Window.menu 直下で visible でない正しく動作しない
 	 */
 	property rightJustify { getter; setter };
 
 	/**
 	 * アイコンの表示
-	 * 設定内容は MenuItem.bi* 定数を使用するか，レイヤオブジェクトを渡す
+	 * @description 設定内容は MenuItem.bi* 定数を使用するか，レイヤオブジェクトを渡す
 	 * ※ 値を設定する時点で Window.menu の子で visible でないと機能しないので注意
 	 *    また，プルダウンメニューは，Window.registerExEvent()をして拡張イベントを登録しないと表示されないので注意
 	 */
 //	property bmpItem      { getter; setter }; //< 文字列位置アイコン（チェック／未チェックアイコンの同時指定不可？）
-	property bmpChecked   { getter; setter }; //< チェック時アイコン (0でデフォルト)
-	property bmpUnchecked { getter; setter }; //< 未チェック時アイコン (0でデフォルト)
+	// チェック時アイコン (0でデフォルト)
+	property bmpChecked   { getter; setter }; 
+	// 未チェック時アイコン (0でデフォルト)
+	property bmpUnchecked { getter; setter }; 
 
 	/// bmpItem 定数
-	/* static */ var biSystem;					//< HBMMENU_SYSTEM
-	/* static */ var biRestore;					//< HBMMENU_MBAR_RESTORE
-	/* static */ var biMinimize;				//< HBMMENU_MBAR_MINIMIZE
-	/* static */ var biClose;					//< HBMMENU_MBAR_CLOSE
-	/* static */ var biCloseDisabled;			//< HBMMENU_MBAR_CLOSE_D
-	/* static */ var biMinimizeDisabled;		//< HBMMENU_MBAR_MINIMIZE_D
-	/* static */ var biPopupClose;				//< HBMMENU_POPUP_CLOSE
-	/* static */ var biPopupRestore;			//< HBMMENU_POPUP_RESTORE
-	/* static */ var biPopupMaximize;			//< HBMMENU_POPUP_MAXIMIZE
-	/* static */ var biPopupMinimize;			//< HBMMENU_POPUP_MINIMIZE
+	// HBMMENU_SYSTEM
+	const biSystem;					
+	// HBMMENU_MBAR_RESTORE
+	const biRestore;				
+	// HBMMENU_MBAR_MINIMIZE
+	const biMinimize;				
+	// HBMMENU_MBAR_CLOSE
+	const biClose;					
+	// HBMMENU_MBAR_CLOSE_D
+	const biCloseDisabled;			
+	// HBMMENU_MBAR_MINIMIZE_D
+	const biMinimizeDisabled;		
+	// HBMMENU_POPUP_CLOSE
+	const biPopupClose;				
+	// HBMMENU_POPUP_RESTORE
+	const biPopupRestore;			
+	// HBMMENU_POPUP_MAXIMIZE
+	const biPopupMaximize;			
+	// HBMMENU_POPUP_MINIMIZE
+	const biPopupMinimize;			
 
 	/**
 	 * ポップアップ表示
@@ -362,7 +414,7 @@ class MenuItem {
 	 * @param rect オーバーラップ禁止範囲（%[ x, y, w, h ]，省略時禁止範囲無し）
 	 * @param menulist メニュー一覧配列（MenuItemのインスタンスである必要はなく，辞書を並べても良い）
 	 * @return 選択されたオブジェクト
-	 * 
+	 * @description
 	 * MenuItem.popupのようにウィンドウメニュー所属である必要はなく，また一覧も辞書の配列を渡すなどができる
 	 * この関数によるポップアップでのbmp*プロパティによるアイコン表示はされないので注意
 	 */
@@ -370,26 +422,33 @@ class MenuItem {
 }
 
 /**
- * Debug.console拡張
+ * @description Debug.console拡張
  */
 class Console {
-	function restoreMaxmimize(); //< ウィンドウ最大化の復帰（最大化のまま終了すると次回サイズが狂う問題解決用）
-	function maxmimize();        //< ウィンドウを最大化
-	function getRect();          //< 座標・サイズの取得
-	function setPos(x, y, w, h); //< 座標・サイズの設定
-	function getPlacement();     //< WindowPlacementの取得
-	function setPlacement(dict); //< WindowPlacementの設定
+	// ウィンドウ最大化の復帰（最大化のまま終了すると次回サイズが狂う問題解決用）
+	function restoreMaxmimize(); 
+	// ウィンドウを最大化
+	function maxmimize();        
+	// 座標・サイズの取得
+	function getRect();          
+	// 座標・サイズの設定
+	function setPos(x, y, w, h); 
+	// WindowPlacementの取得
+	function getPlacement();     
+	// WindowPlacementの設定
+	function setPlacement(dict); 
 	//※ 起動後１度はvisible=trueしてウィンドウを生成しないと失敗する
-	function bringAfter(win);    //< 優先順位の変更
+	// 優先順位の変更
+	function bringAfter(win);    
 }
 
 /**
- * Pad拡張
+ * @description Pad拡張
  */
 class Pad {
 	/**
 	 * 拡張イベントを有効にする（登録失敗で例外が発生）
-	 * 拡張イベントとして以下が発生：
+	 * @description 拡張イベントとして以下が発生：
 	 *  onClose  閉じるボタンが押された
 	 *
 	 * ※borderStyleなどの変更によりウィンドウが作り直されるとイベントが発生しなくなるので注意
@@ -399,7 +458,7 @@ class Pad {
 }
 
 /**
- * System拡張
+ * @description System拡張
  */
 class System
 {
@@ -413,8 +472,10 @@ class System
 	 *         work:      モニタのワークエリア範囲(ウィンドウを最大化したときなどの表示範囲)
 	 *         intersect: 指定範囲と交わる領域(指定しなかった場合は monitor と同じ)
 	 */
-	function getDisplayMonitors();            //< 全てのモニタを列挙する
-	function getDisplayMonitors(x, y, w, h);  //< 指定範囲に交わるモニタのみ列挙する
+	// 全てのモニタを列挙する
+	function getDisplayMonitors();
+	// 指定範囲に交わるモニタのみ列挙する
+	function getDisplayMonitors(x, y, w, h);
 
 	/**
 	 * モニタ情報を取得
@@ -426,10 +487,14 @@ class System
 	 *         モニタの情報。辞書内容は getDisplayMonitors と同じ (ただし intersect 情報は無い)。
 	 *         near=false 時でモニタが無い場合は void を返す。
 	 */
-	function getMonitorInfo();                 //< プライマリモニタを返す
-	function getMonitorInfo(near, x, y);       //< 指定座標の位置のモニタを返す
-	function getMonitorInfo(near, x, y, w, h); //< 指定座標の範囲にもっとも多く交わるモニタを返す
-	function getMonitorInfo(near, window);     //< 指定ウィンドウの範囲にもっとも多く交わるモニタを返す
+	// プライマリモニタを返す
+	function getMonitorInfo();                 
+	// 指定座標の位置のモニタを返す
+	function getMonitorInfo(near, x, y);       
+	// 指定座標の範囲にもっとも多く交わるモニタを返す
+	function getMonitorInfo(near, x, y, w, h); 
+	// 指定ウィンドウの範囲にもっとも多く交わるモニタを返す
+	function getMonitorInfo(near, window);     
 
 	/**
 	 * マウスカーソルのスクリーン座標を設定・取得
@@ -443,7 +508,7 @@ class System
 	 * システムメトリクス情報を取得
 	 * @param index SM_* の「*」部分の文字列（ただし大文字小文字は無関係）
 	 * @return メトリクス値（indexにより内容が異なる）
-	 *
+	 * @description
 	 * 詳細は GetSystemMetrics() API のマニュアルを参照
 	 * SW_ARRANGE は ARW_* の定義がないので直接数値指定で比較すること
 	 */
@@ -452,7 +517,7 @@ class System
 	/**
 	 * システムのダブルクリック許容時間を取得
 	 * @return 時間(ms) 既定値は500ms
-	 *
+	 * @description
 	 * 詳細は GetDoubleClickTime() API のマニュアルを参照
 	 * ダブルクリックの許容移動範囲はgetSystemMetricsのCXDOUBLECLK/CYDOUBLECLKで取得可能
 	 * Layer.onDoubleClickを使わずにソフトウェアで擬似的にダブルクリック判定を行う場合に使用（時間決め打ちでも問題ないけど一応…）
@@ -476,7 +541,7 @@ class System
 	/**
 	 * タスクバーやALT+TABなどで表示されるアプリケーションアイコンを変更する
 	 * @param file アイコンファイルまたはvoid (voidか""で初期状態にリセット）
-	 * ※ アーカイブ内のファイル指定は不可，exeやDLLを指定した場合は一番最初のアイコンが設定される
+	 * @description ※ アーカイブ内のファイル指定は不可，exeやDLLを指定した場合は一番最初のアイコンが設定される
 	 */
 	function setApplicationIcon(file);
 
@@ -484,7 +549,7 @@ class System
 	 * Vista以降のタスクバーやAlt+TABでのサムネイル表示を強制的にアプリケーションアイコン表示にする
 	 * @param iconic trueならサムネイルの代わりにアイコンを表示する／falseなら設定解除
 	 * @return 成功したかどうか（XP以前では常に失敗）
-	 * ※ アプリケーションウィンドウに DWMWA_FORCE_ICONIC_REPRESENTATION が設定される
+	 * @description ※ アプリケーションウィンドウに DWMWA_FORCE_ICONIC_REPRESENTATION が設定される
 	 */
 	function setIconicPreview(iconic);
 
@@ -504,7 +569,7 @@ class Scripts
 	 * Scripts.evalのエラーログ出力抑制
 	 * @param enabled 出力許可
 	 * @return 元の値
-	 *
+	 * @description
 	 * enabled に false を設定すると Scripts.eval の評価処理を
 	 * TVPExecuteExpression 経由で行うようになり，例外発生時にログが出力されない
 	 * 吉里吉里のバージョンアップに伴い仕様が変わる可能性があるので注意のこと

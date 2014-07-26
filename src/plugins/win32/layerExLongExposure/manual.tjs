@@ -38,7 +38,7 @@ class Layer {
 
 	/**
 	 * 総和バッファ破棄
-	 * 確保したバッファを破棄する
+	 * @description 確保したバッファを破棄する
 	 * invalidate時でも自動で破棄される
 	 */
 	function termExposure();

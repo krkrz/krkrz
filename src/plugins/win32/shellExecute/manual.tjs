@@ -1,6 +1,6 @@
 /**
  * 擬似コードによるマニュアル
- * 外部アプリを機動してその終了を待つ機構を提供します。
+ * @description 外部アプリを機動してその終了を待つ機構を提供します。
  * ウインドウメッセージとして WM_APP + 1 を利用しています
  */
 class Window {
@@ -10,7 +10,7 @@ class Window {
 	 * @param target プログラム
 	 * @param param 引数
 	 * @return プロセスハンドル（失敗した場合は-1)。terminateProcess に渡すことができます。
-	 * 処理がおわったら onShellExecuted イベントが発生します。
+	 * @description 処理がおわったら onShellExecuted イベントが発生します。
 	 */
 	function shellExecute(target, param);
 
@@ -33,7 +33,7 @@ class Window {
 	 * @param target プログラム
 	 * @param param 引数
 	 * @return プロセスハンドル（失敗した場合は-1)。terminateProcess に渡すことができます。
-	 * コンソールの行単位出力で onCommandLineOutput イベントが発生します。
+	 * @description コンソールの行単位出力で onCommandLineOutput イベントが発生します。
 	 * 処理がおわったら onShellExecuted イベントが発生します。
 	 */
 	function commandExecute(target, param);
@@ -67,7 +67,7 @@ class System {
 	 *   exitcode: 終了コード(status=="ok"時のみ),
 	 *   message:  エラーメッセージ(status!="ok"時のみ)
 	 *   ];
-	 * バックグラウンド処理はありません。実行対象のプログラムが終了するまで吉里吉里が停止します。
+	 * @description バックグラウンド処理はありません。実行対象のプログラムが終了するまで吉里吉里が停止します。
 	 */
 	function commandExecute(target, param, timeout = 0);
 };

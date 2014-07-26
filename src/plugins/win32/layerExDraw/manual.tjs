@@ -4,197 +4,197 @@
 class GdiPlus {
 
 	// Status 定義
-	Ok = 0,
-    GenericError = 1,
-    InvalidParameter = 2,
-    OutOfMemory = 3,
-    ObjectBusy = 4,
-    InsufficientBuffer = 5,
-    NotImplemented = 6,
-    Win32Error = 7,
-    WrongState = 8,
-    Aborted = 9,
-    FileNotFound = 10,
-    ValueOverflow = 11,
-    AccessDenied = 12,
-    UnknownImageFormat = 13,
-    FontFamilyNotFound = 14,
-    FontStyleNotFound = 15,
-    NotTrueTypeFont = 16,
-    UnsupportedGdiplusVersion = 17,
-    GdiplusNotInitialized = 18,
-    PropertyNotFound = 19,
-    PropertyNotSupported = 20,
-    ProfileNotFound = 21
+	const Ok = 0,
+    const GenericError = 1,
+    const InvalidParameter = 2,
+    const OutOfMemory = 3,
+    const ObjectBusy = 4,
+    const InsufficientBuffer = 5,
+    const NotImplemented = 6,
+    const Win32Error = 7,
+    const WrongState = 8,
+    const Aborted = 9,
+    const FileNotFound = 10,
+    const ValueOverflow = 11,
+    const AccessDenied = 12,
+    const UnknownImageFormat = 13,
+    const FontFamilyNotFound = 14,
+    const FontStyleNotFound = 15,
+    const NotTrueTypeFont = 16,
+    const UnsupportedGdiplusVersion = 17,
+    const GdiplusNotInitialized = 18,
+    const PropertyNotFound = 19,
+    const PropertyNotSupported = 20,
+    const ProfileNotFound = 21
 	
 	// FontStyle 定義
-	FontStyleRegular = 0;
-	FontStyleBold = 1;
-	FontStyleItalic = 2;
-	FontStyleBoldItalic = 3;
-	FontStyleUnderline = 4;
-	FontStyleStrikeout = 8;
+	const FontStyleRegular = 0;
+	const FontStyleBold = 1;
+	const FontStyleItalic = 2;
+	const FontStyleBoldItalic = 3;
+	const FontStyleUnderline = 4;
+	const FontStyleStrikeout = 8;
 
 	// BrushType定義
-	BrushTypeSolidColor = 0;
-    BrushTypeHatchFill = 1;
-    BrushTypeTextureFill = 2;
-    BrushTypePathGradient = 3;
-    BrushTypeLinearGradient = 4;
+	const BrushTypeSolidColor = 0;
+    const BrushTypeHatchFill = 1;
+    const BrushTypeTextureFill = 2;
+    const BrushTypePathGradient = 3;
+    const BrushTypeLinearGradient = 4;
 
 	// DashCap定義
-	DashCapFlat = 0;
-    DashCapRound = 2;
-    DashCapTriangle = 3;
+	const DashCapFlat = 0;
+    const DashCapRound = 2;
+    const DashCapTriangle = 3;
 
 	// DashStyle定義
-	DashStyleSolid = 0;
-    DashStyleDash = 1;
-    DashStyleDot = 2;
-    DashStyleDashDot = 3;
-    DashStyleDashDotDot = 4;
+	const DashStyleSolid = 0;
+    const DashStyleDash = 1;
+    const DashStyleDot = 2;
+    const DashStyleDashDot = 3;
+    const DashStyleDashDotDot = 4;
 
 	// HatchStyle定義
-	HatchStyleHorizontal = 0;
-    HatchStyleVertical = 1;
-    HatchStyleForwardDiagonal = 2;
-    HatchStyleBackwardDiagonal = 3;
-    HatchStyleCross = 4;
-    HatchStyleDiagonalCross = 5;
-    HatchStyle05Percent = 6;
-    HatchStyle10Percent = 7;
-    HatchStyle20Percent = 8;
-    HatchStyle25Percent = 9;
-    HatchStyle30Percent = 10;
-    HatchStyle40Percent = 11;
-    HatchStyle50Percent = 12;
-    HatchStyle60Percent = 13;
-    HatchStyle70Percent = 14;
-    HatchStyle75Percent = 15;
-    HatchStyle80Percent = 16;
-    HatchStyle90Percent = 17;
-    HatchStyleLightDownwardDiagonal = 18;
-    HatchStyleLightUpwardDiagonal = 19;
-    HatchStyleDarkDownwardDiagonal = 20;
-    HatchStyleDarkUpwardDiagonal = 21;
-    HatchStyleWideDownwardDiagonal = 22;
-    HatchStyleWideUpwardDiagonal = 23;
-    HatchStyleLightVertical = 24;
-    HatchStyleLightHorizontal = 25;
-    HatchStyleNarrowVertical = 26;
-    HatchStyleNarrowHorizontal = 27;
-    HatchStyleDarkVertical = 28;
-    HatchStyleDarkHorizontal = 29;
-    HatchStyleDashedDownwardDiagonal = 30;
-    HatchStyleDashedUpwardDiagonal = 311;
-    HatchStyleDashedHorizontal = 32;
-    HatchStyleDashedVertical = 33;
-    HatchStyleSmallConfetti = 34;
-    HatchStyleLargeConfetti = 35;
-    HatchStyleZigZag = 36;
-    HatchStyleWave = 37;
-    HatchStyleDiagonalBrick = 38;
-    HatchStyleHorizontalBrick = 39;
-    HatchStyleWeave = 40;
-    HatchStylePlaid = 41;
-    HatchStyleDivot = 42;
-    HatchStyleDottedGrid = 43;
-    HatchStyleDottedDiamond = 44;
-    HatchStyleShingle = 45;
-    HatchStyleTrellis = 46;
-    HatchStyleSphere = 47;
-    HatchStyleSmallGrid = 48;
-    HatchStyleSmallCheckerBoard = 49;
-    HatchStyleLargeCheckerBoard = 50;
-    HatchStyleOutlinedDiamond = 51;
-    HatchStyleSolidDiamond = 52;
-    HatchStyleTotal = 53;
-    HatchStyleLargeGrid = HatchStyleCross;
-    HatchStyleMin = HatchStyleHorizontal;
-    HatchStyleMax = HatchStyleTotal - 1;
+	const HatchStyleHorizontal = 0;
+    const HatchStyleVertical = 1;
+    const HatchStyleForwardDiagonal = 2;
+    const HatchStyleBackwardDiagonal = 3;
+    const HatchStyleCross = 4;
+    const HatchStyleDiagonalCross = 5;
+    const HatchStyle05Percent = 6;
+    const HatchStyle10Percent = 7;
+    const HatchStyle20Percent = 8;
+    const HatchStyle25Percent = 9;
+    const HatchStyle30Percent = 10;
+    const HatchStyle40Percent = 11;
+    const HatchStyle50Percent = 12;
+    const HatchStyle60Percent = 13;
+    const HatchStyle70Percent = 14;
+    const HatchStyle75Percent = 15;
+    const HatchStyle80Percent = 16;
+    const HatchStyle90Percent = 17;
+    const HatchStyleLightDownwardDiagonal = 18;
+    const HatchStyleLightUpwardDiagonal = 19;
+    const HatchStyleDarkDownwardDiagonal = 20;
+    const HatchStyleDarkUpwardDiagonal = 21;
+    const HatchStyleWideDownwardDiagonal = 22;
+    const HatchStyleWideUpwardDiagonal = 23;
+    const HatchStyleLightVertical = 24;
+    const HatchStyleLightHorizontal = 25;
+    const HatchStyleNarrowVertical = 26;
+    const HatchStyleNarrowHorizontal = 27;
+    const HatchStyleDarkVertical = 28;
+    const HatchStyleDarkHorizontal = 29;
+    const HatchStyleDashedDownwardDiagonal = 30;
+    const HatchStyleDashedUpwardDiagonal = 311;
+    const HatchStyleDashedHorizontal = 32;
+    const HatchStyleDashedVertical = 33;
+    const HatchStyleSmallConfetti = 34;
+    const HatchStyleLargeConfetti = 35;
+    const HatchStyleZigZag = 36;
+    const HatchStyleWave = 37;
+    const HatchStyleDiagonalBrick = 38;
+    const HatchStyleHorizontalBrick = 39;
+    const HatchStyleWeave = 40;
+    const HatchStylePlaid = 41;
+    const HatchStyleDivot = 42;
+    const HatchStyleDottedGrid = 43;
+    const HatchStyleDottedDiamond = 44;
+    const HatchStyleShingle = 45;
+    const HatchStyleTrellis = 46;
+    const HatchStyleSphere = 47;
+    const HatchStyleSmallGrid = 48;
+    const HatchStyleSmallCheckerBoard = 49;
+    const HatchStyleLargeCheckerBoard = 50;
+    const HatchStyleOutlinedDiamond = 51;
+    const HatchStyleSolidDiamond = 52;
+    const HatchStyleTotal = 53;
+    const HatchStyleLargeGrid = HatchStyleCross;
+    const HatchStyleMin = HatchStyleHorizontal;
+    const HatchStyleMax = HatchStyleTotal - 1;
 
 	// LinearGradientMode 定義
-	LinearGradientModeHorizontal = 0;
-    LinearGradientModeVertical = 1;
-    LinearGradientModeForwardDiagonal = 2;
-    LinearGradientModeBackwardDiagonal = 3;
+	const LinearGradientModeHorizontal = 0;
+    const LinearGradientModeVertical = 1;
+    const LinearGradientModeForwardDiagonal = 2;
+    const LinearGradientModeBackwardDiagonal = 3;
 	
 	// LineCap 定義
-    LineCapFlat = 0;
-    LineCapSquare = 1;
-    LineCapRound = 2;
-    LineCapTriangle = 3;
-    LineCapNoAnchor = 0x10;
-    LineCapSquareAnchor = 0x11;
-    LineCapRoundAnchor = 0x12;
-    LineCapDiamondAnchor = 0x13;
-    LineCapArrowAnchor = 0x14;
+    const LineCapFlat = 0;
+    const LineCapSquare = 1;
+    const LineCapRound = 2;
+    const LineCapTriangle = 3;
+    const LineCapNoAnchor = 0x10;
+    const LineCapSquareAnchor = 0x11;
+    const LineCapRoundAnchor = 0x12;
+    const LineCapDiamondAnchor = 0x13;
+    const LineCapArrowAnchor = 0x14;
 
 	// LineJoin 定義
-	LineJoinMiter = 0;
-    LineJoinBevel = 1;
-    LineJoinRound = 2;
-    LineJoinMiterClipped = 3;
+	const LineJoinMiter = 0;
+    const LineJoinBevel = 1;
+    const LineJoinRound = 2;
+    const LineJoinMiterClipped = 3;
 
 	// PenAligntment 定義
-	PenAlignmentCenter = 0;
-    PenAlignmentInset = 1;
+	const PenAlignmentCenter = 0;
+    const PenAlignmentInset = 1;
 
 	// WrapMode 定義
-	WrapModeTile = 0;
-    WrapModeTileFlipX = 1;
-    WrapModeTileFlipY = 2;
-    WrapModeTileFlipXY = 3;
-    WrapModeClamp = 4;
+	const WrapModeTile = 0;
+    const WrapModeTileFlipX = 1;
+    const WrapModeTileFlipY = 2;
+    const WrapModeTileFlipXY = 3;
+    const WrapModeClamp = 4;
 
 	// MatrixOrder 定義
-	MatrixOrderPrepend = 0;
-	MatrixOrderAppend = 1;
+	const MatrixOrderPrepend = 0;
+	const MatrixOrderAppend = 1;
 
 	// ImageType 定義
-	ImageTypeUnknown = 0;
-	ImageTypeBitmap = 1;
-    ImageTypeMetafile = 2;
+	const ImageTypeUnknown = 0;
+	const ImageTypeBitmap = 1;
+    const ImageTypeMetafile = 2;
 
 	// RotateFlip 定義
-    RotateNoneFlipNone = 0;
-    Rotate90FlipNone = 1;
-    Rotate180FlipNone = 2;
-    Rotate270FlipNone = 3;
-    RotateNoneFlipX = 4;
-    Rotate90FlipX = 5;
-    Rotate180FlipX = 6;
-    Rotate270FlipX = 7;
-    RotateNoneFlipY = Rotate180FlipX;
-    Rotate90FlipY = Rotate270FlipX;
-    Rotate180FlipY = RotateNoneFlipX;
-    Rotate270FlipY = Rotate90FlipX;
-    RotateNoneFlipXY = Rotate180FlipNone;
-    Rotate90FlipXY = Rotate270FlipNone;
-    Rotate180FlipXY = RotateNoneFlipNone;
-    Rotate270FlipXY = Rotate90FlipNone;
+    const RotateNoneFlipNone = 0;
+    const Rotate90FlipNone = 1;
+    const Rotate180FlipNone = 2;
+    const Rotate270FlipNone = 3;
+    const RotateNoneFlipX = 4;
+    const Rotate90FlipX = 5;
+    const Rotate180FlipX = 6;
+    const Rotate270FlipX = 7;
+    const RotateNoneFlipY = Rotate180FlipX;
+    const Rotate90FlipY = Rotate270FlipX;
+    const Rotate180FlipY = RotateNoneFlipX;
+    const Rotate270FlipY = Rotate90FlipX;
+    const RotateNoneFlipXY = Rotate180FlipNone;
+    const Rotate90FlipXY = Rotate270FlipNone;
+    const Rotate180FlipXY = RotateNoneFlipNone;
+    const Rotate270FlipXY = Rotate90FlipNone;
 
 	// SmoothingMode 指定
-	SmoothingModeInvalid = -1;
-	SmoothingModeDefault = 0;
-	SmoothingModeHighSpeed = 1;
-	SmoothingModeHighQuality = 2;
-	SmoothingModeNone = 0;
-	SmoothingModeAntiAlias = 1;
+	const SmoothingModeInvalid = -1;
+	const SmoothingModeDefault = 0;
+	const SmoothingModeHighSpeed = 1;
+	const SmoothingModeHighQuality = 2;
+	const SmoothingModeNone = 0;
+	const SmoothingModeAntiAlias = 1;
 
 	// TextRenderingHint 指定
-	TextRenderingHintSystemDefault = 0;
-	TextRenderingHintSingleBitPerPixelGridFit = 1;
-    TextRenderingHintSingleBitPerPixel = 2;
-    TextRenderingHintAntiAliasGridFit = 3;
-    TextRenderingHintAntiAlias = 4;
-    TextRenderingHintClearTypeGridFit = 5;
+	const TextRenderingHintSystemDefault = 0;
+	const TextRenderingHintSingleBitPerPixelGridFit = 1;
+    const TextRenderingHintSingleBitPerPixel = 2;
+    const TextRenderingHintAntiAliasGridFit = 3;
+    const TextRenderingHintAntiAlias = 4;
+    const TextRenderingHintClearTypeGridFit = 5;
 	
 	/**
 	 * プライベートフォントの追加(static)
 	 * @param fontFileName フォントファイル名
 	 * @throws Exception フォントファイルが開けない
-	 * アプリケーション固有のフォントを追加します。
+	 * @description アプリケーション固有のフォントを追加します。
 	 * 吉里吉里アーカイブ中にあるフォントも登録できます。
 	 */
 	function addPrivateFont(fontFileName);
@@ -217,23 +217,32 @@ class GdiPlus {
 		 */
 		function Font(familyName, emSize, style);
 		
-		property familyName; //< フォントファミリー
-		property emSize;     //< フォントのサイズ
-		property style;      //< フォントのスタイル
-                property forceSelfPathDraw; //< GDI+ のフォント描画機構を使わずに、自前でパスを取得してのフォント描画を行うかどうかを設定する。
+		// フォントファミリー
+		property familyName;
+		// フォントのサイズ
+		property emSize;
+		// フォントのスタイル
+		property style;
+		// GDI+ のフォント描画機構を使わずに、自前でパスを取得してのフォント描画を行うかどうかを設定する。
+        property forceSelfPathDraw;
 
-		property ascent;      //< ascent (読み出し専用)
-		property descent;     //< descent (読み出し専用)
-		property lineSpacing; //< 行間の長さ (読み出し専用)。
-                property ascentLeading; //< ascent側のinternalLeading(読み出し専用)
-                property descentLeading; //< descent側のinternalLeading(読み出し専用)
-          // ascent + descent は lineSpacing に等しい。
-          // lineSpacing - ( ascentLeading + descentLeading ) は emSize に等しい。
+		// ascent (読み出し専用)
+		property ascent;
+		// descent (読み出し専用)
+		property descent;
+		// 行間の長さ (読み出し専用)。
+		property lineSpacing;
+		// ascent側のinternalLeading(読み出し専用)
+        property ascentLeading;
+        // descent側のinternalLeading(読み出し専用)
+        property descentLeading;
+        // ascent + descent は lineSpacing に等しい。
+        // lineSpacing - ( ascentLeading + descentLeading ) は emSize に等しい。
 	};
 
 	/**
 	 * 描画外観情報
-	 * Illustrator のアピアランスをイメージしてください。
+	 * @description Illustrator のアピアランスをイメージしてください。
 	 * 描画に対して、複数のブラシ（塗り）とペン（線）を指定できます。
 	 * 先に追加した方が下に入ります
 	 */
@@ -255,7 +264,7 @@ class GdiPlus {
 		 * @param ox 表示オフセットX
 		 * @param oy 表示オフセットY
 		 * @throws Exception ブラシ生成に失敗
-		 *
+		 * @description
 		 * ブラシ情報定義
 		 * 基本  点指定は [x,y] の配列または %[x:x, y:y] の辞書
 		 *       矩形指定は [x,y,width,height] の配列または %[x:x, y:y, width:w, height:h] の辞書
@@ -314,7 +323,7 @@ class GdiPlus {
 		 * @param ox 表示オフセットX
 		 * @param oy 表示オフセットY
 		 * @throws Exception ブラシ生成に失敗
-		 *
+		 * @description
 		 * ペン情報定義: widthOrOption が辞書の場合は詳細情報定義になります
 		 * パラメータについては GDI+ のドキュメントを見て研究してください
 		 *
@@ -377,7 +386,7 @@ class GdiPlus {
 
 		/**
 		 * コンストラクタ
-		 * 正規マトリックスを生成する
+		 * @description 正規マトリックスを生成する
 		 */
 		function Matrix();
 
@@ -417,7 +426,7 @@ class GdiPlus {
 	}
 	
 	/**
-	 * 画像情報を取り扱うクラス
+	 * @description 画像情報を取り扱うクラス
 	 * ※ベクトル画像データの領域は座標が負の領域にある場合もあります
 	 */
 	class Image {
@@ -626,11 +635,11 @@ class Layer {
 	property updateWhenDraw;
 
 	// 描画のアンチエイリアス指定(SmoothingMode)
-	// デフォルト SmoothingModeAntiAlias
+	// @description デフォルト SmoothingModeAntiAlias
 	property smoothingMode;
 
 	// テキスト描画のレンダリング指定(TextRenderingHint)
-	// デフォルト TextRenderingHintAntiAlias
+	// @description デフォルト TextRenderingHintAntiAlias
 	property textRenderingHint;
 
 	/**
@@ -913,7 +922,7 @@ class Layer {
 
 	/**
 	 * このプラグインによる描画内容を記録するかどうか
-	 * record = true の状態の場合、viewTransform を指定すると
+	 * @description record = true の状態の場合、viewTransform を指定すると
 	 * 描画内容そのままで再描画されます。
 	 */
 	property record;
@@ -964,29 +973,29 @@ class Layer {
 	// エンコードパラメータ指定用定数
 
 	// compression用
-	EncoderValueCompressionLZW;
-	EncoderValueCompressionCCITT3;
-    EncoderValueCompressionCCITT4;
-    EncoderValueCompressionRle;
-    EncoderValueCompressionNone;
+	const EncoderValueCompressionLZW;
+	const EncoderValueCompressionCCITT3;
+    const EncoderValueCompressionCCITT4;
+    const EncoderValueCompressionRle;
+    const EncoderValueCompressionNone;
 
 	// scanmethod用
-	EncoderValueScanMethodInterlaced;
-    EncoderValueScanMethodNonInterlaced;
+	const EncoderValueScanMethodInterlaced;
+    const EncoderValueScanMethodNonInterlaced;
 
 	// version用
-	EncoderValueVersionGif87;
-    EncoderValueVersionGif89;
+	const EncoderValueVersionGif87;
+    const EncoderValueVersionGif89;
 
 	// render用
-	EncoderValueRenderProgressive;
-    EncoderValueRenderNonProgressive;
+	const EncoderValueRenderProgressive;
+    const EncoderValueRenderNonProgressive;
 
 	// transform用
-	EncoderValueTransformRotate90;
-    EncoderValueTransformRotate180;
-    EncoderValueTransformRotate270;
-	EncoderValueTransformFlipHorizontal;
-	EncoderValueTransformFlipVertical;
+	const EncoderValueTransformRotate90;
+    const EncoderValueTransformRotate180;
+    const EncoderValueTransformRotate270;
+	const EncoderValueTransformFlipHorizontal;
+	const EncoderValueTransformFlipVertical;
 };
 

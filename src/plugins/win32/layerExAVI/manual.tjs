@@ -14,7 +14,7 @@ class Layer {
 	 * ダイアログを開いて 圧縮設定を行なってから、AVIファイルを準備する
 	 * @param filename ファイル名
 	 * @param fps FPS指定
-         * @return 圧縮設定ダイアログでキャンセルを押して抜けた場合はfalse
+     * @return 圧縮設定ダイアログでキャンセルを押して抜けた場合はfalse
 	 */
 	function openAVI(filename, fps);
 

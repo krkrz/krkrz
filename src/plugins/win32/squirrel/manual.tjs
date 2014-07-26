@@ -13,7 +13,7 @@ class Scripts {
 	
 	/**
 	 * Squirrel スクリプトの実行。
-	 * このメソッドによる実行中では Object/Thread 拡張による wait は利用できません
+	 * @description このメソッドによる実行中では Object/Thread 拡張による wait は利用できません
 	 * @param text スクリプトが格納された文字列
 	 * @param ... 引数
 	 * @throw コンパイルに失敗
@@ -32,7 +32,7 @@ class Scripts {
 	
 	/**
 	 * Squirrel スクリプトのファイルからの実行。
-	 * このメソッドによる実行中では Object/Thread 拡張による wait は利用できません
+	 * @description このメソッドによる実行中では Object/Thread 拡張による wait は利用できません
 	 * @param filename スクリプトが格納されたファイル
 	 * @param ... 引数
 	 * @throw ファイルの読み込みに失敗
@@ -43,7 +43,7 @@ class Scripts {
 
 	/**
 	 * Squirrel グローバルメソッドの呼び出し。
-	 * このメソッドによる実行中では Object/Thread 拡張による wait は利用できません
+	 * @description このメソッドによる実行中では Object/Thread 拡張による wait は利用できません
 	 * @param name メソッド名
 	 * @param ... 引数
 	 * @throw メソッドの取得に失敗
@@ -150,7 +150,7 @@ class Scripts {
 
 	/**
 	 * Squirrel用比較
-	 * 2つのオブジェクトを squirrel 的に比較します
+	 * @description 2つのオブジェクトを squirrel 的に比較します
 	 * @param obj1 オブジェクトその1
 	 * @param obj2 オブジェクトその2
 	 * @return 比較結果 >0: obj1>obj2 ==0:obj1==obj2 <0:obj1<obj2
@@ -159,7 +159,7 @@ class Scripts {
 }
 
 /**
- * Squirrel のグローバルファンクションを直接呼び出すためのクラス
+ * @description Squirrel のグローバルファンクションを直接呼び出すためのクラス
  */
 class SQFunction {
 
@@ -171,7 +171,7 @@ class SQFunction {
 
     /**
 	 * 関数を呼び出す
-	 * このメソッドによる実行中では Object/Thread 拡張による wait は利用できません
+	 * @description このメソッドによる実行中では Object/Thread 拡張による wait は利用できません
 	 * @param 引数はそのまま変換してわたされます
 	 * @return 関数の返り値
 	 */
@@ -179,13 +179,13 @@ class SQFunction {
 };
 
 /**
- * Squirrel 専用の Continuous ハンドラを維持するためのクラス
+ * @description Squirrel 専用の Continuous ハンドラを維持するためのクラス
  */
 class SQContinuous {
 
 	/**
 	 * コンストラクタ
-	 * このメソッドによる実行中では Object/Thread 拡張による wait は利用できません
+	 * @description このメソッドによる実行中では Object/Thread 拡張による wait は利用できません
 	 * @param func squirrel のグローバルな関数 func(tick){} の名前
 	 * ※tick は SQInteger にキャストされてから呼び出されます
 	 */
@@ -203,13 +203,13 @@ class SQContinuous {
 };
 
 /**
- * squirrel 側で createTJSClass して生成されたインスタンス中では
+ * @description squirrel 側で createTJSClass して生成されたインスタンス中では
  * 以下の特殊なメソッドが利用可能です。イベントの伝播などで活用可能です。
  */
 class TJSObject {
 	/**
 	 * Squirrel インスタンスメソッドの呼び出し
-	 * このメソッドによる実行中では Object/Thread 拡張による wait は利用できません
+	 * @description このメソッドによる実行中では Object/Thread 拡張による wait は利用できません
 	 * @param name メソッド名
 	 * @param ... 引数
 	 * @return スクリプトの実行結果

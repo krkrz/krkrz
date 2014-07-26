@@ -8,14 +8,16 @@
 class Window {
 
 	// プログレスバースタイル指定
-	var PBS_SMOOTH = 1;   //< プログレスバースムーズ指定
-	var PBS_VERTICAL = 4; //< プログレスバー垂直配置指定
+	// プログレスバースムーズ指定
+	const PBS_SMOOTH = 1;   
+	// プログレスバー垂直配置指定
+	const PBS_VERTICAL = 4; 
 	
 	/**
 	 * プログレス処理を開始する。
 	 * 吉里吉里が実行ブロック中でも正常に表示継続します。
 	 * @param init 初期化データ(辞書)
-	 *
+	 * @description
 	 * プログレスバー初期化パラメータ
 	 * progressBarEnable: プログレスバーを表示するかどうか(デフォルト:true)
 	 * progressBarStyle: プログレスバーのスタイル (デフォルト:なし)
