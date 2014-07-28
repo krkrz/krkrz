@@ -451,6 +451,24 @@ ttstr TVPGetAppDataPath()
 
 
 
+//---------------------------------------------------------------------------
+// TVPGetSavedGamesPath
+//---------------------------------------------------------------------------
+ttstr TVPGetSavedGamesPath()
+{
+	ttstr path;
+	PWSTR ppszPath = NULL;
+	HRESULT hr = ::SHGetKnownFolderPath(FOLDERID_SavedGames, 0, NULL, &ppszPath);
+	if( hr == S_OK ) {
+		path = ppszPath;
+		::CoTaskMemFree( ppszPath );
+	}
+	return path;
+}
+//---------------------------------------------------------------------------
+
+
+
 
 //---------------------------------------------------------------------------
 // TVPCreateAppLock
@@ -891,6 +909,19 @@ TJS_BEGIN_NATIVE_PROP_DECL(exeName)
 	TJS_DENY_NATIVE_PROP_SETTER
 }
 TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, exeName)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(savedGamesPath)
+{
+	TJS_BEGIN_NATIVE_PROP_GETTER
+	{
+		*result = TVPGetSavedGamesPath();
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_GETTER
+
+	TJS_DENY_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, savedGamesPath)
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_PROP_DECL(title)
 {

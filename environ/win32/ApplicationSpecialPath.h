@@ -29,6 +29,16 @@ public:
 		}
 		return L"";
 	}
+	static inline std::wstring GetSavedGamesPath() {
+		std::wstring result;
+		PWSTR ppszPath = NULL;
+		HRESULT hr = ::SHGetKnownFolderPath(FOLDERID_SavedGames, 0, NULL, &ppszPath);
+		if( hr == S_OK ) {
+			result = std::wstring(ppszPath);
+			::CoTaskMemFree( ppszPath );
+		}
+		return result;
+	}
 	static inline std::wstring ReplaceStringAll( std::wstring src, const std::wstring& target, const std::wstring& dest ) {
 		int nPos = 0;
 		while( (nPos = src.find(target, nPos)) != std::wstring::npos ) {
@@ -46,8 +56,10 @@ public:
 		std::wstring exepath = ExcludeTrailingBackslash(ExtractFileDir(exename));
 		std::wstring personalpath = ExcludeTrailingBackslash(GetPersonalPath());
 		std::wstring appdatapath = ExcludeTrailingBackslash(GetAppDataPath());
+		std::wstring savedgamespath = ExcludeTrailingBackslash(GetSavedGamesPath());
 		if(personalpath == L"") personalpath = exepath;
 		if(appdatapath == L"") appdatapath = exepath;
+		if(savedgamespath == L"") savedgamespath = exepath;
 
 		OSVERSIONINFO osinfo;
 		osinfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
@@ -61,6 +73,7 @@ public:
 		datapath = ReplaceStringAll(datapath, L"$(personalpath)", personalpath);
 		datapath = ReplaceStringAll(datapath, L"$(appdatapath)", appdatapath);
 		datapath = ReplaceStringAll(datapath, L"$(vistapath)", vistapath);
+		datapath = ReplaceStringAll(datapath, L"$(savedgamespath)", savedgamespath);
 		return IncludeTrailingBackslash(ExpandUNCFileName(datapath));
 	}
 	static std::wstring GetUserConfigFileName( const std::wstring& datapath, const std::wstring& exename ) {
