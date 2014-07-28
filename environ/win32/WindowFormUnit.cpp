@@ -1336,12 +1336,12 @@ void TTVPWindowForm::SetHintText(iTJSDispatch2* sender,  const ttstr &text ) {
 	HintX = p.x;
 	HintY = p.y;
 
-	if( HintTimer ) HintTimer->SetEnabled(false);
 	if( text.IsEmpty() ) {
 		if( HintTimer ) HintTimer->SetEnabled(false);
 		UpdateHint();
 	} else {
 		if( LastHintSender != sender || updatetext ) {
+			if( HintTimer ) HintTimer->SetEnabled(false);
 			if( HintDelay > 0 ) {
 				if( HintTimer == NULL ) {
 					HintTimer = new TVPTimer();
