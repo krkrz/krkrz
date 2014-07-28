@@ -970,6 +970,9 @@
     <ClCompile Include="..\extension\Extension.cpp">
       <Filter>extension</Filter>
     </ClCompile>
+    <ClCompile Include="..\visual\LoadJXR.cpp">
+      <Filter>visual</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="tvpwin32.rc">
