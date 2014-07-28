@@ -70,6 +70,8 @@ public:
 			TJS_W(".tlg5"), TVPLoadTLG, NULL));
 		Handlers.push_back(tTVPGraphicHandlerType(
 			TJS_W(".tlg6"), TVPLoadTLG, NULL));
+		Handlers.push_back(tTVPGraphicHandlerType(
+			TJS_W(".jxr"), TVPLoadJXR, NULL));
 		ReCreateHash();
 		Avail = true;
 	}
