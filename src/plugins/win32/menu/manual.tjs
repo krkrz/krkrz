@@ -1,0 +1,192 @@
+
+class Window {
+	/**
+	 * ルートメニューオブジェクト
+	 * @description ルートメニューオブジェクト ( Menu クラスのオブジェクト ) を表します。
+	 * このルートメニューオブジェクトの子として登録されたメニューはメニューバーに並ぶことになります。
+	 */
+	property menu { getter; };
+};
+
+class MenuItem {
+	/**
+	 * MenuItem オブジェクトの構築
+	 * @param window このメニュー項目を作成するウィンドウを指定します。
+	 * @param caption メニュー項目のキャプション (表示する文字列) を指定します。
+	 * MenuItem.caption プロパティで設定/取得できます。
+	 * @description MenuItem クラスのオブジェクトを構築します。
+	 * 作成したメニュー項目を親メニュー項目に追加するには、親メニュー項目の MenuItem.add メソッドを使います。
+	 */
+	function MenuItem( window:Window, caption:string="" );
+
+	/**
+	 * 子メニュー項目の追加
+	 * @param item 追加する子メニュー項目を指定します。
+	 * 子メニュー項目は、すでに子となっているメニュー項目の最後に追加されます。
+	 * @description 子メニュー項目を追加します。
+	 * メニュー項目が他のメニュー項目の子になると、 親メニュー項目が無効化されるときに自動的に子メニュー項目も無効化されるようになります。
+	 * また、メニュー階層においても親子の関係を持つようになります。
+	 */
+	function add(item:MenuItem);
+
+	/**
+	 * 子メニュー項目の挿入
+	 * @param item 挿入する子メニュー項目を指定します。
+	 * @param index 挿入する位置を指定します。0 を指定すると先頭に挿入されます。
+	 * @description 子メニュー項目を指定位置に挿入します。
+	 */
+	function insert(item:MenuItem,index:int);
+
+	/**
+	 * メニュー項目のポップアップ表示
+	 * @param flags メニューの挙動を表すフラグです。以下の値のビット論理和を指定してください。
+	 * tpmLeftButton
+	 * tpmRightButton
+	 * tpmLeftAlign
+	 * tpmCenterAlign
+	 * tpmRightAlign
+	 * tpmTopAlign
+	 * tpmVCenterAlign
+	 * tpmBottomAlign
+	 * tpmHorizontal
+	 * tpmVertical
+	 * tpmNoNotify
+	 * tpmReturnCmd
+	 * tpmRecurse
+	 * tpmHorPosAnimation
+	 * tpmHorNegAnimation
+	 * tpmVerPosAnimation
+	 * tpmVerNegAnimation
+	 * tpmNoAnimation
+	 * これらのフラグの詳細についてはMSDNの該当ページを参照してください。 
+	 * @param x ウィンドウのクライアント座標上でのx位置を表します。 
+	 * @param y ウィンドウのクライアント座標上でのy位置を表します。 
+	 * @return flagsにtpmReturnCmdが指定されていた場合は、 選択されたメニュー項目のIDを整数で返します(ただし、現バージョンではこのIDを吉里吉里側から設定することができないため、flagsにtpmReturnCmdを指定することは意味がありません)。
+	 * 何も選択されずにキャンセルされた場合は0を返します。 
+	 * @description メニュー項目をポップアップ表示します。このメソッドは、メニューが閉じられるまで帰ってきません。
+	 * メニューが閉じられるまでの間に他の非同期イベントが発生する可能性があるので注意してください。
+	 * Window.menuそのものはポップアップできません。
+	 * 非表示状態のメニュー項目はポップアップできません。
+	 * Window.menuの子でないメニューはポップアップできません。
+	 */
+	function popup(flags:int,x:int,y:int);
+
+	/**
+	 * 子メニュー項目の削除
+	 * @param item 削除する子メニュー項目を指定します。
+	 * @description 指定された子メニュー項目をリストから削除します。
+	 */
+	function remove(item:MenuItem);
+
+	/**
+	 * HMENUメニュー項目ハンドル
+	 * @description Windows APIにおけるHMENU型のメニュー項目ハンドルを表します。
+	 * このプロパティはプラグインなどでメニュー項目に直接アクセスしたいときに用います。
+	 * TJS2からのアクセスは意味がありません。
+	 * ここで得られるのは整数ですが、プラグインなどでこの数値を使う場合は HMENU 型に キャストして使ってください。
+	 */
+	property HMENU { getter; }
+
+	/**
+	 * キャプション
+	 * @description キャプション ( 表示する文字列 ) を表します。値を設定することもできます。
+	 * '-' ( ハイフン ) を指定すると区切り線を表示するようになります。
+	 */
+	property caption { setter; getter; }
+
+	/**
+	 * チェックマークを表示するかどうか
+	 * @description メニュー項目の横にチェックマークを表示するかどうかを表します。値を設定することもできます。
+	 * 真を指定するとチェックマークが表示されます。
+	 * MenuItem.radio プロパティが真の場合は、チェックマークではなく、黒い丸が表示されます。
+	 * MenuItem.group にて同じグループ番号を持ち、かつ同じ親を持ち、さらに MenuItem.radio プロパティが真のメニュー項目は、 このプロパティを同時に二つ以上を 真にすることはできません。他のメニュー項目のこのプロパティが真になった場合、 他に真になっているメニュー項目があれば、自動的にそのメニュー項目のこのプロパティは偽に 設定されます。
+	 */
+	property checked { setter; getter; }
+
+	/**
+	 * 子メニュー項目
+	 * @description 子メニュー項目がリストされた配列オブジェクトを表します。
+	 * ここで得られた配列に値を書き込んだり、項目の削除や追加などをしても実際のメニュー項目の状態には反映されません。読み取りのみが行えると考えてください。
+	 */
+	property children { getter; }
+
+	/**
+	 * 選択可能かどうか
+	 * @description メニュー項目を選択可能かどうかを表します。値を設定することもできます。
+	 * 真の場合はメニュー項目が選択可能、偽の場合は選択不可能になります。
+	 */
+	property enabled { setter; getter; }
+
+	/**
+	 * グループ番号
+	 * @description グループ番号を表します。値を設定することもできます。
+	 * 同じグループ番号を持ち、かつ同じ親を持ち、MenuItem.radio プロパティが 真のメニュー項目は、MenuItem.checked プロパティを同時に二つ以上を 真にすることはできません。
+	 */
+	property group { setter; getter; }
+
+	/**
+	 * 順番
+	 * @description 同じ親を持つメニュー項目間における順番を表す、0または正の整数です。
+	 * 0が先頭を表します。
+	 * 現在位置を取得したり、位置を変更するときに便利です。
+	 * 値を設定すると、その位置にメニュー項目が移動します。
+	 */
+	property index { setter; getter; }
+
+	/**
+	 * 親メニュー項目
+	 * @description 親メニュー項目を表します。
+	 */
+	property parent { getter; }
+
+	/**
+	 * ラジオ項目かどうか
+	 * @description ラジオ項目かどうかを指定します。値を設定することもできます。
+	 * この項目が真の場合の動作については MenuItem.checked プロパティを 参照してください。
+	 */
+	property radio { setter; getter; }
+
+	/**
+	 * ルートメニュー項目
+	 * @description ルート(大本)のメニュー項目(MenuItemクラスのインスタンス)を表します。
+	 */
+	property root { getter; }
+
+	/**
+	 * ショートカットキー
+	 * @description ショートカットキーを表します。値を設定することもできます。
+	 * ショートカットキーは文字列で指定します。「シフト系キー+対象キー名」の組み合わせで 指定します。大文字と小文字は区別されません。以下は有効なショートカットキーの例です。
+	 * 
+	 * "Shift+Esc"
+	 * "Ctrl+S"
+	 * "Shift+Alt+E"
+	 * "Alt+Enter"
+	 * "Ctrl+F1"
+	 * "T" (シフト系キーの指定をしないこともできます)
+	 * 
+	 * 無効なショートカットキーの組み合わせや、"" (空文字列) を指定するとショートカットキーは無効になります。
+	 * 現バージョンでは、Tab や Shift+F1 など、システムや吉里吉里であらかじめ用途の決まっているキーの一部や、一部のキー (Shiftキーそのものなど)を指定しても反応しません。
+	 * ショートカットキーを指定すると、そのキーに対応する onKeyDown 等のイベントは発生しなくなり、ショートカットキーを 指定したメニュー項目にのみイベントが発生するようになります。
+	 */
+	property shortcut { setter; getter; }
+
+	/**
+	 * 可視かどうか
+	 * @description メニュー項目が可視かどうかを表します。値を設定することもできます。
+	 * 真ならば表示され、偽ならば非表示です。
+	 */
+	property visible { setter; getter; }
+
+	/**
+	 * オーナーウィンドウ
+	 * @description このメニューアイテムを保持するオーナーウィンドウ(Windowクラスのオブジェクト)を表します。
+	 */
+	property window { getter; }
+
+
+	/**
+	 * メニュー項目が選択された
+	 * @description メニュー項目が選択された ( クリックされたり Enter キーが押された ) 時に発生します。
+	 */
+	function onClick();
+};
