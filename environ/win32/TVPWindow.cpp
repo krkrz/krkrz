@@ -20,9 +20,8 @@
 #include <tpcshrd.h> // for MICROSOFT_TABLETPENSERVICE_PROPERTY
 
 // touch mouse message extraInfo (cf. http://msdn.microsoft.com/en-us/library/windows/desktop/ms703320(v=vs.85).aspx )
-#define MI_WP_SIGNATURE (0xFF515700)
-#define SIGNATURE_MASK  (0xFFFFFF00)
-#define IsTouchEvent(dw) (((dw) & SIGNATURE_MASK) == MI_WP_SIGNATURE)
+const DWORD tTVPWindow::MI_WP_SIGNATURE = 0xFF515700;
+const DWORD tTVPWindow::SIGNATURE_MASK  = 0xFFFFFF00;
 
 tTVPWindow::~tTVPWindow() {
 	if( ime_control_ ) delete ime_control_;
