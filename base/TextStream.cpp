@@ -147,37 +147,63 @@ public:
 			}
 			else
 			{
-				// ansi/mbcs
-				// read whole and hold it
-				Stream->SetPosition(ofs);
-				tjs_uint size = (tjs_uint)(Stream->GetSize());
-				tjs_uint8 *nbuf = new tjs_uint8[size + 1];
-				try
-				{
-					Stream->ReadBuffer(nbuf, size);
-					nbuf[size] = 0; // terminater
-					if( encoding == TJS_W("UTF-8") ) {
+				// check UTF-8 BOM
+				tjs_uint8 mark2[1] = {0};
+				Stream->Read(mark2, 1);
+				if(mark[0] == 0xef && mark[1] == 0xbb && mark2[0] == 0xbf) {
+					// UTF-8 BOM
+					tjs_uint size = (tjs_uint)(Stream->GetSize()-3);
+					tjs_uint8 *nbuf = new tjs_uint8[size + 1];
+					try
+					{
+						Stream->ReadBuffer(nbuf, size);
+						nbuf[size] = 0; // terminater
 						BufferLen = TVPUtf8ToWideCharString((const char*)nbuf, NULL);
 						if(BufferLen == (size_t)-1) TVPThrowExceptionMessage(TJSNarrowToWideConversionError);
 						Buffer = new tjs_char [ BufferLen +1];
 						TVPUtf8ToWideCharString((const char*)nbuf, Buffer);
-					} else if( encoding == TJS_W("Shift_JIS") ) {
-						BufferLen = TJS_narrowtowidelen((tjs_nchar*)nbuf);
-						if(BufferLen == (size_t)-1) TVPThrowExceptionMessage(TJSNarrowToWideConversionError);
-						Buffer = new tjs_char [ BufferLen +1];
-						TJS_narrowtowide(Buffer, (tjs_nchar*)nbuf, BufferLen);
-					} else {
-						TVPThrowExceptionMessage(TVPUnsupportedEncoding, encoding);
 					}
-				}
-				catch(...)
-				{
+					catch(...)
+					{
+						delete [] nbuf;
+						throw;
+					}
 					delete [] nbuf;
-					throw;
+					Buffer[BufferLen] = 0;
+					BufferPtr = Buffer;
+				} else {
+					// ansi/mbcs
+					// read whole and hold it
+					Stream->SetPosition(ofs);
+					tjs_uint size = (tjs_uint)(Stream->GetSize());
+					tjs_uint8 *nbuf = new tjs_uint8[size + 1];
+					try
+					{
+						Stream->ReadBuffer(nbuf, size);
+						nbuf[size] = 0; // terminater
+						if( encoding == TJS_W("UTF-8") ) {
+							BufferLen = TVPUtf8ToWideCharString((const char*)nbuf, NULL);
+							if(BufferLen == (size_t)-1) TVPThrowExceptionMessage(TJSNarrowToWideConversionError);
+							Buffer = new tjs_char [ BufferLen +1];
+							TVPUtf8ToWideCharString((const char*)nbuf, Buffer);
+						} else if( encoding == TJS_W("Shift_JIS") ) {
+							BufferLen = TJS_narrowtowidelen((tjs_nchar*)nbuf);
+							if(BufferLen == (size_t)-1) TVPThrowExceptionMessage(TJSNarrowToWideConversionError);
+							Buffer = new tjs_char [ BufferLen +1];
+							TJS_narrowtowide(Buffer, (tjs_nchar*)nbuf, BufferLen);
+						} else {
+							TVPThrowExceptionMessage(TVPUnsupportedEncoding, encoding);
+						}
+					}
+					catch(...)
+					{
+						delete [] nbuf;
+						throw;
+					}
+					delete [] nbuf;
+					Buffer[BufferLen] = 0;
+					BufferPtr = Buffer;
 				}
-				delete [] nbuf;
-				Buffer[BufferLen] = 0;
-				BufferPtr = Buffer;
 			}
 		}
 		catch(...)
