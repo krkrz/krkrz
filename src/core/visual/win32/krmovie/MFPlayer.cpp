@@ -131,6 +131,7 @@ void STDMETHODCALLTYPE tTVPPlayerCallback::OnMediaPlayerEvent( MFP_EVENT_HEADER 
 STDMETHODIMP tTVPPlayerCallback::GetParameters( DWORD *pdwFlags, DWORD *pdwQueue ) {
 	return E_NOTIMPL;
 }
+#if 0
 class SessionHandler {
 public:
 	void OnClosed();
@@ -147,6 +148,7 @@ public:
 	void OnTopologyStatus();
 
 };
+#endif
 STDMETHODIMP tTVPPlayerCallback::Invoke( IMFAsyncResult *pAsyncResult ) {
 	HRESULT hr;
 	MediaEventType met = MESessionClosed;
