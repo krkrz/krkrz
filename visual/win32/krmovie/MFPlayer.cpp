@@ -140,6 +140,7 @@ tTVPMFPlayer::tTVPMFPlayer() {
 	Stream = NULL;
 
 	HnsDuration = 0;
+	EventCode = 0;
 }
 tTVPMFPlayer::~tTVPMFPlayer() {
 	Shutdown = true;
@@ -662,6 +663,8 @@ void tTVPMFPlayer::OnPause() {
 	VideoStatue = vsPaused;
 }
 void tTVPMFPlayer::OnPlayBackEnded() {
+	EventCode = EC_COMPLETE;
+	::SendMessage( CallbackWindow, WM_GRAPHNOTIFY, 0, 0 );
 }
 void tTVPMFPlayer::OnRateSet( double rate ) {
 }
@@ -737,13 +740,11 @@ void __stdcall tTVPMFPlayer::SetPosition(unsigned __int64 tick) {
 	HRESULT hr = E_FAIL;
 	PROPVARIANT var;
 	PropVariantInit(&var);
-	/*
-	if( MediaPlayer ) {
-		var.vt = VT_I8;
-		var.hVal.QuadPart = tick;
-		HRESULT hr = MediaPlayer->SetPosition( MFP_POSITIONTYPE_100NS, &var );
+    varStart.vt = VT_I8;
+	varStart.hVal.QuadPart = tick * (ONE_SECOND/ONE_MSEC);
+	if( MediaSession ) {
+		MediaSession->Start(NULL, &varStart);
 	}
-	*/
 	PropVariantClear(&var);
 	if( FAILED(hr) ) {
 		TVPThrowExceptionMessage(L"Faild to set position.");
@@ -772,9 +773,19 @@ void __stdcall tTVPMFPlayer::GetStatus(tTVPVideoStatus *status) {
 	}
 }
 void __stdcall tTVPMFPlayer::GetEvent(long *evcode, long *param1, long *param2, bool *got) {
-	*got = false;
+	if( EventCode != 0 ) {
+		*evcode = EventCode;
+		*param1 = 0;
+		*param2 = 0;
+		*got = true;
+	} else {
+		*got = false;
+	}
 }
 void __stdcall tTVPMFPlayer::FreeEventParams(long evcode, long param1, long param2) {
+	if( evcode == EventCode ) {
+		EventCode = 0;
+	}
 }
 void __stdcall tTVPMFPlayer::Rewind() {
 	SetPosition( 0 );
@@ -811,9 +822,10 @@ void __stdcall tTVPMFPlayer::GetNumberOfFrame( int *f ) {
 /**
  * @brief ムービーの長さ(msec)を取得する
  * @param f ムービーの長さを入れる変数へのポインタ
+ * 
+ * http://msdn.microsoft.com/en-us/library/windows/desktop/dd979590%28v=vs.85%29.aspx
  */
 void __stdcall tTVPMFPlayer::GetTotalTime( __int64 *t ) {
-	// http://msdn.microsoft.com/en-us/library/windows/desktop/dd979590%28v=vs.85%29.aspx
     *t = (HnsDuration / (ONE_SECOND / ONE_MSEC));
 }
 
@@ -927,19 +939,26 @@ void __stdcall tTVPMFPlayer::GetAudioVolume( long *volume ) {
 }
 
 void __stdcall tTVPMFPlayer::GetNumberOfAudioStream( unsigned long *streamCount ){
+	/* 何もしない */
 }
 void __stdcall tTVPMFPlayer::SelectAudioStream( unsigned long num ){
+	/* 何もしない */
 }
 void __stdcall tTVPMFPlayer::GetEnableAudioStreamNum( long *num ){
+	/* 何もしない */
 }
 void __stdcall tTVPMFPlayer::DisableAudioStream( void ){
+	/* 何もしない */
 }
 
 void __stdcall tTVPMFPlayer::GetNumberOfVideoStream( unsigned long *streamCount ){
+	/* 何もしない */
 }
 void __stdcall tTVPMFPlayer::SelectVideoStream( unsigned long num ){
+	/* 何もしない */
 }
 void __stdcall tTVPMFPlayer::GetEnableVideoStreamNum( long *num ){
+	/* 何もしない */
 }
 
 void __stdcall tTVPMFPlayer::SetMixingBitmap( HDC hdc, RECT *dest, float alpha ) {
@@ -961,6 +980,7 @@ void __stdcall tTVPMFPlayer::GetMixingMovieBGColor( unsigned long *col ) {
 	/* 何もしない */
 }
 void __stdcall tTVPMFPlayer::PresentVideoImage() {
+	/* 何もしない */
 }
 void __stdcall tTVPMFPlayer::GetContrastRangeMin( float *v ) {
 	/* 何もしない */
