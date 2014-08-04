@@ -182,6 +182,7 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;KRMOVIE_EXPORTS</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="MFPlayer.cpp" />
+    <ClCompile Include="PlayWindow.cpp" />
     <ClCompile Include="StdAfx.cpp" />
     <ClCompile Include="..\..\..\..\plugins\win32\tp_stub.cpp" />
   </ItemGroup>
@@ -216,6 +217,7 @@
     <ClInclude Include="IRendererBufferVideo.h" />
     <ClInclude Include="MFPlayer.h" />
     <ClInclude Include="OptionInfo.h" />
+    <ClInclude Include="PlayWindow.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="..\..\..\..\plugins\win32\tp_stub.h" />
