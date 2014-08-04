@@ -33,6 +33,7 @@ protected:
 	bool		HasVideo;
 	float		PlayRate;
 	float		ZoomLevel;	// (1.0 == 100%)
+	long		EventCode;
 
 	UINT32		FPSNumerator;
 	UINT32		FPSDenominator;
