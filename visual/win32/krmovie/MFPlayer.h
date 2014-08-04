@@ -2,9 +2,10 @@
 #ifndef __MF_PLAYER_H__
 #define __MF_PLAYER_H__
 
-// Media Foundation Player
+#include "PlayWindow.h"
 
-class tTVPPlayerCallback : public IMFPMediaPlayerCallback, public IMFAsyncCallback, public CUnknown {
+// Media Foundation Player
+class tTVPPlayerCallback : public IMFAsyncCallback, public CUnknown {
 	class tTVPMFPlayer* owner_;
 public:
 	tTVPPlayerCallback( class tTVPMFPlayer* owner ) : CUnknown(L"PlayerCallback",NULL), owner_(owner) {}
@@ -13,15 +14,16 @@ public:
 	DECLARE_IUNKNOWN;
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid,void **ppv);
 
-	void STDMETHODCALLTYPE OnMediaPlayerEvent( MFP_EVENT_HEADER *pEventHeader );
-
 	STDMETHODIMP GetParameters( DWORD *pdwFlags, DWORD *pdwQueue );
 	STDMETHODIMP Invoke( IMFAsyncResult *pAsyncResult );
 };
 
-class tTVPMFPlayer : public iTVPVideoOverlay
+class tTVPMFPlayer : public iTVPVideoOverlay, public PlayWindow
 {
 protected:
+	static const MFTIME ONE_SECOND = 10000000; // One second.
+	static const LONG   ONE_MSEC = 1000;       // One millisecond
+
 	ULONG		RefCount;
 	HWND		OwnerWindow;
 	bool		Visible;
@@ -35,19 +37,18 @@ protected:
 	UINT32		FPSNumerator;
 	UINT32		FPSDenominator;
 
-	MFP_MEDIAITEM_CHARACTERISTICS	MediaIteamCap;
-
 	tTVPPlayerCallback* PlayerCallback;
-    IMFPMediaPlayer*	MediaPlayer;
 	IMFByteStream*		ByteStream;
-	IMFPMediaItem*		MediaItem;
 	IMFVideoDisplayControl*	VideoDisplayControl;
 
 	IMFMediaSession*	MediaSession;
 	IMFTopology*		Topology;
+	CComPtr<IMFRateControl> RateControl;
+	CComPtr<IMFRateSupport> RateSupport;
 
-	//tTVPAudioSessionVolume*	AudioVolume;
-	//tTVPMFVideoMediaSink*	VideoStreamSink;
+	IMFAudioStreamVolume* AudioVolume;
+
+	MFTIME				HnsDuration;
 
 	tTVPVideoStatus		VideoStatue;
 	std::wstring		StreamName;
@@ -63,29 +64,24 @@ protected:
 	HRESULT AddBranchToPartialTopology( IMFTopology *pTopology, IMFMediaSource *pSource, IMFPresentationDescriptor *pPD, DWORD iStream, HWND hVideoWnd );
 	HRESULT CreateMediaSinkActivate( IMFStreamDescriptor *pSourceSD, HWND hVideoWindow, IMFActivate **ppActivate );
 
-	HRESULT CreateVideoPlayer( HWND hWnd );
+	HRESULT CreateVideoPlayer();
+
+	HRESULT GetPresentationDescriptorFromTopology( IMFPresentationDescriptor **ppPD );
 public:
 	IMFMediaSession* GetMediaSession() { return MediaSession; }
 
-	// from IMFPMediaPlayerCallback
 	void NotifyError( HRESULT hr );
-	void NotifyState( MFP_MEDIAPLAYER_STATE state );
-
-	void OnMediaItemCreated( MFP_MEDIAITEM_CREATED_EVENT* event );
-	void OnMediaItemSet( MFP_MEDIAITEM_SET_EVENT* event );
-	void OnRateSet( MFP_RATE_SET_EVENT* event );
-	void OnPlayBackEnded( MFP_PLAYBACK_ENDED_EVENT* event );
-	void OnStop( MFP_STOP_EVENT* event );
-	void OnPlay( MFP_PLAY_EVENT* event );
-	void OnPause( MFP_PAUSE_EVENT* event );
-	void OnPositionSet( MFP_POSITION_SET_EVENT* event );
-	void OnFremeStep( MFP_FRAME_STEP_EVENT* event );
-	void OnMediaItemCleared( MFP_MEDIAITEM_CLEARED_EVENT* event );
-	void OnMF( MFP_MF_EVENT* event );
-	void OnError( MFP_ERROR_EVENT* event );
-	void OnAcquireUserCredential( MFP_ACQUIRE_USER_CREDENTIAL_EVENT* event );
+	void OnMediaItemCleared();
+	void OnPause();
+	void OnPlayBackEnded();
+	void OnRateSet( double rate );
+	void OnStop();
+	void OnPlay();
 
 	void OnTopologyStatus(UINT32 status);
+
+	virtual void OnDestoryWindow();
+
 public:
 	tTVPMFPlayer();
 	virtual ~tTVPMFPlayer();

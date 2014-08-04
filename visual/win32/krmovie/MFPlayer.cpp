@@ -5,16 +5,13 @@
 #include <cmath>
 #include <propvarutil.h>
 #include <string>
-
-// for MFPCreateMediaPlayer
-#include <Mfplay.h>
-// Mfplay.lib
-// Mfplay.dll
+#include <vector>
 
 // for MFCreateMFByteStreamOnStream, MFCreateVideoRendererActivate
-#include <Mfidl.h>
-// Mfplat.lib
-// Mfplat.dll
+#include <Mfidl.h>	// Mfplat.lib, Mfplat.dll
+#include <mfapi.h>
+#include <mferror.h>
+#include <evr.h>
 
 #include <streams.h>
 #include <atlbase.h>
@@ -22,33 +19,16 @@
 
 #include "../krmovie.h"
 #include "MFPlayer.h"
-
-#if 0
-#include "TVPEVR.h"
-#else
-#include <intsafe.h>
-#include <mfapi.h>
-#include <mferror.h>
-//#include <dxva2api.h>
-//#include <evr9.h>
-//#include <evcode.h> // EVR event codes (IMediaEventSink)
-#endif
-
 #include "DShowException.h"
 #include "tp_stub.h"
 
 #pragma comment( lib, "propsys.lib" )
-#pragma comment( lib, "Mfplay.lib" )
 #pragma comment( lib, "Mfplat.lib" )
 #pragma comment( lib, "Mf.lib" )
 #pragma comment( lib, "Mfuuid.lib" )
-
-
-#pragma comment( lib, "d3d9.lib" )
-#pragma comment( lib, "dxva2.lib" )
-#pragma comment( lib, "evr.lib" )
-
-// DEFINE_CLASSFACTORY_SERVER_LOCK
+//#pragma comment( lib, "d3d9.lib" )
+//#pragma comment( lib, "dxva2.lib" )
+//#pragma comment( lib, "evr.lib" )
 
 //----------------------------------------------------------------------------
 //! @brief	  	VideoOverlay MediaFoundationを取得する
@@ -71,84 +51,12 @@ void __stdcall GetMFVideoOverlayObject(
 }
 //----------------------------------------------------------------------------
 STDMETHODIMP tTVPPlayerCallback::NonDelegatingQueryInterface(REFIID riid,void **ppv) {
-	if(IsEqualIID(riid,IID_IMFPMediaPlayerCallback)) return GetInterface(static_cast<IMFPMediaPlayerCallback *>(this),ppv);
 	if(IsEqualIID(riid,IID_IMFAsyncCallback)) return GetInterface(static_cast<IMFAsyncCallback *>(this),ppv);
 	return CUnknown::NonDelegatingQueryInterface(riid,ppv);
 }
-void STDMETHODCALLTYPE tTVPPlayerCallback::OnMediaPlayerEvent( MFP_EVENT_HEADER *pEventHeader ) {
-	if( FAILED(pEventHeader->hrEvent) ) {
-		owner_->NotifyError( pEventHeader->hrEvent );
-		return;
-	}
-	switch( pEventHeader->eEventType ) {
-	case MFP_EVENT_TYPE_MEDIAITEM_CREATED:
-		owner_->OnMediaItemCreated( MFP_GET_MEDIAITEM_CREATED_EVENT(pEventHeader) );
-		break;
-
-	case MFP_EVENT_TYPE_MEDIAITEM_SET:
-		owner_->OnMediaItemSet( MFP_GET_MEDIAITEM_SET_EVENT(pEventHeader) );
-		break;
-
-	case MFP_EVENT_TYPE_RATE_SET:
-		owner_->OnRateSet( MFP_GET_RATE_SET_EVENT(pEventHeader) );
-		break;
-
-	// -----
-	case MFP_EVENT_TYPE_PLAYBACK_ENDED:
-		owner_->OnPlayBackEnded( MFP_GET_PLAYBACK_ENDED_EVENT(pEventHeader) );
-		break;
-	case MFP_EVENT_TYPE_STOP:
-		owner_->OnStop( MFP_GET_STOP_EVENT(pEventHeader) );
-		break;
-	case MFP_EVENT_TYPE_PLAY:
-		owner_->OnPlay( MFP_GET_PLAY_EVENT(pEventHeader) );
-		break;
-	case MFP_EVENT_TYPE_PAUSE:
-		owner_->OnPause( MFP_GET_PAUSE_EVENT(pEventHeader) );
-		break;
-	case MFP_EVENT_TYPE_POSITION_SET:
-		owner_->OnPositionSet( MFP_GET_POSITION_SET_EVENT(pEventHeader) );
-		break;
-	case MFP_EVENT_TYPE_FRAME_STEP:
-		owner_->OnFremeStep( MFP_GET_FRAME_STEP_EVENT(pEventHeader) );
-		break;
-	case MFP_EVENT_TYPE_MEDIAITEM_CLEARED:
-		owner_->OnMediaItemCleared( MFP_GET_MEDIAITEM_CLEARED_EVENT(pEventHeader) );
-		break;
-	case MFP_EVENT_TYPE_MF:
-		owner_->OnMF( MFP_GET_MF_EVENT(pEventHeader) );
-		break;
-	case MFP_EVENT_TYPE_ERROR:
-		owner_->OnError( MFP_GET_ERROR_EVENT(pEventHeader) );
-		break;
-	case MFP_EVENT_TYPE_ACQUIRE_USER_CREDENTIAL:
-		owner_->OnAcquireUserCredential( MFP_GET_ACQUIRE_USER_CREDENTIAL_EVENT(pEventHeader) );
-		break;
-	}
-	owner_->NotifyState( pEventHeader->eState );
-}
-
 STDMETHODIMP tTVPPlayerCallback::GetParameters( DWORD *pdwFlags, DWORD *pdwQueue ) {
 	return E_NOTIMPL;
 }
-#if 0
-class SessionHandler {
-public:
-	void OnClosed();
-	void OnPaused();
-	void OnEnded();
-	void OnNotifyPresentationTime();
-	void OnRateChaned();
-	void OnScrubSampleComplete();
-	void OnStarted();
-	void OnStopped();
-	void OnStreamSinkFormatChanged();
-	void OnTopologiesCleared();
-	void OnTopologySet();
-	void OnTopologyStatus();
-
-};
-#endif
 STDMETHODIMP tTVPPlayerCallback::Invoke( IMFAsyncResult *pAsyncResult ) {
 	HRESULT hr;
 	MediaEventType met = MESessionClosed;
@@ -160,13 +68,13 @@ STDMETHODIMP tTVPPlayerCallback::Invoke( IMFAsyncResult *pAsyncResult ) {
 			PropVariantInit(&pvValue);
 			switch( met ) {
 			case MESessionClosed:
-				owner_->OnMediaItemCleared(NULL);
+				owner_->OnMediaItemCleared();
 				break;
 			case MESessionPaused:
-				owner_->OnPause(NULL);
+				owner_->OnPause();
 				break;
 			case MESessionEnded:
-				owner_->OnPlayBackEnded(NULL);
+				owner_->OnPlayBackEnded();
 				break;
 			case MESessionNotifyPresentationTime:
 				break;
@@ -176,18 +84,18 @@ STDMETHODIMP tTVPPlayerCallback::Invoke( IMFAsyncResult *pAsyncResult ) {
 					if( FAILED(PropVariantToDouble(pvValue,&value)) ) {
 						value = 1.0;
 					}
-					owner_->OnRateSet(NULL);// owner_->OnRateSet(value);
+					owner_->OnRateSet(value);
 				} else {
-					owner_->OnRateSet(NULL);// owner_->OnRateSet(1.0);
+					owner_->OnRateSet(1.0);
 				}
 				break;
 			case MESessionScrubSampleComplete:
 				break;
 			case MESessionStarted:
-				owner_->OnPlay(NULL);
+				owner_->OnPlay();
 				break;
 			case MESessionStopped:
-				owner_->OnStop(NULL);
+				owner_->OnStop();
 				break;
 			case MESessionStreamSinkFormatChanged:
 				break;
@@ -209,58 +117,6 @@ STDMETHODIMP tTVPPlayerCallback::Invoke( IMFAsyncResult *pAsyncResult ) {
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-#if 0
-class EVRActiveObject : public IMFActivate, public CUnknown {
-	CComPtr<tTVPEVRCustomPresenter> CustomPres;
-public:
-	EVRActiveObject() : CUnknown(L"EVRActiveObject",NULL) {} 
-
-	// IUnknown
-	DECLARE_IUNKNOWN;
-	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid,void **ppv) {
-		if(IsEqualIID(riid,IID_IMFActivate)) return GetInterface(static_cast<IMFActivate *>(this),ppv);
-		return CUnknown::NonDelegatingQueryInterface(riid,ppv);
-	}
-
-	STDMETHODIMP ActivateObject( REFIID riid, void **ppv ) {
-		if( riid != __uuidof(IMFVideoPresenter) ) {
-			return MF_E_CANNOT_CREATE_SINK;
-		}
-		if( ppv == NULL ) {
-			return E_POINTER;
-		}
-		if( CustomPres != NULL ) {
-			CComQIPtr<IMFVideoPresenter> mfvp(CustomPres);
-			*ppv = mfvp;
-			mfvp.p->AddRef();
-			return S_OK;
-		}
-		//CComObject<tTVPEVRCustomPresenter> * object;
-		//CComObject<tTVPEVRCustomPresenter>::CreateInstance(&object);
-		HRESULT hr;
-		CComPtr<tTVPEVRCustomPresenter>	evrPresent;
-		hr = tTVPEVRCustomPresenter::CreateInstance(NULL,IID_IMFVideoPresenter,(void**)&evrPresent);
-		CustomPres.Attach(evrPresent);
-		CustomPres.p->AddRef();
-		CComQIPtr<IMFVideoPresenter> mfvp(evrPresent);
-		if( mfvp == NULL ) {
-			return MF_E_CANNOT_CREATE_SINK;
-		}
-		*ppv = mfvp;
-		mfvp.p->AddRef();
-		return S_OK;
-	}
-	STDMETHODIMP DetachObject() {
-		CustomPres.Release();
-		return S_OK;
-	}
-	STDMETHODIMP ShutdownObject() {
-		CustomPres.Release();
-		return S_OK;
-	}
-};
-#endif
-//----------------------------------------------------------------------------
 tTVPMFPlayer::tTVPMFPlayer() {
 	CoInitialize(NULL);
 	MFStartup( MF_VERSION );
@@ -272,10 +128,8 @@ tTVPMFPlayer::tTVPMFPlayer() {
 	RefCount = 1;
 	Shutdown = false;
 	PlayerCallback = new tTVPPlayerCallback(this);
-	MediaPlayer = NULL;
 	ByteStream = NULL;
-	MediaItem = NULL;
-	// AudioVolume = NULL;
+	AudioVolume = NULL;
 	VideoDisplayControl = NULL;
 	VideoStatue = vsStopped;
 	FPSNumerator = 1;
@@ -284,6 +138,8 @@ tTVPMFPlayer::tTVPMFPlayer() {
 	MediaSession = NULL;
 	Topology = NULL;
 	Stream = NULL;
+
+	HnsDuration = 0;
 }
 tTVPMFPlayer::~tTVPMFPlayer() {
 	Shutdown = true;
@@ -300,31 +156,77 @@ void __stdcall tTVPMFPlayer::Release(){
 	else
 		RefCount--;
 }
+
+void tTVPMFPlayer::OnDestoryWindow() {
+	ReleaseAll();
+}
 //----------------------------------------------------------------------------
 void __stdcall tTVPMFPlayer::BuildGraph( HWND callbackwin, IStream *stream,
 	const wchar_t * streamname, const wchar_t *type, unsigned __int64 size )
 {
+	VideoStatue = vsProcessing;
+
 	OwnerWindow = callbackwin;
+	PlayWindow::SetOwner( callbackwin );
 	CallbackWindow = callbackwin;
+	PlayWindow::SetMessageDrainWindow( callbackwin );
 	StreamName = std::wstring(streamname);
 	Stream = stream;
 	Stream->AddRef();
-	
+
 	HRESULT hr = S_OK;
 	if( FAILED(hr = MFCreateMFByteStreamOnStream( stream, &ByteStream )) ) {
 		TVPThrowExceptionMessage(L"Faild to create stream.");
+		VideoStatue = vsStopped;
 	}
 }
 
+HRESULT tTVPMFPlayer::GetPresentationDescriptorFromTopology( IMFPresentationDescriptor **ppPD ) {
+    CComPtr<IMFCollection> pCollection;
+    CComPtr<IUnknown> pUnk;
+    CComPtr<IMFTopologyNode> pNode;
+	
+	HRESULT hr = S_OK;
+    // Get the collection of source nodes from the topology.
+    if( FAILED(hr = Topology->GetSourceNodeCollection(&pCollection)) ) {
+		return hr;
+	}
+    // Any of the source nodes should have the PD, so take the first
+    // object in the collection.
+    if( FAILED(hr = pCollection->GetElement(0, &pUnk)) ) {
+		return hr;
+	}
+    if( FAILED(hr = pUnk->QueryInterface(IID_PPV_ARGS(&pNode))) ) {
+		return hr;
+	}
+    // Get the PD, which is stored as an attribute.
+    if( FAILED(hr = pNode->GetUnknown( MF_TOPONODE_PRESENTATION_DESCRIPTOR, IID_PPV_ARGS(ppPD))) ) {
+		return hr;
+	}
+    return hr;
+}
 void tTVPMFPlayer::OnTopologyStatus(UINT32 status) {
 	HRESULT hr;
 	switch( status ) {
 	case MF_TOPOSTATUS_INVALID:
 		break;
 	case MF_TOPOSTATUS_READY: {
+		// http://msdn.microsoft.com/en-us/library/windows/desktop/ms695350%28v=vs.85%29.aspx
 		CComPtr<IMFGetService> pGetService;
 		if( SUCCEEDED(hr = MediaSession->QueryInterface( &pGetService )) ) {
-			hr = pGetService->GetService( MR_VIDEO_RENDER_SERVICE, IID_IMFVideoDisplayControl, (void**)&VideoDisplayControl );
+			if( FAILED(hr = pGetService->GetService( MR_VIDEO_RENDER_SERVICE, IID_IMFVideoDisplayControl, (void**)&VideoDisplayControl )) ) {
+				VideoDisplayControl = NULL;
+			}
+			if( FAILED(hr = pGetService->GetService( MR_STREAM_VOLUME_SERVICE, IID_IMFAudioStreamVolume, (void**)&AudioVolume )) ) {
+				AudioVolume = NULL;
+			}
+			pGetService->GetService( MF_RATE_CONTROL_SERVICE, IID_IMFRateControl, (void**)&RateControl.p );
+			pGetService->GetService( MF_RATE_CONTROL_SERVICE, IID_IMFRateSupport, (void**)&RateSupport.p );
+			
+			CComPtr<IMFPresentationDescriptor> pPD;
+			if( SUCCEEDED(hr = GetPresentationDescriptorFromTopology( &pPD )) ) {
+				(void)pPD->GetUINT64(MF_PD_DURATION, (UINT64*)&HnsDuration);
+			}
 		}
 		break;
 		}
@@ -338,15 +240,19 @@ void tTVPMFPlayer::OnTopologyStatus(UINT32 status) {
 		break;
 	}
 }
-HRESULT tTVPMFPlayer::CreateVideoPlayer( HWND hWnd ) {
-	if( hWnd == NULL || hWnd == INVALID_HANDLE_VALUE )
-		return E_FAIL;
 
+HRESULT tTVPMFPlayer::CreateVideoPlayer() {
 	if( MediaSession ) {
 		return S_OK;	// 既に作成済み
 	}
 
-	HRESULT hr;
+	HRESULT hr = CreateChildWindow();
+	if( hr != S_OK ) return hr;
+
+	HWND hWnd = GetChildWindow();
+	if( hWnd == NULL || hWnd == INVALID_HANDLE_VALUE )
+		return E_FAIL;
+
 	if( FAILED(hr = MFCreateMediaSession( NULL, &MediaSession )) ) {
 		TVPThrowExceptionMessage(L"Faild to create Media session.");
 	}
@@ -722,25 +628,17 @@ void __stdcall tTVPMFPlayer::ReleaseAll()
 		ByteStream->Release();
 		ByteStream = NULL;
 	}
-	if( MediaItem ) {
-		MediaItem->Release();
-		MediaItem = NULL;
-	}
-	/*
 	if( AudioVolume ) {
-		AudioVolume->EnableNotifications(FALSE);
 		AudioVolume->Release();
 		AudioVolume = NULL;
 	}
-	*/
 	if( VideoDisplayControl ) {
 		VideoDisplayControl->Release();
 		VideoDisplayControl = NULL;
 	}
-	if( MediaPlayer ) {
-		MediaPlayer->Release();
-		MediaPlayer = NULL;
-	}
+	RateSupport.Release();
+	RateControl.Release();
+
 	if( Topology ) {
 		Topology->Release();
 		Topology = NULL;
@@ -758,95 +656,40 @@ void __stdcall tTVPMFPlayer::ReleaseAll()
 void tTVPMFPlayer::NotifyError( HRESULT hr ) {
 	TVPThrowExceptionMessage(L"MF Operation Error.",hr);
 }
-void tTVPMFPlayer::NotifyState( MFP_MEDIAPLAYER_STATE state ) {
-	switch( state ) {
-	case MFP_MEDIAPLAYER_STATE_STOPPED:
-		VideoStatue = vsStopped;
-		break;
-	case MFP_MEDIAPLAYER_STATE_PLAYING:
-		VideoStatue = vsPlaying;
-		break;
-	case MFP_MEDIAPLAYER_STATE_PAUSED:
-		VideoStatue = vsPaused;
-		break;
-	case MFP_MEDIAPLAYER_STATE_SHUTDOWN:
-		break;
-	}
+void tTVPMFPlayer::OnMediaItemCleared() {
 }
-void tTVPMFPlayer::OnMediaItemCreated( MFP_MEDIAITEM_CREATED_EVENT* event ) {
-	HRESULT hr = S_OK; 
-	IUnknown *pMFT = NULL;
-	HasVideo = true;
-	if( (MediaPlayer != NULL) && (event->pMediaItem != NULL) ) {
-        BOOL bHasVideo = FALSE, bIsSelected = FALSE;
-		hr = event->pMediaItem->HasVideo(&bHasVideo, &bIsSelected);
-		if( FAILED(hr) ) { goto done; }
-		HasVideo = (bHasVideo!=FALSE) && (bIsSelected!=FALSE);
-		hr = MediaPlayer->SetMediaItem(event->pMediaItem);
-		if( FAILED(hr) ) { goto done; }
-    }
-done:
-	if( FAILED(hr) ) {
-		NotifyError(hr);
-	}
-	if( pMFT ) {
-		pMFT->Release();
-		pMFT = NULL;
-	}
+void tTVPMFPlayer::OnPause() {
+	VideoStatue = vsPaused;
 }
-void tTVPMFPlayer::OnMediaItemSet( MFP_MEDIAITEM_SET_EVENT* event ) {
-	HRESULT hr = S_OK;
-	hr = event->header.hrEvent;
-	if( FAILED(hr) ) { goto done; }
-	if( event->pMediaItem ) {
-		hr = event->pMediaItem->GetCharacteristics( &MediaIteamCap );
-		if (FAILED(hr)) { goto done; }
-	}
-	// hr = MediaPlayer->Play();
-done:
-	if( FAILED(hr) ) {
-		NotifyError(hr);
-	}
+void tTVPMFPlayer::OnPlayBackEnded() {
 }
-void tTVPMFPlayer::OnRateSet( MFP_RATE_SET_EVENT* event ) {
-	PlayRate = event->flRate;
+void tTVPMFPlayer::OnRateSet( double rate ) {
 }
-void tTVPMFPlayer::OnPlayBackEnded( MFP_PLAYBACK_ENDED_EVENT* event ) {
+void tTVPMFPlayer::OnStop() {
+	VideoStatue = vsStopped;
 }
-void tTVPMFPlayer::OnStop( MFP_STOP_EVENT* event ) {
-}
-void tTVPMFPlayer::OnPlay( MFP_PLAY_EVENT* event ) {
-}
-void tTVPMFPlayer::OnPause( MFP_PAUSE_EVENT* event ) {
-}
-void tTVPMFPlayer::OnPositionSet( MFP_POSITION_SET_EVENT* event ) {
-}
-void tTVPMFPlayer::OnFremeStep( MFP_FRAME_STEP_EVENT* event ) {
-}
-void tTVPMFPlayer::OnMediaItemCleared( MFP_MEDIAITEM_CLEARED_EVENT* event ) {
-}
-void tTVPMFPlayer::OnMF( MFP_MF_EVENT* event ) {
-}
-void tTVPMFPlayer::OnError( MFP_ERROR_EVENT* event ) {
-}
-void tTVPMFPlayer::OnAcquireUserCredential( MFP_ACQUIRE_USER_CREDENTIAL_EVENT* event ) {
+void tTVPMFPlayer::OnPlay() {
+	VideoStatue = vsPlaying;
 }
 //----------------------------------------------------------------------------
 void __stdcall tTVPMFPlayer::SetWindow(HWND window) {
 	HRESULT hr = E_FAIL;
 	OwnerWindow = window;
+	PlayWindow::SetOwner( window );
 	if( VideoDisplayControl ) {
 		hr = VideoDisplayControl->SetVideoWindow( window );
 		if( FAILED(hr) ) {
 			TVPThrowExceptionMessage(L"Faild to call SetVideoWindow.");
 		}
 	}
-	CreateVideoPlayer( window );
+	CreateVideoPlayer();
 }
 void __stdcall tTVPMFPlayer::SetMessageDrainWindow(HWND window) {
+	PlayWindow::SetMessageDrainWindow( window );
 	CallbackWindow = window;
 }
 void __stdcall tTVPMFPlayer::SetRect(RECT *rect) {
+	PlayWindow::SetRect( rect );
 	if( VideoDisplayControl ) {
 		// MF では、ソース矩形を指定可能になっている
 		HRESULT hr = VideoDisplayControl->SetVideoPosition( NULL, rect );
@@ -856,6 +699,7 @@ void __stdcall tTVPMFPlayer::SetRect(RECT *rect) {
 	}
 }
 void __stdcall tTVPMFPlayer::SetVisible(bool b) {
+	PlayWindow::SetVisible( b );
 }
 void __stdcall tTVPMFPlayer::Play() {
 	HRESULT hr = E_FAIL;
@@ -865,9 +709,6 @@ void __stdcall tTVPMFPlayer::Play() {
 		hr = MediaSession->Start( &GUID_NULL, &varStart );
 		PropVariantClear(&varStart);
 	}
-	if( MediaPlayer ) {
-		hr = MediaPlayer->Play();
-	}
 	if( FAILED(hr) ) {
 		TVPThrowExceptionMessage(L"Faild to play.");
 	}
@@ -875,10 +716,7 @@ void __stdcall tTVPMFPlayer::Play() {
 void __stdcall tTVPMFPlayer::Stop() {
 	HRESULT hr = E_FAIL;
 	if( MediaSession ) {
-		MediaSession->Stop();
-	}
-	if( MediaPlayer ) {
-		hr = MediaPlayer->Stop();
+		hr = MediaSession->Stop();
 	}
 	if( FAILED(hr) ) {
 		TVPThrowExceptionMessage(L"Faild to stop.");
@@ -886,22 +724,26 @@ void __stdcall tTVPMFPlayer::Stop() {
 }
 void __stdcall tTVPMFPlayer::Pause() {
 	HRESULT hr = E_FAIL;
-	if( MediaPlayer ) {
-		hr = MediaPlayer->Pause();
+	if( MediaSession ) {
+		hr = MediaSession->Pause();
 	}
 	if( FAILED(hr) ) {
 		TVPThrowExceptionMessage(L"Faild to stop.");
 	}
 }
+// Seek
+// http://msdn.microsoft.com/en-us/library/windows/desktop/ee892373%28v=vs.85%29.aspx
 void __stdcall tTVPMFPlayer::SetPosition(unsigned __int64 tick) {
 	HRESULT hr = E_FAIL;
 	PROPVARIANT var;
 	PropVariantInit(&var);
+	/*
 	if( MediaPlayer ) {
 		var.vt = VT_I8;
 		var.hVal.QuadPart = tick;
 		HRESULT hr = MediaPlayer->SetPosition( MFP_POSITIONTYPE_100NS, &var );
 	}
+	*/
 	PropVariantClear(&var);
 	if( FAILED(hr) ) {
 		TVPThrowExceptionMessage(L"Faild to set position.");
@@ -911,12 +753,14 @@ void __stdcall tTVPMFPlayer::GetPosition(unsigned __int64 *tick) {
 	HRESULT hr = E_FAIL;
 	PROPVARIANT var;
 	PropVariantInit(&var);
+	/*
 	if( MediaPlayer ) {
 		hr = MediaPlayer->GetPosition( MFP_POSITIONTYPE_100NS, &var );
 		if( SUCCEEDED(hr) ) {
 			*tick = var.hVal.QuadPart;
 		}
 	}
+	*/
 	PropVariantClear(&var);
 	if( FAILED(hr) ) {
 		TVPThrowExceptionMessage(L"Faild to get position.");
@@ -964,20 +808,13 @@ void __stdcall tTVPMFPlayer::GetNumberOfFrame( int *f ) {
 		*f = (int)( t / avgTime );
 	}
 }
+/**
+ * @brief ムービーの長さ(msec)を取得する
+ * @param f ムービーの長さを入れる変数へのポインタ
+ */
 void __stdcall tTVPMFPlayer::GetTotalTime( __int64 *t ) {
-	HRESULT hr = E_FAIL;
-	PROPVARIANT var;
-	PropVariantInit(&var);
-	if( MediaPlayer ) {
-		hr = MediaPlayer->GetDuration( MFP_POSITIONTYPE_100NS, &var );
-		if( SUCCEEDED(hr) ) {
-			*t = var.uhVal.QuadPart;
-		}
-	}
-	PropVariantClear(&var);
-	if( FAILED(hr) ) {
-		TVPThrowExceptionMessage(L"Faild to get total time.");
-	}
+	// http://msdn.microsoft.com/en-us/library/windows/desktop/dd979590%28v=vs.85%29.aspx
+    *t = (HnsDuration / (ONE_SECOND / ONE_MSEC));
 }
 
 void __stdcall tTVPMFPlayer::GetVideoSize( long *width, long *height ){
@@ -993,8 +830,10 @@ void __stdcall tTVPMFPlayer::GetVideoSize( long *width, long *height ){
 	}
 }
 void __stdcall tTVPMFPlayer::GetFrontBuffer( BYTE **buff ){
+	/* 何もしない */
 }
 void __stdcall tTVPMFPlayer::SetVideoBuffer( BYTE *buff1, BYTE *buff2, long size ){
+	/* 何もしない */
 }
 
 void __stdcall tTVPMFPlayer::SetStopFrame( int frame ) {
@@ -1006,8 +845,12 @@ void __stdcall tTVPMFPlayer::SetDefaultStopFrame() {
 
 void __stdcall tTVPMFPlayer::SetPlayRate( double rate ) {
 	HRESULT hr = E_FAIL;
-	if( MediaPlayer ) {
-		hr = MediaPlayer->SetRate( (float)rate );
+	if( RateSupport.p && RateControl.p ) {
+		float playrate = (float)rate;
+		float acceptrate = playrate;
+		if( SUCCEEDED(hr = RateSupport->IsRateSupported( TRUE, playrate, &acceptrate )) ) {
+			hr = RateControl->SetRate( TRUE, acceptrate );
+		}
 	}
 	if( FAILED(hr) ) {
 		TVPThrowExceptionMessage(L"Faild to set play rate.");
@@ -1015,10 +858,9 @@ void __stdcall tTVPMFPlayer::SetPlayRate( double rate ) {
 }
 void __stdcall tTVPMFPlayer::GetPlayRate( double *rate ) {
 	HRESULT hr = E_FAIL;
-	if( MediaPlayer ) {
-		float playrate;
-		hr = MediaPlayer->GetRate( &playrate );
-		if( SUCCEEDED(hr) ) {
+	if( RateControl.p ) {
+		float playrate = 1.0f;
+		if( SUCCEEDED(hr = RateControl->GetRate( NULL, &playrate )) ) {
 			*rate = playrate;
 		}
 	}
@@ -1029,34 +871,32 @@ void __stdcall tTVPMFPlayer::GetPlayRate( double *rate ) {
 
 void __stdcall tTVPMFPlayer::SetAudioBalance( long balance ) {
 	HRESULT hr = E_FAIL;
-	if( MediaPlayer ) {
-		float b = balance / 10000.0f;
-		hr = MediaPlayer->SetBalance( b );
-	}
+	// AudioVolume でチャンネルに応じたバランス設定していかないといけないので非サポートにしておく
 	if( FAILED(hr) ) {
 		TVPThrowExceptionMessage(L"Faild to set audio balance.");
 	}
 }
 void __stdcall tTVPMFPlayer::GetAudioBalance( long *balance ) {
 	HRESULT hr = E_FAIL;
-	if( MediaPlayer ) {
-		float b;
-		hr = MediaPlayer->GetBalance( &b );
-		if( SUCCEEDED(hr) ) {
-			*balance = (long)( b*10000.0f );
-		}
-	}
+	// AudioVolume でチャンネルに応じたバランス設定していかないといけないので非サポートにしておく
 	if( FAILED(hr) ) {
 		TVPThrowExceptionMessage(L"Faild to get audio balance.");
 	}
 }
 void __stdcall tTVPMFPlayer::SetAudioVolume( long volume ) {
 	HRESULT hr = E_FAIL;
-	if( MediaPlayer ) {
-		if( volume <= -10000  ) {
-			hr = MediaPlayer->SetVolume( 0.0f );
-		} else {
-			hr = MediaPlayer->SetVolume( (10000 + volume)/10000.0f );
+	if( AudioVolume ) {
+		UINT32 count;
+		if( SUCCEEDED(hr = AudioVolume->GetChannelCount( &count )) ) {
+			std::vector<float> channels(count);
+			float v = 0.0f;
+			if( volume > -10000  ) {
+				v = (10000 + volume)/10000.0f;
+			} 
+			for( UINT32 i = 0; i < count; i++ ) {
+				channels[i] = v;
+			}
+			hr = AudioVolume->SetAllVolumes( count, &channels[0] );
 		}
 	}
 	if( FAILED(hr) ) {
@@ -1066,8 +906,18 @@ void __stdcall tTVPMFPlayer::SetAudioVolume( long volume ) {
 void __stdcall tTVPMFPlayer::GetAudioVolume( long *volume ) {
 	HRESULT hr = E_FAIL;
 	float vol = 0.0f;
-	if( MediaPlayer ) {
-		hr = MediaPlayer->GetVolume( &vol );
+	if( AudioVolume ) {
+		UINT32 count;
+		if( SUCCEEDED(hr = AudioVolume->GetChannelCount( &count )) ) {
+			std::vector<float> channels(count);
+			if( SUCCEEDED(hr = AudioVolume->GetAllVolumes( count, &channels[0] )) ) {
+				float total = 0.0f;
+				for( UINT32 i = 0; i < count; i++ ) {
+					total += channels[i];
+				}
+				vol = total / count;
+			}
+		}
 	}
 	if( FAILED(hr) ) {
 		TVPThrowExceptionMessage(L"Faild to get audio volume.");
