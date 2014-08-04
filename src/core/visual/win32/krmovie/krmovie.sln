@@ -1,6 +1,6 @@
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "krmovie", "krmovie.vcproj", "{2315E2BC-8321-4A8F-B551-06BA07255854}"
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "krmovie", "krmovie.vcxproj", "{2315E2BC-8321-4A8F-B551-06BA07255854}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

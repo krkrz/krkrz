@@ -38,6 +38,7 @@ class tTVPVideoModule
 	tGetVideoOverlayObject procGetVideoOverlayObject;
 	tGetVideoOverlayObject procGetVideoLayerObject; // krmovie.dll only
 	tGetVideoOverlayObject procGetMixingVideoOverlayObject; // krmovie.dll only
+	tGetVideoOverlayObject procGetMFVideoOverlayObject; // krmovie.dll only
 	tTVPV2LinkProc procV2Link;
 	tTVPV2UnlinkProc procV2Unlink;
 
@@ -64,6 +65,12 @@ public:
 	{
 		procGetMixingVideoOverlayObject(callbackwin, stream, streamname, type, size, out);
 	}
+	void GetMFVideoOverlayObject(HWND callbackwin, IStream *stream,
+		const wchar_t * streamname, const wchar_t *type, unsigned __int64 size,
+		iTVPVideoOverlay **out)
+	{
+		procGetMFVideoOverlayObject(callbackwin, stream, streamname, type, size, out);
+	}
 };
 static tTVPVideoModule *TVPMovieVideoModule = NULL;
 static tTVPVideoModule *TVPFlashVideoModule = NULL;
@@ -89,6 +96,9 @@ tTVPVideoModule::tTVPVideoModule(const ttstr &name)
 
 		procGetMixingVideoOverlayObject = (tGetVideoOverlayObject)
 			GetProcAddress(Handle, "GetMixingVideoOverlayObject");
+
+		procGetMFVideoOverlayObject = (tGetVideoOverlayObject)
+			GetProcAddress(Handle, "GetMFVideoOverlayObject");
 
 		procGetAPIVersion = (tGetAPIVersion)
 			GetProcAddress(Handle, "GetAPIVersion");
@@ -320,13 +330,17 @@ void tTJSNI_VideoOverlay::Open(const ttstr &_name)
 				mod->GetMixingVideoOverlayObject(EventQueue.GetOwner(),
 					istream, name.c_str(), ext.c_str(),
 					size, &VideoOverlay);
+			else if(Mode == vomMFEVR)
+				mod->GetMFVideoOverlayObject(EventQueue.GetOwner(),
+					istream, name.c_str(), ext.c_str(),
+					size, &VideoOverlay);
 			else
 				mod->GetVideoOverlayObject(EventQueue.GetOwner(),
 					istream, name.c_str(), ext.c_str(),
 					size, &VideoOverlay);
 		}
 
-		if( flash || (Mode == vomOverlay) || (Mode == vomMixer)  )
+		if( flash || (Mode == vomOverlay) || (Mode == vomMixer) || (Mode == vomMFEVR) )
 		{
 			ResetOverlayParams();
 		}
@@ -606,7 +620,7 @@ void tTJSNI_VideoOverlay::ResetOverlayParams()
 	// retrieve new window information from owner window and
 	// set video owner window / message drain window.
 	// also sets rectangle and visible state.
-	if(VideoOverlay && Window && (Mode == vomOverlay || Mode == vomMixer) )
+	if(VideoOverlay && Window && (Mode == vomOverlay || Mode == vomMixer || Mode == vomMFEVR) )
 	{
 		OwnerWindow = Window->GetWindowHandle();
 		VideoOverlay->SetWindow(OwnerWindow);
@@ -623,7 +637,7 @@ void tTJSNI_VideoOverlay::ResetOverlayParams()
 //---------------------------------------------------------------------------
 void tTJSNI_VideoOverlay::DetachVideoOverlay()
 {
-	if(VideoOverlay && Window && (Mode == vomOverlay || Mode == vomMixer) )
+	if(VideoOverlay && Window && (Mode == vomOverlay || Mode == vomMixer || Mode == vomMFEVR) )
 	{
 		VideoOverlay->SetWindow(NULL);
 		VideoOverlay->SetMessageDrainWindow(EventQueue.GetOwner());
