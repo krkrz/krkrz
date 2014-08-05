@@ -24,6 +24,7 @@ protected:
 	static const MFTIME ONE_SECOND = 10000000; // One second.
 	static const LONG   ONE_MSEC = 1000;       // One millisecond
 
+	HWND		BuildWindow;
 	ULONG		RefCount;
 	HWND		OwnerWindow;
 	bool		Visible;
@@ -39,15 +40,14 @@ protected:
 	UINT32		FPSDenominator;
 
 	tTVPPlayerCallback* PlayerCallback;
-	IMFByteStream*		ByteStream;
-	IMFVideoDisplayControl*	VideoDisplayControl;
-
-	IMFMediaSession*	MediaSession;
-	IMFTopology*		Topology;
-	CComPtr<IMFRateControl> RateControl;
-	CComPtr<IMFRateSupport> RateSupport;
-
-	IMFAudioStreamVolume* AudioVolume;
+	CComPtr<IMFByteStream>			ByteStream;
+	CComPtr<IMFVideoDisplayControl>	VideoDisplayControl;
+	CComPtr<IMFMediaSession>		MediaSession;
+	CComPtr<IMFTopology>			Topology;
+	CComPtr<IMFRateControl>			RateControl;
+	CComPtr<IMFRateSupport>			RateSupport;
+	CComPtr<IMFPresentationClock>	PresentationClock;
+	CComPtr<IMFAudioStreamVolume>	AudioVolume;
 
 	MFTIME				HnsDuration;
 
@@ -68,6 +68,18 @@ protected:
 	HRESULT CreateVideoPlayer();
 
 	HRESULT GetPresentationDescriptorFromTopology( IMFPresentationDescriptor **ppPD );
+
+	template <class Q>
+	HRESULT GetCollectionObject(IMFCollection *pCollection, DWORD dwIndex, Q **ppObject) {
+		*ppObject = NULL;   // zero output
+		IUnknown *pUnk = NULL;
+		HRESULT hr = pCollection->GetElement(dwIndex, &pUnk);
+		if( SUCCEEDED(hr) ) {
+			hr = pUnk->QueryInterface(IID_PPV_ARGS(ppObject));
+			pUnk->Release();
+		}
+		return hr;
+	}
 public:
 	IMFMediaSession* GetMediaSession() { return MediaSession; }
 
