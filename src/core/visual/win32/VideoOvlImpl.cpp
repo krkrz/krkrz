@@ -785,6 +785,9 @@ void tTJSNI_VideoOverlay::WndProc( NativeEvent& ev )
 							}
 						}
 						break;
+					case EC_READY:
+						FirePeriodEvent(perReady);
+						break;
 				}
 				VideoOverlay->FreeEventParams( evcode, p1, p2 );
 			} while( got );
