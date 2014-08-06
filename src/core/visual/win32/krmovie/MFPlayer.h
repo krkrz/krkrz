@@ -34,7 +34,7 @@ protected:
 	bool		HasVideo;
 	float		PlayRate;
 	float		ZoomLevel;	// (1.0 == 100%)
-	long		EventCode;
+	//long		EventCode;
 
 	UINT32		FPSNumerator;
 	UINT32		FPSDenominator;
@@ -48,12 +48,15 @@ protected:
 	CComPtr<IMFRateSupport>			RateSupport;
 	CComPtr<IMFPresentationClock>	PresentationClock;
 	CComPtr<IMFAudioStreamVolume>	AudioVolume;
+	//CComPtr<IMFMediaSource>			MediaSource;
 
 	MFTIME				HnsDuration;
 
-	tTVPVideoStatus		VideoStatue;
+	//tTVPVideoStatus		VideoStatue;
 	std::wstring		StreamName;
 	IStream*			Stream;
+	//bool				StartPositionSpecify;
+	//__int64				StartPosition;
 
 protected:
 	void __stdcall ReleaseAll();
@@ -66,7 +69,7 @@ protected:
 	HRESULT CreateMediaSinkActivate( IMFStreamDescriptor *pSourceSD, HWND hVideoWindow, IMFActivate **ppActivate );
 
 	HRESULT CreateVideoPlayer();
-
+	/*
 	HRESULT GetPresentationDescriptorFromTopology( IMFPresentationDescriptor **ppPD );
 
 	template <class Q>
@@ -80,6 +83,7 @@ protected:
 		}
 		return hr;
 	}
+	*/
 public:
 	IMFMediaSession* GetMediaSession() { return MediaSession; }
 
@@ -94,6 +98,8 @@ public:
 	void OnTopologyStatus(UINT32 status);
 
 	virtual void OnDestoryWindow();
+
+	MFCLOCK_STATE GetClockState();
 
 public:
 	tTVPMFPlayer();
