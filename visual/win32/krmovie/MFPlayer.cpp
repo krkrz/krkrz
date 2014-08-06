@@ -30,6 +30,8 @@
 //#pragma comment( lib, "dxva2.lib" )
 //#pragma comment( lib, "evr.lib" )
 
+// How to Play Media Files with Media Foundation
+// http://msdn.microsoft.com/ja-jp/library/windows/desktop/ms703190%28v=vs.85%29.aspx
 //----------------------------------------------------------------------------
 //! @brief	  	VideoOverlay MediaFoundation‚ðŽæ“¾‚·‚é
 //! @param		callbackwin : 
@@ -129,13 +131,15 @@ tTVPMFPlayer::tTVPMFPlayer() {
 	RefCount = 1;
 	Shutdown = false;
 	PlayerCallback = new tTVPPlayerCallback(this);
-	VideoStatue = vsStopped;
+	PlayerCallback->AddRef();
+	//VideoStatue = vsStopped;
 	FPSNumerator = 1;
 	FPSDenominator = 1;
 	Stream = NULL;
 
 	HnsDuration = 0;
-	EventCode = 0;
+	//EventCode = 0;
+	//StartPositionSpecify = false;
 }
 tTVPMFPlayer::~tTVPMFPlayer() {
 	Shutdown = true;
@@ -160,7 +164,7 @@ void tTVPMFPlayer::OnDestoryWindow() {
 void __stdcall tTVPMFPlayer::BuildGraph( HWND callbackwin, IStream *stream,
 	const wchar_t * streamname, const wchar_t *type, unsigned __int64 size )
 {
-	VideoStatue = vsProcessing;
+	//VideoStatue = vsProcessing;
 
 	BuildWindow = callbackwin;
 	OwnerWindow = callbackwin;
@@ -174,10 +178,10 @@ void __stdcall tTVPMFPlayer::BuildGraph( HWND callbackwin, IStream *stream,
 	HRESULT hr = S_OK;
 	if( FAILED(hr = MFCreateMFByteStreamOnStream( stream, &ByteStream )) ) {
 		TVPThrowExceptionMessage(L"Faild to create stream.");
-		VideoStatue = vsStopped;
+		//VideoStatue = vsStopped;
 	}
 }
-
+/*
 HRESULT tTVPMFPlayer::GetPresentationDescriptorFromTopology( IMFPresentationDescriptor **ppPD ) {
     CComPtr<IMFCollection> pCollection;
     CComPtr<IUnknown> pUnk;
@@ -202,6 +206,7 @@ HRESULT tTVPMFPlayer::GetPresentationDescriptorFromTopology( IMFPresentationDesc
 	}
     return hr;
 }
+*/
 void tTVPMFPlayer::OnTopologyStatus(UINT32 status) {
 	HRESULT hr;
 	switch( status ) {
@@ -217,20 +222,15 @@ void tTVPMFPlayer::OnTopologyStatus(UINT32 status) {
 			}
 			pGetService->GetService( MF_RATE_CONTROL_SERVICE, IID_IMFRateControl, (void**)&RateControl );
 			pGetService->GetService( MF_RATE_CONTROL_SERVICE, IID_IMFRateSupport, (void**)&RateSupport );
-
-			CComPtr<IMFPresentationDescriptor> pPD;
-			if( SUCCEEDED(hr = GetPresentationDescriptorFromTopology( &pPD )) ) {
-				(void)pPD->GetUINT64(MF_PD_DURATION, (UINT64*)&HnsDuration);
-			}
 			CComPtr<IMFClock> pClock;
 			HRESULT hrTmp = MediaSession->GetClock(&pClock);
 			if( SUCCEEDED(hrTmp) ) {
 				hr = pClock->QueryInterface(IID_PPV_ARGS(&PresentationClock));
 			}
 		}
-		EventCode = EC_READY;
-		if( BuildWindow != NULL) ::PostMessage( BuildWindow, WM_GRAPHNOTIFY, 0, 0 );
-		//::SendNotifyMessage( BuildWindow, WM_GRAPHNOTIFY, 0, 0 );
+		//EventCode = EC_READY;
+		//if( BuildWindow != NULL) ::PostMessage( BuildWindow, WM_GRAPHNOTIFY, 0, 0 );
+		if( BuildWindow != NULL) ::PostMessage( BuildWindow, WM_READY, 0, 0 );
 		break;
 		}
 	case MF_TOPOSTATUS_STARTED_SOURCE:
@@ -299,6 +299,7 @@ HRESULT tTVPMFPlayer::CreateVideoPlayer() {
 			TVPThrowExceptionMessage(L"Faild to add nodes.");
 		}
 	}
+	pPresentationDescriptor->GetUINT64(MF_PD_DURATION, (UINT64*)&HnsDuration);
 	
 	if( FAILED(hr = MediaSession->SetTopology( 0, Topology )) ) {
 		TVPThrowExceptionMessage(L"Faild to set topology.");
@@ -473,8 +474,18 @@ HRESULT tTVPMFPlayer::AddOutputNode( IMFTopology *pTopology, IMFStreamSink *pStr
 //----------------------------------------------------------------------------
 void __stdcall tTVPMFPlayer::ReleaseAll()
 {
+	if( MediaSession.p ) {
+		MediaSession->Stop();
+		MediaSession->Close();
+		/*
+		if( MediaSource.p ) {
+			MediaSource->Shutdown();
+		}
+		*/
+		MediaSession->Shutdown();
+	}
 	if( PlayerCallback ) {
-		delete PlayerCallback;
+		PlayerCallback->Release();
 		PlayerCallback = NULL;
 	}
 	if( ByteStream.p ) {
@@ -498,6 +509,11 @@ void __stdcall tTVPMFPlayer::ReleaseAll()
 	if( Topology.p ) {
 		Topology.Release();
 	}
+	/*
+	if( MediaSource.p ) {
+		MediaSource.Release();
+	}
+	*/
 	if( MediaSession.p ) {
 		MediaSession.Release();
 	}
@@ -513,19 +529,23 @@ void tTVPMFPlayer::NotifyError( HRESULT hr ) {
 void tTVPMFPlayer::OnMediaItemCleared() {
 }
 void tTVPMFPlayer::OnPause() {
-	VideoStatue = vsPaused;
+	//VideoStatue = vsPaused;
+	if( BuildWindow != NULL) ::PostMessage( BuildWindow, WM_STATE_CHANGE, vsPaused, 0 );
 }
 void tTVPMFPlayer::OnPlayBackEnded() {
-	EventCode = EC_COMPLETE;
-	if( BuildWindow != NULL ) ::PostMessage( BuildWindow, WM_GRAPHNOTIFY, 0, 0 );
+	//EventCode = EC_COMPLETE;
+	//if( BuildWindow != NULL ) ::PostMessage( BuildWindow, WM_GRAPHNOTIFY, 0, 0 );
+	if( BuildWindow != NULL ) ::PostMessage( BuildWindow, WM_STATE_CHANGE, vsEnded, 0 );
 }
 void tTVPMFPlayer::OnRateSet( double rate ) {
 }
 void tTVPMFPlayer::OnStop() {
-	VideoStatue = vsStopped;
+	//VideoStatue = vsStopped;
+	if( BuildWindow != NULL) ::PostMessage( BuildWindow, WM_STATE_CHANGE, vsStopped, 0 );
 }
 void tTVPMFPlayer::OnPlay() {
-	VideoStatue = vsPlaying;
+	//VideoStatue = vsPlaying;
+	if( BuildWindow != NULL) ::PostMessage( BuildWindow, WM_STATE_CHANGE, vsPlaying, 0 );
 }
 //----------------------------------------------------------------------------
 void __stdcall tTVPMFPlayer::SetWindow(HWND window) {
@@ -568,6 +588,13 @@ void __stdcall tTVPMFPlayer::Play() {
 	if( MediaSession.p ) {
 		PROPVARIANT varStart;
 		PropVariantInit(&varStart);
+		/*
+		if( StartPositionSpecify ) {
+			varStart.vt = VT_I8;
+			varStart.hVal.QuadPart = StartPosition;
+			StartPositionSpecify = false;
+		}
+		*/
 		hr = MediaSession->Start( &GUID_NULL, &varStart );
 		PropVariantClear(&varStart);
 	}
@@ -579,6 +606,8 @@ void __stdcall tTVPMFPlayer::Stop() {
 	HRESULT hr = E_FAIL;
 	if( MediaSession.p ) {
 		hr = MediaSession->Stop();
+		//hr = MediaSession->Pause();
+		//StartPositionSpecify = false;
 	}
 	if( FAILED(hr) ) {
 		TVPThrowExceptionMessage(L"Faild to stop.");
@@ -588,16 +617,27 @@ void __stdcall tTVPMFPlayer::Pause() {
 	HRESULT hr = E_FAIL;
 	if( MediaSession.p ) {
 		hr = MediaSession->Pause();
+		//StartPositionSpecify = false;
 	}
 	if( FAILED(hr) ) {
 		TVPThrowExceptionMessage(L"Faild to stop.");
 	}
 }
+MFCLOCK_STATE tTVPMFPlayer::GetClockState() {
+	HRESULT hr = S_OK;
+	MFCLOCK_STATE state;
+	if( PresentationClock.p ) {
+		if( SUCCEEDED(hr = PresentationClock->GetState( 0, &state )) ) {
+			return state;
+		}
+	}
+	return MFCLOCK_STATE_INVALID;
+}
 // Seek
 // http://msdn.microsoft.com/en-us/library/windows/desktop/ee892373%28v=vs.85%29.aspx
 void __stdcall tTVPMFPlayer::SetPosition(unsigned __int64 tick) {
 	HRESULT hr = S_OK;
-	if( MediaSession.p ) {
+	if( MediaSession.p && GetClockState() == MFCLOCK_STATE_RUNNING) {
 		PROPVARIANT var;
 		PropVariantInit(&var);
 		var.vt = VT_I8;
@@ -625,10 +665,29 @@ void __stdcall tTVPMFPlayer::GetPosition(unsigned __int64 *tick) {
 }
 void __stdcall tTVPMFPlayer::GetStatus(tTVPVideoStatus *status) {
 	if( status ) {
-		*status = VideoStatue;
+		switch( GetClockState() ) {
+		case MFCLOCK_STATE_INVALID:
+			//*status = VideoStatue;
+			*status = vsStopped;
+			break;
+		case MFCLOCK_STATE_RUNNING:
+			*status = vsPlaying;
+			break;
+		case MFCLOCK_STATE_STOPPED:
+			*status = vsStopped;
+			break;
+		case MFCLOCK_STATE_PAUSED:
+			*status = vsPaused;
+			break;
+		default:
+			*status = vsStopped;
+			//*status = VideoStatue;
+			break;
+		}
 	}
 }
 void __stdcall tTVPMFPlayer::GetEvent(long *evcode, long *param1, long *param2, bool *got) {
+	/*
 	if( EventCode != 0 ) {
 		*evcode = EventCode;
 		*param1 = 0;
@@ -637,11 +696,14 @@ void __stdcall tTVPMFPlayer::GetEvent(long *evcode, long *param1, long *param2, 
 	} else {
 		*got = false;
 	}
+	*/
 }
 void __stdcall tTVPMFPlayer::FreeEventParams(long evcode, long param1, long param2) {
+	/*
 	if( evcode == EventCode ) {
 		EventCode = 0;
 	}
+	*/
 }
 void __stdcall tTVPMFPlayer::Rewind() {
 	SetPosition( 0 );
@@ -651,14 +713,14 @@ void __stdcall tTVPMFPlayer::SetFrame( int f ) {
 	HRESULT hr = MFFrameRateToAverageTimePerFrame( FPSNumerator, FPSDenominator, &avgTime );
 	if( SUCCEEDED(hr) ) {
 		LONGLONG requestTime = avgTime * (LONGLONG)f;
-		if( MediaSession.p ) {
+		if( MediaSession.p && GetClockState() == MFCLOCK_STATE_RUNNING ) {
 			PROPVARIANT var;
 			PropVariantInit(&var);
 			var.vt = VT_I8;
 			var.hVal.QuadPart = requestTime;
 			MediaSession->Start( &GUID_NULL, &var );
 			PropVariantClear(&var);
-		} 
+		}
 	}
 }
 void __stdcall tTVPMFPlayer::GetFrame( int *f ) {
@@ -669,7 +731,7 @@ void __stdcall tTVPMFPlayer::GetFrame( int *f ) {
 		if( PresentationClock.p ) {
 			MFTIME mftime;
 			if( SUCCEEDED(hr = PresentationClock->GetTime(&mftime)) ) {
-				*f = mftime / avgTime;
+				*f = (int)( mftime / avgTime );
 			}
 		}
 	}
