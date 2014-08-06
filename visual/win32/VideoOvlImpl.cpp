@@ -437,7 +437,7 @@ void tTJSNI_VideoOverlay::Play()
 	{
 		VideoOverlay->Play();
 		ClearWndProcMessages();
-		SetStatus(ssPlay);
+		if( Mode != vomMFEVR ) SetStatus(ssPlay);
 	}
 }
 //---------------------------------------------------------------------------
@@ -448,7 +448,7 @@ void tTJSNI_VideoOverlay::Stop()
 	{
 		VideoOverlay->Stop();
 		ClearWndProcMessages();
-		SetStatus(ssStop);
+		if( Mode != vomMFEVR ) SetStatus(ssStop);
 	}
 }
 //---------------------------------------------------------------------------
@@ -461,7 +461,7 @@ void tTJSNI_VideoOverlay::Pause()
 	{
 		VideoOverlay->Pause();
 //		ClearWndProcMessages();
-		SetStatus(ssPause);
+		if( Mode != vomMFEVR ) SetStatus(ssPause);
 	}
 }
 void tTJSNI_VideoOverlay::Rewind()
@@ -661,7 +661,8 @@ void tTJSNI_VideoOverlay::WndProc( NativeEvent& ev )
 	// EventQueue's message procedure
 	if(VideoOverlay)
 	{
-		if(ev.Message == WM_GRAPHNOTIFY)
+		switch(ev.Message) {
+		case WM_GRAPHNOTIFY:
 		{
 			long evcode, p1, p2;
 			bool got;
@@ -785,20 +786,51 @@ void tTJSNI_VideoOverlay::WndProc( NativeEvent& ev )
 							}
 						}
 						break;
-					case EC_READY:
-						FirePeriodEvent(perReady);
-						break;
 				}
 				VideoOverlay->FreeEventParams( evcode, p1, p2 );
 			} while( got );
 			return;
 		}
-		else if(ev.Message== WM_CALLBACKCMD)
+		case WM_CALLBACKCMD:
 		{
 			// wparam : command
 			// lparam : argument
 			FireCallbackCommand((tjs_char*)ev.WParam, (tjs_char*)ev.LParam);
 			return;
+		}
+		case WM_READY:
+			FirePeriodEvent(perReady);
+			return;
+		case WM_STATE_CHANGE:
+			{
+				switch( ev.WParam ) {
+				case vsStopped:
+					SetStatusAsync( ssStop );
+					break;
+				case vsPlaying:
+					SetStatusAsync( ssPlay );
+					break;
+				case vsPaused:
+					SetStatusAsync( ssPause );
+					break;
+				case vsEnded:
+					if( Status == ssPlay )
+					{
+						if( Loop )
+						{
+							Rewind();
+							FirePeriodEvent(perLoop); // fire period event by loop rewind
+						}
+						else
+						{
+							VideoOverlay->Stop();
+							SetStatusAsync(ssStop); // All data has been rendered
+						}
+					}
+					break;
+				}
+				return;
+			}
 		}
 	}
 
