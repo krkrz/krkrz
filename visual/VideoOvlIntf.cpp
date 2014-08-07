@@ -67,18 +67,16 @@ ttstr tTJSNI_BaseVideoOverlay::GetStatusString() const
 	static ttstr play(TJS_W("play"));
 	static ttstr stop(TJS_W("stop"));
 	static ttstr unknown(TJS_W("unknown"));
-// Start:	Add:	T.Imoto
 	static ttstr pause(TJS_W("pause"));
-// End	:	Add:	T.Imoto
+	static ttstr ready(TJS_W("ready"));
 
 	switch(Status)
 	{
 	case ssUnload:	return unload;
 	case ssPlay:	return play;
 	case ssStop:	return stop;
-// Start:	Add:	T.Imoto
 	case ssPause:	return pause;
-// End	:	Add:	T.Imoto
+	case ssReady:	return ready;
 	default:		return unknown;
 	}
 }

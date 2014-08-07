@@ -798,9 +798,6 @@ void tTJSNI_VideoOverlay::WndProc( NativeEvent& ev )
 			FireCallbackCommand((tjs_char*)ev.WParam, (tjs_char*)ev.LParam);
 			return;
 		}
-		case WM_READY:
-			FirePeriodEvent(perReady);
-			return;
 		case WM_STATE_CHANGE:
 			{
 				switch( ev.WParam ) {
@@ -813,12 +810,15 @@ void tTJSNI_VideoOverlay::WndProc( NativeEvent& ev )
 				case vsPaused:
 					SetStatusAsync( ssPause );
 					break;
+				case vsReady:
+					SetStatusAsync( ssReady );
+					break;
 				case vsEnded:
 					if( Status == ssPlay )
 					{
 						if( Loop )
 						{
-							Rewind();
+							VideoOverlay->Play();
 							FirePeriodEvent(perLoop); // fire period event by loop rewind
 						}
 						else

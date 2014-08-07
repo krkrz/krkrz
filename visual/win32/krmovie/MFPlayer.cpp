@@ -7,8 +7,7 @@
 #include <string>
 #include <vector>
 
-// for MFCreateMFByteStreamOnStream, MFCreateVideoRendererActivate
-#include <Mfidl.h>	// Mfplat.lib, Mfplat.dll
+#include <Mfidl.h>
 #include <mfapi.h>
 #include <mferror.h>
 #include <evr.h>
@@ -23,15 +22,15 @@
 #include "tp_stub.h"
 
 #pragma comment( lib, "propsys.lib" )
-#pragma comment( lib, "Mfplat.lib" )
-#pragma comment( lib, "Mf.lib" )
+//#pragma comment( lib, "Mfplat.lib" )
+#pragma comment( lib, "Mfplat_vista.lib" )
+//#pragma comment( lib, "Mf.lib" )
+#pragma comment( lib, "Mf_vista.lib" )
 #pragma comment( lib, "Mfuuid.lib" )
 //#pragma comment( lib, "d3d9.lib" )
 //#pragma comment( lib, "dxva2.lib" )
 //#pragma comment( lib, "evr.lib" )
 
-// How to Play Media Files with Media Foundation
-// http://msdn.microsoft.com/ja-jp/library/windows/desktop/ms703190%28v=vs.85%29.aspx
 //----------------------------------------------------------------------------
 //! @brief	  	VideoOverlay MediaFoundationを取得する
 //! @param		callbackwin : 
@@ -65,7 +64,6 @@ STDMETHODIMP tTVPPlayerCallback::Invoke( IMFAsyncResult *pAsyncResult ) {
 	CComPtr<IMFMediaEvent> pMediaEvent;
 	if( SUCCEEDED(hr = owner_->GetMediaSession()->EndGetEvent( pAsyncResult, &pMediaEvent )) ) {
 		if( SUCCEEDED(hr = pMediaEvent->GetType(&met)) ) {
-			// OutputDebugString( std::to_wstring(met).c_str() ); OutputDebugString( L"\n" );
 			PROPVARIANT pvValue;
 			PropVariantInit(&pvValue);
 			switch( met ) {
@@ -132,13 +130,11 @@ tTVPMFPlayer::tTVPMFPlayer() {
 	Shutdown = false;
 	PlayerCallback = new tTVPPlayerCallback(this);
 	PlayerCallback->AddRef();
-	//VideoStatue = vsStopped;
 	FPSNumerator = 1;
 	FPSDenominator = 1;
 	Stream = NULL;
 
 	HnsDuration = 0;
-	//EventCode = 0;
 	//StartPositionSpecify = false;
 }
 tTVPMFPlayer::~tTVPMFPlayer() {
@@ -160,12 +156,17 @@ void __stdcall tTVPMFPlayer::Release(){
 void tTVPMFPlayer::OnDestoryWindow() {
 	ReleaseAll();
 }
+/*
+void tTVPMFPlayer::InitializeMFDLL() {
+	if( MfDLL.IsLoaded() == false ) {
+		MfDLL.Load(L"mf.dll");
+	}
+}
+*/
 //----------------------------------------------------------------------------
 void __stdcall tTVPMFPlayer::BuildGraph( HWND callbackwin, IStream *stream,
 	const wchar_t * streamname, const wchar_t *type, unsigned __int64 size )
 {
-	//VideoStatue = vsProcessing;
-
 	BuildWindow = callbackwin;
 	OwnerWindow = callbackwin;
 	PlayWindow::SetOwner( callbackwin );
@@ -176,9 +177,15 @@ void __stdcall tTVPMFPlayer::BuildGraph( HWND callbackwin, IStream *stream,
 	Stream->AddRef();
 
 	HRESULT hr = S_OK;
-	if( FAILED(hr = MFCreateMFByteStreamOnStream( stream, &ByteStream )) ) {
+	// MFCreateMFByteStreamOnStream は、Windows 7 以降にのみある API なので、動的ロードして Vista での起動に支障がないようにする
+	if( MfplatDLL.IsLoaded() == false ) MfplatDLL.Load(L"mfplat.dll");
+	typedef HRESULT (*FuncMFCreateMFByteStreamOnStream)(IStream *pStream,IMFByteStream **ppByteStream);
+	FuncMFCreateMFByteStreamOnStream pCreateMFByteStream = (FuncMFCreateMFByteStreamOnStream)MfplatDLL.GetProcAddress("MFCreateMFByteStreamOnStream");
+	if( pCreateMFByteStream == NULL ) {
+		TVPThrowExceptionMessage(L"Faild to retrieve MFCreateMFByteStreamOnStream from mfplat.dll.");
+	}
+	if( FAILED(hr = pCreateMFByteStream( stream, &ByteStream )) ) {
 		TVPThrowExceptionMessage(L"Faild to create stream.");
-		//VideoStatue = vsStopped;
 	}
 }
 /*
@@ -228,9 +235,7 @@ void tTVPMFPlayer::OnTopologyStatus(UINT32 status) {
 				hr = pClock->QueryInterface(IID_PPV_ARGS(&PresentationClock));
 			}
 		}
-		//EventCode = EC_READY;
-		//if( BuildWindow != NULL) ::PostMessage( BuildWindow, WM_GRAPHNOTIFY, 0, 0 );
-		if( BuildWindow != NULL) ::PostMessage( BuildWindow, WM_READY, 0, 0 );
+		if( BuildWindow != NULL) ::PostMessage( BuildWindow, WM_STATE_CHANGE, vsReady, 0 );
 		break;
 		}
 	case MF_TOPOSTATUS_STARTED_SOURCE:
@@ -529,22 +534,17 @@ void tTVPMFPlayer::NotifyError( HRESULT hr ) {
 void tTVPMFPlayer::OnMediaItemCleared() {
 }
 void tTVPMFPlayer::OnPause() {
-	//VideoStatue = vsPaused;
 	if( BuildWindow != NULL) ::PostMessage( BuildWindow, WM_STATE_CHANGE, vsPaused, 0 );
 }
 void tTVPMFPlayer::OnPlayBackEnded() {
-	//EventCode = EC_COMPLETE;
-	//if( BuildWindow != NULL ) ::PostMessage( BuildWindow, WM_GRAPHNOTIFY, 0, 0 );
 	if( BuildWindow != NULL ) ::PostMessage( BuildWindow, WM_STATE_CHANGE, vsEnded, 0 );
 }
 void tTVPMFPlayer::OnRateSet( double rate ) {
 }
 void tTVPMFPlayer::OnStop() {
-	//VideoStatue = vsStopped;
 	if( BuildWindow != NULL) ::PostMessage( BuildWindow, WM_STATE_CHANGE, vsStopped, 0 );
 }
 void tTVPMFPlayer::OnPlay() {
-	//VideoStatue = vsPlaying;
 	if( BuildWindow != NULL) ::PostMessage( BuildWindow, WM_STATE_CHANGE, vsPlaying, 0 );
 }
 //----------------------------------------------------------------------------
@@ -655,19 +655,23 @@ void __stdcall tTVPMFPlayer::GetPosition(unsigned __int64 *tick) {
 		MFTIME mftime;
 		if( SUCCEEDED(hr = PresentationClock->GetTime(&mftime)) ) {
 			*tick = mftime / (ONE_SECOND / ONE_MSEC);
+		} else {
+			// 失敗した場合は 0 を返すようにしておく
+			hr = S_OK;
+			*tick = 0;
 		}
 	} else {
 		*tick = 0;
 	}
 	if( FAILED(hr) ) {
-		TVPThrowExceptionMessage(L"Faild to get position.");
+		//TVPThrowExceptionMessage(L"Faild to get position.");
+		ThrowDShowException(L"Faild to get position.",hr);
 	}
 }
 void __stdcall tTVPMFPlayer::GetStatus(tTVPVideoStatus *status) {
 	if( status ) {
 		switch( GetClockState() ) {
 		case MFCLOCK_STATE_INVALID:
-			//*status = VideoStatue;
 			*status = vsStopped;
 			break;
 		case MFCLOCK_STATE_RUNNING:
@@ -681,29 +685,15 @@ void __stdcall tTVPMFPlayer::GetStatus(tTVPVideoStatus *status) {
 			break;
 		default:
 			*status = vsStopped;
-			//*status = VideoStatue;
 			break;
 		}
 	}
 }
 void __stdcall tTVPMFPlayer::GetEvent(long *evcode, long *param1, long *param2, bool *got) {
-	/*
-	if( EventCode != 0 ) {
-		*evcode = EventCode;
-		*param1 = 0;
-		*param2 = 0;
-		*got = true;
-	} else {
-		*got = false;
-	}
-	*/
+	/* 何もしない */
 }
 void __stdcall tTVPMFPlayer::FreeEventParams(long evcode, long param1, long param2) {
-	/*
-	if( evcode == EventCode ) {
-		EventCode = 0;
-	}
-	*/
+	/* 何もしない */
 }
 void __stdcall tTVPMFPlayer::Rewind() {
 	SetPosition( 0 );
