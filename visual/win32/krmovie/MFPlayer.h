@@ -3,6 +3,7 @@
 #define __MF_PLAYER_H__
 
 #include "PlayWindow.h"
+#include "CDLLLoader.h"
 
 // Media Foundation Player
 class tTVPPlayerCallback : public IMFAsyncCallback, public CUnknown {
@@ -34,7 +35,6 @@ protected:
 	bool		HasVideo;
 	float		PlayRate;
 	float		ZoomLevel;	// (1.0 == 100%)
-	//long		EventCode;
 
 	UINT32		FPSNumerator;
 	UINT32		FPSDenominator;
@@ -48,15 +48,16 @@ protected:
 	CComPtr<IMFRateSupport>			RateSupport;
 	CComPtr<IMFPresentationClock>	PresentationClock;
 	CComPtr<IMFAudioStreamVolume>	AudioVolume;
-	//CComPtr<IMFMediaSource>			MediaSource;
 
 	MFTIME				HnsDuration;
 
-	//tTVPVideoStatus		VideoStatue;
 	std::wstring		StreamName;
 	IStream*			Stream;
 	//bool				StartPositionSpecify;
 	//__int64				StartPosition;
+	
+	//CDLLLoader MfDLL;
+	CDLLLoader MfplatDLL;
 
 protected:
 	void __stdcall ReleaseAll();

@@ -17,7 +17,7 @@
 
 
 //---------------------------------------------------------------------------
-enum tTVPVideoStatus { vsStopped, vsPlaying, vsPaused, vsProcessing, vsEnded };
+enum tTVPVideoStatus { vsStopped, vsPlaying, vsPaused, vsProcessing, vsEnded, vsReady };
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -127,7 +127,6 @@ typedef void  (__stdcall *tGetVideoOverlayObject)(
 #define WM_GRAPHNOTIFY  (WM_USER+15)
 #define WM_CALLBACKCMD  (WM_USER+16)
 #define EC_UPDATE		(EC_USER+1)
-#define WM_READY		(WM_USER+17)
 #define WM_STATE_CHANGE	(WM_USER+18)
 //---------------------------------------------------------------------------
 
