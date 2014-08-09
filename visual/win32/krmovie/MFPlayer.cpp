@@ -132,7 +132,7 @@ tTVPMFPlayer::tTVPMFPlayer() {
 	PlayerCallback->AddRef();
 	FPSNumerator = 1;
 	FPSDenominator = 1;
-	Stream = NULL;
+	//Stream = NULL;
 
 	HnsDuration = 0;
 	//StartPositionSpecify = false;
@@ -173,8 +173,7 @@ void __stdcall tTVPMFPlayer::BuildGraph( HWND callbackwin, IStream *stream,
 	CallbackWindow = callbackwin;
 	PlayWindow::SetMessageDrainWindow( callbackwin );
 	StreamName = std::wstring(streamname);
-	Stream = stream;
-	Stream->AddRef();
+	//Stream = stream;
 
 	HRESULT hr = S_OK;
 	// MFCreateMFByteStreamOnStream は、Windows 7 以降にのみある API なので、動的ロードして Vista での起動に支障がないようにする
@@ -226,6 +225,8 @@ void tTVPMFPlayer::OnTopologyStatus(UINT32 status) {
 			if( FAILED(hr = pGetService->GetService( MR_VIDEO_RENDER_SERVICE, IID_IMFVideoDisplayControl, (void**)&VideoDisplayControl )) ) {
 			}
 			if( FAILED(hr = pGetService->GetService( MR_STREAM_VOLUME_SERVICE, IID_IMFAudioStreamVolume, (void**)&AudioVolume )) ) {
+			}
+			if( FAILED(hr = pGetService->GetService( MR_POLICY_VOLUME_SERVICE, IID_IMFSimpleAudioVolume, (void**)&SimpleAudioVolume )) ) {
 			}
 			pGetService->GetService( MF_RATE_CONTROL_SERVICE, IID_IMFRateControl, (void**)&RateControl );
 			pGetService->GetService( MF_RATE_CONTROL_SERVICE, IID_IMFRateSupport, (void**)&RateSupport );
@@ -281,15 +282,15 @@ HRESULT tTVPMFPlayer::CreateVideoPlayer() {
 	if( ObjectType != MF_OBJECT_MEDIASOURCE ) {
 		TVPThrowExceptionMessage(L"Invalid media source.");
 	}
-	CComPtr<IMFMediaSource> pMediaSource;
-	if( FAILED(hr = pSource.QueryInterface(&pMediaSource)) ) {
+	//CComPtr<IMFMediaSource> pMediaSource;
+	if( FAILED(hr = pSource.QueryInterface(&MediaSource)) ) {
 		TVPThrowExceptionMessage(L"Faild to query Media source.");
 	}
 	if( FAILED(hr = MFCreateTopology(&Topology)) ) {
 		TVPThrowExceptionMessage(L"Faild to create Topology.");
 	}
 	CComPtr<IMFPresentationDescriptor> pPresentationDescriptor;
-	if( FAILED(hr = pMediaSource->CreatePresentationDescriptor(&pPresentationDescriptor)) ) {
+	if( FAILED(hr = MediaSource->CreatePresentationDescriptor(&pPresentationDescriptor)) ) {
 		TVPThrowExceptionMessage(L"Faild to create Presentation Descriptor.");
 	}
 	DWORD streamCount;
@@ -300,7 +301,7 @@ HRESULT tTVPMFPlayer::CreateVideoPlayer() {
 		TVPThrowExceptionMessage(L"Not found media stream.");
 	}
 	for( DWORD i = 0; i < streamCount; i++ ) {
-		if( FAILED(hr = AddBranchToPartialTopology(Topology, pMediaSource, pPresentationDescriptor, i, hWnd)) ) {
+		if( FAILED(hr = AddBranchToPartialTopology(Topology, MediaSource, pPresentationDescriptor, i, hWnd)) ) {
 			TVPThrowExceptionMessage(L"Faild to add nodes.");
 		}
 	}
@@ -482,11 +483,9 @@ void __stdcall tTVPMFPlayer::ReleaseAll()
 	if( MediaSession.p ) {
 		MediaSession->Stop();
 		MediaSession->Close();
-		/*
 		if( MediaSource.p ) {
 			MediaSource->Shutdown();
 		}
-		*/
 		MediaSession->Shutdown();
 	}
 	if( PlayerCallback ) {
@@ -494,7 +493,11 @@ void __stdcall tTVPMFPlayer::ReleaseAll()
 		PlayerCallback = NULL;
 	}
 	if( ByteStream.p ) {
+		ByteStream->Close();
 		ByteStream.Release();
+	}
+	if( SimpleAudioVolume.p ) {
+		SimpleAudioVolume.Release();
 	}
 	if( AudioVolume.p ) {
 		AudioVolume.Release();
@@ -511,20 +514,14 @@ void __stdcall tTVPMFPlayer::ReleaseAll()
 	if( PresentationClock.p ) {
 		PresentationClock.Release();
 	}
-	if( Topology.p ) {
-		Topology.Release();
-	}
-	/*
 	if( MediaSource.p ) {
 		MediaSource.Release();
 	}
-	*/
+	if( Topology.p ) {
+		Topology.Release();
+	}
 	if( MediaSession.p ) {
 		MediaSession.Release();
-	}
-	if( Stream ) {
-		Stream->Release();
-		Stream = NULL;
 	}
 }
 //----------------------------------------------------------------------------
@@ -790,8 +787,8 @@ void __stdcall tTVPMFPlayer::SetPlayRate( double rate ) {
 	if( RateSupport.p && RateControl.p ) {
 		float playrate = (float)rate;
 		float acceptrate = playrate;
-		if( SUCCEEDED(hr = RateSupport->IsRateSupported( TRUE, playrate, &acceptrate )) ) {
-			hr = RateControl->SetRate( TRUE, acceptrate );
+		if( SUCCEEDED(hr = RateSupport->IsRateSupported( FALSE, playrate, &acceptrate )) ) {
+			hr = RateControl->SetRate( FALSE, acceptrate );
 		}
 	}
 	if( FAILED(hr) ) {
@@ -810,36 +807,69 @@ void __stdcall tTVPMFPlayer::GetPlayRate( double *rate ) {
 		TVPThrowExceptionMessage(L"Faild to get play rate.");
 	}
 }
-
+// ステレオの場合のみバランスは有効
 void __stdcall tTVPMFPlayer::SetAudioBalance( long balance ) {
-	HRESULT hr = E_FAIL;
-	// AudioVolume でチャンネルに応じたバランス設定していかないといけないので非サポートにしておく
+	HRESULT hr = S_OK;
+	if( AudioVolume.p ) {
+		UINT32 count;
+		if( SUCCEEDED(hr = AudioVolume->GetChannelCount( &count )) ) {
+			if( count == 2 ) {
+				float channels[2];
+				float left = 1.0f;
+				float right = 1.0f;
+				if( balance == 0 ) {
+					left = right = 1.0f;
+				} else if( balance > 0 ) {
+					left = (float)(10000 - balance) / 10000.0f;
+					if( left > 1.0f ) left = 1.0f;
+					else if( left < 0.0f ) left = 0.0f;
+				} else {
+					right = (float)(10000 + balance) / 10000.0f;
+					if( right > 1.0f ) right = 1.0f;
+					else if( right < 0.0f ) right = 0.0f;
+				}
+				channels[0] = left;
+				channels[1] = right;
+				hr = AudioVolume->SetAllVolumes( count, &channels[0] );
+			}
+		}
+	}
 	if( FAILED(hr) ) {
 		TVPThrowExceptionMessage(L"Faild to set audio balance.");
 	}
 }
 void __stdcall tTVPMFPlayer::GetAudioBalance( long *balance ) {
-	HRESULT hr = E_FAIL;
-	// AudioVolume でチャンネルに応じたバランス設定していかないといけないので非サポートにしておく
+	HRESULT hr = S_OK;
+	*balance = 0;
+	if( AudioVolume.p ) {
+		UINT32 count;
+		if( SUCCEEDED(hr = AudioVolume->GetChannelCount( &count )) ) {
+			std::vector<float> channels(count);
+			if( SUCCEEDED(hr = AudioVolume->GetAllVolumes( count, &channels[0] )) ) {
+				float total = 0.0f;
+				if( count == 2 ) {
+					float left = channels[0] * (-10000);
+					float right = channels[1] * 10000;
+					float v = left + right;
+					long b = (long)v;
+					if( b < (-10000) ) b = (-10000);
+					else if( b > 10000 ) b = 10000;
+					*balance = b;
+				}
+			}
+		}
+	}
 	if( FAILED(hr) ) {
 		TVPThrowExceptionMessage(L"Faild to get audio balance.");
 	}
 }
 void __stdcall tTVPMFPlayer::SetAudioVolume( long volume ) {
 	HRESULT hr = E_FAIL;
-	if( AudioVolume.p ) {
-		UINT32 count;
-		if( SUCCEEDED(hr = AudioVolume->GetChannelCount( &count )) ) {
-			std::vector<float> channels(count);
-			float v = 0.0f;
-			if( volume > -10000  ) {
-				v = (10000 + volume)/10000.0f;
-			} 
-			for( UINT32 i = 0; i < count; i++ ) {
-				channels[i] = v;
-			}
-			hr = AudioVolume->SetAllVolumes( count, &channels[0] );
-		}
+	if( SimpleAudioVolume.p ) {
+		float v = (10000 + volume)/10000.0f;
+		if( v > 1.0f ) v = 1.0f;
+		else if( v < 0.0f ) v = 0.0f;
+		hr = SimpleAudioVolume->SetMasterVolume( v );
 	}
 	if( FAILED(hr) ) {
 		TVPThrowExceptionMessage(L"Faild to set audio volume.");
@@ -847,26 +877,16 @@ void __stdcall tTVPMFPlayer::SetAudioVolume( long volume ) {
 }
 void __stdcall tTVPMFPlayer::GetAudioVolume( long *volume ) {
 	HRESULT hr = E_FAIL;
-	float vol = 0.0f;
-	if( AudioVolume.p ) {
-		UINT32 count;
-		if( SUCCEEDED(hr = AudioVolume->GetChannelCount( &count )) ) {
-			std::vector<float> channels(count);
-			if( SUCCEEDED(hr = AudioVolume->GetAllVolumes( count, &channels[0] )) ) {
-				float total = 0.0f;
-				for( UINT32 i = 0; i < count; i++ ) {
-					total += channels[i];
-				}
-				vol = total / count;
-			}
+	float vol = 1.0f;
+	if( SimpleAudioVolume.p ) {
+		if( FAILED(hr=SimpleAudioVolume->GetMasterVolume( &vol )) ) {
+			vol = 1.0f;
 		}
-	} else {
-		*volume = 0;
 	}
 	if( FAILED(hr) ) {
 		TVPThrowExceptionMessage(L"Faild to get audio volume.");
 	} else {
-		*volume = 10000 - (long)(vol*10000);
+		*volume = (long)((vol - 1.0f) * 10000);
 	}
 }
 
