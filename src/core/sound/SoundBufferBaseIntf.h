@@ -22,9 +22,8 @@ enum tTVPSoundStatus
 	ssUnload, // data is not specified
 	ssStop, // stop
 	ssPlay, // play
-// Start:	Add:	T.Imoto
 	ssPause, // pause
-// End:		Add:	T.Imoto
+	ssReady, // ready
 };
 //---------------------------------------------------------------------------
 

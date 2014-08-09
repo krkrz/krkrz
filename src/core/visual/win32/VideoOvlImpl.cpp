@@ -38,6 +38,7 @@ class tTVPVideoModule
 	tGetVideoOverlayObject procGetVideoOverlayObject;
 	tGetVideoOverlayObject procGetVideoLayerObject; // krmovie.dll only
 	tGetVideoOverlayObject procGetMixingVideoOverlayObject; // krmovie.dll only
+	tGetVideoOverlayObject procGetMFVideoOverlayObject; // krmovie.dll only
 	tTVPV2LinkProc procV2Link;
 	tTVPV2UnlinkProc procV2Unlink;
 
@@ -64,6 +65,12 @@ public:
 	{
 		procGetMixingVideoOverlayObject(callbackwin, stream, streamname, type, size, out);
 	}
+	void GetMFVideoOverlayObject(HWND callbackwin, IStream *stream,
+		const wchar_t * streamname, const wchar_t *type, unsigned __int64 size,
+		iTVPVideoOverlay **out)
+	{
+		procGetMFVideoOverlayObject(callbackwin, stream, streamname, type, size, out);
+	}
 };
 static tTVPVideoModule *TVPMovieVideoModule = NULL;
 static tTVPVideoModule *TVPFlashVideoModule = NULL;
@@ -89,6 +96,9 @@ tTVPVideoModule::tTVPVideoModule(const ttstr &name)
 
 		procGetMixingVideoOverlayObject = (tGetVideoOverlayObject)
 			GetProcAddress(Handle, "GetMixingVideoOverlayObject");
+
+		procGetMFVideoOverlayObject = (tGetVideoOverlayObject)
+			GetProcAddress(Handle, "GetMFVideoOverlayObject");
 
 		procGetAPIVersion = (tGetAPIVersion)
 			GetProcAddress(Handle, "GetAPIVersion");
@@ -320,13 +330,17 @@ void tTJSNI_VideoOverlay::Open(const ttstr &_name)
 				mod->GetMixingVideoOverlayObject(EventQueue.GetOwner(),
 					istream, name.c_str(), ext.c_str(),
 					size, &VideoOverlay);
+			else if(Mode == vomMFEVR)
+				mod->GetMFVideoOverlayObject(EventQueue.GetOwner(),
+					istream, name.c_str(), ext.c_str(),
+					size, &VideoOverlay);
 			else
 				mod->GetVideoOverlayObject(EventQueue.GetOwner(),
 					istream, name.c_str(), ext.c_str(),
 					size, &VideoOverlay);
 		}
 
-		if( flash || (Mode == vomOverlay) || (Mode == vomMixer)  )
+		if( flash || (Mode == vomOverlay) || (Mode == vomMixer) || (Mode == vomMFEVR) )
 		{
 			ResetOverlayParams();
 		}
@@ -423,7 +437,7 @@ void tTJSNI_VideoOverlay::Play()
 	{
 		VideoOverlay->Play();
 		ClearWndProcMessages();
-		SetStatus(ssPlay);
+		if( Mode != vomMFEVR ) SetStatus(ssPlay);
 	}
 }
 //---------------------------------------------------------------------------
@@ -434,7 +448,7 @@ void tTJSNI_VideoOverlay::Stop()
 	{
 		VideoOverlay->Stop();
 		ClearWndProcMessages();
-		SetStatus(ssStop);
+		if( Mode != vomMFEVR ) SetStatus(ssStop);
 	}
 }
 //---------------------------------------------------------------------------
@@ -447,7 +461,7 @@ void tTJSNI_VideoOverlay::Pause()
 	{
 		VideoOverlay->Pause();
 //		ClearWndProcMessages();
-		SetStatus(ssPause);
+		if( Mode != vomMFEVR ) SetStatus(ssPause);
 	}
 }
 void tTJSNI_VideoOverlay::Rewind()
@@ -606,7 +620,7 @@ void tTJSNI_VideoOverlay::ResetOverlayParams()
 	// retrieve new window information from owner window and
 	// set video owner window / message drain window.
 	// also sets rectangle and visible state.
-	if(VideoOverlay && Window && (Mode == vomOverlay || Mode == vomMixer) )
+	if(VideoOverlay && Window && (Mode == vomOverlay || Mode == vomMixer || Mode == vomMFEVR) )
 	{
 		OwnerWindow = Window->GetWindowHandle();
 		VideoOverlay->SetWindow(OwnerWindow);
@@ -623,7 +637,7 @@ void tTJSNI_VideoOverlay::ResetOverlayParams()
 //---------------------------------------------------------------------------
 void tTJSNI_VideoOverlay::DetachVideoOverlay()
 {
-	if(VideoOverlay && Window && (Mode == vomOverlay || Mode == vomMixer) )
+	if(VideoOverlay && Window && (Mode == vomOverlay || Mode == vomMixer || Mode == vomMFEVR) )
 	{
 		VideoOverlay->SetWindow(NULL);
 		VideoOverlay->SetMessageDrainWindow(EventQueue.GetOwner());
@@ -647,7 +661,8 @@ void tTJSNI_VideoOverlay::WndProc( NativeEvent& ev )
 	// EventQueue's message procedure
 	if(VideoOverlay)
 	{
-		if(ev.Message == WM_GRAPHNOTIFY)
+		switch(ev.Message) {
+		case WM_GRAPHNOTIFY:
 		{
 			long evcode, p1, p2;
 			bool got;
@@ -776,12 +791,46 @@ void tTJSNI_VideoOverlay::WndProc( NativeEvent& ev )
 			} while( got );
 			return;
 		}
-		else if(ev.Message== WM_CALLBACKCMD)
+		case WM_CALLBACKCMD:
 		{
 			// wparam : command
 			// lparam : argument
 			FireCallbackCommand((tjs_char*)ev.WParam, (tjs_char*)ev.LParam);
 			return;
+		}
+		case WM_STATE_CHANGE:
+			{
+				switch( ev.WParam ) {
+				case vsStopped:
+					SetStatusAsync( ssStop );
+					break;
+				case vsPlaying:
+					SetStatusAsync( ssPlay );
+					break;
+				case vsPaused:
+					SetStatusAsync( ssPause );
+					break;
+				case vsReady:
+					SetStatusAsync( ssReady );
+					break;
+				case vsEnded:
+					if( Status == ssPlay )
+					{
+						if( Loop )
+						{
+							VideoOverlay->Play();
+							FirePeriodEvent(perLoop); // fire period event by loop rewind
+						}
+						else
+						{
+							VideoOverlay->Stop();
+							SetStatusAsync(ssStop); // All data has been rendered
+						}
+					}
+					break;
+				}
+				return;
+			}
 		}
 	}
 
