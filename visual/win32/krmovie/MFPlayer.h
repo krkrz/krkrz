@@ -48,11 +48,13 @@ protected:
 	CComPtr<IMFRateSupport>			RateSupport;
 	CComPtr<IMFPresentationClock>	PresentationClock;
 	CComPtr<IMFAudioStreamVolume>	AudioVolume;
+	CComPtr<IMFSimpleAudioVolume>	SimpleAudioVolume;
+	CComPtr<IMFMediaSource>			MediaSource;
 
 	MFTIME				HnsDuration;
 
 	std::wstring		StreamName;
-	IStream*			Stream;
+	//IStream*			Stream;
 	//bool				StartPositionSpecify;
 	//__int64				StartPosition;
 	
