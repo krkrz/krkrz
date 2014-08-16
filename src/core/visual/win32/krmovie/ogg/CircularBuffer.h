@@ -29,8 +29,7 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //===========================================================================
 #pragma once
-#include <libOOOgg/dllstuff.h>
-#include <libOOOgg/IFIFOBuffer.h>
+#include <IFIFOBuffer.h>
 
 
 //Empty Buffer
@@ -123,7 +122,7 @@
 //
 //
 
-class LIBOOOGG_API CircularBuffer:	public IFIFOBuffer
+class CircularBuffer:	public IFIFOBuffer
 {
 public:
 	/// Constructor taking in the size in bytes of the internal buffer.

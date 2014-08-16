@@ -34,13 +34,12 @@
 #undef MIN
 #define MIN(a,b) (((a)<(b))?(a):(b))
 
-#include <libOOOgg/IStampedOggPacketSink.h>
-#include <libOOOgg/OggPaginatorSettings.h>
-#include <libOOOgg/IOggCallback.h>
-#include <libOOOgg/StampedOggPacket.h>
+#include "IStampedOggPacketSink.h"
+#include "OggPaginatorSettings.h"
+#include "IOggCallback.h"
+#include "StampedOggPacket.h"
 
-class LIBOOOGG_API OggPaginator
-	:	public IStampedOggPacketSink
+class OggPaginator : public IStampedOggPacketSink
 {
 public:
 	//TODO::: Have a constructor that lets you set the numheaders.
@@ -54,7 +53,7 @@ public:
 	OggPaginatorSettings* parameters();
 	
 	/// Feed your packets in here.
-	virtual bool acceptStampedOggPacket(StampedOggPacket* inOggPacket);
+	virtual bool acceptStampedOggPacket(class StampedOggPacket* inOggPacket);
 
 	/// Set the callback where your finished pages will go.
 	bool setPageCallback(IOggCallback* inPageCallback);
@@ -79,13 +78,13 @@ protected:
 	bool createFreshPage();
 
 	/// Adds the packet to the page
-	bool addPacketToPage(StampedOggPacket* inOggPacket);
+	bool addPacketToPage(class StampedOggPacket* inOggPacket);
 
 	/// Adds as much packet as the settings dicate.
-	unsigned long addAsMuchPacketAsPossible(StampedOggPacket* inOggPacket, unsigned long inStartAt, long inRemaining);
+	unsigned long addAsMuchPacketAsPossible(class StampedOggPacket* inOggPacket, unsigned long inStartAt, long inRemaining);
 
 	/// Add a part of a packet to a page.
-	bool addPartOfPacketToPage(StampedOggPacket* inOggPacket, unsigned long inStartFrom, unsigned long inLength);
+	bool addPartOfPacketToPage(class StampedOggPacket* inOggPacket, unsigned long inStartFrom, unsigned long inLength);
 	
 
 	unsigned long mPacketCount;

@@ -33,9 +33,9 @@
 #include "BasicSeekPassThrough.h"
 #include "IOggBaseTime.h"
 #include "IOggSeekTable.h"
-#include <libOOOgg/OggDataBuffer.h>
+#include <OggDataBuffer.h>
 
-#include <libOOOggSeek/AutoOggChainGranuleSeekTable.h>
+#include <AutoOggChainGranuleSeekTable.h>
 #include "CustomOggChainGranuleSeekTable.h"
 #include "OggDemuxInputPin.h"
 

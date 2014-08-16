@@ -31,9 +31,9 @@
 
 #pragma once
 
-#include <libOOOgg/StampedOggPacket.h>
+#include "StampedOggPacket.h"
 
-class LIBOOOGG_API IStampedOggPacketSink
+class IStampedOggPacketSink
 {
 public:
 	//Empty Constructor and destructor to ensure proper deletion
@@ -45,5 +45,5 @@ public:
 	    for deleting this page.  All callers should NULL their pointer
 	    immediately after calling to avoid reusing them.
 	  */
-	virtual bool acceptStampedOggPacket(StampedOggPacket* inPacket) = 0;
+	virtual bool acceptStampedOggPacket(class StampedOggPacket* inPacket) = 0;
 };

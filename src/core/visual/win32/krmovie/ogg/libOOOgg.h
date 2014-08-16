@@ -30,25 +30,22 @@
 //===========================================================================
 
 #pragma once
-#include <libOOOgg/dllstuff.h>
 
+#include <OggTypeDefs.h>
+#include <IOggCallback.h>
+#include <IStampedOggPacketSink.h>
 
+#include <OggPageHeader.h>
+#include <OggPage.h>
+#include <OggPacket.h>
+#include <StampedOggPacket.h>
 
-#include <libOOOgg/OggTypeDefs.h>
-#include <libOOOgg/IOggCallback.h>
-#include <libOOOgg/IStampedOggPacketSink.h>
+#include <OggPacketiser.h>
+#include <OggPaginatorSettings.h>
+#include <OggPaginator.h>
+#include <OggPageInterleaver.h>
 
-#include <libOOOgg/OggPageHeader.h>
-#include <libOOOgg/OggPage.h>
-#include <libOOOgg/OggPacket.h>
-#include <libOOOgg/StampedOggPacket.h>
-
-#include <libOOOgg/OggPacketiser.h>
-#include <libOOOgg/OggPaginatorSettings.h>
-#include <libOOOgg/OggPaginator.h>
-#include <libOOOgg/OggPageInterleaver.h>
-
-#include <libOOOgg/OggDataBuffer.h>
+#include <OggDataBuffer.h>
 
 
 

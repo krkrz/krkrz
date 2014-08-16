@@ -32,12 +32,13 @@
 
 #pragma once
 
-#include "Theoradecoderdllstuff.h"
+#include "TheoraTypes.h"
 #include "theoradecodeoutputpin.h"
 #include "theoradecodeinputpin.h"
 
-#include <libilliCore/iBE_Math.h>
+#include <iBE_Math.h>
 #include "TheoraDecoder.h"
+
 
 class TheoraDecodeFilter: public CTransformFilter
 {

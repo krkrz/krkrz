@@ -1,15 +1,14 @@
 #pragma once
 
-#include <libOOOggSeek/libOOOggSeek.h>
+#include <libOOOggSeek.h>
 
-#include <libOOOggSeek/AutoOggSeekTable.h>
+#include <AutoOggSeekTable.h>
 
 #include <string>
 
 using namespace std;
 
-class LIBOOOGGSEEK_API AutoAnxSeekTable
-	:	public AutoOggSeekTable
+class AutoAnxSeekTable : public AutoOggSeekTable
 {
 public:
 #ifdef UNICODE

@@ -31,7 +31,7 @@
 
 #pragma once
 
-#include <libilliCore/illicoreconfig.h>
+#include <illicoreconfig.h>
 
 #include <string>
 

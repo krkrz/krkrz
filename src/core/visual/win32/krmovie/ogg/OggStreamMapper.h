@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libOOOgg/IOggCallback.h>
+#include <IOggCallback.h>
 #include <vector>
 
 class OggDemuxFilter;

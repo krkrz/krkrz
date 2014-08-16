@@ -30,9 +30,9 @@
 //===========================================================================
 
 #pragma once
-#include <libOOOgg/OggPacket.h>
+#include <OggPacket.h>
 
-class LIBOOOGG_API IOggPackSource
+class IOggPackSource
 {
 public:
 	//Empty Constructor and destructor to ensure proper deletion

@@ -32,7 +32,6 @@
 #pragma once
 #include "IOggDecoder.h"
 #include "IOggOutputPin.h"
-#include "Theoradecoderdllstuff.h"
 #include "BasicSeekPassThrough.h"
 
 #include "TheoraDecodeFilter.h"

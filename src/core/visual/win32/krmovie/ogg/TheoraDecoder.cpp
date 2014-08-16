@@ -31,7 +31,7 @@
 
 #include "oggstdafx.h"
 #include "theoradecoder.h"
-#include "Log.h"
+#include "ogglog.h"
 
 TheoraDecoder::TheoraDecoder()
 	: mFirstPacket(true)

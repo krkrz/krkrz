@@ -31,7 +31,7 @@
 
 #include "oggstdafx.h"
 #include <OggDataBuffer.h>
-#include "Log.h"
+#include "ogglog.h"
 #undef min
 
 //LEAK CHECKED - 2004/10/17		-	OK.

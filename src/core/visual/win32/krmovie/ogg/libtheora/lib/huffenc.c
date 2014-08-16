@@ -828,7 +828,7 @@ typedef struct{
   _c1: The first entry to compare.
   _c2: The second entry to compare.
   Return: <0 if _c1<_c2, >0 if _c1>_c2.*/
-static int huff_entry_cmp(const void *_c1,const void *_c2){
+static int __cdecl huff_entry_cmp(const void *_c1,const void *_c2){
   ogg_uint32_t b1;
   ogg_uint32_t b2;
   b1=((const oc_huff_entry *)_c1)->pattern;
