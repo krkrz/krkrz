@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets">
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros">
+    <LIBOGG_VERSION>1.1.4</LIBOGG_VERSION>
+  </PropertyGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>11.0.61030.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>..\..\..\..\libogg-$(LIBOGG_VERSION)\include;..\..\..\..\ogg\include;..\..\..\..\..\..\..\core\ogg\libogg\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>..\..\..\..\libogg-$(LIBOGG_VERSION)\win32\VS2008\$(Platform)\$(Configuration);..\..\..\..\ogg\win32\VS2008\$(Platform)\$(Configuration);..\..\..\..\..\..\..\core\ogg\libogg\win32\VS2008\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="LIBOGG_VERSION">
+      <Value>$(LIBOGG_VERSION)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>
