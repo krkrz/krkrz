@@ -1,0 +1,38 @@
+I first began working on ogg media directshow filters whilst 
+under contract to CSIRO's annodex.net project group. 
+Much of the knowledge I needed to write these filters was 
+gained through my work with this project.
+
+My initial implementation was for a specific annodex 
+(which uses the ogg encapsulation format)demuxer. 
+Part of my aim of this project was to use the knowledge 
+gained to create a set of filters that works with generic
+ogg physical streams rather than just a particular physical 
+bitstream format and to release these back to the open source 
+community. There were several limitations to the approach 
+taken to the original annodex filters which is why I decided 
+to start from scratch to design the filter architecture over
+again with the experience of the first attempt.
+
+Another of my aims of this project is to rewrite the annodex
+demuxer to use this new design in order for it to be more
+extensible and easier to work with. This time writing the
+generic ogg case first and then basing the annodex demuxer
+on this new design it will increase the consistency of the
+code between the two modules and provide less trouble
+integrating new codecs, with the aim of making annodex
+technology available in the standard applications that
+come default with windows.
+
+I encourage you all to go and check out the annodex project
+and to consider coding some applications to utilise this new
+technology. There are many interesting posibilities this new
+technology presents to continuous media and search technology
+which will expand the internet to be a richer more dynamic
+multimedia experience.
+
+Thankyou to CSIRO's annodex.net project group
+(Silvia Pfeiffer, Conrad Parker and André Pang) for the 
+opportunity to work on this exciting new technology and 
+sparking my interest in directshow and the xiph.org 
+range of codecs.

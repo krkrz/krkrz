@@ -1,0 +1,115 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>OggFilterFactory</ProjectName>
+    <ProjectGuid>{C32183CF-519F-4D80-89ED-432368787996}</ProjectGuid>
+    <RootNamespace>factory</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>11.0.61030.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)lib\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)lib\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(SolutionDir)../../../../external/baseclasses;..\codecs\theora\filters\dsfTheoraDecoder;..\codecs\vorbis\filters\dsfVorbisDecoder;..\codecs\theora\libs\libOOTheora;..\codecs\theora\libs\libtheora\include;..\codecs\theora\libs\libtheora-exp\include;..\codecs\vorbis\libs\libOOVorbis;..\codecs\vorbis\\libs\libvorbis\include;..\core\directshow\dsfOggDemux2;..\core\ogg;..\core\ogg\libogg\include;..\core\directshow\libDirectshowAbstracts;..\core\directshow\dsfOggDemux2;..\helper;..\helper\iDSHelper;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <PostBuildEvent>
+      <Message>libをまとめる</Message>
+      <Command>lib /OUT:$(SolutionDir)..\lib\$(Configuration)\dsogg.lib $(SolutionDir)lib\$(Configuration)\\dsfOggDemux2.lib $(SolutionDir)lib\$(Configuration)\\dsfTheoraDecoder.lib $(SolutionDir)lib\$(Configuration)\\dsfVorbisDecoder.lib $(SolutionDir)lib\$(Configuration)\\OggFilterFactory.lib $(SolutionDir)lib\$(Configuration)\\libDirectshowAbstracts.lib $(SolutionDir)lib\$(Configuration)\\libilliCore.lib $(SolutionDir)lib\$(Configuration)\\libogg_static.lib $(SolutionDir)lib\$(Configuration)\\libOOOgg.lib $(SolutionDir)lib\$(Configuration)\\libOOOggSeek.lib $(SolutionDir)lib\$(Configuration)\\libOOTheora.lib $(SolutionDir)lib\$(Configuration)\\libOOVorbis.lib $(SolutionDir)lib\$(Configuration)\\libtheora_static.lib $(SolutionDir)lib\$(Configuration)\\libvorbis_static.lib</Command>
+    </PostBuildEvent>
+    <Lib>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\lib\$(Configuration)\</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(SolutionDir)../../../../external/baseclasses;..\codecs\theora\filters\dsfTheoraDecoder;..\codecs\vorbis\filters\dsfVorbisDecoder;..\codecs\theora\libs\libOOTheora;..\codecs\theora\libs\libtheora\include;..\codecs\theora\libs\libtheora-exp\include;..\codecs\vorbis\libs\libOOVorbis;..\codecs\vorbis\\libs\libvorbis\include;..\core\directshow\dsfOggDemux2;..\core\ogg;..\core\ogg\libogg\include;..\core\directshow\libDirectshowAbstracts;..\core\directshow\dsfOggDemux2;..\helper;..\helper\iDSHelper;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <PostBuildEvent>
+      <Message>libをまとめる</Message>
+      <Command>lib /OUT:$(SolutionDir)..\lib\$(Configuration)\dsogg.lib $(SolutionDir)lib\$(Configuration)\\dsfOggDemux2.lib $(SolutionDir)lib\$(Configuration)\\dsfTheoraDecoder.lib $(SolutionDir)lib\$(Configuration)\\dsfVorbisDecoder.lib $(SolutionDir)lib\$(Configuration)\\OggFilterFactory.lib $(SolutionDir)lib\$(Configuration)\\libDirectshowAbstracts.lib $(SolutionDir)lib\$(Configuration)\\libilliCore.lib $(SolutionDir)lib\$(Configuration)\\libogg_static.lib $(SolutionDir)lib\$(Configuration)\\libOOOgg.lib $(SolutionDir)lib\$(Configuration)\\libOOOggSeek.lib $(SolutionDir)lib\$(Configuration)\\libOOTheora.lib $(SolutionDir)lib\$(Configuration)\\libOOVorbis.lib $(SolutionDir)lib\$(Configuration)\\libtheora_static.lib $(SolutionDir)lib\$(Configuration)\\libvorbis_static.lib /LTCG</Command>
+    </PostBuildEvent>
+    <Lib>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\lib\$(Configuration)\</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="OggFilterFactory.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="OggFilterFactory.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\codecs\theora\filters\dsfTheoraDecoder\dsfTheoraDecoder.vcxproj">
+      <Project>{11cbdfd6-0d73-40c0-95df-997c5fd873f2}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\codecs\vorbis\filters\dsfVorbisDecoder\dsfVorbisDecoder.vcxproj">
+      <Project>{c2b7dbc0-5ab3-46f5-90e9-05ef1b230ae2}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\core\directshow\dsfOggDemux2\dsfOggDemux2.vcxproj">
+      <Project>{304b710a-7355-471c-a4a8-9e8f6d640e6d}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

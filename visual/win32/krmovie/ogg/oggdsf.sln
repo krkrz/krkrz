@@ -1,0 +1,245 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Theora", "Theora", "{BE2F221F-6AC7-479F-A343-3D6AD5467AD1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Vorbis", "Vorbis", "{EADB5C21-7F67-43A3-89C8-7D89FF0040C4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Ogg", "Ogg", "{D23A7CD4-0625-44ED-9CA1-6E5302EDBC71}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libogg_static", "core\ogg\libogg\win32\VS2008\libogg_static.vcxproj", "{15CBFEFF-7965-41F5-B4E2-21E8795C9159}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libvorbis_static", "codecs\vorbis\libs\libvorbis\win32\VS2008\libvorbis\libvorbis_static.vcxproj", "{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libDirectshowAbstracts", "core\directshow\libDirectshowAbstracts\libDirectshowAbstracts.vcxproj", "{EA7091BB-9906-41DF-9738-F4858A136086}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dsfOggDemux2", "core\directshow\dsfOggDemux2\dsfOggDemux2.vcxproj", "{304B710A-7355-471C-A4A8-9E8F6D640E6D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libOOOggSeek", "core\ogg\libOOOggSeek\libOOOggSeek.vcxproj", "{9A14F6AC-BC6E-401A-A300-07369BD6C5FE}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libOOOgg", "core\ogg\libOOOgg\libOOOgg.vcxproj", "{223ACC19-608E-4E1B-A054-067F0CACB272}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dsfTheoraDecoder", "codecs\theora\filters\dsfTheoraDecoder\dsfTheoraDecoder.vcxproj", "{11CBDFD6-0D73-40C0-95DF-997C5FD873F2}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dsfVorbisDecoder", "codecs\vorbis\filters\dsfVorbisDecoder\dsfVorbisDecoder.vcxproj", "{C2B7DBC0-5AB3-46F5-90E9-05EF1B230AE2}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libilliCore", "helper\libilliCore\libilliCore.vcxproj", "{2DA569EC-3E22-4BC9-A242-C7A56EB9C6F4}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libOOTheora", "codecs\theora\libs\libOOTheora\libOOTheora.vcxproj", "{6B20BD7A-644B-4087-9CAC-71B2D68D0231}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libOOVorbis", "codecs\vorbis\libs\libOOVorbis\libOOVorbis.vcxproj", "{C97A67F9-B786-41FA-9FC9-13167FE2BA49}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libtheora_static", "codecs\theora\libs\libtheora\win32\VS2008\libtheora\libtheora_static.vcxproj", "{653F3841-3F26-49B9-AFCF-091DB4B67031}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OggFilterFactory", "factory\factory.vcxproj", "{C32183CF-519F-4D80-89ED-432368787996}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Debug|Windows Mobile 5.0 Pocket PC SDK (ARMV4I) = Debug|Windows Mobile 5.0 Pocket PC SDK (ARMV4I)
+		Debug|Windows Mobile 5.0 Smartphone SDK (ARMV4I) = Debug|Windows Mobile 5.0 Smartphone SDK (ARMV4I)
+		Debug|Windows Mobile 6 Professional SDK (ARMV4I) = Debug|Windows Mobile 6 Professional SDK (ARMV4I)
+		Debug|x64 = Debug|x64
+		Release|Win32 = Release|Win32
+		Release|Windows Mobile 5.0 Pocket PC SDK (ARMV4I) = Release|Windows Mobile 5.0 Pocket PC SDK (ARMV4I)
+		Release|Windows Mobile 5.0 Smartphone SDK (ARMV4I) = Release|Windows Mobile 5.0 Smartphone SDK (ARMV4I)
+		Release|Windows Mobile 6 Professional SDK (ARMV4I) = Release|Windows Mobile 6 Professional SDK (ARMV4I)
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{15CBFEFF-7965-41F5-B4E2-21E8795C9159}.Debug|Win32.ActiveCfg = Debug|Win32
+		{15CBFEFF-7965-41F5-B4E2-21E8795C9159}.Debug|Win32.Build.0 = Debug|Win32
+		{15CBFEFF-7965-41F5-B4E2-21E8795C9159}.Debug|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{15CBFEFF-7965-41F5-B4E2-21E8795C9159}.Debug|Windows Mobile 5.0 Smartphone SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{15CBFEFF-7965-41F5-B4E2-21E8795C9159}.Debug|Windows Mobile 6 Professional SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{15CBFEFF-7965-41F5-B4E2-21E8795C9159}.Debug|x64.ActiveCfg = Debug|x64
+		{15CBFEFF-7965-41F5-B4E2-21E8795C9159}.Debug|x64.Build.0 = Debug|x64
+		{15CBFEFF-7965-41F5-B4E2-21E8795C9159}.Release|Win32.ActiveCfg = Release|Win32
+		{15CBFEFF-7965-41F5-B4E2-21E8795C9159}.Release|Win32.Build.0 = Release|Win32
+		{15CBFEFF-7965-41F5-B4E2-21E8795C9159}.Release|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).ActiveCfg = Release|Win32
+		{15CBFEFF-7965-41F5-B4E2-21E8795C9159}.Release|Windows Mobile 5.0 Smartphone SDK (ARMV4I).ActiveCfg = Release|Win32
+		{15CBFEFF-7965-41F5-B4E2-21E8795C9159}.Release|Windows Mobile 6 Professional SDK (ARMV4I).ActiveCfg = Release|Win32
+		{15CBFEFF-7965-41F5-B4E2-21E8795C9159}.Release|x64.ActiveCfg = Release|x64
+		{15CBFEFF-7965-41F5-B4E2-21E8795C9159}.Release|x64.Build.0 = Release|x64
+		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.Debug|Win32.Build.0 = Debug|Win32
+		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.Debug|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.Debug|Windows Mobile 5.0 Smartphone SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.Debug|Windows Mobile 6 Professional SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.Debug|x64.ActiveCfg = Debug|x64
+		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.Debug|x64.Build.0 = Debug|x64
+		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.Release|Win32.ActiveCfg = Release|Win32
+		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.Release|Win32.Build.0 = Release|Win32
+		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.Release|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).ActiveCfg = Release|Win32
+		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.Release|Windows Mobile 5.0 Smartphone SDK (ARMV4I).ActiveCfg = Release|Win32
+		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.Release|Windows Mobile 6 Professional SDK (ARMV4I).ActiveCfg = Release|Win32
+		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.Release|x64.ActiveCfg = Release|x64
+		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD}.Release|x64.Build.0 = Release|x64
+		{EA7091BB-9906-41DF-9738-F4858A136086}.Debug|Win32.ActiveCfg = Debug|Win32
+		{EA7091BB-9906-41DF-9738-F4858A136086}.Debug|Win32.Build.0 = Debug|Win32
+		{EA7091BB-9906-41DF-9738-F4858A136086}.Debug|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{EA7091BB-9906-41DF-9738-F4858A136086}.Debug|Windows Mobile 5.0 Smartphone SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{EA7091BB-9906-41DF-9738-F4858A136086}.Debug|Windows Mobile 6 Professional SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{EA7091BB-9906-41DF-9738-F4858A136086}.Debug|x64.ActiveCfg = Debug|x64
+		{EA7091BB-9906-41DF-9738-F4858A136086}.Debug|x64.Build.0 = Debug|x64
+		{EA7091BB-9906-41DF-9738-F4858A136086}.Release|Win32.ActiveCfg = Release|Win32
+		{EA7091BB-9906-41DF-9738-F4858A136086}.Release|Win32.Build.0 = Release|Win32
+		{EA7091BB-9906-41DF-9738-F4858A136086}.Release|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).ActiveCfg = Release|Win32
+		{EA7091BB-9906-41DF-9738-F4858A136086}.Release|Windows Mobile 5.0 Smartphone SDK (ARMV4I).ActiveCfg = Release|Win32
+		{EA7091BB-9906-41DF-9738-F4858A136086}.Release|Windows Mobile 6 Professional SDK (ARMV4I).ActiveCfg = Release|Win32
+		{EA7091BB-9906-41DF-9738-F4858A136086}.Release|x64.ActiveCfg = Release|x64
+		{EA7091BB-9906-41DF-9738-F4858A136086}.Release|x64.Build.0 = Release|x64
+		{304B710A-7355-471C-A4A8-9E8F6D640E6D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{304B710A-7355-471C-A4A8-9E8F6D640E6D}.Debug|Win32.Build.0 = Debug|Win32
+		{304B710A-7355-471C-A4A8-9E8F6D640E6D}.Debug|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{304B710A-7355-471C-A4A8-9E8F6D640E6D}.Debug|Windows Mobile 5.0 Smartphone SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{304B710A-7355-471C-A4A8-9E8F6D640E6D}.Debug|Windows Mobile 6 Professional SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{304B710A-7355-471C-A4A8-9E8F6D640E6D}.Debug|x64.ActiveCfg = Debug|x64
+		{304B710A-7355-471C-A4A8-9E8F6D640E6D}.Debug|x64.Build.0 = Debug|x64
+		{304B710A-7355-471C-A4A8-9E8F6D640E6D}.Release|Win32.ActiveCfg = Release|Win32
+		{304B710A-7355-471C-A4A8-9E8F6D640E6D}.Release|Win32.Build.0 = Release|Win32
+		{304B710A-7355-471C-A4A8-9E8F6D640E6D}.Release|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).ActiveCfg = Release|Win32
+		{304B710A-7355-471C-A4A8-9E8F6D640E6D}.Release|Windows Mobile 5.0 Smartphone SDK (ARMV4I).ActiveCfg = Release|Win32
+		{304B710A-7355-471C-A4A8-9E8F6D640E6D}.Release|Windows Mobile 6 Professional SDK (ARMV4I).ActiveCfg = Release|Win32
+		{304B710A-7355-471C-A4A8-9E8F6D640E6D}.Release|x64.ActiveCfg = Release|x64
+		{304B710A-7355-471C-A4A8-9E8F6D640E6D}.Release|x64.Build.0 = Release|x64
+		{9A14F6AC-BC6E-401A-A300-07369BD6C5FE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9A14F6AC-BC6E-401A-A300-07369BD6C5FE}.Debug|Win32.Build.0 = Debug|Win32
+		{9A14F6AC-BC6E-401A-A300-07369BD6C5FE}.Debug|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{9A14F6AC-BC6E-401A-A300-07369BD6C5FE}.Debug|Windows Mobile 5.0 Smartphone SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{9A14F6AC-BC6E-401A-A300-07369BD6C5FE}.Debug|Windows Mobile 6 Professional SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{9A14F6AC-BC6E-401A-A300-07369BD6C5FE}.Debug|x64.ActiveCfg = Debug|x64
+		{9A14F6AC-BC6E-401A-A300-07369BD6C5FE}.Debug|x64.Build.0 = Debug|x64
+		{9A14F6AC-BC6E-401A-A300-07369BD6C5FE}.Release|Win32.ActiveCfg = Release|Win32
+		{9A14F6AC-BC6E-401A-A300-07369BD6C5FE}.Release|Win32.Build.0 = Release|Win32
+		{9A14F6AC-BC6E-401A-A300-07369BD6C5FE}.Release|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).ActiveCfg = Release|Win32
+		{9A14F6AC-BC6E-401A-A300-07369BD6C5FE}.Release|Windows Mobile 5.0 Smartphone SDK (ARMV4I).ActiveCfg = Release|Win32
+		{9A14F6AC-BC6E-401A-A300-07369BD6C5FE}.Release|Windows Mobile 6 Professional SDK (ARMV4I).ActiveCfg = Release|Win32
+		{9A14F6AC-BC6E-401A-A300-07369BD6C5FE}.Release|x64.ActiveCfg = Release|x64
+		{9A14F6AC-BC6E-401A-A300-07369BD6C5FE}.Release|x64.Build.0 = Release|x64
+		{223ACC19-608E-4E1B-A054-067F0CACB272}.Debug|Win32.ActiveCfg = Debug|Win32
+		{223ACC19-608E-4E1B-A054-067F0CACB272}.Debug|Win32.Build.0 = Debug|Win32
+		{223ACC19-608E-4E1B-A054-067F0CACB272}.Debug|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{223ACC19-608E-4E1B-A054-067F0CACB272}.Debug|Windows Mobile 5.0 Smartphone SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{223ACC19-608E-4E1B-A054-067F0CACB272}.Debug|Windows Mobile 6 Professional SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{223ACC19-608E-4E1B-A054-067F0CACB272}.Debug|x64.ActiveCfg = Debug|x64
+		{223ACC19-608E-4E1B-A054-067F0CACB272}.Debug|x64.Build.0 = Debug|x64
+		{223ACC19-608E-4E1B-A054-067F0CACB272}.Release|Win32.ActiveCfg = Release|Win32
+		{223ACC19-608E-4E1B-A054-067F0CACB272}.Release|Win32.Build.0 = Release|Win32
+		{223ACC19-608E-4E1B-A054-067F0CACB272}.Release|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).ActiveCfg = Release|Win32
+		{223ACC19-608E-4E1B-A054-067F0CACB272}.Release|Windows Mobile 5.0 Smartphone SDK (ARMV4I).ActiveCfg = Release|Win32
+		{223ACC19-608E-4E1B-A054-067F0CACB272}.Release|Windows Mobile 6 Professional SDK (ARMV4I).ActiveCfg = Release|Win32
+		{223ACC19-608E-4E1B-A054-067F0CACB272}.Release|x64.ActiveCfg = Release|x64
+		{223ACC19-608E-4E1B-A054-067F0CACB272}.Release|x64.Build.0 = Release|x64
+		{11CBDFD6-0D73-40C0-95DF-997C5FD873F2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{11CBDFD6-0D73-40C0-95DF-997C5FD873F2}.Debug|Win32.Build.0 = Debug|Win32
+		{11CBDFD6-0D73-40C0-95DF-997C5FD873F2}.Debug|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{11CBDFD6-0D73-40C0-95DF-997C5FD873F2}.Debug|Windows Mobile 5.0 Smartphone SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{11CBDFD6-0D73-40C0-95DF-997C5FD873F2}.Debug|Windows Mobile 6 Professional SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{11CBDFD6-0D73-40C0-95DF-997C5FD873F2}.Debug|x64.ActiveCfg = Debug|x64
+		{11CBDFD6-0D73-40C0-95DF-997C5FD873F2}.Debug|x64.Build.0 = Debug|x64
+		{11CBDFD6-0D73-40C0-95DF-997C5FD873F2}.Release|Win32.ActiveCfg = Release|Win32
+		{11CBDFD6-0D73-40C0-95DF-997C5FD873F2}.Release|Win32.Build.0 = Release|Win32
+		{11CBDFD6-0D73-40C0-95DF-997C5FD873F2}.Release|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).ActiveCfg = Release|Win32
+		{11CBDFD6-0D73-40C0-95DF-997C5FD873F2}.Release|Windows Mobile 5.0 Smartphone SDK (ARMV4I).ActiveCfg = Release|Win32
+		{11CBDFD6-0D73-40C0-95DF-997C5FD873F2}.Release|Windows Mobile 6 Professional SDK (ARMV4I).ActiveCfg = Release|Win32
+		{11CBDFD6-0D73-40C0-95DF-997C5FD873F2}.Release|x64.ActiveCfg = Release|x64
+		{11CBDFD6-0D73-40C0-95DF-997C5FD873F2}.Release|x64.Build.0 = Release|x64
+		{C2B7DBC0-5AB3-46F5-90E9-05EF1B230AE2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C2B7DBC0-5AB3-46F5-90E9-05EF1B230AE2}.Debug|Win32.Build.0 = Debug|Win32
+		{C2B7DBC0-5AB3-46F5-90E9-05EF1B230AE2}.Debug|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{C2B7DBC0-5AB3-46F5-90E9-05EF1B230AE2}.Debug|Windows Mobile 5.0 Smartphone SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{C2B7DBC0-5AB3-46F5-90E9-05EF1B230AE2}.Debug|Windows Mobile 6 Professional SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{C2B7DBC0-5AB3-46F5-90E9-05EF1B230AE2}.Debug|x64.ActiveCfg = Debug|x64
+		{C2B7DBC0-5AB3-46F5-90E9-05EF1B230AE2}.Debug|x64.Build.0 = Debug|x64
+		{C2B7DBC0-5AB3-46F5-90E9-05EF1B230AE2}.Release|Win32.ActiveCfg = Release|Win32
+		{C2B7DBC0-5AB3-46F5-90E9-05EF1B230AE2}.Release|Win32.Build.0 = Release|Win32
+		{C2B7DBC0-5AB3-46F5-90E9-05EF1B230AE2}.Release|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).ActiveCfg = Release|Win32
+		{C2B7DBC0-5AB3-46F5-90E9-05EF1B230AE2}.Release|Windows Mobile 5.0 Smartphone SDK (ARMV4I).ActiveCfg = Release|Win32
+		{C2B7DBC0-5AB3-46F5-90E9-05EF1B230AE2}.Release|Windows Mobile 6 Professional SDK (ARMV4I).ActiveCfg = Release|Win32
+		{C2B7DBC0-5AB3-46F5-90E9-05EF1B230AE2}.Release|x64.ActiveCfg = Release|x64
+		{C2B7DBC0-5AB3-46F5-90E9-05EF1B230AE2}.Release|x64.Build.0 = Release|x64
+		{2DA569EC-3E22-4BC9-A242-C7A56EB9C6F4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{2DA569EC-3E22-4BC9-A242-C7A56EB9C6F4}.Debug|Win32.Build.0 = Debug|Win32
+		{2DA569EC-3E22-4BC9-A242-C7A56EB9C6F4}.Debug|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{2DA569EC-3E22-4BC9-A242-C7A56EB9C6F4}.Debug|Windows Mobile 5.0 Smartphone SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{2DA569EC-3E22-4BC9-A242-C7A56EB9C6F4}.Debug|Windows Mobile 6 Professional SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{2DA569EC-3E22-4BC9-A242-C7A56EB9C6F4}.Debug|x64.ActiveCfg = Debug|x64
+		{2DA569EC-3E22-4BC9-A242-C7A56EB9C6F4}.Debug|x64.Build.0 = Debug|x64
+		{2DA569EC-3E22-4BC9-A242-C7A56EB9C6F4}.Release|Win32.ActiveCfg = Release|Win32
+		{2DA569EC-3E22-4BC9-A242-C7A56EB9C6F4}.Release|Win32.Build.0 = Release|Win32
+		{2DA569EC-3E22-4BC9-A242-C7A56EB9C6F4}.Release|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).ActiveCfg = Release|Win32
+		{2DA569EC-3E22-4BC9-A242-C7A56EB9C6F4}.Release|Windows Mobile 5.0 Smartphone SDK (ARMV4I).ActiveCfg = Release|Win32
+		{2DA569EC-3E22-4BC9-A242-C7A56EB9C6F4}.Release|Windows Mobile 6 Professional SDK (ARMV4I).ActiveCfg = Release|Win32
+		{2DA569EC-3E22-4BC9-A242-C7A56EB9C6F4}.Release|x64.ActiveCfg = Release|x64
+		{2DA569EC-3E22-4BC9-A242-C7A56EB9C6F4}.Release|x64.Build.0 = Release|x64
+		{6B20BD7A-644B-4087-9CAC-71B2D68D0231}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6B20BD7A-644B-4087-9CAC-71B2D68D0231}.Debug|Win32.Build.0 = Debug|Win32
+		{6B20BD7A-644B-4087-9CAC-71B2D68D0231}.Debug|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{6B20BD7A-644B-4087-9CAC-71B2D68D0231}.Debug|Windows Mobile 5.0 Smartphone SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{6B20BD7A-644B-4087-9CAC-71B2D68D0231}.Debug|Windows Mobile 6 Professional SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{6B20BD7A-644B-4087-9CAC-71B2D68D0231}.Debug|x64.ActiveCfg = Debug|x64
+		{6B20BD7A-644B-4087-9CAC-71B2D68D0231}.Debug|x64.Build.0 = Debug|x64
+		{6B20BD7A-644B-4087-9CAC-71B2D68D0231}.Release|Win32.ActiveCfg = Release|Win32
+		{6B20BD7A-644B-4087-9CAC-71B2D68D0231}.Release|Win32.Build.0 = Release|Win32
+		{6B20BD7A-644B-4087-9CAC-71B2D68D0231}.Release|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).ActiveCfg = Release|Win32
+		{6B20BD7A-644B-4087-9CAC-71B2D68D0231}.Release|Windows Mobile 5.0 Smartphone SDK (ARMV4I).ActiveCfg = Release|Win32
+		{6B20BD7A-644B-4087-9CAC-71B2D68D0231}.Release|Windows Mobile 6 Professional SDK (ARMV4I).ActiveCfg = Release|Win32
+		{6B20BD7A-644B-4087-9CAC-71B2D68D0231}.Release|x64.ActiveCfg = Release|x64
+		{6B20BD7A-644B-4087-9CAC-71B2D68D0231}.Release|x64.Build.0 = Release|x64
+		{C97A67F9-B786-41FA-9FC9-13167FE2BA49}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C97A67F9-B786-41FA-9FC9-13167FE2BA49}.Debug|Win32.Build.0 = Debug|Win32
+		{C97A67F9-B786-41FA-9FC9-13167FE2BA49}.Debug|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{C97A67F9-B786-41FA-9FC9-13167FE2BA49}.Debug|Windows Mobile 5.0 Smartphone SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{C97A67F9-B786-41FA-9FC9-13167FE2BA49}.Debug|Windows Mobile 6 Professional SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{C97A67F9-B786-41FA-9FC9-13167FE2BA49}.Debug|x64.ActiveCfg = Debug|x64
+		{C97A67F9-B786-41FA-9FC9-13167FE2BA49}.Debug|x64.Build.0 = Debug|x64
+		{C97A67F9-B786-41FA-9FC9-13167FE2BA49}.Release|Win32.ActiveCfg = Release|Win32
+		{C97A67F9-B786-41FA-9FC9-13167FE2BA49}.Release|Win32.Build.0 = Release|Win32
+		{C97A67F9-B786-41FA-9FC9-13167FE2BA49}.Release|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).ActiveCfg = Release|Win32
+		{C97A67F9-B786-41FA-9FC9-13167FE2BA49}.Release|Windows Mobile 5.0 Smartphone SDK (ARMV4I).ActiveCfg = Release|Win32
+		{C97A67F9-B786-41FA-9FC9-13167FE2BA49}.Release|Windows Mobile 6 Professional SDK (ARMV4I).ActiveCfg = Release|Win32
+		{C97A67F9-B786-41FA-9FC9-13167FE2BA49}.Release|x64.ActiveCfg = Release|x64
+		{C97A67F9-B786-41FA-9FC9-13167FE2BA49}.Release|x64.Build.0 = Release|x64
+		{653F3841-3F26-49B9-AFCF-091DB4B67031}.Debug|Win32.ActiveCfg = Debug|Win32
+		{653F3841-3F26-49B9-AFCF-091DB4B67031}.Debug|Win32.Build.0 = Debug|Win32
+		{653F3841-3F26-49B9-AFCF-091DB4B67031}.Debug|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{653F3841-3F26-49B9-AFCF-091DB4B67031}.Debug|Windows Mobile 5.0 Smartphone SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{653F3841-3F26-49B9-AFCF-091DB4B67031}.Debug|Windows Mobile 6 Professional SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{653F3841-3F26-49B9-AFCF-091DB4B67031}.Debug|x64.ActiveCfg = Debug|x64
+		{653F3841-3F26-49B9-AFCF-091DB4B67031}.Debug|x64.Build.0 = Debug|x64
+		{653F3841-3F26-49B9-AFCF-091DB4B67031}.Release|Win32.ActiveCfg = Release|Win32
+		{653F3841-3F26-49B9-AFCF-091DB4B67031}.Release|Win32.Build.0 = Release|Win32
+		{653F3841-3F26-49B9-AFCF-091DB4B67031}.Release|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).ActiveCfg = Release|Win32
+		{653F3841-3F26-49B9-AFCF-091DB4B67031}.Release|Windows Mobile 5.0 Smartphone SDK (ARMV4I).ActiveCfg = Release|Win32
+		{653F3841-3F26-49B9-AFCF-091DB4B67031}.Release|Windows Mobile 6 Professional SDK (ARMV4I).ActiveCfg = Release|Win32
+		{653F3841-3F26-49B9-AFCF-091DB4B67031}.Release|x64.ActiveCfg = Release|x64
+		{653F3841-3F26-49B9-AFCF-091DB4B67031}.Release|x64.Build.0 = Release|x64
+		{C32183CF-519F-4D80-89ED-432368787996}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C32183CF-519F-4D80-89ED-432368787996}.Debug|Win32.Build.0 = Debug|Win32
+		{C32183CF-519F-4D80-89ED-432368787996}.Debug|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{C32183CF-519F-4D80-89ED-432368787996}.Debug|Windows Mobile 5.0 Smartphone SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{C32183CF-519F-4D80-89ED-432368787996}.Debug|Windows Mobile 6 Professional SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{C32183CF-519F-4D80-89ED-432368787996}.Debug|x64.ActiveCfg = Debug|Win32
+		{C32183CF-519F-4D80-89ED-432368787996}.Release|Win32.ActiveCfg = Release|Win32
+		{C32183CF-519F-4D80-89ED-432368787996}.Release|Win32.Build.0 = Release|Win32
+		{C32183CF-519F-4D80-89ED-432368787996}.Release|Windows Mobile 5.0 Pocket PC SDK (ARMV4I).ActiveCfg = Release|Win32
+		{C32183CF-519F-4D80-89ED-432368787996}.Release|Windows Mobile 5.0 Smartphone SDK (ARMV4I).ActiveCfg = Release|Win32
+		{C32183CF-519F-4D80-89ED-432368787996}.Release|Windows Mobile 6 Professional SDK (ARMV4I).ActiveCfg = Release|Win32
+		{C32183CF-519F-4D80-89ED-432368787996}.Release|x64.ActiveCfg = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{11CBDFD6-0D73-40C0-95DF-997C5FD873F2} = {BE2F221F-6AC7-479F-A343-3D6AD5467AD1}
+		{6B20BD7A-644B-4087-9CAC-71B2D68D0231} = {BE2F221F-6AC7-479F-A343-3D6AD5467AD1}
+		{653F3841-3F26-49B9-AFCF-091DB4B67031} = {BE2F221F-6AC7-479F-A343-3D6AD5467AD1}
+		{3A214E06-B95E-4D61-A291-1F8DF2EC10FD} = {EADB5C21-7F67-43A3-89C8-7D89FF0040C4}
+		{C2B7DBC0-5AB3-46F5-90E9-05EF1B230AE2} = {EADB5C21-7F67-43A3-89C8-7D89FF0040C4}
+		{C97A67F9-B786-41FA-9FC9-13167FE2BA49} = {EADB5C21-7F67-43A3-89C8-7D89FF0040C4}
+		{15CBFEFF-7965-41F5-B4E2-21E8795C9159} = {D23A7CD4-0625-44ED-9CA1-6E5302EDBC71}
+		{304B710A-7355-471C-A4A8-9E8F6D640E6D} = {D23A7CD4-0625-44ED-9CA1-6E5302EDBC71}
+		{9A14F6AC-BC6E-401A-A300-07369BD6C5FE} = {D23A7CD4-0625-44ED-9CA1-6E5302EDBC71}
+		{223ACC19-608E-4E1B-A054-067F0CACB272} = {D23A7CD4-0625-44ED-9CA1-6E5302EDBC71}
+	EndGlobalSection
+EndGlobal
