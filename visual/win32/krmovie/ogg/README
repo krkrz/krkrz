@@ -1,0 +1,8 @@
+Directshow Filters for Ogg Vorbis, Speex, Theora, FLAC, and WebM
+
+The aim of this project is to provide the most complete implementation of the Xiph.org codecs 
+for Windows and DirectShow. This includes decoders and encoders for all the Xiph.org formats as 
+well as Annodex.
+
+It is released under a BSD license, so they can be used by both open-source and commercial 
+applications. 

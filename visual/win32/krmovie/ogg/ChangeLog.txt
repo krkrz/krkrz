@@ -1,0 +1,222 @@
+Version 0.85.17777 - 12.01.2011
+
+    * Fixed project configuration which referenced two CRT versions in output binaries.
+      The above issue created faulty binaries for Windows XP and it was due migration
+      to Visual Studio 2008.
+
+Version 0.85.17766 - 19.12.2010
+
+    * Updated libvpx to 0.9.5 (Aylesbury)
+    * Updated webmdshow to 0.9.12
+    * Updated libvorbis to 1.3.2
+    * Updated libtremor
+    * Updated libtheora to 1.2.0 alpha (SVN)
+    * Fixed Speex playback. The previous versions had a Vorbis bug which caused Speex playback to
+       be broken.
+    * Added "controls" attribute to HTML5 <video> ActiveX plugin
+    * Theora Decoder filter can now be connected to the output of the Theora Encoder filter.
+    * Fixed graph freeze when a Vorbis Decoder filter was connected to the output of a 
+      Vorbis Encoder filter.
+    * Fixed #1619: Contextual menu / open
+    * Fixed #1737: No audio on 'A Digital Media Primer for Geeks'
+    * Fixed #1738: dsfVorbisDecoder.dll DirectShow filter doesn't connect to source pin
+    * Fixed #1748: opencodecs unable to cope with less usual audio setups (ogg 6.1, possibly 7.1 
+      and other non-stereo ones)
+
+Version 0.84.17359 - 04.08.2010
+    
+    * Released Windows CE decoder package, no WebM/VP8 support for now, only Ogg Vorbis,
+      Theora, FLAC and Speex decoders.
+    * Fixed a bug in Theora DirectShow encoder filter when multiple encoder filters were used
+      in the same graph
+
+Version 0.84.17338 - 20.07.2010
+
+    * Updated webmdshow to 0.9.9.0
+    * Fixed installer script regarding URL registration 
+      (fixes "Open URL..." in Windows Media Player)
+    * Fixed Vorbis URL playback which was broken in previous version
+    * Installer uses localised "Open" and "Play" shell commands
+
+Version 0.84.17315 - 30.06.2010
+    
+    * Added WebM support (libvpx 0.9.1, webmdshow 0.9.8.1)
+    * Installer updates: 
+        - merged Win32 and x64 installers into one installer
+        - added support for WebM
+        - dropped support for Annodex Muxer, CMML decoder filters 
+        - added "Open Codecs version" to Internet Explorer User Agent signature
+    * Added WebM support to HTML5 <video> ActiveX plugin.
+    * Fixed #1702: Consider integration of webm and vp8
+    
+Version 0.83.17220 - 16.05.2010
+
+    * Updated libvorbis to version 1.3.1
+    * Updated libogg to version 1.2.0
+    * Ogg Demux filter has been changed from a source + parser filter to just parser filter. This step allows usage of 
+      DirectShow's "File Source (Async.)" filter which can handle files bigger than 2GB, or "File Source (URL)" which
+      gives better networking support (proxy, ipv6, etc.)
+    * HTML5 <video> plug-in has received a couple of improvements:
+        - URI support given by uriparser library
+        - VMR9 support (instead of VMR7), this requires DirectX9
+        - Internet Explorer Standards mode support, instead of just Quirks mode
+        - width and height basic attribute support
+    * Removed OGM decoding support
+    * Fixed playback of Theora files with big ogg pages (e.g. hi-res "Patent Absurdity")
+    * Fixed #1447: common http based ogg streams broken in Vista WMP (atleast vista 64)
+    * Fixed #1301: [OGGDSF] dsfOggDemux2.dll, fails for http with private ip
+    * Fixed #1657: FLAC 7.1 wrong mapped channels
+
+Version 0.82.16930 - 22.02.2010
+
+    * Updated Theora to version 1.1.1
+    * Updated Vorbis to version 1.2.3
+    * Windows 7 support (note that contextual menu entries in Windows Explorer is not yet available - Ticket #1619)
+    * Added support for Theora 4:2:2 and 4:4:4 color sampling formats.
+    * Added HTML5 <video> tag support for Microsoft Internet Explorer. This component is not enabled by default in the
+      installer and it is only a technical preview - only basic playback (play/pause by left click button), no seeking, no
+      controls and no HTML5 <video> interfaces support.
+      To use it this functionality in Internet Explorer simply add xmlns="http://www.w3.org/1999/xhtml/video" to the 
+      <video> tag.
+    * Added 7.1 channels support for FLAC and support for files bigger than 2GBytes.
+    * Prefixed all DirectShow filters with "Xiph.Org". This should simplify usage for GraphEdit/GraphStudio users.
+    * Fixed #1474: The installer for 64-bit Stable Version (0.81.15562) - 06.12.2008 it's NOT working properly
+    * Fixed #1475: Typo in README
+    * Fixed #1490: Theroa video resumes after starting to play in wmp 9 (win xp)
+    * Fixed #1491: oggcodecs doesn't work with 6-channel FLACs
+    * Fixed #1497: Ogg Theora Video is upside down/flipped in Windows Media Player (v6.4.09 and v7.10)
+    * Fixed #1500: directshow filters messes up windows media player file open dialogue
+    * Fixed #1546: OGV file(s) are crashing WMP (12)
+    * Fixed #1563: DirectShow filter installer does not add proper "PerceivedType" REG_SZ to HKCR\.ext key
+    * Fixed #1603: Theora Videos Encoded At Around 480x360 Crash Directshow Filter
+
+Version 0.81.15562 - 06.12.2008
+
+    * Updated Theora to version 1.0
+    * Added support for 64 bit (AMD64, EM64T)
+    * Added support for Registration Free COM Activation
+    * Added support for RGB Theora Decoder output (16 and 32 color bit depth)
+    * Fixed bug while seeking at the end of a native FLAC file
+    * Fixed #1262: [PATCH] directshow filters: generate correct number of frames, for Theora, Speex and Vorbis encoders
+    * Fixed #1382: IOggCodec is not an interface
+    * Fixed #1390: Ogg muxing filter doesn't support schroedinger codec
+    * Fixed #1392: OggDemuxPacketSourceFilter GetCurFile memory allocation causes crashes
+    * Fixed #1404: Installer doesn't respect the silent command line parameter
+    * Fixed #1408: libOOTheora.dll memory leak
+    * Fixed #1429: Supporting of rus text in (file name) or/and (file path)
+    * Fixed #1430: Color bleeding on some (newer) ogg theora files
+    * Fixed #1437: many regsvr32.exe processes running, but none for long
+    * Fixed #1440: A debug log file is created during playback
+    * Fixed #1443: Vista Media Centers Crashes when playing FLAC and pressing the "previous track button"
+    * Fixed #1451: oggdsf doesn't support RGB output
+    * Fixed #1471: speaker vibrations with oggcodecs v.0.80.15039
+    
+Version 0.80.15039 - 14.06.2008
+
+    * Support for Microsoft Windows Vista
+    * Updated compiler to Visual Studio 2008 Express, which drops support for Windows 9x, NT 4.
+    * Updated libspeex to version 1.2 beta 1
+    * Updated libvorbis to version 1.2.1 (20080501)
+    * Updated libogg to version 1.1.3
+    * Updated libtheora to version 1.0beta3 (20080416)
+    * Updated libFLAC to version 1.2.1
+    * Fixed crash at the end of incomplete Theora files. 
+
+Version 0.73.1936 - 21/10/2006
+
+This version mainly exposes encoding options for all the codecs as COM interfaces, and as property pages
+(viewable in graphedit).  Still needs more testing and error checking. Fixed a bug with flac that caused silence 
+when a track automatically repeated. The aspect  ratio handling in theora is now correct, the channel order in 
+vorbis is now correct. And now explorer has the "Add to WMP playlist" option,  which other media files have in 
+their right-click menu.
+
+    * Encode options for theora, vorbis, speex and flac and property pages in graphedit
+    * Improved OGM decoding
+    * Improved subtitle support
+    * Vorbis channel order fixed
+    * 24/32 bit >2 channel decode support improved for vorbis and flac
+    * Fix end of file/repeat bug in flac
+    * Correct handling of aspect ratio in theora
+    * "Add to playlist" option for WMP appears in explorer right-click menu 
+    
+
+Version 0.72.1838 - 17/9/2006
+
+Major changes in this version include, updating all the code to Visual Studio 2005. There is now a "working" 
+port for Windows Mobile 5.0  as at this revision, this is not yet released. Many minor bugixes and compatability 
+fixes, dependancy updates, speed increases, unicode support, improved installer. Some major work was done to 
+maintain Windows 9X/ME support while properly supporting unicode. If you use or have an  interest in the 
+maintaining of support for these obsolete operating systems, please let me know whether they are working 
+for you.
+
+    * Fixed bug that would refuse to play extremely small files
+    * Added YUY2 output support to better support old graphics hardware
+    * Updated speex to 1.2beta1
+    * Updated project to VS 2005
+    * Using theora-exp for theora decoding ~30% speed up
+    * Improved 24/32 bit support for FLAC (still may not be perfect)
+    * All code moved to unicode. Fixed bug which would fail if paths had unicode chars
+    * Custom unicode emulating(unicows) CRT's to maintain Windows 9X support
+    * Compatablity fixes for Media Portal and Media Player Classic
+    * Installer detects and offers to remove previous versions
+    * Installer offers to optionally associate WMP to .ogg
+    * MMX optimisations for libtheora ported to MASM, encoding ~25-30% faster
+    * Xiph fish icon in explorer
+    * Code ported to Windows Mobile 5.0 (currently unreleased build)
+    * Switch to integer decoding version of speex 
+
+Version 0.71.0946 - 24/02/2006
+
+More bugfixes, particularly to theora. See 0.70 release for more details about recent changes. Docs and source 
+package will be updated on the weekend, there's no major changes there from 0.70. This version is fairly stable 
+now it seems.
+
+    * Fixed the theora seeking bug, should accurately seek to any frame without artefacts.
+    * Fixed bug not handling WMP doing hardware video acceleration, caused crash on some files (Thanks slashdot!)
+    * Fixed handling of missing 3xx http response codes
+    * Fixed bug where player would crash if you dragged it from one monitor to another while playing
+    * Fixed COM reference double-release bug
+    * Fixed race condition which could crash or hang sometimes after a seek. 
+
+Version (0.70.0827) - 16/02/2006
+
+Wow... has it been a whole year :) Yes, this project is still alive! There's a fair bit of new code, so if you have problems 
+you might want to try the history page and get version 0.69. One notable thing that this new version does not do correctly, 
+is it no longer handles chained icecast streams, but it handles streaming static files on a server much better. The previous 
+solution for icecast was a real hack which is no longer possible, it will be fixed properly fairly soon.
+
+I'm releasing now, because otherwise you'll be waiting forever! Releases should be coming much more frequently hopefully. 
+As always, email me your bugs and feature requests. The unicode filenames will be fixed as soon as I can, sorry, I keep putting 
+that one off.
+
+    * Theora can seek without artefacts to any frame, even non-keyframes.(95% of the time, there's still a slight bug)
+    * All seeking in all codecs is accurate to within a single audio sample (ie. sub-second)
+    * Complete rewrite of demux, it's much easier for me to continue now.
+    * OGM support is improved a bit, still not great. It does not associate with the .ogm extension to avoid messing with other 
+       solutions for .ogm you might have. But renaming the .ogm file to .ogg it will attempt to play it.
+    * Improved handling of static files on servers (still not seeking over http)
+    * Be aware that it builds a seektable for all on-disk files. For really large files (>250MB) it may take a little while 
+       for the file to load.
+    * Updated most libraries, vorbis is still at 1.1.1, speex still 1.1.10. Another release soonish may rectify this. 
+       I just want to release what I've got now, or it will keep being put off. 
+
+Version (0.69.8924) - 15/02/2005
+
+Lots of bufixes, especially memory leaks and memory management. Along with a new installer based on NSIS, which 
+is just click-and-run.
+
+    * Removed several major memory leaks in encoders and decoders
+    * More intelligent buffer sizing, reduces memory footprint about 5-10 fold
+    * Much more documentation
+    * Vorbis encoder has programmatic interface for setting quality
+    * Annodex Muxing support
+    * Programmitic interface for encoding progress
+    * Can seek in WMP6.4
+    * Several other tools (not included in this binary) for server side seeking, and .NET media players added to SDK 
+
+Version 0.68.8333 - 06/12/2004
+
+    * Fixed playback from windows network drives.
+    * Fixed bug where audio would stop if you seek really close to the end.
+    * Seeking performance back to almost instant. 
+    
