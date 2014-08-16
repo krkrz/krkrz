@@ -30,13 +30,13 @@
 //===========================================================================
 
 #pragma once
-#include <libOOOgg/CircularBuffer.h>
-#include <libOOOgg/OggPage.h>
-#include <libOOOgg/OggTypeDefs.h>
-#include <libOOOgg/IOggCallback.h>
-#include <libOOOgg/IFIFOBuffer.h>
+#include <CircularBuffer.h>
+#include <OggPage.h>
+#include <OggTypeDefs.h>
+#include <IOggCallback.h>
+#include <IFIFOBuffer.h>
 
-class LIBOOOGG_API OggDataBuffer {
+class OggDataBuffer {
 public:
 	//Public Constants and enums
 	enum eState {

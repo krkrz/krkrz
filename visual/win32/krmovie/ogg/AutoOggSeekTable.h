@@ -31,22 +31,22 @@
 
 #pragma once
 
-#include <libilliCore/iBE_Math.h>
-#include <libilliCore/iLE_Math.h>
+#include <iBE_Math.h>
+#include <iLE_Math.h>
 
-#include <libOOOgg/libOOOgg.h>
-#include <libOOOggSeek/libOOOggSeek.h>
+#include <libOOOgg.h>
+#include <libOOOggSeek.h>
 
-#include <libOOOgg/IOggCallback.h>
-#include <libOOOgg/OggDataBuffer.h>
-#include <libOOOggSeek/OggSeekTable.h>
+#include <IOggCallback.h>
+#include <OggDataBuffer.h>
+#include <OggSeekTable.h>
 //#include "FLACMath.h"
 #include "math.h"
 #include <fstream>
 
 using namespace std;
 
-class LIBOOOGGSEEK_API AutoOggSeekTable
+class AutoOggSeekTable
 	:	public OggSeekTable
 	,	public IOggCallback
 {

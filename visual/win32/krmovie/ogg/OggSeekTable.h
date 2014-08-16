@@ -31,15 +31,15 @@
 
 #pragma once
 
-#include <libilliCore/libilliCore.h>
-#include <libOOOggSeek/libOOOggSeek.h>
+#include <libilliCore.h>
+#include <libOOOggSeek.h>
 
 #include <fstream>
 #include <map>
 
 using namespace std;
 
-class LIBOOOGGSEEK_API OggSeekTable
+class OggSeekTable
 {
 public:
 	OggSeekTable(void);

@@ -14,8 +14,7 @@
 #include <pullpin.h>
 #include <dvdmedia.h>
 
-#include "oggdllstuff.h"
-#include "common/Log.h"
+#include "oggLog.h"
 
 #include "OggDemuxFilter.h"
 #include "TheoraDecodeFilter.h"

@@ -30,8 +30,8 @@
 //===========================================================================
 
 #pragma once
-#include <libilliCore/iLE_Math.h>
-#include <libilliCore/StringHelper.h>
+#include <iLE_Math.h>
+#include <StringHelper.h>
 //#include "OggSegmentTable.h"
 //#include "OggInt64.h"
 //#include "OggMath.h"
@@ -40,7 +40,7 @@
 using namespace std;
 
 #define OGG_CAPTURE_PATTERN "Oggs"
-class LIBOOOGG_API OggPageHeader			//Do not derive - or needs virtual destructor.
+class OggPageHeader			//Do not derive - or needs virtual destructor.
 {
 public:
 	OggPageHeader(void);

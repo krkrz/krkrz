@@ -1,12 +1,11 @@
 #pragma once
 
-#include <libOOOgg/libOOOgg.h>
+#include <libOOOgg.h>
 #include "OggGranuleSeekTable.h"
 #include "IOggDecoderSeek.h"
 
 
-class LIBOOOGGSEEK_API AutoOggChainGranuleSeekTable
-	:	public IOggCallback
+class AutoOggChainGranuleSeekTable : public IOggCallback
 {
 public:
 #ifdef UNICODE

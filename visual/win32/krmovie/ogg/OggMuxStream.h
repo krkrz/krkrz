@@ -32,9 +32,9 @@
 #pragma once
 
 
-#include <libOOOgg/OggPage.h>
-#include <libOOOgg/IOggCallback.h>
-#include <libOOOgg/INotifyArrival.h>
+#include <OggPage.h>
+#include <IOggCallback.h>
+#include <INotifyArrival.h>
 #include <math.h>
 #include <deque>
 
@@ -42,8 +42,7 @@
 using namespace std;
 
 
-class LIBOOOGG_API OggMuxStream
-	:	public IOggCallback
+class OggMuxStream : public IOggCallback
 {
 public:
 	OggMuxStream(INotifyArrival* inNotifier);

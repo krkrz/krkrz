@@ -908,7 +908,7 @@ static float FLOOR1_fromdB_LOOKUP[256]={
 };
 
 /* this is for per-channel noise normalization */
-static int apsort(const void *a, const void *b){
+static int __cdecl apsort(const void *a, const void *b){
   float f1=**(float**)a;
   float f2=**(float**)b;
   return (f1<f2)-(f1>f2);

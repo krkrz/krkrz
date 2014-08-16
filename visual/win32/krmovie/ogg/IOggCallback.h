@@ -30,9 +30,9 @@
 //===========================================================================
 
 #pragma once
-#include <libOOOgg/OggPage.h>
+#include <OggPage.h>
 //TODO::: Consider changing the return type to allow better feedback.
-class LIBOOOGG_API IOggCallback
+class IOggCallback
 {
 public:
 	//Empty Constructor and destructor to ensure proper deletion

@@ -32,9 +32,9 @@
 #pragma once
 
 
-#include <libOOOgg/IOggCallback.h>
-#include <libOOOgg/INotifyComplete.h>
-#include <libOOOgg/OggMuxStream.h>
+#include <IOggCallback.h>
+#include <INotifyComplete.h>
+#include <OggMuxStream.h>
 
 #include <vector>
 
@@ -59,8 +59,7 @@
 using namespace std;
 
 
-class LIBOOOGG_API OggPageInterleaver
-	:	public INotifyArrival
+class OggPageInterleaver : public INotifyArrival
 {
 public:
 	/// Construct a new OggPageInterleaver, which sends its output and completeness notification to inDataWriter and inNotifier, respectively

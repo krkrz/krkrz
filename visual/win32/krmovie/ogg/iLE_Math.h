@@ -30,7 +30,7 @@
 //===========================================================================
 
 #pragma once
-#include <libilliCore/illicoreconfig.h>
+#include <illicoreconfig.h>
 
 class iLE_Math
 {

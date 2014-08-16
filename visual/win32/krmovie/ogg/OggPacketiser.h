@@ -29,13 +29,12 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //===========================================================================
 #pragma once
-#include <libOOOgg/IOggCallback.h>
-#include <libOOOgg/IStampedOggPacketSink.h>
-#include <libOOOgg/OggPage.h>
+#include <IOggCallback.h>
+#include <IStampedOggPacketSink.h>
+#include <OggPage.h>
 
 //TODO::: Loose mode controls
-class LIBOOOGG_API OggPacketiser
-	:	public IOggCallback
+class OggPacketiser : public IOggCallback
 {
 public:
 	//Constants
@@ -70,9 +69,9 @@ public:
 
 protected:
     IStampedOggPacketSink* mPacketSink;
-	StampedOggPacket* mPendingPacket;
+	class StampedOggPacket* mPendingPacket;
 
-	virtual bool dispatchStampedOggPacket(StampedOggPacket* inPacket);
+	virtual bool dispatchStampedOggPacket(class StampedOggPacket* inPacket);
 
 	bool mLooseMode;
 	unsigned long mNumIgnorePackets;

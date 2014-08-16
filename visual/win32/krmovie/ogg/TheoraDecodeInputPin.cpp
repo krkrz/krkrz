@@ -31,6 +31,7 @@
 //===========================================================================
 
 #include "oggstdafx.h"
+#include "OggTypes.h"
 #include "theoradecodeinputpin.h"
 
 

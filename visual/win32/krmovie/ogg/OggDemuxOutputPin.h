@@ -31,9 +31,9 @@
 //===========================================================================
 #pragma once
 
-#include <libOOOgg/OggPacket.h>
-#include <libOOOgg/IOggCallback.h>
-#include <libOOOgg/OggPacketiser.h>
+#include <OggPacket.h>
+#include <IOggCallback.h>
+#include <OggPacketiser.h>
 #include "IOggDecoder.h"
 #include "IOggOutputPin.h"
 
