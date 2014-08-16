@@ -67,8 +67,8 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>..\..\..\external\baseclasses;..\;..\..\..\..\plugins\win32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;KRMOVIE_EXPORTS;NO_DSHOW_STRSAFE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>ogg\factory;..\..\..\external\baseclasses;..\;..\..\..\..\plugins\win32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;KRMOVIE_EXPORTS;NO_DSHOW_STRSAFE;ENABLE_THEORA;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -89,7 +89,7 @@
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;version.lib;winmm.lib;strmiids.lib;quartz.lib;strmbase.lib;dmoguids.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>.\..\..\..\..\..\bin\win32/krmovie.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\..\external\baseclasses\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\external\baseclasses\$(Configuration);.\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\krmovie.def</ModuleDefinitionFile>
       <ProgramDatabaseFile>.\..\..\..\..\..\bin\win32/krmovie.pdb</ProgramDatabaseFile>
       <OptimizeReferences>true</OptimizeReferences>
@@ -113,8 +113,8 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\external\baseclasses;..\;..\..\..\..\plugins\win32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;KRMOVIE_EXPORTS;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>ogg\factory;..\..\..\external\baseclasses;..\;..\..\..\..\plugins\win32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;KRMOVIE_EXPORTS;DEBUG;ENABLE_THEORA;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeaderOutputFile>.\Debug/krmovie.pch</PrecompiledHeaderOutputFile>
@@ -134,7 +134,7 @@
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;version.lib;winmm.lib;strmiids.lib;quartz.lib;strmbasd.lib;dmoguids.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>.\..\..\..\..\..\bin\win32/krmovie.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\..\external\baseclasses\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\external\baseclasses\$(Configuration);.\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\krmovie.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\..\..\..\..\..\bin\win32/krmovie.pdb</ProgramDatabaseFile>

@@ -1,0 +1,209 @@
+*** libilliCore
+*** libOOOgg
+*** libOOOggSeek
+*** libVorbisComment
+*** OOOggChainSplitter
+*** OOOggCommentDump
+*** OOOggDump
+*** OOOggSeekFileMaker
+*** OOOggSeekFileReader
+*** OOOggStat
+*** OOOggValidate
+
+	Zentaro Kavanagh <ogg@illiminable.com>
+		- Design and coding.
+
+	Andre Pang <Andre.Pang@csiro.au>
+		- Mac OS X and UNIX porting.
+==============================================================
+*** libCMMLParse
+	Zentaro Kavanagh <ogg@illiminable.com>
+		- Design and coding.
+
+	Andre Pang <Andre.Pang@csiro.au>
+		- Design and coding.
+
+	David Badham
+		- Bugfixes and enhancements
+==============================================================
+*** CMMLDump
+*** libOOOggChef
+*** mod_oggchef
+
+	Zentaro Kavanagh <ogg@illiminable.com>
+		- Design and coding.
+
+	Andre Pang <Andre.Pang@csiro.au>
+		- Design and coding.
+==============================================================
+*** libDSPlayDotNET
+	Zentaro Kavanagh <ogg@illiminable.com>
+		- Design and coding.
+
+	David Badham
+		- Bugfixes and enhancements
+==============================================================
+*** AnxCutter
+*** axAnxOggPlayer
+*** CLOgg
+*** DNPlay
+*** dsfAbstractAudioDecoder
+*** dsfAbstractAudioEncoder
+*** dsfAbstractVideoDecoder
+*** dsfAbstractVideoEncoder
+*** dsfAnxDemux
+*** dsfAnxMux
+*** dsfCMMLDecoder	
+*** dsfCMMLRawSource
+*** dsfDiracDecodeSource
+*** dsfDiracEncodeFilter
+*** dsfFLACDecoder
+*** dsfFLACEncoder
+*** dsfOggDemux
+*** dsfOggMux	
+*** dsfSeeking
+*** dsfSpeexDecoder
+*** dsfSpeexEncoder
+*** dsfSubtitleVMR9
+*** dsfTheoraDecoder
+*** dsfTheoraEncoder
+*** dsfVorbisDecoder
+*** dsfVorbisEncoder
+*** iDSHelper
+*** iOCE
+*** iTranscode
+*** libCDROM
+*** libCMMLTags
+*** libCMMLTagsDotNET
+*** libDirectshowAbstracts
+*** libFLACHelper
+*** libiWrapper
+*** libOOTheora
+*** libTemporalURI
+*** libVorbisCommentDotNET
+*** libWinCMMLParse
+
+	Zentaro Kavanagh <ogg@illiminable.com>
+		- Design and coding.
+
+*** dsfNativeFLACSource
+
+	Zentaro Kavanagh <ogg@illiminable.com>
+		- Design and coding.
+
+	Christophe Thibault
+		- Patch to handle files with id3 tags.
+==============================================================
+*** libfishsound
+	Conrad Parker <conrad@metadecks.org>
+		- Design, implementation.
+
+	Silvia Pfeiffer <Silvia.Pfeiffer@CSIRO.AU>
+		- MS Windows porting, general packaging.
+
+	Zentaro Kavanagh <ogg@illiminable.com>
+		- Windows porting and packaging.
+
+	based on code from:
+		libvorbis, by Monty <monty@xiph.org> and 
+		the rest of the Xiph.org Foundation.
+
+		libspeex, by Jean-Marc Valin 
+		<jean-marc.valin@hermes.usherb.ca>
+		and various contributors.
+
+==============================================================
+*** libogg
+*** libvorbis
+	Monty <monty@xiph.org> and Xiph.org contributors
+		- Design and coding.
+==============================================================
+*** libspeex 
+	Jean-Marc Valin <jean-marc.valin@hermes.usherb.ca>
+		- All the code except the following
+
+	David Rowe <david@voicetronix.com.au> via VoiceTronix
+		- lsp.c lsp.h Also ideas and feedback
+
+	John Francis Edwards
+		- wave_out.[ch], some #ifdefs for windows port
+		  and MSVC project files.
+
+	Atsuhiko Yamanaka <ymnk@jcraft.com>:
+		- Patch to speexenc.c to add Vorbis comment 
+		  format.
+
+	Radim Kolar <hsn@cybermail.net>:
+		- Patch to speexenc.c for supporting 
+		  more input formats.
+==============================================================
+*** libFLAC
+*** libFLAC++
+
+	Josh Coalson <jcoalson@users.sourceforge.net>.
+		- All design and development except following
+
+
+	Andrey Astafiev <andrei@tvcell.ru>
+		- Russian translation of the HTML documentation
+
+	Miroslav Lichvar <mirator@upcase.inf.upol.cz>
+		- IA-32 assembly versions of several libFLAC 
+		  routines
+
+	Brady Patterson <bpat@users.sourceforge.net>
+		- AIFF file support
+
+	Daisuke Shimamura <Daisuke_Shimamura@nifty.com>
+		- id3 v1/v2 and i18n support in the XMMS plugin
+
+	X-Fixer <x-fixer@narod.ru>
+		- Configuration system, tag editing, and file
+		  info in the Winamp2 plugin
+
+	Matt Zimmerman <mdz@debian.org>
+		- Libtool/autoconf/automake make system, 
+		  flac man page
+
+==============================================================
+*** libtheora
+	Monty <monty@xiph.org>
+		- Original VP3 port
+
+	Ralph Giles
+	Timothy B. Terriberry 
+		- Ongoing development
+
+	Dan B. Miller
+		- Pre alpha3 development
+
+	Aaron Colwell
+	Thomas Vander Stichele
+	Jan Gerber
+	Conrad Parker
+		- Bug fixes, enhancements, build systems.
+
+	Mauricio Piacentini
+		- Original win32 projects and example ports
+		- VP3->Theora transcoder
+
+	Arc Riley
+		- libogg2 porting.
+
+	Silvia Pfeiffer
+		- Figures for the spec
+	
+	Michael Smith
+	Andre Pang
+	calc
+	ccheney
+	brendan
+	Edward Hervey
+	Adam Moss
+	Colin Ward
+	Jeremy C. Reed
+		- Bug fixes
+
+
+	and other xiph.org contributors
+==============================================================

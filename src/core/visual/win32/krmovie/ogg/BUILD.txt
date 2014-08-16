@@ -1,0 +1,66 @@
+Information for builds after 0.83
+=================================
+
+Visual Studio Standard (or better) version 2005 or 2008 is needed
+to build the project. The express editions do not suffice anymore.
+
+The Netwide Assembler (NASM) is used to build the FLAC assembly
+files. Get version 2.0.7 or later from http://www.nasm.us/
+nasm.exe is assumed to be located in PATH environment variable.
+
+YASM is used to build the VP8 assembly files. Getversion 1.0.1 or later
+from http://www.tortall.net/projects/yasm/. yasm.exe is assumed to
+be located in PATH environment variable.
+
+NSIS (Nullsoft Scriptable Install System) Unicode is used to make the 
+setup files. Get version 2.45 or later from http://www.scratchpaper.com/
+
+Windows SDK
+===========
+Visual Studio 2005:
+Windows SDK for Windows Server 2008 and .NET Framework 3.5 -
+http://www.microsoft.com/downloads/details.aspx?FamilyId=F26B1AA4-741A-433A-9BE5-FA919850BDBF&displaylang=en
+
+Visual Studio 2008:
+Microsoft Windows SDK for Windows 7 and .NET Framework 3.5 SP1 -
+http://www.microsoft.com/downloads/details.aspx?FamilyID=c17ba869-9671-4330-a63e-1fd44e0e2505&displaylang=en
+
+Note that Visual Studio 2005 doesn't work with "Microsoft Windows SDK for Windows 7 and .NET Framework 3.5 SP1",
+I've got linking errors regarding "Strmiids.lib".
+
+The following system environment variable BASECLASSES should point to the
+DirectShow BaseClasses path e.g.:
+c:\Program Files\Microsoft SDKs\Windows\v7.0\Samples\multimedia\directshow\baseclasses\
+
+DirectX SDK:
+DirectX Software Development Kit - 
+http://www.microsoft.com/downloads/details.aspx?FamilyID=B66E14B8-8505-4B17-BF80-EDB2DF5ABAD4&displaylang=en
+
+Also make sure that in you have the Windows SDK include, library, and executable paths configured
+in Visual Studio.
+
+Windows Mobile
+==============
+
+Visual Studio 2005 Standard or Visual Studio 2008 Professional is required.
+
+The following are needed to add Windows Mobile platforms in Visual Studio
+
+- Windows Mobile 5.0 SDK for Pocket PC
+http://www.microsoft.com/downloads/details.aspx?familyid=83A52AF2-F524-4EC5-9155-717CBE5D25ED&displaylang=en
+
+- Windows Mobile 5.0 SDK for Smartphone
+http://www.microsoft.com/downloads/details.aspx?displaylang=en&FamilyID=dc6c00cb-738a-4b97-8910-5cd29ab5f8d9
+
+- Windows Mobile 6 Professional Software Development Kits Refresh
+http://www.microsoft.com/downloads/details.aspx?familyid=06111A3A-A651-4745-88EF-3D48091A390B&displaylang=en
+
+The order of installation is important, otherwise all the vcproj files would be
+changed upon load:
+
+1. Windows Mobile 5.0 Pocket PC SDK (ARMV4I) - "Windows Mobile 5.0 SDK for Pocket PC.msi"
+2. Windows Mobile 5.0 Smartphone SDK (ARMV4I) - "Windows Mobile 5.0 SDK for Smartphone.msi" 
+3. Windows Mobile 6 Professional SDK (ARMV4I) - "Windows Mobile 6 Professional SDK Refresh.msi" 
+
+Or alternatively you can modify the "%VCINSTALLDIR%\vcpackages\WCE.VCPlatform.config" xml file and change
+the order of SDKs there.
