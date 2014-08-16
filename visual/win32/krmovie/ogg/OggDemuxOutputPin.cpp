@@ -33,7 +33,7 @@
 #include "ds_guids.h"
 #include "OggDemuxFilter.h"
 #include "OggDemuxOutputPin.h"
-#include "Log.h"
+#include "ogglog.h"
 
 OggDemuxOutputPin::	OggDemuxOutputPin(TCHAR* inObjectName, OggDemuxFilter* inParentFilter, CCritSec* inFilterLock,	
                                       OggPacket* inIdentHeader,	unsigned long inSerialNo):	

@@ -9,8 +9,8 @@
 //#endif
 //
 
-#include <libOOOgg/libOOOgg.h>
-#include <libOOOggSeek/IOggDecoderSeek.h>
+#include <libOOOgg.h>
+#include <IOggDecoderSeek.h>
 #include <string>
 using namespace std;
 

@@ -30,8 +30,8 @@
 //===========================================================================
 
 #pragma once
-#include <libilliCore/StringHelper.h>
-class LIBOOOGG_API OggPaginatorSettings
+#include <StringHelper.h>
+class OggPaginatorSettings
 {
 public:
 	OggPaginatorSettings(void);

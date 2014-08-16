@@ -34,8 +34,9 @@
 #include "oggstdafx.h"
 #include "VorbisDecodeFilter.h"
 #include <initguid.h>
-#include "vorbisdecoderdllstuff.h"
-#include "util.h"
+#include "oggutil.h"
+#include "OggTypes.h"
+#include "VorbisTypes.h"
 
 //COM Factory Template
 /*

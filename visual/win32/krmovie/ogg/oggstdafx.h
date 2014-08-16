@@ -41,7 +41,7 @@
 
 #include "iLE_Math.h"
 #include "OggPacket.h"
-#include "Log.h"
+#include "ogglog.h"
 
 
 // using namespace std;

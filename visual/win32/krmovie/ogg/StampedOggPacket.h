@@ -33,8 +33,7 @@
 #include "oggstdafx.h"
 #include <OggPacket.h>
 
-class LIBOOOGG_API StampedOggPacket 
-	:	public OggPacket
+class StampedOggPacket : public OggPacket
 {
 public:
 	//Public Constants and Enums

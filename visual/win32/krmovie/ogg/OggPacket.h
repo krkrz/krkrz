@@ -33,9 +33,9 @@
 
 #include <string>
 using namespace std;
-#include <libilliCore/StringHelper.h>
+#include <StringHelper.h>
 
-class LIBOOOGG_API OggPacket
+class OggPacket
 {
 public:
 	//Constructors

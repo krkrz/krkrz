@@ -32,7 +32,6 @@
 #pragma once
 
 //Local Includes
-#include "directshowabstractsdllstuff.h"
 #include "BasicSeekPassThrough.h"
 
 //STL Includes

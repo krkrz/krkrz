@@ -32,9 +32,9 @@
 
 #include "oggstdafx.h"
 #include "VorbisDecodeInputPin.h"
-#include "vorbisdecoderdllstuff.h"
-
 #include <assert.h>
+#include "OggTypes.h"
+#include "VorbisTypes.h"
 
 VorbisDecodeInputPin::VorbisDecodeInputPin(AbstractTransformFilter* inFilter,    CCritSec* inFilterLock,    
                                            AbstractTransformOutputPin* inOutputPin, 

@@ -33,16 +33,15 @@
 
 //STL Includes
 #include <vector>
-using namespace std;
+// using namespace std;
 
 //Class Includes
-#include <libOOOgg/StampedOggPacket.h>
-#include <libOOOgg/OggPageHeader.h>
-#include <libOOOgg/IOggPackSource.h>
+#include "StampedOggPacket.h"
+#include "OggPageHeader.h"
+#include "IOggPackSource.h"
 
 //OggPage represents an Ogg Encapsulation Format page
-class LIBOOOGG_API OggPage
-	: public IOggPackSource
+class OggPage : public IOggPackSource
 {
 public:
 	//Constants

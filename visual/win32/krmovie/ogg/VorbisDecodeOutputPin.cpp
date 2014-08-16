@@ -31,9 +31,9 @@
 //===========================================================================
 
 #include "oggstdafx.h"
-#include "vorbisdecoderdllstuff.h"
 #undef INITGUID
 #include "Vorbisdecodeoutputpin.h"
+#include "VorbisTypes.h"
 
 VorbisDecodeOutputPin::VorbisDecodeOutputPin(VorbisDecodeFilter* inParentFilter, CCritSec* inFilterLock, 
     const MediaTypesList& inAcceptableMediaTypes) :	

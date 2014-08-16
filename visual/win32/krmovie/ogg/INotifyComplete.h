@@ -30,7 +30,7 @@
 //===========================================================================
 #pragma once
 
-class LIBOOOGG_API INotifyComplete
+class INotifyComplete
 {
 public:
 	//Empty Constructor and destructor to ensure proper deletion

@@ -35,9 +35,10 @@
 //===========================================================================
 
 #include "oggstdafx.h"
+#include "OggTypes.h"
 #include <initguid.h>
 #include "TheoraDecodeFilter.h"
-#include "util.h"
+#include "oggutil.h"
 
 #ifdef WINCE
 const GUID MEDIASUBTYPE_AYUV = { 0x56555941, 0x0000, 0x0010, { 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 } };
@@ -80,11 +81,6 @@ const AMOVIESETUP_MEDIATYPE TheoraDecodeFilter::m_outputMediaTypes[] =
     //	&MEDIATYPE_Video,
     //	&MEDIASUBTYPE_RGB24
 		},
-		{
-			&MEDIATYPE_Video,
-			&MEDIASUBTYPE_RGB32
-		
-    }
 };
 
 const AMOVIESETUP_MEDIATYPE TheoraDecodeFilter::m_inputMediaTypes[] = 
@@ -859,8 +855,8 @@ void TheoraDecodeFilter::DecodeToRGB32_42x( yuv_buffer* inYUVBuffer, IMediaSampl
     unsigned char * ptro = locBuffer;
 
 	int stride = -m_bmiWidth * 4;
-    for (unsigned long i = 0; i < m_pictureHeight; i++) 
 	ptro += (m_pictureHeight-1)*m_bmiWidth * 4;
+
     for (unsigned long i = 0; i < m_pictureHeight; i++) 
     {
         unsigned char* ptro2 = ptro;
@@ -1062,7 +1058,7 @@ void TheoraDecodeFilter::DecodeToYV12(yuv_buffer* inYUVBuffer, IMediaSample* out
 HRESULT TheoraDecodeFilter::TheoraDecoded (yuv_buffer* inYUVBuffer, IMediaSample* outSample, bool inIsKeyFrame, REFERENCE_TIME inStart, REFERENCE_TIME inEnd) 
 {	
 	AM_MEDIA_TYPE* sampleMediaType;
-	outSample->GetMediaType(&sampleMediaType);
+	HRESULT hr = outSample->GetMediaType(&sampleMediaType);
 
 	static GUID sampleMediaSubType = m_currentOutputSubType;
 		
@@ -1071,7 +1067,7 @@ HRESULT TheoraDecodeFilter::TheoraDecoded (yuv_buffer* inYUVBuffer, IMediaSample
 		sampleMediaSubType = sampleMediaType->subtype;
 	}
 
-	DeleteMediaType(sampleMediaType);
+	if( hr == S_OK ) DeleteMediaType(sampleMediaType);
 
 	if (sampleMediaSubType == MEDIASUBTYPE_YV12) 
 	{

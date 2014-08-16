@@ -30,18 +30,18 @@
 //===========================================================================
 
 #pragma once
-#include "libootheora.h"
-#include <libOOOgg/dllstuff.h>
-#include <libOOOgg/StampedOggPacket.h>
+#include <StampedOggPacket.h>
 
+extern "C" {
 #include <theora/theora.h>
 #include <theora/codec.h>
 #include <theora/theoradec.h>
+}
 
 //Need this for yuv_buffer for now.
 //#include "theora_cdecl.h"
 
-class LIBOOTHEORA_API TheoraDecoder
+class TheoraDecoder
 {
 public:
 	TheoraDecoder();

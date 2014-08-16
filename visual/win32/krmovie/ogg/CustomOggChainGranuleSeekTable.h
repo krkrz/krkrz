@@ -1,6 +1,6 @@
 #pragma once
 
-#include "libOOOggSeek/AutoOggChainGranuleSeekTable.h"
+#include "AutoOggChainGranuleSeekTable.h"
 
 class CustomOggChainGranuleSeekTable : public AutoOggChainGranuleSeekTable
 {

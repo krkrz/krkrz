@@ -30,7 +30,6 @@
 //===========================================================================
 
 #pragma once
-#include "Theoradecoderdllstuff.h"
 #include "BasicSeekPassThrough.h"
 
 class TheoraDecodeFilter;

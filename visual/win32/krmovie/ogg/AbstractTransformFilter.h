@@ -32,10 +32,6 @@
 
 #pragma once
 
-//Local Includes
-#include "directshowabstractsdllstuff.h"
-
-
 //Forward Declarations
 class AbstractTransformInputPin;
 class AbstractTransformOutputPin;
