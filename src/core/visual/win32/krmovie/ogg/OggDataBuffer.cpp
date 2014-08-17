@@ -217,6 +217,8 @@ OggDataBuffer::eProcessResult OggDataBuffer::processBaseHeader()
 
 		//Make a local buffer for the header
 		unsigned char* locBuff = new unsigned char[OggPageHeader::OGG_BASE_HEADER_SIZE];		//deleted before this function returns
+		// 配列なので、auto_ptr使わない方がいいが、組み込み方なので気にしないことにする
+		auto_ptr<unsigned char> lb(locBuff);
 		
 		// LOG(logDEBUG1) << "ProcessBaseHeader : Reading from stream...";
 		
@@ -237,7 +239,7 @@ OggDataBuffer::eProcessResult OggDataBuffer::processBaseHeader()
 		bool locRetVal = pendingPage->header()->setBaseHeader((unsigned char*)locBuff);		//Views pointer only.
 		if (locRetVal == false) 
         {
-			delete[] locBuff;
+			//delete[] locBuff;
 			return PROCESS_FAILED_TO_SET_HEADER;
 		}
 	
@@ -249,7 +251,7 @@ OggDataBuffer::eProcessResult OggDataBuffer::processBaseHeader()
         //Change the state.
 		mState = AWAITING_SEG_TABLE;
 
-		delete[] locBuff;
+		//delete[] locBuff;
 		// LOG(logDEBUG1) << "Bytes needed for seg table = " << mNumBytesNeeded<<endl;	
 		return PROCESS_OK;
 }
@@ -428,6 +430,7 @@ void OggDataBuffer::clearData()
 	// LOG(logDEBUG1) << "ClearData : Transition back to AWAITING_BASE_HEADER";
 	
 	// This might leak, but fixes crash with invalid data
+	if( pendingPage ) delete pendingPage;
 	pendingPage = 0;
 
 	mNumBytesNeeded = OggPageHeader::OGG_BASE_HEADER_SIZE;

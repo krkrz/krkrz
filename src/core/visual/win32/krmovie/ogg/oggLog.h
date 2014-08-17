@@ -45,14 +45,6 @@
 #include <windows.h>
 #include <MMSystem.h>
 
-#ifndef WINCE
-#pragma message("Automatically linking to winmm.lib")
-#pragma comment (lib, "winmm")
-#else
-#pragma message("Automatically linking to mmtimer.lib")
-#pragma comment (lib, "mmtimer")
-#endif
-
 inline std::wstring NowTime();
 
 enum LogLevel

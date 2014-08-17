@@ -206,7 +206,9 @@ HRESULT OggDemuxOutputPin::CompleteConnect(IPin *inReceivePin)
     {
 		m_decoderInterface = decoder;
 
-		IOggDecoder::eAcceptHeaderResult result = m_decoderInterface->showHeaderPacket(m_identHeader->clone());
+		OggPacket* packetClone = m_identHeader->clone();
+		IOggDecoder::eAcceptHeaderResult result = m_decoderInterface->showHeaderPacket(packetClone);
+		delete packetClone;
 		if (result == IOggDecoder::AHR_ALL_HEADERS_RECEIVED) 
         {
 			m_isStreamReady = true;
@@ -215,13 +217,12 @@ HRESULT OggDemuxOutputPin::CompleteConnect(IPin *inReceivePin)
         {
 			OggPacketiser packetiser;
 			packetiser.setPacketSink(this);
-            std::vector<OggPage*> locList = GetFilter()->getMatchingBufferedPages(m_serialNo);
-			
-			for (size_t i = 0; i < locList.size(); i++) 
-            {
+            std::vector<OggPage*> locList;
+			GetFilter()->getMatchingBufferedPages(m_serialNo,locList);
+			for (size_t i = 0; i < locList.size(); i++)  {
 				packetiser.acceptOggPage(locList[i]);
 			}
-
+			locList.clear();
 			GetFilter()->removeMatchingBufferedPages(m_serialNo);	
 		}
 
@@ -246,6 +247,7 @@ HRESULT OggDemuxOutputPin::CompleteConnect(IPin *inReceivePin)
 
 bool OggDemuxOutputPin::dispatchPacket(StampedOggPacket* inPacket)
 {
+	auto_ptr<StampedOggPacket> ip(inPacket);
 	CAutoLock locStreamLock(GetFilter()->streamLock());
 
 	//Set up the sample info
@@ -261,7 +263,7 @@ bool OggDemuxOutputPin::dispatchPacket(StampedOggPacket* inPacket)
     {
 		//Stopping, flushing or error
 
-		delete inPacket;
+		//delete inPacket;
 		return false;
 	}
 
@@ -288,12 +290,12 @@ bool OggDemuxOutputPin::dispatchPacket(StampedOggPacket* inPacket)
             LOG(logERROR) << __FUNCTIONW__ << " Failure... Queue rejected sample, error: 0x" << std::hex << locHR;
 			//Stopping ??
 
-			delete inPacket;
+			//delete inPacket;
 			return false;
 		} 
         else 
         {
-			delete inPacket;
+			//delete inPacket;
 			return true;
 		}
 	} 

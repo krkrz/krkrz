@@ -168,4 +168,6 @@ protected:
 
 	//Format Block
 	THEORAFORMAT* m_theoraFormatInfo;
+
+	GUID m_SampleMediaSubType;
 };

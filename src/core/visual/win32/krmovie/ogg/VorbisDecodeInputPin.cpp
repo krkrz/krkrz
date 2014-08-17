@@ -103,7 +103,7 @@ STDMETHODIMP VorbisDecodeInputPin::NewSegment(REFERENCE_TIME inStartTime, REFERE
     CAutoLock locLock(mStreamLock);
     //LOG(logDEBUG) << "New segment " << inStartTime<< " - " << inStopTime;
     //mUptoFrame = 0;
-    mRateNumerator = RATE_DENOMINATOR * inRate;
+    mRateNumerator = (__int64)(RATE_DENOMINATOR * inRate);
     if (mRateNumerator > RATE_DENOMINATOR) 
     {
         mRateNumerator = RATE_DENOMINATOR;
@@ -226,7 +226,7 @@ STDMETHODIMP VorbisDecodeInputPin::Receive(IMediaSample* inSample)
                 LOG(logDEBUG4) << __FUNCTIONW__ << " Sample Size: " << sample->GetSize();
                 bytesToCopy = sample->GetSize();
 
-                if (mDecodedByteCount - bytesCopied < sample->GetSize()) 
+                if (mDecodedByteCount - bytesCopied < (unsigned long)sample->GetSize()) 
                 {
                     bytesToCopy = mDecodedByteCount - bytesCopied;
                 }
@@ -268,12 +268,12 @@ STDMETHODIMP VorbisDecodeInputPin::Receive(IMediaSample* inSample)
                     else
                     {
                         //memcpy((void*)locBuffer, (const void*)&mDecodedBuffer[bytesCopied + seekStripOffset], bytesToCopy - seekStripOffset);
-                        reorderChannels(locBuffer, &mDecodedBuffer[bytesCopied + seekStripOffset], bytesToCopy - seekStripOffset);
+                        reorderChannels(locBuffer, &mDecodedBuffer[bytesCopied + seekStripOffset], (unsigned long)(bytesToCopy - seekStripOffset));
 
                         sample->SetTime(&adjustedStart, &adjustedStop);
                         sample->SetMediaTime(&tStart, &tStop);
                         sample->SetSyncPoint(TRUE);
-                        sample->SetActualDataLength(bytesToCopy - seekStripOffset);
+                        sample->SetActualDataLength((long)(bytesToCopy - seekStripOffset));
                         hr = ((VorbisDecodeOutputPin*)(mOutputPin))->mDataQueue->Receive(sample);
                         if (hr != S_OK) 
                         {
@@ -353,7 +353,7 @@ void VorbisDecodeInputPin::reorderChannels(unsigned char* inDestBuffer, const un
     {
         for (unsigned long i = 0; i < locSampleCount; ++i) 
         {
-            for (unsigned long chan = 0; chan < mNumChannels; ++chan) 
+            for (unsigned long chan = 0; chan < (unsigned long)mNumChannels; ++chan) 
             {
                 switch (mNumChannels) 
                 {
@@ -397,7 +397,7 @@ void VorbisDecodeInputPin::reorderChannels(unsigned char* inDestBuffer, const un
     {
         for (unsigned long i = 0; i < locSampleCount; ++i) 
         {
-            for (unsigned long chan = 0; chan < mNumChannels; ++chan) 
+            for (unsigned long chan = 0; chan < (unsigned long)mNumChannels; ++chan) 
             {
                 *locDest++ = locSource[channel_order[chan]];
             }
@@ -518,7 +518,8 @@ HRESULT VorbisDecodeInputPin::CheckMediaType(const CMediaType *inMediaType)
     if (inMediaType->cbFormat > 7)
     {
         char format[8] = {};
-        strncpy(format, reinterpret_cast<const char*>(inMediaType->pbFormat), 7);
+        //strncpy(format, reinterpret_cast<const char*>(inMediaType->pbFormat), 7);
+		strncpy_s(format, 8, reinterpret_cast<const char*>(inMediaType->pbFormat), 7);
         LOG(logDEBUG) << __FUNCTIONW__ << " cbFormat start: " << format;
     }
 

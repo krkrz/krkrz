@@ -26,8 +26,11 @@
 
 #ifdef ENABLE_THEORA
 #include "OggFilterFactory.h"
-
-#pragma comment(lib,"dsogg.lib")
+#ifndef WINCE
+#pragma comment (lib, "winmm")
+#else
+#pragma comment (lib, "mmtimer")
+#endif
 #endif
 
 // {BAE59473-019E-4f1f-8A8C-3D41A9F4921E}
@@ -1669,7 +1672,7 @@ void tTVPDSMovie::BuildTheoraGraph( IBaseFilter *pRdr, IBaseFilter *pSrc )
 	HRESULT	hr;
 
 	// Connect to Ogg splitter filter
-	CComPtr<IBaseFilter>	pOggSplitter( CreateOggSplitter() );	// for MPEG 1 splitter filter
+	CComPtr<IBaseFilter>	pOggSplitter( CreateOggSplitter() );	// for Ogg splitter filter
 
 	if( FAILED(hr = GraphBuilder()->AddFilter(pOggSplitter, L"Ogg Stream Splitter")) )
 		ThrowDShowException(L"Failed to call GraphBuilder()->AddFilter(pOggSplitter, L\"Ogg Stream Splitter\").", hr);

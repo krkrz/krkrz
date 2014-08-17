@@ -162,6 +162,12 @@ OggDemuxFilter::~OggDemuxFilter()
 
     delete m_streamMapper;
 	delete m_seekTable;
+	
+	size_t locSize = m_bufferedPages.size();
+    for (size_t i = 0; i < locSize; i++)     {
+		if( m_bufferedPages[i] ) delete m_bufferedPages[i];
+	}
+	m_bufferedPages.clear();
 }
 
 STDMETHODIMP OggDemuxFilter::NonDelegatingQueryInterface(REFIID riid, void **ppv)
@@ -362,18 +368,15 @@ HRESULT OggDemuxFilter::SetUpPins()
     return S_OK;
 }
 
-std::vector<OggPage*> OggDemuxFilter::getMatchingBufferedPages(unsigned long inSerialNo)
+void OggDemuxFilter::getMatchingBufferedPages(unsigned long inSerialNo, std::vector<OggPage*>& pages )
 {
-    std::vector<OggPage*> locList;
 	for (size_t i = 0; i < m_bufferedPages.size(); i++) 
     {
 		if (m_bufferedPages[i]->header()->StreamSerialNo() == inSerialNo) 
         {
-			locList.push_back(m_bufferedPages[i]->clone());
+			pages.push_back(m_bufferedPages[i]->clone());
 		}
 	}
-	
-    return locList;
 }
 
 void OggDemuxFilter::removeMatchingBufferedPages(unsigned long inSerialNo)

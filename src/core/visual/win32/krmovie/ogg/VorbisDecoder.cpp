@@ -53,6 +53,10 @@ mSampleRate(0)
 
 VorbisDecoder::~VorbisDecoder()
 {
+	vorbis_block_clear(&mVorbisBlock);
+	vorbis_dsp_clear(&mVorbisState);
+	vorbis_info_clear(&mVorbisInfo);
+	vorbis_comment_clear(&mVorbisComment);
 }
 
 VorbisDecoder::eVorbisResult VorbisDecoder::decodeHeader()
