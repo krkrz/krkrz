@@ -98,7 +98,7 @@ void oc_dequant_tables_init(ogg_uint16_t *_dequant[64][3][2],
         {
           int dupe;
           int qtj;
-          int plj;
+          int plj = 0;
           dupe=0;
           for(qtj=0;qtj<=qti;qtj++){
             for(plj=0;plj<(qtj<qti?3:pli);plj++){

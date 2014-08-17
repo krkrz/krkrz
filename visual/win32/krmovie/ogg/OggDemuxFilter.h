@@ -123,7 +123,7 @@ public:
 	virtual STDMETHODIMP GetPreroll(LONGLONG *pllPreroll);
 	virtual STDMETHODIMP IsUsingTimeFormat(const GUID *pFormat);
 
-    std::vector<OggPage*> getMatchingBufferedPages(unsigned long inSerialNo);
+    void getMatchingBufferedPages(unsigned long inSerialNo, std::vector<OggPage*>& pages );
 	void removeMatchingBufferedPages(unsigned long inSerialNo);
 
 	CCritSec* streamLock();

@@ -153,6 +153,7 @@ StampedOggPacket* OggPage::getStampedPacket(unsigned long inPacketNo) {
 //Gives away  a pointer to the caller.
 OggPage* OggPage::clone() {
 	OggPage* retClone = new OggPage;
+	if( retClone->mHeader ) delete retClone->mHeader;
 	retClone->mHeader = mHeader->clone();
 	for (size_t i = 0; i < mPacketList.size(); i++) {
 		retClone->mPacketList.push_back((StampedOggPacket*)mPacketList[i]->clone());		//The cloned new packet is deleted in the destructor

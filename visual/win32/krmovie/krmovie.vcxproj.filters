@@ -13,6 +13,9 @@
       <UniqueIdentifier>{a96a934b-28d3-4115-ac53-a53393a8d36d}</UniqueIdentifier>
       <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
     </Filter>
+    <Filter Include="ogg">
+      <UniqueIdentifier>{577efc51-9797-43ca-98ae-eeb0d546fc3c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="asyncio.cpp">
@@ -90,6 +93,129 @@
     <ClCompile Include="PlayWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ogg\AbstractTransformFilter.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\AbstractTransformInputPin.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\AbstractTransformOutputPin.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\AutoAnxSeekTable.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\AutoOggChainGranuleSeekTable.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\AutoOggSeekTable.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\BasicSeekPassThrough.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\CircularBuffer.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\CustomOggChainGranuleSeekTable.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\ds_guids.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\iBE_Math.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\iLE_Math.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\OggBinarySeeker.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\OggDataBuffer.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\OggDemuxFilter.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\OggDemuxInputPin.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\OggDemuxOutputPin.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\OggFilterFactory.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\OggGranuleSeekTable.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\OggPacket.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\OggPacketiser.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\OggPage.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\OggPageHeader.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\OggPageInterleaver.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\OggPaginator.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\OggPaginatorSettings.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\OggSeekPoint.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\OggSeekTable.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\OGGSRecogniser.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\OggStreamMapper.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\StampedOggPacket.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\StringHelper.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\TheoraDecodeFilter.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\TheoraDecodeInputPin.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\TheoraDecodeOutputPin.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\TheoraDecoder.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\VorbisDecodeFilter.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\VorbisDecodeInputPin.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\VorbisDecodeOutputPin.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\VorbisDecoder.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
+    <ClCompile Include="ogg\OggMuxStream.cpp">
+      <Filter>ogg</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="krmovie.def">
@@ -97,6 +223,9 @@
     </None>
     <None Include="option_desc_ja.json">
       <Filter>Resource Files</Filter>
+    </None>
+    <None Include="ogg\dsfOggDemux2.vcxproj.filters">
+      <Filter>ogg</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -185,6 +314,207 @@
     </ClInclude>
     <ClInclude Include="PlayWindow.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\AbstractTransformFilter.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\AbstractTransformInputPin.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\AbstractTransformOutputPin.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\AutoAnxSeekTable.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\AutoOggChainGranuleSeekTable.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\AutoOggSeekTable.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\BasicSeekPassThrough.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\CircularBuffer.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\CustomOggChainGranuleSeekTable.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\ds_guids.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\iBE_Math.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\IDataSource.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\IFIFOBuffer.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\iLE_Math.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\illicoreconfig.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\INotifyArrival.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\INotifyComplete.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\IOggBaseTime.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\IOggCallback.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\IOggDecoder.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\IOggDecoderSeek.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\IOggOutputPin.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\IOggPackSource.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\IOggSeeker.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\IOggSeekTable.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\IStampedOggPacketSink.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\libilliCore.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\libOOOgg.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\libOOOggSeek.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\OggBinarySeeker.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\OggDataBuffer.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\OggDemuxFilter.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\OggDemuxInputPin.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\OggDemuxOutputPin.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\OggFilterFactory.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\OggGranuleSeekTable.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\OggPacket.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\OggPacketiser.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\OggPage.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\OggPageHeader.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\OggPageInterleaver.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\OggPaginator.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\OggPaginatorSettings.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\OggSeekPoint.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\OggSeekTable.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\OGGSRecogniser.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\oggstdafx.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\OggStreamMapper.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\OggTypeDefs.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\OggTypes.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\StampedOggPacket.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\StringHelper.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\TheoraDecodeFilter.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\TheoraDecodeInputPin.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\TheoraDecodeOutputPin.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\TheoraDecoder.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\TheoraTypes.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\VorbisDecodeFilter.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\VorbisDecodeInputPin.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\VorbisDecodeOutputPin.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\VorbisDecoder.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\VorbisTypes.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\xmlsettings.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\oggLog.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\oggutil.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\IDownmixAudio.h">
+      <Filter>ogg</Filter>
+    </ClInclude>
+    <ClInclude Include="ogg\OggMuxStream.h">
+      <Filter>ogg</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
