@@ -294,7 +294,7 @@ bool AutoOggSeekTable::buildTable()
 		unsigned char* locBuff = new unsigned char[BUFF_SIZE];		//Deleted this function.
 		while (!mFile.eof()) {
 			mFile.read((char*)locBuff, BUFF_SIZE);
-			mOggDemux->feed((const unsigned char*)locBuff, mFile.gcount());
+			mOggDemux->feed((const unsigned char*)locBuff, (unsigned long)mFile.gcount());
 		}
 		delete[] locBuff;
 		//debugLog<<"Closing File..."<<endl;

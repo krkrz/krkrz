@@ -30,6 +30,7 @@
 //===========================================================================
 #include "oggstdafx.h"
 #include <OggPacketiser.h>
+#include <memory>
 
 OggPacketiser::OggPacketiser(void) 
 	:	mPacketSink(NULL)
@@ -59,6 +60,10 @@ OggPacketiser::~OggPacketiser(void)
 {
 	//Don't delete the packet sink
 	//debugLog.close();
+	if( mPendingPacket ) {
+		delete mPendingPacket;
+		mPendingPacket = NULL;
+	}
 }
 
 IStampedOggPacketSink* OggPacketiser::packetSink() {
@@ -78,6 +83,7 @@ bool OggPacketiser::reset() {
 	return true;
 }
 bool OggPacketiser::acceptOggPage(OggPage* inOggPage) {				//AOP::: Needs closer look
+	auto_ptr<OggPage> op(inOggPage);
 	//All callers to acceptOggPage give away their pointer
 	// to this function. All functions implementing this interface
 	// are responsible for deleting this page. All callers
@@ -150,8 +156,8 @@ bool OggPacketiser::acceptOggPage(OggPage* inOggPage) {				//AOP::: Needs closer
 							//debugLog<<"acceptOggPage : DELIVERY FAILED !"<<endl;
 							mPacketiserState = PKRSTATE_OK;
 							mPendingPacket = NULL;
-							delete inOggPage;
-							inOggPage = 0;
+							//delete inOggPage;
+							//inOggPage = 0;
 							return false;
 						}
 						//debugLog<<"acceptOggPage : ... delivery sucessful..."<<endl;
@@ -169,8 +175,8 @@ bool OggPacketiser::acceptOggPage(OggPage* inOggPage) {				//AOP::: Needs closer
 					//Header flag says continuation but first packet is not continued.
 					mPacketiserState = PKRSTATE_INVALID_STREAM;
 					
-					delete inOggPage;
-					inOggPage = 0;
+					//delete inOggPage;
+					//inOggPage = 0;
 					throw 0;
 				}
 			} else {
@@ -178,15 +184,15 @@ bool OggPacketiser::acceptOggPage(OggPage* inOggPage) {				//AOP::: Needs closer
 				if (mLooseMode == true) {
 					//debugLog<<"acceptOggPage : ... but we are ignoring it !"<<endl;
 					//Just ignore when we get continuation pages, just drop the broken bit of packet.
-
+					if( mPendingPacket ) { delete mPendingPacket; mPendingPacket = NULL; }
 					mPendingPacket = NULL;   //MEMCHECK::: Did i just leak memory ?
 					mPacketiserState = PKRSTATE_OK;
 
 					//TODO::: Should really return false here if this returns false.
 					if( processPage(inOggPage, false, false) == false) {
 						//TODO::: State change ???
-						delete inOggPage;
-						inOggPage = 0;
+						//delete inOggPage;
+						//inOggPage = 0;
 						return false;
 					}
 				} else {
@@ -201,8 +207,8 @@ bool OggPacketiser::acceptOggPage(OggPage* inOggPage) {				//AOP::: Needs closer
 			//Is this something ?
 			//UNKNOWN CASE::: Header continuation flag set, but no packets on page.
 			mPacketiserState = PKRSTATE_INVALID_STREAM;
-			delete inOggPage;
-			inOggPage = 0;
+			//delete inOggPage;
+			//inOggPage = 0;
 			throw 0;
 		}
 	} else {
@@ -217,6 +223,7 @@ bool OggPacketiser::acceptOggPage(OggPage* inOggPage) {				//AOP::: Needs closer
 			if (inOggPage->getPacket(0)->isTruncated()) {
 				//debugLog<<"acceptOggPage : ...and it's truncated... so we save it."<<endl;
 				//ASSERT : mPending packet is NULL, because this is not a continuation page.
+				if( mPendingPacket ) { delete mPendingPacket; mPendingPacket = NULL; }
 				mPendingPacket = (StampedOggPacket*)inOggPage->getStampedPacket(0)->clone();
 				//debugLog<<"acceptOggPage : Moving to CONT state."<<endl;
 				mPacketiserState = PKRSTATE_AWAITING_CONTINUATION;
@@ -226,8 +233,8 @@ bool OggPacketiser::acceptOggPage(OggPage* inOggPage) {				//AOP::: Needs closer
 				if (processPage(inOggPage, true, true) == false ) {			//If there was only one pack process it.
 					//debugLog<<"acceptOggPage : FAIL STATE DELIVERY"<<endl;
 					//TODO::: State change
-					delete inOggPage;
-					inOggPage = 0;
+					//delete inOggPage;
+					//inOggPage = 0;
 					return false;
 				}
 
@@ -238,8 +245,8 @@ bool OggPacketiser::acceptOggPage(OggPage* inOggPage) {				//AOP::: Needs closer
 			if (processPage(inOggPage, true, false) == false ) {			//If there was only one packet, no packets would be written
 				//debugLog<<"acceptOggPage : FAIL STATE DELIVERY"<<endl;
 				//TODO::: State change
-				delete inOggPage;
-				inOggPage = 0;
+				//delete inOggPage;
+				//inOggPage = 0;
 				return false;			
 			}
 		}
@@ -272,6 +279,7 @@ bool OggPacketiser::acceptOggPage(OggPage* inOggPage) {				//AOP::: Needs closer
 				mPacketiserState = PKRSTATE_AWAITING_CONTINUATION;
 			
 				//ASSERT when mPacketiserState = OK, mPendingPacket = NULL
+				if( mPendingPacket ) { delete mPendingPacket; mPendingPacket = NULL; }
 				mPendingPacket = (StampedOggPacket*)(inOggPage->getStampedPacket(inOggPage->numPackets() - 1)->clone());
 				//This packet is not delivered, it waits for a continuation.
 			} else {
@@ -281,8 +289,8 @@ bool OggPacketiser::acceptOggPage(OggPage* inOggPage) {				//AOP::: Needs closer
 				if ( dispatchStampedOggPacket( (StampedOggPacket*)(inOggPage->getStampedPacket(inOggPage->numPackets() - 1)->clone()) ) == false ) {
 					//debugLog<<"acceptOggPage : Delivery failed..."<<endl;
 					//TODO::: State change ?
-					delete inOggPage;
-					inOggPage = 0;
+					//delete inOggPage;
+					//inOggPage = 0;
 					return false;
 				}
 				//The last packet is complete. So send it.
@@ -301,15 +309,15 @@ bool OggPacketiser::acceptOggPage(OggPage* inOggPage) {				//AOP::: Needs closer
 			//This is more likely to be due to inconsistency of state code than invalidaity
 			// of file.
 			mPacketiserState = PKRSTATE_INVALID_STREAM;
-			delete inOggPage;
-			inOggPage = 0;
+			//delete inOggPage;
+			//inOggPage = 0;
 			throw 0;
 		} else {
 			//debugLog<<"acceptOggPage : NEVER BE HERE 2"<<endl;
 			//Shouldn't be here
 			mPacketiserState = PKRSTATE_INVALID_STREAM;
-			delete inOggPage;
-			inOggPage = 0;
+			//delete inOggPage;
+			//inOggPage = 0;
 			throw 0;
 		}
 	} else {
@@ -317,8 +325,8 @@ bool OggPacketiser::acceptOggPage(OggPage* inOggPage) {				//AOP::: Needs closer
 		//Zero packets on page.
 	}
 	//debugLog<<"acceptOggPage : All ok... returning..."<<endl<<endl;
-	delete inOggPage;
-	inOggPage = 0;
+	//delete inOggPage;
+	//inOggPage = 0;
 	return true;
 }
 

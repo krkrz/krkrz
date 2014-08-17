@@ -277,7 +277,7 @@ static int oc_huff_tree_collapse_depth(unsigned char _tokens[][2],
   int occupancy;
   int slush;
   int nbits;
-  int best_nbits;
+  int best_nbits = 0;
   slush=_depth>0?OC_HUFF_SLUSH:OC_ROOT_HUFF_SLUSH;
   /*It's legal to have a tree with just a single node, which requires no bits
      to decode and always returns the same token.

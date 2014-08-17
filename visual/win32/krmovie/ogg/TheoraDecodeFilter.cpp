@@ -170,9 +170,12 @@ TheoraDecodeFilter::TheoraDecodeFilter()
 	LOG(logDEBUG) << "Created Theora Decoder Filter";
 
 	m_currentOutputSubType = MEDIASUBTYPE_None;
+	m_SampleMediaSubType = MEDIASUBTYPE_None;
 
 	m_theoraDecoder = new TheoraDecoder;
 	m_theoraDecoder->initCodec();
+
+    m_bmiHeight = m_bmiWidth = 0;
 }
 
 TheoraDecodeFilter::~TheoraDecodeFilter() 
@@ -339,7 +342,8 @@ HRESULT TheoraDecodeFilter::CheckInputType(const CMediaType* inMediaType)
     if (inMediaType->cbFormat > 7)
     {
         char format[8] = {};
-        strncpy(format, reinterpret_cast<const char*>(inMediaType->pbFormat), 7);
+        //strncpy(format, reinterpret_cast<const char*>(inMediaType->pbFormat), 7);
+		strncpy_s(format, 8, reinterpret_cast<const char*>(inMediaType->pbFormat), 7);
         LOG(logDEBUG) << __FUNCTIONW__ << " cbFormat start: " << format;
     }
 
@@ -380,8 +384,8 @@ HRESULT TheoraDecodeFilter::CheckOutputType(const CMediaType* inMediaType)
             LOG(logDEBUG) << __FUNCTIONW__ << "\tbiWidth: " << biWidth;
             LOG(logDEBUG) << __FUNCTIONW__ << "\tbiHeight:  " << biHeight;
 
-            if (abs(biWidth) < m_theoraFormatInfo->pictureWidth ||
-                abs(biHeight) < m_theoraFormatInfo->pictureHeight)
+            if ((unsigned long)abs(biWidth) < m_theoraFormatInfo->pictureWidth ||
+                (unsigned long)abs(biHeight) < m_theoraFormatInfo->pictureHeight)
             {
                 LOG(logDEBUG) << __FUNCTIONW__ << " Output type NOT OK (" << i << ")";
                 return S_FALSE;
@@ -854,7 +858,7 @@ void TheoraDecodeFilter::DecodeToRGB32_42x( yuv_buffer* inYUVBuffer, IMediaSampl
     unsigned char * ptrv = inYUVBuffer->v + (m_yOffset / 2) * inYUVBuffer->uv_stride;
     unsigned char * ptro = locBuffer;
 
-	int stride = -m_bmiWidth * 4;
+	int stride = -(int)m_bmiWidth * 4;
 	ptro += (m_pictureHeight-1)*m_bmiWidth * 4;
 
     for (unsigned long i = 0; i < m_pictureHeight; i++) 
@@ -911,7 +915,9 @@ void TheoraDecodeFilter::DecodeToRGB32_444( yuv_buffer* inYUVBuffer, IMediaSampl
     unsigned char * ptru = inYUVBuffer->u + m_yOffset * inYUVBuffer->uv_stride;
     unsigned char * ptrv = inYUVBuffer->v + m_yOffset * inYUVBuffer->uv_stride;
     unsigned char * ptro = locBuffer;
-
+	
+	int stride = -(int)m_bmiWidth * 4;
+	ptro += (m_pictureHeight-1)*m_bmiWidth * 4;
     for (unsigned long i = 0; i < m_pictureHeight; i++) 
     {
         unsigned char* ptro2 = ptro;
@@ -931,7 +937,8 @@ void TheoraDecodeFilter::DecodeToRGB32_444( yuv_buffer* inYUVBuffer, IMediaSampl
         ptru += inYUVBuffer->uv_stride;
         ptrv += inYUVBuffer->uv_stride;
 
-        ptro += m_bmiWidth * 4;
+        //ptro += m_bmiWidth * 4;
+		ptro += stride;
     }
 }
 
@@ -1060,32 +1067,32 @@ HRESULT TheoraDecodeFilter::TheoraDecoded (yuv_buffer* inYUVBuffer, IMediaSample
 	AM_MEDIA_TYPE* sampleMediaType;
 	HRESULT hr = outSample->GetMediaType(&sampleMediaType);
 
-	static GUID sampleMediaSubType = m_currentOutputSubType;
-		
-	if (sampleMediaType != NULL)
-	{
-		sampleMediaSubType = sampleMediaType->subtype;
+	//GUID& sampleMediaSubType = m_currentOutputSubType;
+	if (sampleMediaType != NULL) {
+		m_SampleMediaSubType = sampleMediaType->subtype;
+	} else {
+		m_SampleMediaSubType = m_currentOutputSubType;
 	}
 
 	if( hr == S_OK ) DeleteMediaType(sampleMediaType);
 
-	if (sampleMediaSubType == MEDIASUBTYPE_YV12) 
+	if (m_SampleMediaSubType == MEDIASUBTYPE_YV12) 
 	{
 		DecodeToYV12(inYUVBuffer, outSample);
 	} 
-	else if (sampleMediaSubType == MEDIASUBTYPE_YUY2) 
+	else if (m_SampleMediaSubType == MEDIASUBTYPE_YUY2) 
 	{
 		DecodeToYUY2(inYUVBuffer, outSample);
 	} 
-	else if (sampleMediaSubType == MEDIASUBTYPE_RGB565) 
+	else if (m_SampleMediaSubType == MEDIASUBTYPE_RGB565) 
 	{
 		DecodeToRGB565(inYUVBuffer, outSample);
 	} 
-	else if (sampleMediaSubType == MEDIASUBTYPE_RGB32) 
+	else if (m_SampleMediaSubType == MEDIASUBTYPE_RGB32) 
 	{
 		DecodeToRGB32(inYUVBuffer, outSample);
 	}
-    else if (sampleMediaSubType == MEDIASUBTYPE_AYUV)
+    else if (m_SampleMediaSubType == MEDIASUBTYPE_AYUV)
     {
         DecodeToAYUV(inYUVBuffer, outSample);
     }

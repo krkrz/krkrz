@@ -255,7 +255,7 @@ void VorbisDecodeFilter::setVorbisFormat(VORBISFORMAT2* vorbisFormat2)
     delete mVorbisFormatInfo;
     mVorbisFormatInfo = new VORBISFORMAT;
 
-    mVorbisFormatInfo->numChannels = vorbisFormat2->channels;
+    mVorbisFormatInfo->numChannels = (unsigned char)vorbisFormat2->channels;
     mVorbisFormatInfo->samplesPerSec = vorbisFormat2->samplesPerSec;
     mVorbisFormatInfo->avgBitsPerSec = vorbisFormat2->bitsPerSample;
     mVorbisFormatInfo->maxBitsPerSec = 0;
