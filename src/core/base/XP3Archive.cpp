@@ -950,7 +950,7 @@ tjs_uint64 TJS_INTF_METHOD tTVPXP3ArchiveStream::Seek(tjs_int64 offset, tjs_int 
 	{
 	case TJS_BS_SEEK_SET:
 		newpos = offset;
-		if(offset >= 0 && offset <= static_cast<tjs_int64>(OrgSize) )
+		if(newpos >= 0 && newpos <= static_cast<tjs_int64>(OrgSize) )
 		{
 			SeekToPosition(newpos);
 		}
@@ -958,7 +958,7 @@ tjs_uint64 TJS_INTF_METHOD tTVPXP3ArchiveStream::Seek(tjs_int64 offset, tjs_int 
 
 	case TJS_BS_SEEK_CUR:
 		newpos = offset + CurPos;
-		if(offset >= 0 && offset <= static_cast<tjs_int64>(OrgSize) )
+		if(newpos >= 0 && newpos <= static_cast<tjs_int64>(OrgSize) )
 		{
 			SeekToPosition(newpos);
 		}
@@ -966,7 +966,7 @@ tjs_uint64 TJS_INTF_METHOD tTVPXP3ArchiveStream::Seek(tjs_int64 offset, tjs_int 
 
 	case TJS_BS_SEEK_END:
 		newpos = offset + OrgSize;
-		if(offset >= 0 && offset <= static_cast<tjs_int64>(OrgSize) )
+		if(newpos >= 0 && newpos <= static_cast<tjs_int64>(OrgSize) )
 		{
 			SeekToPosition(newpos);
 		}
