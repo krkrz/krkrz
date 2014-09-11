@@ -181,7 +181,7 @@ BEGIN
     IDS_TVP_INFO_DONE_WITH_CONTAINS                                           "(info) Done. (contains %1 file(s), %2 segment(s))"
     IDS_TVP_SEPARATOR_CRLF                                                    "\r\n\r\n\r\n==============================================================================\r\n==============================================================================\r\n"
     IDS_TVP_SEPARATOR_CR                                                      "\n\n\n==============================================================================\n==============================================================================\n"
-    IDS_TVP_DEFAULT_FONT_NAME                                                 "MS Sans Serif"
+    IDS_TVP_DEFAULT_FONT_NAME                                                 "DEFAULT_GUI_FONT"
     IDS_TVP_CANNOT_OPEN_FONT_FILE                                             "Can't open font file '%1$s'"
     IDS_TVP_FONT_CANNOT_BE_USED                                               "Font '%1$s' cannot be used"
     IDS_TVP_FONT_RASTERIZE_ERROR                                              "Font Rasterize error."
