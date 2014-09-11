@@ -8,6 +8,7 @@
 #include <vector>
 
 extern void TVPGetAllFontList( std::vector<std::wstring>& list );
+extern const tjs_char *TVPGetDefaultFontName();
 
 void FontSystem::InitFontNames() {
 	// enumlate all fonts
@@ -45,7 +46,7 @@ void FontSystem::ConstructDefaultFont() {
 		DefaultFont.Height = -12;
 		DefaultFont.Flags = 0;
 		DefaultFont.Angle = 0;
-		DefaultFont.Face = ttstr(TVPDefaultFontName);
+		DefaultFont.Face = ttstr(TVPGetDefaultFontName());
 	}
 }
 
@@ -89,8 +90,8 @@ std::wstring FontSystem::GetBeingFont(std::wstring fonts) {
 	}
 
 	if(vfont) {
-		return std::wstring(TJS_W("@")) + std::wstring(TVPDefaultFontName);
+		return std::wstring(TJS_W("@")) + std::wstring(TVPGetDefaultFontName());
 	} else {
-		return std::wstring(TVPDefaultFontName);
+		return std::wstring(TVPGetDefaultFontName());
 	}
 }
