@@ -3,7 +3,7 @@
 
 Requirements for your build:
 
-- Visual Studio 2012 (Express) Update 4 or later.
+- Visual Studio 2012 Update 4 or later.
 
 - nasm 2.10.09 (latest version not checked.)
 	You can download from http://www.nasm.us/ .
@@ -24,7 +24,7 @@ How to Build:
 
 吉里吉里Zのコンパイルには下記が必要です。
 
-- Visual Studio 2012 (Express) Update 4 以降
+- Visual Studio 2012 Update 4 以降
 
 - nasm 2.10.09 (最新版は未チェック)
 	http://www.nasm.us/ からダウンロードして
