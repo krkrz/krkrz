@@ -1,3 +1,46 @@
+-------------------------------------------------------------------------------
+* QuickStartGuide
+
+Requirements for your build:
+
+- Visual Studio 2012 (Express) Update 4 or later.
+
+- nasm 2.10.09 (latest version not checked.)
+	You can download from http://www.nasm.us/ .
+	Set nasm.exe path to PATH user envirionment.
+
+How to Build:
+
+- Open src/core/vc2012/tvpwin32.sln by VS2012.
+
+- Build tvpwin32 project on VS2012.
+
+- Compiled binary out to bin/win32/tvpwin32(_d).exe .
+
+- Enjoy!
+
+-------------------------------------------------------------------------------
+* とりあえずコンパイルしたい人向けの説明
+
+吉里吉里Zのコンパイルには下記が必要です。
+
+- Visual Studio 2012 (Express) Update 4 以降
+
+- nasm 2.10.09 (最新版は未チェック)
+	http://www.nasm.us/ からダウンロードして
+	あらかじめ nasm.exe のパスを環境変数 PATH に登録しておいてください。
+
+コンパイル方法：
+
+- src/core/vc2012/tvpwin32.sln を VS2012で開きます
+
+- 同ソリューション内の tvpwin32 プロジェクトをビルドします
+
+- bin/win32/tvpwin32(_d).exe にバイナリが出力されます
+
+
+-------------------------------------------------------------------------------
+* Detail information (in Japanese)
 
 jpeg-6bx ( SIMD版 libjpg )
 nasm 2.10.09 が必要です。
