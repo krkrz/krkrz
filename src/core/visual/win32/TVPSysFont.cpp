@@ -5,8 +5,53 @@
 #include "TVPSysFont.h"
 #include "FontSystem.h"
 #include "MsgIntf.h"
+#include "SysInitIntf.h"
 
 extern FontSystem* TVPFontSystem;
+
+static bool IsInitDefalutFontName = false;
+/**
+ * ストックフォント指定の場合、システムからフォルト名を取得して、そのオブジェクトをデフォルトとする
+ */
+const tjs_char *TVPGetDefaultFontName() {
+	if( IsInitDefalutFontName ) {
+		return TVPDefaultFontName;
+	}
+
+	// コマンドラインで指定がある場合、そのフォントを使用する
+	tTJSVariant opt;
+	if(TVPGetCommandLine(TJS_W("-deffont"), &opt)) {
+		ttstr str(opt);
+		TVPDefaultFontName.AssignMessage( str.c_str() );
+	}
+	IsInitDefalutFontName =  true;
+
+	// システム定義のフォントかどうかチェックする
+	ttstr name = ttstr(TVPDefaultFontName);
+	HGDIOBJ obj = NULL;
+	if( name == ttstr(TJS_W("ANSI_FIXED_FONT")) ) {
+		obj = ::GetStockObject(ANSI_FIXED_FONT);
+	} else if( name == ttstr(TJS_W("ANSI_VAR_FONT")) ) {
+		obj = ::GetStockObject(ANSI_VAR_FONT);
+	} else if( name == ttstr(TJS_W("DEVICE_DEFAULT_FONT")) ) {
+		obj = ::GetStockObject(DEVICE_DEFAULT_FONT);
+	} else if( name == ttstr(TJS_W("DEFAULT_GUI_FONT")) ) {
+		obj = ::GetStockObject(DEFAULT_GUI_FONT);
+	} else if( name == ttstr(TJS_W("OEM_FIXED_FONT")) ) {
+		obj = ::GetStockObject(OEM_FIXED_FONT);
+	} else if( name == ttstr(TJS_W("SYSTEM_FONT")) ) {
+		obj = ::GetStockObject(SYSTEM_FONT);
+	} else if( name == ttstr(TJS_W("SYSTEM_FIXED_FONT")) ) {
+		obj = ::GetStockObject(SYSTEM_FIXED_FONT);
+	}
+	if( obj != NULL ) {
+		HFONT font = (HFONT)obj;
+		LOGFONT logfont={0};
+		::GetObject( font, sizeof(LOGFONT), &logfont );
+		TVPDefaultFontName.AssignMessage( logfont.lfFaceName );
+	}
+	return TVPDefaultFontName;
+}
 
 void tTVPSysFont::InitializeMemDC() {
 	BITMAPINFO bmpinfo;
@@ -34,7 +79,7 @@ tTVPSysFont::tTVPSysFont() : hFont_(INVALID_HANDLE_VALUE), hOldFont_(INVALID_HAN
 	logfont.lfHeight = -12;
 	logfont.lfWidth = 0;
 	logfont.lfCharSet = DEFAULT_CHARSET;
-	TJS_strncpy_s( logfont.lfFaceName, LF_FACESIZE, TVPDefaultFontName, LF_FACESIZE );
+	TJS_strncpy_s( logfont.lfFaceName, LF_FACESIZE, TVPGetDefaultFontName(), LF_FACESIZE );
 	logfont.lfItalic = FALSE;
 	logfont.lfUnderline = FALSE;
 	logfont.lfStrikeOut = FALSE;
