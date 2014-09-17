@@ -424,7 +424,7 @@ public:
 		tTJSVariantString* ret = ReadString( buff, len, index );
 		tTJSVariant* var = new tTJSVariant();
 		*var = ret;
-		//ret->Release();
+		ret->Release();
 		return var;
 	}
 	static inline tTJSVariant* ReadOctetVarint( const tjs_uint8* buff, tjs_uint len, tjs_uint& index ) {

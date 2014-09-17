@@ -249,8 +249,11 @@ tTJSVariant* tTJSBinarySerializer::ReadArray( const tjs_uint8* buff, const tjs_u
 	for( tjs_uint i = 0; i < count; i++ ) {
 		tTJSVariant* value = ReadBasicType( buff, size, index );
 		InsertArray( array, i, value );
+		delete value;
 	}
-	return new tTJSVariant( array, array );
+	tTJSVariant* ret = new tTJSVariant( array, array );
+	array->Release();
+	return ret;
 }
 tTJSVariant* tTJSBinarySerializer::ReadDictionary( const tjs_uint8* buff, const tjs_uint size, const tjs_uint count, tjs_uint& index ) {
 	if( index > size ) return NULL;
@@ -296,10 +299,12 @@ tTJSVariant* tTJSBinarySerializer::ReadDictionary( const tjs_uint8* buff, const 
 		// ŽŸ‚É—v‘f‚ð“Ç‚Þ
 		tTJSVariant* value = ReadBasicType( buff, size, index );
 		AddDictionary( dic, name, value );
+		delete value;
 		name->Release();
 	}
-
-	return new tTJSVariant( dic, dic );
+	tTJSVariant* ret = new tTJSVariant( dic, dic );
+	dic->Release();
+	return ret;
 }
 tTJSVariant* tTJSBinarySerializer::Read( tTJSBinaryStream* stream )
 {
@@ -310,7 +315,9 @@ tTJSVariant* tTJSBinarySerializer::Read( tTJSBinaryStream* stream )
 		TJS_eTJSError( TJSReadError );
 	}
 	tjs_uint index = 0;
-	return ReadBasicType( buffstart, size, index );
+	tTJSVariant* ret = ReadBasicType( buffstart, size, index );
+	delete[] buffstart;
+	return ret;
 }
 
 } // namespace
