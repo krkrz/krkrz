@@ -184,7 +184,7 @@ void TVPInitWindowOptions()
 TTVPWindowForm::TTVPWindowForm( tTVPApplication* app, tTJSNI_Window* ni, tTJSNI_Window* parent ) : tTVPWindow(), CurrentMouseCursor(crDefault), touch_points_(this),
 	LayerLeft(0), LayerTop(0), LayerWidth(32), LayerHeight(32),
 	LastMouseDownX(0), LastMouseDownY(0),
-	HintX(0), HintY(0), HintTimer(NULL), HintDelay(TVP_TOOLTIP_SHOW_DELAY), LastHintSender(NULL),
+	HintTimer(NULL), HintDelay(TVP_TOOLTIP_SHOW_DELAY), LastHintSender(NULL),
 	FullScreenDestRect(0,0,0,0) {
 	HWND hParent = NULL;
 	if( parent ) hParent = parent->GetSurfaceWindowHandle();
@@ -1329,12 +1329,6 @@ void TTVPWindowForm::SetHintText(iTJSDispatch2* sender,  const ttstr &text ) {
 		UpdateHint();
 	}
 	HintMessage = text;
-	
-	POINT p;
-	::GetCursorPos(&p);
-	::ScreenToClient( GetHandle(), &p );
-	HintX = p.x;
-	HintY = p.y;
 
 	if( HintTimer ) HintTimer->SetEnabled(false);
 	if( text.IsEmpty() ) {
@@ -1359,7 +1353,10 @@ void TTVPWindowForm::SetHintText(iTJSDispatch2* sender,  const ttstr &text ) {
 }
 void TTVPWindowForm::UpdateHint() {
 	if(TJSNativeInstance) {
-		TVPPostInputEvent( new tTVPOnHintChangeInputEvent(TJSNativeInstance, HintMessage, HintX, HintY, HintMessage.IsEmpty()==false ));
+		POINT p;
+		::GetCursorPos(&p);
+		::ScreenToClient( GetHandle(), &p );
+		TVPPostInputEvent( new tTVPOnHintChangeInputEvent(TJSNativeInstance, HintMessage, p.x, p.y, HintMessage.IsEmpty()==false ));
 	}
 	if( HintTimer ) HintTimer->SetEnabled(false);
 }
