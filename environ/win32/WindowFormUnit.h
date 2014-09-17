@@ -172,8 +172,6 @@ private:
 
 	TouchPointList touch_points_;
 	ttstr HintMessage;
-	tjs_int HintX;
-	tjs_int HintY;
 	TVPTimer* HintTimer;
 	tjs_int HintDelay;
 	iTJSDispatch2* LastHintSender;
