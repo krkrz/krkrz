@@ -1552,6 +1552,7 @@ void TTVPWindowForm::SetEnableTouch( bool b ) {
 			}
 		}
 	}
+	ignore_touch_mouse_ = b;
 }
 
 bool TTVPWindowForm::GetEnableTouch() const {
