@@ -1,21 +1,22 @@
 -------------------------------------------------------------------------------
 * QuickStartGuide
 
-Requirements for your build:
+Software required to build the project:
 
 - Visual Studio 2012 Update 4 or later.
 
 - nasm 2.10.09 (latest version not checked.)
-	You can download from http://www.nasm.us/ .
-	Set nasm.exe path to PATH user envirionment.
+	You can download nasm from http://www.nasm.us/ .
+	After downloading it somewhere, make sure it is
+	discoverable by adding it to the PATH environment
+	variable.
 
-How to Build:
+Build instructions:
 
-- Open src/core/vc2012/tvpwin32.sln by VS2012.
+- Open src/core/vc2012/tvpwin32.sln inside Visual Studio.
 
-- Build tvpwin32 project on VS2012.
-
-- Compiled binary out to bin/win32/tvpwin32(_d).exe .
+- Build the tvpwin32 project.
+	The compiled binary will appear at bin/win32/tvpwin32(_d).exe .
 
 - Enjoy!
 
@@ -40,7 +41,7 @@ How to Build:
 
 
 -------------------------------------------------------------------------------
-* Detail information (in Japanese)
+* Detailed information (in Japanese)
 
 jpeg-6bx ( SIMDî≈ libjpg )
 nasm 2.10.09 Ç™ïKóvÇ≈Ç∑ÅB
