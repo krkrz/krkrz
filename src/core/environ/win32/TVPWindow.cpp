@@ -77,19 +77,19 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		return 0;
 
 	case WM_MOUSEMOVE:
-		if( IsTouchEvent( ::GetMessageExtraInfo() ) == false ) {
+		if( ignore_touch_mouse_ == false || IsTouchEvent( ::GetMessageExtraInfo() ) == false ) {
 			OnMouseMove( GetShiftState(wParam), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
 		}
 		return 0;
 
 	case WM_LBUTTONDOWN:
-		if( IsTouchEvent( ::GetMessageExtraInfo() ) == false ) {
+		if( ignore_touch_mouse_ == false || IsTouchEvent( ::GetMessageExtraInfo() ) == false ) {
 			left_double_click_ = false;
 			OnMouseDown( mbLeft, GetShiftState(wParam), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
 		}
 		return 0;
 	case WM_LBUTTONUP:
-		if( IsTouchEvent( ::GetMessageExtraInfo() ) == false ) {
+		if( ignore_touch_mouse_ == false || IsTouchEvent( ::GetMessageExtraInfo() ) == false ) {
 			if( left_double_click_ == false ) {
 				OnMouseClick( mbLeft, GetShiftState(wParam), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
 			}
@@ -98,7 +98,7 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		}
 		return 0;
 	case WM_LBUTTONDBLCLK:
-		if( IsTouchEvent( ::GetMessageExtraInfo() ) == false ) {
+		if( ignore_touch_mouse_ == false || IsTouchEvent( ::GetMessageExtraInfo() ) == false ) {
 			left_double_click_ = true;
 			OnMouseDoubleClick( mbLeft, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
 			OnMouseDown( mbLeft, GetShiftState(wParam), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
@@ -432,6 +432,7 @@ HRESULT tTVPWindow::CreateWnd( const std::wstring& classname, const std::wstring
 		if( (value & (NID_MULTI_INPUT|NID_READY)) == (NID_MULTI_INPUT|NID_READY) ) {
 			// マルチタッチサポート & 準備できている
 			procRegisterTouchWindow( window_handle_, REGISTER_TOUCH_FLAG );
+			ignore_touch_mouse_ = true;
 
 			// MICROSOFT_TABLETPENSERVICE_PROPERTY プロパティを変更する
 			ATOM atom = ::GlobalAddAtom( MICROSOFT_TABLETPENSERVICE_PROPERTY );
