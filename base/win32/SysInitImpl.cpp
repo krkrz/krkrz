@@ -1652,7 +1652,7 @@ bool TVPCheckPrintDataPath()
 		if(!strcmp(_argv[i], "-printdatapath")) // this does not refer TVPGetCommandLine
 		{
 			TVPInitProgramArgumentsAndDataPath(true);
-			printf("%s\n", TVPNativeDataPath.c_str());
+			wprintf(L"%s\n", TVPNativeDataPath.c_str());
 
 			return true; // processed
 		}
