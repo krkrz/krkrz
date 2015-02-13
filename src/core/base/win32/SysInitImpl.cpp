@@ -63,7 +63,7 @@ bool TVPProjectDirSelected = false;
 // (or other security modules like XP3 encryption module) to check
 // the changes which is not intended by the contents author.
 const static char TVPSystemSecurityOptions[] =
-"-- TVPSystemSecurityOptions disablemsgmap(0):forcedataxp3(0):acceptfilenameargument(0) --";
+"-- TVPSystemSecurityOptions forcedataxp3(0):acceptfilenameargument(0) --";
 //---------------------------------------------------------------------------
 int GetSystemSecurityOption(const char *name)
 {
@@ -790,16 +790,6 @@ void TVPInitializeBaseSystems()
 	// set default current directory
 	{
 		TVPSetCurrentDirectory( IncludeTrailingBackslash(ExtractFileDir(ExePath())) );
-	}
-
-	// load message map file
-	bool load_msgmap = GetSystemSecurityOption("disablemsgmap") == 0;
-
-	if(load_msgmap)
-	{
-		const tjs_char name_msgmap [] = TJS_W("msgmap.tjs");
-		if(TVPIsExistentStorage(name_msgmap))
-			TVPExecuteStorage(name_msgmap, NULL, false, TJS_W(""));
 	}
 }
 //---------------------------------------------------------------------------
