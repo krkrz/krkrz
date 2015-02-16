@@ -409,6 +409,7 @@ void TVPInitScriptEngine()
 	tTJSVariant val;
 
 	// Set debug mode
+#ifndef TVP_PUBLISH
 	if(TVPGetCommandLine(TJS_W("-debug"), &val) )
 	{
 		ttstr str(val);
@@ -436,6 +437,7 @@ void TVPInitScriptEngine()
 		ttstr str(val);
 		TVPStartupScriptName = str;
 	}
+#endif
 #endif
 
 	// create script engine object
