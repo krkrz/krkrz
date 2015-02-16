@@ -5,6 +5,10 @@
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Publish|Win32">
+      <Configuration>Publish</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
@@ -29,6 +33,13 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
@@ -38,11 +49,18 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)lib\</OutDir>
     <CustomBuildBeforeTargets>
     </CustomBuildBeforeTargets>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">
+    <OutDir>$(SolutionDir)lib\</OutDir>
+    <CustomBuildBeforeTargets />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)lib\</OutDir>
@@ -63,6 +81,45 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <CustomBuildStep>
+      <Command>
+      </Command>
+    </CustomBuildStep>
+    <CustomBuildStep />
+    <CustomBuildStep>
+      <Outputs>
+      </Outputs>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Inputs>
+      </Inputs>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <TreatOutputAsContent>false</TreatOutputAsContent>
+      <Message>
+      </Message>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <PrecompiledHeader>
@@ -145,410 +202,574 @@
   <ItemGroup>
     <CustomBuild Include="jccolmmx.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jccolss2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jcqnt3dn.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jcqntflt.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jcqntint.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jcqntmmx.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jcqnts2f.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jcqnts2i.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jcqntsse.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jcsammmx.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jcsamss2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jdcolmmx.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jdcolss2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jdmermmx.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jdmerss2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jdsammmx.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jdsamss2.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jf3dnflt.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jfdctflt.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jfdctfst.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jfdctint.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jfmmxfst.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jfmmxint.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jfss2fst.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jfss2int.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jfsseflt.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="ji3dnflt.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jidctflt.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jidctfst.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jidctint.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jidctred.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jimmxfst.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jimmxint.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jimmxred.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jiss2flt.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jiss2fst.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jiss2int.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jiss2red.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jisseflt.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jsimdcpu.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
     <CustomBuild Include="jsimdw32.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Publish|Win32'">$(Configuration)\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
