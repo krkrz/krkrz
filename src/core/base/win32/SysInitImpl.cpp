@@ -782,11 +782,6 @@ static void TVPInitRandomGenerator()
 //---------------------------------------------------------------------------
 void TVPInitializeBaseSystems()
 {
-	// set system archive delimiter
-	tTJSVariant v;
-	if(TVPGetCommandLine(TJS_W("-arcdelim"), &v))
-		TVPArchiveDelimiter = ttstr(v)[0];
-
 	// set default current directory
 	{
 		TVPSetCurrentDirectory( IncludeTrailingBackslash(ExtractFileDir(ExePath())) );
@@ -1154,16 +1149,6 @@ void TVPAfterSystemInit()
 		else if(str == TJS_W("bidi"))
 			TVPGraphicSplitOperationType = gsotBiDirection;
 
-	}
-
-	// check TVPDefaultHoldAlpha option
-	if(TVPGetCommandLine(TJS_W("-holdalpha"), &opt))
-	{
-		ttstr str(opt);
-		if(str == TJS_W("yes") || str == TJS_W("true"))
-			TVPDefaultHoldAlpha = true;
-		else
-			TVPDefaultHoldAlpha = false;
 	}
 
 	// check TVPJPEGFastLoad option
