@@ -97,14 +97,14 @@ struct WindowEx
 		WindowEx *self = GetInstance(obj);
 		return (self != NULL) ? self->_setWindowIcon(n > 0 ? p[0] : NULL, n > 1 ? p[1]->operator bool() : false) : TJS_E_ACCESSDENYED;
 	}
-	static HICON _loadExternalIcon(ttstr file) {
+	static HICON _loadExternalIcon(const ttstr &file) {
 		HICON ret = NULL;
 		if (file.length() > 0) {
-			file = TVPGetPlacedPath(file);
-			if (!file.length()) TVPThrowExceptionMessage(TJS_W("file not found."));
-			if (wcschr(file.c_str(), '>')) TVPThrowExceptionMessage(TJS_W("cannot get in archive icon."));
-			TVPGetLocalName(file);
-			ret = ::ExtractIconW(GetModuleHandle(0), file.c_str(), 0);
+			ttstr placed = TVPGetPlacedPath(file);
+			if (!placed.length()) TVPThrowExceptionMessage(TJS_W("file not found."));
+			ttstr local = TVPGetLocallyAccessibleName(placed);
+			if (!local.length()) TVPThrowExceptionMessage(TJS_W("cannot get in archive icon."));
+			ret = ::ExtractIconW(GetModuleHandle(0), local.c_str(), 0);
 			if (ret == NULL) TVPThrowExceptionMessage(TJS_W("icon not found."));
 		}
 		return ret;
@@ -233,6 +233,20 @@ struct WindowEx
 		return TJS_S_OK;
 	}
 
+	// property disableMove
+	static tjs_error TJS_INTF_METHOD getDisableMove(tTJSVariant *r, tjs_int n, tTJSVariant **p, iTJSDispatch2 *obj) {
+		WindowEx *self = GetInstance(obj);
+		if (r) *r = (self != NULL && self->disableMove);
+		return TJS_S_OK;
+	}
+	static tjs_error TJS_INTF_METHOD setDisableMove(tTJSVariant *r, tjs_int n, tTJSVariant **p, iTJSDispatch2 *obj) {
+		WindowEx *self = GetInstance(obj);
+		if (self == NULL) return TJS_E_ACCESSDENYED;
+		self->disableMove = !!p[0]->AsInteger();
+		//_resetExSystemMenu(self);
+		return TJS_S_OK;
+	}
+
 	// setOverlayBitmap
 	static tjs_error TJS_INTF_METHOD setOverlayBitmap(tTJSVariant *r, tjs_int n, tTJSVariant **p, iTJSDispatch2 *obj) {
 		WindowEx *self = GetInstance(obj);
@@ -255,6 +269,19 @@ struct WindowEx
 		/**/self->sysMenuModified = p[0]->AsObject();
 		/**/self->modifySystemMenu();
 		return TJS_S_OK;
+	}
+	// resetExSystemMenu
+	static tjs_error TJS_INTF_METHOD resetExSystemMenu(tTJSVariant *r, tjs_int n, tTJSVariant **p, iTJSDispatch2 *obj) {
+		_resetExSystemMenu(GetInstance(obj));
+		return TJS_S_OK;
+	}
+	static void _resetExSystemMenu(WindowEx *self) {
+		if (self != NULL && self->sysMenu != NULL) {
+			::DestroyMenu(self->sysMenu);
+			self->sysMenu = NULL;
+			if (self->cachedHWND != NULL) ::GetSystemMenu(self->cachedHWND, TRUE);
+			if (self->sysMenuModified != NULL) self->modifySystemMenu();
+		}
 	}
 
 	// property enableNCMouseEvent
@@ -455,6 +482,7 @@ struct WindowEx
 			case SC_SCREENSAVE:   return callback(EXEV_SCREENSV);
 			case SC_MONITORPOWER: return callback(EXEV_MONITORPW, (int)mes->LParam, 0);
 			case SC_KEYMENU:      return callback(EXEV_KEYMENU,   (int)mes->LParam, 0);
+			case SC_MOVE: if (disableMove) { mes->Result = 0; return true; } break;
 			}
 			break;
 		case WM_SIZE:
@@ -468,6 +496,9 @@ struct WindowEx
 			case SW_PARENTOPENING: callback(EXEV_SHOW); break;
 			case SW_PARENTCLOSING: callback(EXEV_HIDE); break;
 			}
+			break;
+		case WM_QUERYOPEN:
+			callback(EXEV_SHOW);
 			break;
 		case WM_ENTERSIZEMOVE: callback(EXEV_MVSZBEGIN); break;
 		case WM_EXITSIZEMOVE:  callback(EXEV_MVSZEND);   break;
@@ -505,10 +536,11 @@ struct WindowEx
 		case WM_INITMENUPOPUP:
 			if (HIWORD(mes->LParam)) {
 				if (sysMenu != NULL && sysMenu == (HMENU)mes->WParam) modifySystemMenu();
-				if (disableResize) {
+				if (disableResize || disableMove) {
 					// システムメニューサイズ変更抑制
 					mes->Result = ::DefWindowProc(hwnd, mes->Msg, mes->WParam, mes->LParam);
-					::EnableMenuItem((HMENU)mes->WParam, SC_SIZE, MF_GRAYED | MF_BYCOMMAND);
+					if (disableResize) ::EnableMenuItem((HMENU)mes->WParam, SC_SIZE, MF_GRAYED | MF_BYCOMMAND);
+					if (disableMove)   ::EnableMenuItem((HMENU)mes->WParam, SC_MOVE, MF_GRAYED | MF_BYCOMMAND);
 					return true;
 				}
 			} else if (menuex) {
@@ -576,6 +608,7 @@ struct WindowEx
 			hasMoving(false),
 			hasMove(false),
 			disableResize(false),
+			disableMove(false),
 			enableNCMEvent(false),
 			enableWinMsgHook(false),
 			ovbmp(NULL)
@@ -747,6 +780,7 @@ private:
 	HICON externalIcon;
 	bool hasResizing, hasMoving, hasMove, hasNcMsMove; //< メソッドが存在するかフラグ
 	bool disableResize; //< サイズ変更禁止
+	bool disableMove; //< ウィンドウ移動禁止
 	bool enableNCMEvent; //< WM_SETCURSORコールバック
 	bool enableWinMsgHook; //< メッセージフック有効
 	DWORD bitHooks[0x0400/32];
@@ -953,8 +987,10 @@ NCB_ATTACH_CLASS_WITH_HOOK(WindowEx, Window)
 	RawCallback(TJS_W("getClientRect"),       &Class::getClientRect,     0);
 	RawCallback(TJS_W("getNormalRect"),       &Class::getNormalRect,     0);
 	RawCallback(TJS_W("disableResize"),       &Class::getDisableResize,  &Class::setDisableResize, 0);
+	RawCallback(TJS_W("disableMove"),         &Class::getDisableMove,    &Class::setDisableMove, 0);
 	RawCallback(TJS_W("setOverlayBitmap"),                               &Class::setOverlayBitmap,  0);
 	RawCallback(TJS_W("exSystemMenu"),        &Class::getExSystemMenu,   &Class::setExSystemMenu, 0);
+	RawCallback(TJS_W("resetExSystemMenu"),   &Class::resetExSystemMenu, 0);
 	RawCallback(TJS_W("enableNCMouseEvent"),  &Class::getEnNCMEvent,     &Class::setEnNCMEvent, 0);
 	RawCallback(TJS_W("ncHitTest"),           &Class::nonClientHitTest,  0);
 	RawCallback(TJS_W("focusMenuByKey"),      &Class::focusMenuByKey,    0);

@@ -456,7 +456,8 @@ struct ncbWideCharConvertor {
 	struct ToWChar {
 		template <typename DST>
 		inline void operator()(DST &dst, tTJSVariant const &src) {
-			dst = static_cast<DST>(src.GetString());
+			const tjs_char *str = src.GetString();
+			dst = static_cast<DST>(str ? str : L"");
 		}
 	};
 };

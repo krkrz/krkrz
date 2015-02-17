@@ -96,7 +96,7 @@ s = sign,  negative if this is 1, otherwise positive.
 #define TJS_IEEE_D_SIGNIFICAND_MASK       (TJS_UI64_VAL(0x000fffffffffffff))
 #define TJS_IEEE_D_SIGNIFICAND_MSB_MASK   (TJS_UI64_VAL(0x0008000000000000))
 
-#define TJS_IEEE_D_GET_SIGN(x)   (0!=(x & TJS_IEEE_D_SIGN_MASK))
+#define TJS_IEEE_D_GET_SIGN(x)   ((bool)(x & TJS_IEEE_D_SIGN_MASK))
 #define TJS_IEEE_D_GET_EXP(x)  ((tjs_int)(((x & TJS_IEEE_D_EXP_MASK) >> \
 								TJS_IEEE_D_SIGNIFICAND_BITS) - TJS_IEEE_D_EXP_BIAS))
 #define TJS_IEEE_D_GET_SIGNIFICAND(x) (x & TJS_IEEE_D_SIGNIFICAND_MASK)
@@ -197,7 +197,7 @@ public:
 #define TJS_FC_IS_NAN(x)  (((x)&TJS_FC_CLASS_MASK) == TJS_FC_CLASS_NAN)
 #define TJS_FC_IS_INF(x)  (((x)&TJS_FC_CLASS_MASK) == TJS_FC_CLASS_INF)
 
-#define TJS_FC_IS_NEGATIVE(x) (0!=((x) & TJS_FC_SIGN_MASK))
+#define TJS_FC_IS_NEGATIVE(x) ((bool)((x) & TJS_FC_SIGN_MASK))
 #define TJS_FC_IS_POSITIVE(x) (!TJS_FC_IS_NEGATIVE(x))
 
 
@@ -265,8 +265,6 @@ typedef tTJSString ttstr;
 										   // value         : value property; you must
 										   //               : dereference using unary '*' operator.
 										   // the method must return true for found, false for not-found.
-#define TJS_CII_SET_SUPRECLASS	0x00000004 // register super class instance
-#define TJS_CII_GET_SUPRECLASS	0x00000005 // retrieve super class instance
 
 #define TJS_OL_LOCK				0x00000001 // Lock the object
 #define TJS_OL_UNLOCK			0x00000002 // Unlock the object
@@ -1831,10 +1829,7 @@ extern void * TVPImportFuncPtr55a9b73f877bfd4c6d8157e7b1c458df;
 extern void * TVPImportFuncPtrd070209f152dd22087e6e996e02c85cf;
 extern void * TVPImportFuncPtr308f905626bc51c7ef9b65b2c0ca34b2;
 extern void * TVPImportFuncPtr95aab2a1ac9491e8026f4977e0918760;
-extern void * TVPImportFuncPtre0ac94325eb783ca2fe7856a54444c90;
 extern void * TVPImportFuncPtr0c99a79e866f08b4df3914e83fc203dc;
-extern void * TVPImportFuncPtrf2de531a016173057ff3540e47fed4e6;
-extern void * TVPImportFuncPtr4224a9066d8d13d6d7e12f1ace6a5beb;
 extern void * TVPImportFuncPtr900476efbc2031e643c042ca8e63a3d7;
 extern void * TVPImportFuncPtr07dfce61d490cf671a2d5359d713d64a;
 extern void * TVPImportFuncPtr52d30ac8479ef7e870b5aff076482799;
@@ -1893,7 +1888,7 @@ extern void * TVPImportFuncPtreba9b272d78a4b0cd7f9212e29a58607;
 extern void * TVPImportFuncPtrcfbe8ee9d43aa64ae4190eac91f7c55f;
 extern void * TVPImportFuncPtra4308a386968ef5d23025ab8a9e8c6db;
 extern void * TVPImportFuncPtr5a4fcbe1e398e3d9690d571acbbbae9f;
-extern void * TVPImportFuncPtr5b62f504fe6d22428d7518d6c52d775d;
+extern void * TVPImportFuncPtrb8305ae2ae49a3f7f711105e77bafdf0;
 extern void * TVPImportFuncPtrfb3b405f8747b54f26c332b9e6af81cd;
 extern void * TVPImportFuncPtrb7ccd11d130f186883c109d2ba17b598;
 extern void * TVPImportFuncPtrcf8ab6c24f25993ccc7663e572ac2991;
@@ -1928,16 +1923,18 @@ extern void * TVPImportFuncPtrd9b1c73516daea6a9c6564e2b731615a;
 extern void * TVPImportFuncPtr003f9d3de568fcd71dd532f33d38839c;
 extern void * TVPImportFuncPtr5da29a19bbe279a89be00e16c59d7641;
 extern void * TVPImportFuncPtrc1b52e8f3578d11f369552a887e13c5b;
+extern void * TVPImportFuncPtrdcd6ba3960e3e2cf6dbe585b1f67b0ac;
 extern void * TVPImportFuncPtr5b1fa785e397e643dd09cb43c2f2f4db;
 extern void * TVPImportFuncPtr29af78765c764c566e6adc77e0ea7041;
 extern void * TVPImportFuncPtr9e0df54e4c24ee28d5517c1743faa3a3;
 extern void * TVPImportFuncPtrd3aaa55d66777d7308ffa7a348c84841;
 extern void * TVPImportFuncPtrb426fbfb6ccb4e89c252b6af566995b8;
-extern void * TVPImportFuncPtrc145419db7b63f7488ea05a2a8826c1d;
-extern void * TVPImportFuncPtrd795cd5ebfb6ca6f1b91bafbe66d7a65;
-extern void * TVPImportFuncPtr4564a3ce5cf48cb47e63a3948cef03be;
-extern void * TVPImportFuncPtrbee2775f2e4042043b7cb08056d2ae5c;
-extern void * TVPImportFuncPtr5fd8dfd2816a2cfd4a51cab41053d575;
+extern void * TVPImportFuncPtr678c2b211f8d8f661f6fdd95c52fbaa8;
+extern void * TVPImportFuncPtr9ec5b02d14238454101dad083b5dfc3b;
+extern void * TVPImportFuncPtr471b3daf08ed9b828679d0dae78250ed;
+extern void * TVPImportFuncPtrd0bb2c604ee6f0bba72ddc017f6416eb;
+extern void * TVPImportFuncPtr3ab4d4d7b57eea827e7bb7c263afb951;
+extern void * TVPImportFuncPtrdc025d3981a832b095736a0214b98797;
 extern void * TVPImportFuncPtr9982ebedc12d343cb098e2a7b25bdef1;
 extern void * TVPImportFuncPtr81eeacbed5ee6129bef4b370e28b5d10;
 extern void * TVPImportFuncPtr6ed1088905d99012d2fb5827ea19527e;
@@ -2108,9 +2105,6 @@ extern void * TVPImportFuncPtr4d99b9e38121251b40a90cd2bd5fea63;
 extern void * TVPImportFuncPtrf1509827696ebf5627bee1a45d675fb8;
 extern void * TVPImportFuncPtrbbb625e23229350453161810c41419dd;
 extern void * TVPImportFuncPtr489a6aae30de0feff5d3c5fbd42ae325;
-extern void * TVPImportFuncPtr6b9a349305f8c689dcfdbcea2566769c;
-extern void * TVPImportFuncPtr6320d208ce1a570aca52c3cdf7421f7c;
-extern void * TVPImportFuncPtr0f83f0459badd1cd352041b9243d712f;
 extern void * TVPImportFuncPtr186a94b2fed609ed2d2a7ac1a2bed87f;
 extern void * TVPImportFuncPtrbde8efb9971664f2b52fe912745e2791;
 extern void * TVPImportFuncPtr386d6fa5cb73e3519b62d20470e5414b;
@@ -4651,6 +4645,17 @@ typedef void * TVP_THREAD_PARAM;
 
 
 //---------------------------------------------------------------------------
+// KAG Parser debug level
+//---------------------------------------------------------------------------
+enum tTVPKAGDebugLevel
+{
+	tkdlNone, // none is reported
+	tkdlSimple, // simple report
+	tkdlVerbose // complete report ( verbose )
+};
+
+
+//---------------------------------------------------------------------------
 // tTVPClipboardFormat
 //---------------------------------------------------------------------------
 enum tTVPClipboardFormat
@@ -4709,20 +4714,18 @@ struct IDirectSound;
 //---------------------------------------------------------------------------
 // font ralated constants
 //---------------------------------------------------------------------------
-#define TVP_TF_ITALIC    0x0100
-#define TVP_TF_BOLD      0x0200
-#define TVP_TF_UNDERLINE 0x0400
-#define TVP_TF_STRIKEOUT 0x0800
-#define TVP_TF_FONTFILE  0x1000
+#define TVP_TF_ITALIC    0x01
+#define TVP_TF_BOLD      0x02
+#define TVP_TF_UNDERLINE 0x04
+#define TVP_TF_STRIKEOUT 0x08
 
 
 //---------------------------------------------------------------------------
-#define TVP_FSF_FIXEDPITCH    0x01      // fsfFixedPitch
-#define TVP_FSF_SAMECHARSET   0x02      // fsfSameCharSet
-#define TVP_FSF_NOVERTICAL    0x04      // fsfNoVertical
-#define TVP_FSF_TRUETYPEONLY  0x08      // fsfTrueTypeOnly
-#define TVP_FSF_IGNORESYMBOL  0x10      // fsfIgnoreSymbol
-#define TVP_FSF_USEFONTFACE   0x100  // fsfUseFontFace
+#define TVP_FSF_FIXEDPITCH   1      // fsfFixedPitch
+#define TVP_FSF_SAMECHARSET  2      // fsfSameCharSet
+#define TVP_FSF_NOVERTICAL   4      // fsfNoVertical
+#define TVP_FSF_TRUETYPEONLY 8      // fsfTrueTypeOnly
+#define TVP_FSF_USEFONTFACE  0x100  // fsfUseFontFace
 
 
 
@@ -4733,9 +4736,7 @@ enum tTVPMouseButton
 {
 	mbLeft,
 	mbRight,
-	mbMiddle,
-	mbX1,
-	mbX2
+	mbMiddle
 };
 
 
@@ -4984,8 +4985,6 @@ struct tTVPRect
 			tTVPPoint upper_left;
 			tTVPPoint bottom_right;
 		};
-
-		tjs_int array[4];
 	};
 
 	tjs_int get_width() const { return right - left; }
@@ -5272,50 +5271,6 @@ public:
 	//! @param		y		プライマリレイヤ座標上における y 位置
 	virtual void TJS_INTF_METHOD NotifyMouseWheel(tjs_uint32 shift, tjs_int delta, tjs_int x, tjs_int y) = 0;
 
-	//! @brief		画面がタッチされた
-	//! @param		x		描画矩形内における x 位置(描画矩形の左上が原点)
-	//! @param		y		描画矩形内における y 位置(描画矩形の左上が原点)
-	//! @param		cx		触れている幅
-	//! @param		cy		触れている高さ
-	//! @param		id		タッチ識別用ID
-	virtual void TJS_INTF_METHOD NotifyTouchDown( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id ) = 0;
-
-	//! @brief		タッチが離された
-	//! @param		x		描画矩形内における x 位置(描画矩形の左上が原点)
-	//! @param		y		描画矩形内における y 位置(描画矩形の左上が原点)
-	//! @param		cx		触れている幅
-	//! @param		cy		触れている高さ
-	//! @param		id		タッチ識別用ID
-	virtual void TJS_INTF_METHOD NotifyTouchUp( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id ) = 0;
-
-	//! @brief		タッチが移動した
-	//! @param		x		描画矩形内における x 位置(描画矩形の左上が原点)
-	//! @param		y		描画矩形内における y 位置(描画矩形の左上が原点)
-	//! @param		cx		触れている幅
-	//! @param		cy		触れている高さ
-	//! @param		id		タッチ識別用ID
-	virtual void TJS_INTF_METHOD NotifyTouchMove( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id ) = 0;
-
-	//! @brief		拡大タッチ操作が行われた
-	//! @param		startdist	開始時の2点間の幅
-	//! @param		curdist	現在の2点間の幅
-	//! @param		cx		触れている幅
-	//! @param		cy		触れている高さ
-	//! @param		flag	タッチ状態フラグ
-	virtual void TJS_INTF_METHOD NotifyTouchScaling( tjs_real startdist, tjs_real curdist, tjs_real cx, tjs_real cy, tjs_int flag ) = 0;
-
-	//! @brief		回転タッチ操作が行われた
-	//! @param		startangle	開始時の角度
-	//! @param		curangle	現在の角度
-	//! @param		dist	現在の2点間の幅
-	//! @param		cx		触れている幅
-	//! @param		cy		触れている高さ
-	//! @param		flag	タッチ状態フラグ
-	virtual void TJS_INTF_METHOD NotifyTouchRotate( tjs_real startangle, tjs_real curangle, tjs_real dist, tjs_real cx, tjs_real cy, tjs_int flag ) = 0;
-
-	//! @brief		マルチタッチ状態が更新された
-	virtual void TJS_INTF_METHOD NotifyMultiTouch() = 0;
-
 	//! @brief		入力状態のチェック
 	//! @note		ウィンドウから約1秒おきに、レイヤマネージャがユーザからの入力の状態を
 	//!				再チェックするために呼ばれる。レイヤ状態の変化がユーザの入力とは
@@ -5419,7 +5374,7 @@ public:
 
 	//! @brief		ツールチップヒントを設定する
 	//! @param		text		ヒントテキスト(空文字列の場合はヒントの表示をキャンセルする)
-	virtual void TJS_INTF_METHOD SetHintText(iTJSDispatch2* sender, const ttstr & text) = 0;
+	virtual void TJS_INTF_METHOD SetHintText(const ttstr & text) = 0;
 
 	//! @brief		注視ポイントの設定
 	//! @param		layer		フォント情報の含まれるレイヤ
@@ -5473,17 +5428,18 @@ typedef bool (__stdcall * tTVPWindowMessageReceiver)
 
 #define TVP_WM_DETACH (WM_USER+106)  // before re-generating the window
 #define TVP_WM_ATTACH (WM_USER+107)  // after re-generating the window
-#define TVP_WM_FULLSCREEN_CHANGING (WM_USER+108)  // before full-screen or window changing
-#define TVP_WM_FULLSCREEN_CHANGED  (WM_USER+109)  // after full-screen or window changing
 
 
 
 
 //---------------------------------------------------------------------------
-// Direct3D former declaration
+// DirectDraw former declaration
 //---------------------------------------------------------------------------
-#ifndef DIRECT3D_VERSION
-struct IDirect3D9;
+#ifndef __DDRAW_INCLUDED__
+struct IDirectDraw2;
+struct IDirectDraw7;
+struct IDirectDrawSurface;
+struct IDirectDrawClipper;
 #endif
 
 
@@ -5549,15 +5505,6 @@ public:
 	//!				描画デバイス側で再描画を行う必要はない(必要があれば別メソッドにより
 	//!				再描画の必要性が通知されるため)。
 	virtual void TJS_INTF_METHOD SetDestRectangle(const tTVPRect & rect) = 0;
-
-	//! @brief		(Window->DrawDevice) クリッピング矩形の設定
-	//! @note		ウィンドウから、描画先をクリッピングするための矩形を設定するために呼ばれる。
-	//!				描画デバイスは、SetDestRectangleで指定された領域を、このメソッドで指定された矩形
-	//!				でクリッピングを行い表示を行う必要がある。
-	//!				このメソッドによって描画領域が変わったとしても、このタイミングで
-	//!				描画デバイス側で再描画を行う必要はない(必要があれば別メソッドにより
-	//!				再描画の必要性が通知されるため)。
-	virtual void TJS_INTF_METHOD SetClipRectangle(const tTVPRect & rect) = 0;
 
 	//! @brief		(Window->DrawDevice) 元画像のサイズを得る
 	//! @note		ウィンドウから、描画矩形のサイズを決定するために元画像のサイズが
@@ -5642,58 +5589,6 @@ public:
 	//! @param		y		描画矩形内における y 位置(描画矩形の左上が原点)
 	virtual void TJS_INTF_METHOD OnMouseWheel(tjs_uint32 shift, tjs_int delta, tjs_int x, tjs_int y) = 0;
 
-	//! @brief		(Window→DrawDevice) 画面がタッチされた
-	//! @param		x		描画矩形内における x 位置(描画矩形の左上が原点)
-	//! @param		y		描画矩形内における y 位置(描画矩形の左上が原点)
-	//! @param		cx		触れている幅
-	//! @param		cy		触れている高さ
-	//! @param		id		タッチ識別用ID
-	virtual void TJS_INTF_METHOD OnTouchDown( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id ) = 0;
-
-	//! @brief		(Window→DrawDevice) タッチが離された
-	//! @param		x		描画矩形内における x 位置(描画矩形の左上が原点)
-	//! @param		y		描画矩形内における y 位置(描画矩形の左上が原点)
-	//! @param		cx		触れている幅
-	//! @param		cy		触れている高さ
-	//! @param		id		タッチ識別用ID
-	virtual void TJS_INTF_METHOD OnTouchUp( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id ) = 0;
-
-	//! @brief		(Window→DrawDevice) タッチが移動した
-	//! @param		x		描画矩形内における x 位置(描画矩形の左上が原点)
-	//! @param		y		描画矩形内における y 位置(描画矩形の左上が原点)
-	//! @param		cx		触れている幅
-	//! @param		cy		触れている高さ
-	//! @param		id		タッチ識別用ID
-	virtual void TJS_INTF_METHOD OnTouchMove( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id ) = 0;
-
-	//! @brief		(Window→DrawDevice) 拡大タッチ操作が行われた
-	//! @param		startdist	開始時の2点間の幅
-	//! @param		curdist	現在の2点間の幅
-	//! @param		cx		触れている幅
-	//! @param		cy		触れている高さ
-	//! @param		flag	タッチ状態フラグ
-	virtual void TJS_INTF_METHOD OnTouchScaling( tjs_real startdist, tjs_real curdist, tjs_real cx, tjs_real cy, tjs_int flag ) = 0;
-
-	//! @brief		(Window→DrawDevice) 回転タッチ操作が行われた
-	//! @param		startangle	開始時の角度
-	//! @param		curangle	現在の角度
-	//! @param		dist	現在の2点間の幅
-	//! @param		cx		触れている幅
-	//! @param		cy		触れている高さ
-	//! @param		flag	タッチ状態フラグ
-	virtual void TJS_INTF_METHOD OnTouchRotate( tjs_real startangle, tjs_real curangle, tjs_real dist, tjs_real cx, tjs_real cy, tjs_int flag ) = 0;
-
-	//! @brief		(Window→DrawDevice) マルチタッチ状態が更新された
-	virtual void TJS_INTF_METHOD OnMultiTouch() = 0;
-
-	//! @brief		(Window->DrawDevice) 画面の回転が行われた
-	//! @param		orientation	画面の向き ( 横向き、縦向き、不明 )
-	//! @param		rotate		回転角度。Degree。負の値の時不明
-	//! @param		bpp			Bits per pixel
-	//! @param		width		画面幅
-	//! @param		height		画面高さ
-	virtual void TJS_INTF_METHOD OnDisplayRotate( tjs_int orientation, tjs_int rotate, tjs_int bpp, tjs_int width, tjs_int height ) = 0;
-
 	//! @brief		(Window->DrawDevice) 入力状態のチェック
 	//! @note		ウィンドウから約1秒おきに、レイヤマネージャがユーザからの入力の状態を
 	//!				再チェックするために呼ばれる。レイヤ状態の変化がユーザの入力とは
@@ -5740,7 +5635,7 @@ public:
 	//! @brief		(LayerManager→DrawDevice) ツールチップヒントを設定する
 	//! @param		manager		レイヤマネージャ
 	//! @param		text		ヒントテキスト(空文字列の場合はヒントの表示をキャンセルする)
-	virtual void TJS_INTF_METHOD SetHintText(iTVPLayerManager * manager, iTJSDispatch2* sender, const ttstr & text) = 0;
+	virtual void TJS_INTF_METHOD SetHintText(iTVPLayerManager * manager, const ttstr & text) = 0;
 
 	//! @brief		(LayerManager→DrawDevice) 注視ポイントの設定
 	//! @param		manager		レイヤマネージャ
@@ -5855,29 +5750,6 @@ public:
 	//!				差分更新の最適化に役立てるための支援機能。
 	//!				実装する必要はないが、実装することが望ましい。
 	virtual void TJS_INTF_METHOD SetShowUpdateRect(bool b) = 0;
-
-	//! @brief		(Window->DrawDevice) フルスクリーン化する
-	//! @param		window		ウィンドウハンドル
-	//! @param		w			要求する幅
-	//! @param		h			要求する高さ
-	//! @param		bpp			Bit per pixels
-	//! @param		color		16bpp の時 565 か 555を指定
-	//! @param		changeresolution	解像度変更を行うかどうか
-	virtual bool TJS_INTF_METHOD SwitchToFullScreen( HWND window, tjs_uint w, tjs_uint h, tjs_uint bpp, tjs_uint color, bool changeresolution ) = 0;
-	
-	//! @brief		(Window->DrawDevice) フルスクリーンを解除する
-	//! @param		window		ウィンドウハンドル
-	//! @param		w			要求する幅
-	//! @param		h			要求する高さ
-	//! @param		bpp			元々のBit per pixels
-	//! @param		color		16bpp の時 565 か 555を指定
-	virtual void TJS_INTF_METHOD RevertFromFullScreen( HWND window, tjs_uint w, tjs_uint h, tjs_uint bpp, tjs_uint color ) = 0;
-
-	//! @brief		(Window->DrawDevice) VBlank待ちを行う
-	//! @param		in_vblank	待たなくてもVBlank内だったかどうかを返す( !0 : 内、0: 外 )
-	//! @param		delayed		1フレーム遅延が発生したかどうかを返す( !0 : 発生、0: 発生せず )
-	//! @return		Wait可不可 true : 可能、false : 不可
-	virtual bool TJS_INTF_METHOD WaitForVBlank( tjs_int* in_vblank, tjs_int* delayed ) = 0;
 };
 //---------------------------------------------------------------------------
 
@@ -7155,16 +7027,6 @@ inline iTJSTextReadStream * TVPCreateTextStreamForRead(const ttstr & name , cons
 	typedef iTJSTextReadStream * (__stdcall * __functype)(const ttstr &, const ttstr &);
 	return ((__functype)(TVPImportFuncPtr95aab2a1ac9491e8026f4977e0918760))(name, modestr);
 }
-inline iTJSTextReadStream * TVPCreateTextStreamForReadByEncoding(const ttstr & name , const ttstr & modestr , const ttstr & encoding)
-{
-	if(!TVPImportFuncPtre0ac94325eb783ca2fe7856a54444c90)
-	{
-		static char funcname[] = "iTJSTextReadStream * ::TVPCreateTextStreamForReadByEncoding(const ttstr &,const ttstr &,const ttstr &)";
-		TVPImportFuncPtre0ac94325eb783ca2fe7856a54444c90 = TVPGetImportFuncPtr(funcname);
-	}
-	typedef iTJSTextReadStream * (__stdcall * __functype)(const ttstr &, const ttstr &, const ttstr &);
-	return ((__functype)(TVPImportFuncPtre0ac94325eb783ca2fe7856a54444c90))(name, modestr, encoding);
-}
 inline iTJSTextWriteStream * TVPCreateTextStreamForWrite(const ttstr & name , const ttstr & modestr)
 {
 	if(!TVPImportFuncPtr0c99a79e866f08b4df3914e83fc203dc)
@@ -7174,26 +7036,6 @@ inline iTJSTextWriteStream * TVPCreateTextStreamForWrite(const ttstr & name , co
 	}
 	typedef iTJSTextWriteStream * (__stdcall * __functype)(const ttstr &, const ttstr &);
 	return ((__functype)(TVPImportFuncPtr0c99a79e866f08b4df3914e83fc203dc))(name, modestr);
-}
-inline void TVPSetDefaultReadEncoding(const ttstr & encoding)
-{
-	if(!TVPImportFuncPtrf2de531a016173057ff3540e47fed4e6)
-	{
-		static char funcname[] = "void ::TVPSetDefaultReadEncoding(const ttstr &)";
-		TVPImportFuncPtrf2de531a016173057ff3540e47fed4e6 = TVPGetImportFuncPtr(funcname);
-	}
-	typedef void (__stdcall * __functype)(const ttstr &);
-	((__functype)(TVPImportFuncPtrf2de531a016173057ff3540e47fed4e6))(encoding);
-}
-inline const tjs_char * TVPGetDefaultReadEncoding()
-{
-	if(!TVPImportFuncPtr4224a9066d8d13d6d7e12f1ace6a5beb)
-	{
-		static char funcname[] = "const tjs_char * ::TVPGetDefaultReadEncoding()";
-		TVPImportFuncPtr4224a9066d8d13d6d7e12f1ace6a5beb = TVPGetImportFuncPtr(funcname);
-	}
-	typedef const tjs_char * (__stdcall * __functype)();
-	return ((__functype)(TVPImportFuncPtr4224a9066d8d13d6d7e12f1ace6a5beb))();
 }
 inline tjs_int TVPWideCharToUtf8String(const tjs_char * in , char * out)
 {
@@ -7775,15 +7617,15 @@ inline void TVPDoTryBlock(tTVPTryBlockFunction tryblock , tTVPCatchBlockFunction
 	typedef void (__stdcall * __functype)(tTVPTryBlockFunction , tTVPCatchBlockFunction , tTVPFinallyBlockFunction , void *);
 	((__functype)(TVPImportFuncPtr5a4fcbe1e398e3d9690d571acbbbae9f))(tryblock, catchblock, finallyblock, data);
 }
-inline bool TVPGetFileVersionOf(const wchar_t * module_filename , tjs_int & major , tjs_int & minor , tjs_int & release , tjs_int & build)
+inline bool TVPGetFileVersionOf(const char * module_filename , tjs_int & major , tjs_int & minor , tjs_int & release , tjs_int & build)
 {
-	if(!TVPImportFuncPtr5b62f504fe6d22428d7518d6c52d775d)
+	if(!TVPImportFuncPtrb8305ae2ae49a3f7f711105e77bafdf0)
 	{
-		static char funcname[] = "bool ::TVPGetFileVersionOf(const wchar_t *,tjs_int &,tjs_int &,tjs_int &,tjs_int &)";
-		TVPImportFuncPtr5b62f504fe6d22428d7518d6c52d775d = TVPGetImportFuncPtr(funcname);
+		static char funcname[] = "bool ::TVPGetFileVersionOf(const char *,tjs_int &,tjs_int &,tjs_int &,tjs_int &)";
+		TVPImportFuncPtrb8305ae2ae49a3f7f711105e77bafdf0 = TVPGetImportFuncPtr(funcname);
 	}
-	typedef bool (__stdcall * __functype)(const wchar_t *, tjs_int &, tjs_int &, tjs_int &, tjs_int &);
-	return ((__functype)(TVPImportFuncPtr5b62f504fe6d22428d7518d6c52d775d))(module_filename, major, minor, release, build);
+	typedef bool (__stdcall * __functype)(const char *, tjs_int &, tjs_int &, tjs_int &, tjs_int &);
+	return ((__functype)(TVPImportFuncPtrb8305ae2ae49a3f7f711105e77bafdf0))(module_filename, major, minor, release, build);
 }
 inline bool TVPGetCommandLine(const tjs_char * name , tTJSVariant * value = NULL)
 {
@@ -8125,6 +7967,16 @@ inline IDirectSound * TVPGetDirectSound()
 	typedef IDirectSound * (__stdcall * __functype)();
 	return ((__functype)(TVPImportFuncPtrc1b52e8f3578d11f369552a887e13c5b))();
 }
+inline void TVPMIDIOutData(const tjs_uint8 * data , int len)
+{
+	if(!TVPImportFuncPtrdcd6ba3960e3e2cf6dbe585b1f67b0ac)
+	{
+		static char funcname[] = "void ::TVPMIDIOutData(const tjs_uint8 *,int)";
+		TVPImportFuncPtrdcd6ba3960e3e2cf6dbe585b1f67b0ac = TVPGetImportFuncPtr(funcname);
+	}
+	typedef void (__stdcall * __functype)(const tjs_uint8 *, int);
+	((__functype)(TVPImportFuncPtrdcd6ba3960e3e2cf6dbe585b1f67b0ac))(data, len);
+}
 inline void TVPClearGraphicCache()
 {
 	if(!TVPImportFuncPtr5b1fa785e397e643dd09cb43c2f2f4db)
@@ -8175,55 +8027,65 @@ inline tjs_uint32 TVPGetCurrentShiftKeyState()
 	typedef tjs_uint32 (__stdcall * __functype)();
 	return ((__functype)(TVPImportFuncPtrb426fbfb6ccb4e89c252b6af566995b8))();
 }
-inline void TVPRegisterAcceleratorKey(HWND hWnd , char virt , short key , short cmd)
+inline void TVPEnsureDirectDrawObject()
 {
-	if(!TVPImportFuncPtrc145419db7b63f7488ea05a2a8826c1d)
+	if(!TVPImportFuncPtr678c2b211f8d8f661f6fdd95c52fbaa8)
 	{
-		static char funcname[] = "void ::TVPRegisterAcceleratorKey(HWND,char,short,short)";
-		TVPImportFuncPtrc145419db7b63f7488ea05a2a8826c1d = TVPGetImportFuncPtr(funcname);
-	}
-	typedef void (__stdcall * __functype)(HWND , char , short , short);
-	((__functype)(TVPImportFuncPtrc145419db7b63f7488ea05a2a8826c1d))(hWnd, virt, key, cmd);
-}
-inline void TVPUnregisterAcceleratorKey(HWND hWnd , short cmd)
-{
-	if(!TVPImportFuncPtrd795cd5ebfb6ca6f1b91bafbe66d7a65)
-	{
-		static char funcname[] = "void ::TVPUnregisterAcceleratorKey(HWND,short)";
-		TVPImportFuncPtrd795cd5ebfb6ca6f1b91bafbe66d7a65 = TVPGetImportFuncPtr(funcname);
-	}
-	typedef void (__stdcall * __functype)(HWND , short);
-	((__functype)(TVPImportFuncPtrd795cd5ebfb6ca6f1b91bafbe66d7a65))(hWnd, cmd);
-}
-inline void TVPDeleteAcceleratorKeyTable(HWND hWnd)
-{
-	if(!TVPImportFuncPtr4564a3ce5cf48cb47e63a3948cef03be)
-	{
-		static char funcname[] = "void ::TVPDeleteAcceleratorKeyTable(HWND)";
-		TVPImportFuncPtr4564a3ce5cf48cb47e63a3948cef03be = TVPGetImportFuncPtr(funcname);
-	}
-	typedef void (__stdcall * __functype)(HWND);
-	((__functype)(TVPImportFuncPtr4564a3ce5cf48cb47e63a3948cef03be))(hWnd);
-}
-inline void TVPEnsureDirect3DObject()
-{
-	if(!TVPImportFuncPtrbee2775f2e4042043b7cb08056d2ae5c)
-	{
-		static char funcname[] = "void ::TVPEnsureDirect3DObject()";
-		TVPImportFuncPtrbee2775f2e4042043b7cb08056d2ae5c = TVPGetImportFuncPtr(funcname);
+		static char funcname[] = "void ::TVPEnsureDirectDrawObject()";
+		TVPImportFuncPtr678c2b211f8d8f661f6fdd95c52fbaa8 = TVPGetImportFuncPtr(funcname);
 	}
 	typedef void (__stdcall * __functype)();
-	((__functype)(TVPImportFuncPtrbee2775f2e4042043b7cb08056d2ae5c))();
+	((__functype)(TVPImportFuncPtr678c2b211f8d8f661f6fdd95c52fbaa8))();
 }
-inline IDirect3D9 * TVPGetDirect3DObjectNoAddRef()
+inline IDirectDraw2 * TVPGetDirectDrawObjectNoAddRef()
 {
-	if(!TVPImportFuncPtr5fd8dfd2816a2cfd4a51cab41053d575)
+	if(!TVPImportFuncPtr9ec5b02d14238454101dad083b5dfc3b)
 	{
-		static char funcname[] = "IDirect3D9 * ::TVPGetDirect3DObjectNoAddRef()";
-		TVPImportFuncPtr5fd8dfd2816a2cfd4a51cab41053d575 = TVPGetImportFuncPtr(funcname);
+		static char funcname[] = "IDirectDraw2 * ::TVPGetDirectDrawObjectNoAddRef()";
+		TVPImportFuncPtr9ec5b02d14238454101dad083b5dfc3b = TVPGetImportFuncPtr(funcname);
 	}
-	typedef IDirect3D9 * (__stdcall * __functype)();
-	return ((__functype)(TVPImportFuncPtr5fd8dfd2816a2cfd4a51cab41053d575))();
+	typedef IDirectDraw2 * (__stdcall * __functype)();
+	return ((__functype)(TVPImportFuncPtr9ec5b02d14238454101dad083b5dfc3b))();
+}
+inline IDirectDraw7 * TVPGetDirectDraw7ObjectNoAddRef()
+{
+	if(!TVPImportFuncPtr471b3daf08ed9b828679d0dae78250ed)
+	{
+		static char funcname[] = "IDirectDraw7 * ::TVPGetDirectDraw7ObjectNoAddRef()";
+		TVPImportFuncPtr471b3daf08ed9b828679d0dae78250ed = TVPGetImportFuncPtr(funcname);
+	}
+	typedef IDirectDraw7 * (__stdcall * __functype)();
+	return ((__functype)(TVPImportFuncPtr471b3daf08ed9b828679d0dae78250ed))();
+}
+inline IDirectDrawSurface * TVPGetDDPrimarySurfaceNoAddRef()
+{
+	if(!TVPImportFuncPtrd0bb2c604ee6f0bba72ddc017f6416eb)
+	{
+		static char funcname[] = "IDirectDrawSurface * ::TVPGetDDPrimarySurfaceNoAddRef()";
+		TVPImportFuncPtrd0bb2c604ee6f0bba72ddc017f6416eb = TVPGetImportFuncPtr(funcname);
+	}
+	typedef IDirectDrawSurface * (__stdcall * __functype)();
+	return ((__functype)(TVPImportFuncPtrd0bb2c604ee6f0bba72ddc017f6416eb))();
+}
+inline void TVPSetDDPrimaryClipper(IDirectDrawClipper * clipper)
+{
+	if(!TVPImportFuncPtr3ab4d4d7b57eea827e7bb7c263afb951)
+	{
+		static char funcname[] = "void ::TVPSetDDPrimaryClipper(IDirectDrawClipper *)";
+		TVPImportFuncPtr3ab4d4d7b57eea827e7bb7c263afb951 = TVPGetImportFuncPtr(funcname);
+	}
+	typedef void (__stdcall * __functype)(IDirectDrawClipper *);
+	((__functype)(TVPImportFuncPtr3ab4d4d7b57eea827e7bb7c263afb951))(clipper);
+}
+inline void TVPReleaseDDPrimarySurface()
+{
+	if(!TVPImportFuncPtrdc025d3981a832b095736a0214b98797)
+	{
+		static char funcname[] = "void ::TVPReleaseDDPrimarySurface()";
+		TVPImportFuncPtrdc025d3981a832b095736a0214b98797 = TVPGetImportFuncPtr(funcname);
+	}
+	typedef void (__stdcall * __functype)();
+	((__functype)(TVPImportFuncPtrdc025d3981a832b095736a0214b98797))();
 }
 inline iTVPScanLineProvider * TVPSLPLoadImage(const ttstr & name , tjs_int bpp , tjs_uint32 key , tjs_uint w , tjs_uint h)
 {
@@ -9925,36 +9787,6 @@ inline void TVPChBlurCopy65(tjs_uint8 * dest , tjs_int destpitch , tjs_int destw
 	typedef void (__stdcall * __functype)(tjs_uint8 *, tjs_int , tjs_int , tjs_int , const tjs_uint8 *, tjs_int , tjs_int , tjs_int , tjs_int , tjs_int);
 	((__functype)(TVPImportFuncPtr489a6aae30de0feff5d3c5fbd42ae325))(dest, destpitch, destwidth, destheight, src, srcpitch, srcwidth, srcheight, blurwidth, blurlevel);
 }
-inline void TVPChBlurMulCopy(tjs_uint8 * dest , const tjs_uint8 * src , tjs_int len , tjs_int level)
-{
-	if(!TVPImportFuncPtr6b9a349305f8c689dcfdbcea2566769c)
-	{
-		static char funcname[] = "void ::TVPChBlurMulCopy(tjs_uint8 *,const tjs_uint8 *,tjs_int,tjs_int)";
-		TVPImportFuncPtr6b9a349305f8c689dcfdbcea2566769c = TVPGetImportFuncPtr(funcname);
-	}
-	typedef void (__stdcall * __functype)(tjs_uint8 *, const tjs_uint8 *, tjs_int , tjs_int);
-	((__functype)(TVPImportFuncPtr6b9a349305f8c689dcfdbcea2566769c))(dest, src, len, level);
-}
-inline void TVPChBlurAddMulCopy(tjs_uint8 * dest , const tjs_uint8 * src , tjs_int len , tjs_int level)
-{
-	if(!TVPImportFuncPtr6320d208ce1a570aca52c3cdf7421f7c)
-	{
-		static char funcname[] = "void ::TVPChBlurAddMulCopy(tjs_uint8 *,const tjs_uint8 *,tjs_int,tjs_int)";
-		TVPImportFuncPtr6320d208ce1a570aca52c3cdf7421f7c = TVPGetImportFuncPtr(funcname);
-	}
-	typedef void (__stdcall * __functype)(tjs_uint8 *, const tjs_uint8 *, tjs_int , tjs_int);
-	((__functype)(TVPImportFuncPtr6320d208ce1a570aca52c3cdf7421f7c))(dest, src, len, level);
-}
-inline void TVPChBlurCopy(tjs_uint8 * dest , tjs_int destpitch , tjs_int destwidth , tjs_int destheight , const tjs_uint8 * src , tjs_int srcpitch , tjs_int srcwidth , tjs_int srcheight , tjs_int blurwidth , tjs_int blurlevel)
-{
-	if(!TVPImportFuncPtr0f83f0459badd1cd352041b9243d712f)
-	{
-		static char funcname[] = "void ::TVPChBlurCopy(tjs_uint8 *,tjs_int,tjs_int,tjs_int,const tjs_uint8 *,tjs_int,tjs_int,tjs_int,tjs_int,tjs_int)";
-		TVPImportFuncPtr0f83f0459badd1cd352041b9243d712f = TVPGetImportFuncPtr(funcname);
-	}
-	typedef void (__stdcall * __functype)(tjs_uint8 *, tjs_int , tjs_int , tjs_int , const tjs_uint8 *, tjs_int , tjs_int , tjs_int , tjs_int , tjs_int);
-	((__functype)(TVPImportFuncPtr0f83f0459badd1cd352041b9243d712f))(dest, destpitch, destwidth, destheight, src, srcpitch, srcwidth, srcheight, blurwidth, blurlevel);
-}
 inline void TVPBLExpand1BitTo8BitPal(tjs_uint8 * dest , const tjs_uint8 * buf , tjs_int len , const tjs_uint32 * pal)
 {
 	if(!TVPImportFuncPtr186a94b2fed609ed2d2a7ac1a2bed87f)
@@ -10926,5 +10758,12 @@ extern tjs_error Try_iTJSDispatch2_NativeInstanceSupport(iTJSDispatch2 * _this, 
 extern tjs_error Try_iTJSDispatch2_ClassInstanceInfo(iTJSDispatch2 * _this, tjs_uint32 flag, tjs_uint num, tTJSVariant *value);
 extern tjs_error Try_iTJSDispatch2_Reserved2(iTJSDispatch2 * _this);
 extern tjs_error Try_iTJSDispatch2_Reserved3(iTJSDispatch2 * _this);
+//---------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------
+// other compatibility function stub
+//---------------------------------------------------------------------------
+extern ttstr TVPGetLocallyAccessibleName(const ttstr &name);
+
 
 #endif
