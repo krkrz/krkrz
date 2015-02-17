@@ -230,6 +230,7 @@ struct WindowEx
 		WindowEx *self = GetInstance(obj);
 		if (self == NULL) return TJS_E_ACCESSDENYED;
 		self->disableResize = !!p[0]->AsInteger();
+		if (self->disableResize) ::EnableMenuItem(::GetSystemMenu(GetHWND(obj), false), SC_SIZE, MF_DISABLED | MF_GRAYED | MF_BYCOMMAND);
 		return TJS_S_OK;
 	}
 
@@ -243,6 +244,7 @@ struct WindowEx
 		WindowEx *self = GetInstance(obj);
 		if (self == NULL) return TJS_E_ACCESSDENYED;
 		self->disableMove = !!p[0]->AsInteger();
+		if (self->disableMove) ::EnableMenuItem(::GetSystemMenu(GetHWND(obj), false), SC_MOVE, MF_DISABLED | MF_GRAYED | MF_BYCOMMAND);
 		//_resetExSystemMenu(self);
 		return TJS_S_OK;
 	}
@@ -539,8 +541,8 @@ struct WindowEx
 				if (disableResize || disableMove) {
 					// システムメニューサイズ変更抑制
 					mes->Result = ::DefWindowProc(hwnd, mes->Msg, mes->WParam, mes->LParam);
-					if (disableResize) ::EnableMenuItem((HMENU)mes->WParam, SC_SIZE, MF_GRAYED | MF_BYCOMMAND);
-					if (disableMove)   ::EnableMenuItem((HMENU)mes->WParam, SC_MOVE, MF_GRAYED | MF_BYCOMMAND);
+					if (disableResize) ::EnableMenuItem(::GetSystemMenu(hwnd, false), SC_SIZE, MF_DISABLED | MF_GRAYED | MF_BYCOMMAND);
+					if (disableMove)   ::EnableMenuItem(::GetSystemMenu(hwnd, false), SC_MOVE, MF_DISABLED | MF_GRAYED | MF_BYCOMMAND);
 					return true;
 				}
 			} else if (menuex) {
