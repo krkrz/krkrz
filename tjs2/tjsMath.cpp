@@ -308,7 +308,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/random)
 	if(result)
 	{
 		TJSSetFPUE();
-		*result = ((tTVReal)((tTVReal)TJS_rand()/(tTVReal)(TJS_RAND_MAX)));
+		*result = ((tTVReal)((tTVReal)TJS_rand()/(tTVReal)(TJS_RAND_MAX + 1)));
 	}
 	return TJS_S_OK;
 }
