@@ -79,8 +79,6 @@ TJS_EXP_FUNC_DEF(size_t, TJS_strlen, (const tjs_char *d));
 	#define TJS_vsnprintf		vswprintf
 	extern tjs_int TJS_sprintf(tjs_char *s, const tjs_char *format, ...);
 	#define TJS_timezone timezone
-	#define TJS_rand rand
-	#define TJS_RAND_MAX RAND_MAX
 	#define TJS_mbstowcs mbstowcs
 	#define TJS_wcstombs wcstombs
 	#define TJS_mbtowc   mbtowc
@@ -90,12 +88,8 @@ TJS_EXP_FUNC_DEF(size_t, TJS_strlen, (const tjs_char *d));
 	#define TJS_cdecl __cdecl
 #ifdef _MSC_VER
 	#define TJS_vsnprintf		_vsnwprintf
-	#define TJS_rand rand
-	#define TJS_RAND_MAX RAND_MAX
 #else
 	#define TJS_vsnprintf		vsnwprintf
-	#define TJS_rand _lrand
-	#define TJS_RAND_MAX LRAND_MAX
 #endif
 	#define TJS_snprintf		swprintf_s
 	#define TJS_sprintf			swprintf

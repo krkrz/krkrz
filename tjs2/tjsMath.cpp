@@ -41,8 +41,38 @@ int _USERENTRY _matherrl(struct _exception *e)
 }
 #endif
 #endif
-//---------------------------------------------------------------------------
 
+//---------------------------------------------------------------------------
+// XorShift
+//---------------------------------------------------------------------------
+// generates random number using Xorshift
+class XorShift {
+public:
+	const static tjs_uint32 MAX = (2 << 31) - 1;
+
+	static void init(tjs_uint32 seed)
+	{
+		for (tjs_uint32 i = 0; i < 4; ++i) {
+			seeds[i] = seed = 1812433253 * (seed ^ (seed >> 30)) + i;
+		}
+	}
+
+	static tjs_uint32 random()
+	{
+		tjs_uint32 t = seeds[0] ^ (seeds[0] << 11);
+		seeds[0] = seeds[1];
+		seeds[1] = seeds[2];
+		seeds[2] = seeds[3];
+		seeds[3] = (seeds[3] ^ (seeds[3] >> 19)) ^ (t ^ (t >> 8));
+		return seeds[3];
+	}
+
+private:
+	static tjs_uint32 seeds[4];
+};
+
+tjs_uint32 XorShift::seeds[4] = { 123456789, 362436069, 521288629, 88675123 };
+//---------------------------------------------------------------------------
 
 
 namespace TJS
@@ -57,12 +87,11 @@ tTJSNC_Math::tTJSNC_Math() :
 	// constructor
 	time_t time_num;
 	time(&time_num);
-	srand((unsigned int)time_num);
+	XorShift::init((tjs_uint32)time_num);
 
 	/*
 		TJS2 cannot promise that the sequence of generated random numbers are
 		unique.
-		Math.random uses old-style random generator from stdlib
 		since Math.RandomGenerator provides Mersenne Twister high-quality random
 		generator.
 	*/
@@ -308,7 +337,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/random)
 	if(result)
 	{
 		TJSSetFPUE();
-		*result = ((tTVReal)((tTVReal)TJS_rand()/(tTVReal)(TJS_RAND_MAX + 1)));
+		*result = ((tTVReal)((tTVReal)XorShift::random() / (tTVReal)(XorShift::MAX + 1.0)));
 	}
 	return TJS_S_OK;
 }
