@@ -357,6 +357,9 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		// bpp, h resolution, v resolution
 		OnDisplayChange( wParam, LOWORD(lParam), HIWORD(lParam) );
 		break;
+	case WM_ACTIVATEAPP:
+		OnApplicationActivateChange( wParam != 0, (DWORD)lParam );
+		break;
 	default:
 		return ::DefWindowProc(hWnd,msg,wParam,lParam);
 	}
