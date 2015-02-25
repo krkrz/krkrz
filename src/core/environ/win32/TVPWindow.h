@@ -300,6 +300,7 @@ public:
 	virtual void OnTouchSequenceEnd() {}
 
 	virtual void OnDisplayChange( DWORD bpp, WORD hres, WORD vres ) {}
+	virtual void OnApplicationActivateChange( bool activated, DWORD thread_id ) {}
 };
 
 #endif // __TVP_WINDOW_H__
