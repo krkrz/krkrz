@@ -380,6 +380,8 @@ public:
 	virtual void OnDisplayChange( DWORD bpp, WORD hres, WORD vres );
 	virtual void OnDisplayRotate( int orientation, int rotate, int bpp, int hresolution, int vresolution );
 
+	virtual void OnApplicationActivateChange( bool activated, DWORD thread_id );
+
 	virtual void OnDestroy();
 	void WMShowVisible();
 	void WMShowTop( WPARAM wParam );
