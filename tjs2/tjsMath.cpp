@@ -41,21 +41,33 @@ int _USERENTRY _matherrl(struct _exception *e)
 }
 #endif
 #endif
+//---------------------------------------------------------------------------
 
+namespace TJS
+{
 //---------------------------------------------------------------------------
 // XorShift
 //---------------------------------------------------------------------------
 // generates random number using Xorshift
-class XorShift {
+class tTJSXorshift {
 public:
-	const static tjs_uint32 MAX = (2 << 31) - 1;
-
 	static void init(tjs_uint32 seed)
 	{
 		for (tjs_uint32 i = 0; i < 4; ++i) {
 			seeds[i] = seed = 1812433253 * (seed ^ (seed >> 30)) + i;
 		}
 	}
+
+	// generates a random number in the range [0,1)
+	static tTVReal random_real()
+	{
+		TJSSetFPUE();
+		return (tTVReal)((tTVReal)random() / ((tTVReal)MAX + 1));
+	}
+
+private:
+	static tjs_uint32 seeds[4];
+	const static tjs_uint32 MAX = (2LL << 31) - 1;
 
 	static tjs_uint32 random()
 	{
@@ -66,17 +78,11 @@ public:
 		seeds[3] = (seeds[3] ^ (seeds[3] >> 19)) ^ (t ^ (t >> 8));
 		return seeds[3];
 	}
-
-private:
-	static tjs_uint32 seeds[4];
 };
 
-tjs_uint32 XorShift::seeds[4] = { 123456789, 362436069, 521288629, 88675123 };
-//---------------------------------------------------------------------------
+tjs_uint32 tTJSXorshift::seeds[4] = { 123456789, 362436069, 521288629, 88675123 };
 
 
-namespace TJS
-{
 //---------------------------------------------------------------------------
 // tTJSNC_Math : TJS Native Class : Math
 //---------------------------------------------------------------------------
@@ -87,7 +93,7 @@ tTJSNC_Math::tTJSNC_Math() :
 	// constructor
 	time_t time_num;
 	time(&time_num);
-	XorShift::init((tjs_uint32)time_num);
+	tTJSXorshift::init((tjs_uint32)time_num);
 
 	/*
 		TJS2 cannot promise that the sequence of generated random numbers are
@@ -336,8 +342,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/random)
 {
 	if(result)
 	{
-		TJSSetFPUE();
-		*result = ((tTVReal)((tTVReal)XorShift::random() / (tTVReal)(XorShift::MAX + 1.0)));
+		*result = tTJSXorshift::random_real();
 	}
 	return TJS_S_OK;
 }
