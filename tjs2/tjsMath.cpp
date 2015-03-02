@@ -46,7 +46,7 @@ int _USERENTRY _matherrl(struct _exception *e)
 namespace TJS
 {
 //---------------------------------------------------------------------------
-// XorShift
+// tTJSXorshift
 //---------------------------------------------------------------------------
 // generates random number using Xorshift
 class tTJSXorshift {
