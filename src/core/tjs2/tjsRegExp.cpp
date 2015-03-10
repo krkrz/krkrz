@@ -681,9 +681,9 @@ bool tTJSNC_RegExp::Exec(OnigRegion* region, const ttstr &target, tTJSNI_RegExp 
 			}
 		}
 		_this->LastIndex = _this->Start + lastindex/sizeof(tjs_char);
-		_this->LastMatch = ttstr( target.c_str()+(region->beg[0]/sizeof(tjs_char)), (region->end[0] - region->beg[0])/sizeof(tjs_char));
+		_this->LastMatch = ttstr( target.c_str()+_this->Start+(region->beg[0]/sizeof(tjs_char)), (region->end[0] - region->beg[0])/sizeof(tjs_char));
 		tjs_uint last = num_regs-1;
-		_this->LastParen = ttstr( target.c_str()+(region->beg[last]/sizeof(tjs_char)), (region->end[last] - region->beg[last])/sizeof(tjs_char));
+		_this->LastParen = ttstr( target.c_str()+_this->Start+(region->beg[last]/sizeof(tjs_char)), (region->end[last] - region->beg[last])/sizeof(tjs_char));
 		_this->LeftContext = ttstr(target, _this->Start + (region->beg[0])/sizeof(tjs_char));
 		_this->RightContext = ttstr(target.c_str() + _this->LastIndex);
 		if(_this->Flags & globalsearch)
@@ -708,7 +708,7 @@ iTJSDispatch2 * tTJSNC_RegExp::GetResultArray( bool matched, const tjs_char *tar
 			try {
 				for( tjs_uint i = 0; i < size; i++ ) {
 					tTJSVariant val;
-					val = ttstr( target+(region->beg[i]/sizeof(tjs_char)), (region->end[i] - region->beg[i])/sizeof(tjs_char) );
+					val = ttstr( target+_this->Start+(region->beg[i]/sizeof(tjs_char)), (region->end[i] - region->beg[i])/sizeof(tjs_char) );
 					array->PropSetByNum(TJS_MEMBERENSURE|TJS_IGNOREPROP, i, &val, array);
 				}
 			} catch(...) {
