@@ -1707,15 +1707,22 @@ void TTVPWindowForm::OnActive( HWND preactive ) {
 	if( TVPFullScreenedWindow == this )
 		TVPShowModalAtAppActivate();
 
-	Application->OnActivate( GetHandle() );
+	Application->OnActiveAnyWindow();
 }
 void TTVPWindowForm::OnDeactive( HWND postactive ) {
 	if( TJSNativeInstance ) {
 		TVPPostInputEvent( new tTVPOnReleaseCaptureInputEvent(TJSNativeInstance) );
 	}
-
-	Application->OnDeactivate( GetHandle() );
 }
+void TTVPWindowForm::OnApplicationActivateChange( bool activated, DWORD thread_id ) {
+	if ( activated ) {
+		Application->OnActivate( GetHandle() );
+	} else {
+		Application->OnDeactivate( GetHandle() );
+	}
+}
+
+
 void TTVPWindowForm::OnMove( int x, int y ) {
 	if(TJSNativeInstance) {
 		TJSNativeInstance->WindowMoved();
