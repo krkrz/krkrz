@@ -690,8 +690,6 @@ void tTVPApplication::CheckDigitizer() {
 }
 void tTVPApplication::OnActivate( HWND hWnd )
 {
-	OnActiveAnyWindow();
-
 	if( hWnd != GetMainWindowHandle() ) return;
 
 	application_activating_ = true;
