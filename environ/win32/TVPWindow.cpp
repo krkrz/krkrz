@@ -324,6 +324,9 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		return 0;
 	case WM_MOUSEACTIVATE:
 		return OnMouseActivate( reinterpret_cast<HWND>(wParam), LOWORD(lParam), HIWORD(lParam) );
+	case WM_SETCURSOR:
+		if( OnSetCursor( reinterpret_cast<HWND>(wParam), LOWORD(lParam), HIWORD(lParam) ) ) return 1;
+		break;
 	case WM_ENABLE:
 		OnEnable( wParam != 0 );
 		break;

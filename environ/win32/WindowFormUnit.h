@@ -154,7 +154,8 @@ private:
 	//-- mouse cursor
 	tTVPMouseCursorState MouseCursorState;
 	bool ForceMouseCursorVisible; // true in menu select
-	MouseCursor CurrentMouseCursor;
+	MouseCursor MouseCursorManager;
+	tjs_int CurrentMouseCursor;
 	tjs_int LastMouseScreenX; // managed by RestoreMouseCursor
 	tjs_int LastMouseScreenY;
 
@@ -248,7 +249,7 @@ public:
 	void SetMaskRegion(HRGN threshold);
 	void RemoveMaskRegion();
 
-	void SetMouseCursorToWindow( MouseCursor& cursor );
+	void SetMouseCursorToWindow( tjs_int cursor );
 
 	void HideMouseCursor();
 	void SetMouseCursorState(tTVPMouseCursorState mcs);
@@ -356,14 +357,17 @@ public:
 	virtual void OnResize( int state, int w, int h );
 	virtual void OnDropFile( HDROP hDrop );
 	virtual int OnMouseActivate( HWND hTopLevelParentWnd, WORD hitTestCode, WORD MouseMsg );
+	virtual bool OnSetCursor( HWND hContainsCursorWnd, WORD hitTestCode, WORD MouseMsg );
 	virtual void OnEnable( bool enabled );
 	virtual void OnDeviceChange( int event, void *data );
 	virtual void OnNonClientMouseDown( int button, int hittest, int x, int y );
 	virtual void OnMouseEnter();
 	virtual void OnMouseLeave();
+	virtual void OnEnterMenuLoop( bool entered );
+	virtual void OnExitMenuLoop( bool isShortcutMenu );
 	virtual void OnShow( int status );
 	virtual void OnHide( int status );
-	
+
 	virtual void OnFocus(HWND hFocusLostWnd);
 	virtual void OnFocusLost(HWND hFocusingWnd);
 	
