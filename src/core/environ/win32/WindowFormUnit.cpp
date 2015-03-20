@@ -235,6 +235,7 @@ TTVPWindowForm::TTVPWindowForm( tTVPApplication* app, tTJSNI_Window* ni, tTJSNI_
 	MouseCursorState = mcsVisible;
 	ForceMouseCursorVisible = false;
 	CurrentMouseCursor = crDefault;
+	MouseCursorManager.SetCursorIndex( CurrentMouseCursor, NULL );
 
 	DIWheelDevice = NULL;
 #ifndef DISABLE_EMBEDDED_GAME_PAD
@@ -634,24 +635,24 @@ void TTVPWindowForm::SetMouseCursorVisibleState(bool b) {
 	if(b)
 		SetMouseCursorToWindow( CurrentMouseCursor );
 	else
-		SetMouseCursorToWindow( MouseCursor(crNone) );
+		SetMouseCursorToWindow( crNone );
 }
 void TTVPWindowForm::SetForceMouseCursorVisible(bool s) {
-	if(ForceMouseCursorVisible != s) {
+	if( ForceMouseCursorVisible != s ) {
+		ForceMouseCursorVisible = s;
 		if(s) {
 			// force visible mode
 			// the cursor is to be fixed in crDefault
-			SetMouseCursorToWindow( MouseCursor(crDefault) );
+			SetMouseCursorToWindow( crDefault );
 		} else {
 			// normal mode
 			// restore normal cursor
 			SetMouseCursorVisibleState(MouseCursorState == mcsVisible);
 		}
-		ForceMouseCursorVisible = s;
 	}
 }
-void TTVPWindowForm::SetMouseCursorToWindow( MouseCursor& cursor ) {
-	cursor.SetCursor();
+void TTVPWindowForm::SetMouseCursorToWindow( tjs_int cursor ) {
+	MouseCursorManager.SetCursorIndex( cursor, GetHandle() );
 }
 
 //---------------------------------------------------------------------------
@@ -811,7 +812,7 @@ void TTVPWindowForm::SetFullScreenMode( bool b ) {
 	}
 	CallFullScreenChanged();
 
-	CurrentMouseCursor.SetCursor();
+	MouseCursorManager.UpdateCursor();
 }
 bool TTVPWindowForm::GetFullScreenMode() const { 
 	return TVPFullScreenedWindow == this;
@@ -1279,20 +1280,20 @@ void TTVPWindowForm::SetPaintBoxSize(tjs_int w, tjs_int h) {
 }
 
 void TTVPWindowForm::SetDefaultMouseCursor() {
-	if( !CurrentMouseCursor.IsCurrentCursor(crDefault ) ) {
+	if( CurrentMouseCursor != crDefault ) {
+		CurrentMouseCursor = crDefault;
 		if( MouseCursorState == mcsVisible && !ForceMouseCursorVisible ) {
-			SetMouseCursorToWindow(MouseCursor(crDefault));
+			SetMouseCursorToWindow( crDefault );
 		}
 	}
-	CurrentMouseCursor.SetCursorIndex(crDefault);
 }
 void TTVPWindowForm::SetMouseCursor( tjs_int handle ) {
-	if( !CurrentMouseCursor.IsCurrentCursor(handle ) ) {
+	if( CurrentMouseCursor != handle ) {
+		CurrentMouseCursor = handle;
 		if(MouseCursorState == mcsVisible && !ForceMouseCursorVisible) {
-			SetMouseCursorToWindow( MouseCursor(handle) );
+			SetMouseCursorToWindow( handle );
 		}
 	}
-	CurrentMouseCursor.SetCursorIndex(handle);
 }
 /**
  * クライアント領域座標からウィンドウ領域座標へ変換する
@@ -1778,6 +1779,15 @@ int TTVPWindowForm::OnMouseActivate( HWND hTopLevelParentWnd, WORD hitTestCode, 
 	}
 }
 
+bool TTVPWindowForm::OnSetCursor( HWND hContainsCursorWnd, WORD hitTestCode, WORD MouseMsg ) {
+	if( GetHandle() == hContainsCursorWnd && hitTestCode == HTCLIENT ) {
+		MouseCursorManager.UpdateCursor();
+		return true;
+	}
+	return false;
+}
+
+
 void TTVPWindowForm::OnEnable( bool enabled ) {
 	// enabled status has changed
 	if(TJSNativeInstance) {
@@ -1796,13 +1806,14 @@ void TTVPWindowForm::OnNonClientMouseDown( int button, int hittest, int x, int y
 		DeliverPopupHide();
 	}
 }
+void TTVPWindowForm::OnEnterMenuLoop( bool entered ) {
+	SetForceMouseCursorVisible(true);
+}
+void TTVPWindowForm::OnExitMenuLoop( bool isShortcutMenu ) {
+	SetForceMouseCursorVisible(false);
+}
 void TTVPWindowForm::OnMouseEnter() {
 	// mouse entered in client area
-	if( MouseCursorState == mcsVisible ) {
-		CurrentMouseCursor.SetCursor();
-	} else {
-		SetMouseCursorToWindow( MouseCursor(crNone) );
-	}
 	DWORD tick = GetTickCount();
 	TVPPushEnvironNoise(&tick, sizeof(tick));
 	MouseVelocityTracker.clear();
@@ -1811,8 +1822,6 @@ void TTVPWindowForm::OnMouseEnter() {
 	}
 }
 void TTVPWindowForm::OnMouseLeave() {
-	SetMouseCursorToWindow( MouseCursor(crDefault) );
-
 	// mouse leaved from client area
 	DWORD tick = GetTickCount();
 	TVPPushEnvironNoise(&tick, sizeof(tick));
