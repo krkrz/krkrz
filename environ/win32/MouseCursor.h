@@ -48,19 +48,15 @@ public:
 private:
 	int cursor_index_;
 
-	void UpdateCurrentCursor();
+	int GetCurrentCursor();
 
 public:
 	MouseCursor() : cursor_index_(INVALID_CURSOR_INDEX) {}
 	MouseCursor( int index ) : cursor_index_(index) {}
 
-	void SetCursor();
+	void UpdateCursor();
 
-	bool IsCurrentCursor( int index ) {
-		UpdateCurrentCursor();
-		return cursor_index_ == index;
-	}
-	void SetCursorIndex( int index );
+	void SetCursorIndex( int index, HWND hWnd );
 };
 
 #endif
