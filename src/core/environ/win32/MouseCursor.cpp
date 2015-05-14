@@ -50,7 +50,6 @@ const int MouseCursor::CURSOR_INDEXES[MouseCursor::CURSOR_INDEXES_NUM] = {
 std::vector<HCURSOR> MouseCursor::CURSOR_HANDLES_FOR_INDEXES;
 HCURSOR MouseCursor::CURSOR_HANDLES[CURSOR_EOT];
 bool MouseCursor::CURSOR_INITIALIZED = false;
-bool MouseCursor::is_cursor_hide_ = false;
 
 void MouseCursor::Initialize() {
 	if( CURSOR_INITIALIZED ) return;
@@ -83,54 +82,67 @@ void MouseCursor::Finalize() {
 		}
 	}
 }
-void MouseCursor::UpdateCurrentCursor() {
-	int oldindex = cursor_index_;
-	cursor_index_ = INVALID_CURSOR_INDEX;
+int MouseCursor::GetCurrentCursor() {
 	HCURSOR hCursor = ::GetCursor();
+	// 消去時
+	if( hCursor == NULL ) return crNone;
+
 	int size = CURSOR_HANDLES_FOR_INDEXES.size();
-	int handleIndex = oldindex+CURSOR_OFFSET;
+	int handleIndex = cursor_index_ + CURSOR_OFFSET;
 
 	if( handleIndex >= 0 && handleIndex < size && CURSOR_HANDLES_FOR_INDEXES[handleIndex] == hCursor ) {
-		// まずは旧カーソルと比較
-		cursor_index_ = oldindex; // 変更されていない
+		// まずはcursor_index_カーソルと比較
+		return cursor_index_;
 	} else if( CURSOR_HANDLES[CURSOR_ARROW] == hCursor ) {
 		// 次にデフォルトと比較
-		cursor_index_ = crDefault;
+		return crDefault;
 	} else {
-		// 以前と異なり、デフォルトでもない時は、全てと比較する
+		// それ以外は、全てと比較する
 		for( int i = 0; i < size; i++ ) {
 			if( CURSOR_HANDLES_FOR_INDEXES[i] == hCursor ) {
-				cursor_index_ = i - CURSOR_OFFSET;
-				break;
+				return i - CURSOR_OFFSET;
 			}
 		}
 	}
+	// 全てにマッチしなかった場合
+	return INVALID_CURSOR_INDEX;
 }
 void MouseCursor::SetMouseCursor( int index ) {
-	if( is_cursor_hide_ && index != crNone ) {
-		::ShowCursor( TRUE );
-		is_cursor_hide_ = false;
-	}
-	if( index == crNone ) {
-		if( is_cursor_hide_ != true ) {
-			::ShowCursor( FALSE );
-			is_cursor_hide_ = true;
-		}
-	} else {
+	HCURSOR hCursor = NULL;
+	if( index != crNone ) {
 		int id = index + CURSOR_OFFSET; // crSizeAll = -22, なので、その分加算
 		if( id >= 0 && id < (int)CURSOR_HANDLES_FOR_INDEXES.size() ) {
-			::SetCursor( CURSOR_HANDLES_FOR_INDEXES[id] );
+			hCursor = CURSOR_HANDLES_FOR_INDEXES[id];
 		} else {
-			::SetCursor( CURSOR_HANDLES[CURSOR_ARROW] );
+			hCursor = CURSOR_HANDLES[CURSOR_ARROW];
+		}
+	}
+	::SetCursor( hCursor );
+}
+void MouseCursor::UpdateCursor() {
+	if( cursor_index_ != INVALID_CURSOR_INDEX ) {
+		int index = GetCurrentCursor();
+		if( index == INVALID_CURSOR_INDEX || index != cursor_index_ ) {
+			SetMouseCursor( cursor_index_ );
 		}
 	}
 }
-void MouseCursor::SetCursor() {
-	if( cursor_index_ != INVALID_CURSOR_INDEX ) {
-		SetMouseCursor( cursor_index_ );
-	}
-}
+void MouseCursor::SetCursorIndex( int index, HWND hWnd ) {
+	if( cursor_index_ != index ) {
+		cursor_index_ = index;
 
-void MouseCursor::SetCursorIndex( int index ) {
-	cursor_index_ = index;
+		if( hWnd ) {
+			POINT p;
+			::GetCursorPos(&p);
+			HWND hTarget = ::WindowFromPoint(p);
+			if ( hTarget && hTarget == hWnd ) {
+				LRESULT hitTestCode = ::SendMessage( hWnd, WM_NCHITTEST, 0, MAKELPARAM(p.x, p.y) );
+				if( index == crDefault ) {
+					::SendMessage( hWnd, WM_SETCURSOR, WPARAM(hWnd), (LPARAM)MAKELONG(hitTestCode, WM_MOUSEMOVE) );
+				} else if ( hitTestCode == HTCLIENT ) {
+					SetMouseCursor( index );
+				}
+			}
+		}
+	}
 }

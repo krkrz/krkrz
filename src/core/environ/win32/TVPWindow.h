@@ -283,6 +283,7 @@ public:
 	virtual void OnResize( int state, int w, int h ) {}
 	virtual void OnDropFile( HDROP hDrop ) {}
 	virtual int OnMouseActivate( HWND hTopLevelParentWnd, WORD hitTestCode, WORD MouseMsg ) { return MA_ACTIVATE; }
+	virtual bool OnSetCursor( HWND hContainsCursorWnd, WORD hitTestCode, WORD MouseMsg ) { return false; }
 	virtual void OnEnable( bool enabled ) {}
 	virtual void OnEnterMenuLoop( bool entered ) {}
 	virtual void OnExitMenuLoop( bool isShortcutMenu ) {}

@@ -20,8 +20,8 @@
 #include <tpcshrd.h> // for MICROSOFT_TABLETPENSERVICE_PROPERTY
 
 // touch mouse message extraInfo (cf. http://msdn.microsoft.com/en-us/library/windows/desktop/ms703320(v=vs.85).aspx )
-const DWORD tTVPWindow::MI_WP_SIGNATURE = 0xFF515700;
-const DWORD tTVPWindow::SIGNATURE_MASK  = 0xFFFFFF00;
+const DWORD tTVPWindow::MI_WP_SIGNATURE = 0xFF515780;
+const DWORD tTVPWindow::SIGNATURE_MASK  = 0xFFFFFF80;
 
 tTVPWindow::~tTVPWindow() {
 	if( ime_control_ ) delete ime_control_;
@@ -324,6 +324,9 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		return 0;
 	case WM_MOUSEACTIVATE:
 		return OnMouseActivate( reinterpret_cast<HWND>(wParam), LOWORD(lParam), HIWORD(lParam) );
+	case WM_SETCURSOR:
+		if( OnSetCursor( reinterpret_cast<HWND>(wParam), LOWORD(lParam), HIWORD(lParam) ) ) return 1;
+		break;
 	case WM_ENABLE:
 		OnEnable( wParam != 0 );
 		break;
