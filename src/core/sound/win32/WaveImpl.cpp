@@ -204,7 +204,7 @@ static void TVPInitSoundOptions()
 		if(n > 0 && n < 600000) TVPL2BufferLength = n;
 	}
 
-	if(TVPGetCommandLine(TJS_W("-wsvolfactor"), &val))
+	if(TVPGetCommandLine(TJS_W("-dsvolfactor"), &val))
 	{
 		tjs_int n = (tjs_int)val;
 		if(n > 0 && n < 200000) TVPVolumeLogFactor = n;
