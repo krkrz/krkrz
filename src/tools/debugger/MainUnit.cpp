@@ -543,15 +543,16 @@ AnsiString __fastcall TScriptDebuggerForm::LoadTextFile( const AnsiString& path 
 						delete stream;
 						return astring;
 					} else {
-						int count = ::MultiByteToWideChar(CP_UTF8,MB_PRECOMPOSED|MB_ERR_INVALID_CHARS, &(nbuf[0]), -1, NULL, 0);
+						int count = ::MultiByteToWideChar(CP_UTF8,0, &(nbuf[0]), -1, NULL, 0);
 						if( count > 0 ) {
 							std::vector<wchar_t> tmp(count);
-							int ret = ::MultiByteToWideChar(CP_UTF8,MB_PRECOMPOSED|MB_ERR_INVALID_CHARS, &(nbuf[0]), -1, &(tmp[0]), count);
+							int ret = ::MultiByteToWideChar(CP_UTF8,0, &(nbuf[0]), -1, &(tmp[0]), count);
 							if( ret > 0 ) {
-								int sjiscount = ::WideCharToMultiByte(CP_ACP, 0, &(tmp[0]), count, NULL, 0, NULL, NULL );
+								BOOL DefChar;
+								int sjiscount = ::WideCharToMultiByte(CP_ACP, 0, &(tmp[0]), count, NULL, 0, "¬", &DefChar );
 								if( sjiscount > 0 ) {
 									std::vector<char> retchar(sjiscount+1);
-									ret = ::WideCharToMultiByte(CP_ACP, 0, &(tmp[0]), count, &(retchar[0]), sjiscount, NULL, NULL );
+									ret = ::WideCharToMultiByte(CP_ACP, 0, &(tmp[0]), count, &(retchar[0]), sjiscount, "¬", &DefChar );
 									if( ret > 0 ) {
 										retchar[sjiscount] = 0;
 										AnsiString astring(&(retchar[0]));
