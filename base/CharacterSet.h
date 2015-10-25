@@ -20,6 +20,7 @@
 TJS_EXP_FUNC_DEF(tjs_int, TVPWideCharToUtf8String, (const tjs_char *in, char * out));
 TJS_EXP_FUNC_DEF(tjs_int, TVPUtf8ToWideCharString, (const char * in, tjs_char *out));
 
+extern tjs_int TVPUtf8ToWideCharString(const char * in, tjs_uint length, tjs_char *out);
 
 
 #endif

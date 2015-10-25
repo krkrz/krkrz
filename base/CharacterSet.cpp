@@ -213,4 +213,49 @@ tjs_int TVPUtf8ToWideCharString(const char * in, tjs_char *out)
 	return count;
 }
 //---------------------------------------------------------------------------
+tjs_int TVPUtf8ToWideCharString(const char * in, tjs_uint length, tjs_char *out)
+{
+	// convert input utf-8 string to output wide string
+	int count = 0;
+	const char *end = in + length;
+	while(*in && in < end)
+	{
+		if(in + 6 > end)
+		{
+			// fetch utf-8 character length
+			const unsigned char ch = *(const unsigned char *)in;
+
+			if(ch >= 0x80)
+			{
+				tjs_uint len = 0;
+
+				if(ch < 0xc2) return -1;
+				else if(ch < 0xe0) len = 2;
+				else if(ch < 0xf0) len = 3;
+				else if(ch < 0xf8) len = 4;
+				else if(ch < 0xfc) len = 5;
+				else if(ch < 0xfe) len = 6;
+				else return -1;
+
+				if(in + len > end) return -1;
+			}
+		}
+
+		tjs_char c;
+		if(out)
+		{
+			if(!TVPUtf8ToWideChar(in, &c))
+				return -1; // invalid character found
+			*out++ = c;
+		}
+		else
+		{
+			if(!TVPUtf8ToWideChar(in, NULL))
+				return -1; // invalid character found
+		}
+		count ++;
+	}
+	return count;
+}
+//---------------------------------------------------------------------------
 
