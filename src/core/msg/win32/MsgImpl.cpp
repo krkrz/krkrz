@@ -57,13 +57,13 @@ ttstr TVPReadAboutStringFromResource() {
 	if( buf == NULL ) ttstr(L"Resource Read Error.");
 
 	// UTF-8 to UTF-16
-	size_t len = TVPUtf8ToWideCharString( buf, NULL );
+	size_t len = TVPUtf8ToWideCharString( buf, size, NULL );
 	if( len < 0 ) return ttstr(L"Resource Read Error.");
 	wchar_t* tmp = new wchar_t[len+1];
 	ttstr ret;
 	if( tmp ) {
 		try {
-			len = TVPUtf8ToWideCharString( buf, tmp );
+			len = TVPUtf8ToWideCharString( buf, size, tmp );
 		} catch(...) {
 			delete[] tmp;
 			throw;
