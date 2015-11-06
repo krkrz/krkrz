@@ -361,6 +361,35 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/* func. name */load)
 }
 TJS_END_NATIVE_METHOD_DECL(/* func.name */load)
 //----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/loadStruct)
+{
+	if(numparams<1) return TJS_E_BADPARAMCOUNT;
+
+	ttstr name(*param[0]);
+	ttstr mode;
+	if(numparams >= 2 && param[1]->Type() != tvtVoid) mode =*param[1];
+
+	if(result)
+	{
+		tTJSBinaryStream* stream = TJSCreateBinaryStreamForRead(name, mode);
+		if( stream ) {
+			bool isbin = false;
+			try {
+				isbin = tTJS::LoadBinaryDictionayArray( stream, result );
+			} catch(...) {
+				delete stream;
+				throw;
+			}
+			delete stream;
+			if( isbin ) return TJS_S_OK;
+		}
+		return TJS_E_INVALIDPARAM;
+	}
+
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_STATIC_METHOD_DECL(/*func. name*/loadStruct)
+//----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/* func. name */save)
 {
 	// saves the array into a file.
