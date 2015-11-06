@@ -300,7 +300,7 @@ tTJSVariant* tTJSBinarySerializer::ReadDictionary( const tjs_uint8* buff, const 
 		tTJSVariant* value = ReadBasicType( buff, size, index );
 		AddDictionary( dic, name, value );
 		delete value;
-		name->Release();
+		if( name ) name->Release();
 	}
 	tTJSVariant* ret = new tTJSVariant( dic, dic );
 	dic->Release();

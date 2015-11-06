@@ -165,6 +165,9 @@ public:
 	bool LoadByteCode( class tTJSBinaryStream* stream, tTJSVariant *result = NULL,
 		iTJSDispatch2 *context = NULL, const tjs_char *name = NULL);
 
+	// for Binary Dictionay Array
+	static bool LoadBinaryDictionayArray( class tTJSBinaryStream* stream, tTJSVariant *result );
+
 	void CompileScript( const tjs_char *script, class tTJSBinaryStream* output, bool isresultneeded = false, bool outputdebug = false, bool isexpression = false, const tjs_char *name = NULL, tjs_int lineofs = 0 );
 };
 //---------------------------------------------------------------------------

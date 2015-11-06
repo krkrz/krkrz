@@ -565,6 +565,32 @@ bool tTJS::LoadByteCode( class tTJSBinaryStream* stream, tTJSVariant *result,
 	return ret;
 }
 //---------------------------------------------------------------------------
+bool tTJS::LoadBinaryDictionayArray( class tTJSBinaryStream* stream, tTJSVariant *result )
+{
+	if( result == NULL ) return false;
+
+	bool ret = false;
+	try {
+		tjs_uint64 streamlen = stream->GetSize();
+		if( streamlen >= tTJSBinarySerializer::HEADER_LENGTH ) {
+			tjs_uint8 header[tTJSBinarySerializer::HEADER_LENGTH];
+			stream->Read( header, tTJSBinarySerializer::HEADER_LENGTH );
+			if( tTJSBinarySerializer::IsBinary( header ) ) {
+				tTJSBinarySerializer binload;
+				tTJSVariant* var = binload.Read( stream );
+				if( var ) {
+					*result = *var;
+					delete var;
+					ret = true;
+				}
+			}
+		}
+	} catch(...) {
+		throw;
+	}
+	return ret;
+}
+//---------------------------------------------------------------------------
 void tTJS::CompileScript( const tjs_char *script, class tTJSBinaryStream* output, bool isresultneeded, bool outputdebug, bool isexpression, const tjs_char *name, tjs_int lineofs )
 {
 	tTJSScriptBlock *blk = new tTJSScriptBlock(this);
