@@ -52,28 +52,58 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/loadStruct)
 {
 	if(numparams<1) return TJS_E_BADPARAMCOUNT;
 
+	bool dicfree = true;
+	tTJSDictionaryObject* dic = NULL;
+	if( objthis ) {
+		tTJSDictionaryNI* ni;
+		tjs_error hr = objthis->NativeInstanceSupport(TJS_NIS_GETINSTANCE, TJS_NATIVE_CLASSID_NAME, (iTJSNativeInstance**)&ni);
+		if( TJS_SUCCEEDED(hr) ) {
+			if(!ni->IsValid()) return TJS_E_INVALIDOBJECT;
+			ni->Clear();
+			dic = (tTJSDictionaryObject*)objthis;
+			dicfree = false;
+		}
+	}
+
 	ttstr name(*param[0]);
 	ttstr mode;
 	if(numparams >= 2 && param[1]->Type() != tvtVoid) mode =*param[1];
 
-	if(result)
-	{
-		tTJSBinaryStream* stream = TJSCreateBinaryStreamForRead(name, mode);
-		if( stream ) {
-			bool isbin = false;
-			try {
-				isbin = tTJS::LoadBinaryDictionayArray( stream, result );
-			} catch(...) {
-				delete stream;
-				throw;
-			}
-			delete stream;
-			if( isbin ) return TJS_S_OK;
-		}
-		return TJS_E_INVALIDPARAM;
-	}
+	tTJSBinaryStream* stream = TJSCreateBinaryStreamForRead(name, mode);
+	if( !stream ) return TJS_E_INVALIDPARAM;
 
-	return TJS_S_OK;
+	bool isbin = false;
+	try {
+		tjs_uint64 streamlen = stream->GetSize();
+		if( streamlen >= tTJSBinarySerializer::HEADER_LENGTH ) {
+			tjs_uint8 header[tTJSBinarySerializer::HEADER_LENGTH];
+			stream->Read( header, tTJSBinarySerializer::HEADER_LENGTH );
+			if( tTJSBinarySerializer::IsBinary( header ) ) {
+				if( !dic ) dic = (tTJSDictionaryObject*)TJSCreateDictionaryObject();
+				tTJSBinarySerializer binload(dic);
+				tTJSVariant* var = binload.Read( stream );
+				if( var ) {
+					if( result ) *result = *var;
+					delete var;
+					isbin = true;
+				}
+				if( dicfree ) {
+					if( dic ) dic->Release();
+					dic = NULL;
+				}
+			}
+		}
+	} catch(...) {
+		delete stream;
+		if( dicfree ) {
+			if( dic ) dic->Release();
+			dic = NULL;
+		}
+		throw;
+	}
+	delete stream;
+	if( isbin ) return TJS_S_OK;
+	return TJS_E_INVALIDPARAM;
 }
 TJS_END_NATIVE_STATIC_METHOD_DECL(/*func. name*/loadStruct)
 //----------------------------------------------------------------------
