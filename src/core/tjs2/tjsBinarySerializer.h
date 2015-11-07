@@ -447,11 +447,16 @@ public:
 	static void PutVariant( tTJSBinaryStream* stream, tTJSVariant& v );
 	
 	tTJSBinarySerializer();
+	tTJSBinarySerializer( class tTJSDictionaryObject* root );
+	tTJSBinarySerializer( class tTJSArrayObject* root );
 	~tTJSBinarySerializer();
 	tTJSVariant* Read( tTJSBinaryStream* stream );
 
 private:
 	iTJSDispatch2* DicClass;
+	class tTJSDictionaryObject* RootDictionary;
+	class tTJSArrayObject* RootArray;
+
 	class tTJSDictionaryObject* CreateDictionary( tjs_uint count );
 	class tTJSArrayObject* CreateArray( tjs_uint count );
 	void AddDictionary( class tTJSDictionaryObject* dic, tTJSVariantString* name, tTJSVariant* value );

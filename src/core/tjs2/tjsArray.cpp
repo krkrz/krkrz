@@ -363,32 +363,44 @@ TJS_END_NATIVE_METHOD_DECL(/* func.name */load)
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/loadStruct)
 {
+	TJS_GET_NATIVE_INSTANCE(/* var. name */ni, /* var. type */tTJSArrayNI);
+
 	if(numparams<1) return TJS_E_BADPARAMCOUNT;
 
 	ttstr name(*param[0]);
 	ttstr mode;
 	if(numparams >= 2 && param[1]->Type() != tvtVoid) mode =*param[1];
 
-	if(result)
-	{
-		tTJSBinaryStream* stream = TJSCreateBinaryStreamForRead(name, mode);
-		if( stream ) {
-			bool isbin = false;
-			try {
-				isbin = tTJS::LoadBinaryDictionayArray( stream, result );
-			} catch(...) {
-				delete stream;
-				throw;
-			}
-			delete stream;
-			if( isbin ) return TJS_S_OK;
-		}
-		return TJS_E_INVALIDPARAM;
-	}
+	ni->Items.clear();
 
-	return TJS_S_OK;
+	tTJSBinaryStream* stream = TJSCreateBinaryStreamForRead(name, mode);
+	if( !stream ) return TJS_E_INVALIDPARAM;
+
+	bool isbin = false;
+	try {
+		tjs_uint64 streamlen = stream->GetSize();
+		if( streamlen >= tTJSBinarySerializer::HEADER_LENGTH ) {
+			tjs_uint8 header[tTJSBinarySerializer::HEADER_LENGTH];
+			stream->Read( header, tTJSBinarySerializer::HEADER_LENGTH );
+			if( tTJSBinarySerializer::IsBinary( header ) ) {
+				tTJSBinarySerializer binload((tTJSArrayObject*)objthis);
+				tTJSVariant* var = binload.Read( stream );
+				if( var ) {
+					if( result ) *result = *var;
+					delete var;
+					isbin = true;
+				}
+			}
+		}
+	} catch(...) {
+		delete stream;
+		throw;
+	}
+	delete stream;
+	if( isbin ) return TJS_S_OK;
+	return TJS_E_INVALIDPARAM;
 }
-TJS_END_NATIVE_STATIC_METHOD_DECL(/*func. name*/loadStruct)
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/loadStruct)
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/* func. name */save)
 {
