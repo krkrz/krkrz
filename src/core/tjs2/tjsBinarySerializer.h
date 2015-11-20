@@ -13,6 +13,7 @@
 #include "tjsTypes.h"
 #include "tjsVariant.h"
 #include "tjsError.h"
+#include "tjsGlobalStringMap.h"
 #include <vector>
 #include <limits.h>
 
@@ -415,17 +416,20 @@ public:
 			}
 			ret = TJSAllocVariantString( str, len );
 			delete str;
-		} else {
-			ret = TJSAllocVariantStringBuffer(0);
 		}
 		return ret;
 	}
 	static inline tTJSVariant* ReadStringVarint( const tjs_uint8* buff, tjs_uint len, tjs_uint& index ) {
 		tTJSVariantString* ret = ReadString( buff, len, index );
-		tTJSVariant* var = new tTJSVariant();
-		*var = ret;
-		ret->Release();
-		return var;
+		if( !ret ) {
+			tTJSVariant* var = new tTJSVariant(TJSMapGlobalStringMap(ttstr()));
+			return var;
+		} else {
+			ttstr str(ret);
+			tTJSVariant* var = new tTJSVariant(TJSMapGlobalStringMap(str));
+			ret->Release();
+			return var;
+		}
 	}
 	static inline tTJSVariant* ReadOctetVarint( const tjs_uint8* buff, tjs_uint len, tjs_uint& index ) {
 		tTJSVariantOctet* oct = TJSAllocVariantOctet( &buff[index], len );
@@ -443,11 +447,16 @@ public:
 	static void PutVariant( tTJSBinaryStream* stream, tTJSVariant& v );
 	
 	tTJSBinarySerializer();
+	tTJSBinarySerializer( class tTJSDictionaryObject* root );
+	tTJSBinarySerializer( class tTJSArrayObject* root );
 	~tTJSBinarySerializer();
 	tTJSVariant* Read( tTJSBinaryStream* stream );
 
 private:
 	iTJSDispatch2* DicClass;
+	class tTJSDictionaryObject* RootDictionary;
+	class tTJSArrayObject* RootArray;
+
 	class tTJSDictionaryObject* CreateDictionary( tjs_uint count );
 	class tTJSArrayObject* CreateArray( tjs_uint count );
 	void AddDictionary( class tTJSDictionaryObject* dic, tTJSVariantString* name, tTJSVariant* value );

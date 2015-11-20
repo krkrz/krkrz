@@ -66,7 +66,11 @@ void tTJSBinarySerializer::PutVariant( tTJSBinaryStream* stream, tTJSVariant& v 
 	}
 }
 
-tTJSBinarySerializer::tTJSBinarySerializer() : DicClass(NULL) {
+tTJSBinarySerializer::tTJSBinarySerializer() : DicClass(NULL), RootDictionary(NULL), RootArray(NULL) {
+}
+tTJSBinarySerializer::tTJSBinarySerializer( class tTJSDictionaryObject* root ) : DicClass(NULL), RootDictionary(root), RootArray(NULL) {
+}
+tTJSBinarySerializer::tTJSBinarySerializer( class tTJSArrayObject* root ) : DicClass(NULL), RootDictionary(NULL), RootArray(root) {
 }
 tTJSBinarySerializer::~tTJSBinarySerializer() {
 	if( DicClass ) DicClass->Release();
@@ -74,6 +78,16 @@ tTJSBinarySerializer::~tTJSBinarySerializer() {
 }
 
 tTJSDictionaryObject* tTJSBinarySerializer::CreateDictionary( tjs_uint count ) {
+	if( RootDictionary ) {
+		tTJSDictionaryObject* ret = RootDictionary;
+		RootDictionary = NULL;
+		ret->RebuildHash( (tjs_int)count );
+		ret->AddRef();
+		return ret;
+	}
+	if( RootArray ) {
+		TJSThrowFrom_tjs_error(TJS_E_INVALIDPARAM);	// Œ^‚ªˆá‚¤
+	}
 	if( DicClass == NULL ) {
 		iTJSDispatch2* dsp = TJSCreateDictionaryObject(&DicClass);
 		dsp->Release();
@@ -85,6 +99,15 @@ tTJSDictionaryObject* tTJSBinarySerializer::CreateDictionary( tjs_uint count ) {
 	return dic;
 }
 tTJSArrayObject* tTJSBinarySerializer::CreateArray( tjs_uint count ) {
+	if( RootArray ) {
+		tTJSArrayObject* ret = RootArray;
+		RootArray = NULL;
+		ret->AddRef();
+		return ret;
+	}
+	if( RootDictionary ) {
+		TJSThrowFrom_tjs_error(TJS_E_INVALIDPARAM);	// Œ^‚ªˆá‚¤
+	}
 	tTJSArrayObject* array = (tTJSArrayObject*)TJSCreateArrayObject();
 	return array;
 }
@@ -300,7 +323,7 @@ tTJSVariant* tTJSBinarySerializer::ReadDictionary( const tjs_uint8* buff, const 
 		tTJSVariant* value = ReadBasicType( buff, size, index );
 		AddDictionary( dic, name, value );
 		delete value;
-		name->Release();
+		if( name ) name->Release();
 	}
 	tTJSVariant* ret = new tTJSVariant( dic, dic );
 	dic->Release();
