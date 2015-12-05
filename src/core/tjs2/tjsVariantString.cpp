@@ -902,11 +902,13 @@ tTJSVariantString * TJSFormatString(const tjs_char *format, tjs_uint numparams,
 			//tjs_char *p;
 			tjs_char fmt[70];
 			tjs_uint fmtlen = f - fst;
-			if(fmtlen > 67) goto error;  // too long
+			if(fmtlen > 65) goto error;  // too long
 			TJS_strncpy(fmt, fst, fmtlen);
-			fmt[fmtlen] = TJS_W('L'); //// CHECK!! 'L' must indicate a 64bit integer
-			fmt[fmtlen+1] = *f;
-			fmt[fmtlen+2] = 0;
+			fmt[fmtlen] = TJS_W('I'); //// CHECK!! 'I64' must indicate a 64bit integer
+			fmt[fmtlen+1] = TJS_W('6');
+			fmt[fmtlen+2] = TJS_W('4');
+			fmt[fmtlen+3] = *f;
+			fmt[fmtlen+4] = 0;
 			int ind[2];
 			if(!width_ind && !prec_ind)
 			{
