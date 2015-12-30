@@ -973,6 +973,9 @@
     <ClCompile Include="..\visual\LoadJXR.cpp">
       <Filter>visual</Filter>
     </ClCompile>
+    <ClCompile Include="..\visual\IA32\detect_cpu.cpp">
+      <Filter>visual\IA32</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="tvpwin32.rc">
