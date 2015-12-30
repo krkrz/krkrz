@@ -769,6 +769,114 @@
 					{ "value":"no", "desc":"使用可能であっても使用しない" },
 					{ "value":"force", "desc":"強制的に使用する" }
 				]
+			},
+			{
+				"caption":"SSE3",
+				"description":"CPU 認識トラブルが起こったときに調整してください。",
+				"name":"cpusse3",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"使用可能であれば使用する", "default":true },
+					{ "value":"no", "desc":"使用可能であっても使用しない" },
+					{ "value":"force", "desc":"強制的に使用する" }
+				]
+			},
+			{
+				"caption":"SSSE3",
+				"description":"CPU 認識トラブルが起こったときに調整してください。",
+				"name":"cpussse3",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"使用可能であれば使用する", "default":true },
+					{ "value":"no", "desc":"使用可能であっても使用しない" },
+					{ "value":"force", "desc":"強制的に使用する" }
+				]
+			},
+			{
+				"caption":"SSE4.1",
+				"description":"CPU 認識トラブルが起こったときに調整してください。",
+				"name":"cpusse41",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"使用可能であれば使用する", "default":true },
+					{ "value":"no", "desc":"使用可能であっても使用しない" },
+					{ "value":"force", "desc":"強制的に使用する" }
+				]
+			},
+			{
+				"caption":"SSE4.2",
+				"description":"CPU 認識トラブルが起こったときに調整してください。",
+				"name":"cpusse42",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"使用可能であれば使用する", "default":true },
+					{ "value":"no", "desc":"使用可能であっても使用しない" },
+					{ "value":"force", "desc":"強制的に使用する" }
+				]
+			},
+			{
+				"caption":"SSE4a",
+				"description":"CPU 認識トラブルが起こったときに調整してください。",
+				"name":"cpusse4a",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"使用可能であれば使用する", "default":true },
+					{ "value":"no", "desc":"使用可能であっても使用しない" },
+					{ "value":"force", "desc":"強制的に使用する" }
+				]
+			},
+			{
+				"caption":"AVX",
+				"description":"CPU 認識トラブルが起こったときに調整してください。",
+				"name":"cpuavx",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"使用可能であれば使用する", "default":true },
+					{ "value":"no", "desc":"使用可能であっても使用しない" },
+					{ "value":"force", "desc":"強制的に使用する" }
+				]
+			},
+			{
+				"caption":"AVX2",
+				"description":"CPU 認識トラブルが起こったときに調整してください。",
+				"name":"cpuavx2",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"使用可能であれば使用する", "default":true },
+					{ "value":"no", "desc":"使用可能であっても使用しない" },
+					{ "value":"force", "desc":"強制的に使用する" }
+				]
+			},
+			{
+				"caption":"FMA3",
+				"description":"CPU 認識トラブルが起こったときに調整してください。",
+				"name":"cpufma3",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"使用可能であれば使用する", "default":true },
+					{ "value":"no", "desc":"使用可能であっても使用しない" },
+					{ "value":"force", "desc":"強制的に使用する" }
+				]
+			},
+			{
+				"caption":"AES",
+				"description":"CPU 認識トラブルが起こったときに調整してください。",
+				"name":"cpuaes",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"使用可能であれば使用する", "default":true },
+					{ "value":"no", "desc":"使用可能であっても使用しない" },
+					{ "value":"force", "desc":"強制的に使用する" }
+				]
 			}
 		]
 	},

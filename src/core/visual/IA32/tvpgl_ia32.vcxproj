@@ -157,15 +157,6 @@
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).nas</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
     </CustomBuild>
-    <CustomBuild Include="detect_cpu.nas">
-      <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).nas</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).nas</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).nas</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).nas</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
-    </CustomBuild>
     <CustomBuild Include="lightenblend.nas">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -o ./$(Configuration)/%(Filename).obj %(Filename).nas</Command>
