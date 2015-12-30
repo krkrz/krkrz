@@ -37,9 +37,6 @@
     <CustomBuild Include="darkenblend.nas">
       <Filter>ASM Source</Filter>
     </CustomBuild>
-    <CustomBuild Include="detect_cpu.nas">
-      <Filter>ASM Source</Filter>
-    </CustomBuild>
     <CustomBuild Include="lightenblend.nas">
       <Filter>ASM Source</Filter>
     </CustomBuild>

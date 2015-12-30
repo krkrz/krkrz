@@ -444,6 +444,7 @@
     <ClCompile Include="..\visual\FreeTypeFontRasterizer.cpp" />
     <ClCompile Include="..\visual\GraphicsLoaderIntf.cpp" />
     <ClCompile Include="..\visual\GraphicsLoadThread.cpp" />
+    <ClCompile Include="..\visual\IA32\detect_cpu.cpp" />
     <ClCompile Include="..\visual\IA32\tvpgl_ia32_intf.c" />
     <ClCompile Include="..\visual\ImageFunction.cpp" />
     <ClCompile Include="..\visual\LayerBitmapImpl.cpp" />
