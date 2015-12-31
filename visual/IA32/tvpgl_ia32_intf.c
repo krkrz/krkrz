@@ -16,8 +16,7 @@ extern tjs_uint32 TVPCPUType;
 
 void TVPGL_IA32_Init()
 {
-
-
+#ifndef TJS_64BIT_OS
 if(TVPCPUType & TVP_CPU_HAS_MMX)
 	 TVPAdditiveAlphaBlend =  TVPAdditiveAlphaBlend_mmx_a;
 if(TVPCPUType & TVP_CPU_HAS_MMX)
@@ -363,7 +362,7 @@ if(TVPCPUType & TVP_CPU_HAS_MMX)
 	 TVPUnivTransBlend_switch =  TVPUnivTransBlend_switch_mmx_a;
 if(TVPCPUType & TVP_CPU_HAS_EMMX && TVPCPUType & TVP_CPU_HAS_MMX)
 	 TVPUnivTransBlend_switch =  TVPUnivTransBlend_switch_emmx_a;
-
+#endif
 }
 
 
