@@ -276,7 +276,11 @@ static void TVPWriteHWELogFile()
 //---------------------------------------------------------------------------
 //void __cdecl TVP__dee_hacked_getExceptionObjectHook(int ErrorCode,
 //		EXCEPTION_RECORD *P, unsigned long osEsp, unsigned long osERR, PCONTEXT ctx)
+#ifdef TJS_64BIT_OS
+void TVPHandleSEHException( int ErrorCode, EXCEPTION_RECORD *P, unsigned long long osEsp, PCONTEXT ctx)
+#else
 void TVPHandleSEHException( int ErrorCode, EXCEPTION_RECORD *P, unsigned long osEsp, PCONTEXT ctx)
+#endif
 {
 	// exception hook function
 	int len;
@@ -468,8 +472,10 @@ void TVPDumpOSContext(const CONTEXT &ctx)
 		line += TJS_W("CONTEXT_INTEGER ");
 	if(ctx.ContextFlags & CONTEXT_CONTROL)
 		line += TJS_W("CONTEXT_CONTROL ");
+#ifndef TJS_64BIT_OS
 	if(ctx.ContextFlags & CONTEXT_EXTENDED_REGISTERS)
 		line += TJS_W("CONTEXT_EXTENDED_REGISTERS ");
+#endif
 	line += TJS_W("]");
 
 	TVPAddLog(line);
@@ -494,18 +500,39 @@ void TVPDumpOSContext(const CONTEXT &ctx)
 	TVPAddLog(buf);
 
 	// - Generic Integer Registers
+#ifdef TJS_64BIT_OS
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("Integer Registers : EAX:0x%016lx  EBX:0x%016lx  ECX:0x%016lx  EDX:0x%016lx"),
+		ctx.Rax, ctx.Rbx, ctx.Rcx, ctx.Rdx);
+	TVPAddLog(buf);
+	
+	TJS_snprintf(buf, BUF_SIZE, TJS_W(" R8:0x%016lx   R9:0x%016lx  R10:0x%016lx  R11:0x%016lx"), ctx.R8, ctx.R9, ctx.R10, ctx.R11);
+	TVPAddLog(buf);
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("R12:0x%016lx  R13:0x%016lx  R14:0x%016lx  R15:0x%016lx"), ctx.R12, ctx.R13, ctx.R14, ctx.R15);
+	TVPAddLog(buf);
+#else
 	TJS_snprintf(buf, BUF_SIZE, TJS_W("Integer Registers : EAX:0x%08X  EBX:0x%08X  ECX:0x%08X  EDX:0x%08X"),
 		ctx.Eax, ctx.Ebx, ctx.Ecx, ctx.Edx);
 	TVPAddLog(buf);
+#endif
 
 	// - Index Registers
+#ifdef TJS_64BIT_OS
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("Index Registers   : ESI:0x%016lx  EDI:0x%016lx"),
+		ctx.Rsi, ctx.Rdi);
+#else
 	TJS_snprintf(buf, BUF_SIZE, TJS_W("Index Registers   : ESI:0x%08X  EDI:0x%08X"),
 		ctx.Esi, ctx.Edi);
+#endif
 	TVPAddLog(buf);
 
 	// - Pointer Registers
+#ifdef TJS_64BIT_OS
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("Pointer Registers : EBP:0x%016lx  ESP:0x%016lx  EIP:0x%016lx"),
+		ctx.Rbp, ctx.Rsp, ctx.Rip);
+#else
 	TJS_snprintf(buf, BUF_SIZE, TJS_W("Pointer Registers : EBP:0x%08X  ESP:0x%08X  EIP:0x%08X"),
 		ctx.Ebp, ctx.Esp, ctx.Eip);
+#endif
 	TVPAddLog(buf);
 
 	// - Flag Register
@@ -536,6 +563,31 @@ void TVPDumpOSContext(const CONTEXT &ctx)
 	// - FP registers
 
 	// -- control words
+#ifdef TJS_64BIT_OS
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("FP Control Word : 0x%08X   FP Status Word : 0x%08X   FP Tag Word : 0x%08X"),
+		ctx.FltSave.ControlWord, ctx.FltSave.StatusWord, ctx.FltSave.TagWord);
+	TVPAddLog(buf);
+
+	// -- offsets/selectors
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("FP Error Offset : 0x%08X   FP Error Selector : 0x%08X"),
+		ctx.FltSave.ErrorOffset, ctx.FltSave.ErrorSelector);
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("FP Data Offset  : 0x%08X   FP Data Selector  : 0x%08X"),
+		ctx.FltSave.DataOffset, ctx.FltSave.DataSelector);
+
+	// -- registers
+	long double *ptr = (long double *)&(ctx.FltSave.FloatRegisters[0]);
+	for(tjs_int i = 0; i < 8; i++)
+	{
+		TJS_snprintf(buf, BUF_SIZE, TJS_W("FP ST(%d) : %28.20Lg 0x%04X%016I64X"), i,
+			ptr[i], (unsigned int)*(tjs_uint16*)(((tjs_uint8*)(ptr + i)) + 8),
+			*(tjs_uint64*)(ptr + i));
+		TVPAddLog(buf);
+	}
+
+	// -- Cr0NpxState
+	TJS_snprintf(buf, BUF_SIZE,TJS_W("FP MX CSR   : 0x%08X"), ctx.FltSave.MxCsr);	//
+	TVPAddLog(buf);
+#else
 	TJS_snprintf(buf, BUF_SIZE, TJS_W("FP Control Word : 0x%08X   FP Status Word : 0x%08X   FP Tag Word : 0x%08X"),
 		ctx.FloatSave.ControlWord, ctx.FloatSave.StatusWord, ctx.FloatSave.TagWord);
 	TVPAddLog(buf);
@@ -559,8 +611,53 @@ void TVPDumpOSContext(const CONTEXT &ctx)
 	// -- Cr0NpxState
 	TJS_snprintf(buf, BUF_SIZE,TJS_W("FP CR0 NPX State  : 0x%08X"), ctx.FloatSave.Cr0NpxState);
 	TVPAddLog(buf);
+#endif
+	
+#ifdef TJS_64BIT_OS
+	// Debug registers
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("Debug Registers : Dr0:0x%016lx  Dr1:0x%016lx  Dr2:0x%016lx  Dr3:0x%016lx  Dr6:0x%016lx  Dr7:0x%016lx"),
+		ctx.Dr0, ctx.Dr1, ctx.Dr2, ctx.Dr3, ctx.Dr6, ctx.Dr7);
+	TVPAddLog(buf);
+#endif
 
 	// -- SSE/SSE2 registers
+#ifdef TJS_64BIT_OS
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("XMM  0 : 0x%016lx 0x%016lx"),ctx.Xmm0.High, ctx.Xmm0.Low);
+	TVPAddLog(buf);
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("XMM  1 : 0x%016lx 0x%016lx"),ctx.Xmm1.High, ctx.Xmm1.Low);
+	TVPAddLog(buf);
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("XMM  2 : 0x%016lx 0x%016lx"),ctx.Xmm2.High, ctx.Xmm2.Low);
+	TVPAddLog(buf);
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("XMM  3 : 0x%016lx 0x%016lx"),ctx.Xmm3.High, ctx.Xmm3.Low);
+	TVPAddLog(buf);
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("XMM  4 : 0x%016lx 0x%016lx"),ctx.Xmm4.High, ctx.Xmm4.Low);
+	TVPAddLog(buf);
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("XMM  5 : 0x%016lx 0x%016lx"),ctx.Xmm5.High, ctx.Xmm5.Low);
+	TVPAddLog(buf);
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("XMM  6 : 0x%016lx 0x%016lx"),ctx.Xmm6.High, ctx.Xmm6.Low);
+	TVPAddLog(buf);
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("XMM  7 : 0x%016lx 0x%016lx"),ctx.Xmm7.High, ctx.Xmm7.Low);
+	TVPAddLog(buf);
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("XMM  8 : 0x%016lx 0x%016lx"),ctx.Xmm8.High, ctx.Xmm8.Low);
+	TVPAddLog(buf);
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("XMM  9 : 0x%016lx 0x%016lx"),ctx.Xmm9.High, ctx.Xmm9.Low);
+	TVPAddLog(buf);
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("XMM 10 : 0x%016lx 0x%016lx"),ctx.Xmm10.High, ctx.Xmm10.Low);
+	TVPAddLog(buf);
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("XMM 11 : 0x%016lx 0x%016lx"),ctx.Xmm11.High, ctx.Xmm11.Low);
+	TVPAddLog(buf);
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("XMM 12 : 0x%016lx 0x%016lx"),ctx.Xmm12.High, ctx.Xmm12.Low);
+	TVPAddLog(buf);
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("XMM 13 : 0x%016lx 0x%016lx"),ctx.Xmm13.High, ctx.Xmm13.Low);
+	TVPAddLog(buf);
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("XMM 14 : 0x%016lx 0x%016lx"),ctx.Xmm14.High, ctx.Xmm14.Low);
+	TVPAddLog(buf);
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("XMM 15 : 0x%016lx 0x%016lx"),ctx.Xmm15.High, ctx.Xmm15.Low);
+	TVPAddLog(buf);
+
+	TJS_snprintf(buf,BUF_SIZE,  TJS_W("MXCSR : 0x%08x"), ctx.MxCsr );
+	TVPAddLog(buf);
+#else
 	if(ctx.ContextFlags & CONTEXT_EXTENDED_REGISTERS)
 	{
 		// ExtendedRegisters is a area which meets fxsave and fxrstor instruction?
@@ -601,6 +698,7 @@ void TVPDumpOSContext(const CONTEXT &ctx)
 			*(DWORD*)(ctx.ExtendedRegisters + 0x18));
 		TVPAddLog(buf);
 	}
+#endif
 }
 //---------------------------------------------------------------------------
 void TVPDumpHWException()
@@ -1193,7 +1291,9 @@ void TVPAfterSystemInit()
 	TVPDumpOptions();
 
 	// initilaize x86 graphic routines
+#ifndef TJS_64BIT_OS
 	TVPGL_IA32_Init();
+#endif
 
 	// timer precision
 	UINT prectick = 1;

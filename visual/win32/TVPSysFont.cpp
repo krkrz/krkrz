@@ -292,7 +292,7 @@ static int CALLBACK EnumAllFontsProc( LOGFONT *lplf, TEXTMETRIC *lptm, DWORD typ
 }
 void TVPGetAllFontList( std::vector<std::wstring>& list ) {
 	HDC dc = ::GetDC(NULL);
-	::EnumFonts(dc, NULL, (int (__stdcall *)())EnumAllFontsProc,(LPARAM)&list );
+	::EnumFonts(dc, NULL, (FONTENUMPROC)EnumAllFontsProc,(LPARAM)&list );
  	::ReleaseDC(NULL, dc);
 }
 
