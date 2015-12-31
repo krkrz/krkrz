@@ -58,6 +58,7 @@ static void TVPGetCPUTypeForOne()
 #endif
 
 	// check OSFXSR WinXP以降ならサポートしているので、もうこのチェックは無意味かな
+#ifndef TJS_64BIT_OS
 	if(TVPCPUFeatures & TVP_CPU_HAS_SSE)
 	{
 		__try {
@@ -74,7 +75,7 @@ static void TVPGetCPUTypeForOne()
 			TVPCPUFeatures &=~ TVP_CPU_HAS_SSE42;
 		}
 	}
-
+#endif
 }
 //---------------------------------------------------------------------------
 
@@ -231,6 +232,47 @@ void TVPDetectCPU()
 	if(TVPCPUChecked) return;
 	TVPCPUChecked = true;
 
+#ifdef TJS_64BIT_OS
+
+	// get process affinity mask
+	ULONGLONG pam = 1;
+	HANDLE hp = ::OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, ::GetCurrentProcessId());
+	if(hp)
+	{
+		ULONGLONG sam = 1;
+		::GetProcessAffinityMask(hp, (PDWORD_PTR)&pam, (PDWORD_PTR)&sam);
+		::CloseHandle(hp);
+	}
+
+	// for each CPU...
+	ttstr cpuinfo;
+	bool first = true;
+	tjs_uint32 features = 0;
+	for(tjs_int cpu = 0; cpu < 64; cpu++)
+	{
+		if(pam & (1ULL<<cpu))
+		{
+			tTVPCPUCheckThread * thread = new tTVPCPUCheckThread(1<<cpu);
+			thread->WaitEnd();
+			bool succeeded = thread->GetSucceeded();
+			delete thread;
+			if(!succeeded) throw Exception(L"CPU check failure");
+			cpuinfo += TVPDumpCPUInfo(cpu) + TJS_W("\r\n");
+
+			// mask features
+			if(first)
+			{
+				features =  (TVPCPUFeatures & TVP_CPU_FEATURE_MASK);
+				TVPCPUType = TVPCPUFeatures;
+				first = false;
+			}
+			else
+			{
+				features &= (TVPCPUFeatures & TVP_CPU_FEATURE_MASK);
+			}
+		}
+	}
+#else
 	// get process affinity mask
 	DWORD pam = 1;
 	HANDLE hp = ::OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, ::GetCurrentProcessId());
@@ -269,7 +311,7 @@ void TVPDetectCPU()
 			}
 		}
 	}
-
+#endif
 	TVPCPUType &= ~ TVP_CPU_FEATURE_MASK;
 	TVPCPUType |= features;
 
