@@ -231,7 +231,7 @@ tjs_uint32 TVPCheckCPU()
 	if( featureEcx & (1<<20) ) flags |= TVP_CPU_HAS_SSE42;
 	if( featureEcx & (1<<25) ) flags |= TVP_CPU_HAS_AES;
 	if( featureEcx & (1<<28) ) flags |= TVP_CPU_HAS_AVX;
-	if( featureEcx & (1<<4) ) flags |= TVP_CPU_HAS_TSC;
+	if( feature & (1<<4) ) flags |= TVP_CPU_HAS_TSC;
 
 	GetCpuidEx( 7, eax, ebx, ecx, edx, 0 );
 	int featureEbx = ebx;
@@ -250,9 +250,16 @@ tjs_uint32 TVPCheckCPU()
 
 	// OS Check
 #ifdef _MSC_VER
-	// YMMレジスタ(AVX)はWindowsなら7 SP1以降
-	if( !__os_has_avx_support() ) {
-		flags &= ~(TVP_CPU_HAS_AVX|TVP_CPU_HAS_AVX2);
+	if( flags & (TVP_CPU_HAS_AVX|TVP_CPU_HAS_AVX2) ) {
+		__try {
+			// YMMレジスタ(AVX)はWindowsなら7 SP1以降
+			if( !__os_has_avx_support() ) {
+				flags &= ~(TVP_CPU_HAS_AVX|TVP_CPU_HAS_AVX2);
+			}
+		} __except(EXCEPTION_EXECUTE_HANDLER) {
+			// exception had been ocured
+			flags &= ~(TVP_CPU_HAS_AVX|TVP_CPU_HAS_AVX2);
+		} 
 	}
 #endif
 
