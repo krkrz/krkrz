@@ -15,6 +15,7 @@
 
 #ifdef __WIN32__
 #include <float.h>
+#include <intrin.h>
 #endif
 
 namespace TJS
@@ -380,11 +381,15 @@ void TJSNativeDebuggerBreak()
 	// debugger, or the program may cause an unhandled debugger breakpoint
 	// exception.
 
-#if defined(__WIN32__) && defined(_M_IX86)
-	#ifdef __BORLANDC__
-			__emit__ (0xcc); // int 3 (Raise debugger breakpoint exception)
+#if defined(__WIN32__)
+	#if defined(_M_IX86)
+		#ifdef __BORLANDC__
+				__emit__ (0xcc); // int 3 (Raise debugger breakpoint exception)
+		#else
+				_asm _emit 0xcc; // int 3 (Raise debugger breakpoint exception)
+		#endif
 	#else
-			_asm _emit 0xcc; // int 3 (Raise debugger breakpoint exception)
+		__debugbreak();
 	#endif
 #endif
 }
@@ -401,7 +406,7 @@ static bool TJSFPUInit = false;
 #endif
 void TJSSetFPUE()
 {
-#if defined(__WIN32__) && !defined(__GNUC__)
+#if defined(__WIN32__) && !defined(__GNUC__) && !defined(_M_X64)
 	if(!TJSFPUInit)
 	{
 		TJSFPUInit = true;
@@ -426,7 +431,7 @@ void TJSSetFPUE()
 void TJSRestoreFPUE()
 {
 
-#if defined(__WIN32__) && !defined(__GNUC__)
+#if defined(__WIN32__) && !defined(__GNUC__) && !defined(_M_X64)
 	if(!TJSFPUInit) return;
 	_control87(TJSDefaultFPUCW, 0xffff);
 #endif
