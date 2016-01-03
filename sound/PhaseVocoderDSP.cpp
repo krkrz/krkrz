@@ -48,6 +48,8 @@ extern "C"
 #ifdef _WIN32
 #define TVP_CDECL __cdecl
 #endif
+	
+#ifndef TJS_64BIT_OS
 void TVP_CDECL sse__ZN20tRisaPhaseVocoderDSP11ProcessCoreEi(tRisaPhaseVocoderDSP *_this, int ch);
 void TVP_CDECL def__ZN20tRisaPhaseVocoderDSP11ProcessCoreEi(tRisaPhaseVocoderDSP *_this, int ch);
 void TVP_CDECL sse__Z31RisaInterleaveOverlappingWindowPfPKPKfS_ijj(float * dest, const float * const * src,
@@ -58,6 +60,7 @@ void TVP_CDECL sse__Z30RisaDeinterleaveApplyingWindowPPfPKfS_ijj(float * dest[],
 					float * win, int numch, size_t destofs, size_t len);
 void TVP_CDECL def__Z30RisaDeinterleaveApplyingWindowPPfPKfS_ijj(float * dest[], const float * src,
 					float * win, int numch, size_t destofs, size_t len);
+#endif
 }
 
 //---------------------------------------------------------------------------
@@ -318,6 +321,8 @@ bool tRisaPhaseVocoderDSP::GetOutputBuffer(
 //---------------------------------------------------------------------------
 tRisaPhaseVocoderDSP::tStatus tRisaPhaseVocoderDSP::Process()
 {
+	
+#ifndef TJS_64BIT_OS
 	bool use_sse =
 			(TVPCPUType & TVP_CPU_HAS_MMX) &&
 			(TVPCPUType & TVP_CPU_HAS_SSE) &&
@@ -454,7 +459,8 @@ tRisaPhaseVocoderDSP::tStatus tRisaPhaseVocoderDSP::Process()
 	// 入出力バッファのポインタを進める
 	OutputBuffer.AdvanceWritePos(OutputHopSize * Channels);
 	InputBuffer.AdvanceReadPos(InputHopSize * Channels);
-
+	
+#endif
 	// ステータス = no error
 	return psNoError;
 }

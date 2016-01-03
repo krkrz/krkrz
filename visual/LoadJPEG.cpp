@@ -7,6 +7,8 @@
 #include "MsgIntf.h"
 #include "tvpgl.h"
 
+
+#ifndef TJS_64BIT_OS
 extern "C"
 {
 #define XMD_H
@@ -14,12 +16,13 @@ extern "C"
 #include <jpeglib.h>
 #include <jerror.h>
 }
-
+#endif
 
 //---------------------------------------------------------------------------
 // JPEG loading handler
 //---------------------------------------------------------------------------
 tTVPJPEGLoadPrecision TVPJPEGLoadPrecision = jlpMedium;
+#ifndef TJS_64BIT_OS
 //---------------------------------------------------------------------------
 struct my_error_mgr
 {
@@ -148,12 +151,13 @@ jpeg_TStream_src (j_decompress_ptr cinfo, tTJSBinaryStream * infile)
   src->pub.bytes_in_buffer = 0; /* forces fill_input_buffer on first read */
   src->pub.next_input_byte = NULL; /* until buffer loaded */
 }
-
+#endif
 //---------------------------------------------------------------------------
 void TVPLoadJPEG(void* formatdata, void *callbackdata, tTVPGraphicSizeCallback sizecallback,
 	tTVPGraphicScanLineCallback scanlinecallback, tTVPMetaInfoPushCallback metainfopushcallback,
 	tTJSBinaryStream *src, tjs_int keyidx,  tTVPGraphicLoadMode mode)
 {
+#ifndef TJS_64BIT_OS
 	// JPEG loading handler
 
 	// JPEG does not support palettized image
@@ -292,8 +296,10 @@ void TVPLoadJPEG(void* formatdata, void *callbackdata, tTVPGraphicSizeCallback s
 
 	jpeg_finish_decompress(&cinfo);
 	jpeg_destroy_decompress(&cinfo);
+#endif
 }
 //---------------------------------------------------------------------------
+#ifndef TJS_64BIT_OS
 struct stream_destination_mgr {
 	struct jpeg_destination_mgr	pub;		/* public fields */
 	tTJSBinaryStream*			stream;
@@ -348,6 +354,7 @@ METHODDEF(void) JPEG_write_stream( j_compress_ptr cinfo, JOCTET* buffer, int buf
 	dest->pub.empty_output_buffer = JPEG_write_empty_output_buffer;
 	dest->pub.term_destination = JPEG_write_term_destination;
 }
+#endif
 //---------------------------------------------------------------------------
 /**
  * JPG‘‚«ž‚Ý
@@ -358,6 +365,7 @@ METHODDEF(void) JPEG_write_stream( j_compress_ptr cinfo, JOCTET* buffer, int buf
  */
 void TVPSaveAsJPG( const ttstr & storagename, const ttstr & mode, const tTVPBaseBitmap* image )
 {
+#ifndef TJS_64BIT_OS
 	if(!image->Is32BPP())
 		TVPThrowInternalError;
 
@@ -429,4 +437,5 @@ void TVPSaveAsJPG( const ttstr & storagename, const ttstr & mode, const tTVPBase
 	}
 	delete[] dest_buf;
 	delete stream;
+#endif
 }

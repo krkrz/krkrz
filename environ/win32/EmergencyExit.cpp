@@ -43,7 +43,32 @@ class tTVPEmergencyExitThread : public tTVPThread
 public:
 	tTVPEmergencyExitThread() : tTVPThread(true)
 	{
+#ifdef TJS_64BIT_OS
+		// get pam
+		ULONGLONG pam = 1;// process affinity mask
+		HANDLE hp = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, GetCurrentProcessId());
+		if(hp)
+		{
+			ULONGLONG sam = 1;
+			GetProcessAffinityMask(hp, (PDWORD_PTR)&pam, (PDWORD_PTR)&sam);
+			CloseHandle(hp);
 
+			// set tam to run only upon one processor (for proper working with rdtsc)
+			DWORD tam = pam;
+			tjs_int bit;
+			for(bit = 0; bit <= 31; bit++)
+			{
+				if(tam & (1<<bit)) break;
+			}
+			bit ++;
+			for(; bit <= 31; bit++)
+			{
+				tam &= ~(1<<bit);
+			}
+
+			SetThreadAffinityMask(GetHandle(), tam);
+		}
+#else
 		// get pam
 		DWORD pam = 1;// process affinity mask
 		HANDLE hp = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, GetCurrentProcessId());
@@ -68,7 +93,7 @@ public:
 
 			SetThreadAffinityMask(GetHandle(), tam);
 		}
-
+#endif
 		Resume();
 	}
 
