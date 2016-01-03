@@ -99,7 +99,11 @@ bool TVPGetAsyncKeyState(tjs_uint keycode, bool getcurrent)
 //---------------------------------------------------------------------------
 ttstr TVPGetPlatformName()
 {
+#ifdef TJS_64BIT_OS
+	static ttstr platform(TJS_W("Win64"));
+#else
 	static ttstr platform(TJS_W("Win32"));
+#endif
 	return platform;
 }
 //---------------------------------------------------------------------------

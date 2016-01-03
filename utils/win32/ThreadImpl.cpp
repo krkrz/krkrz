@@ -203,6 +203,7 @@ void TVPBeginThreadTask(tjs_int taskNum)
   TVPThreadTaskCount = 0;
   tjs_int extraThreadNum = TVPGetThreadNum() - 1;
   if (TVPProcesserIdList.empty()) {
+#ifndef TJS_64BIT_OS
     DWORD processAffinityMask, systemAffinityMask;
     GetProcessAffinityMask(GetCurrentProcess(),
                            &processAffinityMask,
@@ -211,6 +212,16 @@ void TVPBeginThreadTask(tjs_int taskNum)
       if (processAffinityMask & (1 << i))
         TVPProcesserIdList.push_back(i);
     }
+#else
+    ULONGLONG processAffinityMask, systemAffinityMask;
+    GetProcessAffinityMask(GetCurrentProcess(),
+                           (PDWORD_PTR)&processAffinityMask,
+                           (PDWORD_PTR)&systemAffinityMask);
+    for (tjs_int i = 0; i < MAXIMUM_PROCESSORS; i++) {
+      if (processAffinityMask & (1ULL << i))
+        TVPProcesserIdList.push_back(i);
+    }
+#endif
     if (TVPProcesserIdList.empty())
       TVPProcesserIdList.push_back(MAXIMUM_PROCESSORS);
   }

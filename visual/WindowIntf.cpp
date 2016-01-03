@@ -291,8 +291,13 @@ void tTJSNI_BaseWindow::SetDrawDeviceObject(const tTJSVariant & val)
 		tTJSVariant iface_v;
 		if(TJS_FAILED(clo.PropGet(0, TJS_W("interface"), NULL, &iface_v, NULL)))
 			TVPThrowExceptionMessage( TVPCannotRetriveInterfaceFromDrawDevice );
+#ifndef TJS_64BIT_OS
 		DrawDevice =
 			reinterpret_cast<iTVPDrawDevice *>((long)(tjs_int64)iface_v);
+#else	// x64
+		DrawDevice =
+			reinterpret_cast<iTVPDrawDevice *>((tjs_int64)iface_v);
+#endif
 		DrawDevice->SetWindowInterface(const_cast<tTJSNI_BaseWindow*>(this));
 		ResetDrawDevice();
 	}

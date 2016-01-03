@@ -31,7 +31,7 @@ static tjs_int TVPLastScreenWidth = 0;
 static tjs_int TVPLastScreenHeight = 0;
 static tjs_int TVPLastOFNLeft = -30000;
 static tjs_int TVPLastOFNTop = -30000;
-static UINT APIENTRY TVPOFNHookProc(HWND hdlg, UINT uiMsg, WPARAM wParam,
+static UINT_PTR APIENTRY TVPOFNHookProc(HWND hdlg, UINT uiMsg, WPARAM wParam,
 	LPARAM lParam)
 {
 	if(uiMsg == WM_INITDIALOG)

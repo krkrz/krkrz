@@ -45,7 +45,11 @@ kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32
 */
 
 tTVPApplication* Application;
+#ifdef TJS_64BIT_OS
+extern void TVPHandleSEHException( int ErrorCode, EXCEPTION_RECORD *P, unsigned long long osEsp, PCONTEXT ctx);
+#else
 extern void TVPHandleSEHException( int ErrorCode, EXCEPTION_RECORD *P, unsigned long osEsp, PCONTEXT ctx);
+#endif
 
 // アプリケーションの開始時に呼ぶ
 inline void CheckMemoryLeaksStart()
@@ -269,7 +273,11 @@ void se_translator_function(unsigned int code, struct _EXCEPTION_POINTERS* ep) {
 	if( !TVPIsHandledHWException ) {
 		//ShowStackTrace( ep->ContextRecord );
 		TVPWriteHWEDumpFile( ep );
+#ifdef TJS_64BIT_OS
+		TVPHandleSEHException( code, ep->ExceptionRecord, ep->ContextRecord->Rsp, ep->ContextRecord );
+#else
 		TVPHandleSEHException( code, ep->ExceptionRecord, ep->ContextRecord->Esp, ep->ContextRecord );
+#endif
 		TVPIsHandledHWException = true;
 	}
 	throw SEHException(code,ep);
