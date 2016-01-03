@@ -57,7 +57,7 @@ static void TVPGetCPUTypeForOne()
 	}
 #endif
 
-	// check OSFXSR
+	// check OSFXSR WinXP以降ならサポートしているので、もうこのチェックは無意味かな
 	if(TVPCPUFeatures & TVP_CPU_HAS_SSE)
 	{
 		__try {
@@ -68,6 +68,10 @@ static void TVPGetCPUTypeForOne()
 			// execution of 'xorps' is failed (XMM registers not available)
 			TVPCPUFeatures &=~ TVP_CPU_HAS_SSE;
 			TVPCPUFeatures &=~ TVP_CPU_HAS_SSE2;
+			TVPCPUFeatures &=~ TVP_CPU_HAS_SSE3;
+			TVPCPUFeatures &=~ TVP_CPU_HAS_SSSE3;
+			TVPCPUFeatures &=~ TVP_CPU_HAS_SSE41;
+			TVPCPUFeatures &=~ TVP_CPU_HAS_SSE42;
 		}
 	}
 
@@ -143,6 +147,19 @@ static ttstr TVPDumpCPUFeatures(tjs_uint32 features)
 	TVP_DUMP_CPU(TVP_CPU_HAS_SSE2, "SSE2");
 	TVP_DUMP_CPU(TVP_CPU_HAS_TSC, "TSC");
 
+	TVP_DUMP_CPU(TVP_CPU_HAS_TSCP, "TSCP");
+	TVP_DUMP_CPU(TVP_CPU_HAS_SSE3, "SSE3");
+	TVP_DUMP_CPU(TVP_CPU_HAS_SSSE3, "SSSE3");
+	TVP_DUMP_CPU(TVP_CPU_HAS_SSE41, "SSE41");
+	TVP_DUMP_CPU(TVP_CPU_HAS_SSE42, "SSE42");
+	TVP_DUMP_CPU(TVP_CPU_HAS_SSE4a, "SSE4A");
+	TVP_DUMP_CPU(TVP_CPU_HAS_AVX, "AVX");
+	TVP_DUMP_CPU(TVP_CPU_HAS_AVX2, "AVX2");
+	TVP_DUMP_CPU(TVP_CPU_HAS_FMA3, "FMA3");
+	TVP_DUMP_CPU(TVP_CPU_HAS_AES, "AES");
+	TVP_DUMP_CPU(TVP_CPU_HAS_RDRAND, "RDRAND");
+	TVP_DUMP_CPU(TVP_CPU_HAS_RDSEED, "RDSEED");
+
 	return ret;
 }
 //---------------------------------------------------------------------------
@@ -167,6 +184,8 @@ static ttstr TVPDumpCPUInfo(tjs_int cpu_num)
 	TVP_DUMP_CPU(TVP_CPU_IS_RISE, "Rise");
 	TVP_DUMP_CPU(TVP_CPU_IS_UMC, "UMC");
 	TVP_DUMP_CPU(TVP_CPU_IS_TRANSMETA, "Transmeta");
+	TVP_DUMP_CPU(TVP_CPU_IS_NSC, "NSC");
+	TVP_DUMP_CPU(TVP_CPU_IS_COMPAQ, "Compaq");
 
 	TVP_DUMP_CPU(TVP_CPU_IS_UNKNOWN, "Unknown");
 
@@ -266,6 +285,16 @@ void TVPDetectCPU()
 	TVPDisableCPU(TVP_CPU_HAS_EMMX, TJS_W("-cpuemmx"));
 	TVPDisableCPU(TVP_CPU_HAS_SSE2, TJS_W("-cpusse2"));
 
+	TVPDisableCPU(TVP_CPU_HAS_SSE3, TJS_W("-cpusse3"));
+	TVPDisableCPU(TVP_CPU_HAS_SSSE3, TJS_W("-cpussse3"));
+	TVPDisableCPU(TVP_CPU_HAS_SSE41, TJS_W("-cpusse41"));
+	TVPDisableCPU(TVP_CPU_HAS_SSE42, TJS_W("-cpusse42"));
+	TVPDisableCPU(TVP_CPU_HAS_SSE4a, TJS_W("-cpusse4a"));
+	TVPDisableCPU(TVP_CPU_HAS_AVX, TJS_W("-cpuavx"));
+	TVPDisableCPU(TVP_CPU_HAS_AVX2, TJS_W("-cpuavx2"));
+	TVPDisableCPU(TVP_CPU_HAS_FMA3, TJS_W("-cpufma3"));
+	TVPDisableCPU(TVP_CPU_HAS_AES, TJS_W("-cpuaes"));
+
 	if(TVPCPUType == 0)
 		throw Exception( TVPFormatMessage(TVPCpuCheckFailureNotSupprtedCpu, cpuinfo).c_str() );
 
@@ -305,11 +334,3 @@ tjs_uint32 TVPGetCPUType()
 }
 //---------------------------------------------------------------------------
 
-#ifdef NOT_USE_ASM
-tjs_uint64 TVPGetTSC() {
-	if( TVPCPUType & TVP_CPU_HAS_TSC ) {
-		return __rdtsc();
-	}
-	return 0;
-}
-#endif
