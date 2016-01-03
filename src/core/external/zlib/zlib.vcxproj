@@ -151,6 +151,7 @@
     <ClCompile Include="contrib\masmx64\inffas8664.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\;</AdditionalIncludeDirectories>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="crc32.c" />
     <ClCompile Include="deflate.c" />
@@ -210,6 +211,8 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ml64 /Zi /c /safeseh /Fl$(Configuration)64\%(Filename).lst /Fo $(Configuration)64\%(Filename).obj contrib\masmx64\%(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).asm</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Configuration)64\%(Filename).obj</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </CustomBuild>
     <CustomBuild Include="contrib\masmx64\inffasx64.asm">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).asm</Message>
@@ -218,6 +221,8 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Configuration)64\%(Filename).obj</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ml64 /Zi /c /safeseh /Fl$(Configuration)64\%(Filename).lst /Fo $(Configuration)64\%(Filename).obj contrib\masmx64\%(Filename).asm</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).asm</Message>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
