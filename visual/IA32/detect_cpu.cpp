@@ -191,10 +191,7 @@ tjs_uint32 TVPCheckCPU()
 	int vendor = GetCpuVendor( maxCpuId );
 
 	unsigned long flags = 0;
-	
-	// FPUÇ¬Ç¢ÇƒÇ»Ç¢ CPU Ç»ÇÒÇƒç°éûÇ»Ç¢ÇæÇÎÇ∆åæÇ§Ç±Ç∆Ç≈åàÇﬂë≈Çø
-	flags |= TVP_CPU_HAS_FPU;
-	
+
 	int eax, ebx, ecx, edx;
 	GetCpuid( 0x80000000, eax, ebx, ecx, edx );
 	int maxCpuIdEx = eax;
@@ -205,7 +202,9 @@ tjs_uint32 TVPCheckCPU()
 		featureExEcx = ecx;
 		featureEx = edx;
 
+		if( featureEx & 1 ) flags |= TVP_CPU_HAS_FPU;
 		if( featureEx & (1<<22) ) flags |= TVP_CPU_HAS_EMMX;
+		if( featureEx & (1<<27) ) flags |= TVP_CPU_HAS_TSCP;
 		if( featureEx & (1<<31) ) flags |= TVP_CPU_HAS_3DN;
 		if( featureEx & (1<<30) ) flags |= TVP_CPU_HAS_E3DN;
 		if( featureExEcx & (1<<6) ) flags |= TVP_CPU_HAS_SSE4a;
@@ -217,6 +216,7 @@ tjs_uint32 TVPCheckCPU()
 	int featureEcx = ecx;
 	int feature = edx;
 
+	if( feature & 1 ) flags |= TVP_CPU_HAS_FPU;
 	if( feature & (1<<23) ) flags |= TVP_CPU_HAS_MMX;
 	if( feature & (1<<15) ) flags |= TVP_CPU_HAS_CMOV;
 	if( feature & (1<<25) ) {
@@ -231,11 +231,13 @@ tjs_uint32 TVPCheckCPU()
 	if( featureEcx & (1<<20) ) flags |= TVP_CPU_HAS_SSE42;
 	if( featureEcx & (1<<25) ) flags |= TVP_CPU_HAS_AES;
 	if( featureEcx & (1<<28) ) flags |= TVP_CPU_HAS_AVX;
+	if( featureEcx & (1<<30) ) flags |= TVP_CPU_HAS_RDRAND;
 	if( feature & (1<<4) ) flags |= TVP_CPU_HAS_TSC;
 
 	GetCpuidEx( 7, eax, ebx, ecx, edx, 0 );
 	int featureEbx = ebx;
 	if( featureEbx & (1<<5) ) flags |= TVP_CPU_HAS_AVX2;
+	if( featureEbx & (1<<18) ) flags |= TVP_CPU_HAS_RDSEED;
 
 	if( vendor == TVP_CPU_IS_INTEL && maxCpuId >= 0x00000004 ) {
 		GetCpuid( 0x00000004, eax, ebx, ecx, edx );
@@ -271,6 +273,13 @@ tjs_uint32 TVPCheckCPU()
 tjs_uint64 TVPGetTSC() {
 	if( TVPCPUType & TVP_CPU_HAS_TSC ) {
 		return __rdtsc();
+	}
+	return 0;
+}
+
+tjs_uint64 TVPGetTSCP( tjs_uint32 *aux ) {
+	if( TVPCPUType & TVP_CPU_HAS_TSCP ) {
+		return __rdtscp(aux);
 	}
 	return 0;
 }
