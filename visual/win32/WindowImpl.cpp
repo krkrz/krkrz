@@ -2075,8 +2075,8 @@ TJS_BEGIN_NATIVE_METHOD_DECL(registerMessageReceiver)
 	if(numparams < 3) return TJS_E_BADPARAMCOUNT;
 
 	_this->RegisterWindowMessageReceiver((tTVPWMRRegMode)((tjs_int)*param[0]),
-		reinterpret_cast<void *>((tjs_int)(*param[1])),
-		reinterpret_cast<const void *>((tjs_int)(*param[2])));
+		reinterpret_cast<void *>((tjs_intptr_t)(*param[1])),
+		reinterpret_cast<const void *>((tjs_intptr_t)(*param[2])));
 
 	return TJS_S_OK;
 }
@@ -2195,7 +2195,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(HWND)
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
-		*result = (tTVInteger)(tjs_uint)_this->GetWindowHandleForPlugin();
+		*result = (tTVInteger)(tjs_intptr_t)_this->GetWindowHandleForPlugin();
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_GETTER
