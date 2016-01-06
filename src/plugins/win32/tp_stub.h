@@ -55,6 +55,13 @@ typedef double tjs_real;
 #define TJS_I64_VAL(x) ((tjs_int64)(x##i64))
 #define TJS_UI64_VAL(x) ((tjs_uint64)(x##i64))
 
+#ifdef _M_X64
+#define TJS_64BIT_OS	/* 64bit windows */
+#endif
+
+typedef intptr_t tjs_intptr_t;
+typedef uintptr_t tjs_uintptr_t;
+
 
 
 #define TJS_W(X) L##X
@@ -5889,6 +5896,7 @@ enum tTVPVideoOverlayMode {
 	vomOverlay,		// Overlay
 	vomLayer,		// Draw Layer
 	vomMixer,		// VMR
+	vomMFEVR,		// Media Foundation with EVR
 };
 
 
@@ -6288,27 +6296,43 @@ typedef struct
 //---------------------------------------------------------------------------
 
 
-#define TVP_CPU_HAS_FPU 0x000010000
-#define TVP_CPU_HAS_MMX 0x000020000
-#define TVP_CPU_HAS_3DN 0x000040000
-#define TVP_CPU_HAS_SSE 0x000080000
-#define TVP_CPU_HAS_CMOV 0x000100000
-#define TVP_CPU_HAS_E3DN 0x000200000
-#define TVP_CPU_HAS_EMMX 0x000400000
-#define TVP_CPU_HAS_SSE2 0x000800000
-#define TVP_CPU_HAS_TSC 0x001000000
-#define TVP_CPU_FEATURE_MASK 0x0ffff0000
-#define TVP_CPU_IS_INTEL 0x000000010
-#define TVP_CPU_IS_AMD 0x000000020
-#define TVP_CPU_IS_IDT 0x000000030
-#define TVP_CPU_IS_CYRIX 0x000000040
-#define TVP_CPU_IS_NEXGEN 0x000000050
-#define TVP_CPU_IS_RISE 0x000000060
-#define TVP_CPU_IS_UMC 0x000000070
-#define TVP_CPU_IS_TRANSMETA 0x000000080
-#define TVP_CPU_IS_UNKNOWN 0x000000000
-#define TVP_CPU_VENDOR_MASK 0x000000ff0
-#define TVP_CPU_FAMILY_MASK 0x00000000f
+#define TVP_CPU_HAS_FPU      0x00010000
+#define TVP_CPU_HAS_MMX      0x00020000
+#define TVP_CPU_HAS_3DN      0x00040000
+#define TVP_CPU_HAS_SSE      0x00080000
+#define TVP_CPU_HAS_CMOV     0x00100000
+#define TVP_CPU_HAS_E3DN     0x00200000
+#define TVP_CPU_HAS_EMMX     0x00400000
+#define TVP_CPU_HAS_SSE2     0x00800000
+#define TVP_CPU_HAS_TSC      0x01000000
+#define TVP_CPU_HAS_SSE3     0x02000000
+#define TVP_CPU_HAS_SSSE3    0x04000000
+#define TVP_CPU_HAS_SSE41    0x08000000
+#define TVP_CPU_HAS_SSE42    0x10000000
+#define TVP_CPU_HAS_SSE4a    0x20000000
+#define TVP_CPU_HAS_AVX      0x40000000
+#define TVP_CPU_HAS_AVX2     0x80000000
+#define TVP_CPU_HAS_FMA3     0x00001000
+#define TVP_CPU_HAS_AES      0x00002000
+#define TVP_CPU_HAS_TSCP     0x00004000
+#define TVP_CPU_HAS_RDRAND   0x00008000
+#define TVP_CPU_HAS_RDSEED   0x00000100
+#define TVP_CPU_FEATURE_MASK 0xffffff00
+
+#define TVP_CPU_IS_UNKNOWN   0x00000000
+#define TVP_CPU_IS_INTEL     0x00000010
+#define TVP_CPU_IS_AMD       0x00000020
+#define TVP_CPU_IS_IDT       0x00000030
+#define TVP_CPU_IS_CYRIX     0x00000040
+#define TVP_CPU_IS_NEXGEN    0x00000050
+#define TVP_CPU_IS_RISE      0x00000060
+#define TVP_CPU_IS_UMC       0x00000070
+#define TVP_CPU_IS_TRANSMETA 0x00000080
+#define TVP_CPU_IS_NSC       0x00000090
+#define TVP_CPU_IS_COMPAQ    0x000000a0
+#define TVP_CPU_VENDOR_MASK  0x000000f0
+
+#define TVP_CPU_FAMILY_MASK  0x0000000f
 
 
 
