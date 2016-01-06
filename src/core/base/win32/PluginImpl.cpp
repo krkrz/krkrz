@@ -544,7 +544,11 @@ void TVPLoadPluigins(void)
 
 	TVPSearchPluginsAt(list, exepath);
 	TVPSearchPluginsAt(list, exepath + L"system\\");
+#ifdef TJS_64BIT_OS
+	TVPSearchPluginsAt(list, exepath + L"plugin64\\");
+#else
 	TVPSearchPluginsAt(list, exepath + L"plugin\\");
+#endif
 
 	// sort by filename
 	std::sort(list.begin(), list.end());

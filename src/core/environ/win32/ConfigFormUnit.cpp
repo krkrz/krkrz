@@ -307,8 +307,13 @@ void ConfigFormUnit::LoadOptionTree() {
 	if( options ) {
 		LoadPluginOptionDesc( options, L"\\", L"dll" );
 		LoadPluginOptionDesc( options, L"\\", L"tpm" );
+#ifdef TJS_64BIT_OS
+		LoadPluginOptionDesc( options, L"plugin64\\", L"dll" );
+		LoadPluginOptionDesc( options, L"plugin64\\", L"tpm" );
+#else
 		LoadPluginOptionDesc( options, L"plugin\\", L"dll" );
 		LoadPluginOptionDesc( options, L"plugin\\", L"tpm" );
+#endif
 
 		tTJSVariant val;
 		HTREEITEM hFirst = NULL;
