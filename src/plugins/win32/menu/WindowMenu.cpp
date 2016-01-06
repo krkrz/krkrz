@@ -62,7 +62,7 @@ int WindowMenuItem::GetMenuIndex() const {
 	size_t count = parent_->children_.size();
 	for( size_t i = 0; i < count; i++ ) {
 		if( parent_->children_[i] == this ) {
-			return i;
+			return (int)i;
 		}
 	}
 	return -1;
@@ -82,7 +82,7 @@ void WindowMenuItem::UpdateChildren() {
 			::RemoveMenu(hMenu_,0,MF_BYPOSITION);
 			count--;
 		}
-		count = children_.size();
+		count = (int)children_.size();
 		int index = 0;
 		for( int i = 0; i < count; i++ ) {
 			if( children_[i]->GetVisible() ) {
@@ -110,7 +110,7 @@ void WindowMenuItem::CheckRadioItem( WindowMenuItem* item ) {
 }
 
 void WindowMenuItem::UncheckRadioItem( int group ) {
-	int count = children_.size();
+	int count = (int)children_.size();
 	for( int i = 0; i < count; i++ ) {
 		if( children_[i]->GetGroupIndex() == group && children_[i]->GetRadioItem() ) {
 			children_[i]->menu_item_info_.fState &= ~MFS_CHECKED;
@@ -118,7 +118,7 @@ void WindowMenuItem::UncheckRadioItem( int group ) {
 	}
 }
 int WindowMenuItem::GetCheckRadioIndex( int group ) {
-	int count = children_.size();
+	int count = (int)children_.size();
 	for( int i = 0; i < count; i++ ) {
 		if( children_[i]->GetGroupIndex() == group && children_[i]->GetRadioItem() ) {
 			if( children_[i]->GetChecked() == true ) {
@@ -193,7 +193,7 @@ void WindowMenuItem::Delete( int index ) {
 	}
 }
 int WindowMenuItem::IndexOf( const WindowMenuItem* item ) {
-	int count = children_.size();
+	int count = (int)children_.size();
 	int i = 0;
 	for( ; i < count; i++ ) {
 		if( children_[i] == item ) {
@@ -210,7 +210,7 @@ void WindowMenuItem::SetCaption( const TCHAR* caption ) {
 	}
 	menu_item_info_.fMask &= ~(MIIM_STRING|MIIM_FTYPE);
 	if( caption ) {
-		int len = _tcsnlen( caption, MAX_CAPTION_LENGTH )+1;
+		int len = (int)_tcsnlen( caption, MAX_CAPTION_LENGTH )+1;
 		if( len > 0 ) {
 			if( len == 2 && caption[0] == _T('-') ) {
 				menu_item_info_.fType |= MFT_SEPARATOR;

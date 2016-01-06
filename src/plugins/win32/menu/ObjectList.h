@@ -208,7 +208,7 @@ public:
 			if(s != d) *d = *s;
 			s++, d++;
 		}
-		Count = d - Objects;
+		Count = (tjs_int)(d - Objects);
 		Capacity = Count;
 		if(Count) {
 			//Objects = (void**)TJS_realloc(Objects, Count * sizeof(void *));
@@ -242,7 +242,7 @@ public:
 		ObjT * const *  slim = Objects + Count;
 		while(s < slim)
 		{
-			if(*s == object) return s - Objects;
+			if(*s == object) return (tjs_int)(s - Objects);
 			s++;
 		}
 		return -1;

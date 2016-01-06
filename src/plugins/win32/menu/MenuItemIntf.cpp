@@ -77,7 +77,7 @@ static ttstr MakeCaptionWithShortCut( ttstr const &caption, int key ) {
 
 	const wchar_t *text = caption.c_str();
 	const wchar_t *tab  = wcschr( text, L'\t' );
-	return ( (tab != NULL) ? ttstr( text, tab-text ) : ttstr( caption ) ) + TJS_W("\t") + shortcut;
+	return ( (tab != NULL) ? ttstr( text, (int)(tab-text) ) : ttstr( caption ) ) + TJS_W("\t") + shortcut;
 }
 
 
@@ -164,7 +164,7 @@ tjs_error TJS_INTF_METHOD tTJSNI_MenuItem::Construct(tjs_int numparams, tTJSVari
 		tTJSVariant *p[3] = {&mode, &proc, &userdata};
 		mode = (tTVInteger)(tjs_int)wrmRegister;
 		proc = (tTVInteger)reinterpret_cast<tjs_int64>(MyReceiver);
-		userdata = (tTVInteger)(tjs_int)this;
+		userdata = (tTVInteger)(tjs_intptr_t)this;
 		obj->FuncCall(0, TJS_W("registerMessageReceiver"), NULL, NULL, 3, p, obj);
 	} else {
 		tTJSVariant var;
@@ -928,7 +928,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(HMENU)
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_MenuItem);
-		if (result) *result = (tTVInteger)(tjs_uint)_this->GetMenuItemHandleForPlugin();
+		if (result) *result = (tTVInteger)(tjs_intptr_t)_this->GetMenuItemHandleForPlugin();
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_GETTER
