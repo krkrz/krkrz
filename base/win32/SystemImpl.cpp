@@ -99,17 +99,25 @@ bool TVPGetAsyncKeyState(tjs_uint keycode, bool getcurrent)
 //---------------------------------------------------------------------------
 ttstr TVPGetPlatformName()
 {
-#ifdef TJS_64BIT_OS
-	static ttstr platform(TJS_W("Win64"));
-#else
-	static ttstr platform(TJS_W("Win32"));
-#endif
-	return platform;
+	SYSTEM_INFO sysInfo;
+	::GetNativeSystemInfo( &sysInfo );
+	switch( sysInfo.wProcessorArchitecture )
+	{
+		case PROCESSOR_ARCHITECTURE_AMD64:
+		case PROCESSOR_ARCHITECTURE_IA64:
+			return ttstr(TJS_W("Win64"));
+
+		case PROCESSOR_ARCHITECTURE_INTEL:
+		case PROCESSOR_ARCHITECTURE_UNKNOWN:
+		default:
+			return ttstr(TJS_W("Win32"));
+	}
 }
 //---------------------------------------------------------------------------
 
 
 
+typedef void (WINAPI *RtlGetVersionFunc)(OSVERSIONINFOEX* );
 //---------------------------------------------------------------------------
 // TVPGetOSName
 //---------------------------------------------------------------------------
@@ -117,7 +125,22 @@ ttstr TVPGetOSName()
 {
 	OSVERSIONINFOEX ovi;
 	ovi.dwOSVersionInfoSize = sizeof(ovi);
-	GetVersionEx((OSVERSIONINFO*)&ovi);
+
+	bool isGetVersion = false;
+	HMODULE hModule = ::LoadLibrary( L"ntdll.dll" );
+	if( hModule ) {
+		RtlGetVersionFunc func;
+		func = (RtlGetVersionFunc)::GetProcAddress( hModule, "RtlGetVersion" );
+		if( func ) {
+			func( &ovi );
+			isGetVersion = true;
+		}
+		::FreeLibrary( hModule );
+		hModule = NULL;
+	}
+	if( isGetVersion == false ) {
+		GetVersionEx((OSVERSIONINFO*)&ovi);
+	}
 	tjs_char buf[256];
 	const tjs_char *osname = NULL;
 
@@ -175,6 +198,10 @@ ttstr TVPGetOSName()
 				else
 					osname = TJS_W("Windows Server 2012 R2");
 				break;
+			case 4:
+				if( ovi.wProductType == VER_NT_WORKSTATION )
+					osname = TJS_W("Windows 10");
+				break;
 			}
 		}
 		if( osname == NULL ) osname = TJS_W("Windows NT");
@@ -193,6 +220,25 @@ ttstr TVPGetOSName()
 }
 //---------------------------------------------------------------------------
 
+//---------------------------------------------------------------------------
+// TVPGetOSBits
+//---------------------------------------------------------------------------
+tjs_int TVPGetOSBits()
+{
+	SYSTEM_INFO sysInfo;
+	::GetNativeSystemInfo( &sysInfo );
+	switch( sysInfo.wProcessorArchitecture )
+	{
+		case PROCESSOR_ARCHITECTURE_AMD64:
+		case PROCESSOR_ARCHITECTURE_IA64:
+			return 64;
+		case PROCESSOR_ARCHITECTURE_INTEL:
+		case PROCESSOR_ARCHITECTURE_UNKNOWN:
+		default:
+			return 32;
+	}
+}
+//---------------------------------------------------------------------------
 
 
 //---------------------------------------------------------------------------
