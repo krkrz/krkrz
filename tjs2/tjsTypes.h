@@ -12,7 +12,7 @@
 #ifndef __TJSTYPES_H__
 #define __TJSTYPES_H__
 
-
+#include <stdint.h>
 
 #ifdef HAVE_CONFIG_H
  #include "config.h"
@@ -86,6 +86,9 @@ typedef double tjs_real;
 #define TJS_64BIT_OS	/* 64bit windows */
 #endif
 
+typedef intptr_t tjs_intptr_t;
+typedef uintptr_t tjs_uintptr_t;
+
 /*]*/
 
 #else
@@ -131,6 +134,9 @@ typedef double tjs_real;
 
 typedef int tjs_int;
 typedef unsigned int tjs_uint;
+
+typedef intptr_t tjs_intptr_t;
+typedef uintptr_t tjs_uintptr_t;
 
 #define TJS_I64_VAL(x) ((tjs_int64)(x##LL))
 #define TJS_UI64_VAL(x) ((tjs_uint64)(x##LL))
