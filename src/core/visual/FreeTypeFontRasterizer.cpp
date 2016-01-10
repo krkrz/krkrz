@@ -147,6 +147,9 @@ tTVPCharacterData* FreeTypeFontRasterizer::GetBitmap( const tTVPFontAndCharacter
 	data->Blured = font.Blured;
 	data->BlurWidth = font.BlurWidth;
 	data->BlurLevel = font.BlurLevel;
+
+	// apply blur
+	if(font.Blured) data->Blur(); // nasty ...
 	return data;
 }
 //---------------------------------------------------------------------------
