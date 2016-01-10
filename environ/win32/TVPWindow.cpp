@@ -872,9 +872,9 @@ int tTVPWindow::ShowModal() {
 		try {
 			Application->GetEnableWindowList( enableWindows, NULL );
 			Application->DisableWindows();
+			SetEnable( true );
 			Show();
 			::SetActiveWindow( GetHandle() );
-			SetEnable( true );
 			modal_result_ = 0;
 			while( modal_result_ == 0 ) {
 				Application->HandleMessage();
