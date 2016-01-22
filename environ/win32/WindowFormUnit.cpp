@@ -1304,6 +1304,7 @@ void TTVPWindowForm::OffsetClientPoint( int &x, int &y ) {
 	x = -origin.x;
 	y = -origin.y;
 }
+// Layer.cursorX/cursorY‚ÅŒÄ‚Î‚ê‚é
 void TTVPWindowForm::GetCursorPos(tjs_int &x, tjs_int &y) {
 	// get mouse cursor position in client
 	POINT origin = {0,0};
@@ -1312,6 +1313,7 @@ void TTVPWindowForm::GetCursorPos(tjs_int &x, tjs_int &y) {
 	::GetCursorPos(&mp);
 	x = mp.x - origin.x;
 	y = mp.y - origin.y;
+	TranslateWindowToDrawArea( x, y );
 }
 void TTVPWindowForm::SetCursorPos(tjs_int x, tjs_int y) {
 	TranslateDrawAreaToWindow( x, y );
