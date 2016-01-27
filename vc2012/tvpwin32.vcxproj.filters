@@ -58,6 +58,9 @@
     <Filter Include="extension">
       <UniqueIdentifier>{00466776-e92e-48d6-905d-db6c36ab46cc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="visual\gl">
+      <UniqueIdentifier>{f40130cb-77be-4493-bb7e-e204ddf45037}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -542,6 +545,24 @@
     <ClInclude Include="..\extension\Extension.h">
       <Filter>extension</Filter>
     </ClInclude>
+    <ClInclude Include="..\visual\gl\blend_functor_c.h">
+      <Filter>visual\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\gl\blend_functor_sse2.h">
+      <Filter>visual\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\gl\blend_ps_functor_sse2.h">
+      <Filter>visual\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\gl\blend_util_func.h">
+      <Filter>visual\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\gl\blend_variation.h">
+      <Filter>visual\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\gl\simd_def_x86x64.h">
+      <Filter>visual\gl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\tjs2\tjs.cpp">
@@ -975,6 +996,12 @@
     </ClCompile>
     <ClCompile Include="..\visual\IA32\detect_cpu.cpp">
       <Filter>visual\IA32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\gl\blend_function.cpp">
+      <Filter>visual\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\gl\blend_function_sse2.cpp">
+      <Filter>visual\gl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
