@@ -29,7 +29,7 @@ ttstr TVPDataPath; // data directory (in unified storage name)
 
 
 
-
+extern void TVPGL_C_Init();
 //---------------------------------------------------------------------------
 // TVPSystemInit : Entire System Initialization
 //---------------------------------------------------------------------------
@@ -40,6 +40,7 @@ void TVPSystemInit(void)
 	TVPInitScriptEngine();
 
 	TVPInitTVPGL();
+	TVPGL_C_Init();
 
 	TVPAfterSystemInit();
 }

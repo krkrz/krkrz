@@ -1186,6 +1186,7 @@ void TVPBeforeSystemInit()
 static void TVPDumpOptions();
 //---------------------------------------------------------------------------
 extern bool TVPEnableGlobalHeapCompaction;
+extern void TVPGL_SSE2_Init();
 static bool TVPHighTimerPeriod = false;
 static UINT TVPTimeBeginPeriodRes = 0;
 //---------------------------------------------------------------------------
@@ -1294,6 +1295,7 @@ void TVPAfterSystemInit()
 #ifndef TJS_64BIT_OS
 	TVPGL_IA32_Init();
 #endif
+	TVPGL_SSE2_Init();
 
 	// timer precision
 	UINT prectick = 1;
