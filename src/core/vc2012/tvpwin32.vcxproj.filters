@@ -1003,6 +1003,9 @@
     <ClCompile Include="..\visual\gl\blend_function_sse2.cpp">
       <Filter>visual\gl</Filter>
     </ClCompile>
+    <ClCompile Include="..\visual\gl\univtrans_sse2.cpp">
+      <Filter>visual\gl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="tvpwin32.rc">

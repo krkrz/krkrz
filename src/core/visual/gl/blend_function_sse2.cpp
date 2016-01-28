@@ -31,7 +31,7 @@ template<typename functor>
 static inline void blend_func_sse2( tjs_uint32 * __restrict dest, const tjs_uint32 * __restrict src, tjs_int len, const functor& func ) {
 	if( len <= 0 ) return;
 
-	tjs_int count = (tjs_int)((unsigned)dest & 0x15);
+	tjs_int count = (tjs_int)((unsigned)dest & 0xF);
 	if( count ) {
 		count = (16 - count)>>2;
 		count = count < len ? count : count - len;
@@ -76,7 +76,7 @@ template<typename functor>
 static void blend_src_branch_func_sse2( tjs_uint32 * __restrict dest, const tjs_uint32 * __restrict src, tjs_int len, const functor& func ) {
 	if( len <= 0 ) return;
 	
-	tjs_int count = (tjs_int)((unsigned)dest & 0x15);
+	tjs_int count = (tjs_int)((unsigned)dest & 0xF);
 	if( count ) {
 		count = (16 - count)>>2;
 		count = count < len ? count : count - len;
@@ -260,6 +260,10 @@ DEFINE_BLEND_FUNCTION_MIN_VARIATION( PsDiffBlend, ps_diff_blend )
 DEFINE_BLEND_FUNCTION_MIN_VARIATION( PsDiff5Blend, ps_diff5_blend )
 DEFINE_BLEND_FUNCTION_MIN_VARIATION( PsExclusionBlend, ps_exclusion_blend )
 
+extern void TVPUnivTransBlend_sse2_c(tjs_uint32 *dest, const tjs_uint32 *src1, const tjs_uint32 *src2, const tjs_uint8 *rule, const tjs_uint32 *table, tjs_int len);
+extern void TVPUnivTransBlend_switch_sse2_c(tjs_uint32 *dest, const tjs_uint32 *src1, const tjs_uint32 *src2, const tjs_uint8 *rule, const tjs_uint32 *table, tjs_int len, tjs_int src1lv, tjs_int src2lv);
+extern void TVPUnivTransBlend_d_sse2_c(tjs_uint32 *dest, const tjs_uint32 *src1, const tjs_uint32 *src2, const tjs_uint8 *rule, const tjs_uint32 *table, tjs_int len);
+extern void TVPUnivTransBlend_switch_d_sse2_c(tjs_uint32 *dest, const tjs_uint32 *src1, const tjs_uint32 *src2, const tjs_uint8 *rule, const tjs_uint32 *table, tjs_int len, tjs_int src1lv, tjs_int src2lv);
 
 void TVPGL_SSE2_Init() {
 	if( TVPCPUType & TVP_CPU_HAS_SSE2 ) {
@@ -281,8 +285,9 @@ void TVPGL_SSE2_Init() {
 		// TVPAlphaBlend_a
 		// TVPAlphaBlend_do
 		// TVPAlphaBlend_ao
-		//TVPConstAlphaBlend =  TVPConstAlphaBlend_sse2_c; 未テスト
-		//TVPConstAlphaBlend_SD =  TVPConstAlphaBlend_SD_sse2_c; 未テスト
+		TVPConstAlphaBlend =  TVPConstAlphaBlend_sse2_c;
+		TVPConstAlphaBlend_SD =  TVPConstAlphaBlend_SD_sse2_c;
+		TVPConstAlphaBlend_SD_a = TVPConstAlphaBlend_SD_sse2_c;
 
 		TVPDarkenBlend =  TVPDarkenBlend_sse2_c;
 		TVPDarkenBlend_HDA =  TVPDarkenBlend_HDA_sse2_c;
@@ -369,6 +374,14 @@ void TVPGL_SSE2_Init() {
 		TVPPsExclusionBlend_o =  TVPPsExclusionBlend_o_sse2_c;
 		TVPPsExclusionBlend_HDA =  TVPPsExclusionBlend_HDA_sse2_c;
 		TVPPsExclusionBlend_HDA_o =  TVPPsExclusionBlend_HDA_o_sse2_c;
+
+		// SSE2版はアルファもブレンドしているので、どちらでも行ける
+		TVPUnivTransBlend = TVPUnivTransBlend_sse2_c;
+		TVPUnivTransBlend_a = TVPUnivTransBlend_sse2_c;
+		TVPUnivTransBlend_d = TVPUnivTransBlend_d_sse2_c;
+		TVPUnivTransBlend_switch = TVPUnivTransBlend_switch_sse2_c;
+		TVPUnivTransBlend_switch_a = TVPUnivTransBlend_switch_sse2_c;
+		TVPUnivTransBlend_switch_d = TVPUnivTransBlend_switch_d_sse2_c;
 	}
 }
 
