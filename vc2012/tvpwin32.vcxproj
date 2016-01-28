@@ -609,6 +609,7 @@
     <ClCompile Include="..\visual\FreeTypeFontRasterizer.cpp" />
     <ClCompile Include="..\visual\gl\blend_function.cpp" />
     <ClCompile Include="..\visual\gl\blend_function_sse2.cpp" />
+    <ClCompile Include="..\visual\gl\univtrans_sse2.cpp" />
     <ClCompile Include="..\visual\GraphicsLoaderIntf.cpp" />
     <ClCompile Include="..\visual\GraphicsLoadThread.cpp" />
     <ClCompile Include="..\visual\IA32\detect_cpu.cpp" />
