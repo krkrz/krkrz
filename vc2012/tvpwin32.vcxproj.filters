@@ -563,6 +563,12 @@
     <ClInclude Include="..\visual\gl\simd_def_x86x64.h">
       <Filter>visual\gl</Filter>
     </ClInclude>
+    <ClInclude Include="..\visual\gl\sse_mathfun.h">
+      <Filter>visual\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\gl\x86simdutil.h">
+      <Filter>visual\gl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\tjs2\tjs.cpp">
@@ -1004,6 +1010,12 @@
       <Filter>visual\gl</Filter>
     </ClCompile>
     <ClCompile Include="..\visual\gl\univtrans_sse2.cpp">
+      <Filter>visual\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\gl\adjust_color_sse2.cpp">
+      <Filter>visual\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\gl\x86simdutil.cpp">
       <Filter>visual\gl</Filter>
     </ClCompile>
   </ItemGroup>

@@ -265,6 +265,9 @@ extern void TVPUnivTransBlend_switch_sse2_c(tjs_uint32 *dest, const tjs_uint32 *
 extern void TVPUnivTransBlend_d_sse2_c(tjs_uint32 *dest, const tjs_uint32 *src1, const tjs_uint32 *src2, const tjs_uint8 *rule, const tjs_uint32 *table, tjs_int len);
 extern void TVPUnivTransBlend_switch_d_sse2_c(tjs_uint32 *dest, const tjs_uint32 *src1, const tjs_uint32 *src2, const tjs_uint8 *rule, const tjs_uint32 *table, tjs_int len, tjs_int src1lv, tjs_int src2lv);
 
+extern void TVPInitGammaAdjustTempData_sse2_c( tTVPGLGammaAdjustTempData *temp, const tTVPGLGammaAdjustData *data );
+extern void TVPAdjustGamma_a_sse2_c(tjs_uint32 *dest, tjs_int len, tTVPGLGammaAdjustTempData *param);
+
 void TVPGL_SSE2_Init() {
 	if( TVPCPUType & TVP_CPU_HAS_SSE2 ) {
 		TVPAdditiveAlphaBlend = TVPAdditiveAlphaBlend_sse2_c;
@@ -382,6 +385,11 @@ void TVPGL_SSE2_Init() {
 		TVPUnivTransBlend_switch = TVPUnivTransBlend_switch_sse2_c;
 		TVPUnivTransBlend_switch_a = TVPUnivTransBlend_switch_sse2_c;
 		TVPUnivTransBlend_switch_d = TVPUnivTransBlend_switch_d_sse2_c;
+
+		if( TVPCPUType & TVP_CPU_HAS_SSE ) {
+			TVPInitGammaAdjustTempData = TVPInitGammaAdjustTempData_sse2_c;
+		}
+		TVPAdjustGamma_a = TVPAdjustGamma_a_sse2_c;	// 逆数テーブルを使用しない方法にするとSSEも使う
 	}
 }
 
