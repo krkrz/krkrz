@@ -3,6 +3,11 @@
 #define __BLEND_FUNCTOR_SSE2_H__
 
 
+extern "C" {
+extern unsigned char TVPOpacityOnOpacityTable[256*256];
+extern unsigned char TVPNegativeMulTable[256*256];
+};
+
 // ソースのアルファを使う
 template<typename blend_func>
 struct sse2_variation : public blend_func {
@@ -38,56 +43,51 @@ struct sse2_variation_opa : public blend_func {
 };
 
 // ソースとデスティネーションのアルファを使う
-template<typename blend_func>
-struct sse2_variation_d : public blend_func {
+//template<typename blend_func>
+struct sse2_alpha_blend_d_functor {
 	const __m128i colormask_;
-	//const __m128i alphamask_;
-	inline sse2_variation_d() : colormask_(_mm_set1_epi32(0x00ffffff))/*, alphamask_(_mm_set1_epi32(0xff000000)) */{}
+	const __m128i zero_;
+	inline sse2_alpha_blend_d_functor() : colormask_(_mm_set1_epi32(0x00ffffff)), zero_(_mm_setzero_si128()){}
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s ) const {
-		//if( s <= 0x00FFFFFF ) return d;
-		//if( s >= 0xFF000000 ) return s;
 		tjs_uint32 addr = ((s >> 16) & 0xff00) + (d>>24);
 		tjs_uint32 sopa = TVPOpacityOnOpacityTable[addr];
-		tjs_uint32 ret = blend_func::operator()( d, s, sopa );
 
-		// TVPNegativeMulTable[addr] = (unsigned char)( 255 - (255-a)*(255-b)/ 255 );
+		__m128i ma = _mm_cvtsi32_si128( sopa );
+		ma = _mm_shufflelo_epi16( ma, _MM_SHUFFLE( 0, 0, 0, 0 )  );	// 00oo00oo00oo00oo
+		__m128i ms = _mm_cvtsi32_si128( s );
+		ms = _mm_unpacklo_epi8( ms, zero_ );// 00 ss 00 ss 00 ss 00 ss
+		__m128i md = _mm_cvtsi32_si128( d );
+		md = _mm_unpacklo_epi8( md, zero_ );// 00 dd 00 dd 00 dd 00 dd
+
+		ms = _mm_sub_epi16( ms, md );		// ms -= md
+		ms = _mm_mullo_epi16( ms, ma );		// ms *= ma
+		md = _mm_slli_epi16( md, 8 );		// md <<= 8
+		md = _mm_add_epi16( md, ms );		// md += ms
+		md = _mm_srli_epi16( md, 8 );		// ms >>= 8
+		md = _mm_packus_epi16( md, md );
+		tjs_uint32 ret = _mm_cvtsi128_si32( md );
+
 #if 0
+		// TVPNegativeMulTable[addr] = (unsigned char)( 255 - (255-a)*(255-b)/ 255 );
 		addr ^= 0xffff; // (a = 255-a, b = 255-b) : ^=xor
 		tjs_uint32 tmp = addr;
 		addr = (addr&0xff) * (tmp>>8);	// (255-a)*(255-b)
 		addr = ~addr;	// result = 255-result : ビット反転
 		addr = (addr&0xff00) << 16;	// /255 : 最下位ではなく、一つ上を選択することで/255と同等
-#else
-		addr = TVPNegativeMulTable[addr] << 24;
 #endif
+		addr = TVPNegativeMulTable[addr] << 24;
 		return (ret&0x00ffffff) | addr;
 	}
-	inline __m128i operator()( __m128i d, __m128i s ) const {
-		// (s>>24)<<8) + (d>>24) == ((s >> 16) & 0xff00) + (d>>24)
-		/*
-		if( _mm_testc_si128( s, alphamask_ ) ) { return s; }
-		if( _mm_testz_si128( s, alphamask_ ) ) { return d; }
-		*/
-
-		__m128i sa = s;
+	inline __m128i operator()( __m128i md1, __m128i ms1 ) const {
+		//if( _mm_testc_si128( s, alphamask_ ) ) { return s; }
+		//if( _mm_testz_si128( s, alphamask_ ) ) { return d; }
+		__m128i sa = ms1;
 		sa  = _mm_srli_epi32( sa, 24 );
-		__m128i da = d;
+		__m128i da = md1;
 		da = _mm_srli_epi32( da, 24 );
 		__m128i maddr = _mm_add_epi32( _mm_slli_epi32(sa, 8), da );
 		__m128i dopa = maddr;
-
-	/*
-		tjs_uint32 addrlo = _mm_cvtsi64_si32( maddr );
-		tjs_uint32 solo = TVPOpacityOnOpacityTable[addrlo];
-		tjs_uint32 addrhi = _mm_cvtsi64_si32( _mm_srli_epi64(maddr, 32) );
-		tjs_uint32 sohi = TVPOpacityOnOpacityTable[addrhi];
-		__m128i sopa = _mm_cvtsi32_si64( sohi );
-		sopa = _mm_slli_epi64( sopa, 32 );
-		__m128i tmp = _mm_cvtsi32_si64( solo );
-		sopa = _mm_or_si64( sopa, tmp );
-		__m128i md = blend_func::operator()( d, s, sopa );
-	*/
-
+#if 0
 		tjs_uint32 addr;
 		addr = _mm_cvtsi128_si32( maddr );
 		tjs_uint32 opa = TVPOpacityOnOpacityTable[addr];
@@ -111,10 +111,48 @@ struct sse2_variation_d : public blend_func {
 		mopa2 = _mm_unpacklo_epi32( mopa2, mopa3 );
 
 		mopa = _mm_unpacklo_epi64( mopa, mopa2 );
+#else	// 以下のようにコンパイラ任せの方がいいかも
+		__m128i ma1 = _mm_set_epi32(
+			TVPOpacityOnOpacityTable[maddr.m128i_u32[3]],
+			TVPOpacityOnOpacityTable[maddr.m128i_u32[2]],
+			TVPOpacityOnOpacityTable[maddr.m128i_u32[1]],
+			TVPOpacityOnOpacityTable[maddr.m128i_u32[0]]);
+#endif
+#if 0
+		tjs_uint32 sopa = ma1.m128i_u32[0];
+		tjs_uint32 d = md1.m128i_u32[0];
+		tjs_uint32 s = ms1.m128i_u32[0];
+		tjs_uint32 d1 = d & 0xff00ff;
+		d1 = (d1 + (((s & 0xff00ff) - d1) * sopa >> 8)) & 0xff00ff;
+		d &= 0xff00;
+		s &= 0xff00;
+		tjs_uint32 dest = d1 + ((d + ((s - d) * sopa >> 8)) & 0xff00);
+#endif
+		__m128i ms2 = ms1;
+		__m128i md2 = md1;
+		ms1 = _mm_unpacklo_epi8( ms1, zero_ );
+		md1 = _mm_unpacklo_epi8( md1, zero_ );
+		ma1 = _mm_packs_epi32( ma1, ma1 );		// 0 1 2 3 0 1 2 3
+		ma1 = _mm_unpacklo_epi16( ma1, ma1 );	// 0 0 1 1 2 2 3 3
+		__m128i ma2 = ma1;
+		ma1 = _mm_unpacklo_epi16( ma1, ma1 );	 // 0 0 0 0 1 1 1 1
+		ms1 = _mm_sub_epi16( ms1, md1 );	// s -= d
+		ms1 = _mm_mullo_epi16( ms1, ma1 );	// s *= a
+		md1 = _mm_slli_epi16( md1, 8 );		// d <<= 8
+		md1 = _mm_add_epi16( md1, ms1 );	// d += s
+		md1 = _mm_srli_epi16( md1, 8 );		// d >>= 8
 
-		__m128i md = blend_func::operator()( d, s, mopa );
+		ms2 = _mm_unpackhi_epi8( ms2, zero_ );
+		md2 = _mm_unpackhi_epi8( md2, zero_ );
+		ma2 = _mm_unpackhi_epi16( ma2, ma2 );	// 2 2 2 2 3 3 3 3
+		ms2 = _mm_sub_epi16( ms2, md2 );		// s -= d
+		ms2 = _mm_mullo_epi16( ms2, ma2 );		// s *= a
+		md2 = _mm_slli_epi16( md2, 8 );			// d <<= 8
+		md2 = _mm_add_epi16( md2, ms2 );		// d += s
+		md2 = _mm_srli_epi16( md2, 8 );			// d >>= 8
+		md1 = _mm_packus_epi16( md1, md2 );
 
-		__m128i mask = _mm_set1_epi32( 0x0000ffff );
+		const __m128i mask = _mm_set1_epi32( 0x0000ffff );
 		dopa = _mm_xor_si128( dopa, mask );	// (a = 255-a, b = 255-b) : ^=xor
 		__m128i mtmp = dopa;
 
@@ -127,8 +165,8 @@ struct sse2_variation_d : public blend_func {
 		dopa = _mm_srli_epi16( dopa, 8 );		// addr>>8
 		dopa = _mm_slli_epi32( dopa, 24 );		// アルファ位置へ
 
-		md = _mm_and_si128( md, colormask_ );
-		return _mm_or_si128( md, dopa );
+		md1 = _mm_and_si128( md1, colormask_ );
+		return _mm_or_si128( md1, dopa );
 	}
 };
 
@@ -238,59 +276,122 @@ struct sse2_variation_straight : public sse2_alpha_blend {
 	}
 };
 
-// opacity値を使う
-struct sse2_const_alpha_blend_functor {
-	const __m128i opa_;
-	const __m128i zero_;
-	inline sse2_const_alpha_blend_functor( tjs_int32 opa ) : zero_(_mm_setzero_si128()), opa_(_mm_set1_epi16((short)opa)) {}
+// もっともシンプルなコピー dst = src
+struct sse2_const_copy_functor {
+	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s ) const { return s; }
+	inline __m128i operator()( __m128i md1, __m128i ms1 ) const { return ms1; }
+};
+// 単純コピーだけど alpha をコピーしない(HDAと同じ)
+struct sse2_color_copy_functor {
+	const __m128i colormask_;
+	const __m128i alphamask_;
+	inline sse2_color_copy_functor() : colormask_(_mm_set1_epi32(0x00ffffff)), alphamask_(_mm_set1_epi32(0xff000000)) {}
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s ) const {
-		__m128i ms = _mm_cvtsi32_si128( s );
-		__m128i md = _mm_cvtsi32_si128( d );
-		ms = _mm_unpacklo_epi8( ms, zero_ );// unpack 00 ss 00 ss 00 ss 00 ss
-		md = _mm_unpacklo_epi8( md, zero_ );// unpack 00 dd 00 dd 00 dd 00 dd
-		ms = _mm_sub_epi16( ms, md );		// ms -= md
-		ms = _mm_mullo_epi16( ms, opa_ );	// ms *= ma
-		ms = _mm_srli_epi16( ms, 8 );		// ms >>= 8
-		md = _mm_add_epi8( md, ms );		// md += ms : d + ((s-d)*sopa)>>8
-		md = _mm_packus_epi16( md, zero_ );	// pack
-		return _mm_cvtsi128_si32( md );		// store
+		return (d&0xff000000) + (s&0x00ffffff);
 	}
 	inline __m128i operator()( __m128i md1, __m128i ms1 ) const {
-		__m128i ms2 = ms1;
-		__m128i md2 = md1;
-
-		ms1 = _mm_unpacklo_epi8( ms1, zero_ );
-		md1 = _mm_unpacklo_epi8( md1, zero_ );
-		ms1 = _mm_sub_epi16( ms1, md1 );	// s -= d
-		ms1 = _mm_mullo_epi16( ms1, opa_ );	// s *= a
-		ms1 = _mm_srli_epi16( ms1, 8 );		// s >>= 8
-		md1 = _mm_add_epi8( md1, ms1 );		// d += s
-
-		ms2 = _mm_unpackhi_epi8( ms2, zero_ );
-		md2 = _mm_unpackhi_epi8( md2, zero_ );
-		ms2 = _mm_sub_epi16( ms2, md2 );		// s -= d
-		ms2 = _mm_mullo_epi16( ms2, opa_ );		// s *= a
-		ms2 = _mm_srli_epi16( ms2, 8 );			// s >>= 8
-		md2 = _mm_add_epi8( md2, ms2 );		// d += s
-		return _mm_packus_epi16( md1, md2 );
+		ms1 = _mm_and_si128( ms1, colormask_ );
+		md1 = _mm_and_si128( md1, alphamask_ );
+		return _mm_or_si128( md1, ms1 );
 	}
 };
+// alphaだけコピーする : color_copy の src destを反転しただけ
+struct sse2_alpha_copy_functor : public sse2_color_copy_functor {
+	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s ) const {
+		return sse2_color_copy_functor::operator()( s, d );
+	}
+	inline __m128i operator()( __m128i md1, __m128i ms1 ) const {
+		return sse2_color_copy_functor::operator()( ms1, md1 );
+	}
+};
+// このままコピーするがアルファを0xffで埋める dst = 0xff000000 | src
+struct sse2_color_opaque_functor {
+	const __m128i alphamask_;
+	inline sse2_color_opaque_functor() : alphamask_(_mm_set1_epi32(0xff000000)) {}
+	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s ) const { return 0xff000000 | s; }
+	inline __m128i operator()( __m128i md1, __m128i ms1 ) const { return _mm_or_si128( alphamask_, ms1 ); }
+};
+// 矩形版未実装
+struct sse2_alpha_blend_a_functor {
+	const __m128i mask_;
+	const __m128i zero_;
+	inline sse2_alpha_blend_a_functor() : zero_(_mm_setzero_si128()), mask_(_mm_set_epi32(0x0000ffff,0xffffffff,0x0000ffff,0xffffffff)) {}
+	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s ) const {
+		__m128i ms = _mm_cvtsi32_si128( s );
+		__m128i mo = ms;
+		mo = _mm_srli_epi32( mo, 24 );			// >> 24
+		__m128i msa = mo;
+		msa = _mm_slli_epi64( msa, 48 );		// << 48
+		mo = _mm_shufflelo_epi16( mo, _MM_SHUFFLE( 0, 0, 0, 0 )  );	// 00oo00oo00oo00oo
+		ms = _mm_unpacklo_epi8( ms, zero_ );	// 00Sa00Si00Si00Si
+		ms = _mm_mullo_epi16( ms, mo );			// src * sopa
+		ms = _mm_srli_epi16( ms, 8 );			// src * sopa >> 8
+		ms = _mm_and_si128( ms, mask_ );		// drop alpha
+		ms = _mm_or_si128( ms, msa );			// set original alpha
 
+		__m128i md = _mm_cvtsi32_si128( d );
+		md = _mm_unpacklo_epi8( md, zero_ );	// 00Da00Di00Di00Di
+		__m128i md2 = md;
+		md2 = _mm_mullo_epi16( md2, mo );	// d * sopa
+		md2 = _mm_srli_epi16( md2, 8 );		// 00 SaDa 00 SaDi 00 SaDi 00 SaDi
+		md = _mm_sub_epi16( md, md2 );		// d - d*sopa
+		md = _mm_add_epi16( md, ms );		// (d-d*sopa) + s
+		md = _mm_packus_epi16( md, zero_ );
+		return _mm_cvtsi128_si32( md );
+	}
+	inline __m128i operator()( __m128i md, __m128i ms ) const {
+		__m128i mo0 = ms;
+		mo0 = _mm_srli_epi32( mo0, 24 );
+		__m128i msa = mo0;
+		msa = _mm_slli_epi32( msa, 24 );		// << 24
+		mo0 = _mm_packs_epi32( mo0, mo0 );		// 0 1 2 3 0 1 2 3
+		mo0 = _mm_unpacklo_epi16( mo0, mo0 );	// 0 0 1 1 2 2 3 3
+		__m128i mo1 = mo0;
+		mo1 = _mm_unpacklo_epi16( mo1, mo1 );	// 0 0 0 0 1 1 1 1 o[1]
+		mo0 = _mm_unpackhi_epi16( mo0, mo0 );	// 2 2 2 2 3 3 3 3 o[0]
+		
+		__m128i ms1 = ms;
+		ms = _mm_unpackhi_epi8( ms, zero_ );
+		ms = _mm_mullo_epi16( ms, mo0 );		// src * sopa
+		ms = _mm_srli_epi16( ms, 8 );			// src * sopa >> 8
+		ms = _mm_and_si128( ms, mask_ );		// drop alpha
+		__m128i msa1 = msa;
+		msa = _mm_unpackhi_epi8( msa, zero_ );
+		ms = _mm_or_si128( ms, msa );			// set original alpha
+		
+		ms1 = _mm_unpacklo_epi8( ms1, zero_ );
+		ms1 = _mm_srli_epi16( ms1, 8 );			// src * sopa >> 8
+		ms1 = _mm_and_si128( ms1, mask_ );		// drop alpha
+		msa1 = _mm_unpacklo_epi8( msa1, zero_ );
+		ms1 = _mm_or_si128( ms1, msa1 );		// set original alpha
+
+		__m128i md1 = md;
+		md = _mm_unpackhi_epi8( md, zero_ );// 00dd00dd00dd00dd d[0]
+		__m128i md02 = md;
+		md02 = _mm_mullo_epi16( md02, mo0 );	// d * sopa | d[0]
+		md02 = _mm_srli_epi16( md02, 8 );	// 00 SaDa 00 SaDi 00 SaDi 00 SaDi | d[0]
+		md = _mm_sub_epi16( md, md02 );		// d - d*sopa | d[0]
+		md = _mm_add_epi16( md, ms );		// d - d*sopa + s | d[0]
+
+		md1 = _mm_unpacklo_epi8( md1, zero_ );// 00dd00dd00dd00dd d[1]
+		__m128i md12 = md1;
+		md12 = _mm_mullo_epi16( md12, mo1 );// d * sopa | d[1]
+		md12 = _mm_srli_epi16( md12, 8 );	// 00 SaDa 00 SaDi 00 SaDi 00 SaDi | d[1]
+		md1 = _mm_sub_epi16( md1, md12 );	// d - d*sopa | d[1]
+		md1 = _mm_add_epi16( md1, ms1 );	// d - d*sopa + s | d[1]
+
+		return _mm_packus_epi16( md1, md );
+	}
+};
 
 //typedef sse2_variation<sse2_alpha_blend>							sse2_alpha_blend_functor;
 typedef sse2_variation_straight										sse2_alpha_blend_functor;
 typedef sse2_variation_opa<sse2_alpha_blend>						sse2_alpha_blend_o_functor;
 typedef sse2_variation_hda<sse2_variation<sse2_alpha_blend> >		sse2_alpha_blend_hda_functor;
 typedef sse2_variation_hda<sse2_variation_opa<sse2_alpha_blend> >	sse2_alpha_blend_hda_o_functor;
-typedef sse2_variation_d<sse2_alpha_blend>							sse2_alpha_blend_d_functor;
-//																	sse2_const_alpha_blend_functor;
-typedef sse2_const_alpha_blend_functor								sse2_const_alpha_blend_sd_functor;
-// tjs_uint32 sse2_const_alpha_blend_functor::operator()( tjs_uint32 d, tjs_uint32 s )
-// tjs_uint32 sse2_const_alpha_blend_sd_functor::operator()( tjs_uint32 s1, tjs_uint32 s2 )
-// と引数は異なるが、処理内容は同じ
-// const_alpha_blend は、dest と src1 を共有しているようなもの dest = dest * src
-// const_alpha_blend_sd は、dest = src1 * src2
-
+//typedef sse2_variation_d<sse2_alpha_blend>							sse2_alpha_blend_d_functor;
+// sse2_alpha_blend_d_functor
+// sse2_alpha_blend_a_functor
 
 struct sse2_premul_alpha_blend_functor {
 	const __m128i zero_;
@@ -302,6 +403,7 @@ struct sse2_premul_alpha_blend_functor {
 		__m128i md = _mm_cvtsi32_si128( d );
 		mo = _mm_unpacklo_epi16( mo, mo );	// 0000000000oo00oo
 		mo = _mm_unpacklo_epi32( mo, mo );	// 00oo00oo00oo00oo
+		//mo = _mm_shufflelo_epi16( mo, _MM_SHUFFLE( 0, 0, 0, 0 )  );	// 0000000000000000 00oo00oo00oo00oo にできるか
 		md = _mm_unpacklo_epi8( md, zero_ );// 00dd00dd00dd00dd
 		__m128i md2 = md;
 		md = _mm_mullo_epi16( md, mo );	// md * sopa
@@ -406,6 +508,10 @@ struct sse2_premul_alpha_blend_o_functor {
 		return _mm_packus_epi16( md1, md2 );
 	}
 };
+/*
+	Di = sat(Si, (1-Sa)*Di)
+	Da = Sa + Da - SaDa
+*/
 // additive alpha blend holding destination alpha
 struct sse2_premul_alpha_blend_hda_functor {
 	const __m128i zero_;
@@ -512,6 +618,179 @@ struct sse2_premul_alpha_blend_a_functor {
 		return _mm_packus_epi16( md1, md );
 	}
 };
+
+// opacity値を使う
+struct sse2_const_alpha_blend_functor {
+	const __m128i opa_;
+	const __m128i zero_;
+	inline sse2_const_alpha_blend_functor( tjs_int32 opa ) : zero_(_mm_setzero_si128()), opa_(_mm_set1_epi16((short)opa)) {}
+	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s ) const {
+		__m128i ms = _mm_cvtsi32_si128( s );
+		__m128i md = _mm_cvtsi32_si128( d );
+		ms = _mm_unpacklo_epi8( ms, zero_ );// unpack 00 ss 00 ss 00 ss 00 ss
+		md = _mm_unpacklo_epi8( md, zero_ );// unpack 00 dd 00 dd 00 dd 00 dd
+		ms = _mm_sub_epi16( ms, md );		// ms -= md
+		ms = _mm_mullo_epi16( ms, opa_ );	// ms *= ma
+		ms = _mm_srli_epi16( ms, 8 );		// ms >>= 8
+		md = _mm_add_epi8( md, ms );		// md += ms : d + ((s-d)*sopa)>>8
+		md = _mm_packus_epi16( md, zero_ );	// pack
+		return _mm_cvtsi128_si32( md );		// store
+	}
+	inline __m128i operator()( __m128i md1, __m128i ms1 ) const {
+		__m128i ms2 = ms1;
+		__m128i md2 = md1;
+
+		ms1 = _mm_unpacklo_epi8( ms1, zero_ );
+		md1 = _mm_unpacklo_epi8( md1, zero_ );
+		ms1 = _mm_sub_epi16( ms1, md1 );	// s -= d
+		ms1 = _mm_mullo_epi16( ms1, opa_ );	// s *= a
+		ms1 = _mm_srli_epi16( ms1, 8 );		// s >>= 8
+		md1 = _mm_add_epi8( md1, ms1 );		// d += s
+
+		ms2 = _mm_unpackhi_epi8( ms2, zero_ );
+		md2 = _mm_unpackhi_epi8( md2, zero_ );
+		ms2 = _mm_sub_epi16( ms2, md2 );		// s -= d
+		ms2 = _mm_mullo_epi16( ms2, opa_ );		// s *= a
+		ms2 = _mm_srli_epi16( ms2, 8 );			// s >>= 8
+		md2 = _mm_add_epi8( md2, ms2 );		// d += s
+		return _mm_packus_epi16( md1, md2 );
+	}
+	// 2pixel版でunpack済み(16bit単位)
+	inline __m128i two( __m128i md1, __m128i ms1 ) const {
+		ms1 = _mm_sub_epi16( ms1, md1 );	// s -= d
+		ms1 = _mm_mullo_epi16( ms1, opa_ );	// s *= a
+		ms1 = _mm_srli_epi16( ms1, 8 );		// s >>= 8
+		return _mm_add_epi8( md1, ms1 );	// d += s
+	}
+};
+typedef sse2_variation_hda<sse2_const_alpha_blend_functor>	sse2_const_alpha_blend_hda_functor;
+
+struct sse2_const_alpha_blend_d_functor {
+	const tjs_int32 opa32_;
+	const __m128i colormask_;
+	const __m128i zero_;
+	const __m128i opa_;
+	inline sse2_const_alpha_blend_d_functor( tjs_int32 opa )
+		: colormask_(_mm_set1_epi32(0x00ffffff)), opa32_(opa<<8), zero_(_mm_setzero_si128()), opa_(_mm_set1_epi32(opa<<8)) {}
+	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s ) const {
+		tjs_uint32 addr = opa32_ + (d>>24);
+		tjs_uint32 sopa = TVPOpacityOnOpacityTable[addr];
+		__m128i ma = _mm_cvtsi32_si128( sopa );
+		ma = _mm_shufflelo_epi16( ma, _MM_SHUFFLE( 0, 0, 0, 0 )  );	// 0000000000000000 00oo00oo00oo00oo
+		__m128i ms = _mm_cvtsi32_si128( s );
+		__m128i md = _mm_cvtsi32_si128( d );
+		ms = _mm_unpacklo_epi8( ms, zero_ );// 00 ss 00 ss 00 ss 00 ss
+		md = _mm_unpacklo_epi8( md, zero_ );// 00 dd 00 dd 00 dd 00 dd
+		ms = _mm_sub_epi16( ms, md );		// ms -= md
+		ms = _mm_mullo_epi16( ms, ma );		// ms *= ma
+		ms = _mm_srli_epi16( ms, 8 );		// ms >>= 8
+		md = _mm_add_epi8( md, ms );		// md += ms : d + ((s-d)*sopa)>>8
+		md = _mm_packus_epi16( md, zero_ );	// pack
+		tjs_uint32 ret = _mm_cvtsi128_si32( md );		// store
+		addr = TVPNegativeMulTable[addr] << 24;
+		return (ret&0x00ffffff) | addr;
+	}
+	inline __m128i operator()( __m128i md1, __m128i ms1 ) const {
+		__m128i da = md1;
+		da = _mm_srli_epi32( da, 24 );
+		__m128i maddr = _mm_add_epi32( opa_, da );
+		__m128i dopa = maddr;
+		__m128i ma1 = _mm_set_epi32(
+			TVPOpacityOnOpacityTable[maddr.m128i_u32[3]],
+			TVPOpacityOnOpacityTable[maddr.m128i_u32[2]],
+			TVPOpacityOnOpacityTable[maddr.m128i_u32[1]],
+			TVPOpacityOnOpacityTable[maddr.m128i_u32[0]]);
+		
+		ma1 = _mm_packs_epi32( ma1, ma1 );		// 0 1 2 3 0 1 2 3
+		ma1 = _mm_unpacklo_epi16( ma1, ma1 );	// 0 0 1 1 2 2 3 3
+		__m128i ma2 = ma1;
+		ma1 = _mm_unpacklo_epi16( ma1, ma1 );	 // 0 0 0 0 1 1 1 1
+
+		__m128i ms2 = ms1;
+		__m128i md2 = md1;
+		ms1 = _mm_unpacklo_epi8( ms1, zero_ );
+		md1 = _mm_unpacklo_epi8( md1, zero_ );
+		ms1 = _mm_sub_epi16( ms1, md1 );	// s -= d
+		ms1 = _mm_mullo_epi16( ms1, ma1 );	// s *= a
+		ms1 = _mm_srli_epi16( ms1, 8 );		// s >>= 8
+		md1 = _mm_add_epi8( md1, ms1 );		// d += s
+		
+		ma2 = _mm_unpackhi_epi16( ma2, ma2 );	// 2 2 2 2 3 3 3 3
+		ms2 = _mm_unpackhi_epi8( ms2, zero_ );
+		md2 = _mm_unpackhi_epi8( md2, zero_ );
+		ms2 = _mm_sub_epi16( ms2, md2 );		// s -= d
+		ms2 = _mm_mullo_epi16( ms2, ma2 );		// s *= a
+		ms2 = _mm_srli_epi16( ms2, 8 );			// s >>= 8
+		md2 = _mm_add_epi8( md2, ms2 );			// d += s
+		md1 = _mm_packus_epi16( md1, md2 );
+
+		/*
+		addr = ((s>>16)&0xff00) + (d>>24);
+		addr ^= 0xffff;  (a = 255-a, b = 255-b)
+		da = addr&0xff;
+		sa = addr>>8;
+		addr = sa * da;
+		addr = ~addr;	result = 255-result
+		addr &= 0xff00;
+		addr <<= 16;
+		*/
+		// addr = b << 8 | a : b = opa | sa, a = da
+		// ( 255 - (255-a)*(255-b)/ 255 ); 
+		// 257 = 65536 / 255 
+		// 257 * 255 = 65535
+		__m128i mask = colormask_;
+		mask = _mm_srli_epi32( mask, 8 );	// 0x00ffffff >> 8 = 0x0000ffff
+		dopa = _mm_xor_si128( dopa, mask );	// (a = 255-a, b = 255-b) : ^=xor : 普通に8bit単位で引いても一緒か……
+		__m128i mtmp = dopa;
+
+		dopa = _mm_slli_epi32( dopa, 8 );		// 00ff|ff00	上位 << 8
+		mtmp = _mm_slli_epi16( mtmp, 8 );		// 0000|ff00	下位 << 8
+		mtmp = _mm_slli_epi32( mtmp, 8 );		// 00ff|0000
+		dopa = _mm_mullo_epi16( dopa, mtmp );	// 上位で演算、下位部分はごみ
+		dopa = _mm_srli_epi32( dopa, 16 );		// addr >> 16 | 下位を捨てる
+		dopa = _mm_andnot_si128( dopa, mask );	// ~addr&0x0000ffff
+		dopa = _mm_srli_epi16( dopa, 8 );		// addr>>8
+		dopa = _mm_slli_epi32( dopa, 24 );		// アルファ位置へ
+
+		md1 = _mm_and_si128( md1, colormask_ );
+		//md1 = _mm_slli_epi32( md1, 8 ); // アルファを落とす colormask_ を使わなくていいが……
+		//md1 = _mm_srli_epi32( md1, 8 );
+		return _mm_or_si128( md1, dopa );
+	}
+};
+struct sse2_const_alpha_blend_a_functor {
+	const tjs_uint32 opa32_;
+	const __m128i opa_;
+	const __m128i colormask_;
+	const struct sse2_premul_alpha_blend_a_functor blend_;
+	inline sse2_const_alpha_blend_a_functor( tjs_int32 opa ) : colormask_(_mm_set1_epi32(0x00ffffff)), opa32_(opa<<24), opa_(_mm_set1_epi32(opa<<24)) {}
+	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s ) const {
+		return blend_( d, (s&0x00ffffff)|opa32_ );
+	}
+	inline __m128i operator()( __m128i md1, __m128i ms1 ) const {
+		ms1 = _mm_and_si128( ms1, colormask_ );
+		ms1 = _mm_or_si128( ms1, opa_ );
+		return blend_( md1, ms1 );
+	}
+};
+
+//																	sse2_const_alpha_blend_functor;
+typedef sse2_const_alpha_blend_functor								sse2_const_alpha_blend_sd_functor;
+// tjs_uint32 sse2_const_alpha_blend_functor::operator()( tjs_uint32 d, tjs_uint32 s )
+// tjs_uint32 sse2_const_alpha_blend_sd_functor::operator()( tjs_uint32 s1, tjs_uint32 s2 )
+// と引数は異なるが、処理内容は同じ
+// const_alpha_blend は、dest と src1 を共有しているようなもの dest = dest * src
+// const_alpha_blend_sd は、dest = src1 * src2
+
+// sse2_const_copy_functor = TVPCopy はない、memcpy になってる
+// sse2_color_copy_functor = TVPCopyColor / TVPLinTransColorCopy
+// sse2_alpha_copy_functor = TVPCopyMask
+// sse2_color_opaque_functor = TVPCopyOpaqueImage
+// sse2_const_alpha_blend_functor = TVPConstAlphaBlend
+// sse2_const_alpha_blend_hda_functor = TVPConstAlphaBlend_HDA
+// sse2_const_alpha_blend_d_functor = TVPConstAlphaBlend_a
+// sse2_const_alpha_blend_a_functor = TVPConstAlphaBlend_a
+
 //--------------------------------------------------------------------
 // ここまでアルファブレンド
 // ここから加算合成など、psでないブレンドはソースアルファが考慮されない
