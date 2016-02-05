@@ -458,6 +458,7 @@
     <ClInclude Include="..\visual\gl\blend_ps_functor_sse2.h" />
     <ClInclude Include="..\visual\gl\blend_util_func.h" />
     <ClInclude Include="..\visual\gl\blend_variation.h" />
+    <ClInclude Include="..\visual\gl\interpolation_functor_sse2.h" />
     <ClInclude Include="..\visual\gl\simd_def_x86x64.h" />
     <ClInclude Include="..\visual\gl\sse_mathfun.h" />
     <ClInclude Include="..\visual\gl\x86simdutil.h" />
