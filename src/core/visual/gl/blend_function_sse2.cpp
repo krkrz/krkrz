@@ -562,6 +562,16 @@ extern void TVPUnivTransBlend_switch_d_sse2_c(tjs_uint32 *dest, const tjs_uint32
 extern void TVPInitGammaAdjustTempData_sse2_c( tTVPGLGammaAdjustTempData *temp, const tTVPGLGammaAdjustData *data );
 extern void TVPAdjustGamma_a_sse2_c(tjs_uint32 *dest, tjs_int len, tTVPGLGammaAdjustTempData *param);
 
+extern void TVPAddSubVertSum16_sse2_c(tjs_uint16 *dest, const tjs_uint32 *addline, const tjs_uint32 *subline, tjs_int len);
+extern void TVPAddSubVertSum16_d_sse2_c(tjs_uint16 *dest, const tjs_uint32 *addline, const tjs_uint32 *subline, tjs_int len);
+extern void TVPAddSubVertSum32_sse2_c(tjs_uint32 *dest, const tjs_uint32 *addline, const tjs_uint32 *subline, tjs_int len);
+extern void TVPAddSubVertSum32_d_sse2_c(tjs_uint32 *dest, const tjs_uint32 *addline, const tjs_uint32 *subline, tjs_int len);
+extern void TVPDoBoxBlurAvg16_sse2_c(tjs_uint32 *dest, tjs_uint16 *sum, const tjs_uint16 * add, const tjs_uint16 * sub, tjs_int n, tjs_int len);
+extern void TVPDoBoxBlurAvg16_d_sse2_c(tjs_uint32 *dest, tjs_uint16 *sum, const tjs_uint16 * add, const tjs_uint16 * sub, tjs_int n, tjs_int len);
+extern void TVPDoBoxBlurAvg32_sse2_c(tjs_uint32 *dest, tjs_uint32 *sum, const tjs_uint32 * add, const tjs_uint32 * sub, tjs_int n, tjs_int len);
+extern void TVPDoBoxBlurAvg32_d_sse2_c(tjs_uint32 *dest, tjs_uint32 *sum, const tjs_uint32 * add, const tjs_uint32 * sub, tjs_int n, tjs_int len);
+
+
 
 void TVPGL_SSE2_Init() {
 	if( TVPCPUType & TVP_CPU_HAS_SSE2 ) {
@@ -714,6 +724,18 @@ void TVPGL_SSE2_Init() {
 		TVPLinTransConstAlphaBlend_a = TVPLinTransConstAlphaBlend_a_sse2_c;
 		TVPInterpLinTransCopy = TVPInterpLinTransCopy_sse2_c;
 		TVPInterpLinTransConstAlphaBlend = TVPInterpLinTransConstAlphaBlend_sse2_c;
+
+		// Box Blur ( TODO 実環境で要テスト)
+		TVPAddSubVertSum16 = TVPAddSubVertSum16_sse2_c;
+		TVPAddSubVertSum16_d = TVPAddSubVertSum16_d_sse2_c;
+		TVPAddSubVertSum32 = TVPAddSubVertSum32_sse2_c;
+		TVPAddSubVertSum32_d = TVPAddSubVertSum32_d_sse2_c;
+		TVPDoBoxBlurAvg16 = TVPDoBoxBlurAvg16_sse2_c;
+		TVPDoBoxBlurAvg32 = TVPDoBoxBlurAvg32_sse2_c;
+		if( TVPCPUType & TVP_CPU_HAS_SSE ) {
+			TVPDoBoxBlurAvg16_d = TVPDoBoxBlurAvg16_d_sse2_c;	// SSE
+			TVPDoBoxBlurAvg32_d = TVPDoBoxBlurAvg32_d_sse2_c;	// SSE
+		}
 	}
 }
 
