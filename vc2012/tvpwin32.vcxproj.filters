@@ -1021,6 +1021,9 @@
     <ClCompile Include="..\visual\gl\x86simdutil.cpp">
       <Filter>visual\gl</Filter>
     </ClCompile>
+    <ClCompile Include="..\visual\gl\boxblur_sse2.cpp">
+      <Filter>visual\gl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="tvpwin32.rc">
