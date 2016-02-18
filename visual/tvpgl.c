@@ -9451,6 +9451,7 @@ TVP_GL_FUNC_DECL(void, TVPInitGammaAdjustTempData_c, (tTVPGLGammaAdjustTempData 
 	int i;
 	for(i=0;i<256;i++)
 	{
+#if 0
 		double rate = (double)i/255.0;
 		int n;
 		n = (int)(pow(rate, rgamma)*ramp+0.5+(double)data->RFloor);
@@ -9462,6 +9463,20 @@ TVP_GL_FUNC_DECL(void, TVPInitGammaAdjustTempData_c, (tTVPGLGammaAdjustTempData 
 		n = (int)(pow(rate, bgamma)*bamp+0.5+(double)data->BFloor);
 		if(n<0) n=0; else if(n>255) n=255;
 		temp->B[i]= n;
+#else
+		// pow(x, y) == exp(y * log(x))
+		double rate = log((double)i/255.0);
+		int n;
+		n = (int)(exp(rate * rgamma)*ramp+0.5+(double)data->RFloor);
+		if(n<0) n=0; else if(n>255) n=255;
+		temp->R[i]= n;
+		n = (int)(exp(rate * ggamma)*gamp+0.5+(double)data->GFloor);
+		if(n<0) n=0; else if(n>255) n=255;
+		temp->G[i]= n;
+		n = (int)(exp(rate * bgamma)*bamp+0.5+(double)data->BFloor);
+		if(n<0) n=0; else if(n>255) n=255;
+		temp->B[i]= n;
+#endif
 	}
 }
 
