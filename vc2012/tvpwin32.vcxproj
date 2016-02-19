@@ -614,6 +614,7 @@
     <ClCompile Include="..\visual\gl\blend_function.cpp" />
     <ClCompile Include="..\visual\gl\blend_function_sse2.cpp" />
     <ClCompile Include="..\visual\gl\boxblur_sse2.cpp" />
+    <ClCompile Include="..\visual\gl\colorfill_sse2.cpp" />
     <ClCompile Include="..\visual\gl\univtrans_sse2.cpp" />
     <ClCompile Include="..\visual\gl\x86simdutil.cpp" />
     <ClCompile Include="..\visual\GraphicsLoaderIntf.cpp" />
