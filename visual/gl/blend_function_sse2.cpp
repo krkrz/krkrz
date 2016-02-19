@@ -571,6 +571,14 @@ extern void TVPDoBoxBlurAvg16_d_sse2_c(tjs_uint32 *dest, tjs_uint16 *sum, const 
 extern void TVPDoBoxBlurAvg32_sse2_c(tjs_uint32 *dest, tjs_uint32 *sum, const tjs_uint32 * add, const tjs_uint32 * sub, tjs_int n, tjs_int len);
 extern void TVPDoBoxBlurAvg32_d_sse2_c(tjs_uint32 *dest, tjs_uint32 *sum, const tjs_uint32 * add, const tjs_uint32 * sub, tjs_int n, tjs_int len);
 
+extern void TVPFillARGB_sse2_c( tjs_uint32 *dest, tjs_int len, tjs_uint32 value );
+extern void TVPFillARGB_NC_sse2_c( tjs_uint32 *dest, tjs_int len, tjs_uint32 value );
+extern void TVPFillColor_sse2_c(tjs_uint32 *dest, tjs_int len, tjs_uint32 color);
+extern void TVPFillMask_sse2_c(tjs_uint32 *dest, tjs_int len, tjs_uint32 mask);
+extern void TVPConstColorAlphaBlend_sse2_c(tjs_uint32 *dest, tjs_int len, tjs_uint32 color, tjs_int opa);
+extern void TVPConstColorAlphaBlend_d_sse2_c(tjs_uint32 *dest, tjs_int len, tjs_uint32 color, tjs_int opa);
+extern void TVPConstColorAlphaBlend_a_sse2_c(tjs_uint32 *dest, tjs_int len, tjs_uint32 color, tjs_int opa);
+
 
 
 void TVPGL_SSE2_Init() {
@@ -691,6 +699,15 @@ void TVPGL_SSE2_Init() {
 		TVPPsExclusionBlend_HDA =  TVPPsExclusionBlend_HDA_sse2_c;
 		TVPPsExclusionBlend_HDA_o =  TVPPsExclusionBlend_HDA_o_sse2_c;
 
+		// fill
+		TVPFillARGB = TVPFillARGB_sse2_c;
+		TVPFillARGB_NC = TVPFillARGB_NC_sse2_c;
+		TVPFillColor = TVPFillColor_sse2_c;
+		TVPFillMask = TVPFillMask_sse2_c;
+		TVPConstColorAlphaBlend = TVPConstColorAlphaBlend_sse2_c;
+		TVPConstColorAlphaBlend_d = TVPConstColorAlphaBlend_d_sse2_c;
+		TVPConstColorAlphaBlend_a = TVPConstColorAlphaBlend_a_sse2_c;
+
 		// SSE2版はアルファもブレンドしているので、どちらでも行ける
 		TVPUnivTransBlend = TVPUnivTransBlend_sse2_c;
 		TVPUnivTransBlend_a = TVPUnivTransBlend_sse2_c;
@@ -736,6 +753,7 @@ void TVPGL_SSE2_Init() {
 			TVPDoBoxBlurAvg16_d = TVPDoBoxBlurAvg16_d_sse2_c;	// SSE
 			TVPDoBoxBlurAvg32_d = TVPDoBoxBlurAvg32_d_sse2_c;	// SSE
 		}
+		
 	}
 }
 
