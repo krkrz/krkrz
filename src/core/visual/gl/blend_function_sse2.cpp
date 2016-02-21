@@ -579,7 +579,15 @@ extern void TVPConstColorAlphaBlend_sse2_c(tjs_uint32 *dest, tjs_int len, tjs_ui
 extern void TVPConstColorAlphaBlend_d_sse2_c(tjs_uint32 *dest, tjs_int len, tjs_uint32 color, tjs_int opa);
 extern void TVPConstColorAlphaBlend_a_sse2_c(tjs_uint32 *dest, tjs_int len, tjs_uint32 color, tjs_int opa);
 
-
+extern void TVPApplyColorMap65_sse2_c(tjs_uint32 *dest, const tjs_uint8 *src, tjs_int len, tjs_uint32 color);
+extern void TVPApplyColorMap_sse2_c(tjs_uint32 *dest, const tjs_uint8 *src, tjs_int len, tjs_uint32 color);
+extern void TVPApplyColorMap65_d_sse2_c(tjs_uint32 *dest, const tjs_uint8 *src, tjs_int len, tjs_uint32 color);
+extern void TVPApplyColorMap65_a_sse2_c(tjs_uint32 *dest, const tjs_uint8 *src, tjs_int len, tjs_uint32 color);
+extern void TVPApplyColorMap_a_sse2_c(tjs_uint32 *dest, const tjs_uint8 *src, tjs_int len, tjs_uint32 color);
+extern void TVPApplyColorMap65_o_sse2_c(tjs_uint32 *dest, const tjs_uint8 *src, tjs_int len, tjs_uint32 color, tjs_int opa);
+extern void TVPApplyColorMap_o_sse2_c(tjs_uint32 *dest, const tjs_uint8 *src, tjs_int len, tjs_uint32 color, tjs_int opa);
+extern void TVPApplyColorMap65_ao_sse2_c(tjs_uint32 *dest, const tjs_uint8 *src, tjs_int len, tjs_uint32 color, tjs_int opa);
+extern void TVPApplyColorMap_ao_sse2_c(tjs_uint32 *dest, const tjs_uint8 *src, tjs_int len, tjs_uint32 color, tjs_int opa);
 
 void TVPGL_SSE2_Init() {
 	if( TVPCPUType & TVP_CPU_HAS_SSE2 ) {
@@ -707,6 +715,17 @@ void TVPGL_SSE2_Init() {
 		TVPConstColorAlphaBlend = TVPConstColorAlphaBlend_sse2_c;
 		TVPConstColorAlphaBlend_d = TVPConstColorAlphaBlend_d_sse2_c;
 		TVPConstColorAlphaBlend_a = TVPConstColorAlphaBlend_a_sse2_c;
+
+		// apply color
+		TVPApplyColorMap65 = TVPApplyColorMap65_sse2_c;
+		TVPApplyColorMap = TVPApplyColorMap_sse2_c;
+		TVPApplyColorMap65_d = TVPApplyColorMap65_d_sse2_c;
+		TVPApplyColorMap65_a = TVPApplyColorMap65_a_sse2_c;
+		TVPApplyColorMap_a = TVPApplyColorMap_a_sse2_c;
+		TVPApplyColorMap65_o = TVPApplyColorMap65_o_sse2_c;
+		TVPApplyColorMap_o = TVPApplyColorMap_o_sse2_c;
+		TVPApplyColorMap65_ao = TVPApplyColorMap65_ao_sse2_c;
+		TVPApplyColorMap_ao = TVPApplyColorMap_ao_sse2_c;
 
 		// SSE2版はアルファもブレンドしているので、どちらでも行ける
 		TVPUnivTransBlend = TVPUnivTransBlend_sse2_c;
