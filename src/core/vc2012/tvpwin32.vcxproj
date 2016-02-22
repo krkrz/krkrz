@@ -616,6 +616,7 @@
     <ClCompile Include="..\visual\gl\boxblur_sse2.cpp" />
     <ClCompile Include="..\visual\gl\colorfill_sse2.cpp" />
     <ClCompile Include="..\visual\gl\colormap_sse2.cpp" />
+    <ClCompile Include="..\visual\gl\pixelformat_sse2.cpp" />
     <ClCompile Include="..\visual\gl\univtrans_sse2.cpp" />
     <ClCompile Include="..\visual\gl\x86simdutil.cpp" />
     <ClCompile Include="..\visual\GraphicsLoaderIntf.cpp" />

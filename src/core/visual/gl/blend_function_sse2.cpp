@@ -589,6 +589,9 @@ extern void TVPApplyColorMap_o_sse2_c(tjs_uint32 *dest, const tjs_uint8 *src, tj
 extern void TVPApplyColorMap65_ao_sse2_c(tjs_uint32 *dest, const tjs_uint8 *src, tjs_int len, tjs_uint32 color, tjs_int opa);
 extern void TVPApplyColorMap_ao_sse2_c(tjs_uint32 *dest, const tjs_uint8 *src, tjs_int len, tjs_uint32 color, tjs_int opa);
 
+extern void TVPConvert24BitTo32Bit_sse2_c(tjs_uint32 *dest, const tjs_uint8 *buf, tjs_int len);
+extern void TVPConvert24BitTo32Bit_ssse3_c(tjs_uint32 *dest, const tjs_uint8 *buf, tjs_int len);
+
 void TVPGL_SSE2_Init() {
 	if( TVPCPUType & TVP_CPU_HAS_SSE2 ) {
 		TVPAdditiveAlphaBlend = TVPAdditiveAlphaBlend_sse2_c;
@@ -772,7 +775,15 @@ void TVPGL_SSE2_Init() {
 			TVPDoBoxBlurAvg16_d = TVPDoBoxBlurAvg16_d_sse2_c;	// SSE
 			TVPDoBoxBlurAvg32_d = TVPDoBoxBlurAvg32_d_sse2_c;	// SSE
 		}
-		
+
+		// pixel format convert
+		if( TVPCPUType & TVP_CPU_HAS_SSSE3 ) {
+			TVPConvert24BitTo32Bit = TVPConvert24BitTo32Bit_ssse3_c;
+			TVPBLConvert24BitTo32Bit = TVPConvert24BitTo32Bit_ssse3_c;
+		} else {
+			TVPConvert24BitTo32Bit = TVPConvert24BitTo32Bit_sse2_c;
+			TVPBLConvert24BitTo32Bit = TVPConvert24BitTo32Bit_sse2_c;
+		}
 	}
 }
 
