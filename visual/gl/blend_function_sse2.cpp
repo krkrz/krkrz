@@ -327,6 +327,123 @@ void sse2_interpolation_line_transform_copy(tjs_uint32 *dest, tjs_int len, const
 		dest++;
 	}
 }
+
+//--------------------------------------------------------------------
+// ブレンドなど何も行わない場合は、Cバージョンの方が少しだけ速い
+// 色々と試してみたが以下の実装がその中では一番速かった
+template<typename functor>
+static inline void stretch_blend_func_sse2(tjs_uint32 *dest, tjs_int len, const tjs_uint32 *src, tjs_int srcstart, tjs_int srcstep, const functor &func ) {
+	if( len <= 0 ) return;
+
+	tjs_int count = (tjs_int)((unsigned)dest & 0xF);
+	if( count ) {
+		count = (16 - count)>>2;
+		count = count < len ? count : count - len;
+		tjs_uint32* limit = dest + count;
+		while( dest < limit ) {
+			*dest = func( *dest, src[srcstart >> 16] );
+			srcstart += srcstep;
+			dest++;
+		}
+		len -= count;
+	}
+	//tjs_uint32 rem = (len>>2)<<2;
+	tjs_uint32 rem = (len>>3)<<3;
+	tjs_uint32* limit = dest + rem;
+	while( dest < limit ) {
+		__m128i mdst = _mm_load_si128( (__m128i const*)&dest[0] );
+		__m128i msrc = _mm_cvtsi32_si128( src[srcstart >> 16] );
+		__m128i mtmp = _mm_cvtsi32_si128( src[(srcstart+srcstep) >> 16] );
+		msrc = _mm_unpacklo_epi32( msrc, mtmp );
+		__m128i mtm1 = _mm_cvtsi32_si128( src[(srcstart+srcstep*2) >> 16]  );
+		__m128i mtm2 = _mm_cvtsi32_si128( src[(srcstart+srcstep*3) >> 16] );
+		mtm1 = _mm_unpacklo_epi32( mtm1, mtm2 );
+		msrc = _mm_unpacklo_epi64( msrc, mtm1 );
+		_mm_store_si128((__m128i *)&dest[0], func( mdst, msrc ) );
+
+		mdst = _mm_load_si128( (__m128i const*)&dest[4] );
+		msrc = _mm_cvtsi32_si128( src[(srcstart+srcstep*4) >> 16] );
+		mtmp = _mm_cvtsi32_si128( src[(srcstart+srcstep*5) >> 16] );
+		msrc = _mm_unpacklo_epi32( msrc, mtmp );
+		mtm1 = _mm_cvtsi32_si128( src[(srcstart+srcstep*6) >> 16]  );
+		mtm2 = _mm_cvtsi32_si128( src[(srcstart+srcstep*7) >> 16] );
+		mtm1 = _mm_unpacklo_epi32( mtm1, mtm2 );
+		msrc = _mm_unpacklo_epi64( msrc, mtm1 );
+		_mm_store_si128((__m128i *)&dest[4], func( mdst, msrc ) );
+		dest += 8;
+		srcstart += srcstep*8;
+	}
+	limit += (len-rem);
+	while( dest < limit ) {
+		*dest = func( *dest, src[srcstart >> 16] );
+		srcstart += srcstep;
+		dest++;
+	}
+}
+template<typename functor>
+static inline void stretch_copy_func_sse2(tjs_uint32 *dest, tjs_int len, const tjs_uint32 *src, tjs_int srcstart, tjs_int srcstep ) {
+	functor func;
+	stretch_blend_func_sse2( dest, len, src, srcstart, srcstep, func );
+}
+
+template<typename functor>
+static inline void stretch_blend_inter_func_sse2(tjs_uint32 *dest, tjs_int len, const tjs_uint32 *src1, const tjs_uint32 *src2, tjs_int blend_y, tjs_int srcstart, tjs_int srcstep, const functor& func ) {
+	if( len <= 0 ) return;
+
+	sse2_bilinear_fixy_functor	inter(blend_y);
+
+	__m128i mstep1(_mm_set1_epi32( srcstep ));
+	__m128i mstep(mstep1);
+	mstep = _mm_add_epi32( mstep, mstep );	// step*2
+	mstep = _mm_add_epi32( mstep, mstep );	// step*4
+#if 1
+	__m128i mstart(_mm_set_epi32( srcstart+srcstep*3, srcstart+srcstep*2, srcstart+srcstep, srcstart ));
+#else
+	__m128i mstart(_mm_set1_epi32( srcstart ));
+	__m128i mtmp(mstep1);
+	mtmp = _mm_slli_si128( mtmp, 4 );	// << 4*8
+	mstart = _mm_add_epi32( mstart, mtmp );	// +step, +step, +step, +0
+	mtmp = _mm_slli_si128( mtmp, 4 );	// << 4*8
+	mstart = _mm_add_epi32( mstart, mtmp );	// +step*2, +step*2, +step, +0
+	mtmp = _mm_slli_si128( mtmp, 4 );	// << 4*8
+	mstart = _mm_add_epi32( mstart, mtmp );	// +step*3, +step*2, +step, +0
+#endif
+
+	tjs_int count = (tjs_int)((unsigned)dest & 0xF);
+	if( count ) {
+		count = (16 - count)>>2;
+		count = count < len ? count : count - len;
+		tjs_uint32* limit = dest + count;
+		while( dest < limit ) {
+			tjs_uint32 s = inter( src1, src2, mstart.m128i_i32[0] );
+			*dest = func( *dest, s  );
+			mstart = _mm_add_epi32( mstart, mstep1 );
+			dest++;
+		}
+		len -= count;
+	}
+	tjs_uint32 rem = (len>>2)<<2;
+	tjs_uint32* limit = dest + rem;
+	while( dest < limit ) {
+		__m128i mdst = _mm_load_si128( (__m128i const*)dest );
+		__m128i msrc = inter( src1, src2, mstart );
+		_mm_store_si128((__m128i *)dest, func( mdst, msrc ) );
+		mstart = _mm_add_epi32( mstart, mstep );
+		dest += 4;
+	}
+	limit += (len-rem);
+	while( dest < limit ) {
+		tjs_uint32 s = inter( src1, src2, mstart.m128i_i32[0] );
+		*dest = func( *dest, s  );
+		mstart = _mm_add_epi32( mstart, mstep1 );
+		dest++;
+	}
+}
+template<typename functor>
+static inline void stretch_copy_func_sse2(tjs_uint32 *dest, tjs_int destlen, const tjs_uint32 *src1, const tjs_uint32 *src2, tjs_int blend_y, tjs_int srcstart, tjs_int srcstep ) {
+	functor func;
+	stretch_blend_inter_func_sse2( dest, destlen, src1, src2, blend_y, srcstart, srcstep, func );
+}
 #define DEFINE_BLEND_FUNCTION_MIN_VARIATION( NAME, FUNC ) \
 static void TVP##NAME##_sse2_c( tjs_uint32 *dest, const tjs_uint32 *src, tjs_int len ) {				\
 	copy_func_sse2<sse2_##FUNC##_functor>( dest, src, len );											\
@@ -553,7 +670,85 @@ void TVPInterpLinTransCopy_sse2_c(tjs_uint32 *dest, tjs_int len, const tjs_uint3
 void TVPInterpLinTransConstAlphaBlend_sse2_c(tjs_uint32 *dest, tjs_int len, const tjs_uint32 *src,  tjs_int sx, tjs_int sy, tjs_int stepx, tjs_int stepy, tjs_int srcpitch, tjs_int opa) {
 	DEF_BILINEAR_OPA( sse2_const_alpha_blend_functor )
 }
-
+// 拡大縮小
+// ニアレスト
+void TVPStretchCopy_sse2_c(tjs_uint32 *dest, tjs_int len, const tjs_uint32 *src, tjs_int srcstart, tjs_int srcstep) {
+	stretch_copy_func_sse2<sse2_const_copy_functor>( dest, len, src, srcstart, srcstep );
+}
+void TVPStretchAlphaBlend_sse2_c(tjs_uint32 *dest, tjs_int len, const tjs_uint32 *src, tjs_int srcstart, tjs_int srcstep) {
+	stretch_copy_func_sse2<sse2_alpha_blend_functor>( dest, len, src, srcstart, srcstep );
+}
+void TVPStretchAlphaBlend_HDA_sse2_c(tjs_uint32 *dest, tjs_int len, const tjs_uint32 *src, tjs_int srcstart, tjs_int srcstep) {
+	stretch_copy_func_sse2<sse2_alpha_blend_hda_functor>( dest, len, src, srcstart, srcstep );
+}
+void TVPStretchAlphaBlend_o_sse2_c(tjs_uint32 *dest, tjs_int len, const tjs_uint32 *src, tjs_int srcstart, tjs_int srcstep, tjs_int opa) {
+	sse2_alpha_blend_o_functor func(opa);
+	stretch_blend_func_sse2( dest, len, src, srcstart, srcstep, func );
+}
+void TVPStretchAlphaBlend_HDA_o_sse2_c(tjs_uint32 *dest, tjs_int len, const tjs_uint32 *src, tjs_int srcstart, tjs_int srcstep, tjs_int opa) {
+	sse2_alpha_blend_hda_o_functor func(opa);
+	stretch_blend_func_sse2( dest, len, src, srcstart, srcstep, func );
+}
+void TVPStretchAlphaBlend_d_sse2_c(tjs_uint32 *dest, tjs_int len, const tjs_uint32 *src, tjs_int srcstart, tjs_int srcstep) {
+	stretch_copy_func_sse2<sse2_alpha_blend_d_functor>( dest, len, src, srcstart, srcstep );
+}
+void TVPStretchAlphaBlend_a_sse2_c(tjs_uint32 *dest, tjs_int len, const tjs_uint32 *src, tjs_int srcstart, tjs_int srcstep) {
+	stretch_copy_func_sse2<sse2_alpha_blend_a_functor>( dest, len, src, srcstart, srcstep );
+}
+//void TVPStretchAlphaBlend_do_sse2_c(tjs_uint32 *dest, tjs_int len, const tjs_uint32 *src, tjs_int srcstart, tjs_int srcstep, tjs_int opa);
+//void TVPStretchAlphaBlend_ao_sse2_c(tjs_uint32 *dest, tjs_int len, const tjs_uint32 *src, tjs_int srcstart, tjs_int srcstep, tjs_int opa);
+void TVPStretchAdditiveAlphaBlend_sse2_c(tjs_uint32 *dest, tjs_int len, const tjs_uint32 *src, tjs_int srcstart, tjs_int srcstep) {
+	stretch_copy_func_sse2<sse2_premul_alpha_blend_functor>( dest, len, src, srcstart, srcstep );
+}
+void TVPStretchAdditiveAlphaBlend_HDA_sse2_c(tjs_uint32 *dest, tjs_int len, const tjs_uint32 *src, tjs_int srcstart, tjs_int srcstep) {
+	stretch_copy_func_sse2<sse2_premul_alpha_blend_hda_functor>( dest, len, src, srcstart, srcstep );
+}
+void TVPStretchAdditiveAlphaBlend_o_sse2_c(tjs_uint32 *dest, tjs_int len, const tjs_uint32 *src, tjs_int srcstart, tjs_int srcstep, tjs_int opa) {
+	sse2_premul_alpha_blend_o_functor func(opa);
+	stretch_blend_func_sse2( dest, len, src, srcstart, srcstep, func );
+}
+//void TVPStretchAdditiveAlphaBlend_HDA_o_sse2_c(tjs_uint32 *dest, tjs_int len, const tjs_uint32 *src, tjs_int srcstart, tjs_int srcstep, tjs_int opa);
+void TVPStretchAdditiveAlphaBlend_a_sse2_c(tjs_uint32 *dest, tjs_int len, const tjs_uint32 *src, tjs_int srcstart, tjs_int srcstep) {
+	stretch_copy_func_sse2<sse2_premul_alpha_blend_a_functor>( dest, len, src, srcstart, srcstep );
+}
+//void TVPStretchAdditiveAlphaBlend_ao_sse2_c(tjs_uint32 *dest, tjs_int len, const tjs_uint32 *src, tjs_int srcstart, tjs_int srcstep, tjs_int opa);
+void TVPStretchCopyOpaqueImage_sse2_c(tjs_uint32 *dest, tjs_int destlen, const tjs_uint32 *src, tjs_int srcstart, tjs_int srcstep) {
+	stretch_copy_func_sse2<sse2_color_opaque_functor>( dest, destlen, src, srcstart, srcstep );
+}
+void TVPStretchConstAlphaBlend_sse2_c(tjs_uint32 *dest, tjs_int len, const tjs_uint32 *src, tjs_int srcstart, tjs_int srcstep, tjs_int opa) {
+	sse2_const_alpha_blend_functor func(opa);
+	stretch_blend_func_sse2( dest, len, src, srcstart, srcstep, func );
+}
+void TVPStretchConstAlphaBlend_HDA_sse2_c(tjs_uint32 *dest, tjs_int len, const tjs_uint32 *src, tjs_int srcstart, tjs_int srcstep, tjs_int opa) {
+	sse2_const_alpha_blend_hda_functor func(opa);
+	stretch_blend_func_sse2( dest, len, src, srcstart, srcstep, func );
+}
+void TVPStretchConstAlphaBlend_d_sse2_c(tjs_uint32 *dest, tjs_int len, const tjs_uint32 *src, tjs_int srcstart, tjs_int srcstep, tjs_int opa) {
+	sse2_const_alpha_blend_d_functor func(opa);
+	stretch_blend_func_sse2( dest, len, src, srcstart, srcstep, func );
+}
+void TVPStretchConstAlphaBlend_a_sse2_c(tjs_uint32 *dest, tjs_int len, const tjs_uint32 *src, tjs_int srcstart, tjs_int srcstep, tjs_int opa) {
+	sse2_const_alpha_blend_a_functor func(opa);
+	stretch_blend_func_sse2( dest, len, src, srcstart, srcstep, func );
+}
+void TVPStretchColorCopy_sse2_c(tjs_uint32 *dest, tjs_int destlen, const tjs_uint32 *src, tjs_int srcstart, tjs_int srcstep) {
+	stretch_copy_func_sse2<sse2_color_copy_functor>( dest, destlen, src, srcstart, srcstep );
+}
+// バイリニア
+void TVPInterpStretchCopy_sse2_c(tjs_uint32 *dest, tjs_int destlen, const tjs_uint32 *src1, const tjs_uint32 *src2, tjs_int blend_y, tjs_int srcstart, tjs_int srcstep) {
+	stretch_copy_func_sse2<sse2_const_copy_functor>( dest, destlen, src1, src2, blend_y, srcstart, srcstep );
+}
+void TVPInterpStretchAdditiveAlphaBlend_sse2_c(tjs_uint32 *dest, tjs_int destlen, const tjs_uint32 *src1, const tjs_uint32 *src2, tjs_int blend_y, tjs_int srcstart, tjs_int srcstep) {
+	stretch_copy_func_sse2<sse2_premul_alpha_blend_functor>( dest, destlen, src1, src2, blend_y, srcstart, srcstep );
+}
+void TVPInterpStretchAdditiveAlphaBlend_o_sse2_c(tjs_uint32 *dest, tjs_int destlen, const tjs_uint32 *src1, const tjs_uint32 *src2, tjs_int blend_y, tjs_int srcstart, tjs_int srcstep, tjs_int opa) {
+	sse2_premul_alpha_blend_o_functor func(opa);
+	stretch_blend_inter_func_sse2( dest, destlen, src1, src2, blend_y, srcstart, srcstep, func );
+}
+void TVPInterpStretchConstAlphaBlend_sse2_c(tjs_uint32 *dest, tjs_int destlen, const tjs_uint32 *src1, const tjs_uint32 *src2, tjs_int blend_y, tjs_int srcstart, tjs_int srcstep, tjs_int opa) {
+	sse2_const_alpha_blend_functor func(opa);
+	stretch_blend_inter_func_sse2( dest, destlen, src1, src2, blend_y, srcstart, srcstep, func );
+}
 extern void TVPUnivTransBlend_sse2_c(tjs_uint32 *dest, const tjs_uint32 *src1, const tjs_uint32 *src2, const tjs_uint8 *rule, const tjs_uint32 *table, tjs_int len);
 extern void TVPUnivTransBlend_switch_sse2_c(tjs_uint32 *dest, const tjs_uint32 *src1, const tjs_uint32 *src2, const tjs_uint8 *rule, const tjs_uint32 *table, tjs_int len, tjs_int src1lv, tjs_int src2lv);
 extern void TVPUnivTransBlend_d_sse2_c(tjs_uint32 *dest, const tjs_uint32 *src1, const tjs_uint32 *src2, const tjs_uint8 *rule, const tjs_uint32 *table, tjs_int len);
@@ -742,6 +937,29 @@ void TVPGL_SSE2_Init() {
 			TVPInitGammaAdjustTempData = TVPInitGammaAdjustTempData_sse2_c;
 		}
 		TVPAdjustGamma_a = TVPAdjustGamma_a_sse2_c;	// 逆数テーブルを使用しない方法にするとSSEも使う
+
+		// 拡大縮小
+		// TVPStretchCopy = TVPStretchCopy_sse2_c; // SSE2使わない方が少し速い
+		TVPStretchAlphaBlend = TVPStretchAlphaBlend_sse2_c;
+		TVPStretchAlphaBlend_HDA = TVPStretchAlphaBlend_HDA_sse2_c;
+		TVPStretchAlphaBlend_o = TVPStretchAlphaBlend_o_sse2_c;
+		TVPStretchAlphaBlend_HDA_o = TVPStretchAlphaBlend_HDA_o_sse2_c;
+		TVPStretchAlphaBlend_d = TVPStretchAlphaBlend_d_sse2_c;
+		TVPStretchAlphaBlend_a = TVPStretchAlphaBlend_a_sse2_c;
+		TVPStretchAdditiveAlphaBlend = TVPStretchAdditiveAlphaBlend_sse2_c;
+		TVPStretchAdditiveAlphaBlend_HDA = TVPStretchAdditiveAlphaBlend_HDA_sse2_c;
+		TVPStretchAdditiveAlphaBlend_o = TVPStretchAdditiveAlphaBlend_o_sse2_c;
+		TVPStretchAdditiveAlphaBlend_a = TVPStretchAdditiveAlphaBlend_a_sse2_c;
+		TVPStretchCopyOpaqueImage = TVPStretchCopyOpaqueImage_sse2_c;
+		TVPStretchConstAlphaBlend = TVPStretchConstAlphaBlend_sse2_c;
+		TVPStretchConstAlphaBlend_HDA = TVPStretchConstAlphaBlend_HDA_sse2_c;
+		TVPStretchConstAlphaBlend_d = TVPStretchConstAlphaBlend_d_sse2_c;
+		TVPStretchConstAlphaBlend_a = TVPStretchConstAlphaBlend_a_sse2_c;
+		TVPStretchColorCopy = TVPStretchColorCopy_sse2_c;
+		TVPInterpStretchCopy = TVPInterpStretchCopy_sse2_c;
+		TVPInterpStretchAdditiveAlphaBlend = TVPInterpStretchAdditiveAlphaBlend_sse2_c;
+		TVPInterpStretchAdditiveAlphaBlend_o = TVPInterpStretchAdditiveAlphaBlend_o_sse2_c;
+		TVPInterpStretchConstAlphaBlend = TVPInterpStretchConstAlphaBlend_sse2_c;
 
 		// アフィン変換用
 		TVPLinTransAlphaBlend = TVPLinTransAlphaBlend_sse2_c;
