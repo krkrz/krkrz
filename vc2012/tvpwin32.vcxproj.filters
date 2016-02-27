@@ -1033,6 +1033,9 @@
     <ClCompile Include="..\visual\gl\pixelformat_sse2.cpp">
       <Filter>visual\gl</Filter>
     </ClCompile>
+    <ClCompile Include="..\visual\gl\tlg_sse2.cpp">
+      <Filter>visual\gl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="tvpwin32.rc">
