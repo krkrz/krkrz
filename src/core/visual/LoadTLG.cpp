@@ -78,12 +78,12 @@ void TVPLoadTLG5(void* formatdata, void *callbackdata,
 
 	try
 	{
-		text = (tjs_uint8*)TJSAlignedAlloc(4096, 4);
+		text = (tjs_uint8*)TJSAlignedAlloc(4096+16, 4);
 		memset(text, 0, 4096);
 
-		inbuf = (tjs_uint8*)TJSAlignedAlloc(blockheight * width + 10, 4);
+		inbuf = (tjs_uint8*)TJSAlignedAlloc(blockheight * width + 10+16, 4);
 		for(tjs_int i = 0; i < colors; i++)
-			outbuf[i] = (tjs_uint8*)TJSAlignedAlloc(blockheight * width + 10, 4);
+			outbuf[i] = (tjs_uint8*)TJSAlignedAlloc(blockheight * width + 10+16, 4);
 
 		tjs_uint8 *prevline = NULL;
 		for(tjs_int y_blk = 0; y_blk < height; y_blk += blockheight)

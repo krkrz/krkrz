@@ -123,24 +123,26 @@ tjs_int TVPTLG5DecompressSlide_sse_c( tjs_uint8 *out, const tjs_uint8 *in, tjs_i
 	_mm_empty();
 	return r;
 }
+#endif
 
 tjs_int TVPTLG5DecompressSlide_sse2_c( tjs_uint8 *out, const tjs_uint8 *in, tjs_int insize, tjs_uint8 *text, tjs_int initialr ) {
 	tjs_int r = initialr;
 	tjs_uint flags = 0;
 	const tjs_uint8 *inlim = in + insize;
-	// text と out は、+16余分に確保して、はみ出してもいいようにしておく
+	// text と out、in は、+16余分に確保して、はみ出してもいいようにしておく
 	//const __m128i mask = _mm_set1_epi32(0xffffffff);
 	const __m128i mask = _mm_set_epi32(0,0,0xffffffff,0xffffffff);
 	while(in < inlim ) {
 		if(((flags >>= 1) & 256) == 0) {
-			flags = in[0];
+			flags = in[0] | 0xff00;
 			in++;
 #if 1
-			if( flags == 0 && in < (inlim-8) ) {	// copy 8byte
+			if( flags == 0xff00 && r < (4096-8) && in < (inlim-8)  ) {	// copy 8byte
 				__m128i c = _mm_loadl_epi64( (__m128i const*)in );
 				_mm_storel_epi64( (__m128i *)out, c );
 				_mm_storel_epi64( (__m128i *)&text[r], c );	// 末尾はみ出すのを気にせずコピー
 				r += 8;
+#if 0
 				if( r > 4095 ) {
 					r &= 0x0FFF;
 					c = _mm_srli_epi64( c, (8 - r)*8 );
@@ -149,14 +151,13 @@ tjs_int TVPTLG5DecompressSlide_sse2_c( tjs_uint8 *out, const tjs_uint8 *in, tjs_
 					m = _mm_srli_epi64( m, (8 - r)*8 );
 					_mm_maskmoveu_si128( c, m, (char*)text );
 				}
+#endif
 				in += 8;
 				out += 8;
+				flags = 0;
 				continue;
-			} else
-#endif
-			{
-				flags |= 0xff00;
 			}
+#endif
 		}
 		if(flags & 1) {
 			tjs_int mpos = in[0] | ((in[1] & 0xf) << 8);
@@ -164,63 +165,37 @@ tjs_int TVPTLG5DecompressSlide_sse2_c( tjs_uint8 *out, const tjs_uint8 *in, tjs_
 			in += 2;
 			mlen += 3;
 			if(mlen == 18) {
-				mlen += in[0];
-				in++;
-			}
-			if( mlen < 8 ) {
+				mlen += in[0]; in++;
+				// 数バイトの細切れだと遅いと思うけど、そうじゃなければ速いかな？
+				// 8バイト単位 128bitシフトはimmでないといけないので、64bitごとに処理
+				// 頑張れば16バイト単位でも行けそうだけど、分岐が多くなりそうなので
+				if( (mpos+mlen) < 4096 && (r+mlen) < 4096 ) {
+					// 末尾気にせずコピーしていい時は16byte単位でまとめてコピー
+					tjs_int count = mlen >> 4;
+					while( count-- ) {
+						__m128i c = _mm_loadu_si128( (__m128i const*)&text[mpos] );
+						_mm_storeu_si128( (__m128i *)out, c );
+						_mm_storeu_si128( (__m128i *)&text[r], c );
+						mpos += 16; r += 16; out += 16;
+					}
+					mlen &= 0x0f;	// 余り
+					while(mlen--) {
+						out[0] = text[r++] = text[mpos++]; out++;
+					}
+					continue;
+				}
+#if 0
 				while(mlen--) {
 					out[0] = text[r++] = text[mpos++]; out++;
 					mpos &= 0x0fff;
 					r &= 0x0fff;
 				}
-			} else {
-				// 数バイトの細切れだと遅いと思うけど、そうじゃなければ速いかな？
-				// 8バイト単位 128bitシフトはimmでないといけないので、64bitごとに処理
-				// 頑張れば16バイト単位でも行けそうだけど、分岐が多くなりそうなので
+#else
 				while( mlen ) {
-					if( (mpos+16) < 4096 && (r+16) < 4096 && mlen >= 16 ) {	// 気にせずコピーしていい時は16byte単位でコピー
-						__m128i c = _mm_loadu_si128( (__m128i const*)&text[mpos] );
-						_mm_storeu_si128( (__m128i *)out, c );
-						_mm_storeu_si128( (__m128i *)&text[r], c );
-						mpos += 16; r += 16; out += 16; mlen -= 16;
-					} else {
-						__m128i c = _mm_loadl_epi64( (__m128i const*)&text[mpos] );
-						_mm_storeu_si128( (__m128i *)out, c );
-						if( mlen < 8 ) {
-							if( (4096-mpos) < mlen ) {
-								tjs_int mrem = (4096-mpos);
-								out += mrem;
-								mlen -= mrem;
-								__m128i m = mask;
-								m = _mm_srli_epi64( m, (8-mrem)*8 );
-								_mm_maskmoveu_si128( c, m, (char*)&text[r] );
-								r += mrem;
-								if( r > 4095 ) {
-									r &= 0x0fff;
-									c = _mm_srli_epi64( c, (mrem-r)*8 );
-									m = mask;
-									m = _mm_srli_epi64( m, (8-r)*8 );
-									_mm_maskmoveu_si128( c, m, (char*)text );
-								}
-								mpos = 0;
-							} else {
-								out += mlen;
-								__m128i m = mask;
-								m = _mm_srli_epi64( m, (8-mlen)*8 );
-								_mm_maskmoveu_si128( c, m, (char*)&text[r] );
-								r += mlen;
-								if( r > 4095 ) {
-									r &= 0x0fff;
-									c = _mm_srli_epi64( c, (mlen-r)*8 );
-									m = mask;
-									m = _mm_srli_epi64( m, (8-r)*8 );
-									_mm_maskmoveu_si128( c, m, (char*)text );
-								}
-								mpos += mlen;
-								mpos &= 0x0fff;
-								mlen = 0;
-							}
-						} else if( (4096-mpos) < 8 ) {
+					__m128i c = _mm_loadl_epi64( (__m128i const*)&text[mpos] );
+					_mm_storeu_si128( (__m128i *)out, c );
+					if( mlen < 8 ) {
+						if( (4096-mpos) < mlen ) {
 							tjs_int mrem = (4096-mpos);
 							out += mrem;
 							mlen -= mrem;
@@ -237,33 +212,71 @@ tjs_int TVPTLG5DecompressSlide_sse2_c( tjs_uint8 *out, const tjs_uint8 *in, tjs_
 							}
 							mpos = 0;
 						} else {
-							out += 8;
-							mlen -= 8;
-							_mm_storel_epi64( (__m128i *)&text[r], c );
-							r += 8;
+							out += mlen;
+							__m128i m = mask;
+							m = _mm_srli_epi64( m, (8-mlen)*8 );
+							_mm_maskmoveu_si128( c, m, (char*)&text[r] );
+							r += mlen;
 							if( r > 4095 ) {
 								r &= 0x0fff;
-								c = _mm_srli_epi64( c, (8-r)*8 );
-								__m128i m = mask;
+								c = _mm_srli_epi64( c, (mlen-r)*8 );
+								m = mask;
 								m = _mm_srli_epi64( m, (8-r)*8 );
 								_mm_maskmoveu_si128( c, m, (char*)text );
 							}
-							mpos += 8;
+							mpos += mlen;
 							mpos &= 0x0fff;
+							mlen = 0;
 						}
+					} else if( (4096-mpos) < 8 ) {
+						tjs_int mrem = (4096-mpos);
+						out += mrem;
+						mlen -= mrem;
+						__m128i m = mask;
+						m = _mm_srli_epi64( m, (8-mrem)*8 );
+						_mm_maskmoveu_si128( c, m, (char*)&text[r] );
+						r += mrem;
+						if( r > 4095 ) {
+							r &= 0x0fff;
+							c = _mm_srli_epi64( c, (mrem-r)*8 );
+							m = mask;
+							m = _mm_srli_epi64( m, (8-r)*8 );
+							_mm_maskmoveu_si128( c, m, (char*)text );
+						}
+						mpos = 0;
+					} else {
+						out += 8;
+						mlen -= 8;
+						_mm_storel_epi64( (__m128i *)&text[r], c );
+						r += 8;
+						if( r > 4095 ) {
+							r &= 0x0fff;
+							c = _mm_srli_epi64( c, (8-r)*8 );
+							__m128i m = mask;
+							m = _mm_srli_epi64( m, (8-r)*8 );
+							_mm_maskmoveu_si128( c, m, (char*)text );
+						}
+						mpos += 8;
+						mpos &= 0x0fff;
 					}
+				}
+#endif
+			} else {
+				while(mlen--) {
+					out[0] = text[r++] = text[mpos++]; out++;
+					mpos &= 0x0fff;
+					r &= 0x0fff;
 				}
 			}
 		} else {
 			unsigned char c = in[0]; in++;
 			out[0] = c; out++;
 			text[r++] = c;
-			r &= (4096 - 1);
+			r &= 0x0fff;
 		}
 	}
 	return r;
 }
-#endif
 
 void TVPTLG5ComposeColors3To4_sse2_c(tjs_uint8 *outp, const tjs_uint8 *upper, tjs_uint8 * const * buf, tjs_int width) {
 	tjs_int len = (width>>2)<<2;
