@@ -791,6 +791,9 @@ extern void TVPConvert24BitTo32Bit_ssse3_c(tjs_uint32 *dest, const tjs_uint8 *bu
 //extern void TVPTLG5ComposeColors3To4_test(tjs_uint8 *outp, const tjs_uint8 *upper, tjs_uint8 * const * buf, tjs_int width);
 //extern void TVPTLG5ComposeColors4To4_test(tjs_uint8 *outp, const tjs_uint8 *upper, tjs_uint8 * const * buf, tjs_int width);
 
+//extern "C" tjs_int TVPTLG5DecompressSlide_c( tjs_uint8 *out, const tjs_uint8 *in, tjs_int insize, tjs_uint8 *text, tjs_int initialr );
+
+extern tjs_int TVPTLG5DecompressSlide_sse2_c( tjs_uint8 *out, const tjs_uint8 *in, tjs_int insize, tjs_uint8 *text, tjs_int initialr );
 extern void TVPTLG5ComposeColors3To4_sse2_c(tjs_uint8 *outp, const tjs_uint8 *upper, tjs_uint8 * const * buf, tjs_int width);
 extern void TVPTLG5ComposeColors4To4_sse2_c(tjs_uint8 *outp, const tjs_uint8 *upper, tjs_uint8 * const * buf, tjs_int width);
 
@@ -1013,6 +1016,7 @@ void TVPGL_SSE2_Init() {
 //		TVPTLG5DecompressSlide = TVPTLG5DecompressSlide_test;		// for Test
 //		TVPTLG5ComposeColors3To4 = TVPTLG5ComposeColors3To4_test;	// for Test
 //		TVPTLG5ComposeColors4To4 = TVPTLG5ComposeColors4To4_test;	// for Test
+		TVPTLG5DecompressSlide = TVPTLG5DecompressSlide_sse2_c;
 		TVPTLG5ComposeColors3To4 = TVPTLG5ComposeColors3To4_sse2_c;
 		TVPTLG5ComposeColors4To4 = TVPTLG5ComposeColors4To4_sse2_c;
 	}
