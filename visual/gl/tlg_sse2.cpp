@@ -405,6 +405,732 @@ void TVPTLG5ComposeColors4To4_sse2_c(tjs_uint8 *outp, const tjs_uint8 *upper, tj
 		outp += 4; upper += 4;
 	}
 }
+
+// TLG6 chroma/luminosity decoder
+// This does reordering, color correlation filter, MED/AVG
+#define TVP_TLG6_W_BLOCK_SIZE		8
+
+static const __m128i g_mask( _mm_set1_epi32( 0x0000ff00 ) );
+static const __m128i b_mask( _mm_set1_epi32( 0x000000ff ) );
+static const __m128i r_mask( _mm_set1_epi32( 0x00ff0000 ) );
+static const __m128i a_mask( _mm_set1_epi32( 0xff000000 ) );
+static const __m128i g_d_mask( _mm_set1_epi32( 0x0000fe00 ) );
+static const __m128i r_d_mask( _mm_set1_epi32( 0x00fe0000 ) );
+static const __m128i b_d_mask( _mm_set1_epi32( 0x000000fe ) );
+static const __m128i avg_mask_fe( _mm_set1_epi32( 0xfefefefe ) );
+static const __m128i avg_mask_01( _mm_set1_epi32( 0x01010101 ) );
+
+// ( 0, IB, IG, IR)
+struct filter_insts_0_sse2 {
+	inline __m128i operator()( __m128i a ) const {
+		return a;
+	}
+};
+// ( 1, IB+IG, IG, IR+IG)
+struct filter_insts_1_sse2 {
+	inline __m128i operator()( __m128i a ) const {
+		__m128i b = a;
+		__m128i c = a;
+		b = _mm_and_si128( b, g_mask );
+		c = _mm_and_si128( c, g_mask );
+		b = _mm_slli_epi32( b, 8 );	// g << 8
+		c = _mm_srli_epi32( c, 8 );	// g >> 8
+		a = _mm_add_epi8( a, b );	// r+g
+		a = _mm_add_epi8( a, c );	// b+g
+		return a;
+	}
+};
+// ( 2, IB, IG+IB, IR+IB+IG)
+struct filter_insts_2_sse2 {
+	inline __m128i operator()( __m128i a ) const {
+		__m128i b = a;
+		b = _mm_slli_epi32( b, 8 );		// << 8
+		b = _mm_and_si128( b, g_mask );	// & 0x0000ff00
+		a = _mm_add_epi8( a, b );		// g+b
+		b = a;
+		b = _mm_slli_epi32( b, 8 );		// << 8
+		b = _mm_and_si128( b, r_mask );	// & 0x00ff0000
+		a = _mm_add_epi8( a, b );		// r+g+b
+		return a;
+	}
+};
+// ( 3, IB+IR+IG, IG+IR, IR)
+struct filter_insts_3_sse2 {
+	inline __m128i operator()( __m128i a ) const {
+		__m128i b = a;
+		b = _mm_srli_epi32( b, 8 );		// >> 8
+		b = _mm_and_si128( b, g_mask );	// & 0x0000ff00
+		a = _mm_add_epi8( a, b );		// g+r
+		b = a;
+		b = _mm_srli_epi32( b, 8 );		// >> 8
+		b = _mm_and_si128( b, b_mask );	// & 0x000000ff
+		a = _mm_add_epi8( a, b );		// b+g+r
+		return a;
+	}
+};
+// ( 4, IB+IR, IG+IB+IR, IR+IB+IR+IG)
+struct filter_insts_4_sse2 {
+	inline __m128i operator()( __m128i a ) const {
+		__m128i b = a;
+		b = _mm_srli_epi32( b, 16 );	// >> 16
+		b = _mm_and_si128( b, b_mask );	// & 0x000000ff
+		a = _mm_add_epi8( a, b );		// b+r
+		b = a;
+		b = _mm_slli_epi32( b, 8 );		// << 8
+		b = _mm_and_si128( b, g_mask );	// & 0x0000ff00
+		a = _mm_add_epi8( a, b );		// g+b+r
+		b = a;
+		b = _mm_slli_epi32( b, 8 );		// << 8
+		b = _mm_and_si128( b, r_mask );	// & 0x00ff0000
+		a = _mm_add_epi8( a, b );		// r+g+b+r
+		return a;
+	}
+};
+// ( 5, IB+IR, IG+IB+IR, IR)
+struct filter_insts_5_sse2 {
+	inline __m128i operator()( __m128i a ) const {
+		__m128i b = a;
+		b = _mm_srli_epi32( b, 16 );
+		b = _mm_and_si128( b, b_mask );
+		a = _mm_add_epi8( a, b );
+		b = a;
+		b = _mm_slli_epi32( b, 8 );
+		b = _mm_and_si128( b, g_mask );
+		a = _mm_add_epi8( a, b );
+		return a;
+	}
+};
+// ( 6, IB+IG, IG, IR)
+struct filter_insts_6_sse2 {
+	inline __m128i operator()( __m128i a ) const {
+		__m128i b = a;
+		b = _mm_srli_epi32( b, 8 );
+		b = _mm_and_si128( b, b_mask );
+		a = _mm_add_epi8( a, b );
+		return a;
+	}
+};
+// ( 7, IB, IG+IB, IR)
+struct filter_insts_7_sse2 {
+	inline __m128i operator()( __m128i a ) const {
+		__m128i b = a;
+		b = _mm_slli_epi32( b, 8 );
+		b = _mm_and_si128( b, g_mask );
+		a = _mm_add_epi8( a, b );
+		return a;
+	}
+};
+// ( 8, IB, IG, IR+IG)
+struct filter_insts_8_sse2 {
+	inline __m128i operator()( __m128i a ) const {
+		__m128i b = a;
+		b = _mm_slli_epi32( b, 8 );
+		b = _mm_and_si128( b, r_mask );
+		a = _mm_add_epi8( a, b );
+		return a;
+	}
+};
+// ( 9, IB+IG+IR+IB, IG+IR+IB, IR+IB)
+struct filter_insts_9_sse2 {
+	inline __m128i operator()( __m128i a ) const {
+		__m128i b = a;
+		b = _mm_slli_epi32( b, 16 );
+		b = _mm_and_si128( b, r_mask );
+		a = _mm_add_epi8( a, b );
+		b = a;
+		b = _mm_srli_epi32( b, 8 );
+		b = _mm_and_si128( b, g_mask );
+		a = _mm_add_epi8( a, b );
+		b = a;
+		b = _mm_srli_epi32( b, 8 );
+		b = _mm_and_si128( b, b_mask );
+		a = _mm_add_epi8( a, b );
+		return a;
+	}
+};
+// (10, IB+IR, IG+IR, IR)
+struct filter_insts_10_sse2 {
+	inline __m128i operator()( __m128i a ) const {
+		__m128i b = a;
+		__m128i c = a;
+		b = _mm_srli_epi32( b, 8 );
+		c = _mm_srli_epi32( c, 16 );
+		b = _mm_and_si128( b, g_mask );
+		c = _mm_and_si128( c, b_mask );
+		a = _mm_add_epi8( a, b );
+		a = _mm_add_epi8( a, c );
+		return a;
+	}
+};
+// (11, IB, IG+IB, IR+IB)
+struct filter_insts_11_sse2 {
+	inline __m128i operator()( __m128i a ) const {
+		__m128i b = a;
+		__m128i c = a;
+		b = _mm_slli_epi32( b, 8 );
+		c = _mm_slli_epi32( c, 16 );
+		b = _mm_and_si128( b, g_mask );
+		c = _mm_and_si128( c, r_mask );
+		a = _mm_add_epi8( a, b );
+		a = _mm_add_epi8( a, c );
+		return a;
+	}
+};
+// (12, IB, IG+IR+IB, IR+IB)
+struct filter_insts_12_sse2 {
+	inline __m128i operator()( __m128i a ) const {
+		__m128i b = a;
+		b = _mm_slli_epi32( b, 16 );
+		b = _mm_and_si128( b, r_mask );
+		a = _mm_add_epi8( a, b );
+		b = a;
+		b = _mm_srli_epi32( b, 8 );
+		b = _mm_and_si128( b, g_mask );
+		a = _mm_add_epi8( a, b );
+		return a;
+	}
+};
+// (13, IB+IG, IG+IR+IB+IG, IR+IB+IG)
+struct filter_insts_13_sse2 {
+	inline __m128i operator()( __m128i a ) const {
+		__m128i b = a;
+		b = _mm_srli_epi32( b, 8 );
+		b = _mm_and_si128( b, b_mask );
+		a = _mm_add_epi8( a, b );
+		b = a;
+		b = _mm_slli_epi32( b, 16 );
+		b = _mm_and_si128( b, r_mask );
+		a = _mm_add_epi8( a, b );
+		b = a;
+		b = _mm_srli_epi32( b, 8 );
+		b = _mm_and_si128( b, g_mask );
+		a = _mm_add_epi8( a, b );
+		return a;
+	}
+};
+// (14, IB+IG+IR, IG+IR, IR+IB+IG+IR)
+struct filter_insts_14_sse2 {
+	inline __m128i operator()( __m128i a ) const {
+		__m128i b = a;
+		b = _mm_srli_epi32( b, 8 );
+		b = _mm_and_si128( b, g_mask );
+		a = _mm_add_epi8( a, b );
+		b = a;
+		b = _mm_srli_epi32( b, 8 );
+		b = _mm_and_si128( b, b_mask );
+		a = _mm_add_epi8( a, b );
+		b = a;
+		b = _mm_slli_epi32( b, 16 );
+		b = _mm_and_si128( b, r_mask );
+		a = _mm_add_epi8( a, b );
+		return a;
+	}
+};
+// (15, IB, IG+(IB<<1), IR+(IB<<1))
+struct filter_insts_15_sse2 {
+	inline __m128i operator()( __m128i a ) const {
+		__m128i b = a;
+		__m128i c = a;
+		b = _mm_slli_epi32( b, 8+1 );		// b <<= (8+1)
+		c = _mm_slli_epi32( c, 16+1 );		// c <<= (16+1)
+		b = _mm_and_si128( b, g_d_mask );	// b &= 0x0000fe00
+		c = _mm_and_si128( c, r_d_mask );	// c != 0x00fe0000
+		a = _mm_add_epi8( a, b );		// a += b;
+		a = _mm_add_epi8( a, c );		// a += c;
+		return a;
+	}
+};
+#if 1
+// v Ç≈ÉGÉâÅ[Ç™èoÇÈÇÃÇ≈ÅAcÇéQè∆ìnÇµÇ∆ÇµÇƒÇ®Ç≠ÅAÉCÉìÉâÉCÉìâªÇ≥ÇÍÇƒâeãøÇÕÇ»Ç¢ÇÕÇ∏
+static inline __m128i do_med_sse2( __m128i a, __m128i b, const __m128i& c, __m128i v ) {
+	__m128i a2 = a;
+	a = _mm_max_epu8( a, b );	// = max_a_b
+	b = _mm_min_epu8( b, a2 );	// = min_a_b
+	v = _mm_add_epi8( v, a );
+	a = _mm_min_epu8( a, c );	// = max_a_b < c ? max_a_b : c
+	v = _mm_add_epi8( v, b );
+	a = _mm_max_epu8( a, b );	// = min_a_b < a ? a : min_a_b
+	return _mm_sub_epi8( v, a );
+}
+#else
+#define do_med( a, b, c, v ) \
+	_mm_setzero_si128();{__m128i a2 = a; \
+	a = _mm_max_epu8( a, b ); \
+	b = _mm_min_epu8( b, a2 ); \
+	v = _mm_add_epi8( v, a ); \
+	a = _mm_min_epu8( a, c ); \
+	v = _mm_add_epi8( v, b ); \
+	a = _mm_max_epu8( a, b ); \
+	p = _mm_sub_epi8( v, a );}
+#endif
+// v += max(a,b);
+// v += max(a,b) < c ? max(a,b) : c
+// v -= min(a,b) < a ? a : min(a,b)
+
+// v += max(p,u);
+// v += max(p,u) < up ? max(p,u) : up
+// v -= min(p,u) < p ? p : min(p,u)
+
+struct filter_forward_input_sse2 {
+	inline __m128i first(tjs_uint32 *in) const {
+		return _mm_loadu_si128( (__m128i const*)&in[0] );
+	}
+	inline __m128i second(tjs_uint32 *in) const {
+		return _mm_loadu_si128( (__m128i const*)&in[4] );
+	}
+};
+struct filter_backward_input_sse2 {
+	inline __m128i first(tjs_uint32 *in) const {
+		__m128i minput = _mm_loadu_si128( (__m128i const*)&in[4] );
+		return _mm_shuffle_epi32( minput, _MM_SHUFFLE( 0, 1, 2, 3 ) );	// ãtì]
+	}
+	inline __m128i second(tjs_uint32 *in) const {
+		__m128i minput = _mm_loadu_si128( (__m128i const*)&in[0] );
+		return _mm_shuffle_epi32( minput, _MM_SHUFFLE( 0, 1, 2, 3 ) );	// ãtì]
+	}
+};
+
+template<typename tfilter, typename tinput>
+static inline void do_filter_med_sse2( tjs_uint32& inp, tjs_uint32& inup, tjs_uint32 *in, tjs_uint32 *prevline, tjs_uint32 *curline ) {
+	tfilter filter;
+	tinput input;
+	__m128i p = _mm_cvtsi32_si128( inp );
+	__m128i up = _mm_cvtsi32_si128( inup );
+
+	__m128i minput = input.first( in );
+	__m128i u = _mm_loadu_si128( (__m128i const*)&prevline[0] );
+	minput = filter( minput );
+	p = do_med_sse2( p, u, up, minput );
+	up = u;
+	curline[0] = _mm_cvtsi128_si32( p );
+
+	minput = _mm_srli_si128( minput, 4 );	// >> 32
+	u = _mm_srli_si128( u, 4 );	// >> 32
+	p = do_med_sse2( p, u, up, minput );
+	up = u;
+	curline[1] = _mm_cvtsi128_si32( p );
+
+	minput = _mm_srli_si128( minput, 4 );	// >> 32
+	u = _mm_srli_si128( u, 4 );	// >> 32
+	p = do_med_sse2( p, u, up, minput );
+	up = u;
+	curline[2] = _mm_cvtsi128_si32( p );
+
+	minput = _mm_srli_si128( minput, 4 );	// >> 32
+	u = _mm_srli_si128( u, 4 );	// >> 32
+	p = do_med_sse2( p, u, up, minput );
+	up = u;
+	curline[3] = _mm_cvtsi128_si32( p );
+
+	minput = input.second( in );
+	u = _mm_loadu_si128( (__m128i const*)&prevline[4] );
+	minput = filter( minput );
+	p = do_med_sse2( p, u, up, minput );
+	up = u;
+	curline[4] = _mm_cvtsi128_si32( p );
+
+	minput = _mm_srli_si128( minput, 4 );	// >> 32
+	u = _mm_srli_si128( u, 4 );	// >> 32
+	p = do_med_sse2( p, u, up, minput );
+	up = u;
+	curline[5] = _mm_cvtsi128_si32( p );
+
+	minput = _mm_srli_si128( minput, 4 );	// >> 32
+	u = _mm_srli_si128( u, 4 );	// >> 32
+	p = do_med_sse2( p, u, up, minput );
+	up = u;
+	curline[6] = _mm_cvtsi128_si32( p );
+
+	minput = _mm_srli_si128( minput, 4 );	// >> 32
+	u = _mm_srli_si128( u, 4 );	// >> 32
+	p = do_med_sse2( p, u, up, minput );
+	curline[7] = _mm_cvtsi128_si32( p );
+
+	inp = _mm_cvtsi128_si32( p );
+	inup =  _mm_cvtsi128_si32( u );
+}
+
+// c = up : ÇÕégÇ¡ÇƒÇ»Ç¢ÇÃÇ≈ÅAóvÇÁÇ»Ç¢
+// p, u, up, in
+static inline __m128i do_avg_sse2( __m128i a, __m128i b, /*__m128i c, */__m128i v ) {
+	a = _mm_avg_epu8( a, b );
+	return _mm_add_epi8( a, v );
+}
+// TVP_TLG6_W_BLOCK_SIZE == 8
+// SSE2 Ç»ÇÁ 2âÒÇ»ÇÃÇ≈ÅAÉAÉìÉçÅ[ÉãÇµÇƒÇµÇ‹Ç¡ÇƒÇ¢Ç¢Ç©Ç‡
+template<typename tfilter, typename tinput>
+inline void do_filter_avg_sse2( tjs_uint32& inp, tjs_uint32& up, tjs_uint32 *in, tjs_uint32 *prevline, tjs_uint32 *curline ) {
+	tfilter filter;
+	tinput input;
+	__m128i p = _mm_cvtsi32_si128( inp );
+	__m128i minput = input.first( in );
+	__m128i u = _mm_loadu_si128( (__m128i const*)&prevline[0] );
+	minput = filter( minput );
+	p = do_avg_sse2( p, u, minput );
+	curline[0] = _mm_cvtsi128_si32( p );
+
+	minput = _mm_srli_si128( minput, 4 );	// >> 32
+	u = _mm_srli_si128( u, 4 );	// >> 32
+	p = do_avg_sse2( p, u, minput );
+	curline[1] = _mm_cvtsi128_si32( p );
+
+	minput = _mm_srli_si128( minput, 4 );	// >> 32
+	u = _mm_srli_si128( u, 4 );	// >> 32
+	p = do_avg_sse2( p, u, minput );
+	curline[2] = _mm_cvtsi128_si32( p );
+
+	minput = _mm_srli_si128( minput, 4 );	// >> 32
+	u = _mm_srli_si128( u, 4 );	// >> 32
+	p = do_avg_sse2( p, u, minput );
+	curline[3] = _mm_cvtsi128_si32( p );
+
+	minput = input.second( in );
+	u = _mm_loadu_si128( (__m128i const*)&prevline[4] );
+	minput = filter( minput );
+	p = do_avg_sse2( p, u, minput );
+	curline[4] = _mm_cvtsi128_si32( p );
+
+	minput = _mm_srli_si128( minput, 4 );	// >> 32
+	u = _mm_srli_si128( u, 4 );	// >> 32
+	p = do_avg_sse2( p, u, minput );
+	curline[5] = _mm_cvtsi128_si32( p );
+
+	minput = _mm_srli_si128( minput, 4 );	// >> 32
+	u = _mm_srli_si128( u, 4 );	// >> 32
+	p = do_avg_sse2( p, u, minput );
+	curline[6] = _mm_cvtsi128_si32( p );
+
+	minput = _mm_srli_si128( minput, 4 );	// >> 32
+	u = _mm_srli_si128( u, 4 );	// >> 32
+	p = do_avg_sse2( p, u, minput );
+	curline[7] = _mm_cvtsi128_si32( p );
+
+	inp = _mm_cvtsi128_si32( p );
+	up =  _mm_cvtsi128_si32( u );
+}
+#if 0 // MMX(SSE) égÇ§î≈íxÇ¢
+static inline __m64 do_med_sse( __m64 a, __m64 b, const __m64& c, __m64 v ) {
+	__m64 a2 = a;
+	a = _mm_max_pu8( a, b );	// = max_a_b
+	b = _mm_min_pu8( b, a2 );	// = min_a_b
+	v = _mm_add_pi8( v, a );
+	a = _mm_min_pu8( a, c );	// = max_a_b < c ? max_a_b : c
+	v = _mm_add_pi8( v, b );
+	a = _mm_max_pu8( a, b );	// = min_a_b < a ? a : min_a_b
+	return _mm_sub_pi8( v, a );
+}
+static inline __m64 do_avg_sse( __m64 a, __m64 b, __m64 v ) {
+	a = _mm_avg_pu8( a, b );
+	return _mm_add_pi8( a, v );
+}
+template<typename tfilter, typename tinput>
+static inline void do_filter_med_sse2_sse( tjs_uint32& inp, tjs_uint32& inup, tjs_uint32 *in, tjs_uint32 *prevline, tjs_uint32 *curline ) {
+	tfilter filter;
+	tinput input;
+	__m64 p = _mm_cvtsi32_si64(inp);
+	__m64 up = _mm_cvtsi32_si64(inup);
+
+	__m128i minput = input.first( in );
+	minput = filter( minput );
+	__m64 u = _mm_cvtsi32_si64( prevline[0] );
+	__m64 i = _mm_movepi64_pi64(minput);
+	p = do_med_sse( p, u, up, i );
+	up = u;
+	curline[0] = _mm_cvtsi64_si32( p );
+
+	i = _mm_srli_pi64( i, 32 );
+	u = _mm_cvtsi32_si64( prevline[1] );
+	p = do_med_sse( p, u, up, i );
+	up = u;
+	curline[1] = _mm_cvtsi64_si32( p );
+
+	minput = _mm_srli_si128( minput, 8 );	// >> 64
+	i = _mm_movepi64_pi64(minput);
+	u = _mm_cvtsi32_si64( prevline[2] );
+	p = do_med_sse( p, u, up, i );
+	up = u;
+	curline[2] = _mm_cvtsi64_si32( p );
+	
+	i = _mm_srli_pi64( i, 32 );	// >> 32
+	u = _mm_cvtsi32_si64( prevline[3] );
+	p = do_med_sse( p, u, up, i );
+	up = u;
+	curline[3] = _mm_cvtsi64_si32( p );
+
+	minput = input.second( in );
+	minput = filter( minput );
+	u = _mm_cvtsi32_si64( prevline[4] );
+	i = _mm_movepi64_pi64(minput);
+	p = do_med_sse( p, u, up, i );
+	up = u;
+	curline[4] = _mm_cvtsi64_si32( p );
+	
+	i = _mm_srli_pi64( i, 32 );
+	u = _mm_cvtsi32_si64( prevline[5] );
+	p = do_med_sse( p, u, up, i );
+	up = u;
+	curline[5] = _mm_cvtsi64_si32( p );
+
+	minput = _mm_srli_si128( minput, 8 );	// >> 64
+	i = _mm_movepi64_pi64(minput);
+	u = _mm_cvtsi32_si64( prevline[6] );
+	p = do_med_sse( p, u, up, i );
+	up = u;
+	curline[6] = _mm_cvtsi64_si32( p );
+	
+	i = _mm_srli_pi64( i, 32 );	// >> 32
+	u = _mm_cvtsi32_si64( prevline[7] );
+	p = do_med_sse( p, u, up, i );
+	up = u;
+	curline[7] = _mm_cvtsi64_si32( p );
+
+	inp = _mm_cvtsi64_si32( p );
+	inup =  _mm_cvtsi64_si32( u );
+	_mm_empty();
+}
+
+template<typename tfilter, typename tinput>
+static inline void do_filter_avg_sse2_sse( tjs_uint32& inp, tjs_uint32& inup, tjs_uint32 *in, tjs_uint32 *prevline, tjs_uint32 *curline ) {
+	tfilter filter;
+	tinput input;
+	__m64 p = _mm_cvtsi32_si64(inp);
+	__m128i minput = input.first( in );
+	minput = filter( minput );
+	__m64 u = _mm_cvtsi32_si64( prevline[0] );
+	__m64 i = _mm_movepi64_pi64(minput);
+	p = do_avg_sse( p, u, i );
+	curline[0] = _mm_cvtsi64_si32( p );
+
+	i = _mm_srli_pi64( i, 32 );
+	u = _mm_cvtsi32_si64( prevline[1] );
+	p = do_avg_sse( p, u, i );
+	curline[1] = _mm_cvtsi64_si32( p );
+
+	minput = _mm_srli_si128( minput, 8 );	// >> 64
+	i = _mm_movepi64_pi64(minput);
+	u = _mm_cvtsi32_si64( prevline[2] );
+	p = do_avg_sse( p, u, i );
+	curline[2] = _mm_cvtsi64_si32( p );
+	
+	i = _mm_srli_pi64( i, 32 );	// >> 32
+	u = _mm_cvtsi32_si64( prevline[3] );
+	p = do_avg_sse( p, u, i );
+	curline[3] = _mm_cvtsi64_si32( p );
+
+	minput = input.second( in );
+	minput = filter( minput );
+	u = _mm_cvtsi32_si64( prevline[4] );
+	i = _mm_movepi64_pi64(minput);
+	p = do_avg_sse( p, u, i );
+	curline[4] = _mm_cvtsi64_si32( p );
+	
+	i = _mm_srli_pi64( i, 32 );
+	u = _mm_cvtsi32_si64( prevline[5] );
+	p = do_avg_sse( p, u, i );
+	curline[5] = _mm_cvtsi64_si32( p );
+
+	minput = _mm_srli_si128( minput, 8 );	// >> 64
+	i = _mm_movepi64_pi64(minput);
+	u = _mm_cvtsi32_si64( prevline[6] );
+	p = do_avg_sse( p, u, i );
+	curline[6] = _mm_cvtsi64_si32( p );
+	
+	i = _mm_srli_pi64( i, 32 );	// >> 32
+	u = _mm_cvtsi32_si64( prevline[7] );
+	p = do_avg_sse( p, u, i );
+	curline[7] = _mm_cvtsi64_si32( p );
+
+	inp = _mm_cvtsi64_si32( p );
+	inup =  _mm_cvtsi64_si32( u );
+	_mm_empty();
+}
+#endif
+
+/*
+	chroma/luminosity decoding
+	(this does reordering, color correlation filter, MED/AVG  at a time)
+*/
+void TVPTLG6DecodeLineGeneric_sse2_c(tjs_uint32 *prevline, tjs_uint32 *curline, tjs_int width, tjs_int start_block, tjs_int block_limit, tjs_uint8 *filtertypes, tjs_int skipblockbytes, tjs_uint32 *in, tjs_uint32 initialp, tjs_int oddskip, tjs_int dir) {
+	tjs_uint32 p, up;
+	if(start_block) {
+		prevline += start_block * TVP_TLG6_W_BLOCK_SIZE;
+		curline  += start_block * TVP_TLG6_W_BLOCK_SIZE;
+		p  = curline[-1];
+		up = prevline[-1];
+	} else {
+		p = up = initialp;
+	}
+	oddskip *= TVP_TLG6_W_BLOCK_SIZE;	// oddskip * 8
+	if( dir & 1 ) {
+		// forward
+		skipblockbytes -= TVP_TLG6_W_BLOCK_SIZE;
+		in += skipblockbytes * start_block;
+		in += oddskip;
+		for( int i = start_block; i < block_limit; i ++) {
+			if( i&1 ) {
+				in += oddskip;
+			} else {
+				in -= oddskip;
+			}
+			switch(filtertypes[i]) {
+#define TVP_TLG6_DO_CHROMA_DECODE_FORWARD( N )	\
+	case (N<<1)+0: do_filter_med_sse2<filter_insts_##N##_sse2,filter_forward_input_sse2>( p, up, in, prevline, curline ); prevline+=8; curline+=8; in+=8; break;\
+	case (N<<1)+1: do_filter_avg_sse2<filter_insts_##N##_sse2,filter_forward_input_sse2>( p, up, in, prevline, curline ); prevline+=8; curline+=8; in+=8; break;
+				TVP_TLG6_DO_CHROMA_DECODE_FORWARD( 0);
+				TVP_TLG6_DO_CHROMA_DECODE_FORWARD( 1);
+				TVP_TLG6_DO_CHROMA_DECODE_FORWARD( 2);
+				TVP_TLG6_DO_CHROMA_DECODE_FORWARD( 3);
+				TVP_TLG6_DO_CHROMA_DECODE_FORWARD( 4);
+				TVP_TLG6_DO_CHROMA_DECODE_FORWARD( 5);
+				TVP_TLG6_DO_CHROMA_DECODE_FORWARD( 6);
+				TVP_TLG6_DO_CHROMA_DECODE_FORWARD( 7);
+				TVP_TLG6_DO_CHROMA_DECODE_FORWARD( 8);
+				TVP_TLG6_DO_CHROMA_DECODE_FORWARD( 9);
+				TVP_TLG6_DO_CHROMA_DECODE_FORWARD(10);
+				TVP_TLG6_DO_CHROMA_DECODE_FORWARD(11);
+				TVP_TLG6_DO_CHROMA_DECODE_FORWARD(12);
+				TVP_TLG6_DO_CHROMA_DECODE_FORWARD(13);
+				TVP_TLG6_DO_CHROMA_DECODE_FORWARD(14);
+				TVP_TLG6_DO_CHROMA_DECODE_FORWARD(15);
+#undef TVP_TLG6_DO_CHROMA_DECODE_FORWARD
+			}
+			in += skipblockbytes;
+		}
+	} else {
+		// backward
+		skipblockbytes += TVP_TLG6_W_BLOCK_SIZE;
+		in += skipblockbytes * start_block;
+		in += oddskip;
+		//in += (TVP_TLG6_W_BLOCK_SIZE - 1);
+		in += TVP_TLG6_W_BLOCK_SIZE;
+		for( int i = start_block; i < block_limit; i ++) {
+			if( i&1 ) {
+				in += oddskip;
+			} else{
+				in -= oddskip;
+			}
+			switch(filtertypes[i]) {
+#define TVP_TLG6_DO_CHROMA_DECODE_BACKWARD( N )	\
+	case (N<<1)+0: in-=8; do_filter_med_sse2<filter_insts_##N##_sse2,filter_backward_input_sse2>( p, up, in, prevline, curline ); prevline+=8; curline+=8; break;\
+	case (N<<1)+1: in-=8; do_filter_avg_sse2<filter_insts_##N##_sse2,filter_backward_input_sse2>( p, up, in, prevline, curline ); prevline+=8; curline+=8; break;
+				TVP_TLG6_DO_CHROMA_DECODE_BACKWARD( 0);
+				TVP_TLG6_DO_CHROMA_DECODE_BACKWARD( 1);
+				TVP_TLG6_DO_CHROMA_DECODE_BACKWARD( 2);
+				TVP_TLG6_DO_CHROMA_DECODE_BACKWARD( 3);
+				TVP_TLG6_DO_CHROMA_DECODE_BACKWARD( 4);
+				TVP_TLG6_DO_CHROMA_DECODE_BACKWARD( 5);
+				TVP_TLG6_DO_CHROMA_DECODE_BACKWARD( 6);
+				TVP_TLG6_DO_CHROMA_DECODE_BACKWARD( 7);
+				TVP_TLG6_DO_CHROMA_DECODE_BACKWARD( 8);
+				TVP_TLG6_DO_CHROMA_DECODE_BACKWARD( 9);
+				TVP_TLG6_DO_CHROMA_DECODE_BACKWARD(10);
+				TVP_TLG6_DO_CHROMA_DECODE_BACKWARD(11);
+				TVP_TLG6_DO_CHROMA_DECODE_BACKWARD(12);
+				TVP_TLG6_DO_CHROMA_DECODE_BACKWARD(13);
+				TVP_TLG6_DO_CHROMA_DECODE_BACKWARD(14);
+				TVP_TLG6_DO_CHROMA_DECODE_BACKWARD(15);
+#undef TVP_TLG6_DO_CHROMA_DECODE_BACKWARD
+			}
+			in += skipblockbytes;
+		}
+	}
+}
+void TVPTLG6DecodeLine_sse2_c(tjs_uint32 *prevline, tjs_uint32 *curline, tjs_int width, tjs_int block_count, tjs_uint8 *filtertypes, tjs_int skipblockbytes, tjs_uint32 *in, tjs_uint32 initialp, tjs_int oddskip, tjs_int dir) {
+	TVPTLG6DecodeLineGeneric_sse2_c(prevline, curline, width, 0, block_count,
+		filtertypes, skipblockbytes, in, initialp, oddskip, dir);
+}
+#if 0 // SSE2/SSE/MMX ÇégÇ§ÉoÅ[ÉWÉáÉì
+void TVPTLG6DecodeLineGeneric_sse2_sse_c(tjs_uint32 *prevline, tjs_uint32 *curline, tjs_int width, tjs_int start_block, tjs_int block_limit, tjs_uint8 *filtertypes, tjs_int skipblockbytes, tjs_uint32 *in, tjs_uint32 initialp, tjs_int oddskip, tjs_int dir) {
+	tjs_uint32 p, up;
+	if(start_block) {
+		prevline += start_block * TVP_TLG6_W_BLOCK_SIZE;
+		curline  += start_block * TVP_TLG6_W_BLOCK_SIZE;
+		p  = curline[-1];
+		up = prevline[-1];
+	} else {
+		p = up = initialp;
+	}
+	oddskip *= TVP_TLG6_W_BLOCK_SIZE;	// oddskip * 8
+	if( dir & 1 ) {
+		// forward
+		skipblockbytes -= TVP_TLG6_W_BLOCK_SIZE;
+		in += skipblockbytes * start_block;
+		in += oddskip;
+		for( int i = start_block; i < block_limit; i ++) {
+			if( i&1 ) {
+				in += oddskip;
+			} else {
+				in -= oddskip;
+			}
+			switch(filtertypes[i]) {
+#define TVP_TLG6_DO_CHROMA_DECODE_FORWARD( N )	\
+	case (N<<1)+0: do_filter_med_sse2_sse<filter_insts_##N##_sse2,filter_forward_input_sse2>( p, up, in, prevline, curline ); prevline+=8; curline+=8; in+=8; break;\
+	case (N<<1)+1: do_filter_avg_sse2_sse<filter_insts_##N##_sse2,filter_forward_input_sse2>( p, up, in, prevline, curline ); prevline+=8; curline+=8; in+=8; break;
+				TVP_TLG6_DO_CHROMA_DECODE_FORWARD( 0);
+				TVP_TLG6_DO_CHROMA_DECODE_FORWARD( 1);
+				TVP_TLG6_DO_CHROMA_DECODE_FORWARD( 2);
+				TVP_TLG6_DO_CHROMA_DECODE_FORWARD( 3);
+				TVP_TLG6_DO_CHROMA_DECODE_FORWARD( 4);
+				TVP_TLG6_DO_CHROMA_DECODE_FORWARD( 5);
+				TVP_TLG6_DO_CHROMA_DECODE_FORWARD( 6);
+				TVP_TLG6_DO_CHROMA_DECODE_FORWARD( 7);
+				TVP_TLG6_DO_CHROMA_DECODE_FORWARD( 8);
+				TVP_TLG6_DO_CHROMA_DECODE_FORWARD( 9);
+				TVP_TLG6_DO_CHROMA_DECODE_FORWARD(10);
+				TVP_TLG6_DO_CHROMA_DECODE_FORWARD(11);
+				TVP_TLG6_DO_CHROMA_DECODE_FORWARD(12);
+				TVP_TLG6_DO_CHROMA_DECODE_FORWARD(13);
+				TVP_TLG6_DO_CHROMA_DECODE_FORWARD(14);
+				TVP_TLG6_DO_CHROMA_DECODE_FORWARD(15);
+#undef TVP_TLG6_DO_CHROMA_DECODE_FORWARD
+			}
+			in += skipblockbytes;
+		}
+	} else {
+		// backward
+		skipblockbytes += TVP_TLG6_W_BLOCK_SIZE;
+		in += skipblockbytes * start_block;
+		in += oddskip;
+		//in += (TVP_TLG6_W_BLOCK_SIZE - 1);
+		in += TVP_TLG6_W_BLOCK_SIZE;
+		for( int i = start_block; i < block_limit; i ++) {
+			if( i&1 ) {
+				in += oddskip;
+			} else{
+				in -= oddskip;
+			}
+			switch(filtertypes[i]) {
+#define TVP_TLG6_DO_CHROMA_DECODE_BACKWARD( N )	\
+	case (N<<1)+0: in-=8; do_filter_med_sse2_sse<filter_insts_##N##_sse2,filter_backward_input_sse2>( p, up, in, prevline, curline ); prevline+=8; curline+=8; break;\
+	case (N<<1)+1: in-=8; do_filter_avg_sse2_sse<filter_insts_##N##_sse2,filter_backward_input_sse2>( p, up, in, prevline, curline ); prevline+=8; curline+=8; break;
+				TVP_TLG6_DO_CHROMA_DECODE_BACKWARD( 0);
+				TVP_TLG6_DO_CHROMA_DECODE_BACKWARD( 1);
+				TVP_TLG6_DO_CHROMA_DECODE_BACKWARD( 2);
+				TVP_TLG6_DO_CHROMA_DECODE_BACKWARD( 3);
+				TVP_TLG6_DO_CHROMA_DECODE_BACKWARD( 4);
+				TVP_TLG6_DO_CHROMA_DECODE_BACKWARD( 5);
+				TVP_TLG6_DO_CHROMA_DECODE_BACKWARD( 6);
+				TVP_TLG6_DO_CHROMA_DECODE_BACKWARD( 7);
+				TVP_TLG6_DO_CHROMA_DECODE_BACKWARD( 8);
+				TVP_TLG6_DO_CHROMA_DECODE_BACKWARD( 9);
+				TVP_TLG6_DO_CHROMA_DECODE_BACKWARD(10);
+				TVP_TLG6_DO_CHROMA_DECODE_BACKWARD(11);
+				TVP_TLG6_DO_CHROMA_DECODE_BACKWARD(12);
+				TVP_TLG6_DO_CHROMA_DECODE_BACKWARD(13);
+				TVP_TLG6_DO_CHROMA_DECODE_BACKWARD(14);
+				TVP_TLG6_DO_CHROMA_DECODE_BACKWARD(15);
+#undef TVP_TLG6_DO_CHROMA_DECODE_BACKWARD
+			}
+			in += skipblockbytes;
+		}
+	}
+	_mm_empty();
+}
+void TVPTLG6DecodeLine_sse2_sse_c(tjs_uint32 *prevline, tjs_uint32 *curline, tjs_int width, tjs_int block_count, tjs_uint8 *filtertypes, tjs_int skipblockbytes, tjs_uint32 *in, tjs_uint32 initialp, tjs_int oddskip, tjs_int dir) {
+	TVPTLG6DecodeLineGeneric_sse2_sse_c(prevline, curline, width, 0, block_count,
+		filtertypes, skipblockbytes, in, initialp, oddskip, dir);
+}
+#endif
 //#define LZSS_TEST
 #ifdef LZSS_TEST
 #include <windows.h>
@@ -412,6 +1138,45 @@ void TVPTLG5ComposeColors4To4_sse2_c(tjs_uint8 *outp, const tjs_uint8 *upper, tj
 #include <math.h>
 #include "tjsCommHead.h"
 #include "tjsUtils.h"
+
+extern "C" void TVPTLG6DecodeLine_c(tjs_uint32 *prevline, tjs_uint32 *curline, tjs_int width, tjs_int block_count, tjs_uint8 *filtertypes, tjs_int skipblockbytes, tjs_uint32 *in, tjs_uint32 initialp, tjs_int oddskip, tjs_int dir);
+// Cî≈Ç∆î‰ärÇ∑ÇÈÇ∆4î{à»è„ÇæÇØÇ«ÅAMMX2(SSE)Ç…î‰ärÇ∑ÇÈÇ∆è≠ÇµíxÇ¢Ç©ÅcÅc
+void TVPTLG6DecodeLine_test(tjs_uint32 *prevline, tjs_uint32 *curline, tjs_int width, tjs_int block_count, tjs_uint8 *filtertypes, tjs_int skipblockbytes, tjs_uint32 *in, tjs_uint32 initialp, tjs_int oddskip, tjs_int dir) {
+	tjs_uint32 *curline0 = (tjs_uint32*)TJSAlignedAlloc(block_count*TVP_TLG6_W_BLOCK_SIZE*sizeof(tjs_uint32), 4);
+	tjs_uint32 *curline1 = (tjs_uint32*)TJSAlignedAlloc(block_count*TVP_TLG6_W_BLOCK_SIZE*sizeof(tjs_uint32), 4);
+	memcpy( curline0, curline, block_count*TVP_TLG6_W_BLOCK_SIZE*sizeof(tjs_uint32) );
+	memcpy( curline1, curline, block_count*TVP_TLG6_W_BLOCK_SIZE*sizeof(tjs_uint32) );
+	TVPTLG6DecodeLine_sse_a( prevline, curline, width, block_count, filtertypes, skipblockbytes, in, initialp, oddskip, dir);
+#if 1
+	tjs_uint32 aux;
+	unsigned __int64 start = __rdtscp(&aux);
+	TVPTLG6DecodeLine_sse2_c( prevline, curline0, width, block_count, filtertypes, skipblockbytes, in, initialp, oddskip, dir);
+	//TVPTLG6DecodeLine_sse2_sse_c( prevline, curline0, width, block_count, filtertypes, skipblockbytes, in, initialp, oddskip, dir);
+	unsigned __int64 end0 = __rdtscp(&aux);
+	TVPTLG6DecodeLine_sse_a( prevline, curline1, width, block_count, filtertypes, skipblockbytes, in, initialp, oddskip, dir);
+	//TVPTLG6DecodeLine_c( prevline, curline1, width, block_count, filtertypes, skipblockbytes, in, initialp, oddskip, dir);
+	unsigned __int64 end1 = __rdtscp(&aux);
+	{
+		unsigned __int64 func_b_total = end0-start;
+		unsigned __int64 func_a_total = end1-end0;
+		wchar_t buff[128];
+		wsprintf( buff, L"TLG6 SSE2 %I64d, ASM %I64d, rate %I64d\n", func_b_total, func_a_total, (func_b_total)*100/(func_a_total) );
+		OutputDebugString( buff );
+	}
+#ifdef _DEBUG
+	for( int i = 0; i < block_count*TVP_TLG6_W_BLOCK_SIZE; i++ ) {
+		if( curline0[i] != curline1[i] ) {
+			wchar_t buff[128];
+			wsprintf( buff, L"LZSS text type : %d, index : %d, 0x%08x, 0x%08x\n", filtertypes[i/TVP_TLG6_W_BLOCK_SIZE], i, curline0[i], curline1[i] );
+			OutputDebugString( buff );
+		}
+	}
+#endif
+#endif
+	TJSAlignedDealloc( curline0 );
+	TJSAlignedDealloc( curline1 );
+}
+
 extern "C" tjs_int TVPTLG5DecompressSlide_c(tjs_uint8 *out, const tjs_uint8 *in, tjs_int insize, tjs_uint8 *text, tjs_int initialr);
 tjs_int TVPTLG5DecompressSlide_test( tjs_uint8 *out, const tjs_uint8 *in, tjs_int insize, tjs_uint8 *text, tjs_int initialr ) {
 	tjs_uint8* text0 = (tjs_uint8*)TJSAlignedAlloc(4096+16, 4);
