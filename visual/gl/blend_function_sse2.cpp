@@ -790,12 +790,14 @@ extern void TVPConvert24BitTo32Bit_ssse3_c(tjs_uint32 *dest, const tjs_uint8 *bu
 //extern tjs_int TVPTLG5DecompressSlide_test( tjs_uint8 *out, const tjs_uint8 *in, tjs_int insize, tjs_uint8 *text, tjs_int initialr );
 //extern void TVPTLG5ComposeColors3To4_test(tjs_uint8 *outp, const tjs_uint8 *upper, tjs_uint8 * const * buf, tjs_int width);
 //extern void TVPTLG5ComposeColors4To4_test(tjs_uint8 *outp, const tjs_uint8 *upper, tjs_uint8 * const * buf, tjs_int width);
-
+//extern void TVPTLG6DecodeLine_test(tjs_uint32 *prevline, tjs_uint32 *curline, tjs_int width, tjs_int block_count, tjs_uint8 *filtertypes, tjs_int skipblockbytes, tjs_uint32 *in, tjs_uint32 initialp, tjs_int oddskip, tjs_int dir);
 //extern "C" tjs_int TVPTLG5DecompressSlide_c( tjs_uint8 *out, const tjs_uint8 *in, tjs_int insize, tjs_uint8 *text, tjs_int initialr );
 
 extern tjs_int TVPTLG5DecompressSlide_sse2_c( tjs_uint8 *out, const tjs_uint8 *in, tjs_int insize, tjs_uint8 *text, tjs_int initialr );
 extern void TVPTLG5ComposeColors3To4_sse2_c(tjs_uint8 *outp, const tjs_uint8 *upper, tjs_uint8 * const * buf, tjs_int width);
 extern void TVPTLG5ComposeColors4To4_sse2_c(tjs_uint8 *outp, const tjs_uint8 *upper, tjs_uint8 * const * buf, tjs_int width);
+extern void TVPTLG6DecodeLineGeneric_sse2_c(tjs_uint32 *prevline, tjs_uint32 *curline, tjs_int width, tjs_int start_block, tjs_int block_limit, tjs_uint8 *filtertypes, tjs_int skipblockbytes, tjs_uint32 *in, tjs_uint32 initialp, tjs_int oddskip, tjs_int dir);
+extern void TVPTLG6DecodeLine_sse2_c(tjs_uint32 *prevline, tjs_uint32 *curline, tjs_int width, tjs_int block_count, tjs_uint8 *filtertypes, tjs_int skipblockbytes, tjs_uint32 *in, tjs_uint32 initialp, tjs_int oddskip, tjs_int dir);
 
 void TVPGL_SSE2_Init() {
 	if( TVPCPUType & TVP_CPU_HAS_SSE2 ) {
@@ -803,6 +805,7 @@ void TVPGL_SSE2_Init() {
 		TVPAdditiveAlphaBlend_o = TVPAdditiveAlphaBlend_o_sse2_c;
 		TVPAdditiveAlphaBlend_HDA = TVPAdditiveAlphaBlend_HDA_sse2_c;
 		TVPAdditiveAlphaBlend_a = TVPAdditiveAlphaBlend_a_sse2_c;
+		// TVPAdditiveAlphaBlend_HDA_o
 		// TVPAdditiveAlphaBlend_ao
 
 		TVPAddBlend =  TVPAddBlend_sse2_c;
@@ -814,6 +817,7 @@ void TVPGL_SSE2_Init() {
 		TVPAlphaBlend_o =  TVPAlphaBlend_o_sse2_c;
 		TVPAlphaBlend_HDA =  TVPAlphaBlend_HDA_sse2_c;
 		TVPAlphaBlend_d =  TVPAlphaBlend_d_sse2_c;
+		// TVPAlphaBlend_HDA_o
 		// TVPAlphaBlend_a
 		// TVPAlphaBlend_do
 		// TVPAlphaBlend_ao
@@ -824,6 +828,7 @@ void TVPGL_SSE2_Init() {
 
 		TVPConstAlphaBlend_SD =  TVPConstAlphaBlend_SD_sse2_c;
 		TVPConstAlphaBlend_SD_a = TVPConstAlphaBlend_SD_sse2_c;
+		// TVPConstAlphaBlend_SD_d
 
 		TVPCopyColor = TVPCopyColor_sse2_c;
 		TVPCopyMask = TVPCopyMask_sse2_c;
@@ -831,15 +836,24 @@ void TVPGL_SSE2_Init() {
 
 		TVPDarkenBlend =  TVPDarkenBlend_sse2_c;
 		TVPDarkenBlend_HDA =  TVPDarkenBlend_HDA_sse2_c;
+		// TVPDarkenBlend_o		// MMX版がない、使用頻度からもSSE2未対応に
+		// TVPDarkenBlend_HDA_o	// MMX版がない、使用頻度からもSSE2未対応に
 
 		TVPLightenBlend =  TVPLightenBlend_sse2_c;
 		TVPLightenBlend_HDA =  TVPLightenBlend_HDA_sse2_c;
+		// TVPLightenBlend_o		// MMX版がない、使用頻度からもSSE2未対応に
+		// TVPLightenBlend_HDA_o	// MMX版がない、使用頻度からもSSE2未対応に
 
 		TVPMulBlend =  TVPMulBlend_sse2_c;
 		TVPMulBlend_HDA =  TVPMulBlend_HDA_sse2_c;
 		TVPMulBlend_o =  TVPMulBlend_o_sse2_c;
 		TVPMulBlend_HDA_o =  TVPMulBlend_HDA_o_sse2_c;
-		
+
+		// TVPColorDodgeBlend		// MMX版がない、使用頻度からもSSE2未対応に
+		// TVPColorDodgeBlend_HDA	// MMX版がない、使用頻度からもSSE2未対応に
+		// TVPColorDodgeBlend_o		// MMX版がない、使用頻度からもSSE2未対応に
+		// TVPColorDodgeBlend_HDA_o	// MMX版がない、使用頻度からもSSE2未対応に
+
 		TVPScreenBlend =  TVPScreenBlend_sse2_c;
 		TVPScreenBlend_HDA =  TVPScreenBlend_HDA_sse2_c;
 		TVPScreenBlend_o =  TVPScreenBlend_o_sse2_c;
@@ -934,7 +948,22 @@ void TVPGL_SSE2_Init() {
 		TVPApplyColorMap_o = TVPApplyColorMap_o_sse2_c;
 		TVPApplyColorMap65_ao = TVPApplyColorMap65_ao_sse2_c;
 		TVPApplyColorMap_ao = TVPApplyColorMap_ao_sse2_c;
+		// TVPApplyColorMap_HDA
+		// TVPApplyColorMap_HDA_o
+		// TVPApplyColorMap65_HDA
+		// TVPApplyColorMap65_HDA_o
+		// TVPApplyColorMap_d
+		// TVPApplyColorMap_do
+		// TVPApplyColorMap65_do
+		// TVPRemoveConstOpacity = ;
+		// TVPRemoveOpacity = ;
+		// TVPRemoveOpacity_o = ;
+		// TVPRemoveOpacity65 = ;
+		// TVPRemoveOpacity65_o = ;
 
+		// TVPInitUnivTransBlendTable // テーブルのSIMD化は効果薄い
+		// TVPInitUnivTransBlendTable_d
+		// TVPInitUnivTransBlendTable_a
 		// SSE2版はアルファもブレンドしているので、どちらでも行ける
 		TVPUnivTransBlend = TVPUnivTransBlend_sse2_c;
 		TVPUnivTransBlend_a = TVPUnivTransBlend_sse2_c;
@@ -945,8 +974,10 @@ void TVPGL_SSE2_Init() {
 
 		if( TVPCPUType & TVP_CPU_HAS_SSE ) {
 			TVPInitGammaAdjustTempData = TVPInitGammaAdjustTempData_sse2_c;
+			// TVPUninitGammaAdjustTempData // 何もしないので未実装
 		}
 		TVPAdjustGamma_a = TVPAdjustGamma_a_sse2_c;	// 逆数テーブルを使用しない方法にするとSSEも使う
+		//TVPAdjustGamma // C版と比較して大差ないのでSSE2版未使用
 
 		// 拡大縮小
 		// TVPStretchCopy = TVPStretchCopy_sse2_c; // SSE2使わない方が少し速い
@@ -956,10 +987,13 @@ void TVPGL_SSE2_Init() {
 		TVPStretchAlphaBlend_HDA_o = TVPStretchAlphaBlend_HDA_o_sse2_c;
 		TVPStretchAlphaBlend_d = TVPStretchAlphaBlend_d_sse2_c;
 		TVPStretchAlphaBlend_a = TVPStretchAlphaBlend_a_sse2_c;
+		// TVPStretchAlphaBlend_do
+		// TVPStretchAlphaBlend_ao
 		TVPStretchAdditiveAlphaBlend = TVPStretchAdditiveAlphaBlend_sse2_c;
 		TVPStretchAdditiveAlphaBlend_HDA = TVPStretchAdditiveAlphaBlend_HDA_sse2_c;
 		TVPStretchAdditiveAlphaBlend_o = TVPStretchAdditiveAlphaBlend_o_sse2_c;
 		TVPStretchAdditiveAlphaBlend_a = TVPStretchAdditiveAlphaBlend_a_sse2_c;
+		// TVPStretchAdditiveAlphaBlend_ao
 		TVPStretchCopyOpaqueImage = TVPStretchCopyOpaqueImage_sse2_c;
 		TVPStretchConstAlphaBlend = TVPStretchConstAlphaBlend_sse2_c;
 		TVPStretchConstAlphaBlend_HDA = TVPStretchConstAlphaBlend_HDA_sse2_c;
@@ -970,6 +1004,9 @@ void TVPGL_SSE2_Init() {
 		TVPInterpStretchAdditiveAlphaBlend = TVPInterpStretchAdditiveAlphaBlend_sse2_c;
 		TVPInterpStretchAdditiveAlphaBlend_o = TVPInterpStretchAdditiveAlphaBlend_o_sse2_c;
 		TVPInterpStretchConstAlphaBlend = TVPInterpStretchConstAlphaBlend_sse2_c;
+		// TVPFastLinearInterpH2F	// 使われなくなっているので未実装
+		// TVPFastLinearInterpH2B	// 使われなくなっているので未実装
+		// TVPFastLinearInterpV2	// 使われなくなっているので未実装
 
 		// アフィン変換用
 		TVPLinTransAlphaBlend = TVPLinTransAlphaBlend_sse2_c;
@@ -978,6 +1015,8 @@ void TVPGL_SSE2_Init() {
 		TVPLinTransAlphaBlend_HDA_o = TVPLinTransAlphaBlend_HDA_o_sse2_c;
 		TVPLinTransAlphaBlend_d = TVPLinTransAlphaBlend_d_sse2_c;
 		TVPLinTransAlphaBlend_a = TVPLinTransAlphaBlend_a_sse2_c;
+		// TVPLinTransAlphaBlend_do
+		// TVPLinTransAlphaBlend_ao
 		TVPLinTransAdditiveAlphaBlend = TVPLinTransAdditiveAlphaBlend_sse2_c;
 		TVPLinTransAdditiveAlphaBlend_HDA = TVPLinTransAdditiveAlphaBlend_HDA_sse2_c;
 		TVPLinTransAdditiveAlphaBlend_o = TVPLinTransAdditiveAlphaBlend_o_sse2_c;
@@ -1000,8 +1039,8 @@ void TVPGL_SSE2_Init() {
 		TVPDoBoxBlurAvg16 = TVPDoBoxBlurAvg16_sse2_c;
 		TVPDoBoxBlurAvg32 = TVPDoBoxBlurAvg32_sse2_c;
 		if( TVPCPUType & TVP_CPU_HAS_SSE ) {
-			TVPDoBoxBlurAvg16_d = TVPDoBoxBlurAvg16_d_sse2_c;	// SSE
-			TVPDoBoxBlurAvg32_d = TVPDoBoxBlurAvg32_d_sse2_c;	// SSE
+			TVPDoBoxBlurAvg16_d = TVPDoBoxBlurAvg16_d_sse2_c;	// with SSE
+			TVPDoBoxBlurAvg32_d = TVPDoBoxBlurAvg32_d_sse2_c;	// with SSE
 		}
 
 		// pixel format convert
@@ -1012,13 +1051,58 @@ void TVPGL_SSE2_Init() {
 			TVPConvert24BitTo32Bit = TVPConvert24BitTo32Bit_sse2_c;
 			TVPBLConvert24BitTo32Bit = TVPConvert24BitTo32Bit_sse2_c;
 		}
+		//色変換は使用頻度少ない 以下はMMX版もないのでSSE2版もなくていいかも
+		//TVPBLExpand1BitTo8BitPal	// BMP読み込み、1bit文字の変換で使われる
+		//TVPBLExpand1BitTo8Bit		// BMP読み込みで使われるのみ
+		//TVPBLExpand1BitTo32BitPal	// BMP読み込みで使われるのみ
+		//TVPBLExpand4BitTo8BitPal	// BMP読み込みで使われるのみ
+		//TVPBLExpand4BitTo8Bit		// BMP読み込みで使われるのみ
+		//TVPBLExpand4BitTo32BitPal	// BMP読み込みで使われるのみ
+		//TVPBLExpand8BitTo8BitPal	// BMP読み込みで使われるのみ
+		//TVPBLExpand8BitTo32BitPal	// BMP読み込みで使われるのみ
+		//TVPExpand8BitTo32BitGray	// JPEG読み込みで使われるのみ
+		//TVPBLConvert15BitTo8Bit	// BMP読み込みで使われるのみ
+		//TVPBLConvert15BitTo32Bit	// BMP読み込みで使われるのみ
+		//TVPBLConvert24BitTo8Bit	// BMP/PNG読み込みで使われるのみ
+		//TVPBLConvert32BitTo8Bit	// BMP読み込みで使われるのみ
+		//TVPBLConvert32BitTo32Bit_NoneAlpha	// BMP読み込みで使われるのみ
+		//TVPBLConvert32BitTo32Bit_MulAddAlpha	// BMP読み込みで使われるのみ
+		//TVPBLConvert32BitTo32Bit_AddAlpha		// BMP読み込みで使われるのみ
+		//TVPDither32BitTo16Bit565 // 使われていない
+		//TVPDither32BitTo16Bit555 // 使われていない
+		//TVPDither32BitTo8Bit		// BMP読み込みで使われるのみ
 
+		// load TLG
 //		TVPTLG5DecompressSlide = TVPTLG5DecompressSlide_test;		// for Test
 //		TVPTLG5ComposeColors3To4 = TVPTLG5ComposeColors3To4_test;	// for Test
 //		TVPTLG5ComposeColors4To4 = TVPTLG5ComposeColors4To4_test;	// for Test
 		TVPTLG5DecompressSlide = TVPTLG5DecompressSlide_sse2_c;
 		TVPTLG5ComposeColors3To4 = TVPTLG5ComposeColors3To4_sse2_c;
 		TVPTLG5ComposeColors4To4 = TVPTLG5ComposeColors4To4_sse2_c;
+		//TVPTLG6DecodeGolombValuesForFirst	// MMXを積極的に使ったものはなく、SIMD化しづらそうなためSSE2版未実装
+		//TVPTLG6DecodeGolombValues			// MMXを積極的に使ったものはなく、SIMD化しづらそうなためSSE2版未実装
+		TVPTLG6DecodeLineGeneric = TVPTLG6DecodeLineGeneric_sse2_c;
+		TVPTLG6DecodeLine = TVPTLG6DecodeLine_sse2_c;
+		//TVPTLG6DecodeLine = TVPTLG6DecodeLine_test;	// for Test
+
+		// TVPMakeAlphaFromKey = TVPMakeAlphaFromKey_c; // 未テスト
+
+		// 以下MMX版がないので未対応
+		//TVPAlphaColorMat
+		//TVPConvertAdditiveAlphaToAlpha
+		//TVPConvertAlphaToAdditiveAlpha
+		//TVPBindMaskToMain
+		//TVPSwapLine8
+		//TVPSwapLine32
+		//TVPReverse8
+		//TVPReverse32
+		//TVPDoGrayScale
+		//TVPChBlurMulCopy65
+		//TVPChBlurAddMulCopy65
+		//TVPChBlurCopy65
+		//TVPChBlurMulCopy
+		//TVPChBlurAddMulCopy
+		//TVPChBlurCopy
 	}
 }
 
@@ -1032,7 +1116,7 @@ enum CheckType {
 	CT_OPA,
 	CT_SD,
 };
-void start_test( bool ischeckalpha, void* blend_a, void* blend_b, int check_type = CT_NOARMAL, tjs_int opa = 255 ) {
+static void start_test( bool ischeckalpha, void* blend_a, void* blend_b, int check_type = CT_NOARMAL, tjs_int opa = 255 ) {
 	tjs_uint32 aux;
 	//unsigned long* src = _aligned_malloc( 256*256, 32 );
 	tjs_uint32* src = (tjs_uint32*)_mm_malloc( 256*256*sizeof(tjs_uint32), 32 );
