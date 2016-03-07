@@ -77,28 +77,18 @@ tjs_uint8 TVP_GUID_KSDATAFORMAT_SUBTYPE_IEEE_FLOAT[16] =
 //---------------------------------------------------------------------------
 
 
-
+#include "DetectCPU.h"
+#include "tvpgl_ia32_intf.h"
 
 //---------------------------------------------------------------------------
 // CPU specific optimized routine prototypes
 //---------------------------------------------------------------------------
-extern "C"
-{
-#ifdef _WIN32
-#define TVP_CDECL __cdecl
+extern void PCMConvertLoopInt16ToFloat32(void * __restrict dest, const void * __restrict src, size_t numsamples);
+extern void PCMConvertLoopFloat32ToInt16(void * __restrict dest, const void * __restrict src, size_t numsamples);
+#if defined(_M_IX86)||defined(_M_X64)
+extern void PCMConvertLoopInt16ToFloat32_sse(void * __restrict dest, const void * __restrict src, size_t numsamples);
+extern void PCMConvertLoopFloat32ToInt16_sse(void * __restrict dest, const void * __restrict src, size_t numsamples);
 #endif
-	
-#ifndef TJS_64BIT_OS
-void TVP_CDECL sse__Z32RisaPCMConvertLoopInt16ToFloat32PvPKvj(void * dest, const void * src, size_t numsamples);
-void TVP_CDECL def__Z32RisaPCMConvertLoopInt16ToFloat32PvPKvj(void * dest, const void * src, size_t numsamples);
-void TVP_CDECL sse__Z32RisaPCMConvertLoopFloat32ToInt16PvPKvj(void * dest, const void * src, size_t numsamples);
-void TVP_CDECL def__Z32RisaPCMConvertLoopFloat32ToInt16PvPKvj(void * dest, const void * src, size_t numsamples);
-#endif
-}
-//extern tjs_uint32 TVPCPUType;
-#include "DetectCPU.h"
-#include "tvpgl_ia32_intf.h"
-
 
 
 //---------------------------------------------------------------------------
@@ -107,7 +97,6 @@ void TVP_CDECL def__Z32RisaPCMConvertLoopFloat32ToInt16PvPKvj(void * dest, const
 static void TVPConvertFloatPCMTo16bits(tjs_int16 *output, const float *input,
 	tjs_int channels, tjs_int count, bool downmix)
 {
-#ifndef TJS_64BIT_OS
 	// convert 32bit float to 16bit integer
 
 	// float PCM is in range of +1.0 ... 0 ... -1.0
@@ -116,15 +105,19 @@ static void TVPConvertFloatPCMTo16bits(tjs_int16 *output, const float *input,
 	if(!downmix)
 	{
 		tjs_int total = channels * count;
+#if defined(_M_IX86)||defined(_M_X64)
 		bool use_sse =
 				(TVPCPUType & TVP_CPU_HAS_MMX) &&
 				(TVPCPUType & TVP_CPU_HAS_SSE) &&
 				(TVPCPUType & TVP_CPU_HAS_CMOV);
 
 		if(use_sse)
-			sse__Z32RisaPCMConvertLoopFloat32ToInt16PvPKvj(output, input, total);
+			PCMConvertLoopFloat32ToInt16_sse(output, input, total);
 		else
-			def__Z32RisaPCMConvertLoopFloat32ToInt16PvPKvj(output, input, total);
+			PCMConvertLoopFloat32ToInt16(output, input, total);
+#else
+		PCMConvertLoopFloat32ToInt16(output, input, total);
+#endif
 	}
 	else
 	{
@@ -148,7 +141,6 @@ static void TVPConvertFloatPCMTo16bits(tjs_int16 *output, const float *input,
 			}
 		}
 	}
-#endif
 }
 //---------------------------------------------------------------------------
 static void TVPConvertIntegerPCMTo16bits(tjs_int16 *output, const void *input,
@@ -333,7 +325,6 @@ static void TVPConvertIntegerPCMToFloat(float *output, const void *input,
 	tjs_int bytespersample,
 	tjs_int validbits, tjs_int channels, tjs_int count)
 {
-#ifndef TJS_64BIT_OS
 	// convert integer PCMs to float PCM
 
 #ifdef TJS_HOST_IS_BIG_ENDIAN
@@ -360,6 +351,7 @@ static void TVPConvertIntegerPCMToFloat(float *output, const void *input,
 
 		if(validbits == 16)
 		{
+#if defined(_M_IX86)||defined(_M_X64)
 			// most popular
 			bool use_sse =
 					(TVPCPUType & TVP_CPU_HAS_MMX) &&
@@ -367,9 +359,12 @@ static void TVPConvertIntegerPCMToFloat(float *output, const void *input,
 					(TVPCPUType & TVP_CPU_HAS_CMOV);
 
 			if(use_sse)
-				sse__Z32RisaPCMConvertLoopInt16ToFloat32PvPKvj(output, p, total);
+				PCMConvertLoopInt16ToFloat32_sse(output, p, total);
 			else
-				def__Z32RisaPCMConvertLoopInt16ToFloat32PvPKvj(output, p, total);
+				PCMConvertLoopInt16ToFloat32(output, p, total);
+#else
+			PCMConvertLoopInt16ToFloat32(output, p, total);
+#endif
 		}
 		else
 		{
@@ -402,7 +397,6 @@ static void TVPConvertIntegerPCMToFloat(float *output, const void *input,
 		while(total--)
 			*(output++) = (float)(((*(p++) & mask) >> 0) * (1.0 / (1<<31)));
 	}
-#endif
 }
 //---------------------------------------------------------------------------
 void TVPConvertPCMToFloat(float *output, const void *input,
