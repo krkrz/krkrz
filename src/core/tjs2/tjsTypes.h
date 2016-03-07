@@ -165,6 +165,8 @@ typedef tjs_int32 tjs_error;
 typedef tjs_int64 tTVInteger;
 typedef tjs_real tTVReal;
 
+typedef size_t tjs_size;
+typedef ptrdiff_t tjs_offset;
 
 /* IEEE double manipulation support
  (TJS requires IEEE double(64-bit float) native support on machine or C++ compiler) */
