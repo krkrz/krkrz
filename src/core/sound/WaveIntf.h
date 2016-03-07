@@ -41,8 +41,9 @@ extern tjs_uint8 TVP_GUID_KSDATAFORMAT_SUBTYPE_IEEE_FLOAT[16];
 
 /*[*/
 //---------------------------------------------------------------------------
-// PCM data format (internal use)
+// PCM data format
 //---------------------------------------------------------------------------
+#pragma pack(push, 4)
 struct tTVPWaveFormat
 {
 	tjs_uint SamplesPerSec; // sample granule per sec
@@ -55,6 +56,7 @@ struct tTVPWaveFormat
 	bool IsFloat; // true if the data is IEEE floating point
 	bool Seekable;
 };
+#pragma pack(pop)
 //---------------------------------------------------------------------------
 
 
@@ -123,6 +125,7 @@ extern tTVPWaveDecoder *  TVPCreateWaveDecoder(const ttstr & storagename);
 //---------------------------------------------------------------------------
 
 
+/*[*/
 //---------------------------------------------------------------------------
 // interface for basic filter management
 //---------------------------------------------------------------------------
@@ -140,6 +143,7 @@ public:
 
 
 
+/*]*/
 //---------------------------------------------------------------------------
 // tTJSNI_BaseWaveSoundBuffer
 //---------------------------------------------------------------------------

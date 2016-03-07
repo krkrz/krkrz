@@ -4675,8 +4675,9 @@ enum tTVPSoundGlobalFocusMode
 
 
 //---------------------------------------------------------------------------
-// PCM data format (internal use)
+// PCM data format
 //---------------------------------------------------------------------------
+#pragma pack(push, 4)
 struct tTVPWaveFormat
 {
 	tjs_uint SamplesPerSec; // sample granule per sec
@@ -4689,8 +4690,143 @@ struct tTVPWaveFormat
 	bool IsFloat; // true if the data is IEEE floating point
 	bool Seekable;
 };
+#pragma pack(pop)
 //---------------------------------------------------------------------------
 
+
+
+
+
+//---------------------------------------------------------------------------
+// interface for basic filter management
+//---------------------------------------------------------------------------
+class tTVPSampleAndLabelSource;
+class iTVPBasicWaveFilter
+{
+public:
+	// recreate filter. filter will remain owned by the each filter instance.
+	virtual tTVPSampleAndLabelSource * Recreate(tTVPSampleAndLabelSource * source) = 0;
+	virtual void Clear(void) = 0;
+	virtual void Update(void) = 0;
+	virtual void Reset(void) = 0;
+};
+//---------------------------------------------------------------------------
+
+
+
+
+
+//---------------------------------------------------------------------------
+//! @brief 再生セグメント情報
+//---------------------------------------------------------------------------
+#pragma pack(push, 4)
+struct tTVPWaveSegment
+{
+	//! @brief コンストラクタ
+	tTVPWaveSegment(tjs_int64 start, tjs_int64 length)
+		{ Start = start; Length = FilteredLength = length; }
+	tTVPWaveSegment(tjs_int64 start, tjs_int64 length, tjs_int64 filteredlength)
+		{ Start = start; Length = length; FilteredLength = filteredlength; }
+	tjs_int64 Start; //!< オリジナルデコーダ上でのセグメントのスタート位置 (PCM サンプルグラニュール数単位)
+	tjs_int64 Length; //!< オリジナルデコーダ上でのセグメントの長さ (PCM サンプルグラニュール数単位)
+	tjs_int64 FilteredLength; //!< フィルタ後の長さ (PCM サンプルグラニュール数単位)
+};
+#pragma pack(pop)
+//---------------------------------------------------------------------------
+
+
+
+
+//---------------------------------------------------------------------------
+//! @brief 再生ラベル情報
+//---------------------------------------------------------------------------
+#pragma pack(push, 4)
+struct tTVPWaveLabel
+{
+	//! @brief コンストラクタ
+	tjs_int64 Position; //!< オリジナルデコーダ上でのラベル位置 (PCM サンプルグラニュール数単位)
+	ttstr Name; //!< ラベル名
+	tjs_int Offset;
+		/*!< オフセット
+			@note
+			This member will be set in tTVPWaveLoopManager::Render,
+			and will contain the sample granule offset from first decoding
+			point at call of tTVPWaveLoopManager::Render().
+		*/
+
+
+};
+#pragma pack(pop)
+
+
+
+
+
+
+//---------------------------------------------------------------------------
+//! @brief Waveのセグメント・ラベルのキューを管理するインターフェース
+//---------------------------------------------------------------------------
+class iTVPWaveSegmentQueue
+{
+public:
+	virtual ~iTVPWaveSegmentQueue() { ; }
+
+	//! @brief		内容をクリアする
+	virtual void Clear() = 0;
+
+	//! @brief		tTVPWaveSegmentQueueをエンキューする
+	//! @param		queue		エンキューしたいtTVPWaveSegmentQueueオブジェクト
+	virtual void Enqueue(const tTVPWaveSegmentQueue & queue) = 0;
+
+	//! @brief		tTVPWaveSegmentをエンキューする
+	//! @param		queue		エンキューしたいtTVPWaveSegmentオブジェクト
+	virtual void Enqueue(const tTVPWaveSegment & segment) = 0;
+
+	//! @brief		tTVPWaveLabelをエンキューする
+	//! @param		queue		エンキューしたいtTVPWaveLabelオブジェクト
+	//! @note		Offset は修正されないので注意
+	virtual void Enqueue(const tTVPWaveLabel & Label) = 0;
+
+	//! @brief		先頭から指定長さ分をデキューする
+	//! @param		dest		格納先キュー(内容はクリアされる)
+	//! @param		length		切り出す長さ(サンプルグラニュール単位)
+	virtual void Dequeue(tTVPWaveSegmentQueue & dest, tjs_int64 length) = 0;
+
+	//! @brief		このキューの全体の長さを得る
+	//! @return		このキューの長さ (サンプルグラニュール単位)
+	virtual tjs_int64 GetFilteredLength() const = 0;
+
+	//! @brief		このキューの長さを変化させる
+	//! @param		new_total_filtered_length 新しいキューの長さ (サンプルグラニュール単位)
+	//! @note		キュー中のSegments などの長さや Labelsの位置は線形補間される
+	virtual void Scale(tjs_int64 new_total_length) = 0;
+
+	//! @brief		フィルタされた位置からデコード位置へ変換を行う
+	//! @param		pos フィルタされた位置
+	//! @note		デコード位置
+	virtual tjs_int64 FilteredPositionToDecodePosition(tjs_int64 pos) const = 0;
+};
+//---------------------------------------------------------------------------
+
+
+class tTVPWaveSegmentQueue : public iTVPWaveSegmentQueue { };
+
+
+//---------------------------------------------------------------------------
+// tTVPSampleAndLabelSource : source interface for sound sample and its label info
+//---------------------------------------------------------------------------
+struct tTVPWaveFormat;
+class tTVPSampleAndLabelSource
+{
+public:
+	virtual void Decode(void *dest, tjs_uint samples, tjs_uint &written,
+		tTVPWaveSegmentQueue &segments) = 0;
+
+	virtual const tTVPWaveFormat & GetFormat() const  = 0;
+
+	virtual ~ tTVPSampleAndLabelSource() { }
+};
+//---------------------------------------------------------------------------
 
 
 
@@ -5889,6 +6025,7 @@ enum tTVPVideoOverlayMode {
 	vomOverlay,		// Overlay
 	vomLayer,		// Draw Layer
 	vomMixer,		// VMR
+	vomMFEVR,		// Media Foundation with EVR
 };
 
 

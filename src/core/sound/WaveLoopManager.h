@@ -165,10 +165,10 @@ bool inline operator < (const tTVPWaveLoopLink & lhs, const tTVPWaveLoopLink & r
 
 
 
+/*[*/
 //---------------------------------------------------------------------------
 // tTVPSampleAndLabelSource : source interface for sound sample and its label info
 //---------------------------------------------------------------------------
-class tTVPWaveDecoder;
 struct tTVPWaveFormat;
 class tTVPSampleAndLabelSource
 {
@@ -183,9 +183,11 @@ public:
 //---------------------------------------------------------------------------
 
 
+/*]*/
 //---------------------------------------------------------------------------
 // tTVPWaveLoopManager : wave loop manager
 //---------------------------------------------------------------------------
+class tTVPWaveDecoder;
 class tTVPWaveLoopManager : public tTVPSampleAndLabelSource
 {
 	tTJSCriticalSection FlagsCS; // CS to protect flags/links/labels
