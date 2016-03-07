@@ -90,14 +90,11 @@ void PCMConvertLoopInt16ToFloat32_sse(void * __restrict dest, const void * __res
 	{
 		for(       ; n < numsamples - 7; n += 8)
 		{
-#if 0
-			*(__m128*)(d + n +  0) = _mm_mul_ps(_mm_cvtpi16_ps(*(__m64*)(s+n+ 0)), PM128(TJS_V_VEC_REDUCE));
-			*(__m128*)(d + n +  4) = _mm_mul_ps(_mm_cvtpi16_ps(*(__m64*)(s+n+ 4)), PM128(TJS_V_VEC_REDUCE));
-#else
 			Int16ToFloat32_sse( d+n, s+n );
-#endif
 		}
+#ifndef _M_X64
 		_mm_empty();
+#endif
 	}
 
 	// ‚Ì‚±‚è
@@ -135,14 +132,11 @@ void PCMConvertLoopFloat32ToInt16_sse(void * __restrict dest, const void * __res
 		SetRoundingModeToNearest_SSE();
 		for(     ; n < numsamples - 7; n += 8)
 		{
-#if 0
-			*(__m64*)(d + n + 0) = _mm_cvtps_pi16( _mm_mul_ps(*(__m128*)(s + n + 0), PM128(TJS_V_VEC_MAGNIFY)) );
-			*(__m64*)(d + n + 4) = _mm_cvtps_pi16( _mm_mul_ps(*(__m128*)(s + n + 4), PM128(TJS_V_VEC_MAGNIFY)) );
-#else
 			Float32ToInt16_sse( d+n, s+n );
-#endif
 		}
+#ifndef _M_X64
 		_mm_empty();
+#endif
 	}
 
 	// ‚Ì‚±‚è
