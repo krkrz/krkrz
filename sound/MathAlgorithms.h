@@ -269,6 +269,88 @@ static inline void SetRoundingModeToNearest_SSE()
  * @note	原典: http://arxiv.org/PS_cache/cs/pdf/0406/0406049.pdf  @r
  *			呼び出しに先立って Risa_SetRoundingModeToNearest_SSE を呼ぶこと。
  */
+static inline void VFast_sincos_F4_SSE2(__m128 v, __m128 &sin, __m128 &cos)
+{
+	__m128 s1, s2, c1, c2, fixmag1;
+
+	__m128 x1 = _mm_mul_ps(v, PM128(TVP_V_R_2PI));
+//	float x1=madd(v, (float)(1.0/(2.0*3.1415926536)), (float)(0.0));
+
+	/* q1=x/2pi reduced onto (-0.5,0.5), q2=q1**2 */
+	__m128i r0 = _mm_cvtps_epi32(x1);
+	__m128 q1, q2;
+	q1 = _mm_cvtepi32_ps(r0);
+	q1 = _mm_sub_ps(x1, q1);
+
+	q2 = _mm_mul_ps(q1, q1);
+
+//	float q1=nmsub(round(x1), (float)(1.0), x1); // q1 = x1 - round(x1)
+//	float q2=madd(q1, q1, (float)(0.0));
+
+	s1 = _mm_add_ps(_mm_mul_ps(q2, PM128(TVP_VFASTSINCOS_SS4)), PM128(TVP_VFASTSINCOS_SS3));
+		// s1 = (q2 * ss4 + ss3)
+	s1 = _mm_add_ps(_mm_mul_ps(s1, q2), PM128(TVP_VFASTSINCOS_SS2));
+		// s1 = (q2 * (q2 * ss4 + ss3) + ss2)
+	s1 = _mm_add_ps(_mm_mul_ps(s1, q2), PM128(TVP_VFASTSINCOS_SS1));
+		// s1 = (q2 * (q2 * (q2 * ss4 + ss3) + ss2) + ss1)
+	s1 = _mm_mul_ps(s1, q1);
+
+//	s1 = q1 * (q2 * (q2 * (q2 * ss4 + ss3) + ss2) + ss1);
+//	s1= madd(q1,
+//			madd(q2,
+//				madd(q2,
+//					madd(q2, (float)(ss4),
+//								(float)(ss3)),
+//									(float)( ss2)),
+//							(float)(ss1)),
+//						(float)(0.0));
+
+
+	c1 = _mm_add_ps(_mm_mul_ps(q2, PM128(TVP_VFASTSINCOS_CC3)), PM128(TVP_VFASTSINCOS_CC2));
+		// c1 = (q2 * cc3 + cc2)
+	c1 = _mm_add_ps(_mm_mul_ps(c1, q2), PM128(TVP_VFASTSINCOS_CC1));
+		// c1 =  (q2 * (q2 * cc3 + cc2) + cc1 )
+	c1 = _mm_add_ps(_mm_mul_ps(c1, q2), PM128(PFV_1));
+//	c1= (q2 *  (q2 * (q2 * cc3 + cc2) + cc1 ) + 1.0);
+//	c1= madd(q2,
+//			madd(q2,
+//				madd(q2, (float)(cc3),
+//				(float)(cc2)),
+//			(float)(cc1)),
+//		(float)(1.0));
+
+	/* now, do one out of two angle-doublings to get sin & cos theta/2 */
+	c2 = _mm_sub_ps( _mm_mul_ps(c1, c1), _mm_mul_ps(s1, s1));
+//	c2=nmsub(s1, s1, madd(c1, c1, (float)(0.0))); // c2 = (c1*c1) - (s1*s1)
+	s2 = _mm_mul_ps(_mm_mul_ps(s1, c1), PM128(PFV_2));
+//	s2=madd((float)(2.0), madd(s1, c1, (float)(0.0)), (float)(0.0)); // s2=2*s1*c1
+
+	/* now, cheat on the correction for magnitude drift...
+	if the pair has drifted to (1+e)*(cos, sin),
+	the next iteration will be (1+e)**2*(cos, sin)
+	which is, for small e, (1+2e)*(cos,sin).
+	However, on the (1+e) error iteration,
+	sin**2+cos**2=(1+e)**2=1+2e also,
+	so the error in the square of this term
+	will be exactly the error in the magnitude of the next term.
+	Then, multiply final result by (1-e) to correct */
+
+	/* this works with properly normalized sine-cosine functions, but un-normalized is more */
+	__m128 c2_c2 = _mm_mul_ps(c2, c2);
+	__m128 s2_s2 = _mm_mul_ps(s2, s2);
+	fixmag1 = _mm_sub_ps(_mm_sub_ps(PM128(PFV_2), c2_c2), s2_s2);
+//	fixmag1=nmsub(s2,s2, nmsub(c2, c2, (float)(2.0))); // fixmag1 = ( 2.0 - c2*c2 ) - s2*s2
+
+	c1 = _mm_sub_ps(c2_c2, s2_s2);
+//	c1=nmsub(s2, s2, madd(c2, c2, (float)(0.0))); // c1 = c2*c2 - s2*s2
+	s1 = _mm_mul_ps(_mm_mul_ps(s2, c2), PM128(PFV_2));
+//	s1=madd((float)(2.0), madd(s2, c2, (float)(0.0)), (float)(0.0));
+	cos = _mm_mul_ps(c1, fixmag1);
+//	cos=madd(c1, fixmag1, (float)(0.0));
+	sin = _mm_mul_ps(s1, fixmag1);
+//	sin=madd(s1, fixmag1, (float)(0.0));
+}
+#if defined(_M_IX86)
 static inline void VFast_sincos_F4_SSE(__m128 v, __m128 &sin, __m128 &cos)
 {
 	__m128 s1, s2, c1, c2, fixmag1;
@@ -353,6 +435,9 @@ static inline void VFast_sincos_F4_SSE(__m128 v, __m128 &sin, __m128 &cos)
 
 	_mm_empty();
 }
+#elif defined(_M_X64)
+#define VFast_sincos_F4_SSE VFast_sincos_F4_SSE2
+#endif
 //---------------------------------------------------------------------------
 
 
@@ -360,6 +445,40 @@ static inline void VFast_sincos_F4_SSE(__m128 v, __m128 &sin, __m128 &cos)
 /**
  * Phase Wrapping(radianを-PI～PIにラップする) (4x float, SSE版)
  */
+static inline __m128 Wrap_Pi_F4_SSE2(__m128 v)
+{
+	// v を M_PI で割る
+	__m128 v_quant = _mm_mul_ps(v, PM128(TVP_V_R_PI)); // v_quant = v/M_PI
+
+	// v_quantを小数点以下を切り捨てて整数に変換
+	__m128i q = _mm_cvttps_epi32(v_quant);
+	// 正の場合はv_quant&1を足し、負の場合は引く
+	// a = v_quant,    v_quant = a + ( (0 - (a&1)) & ((a>>31)|1) )
+	q =
+		_mm_add_epi32(
+			q,
+			_mm_and_si128(
+				_mm_sub_epi32(
+					_mm_setzero_si128(),
+					_mm_and_si128(q, PM128I(TVP_V_I32_1))
+				),
+				_mm_or_si128(
+					_mm_srai_epi32(q, 31),
+					PM128I(TVP_V_I32_1)
+				)
+			)
+		);
+	// それらを実数に戻し、M_PI をかける
+	v_quant = _mm_cvtepi32_ps(q);
+	v_quant = _mm_mul_ps(v_quant, PM128(TVP_V_PI));
+
+	// それを v から引く
+	v = _mm_sub_ps(v, v_quant);
+
+	// 戻る
+	return v;
+}
+#if defined(_M_IX86)
 static inline __m128 Wrap_Pi_F4_SSE(__m128 v)
 {
 	// v を M_PI で割る
@@ -415,6 +534,10 @@ static inline __m128 Wrap_Pi_F4_SSE(__m128 v)
 	// 戻る
 	return v;
 }
+#elif defined(_M_X64)
+// x64 の時はSSE2を使う
+#define Wrap_Pi_F4_SSE Wrap_Pi_F4_SSE2
+#endif
 //---------------------------------------------------------------------------
 
 

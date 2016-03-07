@@ -73,9 +73,7 @@
 #endif
 #define PM64(x)		(*(__m64*)(x))
 #define PM128(x)	(*(__m128*)(x))
-#ifdef	__SSE2__
 #define PM128I(x)	(*(__m128i*)(x))
-#endif
 
 typedef union {
 	unsigned char	si8[8];
