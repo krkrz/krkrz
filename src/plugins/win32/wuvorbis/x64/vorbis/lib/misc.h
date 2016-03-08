@@ -52,11 +52,16 @@ extern void _VDBG_free(void *ptr,char *file,long line);
 #undef _ogg_free
 #undef _ogg_alloca
 
-#define _ogg_malloc(x) xmm_malloc(x)
-#define _ogg_calloc(x,y) xmm_calloc((x), (y))
-#define _ogg_realloc(x,y) xmm_realloc((x), (y))
-#define _ogg_alloca(x) xmm_align(alloca((x)+16))
-#define _ogg_free(x) xmm_free(x)
+extern void * dee_ogg_malloc(size_t bytes);
+extern void * dee_ogg_calloc(size_t num, size_t size);
+extern void dee_ogg_free(void *ptr);
+extern void * dee_ogg_realloc(void *block, size_t bytes);
+extern void * dee_ogg_alloca(size_t bytes);
+#define _ogg_malloc(x) dee_ogg_malloc(x)
+#define _ogg_calloc(x,y) dee_ogg_calloc((x), (y))
+#define _ogg_realloc(x,y) dee_ogg_realloc((x), (y))
+#define _ogg_alloca(x) dee_ogg_alloca(x)
+#define _ogg_free(x) dee_ogg_free(x)
 #endif														/* SSE Optimize */
 
 #endif

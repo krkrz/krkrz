@@ -130,6 +130,9 @@ void mdct_init(mdct_lookup *lookup,int n){
 		for(i=0,j=n2-4;i<n8;i+=4,j-=4)
 		{
 			__m128	XMM0, XMM1, XMM2, XMM3;
+#ifdef _DEBUG
+			XMM0 = XMM1 = XMM2 = XMM3 = _mm_setzero_ps();
+#endif
 #pragma warning(disable : 592)
 			XMM0	 = _mm_loadl_pi(XMM0, (__m64*)(S+j+2));
 			XMM2	 = _mm_loadl_pi(XMM2, (__m64*)(S+j  ));
@@ -152,6 +155,9 @@ void mdct_init(mdct_lookup *lookup,int n){
 		for(;i<n4;i+=4,j-=4)
 		{
 			__m128	XMM0, XMM1, XMM2, XMM3;
+#ifdef _DEBUG
+			XMM0 = XMM1 = XMM2 = XMM3 = _mm_setzero_ps();
+#endif
 #pragma warning(disable : 592)
 			XMM0	 = _mm_loadl_pi(XMM0, (__m64*)(S+j+2));
 			XMM2	 = _mm_loadl_pi(XMM2, (__m64*)(S+j  ));

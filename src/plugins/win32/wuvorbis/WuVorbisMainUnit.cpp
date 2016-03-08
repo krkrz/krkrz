@@ -12,6 +12,7 @@ extern "C" {
 #include <math.h>
 #include <string.h>
 #include <stdlib.h>
+#include <malloc.h>
 
 #ifndef NOT_HAVE_TP_STUB
 #include "tp_stub.h"
@@ -711,6 +712,22 @@ void * dee_ogg_realloc(void *block, size_t bytes)
 	dee_ogg_free(block);
 	
 	return newptr;
+}
+//---------------------------------------------------------------------------
+void * dee_ogg_alloca(size_t bytes)
+{
+	bytes += 16;
+	tjs_int align = 16;
+	void *ptr = _alloca(bytes + align + sizeof(alloc_record));
+	if(!ptr) return NULL;
+	void *org_ptr = ptr;
+	DWORD *iptr =
+		reinterpret_cast<DWORD *>(&ptr);
+	*iptr += align + sizeof(alloc_record);
+	*iptr &= ~(DWORD)(align - 1);
+	(reinterpret_cast<alloc_record*>(ptr))[-1].org_ptr = org_ptr;
+	(reinterpret_cast<alloc_record*>(ptr))[-1].org_size = bytes;
+	return ptr;
 }
 //---------------------------------------------------------------------------
 }
