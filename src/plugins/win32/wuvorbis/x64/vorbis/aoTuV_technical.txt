@@ -1,0 +1,144 @@
+aoTuV beta5 technical information
+
+
+The differences from the aoTuV beta 4.51...
+
+  1.   In order to work noise normalization correctly, the value of tone 
+  masking is compressed under certain conditions. A floor curve approaches 
+  the original audio spectrum line as a result.  [New M4] 
+
+  2.   In order to cut down the bitrate, a part of M2 code of beta4 was 
+  deleted. 
+
+Å@3.   The ATH curve was changed slightly. 
+
+  4.   Pre-echo decreased slightly. This is based on change of M3 code. 
+
+  5.   In order to decrease artifact by collapse of audio energy, noise 
+  normalization processing of point stereo was extended. [32/44.1/48kHz only] 
+
+  6.   The threshold of channel coupling (lossless <=> point) is changed dynamically. This is a method based on a certain idea. [M6] 
+
+...and I tune up many parameters. 
+
+
+2006/10/24
+Aoyumi
+
+----------------------------------------------------------------------------
+
+aoTuV beta4.51 technical information
+
+
+The differences from the aoTuV beta 4.5...
+
+  1.  The changed part of "scale.h" of Xiph.Org SVN was reflected in aoTuV. 
+  This will solve the problem of the compile by gcc4. 
+
+  2.  A part of portion added by beta4.5 had caused memory access violation. 
+  Depending on environment, a problem arises in qualiy-1/-2. This problem was 
+  corrected. 
+
+
+2005/11/17
+Aoyumi
+
+----------------------------------------------------------------------------
+
+aoTuV beta4.5 technical information
+
+
+The differences from the aoTuV beta 4...
+
+  1.  M4 code of beta3 was deleted. M5 is added as what is replaced with it. 
+  The advantage of this method is that the result stabilized more is obtained. 
+  Instead, the change width of the bit rate becomes large rather than before. 
+  [32/44.1/48kHz only] 
+
+  2.  New M4 was added. There is this for the same purpose as M1. However, 
+  it is tuned up only in the low bit rate region according to work and 
+  individual parameters. [32/44.1/48kHz only] 
+
+  3.  M2 code was extended. This decreases a specific noise problem.  
+  [32/44.1/48kHz only] 
+
+...and I mainly tune up tone/noise masking and noise normalization parameters. 
+
+The above change is applied below quality3. 
+
+
+2005/11/05
+Aoyumi
+
+----------------------------------------------------------------------------
+
+aoTuV beta4 technical information
+
+
+The differences from the aoTuV beta 3...
+
+  1.  Adoption of new hypot (point stereo). This works in general better than
+  dipole/round hypot. And when residue is likely to decrease greatly at the
+  time of a reverse phase, added code is made to increase the ratio of lossless.
+
+  2.  Change of ATH curve. This is not a big change. 
+
+  3.  Residue used for threshold calculation of channel coupling is changed.
+  This one seems to be good selection. 
+
+  4.  HF reduction code of beta3 was deleted. Now, this is not required. 
+
+  5.  The energy deficit of M4 code of beta3 -- correction of a bug Now.
+
+  6.  The code for pulling downward floor of the frequency range which can
+  be easy to be heard was added (New M2). This works by the low bit rate and
+  has a comparatively good trade-off. 
+
+  7.  Change of threshold calculation of noise normalization. Moreover, it
+  takes phase information into consideration. 
+
+
+...and I mainly tune up tone/noise masking and noise compander parameters. 
+
+
+2005/06/18
+Aoyumi
+
+----------------------------------------------------------------------------
+
+aoTuV beta3 technical information
+
+
+The differences from the aoTuV beta 2 and Vorbis 1.1...
+
+  1. Dynamic impulse block noise control(q0-10). [32/44.1/48kHz only] 
+  Conspicuous pre-echo is reduced.
+
+  2. New ATH curve. 
+
+  3. In order to cancel that a small sound becomes unstable, the noise level
+  of low frequency is lowered under specific conditions. (Only below q3) 
+  There is a greatest effect on a piano etc. [32/44.1/48kHz only]
+
+  4. The rate of lossless stereo is increased in specific conditions. This
+  improves many of conspicuous problems which a point stereo causes. (e.g 
+  drumus's hiss/voice, guitar and brass's distortion) [32/44.1/48kHz only]
+
+  5. The action of the noise normalization of point stereo is corrected. It
+  was set to one of the causes of distortion in a long tone (e.g 
+  strings/oboe/high tone voice). 
+
+  6. The HF reduction code was not working normally. This is corrected and
+  it retuned up according to the present condition. [32/44.1/48kHz only]
+
+  7. The q-2 mode was added in all sampling frequencies. And nominal bitrate
+  of q-1 are changed into a more nearly average value. Although nominal 
+  bitrate is more large at a low sampling frequency, average bitrate hardly
+  differs from the former version. 
+
+
+...and I mainly tune up tone/noise masking parameters. 
+
+
+2004/11/21
+Aoyumi
