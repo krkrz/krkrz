@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "resourceEdit", "resourceEdit.vcxproj", "{0CB00D98-AE89-484B-B4F3-8DF38F784787}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0CB00D98-AE89-484B-B4F3-8DF38F784787}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0CB00D98-AE89-484B-B4F3-8DF38F784787}.Debug|Win32.Build.0 = Debug|Win32
+		{0CB00D98-AE89-484B-B4F3-8DF38F784787}.Release|Win32.ActiveCfg = Release|Win32
+		{0CB00D98-AE89-484B-B4F3-8DF38F784787}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
