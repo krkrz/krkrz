@@ -9,6 +9,7 @@
 #include <math.h>
 #include "ripple.h"
 #include "common.h"
+#include <intrin.h>
 
 //---------------------------------------------------------------------------
 /*
@@ -431,6 +432,97 @@ static void TVPRippleTransform_c_b(
 //---------------------------------------------------------------------------
 
 
+static void TVPRippleTransform_sse2_f(
+	const tjs_uint16 *displacemap, const tjs_uint16 *driftmap, tjs_uint32 *dest,
+	tjs_int num, tjs_int pitch, const tjs_uint8 * src1, const tjs_uint8 * src2, tjs_int ratio) {
+	__m128i mratio = _mm_set1_epi16( (short)(ratio<<7) );
+	__m128i mzero = _mm_setzero_si128();
+	int limit = (num>>1)<<1;
+	int i = 0;
+	for( ; i < limit; i+=2)
+	{
+		tjs_int n1 = driftmap[displacemap[i+0]];
+		tjs_int n2 = driftmap[displacemap[i+1]];
+		tjs_int ofs1 = (int)((i+0 - (int)(char)(n1>>8))*sizeof(tjs_uint32)) + (int)(char)(n1)*pitch;
+		tjs_int ofs2 = (int)((i+1 - (int)(char)(n2>>8))*sizeof(tjs_uint32)) + (int)(char)(n2)*pitch;
+		__m128i ms1 = _mm_cvtsi32_si128( *(const tjs_uint32*)&src1[ofs1] );
+		__m128i ms2 = _mm_cvtsi32_si128( *(const tjs_uint32*)&src2[ofs1] );
+		__m128i ms12 = _mm_cvtsi32_si128( *(const tjs_uint32*)&src1[ofs2] );
+		__m128i ms22 = _mm_cvtsi32_si128( *(const tjs_uint32*)&src2[ofs2] );
+		ms2 = _mm_unpacklo_epi32( ms2, ms22 );
+		ms1 = _mm_unpacklo_epi32( ms1, ms12 );
+		ms2 = _mm_unpacklo_epi8( ms2, mzero );
+		ms1 = _mm_unpacklo_epi8( ms1, mzero );
+		ms2 = _mm_sub_epi16( ms2, ms1 );		// ms2 - ms1
+		ms2 = _mm_mulhi_epi16( ms2, mratio );	// ms2 * mratio
+		ms2 = _mm_slli_epi16( ms2, 1 );			// ms2 << 1
+		ms1 = _mm_add_epi16( ms1, ms2 );		// ms1 + ms2
+		ms1 = _mm_packus_epi16( ms1, ms1 );
+		_mm_storel_epi64( (__m128i *)&dest[i], ms1 );
+	}
+	if( i < num )
+	{
+		tjs_int n1 = driftmap[displacemap[i]];
+		tjs_int ofs1 = (int)((i - (int)(char)(n1>>8))*sizeof(tjs_uint32)) + (int)(char)(n1)*pitch;
+		__m128i ms2 = _mm_cvtsi32_si128( *(const tjs_uint32*)&src2[ofs1] );
+		__m128i ms1 = _mm_cvtsi32_si128( *(const tjs_uint32*)&src1[ofs1] );
+		ms2 = _mm_unpacklo_epi8( ms2, mzero );
+		ms1 = _mm_unpacklo_epi8( ms1, mzero );
+		ms2 = _mm_sub_epi16( ms2, ms1 );		// ms2 - ms1
+		ms2 = _mm_mulhi_epi16( ms2, mratio );	// ms2 * mratio
+		ms2 = _mm_slli_epi16( ms2, 1 );			// ms2 << 1
+		ms1 = _mm_add_epi16( ms1, ms2 );		// ms1 + ms2
+		ms1 = _mm_packus_epi16( ms1, ms1 );
+		dest[i] = _mm_cvtsi128_si32( ms1 );
+	}
+}
+
+static void TVPRippleTransform_sse2_b(
+	const tjs_uint16 *displacemap, const tjs_uint16 *driftmap, tjs_uint32 *dest,
+	tjs_int num, tjs_int pitch, const tjs_uint8 * src1, const tjs_uint8 * src2, tjs_int ratio) {
+	__m128i mratio = _mm_set1_epi16( (short)(ratio<<7) );
+	__m128i mzero = _mm_setzero_si128();
+	int limit = (num>>1)<<1;
+	int i = 0;
+	for( ; i < limit; i+=2)
+	{
+		tjs_int n1 = driftmap[*(displacemap--)];
+		tjs_int n2 = driftmap[*(displacemap--)];
+		tjs_int ofs1 = (int)((i+0 - (int)(char)(n1>>8))*sizeof(tjs_uint32)) + (int)(char)(n1)*pitch;
+		tjs_int ofs2 = (int)((i+1 - (int)(char)(n2>>8))*sizeof(tjs_uint32)) + (int)(char)(n2)*pitch;
+		__m128i ms1 = _mm_cvtsi32_si128( *(const tjs_uint32*)&src1[ofs1] );
+		__m128i ms2 = _mm_cvtsi32_si128( *(const tjs_uint32*)&src2[ofs1] );
+		__m128i ms12 = _mm_cvtsi32_si128( *(const tjs_uint32*)&src1[ofs2] );
+		__m128i ms22 = _mm_cvtsi32_si128( *(const tjs_uint32*)&src2[ofs2] );
+		ms2 = _mm_unpacklo_epi32( ms2, ms22 );
+		ms1 = _mm_unpacklo_epi32( ms1, ms12 );
+		ms2 = _mm_unpacklo_epi8( ms2, mzero );
+		ms1 = _mm_unpacklo_epi8( ms1, mzero );
+		ms2 = _mm_sub_epi16( ms2, ms1 );		// ms2 - ms1
+		ms2 = _mm_mulhi_epi16( ms2, mratio );	// ms2 * mratio
+		ms2 = _mm_slli_epi16( ms2, 1 );			// ms2 << 1
+		ms1 = _mm_add_epi16( ms1, ms2 );		// ms1 + ms2
+		ms1 = _mm_packus_epi16( ms1, ms1 );
+		_mm_storel_epi64( (__m128i *)&dest[i], ms1 );
+	}
+	if( i < num )
+	{
+		tjs_int n1 = driftmap[*(displacemap--)];
+		tjs_int ofs1 = (int)((i - (int)(char)(n1>>8))*sizeof(tjs_uint32)) + (int)(char)(n1)*pitch;
+		__m128i ms2 = _mm_cvtsi32_si128( *(const tjs_uint32*)&src2[ofs1] );
+		__m128i ms1 = _mm_cvtsi32_si128( *(const tjs_uint32*)&src1[ofs1] );
+		ms2 = _mm_unpacklo_epi8( ms2, mzero );
+		ms1 = _mm_unpacklo_epi8( ms1, mzero );
+		ms2 = _mm_sub_epi16( ms2, ms1 );		// ms2 - ms1
+		ms2 = _mm_mulhi_epi16( ms2, mratio );	// ms2 * mratio
+		ms2 = _mm_slli_epi16( ms2, 1 );			// ms2 << 1
+		ms1 = _mm_add_epi16( ms1, ms2 );		// ms1 + ms2
+		ms1 = _mm_packus_epi16( ms1, ms1 );
+		dest[i] = _mm_cvtsi128_si32( ms1 );
+	}
+}
+
+#ifndef _M_X64
 //---------------------------------------------------------------------------
 static void TVPRippleTransform_mmx_f(
 	const tjs_uint16 *displacemap, const tjs_uint16 *driftmap, tjs_uint32 *dest,
@@ -880,7 +972,7 @@ static void TVPRippleTransform_emmx_b(
 	}
 }
 //---------------------------------------------------------------------------
-
+#endif
 
 
 //---------------------------------------------------------------------------
@@ -894,12 +986,14 @@ static tTVPRippleTransformFunc TVPRippleTransform_b = TVPRippleTransform_c_b;
 static void TVPInitRippleTransformFuncs()
 {
 	tjs_uint32 cputype = TVPGetCPUType();
+#ifndef _M_X64
 	if(cputype & TVP_CPU_HAS_MMX)
 	{
 		// MMX が使用可能な場合
 		TVPRippleTransform_f = TVPRippleTransform_mmx_f;
 		TVPRippleTransform_b = TVPRippleTransform_mmx_b;
 	}
+
 	if((cputype & TVP_CPU_HAS_MMX) && (cputype & TVP_CPU_HAS_EMMX))
 	{
 		// MMX/EMMX が使用可能な場合
@@ -907,6 +1001,13 @@ static void TVPInitRippleTransformFuncs()
 		// 微妙に速い
 		TVPRippleTransform_f = TVPRippleTransform_emmx_f;
 		TVPRippleTransform_b = TVPRippleTransform_emmx_b;
+	}
+#endif
+	if(cputype & TVP_CPU_HAS_SSE2)
+	{
+		// SSE2 が使用可能な場合
+		TVPRippleTransform_f = TVPRippleTransform_sse2_f;
+		TVPRippleTransform_b = TVPRippleTransform_sse2_b;
 	}
 }
 //---------------------------------------------------------------------------
