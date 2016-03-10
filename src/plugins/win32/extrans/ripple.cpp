@@ -411,7 +411,7 @@ static void TVPRippleTransform_c_f(
 	for(int i = 0; i < num; i++)
 	{
 		tjs_int n = driftmap[displacemap[i]];
-		tjs_int ofs = (int)((i - (int)(char)(n>>8))*sizeof(tjs_uint32)) +
+		tjs_intptr_t ofs = (int)((i - (int)(char)(n>>8))*sizeof(tjs_uint32)) +
 			(int)(char)(n)*pitch;
 		TVP_RIPPLE_BLEND
 	}
@@ -424,7 +424,7 @@ static void TVPRippleTransform_c_b(
 	for(int i = 0; i < num; i++)
 	{
 		tjs_int n = driftmap[*(displacemap--)];
-		tjs_int ofs = (int)((i + (int)(char)(n>>8))*sizeof(tjs_uint32)) +
+		tjs_intptr_t ofs = (int)((i + (int)(char)(n>>8))*sizeof(tjs_uint32)) +
 			(int)(char)(n)*pitch;
 		TVP_RIPPLE_BLEND
 	}
@@ -443,8 +443,8 @@ static void TVPRippleTransform_sse2_f(
 	{
 		tjs_int n1 = driftmap[displacemap[i+0]];
 		tjs_int n2 = driftmap[displacemap[i+1]];
-		tjs_int ofs1 = (int)((i+0 - (int)(char)(n1>>8))*sizeof(tjs_uint32)) + (int)(char)(n1)*pitch;
-		tjs_int ofs2 = (int)((i+1 - (int)(char)(n2>>8))*sizeof(tjs_uint32)) + (int)(char)(n2)*pitch;
+		tjs_intptr_t ofs1 = (int)((i+0 - (int)(char)(n1>>8))*sizeof(tjs_uint32)) + (int)(char)(n1)*pitch;
+		tjs_intptr_t ofs2 = (int)((i+1 - (int)(char)(n2>>8))*sizeof(tjs_uint32)) + (int)(char)(n2)*pitch;
 		__m128i ms1 = _mm_cvtsi32_si128( *(const tjs_uint32*)&src1[ofs1] );
 		__m128i ms2 = _mm_cvtsi32_si128( *(const tjs_uint32*)&src2[ofs1] );
 		__m128i ms12 = _mm_cvtsi32_si128( *(const tjs_uint32*)&src1[ofs2] );
@@ -463,7 +463,7 @@ static void TVPRippleTransform_sse2_f(
 	if( i < num )
 	{
 		tjs_int n1 = driftmap[displacemap[i]];
-		tjs_int ofs1 = (int)((i - (int)(char)(n1>>8))*sizeof(tjs_uint32)) + (int)(char)(n1)*pitch;
+		tjs_intptr_t ofs1 = (int)((i - (int)(char)(n1>>8))*sizeof(tjs_uint32)) + (int)(char)(n1)*pitch;
 		__m128i ms2 = _mm_cvtsi32_si128( *(const tjs_uint32*)&src2[ofs1] );
 		__m128i ms1 = _mm_cvtsi32_si128( *(const tjs_uint32*)&src1[ofs1] );
 		ms2 = _mm_unpacklo_epi8( ms2, mzero );
@@ -488,8 +488,8 @@ static void TVPRippleTransform_sse2_b(
 	{
 		tjs_int n1 = driftmap[*(displacemap--)];
 		tjs_int n2 = driftmap[*(displacemap--)];
-		tjs_int ofs1 = (int)((i+0 - (int)(char)(n1>>8))*sizeof(tjs_uint32)) + (int)(char)(n1)*pitch;
-		tjs_int ofs2 = (int)((i+1 - (int)(char)(n2>>8))*sizeof(tjs_uint32)) + (int)(char)(n2)*pitch;
+		tjs_intptr_t ofs1 = (int)((i+0 - (int)(char)(n1>>8))*sizeof(tjs_uint32)) + (int)(char)(n1)*pitch;
+		tjs_intptr_t ofs2 = (int)((i+1 - (int)(char)(n2>>8))*sizeof(tjs_uint32)) + (int)(char)(n2)*pitch;
 		__m128i ms1 = _mm_cvtsi32_si128( *(const tjs_uint32*)&src1[ofs1] );
 		__m128i ms2 = _mm_cvtsi32_si128( *(const tjs_uint32*)&src2[ofs1] );
 		__m128i ms12 = _mm_cvtsi32_si128( *(const tjs_uint32*)&src1[ofs2] );
@@ -508,7 +508,7 @@ static void TVPRippleTransform_sse2_b(
 	if( i < num )
 	{
 		tjs_int n1 = driftmap[*(displacemap--)];
-		tjs_int ofs1 = (int)((i - (int)(char)(n1>>8))*sizeof(tjs_uint32)) + (int)(char)(n1)*pitch;
+		tjs_intptr_t ofs1 = (int)((i - (int)(char)(n1>>8))*sizeof(tjs_uint32)) + (int)(char)(n1)*pitch;
 		__m128i ms2 = _mm_cvtsi32_si128( *(const tjs_uint32*)&src2[ofs1] );
 		__m128i ms1 = _mm_cvtsi32_si128( *(const tjs_uint32*)&src1[ofs1] );
 		ms2 = _mm_unpacklo_epi8( ms2, mzero );
@@ -1021,7 +1021,7 @@ static void TVPInitRippleTransformFuncs()
 		if(x>=srcwidth) x = srcwidth - 1 - (x - srcwidth); \
 		if(y>=srcheight) y = srcheight - 1 - (y - srcheight); \
 	}
-#define TVP_RIPPLE_CALC_OFS tjs_uint ofs = \
+#define TVP_RIPPLE_CALC_OFS tjs_intptr_t ofs = \
 		x*sizeof(tjs_uint32) + y*pitch;
 //---------------------------------------------------------------------------
 static void TVPRippleTransform_f_a_e(
