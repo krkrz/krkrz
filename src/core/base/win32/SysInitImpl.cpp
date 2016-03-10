@@ -482,6 +482,7 @@ void TVPDumpOSContext(const CONTEXT &ctx)
 
 
 	// - debug registers
+#ifndef TJS_64BIT_OS
 	TJS_snprintf(buf, BUF_SIZE,
 		TJS_W("Debug Registers   : ")
 		TJS_W("0:0x%08X  ")
@@ -491,6 +492,17 @@ void TVPDumpOSContext(const CONTEXT &ctx)
 		TJS_W("6:0x%08X  ")
 		TJS_W("7:0x%08X  "),
 			ctx.Dr0, ctx.Dr1, ctx.Dr2, ctx.Dr3, ctx.Dr6, ctx.Dr7);
+#else
+	TJS_snprintf(buf, BUF_SIZE,
+		TJS_W("Debug Registers   : ")
+		TJS_W("0:0x%016lx  ")
+		TJS_W("1:0x%016lx  ")
+		TJS_W("2:0x%016lx  ")
+		TJS_W("3:0x%016lx  ")
+		TJS_W("6:0x%016lx  ")
+		TJS_W("7:0x%016lx  "),
+			ctx.Dr0, ctx.Dr1, ctx.Dr2, ctx.Dr3, ctx.Dr6, ctx.Dr7);
+#endif
 	TVPAddLog(buf);
 
 
@@ -501,11 +513,11 @@ void TVPDumpOSContext(const CONTEXT &ctx)
 
 	// - Generic Integer Registers
 #ifdef TJS_64BIT_OS
-	TJS_snprintf(buf, BUF_SIZE, TJS_W("Integer Registers : EAX:0x%016lx  EBX:0x%016lx  ECX:0x%016lx  EDX:0x%016lx"),
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("Integer Registers : RAX:0x%016lx  RBX:0x%016lx  RCX:0x%016lx  RDX:0x%016lx"),
 		ctx.Rax, ctx.Rbx, ctx.Rcx, ctx.Rdx);
 	TVPAddLog(buf);
 	
-	TJS_snprintf(buf, BUF_SIZE, TJS_W(" R8:0x%016lx   R9:0x%016lx  R10:0x%016lx  R11:0x%016lx"), ctx.R8, ctx.R9, ctx.R10, ctx.R11);
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("R8 :0x%016lx  R9 :0x%016lx  R10:0x%016lx  R11:0x%016lx"), ctx.R8, ctx.R9, ctx.R10, ctx.R11);
 	TVPAddLog(buf);
 	TJS_snprintf(buf, BUF_SIZE, TJS_W("R12:0x%016lx  R13:0x%016lx  R14:0x%016lx  R15:0x%016lx"), ctx.R12, ctx.R13, ctx.R14, ctx.R15);
 	TVPAddLog(buf);
@@ -517,7 +529,7 @@ void TVPDumpOSContext(const CONTEXT &ctx)
 
 	// - Index Registers
 #ifdef TJS_64BIT_OS
-	TJS_snprintf(buf, BUF_SIZE, TJS_W("Index Registers   : ESI:0x%016lx  EDI:0x%016lx"),
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("Index Registers   : RSI:0x%016lx  RDI:0x%016lx"),
 		ctx.Rsi, ctx.Rdi);
 #else
 	TJS_snprintf(buf, BUF_SIZE, TJS_W("Index Registers   : ESI:0x%08X  EDI:0x%08X"),
@@ -527,7 +539,7 @@ void TVPDumpOSContext(const CONTEXT &ctx)
 
 	// - Pointer Registers
 #ifdef TJS_64BIT_OS
-	TJS_snprintf(buf, BUF_SIZE, TJS_W("Pointer Registers : EBP:0x%016lx  ESP:0x%016lx  EIP:0x%016lx"),
+	TJS_snprintf(buf, BUF_SIZE, TJS_W("Pointer Registers : RBP:0x%016lx  RSP:0x%016lx  RIP:0x%016lx"),
 		ctx.Rbp, ctx.Rsp, ctx.Rip);
 #else
 	TJS_snprintf(buf, BUF_SIZE, TJS_W("Pointer Registers : EBP:0x%08X  ESP:0x%08X  EIP:0x%08X"),
@@ -610,13 +622,6 @@ void TVPDumpOSContext(const CONTEXT &ctx)
 
 	// -- Cr0NpxState
 	TJS_snprintf(buf, BUF_SIZE,TJS_W("FP CR0 NPX State  : 0x%08X"), ctx.FloatSave.Cr0NpxState);
-	TVPAddLog(buf);
-#endif
-	
-#ifdef TJS_64BIT_OS
-	// Debug registers
-	TJS_snprintf(buf, BUF_SIZE, TJS_W("Debug Registers : Dr0:0x%016lx  Dr1:0x%016lx  Dr2:0x%016lx  Dr3:0x%016lx  Dr6:0x%016lx  Dr7:0x%016lx"),
-		ctx.Dr0, ctx.Dr1, ctx.Dr2, ctx.Dr3, ctx.Dr6, ctx.Dr7);
 	TVPAddLog(buf);
 #endif
 
