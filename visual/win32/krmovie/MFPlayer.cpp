@@ -686,10 +686,10 @@ void __stdcall tTVPMFPlayer::GetStatus(tTVPVideoStatus *status) {
 		}
 	}
 }
-void __stdcall tTVPMFPlayer::GetEvent(long *evcode, long *param1, long *param2, bool *got) {
+void __stdcall tTVPMFPlayer::GetEvent(long *evcode, LONG_PTR *param1, LONG_PTR *param2, bool *got) {
 	/* ‰½‚à‚µ‚È‚¢ */
 }
-void __stdcall tTVPMFPlayer::FreeEventParams(long evcode, long param1, long param2) {
+void __stdcall tTVPMFPlayer::FreeEventParams(long evcode, LONG_PTR param1, LONG_PTR param2) {
 	/* ‰½‚à‚µ‚È‚¢ */
 }
 void __stdcall tTVPMFPlayer::Rewind() {

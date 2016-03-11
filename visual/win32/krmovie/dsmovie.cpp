@@ -267,7 +267,7 @@ void __stdcall tTVPDSMovie::GetStatus(tTVPVideoStatus *status)
 //! @param 		param2 : パラメータ2。内容はイベントコードにより異なる。
 //! @param 		got : 取得の正否
 //----------------------------------------------------------------------------
-void __stdcall tTVPDSMovie::GetEvent( long *evcode, long *param1, long *param2, bool *got )
+void __stdcall tTVPDSMovie::GetEvent( long *evcode, LONG_PTR *param1, LONG_PTR *param2, bool *got )
 {
 	if(Shutdown) return;
 	HRESULT hr;
@@ -291,7 +291,7 @@ void __stdcall tTVPDSMovie::GetEvent( long *evcode, long *param1, long *param2, 
 //! @param 		param1 : 解放するパラメータ1。内容はイベントコードにより異なる。
 //! @param 		param2 : 解放するパラメータ2。内容はイベントコードにより異なる。
 //----------------------------------------------------------------------------
-void __stdcall tTVPDSMovie::FreeEventParams(long evcode, long param1, long param2)
+void __stdcall tTVPDSMovie::FreeEventParams(long evcode, LONG_PTR param1, LONG_PTR param2)
 {
 	if(Shutdown) return;
 
@@ -778,7 +778,7 @@ void __stdcall tTVPDSMovie::GetNumberOfAudioStream( unsigned long *streamCount )
 	if(Shutdown) return;
 
 	if( streamCount != NULL )
-		*streamCount = m_AudioStreamInfo.size();
+		*streamCount = (unsigned long)m_AudioStreamInfo.size();
 }
 //----------------------------------------------------------------------------
 //! @brief	  	指定したオーディオストリーム番号のストリームを有効にする
@@ -810,7 +810,7 @@ void __stdcall tTVPDSMovie::GetNumberOfVideoStream( unsigned long *streamCount )
 	if(Shutdown) return;
 
 	if( streamCount != NULL )
-		*streamCount = m_VideoStreamInfo.size();
+		*streamCount = (unsigned long)m_VideoStreamInfo.size();
 }
 //----------------------------------------------------------------------------
 //! @brief	  	指定したビデオストリーム番号のストリームを有効にする
