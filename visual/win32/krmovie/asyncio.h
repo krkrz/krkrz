@@ -52,7 +52,7 @@ class CAsyncRequest
     LONG 	m_lLength;
     BYTE* 	m_pBuffer;
     LPVOID 	m_pContext;
-    DWORD	m_dwUser;
+    DWORD_PTR	m_dwUser;
     HRESULT     m_hr;
 
 public:
@@ -66,7 +66,7 @@ public:
         BOOL bAligned,
 	BYTE* pBuffer,
 	LPVOID pContext,	// filter's context
-	DWORD dwUser);		// downstream filter's context
+	DWORD_PTR dwUser);		// downstream filter's context
 
     // issue the i/o if not overlapped, and block until i/o complete.
     // returns error code of file i/o
@@ -84,7 +84,7 @@ public:
     	return m_pContext;
     };
 
-    DWORD GetUser()
+    DWORD_PTR GetUser()
     {
 	return m_dwUser;
     };
@@ -211,13 +211,13 @@ public:
                 BOOL bAligned,
 		BYTE* pBuffer,
 		LPVOID pContext,
-		DWORD dwUser);
+		DWORD_PTR dwUser);
 
     // wait for the next read to complete
     HRESULT WaitForNext(
 	    	DWORD dwTimeout,
 		LPVOID *ppContext,
-		DWORD * pdwUser,
+		DWORD_PTR * pdwUser,
                 LONG * pcbActual
                 );
 

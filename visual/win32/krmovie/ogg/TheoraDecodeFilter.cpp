@@ -649,7 +649,7 @@ HRESULT TheoraDecodeFilter::Receive(IMediaSample* inInputSample)
     //Now we have one with a stamp, we can send all the previous ones.
 	TheoraDecodeInputPin* locInputPin = (TheoraDecodeInputPin*)m_pInput;
 	REFERENCE_TIME locGlobalEnd = locInputPin->convertGranuleToTime(locEnd);
-	unsigned long locNumBufferedFrames = m_bufferedPackets.size();
+	unsigned long locNumBufferedFrames = (unsigned long)m_bufferedPackets.size();
 	REFERENCE_TIME locGlobalStart = locGlobalEnd - (locNumBufferedFrames * m_frameDuration);
 
 	locStart = locGlobalStart;

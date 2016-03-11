@@ -664,7 +664,8 @@ void tTJSNI_VideoOverlay::WndProc( NativeEvent& ev )
 		switch(ev.Message) {
 		case WM_GRAPHNOTIFY:
 		{
-			long evcode, p1, p2;
+			long evcode;
+			LONG_PTR p1, p2;
 			bool got;
 			do {
 				VideoOverlay->GetEvent(&evcode, &p1, &p2, &got);
@@ -697,7 +698,7 @@ void tTJSNI_VideoOverlay::WndProc( NativeEvent& ev )
 					case EC_UPDATE:
 						if( Mode == vomLayer && Status == ssPlay )
 						{
-							int		curFrame = p1;
+							int		curFrame = (int)p1;
 							if( Layer1 == NULL && Layer2 == NULL )	// nothing to do.
 								return;
 
@@ -1379,7 +1380,8 @@ void tTJSNI_VideoOverlay::ClearWndProcMessages()
 	{
 		if(VideoOverlay)
 		{
-			long evcode, p1, p2;
+			long evcode;
+			LONG_PTR p1, p2;
 			bool got;
 			VideoOverlay->GetEvent(&evcode, &p1, &p2, &got); // dummy call
 // Add: Start: T.Imoto
