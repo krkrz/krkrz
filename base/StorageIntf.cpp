@@ -286,7 +286,7 @@ ttstr tTVPStorageMediaManager::NormalizeStorageName(const ttstr &name,
 		inarchive_name = ttstr(pa + 1);
 		tTVPArchive::NormalizeInArchiveStorageName(inarchive_name);
 		inarc_name_found = true;
-		tmp = ttstr(pca, pa - pca);
+		tmp = ttstr(pca, (int)(pa - pca));
 	}
 	if(tmp.IsEmpty()) TVPThrowExceptionMessage(TVPInvalidPathName, name);
 
@@ -309,7 +309,7 @@ ttstr tTVPStorageMediaManager::NormalizeStorageName(const ttstr &name,
 	if(*pa == TJS_W(':'))
 	{
 		// media name found
-		media = ttstr(pb, pa - pb);
+		media = ttstr(pb, (int)(pa - pb));
 		pa ++;
 	}
 	else
@@ -341,7 +341,7 @@ ttstr tTVPStorageMediaManager::NormalizeStorageName(const ttstr &name,
 				pc = TJS_strchr(pa, TJS_W('/'));
 				if(!pc)
 					TVPThrowExceptionMessage(TVPInvalidPathName, name);
-				domain = ttstr(pa, pc - pa);
+				domain = ttstr(pa, (int)(pc - pa));
 				pa = pc;
 			}
 		}
@@ -487,7 +487,7 @@ ttstr tTVPStorageMediaManager::ExtractMediaName(const ttstr &name)
 	const tjs_char * p = name.c_str();
 	const tjs_char * po = p;
 	while(*p && *p != TJS_W(':')) p++;
-	return ttstr(po, p - po);
+	return ttstr(po, (int)(p - po));
 }
 //---------------------------------------------------------------------------
 bool tTVPStorageMediaManager::CheckExistentStorage(const ttstr & name)
@@ -806,7 +806,7 @@ bool TVPIsExistentStorageNoSearchNoNormalize(const ttstr &name)
 	{
 		// this storagename indicates a file in an archive
 
-		ttstr arcname(name, sharp_pos - name.c_str());
+		ttstr arcname(name, (int)(sharp_pos - name.c_str()));
 
 		tTVPArchive *arc;
 		arc = TVPArchiveCache.Get(arcname);
@@ -861,7 +861,7 @@ ttstr TVPExtractStorageExt(const ttstr & name)
 		if(*p == TJS_W('.'))
 		{
 			// found extension delimiter
-			tjs_int extlen = slen - ( p - s );
+			tjs_int extlen = (tjs_int)(slen - ( p - s ));
 			return ttstr(p, extlen);
 		}
 
@@ -898,7 +898,7 @@ ttstr TVPExtractStorageName(const ttstr & name)
 	if(p == s)
 		return name;
 	else
-		return ttstr(p, slen - (p -s));
+		return ttstr(p, (int)(slen - (p -s)));
 }
 //---------------------------------------------------------------------------
 
@@ -925,7 +925,7 @@ ttstr TVPExtractStoragePath(const ttstr & name)
 	}
 
 	p++;
-	return ttstr(s, (p-s));
+	return ttstr(s, (int)(p-s));
 }
 //---------------------------------------------------------------------------
 
@@ -950,7 +950,7 @@ extern ttstr TVPChopStorageExt(const ttstr & name)
 		if(*p == TJS_W('.'))
 		{
 			// found extension delimiter
-			return ttstr(s, p-s);
+			return ttstr(s, (int)(p-s));
 		}
 
 		p--;
@@ -1057,7 +1057,7 @@ static tjs_uint TVPRebuildAutoPathTable()
 		{
 			// this storagename indicates a file in an archive
 
-			ttstr arcname(path, sharp_pos - path.c_str());
+			ttstr arcname(path, (int)(sharp_pos - path.c_str()));
 			ttstr in_arc_name(sharp_pos + 1);
 			tTVPArchive::NormalizeInArchiveStorageName(in_arc_name);
 			tjs_int in_arc_name_len = in_arc_name.GetLen();
@@ -1253,7 +1253,7 @@ static tTJSBinaryStream * _TVPCreateStream(const ttstr & _name, tjs_uint32 flags
 		if((flags & TJS_BS_ACCESS_MASK ) !=TJS_BS_READ)
 			TVPThrowExceptionMessage(TVPCannotWriteToArchive);
 
-		ttstr arcname(name, sharp_pos - name.c_str());
+		ttstr arcname(name, (int)(sharp_pos - name.c_str()));
 
 		tTVPArchive *arc;
 		tTJSBinaryStream *stream;

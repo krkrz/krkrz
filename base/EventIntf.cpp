@@ -858,7 +858,7 @@ void TVPCancelInputEvents(void * source, tjs_int tag)
 //---------------------------------------------------------------------------
 tjs_int TVPGetInputEventCount()
 {
-	return TVPInputEventQueue.size();
+	return (tjs_int)TVPInputEventQueue.size();
 }
 //---------------------------------------------------------------------------
 

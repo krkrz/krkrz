@@ -29,10 +29,10 @@ int tjsConstArrayData::PutByteBuffer( tTJSVariantOctet* val ) {
 		len = val->GetLength();
 		data =  val->GetData();
 	}
-	tjs_uint size = ByteBuffer.size();
+	tjs_uint size = (tjs_uint)ByteBuffer.size();
 	int index = -1;
 	for( tjs_uint i = 0; i < size; i++ ) {
-		tjs_uint datalen = ByteBuffer[i]->size();
+		tjs_uint datalen = (tjs_uint)ByteBuffer[i]->size();
 		if( len == datalen ) {
 			if( len == 0 ) {
 				index = i;
@@ -46,7 +46,7 @@ int tjsConstArrayData::PutByteBuffer( tTJSVariantOctet* val ) {
 		}
 	}
 	if( index >= 0 ) return index;
-	index = ByteBuffer.size();
+	index = (int)ByteBuffer.size();
 	std::vector<tjs_uint8>* buf = new std::vector<tjs_uint8>();
 	buf->reserve( len );
 	for( tjs_uint i = 0; i < len; i++ ) {
@@ -58,7 +58,7 @@ int tjsConstArrayData::PutByteBuffer( tTJSVariantOctet* val ) {
 int tjsConstArrayData::PutByte( tjs_int8 b ) {
 	std::map<tjs_int8,int>::const_iterator index = ByteHash.find( b );
 	if( index == ByteHash.end() ) {
-		int idx = Byte.size();
+		int idx = (int)Byte.size();
 		Byte.push_back( b );
 		ByteHash.insert( std::pair<tjs_int8,int>(b,idx) );
 		return idx;
@@ -69,7 +69,7 @@ int tjsConstArrayData::PutByte( tjs_int8 b ) {
 int tjsConstArrayData::PutShort( tjs_int16 b ) {
 	std::map<tjs_int16,int>::const_iterator index = ShortHash.find( b );
 	if( index == ShortHash.end() ) {
-		int idx = Short.size();
+		int idx = (int)Short.size();
 		Short.push_back( b );
 		ShortHash.insert( std::pair<tjs_int16,int>(b,idx) );
 		return idx;
@@ -80,7 +80,7 @@ int tjsConstArrayData::PutShort( tjs_int16 b ) {
 int tjsConstArrayData::PutInteger( tjs_int32 b ) {
 	std::map<tjs_int32,int>::const_iterator index = IntegerHash.find( b );
 	if( index == IntegerHash.end() ) {
-		int idx = Integer.size();
+		int idx = (int)Integer.size();
 		Integer.push_back( b );
 		IntegerHash.insert( std::pair<tjs_int32,int>(b,idx) );
 		return idx;
@@ -91,7 +91,7 @@ int tjsConstArrayData::PutInteger( tjs_int32 b ) {
 int tjsConstArrayData::PutLong( tjs_int64 b ) {
 	std::map<tjs_int64,int>::const_iterator index = LongHash.find( b );
 	if( index == LongHash.end() ) {
-		int idx = Long.size();
+		int idx = (int)Long.size();
 		Long.push_back( b );
 		LongHash.insert( std::pair<tjs_int64,int>(b,idx) );
 		return idx;
@@ -102,7 +102,7 @@ int tjsConstArrayData::PutLong( tjs_int64 b ) {
 int tjsConstArrayData::PutDouble( double b ) {
 	std::map<double,int>::const_iterator index = DoubleHash.find( b );
 	if( index == DoubleHash.end() ) {
-		int idx = Double.size();
+		int idx = (int)Double.size();
 		Double.push_back( b );
 		DoubleHash.insert( std::pair<double,int>(b,idx) );
 		return idx;
@@ -117,7 +117,7 @@ int tjsConstArrayData::PutString( const tjs_char* val ) {
 	if( val ) b = std::wstring(val);
 	std::map<std::wstring,int>::const_iterator index = StringHash.find( b );
 	if( index == StringHash.end() ) {
-		int idx = String.size();
+		int idx = (int)String.size();
 		String.push_back( b );
 		StringHash.insert( std::pair<std::wstring,int>(b,idx) );
 		return idx;
@@ -202,9 +202,9 @@ std::vector<tjs_uint8>* tjsConstArrayData::ExportBuffer() {
 	int size = 0;
 	int stralllen = 0;
 	// string
-	int count = String.size();
+	int count = (int)String.size();
 	for( int i = 0; i < count; i++ ) {
-		int len = String[i].length();
+		int len = (int)String[i].length();
 		len = ((len + 1) / 2) * 2;
 		stralllen += len * 2;
 	}
@@ -213,9 +213,9 @@ std::vector<tjs_uint8>* tjsConstArrayData::ExportBuffer() {
 
 	// byte buffer
 	int bytealllen = 0;
-	count = ByteBuffer.size();
+	count = (int)ByteBuffer.size();
 	for( int i = 0; i < count; i++ ) {
-		int len = ByteBuffer[i]->size();
+		int len = (int)ByteBuffer[i]->size();
 		len = ((len+3)/4)*4;
 		bytealllen += len;
 	}
@@ -223,29 +223,29 @@ std::vector<tjs_uint8>* tjsConstArrayData::ExportBuffer() {
 	size += bytealllen + count*4 + 4;
 
 	// byte
-	count = Byte.size();
+	count = (int)Byte.size();
 	count = ((count+3) / 4) * 4; // アライメント
 	size += count + 4;
 
 	// short
-	count = Short.size() * 2;
+	count = (int)(Short.size() * 2);
 	count = ((count+3) / 4) * 4; // アライメント
 	size += count + 4;
 
 	// int
-	size += Integer.size()*4 + 4;
+	size += (int)(Integer.size()*4 + 4);
 
 	// long
-	size += Long.size()*8 + 4;
+	size += (int)(Long.size()*8 + 4);
 
 	// double
-	size += Double.size()*8 + 4;
+	size += (int)(Double.size()*8 + 4);
 
 	std::vector<tjs_uint8>* buf = new std::vector<tjs_uint8>();
 	buf->reserve( size );
 
 	// byte write
-	count = Byte.size();
+	count = (int)Byte.size();
 	Add4ByteToVector( buf, count );
 	for( int i = 0; i < count; i++ ) {
 		buf->push_back( Byte[i] );
@@ -256,7 +256,7 @@ std::vector<tjs_uint8>* tjsConstArrayData::ExportBuffer() {
 	}
 
 	// short write
-	count = Short.size();
+	count = (int)Short.size();
 	Add4ByteToVector( buf, count );
 	for( int i = 0; i < count; i++ ) {
 		Add2ByteToVector( buf, Short[i] );
@@ -268,21 +268,21 @@ std::vector<tjs_uint8>* tjsConstArrayData::ExportBuffer() {
 	}
 
 	// int write
-	count = Integer.size();
+	count = (int)Integer.size();
 	Add4ByteToVector( buf, count );
 	for( int i = 0; i < count; i++ ) {
 		Add4ByteToVector( buf, Integer[i] );
 	}
 
 	// long write
-	count = Long.size();
+	count = (int)Long.size();
 	Add4ByteToVector( buf, count );
 	for( int i = 0; i < count; i++ ) {
 		Add8ByteToVector( buf, Long[i] );
 	}
 
 	// double write
-	count = Double.size();
+	count = (int)Double.size();
 	Add4ByteToVector( buf, count );
 	for( int i = 0; i < count; i++ ) {
 		double dval = Double[i];
@@ -290,11 +290,11 @@ std::vector<tjs_uint8>* tjsConstArrayData::ExportBuffer() {
 	}
 
 	// string write
-	count = String.size();
+	count = (int)String.size();
 	Add4ByteToVector( buf, count );
 	for( int i = 0; i < count; i++ ) {
 		std::wstring& str = String[i];
-		int len = str.length();
+		int len = (int)str.length();
 		Add4ByteToVector( buf, len );
 		for( int s = 0; s < len; s++ ) {
 			Add2ByteToVector( buf, str[s] );
@@ -305,11 +305,11 @@ std::vector<tjs_uint8>* tjsConstArrayData::ExportBuffer() {
 	}
 
 	// byte buffer write
-	count = ByteBuffer.size();
+	count = (int)ByteBuffer.size();
 	Add4ByteToVector( buf, count );
 	for( int i = 0; i < count; i++ ) {
 		std::vector<tjs_uint8>* by = ByteBuffer[i];
-		int cap = by->size();
+		int cap = (int)by->size();
 		Add4ByteToVector( buf, cap );
 		for( int b = 0; b < cap; b++ ) {
 			buf->push_back( (*by)[b] );

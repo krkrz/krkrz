@@ -1368,7 +1368,7 @@ void TVPSaveAsTLG( const ttstr & storagename, const ttstr & mode, const tTVPBase
 
 			// write chunk size
 			std::string tagstr = tag.str();
-			size = tagstr.length();
+			size = (tjs_uint)tagstr.length();
 			bin[0] = size & 0xff;
 			bin[1] = (size >> 8) & 0xff;
 			bin[2] = (size >> 16) & 0xff;
@@ -1376,7 +1376,7 @@ void TVPSaveAsTLG( const ttstr & storagename, const ttstr & mode, const tTVPBase
 			stream->WriteBuffer(bin, 4);
 
 			// write chunk data
-			stream->WriteBuffer( tagstr.c_str(), tagstr.length() );
+			stream->WriteBuffer( tagstr.c_str(), (tjs_uint)tagstr.length() );
 		} else {
 			if( istls6 ) {
 				SaveTLG6( stream, image, mode == TJS_W("tlg624") );

@@ -172,7 +172,7 @@ void tTVPSusiePicturePlugin::Load(void *callbackdata,
 		memset(&bi, 0, sizeof(bi));
 		BITMAPINFOHEADER *srcbi = (BITMAPINFOHEADER *)LocalLock(info);
 		infolocked = true;
-		tjs_int datasize = LocalSize(bitmap);
+		tjs_int datasize = (tjs_int)LocalSize(bitmap);
 		void * data = (void*) LocalLock(bitmap);
 		bitmaplocked = true;
 

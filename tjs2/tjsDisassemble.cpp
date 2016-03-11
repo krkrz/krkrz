@@ -568,7 +568,7 @@ void tTJSInterCodeContext::_output_func(const tjs_char *msg,
 		tjs_int size, void *data)
 
 {
-	tjs_int buflen = TJS_strlen(msg) + TJS_strlen(comment) + 20;
+	tjs_int buflen = (tjs_int)(TJS_strlen(msg) + TJS_strlen(comment) + 20);
 	tjs_char *buf = new tjs_char[buflen];
 
 	TJS_snprintf(buf, buflen, TJS_W("%08d %ls"), addr, msg);
@@ -594,7 +594,7 @@ void tTJSInterCodeContext::_output_func(const tjs_char *msg,
 void tTJSInterCodeContext::_output_func_src(const tjs_char *msg,
 	const tjs_char *name, tjs_int line, void *data)
 {
-	tjs_int buflen = TJS_strlen(msg) + TJS_strlen(name) + 20;
+	tjs_int buflen = (tjs_int)(TJS_strlen(msg) + TJS_strlen(name) + 20);
 	tjs_char *buf = new tjs_char[buflen];
 	if(line >= 0)
 		TJS_snprintf(buf, buflen, TJS_W("#%ls(%d) %ls"), name, line+1, msg);

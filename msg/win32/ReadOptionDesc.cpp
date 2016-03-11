@@ -258,18 +258,18 @@ tTVPCommandOptionList* TVPGetEngineCommandDesc() {
 }
 
 void TVPMargeCommandDesc( tTVPCommandOptionList& dest, const tTVPCommandOptionList& src ) {
-	tjs_uint count = src.Categories.size();
+	tjs_uint count = (tjs_uint)src.Categories.size();
 	std::vector<tjs_uint> addcat;
 	addcat.reserve( count );
 	for( tjs_uint i = 0; i < count; i++ ) {
 		const tTVPCommandOptionCategory& srccat = src.Categories[i];
-		tjs_uint dcnt = dest.Categories.size();
+		tjs_uint dcnt = (tjs_uint)dest.Categories.size();
 		bool found = false;
 		for( tjs_uint j = 0; j < dcnt; j++ ) {
 			tTVPCommandOptionCategory& dstcat = dest.Categories[j];
 			if( dstcat.Name == srccat.Name ) {
 				found = true;
-				tjs_uint optcount = srccat.Options.size();
+				tjs_uint optcount = (tjs_uint)srccat.Options.size();
 				dstcat.Options.reserve( dstcat.Options.size() + optcount );
 				for( tjs_uint k = 0; k < optcount; k++ ) {
 					dstcat.Options.push_back( srccat.Options[k] );

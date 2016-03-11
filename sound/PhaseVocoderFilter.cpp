@@ -332,8 +332,8 @@ void tTJSNI_PhaseVocoder::Decode(void *dest, tjs_uint samples, tjs_uint &written
 				PhaseVocoder->GetInputBuffer(inputhopsize, p1, p1len, p2, p2len);
 				tjs_uint filled = 0;
 				tjs_uint total = 0;
-				Fill       (p1, p1len, filled, InputSegments), total += filled;
-				if(p2) Fill(p2, p2len, filled, InputSegments), total += filled;
+				Fill       (p1, (tjs_uint)p1len, filled, InputSegments), total += filled;
+				if(p2) Fill(p2, (tjs_uint)p2len, filled, InputSegments), total += filled;
 				if(total == 0) { break ; } // もうデータがない
 			}
 
@@ -365,8 +365,8 @@ void tTJSNI_PhaseVocoder::Decode(void *dest, tjs_uint samples, tjs_uint &written
 			if(p2) memcpy(dest_buf + p1len * OutputFormat.Channels, p2,
 							p2len * sizeof(float)*OutputFormat.Channels);
 
-			samples  -= copy_size;
-			written  += copy_size;
+			samples  -= (tjs_uint)copy_size;
+			written  += (tjs_uint)copy_size;
 			dest_buf += copy_size * OutputFormat.Channels;
 
 			// segment queue の書き出し

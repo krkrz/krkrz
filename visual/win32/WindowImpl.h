@@ -25,9 +25,9 @@ enum tTVPWMRRegMode { wrmRegister=0, wrmUnregister=1 };
 struct tTVPWindowMessage
 {
 	unsigned int Msg; // window message
-	int WParam;  // WPARAM
-	int LParam;  // LPARAM
-	int Result;  // result
+	WPARAM WParam;  // WPARAM
+	LPARAM LParam;  // LPARAM
+	LRESULT Result;  // result
 };
 #pragma pack(pop)
 typedef bool (__stdcall * tTVPWindowMessageReceiver)

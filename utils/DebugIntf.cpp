@@ -413,7 +413,7 @@ void TVPAddLog(const ttstr &line, bool appendtoimportant)
 		TVPLogDeque->erase(i, i+100);
 	}
 
-	tjs_int timebuflen = TJS_strlen(timebuf);
+	tjs_int timebuflen = (tjs_int)TJS_strlen(timebuf);
 	ttstr buf((tTJSStringBufferLength)(timebuflen + 1 + line.GetLen()));
 	tjs_char * p = buf.Independ();
 	TJS_strcpy(p, timebuf);
@@ -464,7 +464,7 @@ ttstr TVPGetLastLog(tjs_uint n)
 	if(!TVPLogDeque) return TJS_W(""); // log system is shuttingdown
 
 	tjs_uint len = 0;
-	tjs_uint size = TVPLogDeque->size();
+	tjs_uint size = (tjs_uint)TVPLogDeque->size();
 	if(n > size) n = size;
 	if(n==0) return ttstr();
 	std::deque<tTVPLogItem>::iterator i = TVPLogDeque->end();

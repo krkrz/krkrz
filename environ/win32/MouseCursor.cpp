@@ -75,7 +75,7 @@ void MouseCursor::Initialize() {
 void MouseCursor::Finalize() {
 	// “Ç‚Ýž‚Ü‚ê‚½ƒJ[ƒ\ƒ‹‚ðíœ
 	if( CURSOR_HANDLES_FOR_INDEXES.size() > CURSOR_INDEXES_NUM ) {
-		int numCursor = CURSOR_HANDLES_FOR_INDEXES.size();
+		int numCursor = (int)CURSOR_HANDLES_FOR_INDEXES.size();
 		for( int i = CURSOR_INDEXES_NUM; i < numCursor; i++ ) {
 			::DestroyCursor( CURSOR_HANDLES_FOR_INDEXES[i] );
 			CURSOR_HANDLES_FOR_INDEXES[i] = INVALID_HANDLE_VALUE;
@@ -87,7 +87,7 @@ int MouseCursor::GetCurrentCursor() {
 	// Á‹ŽŽž
 	if( hCursor == NULL ) return crNone;
 
-	int size = CURSOR_HANDLES_FOR_INDEXES.size();
+	int size = (int)CURSOR_HANDLES_FOR_INDEXES.size();
 	int handleIndex = cursor_index_ + CURSOR_OFFSET;
 
 	if( handleIndex >= 0 && handleIndex < size && CURSOR_HANDLES_FOR_INDEXES[handleIndex] == hCursor ) {

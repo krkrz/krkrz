@@ -71,7 +71,7 @@ static void TVPUnregisterWindowToList(tTJSNI_Window *window)
 //---------------------------------------------------------------------------
 tTJSNI_Window * TVPGetWindowListAt(tjs_int idx) { return TVPWindowVector[idx]; }
 //---------------------------------------------------------------------------
-tjs_int TVPGetWindowCount() { return TVPWindowVector.size(); }
+tjs_int TVPGetWindowCount() { return (tjs_int)TVPWindowVector.size(); }
 //---------------------------------------------------------------------------
 void TVPClearAllWindowInputEvents()
 {

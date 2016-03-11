@@ -91,14 +91,14 @@ static Bool JXR_EOS(struct WMPStream* pWS) {
 }
 static ERR JXR_read(struct WMPStream* pWS, void* pv, size_t cb) {
 	tTJSBinaryStream* src = ((tTJSBinaryStream*)(pWS->state.pvObj));
-	tjs_uint size = src->Read( pv, cb );
+	tjs_uint size = src->Read( pv, (tjs_uint)cb );
 	return size == cb ? WMP_errSuccess : WMP_errFileIO;
 }
 static ERR JXR_write(struct WMPStream* pWS, const void* pv, size_t cb) {
 	ERR err = WMP_errSuccess;
 	if( 0 != cb ) {
 		tTJSBinaryStream* src = ((tTJSBinaryStream*)(pWS->state.pvObj));
-		tjs_uint size = src->Write( pv, cb );
+		tjs_uint size = src->Write( pv, (tjs_uint)cb );
 		err = size == cb ? WMP_errSuccess : WMP_errFileIO;
 	}
 	return err;

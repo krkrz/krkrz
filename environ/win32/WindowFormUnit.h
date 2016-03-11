@@ -354,19 +354,19 @@ public:
 	virtual void OnMouseWheel( int delta, int shift, int x, int y );
 
 	virtual void OnMove( int x, int y );
-	virtual void OnResize( int state, int w, int h );
+	virtual void OnResize( UINT_PTR state, int w, int h );
 	virtual void OnDropFile( HDROP hDrop );
 	virtual int OnMouseActivate( HWND hTopLevelParentWnd, WORD hitTestCode, WORD MouseMsg );
 	virtual bool OnSetCursor( HWND hContainsCursorWnd, WORD hitTestCode, WORD MouseMsg );
 	virtual void OnEnable( bool enabled );
-	virtual void OnDeviceChange( int event, void *data );
-	virtual void OnNonClientMouseDown( int button, int hittest, int x, int y );
+	virtual void OnDeviceChange( UINT_PTR event, void *data );
+	virtual void OnNonClientMouseDown( int button, UINT_PTR hittest, int x, int y );
 	virtual void OnMouseEnter();
 	virtual void OnMouseLeave();
 	virtual void OnEnterMenuLoop( bool entered );
 	virtual void OnExitMenuLoop( bool isShortcutMenu );
-	virtual void OnShow( int status );
-	virtual void OnHide( int status );
+	virtual void OnShow( UINT_PTR status );
+	virtual void OnHide( UINT_PTR status );
 
 	virtual void OnFocus(HWND hFocusLostWnd);
 	virtual void OnFocusLost(HWND hFocusingWnd);
@@ -381,7 +381,7 @@ public:
 	virtual void OnTouchRotate( double startangle, double currentangle, double distance, double cx, double cy, int flag );
 	virtual void OnMultiTouch();
 
-	virtual void OnDisplayChange( DWORD bpp, WORD hres, WORD vres );
+	virtual void OnDisplayChange( UINT_PTR bpp, WORD hres, WORD vres );
 	virtual void OnDisplayRotate( int orientation, int rotate, int bpp, int hresolution, int vresolution );
 
 	virtual void OnApplicationActivateChange( bool activated, DWORD thread_id );

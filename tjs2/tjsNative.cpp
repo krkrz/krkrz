@@ -32,7 +32,7 @@ tjs_int32 TJSRegisterNativeClass(const tjs_char *name)
 
 	NativeClassNames.push_back(TJSMapGlobalStringMap(name));
 
-	return NativeClassNames.size() -1;
+	return (tjs_int32)(NativeClassNames.size() -1);
 }
 //---------------------------------------------------------------------------
 tjs_int32 TJSFindNativeClassID(const tjs_char *name)

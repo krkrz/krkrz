@@ -325,7 +325,7 @@ static void TVPReadRegValue(tTJSVariant &result, const ttstr & key)
 	ttstr valuename(key_p+1);
 	if(key_p < start || *key_p != TJS_W('\\')) key_p++;
 
-	ttstr keyname(start, key_p - start);
+	ttstr keyname(start, (int)(key_p - start));
 
 	// open key
 	HKEY handle;
