@@ -502,6 +502,7 @@ void TVPSaveAsJPG( const ttstr & storagename, const ttstr & mode, const tTVPBase
 		cinfo.comp_info[2].h_samp_factor=1;
 		cinfo.comp_info[1].v_samp_factor=1;
 		cinfo.comp_info[2].v_samp_factor=1;
+		cinfo.optimize_coding = TRUE;
 		jpeg_simple_progression( &cinfo );	// set progressive, may be more compression
 		jpeg_start_compress( &cinfo, TRUE );
 
