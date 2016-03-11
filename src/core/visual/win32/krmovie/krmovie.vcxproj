@@ -71,22 +71,22 @@
     <_ProjectFileVersion>11.0.61030.0</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>.\..\..\..\..\..\bin\win32\</OutDir>
-    <IntDir>.\Release\</IntDir>
+    <OutDir>.\..\..\..\..\..\bin\win32\plugin\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>.\..\..\..\..\..\bin\win64\</OutDir>
+    <OutDir>.\..\..\..\..\..\bin\win64\plugin64\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>.\..\..\..\..\..\bin\win32\</OutDir>
-    <IntDir>.\Debug\</IntDir>
+    <OutDir>.\..\..\..\..\..\bin\win32\plugin\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>.\..\..\..\..\..\bin\win64\</OutDir>
+    <OutDir>.\..\..\..\..\..\bin\win64\plugin64\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>
@@ -124,9 +124,9 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;version.lib;winmm.lib;strmiids.lib;quartz.lib;strmbase.lib;dmoguids.lib;libogg_static.lib;libtheora_static.lib;libvorbis_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>.\..\..\..\..\..\bin\win32/krmovie.dll</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\..\external\baseclasses\$(Configuration);.\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>.\lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\krmovie.def</ModuleDefinitionFile>
       <ProgramDatabaseFile>.\..\..\..\..\..\bin\win32/krmovie.pdb</ProgramDatabaseFile>
       <OptimizeReferences>true</OptimizeReferences>
@@ -175,9 +175,9 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;version.lib;winmm.lib;strmiids.lib;quartz.lib;strmbase.lib;dmoguids.lib;libogg_static.lib;libtheora_static.lib;libvorbis_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>.\..\..\..\..\..\bin\win64\krmovie.dll</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>.\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>.\lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\krmovie.def</ModuleDefinitionFile>
       <ProgramDatabaseFile>.\..\..\..\..\..\bin\win32/krmovie.pdb</ProgramDatabaseFile>
       <OptimizeReferences>true</OptimizeReferences>
@@ -221,9 +221,9 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;version.lib;winmm.lib;strmiids.lib;quartz.lib;strmbasd.lib;dmoguids.lib;libogg_static.lib;libtheora_static.lib;libvorbis_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>.\..\..\..\..\..\bin\win32/krmovie.dll</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\..\external\baseclasses\$(Configuration);.\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>.\lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\krmovie.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\..\..\..\..\..\bin\win32/krmovie.pdb</ProgramDatabaseFile>
@@ -265,9 +265,9 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;version.lib;winmm.lib;strmiids.lib;quartz.lib;strmbasd.lib;dmoguids.lib;libogg_static.lib;libtheora_static.lib;libvorbis_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>.\..\..\..\..\..\bin\win64\krmovie.dll</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\..\external\baseclasses\$(Configuration);.\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>.\lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\krmovie.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\..\..\..\..\..\bin\win32/krmovie.pdb</ProgramDatabaseFile>
