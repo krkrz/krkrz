@@ -215,7 +215,10 @@ extern class tTJSBinaryStream * (*TJSCreateBinaryStreamForWrite)(const tTJSStrin
 #define TJS_BS_APPEND 2
 #define TJS_BS_UPDATE 3
 
+#define TJS_BS_DELETE_ON_CLOSE	0x10
+
 #define TJS_BS_ACCESS_MASK 0x0f
+#define TJS_BS_OPTION_MASK 0xf0
 
 #define TJS_BS_SEEK_SET 0
 #define TJS_BS_SEEK_CUR 1
