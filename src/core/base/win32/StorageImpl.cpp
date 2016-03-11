@@ -504,6 +504,10 @@ tTVPLocalFileStream::tTVPLocalFileStream(const ttstr &origname,
 	case TJS_BS_UPDATE:
 		rw = GENERIC_WRITE|GENERIC_READ;	dwcd = OPEN_EXISTING;		break;
 	}
+	DWORD flagsAndAttributes = FILE_ATTRIBUTE_NORMAL;
+	if( (flag & TJS_BS_DELETE_ON_CLOSE) && (access == TJS_BS_WRITE)  ) {
+		flagsAndAttributes |= FILE_FLAG_DELETE_ON_CLOSE;
+	}
 
 	tjs_int trycount = 0;
 
@@ -514,7 +518,7 @@ retry:
 		FILE_SHARE_READ, // read shared accesss is strongly needed
 		NULL,
 		dwcd,
-		FILE_ATTRIBUTE_NORMAL,
+		flagsAndAttributes,
 		NULL);
 
 	if(Handle == INVALID_HANDLE_VALUE)
