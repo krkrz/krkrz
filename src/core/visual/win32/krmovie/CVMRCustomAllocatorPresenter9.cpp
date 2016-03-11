@@ -572,7 +572,7 @@ HRESULT CVMRCustomAllocatorPresenter9::DecideD3DPresentParameters( D3DPRESENT_PA
 
 	UINT	width = 0;
 	UINT	height = 0;
-	LONG	ownerStyle = ::GetWindowLong( Owner()->OwnerWindow, GWL_STYLE );
+	LONG_PTR	ownerStyle = ::GetWindowLongPtr( Owner()->OwnerWindow, GWL_STYLE );
 	if( !(ownerStyle&WS_THICKFRAME) ) {
 		// オーナーはサイズ変更不可
 		RECT	clientRect;
@@ -803,7 +803,7 @@ HRESULT CVMRCustomAllocatorPresenter9::CreateChildWindow()
 	if( m_ChildWnd == NULL )
 		return HRESULT_FROM_WIN32(GetLastError());
 
-	SetWindowLong(m_ChildWnd,GWL_USERDATA,(LONG)this);
+	::SetWindowLongPtr(m_ChildWnd,GWLP_USERDATA,(LONG_PTR)this);
 	ShowWindow(m_ChildWnd,SW_SHOWDEFAULT);
 	if( UpdateWindow(m_ChildWnd) == 0 )
 		return HRESULT_FROM_WIN32(GetLastError());
@@ -850,7 +850,7 @@ void CVMRCustomAllocatorPresenter9::DestroyChildWindow()
 	CAutoLock Lock(m_Lock);
 	if( m_ChildWnd != NULL )
 	{
-		SetWindowLong(m_ChildWnd,GWL_USERDATA,0);
+		::SetWindowLongPtr(m_ChildWnd,GWLP_USERDATA,0);
 		DestroyWindow(m_ChildWnd);
 	}
 	m_ChildWnd = NULL;
@@ -866,7 +866,7 @@ void CVMRCustomAllocatorPresenter9::DestroyChildWindow()
 //----------------------------------------------------------------------------
 LRESULT WINAPI CVMRCustomAllocatorPresenter9::WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
-	CVMRCustomAllocatorPresenter9	*win = reinterpret_cast<CVMRCustomAllocatorPresenter9*>(GetWindowLong(hWnd,GWL_USERDATA));
+	CVMRCustomAllocatorPresenter9	*win = reinterpret_cast<CVMRCustomAllocatorPresenter9*>(::GetWindowLongPtr(hWnd,GWLP_USERDATA));
 	if( win != NULL )
 	{
 		return win->Proc( hWnd, msg, wParam, lParam );

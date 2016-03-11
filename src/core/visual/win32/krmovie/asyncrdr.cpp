@@ -163,7 +163,7 @@ CAsyncOutputPin::RequestAllocator(
 STDMETHODIMP
 CAsyncOutputPin::Request(
     IMediaSample* pSample,
-    DWORD dwUser)	        // user context
+    DWORD_PTR dwUser)	        // user context
 {
     REFERENCE_TIME tStart, tStop;
     HRESULT hr = pSample->GetTime(&tStart, &tStop);
@@ -278,7 +278,7 @@ STDMETHODIMP
 CAsyncOutputPin::WaitForNext(
     DWORD dwTimeout,
     IMediaSample** ppSample,  // completed sample
-    DWORD * pdwUser)		// user context
+    DWORD_PTR * pdwUser)		// user context
 {
     LONG cbActual;
 

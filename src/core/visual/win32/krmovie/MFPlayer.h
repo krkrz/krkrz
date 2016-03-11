@@ -124,9 +124,9 @@ public:
 	virtual void __stdcall SetPosition(unsigned __int64 tick);
 	virtual void __stdcall GetPosition(unsigned __int64 *tick);
 	virtual void __stdcall GetStatus(tTVPVideoStatus *status);
-	virtual void __stdcall GetEvent(long *evcode, long *param1, long *param2, bool *got);
+	virtual void __stdcall GetEvent(long *evcode, LONG_PTR *param1, LONG_PTR *param2, bool *got);
 
-	virtual void __stdcall FreeEventParams(long evcode, long param1, long param2);
+	virtual void __stdcall FreeEventParams(long evcode, LONG_PTR param1, LONG_PTR param2);
 
 	virtual void __stdcall Rewind();
 	virtual void __stdcall SetFrame( int f );

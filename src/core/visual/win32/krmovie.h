@@ -13,7 +13,7 @@
 #ifndef __KRMOVIE_H__
 #define __KRMOVIE_H__
 
-#define TVP_KRMOVIE_VER   0x0001000B
+#define TVP_KRMOVIE_VER   0x0001000C
 
 
 //---------------------------------------------------------------------------
@@ -39,10 +39,10 @@ public:
 	virtual void __stdcall SetPosition(unsigned __int64 tick) = 0;
 	virtual void __stdcall GetPosition(unsigned __int64 *tick) = 0;
 	virtual void __stdcall GetStatus(tTVPVideoStatus *status) = 0;
-	virtual void __stdcall GetEvent(long *evcode, long *param1,
-			long *param2, bool *got) = 0;
+	virtual void __stdcall GetEvent(long *evcode, LONG_PTR *param1,
+			LONG_PTR *param2, bool *got) = 0;
 
-	virtual void __stdcall FreeEventParams(long evcode, long param1, long param2) = 0;
+	virtual void __stdcall FreeEventParams(long evcode, LONG_PTR param1, LONG_PTR param2) = 0;
 
 	virtual void __stdcall Rewind() = 0;
 	virtual void __stdcall SetFrame( int f ) = 0;
