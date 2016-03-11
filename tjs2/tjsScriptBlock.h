@@ -69,7 +69,7 @@ public:
 	void Add(tTJSInterCodeContext * cntx);
 	void Remove(tTJSInterCodeContext * cntx);
 
-	tjs_uint GetContextCount() const { return InterCodeContextList.size(); }
+	tjs_uint GetContextCount() const { return (tjs_uint)InterCodeContextList.size(); }
 	tjs_uint GetTotalVMCodeSize() const;  // returns in VM word size ( 1 word = 32bit )
 	tjs_uint GetTotalVMDataSize() const;  // returns in tTJSVariant count
 

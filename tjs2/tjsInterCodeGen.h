@@ -132,7 +132,7 @@ public:
 	tjs_int GetPosition() const { return Position; }
 	tTJSVariant & GetValue() { if(!Val) return *(tTJSVariant*)NULL; else return *Val; }
 	tTJSExprNode * operator [] (tjs_int i) const { if(!Nodes) return NULL; else return (*Nodes)[i]; }
-	unsigned int GetSize() const { if(Nodes) return Nodes->size(); else return 0;}
+	unsigned int GetSize() const { if(Nodes) return (unsigned int)Nodes->size(); else return 0;}
 
 	// for array and dictionary constant value
 	void AddArrayElement(const tTJSVariant & val);

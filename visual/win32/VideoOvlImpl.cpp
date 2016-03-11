@@ -253,7 +253,7 @@ void tTJSNI_VideoOverlay::Open(const ttstr &_name)
 	const tjs_char * param_pos;
 	int param_pos_ind;
 	param_pos = TJS_strchr(name.c_str(), TJS_W('?'));
-	param_pos_ind = param_pos - name.c_str();
+	param_pos_ind = (int)(param_pos - name.c_str());
 	if(param_pos != NULL)
 	{
 		param = param_pos;

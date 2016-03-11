@@ -43,7 +43,7 @@ tjs_int TJSGetShorterStrLen(const tjs_char *str, tjs_int max)
 	const tjs_char *p = str;
 	max++;
 	while(*p && --max) p++;
-	return p - str;
+	return (tjs_int)(p - str);
 }
 //---------------------------------------------------------------------------
 
@@ -253,7 +253,7 @@ void TJSDumpStringHeap(void)
 //---------------------------------------------------------------------------
 static int TJS_USERENTRY TJSStringHeapSortFunction(const void *a, const void *b)
 {
-	return *(const tTJSVariantString **)b - *(const tTJSVariantString **)a;
+	return (int)(*(const tTJSVariantString **)b - *(const tTJSVariantString **)a);
 }
 //---------------------------------------------------------------------------
 void TJSCompactStringHeap()
@@ -544,7 +544,7 @@ tTJSVariantString * tTJSVariantString::FixLength()
 	if(!this) return NULL;
 
 	if(RefCount != 0) TJSThrowStringDeallocError();
-	Length = TJS_strlen(this->operator const tjs_char*());
+	Length = (tjs_int)TJS_strlen(this->operator const tjs_char*());
 	if(!Length)
 	{
 		TJSDeallocStringHeap(this);
@@ -574,14 +574,14 @@ tTJSVariantString * TJSAllocVariantString(const tjs_char *ref1, const tjs_char *
 		}
 	}
 
-	tjs_int len1 = ref1?wcslen(ref1):0;
-	tjs_int len2 = ref2?wcslen(ref2):0;
+	tjs_intptr_t len1 = ref1?wcslen(ref1):0;
+	tjs_intptr_t len2 = ref2?wcslen(ref2):0;
 
 	tTJSVariantString *ret = TJSAllocStringHeap();
 
 	if(len1+len2>TJS_VS_SHORT_LEN)
 	{
-		ret->LongString = TJSVS_malloc(len1+len2+1);
+		ret->LongString = TJSVS_malloc((tjs_uint)(len1+len2+1));
 		if(ref1) wcscpy(ret->LongString , ref1);
 		if(ref2) wcscpy(ret->LongString + len1, ref2);
 	}
@@ -590,7 +590,7 @@ tTJSVariantString * TJSAllocVariantString(const tjs_char *ref1, const tjs_char *
 		if(ref1) wcscpy(ret->ShortString, ref1);
 		if(ref2) wcscpy(ret->ShortString + len1, ref2);
 	}
-	ret->Length = len1+len2;
+	ret->Length = (tjs_int)(len1+len2);
 	return ret;
 }
 //---------------------------------------------------------------------------
@@ -901,7 +901,7 @@ tTJSVariantString * TJSFormatString(const tjs_char *format, tjs_uint numparams,
 			tjs_char buf[1024];
 			//tjs_char *p;
 			tjs_char fmt[70];
-			tjs_uint fmtlen = f - fst;
+			tjs_uint fmtlen = (tjs_uint)(f - fst);
 			if(fmtlen > 65) goto error;  // too long
 			TJS_strncpy(fmt, fst, fmtlen);
 			fmt[fmtlen] = TJS_W('I'); //// CHECK!! 'I64' must indicate a 64bit integer
@@ -938,7 +938,7 @@ tTJSVariantString * TJSFormatString(const tjs_char *format, tjs_uint numparams,
 				TJS_snprintf(buf, sizeof(buf)/sizeof(tjs_char), fmt, ind[0], ind[1], integer);
 			}
 
-			tjs_uint size = TJS_strlen(buf);
+			tjs_uint size = (tjs_uint)TJS_strlen(buf);
 			tjs_uint inc_size;
 			if(s+size > allocsize)
 			{
@@ -959,7 +959,7 @@ tTJSVariantString * TJSFormatString(const tjs_char *format, tjs_uint numparams,
  			if(width+prec > 900) goto error;// too long
 			tjs_char buf[1024];
 			tjs_char fmt[70];
-			tjs_uint fmtlen = f - fst;
+			tjs_uint fmtlen = (tjs_uint)(f - fst);
 			if(fmtlen > 67) goto error;  // too long
 			TJS_strncpy(fmt, fst, fmtlen);
 			fmt[fmtlen] = TJS_W('l'); //// CHECK!! 'l' must indicate a 64bit real
@@ -994,7 +994,7 @@ tTJSVariantString * TJSFormatString(const tjs_char *format, tjs_uint numparams,
 				TJS_snprintf(buf, sizeof(buf)/sizeof(tjs_char), fmt, ind[0], ind[1], real);
 			}
 
-			tjs_uint size = TJS_strlen(buf);
+			tjs_uint size = (tjs_uint)TJS_strlen(buf);
 			tjs_uint inc_size;
 			if(s+size > allocsize)
 			{

@@ -91,7 +91,7 @@ public:
 		if(maxlen != -1)
 			len = TJSGetShorterStrLen(ref, maxlen);
 		else
-			len = TJS_strlen(ref);
+			len = (tjs_int)TJS_strlen(ref);
 
 		Length = len;
 		if(len>TJS_VS_SHORT_LEN)
@@ -108,7 +108,7 @@ public:
 	TJS_METHOD_DEF(void, SetString, (const tjs_nchar *ref))
 	{
 		if(LongString) TJSVS_free(LongString), LongString = NULL;
-		tjs_int len = TJS_narrowtowidelen(ref);
+		tjs_int len = (tjs_int)TJS_narrowtowidelen(ref);
 		if(len == -1) TJSThrowNarrowToWideConversionError();
 
 		Length = len;
@@ -184,7 +184,7 @@ public:
 	TJS_METHOD_DEF(void, Append, (const tjs_char *str))
 	{
 		// assume this != NULL
-		Append(str, TJS_strlen(str));
+		Append(str, (tjs_int)TJS_strlen(str));
 	}
 
 	TJS_METHOD_DEF(void, Append, (const tjs_char *str, tjs_int applen))

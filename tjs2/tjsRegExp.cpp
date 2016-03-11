@@ -118,10 +118,10 @@ void replace_regex( tTJSVariant **param, tjs_int numparams, tTJSNI_RegExp *_this
 			onig_region_free( region, 0  );
 		} while( isreplaceall && s < send && onig_search( _this->RegEx, (UChar*)s, (UChar*)send, (UChar*)s, (UChar*)send, region, ONIG_OPTION_NONE ) >= 0 );
 		if( s < send ) {
-			res += ttstr(s,send-s);
+			res += ttstr(s,(int)(send-s));
 		}
 	} else {
-		res += ttstr(s,send-s);
+		res += ttstr(s,(int)(send-s));
 	}
 	onig_region_free( region, 1  );
 }
@@ -144,11 +144,11 @@ iTJSDispatch2* split_regex( const ttstr &target, iTJSDispatch2 * array, tTJSNI_R
 			onig_region_clear( region );
 		} while( onig_search( _this->RegEx, (UChar*)s, (UChar*)send, (UChar*)s, (UChar*)send, region, ONIG_OPTION_NONE ) >= 0 );
 		if( !purgeempty || s < send ) {
-			tTJSVariant val = ttstr( s, send-s );
+			tTJSVariant val = ttstr( s, (int)(send-s) );
 			array->PropSetByNum(TJS_MEMBERENSURE, storecount++, &val, array);
 		}
 	} else {
-		tTJSVariant val = ttstr( s, send-s );
+		tTJSVariant val = ttstr( s, (int)(send-s) );
 		array->PropSetByNum(TJS_MEMBERENSURE, storecount++, &val, array);
 	}
 	onig_region_clear( region );

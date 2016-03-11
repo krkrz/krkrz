@@ -312,7 +312,7 @@ void tTJS::OutputToConsoleWithCentering(const tjs_char *msg, tjs_uint width) con
 {
 	// this function does not matter whether msg includes ZENKAKU characters ...
 	if(!msg) return;
-	tjs_int len = TJS_strlen(msg);
+	tjs_int len = (tjs_int)TJS_strlen(msg);
 	tjs_int ns = ((tjs_int)width - len)/2;
 	if(ns<=0)
 	{
@@ -340,7 +340,7 @@ void tTJS::OutputToConsoleWithCentering(const tjs_char *msg, tjs_uint width) con
 //---------------------------------------------------------------------------
 void tTJS::OutputToConsoleSeparator(const tjs_char *text, tjs_uint count) const
 {
-	tjs_int len = TJS_strlen(text);
+	tjs_int len = (tjs_int)TJS_strlen(text);
 	tjs_char *outbuf = new tjs_char [ len * count + 1];
 	tjs_char *p = outbuf;
 	while(count--)

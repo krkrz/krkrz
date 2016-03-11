@@ -212,7 +212,7 @@ size_t TJS_mbstowcs(tjs_char *pwcs, const tjs_nchar *s, size_t n)
 		// Try converting to wide characters. Here assumes pwcs is large enough
 		// to store the result.
 		int count = MultiByteToWideChar(CP_ACP,
-			MB_PRECOMPOSED|MB_ERR_INVALID_CHARS, s, -1, pwcs, n);
+			MB_PRECOMPOSED|MB_ERR_INVALID_CHARS, s, -1, pwcs, (int)n);
 		if(count != 0) return count - 1;
 
 		if(GetLastError() != ERROR_INSUFFICIENT_BUFFER) return (size_t) -1;
@@ -220,7 +220,7 @@ size_t TJS_mbstowcs(tjs_char *pwcs, const tjs_nchar *s, size_t n)
 		// pwcs is not enough to store the result ...
 
 		// count number of source characters to fit the destination buffer
-		int charcnt = n;
+		int charcnt = (int)n;
 		const unsigned char *p;
 		for(p = (const unsigned char*)s; charcnt-- && *p; p++)
 		{
@@ -228,7 +228,7 @@ size_t TJS_mbstowcs(tjs_char *pwcs, const tjs_nchar *s, size_t n)
 		}
 		int bytecnt = (int)(p - (const unsigned char *)s);
 
-		count = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, s, bytecnt, pwcs, n);
+		count = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, s, bytecnt, pwcs, (int)n);
 		if(count == 0) return (size_t) -1;
 
 		return count;
@@ -253,7 +253,7 @@ size_t TJS_wcstombs(tjs_nchar *s, const tjs_char *pwcs, size_t n)
 		// store the result.
 		size_t pwcs_len = TJS_strlen(pwcs);
 		size_t count = WideCharToMultiByte(CP_ACP, 0,
-			pwcs, pwcs_len, s, n, NULL, &useddefault);
+			pwcs, (int)pwcs_len, s, (int)n, NULL, &useddefault);
 
 		if(count != 0/* && !useddefault*/)
 			return count;
@@ -350,7 +350,7 @@ tTJSNarrowStringHolder::tTJSNarrowStringHolder(const wchar_t * wide)
 	if(!wide)
 		n = -1;
 	else
-		n = TJS_wcstombs(NULL, wide, 0);
+		n = (int)TJS_wcstombs(NULL, wide, 0);
 
 	if( n == -1 )
 	{

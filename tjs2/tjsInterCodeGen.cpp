@@ -423,7 +423,7 @@ void tTJSInterCodeContext::ClearNodesToDelete(void)
 {
 	if(NodeToDeleteVector.size())
 	{
-		for(tjs_int i=NodeToDeleteVector.size()-1; i>=0; i--)
+		for(tjs_int i=(tjs_int)(NodeToDeleteVector.size()-1); i>=0; i--)
 		{
 			delete NodeToDeleteVector[i];
 		}
@@ -670,7 +670,7 @@ tjs_int tTJSInterCodeContext::PutData(const tTJSVariant &val)
 		{
 			if((*ptr)->DiscernCompareStrictReal(val))
 			{
-				return ptr - _DataArea; // re-use this
+				return (tjs_int)(ptr - _DataArea); // re-use this
 			}
 			count ++;
 			if(ptr == _DataArea) break;
@@ -2329,7 +2329,7 @@ tjs_int tTJSInterCodeContext::GenNodeCode(tjs_int & frame, tTJSExprNode *node,
 		// virtual left side of "." operator which omits object
 
 		// search in NestVector
-		tjs_int i = NestVector.size() -1;
+		tjs_int i = (tjs_int)(NestVector.size() -1);
 		for(; i>=0; i--)
 		{
 			tNestData &data = NestVector[i];
@@ -2954,7 +2954,7 @@ void tTJSInterCodeContext::SetForThirdExprCode(tTJSExprNode *node)
 void tTJSInterCodeContext::ExitForCode()
 {
 	// exit from "for"
-	tjs_int nestsize = NestVector.size();
+	tjs_int nestsize = (tjs_int)NestVector.size();
 	if(nestsize == 0)
 	{
 		_yyerror(TJSSyntaxError, Block);
@@ -3081,7 +3081,7 @@ void tTJSInterCodeContext::ProcessCaseCode(tTJSExprNode *node)
 	// process "case expression :".
 	// process "default :" if node == NULL.
 
-	tjs_int nestsize = NestVector.size();
+	tjs_int nestsize = (tjs_int)NestVector.size();
 
 	if(nestsize < 3)
 	{
@@ -3215,7 +3215,7 @@ void tTJSInterCodeContext::DoBreak(void)
 	tjs_int vc = Namespace.GetCount();
 	tjs_int pvc = vc;
 
-	tjs_int i = NestVector.size() -1;
+	tjs_int i = (tjs_int)(NestVector.size() -1);
 	for(; i>=0; i--)
 	{
 		tNestData &data = NestVector[i];
@@ -3263,7 +3263,7 @@ void tTJSInterCodeContext::DoContinue(void)
 	tjs_int vc = Namespace.GetCount();
 	tjs_int pvc = vc;
 
-	tjs_int i = NestVector.size() -1;
+	tjs_int i = (tjs_int)(NestVector.size() -1);
 	for(; i>=0; i--)
 	{
 		tNestData &data = NestVector[i];
@@ -3353,7 +3353,7 @@ void tTJSInterCodeContext::ReturnFromFunc(tTJSExprNode *node)
 	ClearLocalVariable(Namespace.GetCount(), 0);
 
 	// check try block
-	tjs_int i = NestVector.size() -1;
+	tjs_int i = (tjs_int)(NestVector.size() -1);
 	for(; i>=0; i--)
 	{
 		tNestData &data = NestVector[i];
@@ -3563,7 +3563,7 @@ void tTJSInterCodeContext::GenerateFuncCallArgCode()
 	{
 		PutCode(-2, LEX_POS); // arguments have argument expanding node
 		std::vector<tFuncArgItem> & vec = FuncArgStack.top().ArgVector;
-		PutCode(vec.size(), LEX_POS); // count of the arguments
+		PutCode((tjs_int)vec.size(), LEX_POS); // count of the arguments
 		tjs_uint i;
 		for(i=0; i<vec.size(); i++)
 		{
@@ -3574,7 +3574,7 @@ void tTJSInterCodeContext::GenerateFuncCallArgCode()
 	else
 	{
 		std::vector<tFuncArgItem> & vec = FuncArgStack.top().ArgVector;
-		PutCode(vec.size(), LEX_POS); // count of arguments
+		PutCode((tjs_int)vec.size(), LEX_POS); // count of arguments
 		tjs_uint i;
 		for(i=0; i<vec.size(); i++)
 			PutCode(TJS_TO_VM_REG_ADDR(vec[i].Register), LEX_POS);
@@ -3651,7 +3651,7 @@ void tTJSInterCodeContext::PushCurrentNode(tTJSExprNode *node)
 //---------------------------------------------------------------------------
 tTJSExprNode * tTJSInterCodeContext::GetCurrentNode()
 {
-	tjs_uint size = CurrentNodeVector.size();
+	tjs_uint size = (tjs_uint)CurrentNodeVector.size();
 	if(size == 0) return NULL;
 	return CurrentNodeVector[size-1];
 }
@@ -3905,8 +3905,8 @@ std::vector<tjs_uint8>* tTJSInterCodeContext::ExportByteCode( bool outputdebug, 
 	}
 	int codesize = (CodeAreaSize%2) == 1 ? CodeAreaSize * 2+2 : CodeAreaSize * 2;
 	int datasize = DataAreaSize * 4;
-	int scgpsize = SuperClassGetterPointer.size() * 4;
-	int propsize = (Properties != NULL ? Properties->size() * 8 : 0)+4;
+	int scgpsize = (int)(SuperClassGetterPointer.size() * 4);
+	int propsize = (int)((Properties != NULL ? Properties->size() * 8 : 0)+4);
 	int size = 12*4 + srcpossize + codesize + datasize + scgpsize + propsize + 4*4;
 	std::vector<tjs_uint8>* result = new std::vector<tjs_uint8>();
 	result->reserve( size );
@@ -3954,7 +3954,7 @@ std::vector<tjs_uint8>* tTJSInterCodeContext::ExportByteCode( bool outputdebug, 
 		Add2ByteToVector( result, type );
 		Add2ByteToVector( result, v );
 	}
-	count = SuperClassGetterPointer.size();
+	count = (int)SuperClassGetterPointer.size();
 	Add4ByteToVector( result, count);
 	for( int i = 0; i < count ; i++ ) {
 		int v = SuperClassGetterPointer.at(i);
@@ -3962,7 +3962,7 @@ std::vector<tjs_uint8>* tTJSInterCodeContext::ExportByteCode( bool outputdebug, 
 	}
 	count = 0;
 	if( Properties != NULL ) {
-		count = Properties->size();
+		count = (int)Properties->size();
 		Add4ByteToVector( result, count);
 		if( count > 0 ) {
 			for( int i = 0; i < count; i++ ) {

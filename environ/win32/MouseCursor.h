@@ -40,7 +40,7 @@ public:
 	static void Finalize();
 	static void SetMouseCursor( int index );
 	static int AddCursor( HCURSOR hCursor ) {
-		int index = CURSOR_HANDLES_FOR_INDEXES.size();
+		int index = (int)CURSOR_HANDLES_FOR_INDEXES.size();
 		CURSOR_HANDLES_FOR_INDEXES.push_back( hCursor );
 		return index - CURSOR_OFFSET;
 	}

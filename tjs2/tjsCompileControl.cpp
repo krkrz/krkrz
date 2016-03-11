@@ -207,10 +207,10 @@ tjs_int tTJSPPExprParser::GetNext(tjs_int32 &value)
 		*Current==TJS_W('_')) && *Current)
 		Current++;
 
-	ttstr str(st, Current-st);
+	ttstr str(st, (int)(Current-st));
 
 	IDs.push_back(str);
-    value = IDs.size() -1;
+    value = (tjs_int32)(IDs.size() -1);
 
 	return PT_SYMBOL;
 }

@@ -38,7 +38,7 @@ tjs_int tTJSString::GetNarrowStrLen() const
 {
 	// note that this function will return -1 when there are invalid chars in string.
 	if(!Ptr) return 0;
-	return TJS_wcstombs(NULL, c_str(), 0);
+	return (tjs_int)TJS_wcstombs(NULL, c_str(), 0);
 }
 //---------------------------------------------------------------------------
 void tTJSString::ToNarrowStr(tjs_nchar *dest, tjs_int destmaxlen) const
@@ -83,7 +83,7 @@ void tTJSString::Replace(const tTJSString &from, const tTJSString &to, bool fora
 		p = TJS_strstr(st, from.c_str());
 		if(p)
 		{
-			tTJSString name(*this, p-st);
+			tTJSString name(*this, (int)(p-st));
 			tTJSString n2(p + fromlen);
 			*this = name + to + n2;
 			if(!forall) break;

@@ -906,7 +906,7 @@ void tTVPXP3ArchiveStream::SeekToPosition(tjs_uint64 pos)
 
 	// do binary search to determine current segment number
 	tjs_int st = 0;
-	tjs_int et = Segments->size();
+	tjs_int et = (tjs_int)Segments->size();
 	tjs_int seg_num;
 
 	while(true)

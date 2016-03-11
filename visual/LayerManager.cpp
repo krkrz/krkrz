@@ -860,7 +860,7 @@ void tTVPLayerManager::RemoveTreeModalState(tTJSNI_BaseLayer *root)
 tTJSNI_BaseLayer *tTVPLayerManager::GetCurrentModalLayer() const
 {
 	// (primary only) get current modal layer
-	tjs_uint size = ModalLayerVector.size();
+	tjs_uint size = (tjs_uint)ModalLayerVector.size();
 	if(size == 0) return NULL;
 	return *(ModalLayerVector.begin() + size - 1);
 }

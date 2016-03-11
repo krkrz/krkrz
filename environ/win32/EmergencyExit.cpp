@@ -54,16 +54,16 @@ public:
 			CloseHandle(hp);
 
 			// set tam to run only upon one processor (for proper working with rdtsc)
-			DWORD tam = pam;
+			ULONGLONG tam = pam;
 			tjs_int bit;
 			for(bit = 0; bit <= 31; bit++)
 			{
-				if(tam & (1<<bit)) break;
+				if(tam & (1ULL<<bit)) break;
 			}
 			bit ++;
 			for(; bit <= 31; bit++)
 			{
-				tam &= ~(1<<bit);
+				tam &= ~(1ULL<<bit);
 			}
 
 			SetThreadAffinityMask(GetHandle(), tam);

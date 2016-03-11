@@ -384,7 +384,7 @@ METHODDEF(boolean) JPEG_write_empty_output_buffer( j_compress_ptr cinfo ) {
 	
 	// ‘«‚è‚È‚­‚È‚Á‚½‚ç“r’†‘‚«ž‚Ý
 	size_t	wrotelen = dest->bufsizeinit - dest->pub.free_in_buffer;
-	dest->stream->WriteBuffer( dest->buffer, wrotelen );
+	dest->stream->WriteBuffer( dest->buffer, (tjs_uint)wrotelen );
 
 	dest->pub.next_output_byte = dest->buffer;
 	dest->pub.free_in_buffer = dest->bufsize;
@@ -467,7 +467,7 @@ void TVPSaveAsJPG( const ttstr & storagename, const ttstr & mode, const tTVPBase
 		
 		int num_write_bytes = 0; //size of jpeg after compression
 		JOCTET *jpgbuff = (JOCTET*)dest_buf; //JOCTET pointer to buffer
-		JPEG_write_stream( &cinfo, jpgbuff , buff_size, &num_write_bytes, stream );
+		JPEG_write_stream( &cinfo, jpgbuff , (int)buff_size, &num_write_bytes, stream );
 
 		cinfo.image_width = width;
 		cinfo.image_height = height;

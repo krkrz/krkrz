@@ -213,7 +213,7 @@ unsigned long tGenericFreeTypeFace::IoFunc( FT_Stream stream, unsigned long offs
 		result = count;
 	}
 
-	return result;
+	return (unsigned long)result;
 }
 //---------------------------------------------------------------------------
 
@@ -379,7 +379,7 @@ tjs_uint tFreeTypeFace::GetGlyphCount()
 			GlyphIndexToCharcodeVector->end()); // •¶ŽšƒR[ƒh‡‚Å•À‚Ñ‘Ö‚¦
 	}
 
-	return GlyphIndexToCharcodeVector->size();
+	return (tjs_uint)GlyphIndexToCharcodeVector->size();
 }
 //---------------------------------------------------------------------------
 
