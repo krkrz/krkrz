@@ -69,6 +69,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetName>$(ProjectName)_d</TargetName>
     <OutDir>$(SolutionDir)lib\$(Platform)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetName>$(ProjectName)_d</TargetName>
@@ -76,6 +77,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)lib\$(Platform)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)lib\$(Platform)\</OutDir>
@@ -219,6 +221,1160 @@
     </ClCompile>
     <ClCompile Include="..\transupp.c" />
     <ClCompile Include="..\turbojpeg.c" />
+    <CustomBuild Include="..\simd\jcgray-sse2-64.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+nasm -fwin64 -DWIN64 -D__x86_64__ -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+nasm -fwin64 -DWIN64 -D__x86_64__ -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jccolor-sse2-64.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+nasm -fwin64 -DWIN64 -D__x86_64__ -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+nasm -fwin64 -DWIN64 -D__x86_64__ -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jcsample-sse2-64.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+nasm -fwin64 -DWIN64 -D__x86_64__ -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+nasm -fwin64 -DWIN64 -D__x86_64__ -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jdcolor-sse2-64.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+nasm -fwin64 -DWIN64 -D__x86_64__ -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+nasm -fwin64 -DWIN64 -D__x86_64__ -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jdmerge-sse2-64.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+nasm -fwin64 -DWIN64 -D__x86_64__ -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+nasm -fwin64 -DWIN64 -D__x86_64__ -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jdsample-sse2-64.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+nasm -fwin64 -DWIN64 -D__x86_64__ -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+nasm -fwin64 -DWIN64 -D__x86_64__ -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jfdctflt-sse-64.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+nasm -fwin64 -DWIN64 -D__x86_64__ -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+nasm -fwin64 -DWIN64 -D__x86_64__ -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jfdctfst-sse2-64.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+nasm -fwin64 -DWIN64 -D__x86_64__ -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+nasm -fwin64 -DWIN64 -D__x86_64__ -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jfdctint-sse2-64.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+nasm -fwin64 -DWIN64 -D__x86_64__ -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+nasm -fwin64 -DWIN64 -D__x86_64__ -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jidctflt-sse2-64.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+nasm -fwin64 -DWIN64 -D__x86_64__ -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+nasm -fwin64 -DWIN64 -D__x86_64__ -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jidctfst-sse2-64.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+nasm -fwin64 -DWIN64 -D__x86_64__ -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+nasm -fwin64 -DWIN64 -D__x86_64__ -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jidctint-sse2-64.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+nasm -fwin64 -DWIN64 -D__x86_64__ -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+nasm -fwin64 -DWIN64 -D__x86_64__ -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jidctred-sse2-64.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+nasm -fwin64 -DWIN64 -D__x86_64__ -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+nasm -fwin64 -DWIN64 -D__x86_64__ -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jquantf-sse2-64.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+nasm -fwin64 -DWIN64 -D__x86_64__ -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+nasm -fwin64 -DWIN64 -D__x86_64__ -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jquanti-sse2-64.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+nasm -fwin64 -DWIN64 -D__x86_64__ -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+nasm -fwin64 -DWIN64 -D__x86_64__ -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\simd\jccolor-mmx.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jccolor-sse2.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jcgray-mmx.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jcgray-sse2.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jcsample-mmx.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jcsample-sse2.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jdcolor-mmx.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jdcolor-sse2.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jdmerge-mmx.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jdmerge-sse2.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jdsample-mmx.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jdsample-sse2.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jfdctflt-3dn.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jfdctflt-sse.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jfdctfst-mmx.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jfdctfst-sse2.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jfdctint-mmx.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jfdctint-sse2.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jidctflt-3dn.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jidctflt-sse.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jidctfst-mmx.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jidctfst-sse2.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jidctint-mmx.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jidctint-sse2.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jidctred-mmx.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jidctred-sse2.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jquant-3dn.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jquant-mmx.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jquant-sse.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jquantf-sse2.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jquanti-sse2.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jsimdcpu.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\simd\jidctflt-sse2.asm">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).asm</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+nasm -fwin32 -DWIN32 -I../win/ -I../simd/ ../simd/%(Filename).asm -o./$(Platform)/$(Configuration)/%(Filename).obj
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).asm</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\%(Filename).obj</Outputs>
+    </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
