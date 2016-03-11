@@ -444,7 +444,7 @@ static tTJSVariantOctet* Pack( const std::vector<OctPackTemplate>& templ, const 
 			break;
 		case OctPack_fill: {		// @ : â‘ÎˆÊ’u‚Ü‚Åƒkƒ‹•¶š‚ğ–„‚ß‚é
 			tjs_size count = result.size();
-			for( tjs_size i = count; i < len; i++ ) {
+			for( tjs_size i = count; i < (tjs_size)len; i++ ) {
 				result.push_back( 0 );
 			}
 			argindex--;
@@ -637,7 +637,7 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 	tjs_size len = length;
 	tjs_size count = templ.size();
 	tjs_int argindex = 0;
-	for( tjs_int i = 0; i < count && current < tail; argindex++ ) {
+	for( tjs_int i = 0; i < (tjs_int)count && current < tail; argindex++ ) {
 		OctPackType t = templ[i].Type;
 		tjs_size len = templ[i].Length;
 		switch( t ) {
@@ -825,13 +825,13 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 			break;
 		case OctPack_null:		// x : ƒkƒ‹•¶š
 			if( len < 0 ) len = (tail - current);
-			for( tjs_int x = 0; x < len; x++ ) {
+			for( tjs_int x = 0; x < (tjs_int)len; x++ ) {
 				current++;
 			}
 			break;
 		case OctPack_NULL:		// X : back up a byte
 			if( len < 0 ) len = (current - data);
-			for( tjs_int x = 0; x < len; x++ ) {
+			for( tjs_int x = 0; x < (tjs_int)len; x++ ) {
 				if( data != current ) current--;
 				else break;
 			}
