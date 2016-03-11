@@ -29,7 +29,7 @@ bool tTJSByteCodeLoader::IsTJS2ByteCode( const tjs_uint8* buff )
 tTJSScriptBlock* tTJSByteCodeLoader::ReadByteCode( tTJS* owner, const tjs_char* name, const tjs_uint8* buf, size_t size ) {
 	ReadBuffer = buf;
 	ReadIndex = 0;
-	ReadSize = size;
+	ReadSize = (tjs_uint32)size;
 
 	const tjs_uint8* databuff = ReadBuffer;
 
@@ -49,7 +49,7 @@ tTJSScriptBlock* tTJSByteCodeLoader::ReadByteCode( tTJS* owner, const tjs_char* 
 	size = read4byte( &(databuff[16]) );
 	ReadDataArea( databuff, 20, size );
 
-	int offset = 12 + size; // これがデータエリア後の位置
+	int offset = (int)(12 + size); // これがデータエリア後の位置
 	// OBJS
 	tag = read4byte( &(databuff[offset]) );
 	offset+=4;
@@ -331,7 +331,7 @@ void tTJSByteCodeLoader::ReadObjects( tTJSScriptBlock* block, const tjs_uint8* b
 		if( properties[o].size() > 0 ) {
 			tTJSInterCodeContext* obj = parentObj;
 			std::vector<int>& prop = properties[o];
-			int length = prop.size() >> 1;
+			int length = (int)(prop.size() >> 1);
 			for( int i = 0; i < length; i++ ) {
 				int pos = i << 1;
 				int pname = prop[pos];
@@ -342,7 +342,7 @@ void tTJSByteCodeLoader::ReadObjects( tTJSScriptBlock* block, const tjs_uint8* b
 			}
 		}
 	}
-	int count = work.size();
+	int count = (int)work.size();
 	for( int i = 0; i < count; i++ ) {
 		VariantRepalace& w = work[i];
 		(*w.Work) = objs[w.Index];

@@ -44,7 +44,7 @@ public:
 	tjs_int Find(const tjs_char * name);
 	void Remove(const tjs_char * name);
 
-	tjs_int GetCount(void) const  { return List.size(); }
+	tjs_int GetCount(void) const  { return (tjs_int)List.size(); }
 		// this count includes variable holder that is marked as un-used
 	tjs_int GetLocalCountStart(void) const  { return LocalCountStart; }
 

@@ -654,7 +654,7 @@ public:
 
 	void SetCodePointer(const tjs_int32 * codebase, tjs_int32 * const * codeptr)
 	{
-		tjs_uint size = Stack.size();
+		tjs_uint size = (tjs_uint)Stack.size();
 		if(size < 1) return;
 		tjs_uint top = size - 1;
 		Stack[top].CodeBase = codebase;
@@ -677,7 +677,7 @@ public:
 			if(rec.CodeBase && rec.CodePtr)
 			{
 				str = rec.Context->GetPositionDescriptionString(
-					*rec.CodePtr - rec.CodeBase);
+					(tjs_int)(*rec.CodePtr - rec.CodeBase));
 			}
 			else
 			{

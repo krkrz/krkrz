@@ -557,7 +557,7 @@ bool tTVPApplication::ProcessMessage( MSG &msg ) {
 				DispatchMessage(&msg);
 			}
 		} else {
-			TVPTerminateCode = msg.wParam;
+			TVPTerminateCode = (int)msg.wParam;
 			tarminate_ = true;
 		}
 	}

@@ -40,7 +40,7 @@ public:
 		return result;
 	}
 	static inline std::wstring ReplaceStringAll( std::wstring src, const std::wstring& target, const std::wstring& dest ) {
-		int nPos = 0;
+		std::wstring::size_type nPos = 0;
 		while( (nPos = src.find(target, nPos)) != std::wstring::npos ) {
 			src.replace( nPos, target.length(), dest );
 		}

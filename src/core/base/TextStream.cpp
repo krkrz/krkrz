@@ -318,7 +318,7 @@ public:
 		}
 		else
 		{
-			if(size == 0) size = BufferLen;
+			if(size == 0) size = (tjs_uint)BufferLen;
 			if(size)
 			{
 				tjs_char *buf = targ.AllocBuffer(size);
@@ -615,7 +615,7 @@ public:
 		{
 			// compressed with zlib stream.
 			ZStream->next_in = (Bytef*)ptr;
-			ZStream->avail_in = size;
+			ZStream->avail_in = (uInt)size;
 
 			while (ZStream->avail_in > 0) {
 				int result = deflate(ZStream, Z_NO_FLUSH);
@@ -632,7 +632,7 @@ public:
 		}
 		else
 		{
-			Stream->WriteBuffer(ptr, size); // write directly
+			Stream->WriteBuffer(ptr, (tjs_uint)size); // write directly
 		}
 	}
 

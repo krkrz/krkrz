@@ -330,7 +330,7 @@ void tTJSDictionaryNI::Assign(iTJSDispatch2 * dsp, bool clear)
 		if(clear) Owner->Clear();
 
 		// reserve area
-		tjs_int reqcount = Owner->Count + arrayni->Items.size();
+		tjs_int reqcount = (tjs_int)(Owner->Count + arrayni->Items.size());
 		Owner->RebuildHash( reqcount );
 
 		tTJSArrayNI::tArrayItemIterator i;

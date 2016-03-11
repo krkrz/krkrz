@@ -65,7 +65,7 @@ static void PNG_warning (png_structp ps, png_const_charp msg)
 // user_read_data
 static void PNG_read_data(png_structp png_ptr,png_bytep data,png_size_t length)
 {
-	((tTJSBinaryStream *)png_get_io_ptr(png_ptr))->ReadBuffer((void*)data, length);
+	((tTJSBinaryStream *)png_get_io_ptr(png_ptr))->ReadBuffer((void*)data, (tjs_uint)length);
 }
 //---------------------------------------------------------------------------
 // read_row_callback
@@ -340,7 +340,7 @@ void TVPLoadPNG(void* formatdata, void *callbackdata, tTVPGraphicSizeCallback si
 			// non-interlace
 			if(do_convert_rgb_gray)
 			{
-				png_uint_32 rowbytes = png_get_rowbytes(png_ptr, info_ptr);
+				png_size_t rowbytes = png_get_rowbytes(png_ptr, info_ptr);
 				image = new tjs_uint8[rowbytes];
 			}
 #if 1
@@ -390,7 +390,7 @@ void TVPLoadPNG(void* formatdata, void *callbackdata, tTVPGraphicSizeCallback si
 			// load the image at once
 
 			row_pointers = new png_bytep[height];
-			png_uint_32 rowbytes = png_get_rowbytes(png_ptr, info_ptr);
+			png_size_t rowbytes = png_get_rowbytes(png_ptr, info_ptr);
 			image = new tjs_uint8[rowbytes * height];
 			for(i=0; i<height; i++)
 			{

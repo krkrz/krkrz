@@ -204,7 +204,7 @@ struct tTVPHWExceptionData
 	tjs_int Code;
 	tjs_uint8 *EIP;
 	tjs_uint32 *ESP;
-	int AccessFlag; // for EAccessViolation (0=read, 1=write, 8=execute)
+	ULONG_PTR AccessFlag; // for EAccessViolation (0=read, 1=write, 8=execute)
 	void *AccessTarget; // for EAccessViolation
 	CONTEXT Context; // OS exception context
 	wchar_t Module[MAX_PATH]; // module name which caused the exception
@@ -1126,7 +1126,7 @@ void TVPBeforeSystemInit()
 	{
 		if(forcedataxp3) throw EAbort(TJS_W("Aborted"));
 		TJS_strcpy(buf, ExtractFileDir(ExePath()).c_str());
-		int curdirlen = TJS_strlen(buf);
+		int curdirlen = (int)TJS_strlen(buf);
 		if(buf[curdirlen-1] != TJS_W('\\')) buf[curdirlen] = TJS_W('\\'), buf[curdirlen+1] = 0;
 	}
 
@@ -1152,7 +1152,7 @@ void TVPBeforeSystemInit()
 			bRes = ::SHGetPathFromIDList( pidlRetFolder, chPutFolder );
 			if( bRes != FALSE ) {
 				wcsncpy( buf, chPutFolder, MAX_PATH );
-				tjs_int buflen = TJS_strlen(buf);
+				tjs_int buflen = (tjs_int)TJS_strlen(buf);
 				if( buflen >= 1 ) {
 					if( buf[buflen-1] != TJS_W('\\') && buflen < (MAX_PATH-2) ) {
 						buf[buflen] = TJS_W('\\');
@@ -1172,7 +1172,7 @@ void TVPBeforeSystemInit()
 		Application->SetShowMainForm( false );
 	}
 
-	tjs_int buflen = TJS_strlen(buf);
+	tjs_int buflen = (tjs_int)TJS_strlen(buf);
 	if(buflen >= 1)
 	{
 		if(buf[buflen-1] != TJS_W('\\')) buf[buflen] = TVPArchiveDelimiter, buf[buflen+1] = 0;
@@ -1518,7 +1518,7 @@ static ttstr TVPParseCommandLineOne(const ttstr &i)
 
 	p++;
 
-	ttstr optname(o, p - o);
+	ttstr optname(o, (int)(p - o));
 
 	if(*p == TJS_W('\'') || *p == TJS_W('\"'))
 	{
@@ -1694,7 +1694,7 @@ bool TVPGetCommandLine(const tjs_char * name, tTJSVariant *value)
 {
 	TVPInitProgramArgumentsAndDataPath(false);
 
-	tjs_int namelen = TJS_strlen(name);
+	tjs_int namelen = (tjs_int)TJS_strlen(name);
 	std::vector<ttstr>::const_iterator i;
 	for(i = TVPProgramArguments.begin(); i != TVPProgramArguments.end(); i++)
 	{
@@ -1722,7 +1722,7 @@ void TVPSetCommandLine(const tjs_char * name, const ttstr & value)
 {
 	TVPInitProgramArgumentsAndDataPath(false);
 
-	tjs_int namelen = TJS_strlen(name);
+	tjs_int namelen = (tjs_int)TJS_strlen(name);
 	std::vector<ttstr>::iterator i;
 	for(i = TVPProgramArguments.begin(); i != TVPProgramArguments.end(); i++)
 	{

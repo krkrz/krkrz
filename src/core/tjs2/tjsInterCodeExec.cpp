@@ -1422,16 +1422,16 @@ tjs_int tTJSInterCodeContext::ExecuteCode(tTJSVariant *ra_org, tjs_int startip,
 					cur_line_no = -1;
 				}
 #endif	// ENABLE_DEBUGGER
-				return code+1-CodeArea;
+				return (tjs_int)(code+1-CodeArea);
 
 			case VM_ENTRY:
-				code = CodeArea + ExecuteCodeInTryBlock(ra, code-CodeArea + 3, args,
-					numargs, result, TJS_FROM_VM_CODE_ADDR(code[1])+code-CodeArea,
+				code = CodeArea + ExecuteCodeInTryBlock(ra, (tjs_int)(code-CodeArea + 3), args,
+					numargs, result, (tjs_int)(TJS_FROM_VM_CODE_ADDR(code[1])+code-CodeArea),
 					TJS_FROM_VM_REG_ADDR(code[2]));
 				break;
 
 			case VM_EXTRY:
-				return code+1-CodeArea;  // same as ret
+				return (tjs_int)(code+1-CodeArea);  // same as ret
 
 			case VM_THROW:
 #ifdef ENABLE_DEBUGGER
@@ -1441,7 +1441,7 @@ tjs_int tTJSInterCodeContext::ExecuteCode(tTJSVariant *ra_org, tjs_int startip,
 				}
 #endif	// ENABLE_DEBUGGER
 				ThrowScriptException(TJS_GET_VM_REG(ra, code[1]),
-					Block, CodePosToSrcPos(code-CodeArea));
+					Block, CodePosToSrcPos((tjs_int)(code-CodeArea)));
 				code += 2; // actually here not proceed...
 				break;
 
@@ -1495,38 +1495,38 @@ tjs_int tTJSInterCodeContext::ExecuteCode(tTJSVariant *ra_org, tjs_int startip,
 	catch(eTJSScriptException &e)
 	{
 		DEBUGGER_EXCEPTION_HOOK;
-		e.AddTrace(this, codesave-CodeArea);
+		e.AddTrace(this, (tjs_int)(codesave-CodeArea));
 		throw e;
 	}
 	catch(eTJSScriptError &e)
 	{
 		DEBUGGER_EXCEPTION_HOOK;
-		e.AddTrace(this, codesave-CodeArea);
+		e.AddTrace(this, (tjs_int)(codesave-CodeArea));
 		throw e;
 	}
 	catch(eTJS &e)
 	{
 		DEBUGGER_EXCEPTION_HOOK;
-		DisplayExceptionGeneratedCode(codesave - CodeArea, ra_org);
-		TJS_eTJSScriptError(e.GetMessage(), this, codesave-CodeArea);
+		DisplayExceptionGeneratedCode((tjs_int)(codesave - CodeArea), ra_org);
+		TJS_eTJSScriptError(e.GetMessage(), this, (tjs_int)(codesave-CodeArea));
 	}
 	catch(exception &e)
 	{
 		DEBUGGER_EXCEPTION_HOOK;
-		DisplayExceptionGeneratedCode(codesave - CodeArea, ra_org);
-		TJS_eTJSScriptError(e.what(), this, codesave-CodeArea);
+		DisplayExceptionGeneratedCode((tjs_int)(codesave - CodeArea), ra_org);
+		TJS_eTJSScriptError(e.what(), this, (tjs_int)(codesave-CodeArea));
 	}
 	catch(const wchar_t *text)
 	{
 		DEBUGGER_EXCEPTION_HOOK;
-		DisplayExceptionGeneratedCode(codesave - CodeArea, ra_org);
-		TJS_eTJSScriptError(text, this, codesave-CodeArea);
+		DisplayExceptionGeneratedCode((tjs_int)(codesave - CodeArea), ra_org);
+		TJS_eTJSScriptError(text, this, (tjs_int)(codesave-CodeArea));
 	}
 	catch(const char *text)
 	{
 		DEBUGGER_EXCEPTION_HOOK;
-		DisplayExceptionGeneratedCode(codesave - CodeArea, ra_org);
-		TJS_eTJSScriptError(text, this, codesave-CodeArea);
+		DisplayExceptionGeneratedCode((tjs_int)(codesave - CodeArea), ra_org);
+		TJS_eTJSScriptError(text, this, (tjs_int)(codesave-CodeArea));
 	}
 #ifdef TJS_SUPPORT_VCL
 	catch(const EAccessViolation &e)
@@ -1544,7 +1544,7 @@ tjs_int tTJSInterCodeContext::ExecuteCode(tTJSVariant *ra_org, tjs_int startip,
 #endif
 #undef DEBUGGER_EXCEPTION_HOOK
 
-	return codesave-CodeArea;
+	return (tjs_int)(codesave-CodeArea);
 }
 //---------------------------------------------------------------------------
 tjs_int tTJSInterCodeContext::ExecuteCodeInTryBlock(tTJSVariant *ra, tjs_int startip,
