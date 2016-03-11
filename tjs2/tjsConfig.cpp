@@ -402,38 +402,51 @@ void TJSNativeDebuggerBreak()
 #if defined(__WIN32__) && !defined(__GNUC__)
 static unsigned int TJSDefaultFPUCW = 0;
 static unsigned int TJSNewFPUCW = 0;
+static unsigned int TJSDefaultMMCW = 0;
 static bool TJSFPUInit = false;
 #endif
+// FPU例外をマスク
 void TJSSetFPUE()
 {
-#if defined(__WIN32__) && !defined(__GNUC__) && !defined(_M_X64)
+#if defined(__WIN32__) && !defined(__GNUC__)
 	if(!TJSFPUInit)
 	{
 		TJSFPUInit = true;
+#if defined(_M_X64)
+		TJSDefaultMMCW = _MM_GET_EXCEPTION_MASK();
+#else
 		TJSDefaultFPUCW = _control87(0, 0);
-		
+
 #ifdef _MSC_VER
 		TJSNewFPUCW = _control87(MCW_EM, MCW_EM);
 #else
 		_default87 = TJSNewFPUCW = _control87(MCW_EM, MCW_EM);
-#endif
+#endif	// _MSC_VER
 #ifdef TJS_SUPPORT_VCL
 		Default8087CW = TJSNewFPUCW;
-#endif
+#endif	// TJS_SUPPORT_VCL
+#endif	// _M_X64
 	}
 
+#if defined(_M_X64)
+	_MM_SET_EXCEPTION_MASK(_MM_MASK_INVALID|_MM_MASK_DIV_ZERO|_MM_MASK_DENORM|_MM_MASK_OVERFLOW|_MM_MASK_UNDERFLOW|_MM_MASK_INEXACT);
+#else
 //	_fpreset();
 	_control87(TJSNewFPUCW, 0xffff);
 #endif
+#endif	// defined(__WIN32__) && !defined(__GNUC__)
 
 }
-
+// 例外マスクを解除し元に戻す
 void TJSRestoreFPUE()
 {
-
-#if defined(__WIN32__) && !defined(__GNUC__) && !defined(_M_X64)
 	if(!TJSFPUInit) return;
+#if defined(__WIN32__) && !defined(__GNUC__)
+#if defined(_M_X64)
+	_MM_SET_EXCEPTION_MASK(TJSDefaultMMCW);
+#else
 	_control87(TJSDefaultFPUCW, 0xffff);
+#endif
 #endif
 }
 
