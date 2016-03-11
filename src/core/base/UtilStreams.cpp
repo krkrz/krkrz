@@ -50,7 +50,7 @@ tTVPLocalTempStorageHolder::tTVPLocalTempStorageHolder(const ttstr & name)
 		{
 			// copy to local file
 			tTVPStreamHolder src(name);
-			tTVPStreamHolder dest(LocalName, TJS_BS_WRITE);
+			tTVPStreamHolder dest(LocalName, TJS_BS_WRITE|TJS_BS_DELETE_ON_CLOSE);
 			tjs_uint8 * buffer = new tjs_uint8[TVP_LOCAL_TEMP_COPY_BLOCK_SIZE];
 			try
 			{
