@@ -749,6 +749,8 @@ void TVPInterpStretchConstAlphaBlend_sse2_c(tjs_uint32 *dest, tjs_int destlen, c
 	sse2_const_alpha_blend_functor func(opa);
 	stretch_blend_inter_func_sse2( dest, destlen, src1, src2, blend_y, srcstart, srcstep, func );
 }
+extern void TVPInitUnivTransBlendTable_sse2_c(tjs_uint32 *table, tjs_int phase, tjs_int vague);
+extern void TVPInitUnivTransBlendTable_d_sse2_c(tjs_uint32 *table, tjs_int phase, tjs_int vague);
 extern void TVPUnivTransBlend_sse2_c(tjs_uint32 *dest, const tjs_uint32 *src1, const tjs_uint32 *src2, const tjs_uint8 *rule, const tjs_uint32 *table, tjs_int len);
 extern void TVPUnivTransBlend_switch_sse2_c(tjs_uint32 *dest, const tjs_uint32 *src1, const tjs_uint32 *src2, const tjs_uint8 *rule, const tjs_uint32 *table, tjs_int len, tjs_int src1lv, tjs_int src2lv);
 extern void TVPUnivTransBlend_d_sse2_c(tjs_uint32 *dest, const tjs_uint32 *src1, const tjs_uint32 *src2, const tjs_uint8 *rule, const tjs_uint32 *table, tjs_int len);
@@ -961,9 +963,9 @@ void TVPGL_SSE2_Init() {
 		// TVPRemoveOpacity65 = ;
 		// TVPRemoveOpacity65_o = ;
 
-		// TVPInitUnivTransBlendTable // テーブルのSIMD化は効果薄い
-		// TVPInitUnivTransBlendTable_d
-		// TVPInitUnivTransBlendTable_a
+		TVPInitUnivTransBlendTable = TVPInitUnivTransBlendTable_sse2_c;
+		TVPInitUnivTransBlendTable_d = TVPInitUnivTransBlendTable_d_sse2_c;
+		TVPInitUnivTransBlendTable_a = TVPInitUnivTransBlendTable_sse2_c;
 		// SSE2版はアルファもブレンドしているので、どちらでも行ける
 		TVPUnivTransBlend = TVPUnivTransBlend_sse2_c;
 		TVPUnivTransBlend_a = TVPUnivTransBlend_sse2_c;
