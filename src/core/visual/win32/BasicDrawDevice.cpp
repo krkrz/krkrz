@@ -238,8 +238,8 @@ HRESULT tTVPBasicDrawDevice::DecideD3DPresentParameters() {
 	D3dPP.Windowed = TRUE;
 	D3dPP.SwapEffect = D3DSWAPEFFECT_COPY;
 	D3dPP.BackBufferFormat = D3DFMT_UNKNOWN;
-	D3dPP.BackBufferHeight = DispMode.Height;
-	D3dPP.BackBufferWidth = DispMode.Width;
+	D3dPP.BackBufferHeight = DispMode.Height > (tjs_uint)DestRect.get_height() ? DispMode.Height : (tjs_uint)DestRect.get_height();
+	D3dPP.BackBufferWidth = DispMode.Width > (tjs_uint)DestRect.get_width() ? DispMode.Width : (tjs_uint)DestRect.get_width();
 	D3dPP.hDeviceWindow = TargetWindow;
 	D3dPP.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
 
