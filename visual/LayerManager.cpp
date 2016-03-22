@@ -144,6 +144,7 @@ void tTVPLayerManager::DetachPrimary()
 	{
 		SetFocusTo(NULL);
 		ReleaseCapture();
+		ReleaseTouchCaptureAll();
 		ForceMouseLeave();
 		NotifyPart(Primary);
 		Primary = NULL;
@@ -509,29 +510,35 @@ void tTVPLayerManager::PrimaryMouseMove(tjs_int x, tjs_int y, tjs_uint32 flags)
 void tTVPLayerManager::PrimaryTouchDown( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id )
 {
 	tjs_int ix = (tjs_int)x, iy = (tjs_int)y;
+	ReleaseTouchCapture(id);
 	tTJSNI_BaseLayer * l = GetMostFrontChildAt(ix, iy);
 	if( l )
 	{
 		l->FromPrimaryCoordinates(x, y);
+		ReleaseTouchCaptureIDMark = (tjs_int64)id;
 		l->FireTouchDown(x, y, cx, cy, id);
+		if( ReleaseTouchCaptureIDMark == (tjs_int64)id ) {
+			SetTouchCapture( id, l );
+		}
 	}
 }
 //---------------------------------------------------------------------------
 void tTVPLayerManager::PrimaryTouchUp( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id )
 {
 	tjs_int ix = (tjs_int)x, iy = (tjs_int)y;
-	tTJSNI_BaseLayer * l = GetMostFrontChildAt(ix, iy);
+	tTJSNI_BaseLayer * l = GetTouchCapture(id) ? GetTouchCapture(id) : GetMostFrontChildAt(ix, iy);
 	if( l )
 	{
 		l->FromPrimaryCoordinates(x, y);
 		l->FireTouchUp(x, y, cx, cy, id);
+		ReleaseTouchCapture(id);
 	}
 }
 //---------------------------------------------------------------------------
 void tTVPLayerManager::PrimaryTouchMove( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id )
 {
 	tjs_int ix = (tjs_int)x, iy = (tjs_int)y;
-	tTJSNI_BaseLayer * l = GetMostFrontChildAt(ix, iy);
+	tTJSNI_BaseLayer * l = GetTouchCapture(id) ? GetTouchCapture(id) : GetMostFrontChildAt(ix, iy);
 	if( l )
 	{
 		l->FromPrimaryCoordinates(x, y);
@@ -620,6 +627,65 @@ void tTVPLayerManager::ReleaseCaptureFromTree(tTJSNI_BaseLayer * layer)
 		{
 			ReleaseCapture();
 		}
+	}
+	std::vector<tTVPTouchCaptureLayer>::iterator itr = TouchCapture.begin();
+	while( itr != TouchCapture.end() )
+	{
+		tTJSNI_BaseLayer* l = itr->Owner;
+		if( l && l->IsAncestorOrSelf(layer))
+		{
+			if( l->Owner ) l->Owner->Release();
+			if( ReleaseTouchCaptureIDMark == (tjs_int64)(itr->TouchID) ) ReleaseTouchCaptureIDMark = -1;
+			itr = TouchCapture.erase(itr);
+		}
+		else
+		{
+			itr++;
+		}
+	}
+}
+//---------------------------------------------------------------------------
+void tTVPLayerManager::ReleaseTouchCapture( tjs_uint32 id )
+{
+	FindTouchID pred( id );
+	std::vector<tTVPTouchCaptureLayer>::iterator itr = std::find_if( TouchCapture.begin(), TouchCapture.end(), pred );
+	if( itr != TouchCapture.end() )
+	{
+		tTJSNI_BaseLayer* old = itr->Owner;
+		if( old && old->Owner ) old->Owner->Release();
+		TouchCapture.erase(itr);
+	}
+	if( ReleaseTouchCaptureIDMark == (tjs_int64)id ) ReleaseTouchCaptureIDMark = -1;
+}
+//---------------------------------------------------------------------------
+void tTVPLayerManager::ReleaseTouchCaptureAll()
+{
+	for( std::vector<tTVPTouchCaptureLayer>::iterator itr = TouchCapture.begin(); itr != TouchCapture.end(); itr++ )
+	{
+		tTJSNI_BaseLayer* l = itr->Owner;
+		if( l->Owner ) l->Owner->Release();
+	}
+	TouchCapture.clear();
+	ReleaseTouchCaptureIDMark = -1;
+}
+//---------------------------------------------------------------------------
+void tTVPLayerManager::SetTouchCapture( tjs_uint32 id, tTJSNI_BaseLayer* layer )
+{
+	FindTouchID pred( id );
+	std::vector<tTVPTouchCaptureLayer>::iterator itr = std::find_if( TouchCapture.begin(), TouchCapture.end(), pred );
+	if( itr != TouchCapture.end() )
+	{
+		// 既に同一IDのものがある場合は、同じ場所で置き換える
+		tTJSNI_BaseLayer* old = itr->Owner;
+		if( old && old->Owner ) old->Owner->Release();
+		itr->Owner = layer;
+		if( layer->Owner ) layer->Owner->AddRef();
+	}
+	else
+	{
+		// ない場合は、末尾に追加。
+		TouchCapture.push_back( tTVPTouchCaptureLayer( id, layer ) );
+		if( layer->Owner ) layer->Owner->AddRef();
 	}
 }
 //---------------------------------------------------------------------------
