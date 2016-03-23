@@ -699,6 +699,52 @@ void TTVPWindowForm::SetZoom( tjs_int numer, tjs_int denom, bool set_logical ) {
 	InternalSetPaintBoxSize();
 	if( ischanged ) ::InvalidateRect( GetHandle(), NULL, FALSE );
 }
+void TTVPWindowForm::RelocateFullScreenMode() {
+	if(TVPFullScreenedWindow != this) return;
+
+	if(TJSNativeInstance) TJSNativeInstance->DetachVideoOverlay();
+
+	tjs_int desired_fs_w = OrgClientWidth;
+	tjs_int desired_fs_h = OrgClientHeight;
+	TVPRecalcFullScreen( desired_fs_w, desired_fs_h );
+	
+	// get resulted screen size
+	tjs_int fs_w = TVPFullScreenMode.Width;
+	tjs_int fs_h = TVPFullScreenMode.Height;
+
+	// determine fullscreen zoom factor and client size
+	int sb_w, sb_h, zoom_d, zoom_n;
+	zoom_d = TVPFullScreenMode.ZoomDenom;
+	zoom_n = TVPFullScreenMode.ZoomNumer;
+	sb_w = desired_fs_w * zoom_n / zoom_d;
+	sb_h = desired_fs_h * zoom_n / zoom_d;
+
+	FullScreenDestRect.set_size( sb_w, sb_h );
+	FullScreenDestRect.set_offsets( (fs_w - sb_w)/2, (fs_h - sb_h)/2 );
+
+	{
+		tjs_int numer = zoom_n;
+		tjs_int denom = zoom_d;
+		AdjustNumerAndDenom(numer, denom);
+		ActualZoomDenom = denom;
+		ActualZoomNumer = numer;
+		InternalSetPaintBoxSize();
+	}
+
+	// reset window size
+	HMONITOR hMonitor = ::MonitorFromWindow( GetHandle(), MONITOR_DEFAULTTOPRIMARY );
+	MONITORINFO mi = {sizeof(MONITORINFO)};
+	int ml = 0, mt = 0;
+	if( ::GetMonitorInfo( hMonitor, &mi ) ) {
+		ml = mi.rcMonitor.left;
+		mt = mi.rcMonitor.top;
+	}
+	SetBounds( ml, mt, fs_w, fs_h );
+	SetInnerSize( fs_w, fs_h );
+
+	// re-adjust video rect
+	if(TJSNativeInstance) TJSNativeInstance->ReadjustVideoRect();
+}
 void TTVPWindowForm::SetFullScreenMode( bool b ) {
 	// note that we should not change the display mode when showing overlay videos.
 	CallFullScreenChanging(); // notify to plugin
@@ -1912,6 +1958,9 @@ bool TTVPWindowForm::GetOrientation( int& orientation, int& rotate ) const {
 	return ret != FALSE;
 }
 void TTVPWindowForm::OnDisplayChange( UINT_PTR bpp, WORD hres, WORD vres ) {
+	if( GetFullScreenMode() )
+		RelocateFullScreenMode();
+
 	int orient;
 	int rot;
 	if( GetOrientation( orient, rot ) ) {

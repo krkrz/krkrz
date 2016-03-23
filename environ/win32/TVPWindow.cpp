@@ -270,9 +270,10 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		OnFocusLost( reinterpret_cast<HWND>(wParam) );
 		return 0;
 	case WM_GETMINMAXINFO:
-		if( min_size_.cx != 0 ||  min_size_.cy != 0 || max_size_.cx != 0 || max_size_.cy != 0 ) {
+		{
 			MINMAXINFO* lpmmi = (LPMINMAXINFO)lParam;
 			// lpmmi->ptMaxPosition 最大化時の位置
+			// lpmmi->ptMaxSize 最大化時のサイズ
 			// 最小サイズ
 			if( min_size_.cx > 0 ) {
 				lpmmi->ptMinTrackSize.x = min_size_.cx;
@@ -282,15 +283,15 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 			}
 			if( max_size_.cx > 0 ) {
 				lpmmi->ptMaxTrackSize.x = max_size_.cx; // サイズ変更時の最大サイズ
-				lpmmi->ptMaxSize.x = max_size_.cx; // 最大化時のサイズ
+			} else {
+				lpmmi->ptMaxTrackSize.x = INT_MAX; // サイズ変更時の最大サイズ
 			}
 			if( max_size_.cy > 0 ) {
 				lpmmi->ptMaxTrackSize.y = max_size_.cy; // サイズ変更時の最大サイズ
-				lpmmi->ptMaxSize.y = max_size_.cy; // 最大化時のサイズ
+			} else {
+				lpmmi->ptMaxTrackSize.y = INT_MAX; // サイズ変更時の最大サイズ
 			}
 			return 0;
-		} else {
-			return ::DefWindowProc(hWnd,msg,wParam,lParam);
 		}
 	case WM_ACTIVATE: {
 		WPARAM fActive =  wParam & 0xFFFF;

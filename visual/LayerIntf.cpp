@@ -3127,6 +3127,20 @@ void tTJSNI_BaseLayer::ReleaseCapture()
 		// this releases mouse capture from all layers, ignoring which layer captures.
 }
 //---------------------------------------------------------------------------
+void tTJSNI_BaseLayer::ReleaseTouchCapture( tjs_uint32 id, bool all ) {
+	if(Manager)
+	{
+		if( all )
+		{
+			Manager->ReleaseTouchCaptureAll();
+		}
+		else
+		{
+			Manager->ReleaseTouchCapture(id);
+		}
+	}
+}
+//---------------------------------------------------------------------------
 void tTJSNI_BaseLayer::FireTouchDown( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id )
 {
 	if(Owner && !Shutdown)
@@ -7596,6 +7610,24 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/releaseCapture)
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/releaseCapture)
+//---------------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/releaseTouchCapture)
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
+	
+	if(numparams >= 1)
+	{
+		tjs_uint32 id = static_cast<tjs_uint32>(param[0]->AsInteger());
+		_this->ReleaseTouchCapture(id);
+	}
+	else
+	{
+		_this->ReleaseTouchCapture(0,true);
+	}
+
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/releaseTouchCapture)
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/focus) // not setFocus
 {
