@@ -988,6 +988,17 @@
 					{ "value":"Shift_JIS", "desc":"Shift-JIS" },
 					{ "value":"UTF-8", "desc":"UTF-8", "default":true }
 				]
+			},
+			{
+				"caption":"タッチイベントの無効化",
+				"description":"タッチイベントを無効化して、代わりにマウスイベントを発生させます。",
+				"name":"ignoretouch",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"false", "desc":"有効", "default":true },
+					{ "value":"true", "desc":"無効" }
+				]
 			}
 		]
 	}
