@@ -24,10 +24,17 @@
 
 #include <algorithm>
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4819)
+#endif
 #include <ft2build.h>
 #include FT_TRUETYPE_UNPATENTED_H
 #include FT_SYNTHESIS_H
 #include FT_BITMAP_H
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 extern bool TVPEncodeUTF8ToUTF16( std::wstring &output, const std::string &source );
 

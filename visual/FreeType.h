@@ -18,8 +18,15 @@
 #include "FreeTypeFace.h"
 //#include "NativeFreeTypeDriver.h"
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4819)
+#endif
 #include <ft2build.h>
 #include FT_FREETYPE_H
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 //---------------------------------------------------------------------------
 #define	TVP_GET_FACE_INDEX_FROM_OPTIONS(x) ((x) & 0xff) //!< オプション整数からFaceインデックスを取り出すマクロ
