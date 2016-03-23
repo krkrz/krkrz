@@ -503,6 +503,10 @@ void TJS_INTF_METHOD tTVPBasicDrawDevice::SetDestRectangle(const tTVPRect & rect
 		inherited::SetDestRectangle(rect);
 	} else {
 		// サイズも違う
+		if( rect.get_width() > (tjs_int)D3dPP.BackBufferWidth || rect.get_height() > (tjs_int)D3dPP.BackBufferHeight ) {
+			// バックバッファサイズよりも大きいサイズが指定された場合一度破棄する。後のEnsureDeviceで再生成される。
+			DestroyD3DDevice();
+		}
 		bool success = true;
 		inherited::SetDestRectangle(rect);
 
