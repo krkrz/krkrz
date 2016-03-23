@@ -15,6 +15,7 @@
 #include "MsgIntf.h"
 #include "UserEvent.h"
 #include "TickCount.h"
+#include "SysInitIntf.h"
 
 #include <TCHAR.h>
 #include <tpcshrd.h> // for MICROSOFT_TABLETPENSERVICE_PROPERTY
@@ -433,14 +434,21 @@ HRESULT tTVPWindow::CreateWnd( const std::wstring& classname, const std::wstring
 	if( ::UpdateWindow(window_handle_) == 0 )
 		return HRESULT_FROM_WIN32(::GetLastError());
 
+	bool ignore_touch = false;
+	tTJSVariant touch;
+	if(TVPGetCommandLine(TJS_W("-ignoretouch"), &touch)) {
+		ttstr str = touch;
+		if(str == TJS_W("true")) ignore_touch = true;
+	}
 	// ハードがマルチタッチをサポートしているかどうか
-	if( procRegisterTouchWindow ) {
+	if( procRegisterTouchWindow && ignore_touch == false ) {
 		int value= ::GetSystemMetrics( SM_DIGITIZER );
 		if( (value & (NID_MULTI_INPUT|NID_READY)) == (NID_MULTI_INPUT|NID_READY) ) {
 			// マルチタッチサポート & 準備できている
+#ifndef TVP_TOUCH_DISABLE
 			procRegisterTouchWindow( window_handle_, REGISTER_TOUCH_FLAG );
 			ignore_touch_mouse_ = true;
-
+#endif
 			// MICROSOFT_TABLETPENSERVICE_PROPERTY プロパティを変更する
 			ATOM atom = ::GlobalAddAtom( MICROSOFT_TABLETPENSERVICE_PROPERTY );
 			::SetProp( window_handle_, MICROSOFT_TABLETPENSERVICE_PROPERTY, reinterpret_cast<HANDLE>( DEFAULT_TABLETPENSERVICE_PROPERTY ) );
