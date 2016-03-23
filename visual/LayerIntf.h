@@ -594,6 +594,7 @@ private:
 
 public:
 	void ReleaseCapture();
+	void ReleaseTouchCapture( tjs_uint32 id, bool all = false );
 
 private:
 	tTJSNI_BaseLayer *SearchFirstFocusable(bool ignore_chain_focusable = true);
