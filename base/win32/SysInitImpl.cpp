@@ -1197,9 +1197,6 @@ static UINT TVPTimeBeginPeriodRes = 0;
 //---------------------------------------------------------------------------
 void TVPAfterSystemInit()
 {
-	// ensure datapath directory
-	TVPEnsureDataPathDirectory();
-
 	// check CPU type
 	TVPDetectCPU();
 
