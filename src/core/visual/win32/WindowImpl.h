@@ -203,6 +203,7 @@ struct tTVPScreenModeCandidate : tTVPScreenMode
 struct IDirect3D9;
 extern void TVPTestDisplayMode(tjs_int w, tjs_int h, tjs_int & bpp);
 extern void TVPSwitchToFullScreen(HWND window, tjs_int w, tjs_int h, class iTVPDrawDevice* drawdevice);
+extern void TVPRecalcFullScreen( tjs_int w, tjs_int h );
 extern void TVPRevertFromFullScreen(HWND window,tjs_uint w,tjs_uint h, class iTVPDrawDevice* drawdevice);
 TJS_EXP_FUNC_DEF(void, TVPEnsureDirect3DObject, ());
 void TVPDumpDirect3DDriverInformation();

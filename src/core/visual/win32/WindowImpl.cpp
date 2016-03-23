@@ -912,6 +912,28 @@ void TVPSwitchToFullScreen(HWND window, tjs_int w, tjs_int h, iTVPDrawDevice* dr
 	//TVPEnsureVSyncTimingThread();
 }
 //---------------------------------------------------------------------------
+void TVPRecalcFullScreen( tjs_int w, tjs_int h )
+{
+	if( TVPInFullScreen != true ) return;
+
+	TVPInitFullScreenOptions();
+
+	// get fullscreen mode candidates
+	std::vector<tTVPScreenModeCandidate> candidates;
+	tTVPScreenMode preferred;
+	preferred.Width = w;
+	preferred.Height = h;
+	preferred.BitsPerPixel = TVPPreferredFullScreenBPP;
+	TVPMakeFullScreenModeCandidates(
+		preferred,
+		TVPPreferredFullScreenResolutionMode,
+		TVPPreferredFullScreenUsingEngineZoomMode,
+		candidates);
+
+	TVPFullScreenMode = *(candidates.begin());
+	TVPGetDisplayColorFormat();
+}
+//---------------------------------------------------------------------------
 void TVPRevertFromFullScreen(HWND window,tjs_uint w,tjs_uint h, iTVPDrawDevice* drawdevice)
 {
 	if(!TVPInFullScreen) return;
