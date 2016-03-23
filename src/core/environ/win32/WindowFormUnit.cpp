@@ -836,7 +836,7 @@ void TTVPWindowForm::CallWindowAttach() {
 
 	tTVPWindowMessage msg;
 	msg.Msg = TVP_WM_ATTACH;
-	msg.LParam = reinterpret_cast<int>(GetWindowHandleForPlugin());
+	msg.LParam = reinterpret_cast<LPARAM>(GetWindowHandleForPlugin());
 	msg.WParam = 0;
 	msg.Result = 0;
 
@@ -858,7 +858,7 @@ void TTVPWindowForm::CallFullScreenChanged() {
 void TTVPWindowForm::CallFullScreenChanging() {
 	tTVPWindowMessage msg;
 	msg.Msg = TVP_WM_FULLSCREEN_CHANGING;
-	msg.LParam = reinterpret_cast<int>(GetWindowHandleForPlugin());
+	msg.LParam = reinterpret_cast<LPARAM>(GetWindowHandleForPlugin());
 	msg.WParam = 0;
 	msg.Result = 0;
 	DeliverMessageToReceiver(msg);

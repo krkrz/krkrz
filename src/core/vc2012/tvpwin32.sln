@@ -161,7 +161,6 @@ Global
 		{04C6127E-4773-4BAE-8FE6-DC29F4F542E1}.Debug|Win32.ActiveCfg = Debug|Win32
 		{04C6127E-4773-4BAE-8FE6-DC29F4F542E1}.Debug|Win32.Build.0 = Debug|Win32
 		{04C6127E-4773-4BAE-8FE6-DC29F4F542E1}.Debug|x64.ActiveCfg = Debug|x64
-		{04C6127E-4773-4BAE-8FE6-DC29F4F542E1}.Debug|x64.Build.0 = Debug|x64
 		{04C6127E-4773-4BAE-8FE6-DC29F4F542E1}.Release Enable Debugger|Win32.ActiveCfg = Release|Win32
 		{04C6127E-4773-4BAE-8FE6-DC29F4F542E1}.Release Enable Debugger|Win32.Build.0 = Release|Win32
 		{04C6127E-4773-4BAE-8FE6-DC29F4F542E1}.Release Enable Debugger|x64.ActiveCfg = Release|x64
@@ -175,7 +174,6 @@ Global
 		{04C6127E-4773-4BAE-8FE6-DC29F4F542E1}.Release|Win32.ActiveCfg = Release|Win32
 		{04C6127E-4773-4BAE-8FE6-DC29F4F542E1}.Release|Win32.Build.0 = Release|Win32
 		{04C6127E-4773-4BAE-8FE6-DC29F4F542E1}.Release|x64.ActiveCfg = Release|x64
-		{04C6127E-4773-4BAE-8FE6-DC29F4F542E1}.Release|x64.Build.0 = Release|x64
 		{4B4C055C-170E-4DCF-8F73-BED91BE7CFA4}.Debug Multithreaded|Win32.ActiveCfg = Debug|Win32
 		{4B4C055C-170E-4DCF-8F73-BED91BE7CFA4}.Debug Multithreaded|Win32.Build.0 = Debug|Win32
 		{4B4C055C-170E-4DCF-8F73-BED91BE7CFA4}.Debug Multithreaded|x64.ActiveCfg = Debug|x64

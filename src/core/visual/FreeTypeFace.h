@@ -14,8 +14,15 @@
 #ifndef FREETYPEFACE_H
 #define FREETYPEFACE_H
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4819)
+#endif
 #include <ft2build.h>
 #include FT_FREETYPE_H
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 #include <vector>
 #include <string>
 
