@@ -268,6 +268,7 @@ public:
 	//-- full screen management
 	void SetFullScreenMode(bool b);
 	bool GetFullScreenMode() const;
+	void RelocateFullScreenMode();
 
 	//-- methods/properties
 	void UpdateWindow(tTVPUpdateType type = utNormal);

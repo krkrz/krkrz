@@ -238,8 +238,8 @@ HRESULT tTVPBasicDrawDevice::DecideD3DPresentParameters() {
 	D3dPP.Windowed = TRUE;
 	D3dPP.SwapEffect = D3DSWAPEFFECT_COPY;
 	D3dPP.BackBufferFormat = D3DFMT_UNKNOWN;
-	D3dPP.BackBufferHeight = DispMode.Height;
-	D3dPP.BackBufferWidth = DispMode.Width;
+	D3dPP.BackBufferHeight = DispMode.Height > (tjs_uint)DestRect.get_height() ? DispMode.Height : (tjs_uint)DestRect.get_height();
+	D3dPP.BackBufferWidth = DispMode.Width > (tjs_uint)DestRect.get_width() ? DispMode.Width : (tjs_uint)DestRect.get_width();
 	D3dPP.hDeviceWindow = TargetWindow;
 	D3dPP.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
 
@@ -503,6 +503,10 @@ void TJS_INTF_METHOD tTVPBasicDrawDevice::SetDestRectangle(const tTVPRect & rect
 		inherited::SetDestRectangle(rect);
 	} else {
 		// サイズも違う
+		if( rect.get_width() > (tjs_int)D3dPP.BackBufferWidth || rect.get_height() > (tjs_int)D3dPP.BackBufferHeight ) {
+			// バックバッファサイズよりも大きいサイズが指定された場合一度破棄する。後のEnsureDeviceで再生成される。
+			DestroyD3DDevice();
+		}
 		bool success = true;
 		inherited::SetDestRectangle(rect);
 

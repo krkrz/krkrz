@@ -14,6 +14,8 @@
 
 #include "LayerIntf.h"
 #include "drawable.h"
+#include <algorithm>
+#include <vector>
 
 /*[*/
 class tTJSNI_BaseLayer;
@@ -204,6 +206,14 @@ public:
 //---------------------------------------------------------------------------
 /*]*/
 
+//---------------------------------------------------------------------------
+// Touch capture infomation for layer
+//---------------------------------------------------------------------------
+struct tTVPTouchCaptureLayer {
+	tjs_uint32	TouchID;
+	tTJSNI_BaseLayer*	Owner;
+	tTVPTouchCaptureLayer( tjs_uint32 id, tTJSNI_BaseLayer* layer ) : TouchID(id), Owner(layer){}
+};
 
 //---------------------------------------------------------------------------
 // tTVPLayerManager
@@ -222,6 +232,8 @@ class tTVPLayerManager : public iTVPLayerManager, public tTVPDrawable
 
 	tTJSNI_BaseLayer * CaptureOwner;
 	tTJSNI_BaseLayer * LastMouseMoveSent;
+	std::vector<tTVPTouchCaptureLayer> TouchCapture;	//!< 同時タッチ数は多くても10点程度なのでvectorで持つ(ほぼ1or2点)
+	tjs_int64 ReleaseTouchCaptureIDMark;	//!< last touch down id
 
 	std::vector<tTJSNI_BaseLayer *> ModalLayerVector;
 		// pointer to modal layer vector
@@ -442,6 +454,29 @@ public:
 
 public:
 	void TJS_INTF_METHOD DumpLayerStructure();
+	
+	void ReleaseTouchCapture( tjs_uint32 id );
+	void ReleaseTouchCaptureAll();
+private:
+	struct FindTouchID {
+		tjs_uint32 TouchID;
+		inline FindTouchID( tjs_uint32 id ) : TouchID(id) {}
+		inline bool operator()(const tTVPTouchCaptureLayer& touch) const { return touch.TouchID == TouchID; }
+	};
+	inline tTJSNI_BaseLayer* GetTouchCapture( tjs_uint32 id )
+	{
+		FindTouchID pred( id );
+		std::vector<tTVPTouchCaptureLayer>::iterator itr = std::find_if( TouchCapture.begin(), TouchCapture.end(), pred );
+		if( itr != TouchCapture.end() )
+		{
+			return itr->Owner;
+		}
+		else
+		{
+			return NULL;
+		}
+	}
+	void SetTouchCapture( tjs_uint32 id, tTJSNI_BaseLayer* layer );
 };
 //---------------------------------------------------------------------------
 
