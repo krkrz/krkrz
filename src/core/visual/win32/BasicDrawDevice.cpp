@@ -507,7 +507,7 @@ void TJS_INTF_METHOD tTVPBasicDrawDevice::SetDestRectangle(const tTVPRect & rect
 		// 位置だけの変更だ
 		inherited::SetDestRectangle(rect);
 	} else {
-		// サイズも違う
+		// サイズが違う場合は一度破棄する。後のEnsureDeviceで再生成される。
 		DestroyD3DDevice();
 		
 		bool success = true;
