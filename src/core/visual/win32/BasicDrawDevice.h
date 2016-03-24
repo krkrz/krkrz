@@ -16,6 +16,7 @@ class tTVPBasicDrawDevice : public tTVPDrawDevice
 	bool IsMainWindow;
 	bool DrawUpdateRectangle;
 	bool BackBufferDirty;
+	bool IsFullScreened;
 
 	IDirect3D9*				Direct3D;
 	IDirect3DDevice9*		Direct3DDevice;
