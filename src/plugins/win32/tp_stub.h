@@ -73,6 +73,8 @@ typedef tjs_int32 tjs_error;
 typedef tjs_int64 tTVInteger;
 typedef tjs_real tTVReal;
 
+typedef size_t tjs_size;
+typedef ptrdiff_t tjs_offset;
 
 /* IEEE double manipulation support
  (TJS requires IEEE double(64-bit float) native support on machine or C++ compiler) */
@@ -1240,7 +1242,10 @@ extern class tTJSBinaryStream * (*TJSCreateBinaryStreamForWrite)(const tTJSStrin
 #define TJS_BS_APPEND 2
 #define TJS_BS_UPDATE 3
 
+#define TJS_BS_DELETE_ON_CLOSE	0x10
+
 #define TJS_BS_ACCESS_MASK 0x0f
+#define TJS_BS_OPTION_MASK 0xf0
 
 #define TJS_BS_SEEK_SET 0
 #define TJS_BS_SEEK_CUR 1
@@ -1935,6 +1940,8 @@ extern void * TVPImportFuncPtrd9b1c73516daea6a9c6564e2b731615a;
 extern void * TVPImportFuncPtr003f9d3de568fcd71dd532f33d38839c;
 extern void * TVPImportFuncPtr5da29a19bbe279a89be00e16c59d7641;
 extern void * TVPImportFuncPtrc1b52e8f3578d11f369552a887e13c5b;
+extern void * TVPImportFuncPtrb94ead6de9316bc65758c5aefb564078;
+extern void * TVPImportFuncPtr8a35be936d2aca049e398a081e511c97;
 extern void * TVPImportFuncPtr5b1fa785e397e643dd09cb43c2f2f4db;
 extern void * TVPImportFuncPtr29af78765c764c566e6adc77e0ea7041;
 extern void * TVPImportFuncPtr9e0df54e4c24ee28d5517c1743faa3a3;
@@ -4714,6 +4721,64 @@ struct IDirectSound;
 
 
 //---------------------------------------------------------------------------
+// Graphic Loading Handler Type
+//---------------------------------------------------------------------------
+typedef void (*tTVPGraphicSizeCallback)
+	(void *callbackdata, tjs_uint w, tjs_uint h);
+/*
+	callback type to inform the image's size.
+	call this once before TVPGraphicScanLineCallback.
+*/
+
+typedef void * (*tTVPGraphicScanLineCallback)
+	(void *callbackdata, tjs_int y);
+/*
+	callback type to ask the scanline buffer for the decoded image, per a line.
+	returning null can stop the processing.
+
+	passing of y=-1 notifies the scan line image had been written to the buffer that
+	was given by previous calling of TVPGraphicScanLineCallback. in this time,
+	this callback function must return NULL.
+*/
+
+typedef const void * (*tTVPGraphicSaveScanLineCallback)
+	(void *callbackdata, tjs_int y);
+
+typedef void (*tTVPMetaInfoPushCallback)
+	(void *callbackdata, const ttstr & name, const ttstr & value);
+/*
+	callback type to push meta-information of the image.
+	this can be null.
+*/
+
+enum tTVPGraphicLoadMode
+{
+	glmNormal, // normal, ie. 32bit ARGB graphic
+	glmPalettized, // palettized 8bit mode
+	glmGrayscale // grayscale 8bit mode
+};
+
+
+typedef bool (*tTVPGraphicAcceptSaveHandler)(void* formatdata, const ttstr & type, class iTJSDispatch2** dic );
+
+
+/* For grahpic load and save */
+typedef void (*tTVPGraphicLoadingHandlerForPlugin)(void* formatdata,
+	void *callbackdata,
+	tTVPGraphicSizeCallback sizecallback,
+	tTVPGraphicScanLineCallback scanlinecallback,
+	tTVPMetaInfoPushCallback metainfopushcallback,
+	struct IStream *src,
+	tjs_int32 keyidx,
+	tTVPGraphicLoadMode mode);
+typedef void (*tTVPGraphicHeaderLoadingHandlerForPlugin)(void* formatdata, struct IStream* src, class iTJSDispatch2** dic );
+typedef void (*tTVPGraphicSaveHandlerForPlugin)(void* formatdata, void* callbackdata, struct IStream* dst, const ttstr & mode,
+	tjs_uint width, tjs_uint height,
+	tTVPGraphicSaveScanLineCallback scanlinecallback,
+	class iTJSDispatch2* meta );
+
+
+//---------------------------------------------------------------------------
 // font ralated constants
 //---------------------------------------------------------------------------
 #define TVP_TF_ITALIC    0x0100
@@ -5470,9 +5535,9 @@ enum tTVPWMRRegMode { wrmRegister=0, wrmUnregister=1 };
 struct tTVPWindowMessage
 {
 	unsigned int Msg; // window message
-	int WParam;  // WPARAM
-	int LParam;  // LPARAM
-	int Result;  // result
+	WPARAM WParam;  // WPARAM
+	LPARAM LParam;  // LPARAM
+	LRESULT Result;  // result
 };
 #pragma pack(pop)
 typedef bool (__stdcall * tTVPWindowMessageReceiver)
@@ -8148,6 +8213,26 @@ inline IDirectSound * TVPGetDirectSound()
 	}
 	typedef IDirectSound * (__stdcall * __functype)();
 	return ((__functype)(TVPImportFuncPtrc1b52e8f3578d11f369552a887e13c5b))();
+}
+inline void TVPRegisterGraphicLoadingHandler(const ttstr & name , tTVPGraphicLoadingHandlerForPlugin loading , tTVPGraphicHeaderLoadingHandlerForPlugin header , tTVPGraphicSaveHandlerForPlugin save , tTVPGraphicAcceptSaveHandler accept , void * formatdata)
+{
+	if(!TVPImportFuncPtrb94ead6de9316bc65758c5aefb564078)
+	{
+		static char funcname[] = "void ::TVPRegisterGraphicLoadingHandler(const ttstr &,tTVPGraphicLoadingHandlerForPlugin,tTVPGraphicHeaderLoadingHandlerForPlugin,tTVPGraphicSaveHandlerForPlugin,tTVPGraphicAcceptSaveHandler,void *)";
+		TVPImportFuncPtrb94ead6de9316bc65758c5aefb564078 = TVPGetImportFuncPtr(funcname);
+	}
+	typedef void (__stdcall * __functype)(const ttstr &, tTVPGraphicLoadingHandlerForPlugin , tTVPGraphicHeaderLoadingHandlerForPlugin , tTVPGraphicSaveHandlerForPlugin , tTVPGraphicAcceptSaveHandler , void *);
+	((__functype)(TVPImportFuncPtrb94ead6de9316bc65758c5aefb564078))(name, loading, header, save, accept, formatdata);
+}
+inline void TVPUnregisterGraphicLoadingHandler(const ttstr & name , tTVPGraphicLoadingHandlerForPlugin loading , tTVPGraphicHeaderLoadingHandlerForPlugin header , tTVPGraphicSaveHandlerForPlugin save , tTVPGraphicAcceptSaveHandler accept , void * formatdata)
+{
+	if(!TVPImportFuncPtr8a35be936d2aca049e398a081e511c97)
+	{
+		static char funcname[] = "void ::TVPUnregisterGraphicLoadingHandler(const ttstr &,tTVPGraphicLoadingHandlerForPlugin,tTVPGraphicHeaderLoadingHandlerForPlugin,tTVPGraphicSaveHandlerForPlugin,tTVPGraphicAcceptSaveHandler,void *)";
+		TVPImportFuncPtr8a35be936d2aca049e398a081e511c97 = TVPGetImportFuncPtr(funcname);
+	}
+	typedef void (__stdcall * __functype)(const ttstr &, tTVPGraphicLoadingHandlerForPlugin , tTVPGraphicHeaderLoadingHandlerForPlugin , tTVPGraphicSaveHandlerForPlugin , tTVPGraphicAcceptSaveHandler , void *);
+	((__functype)(TVPImportFuncPtr8a35be936d2aca049e398a081e511c97))(name, loading, header, save, accept, formatdata);
 }
 inline void TVPClearGraphicCache()
 {
