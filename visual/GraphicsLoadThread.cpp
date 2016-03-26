@@ -268,7 +268,7 @@ void tTVPAsyncImageLoader::LoadImageFromCommand( tTVPImageLoadCommand* cmd ) {
 	if( handler ) {
 		try {
 			tTVPStreamHolder holder(cmd->path_);
-			(handler->Handler)(handler->FormatData, (void*)cmd->dest_, TVPLoadGraphicAsync_SizeCallback,
+			handler->Load(handler->FormatData, (void*)cmd->dest_, TVPLoadGraphicAsync_SizeCallback,
 				TVPLoadGraphicAsync_ScanLineCallback, TVPLoadGraphicAsync_MetaInfoPushCallback,
 				holder.Get(), -1, glmNormal );
 		} catch(...) {

@@ -33,6 +33,7 @@
 #include "FontRasterizer.h"
 #include "RectItf.h"
 #include "FontSystem.h"
+#include "tjsDictionary.h"
 
 extern void TVPSetFontRasterizer( tjs_int index );
 extern tjs_int TVPGetFontRasterizer();
@@ -2439,60 +2440,59 @@ void tTJSNI_BaseLayer::IndependProvinceImage(bool copy)
 void tTJSNI_BaseLayer::SaveLayerImage(const ttstr &name, const ttstr &type)
 {
 	if(!MainImage) TVPThrowExceptionMessage(TVPNotDrawableLayerType);
-
-	if( type.StartsWith(TJS_W("bmp")) )
-		TVPSaveAsBMP(name, type, MainImage);
-	else if( type.StartsWith(TJS_W("png")) )
-		TVPSaveAsPNG(name, type, MainImage);
-	else if( type.StartsWith(TJS_W("jpg")) )
-		TVPSaveAsJPG(name, type, MainImage);
-	else if( type.StartsWith(TJS_W("tlg")) ) {
-		std::vector<std::string> tags;
-		tags.push_back("mode");
+	
+	iTJSDispatch2 *dic = TJSCreateDictionaryObject();
+	try {
+		tTJSVariant val;
 		switch(Type) {
-		case ltOpaque:				tags.push_back("opaque");		break;
-		case ltAlpha:				tags.push_back("alpha");		break;
-		case ltAdditive:			tags.push_back("add");			break;
-		case ltSubtractive:			tags.push_back("sub");			break;
-		case ltMultiplicative:		tags.push_back("mul");			break;
-		case ltDodge:				tags.push_back("dodge");		break;
-		case ltDarken:				tags.push_back("darken");		break;
-		case ltLighten:				tags.push_back("lighten");		break;
-		case ltScreen:				tags.push_back("screen");		break;
-		case ltAddAlpha:			tags.push_back("addalpha");		break;
-		case ltPsNormal:			tags.push_back("psnormal");		break;
-		case ltPsAdditive:			tags.push_back("psadd");		break;
-		case ltPsSubtractive:		tags.push_back("pssub");		break;
-		case ltPsMultiplicative:	tags.push_back("psmul");		break;
-		case ltPsScreen:			tags.push_back("psscreen");		break;
-		case ltPsOverlay:			tags.push_back("psoverlay");	break;
-		case ltPsHardLight:			tags.push_back("pshlight");		break;
-		case ltPsSoftLight:			tags.push_back("psslight");		break;
-		case ltPsColorDodge:		tags.push_back("psdodge");		break;
-		case ltPsColorDodge5:		tags.push_back("psdodge5");		break;
-		case ltPsColorBurn:			tags.push_back("psburn");		break;
-		case ltPsLighten:			tags.push_back("pslighten");	break;
-		case ltPsDarken:			tags.push_back("psdarken");		break;
-		case ltPsDifference:	 	tags.push_back("psdiff");		break;
-		case ltPsDifference5:	 	tags.push_back("psdiff5");		break;
-		case ltPsExclusion:			tags.push_back("psexcl");		break;
-		default:					tags.push_back("opaque");		break;
+		case ltOpaque:				val = tTJSVariant(TJS_W("opaque"));		break;
+		case ltAlpha:				val = tTJSVariant(TJS_W("alpha"));		break;
+		case ltAdditive:			val = tTJSVariant(TJS_W("add"));		break;
+		case ltSubtractive:			val = tTJSVariant(TJS_W("sub"));		break;
+		case ltMultiplicative:		val = tTJSVariant(TJS_W("mul"));		break;
+		case ltDodge:				val = tTJSVariant(TJS_W("dodge"));		break;
+		case ltDarken:				val = tTJSVariant(TJS_W("darken"));		break;
+		case ltLighten:				val = tTJSVariant(TJS_W("lighten"));	break;
+		case ltScreen:				val = tTJSVariant(TJS_W("screen"));		break;
+		case ltAddAlpha:			val = tTJSVariant(TJS_W("addalpha"));	break;
+		case ltPsNormal:			val = tTJSVariant(TJS_W("psnormal"));	break;
+		case ltPsAdditive:			val = tTJSVariant(TJS_W("psadd"));		break;
+		case ltPsSubtractive:		val = tTJSVariant(TJS_W("pssub"));		break;
+		case ltPsMultiplicative:	val = tTJSVariant(TJS_W("psmul"));		break;
+		case ltPsScreen:			val = tTJSVariant(TJS_W("psscreen"));	break;
+		case ltPsOverlay:			val = tTJSVariant(TJS_W("psoverlay"));	break;
+		case ltPsHardLight:			val = tTJSVariant(TJS_W("pshlight"));	break;
+		case ltPsSoftLight:			val = tTJSVariant(TJS_W("psslight"));	break;
+		case ltPsColorDodge:		val = tTJSVariant(TJS_W("psdodge"));	break;
+		case ltPsColorDodge5:		val = tTJSVariant(TJS_W("psdodge5"));	break;
+		case ltPsColorBurn:			val = tTJSVariant(TJS_W("psburn"));		break;
+		case ltPsLighten:			val = tTJSVariant(TJS_W("pslighten"));	break;
+		case ltPsDarken:			val = tTJSVariant(TJS_W("psdarken"));	break;
+		case ltPsDifference:	 	val = tTJSVariant(TJS_W("psdiff"));		break;
+		case ltPsDifference5:	 	val = tTJSVariant(TJS_W("psdiff5"));	break;
+		case ltPsExclusion:			val = tTJSVariant(TJS_W("psexcl"));		break;
+		default:					val = tTJSVariant(TJS_W("opaque"));		break;
 		}
+		dic->PropSet(TJS_MEMBERENSURE, TJS_W("mode"), 0, &val, dic );
+
 		if( ImageLeft > 0 ) {
-			tags.push_back("offs_x");
-			tags.push_back(ttstr(ImageLeft).AsNarrowStdString() );
+			val = tTJSVariant(ImageLeft);
+			dic->PropSet(TJS_MEMBERENSURE, TJS_W("offs_x"), 0, &val, dic );
 		}
 		if( ImageTop > 0 ) {
-			tags.push_back("offs_y");
-			tags.push_back(ttstr(ImageTop).AsNarrowStdString() );
+			val = tTJSVariant(ImageTop);
+			dic->PropSet(TJS_MEMBERENSURE, TJS_W("offs_y"), 0, &val, dic );
 		}
 		if( ImageLeft > 0 || ImageTop > 0 ) {
-			tags.push_back("offs_unit");
-			tags.push_back("pixel");
+			val = tTJSVariant(TJS_W("pixel"));
+			dic->PropSet(TJS_MEMBERENSURE, TJS_W("offs_unit"), 0, &val, dic );
 		}
-		TVPSaveAsTLG( name, type, MainImage, tags );
+		TVPSaveImage( name, type, MainImage, dic );
+	} catch(...) {
+		dic->Release();
+		throw;
 	}
-
+	dic->Release();
 }
 //---------------------------------------------------------------------------
 iTJSDispatch2 * tTJSNI_BaseLayer::LoadImages(const ttstr &name, tjs_uint32 colorkey)
