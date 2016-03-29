@@ -6,7 +6,6 @@
 #define __OptionInfoH__
 
 #include <windows.h>
-#include "tp_stub.h"
 
 
 //---------------------------------------------------------------------------
