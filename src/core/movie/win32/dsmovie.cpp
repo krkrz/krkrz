@@ -14,6 +14,10 @@
 	Modified by T.Imoto <http://www.kaede-software.com>
 */
 
+#include "tjsCommHead.h"
+#include "MsgIntf.h"
+#include "SysInitIntf.h"
+#include "PluginImpl.h"
 #include "dsmovie.h"
 #include "CIStream.h"
 
@@ -32,6 +36,11 @@
 #pragma comment (lib, "mmtimer")
 #endif
 #endif
+
+#pragma comment (lib, "strmiids")
+#pragma comment (lib, "quartz")
+#pragma comment (lib, "dmoguids")
+
 
 // {BAE59473-019E-4f1f-8A8C-3D41A9F4921E}
 static const GUID CLSID_WMReaderSource = 

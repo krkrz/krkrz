@@ -1,6 +1,6 @@
 
-
-
+#include "tjsCommHead.h"
+#include "MsgIntf.h"
 #include "PlayWindow.h"
 #include "DShowException.h"
 

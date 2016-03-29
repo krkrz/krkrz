@@ -12,6 +12,7 @@
 			2004/08/05	T.Imoto		
 *****************************************************************************/
 
+#include "tjsCommHead.h"
 #include <streams.h>
 #include <atlbase.h>
 #include "BufferRenderer.h"

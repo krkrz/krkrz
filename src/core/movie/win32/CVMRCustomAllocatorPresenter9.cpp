@@ -10,11 +10,16 @@
 @note
 *****************************************************************************/
 
+#include "tjsCommHead.h"
+#include "MsgIntf.h"
+#include "DebugIntf.h"
+#include "SysInitIntf.h"
+#include "PluginImpl.h"
+
 #include "CVMRCustomAllocatorPresenter9.h"
 #include "dsmixer.h"
 #include "DShowException.h"
 #include "OptionInfo.h"
-#include "tp_stub.h"
 #include <windows.h>
 #define COMPILE_MULTIMON_STUBS
 #include <multimon.h>

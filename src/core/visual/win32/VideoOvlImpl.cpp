@@ -16,10 +16,8 @@
 #include "MsgIntf.h"
 #include "VideoOvlImpl.h"
 #include "DebugIntf.h"
-// Start:	Add:	T.Imoto
 #include "LayerIntf.h"
 #include "LayerBitmapIntf.h"
-// End:		Add:	T.Imoto
 #include "SysInitIntf.h"
 #include "StorageImpl.h"
 #include "krmovie.h"
@@ -28,127 +26,8 @@
 #include <evcode.h>
 
 #include "Application.h"
+#include "TVPVideoOverlay.h"
 
-//---------------------------------------------------------------------------
-class tTVPVideoModule
-{
-	tTVPPluginHolder *Holder;
-	HMODULE Handle;
-	tGetAPIVersion procGetAPIVersion;
-	tGetVideoOverlayObject procGetVideoOverlayObject;
-	tGetVideoOverlayObject procGetVideoLayerObject; // krmovie.dll only
-	tGetVideoOverlayObject procGetMixingVideoOverlayObject; // krmovie.dll only
-	tGetVideoOverlayObject procGetMFVideoOverlayObject; // krmovie.dll only
-	tTVPV2LinkProc procV2Link;
-	tTVPV2UnlinkProc procV2Unlink;
-
-public:
-	tTVPVideoModule(const ttstr & name);
-	~tTVPVideoModule();
-
-	void GetAPIVersion(DWORD *version) { procGetAPIVersion(version); }
-	void GetVideoOverlayObject(HWND callbackwin, IStream *stream,
-		const wchar_t * streamname, const wchar_t *type, unsigned __int64 size,
-		iTVPVideoOverlay **out)
-	{
-		procGetVideoOverlayObject(callbackwin, stream, streamname, type, size, out);
-	}
-	void GetVideoLayerObject(HWND callbackwin, IStream *stream,
-		const wchar_t * streamname, const wchar_t *type, unsigned __int64 size,
-		iTVPVideoOverlay **out)
-	{
-		procGetVideoLayerObject(callbackwin, stream, streamname, type, size, out);
-	}
-	void GetMixingVideoOverlayObject(HWND callbackwin, IStream *stream,
-		const wchar_t * streamname, const wchar_t *type, unsigned __int64 size,
-		iTVPVideoOverlay **out)
-	{
-		procGetMixingVideoOverlayObject(callbackwin, stream, streamname, type, size, out);
-	}
-	void GetMFVideoOverlayObject(HWND callbackwin, IStream *stream,
-		const wchar_t * streamname, const wchar_t *type, unsigned __int64 size,
-		iTVPVideoOverlay **out)
-	{
-		procGetMFVideoOverlayObject(callbackwin, stream, streamname, type, size, out);
-	}
-};
-static tTVPVideoModule *TVPMovieVideoModule = NULL;
-static tTVPVideoModule *TVPFlashVideoModule = NULL;
-static void TVPUnloadKrMovie();
-//---------------------------------------------------------------------------
-tTVPVideoModule::tTVPVideoModule(const ttstr &name)
-{
-	Holder = new tTVPPluginHolder(name);
-	Handle = LoadLibrary(Holder->GetLocalName().AsStdString().c_str());
-	if(!Handle)
-	{
-		delete Holder;
-		TVPThrowExceptionMessage(TVPCannotLoadKrMovieDLL);
-	}
-
-	try
-	{
-		procGetVideoOverlayObject = (tGetVideoOverlayObject)
-			GetProcAddress(Handle, "GetVideoOverlayObject");
-
-		procGetVideoLayerObject = (tGetVideoOverlayObject)
-			GetProcAddress(Handle, "GetVideoLayerObject");
-
-		procGetMixingVideoOverlayObject = (tGetVideoOverlayObject)
-			GetProcAddress(Handle, "GetMixingVideoOverlayObject");
-
-		procGetMFVideoOverlayObject = (tGetVideoOverlayObject)
-			GetProcAddress(Handle, "GetMFVideoOverlayObject");
-
-		procGetAPIVersion = (tGetAPIVersion)
-			GetProcAddress(Handle, "GetAPIVersion");
-
-		procV2Link = (tTVPV2LinkProc)
-			GetProcAddress(Handle, "V2Link");
-
-		procV2Unlink = (tTVPV2UnlinkProc)
-			GetProcAddress(Handle, "V2Unlink");
-
-		if(!procGetAPIVersion)
-			TVPThrowExceptionMessage(TVPInvalidKrMovieDLL);
-
-		DWORD version;
-		procGetAPIVersion(&version);
-		if(version != TVP_KRMOVIE_VER)
-			TVPThrowExceptionMessage(TVPInvalidKrMovieDLL);
-
-		procV2Link(TVPGetFunctionExporter()); // link functions used by tp_stub
-	}
-	catch(...)
-	{
-		FreeLibrary(Handle);
-		delete Holder;
-		throw;
-	}
-}
-//---------------------------------------------------------------------------
-tTVPVideoModule::~tTVPVideoModule()
-{
-	procV2Unlink();
-	FreeLibrary(Handle);
-	delete Holder;
-}
-//---------------------------------------------------------------------------
-static tTVPVideoModule * TVPGetMovieVideoModule()
-{
-	if(TVPMovieVideoModule == NULL)
-		TVPMovieVideoModule = new tTVPVideoModule("krmovie.dll");
-
-	return TVPMovieVideoModule;
-}
-//---------------------------------------------------------------------------
-static tTVPVideoModule * TVPGetFlashVideoModule()
-{
-	if(TVPFlashVideoModule == NULL)
-		TVPFlashVideoModule = new tTVPVideoModule("krflash.dll");
-
-	return TVPFlashVideoModule;
-}
 //---------------------------------------------------------------------------
 static std::vector<tTJSNI_VideoOverlay *> TVPVideoOverlayVector;
 //---------------------------------------------------------------------------
@@ -173,9 +52,6 @@ static void TVPShutdownVideoOverlay()
 	{
 		(*i)->Shutdown();
 	}
-
-	if(TVPMovieVideoModule) delete TVPMovieVideoModule, TVPMovieVideoModule = NULL;
-	if(TVPFlashVideoModule) delete TVPFlashVideoModule, TVPFlashVideoModule = NULL;
 }
 static tTVPAtExit TVPShutdownVideoOverlayAtExit
 	(TVP_ATEXIT_PRI_PREPARE, TVPShutdownVideoOverlay);
@@ -204,7 +80,6 @@ tTJSNI_VideoOverlay::tTJSNI_VideoOverlay()
 	Layer1 = NULL;
 	Layer2 = NULL;
 	Mode = vomOverlay;
-//	Mode = vomLayer;
 	Loop = false;
 	IsPrepare = false;
 	SegLoopStartFrame = -1;
@@ -262,37 +137,10 @@ void tTJSNI_VideoOverlay::Open(const ttstr &_name)
 
 	IStream *istream = NULL;
 	long size;
-	bool flash;
 	ttstr ext = TVPExtractStorageExt(name).c_str();
 	ext.ToLowerCase();
 
-	tTVPVideoModule *mod = NULL;
-	if(ext == TJS_W(".swf"))
 	{
-		// shockwave flash movie
-		flash = true;
-
-		// load krflash.dll
-		mod = TVPGetFlashVideoModule();
-
-		// prepare local storage
-		if(LocalTempStorageHolder)
-			delete LocalTempStorageHolder, LocalTempStorageHolder = NULL;
-
-		// find local name
-		ttstr placed = TVPSearchPlacedPath(name);
-
-		// open and hold
-		LocalTempStorageHolder =
-			new tTVPLocalTempStorageHolder(placed);
-	}
-	else
-	{
-		flash = false;
-
-		// load krmovie.dll
-		mod = TVPGetMovieVideoModule();
-
 		// prepate IStream
 		tTJSBinaryStream *stream0 = NULL;
 		try
@@ -314,33 +162,18 @@ void tTJSNI_VideoOverlay::Open(const ttstr &_name)
 	// create video overlay object
 	try
 	{
-		if(flash)
-		{
-			mod->GetVideoOverlayObject(EventQueue.GetOwner(),
-				NULL, (LocalTempStorageHolder->GetLocalName() + param).c_str(),
-				ext.c_str(), 0, &VideoOverlay);
-		}
-		else
 		{
 			if(Mode == vomLayer)
-				mod->GetVideoLayerObject(EventQueue.GetOwner(),
-					istream, name.c_str(), ext.c_str(),
-					size, &VideoOverlay);
+				GetVideoLayerObject(EventQueue.GetOwner(), istream, name.c_str(), ext.c_str(), size, &VideoOverlay);
 			else if(Mode == vomMixer)
-				mod->GetMixingVideoOverlayObject(EventQueue.GetOwner(),
-					istream, name.c_str(), ext.c_str(),
-					size, &VideoOverlay);
+				GetMixingVideoOverlayObject(EventQueue.GetOwner(), istream, name.c_str(), ext.c_str(), size, &VideoOverlay);
 			else if(Mode == vomMFEVR)
-				mod->GetMFVideoOverlayObject(EventQueue.GetOwner(),
-					istream, name.c_str(), ext.c_str(),
-					size, &VideoOverlay);
+				GetMFVideoOverlayObject(EventQueue.GetOwner(), istream, name.c_str(), ext.c_str(), size, &VideoOverlay);
 			else
-				mod->GetVideoOverlayObject(EventQueue.GetOwner(),
-					istream, name.c_str(), ext.c_str(),
-					size, &VideoOverlay);
+				GetVideoOverlayObject(EventQueue.GetOwner(), istream, name.c_str(), ext.c_str(), size, &VideoOverlay);
 		}
 
-		if( flash || (Mode == vomOverlay) || (Mode == vomMixer) || (Mode == vomMFEVR) )
+		if( (Mode == vomOverlay) || (Mode == vomMixer) || (Mode == vomMFEVR) )
 		{
 			ResetOverlayParams();
 		}
@@ -452,8 +285,6 @@ void tTJSNI_VideoOverlay::Stop()
 	}
 }
 //---------------------------------------------------------------------------
-// Start:	Add:	T.Imoto
-//---------------------------------------------------------------------------
 void tTJSNI_VideoOverlay::Pause()
 {
 	// pause playing
@@ -500,8 +331,6 @@ void tTJSNI_VideoOverlay::SetPeriodEvent( int eventFrame )
 	else
 		IsEventPast = false;
 }
-//---------------------------------------------------------------------------
-// End:		Add:	T.Imoto
 //---------------------------------------------------------------------------
 void tTJSNI_VideoOverlay::SetRectangleToVideoOverlay()
 {
@@ -838,7 +667,6 @@ void tTJSNI_VideoOverlay::WndProc( NativeEvent& ev )
 	EventQueue.HandlerDefault(ev);
 }
 //---------------------------------------------------------------------------
-// Start:	Add:	T.Imoto
 void tTJSNI_VideoOverlay::SetTimePosition( tjs_uint64 p )
 {
 	if(VideoOverlay)
@@ -1348,8 +1176,6 @@ void tTJSNI_VideoOverlay::SetSaturation( tjs_real v )
 		VideoOverlay->SetSaturation( static_cast<float>(v) );
 	}
 }
-// End:		Add:	T.Imoto
-
 //---------------------------------------------------------------------------
 tjs_int tTJSNI_VideoOverlay::GetOriginalWidth()
 {
@@ -1384,10 +1210,8 @@ void tTJSNI_VideoOverlay::ClearWndProcMessages()
 			LONG_PTR p1, p2;
 			bool got;
 			VideoOverlay->GetEvent(&evcode, &p1, &p2, &got); // dummy call
-// Add: Start: T.Imoto
 			if( got )
 				VideoOverlay->FreeEventParams( evcode, p1, p2 );
-// Add: End: T.Imoto
 		}
 	}
 }
