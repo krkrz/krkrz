@@ -11,6 +11,9 @@
 			2004/08/17	T.Imoto		
 *****************************************************************************/
 
+#include "tjsCommHead.h"
+#include "MsgIntf.h"
+#include "DebugIntf.h"
 #include "DShowException.h"
 
 

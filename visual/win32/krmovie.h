@@ -13,7 +13,6 @@
 #ifndef __KRMOVIE_H__
 #define __KRMOVIE_H__
 
-#define TVP_KRMOVIE_VER   0x0001000C
 
 
 //---------------------------------------------------------------------------
@@ -114,13 +113,6 @@ public:
 	virtual void __stdcall GetSaturation( float *v ) = 0;
 	virtual void __stdcall SetSaturation( float v ) = 0;
 };
-//---------------------------------------------------------------------------
-
-//---------------------------------------------------------------------------
-typedef void (__stdcall *tGetAPIVersion)(DWORD *version);
-typedef void  (__stdcall *tGetVideoOverlayObject)(
-	HWND callbackwin, IStream *stream, const wchar_t * streamname,
-	const wchar_t *type, unsigned __int64 size, iTVPVideoOverlay **out);
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------

@@ -22,7 +22,7 @@
 #include <assert.h>
 #include <atlbase.h>
 #include <streams.h>
-#include "../krmovie.h"
+#include "krmovie.h"
 #include <vector>
 
 class CIStreamProxy;

@@ -15,7 +15,6 @@
 #define __DSHOW_EXCEPTION_H__
 
 #include <dshow.h>
-#include "tp_stub.h"
 
 //----------------------------------------------------------------------------
 //! @brief DirectShowのHRESULTをメッセージに変える例外クラス

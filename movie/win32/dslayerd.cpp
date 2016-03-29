@@ -12,6 +12,10 @@
 *****************************************************************************/
 
 
+#include "tjsCommHead.h"
+#include "MsgIntf.h"
+#include "SysInitIntf.h"
+#include "PluginImpl.h"
 #include "dslayerd.h"
 #include "CIStream.h"
 

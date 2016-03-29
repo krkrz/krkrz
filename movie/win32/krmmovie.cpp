@@ -12,14 +12,14 @@
 			2005/09/25	T.Imoto		çÏê¨
 *****************************************************************************/
 
-
+#include "tjsCommHead.h"
+#include "SysInitIntf.h"
+#include "PluginImpl.h"
 #include "dsmixer.h"
-#include "..\krmovie.h"
+#include "krmovie.h"
 
 #include "asyncio.h"
 #include "asyncrdr.h"
-
-#include "tp_stub.h"
 
 #include "OptionInfo.h"
 

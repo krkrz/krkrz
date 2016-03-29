@@ -1,4 +1,8 @@
 
+#include "tjsCommHead.h"
+#include "MsgIntf.h"
+#include "SysInitIntf.h"
+
 #include <windows.h>
 #include <assert.h>
 #include <math.h>
@@ -16,10 +20,9 @@
 #include <atlbase.h>
 #include <atlcom.h>
 
-#include "../krmovie.h"
+#include "krmovie.h"
 #include "MFPlayer.h"
 #include "DShowException.h"
-#include "tp_stub.h"
 
 #pragma comment( lib, "propsys.lib" )
 //#pragma comment( lib, "Mfplat.lib" )
