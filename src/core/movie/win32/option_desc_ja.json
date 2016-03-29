@@ -1,0 +1,19 @@
+[
+	{
+		"category":"デバッグ",
+		"options":[
+			{
+				"caption":"ROTテーブルへの登録",
+				"description":"ムービー再生時にROT(Running Object Table)へ登録するかどうかの設定です。「する」を選択すると、DirectX SDK付属のGraphEditを用いてムービー再生トラブルの解析を行うことができます。「ポーズ」を選択すると、さらにグラフの構築直後にメッセージボックスを表示して一時停止するようになります。",
+				"name":"movie_reg_rot",
+				"type":"select",
+				"user":false,
+				"values":[
+					{ "value":"no", "desc":"いいえ", "default":true },
+					{ "value":"yes", "desc":"はい" },
+					{ "value":"pause", "desc":"ポーズ" }
+				]
+			}
+		]
+	}
+]
