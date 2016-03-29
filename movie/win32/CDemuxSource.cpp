@@ -11,6 +11,7 @@
 @note
 *****************************************************************************/
 
+#include "tjsCommHead.h"
 #include <assert.h>
 #include <streams.h>
 #include "CDemuxSource.h"

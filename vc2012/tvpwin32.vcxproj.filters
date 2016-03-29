@@ -61,6 +61,12 @@
     <Filter Include="visual\gl">
       <UniqueIdentifier>{f40130cb-77be-4493-bb7e-e204ddf45037}</UniqueIdentifier>
     </Filter>
+    <Filter Include="movie">
+      <UniqueIdentifier>{ab526f18-de12-4994-9262-a4f779202f79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="movie\win32">
+      <UniqueIdentifier>{2b2298b4-9c07-4290-803e-9f80182128f7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -581,6 +587,78 @@
     <ClInclude Include="..\sound\xmmlib.h">
       <Filter>sound</Filter>
     </ClInclude>
+    <ClInclude Include="..\movie\win32\asyncio.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\asyncrdr.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\BufferRenderer.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\CDemuxOutputPin.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\CDemuxSource.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\CDLLLoader.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\CIStream.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\CMediaSeekingProxy.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\CVMRCustomAllocatorPresenter9.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\CWMAllocator.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\CWMBuffer.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\CWMReader.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\DShowException.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\dslayerd.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\dsmixer.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\dsmovie.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\dsoverlay.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\IBufferRenderer.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\IDemuxReader.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\IRendererBufferAccess.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\IRendererBufferVideo.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\MFPlayer.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\PlayWindow.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\OptionInfo.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\tjs2\tjs.cpp">
@@ -1065,6 +1143,75 @@
     </ClCompile>
     <ClCompile Include="..\sound\xmmlib.cpp">
       <Filter>sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\asyncio.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\asyncrdr.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\BufferRenderer.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\CDemuxOutputPin.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\CDemuxSource.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\CMediaSeekingProxy.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\CVMRCustomAllocatorPresenter9.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\CWMAllocator.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\CWMBuffer.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\CWMReader.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\DShowException.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\dslayerd.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\dsmixer.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\dsmovie.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\dsoverlay.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\IBufferRenderer_i.c">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\IRendererBufferAccess_i.c">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\IRendererBufferVideo_i.c">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\krlmovie.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\krmmovie.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\krmovie.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\MFPlayer.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\PlayWindow.cpp">
+      <Filter>movie\win32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

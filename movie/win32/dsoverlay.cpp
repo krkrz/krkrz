@@ -14,6 +14,10 @@
 	Modified by T.Imoto <http://www.kaede-software.com> 2004
 */
 
+#include "tjsCommHead.h"
+#include "MsgIntf.h"
+#include "SysInitIntf.h"
+#include "PluginImpl.h"
 #include "dsoverlay.h"
 #include "CIStream.h"
 

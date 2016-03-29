@@ -12,6 +12,7 @@ IMediaSeeking‚ÌŒÄ‚Ño‚µ‚ğ‘ã—‚·‚éB
 @note
 *****************************************************************************/
 
+#include "tjsCommHead.h"
 #include "CMediaSeekingProxy.h"
 
 //#define ENABLE_SET

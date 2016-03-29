@@ -1,7 +1,7 @@
-## ƒrƒ‹ƒh•û–@
+## ãƒ“ãƒ«ãƒ‰æ–¹æ³•
 
-DirectShow ‚Ì baseclasses ‚ª•K—v‚Å‚·B
-baseclasses ‚ğ src/core/external/baseclasses ‚É”z’u‚µ‚ÄAƒrƒ‹ƒh‚µ‚Ä‚­‚¾‚³‚¢B
+DirectShow ã® baseclasses ãŒå¿…è¦ã§ã™ã€‚
+baseclasses ã‚’ src/core/external/baseclasses ã«é…ç½®ã—ã¦ã€ãƒ“ãƒ«ãƒ‰ã—ã¦ãã ã•ã„ã€‚
 
 
 ## note:
