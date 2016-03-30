@@ -396,6 +396,14 @@ void TVPLoadHeaderJXR(void* formatdata, tTJSBinaryStream *src, iTJSDispatch2** d
 
 #include "JXRGlue.h"
 
+/*
+jxrlibで読み込みを行う場合は
+external/jxrlib/image/vc11projects/CommonLib_vc11.vcxproj
+external/jxrlib/image/vc11projects/DecodeLib_vc11.vcxproj
+external/jxrlib/image/vc11projects/EncodeLib_vc11.vcxproj
+external/jxrlib/jxrgluelib/JXRGlueLib_vc11.vcxproj
+をソリューションに加えてビルドすること
+*/
 #if defined( WIN32 )
 #ifdef _DEBUG
 #pragma comment(lib, "JXRCommonLib_d.lib")
