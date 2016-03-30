@@ -886,13 +886,8 @@ void tTJSNI_BaseWaveSoundBuffer::RebuildFilterChain()
 		tTJSVariantClosure clo = v.AsObjectClosureNoAddRef();
 		tTJSVariant iface_v;
 		if(TJS_FAILED(clo.PropGet(0, TJS_W("interface"), NULL, &iface_v, NULL))) continue;
-#ifndef TJS_64BIT_OS
 		iTVPBasicWaveFilter * filter =
-			reinterpret_cast<iTVPBasicWaveFilter *>((long)(tjs_int64)iface_v);
-#else
-		iTVPBasicWaveFilter * filter =
-			reinterpret_cast<iTVPBasicWaveFilter *>((tjs_int64)iface_v);
-#endif
+			reinterpret_cast<iTVPBasicWaveFilter *>((tjs_intptr_t)(tjs_int64)iface_v);
 		// save to the backupped array
 		FilterInterfaces.push_back(tFilterObjectAndInterface(v, filter));
 	}

@@ -435,11 +435,7 @@ tTJSNI_BaseLayer::Construct(tjs_int numparams, tTJSVariant **param,
 	tTJSVariant iface_v;
 	if(TJS_FAILED(clo.PropGet(0, TJS_W("layerTreeOwnerInterface"), NULL, &iface_v, NULL)))
 		TVPThrowExceptionMessage( TJS_W("Cannot Retrive Layer Tree Owner Interface.") );
-#ifndef TJS_64BIT_OS
-	lto = reinterpret_cast<iTVPLayerTreeOwner *>((long)(tjs_int64)iface_v);
-#else
-	lto = reinterpret_cast<iTVPLayerTreeOwner *>((tjs_int64)iface_v);
-#endif
+	lto = reinterpret_cast<iTVPLayerTreeOwner *>((tjs_intptr_t)(tjs_int64)iface_v);
 
 	// get the layer native instance
 	clo = param[1]->AsObjectClosureNoAddRef();
