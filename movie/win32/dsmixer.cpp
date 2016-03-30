@@ -29,6 +29,7 @@
 #include <windowsx.h>
 #include <objbase.h>
 #include "CVMRCustomAllocatorPresenter9.h"
+#include "TVPVideoOverlay.h"
 
 //----------------------------------------------------------------------------
 //! @brief	  	èâä˙âª
@@ -208,14 +209,30 @@ void __stdcall tTVPDSMixerVideoOverlay::BuildGraph( HWND callbackwin, IStream *s
 #endif
 			else
 			{
-				CComPtr<IBaseFilter>	pVMR9;
-				AddVMR9Filer( pVMR9 );
-				BuildMPEGGraph( pVMR9, m_Reader); // may throw an exception
-	
-				if( FAILED(hr = pVMR9.QueryInterface( &m_VMR9MixerCtrl ) ) )
-					ThrowDShowException(L"Failed to query IVMRMixerControl9.", hr);
-				if( FAILED(hr = pVMR9.QueryInterface( &m_VMR9MixerBmp ) ) )
-					ThrowDShowException(L"Failed to query IVMRMixerBitmap9.", hr);
+				tTVPDSFilterHandlerType* handler = TVPGetDSFilterHandler( mt.subtype );
+				if( handler )
+				{
+					CComPtr<IBaseFilter>	pVMR9;
+					AddVMR9Filer( pVMR9 );
+					BuildPluginGraph( handler, pVMR9, m_Reader );
+
+					if( FAILED(hr = pVMR9.QueryInterface( &m_VMR9MixerCtrl ) ) )
+						ThrowDShowException(L"Failed to query IVMRMixerControl9.", hr);
+					if( FAILED(hr = pVMR9.QueryInterface( &m_VMR9MixerBmp ) ) )
+						ThrowDShowException(L"Failed to query IVMRMixerBitmap9.", hr);
+
+				}
+				else
+				{
+					CComPtr<IBaseFilter>	pVMR9;
+					AddVMR9Filer( pVMR9 );
+					BuildMPEGGraph( pVMR9, m_Reader); // may throw an exception
+		
+					if( FAILED(hr = pVMR9.QueryInterface( &m_VMR9MixerCtrl ) ) )
+						ThrowDShowException(L"Failed to query IVMRMixerControl9.", hr);
+					if( FAILED(hr = pVMR9.QueryInterface( &m_VMR9MixerBmp ) ) )
+						ThrowDShowException(L"Failed to query IVMRMixerBitmap9.", hr);
+				}
 			}
 		}
 #if 1

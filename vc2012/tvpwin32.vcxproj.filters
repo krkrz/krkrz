@@ -659,6 +659,9 @@
     <ClInclude Include="..\movie\win32\OptionInfo.h">
       <Filter>movie\win32</Filter>
     </ClInclude>
+    <ClInclude Include="..\movie\win32\TVPVideoOverlay.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\tjs2\tjs.cpp">
@@ -1211,6 +1214,9 @@
       <Filter>movie\win32</Filter>
     </ClCompile>
     <ClCompile Include="..\movie\win32\PlayWindow.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\TVPVideoOverlay.cpp">
       <Filter>movie\win32</Filter>
     </ClCompile>
   </ItemGroup>
