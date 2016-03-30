@@ -625,6 +625,11 @@ HRESULT CVMRCustomAllocatorPresenter9::CreateD3D()
 #else
 		m_D3DDll.Load(_T("d3d9.dll"));
 #endif
+#if _DEBUG
+	// load non debug version
+	if( m_D3DDll.IsLoaded() == false )
+		m_D3DDll.Load(_T("d3d9.dll"));
+#endif
 	if( m_D3DDll.IsLoaded() == false )
 		return m_D3DDll.GetLastError();
 

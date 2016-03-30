@@ -28,6 +28,8 @@
 #include "CDemuxSource.h"
 #include "CWMReader.h"
 
+#include "TVPVideoOverlay.h"
+
 #ifdef ENABLE_THEORA
 #include "OggFilterFactory.h"
 #ifndef WINCE
@@ -1180,16 +1182,14 @@ void tTVPDSMovie::ParseVideoType( CMediaType &mt, const wchar_t *type )
 		mt.subtype = MEDIASUBTYPE_Avi;
 	else if (_wcsicmp(type, L".mov") == 0)
 		mt.subtype = MEDIASUBTYPE_QTMovie;
-	//else if (_wcsicmp(type, L".mp4") == 0)
-	//	mt.subtype = MFVideoFormat_H264;
-//	else if (wcsicmp(type, L".wmv") == 0)
-//		mt.subtype = SubTypeGUID_WMV3;
-#ifdef ENABLE_THEORA
-	else if (_wcsicmp(type, L".ogg") == 0 || _wcsicmp(type, L".ogv") == 0)
-		mt.subtype = MEDIASUBTYPE_Ogg;
-#endif
-	else
-		TVPThrowExceptionMessage(L"Unknown video format extension."); // unknown format
+	else {
+		tTVPDSFilterHandlerType* handler = TVPGetDSFilterHandler( ttstr(type) );
+		if( handler ) {
+			mt.subtype = *(handler->Guid);
+		} else {
+			TVPThrowExceptionMessage(L"Unknown video format extension."); // unknown format
+		}
+	}
 }
 //----------------------------------------------------------------------------
 //! @brief	  	拡張子からムービーがWindows Media Fileかどうか判別します
@@ -1669,6 +1669,59 @@ void tTVPDSMovie::BuildWMVGraph( IBaseFilter *pRdr, IStream *pStream )
 	if( FAILED(hr = ConnectFilters( pWMADec, pDDSRenderer ) ) )
 		ThrowDShowException(L"Failed to call ConnectFilters( pWMADec, pDDSRenderer ).", hr);
 
+}
+//----------------------------------------------------------------------------
+//! @brief	  	プラグインで登録されたフィルタでグラフを手動で構築する
+//! @param		pRdr : グラフに参加しているレンダーフィルタ
+//! @param		pSrc : グラフに参加しているソースフィルタ
+//----------------------------------------------------------------------------
+void tTVPDSMovie::BuildPluginGraph( struct tTVPDSFilterHandlerType* handler, IBaseFilter *pRdr, IBaseFilter *pSrc )
+{
+	HRESULT	hr;
+
+	// Connect to splitter filter
+	CComPtr<IBaseFilter>	pSplitter( (IBaseFilter*)handler->SplitterHander(handler->FormatData) );	// for splitter filter
+
+	if( FAILED(hr = GraphBuilder()->AddFilter(pSplitter, L"Plugin Stream Splitter")) )
+		ThrowDShowException(L"Failed to call GraphBuilder()->AddFilter(pSplitter, L\"Stream Splitter\").", hr);
+	if( FAILED(hr = ConnectFilters( pSrc, pSplitter )) )
+		ThrowDShowException(L"Failed to call ConnectFilters( pSrc, pSplitter ).", hr);
+
+	// Connect to video codec filter
+	CComPtr<IBaseFilter>	pVideoCodec( (IBaseFilter*)handler->VideoHander(handler->FormatData) );	// for video codec filter
+	if( FAILED(hr = GraphBuilder()->AddFilter(pVideoCodec, L"Plugin Video Decoder")) )
+		ThrowDShowException(L"Failed to call GraphBuilder()->AddFilter(pVideoCodec, L\"Video Decoder\").", hr);
+	if( FAILED(hr = ConnectFilters( pSplitter, pVideoCodec )) )
+		ThrowDShowException(L"Failed to call ConnectFilters( pSplitter, pVideoCodec ).", hr);
+
+	// Connect to render filter
+	if( FAILED(hr = ConnectFilters( pVideoCodec, pRdr )) )
+		ThrowDShowException(L"Failed to call ConnectFilters( pVideoCodec, pRdr ).", hr);
+
+	// Connect to audio codec filter
+	CComPtr<IBaseFilter>	pAudioCodec( (IBaseFilter*)handler->AudioHander(handler->FormatData) );	// for audio codec filter
+	if( FAILED(hr = GraphBuilder()->AddFilter(pAudioCodec, L"Plugin Audio Decoder")) )
+		ThrowDShowException(L"Failed to call GraphBuilder()->AddFilter(pAudioCodec, L\"Audio Decoder\").", hr);
+	if( FAILED(hr = ConnectFilters( pSplitter, pAudioCodec )) )
+	{	// not have Audio.
+		if( FAILED(hr = GraphBuilder()->RemoveFilter( pAudioCodec)) )
+			ThrowDShowException(L"Failed to call GraphBuilder()->RemoveFilter( pAudioCodec).", hr);
+		return;
+	}
+
+	// Connect to DDS render filter
+	CComPtr<IBaseFilter>	pDDSRenderer;	// for sound renderer filter
+	if( FAILED(hr = pDDSRenderer.CoCreateInstance(CLSID_DSoundRender, NULL, CLSCTX_INPROC_SERVER)) )
+		ThrowDShowException(L"Failed to create sound render filter object.", hr);
+	if( FAILED(hr = GraphBuilder()->AddFilter(pDDSRenderer, L"Sound Renderer")) )
+		ThrowDShowException(L"Failed to call GraphBuilder()->AddFilter(pDDSRenderer, L\"Sound Renderer\").", hr);
+	if( FAILED(hr = ConnectFilters( pAudioCodec, pDDSRenderer ) ) )
+	{
+		if( FAILED(hr = GraphBuilder()->RemoveFilter( pAudioCodec)) )
+			ThrowDShowException(L"Failed to call GraphBuilder()->RemoveFilter( pAudioCodec).", hr);
+		if( FAILED(hr = GraphBuilder()->RemoveFilter( pDDSRenderer)) )
+			ThrowDShowException(L"Failed to call GraphBuilder()->RemoveFilter( pDDSRenderer).", hr);
+	}
 }
 #ifdef ENABLE_THEORA
 //----------------------------------------------------------------------------

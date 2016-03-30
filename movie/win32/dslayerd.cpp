@@ -22,6 +22,7 @@
 #include "DShowException.h"
 #include "BufferRenderer.h"
 #include "OptionInfo.h"
+#include "TVPVideoOverlay.h"
 
 //----------------------------------------------------------------------------
 //! @brief	  	m_BmpBits‚ÉNULL‚ðÝ’è‚·‚é
@@ -199,9 +200,19 @@ void __stdcall tTVPDSLayerVideo::BuildGraph( HWND callbackwin, IStream *stream,
 #endif
 			else
 			{
-				if( FAILED(hr = GraphBuilder()->AddFilter( pBRender, L"Buffer Renderer")) )
-					ThrowDShowException(L"Failed to call GraphBuilder()->AddFilter( pBRender, L\"Buffer Renderer\").", hr);
-				BuildMPEGGraph( pBRender, m_Reader); // may throw an exception
+				tTVPDSFilterHandlerType* handler = TVPGetDSFilterHandler( mt.subtype );
+				if( handler )
+				{
+					if( FAILED(hr = GraphBuilder()->AddFilter( pBRender, L"Buffer Renderer")) )
+						ThrowDShowException(L"Failed to call GraphBuilder()->AddFilter( pBRender, L\"Buffer Renderer\").", hr);
+					BuildPluginGraph( handler, pBRender, m_Reader );
+				}
+				else
+				{
+					if( FAILED(hr = GraphBuilder()->AddFilter( pBRender, L"Buffer Renderer")) )
+						ThrowDShowException(L"Failed to call GraphBuilder()->AddFilter( pBRender, L\"Buffer Renderer\").", hr);
+					BuildMPEGGraph( pBRender, m_Reader); // may throw an exception
+				}
 			}
 		}
 

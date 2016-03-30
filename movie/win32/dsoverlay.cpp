@@ -23,6 +23,7 @@
 
 #include "DShowException.h"
 #include "OptionInfo.h"
+#include "TVPVideoOverlay.h"
 
 //----------------------------------------------------------------------------
 //! @brief	  	‰½‚à‚µ‚È‚¢
@@ -118,13 +119,27 @@ void __stdcall tTVPDSVideoOverlay::BuildGraph( HWND callbackwin, IStream *stream
 #endif
 			else
 			{
-				CComPtr<IBaseFilter>	pVRender;	// for video renderer filter
-				if( FAILED(hr = pVRender.CoCreateInstance(CLSID_VideoRenderer, NULL, CLSCTX_INPROC_SERVER)) )
-					ThrowDShowException(L"Failed to create video renderer filter object.", hr);
-				if( FAILED(hr = GraphBuilder()->AddFilter(pVRender, L"Video Renderer")) )
-					ThrowDShowException(L"Failed to call IFilterGraph::AddFilter.", hr);
+				tTVPDSFilterHandlerType* handler = TVPGetDSFilterHandler( mt.subtype );
+				if( handler )
+				{
+					CComPtr<IBaseFilter>	pVRender;	// for video renderer filter
+					if( FAILED(hr = pVRender.CoCreateInstance(CLSID_VideoRenderer, NULL, CLSCTX_INPROC_SERVER)) )
+						ThrowDShowException(L"Failed to create video renderer filter object.", hr);
+					if( FAILED(hr = GraphBuilder()->AddFilter(pVRender, L"Video Renderer")) )
+						ThrowDShowException(L"Failed to call IFilterGraph::AddFilter.", hr);
 
-				BuildMPEGGraph( pVRender, m_Reader); // may throw an exception
+					BuildPluginGraph( handler, pVRender, m_Reader );
+				}
+				else
+				{
+					CComPtr<IBaseFilter>	pVRender;	// for video renderer filter
+					if( FAILED(hr = pVRender.CoCreateInstance(CLSID_VideoRenderer, NULL, CLSCTX_INPROC_SERVER)) )
+						ThrowDShowException(L"Failed to create video renderer filter object.", hr);
+					if( FAILED(hr = GraphBuilder()->AddFilter(pVRender, L"Video Renderer")) )
+						ThrowDShowException(L"Failed to call IFilterGraph::AddFilter.", hr);
+
+					BuildMPEGGraph( pVRender, m_Reader); // may throw an exception
+				}
 			}
 		}
 

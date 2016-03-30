@@ -391,6 +391,7 @@
     <ClInclude Include="..\movie\win32\MFPlayer.h" />
     <ClInclude Include="..\movie\win32\OptionInfo.h" />
     <ClInclude Include="..\movie\win32\PlayWindow.h" />
+    <ClInclude Include="..\movie\win32\TVPVideoOverlay.h" />
     <ClInclude Include="..\msg\MsgIntf.h" />
     <ClInclude Include="..\msg\svn_revision.h" />
     <ClInclude Include="..\msg\win32\MsgImpl.h" />
@@ -587,6 +588,7 @@
     <ClCompile Include="..\movie\win32\krmovie.cpp" />
     <ClCompile Include="..\movie\win32\MFPlayer.cpp" />
     <ClCompile Include="..\movie\win32\PlayWindow.cpp" />
+    <ClCompile Include="..\movie\win32\TVPVideoOverlay.cpp" />
     <ClCompile Include="..\msg\MsgIntf.cpp" />
     <ClCompile Include="..\msg\win32\MsgImpl.cpp" />
     <ClCompile Include="..\msg\win32\MsgLoad.cpp" />

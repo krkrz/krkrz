@@ -2672,6 +2672,15 @@ static void __stdcall TVP_Stub_5f6d263c0d48d03f6eb0dc44c9dd0be2(tjs_uint32 * des
 	return TVPPsExclusionBlend_HDA_o(dest, src, len, opa);
 }
 #include "tvpgl_ia32_intf.h"
+#include "TVPVideoOverlay.h"
+static void __stdcall TVP_Stub_bf363ba3d5b54df9d6df35a518deb6b0(const ttstr & name , void * guid , tTVPCreateDSFilter splitter , tTVPCreateDSFilter video , tTVPCreateDSFilter audio , void * formatdata)
+{
+	return TVPRegisterDSVideoCodec(name, guid, splitter, video, audio, formatdata);
+}
+static void __stdcall TVP_Stub_6cc8a24cc7ce23179d1d4ccab7a8c97b(const ttstr & name , void * guid , tTVPCreateDSFilter splitter , tTVPCreateDSFilter video , tTVPCreateDSFilter audio , void * formatdata)
+{
+	return TVPUnregisterDSVideoCodec(name, guid, splitter, video, audio, formatdata);
+}
 
 #include <zlib/zlib.h>
 /* function table is pretty large; is compressed via zlib */
@@ -2996,7 +3005,10 @@ static tjs_uint8 compressed_functable[] = {
 0x97, 0xe1, 0x06, 0x0a, 0x7a, 0xfb, 0x0c, 0xc3, 0x25, 0x0f, 0x0f, 0x3e, 0xd6, 0xa9, 0xd9, 0x83, 
 0xe9, 0xe1, 0x61, 0x19, 0x1e, 0x22, 0x84, 0x3e, 0x3e, 0x51, 0xbb, 0xe5, 0x0f, 0xa7, 0x89, 0x9f, 
 0x69, 0xc2, 0xc5, 0xe8, 0xb3, 0xe7, 0x28, 0xdd, 0x91, 0x6f, 0x75, 0xf6, 0xb0, 0x8f, 0x88, 0x11, 
-0x56, 0xa3, 0xe1, 0x76, 0x52, 0x71, 0x86, 0x68, 0xf6, 0x3f, 0x94, 0x27, 0x42, 0x4c, 
+0x56, 0xa3, 0xe1, 0x76, 0x52, 0x71, 0xfc, 0x34, 0xab, 0xbf, 0xb2, 0x76, 0xb6, 0xbc, 0x4d, 0x62, 
+0x88, 0xa6, 0x28, 0x86, 0x91, 0xf4, 0x45, 0xae, 0x94, 0xf8, 0x35, 0xfb, 0xff, 0x04, 0xec, 0xbf, 
+0x6d, 0x2e, 0xd9, 0x3f, 0x54, 0x73, 0x7c, 0xc4, 0xf8, 0xc5, 0x73, 0xec, 0xfc, 0xdb, 0x89, 0xfd, 
+0x1f, 0x79, 0x51, 0x95, 0x71, 
 
 };
 static void * func_ptrs[] = {
@@ -3651,15 +3663,17 @@ static void * func_ptrs[] = {
 	TVP_Stub_e48798dc69498f80b6633bb405eda6eb,
 	TVP_Stub_998a5e1aa5cd85689795348fc540a655,
 	TVP_Stub_5f6d263c0d48d03f6eb0dc44c9dd0be2,
+	TVP_Stub_bf363ba3d5b54df9d6df35a518deb6b0,
+	TVP_Stub_6cc8a24cc7ce23179d1d4ccab7a8c97b,
 
 };
 
 
 void TVPExportFunctions()
 {
-	const unsigned long compressed_size = 5134;
-	const unsigned long decompressed_size = 42389;
-	const tjs_int function_count = 651;
+	const unsigned long compressed_size = 5173;
+	const unsigned long decompressed_size = 42625;
+	const tjs_int function_count = 653;
 	unsigned char * dest = new unsigned char [decompressed_size];
 
 	try
