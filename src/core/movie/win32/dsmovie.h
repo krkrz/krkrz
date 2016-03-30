@@ -186,6 +186,7 @@ protected:
 #ifdef ENABLE_THEORA
 	void BuildTheoraGraph( IBaseFilter *pRdr, IBaseFilter *pSrc );
 #endif
+	void BuildPluginGraph( struct tTVPDSFilterHandlerType* handler, IBaseFilter *pRdr, IBaseFilter *pSrc );
 
 	HRESULT __stdcall AddToROT( DWORD ROTreg );
 	void __stdcall RemoveFromROT( DWORD ROTreg );

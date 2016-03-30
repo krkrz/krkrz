@@ -711,6 +711,8 @@ void * TVPImportFuncPtr923884216edf134d07d8e70f8f57e827 = NULL;
 void * TVPImportFuncPtre48798dc69498f80b6633bb405eda6eb = NULL;
 void * TVPImportFuncPtr998a5e1aa5cd85689795348fc540a655 = NULL;
 void * TVPImportFuncPtr5f6d263c0d48d03f6eb0dc44c9dd0be2 = NULL;
+void * TVPImportFuncPtrbf363ba3d5b54df9d6df35a518deb6b0 = NULL;
+void * TVPImportFuncPtr6cc8a24cc7ce23179d1d4ccab7a8c97b = NULL;
 
 //---------------------------------------------------------------------------
 // tTJSDispatch

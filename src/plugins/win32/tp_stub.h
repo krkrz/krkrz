@@ -2217,6 +2217,8 @@ extern void * TVPImportFuncPtr923884216edf134d07d8e70f8f57e827;
 extern void * TVPImportFuncPtre48798dc69498f80b6633bb405eda6eb;
 extern void * TVPImportFuncPtr998a5e1aa5cd85689795348fc540a655;
 extern void * TVPImportFuncPtr5f6d263c0d48d03f6eb0dc44c9dd0be2;
+extern void * TVPImportFuncPtrbf363ba3d5b54df9d6df35a518deb6b0;
+extern void * TVPImportFuncPtr6cc8a24cc7ce23179d1d4ccab7a8c97b;
 
 
 //---------------------------------------------------------------------------
@@ -6444,6 +6446,9 @@ typedef struct
 
 
 
+
+
+typedef void* (*tTVPCreateDSFilter)( void* formatdata );
 
 //---------------------------------------------------------------------------
 
@@ -10983,6 +10988,26 @@ inline void TVPPsExclusionBlend_HDA_o(tjs_uint32 * dest , const tjs_uint32 * src
 	}
 	typedef void (__stdcall * __functype)(tjs_uint32 *, const tjs_uint32 *, tjs_int , tjs_int);
 	((__functype)(TVPImportFuncPtr5f6d263c0d48d03f6eb0dc44c9dd0be2))(dest, src, len, opa);
+}
+inline void TVPRegisterDSVideoCodec(const ttstr & name , void * guid , tTVPCreateDSFilter splitter , tTVPCreateDSFilter video , tTVPCreateDSFilter audio , void * formatdata)
+{
+	if(!TVPImportFuncPtrbf363ba3d5b54df9d6df35a518deb6b0)
+	{
+		static char funcname[] = "void ::TVPRegisterDSVideoCodec(const ttstr &,void *,tTVPCreateDSFilter,tTVPCreateDSFilter,tTVPCreateDSFilter,void *)";
+		TVPImportFuncPtrbf363ba3d5b54df9d6df35a518deb6b0 = TVPGetImportFuncPtr(funcname);
+	}
+	typedef void (__stdcall * __functype)(const ttstr &, void *, tTVPCreateDSFilter , tTVPCreateDSFilter , tTVPCreateDSFilter , void *);
+	((__functype)(TVPImportFuncPtrbf363ba3d5b54df9d6df35a518deb6b0))(name, guid, splitter, video, audio, formatdata);
+}
+inline void TVPUnregisterDSVideoCodec(const ttstr & name , void * guid , tTVPCreateDSFilter splitter , tTVPCreateDSFilter video , tTVPCreateDSFilter audio , void * formatdata)
+{
+	if(!TVPImportFuncPtr6cc8a24cc7ce23179d1d4ccab7a8c97b)
+	{
+		static char funcname[] = "void ::TVPUnregisterDSVideoCodec(const ttstr &,void *,tTVPCreateDSFilter,tTVPCreateDSFilter,tTVPCreateDSFilter,void *)";
+		TVPImportFuncPtr6cc8a24cc7ce23179d1d4ccab7a8c97b = TVPGetImportFuncPtr(funcname);
+	}
+	typedef void (__stdcall * __functype)(const ttstr &, void *, tTVPCreateDSFilter , tTVPCreateDSFilter , tTVPCreateDSFilter , void *);
+	((__functype)(TVPImportFuncPtr6cc8a24cc7ce23179d1d4ccab7a8c97b))(name, guid, splitter, video, audio, formatdata);
 }
 
 #ifdef __BORLANDC__
