@@ -309,9 +309,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>./lib;./lib\Release;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib\$(Platform)\</AdditionalLibraryDirectories>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;dsound.lib;version.lib;mpr.lib;shlwapi.lib;vfw32.lib;imm32.lib;zlib.lib;libpng.lib;onig_s.lib;freetype.lib;turbojpeg-static.lib;strmbase.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ImageHasSafeExceptionHandlers>true</ImageHasSafeExceptionHandlers>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <GenerateMapFile>true</GenerateMapFile>
       <MapFileName>$(ProjectName).map</MapFileName>
       <MapExports>true</MapExports>
@@ -725,6 +725,34 @@
     <Image Include="tvpwin32.ico" />
   </ItemGroup>
   <ItemGroup>
+    <CustomBuild Include="..\visual\IA32\tlg6_chroma.nas">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -I../visual/IA32/ -o ./$(Configuration)/%(Filename).obj ../visual/IA32/%(Filename).nas</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).nas</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release Enable Debugger|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -I../visual/IA32/ -o "./$(Configuration)/%(Filename).obj" ../visual/IA32/%(Filename).nas</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release Enable Debugger|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release Enable Debugger|Win32'">%(Filename).nas</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -I../visual/IA32/ -o ./$(Configuration)/%(Filename).obj ../visual/IA32/%(Filename).nas</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).nas</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Enable Debugger|x64'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <CustomBuild Include="..\visual\IA32\tlg6_golomb.nas">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -I../visual/IA32/ -o ./$(Configuration)/%(Filename).obj ../visual/IA32/%(Filename).nas</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).nas</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release Enable Debugger|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -I../visual/IA32/ -o "./$(Configuration)/%(Filename).obj" ../visual/IA32/%(Filename).nas</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release Enable Debugger|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release Enable Debugger|Win32'">%(Filename).nas</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -I../visual/IA32/ -o ./$(Configuration)/%(Filename).obj ../visual/IA32/%(Filename).nas</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).nas</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Enable Debugger|x64'">true</ExcludedFromBuild>
+    </CustomBuild>
     <None Include="option_desc_ja.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

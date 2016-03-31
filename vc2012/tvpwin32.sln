@@ -5,7 +5,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tvpwin32", "tvpwin32.vcxpro
 	ProjectSection(ProjectDependencies) = postProject
 		{6BCEBA3B-7D1D-4D63-AB31-CA4570295560} = {6BCEBA3B-7D1D-4D63-AB31-CA4570295560}
 		{70F4D261-0235-4052-B1CF-5BE29660A43E} = {70F4D261-0235-4052-B1CF-5BE29660A43E}
-		{04C6127E-4773-4BAE-8FE6-DC29F4F542E1} = {04C6127E-4773-4BAE-8FE6-DC29F4F542E1}
 		{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B} = {78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}
 		{8AF5DED1-E1B2-4C07-9BA8-091F2B4214CC} = {8AF5DED1-E1B2-4C07-9BA8-091F2B4214CC}
 		{DBBF98E4-BD0A-4BB8-BB02-E77B003E9A6E} = {DBBF98E4-BD0A-4BB8-BB02-E77B003E9A6E}
@@ -20,8 +19,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libpng", "..\external\lpng\
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "onig_s", "..\external\onig\onig_s.vcxproj", "{DBBF98E4-BD0A-4BB8-BB02-E77B003E9A6E}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tvpgl_ia32", "..\visual\IA32\tvpgl_ia32.vcxproj", "{04C6127E-4773-4BAE-8FE6-DC29F4F542E1}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "turbojpeg-static", "..\external\libjpeg-turbo\vc2012proj\turbojpeg-static.vcxproj", "{8AF5DED1-E1B2-4C07-9BA8-091F2B4214CC}"
 EndProject
@@ -143,28 +140,6 @@ Global
 		{DBBF98E4-BD0A-4BB8-BB02-E77B003E9A6E}.Release|Win32.Build.0 = Release|Win32
 		{DBBF98E4-BD0A-4BB8-BB02-E77B003E9A6E}.Release|x64.ActiveCfg = Release|x64
 		{DBBF98E4-BD0A-4BB8-BB02-E77B003E9A6E}.Release|x64.Build.0 = Release|x64
-		{04C6127E-4773-4BAE-8FE6-DC29F4F542E1}.Debug Multithreaded|Win32.ActiveCfg = Debug|Win32
-		{04C6127E-4773-4BAE-8FE6-DC29F4F542E1}.Debug Multithreaded|Win32.Build.0 = Debug|Win32
-		{04C6127E-4773-4BAE-8FE6-DC29F4F542E1}.Debug Multithreaded|x64.ActiveCfg = Debug|Win32
-		{04C6127E-4773-4BAE-8FE6-DC29F4F542E1}.Debug Singlethreaded|Win32.ActiveCfg = Debug|Win32
-		{04C6127E-4773-4BAE-8FE6-DC29F4F542E1}.Debug Singlethreaded|Win32.Build.0 = Debug|Win32
-		{04C6127E-4773-4BAE-8FE6-DC29F4F542E1}.Debug Singlethreaded|x64.ActiveCfg = Debug|Win32
-		{04C6127E-4773-4BAE-8FE6-DC29F4F542E1}.Debug|Win32.ActiveCfg = Debug|Win32
-		{04C6127E-4773-4BAE-8FE6-DC29F4F542E1}.Debug|Win32.Build.0 = Debug|Win32
-		{04C6127E-4773-4BAE-8FE6-DC29F4F542E1}.Debug|x64.ActiveCfg = Debug|x64
-		{04C6127E-4773-4BAE-8FE6-DC29F4F542E1}.Release Enable Debugger|Win32.ActiveCfg = Release|Win32
-		{04C6127E-4773-4BAE-8FE6-DC29F4F542E1}.Release Enable Debugger|Win32.Build.0 = Release|Win32
-		{04C6127E-4773-4BAE-8FE6-DC29F4F542E1}.Release Enable Debugger|x64.ActiveCfg = Release|x64
-		{04C6127E-4773-4BAE-8FE6-DC29F4F542E1}.Release Enable Debugger|x64.Build.0 = Release|x64
-		{04C6127E-4773-4BAE-8FE6-DC29F4F542E1}.Release Multithreaded|Win32.ActiveCfg = Release|Win32
-		{04C6127E-4773-4BAE-8FE6-DC29F4F542E1}.Release Multithreaded|Win32.Build.0 = Release|Win32
-		{04C6127E-4773-4BAE-8FE6-DC29F4F542E1}.Release Multithreaded|x64.ActiveCfg = Release|Win32
-		{04C6127E-4773-4BAE-8FE6-DC29F4F542E1}.Release Singlethreaded|Win32.ActiveCfg = Release|Win32
-		{04C6127E-4773-4BAE-8FE6-DC29F4F542E1}.Release Singlethreaded|Win32.Build.0 = Release|Win32
-		{04C6127E-4773-4BAE-8FE6-DC29F4F542E1}.Release Singlethreaded|x64.ActiveCfg = Release|Win32
-		{04C6127E-4773-4BAE-8FE6-DC29F4F542E1}.Release|Win32.ActiveCfg = Release|Win32
-		{04C6127E-4773-4BAE-8FE6-DC29F4F542E1}.Release|Win32.Build.0 = Release|Win32
-		{04C6127E-4773-4BAE-8FE6-DC29F4F542E1}.Release|x64.ActiveCfg = Release|x64
 		{8AF5DED1-E1B2-4C07-9BA8-091F2B4214CC}.Debug Multithreaded|Win32.ActiveCfg = Debug|Win32
 		{8AF5DED1-E1B2-4C07-9BA8-091F2B4214CC}.Debug Multithreaded|Win32.Build.0 = Debug|Win32
 		{8AF5DED1-E1B2-4C07-9BA8-091F2B4214CC}.Debug Multithreaded|x64.ActiveCfg = Debug|Win32

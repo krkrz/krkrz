@@ -1236,4 +1236,12 @@
   <ItemGroup>
     <None Include="option_desc_ja.json" />
   </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\visual\IA32\tlg6_chroma.nas">
+      <Filter>visual\IA32</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\visual\IA32\tlg6_golomb.nas">
+      <Filter>visual\IA32</Filter>
+    </CustomBuild>
+  </ItemGroup>
 </Project>
