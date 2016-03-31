@@ -6402,52 +6402,6 @@ typedef struct
 #define TVP_CPU_FAMILY_MASK  0x0000000f
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 typedef void* (*tTVPCreateDSFilter)( void* formatdata );
 
 //---------------------------------------------------------------------------
