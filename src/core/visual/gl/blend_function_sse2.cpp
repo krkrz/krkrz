@@ -801,6 +801,13 @@ extern void TVPTLG5ComposeColors4To4_sse2_c(tjs_uint8 *outp, const tjs_uint8 *up
 extern void TVPTLG6DecodeLineGeneric_sse2_c(tjs_uint32 *prevline, tjs_uint32 *curline, tjs_int width, tjs_int start_block, tjs_int block_limit, tjs_uint8 *filtertypes, tjs_int skipblockbytes, tjs_uint32 *in, tjs_uint32 initialp, tjs_int oddskip, tjs_int dir);
 extern void TVPTLG6DecodeLine_sse2_c(tjs_uint32 *prevline, tjs_uint32 *curline, tjs_int width, tjs_int block_count, tjs_uint8 *filtertypes, tjs_int skipblockbytes, tjs_uint32 *in, tjs_uint32 initialp, tjs_int oddskip, tjs_int dir);
 
+extern void TVPChBlurAddMulCopy65_sse2_c( tjs_uint8 *dest, const tjs_uint8 *src, tjs_int len, tjs_int opa );
+extern void TVPChBlurAddMulCopy_sse2_c( tjs_uint8 *dest, const tjs_uint8 *src, tjs_int len, tjs_int opa );
+extern void TVPChBlurMulCopy65_sse2_c( tjs_uint8 *dest, const tjs_uint8 *src, tjs_int len, tjs_int opa );
+extern void TVPChBlurMulCopy_sse2_c( tjs_uint8 *dest, const tjs_uint8 *src, tjs_int len, tjs_int opa );
+extern void TVPChBlurCopy65_sse2_c( tjs_uint8 *dest, tjs_int destpitch, tjs_int destwidth, tjs_int destheight, const tjs_uint8 * src, tjs_int srcpitch, tjs_int srcwidth, tjs_int srcheight, tjs_int blurwidth, tjs_int blurlevel );
+extern void TVPChBlurCopy_sse2_c( tjs_uint8 *dest, tjs_int destpitch, tjs_int destwidth, tjs_int destheight, const tjs_uint8 * src, tjs_int srcpitch, tjs_int srcwidth, tjs_int srcheight, tjs_int blurwidth, tjs_int blurlevel );
+
 void TVPGL_SSE2_Init() {
 	if( TVPCPUType & TVP_CPU_HAS_SSE2 ) {
 		TVPAdditiveAlphaBlend = TVPAdditiveAlphaBlend_sse2_c;
@@ -1102,12 +1109,13 @@ void TVPGL_SSE2_Init() {
 		//TVPReverse8
 		//TVPReverse32
 		//TVPDoGrayScale
-		//TVPChBlurMulCopy65
-		//TVPChBlurAddMulCopy65
-		//TVPChBlurCopy65
-		//TVPChBlurMulCopy
-		//TVPChBlurAddMulCopy
-		//TVPChBlurCopy
+
+		TVPChBlurMulCopy65 = TVPChBlurMulCopy65_sse2_c;
+		TVPChBlurAddMulCopy65 = TVPChBlurAddMulCopy65_sse2_c;
+		TVPChBlurCopy65 = TVPChBlurCopy65_sse2_c;
+		TVPChBlurMulCopy = TVPChBlurMulCopy_sse2_c;
+		TVPChBlurAddMulCopy = TVPChBlurAddMulCopy_sse2_c;
+		TVPChBlurCopy = TVPChBlurCopy_sse2_c;
 	}
 }
 
