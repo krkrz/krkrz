@@ -3,7 +3,7 @@
 #include "tvpgl.h"
 #include "tvpgl_ia32_intf.h"
 #include "simd_def_x86x64.h"
-
+#include <string.h>
 
 extern "C" {
 extern unsigned char TVPNegativeMulTable65[65*256];
@@ -59,6 +59,52 @@ struct sse2_apply_color_map_xx_functor {
 		return _mm_packus_epi16( md1, md2 );
 	}
 };
+struct sse2_apply_color_map256_functor {
+	__m128i mc_;
+	__m128i color_;
+	const __m128i zero_;
+	inline sse2_apply_color_map256_functor( tjs_uint32 color ) : zero_(_mm_setzero_si128()) {
+		mc_ = _mm_cvtsi32_si128( color );
+		mc_ = _mm_shuffle_epi32( mc_, _MM_SHUFFLE( 0, 0, 0, 0 )  );
+		color_ = mc_;
+		mc_ = _mm_unpacklo_epi8( mc_, zero_ );
+	}
+	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint8 s ) const {
+		__m128i md = _mm_cvtsi32_si128( d );
+		md = _mm_unpacklo_epi8( md, zero_ );
+		__m128i mo = _mm_cvtsi32_si128( s );
+		mo = _mm_shufflelo_epi16( mo, _MM_SHUFFLE( 0, 0, 0, 0 )  );	// 00oo00oo00oo00oo
+		__m128i mc = mc_;
+		mc = _mm_sub_epi16( mc, md );	// c - d
+		mc = _mm_mullo_epi16( mc, mo );	// c *= opa
+		mc = _mm_srli_epi16( mc, 8 );	// c >>= tshift
+		md = _mm_add_epi8( md, mc );	// d += c
+		md = _mm_packus_epi16( md, zero_ );
+		return _mm_cvtsi128_si32( md );
+	}
+	inline __m128i operator()( __m128i md1, __m128i mo1 ) const {
+		__m128i md2 = md1;
+		md1 = _mm_unpacklo_epi8( md1, zero_ );
+		__m128i mo2 = mo1;
+		mo1 = _mm_unpacklo_epi16( mo1, mo1 );
+		mo2 = _mm_unpackhi_epi16( mo2, mo2 );
+
+		__m128i mc = mc_;
+		mc = _mm_sub_epi16( mc, md1 );		// c - d
+		mc = _mm_mullo_epi16( mc, mo1 );	// c *= opa
+		mc = _mm_srli_epi16( mc, 8 );	// c >>= tshift
+		md1 = _mm_add_epi8( md1, mc );		// d += c
+
+		mc = mc_;
+		md2 = _mm_unpackhi_epi8( md2, zero_ );
+		mc = _mm_sub_epi16( mc, md2 );		// c - d
+		mc = _mm_mullo_epi16( mc, mo2 );	// c *= opa
+		mc = _mm_srli_epi16( mc, 8 );	// c >>= tshift
+		md2 = _mm_add_epi8( md2, mc );		// d += c
+
+		return _mm_packus_epi16( md1, md2 );
+	}
+};
 
 template<typename tbase>
 struct sse2_apply_color_map_xx_o_functor : tbase {
@@ -94,9 +140,9 @@ struct sse2_apply_color_map_xx_straight_functor : tbase {
 	}
 };
 typedef sse2_apply_color_map_xx_straight_functor<sse2_apply_color_map_xx_functor<6> > sse2_apply_color_map65_functor;
-typedef sse2_apply_color_map_xx_straight_functor<sse2_apply_color_map_xx_functor<8> > sse2_apply_color_map_functor;
+typedef sse2_apply_color_map_xx_straight_functor<sse2_apply_color_map256_functor > sse2_apply_color_map_functor;
 typedef sse2_apply_color_map_xx_o_functor<sse2_apply_color_map_xx_functor<6> > sse2_apply_color_map65_o_functor;
-typedef sse2_apply_color_map_xx_o_functor<sse2_apply_color_map_xx_functor<8> > sse2_apply_color_map_o_functor;
+typedef sse2_apply_color_map_xx_o_functor<sse2_apply_color_map256_functor > sse2_apply_color_map_o_functor;
 
 struct sse2_apply_color_map65_d_functor {
 	__m128i mc_;
@@ -382,3 +428,326 @@ void TVPApplyColorMap_ao(tjs_uint32 *dest, const tjs_uint8 *src, tjs_int len, tj
 void TVPApplyColorMap65_ao(tjs_uint32 *dest, const tjs_uint8 *src, tjs_int len, tjs_uint32 color, tjs_int opa); // has SSE2
 */
 
+
+struct sse2_ch_blur_mul_copy_functor {
+	const __m128i zero_;
+	const __m128i levello_;
+	const __m128i levelhi_;
+	const tjs_int level32_;
+	inline sse2_ch_blur_mul_copy_functor( tjs_int level )
+		: zero_(_mm_setzero_si128()), level32_(level)
+		, levello_(_mm_set1_epi16(level&0xffff)), levelhi_(_mm_set1_epi16(level>>16))
+	{}
+	inline tjs_uint8 operator()( tjs_uint8 d, tjs_uint8 s ) const {
+		tjs_int a = (s * level32_ >> 18);
+		if(a>=255) a = 255;
+		return (tjs_uint8)a;
+	}
+	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s ) const {
+		__m128i ms1 = _mm_cvtsi32_si128(s);
+		ms1 = _mm_unpacklo_epi8( ms1, zero_ );
+		__m128i ms1l = ms1;
+		ms1l = _mm_mulhi_epu16( ms1l, levello_ );
+		ms1 = _mm_mullo_epi16( ms1, levelhi_ );
+		ms1 = _mm_adds_epu16( ms1, ms1l );
+		ms1 = _mm_srli_epi16( ms1, 2 );
+		ms1 = _mm_packus_epi16( ms1, zero_ );
+		return _mm_cvtsi128_si32( ms1 );
+	}
+	inline __m128i operator()( __m128i md1, __m128i ms1 ) const {
+		__m128i ms2 = ms1;
+		ms1 = _mm_unpacklo_epi8( ms1, zero_ );
+		ms2 = _mm_unpackhi_epi8( ms2, zero_ );
+		__m128i ms1l = ms1;
+		ms1l = _mm_mulhi_epu16( ms1l, levello_ );
+		ms1 = _mm_mullo_epi16( ms1, levelhi_ );
+		ms1 = _mm_adds_epu16( ms1, ms1l );
+		ms1 = _mm_srli_epi16( ms1, 2 );
+
+		__m128i ms2l = ms2;
+		ms2l = _mm_mulhi_epu16( ms2l, levello_ );
+		ms2 = _mm_mullo_epi16( ms2, levelhi_ );
+		ms2 = _mm_adds_epu16( ms2, ms2l );
+		ms2 = _mm_srli_epi16( ms2, 2 );
+		return _mm_packus_epi16( ms1, ms2 );
+	}
+};
+struct sse2_ch_blur_add_mul_copy_functor {
+	const __m128i zero_;
+	const __m128i levello_;
+	const __m128i levelhi_;
+	const tjs_int level32_;
+	inline sse2_ch_blur_add_mul_copy_functor( tjs_int level )
+		: zero_(_mm_setzero_si128()), level32_(level)
+		, levello_(_mm_set1_epi16(level&0xffff)), levelhi_(_mm_set1_epi16(level>>16)){}
+	inline tjs_uint8 operator()( tjs_uint8 d, tjs_uint8 s ) const {
+		tjs_int a = d+(s * level32_ >> 18);
+		if(a>=255) a = 255;
+		return (tjs_uint8)a;
+	}
+	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s ) const {
+		__m128i ms1 = _mm_cvtsi32_si128(s);
+		ms1 = _mm_unpacklo_epi8( ms1, zero_ );
+		__m128i md1 = _mm_cvtsi32_si128(d);
+		md1 = _mm_unpacklo_epi8( md1, zero_ );
+		__m128i ms1l = ms1;
+		ms1l = _mm_mulhi_epu16( ms1l, levello_ );
+		ms1 = _mm_mullo_epi16( ms1, levelhi_ );
+		ms1 = _mm_adds_epu16( ms1, ms1l );
+		ms1 = _mm_srli_epi16( ms1, 2 );
+		md1 = _mm_adds_epu16( md1, ms1 );
+		md1 = _mm_packus_epi16( md1, zero_ );
+		return _mm_cvtsi128_si32( md1 );
+	}
+	inline __m128i operator()( __m128i md1, __m128i ms1 ) const {
+		__m128i ms2 = ms1;
+		__m128i md2 = md1;
+		ms1 = _mm_unpacklo_epi8( ms1, zero_ );
+		ms2 = _mm_unpackhi_epi8( ms2, zero_ );
+		md1 = _mm_unpacklo_epi8( md1, zero_ );
+		md2 = _mm_unpackhi_epi8( md2, zero_ );
+
+		__m128i ms1l = ms1;
+		ms1l = _mm_mulhi_epu16( ms1l, levello_ );
+		ms1 = _mm_mullo_epi16( ms1, levelhi_ );
+		ms1 = _mm_adds_epu16( ms1, ms1l );
+		ms1 = _mm_srli_epi16( ms1, 2 );
+
+		__m128i ms2l = ms2;
+		ms2l = _mm_mulhi_epu16( ms2l, levello_ );
+		ms2 = _mm_mullo_epi16( ms2, levelhi_ );
+		ms2 = _mm_adds_epu16( ms2, ms2l );
+		ms2 = _mm_srli_epi16( ms2, 2 );
+
+		md1 = _mm_adds_epu16( md1, ms1 );
+		md2 = _mm_adds_epu16( md2, ms2 );
+		return _mm_packus_epi16( md1, md2 );
+	}
+};
+struct sse2_ch_blur_mul_copy65_functor {
+	const __m128i zero_;
+	const __m128i levello_;
+	const __m128i levelhi_;
+	const __m128i m64_;
+	const tjs_int level32_;
+	inline sse2_ch_blur_mul_copy65_functor( tjs_int level )
+		: zero_(_mm_setzero_si128()), m64_(_mm_set1_epi16(64)), level32_(level)
+		, levello_(_mm_set1_epi16(level&0xffff)), levelhi_(_mm_set1_epi16(level>>16)) {}
+	inline tjs_uint8 operator()( tjs_uint8 d, tjs_uint8 s ) const {
+		tjs_int a = (s * level32_ >> 18);
+		if(a>=64) a = 64;
+		return (tjs_uint8)a;
+	}
+	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s ) const {
+		__m128i ms1 = _mm_cvtsi32_si128(s);
+		ms1 = _mm_unpacklo_epi8( ms1, zero_ );
+		__m128i ms1l = ms1;
+		ms1l = _mm_mulhi_epu16( ms1l, levello_ );
+		ms1 = _mm_mullo_epi16( ms1, levelhi_ );
+		ms1 = _mm_adds_epu16( ms1, ms1l );
+		ms1 = _mm_srli_epi16( ms1, 2 );
+
+		__m128i ms1mask = _mm_cmplt_epi16( ms1, m64_ );	// d < 64 ? 0xffff : 0
+		ms1 = _mm_and_si128(ms1, ms1mask);
+		ms1mask = _mm_andnot_si128(ms1mask, m64_ );	// d >= 64 ? 64 : 0
+		ms1 = _mm_or_si128( ms1, ms1mask );
+		ms1 = _mm_packus_epi16( ms1, zero_ );
+		return _mm_cvtsi128_si32( ms1 );
+	}
+	inline __m128i operator()( __m128i md, __m128i ms1 ) const {
+		__m128i ms2 = ms1;
+		ms1 = _mm_unpacklo_epi8( ms1, zero_ );
+		ms2 = _mm_unpackhi_epi8( ms2, zero_ );
+		__m128i ms1l = ms1;
+		ms1l = _mm_mulhi_epu16( ms1l, levello_ );
+		ms1 = _mm_mullo_epi16( ms1, levelhi_ );
+		ms1 = _mm_adds_epu16( ms1, ms1l );
+		ms1 = _mm_srli_epi16( ms1, 2 );
+
+		__m128i ms2l = ms2;
+		ms2l = _mm_mulhi_epu16( ms2l, levello_ );
+		ms2 = _mm_mullo_epi16( ms2, levelhi_ );
+		ms2 = _mm_adds_epu16( ms2, ms2l );
+		ms2 = _mm_srli_epi16( ms2, 2 );
+
+		__m128i ms1mask = _mm_cmplt_epi16( ms1, m64_ );	// d < 64 ? 0xffff : 0
+		__m128i ms2mask = _mm_cmplt_epi16( ms2, m64_ );	// d < 64 ? 0xffff : 0
+		ms1 = _mm_and_si128(ms1, ms1mask);
+		ms2 = _mm_and_si128(ms2, ms2mask);
+		ms1mask = _mm_andnot_si128(ms1mask, m64_ );	// d >= 64 ? 64 : 0
+		ms2mask = _mm_andnot_si128(ms2mask, m64_ );	// d >= 64 ? 64 : 0
+		ms1 = _mm_or_si128( ms1, ms1mask );
+		ms2 = _mm_or_si128( ms2, ms2mask );
+		return _mm_packus_epi16( ms1, ms2 );
+	}
+};
+struct sse2_ch_blur_add_mul_copy65_functor {
+	const __m128i zero_;
+	const __m128i levello_;
+	const __m128i levelhi_;
+	const __m128i m64_;
+	const tjs_int level32_;
+	inline sse2_ch_blur_add_mul_copy65_functor( tjs_int level )
+		: zero_(_mm_setzero_si128()), m64_(_mm_set1_epi16(64)), level32_(level)
+		, levello_(_mm_set1_epi16(level&0xffff)), levelhi_(_mm_set1_epi16(level>>16)) {}
+	inline tjs_uint8 operator()( tjs_uint8 d, tjs_uint8 s ) const {
+		tjs_int a = d+(s * level32_ >> 18);
+		if(a>=255) a = 255;
+		return (tjs_uint8)a;
+	}
+	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s ) const {
+		__m128i ms1 = _mm_cvtsi32_si128(s);
+		ms1 = _mm_unpacklo_epi8( ms1, zero_ );
+		__m128i md1 = _mm_cvtsi32_si128(d);
+		md1 = _mm_unpacklo_epi8( md1, zero_ );
+		__m128i ms1l = ms1;
+		ms1l = _mm_mulhi_epu16( ms1l, levello_ );
+		ms1 = _mm_mullo_epi16( ms1, levelhi_ );
+		ms1 = _mm_adds_epu16( ms1, ms1l );
+		ms1 = _mm_srli_epi16( ms1, 2 );
+		md1 = _mm_adds_epu16( md1, ms1 );
+		__m128i md1mask = _mm_cmplt_epi16( md1, m64_ );	// d < 64 ? 0xffff : 0
+		md1 = _mm_and_si128(md1, md1mask);
+		md1mask = _mm_andnot_si128(md1mask, m64_ );	// d >= 64 ? 64 : 0
+		md1 = _mm_or_si128( md1, md1mask );
+		md1 = _mm_packus_epi16( md1, zero_ );
+		return _mm_cvtsi128_si32( md1 );
+	}
+	inline __m128i operator()( __m128i md1, __m128i ms1 ) const {
+		__m128i ms2 = ms1;
+		__m128i md2 = md1;
+		ms1 = _mm_unpacklo_epi8( ms1, zero_ );
+		ms2 = _mm_unpackhi_epi8( ms2, zero_ );
+		md1 = _mm_unpacklo_epi8( md1, zero_ );
+		md2 = _mm_unpackhi_epi8( md2, zero_ );
+
+		__m128i ms1l = ms1;
+		ms1l = _mm_mulhi_epu16( ms1l, levello_ );
+		ms1 = _mm_mullo_epi16( ms1, levelhi_ );
+		ms1 = _mm_adds_epu16( ms1, ms1l );
+		ms1 = _mm_srli_epi16( ms1, 2 );
+
+		__m128i ms2l = ms2;
+		ms2l = _mm_mulhi_epu16( ms2l, levello_ );
+		ms2 = _mm_mullo_epi16( ms2, levelhi_ );
+		ms2 = _mm_adds_epu16( ms2, ms2l );
+		ms2 = _mm_srli_epi16( ms2, 2 );
+
+		md1 = _mm_adds_epu16( md1, ms1 );
+		md2 = _mm_adds_epu16( md2, ms2 );
+
+		__m128i md1mask = _mm_cmplt_epi16( md1, m64_ );	// d < 64 ? 0xffff : 0
+		__m128i md2mask = _mm_cmplt_epi16( md2, m64_ );	// d < 64 ? 0xffff : 0
+		md1 = _mm_and_si128(md1, md1mask);
+		md2 = _mm_and_si128(md2, md2mask);
+		md1mask = _mm_andnot_si128(md1mask, m64_ );	// d >= 64 ? 64 : 0
+		md2mask = _mm_andnot_si128(md2mask, m64_ );	// d >= 64 ? 64 : 0
+		md1 = _mm_or_si128( md1, md1mask );
+		md2 = _mm_or_si128( md2, md2mask );
+		return _mm_packus_epi16( md1, md2 );
+	}
+};
+
+template<typename functor>
+static inline void blend_func_sse2( tjs_uint8 * __restrict dest, const tjs_uint8 * __restrict src, tjs_int len, const functor& func ) {
+	tjs_uint32 rem = (len>>4)<<4;
+	tjs_uint32 rem32 = (len>>2)<<2;
+	tjs_uint8* limit = dest + rem;
+	tjs_uint8* limit32 = dest + rem32;
+	tjs_uint8* end = dest + len;
+	while( dest < limit ) {
+		__m128i md = _mm_loadu_si128( (__m128i const*)dest );
+		__m128i ms = _mm_loadu_si128( (__m128i const*)src );
+		_mm_storeu_si128( (__m128i*)dest, func( md, ms ) );
+		dest+=16; src+=16;
+	}
+	while( dest < limit32 ) {
+		tjs_uint32 d = *(tjs_uint32 const*)dest;
+		tjs_uint32 s = *(tjs_uint32 const*)src;
+		*(tjs_uint32*)dest = func( d, s );
+		dest+=4; src+=4;
+	}
+	while( dest < end ) {
+		*dest = func( *dest, *src );
+		dest++; src++;
+	}
+}
+
+void TVPChBlurAddMulCopy65_sse2_c( tjs_uint8 *dest, const tjs_uint8 *src, tjs_int len, tjs_int opa ) {
+	sse2_ch_blur_add_mul_copy65_functor func(opa);
+	blend_func_sse2( dest, src, len, func );
+}
+void TVPChBlurAddMulCopy_sse2_c( tjs_uint8 *dest, const tjs_uint8 *src, tjs_int len, tjs_int opa ) {
+	sse2_ch_blur_add_mul_copy_functor func(opa);
+	blend_func_sse2( dest, src, len, func );
+}
+void TVPChBlurMulCopy65_sse2_c( tjs_uint8 *dest, const tjs_uint8 *src, tjs_int len, tjs_int opa ) {
+	sse2_ch_blur_mul_copy65_functor func(opa);
+	blend_func_sse2( dest, src, len, func );
+}
+void TVPChBlurMulCopy_sse2_c( tjs_uint8 *dest, const tjs_uint8 *src, tjs_int len, tjs_int opa ) {
+	sse2_ch_blur_mul_copy_functor func(opa);
+	blend_func_sse2( dest, src, len, func );
+}
+
+/* fast_int_hypot from http://demo.and.or.jp/makedemo/effect/math/hypot/fast_hypot.c */
+static inline tjs_uint fast_int_hypot(tjs_int lx, tjs_int ly) {
+	tjs_uint len1, len2,t,length;
+	if(lx<0) lx = -lx;
+	if(ly<0) ly = -ly;
+	if (lx >= ly) { len1 = lx ; len2 = ly; }
+	else len1 = ly ; len2 = lx;
+	t = len2 + (len2 >> 1) ;
+	length = len1 - (len1 >> 5) - (len1 >> 7) + (t >> 2) + (t >> 6) ;
+	return length;
+}
+/* simple blur for character data */
+/* shuld be more optimized */
+template<typename functor>
+static inline void sse2_ch_blur_copy_func( tjs_uint8 *dest, tjs_int destpitch, tjs_int destwidth, tjs_int destheight, const tjs_uint8 * src, tjs_int srcpitch, tjs_int srcwidth, tjs_int srcheight, tjs_int blurwidth, tjs_int blurlevel ) {
+	/* clear destination */
+	memset(dest, 0, destpitch*destheight);
+
+	/* compute filter level */
+	tjs_int lvsum = 0;
+	for(tjs_int y = -blurwidth; y <= blurwidth; y++) {
+		for(tjs_int x = -blurwidth; x <= blurwidth; x++) {
+			tjs_int len = fast_int_hypot(x, y);
+			if(len <= blurwidth)
+				lvsum += (blurwidth - len +1);
+		}
+	}
+
+	if(lvsum) lvsum = (1<<18)/lvsum; else lvsum=(1<<18);
+
+	/* apply */
+	for(tjs_int y = -blurwidth; y <= blurwidth; y++) {
+		for(tjs_int x = -blurwidth; x <= blurwidth; x++) {
+			tjs_int len = fast_int_hypot(x, y);
+			if(len <= blurwidth) {
+				len = blurwidth - len +1;
+				len *= lvsum;
+				len *= blurlevel;
+				len >>= 8;
+				if( len >= (1<<10) ) {
+					functor func(len);
+					for(tjs_int sy = 0; sy < srcheight; sy++) {
+						blend_func_sse2( dest + (y + sy + blurwidth)*destpitch + x + blurwidth, src + sy * srcpitch, srcwidth, func );
+					}
+				}
+			}
+		}
+	}
+}
+void TVPChBlurCopy65_sse2_c( tjs_uint8 *dest, tjs_int destpitch, tjs_int destwidth, tjs_int destheight, const tjs_uint8 * src, tjs_int srcpitch, tjs_int srcwidth, tjs_int srcheight, tjs_int blurwidth, tjs_int blurlevel ) {
+	sse2_ch_blur_copy_func<sse2_ch_blur_add_mul_copy65_functor>( dest, destpitch, destwidth, destheight, src, srcpitch, srcwidth, srcheight, blurwidth, blurlevel );
+}
+void TVPChBlurCopy_sse2_c( tjs_uint8 *dest, tjs_int destpitch, tjs_int destwidth, tjs_int destheight, const tjs_uint8 * src, tjs_int srcpitch, tjs_int srcwidth, tjs_int srcheight, tjs_int blurwidth, tjs_int blurlevel ) {
+	sse2_ch_blur_copy_func<sse2_ch_blur_add_mul_copy_functor>( dest, destpitch, destwidth, destheight, src, srcpitch, srcwidth, srcheight, blurwidth, blurlevel );
+}
+//TVPChBlurMulCopy65 = TVPChBlurMulCopy65_sse2_c;
+//TVPChBlurAddMulCopy65 = TVPChBlurAddMulCopy65_sse2_c;
+//TVPChBlurMulCopy = TVPChBlurMulCopy_sse2_c;
+//TVPChBlurAddMulCopy = TVPChBlurAddMulCopy_sse2_c;
+//TVPChBlurCopy65 = TVPChBlurCopy65_sse2_c;
+//TVPChBlurCopy = TVPChBlurCopy_sse2_c;
