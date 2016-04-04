@@ -1301,6 +1301,7 @@ void TVPConvertAdditiveAlphaToAlpha_sse2_c(tjs_uint32 *buf, tjs_int len){
 void TVPConvertAlphaToAdditiveAlpha_sse2_c(tjs_uint32 *buf, tjs_int len){
 	convert_func_sse2<sse2_alpha_to_premulalpha>( buf, len );
 }
+extern void TVPGL_AVX2_Init();
 void TVPGL_SSE2_Init() {
 	if( TVPCPUType & TVP_CPU_HAS_SSE2 ) {
 		TVPAdditiveAlphaBlend = TVPAdditiveAlphaBlend_sse2_c;
@@ -1612,6 +1613,9 @@ void TVPGL_SSE2_Init() {
 		TVPChBlurMulCopy = TVPChBlurMulCopy_sse2_c;
 		TVPChBlurAddMulCopy = TVPChBlurAddMulCopy_sse2_c;
 		TVPChBlurCopy = TVPChBlurCopy_sse2_c;
+	}
+	if( TVPCPUType & TVP_CPU_HAS_AVX2 ) {
+		TVPGL_AVX2_Init();
 	}
 }
 
