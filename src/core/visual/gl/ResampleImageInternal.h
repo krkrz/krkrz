@@ -122,7 +122,7 @@ void TVPCalculateAxisAreaAvg( int srcstart, int srcend, int srclength, int dstle
 template<typename TVector>
 void TVPNormalizeAxisAreaAvg( std::vector<int>& length, TVector& weight ) {
 	// ê≥ãKâª
-	const int count = length.size();
+	const int count = (const int)length.size();
 	float* wstart = &weight[0];
 	for( int i = 0; i < count; i++ ) {
 		int len = length[i];

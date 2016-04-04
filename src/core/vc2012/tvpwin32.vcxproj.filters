@@ -677,6 +677,9 @@
     <ClInclude Include="..\visual\gl\WeightFunctorSSE.h">
       <Filter>visual\gl</Filter>
     </ClInclude>
+    <ClInclude Include="..\visual\gl\blend_functor_avx2.h">
+      <Filter>visual\gl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\tjs2\tjs.cpp">
@@ -1244,6 +1247,9 @@
       <Filter>visual\gl</Filter>
     </ClCompile>
     <ClCompile Include="..\visual\gl\x86simdutilAVX2.cpp">
+      <Filter>visual\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\gl\blend_function_avx2.cpp">
       <Filter>visual\gl</Filter>
     </ClCompile>
   </ItemGroup>

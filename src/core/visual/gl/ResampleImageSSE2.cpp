@@ -292,7 +292,7 @@ struct AxisParamSSE2 {
 	}
 	// ê≥ãKâª
 	void normalizeAreaAvg( float* wstart, float* dweight, tjs_uint size, bool strip ) {
-		const int count = length_.size();
+		const int count = (const int)length_.size();
 		int dwindex = 0;
 		const __m128 epsilon = M128_EPSILON;
 		for( int i = 0; i < count; i++ ) {
@@ -344,7 +344,7 @@ struct AxisParamSSE2 {
 		}
 	}
 	void normalizeAreaAvg( float* wstart, tjs_uint32* dweight, tjs_uint size,  bool strip ) {
-		const int count = length_.size();
+		const int count = (const int)length_.size();
 #ifdef _DEBUG
 		std::vector<float,aligned_allocator<float> > work(size);
 #else
@@ -408,13 +408,13 @@ struct AxisParamSSE2 {
 			// é¿ç€ÇÃÉTÉCÉYÇãÅÇﬂÇÈ
 			int maxsize = 0;
 			if( strip == false ) {
-				int count = length_.size();
+				int count = (int)length_.size();
 				for( int i = 0; i < count; i++ ) {
 					int len = length_[i];
 					maxsize += ((len+3)>>2)<<2;	// 4 ÇÃî{êîâª
 				}
 			} else {
-				maxsize = weight.size();
+				maxsize = (int)weight.size();
 			}
 #ifdef _DEBUG
 			weight_.resize( maxsize+3 );
