@@ -15,13 +15,12 @@
 #include "DebugIntf.h"
 #include "LayerBitmapIntf.h"
 #include "MsgIntf.h"
-#include "Resampler.h"
 #include "DebugIntf.h"
 #include "tvpgl.h"
 #include "argb.h"
 #include "tjsUtils.h"
 #include "ThreadIntf.h"
-
+#include "ResampleImage.h"
 
 //#define TVP_FORCE_BILINEAR
 
@@ -1614,7 +1613,7 @@ void tTVPBaseBitmap::TVPDoBiLinearStretchLoop(
 bool tTVPBaseBitmap::StretchBlt(tTVPRect cliprect,
 		tTVPRect destrect, const tTVPBaseBitmap *ref,
 		tTVPRect refrect, tTVPBBBltMethod method, tjs_int opa,
-			bool hda, tTVPBBStretchType mode)
+			bool hda, tTVPBBStretchType mode, tjs_real typeopt )
 {
 	// do stretch blt
 	// stFastLinear is enabled only in following condition:
@@ -1658,13 +1657,10 @@ bool tTVPBaseBitmap::StretchBlt(tTVPRect cliprect,
 	if(cr.bottom > h) cr.bottom = h;
 
 	//--- check mode and other conditions
-	if((type == stLinear || type == stCubic) && !hda && opa==255 && method==bmCopy
-		&& dw > 0 && dh > 0 && rw > 0 && rh > 0 &&
-		destrect.left >= cr.left && destrect.top >= cr.top &&
-		destrect.right <= cr.right && destrect.bottom <= cr.bottom)
+	if( type >= stLinear )
 	{
 		// takes another routine
-		TVPResampleImage(this, destrect, ref, refrect, type==stLinear?1:2);
+		TVPResampleImage( cliprect, this, destrect, ref, refrect, type, typeopt, method, opa, hda );
 		return true;
 	}
 
