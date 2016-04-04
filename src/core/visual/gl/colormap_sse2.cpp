@@ -314,7 +314,7 @@ static inline void apply_color_map_branch_func_sse2( tjs_uint32 *dest, const tjs
 	tjs_int count = (tjs_int)((unsigned)dest & 0xF);
 	if( count ) {
 		count = (16 - count)>>2;
-		count = count < len ? count : count - len;
+		count = count > len ? len : count;
 		tjs_uint32* limit = dest + count;
 		while( dest < limit ) {
 			*dest = func( *dest, *src );
@@ -348,7 +348,7 @@ static inline void apply_color_map_func_sse2( tjs_uint32 *dest, const tjs_uint8 
 	tjs_int count = (tjs_int)((unsigned)dest & 0xF);
 	if( count ) {
 		count = (16 - count)>>2;
-		count = count < len ? count : count - len;
+		count = count > len ? len : count;
 		tjs_uint32* limit = dest + count;
 		while( dest < limit ) {
 			*dest = func( *dest, *src );

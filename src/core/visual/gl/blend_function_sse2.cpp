@@ -34,7 +34,7 @@ void TVPMakeAlphaFromKey_sse2_c(tjs_uint32 *dest, tjs_int len, tjs_uint32 key) {
 	tjs_int count = (tjs_int)((unsigned)dest & 0xF);
 	if( count ) {	// ‚±‚±‚Å len > 3 ‚Æ‚µ‚Ä‚µ‚Ü‚Á‚½•û‚ª‚¢‚¢‚©‚È
 		count = (16 - count)>>2;
-		count = count < len ? count : count - len;
+		count = count > len ? len : count;
 		tjs_uint32* limit = dest + count;
 		while( dest < limit ) {
 			tjs_uint32 c = (*dest)&0x00ffffff;
@@ -416,7 +416,7 @@ static inline void convert_func_sse2( tjs_uint32 *dest, tjs_int len ) {
 	tjs_int count = (tjs_int)((unsigned)dest & 0xF);
 	if( count ) {
 		count = (16 - count)>>2;
-		count = count < len ? count : count - len;
+		count = count > len ? len : count;
 		tjs_uint32* limit = dest + count;
 		while( dest < limit ) {
 			*dest = func( *dest );
@@ -444,7 +444,7 @@ static inline void convert_func_sse2( tjs_uint32 *dest, tjs_int len, const funct
 	tjs_int count = (tjs_int)((unsigned)dest & 0xF);
 	if( count ) {
 		count = (16 - count)>>2;
-		count = count < len ? count : count - len;
+		count = count > len ? len : count;
 		tjs_uint32* limit = dest + count;
 		while( dest < limit ) {
 			*dest = func( *dest );
@@ -472,7 +472,7 @@ static inline void blend_func_sse2( tjs_uint32 * __restrict dest, const tjs_uint
 	tjs_int count = (tjs_int)((unsigned)dest & 0xF);
 	if( count ) {
 		count = (16 - count)>>2;
-		count = count < len ? count : count - len;
+		count = count > len ? len : count;
 		tjs_uint32* limit = dest + count;
 		while( dest < limit ) {
 			*dest = func( *dest, *src );
@@ -565,7 +565,7 @@ static inline void sd_blend_func_sse2( tjs_uint32 *dest, const tjs_uint32 *src1,
 	tjs_int count = (tjs_int)((unsigned)dest & 0xF);
 	if( count ) {
 		count = (16 - count)>>2;
-		count = count < len ? count : count - len;
+		count = count > len ? len : count;
 		tjs_uint32* limit = dest + count;
 		while( dest < limit ) {
 			*dest = func( *src1, *src2 );
@@ -606,7 +606,7 @@ static void blend_src_branch_func_sse2( tjs_uint32 * __restrict dest, const tjs_
 	tjs_int count = (tjs_int)((unsigned)dest & 0xF);
 	if( count ) {
 		count = (16 - count)>>2;
-		count = count < len ? count : count - len;
+		count = count > len ? len : count;
 		tjs_uint32* limit = dest + count;
 		while( dest < limit ) {
 			*dest = func( *dest, *src );
@@ -696,7 +696,7 @@ void sse2_interpolation_line_transform_copy(tjs_uint32 *dest, tjs_int len, const
 	tjs_int count = (tjs_int)(((unsigned)dest)&0xF);
 	if( count ) {
 		count = (16 - count)>>2;
-		count = count < len ? count : count - len;
+		count = count > len ? len : count;
 		tjs_uint32* limit = dest + count;
 		while( dest < limit ) {
 			__m128i mxyi = mxy;
@@ -746,7 +746,7 @@ static inline void stretch_blend_func_sse2(tjs_uint32 *dest, tjs_int len, const 
 	tjs_int count = (tjs_int)((unsigned)dest & 0xF);
 	if( count ) {
 		count = (16 - count)>>2;
-		count = count < len ? count : count - len;
+		count = count > len ? len : count;
 		tjs_uint32* limit = dest + count;
 		while( dest < limit ) {
 			*dest = func( *dest, src[srcstart >> 16] );
@@ -820,7 +820,7 @@ static inline void stretch_blend_inter_func_sse2(tjs_uint32 *dest, tjs_int len, 
 	tjs_int count = (tjs_int)((unsigned)dest & 0xF);
 	if( count ) {
 		count = (16 - count)>>2;
-		count = count < len ? count : count - len;
+		count = count > len ? len : count;
 		tjs_uint32* limit = dest + count;
 		while( dest < limit ) {
 			tjs_uint32 s = inter( src1, src2, mstart.m128i_i32[0] );
@@ -1235,7 +1235,7 @@ void TVPDoGrayScale_ssse3_c(tjs_uint32 *dest, tjs_int len ) {
 	tjs_int count = (tjs_int)((unsigned)dest & 0xF);
 	if( count ) {
 		count = (16 - count)>>2;
-		count = count < len ? count : count - len;
+		count = count > len ? len : count;
 		tjs_uint32* limit = dest + count;
 		while( dest < limit ) {
 			*dest = dogray( *dest );
