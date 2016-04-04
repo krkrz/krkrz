@@ -751,3 +751,24 @@ void TVPChBlurCopy_sse2_c( tjs_uint8 *dest, tjs_int destpitch, tjs_int destwidth
 //TVPChBlurAddMulCopy = TVPChBlurAddMulCopy_sse2_c;
 //TVPChBlurCopy65 = TVPChBlurCopy65_sse2_c;
 //TVPChBlurCopy = TVPChBlurCopy_sse2_c;
+
+struct sse2_bind_mask_to_main_functor {
+	const __m128i zero_;
+	const __m128i colormask_;
+	inline sse2_bind_mask_to_main_functor() : zero_(_mm_setzero_si128()), colormask_(_mm_set1_epi32(0x00ffffff)) {}
+	inline tjs_uint32 operator()( tjs_uint32 c, tjs_uint8 a ) const {
+		return (c&0xffffff) | (a<<24);
+	}
+	inline __m128i operator()( __m128i md, tjs_uint32 s ) const {
+		__m128i mo = _mm_cvtsi32_si128( s );
+		mo = _mm_unpacklo_epi8( mo, zero_ );	// 0000 0a 0a 0a 0a
+		mo = _mm_unpacklo_epi16( mo, zero_ );	// 000a 000a 000a 000a
+		mo = _mm_slli_epi32( mo, 24 );
+		md = _mm_and_si128( md, colormask_ );
+		return _mm_or_si128( md, mo );
+	}
+};
+void TVPBindMaskToMain_sse2_c(tjs_uint32 *main, const tjs_uint8 *mask, tjs_int len) {
+	sse2_bind_mask_to_main_functor func;
+	apply_color_map_func_sse2( main, mask, len , func );
+}
