@@ -4210,7 +4210,7 @@ void tTJSNI_BaseLayer::CopyRect(tjs_int dx, tjs_int dy, tTVPBaseBitmap *src, tTV
 }
 //---------------------------------------------------------------------------
 void tTJSNI_BaseLayer::StretchCopy(const tTVPRect &destrect, tTVPBaseBitmap *src,
-		const tTVPRect &srcrect, tTVPBBStretchType type)
+		const tTVPRect &srcrect, tTVPBBStretchType type, tjs_real typeopt)
 {
 	// stretching copy
 	tTVPRect ur = destrect;
@@ -4226,7 +4226,7 @@ void tTJSNI_BaseLayer::StretchCopy(const tTVPRect &destrect, tTVPBaseBitmap *src
 		if(!src) TVPThrowExceptionMessage(TVPSourceLayerHasNoImage);
 		ImageModified =
 			MainImage->StretchBlt(ClipRect, destrect, src, srcrect, bmCopy, 255, false,
-				type) || ImageModified;
+				type, typeopt) || ImageModified;
 		break;
 
 	case dfOpaque:
@@ -4234,7 +4234,7 @@ void tTJSNI_BaseLayer::StretchCopy(const tTVPRect &destrect, tTVPBaseBitmap *src
 		if(!src) TVPThrowExceptionMessage(TVPSourceLayerHasNoImage);
 		ImageModified =
 			MainImage->StretchBlt(ClipRect, destrect, src, srcrect,
-				bmCopy, 255, HoldAlpha, type) || ImageModified;
+				bmCopy, 255, HoldAlpha, type, typeopt) || ImageModified;
 		break;
 
 	default:
@@ -4374,7 +4374,7 @@ void tTJSNI_BaseLayer::OperateRect(tjs_int dx, tjs_int dy, tTVPBaseBitmap *src,
 //---------------------------------------------------------------------------
 void tTJSNI_BaseLayer::OperateStretch(const tTVPRect &destrect,
 	tTVPBaseBitmap *src, const tTVPRect &srcrect, tTVPBlendOperationMode mode, tjs_int opacity,
-			tTVPBBStretchType type)
+			tTVPBBStretchType type, tjs_real typeopt)
 {
 	// stretching operation (add/mul/sub etc.)
 
@@ -4397,7 +4397,7 @@ void tTJSNI_BaseLayer::OperateStretch(const tTVPRect &destrect,
 	if(!MainImage) TVPThrowExceptionMessage(TVPNotDrawableLayerType);
 	if(!src) TVPThrowExceptionMessage(TVPSourceLayerHasNoImage);
 	ImageModified = MainImage->StretchBlt(ClipRect, destrect, src, srcrect, met,
-		opacity, HoldAlpha, type) || ImageModified;
+		opacity, HoldAlpha, type, typeopt) || ImageModified;
 
 	if(ImageLeft != 0 || ImageTop != 0)
 	{
@@ -7235,7 +7235,13 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/stretchCopy)
 	if(numparams >= 10)
 		type = (tTVPBBStretchType)(tjs_int)*param[9];
 
-	_this->StretchCopy(destrect, src, srcrect, type);
+	tjs_real typeopt = 0.0;
+	if(numparams >= 11)
+		typeopt = (tjs_real)*param[10];
+	else if( type == stFastCubic || type == stCubic )
+		typeopt = -1.0;
+
+	_this->StretchCopy(destrect, src, srcrect, type, typeopt);
 
 	return TJS_S_OK;
 }
@@ -7294,10 +7300,16 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/operateStretch)
 	if(numparams >= 12 && param[11]->Type() != tvtVoid)
 		type = (tTVPBBStretchType)(tjs_int)*param[11];
 
+	tjs_real typeopt = 0.0;
+	if(numparams >= 13)
+		typeopt = (tjs_real)*param[12];
+	else if( type == stFastCubic || type == stCubic )
+		typeopt = -1.0;
+
 	// get correct blend mode if the mode is omAuto
 	if(mode == omAuto) mode = automode;
 
-	_this->OperateStretch(destrect, src, srcrect, mode, opa, type);
+	_this->OperateStretch(destrect, src, srcrect, mode, opa, type, typeopt);
 
 	return TJS_S_OK;
 }
