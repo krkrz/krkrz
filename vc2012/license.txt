@@ -7,7 +7,10 @@ Kirikiri Z Project Contributors
 W.Dee, casper, 有限会社MCF, Biscrat, 青猫, nagai, ルー, 高際 雅之, 永劫,
 ゆんゆん探偵, りょうご（今は無きあの星）, AZ-UME, 京 秋人, 
 Katsumasa Tsuneyoshi, 小池潤, miahmie, サークル獏, アザナシ, はっしぃ, 
-棚中製作所, わっふる/waffle, ワムソフト, TYPE-MOON, 有限会社エムツー
+棚中製作所, わっふる/waffle, ワムソフト, TYPE-MOON, 有限会社エムツー,
+Takenori Imoto
+Kirikiri Z 64bit Project Contributors
+合資会社ワムソフト, Takenori Imoto, 他
 
 吉里吉里Z実行コアの使用/配布/改変は、以下の条件に従ってください。
 ----------------------------------------------------------------------------
