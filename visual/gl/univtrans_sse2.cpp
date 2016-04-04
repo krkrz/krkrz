@@ -251,7 +251,7 @@ static inline void sse2_univ_trans(tjs_uint32 *dest, const tjs_uint32 *src1, con
 	tjs_int count = (tjs_int)(((unsigned)dest)&0xF);
 	if( count ) {
 		count = (16 - count)>>2;
-		count = count < len ? count : count - len;
+		count = count > len ? len : count;
 		tjs_uint32* limit = dest + count;
 		while( dest < limit ) {
 			*dest = func( *src1, *src2, *rule );
@@ -291,7 +291,7 @@ static inline void sse2_univ_trans_switch(tjs_uint32 *dest, const tjs_uint32 *sr
 	tjs_int count = (tjs_int)(((unsigned)dest)&0xF);
 	if( count ) {
 		count = (16 - count)>>2;
-		count = count < len ? count : count - len;
+		count = count > len ? len : count;
 		tjs_uint32* limit = dest + count;
 		while( dest < limit ) {
 			tjs_int opa = *rule;

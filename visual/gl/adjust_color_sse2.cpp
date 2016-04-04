@@ -86,7 +86,7 @@ void TVPAdjustGamma_a_sse2_c(tjs_uint32 *dest, tjs_int len, tTVPGLGammaAdjustTem
 	tjs_int count = (tjs_int)((unsigned)dest & 0xF);
 	if( count ) {
 		count = (16 - count)>>2;
-		count = count < len ? count : count - len;
+		count = count > len ? len : count;
 		tjs_uint32* limit = dest + count;
 		while( dest < limit ) {
 			*dest = func( *dest );
