@@ -26,7 +26,7 @@ extern unsigned char TVP252DitherPalette[3][256];
 extern tjs_uint32 TVPRecipTable256[256];
 extern tjs_uint16 TVPRecipTable256_16[256];
 }
-// –¢ƒeƒXƒg
+#if 0
 void TVPMakeAlphaFromKey_sse2_c(tjs_uint32 *dest, tjs_int len, tjs_uint32 key) {
 	if( len <= 0 ) return;
 
@@ -71,8 +71,400 @@ void TVPMakeAlphaFromKey_sse2_c(tjs_uint32 *dest, tjs_int len, tjs_uint32 key) {
 		dest++;
 	}
 }
+#endif
+		
+
+void TVPSwapLine32_sse2_c(tjs_uint32 *line1, tjs_uint32 *line2, tjs_int len) {
+	tjs_int rem = (len>>2)<<2;
+	tjs_uint32 *limit = line1+rem;
+	while( line1 < limit ) {
+		__m128i ml1 = _mm_loadu_si128( (__m128i const*)line1 );
+		__m128i ml2 = _mm_loadu_si128( (__m128i const*)line2 );
+		_mm_storeu_si128( (__m128i*)line1, ml2 );
+		_mm_storeu_si128( (__m128i*)line2, ml1 );
+		line1+=4; line2+=4;
+	}
+	limit += (len-rem);
+	while( line1 < limit ) {
+		tjs_uint32 tmp = *line1;
+		*line1 = *line2;
+		*line2 = tmp;
+		line1++; line2++;
+	}
+}
+
+void TVPSwapLine8_sse2_c(tjs_uint8 *line1, tjs_uint8 *line2, tjs_int len) {
+	tjs_int rem = (len>>4)<<4;
+	tjs_uint8 *limit = line1+rem;
+	while( line1 < limit ) {
+		__m128i ml1 = _mm_loadu_si128( (__m128i const*)line1 );
+		__m128i ml2 = _mm_loadu_si128( (__m128i const*)line2 );
+		_mm_storeu_si128( (__m128i*)line1, ml2 );
+		_mm_storeu_si128( (__m128i*)line2, ml1 );
+		line1+=16; line2+=16;
+	}
+	limit += (len-rem);
+	while( line1 < limit ) {
+		tjs_uint8 tmp = *line1;
+		*line1 = *line2;
+		*line2 = tmp;
+		line1++; line2++;
+	}
+}
+
+void TVPReverse32_sse2_c(tjs_uint32 *pixels, tjs_int len) {
+	tjs_uint32 *dest = pixels + len -1;
+	len/=2;
+	tjs_int rem = (len>>2)<<2;
+	tjs_uint32 *limit = pixels+rem;
+	while( pixels < limit ) {
+		__m128i ms = _mm_loadu_si128( (__m128i const*)pixels );
+		__m128i md = _mm_loadu_si128( (__m128i const*)&dest[-3] );
+		ms = _mm_shuffle_epi32( ms, _MM_SHUFFLE( 0, 1, 2, 3 ) );	// ‹t“]
+		md = _mm_shuffle_epi32( md, _MM_SHUFFLE( 0, 1, 2, 3 ) );	// ‹t“]
+		_mm_storeu_si128( (__m128i*)&dest[-3], ms );
+		_mm_storeu_si128( (__m128i*)pixels, md );
+		pixels += 4; dest -= 4;
+	}
+	limit += (len-rem);
+	while( pixels < limit ) {
+		tjs_uint32 tmp = *pixels;
+		*pixels = *dest;
+		*dest = tmp;
+		dest--;
+		pixels++;
+	}
+}
+void TVPReverse8_sse2_c(tjs_uint8 *pixels, tjs_int len){
+	tjs_uint8 *dest = pixels + len -1;
+	len/=2;
+	tjs_int rem = (len>>4)<<4;
+	tjs_uint8 *limit = pixels+rem;
+	if( pixels < limit ) {
+		while( pixels < limit ) {
+			__m128i ms1 = _mm_loadu_si128( (__m128i const*)pixels );
+			__m128i md1 = _mm_loadu_si128( (__m128i const*)&dest[-15] );
+			ms1 = _mm_shuffle_epi32( ms1, _MM_SHUFFLE( 0, 1, 2, 3 ) );		// ‹t“] 32bit
+			ms1 = _mm_shufflelo_epi16( ms1, _MM_SHUFFLE( 2, 3, 0, 1 )  );	// ‹t“] 16bit
+			ms1 = _mm_shufflehi_epi16( ms1, _MM_SHUFFLE( 2, 3, 0, 1 )  );
+			__m128i msr = ms1;	// ‹t“] 8bit
+			ms1 = _mm_slli_epi16( ms1, 8 );	// << 8
+			msr = _mm_srli_epi16( msr, 8 );	// >> 8
+			ms1 = _mm_or_si128( ms1, msr );
+			_mm_storeu_si128( (__m128i*)&dest[-15], ms1 );
+
+			md1 = _mm_shuffle_epi32( md1, _MM_SHUFFLE( 0, 1, 2, 3 ) );		// ‹t“] 32bit
+			md1 = _mm_shufflelo_epi16( md1, _MM_SHUFFLE( 2, 3, 0, 1 )  );	// ‹t“] 16bit
+			md1 = _mm_shufflehi_epi16( md1, _MM_SHUFFLE( 2, 3, 0, 1 )  );
+			__m128i mdr = md1;	// ‹t“] 8bit
+			md1 = _mm_slli_epi16( md1, 8 );	// << 8
+			mdr = _mm_srli_epi16( mdr, 8 );	// >> 8
+			md1 = _mm_or_si128( md1, mdr );
+			_mm_storeu_si128( (__m128i*)pixels, md1 );
+			pixels += 16; dest -= 16;
+		}
+	}
+	limit += (len-rem);
+	while( pixels < limit ) {
+		tjs_uint8 tmp = *pixels;
+		*pixels = *dest;
+		*dest = tmp;
+		dest--;
+		pixels++;
+	}
+}
+void TVPReverse8_ssse3_c(tjs_uint8 *pixels, tjs_int len){
+	tjs_uint8 *dest = pixels + len -1;
+	len/=2;
+	tjs_int rem = (len>>4)<<4;
+	tjs_uint8 *limit = pixels+rem;
+	if( pixels < limit ) {
+		const __m128i mask(_mm_set_epi32(0x00010203,0x04050607,0x08090a0b,0x0c0d0e0f));
+		while( pixels < limit ) {
+			__m128i ms = _mm_loadu_si128( (__m128i const*)pixels );
+			__m128i md = _mm_loadu_si128( (__m128i const*)&dest[-15] );
+			ms = _mm_shuffle_epi8( ms, mask );	// ‹t“]
+			md = _mm_shuffle_epi8( md, mask );	// ‹t“]
+			_mm_storeu_si128( (__m128i*)&dest[-15], ms );
+			_mm_storeu_si128( (__m128i*)pixels, md );
+			pixels += 16; dest -= 16;
+		}
+	}
+	limit += (len-rem);
+	while( pixels < limit ) {
+		tjs_uint8 tmp = *pixels;
+		*pixels = *dest;
+		*dest = tmp;
+		dest--;
+		pixels++;
+	}
+}
+struct sse2_make_alpha_from_key_functor {
+	const tjs_uint32 key_;
+	const __m128i mmkey;
+	const __m128i mmask;
+	const __m128i alpha;
+	inline sse2_make_alpha_from_key_functor( tjs_uint32 key ) : key_(key),
+		mmkey(_mm_set1_epi32(key)), mmask(_mm_set1_epi32(0x00ffffff)), alpha(_mm_set1_epi32(0xff000000)) {}
+	inline tjs_uint32 operator()( tjs_uint32 d ) const {
+		d = d&0x00ffffff;
+		if( d != key_ ) d |= 0xff000000;
+		return d;
+	}
+	inline __m128i operator()( __m128i md ) const {
+		md = _mm_and_si128( md, mmask );	// d &= mask ƒAƒ‹ƒtƒ@‚ðƒNƒŠƒA(“§–¾‚É)
+		__m128i mk = mmkey;
+		mk = _mm_cmpeq_epi32( mk, md );		// d == key ? 1111 : 0000
+		mk = _mm_andnot_si128( mk, alpha );	// maskalpha = (^cmpmask) & alpha
+		md = _mm_or_si128( md, mk );		// d |= maskalpha
+		return md;
+	}
+};
+struct sse2_do_gray_scale {
+	const __m128i zero_;
+	const __m128i alphamask_;
+	__m128i lum_;
+	inline sse2_do_gray_scale() : zero_( _mm_setzero_si128() ), alphamask_(_mm_set1_epi32(0xff000000)), lum_(_mm_set1_epi32(0x0036B713)) {
+		lum_ = _mm_unpacklo_epi8( lum_, zero_ );
+		// lum_ ‚ÌƒAƒ‹ƒtƒ@¬•ª‚ðff‚É‚·‚ê‚ÎŒë·‚ª­‚µo‚é‚ªƒAƒ‹ƒtƒ@‚Ìƒ}ƒXƒN“™‚ª•K—v‚È‚­‚È‚Á‚Ä­‚µ‚¾‚¯‘¬‚­‚È‚é
+	}
+	inline tjs_uint32 operator()( tjs_uint32 s ) const {
+		tjs_uint32 d = (s&0xff)*19;
+		d += ((s >> 8)&0xff)*183;
+		d += ((s >> 16)&0xff)*54;
+		d = (d >> 8) * 0x10101 + (s & 0xff000000);
+		return d;
+	}
+	inline __m128i operator()( __m128i ms1 ) const {
+		__m128i ma = ms1;
+		ma = _mm_and_si128( ma, alphamask_ );
+		__m128i ms2 = ms1;
+		ms1 = _mm_unpacklo_epi8( ms1, zero_ );
+		ms2 = _mm_unpackhi_epi8( ms2, zero_ );
+		ms1 = _mm_mullo_epi16( ms1, lum_ );
+		ms2 = _mm_mullo_epi16( ms2, lum_ );
+		__m128i tmp1 = ms1;
+		__m128i tmp2 = ms2;
+		tmp1 = _mm_srli_epi64( tmp1, 32 );	// drop G B
+		tmp2 = _mm_srli_epi64( tmp2, 32 );
+		ms1 = _mm_add_epi16( ms1, tmp1 );	// G R+B
+		ms2 = _mm_add_epi16( ms2, tmp2 );
+		tmp1 = ms1;
+		tmp2 = ms2;
+		tmp1 = _mm_srli_epi64( tmp1, 16 );
+		tmp2 = _mm_srli_epi64( tmp2, 16 );
+		ms1 = _mm_add_epi16( ms1, tmp1 );	// R+G+B
+		ms2 = _mm_add_epi16( ms2, tmp2 );
+		ms1 = _mm_srli_epi16( ms1, 8 );
+		ms1 = _mm_shufflelo_epi16( ms1, _MM_SHUFFLE( 3, 0, 0, 0 )  );
+		ms1 = _mm_shufflehi_epi16( ms1, _MM_SHUFFLE( 3, 0, 0, 0 )  );
+		ms2 = _mm_srli_epi16( ms2, 8 );
+		ms2 = _mm_shufflelo_epi16( ms2, _MM_SHUFFLE( 3, 0, 0, 0 )  );
+		ms2 = _mm_shufflehi_epi16( ms2, _MM_SHUFFLE( 3, 0, 0, 0 )  );
+		ms1 = _mm_packus_epi16( ms1, ms2 );
+		ms1 = _mm_or_si128( ms1, ma );
+		return ms1;
+	}
+};
+
+struct ssse3_do_gray_scale {
+	const __m128i zero_;
+	const __m128i alphamask_;
+	__m128i mask;
+	__m128i lum_;
+	inline ssse3_do_gray_scale() : zero_( _mm_setzero_si128() ), alphamask_(_mm_set1_epi32(0xff000000)), lum_(_mm_set1_epi32(0x0036B713)) {
+		lum_ = _mm_unpacklo_epi8( lum_, zero_ );
+		
+		mask.m128i_u8[0] = 0x01;
+		mask.m128i_u8[1] = 0x01;
+		mask.m128i_u8[2] = 0x01;
+		mask.m128i_u8[3] = 0x81;
+		mask.m128i_u8[4] = 0x03;
+		mask.m128i_u8[5] = 0x03;
+		mask.m128i_u8[6] = 0x03;
+		mask.m128i_u8[7] = 0x83;
+		mask.m128i_u8[8] = 0x05;
+		mask.m128i_u8[9] = 0x05;
+		mask.m128i_u8[10] = 0x05;
+		mask.m128i_u8[11] = 0x85;
+		mask.m128i_u8[12] = 0x07;
+		mask.m128i_u8[13] = 0x07;
+		mask.m128i_u8[14] = 0x07;
+		mask.m128i_u8[15] = 0x87;
+		// (0x1x2x3x0x1x2x3x)
+		//  0123456789abcdef
+	}
+	inline tjs_uint32 operator()( tjs_uint32 s ) const {
+		tjs_uint32 d = (s&0xff)*19;
+		d += ((s >> 8)&0xff)*183;
+		d += ((s >> 16)&0xff)*54;
+		d = (d >> 8) * 0x10101 + (s & 0xff000000);
+		return d;
+	}
+	inline __m128i operator()( __m128i ms1 ) const {
+		__m128i ma = ms1;
+		ma = _mm_and_si128( ma, alphamask_ );
+		__m128i ms2 = ms1;
+		ms1 = _mm_unpacklo_epi8( ms1, zero_ );
+		ms2 = _mm_unpackhi_epi8( ms2, zero_ );
+		ms1 = _mm_mullo_epi16( ms1, lum_ );
+		ms2 = _mm_mullo_epi16( ms2, lum_ );
+		ms1 = _mm_hadd_epi16( ms1, ms2 );	// A+R G+B | A+R G+B ... (A=0)
+		ms1 = _mm_hadd_epi16( ms1, ms1 );	// A+R+G+B | A+R+G+B | A+R+G+B | A+R+G+B (01230123) : 8pixel‚Ü‚Æ‚ß‚Äˆ—‚·‚ê‚Î‚à‚Á‚Æ‘¬‚»‚¤
+		ms1 = _mm_shuffle_epi8( ms1, mask );
+		ms1 = _mm_or_si128( ms1, ma );
+		return ms1;
+	}
+};
+// ’Êí‚ÌƒAƒ‹ƒtƒ@‚©‚çæŽZÏ‚ÝƒAƒ‹ƒtƒ@‚Ö
+struct sse2_alpha_to_premulalpha {
+	const __m128i zero_;
+	const __m128i colormask_;
+	inline sse2_alpha_to_premulalpha() : zero_( _mm_setzero_si128() ), colormask_(_mm_set1_epi32(0x00ffffff)) {}
+	inline tjs_uint32 operator()( tjs_uint32 s ) const {
+		__m128i ma = _mm_cvtsi32_si128( s>>24 );
+		ma = _mm_shufflelo_epi16( ma, _MM_SHUFFLE( 0, 0, 0, 0 )  );	// 00oo00oo00oo00oo
+		__m128i ms = _mm_cvtsi32_si128( s );
+		ms = _mm_unpacklo_epi16( ms, zero_ );
+		ms = _mm_mullo_epi16( ms, ma );		// s *= a
+		ms = _mm_srli_epi16( ms, 8 );		// s >>= 8
+		ms = _mm_packus_epi16( ms, ms );
+		return (_mm_cvtsi128_si32(ms)&0x00ffffff)|(s&0xff000000);
+	}
+	inline __m128i operator()( __m128i ms1 ) const {
+		__m128i ma1 = ms1;
+		ma1 = _mm_srli_epi32( ma1, 24 );
+		__m128i ma = ma1;
+		ma = _mm_slli_epi32( ma, 24 );
+		ma1 = _mm_packs_epi32( ma1, ma1 );		// 0 1 2 3 0 1 2 3
+		ma1 = _mm_unpacklo_epi16( ma1, ma1 );	// 0 0 1 1 2 2 3 3
+		__m128i ma2 = ma1;
+		ma1 = _mm_unpacklo_epi16( ma1, ma1 );	// 0 0 0 0 1 1 1 1
+		ma2 = _mm_unpackhi_epi16( ma2, ma2 );	// 2 2 2 2 3 3 3 3
+
+		__m128i ms2 = ms1;
+		ms1 = _mm_unpacklo_epi8( ms1, zero_ );
+		ms1 = _mm_mullo_epi16( ms1, ma1 );		// s *= a
+		ms1 = _mm_srli_epi16( ms1, 8 );			// s >>= 8
+		ms2 = _mm_unpackhi_epi8( ms2, zero_ );
+		ms2 = _mm_mullo_epi16( ms2, ma2 );		// s *= a
+		ms2 = _mm_srli_epi16( ms2, 8 );			// s >>= 8
+		ms1 = _mm_packus_epi16( ms1, ms2 );
+		ms1 = _mm_and_si128( ms1, colormask_ );
+		return _mm_or_si128( ms1, ma );
+	}
+};
+// æŽZÏ‚ÝƒAƒ‹ƒtƒ@‚©‚ç’ÊíƒAƒ‹ƒtƒ@‚Ö
+// alpha = alpha
+// color = color*255 / alpha
+struct sse2_premulalpha_to_alpha {
+	const __m128i colormask_;
+	const __m128 f65535_;
+	inline sse2_premulalpha_to_alpha() : colormask_(_mm_set1_epi32(0x00ffffff)), f65535_(_mm_set1_ps(65535.0f)) {}
+	inline tjs_uint32 operator()( tjs_uint32 s ) const {
+		const tjs_uint8 *t = ((s >> 16) & 0xff00) + TVPDivTable;
+		return (s & 0xff000000) +
+			(t[(s >> 16) & 0xff] << 16) +
+			(t[(s >>  8) & 0xff] <<  8) +
+			(t[ s        & 0xff]      );
+	}
+	inline __m128i operator()( __m128i ms ) const {
+		__m128i ma1 = ms;
+		ma1 = _mm_srli_epi32( ma1, 24 );
+		__m128i ma = ma1;
+		ma = _mm_slli_epi32( ma, 24 );
+		__m128 rcp = _mm_cvtepi32_ps(ma1);
+#if 1
+		rcp = _mm_rcp_ps(rcp);
+#else
+		rcp = m128_rcp_22bit_ps(rcp);	// ­‚µ¸“x‚ª—Ç‚¢‚ªÅ‘åŒë·‚ª2‚È‚Ì‚Í•Ï‚í‚ç‚¸, 20%‚­‚ç‚¢’x‚­‚È‚é
+#endif
+		rcp = _mm_mul_ps(rcp, f65535_);
+		ma1 = _mm_cvtps_epi32(rcp);
+		ma1 = _mm_shufflelo_epi16( ma1, _MM_SHUFFLE( 2, 2, 0, 0 )  ); // 0 0 1 1 X 2 X 3
+		ma1 = _mm_shufflehi_epi16( ma1, _MM_SHUFFLE( 2, 2, 0, 0 )  ); // 0 0 1 1 2 2 3 3
+		__m128i ma2 = ma1;
+		ma1 = _mm_unpacklo_epi16( ma1, ma1 );	// 0 0 0 0 1 1 1 1
+		ma2 = _mm_unpackhi_epi16( ma2, ma2 );	// 2 2 2 2 3 3 3 3
+		__m128i ms1 = _mm_setzero_si128();
+		ms1 = _mm_unpacklo_epi8( ms1, ms );		// s 0 s 0 s 0 s 0 : ãˆÊ8ƒrƒbƒg‚Ö
+		ms1 = _mm_mulhi_epu16( ms1, ma1 );		// s / a
+		__m128i ms2 = _mm_setzero_si128();
+		ms2 = _mm_unpackhi_epi8( ms2, ms );
+		ms2 = _mm_mulhi_epu16( ms2, ma2 );		// s / a
+
+		__m128i ss1 = ms1;
+		ss1 = _mm_srli_epi16( ss1, 15 );
+		__m128i ss2 = ms2;
+		ss2 = _mm_srli_epi16( ss2, 15 );
+		ss1 = _mm_packus_epi16( ss1, ss2 );
+
+		ms1 = _mm_packus_epi16( ms1, ms2 );
+		ms1 = _mm_sub_epi8( ms1, ss1 );		// •„†‚È‚µ16bit–O˜apack‚Ì‚½‚ß‚Ìˆ—
+		ms1 = _mm_and_si128( ms1, colormask_ );
+		return _mm_or_si128( ms1, ma );
+	}
+};
 
 
+
+template<typename functor>
+static inline void convert_func_sse2( tjs_uint32 *dest, tjs_int len ) {
+	if( len <= 0 ) return;
+
+	functor func;
+	tjs_int count = (tjs_int)((unsigned)dest & 0xF);
+	if( count ) {
+		count = (16 - count)>>2;
+		count = count < len ? count : count - len;
+		tjs_uint32* limit = dest + count;
+		while( dest < limit ) {
+			*dest = func( *dest );
+			dest++;
+		}
+		len -= count;
+	}
+	tjs_uint32 rem = (len>>2)<<2;
+	tjs_uint32* limit = dest + rem;
+	while( dest < limit ) {
+		__m128i md = _mm_load_si128( (__m128i const*)dest );
+		_mm_store_si128( (__m128i*)dest, func( md ) );
+		dest+=4;
+	}
+	limit += (len-rem);
+	while( dest < limit ) {
+		*dest = func( *dest );
+		dest++;
+	}
+}
+template<typename functor>
+static inline void convert_func_sse2( tjs_uint32 *dest, tjs_int len, const functor& func ) {
+	if( len <= 0 ) return;
+
+	tjs_int count = (tjs_int)((unsigned)dest & 0xF);
+	if( count ) {
+		count = (16 - count)>>2;
+		count = count < len ? count : count - len;
+		tjs_uint32* limit = dest + count;
+		while( dest < limit ) {
+			*dest = func( *dest );
+			dest++;
+		}
+		len -= count;
+	}
+	tjs_uint32 rem = (len>>2)<<2;
+	tjs_uint32* limit = dest + rem;
+	while( dest < limit ) {
+		__m128i md = _mm_load_si128( (__m128i const*)dest );
+		_mm_store_si128( (__m128i*)dest, func( md ) );
+		dest+=4;
+	}
+	limit += (len-rem);
+	while( dest < limit ) {
+		*dest = func( *dest );
+		dest++;
+	}
+}
 template<typename functor>
 static inline void blend_func_sse2( tjs_uint32 * __restrict dest, const tjs_uint32 * __restrict src, tjs_int len, const functor& func ) {
 	if( len <= 0 ) return;
@@ -117,6 +509,22 @@ static void copy_func_sse2( tjs_uint32 * __restrict dest, const tjs_uint32 * __r
 	blend_func_sse2<functor>( dest, src, len, func );
 }
 
+template<typename functor>
+static inline void blend_func_sse2( tjs_uint8 * __restrict dest, const tjs_uint8 * __restrict src, tjs_int len, const functor& func ) {
+	tjs_uint32 rem = (len>>4)<<4;
+	tjs_uint8* limit = dest + rem;
+	while( dest < limit ) {
+		__m128i md = _mm_loadu_si128( (__m128i const*)dest );
+		__m128i ms = _mm_loadu_si128( (__m128i const*)src );
+		_mm_storeu_si128( (__m128i*)dest, func( md, ms ) );
+		dest+=16; src+=16;
+	}
+	limit += (len-rem);
+	while( dest < limit ) {
+		*dest = func( *dest, *src );
+		dest++; src++;
+	}
+}
 // src ‚Æ dest ‚ªd•¡‚µ‚Ä‚¢‚é‰Â”\«‚Ì‚ ‚é‚à‚Ì
 template<typename functor>
 static inline void overlap_blend_func_sse2( tjs_uint32 * dest, const tjs_uint32 * src, tjs_int len, const functor& func ) {
@@ -145,7 +553,7 @@ static inline void overlap_blend_func_sse2( tjs_uint32 * dest, const tjs_uint32 
 	}
 }
 template<typename functor>
-static void overlap_copy_func_sse2( tjs_uint32 * __restrict dest, const tjs_uint32 * __restrict src, tjs_int len ) {
+static void overlap_copy_func_sse2( tjs_uint32 * dest, const tjs_uint32 * src, tjs_int len ) {
 	functor func;
 	overlap_blend_func_sse2<functor>( dest, src, len, func );
 }
@@ -775,6 +1183,7 @@ extern void TVPFillMask_sse2_c(tjs_uint32 *dest, tjs_int len, tjs_uint32 mask);
 extern void TVPConstColorAlphaBlend_sse2_c(tjs_uint32 *dest, tjs_int len, tjs_uint32 color, tjs_int opa);
 extern void TVPConstColorAlphaBlend_d_sse2_c(tjs_uint32 *dest, tjs_int len, tjs_uint32 color, tjs_int opa);
 extern void TVPConstColorAlphaBlend_a_sse2_c(tjs_uint32 *dest, tjs_int len, tjs_uint32 color, tjs_int opa);
+extern void TVPAlphaColorMat_sse2_c(tjs_uint32 *dest, tjs_uint32 color, tjs_int len );
 
 extern void TVPApplyColorMap65_sse2_c(tjs_uint32 *dest, const tjs_uint8 *src, tjs_int len, tjs_uint32 color);
 extern void TVPApplyColorMap_sse2_c(tjs_uint32 *dest, const tjs_uint8 *src, tjs_int len, tjs_uint32 color);
@@ -808,6 +1217,90 @@ extern void TVPChBlurMulCopy_sse2_c( tjs_uint8 *dest, const tjs_uint8 *src, tjs_
 extern void TVPChBlurCopy65_sse2_c( tjs_uint8 *dest, tjs_int destpitch, tjs_int destwidth, tjs_int destheight, const tjs_uint8 * src, tjs_int srcpitch, tjs_int srcwidth, tjs_int srcheight, tjs_int blurwidth, tjs_int blurlevel );
 extern void TVPChBlurCopy_sse2_c( tjs_uint8 *dest, tjs_int destpitch, tjs_int destwidth, tjs_int destheight, const tjs_uint8 * src, tjs_int srcpitch, tjs_int srcwidth, tjs_int srcheight, tjs_int blurwidth, tjs_int blurlevel );
 
+extern void TVPBindMaskToMain_sse2_c(tjs_uint32 *main, const tjs_uint8 *mask, tjs_int len);
+void TVPMakeAlphaFromKey_sse2_c(tjs_uint32 *dest, tjs_int len, tjs_uint32 key) {
+	sse2_make_alpha_from_key_functor func( key );
+	convert_func_sse2( dest, len, func );
+}
+void TVPDoGrayScale_sse2_c(tjs_uint32 *dest, tjs_int len ) {
+	convert_func_sse2<sse2_do_gray_scale>( dest, len );
+}
+#if 0
+void TVPDoGrayScale_ssse3_c(tjs_uint32 *dest, tjs_int len ) {
+	convert_func_sse2<ssse3_do_gray_scale>( dest, len );
+}
+#else
+void TVPDoGrayScale_ssse3_c(tjs_uint32 *dest, tjs_int len ) {
+	do_gray_scale_functor dogray;
+	tjs_int count = (tjs_int)((unsigned)dest & 0xF);
+	if( count ) {
+		count = (16 - count)>>2;
+		count = count < len ? count : count - len;
+		tjs_uint32* limit = dest + count;
+		while( dest < limit ) {
+			*dest = dogray( *dest );
+			dest++;
+		}
+		len -= count;
+	}
+	tjs_uint32 rem = (len>>3)<<3;
+	tjs_uint32* limit = dest + rem;
+	if( dest < limit ) {
+		const __m128i zero_( _mm_setzero_si128() );
+		const __m128i alphamask_(_mm_set1_epi32(0xff000000));
+		const __m128i lum_(_mm_unpacklo_epi8( _mm_set1_epi32(0x0036B713), zero_ ));
+		const __m128i mask (_mm_set_epi32(0x87070707,0x85050505,0x83030303,0x81010101));
+		const __m128i mask2(_mm_set_epi32(0x8f0f0f0f,0x8d0d0d0d,0x8b0b0b0b,0x89090909));
+
+		do {
+			__m128i md1 = _mm_load_si128( (__m128i const*)(dest+0) );
+			__m128i md2 = _mm_load_si128( (__m128i const*)(dest+4) );
+			__m128i ma1 = md1;
+			__m128i ma2 = md2;
+			ma1 = _mm_and_si128( ma1, alphamask_ );
+			ma2 = _mm_and_si128( ma2, alphamask_ );
+
+			__m128i ms2 = md1;
+			md1 = _mm_unpacklo_epi8( md1, zero_ );
+			ms2 = _mm_unpackhi_epi8( ms2, zero_ );
+			md1 = _mm_mullo_epi16( md1, lum_ );
+			ms2 = _mm_mullo_epi16( ms2, lum_ );
+			md1 = _mm_hadd_epi16( md1, ms2 );	// A+R G+B | A+R G+B ... (A=0)
+
+			__m128i mt2 = md2;
+			md2 = _mm_unpacklo_epi8( md2, zero_ );
+			mt2 = _mm_unpackhi_epi8( mt2, zero_ );
+			md2 = _mm_mullo_epi16( md2, lum_ );
+			mt2 = _mm_mullo_epi16( mt2, lum_ );
+			md2 = _mm_hadd_epi16( md2, mt2 );	// A+R G+B | A+R G+B ... (A=0)
+
+			md1 = _mm_hadd_epi16( md1, md2 );	// A+R+G+B | A+R+G+B | A+R+G+B | A+R+G+B (01234567)
+			md2 = md1;
+			md1 = _mm_shuffle_epi8( md1, mask );
+			md1 = _mm_or_si128( md1, ma1 );
+			_mm_store_si128( (__m128i*)(dest+0), md1 );
+			
+			md2 = _mm_shuffle_epi8( md2, mask2 );
+			md2 = _mm_or_si128( md2, ma2 );
+			_mm_store_si128( (__m128i*)(dest+4), md2 );
+
+			dest += 8;
+		} while( dest < limit );
+	}
+
+	limit += (len-rem);
+	while( dest < limit ) {
+		*dest = dogray( *dest );
+		dest++;
+	}
+}
+#endif
+void TVPConvertAdditiveAlphaToAlpha_sse2_c(tjs_uint32 *buf, tjs_int len){
+	convert_func_sse2<sse2_premulalpha_to_alpha>( buf, len );
+}
+void TVPConvertAlphaToAdditiveAlpha_sse2_c(tjs_uint32 *buf, tjs_int len){
+	convert_func_sse2<sse2_alpha_to_premulalpha>( buf, len );
+}
 void TVPGL_SSE2_Init() {
 	if( TVPCPUType & TVP_CPU_HAS_SSE2 ) {
 		TVPAdditiveAlphaBlend = TVPAdditiveAlphaBlend_sse2_c;
@@ -1097,19 +1590,22 @@ void TVPGL_SSE2_Init() {
 #endif
 		//TVPTLG6DecodeLine = TVPTLG6DecodeLine_test;	// for Test
 
-		// TVPMakeAlphaFromKey = TVPMakeAlphaFromKey_c; // –¢ƒeƒXƒg
+		TVPMakeAlphaFromKey = TVPMakeAlphaFromKey_sse2_c;
 
-		// ˆÈ‰ºMMX”Å‚ª‚È‚¢‚Ì‚Å–¢‘Î‰ž
-		//TVPAlphaColorMat
-		//TVPConvertAdditiveAlphaToAlpha
-		//TVPConvertAlphaToAdditiveAlpha
-		//TVPBindMaskToMain
-		//TVPSwapLine8
-		//TVPSwapLine32
-		//TVPReverse8
-		//TVPReverse32
-		//TVPDoGrayScale
-
+		TVPAlphaColorMat = TVPAlphaColorMat_sse2_c;
+		TVPConvertAdditiveAlphaToAlpha = TVPConvertAdditiveAlphaToAlpha_sse2_c;
+		TVPConvertAlphaToAdditiveAlpha = TVPConvertAlphaToAdditiveAlpha_sse2_c;
+		TVPBindMaskToMain = TVPBindMaskToMain_sse2_c;
+		TVPSwapLine8 = TVPSwapLine8_sse2_c;
+		TVPSwapLine32 = TVPSwapLine32_sse2_c;
+		TVPReverse32 = TVPReverse32_sse2_c;
+		if( TVPCPUType & TVP_CPU_HAS_SSSE3 ) {
+			TVPReverse8 = TVPReverse8_ssse3_c;
+			TVPDoGrayScale = TVPDoGrayScale_ssse3_c;
+		} else {
+			TVPReverse8 = TVPReverse8_sse2_c;
+			TVPDoGrayScale = TVPDoGrayScale_sse2_c;
+		}
 		TVPChBlurMulCopy65 = TVPChBlurMulCopy65_sse2_c;
 		TVPChBlurAddMulCopy65 = TVPChBlurAddMulCopy65_sse2_c;
 		TVPChBlurCopy65 = TVPChBlurCopy65_sse2_c;

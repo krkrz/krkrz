@@ -375,4 +375,57 @@ void TVPConstColorAlphaBlend_a_sse2_c(tjs_uint32 *dest, tjs_int len, tjs_uint32 
 	sse2_const_alpha_fill_blend_a_functor func( opa, color );
 	sse2_const_color_alpha_blend( dest, len, func );
 }
+struct sse2_alpha_color_mat_functor {
+	const __m128i zero_;
+	const __m128i color_;
+	const __m128i alphamask_;
+	inline sse2_alpha_color_mat_functor(  tjs_int32 color )
+	: zero_(_mm_setzero_si128()), alphamask_(_mm_set1_epi32(0xff000000)), color_(_mm_unpacklo_epi8( _mm_set1_epi32(color), zero_)){}
+	inline tjs_uint32 operator()( tjs_uint32 s ) const {
+		__m128i md = color_;
+		__m128i ms = _mm_cvtsi32_si128( s );
+		__m128i ma = ms;
+		ma = _mm_srli_epi32( ma, 24 );
+		ma = _mm_shufflelo_epi16( ma, _MM_SHUFFLE( 0, 0, 0, 0 )  );	// ‰ºˆÊ‚Ì‚Ý
+		
+		ms = _mm_unpacklo_epi8( ms, zero_ );
+		ms = _mm_sub_epi16( ms, md );		// ms -= md
+		ms = _mm_mullo_epi16( ms, ma );		// ms *= ma
+		ms = _mm_srli_epi16( ms, 8 );		// ms >>= 8
+		ms = _mm_add_epi8( ms, md );		// md += ms : d + ((s-d)*sopa)>>8
+		ms = _mm_packus_epi16( ms, zero_ );	// pack
+		return _mm_cvtsi128_si32( ms ) | 0xff000000;		// store
+	}
+	inline __m128i operator()( __m128i ms1 ) const {
+		__m128i md = color_;
+		__m128i ms2 = ms1;
+		__m128i ma1 = ms1;
+		ma1 = _mm_srli_epi32( ma1, 24 );
+		ma1 = _mm_packs_epi32( ma1, ma1 );		// 0 1 2 3 0 1 2 3
+		ma1 = _mm_unpacklo_epi16( ma1, ma1 );	// 0 0 1 1 2 2 3 3
+		__m128i ma2 = ma1;
+		ma1 = _mm_unpacklo_epi16( ma1, ma1 );	// 0 0 0 0 1 1 1 1
+		ma2 = _mm_unpackhi_epi16( ma2, ma2 );	// 2 2 2 2 3 3 3 3
+		
+		ms1 = _mm_unpacklo_epi8( ms1, zero_ );
+		ms1 = _mm_sub_epi16( ms1, md );		// s -= d
+		ms1 = _mm_mullo_epi16( ms1, ma1 );	// s *= a
+		ms1 = _mm_srli_epi16( ms1, 8 );		// s >>= 8
+		ms1 = _mm_add_epi8( ms1, md );		// d += s
+		
+		ms2 = _mm_unpackhi_epi8( ms2, zero_ );
+		ms2 = _mm_sub_epi16( ms2, md );		// s -= d
+		ms2 = _mm_mullo_epi16( ms2, ma2 );	// s *= a
+		ms2 = _mm_srli_epi16( ms2, 8 );		// s >>= 8
+		ms2 = _mm_add_epi8( ms2, md );		// d += s
+		ms1 = _mm_packus_epi16( ms1, ms2 );
+		return _mm_or_si128( ms1, alphamask_ );
+	}
+};
+
+void TVPAlphaColorMat_sse2_c(tjs_uint32 *dest, tjs_uint32 color, tjs_int len ) {
+	sse2_alpha_color_mat_functor func( color );
+	sse2_const_color_alpha_blend( dest, len, func );
+}
+
 

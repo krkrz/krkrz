@@ -103,6 +103,20 @@ struct premulalpha_blend_a_d_o_func {	// TVPAddAlphaBlend_a_d_o
 		return func_(d, s);
 	}
 };
+/*
+	Di = sat(Si, (1-Sa)*Di)
+	Da = Sa + Da - SaDa
+*/
+struct premulalpha_blend_a_ca_func {	// = TVPAddAlphaBlend_a_ca
+	saturated_u8_add_func sat_add_;
+	inline tjs_uint32 operator()( tjs_uint32 dest, tjs_uint32 sopa, tjs_uint32 sopa_inv, tjs_uint32 src ) const {
+		tjs_uint32 dopa = dest >> 24;
+		dopa = dopa + sopa - (dopa*sopa >> 8);
+		dopa -= (dopa >> 8); /* adjust alpha */
+		return (dopa << 24) + sat_add_((((dest & 0xff00ff)*sopa_inv >> 8) & 0xff00ff) + (((dest & 0xff00)*sopa_inv >> 8) & 0xff00), src);
+	}
+};
+
 
 //------------------------------------------------------------------------------
 // ƒJƒ‰[¬•ª‚Éfac‚ğ‚©‚¯‚é
@@ -128,6 +142,15 @@ struct alpha_to_premulalpha_func {
 	}
 };
 //------------------------------------------------------------------------------
-
+/* returns a * ratio + b * (1 - ratio) */
+struct blend_argb {
+	inline tjs_uint32 operator()(tjs_uint32 b, tjs_uint32 a, tjs_int ratio ) const {
+		tjs_uint32 b2 = b & 0x00ff00ff;
+		tjs_uint32 t = (b2 + (((a & 0x00ff00ff) - b2) * ratio >> 8)) & 0x00ff00ff;
+		b2 = (b & 0xff00ff00) >> 8;
+		return t +  (((b2 + (( ((a & 0xff00ff00) >> 8) - b2) * ratio >> 8)) << 8)& 0xff00ff00);
+	}
+};
+//------------------------------------------------------------------------------
 
 #endif // __BLEND_UTIL_FUNC_H__
