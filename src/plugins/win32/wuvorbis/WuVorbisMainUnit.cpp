@@ -751,7 +751,7 @@ extern "C" void SetCPUType(unsigned __int32 type)
 	InternalSetCPUType(type);
 }
 //---------------------------------------------------------------------------
-extern unsigned __int32 _cdecl TVPCheckCPU(void);
+extern tjs_uint32 TVPCheckCPU();
 extern "C"  unsigned __int32 TVPCPUType = 0;
 extern "C" unsigned __int32 DetectCPU(void)
 {
