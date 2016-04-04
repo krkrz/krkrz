@@ -15,7 +15,7 @@ void TVPFillARGB_sse2_c( tjs_uint32 *dest, tjs_int len, tjs_uint32 value ) {
 	tjs_int count = (tjs_int)((unsigned)dest & 0xF);
 	if( count ) {
 		count = (16 - count)>>2;
-		count = count < len ? count : count - len;
+		count = count > len ? len : count;
 		tjs_uint32* limit = dest + count;
 		while( dest < limit ) {
 			*dest = value;
@@ -47,7 +47,7 @@ void TVPFillARGB_NC_sse2_c( tjs_uint32 *dest, tjs_int len, tjs_uint32 value ) {
 	tjs_int count = (tjs_int)((unsigned)dest & 0xF);
 	if( count ) {
 		count = (16 - count)>>2;
-		count = count < len ? count : count - len;
+		count = count > len ? len : count;
 		tjs_uint32* limit = dest + count;
 		while( dest < limit ) {
 			*dest = value;
@@ -108,7 +108,7 @@ inline void sse2_const_color_copy_unroll( tjs_uint32 *dest, tjs_int len, const f
 	tjs_int count = (tjs_int)((unsigned)dest & 0xF);
 	if( count ) {
 		count = (16 - count)>>2;
-		count = count < len ? count : count - len;
+		count = count > len ? len : count;
 		tjs_uint32* limit = dest + count;
 		while( dest < limit ) {
 			*dest = func( *dest );
@@ -338,7 +338,7 @@ inline void sse2_const_color_alpha_blend( tjs_uint32 *dest, tjs_int len, const f
 	tjs_int count = (tjs_int)((unsigned)dest & 0xF);
 	if( count ) {
 		count = (16 - count)>>2;
-		count = count < len ? count : count - len;
+		count = count > len ? len : count;
 		tjs_uint32* limit = dest + count;
 		while( dest < limit ) {
 			*dest = func( *dest );
