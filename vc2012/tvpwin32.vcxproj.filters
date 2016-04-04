@@ -317,9 +317,6 @@
     <ClInclude Include="..\visual\LoadTLG.h">
       <Filter>visual</Filter>
     </ClInclude>
-    <ClInclude Include="..\visual\Resampler.h">
-      <Filter>visual</Filter>
-    </ClInclude>
     <ClInclude Include="..\visual\transhandler.h">
       <Filter>visual</Filter>
     </ClInclude>
@@ -662,6 +659,24 @@
     <ClInclude Include="..\movie\win32\TVPVideoOverlay.h">
       <Filter>movie\win32</Filter>
     </ClInclude>
+    <ClInclude Include="..\visual\gl\aligned_allocator.h">
+      <Filter>visual\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\gl\ResampleImage.h">
+      <Filter>visual\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\gl\ResampleImageInternal.h">
+      <Filter>visual\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\gl\WeightFunctor.h">
+      <Filter>visual\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\gl\WeightFunctorAVX.h">
+      <Filter>visual\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\gl\WeightFunctorSSE.h">
+      <Filter>visual\gl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\tjs2\tjs.cpp">
@@ -890,9 +905,6 @@
       <Filter>visual</Filter>
     </ClCompile>
     <ClCompile Include="..\visual\LoadTLG.cpp">
-      <Filter>visual</Filter>
-    </ClCompile>
-    <ClCompile Include="..\visual\Resampler.cpp">
       <Filter>visual</Filter>
     </ClCompile>
     <ClCompile Include="..\visual\TransIntf.cpp">
@@ -1218,6 +1230,21 @@
     </ClCompile>
     <ClCompile Include="..\movie\win32\TVPVideoOverlay.cpp">
       <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\gl\ResampleImage.cpp">
+      <Filter>visual\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\gl\ResampleImageAVX2.cpp">
+      <Filter>visual\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\gl\ResampleImageSSE2.cpp">
+      <Filter>visual\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\gl\WeightFunctor.cpp">
+      <Filter>visual\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\gl\x86simdutilAVX2.cpp">
+      <Filter>visual\gl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

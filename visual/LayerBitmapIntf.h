@@ -62,11 +62,27 @@ enum tTVPBBStretchType
 	stFastLinear = 1, // fast linear interpolation (does not have so much precision)
 	stLinear = 2,  // (strict) linear interpolation
 	stCubic = 3,    // cubic interpolation
+	stSemiFastLinear = 4,
+	stFastCubic = 5,
+	stLanczos2 = 6,    // Lanczos 2 interpolation
+	stFastLanczos2 = 7,
+	stLanczos3 = 8,    // Lanczos 3 interpolation
+	stFastLanczos3 = 9,
+	stSpline16 = 10,	// Spline16 interpolation
+	stFastSpline16 = 11,
+	stSpline36 = 12,	// Spline36 interpolation
+	stFastSpline36 = 13,
+	stAreaAvg = 14,	// Area average interpolation
+	stFastAreaAvg = 15,
+	stGaussian = 16,
+	stFastGaussian = 17,
+	stBlackmanSinc = 18,
+	stFastBlackmanSinc = 19,
 
-	stTypeMask = 0xf, // stretch type mask
-	stFlagMask = 0xf0, // flag mask
+	stTypeMask = 0x0000ffff, // stretch type mask
+	stFlagMask = 0xffff0000, // flag mask
 
-	stRefNoClip = 0x10 // referencing source is not limited by the given rectangle
+	stRefNoClip = 0x10000 // referencing source is not limited by the given rectangle
 						// (may allow to see the border pixel to interpolate)
 };
 /*]*/
@@ -311,7 +327,7 @@ private:
 public:
 	bool StretchBlt(tTVPRect cliprect, tTVPRect destrect, const tTVPBaseBitmap *ref,
 		tTVPRect refrect, tTVPBBBltMethod method, tjs_int opa,
-			bool hda = true, tTVPBBStretchType type = stNearest);
+			bool hda = true, tTVPBBStretchType type = stNearest, tjs_real typeopt=0.0);
 
 private:
 	template <typename tFuncStretch, typename tFuncAffine>

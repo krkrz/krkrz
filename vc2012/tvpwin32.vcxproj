@@ -481,14 +481,20 @@
     <ClInclude Include="..\visual\FreeType.h" />
     <ClInclude Include="..\visual\FreeTypeFace.h" />
     <ClInclude Include="..\visual\FreeTypeFontRasterizer.h" />
+    <ClInclude Include="..\visual\gl\aligned_allocator.h" />
     <ClInclude Include="..\visual\gl\blend_functor_c.h" />
     <ClInclude Include="..\visual\gl\blend_functor_sse2.h" />
     <ClInclude Include="..\visual\gl\blend_ps_functor_sse2.h" />
     <ClInclude Include="..\visual\gl\blend_util_func.h" />
     <ClInclude Include="..\visual\gl\blend_variation.h" />
     <ClInclude Include="..\visual\gl\interpolation_functor_sse2.h" />
+    <ClInclude Include="..\visual\gl\ResampleImage.h" />
+    <ClInclude Include="..\visual\gl\ResampleImageInternal.h" />
     <ClInclude Include="..\visual\gl\simd_def_x86x64.h" />
     <ClInclude Include="..\visual\gl\sse_mathfun.h" />
+    <ClInclude Include="..\visual\gl\WeightFunctor.h" />
+    <ClInclude Include="..\visual\gl\WeightFunctorAVX.h" />
+    <ClInclude Include="..\visual\gl\WeightFunctorSSE.h" />
     <ClInclude Include="..\visual\gl\x86simdutil.h" />
     <ClInclude Include="..\visual\GraphicsLoaderIntf.h" />
     <ClInclude Include="..\visual\GraphicsLoadThread.h" />
@@ -502,7 +508,6 @@
     <ClInclude Include="..\visual\LoadTLG.h" />
     <ClInclude Include="..\visual\PrerenderedFont.h" />
     <ClInclude Include="..\visual\RectItf.h" />
-    <ClInclude Include="..\visual\Resampler.h" />
     <ClInclude Include="..\visual\SaveTLG.h" />
     <ClInclude Include="..\visual\transhandler.h" />
     <ClInclude Include="..\visual\TransIntf.h" />
@@ -676,9 +681,25 @@
     <ClCompile Include="..\visual\gl\colorfill_sse2.cpp" />
     <ClCompile Include="..\visual\gl\colormap_sse2.cpp" />
     <ClCompile Include="..\visual\gl\pixelformat_sse2.cpp" />
+    <ClCompile Include="..\visual\gl\ResampleImage.cpp" />
+    <ClCompile Include="..\visual\gl\ResampleImageAVX2.cpp">
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release Enable Debugger|Win32'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AssemblyAndSourceCode</AssemblerOutput>
+    </ClCompile>
+    <ClCompile Include="..\visual\gl\ResampleImageSSE2.cpp">
+      <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AssemblyAndSourceCode</AssemblerOutput>
+    </ClCompile>
     <ClCompile Include="..\visual\gl\tlg_sse2.cpp" />
     <ClCompile Include="..\visual\gl\univtrans_sse2.cpp" />
+    <ClCompile Include="..\visual\gl\WeightFunctor.cpp" />
     <ClCompile Include="..\visual\gl\x86simdutil.cpp" />
+    <ClCompile Include="..\visual\gl\x86simdutilAVX2.cpp">
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release Enable Debugger|Win32'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+    </ClCompile>
     <ClCompile Include="..\visual\GraphicsLoaderIntf.cpp" />
     <ClCompile Include="..\visual\GraphicsLoadThread.cpp" />
     <ClCompile Include="..\visual\IA32\detect_cpu.cpp" />
@@ -695,7 +716,6 @@
     <ClCompile Include="..\visual\LoadTLG.cpp" />
     <ClCompile Include="..\visual\PrerenderedFont.cpp" />
     <ClCompile Include="..\visual\RectItf.cpp" />
-    <ClCompile Include="..\visual\Resampler.cpp" />
     <ClCompile Include="..\visual\SaveTLG5.cpp" />
     <ClCompile Include="..\visual\SaveTLG6.cpp" />
     <ClCompile Include="..\visual\TransIntf.cpp" />
