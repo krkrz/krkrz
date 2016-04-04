@@ -1,12 +1,15 @@
+/*
+
+	TVP2 ( T Visual Presenter 2 )  A script authoring tool
+	Copyright (C) 2000-2009 W.Dee <dee@kikyou.info> and contributors
+
+	See details of license at "license.txt"
+
+
+*/
 /******************************************************************************/
 /**
  * アルファの扱い方によって発生するバリエーションを作りやすくするためのファンクタ
- * ----------------------------------------------------------------------------
- * 	Copyright (C) T.Imoto <http://www.kaede-software.com>
- * ----------------------------------------------------------------------------
- * @author		T.Imoto
- * @date		2014/02/11
- * @note		
  * blend_func は、
  * tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s, tjs_uint32 a )
  * を持つファンクタ

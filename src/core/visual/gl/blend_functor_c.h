@@ -1,12 +1,14 @@
+/*
+
+	TVP2 ( T Visual Presenter 2 )  A script authoring tool
+	Copyright (C) 2000-2009 W.Dee <dee@kikyou.info> and contributors
+
+	See details of license at "license.txt"
+
+
+*/
 /******************************************************************************/
 /**
- * アルファブレンド
- * ----------------------------------------------------------------------------
- * 	Copyright (C) T.Imoto <http://www.kaede-software.com>
- * ----------------------------------------------------------------------------
- * @author		T.Imoto
- * @date		2014/02/11
- * @note		
  * Additive alpha は、pre-multiplied alpha と言う表記へ
  *****************************************************************************/
 
@@ -334,6 +336,11 @@ typedef hda_nsa_op<screen_blend_functor>			screen_blend_HDA_functor;
 typedef translucent_nsa_op<screen_blend_HDA_o_func>	screen_blend_HDA_o_functor;
 
 //------------------------------------------------------------------------------
+/*
+  Photoshop-like layer blender for KIRIKIRI (C-version)
+  (c)2004-2005 Kengo Takagi (Kenjo) <kenjo@ceres.dti.ne.jp>
+*/
+
 /** Photoshop互換のアルファ合成 */
 struct ps_alpha_blend_func {
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s, tjs_uint32 a ) const {
