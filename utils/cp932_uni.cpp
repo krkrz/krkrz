@@ -1429,10 +1429,10 @@ tjs_char SJISToUnicode(tjs_uint sjis)
  *			(最後に\0は書き込まれないしその文字数も含まれないので注意)
  *			(tjs_size)-1 = 異常な文字が見つかった
  */
-tjs_int SJISToUnicodeString(const char * in, tjs_char *out)
+tjs_size SJISToUnicodeString(const char * in, tjs_char *out)
 {
 	// convert input Shift-JIS (CP932) string to output wide string
-	int count = 0;
+	tjs_size count = 0;
 	while(*in)
 	{
 		tjs_char c;
@@ -1453,6 +1453,45 @@ tjs_int SJISToUnicodeString(const char * in, tjs_char *out)
 }
 //---------------------------------------------------------------------------
 
+//---------------------------------------------------------------------------
+/**
+ * CP932文字列をUNICODEに変換する
+ * @param in	入力 MBCS 文字列
+ * @param out	出力 UNICODE (wchar_t) 文字列 (NULLの場合は書き込まれない)
+ * @param limit 出力バッファサイズ
+ * @return	出力された文字数
+ *			(最後に\0は書き込まれないしその文字数も含まれないので注意)
+ *			(tjs_size)-1 = 異常な文字が見つかった
+ */
+tjs_size SJISToUnicodeString(const char * in, tjs_char *out, tjs_size limit )
+{
+	if( out == NULL ) return SJISToUnicodeString(in,NULL);
 
+	// convert input Shift-JIS (CP932) string to output wide string
+	tjs_size count = 0;
+	while( (*in) && count < limit )
+	{
+		tjs_char c;
+		if(!TVPSJISToUnicode(in, &c))
+			return static_cast<tjs_int>(-1); // invalid character found
+		*out++ = c;
+		count ++;
+	}
+	return count;
+}
+
+//---------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------
+/**
+ * CP932文字で2バイト文字コードの1バイト目か確認する
+ * @param b	入力 MBCS 文字列
+ * @return	true 2バイト文字の1バイト目, false 1バイト文字
+ */
+bool IsSJISLeadByte( tjs_nchar b )
+{
+	tjs_uint16 ch = SJIS2UNICODE_Submap_map_00[b];
+	return ( ch == 0x0000U );
+}
 //---------------------------------------------------------------------------
 

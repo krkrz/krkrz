@@ -2577,8 +2577,71 @@ tjs_uint UnicodeToSJIS(tjs_char in)
 	return 0;
 }
 //---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+/**
+ * UNICODE文字列をCP932に変換する
+ * @param in	入力 UNICODE 文字列
+ * @param out	出力 CP932文字列 (NULLの場合は書き込まれない)
+ * @return	出力された文字数
+ *			(最後に\0は書き込まれないしその文字数も含まれないので注意)
+ *			(tjs_size)-1 = 異常な文字が見つかった
+ */
+tjs_size UnicodeToSJISString(const tjs_char *in, tjs_nchar* out )
+{
+	tjs_size count = 0;
+	while(*in)
+	{
+		tjs_uint c = UnicodeToSJIS(*in);
+		if( c == 0 )
+			return static_cast<tjs_size>(-1); // invalid character found
+		if(out)
+		{
+			if( c & 0xff00 )
+				*out++ = static_cast<tjs_nchar>((c>>8)&0xff);
+			*out++ = static_cast<tjs_nchar>( c&0xff );
+		}
+		if( c & 0xff00 )
+			count++;
+		count++;
+		in++;
+	}
+	return count;
+}
+//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+/**
+ * UNICODE文字列をCP932に変換する
+ * @param in	入力 UNICODE 文字列
+ * @param out	出力 CP932文字列 (NULLの場合は書き込まれない)
+ * @param limit 出力バッファサイズ
+ * @return	出力された文字数
+ *			(最後に\0は書き込まれないしその文字数も含まれないので注意)
+ *			(tjs_size)-1 = 異常な文字が見つかった
+ */
+tjs_size UnicodeToSJISString(const tjs_char *in, tjs_nchar* out, tjs_size limit )
+{
+	if( out == NULL ) return UnicodeToSJISString(in,NULL);
 
-
+	tjs_size count = 0;
+	while( (*in) && count < limit )
+	{
+		tjs_uint c = UnicodeToSJIS(*in);
+		if( c == 0 )
+			return static_cast<tjs_size>(-1); // invalid character found
+		if( c & 0xff00 )
+		{
+			if( (count+1) >= limit )
+				break;
+			*out++ = static_cast<tjs_nchar>((c>>8)&0xff);
+			count++;
+		}
+		*out++ = static_cast<tjs_nchar>( c&0xff );
+		count++;
+		in++;
+	}
+	return count;
+}
+//---------------------------------------------------------------------------
 #ifdef SELFTEST
 
 #include <stdio.h>
