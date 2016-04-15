@@ -71,6 +71,10 @@ TJS_EXP_FUNC_DEF(size_t, TJS_strlen, (const tjs_char *d));
 #define TJS_octetcmp		memcmp
 #define TJS_strtod			wcstod
 
+extern size_t TJS_mbstowcs(tjs_char *pwcs, const tjs_nchar *s, size_t n);
+extern size_t TJS_wcstombs(tjs_nchar *s, const tjs_char *pwcs, size_t n);
+extern int TJS_mbtowc(tjs_char *pwc, const tjs_nchar *s, size_t n);
+extern int TJS_wctomb(tjs_nchar *s, tjs_char wc);
 
 #define TJS_strncpy_s		wcsncpy_s
 
@@ -79,10 +83,6 @@ TJS_EXP_FUNC_DEF(size_t, TJS_strlen, (const tjs_char *d));
 	#define TJS_vsnprintf		vswprintf
 	extern tjs_int TJS_sprintf(tjs_char *s, const tjs_char *format, ...);
 	#define TJS_timezone timezone
-	#define TJS_mbstowcs mbstowcs
-	#define TJS_wcstombs wcstombs
-	#define TJS_mbtowc   mbtowc
-	#define TJS_wctomb   wctomb
 	#define TJS_snprintf wsnprintf
 #elif __WIN32__
 	#define TJS_cdecl __cdecl
@@ -94,12 +94,7 @@ TJS_EXP_FUNC_DEF(size_t, TJS_strlen, (const tjs_char *d));
 	#define TJS_snprintf		swprintf_s
 	#define TJS_sprintf			swprintf
 	#define TJS_timezone _timezone
-	extern size_t TJS_mbstowcs(tjs_char *pwcs, const tjs_nchar *s, size_t n);
-	extern size_t TJS_wcstombs(tjs_nchar *s, const tjs_char *pwcs, size_t n);
-	extern int TJS_mbtowc(tjs_char *pwc, const tjs_nchar *s, size_t n);
-	extern int TJS_wctomb(tjs_nchar *s, tjs_char wc);
 #endif
-
 
 #define TJS_narrowtowidelen(X) TJS_mbstowcs(NULL, (X),0) // narrow->wide (if) converted length
 #define TJS_narrowtowide TJS_mbstowcs
