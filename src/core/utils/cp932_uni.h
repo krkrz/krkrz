@@ -19,8 +19,10 @@
 
 //---------------------------------------------------------------------------
 
-size_t SJISToUnicodeString(const char * in, tjs_char *out);
+tjs_size SJISToUnicodeString(const char * in, tjs_char *out);
+tjs_size SJISToUnicodeString(const char * in, tjs_char *out, tjs_size limit );
 tjs_char SJISToUnicode(tjs_uint sjis);
+bool IsSJISLeadByte( tjs_nchar b );
 
 //---------------------------------------------------------------------------
 
