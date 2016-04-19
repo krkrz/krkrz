@@ -2046,7 +2046,14 @@ void TJS_INTF_METHOD tTJSNI_Window::ResetImeMode( class iTVPLayerManager* manage
 	if( DrawDevice ) DrawDevice->ResetImeMode(manager);
 }
 //---------------------------------------------------------------------------
-
+void tTJSNI_Window::OnTouchUp( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id )
+{
+	tTJSNI_BaseWindow::OnTouchUp( x, y, cx, cy, id );
+	if( Form )
+	{
+		Form->ResetTouchVelocity( id );
+	}
+}
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------

@@ -439,6 +439,7 @@ public:
 	
 	bool WaitForVBlank( tjs_int* in_vblank, tjs_int* delayed );
 
+	void OnTouchUp( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id );
 public: // for iTVPLayerTreeOwner
 	// LayerManager -> LTO
 	/*

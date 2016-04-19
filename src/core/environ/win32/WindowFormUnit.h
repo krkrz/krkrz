@@ -424,6 +424,9 @@ public:
 	void ResetMouseVelocity() {
 		MouseVelocityTracker.clear();
 	}
+	void ResetTouchVelocity( tjs_int id ) {
+		TouchVelocityTracker.end( id );
+	}
 
 	void SetHintDelay( tjs_int delay ) { HintDelay = delay; }
 	tjs_int GetHintDelay() const { return HintDelay; }
