@@ -1729,7 +1729,7 @@ void TTVPWindowForm::OnTouchUp( double x, double y, double cx, double cy, DWORD 
 	}
 	touch_points_.TouchUp( x, y, cx, cy, id, tick );
 
-	TouchVelocityTracker.end( id );
+	//TouchVelocityTracker.end( id );
 }
 
 void TTVPWindowForm::OnTouchScaling( double startdist, double currentdist, double cx, double cy, int flag ) {
