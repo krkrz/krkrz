@@ -2904,7 +2904,7 @@ void tTJSInterCodeContext::ExitElseCode()
 	NestVector.pop_back();
 }
 //---------------------------------------------------------------------------
-void tTJSInterCodeContext::EnterForCode(bool varcreate)
+void tTJSInterCodeContext::EnterForCode()
 {
 	// enter to "for".
 	// ( varcreate = true, indicates that the variable is to be created in the
@@ -2912,8 +2912,10 @@ void tTJSInterCodeContext::EnterForCode(bool varcreate)
 
 	NestVector.push_back(tNestData());
 	NestVector.back().Type = ntFor;
-	if(varcreate) EnterBlock(); // create a scope
-	NestVector.back().VariableCreated = varcreate;
+	EnterBlock();
+	// create a scope for "for" initializing clause even it does not introduce
+	//   local variables, due to brevity of semantics
+	//NestVector.back().VariableCreated = false;
 }
 //---------------------------------------------------------------------------
 void tTJSInterCodeContext::CreateForExprCode(tTJSExprNode *node)
@@ -2983,7 +2985,7 @@ void tTJSInterCodeContext::ExitForCode()
 	PutCode(VM_JMP, LEX_POS);
 	PutCode(NestVector.back().LoopStartIP - jmp_ip, LEX_POS);
 	DoNestTopExitPatch();
-	if(NestVector.back().VariableCreated) ExitBlock();
+	ExitBlock();
 	DoNestTopExitPatch();
 	NestVector.pop_back();
 }
