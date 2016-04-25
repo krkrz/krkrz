@@ -979,7 +979,7 @@ public:
 		const int srcheight = srcrect.get_height();
 		const int dstwidth = destrect.get_width();
 		const int dstheight = destrect.get_height();
-		paramx_.calculateAxis( srcrect.left, srcrect.right, srcwidth, dstwidth, tap, false, func );
+		paramx_.calculateAxis( 0, srcwidth, srcwidth, dstwidth, tap, false, func );
 		paramy_.calculateAxis( srcrect.top, srcrect.bottom, srcheight, dstheight, tap, true, func );
 		ResampleImage( clip, blendfunc, dest, destrect, src, srcrect );
 	}
@@ -1000,7 +1000,7 @@ public:
 			Resample( clip, blendfunc, dest, destrect, src, srcrect, tap, func );
 			return;
 		}
-		paramx_.calculateAxis( srcrect.left, srcrect.right, srcwidth, dstwidth, tap, false, func );
+		paramx_.calculateAxis( 0, srcwidth, srcwidth, dstwidth, tap, false, func );
 		paramy_.calculateAxis( srcrect.top, srcrect.bottom, srcheight, dstheight, tap, true, func );
 		ResampleImageMT( clip, blendfunc, dest, destrect, src, srcrect, threadNum );
 	}
@@ -1011,7 +1011,7 @@ public:
 		const int dstwidth = destrect.get_width();
 		const int dstheight = destrect.get_height();
 		if( dstwidth > srcwidth || dstheight > srcheight ) return;
-		paramx_.calculateAxisAreaAvg( srcrect.left, srcrect.right, srcwidth, dstwidth, false );
+		paramx_.calculateAxisAreaAvg( 0, srcwidth, srcwidth, dstwidth, false );
 		paramy_.calculateAxisAreaAvg( srcrect.top, srcrect.bottom, srcheight, dstheight, true );
 		ResampleImage( clip, blendfunc, dest, destrect, src, srcrect );
 	}
@@ -1032,7 +1032,7 @@ public:
 			ResampleAreaAvg( clip, blendfunc, dest, destrect, src, srcrect );
 			return;
 		}
-		paramx_.calculateAxisAreaAvg( srcrect.left, srcrect.right, srcwidth, dstwidth, false );
+		paramx_.calculateAxisAreaAvg( 0, srcwidth, srcwidth, dstwidth, false );
 		paramy_.calculateAxisAreaAvg( srcrect.top, srcrect.bottom, srcheight, dstheight, true );
 		ResampleImageMT( clip, blendfunc, dest, destrect, src, srcrect, threadNum );
 	}
