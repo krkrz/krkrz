@@ -297,6 +297,12 @@ public:
 	bool CopyRect(tjs_int x, tjs_int y, const tTVPBaseBitmap *ref,
 		tTVPRect refrect, tjs_int plane = (TVP_BB_COPY_MAIN|TVP_BB_COPY_MASK));
 
+    /**
+     * @param ref : コピー元画像(9patch形式)
+     * @param margin : 9patchの右下にある描画領域指定を取得する
+     */
+    bool Copy9Patch( const tTVPBaseBitmap *ref, tTVPRect& margin );
+
 	bool Blt(tjs_int x, tjs_int y, const tTVPBaseBitmap *ref,
 		tTVPRect refrect, tTVPBBBltMethod method, tjs_int opa,
 			bool hda = true);
