@@ -409,7 +409,7 @@ public:
 		const int len = paramy_.length_[y];
 		const int bottom = top + len;
 		const float* weighty = wstarty;
-		const tjs_uint32* srctop = (const tjs_uint32*)src->GetScanLine(top+srcrect.top) + srcrect.left;
+		const tjs_uint32* srctop = (const tjs_uint32*)src->GetScanLine(top) + srcrect.left;
 		tjs_int stride = src->GetPitchBytes()/(int)sizeof(tjs_uint32);
 		for( int x = 0; x < srcwidth; x++ ) {
 			weighty = wstarty;
@@ -549,7 +549,7 @@ public:
 		const int srcheight = srcrect.get_height();
 		const int dstwidth = destrect.get_width();
 		const int dstheight = destrect.get_height();
-		AxisParamCalculateAxis( paramx_, srcrect.left, srcrect.right, srcwidth, dstwidth, tap, func );
+		AxisParamCalculateAxis( paramx_, 0, srcwidth, srcwidth, dstwidth, tap, func );
 		AxisParamCalculateAxis( paramy_, srcrect.top, srcrect.bottom, srcheight, dstheight, tap, func );
 		ResampleImage( clip, blendfunc, dest, destrect, src, srcrect );
 	}
@@ -570,7 +570,7 @@ public:
 			Resample( clip, blendfunc, dest, destrect, src, srcrect, tap, func );
 			return;
 		}
-		AxisParamCalculateAxis( paramx_, srcrect.left, srcrect.right, srcwidth, dstwidth, tap, func );
+		AxisParamCalculateAxis( paramx_, 0, srcwidth, srcwidth, dstwidth, tap, func );
 		AxisParamCalculateAxis( paramy_, srcrect.top, srcrect.bottom, srcheight, dstheight, tap, func );
 		ResampleImageMT( clip, blendfunc, dest, destrect, src, srcrect, threadNum );
 	}
@@ -580,7 +580,7 @@ public:
 		const int dstwidth = destrect.get_width();
 		const int dstheight = destrect.get_height();
 		if( dstwidth > srcwidth || dstheight > srcheight ) return;
-		AxisParamCalculateAxisAreaAvg( paramx_, srcrect.left, srcrect.right, srcwidth, dstwidth );
+		AxisParamCalculateAxisAreaAvg( paramx_, 0, srcwidth, srcwidth, dstwidth );
 		AxisParamCalculateAxisAreaAvg( paramy_, srcrect.top, srcrect.bottom, srcheight, dstheight );
 		ResampleImage( clip, blendfunc, dest, destrect, src, srcrect );
 	}
@@ -601,7 +601,7 @@ public:
 			ResampleAreaAvg( clip, blendfunc, dest, destrect, src, srcrect );
 			return;
 		}
-		AxisParamCalculateAxisAreaAvg( paramx_, srcrect.left, srcrect.right, srcwidth, dstwidth );
+		AxisParamCalculateAxisAreaAvg( paramx_, 0, srcwidth, srcwidth, dstwidth );
 		AxisParamCalculateAxisAreaAvg( paramy_, srcrect.top, srcrect.bottom, srcheight, dstheight );
 		ResampleImageMT( clip, blendfunc, dest, destrect, src, srcrect, threadNum );
 	}
