@@ -439,7 +439,7 @@ public:
 	void EnterElseCode();
 	void ExitElseCode();
 
-	void EnterForCode(bool varcreate);
+	void EnterForCode();
 	void CreateForExprCode(tTJSExprNode *node);
 	void SetForThirdExprCode(tTJSExprNode *node);
 	void ExitForCode();

@@ -2363,21 +2363,21 @@ yyreduce:
 
 /* Line 1455 of yacc.c  */
 #line 314 "syntax/tjs.y"
-    { cc->EnterForCode(false); ;}
+    { cc->EnterForCode(); ;}
     break;
 
   case 45:
 
 /* Line 1455 of yacc.c  */
 #line 315 "syntax/tjs.y"
-    { cc->EnterForCode(true); ;}
+    { cc->EnterForCode(); ;}
     break;
 
   case 47:
 
 /* Line 1455 of yacc.c  */
 #line 317 "syntax/tjs.y"
-    { cc->EnterForCode(false);
+    { cc->EnterForCode();
 											  cc->CreateExprCode((yyvsp[(1) - (1)].np)); ;}
     break;
 
