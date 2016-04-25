@@ -311,10 +311,10 @@ for
 
 /* the first clause of a for statement */
 for_first_clause
-	: /* empty */							{ cc->EnterForCode(false); }
-	|										{ cc->EnterForCode(true); }
+	: /* empty */							{ cc->EnterForCode(); }
+	|										{ cc->EnterForCode(); }
 	  variable_def_inner
-	| expr									{ cc->EnterForCode(false);
+	| expr									{ cc->EnterForCode();
 											  cc->CreateExprCode($1); }
 ;
 
