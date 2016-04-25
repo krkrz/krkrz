@@ -4209,6 +4209,26 @@ void tTJSNI_BaseLayer::CopyRect(tjs_int dx, tjs_int dy, tTVPBaseBitmap *src, tTV
 	}
 }
 //---------------------------------------------------------------------------
+bool tTJSNI_BaseLayer::Copy9Patch( const tTVPBaseBitmap *src, tTVPRect &margin )
+{
+	if(!MainImage) TVPThrowExceptionMessage(TVPNotDrawableLayerType);
+	ImageModified = MainImage->Copy9Patch( src, margin );
+	if( ImageModified )
+	{
+		tTVPRect ur(0,0,GetImageWidth(),GetImageHeight());
+		if(ImageLeft != 0 || ImageTop != 0)
+		{
+			ur.add_offsets(ImageLeft, ImageTop);
+			Update(ur);
+		}
+		else
+		{
+			Update(ur);
+		}
+	}
+	return ImageModified;
+}
+//---------------------------------------------------------------------------
 void tTJSNI_BaseLayer::StretchCopy(const tTVPRect &destrect, tTVPBaseBitmap *src,
 		const tTVPRect &srcrect, tTVPBBStretchType type, tjs_real typeopt)
 {
@@ -7138,6 +7158,51 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/copyRect)
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/copyRect)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/copy9Patch)
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
+	if(numparams < 1) return TJS_E_BADPARAMCOUNT;
+
+	tTVPBaseBitmap* src = NULL;
+	tTJSVariantClosure clo = param[0]->AsObjectClosureNoAddRef();
+	if(clo.Object)
+	{
+		tTJSNI_BaseLayer * srclayer = NULL;
+		if(TJS_FAILED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE,
+			tTJSNC_Layer::ClassID, (iTJSNativeInstance**)&srclayer)))
+			src = NULL;
+		else
+		{
+			src = srclayer->GetMainImage();
+		}
+
+		if( src == NULL )
+		{	// try to get bitmap interface
+			tTJSNI_Bitmap * srcbmp = NULL;
+			if(TJS_FAILED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE,
+				tTJSNC_Bitmap::ClassID, (iTJSNativeInstance**)&srcbmp)))
+				src = NULL;
+			else
+				src = srcbmp->GetBitmap();
+		}
+	}
+	if(!src) TVPThrowExceptionMessage(TVPSpecifyLayerOrBitmap);
+
+	tTVPRect margin;
+	bool updated = _this->Copy9Patch( src, margin );
+	if( result ) {
+		if( updated ) {
+			iTJSDispatch2 *ret = TVPCreateRectObject( margin.left, margin.top, margin.right, margin.bottom );
+			*result = tTJSVariant(ret, ret);
+			ret->Release();
+		} else {
+			result->Clear();
+		}
+	}
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/copy9Patch)
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/operateRect)
 {

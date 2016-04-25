@@ -745,6 +745,8 @@ public:
 
 	void CopyRect(tjs_int dx, tjs_int dy, tTVPBaseBitmap *src, tTVPBaseBitmap *provincesrc,
 		const tTVPRect &rect);
+	
+	bool Copy9Patch( const tTVPBaseBitmap *src, tTVPRect &margin );
 
 	void StretchCopy(const tTVPRect &destrect, tTVPBaseBitmap *src,
 		const tTVPRect &rect, tTVPBBStretchType mode = stNearest, tjs_real typeopt = 0.0);
