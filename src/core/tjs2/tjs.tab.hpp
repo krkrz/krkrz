@@ -1,11 +1,10 @@
 namespace TJS {
-
-/* A Bison parser, made by GNU Bison 2.4.1.  */
+/* A Bison parser, made by GNU Bison 2.4.2.  */
 
 /* Skeleton interface for Bison's Yacc-like parsers in C
    
-      Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
-   Free Software Foundation, Inc.
+      Copyright (C) 1984, 1989-1990, 2000-2006, 2009-2010 Free Software
+   Foundation, Inc.
    
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -107,70 +106,71 @@ namespace TJS {
      T_RBRACE = 322,
      T_CONTINUE = 323,
      T_FUNCTION = 324,
-     T_DEBUGGER = 325,
-     T_DEFAULT = 326,
-     T_CASE = 327,
-     T_EXTENDS = 328,
-     T_FINALLY = 329,
-     T_PROPERTY = 330,
-     T_PRIVATE = 331,
-     T_PUBLIC = 332,
-     T_PROTECTED = 333,
-     T_STATIC = 334,
-     T_RETURN = 335,
-     T_BREAK = 336,
-     T_EXPORT = 337,
-     T_IMPORT = 338,
-     T_SWITCH = 339,
-     T_IN = 340,
-     T_INCONTEXTOF = 341,
-     T_FOR = 342,
-     T_WHILE = 343,
-     T_DO = 344,
-     T_IF = 345,
-     T_VAR = 346,
-     T_CONST = 347,
-     T_ENUM = 348,
-     T_GOTO = 349,
-     T_THROW = 350,
-     T_TRY = 351,
-     T_SETTER = 352,
-     T_GETTER = 353,
-     T_ELSE = 354,
-     T_CATCH = 355,
-     T_OMIT = 356,
-     T_SYNCHRONIZED = 357,
-     T_WITH = 358,
-     T_INT = 359,
-     T_REAL = 360,
-     T_STRING = 361,
-     T_OCTET = 362,
-     T_FALSE = 363,
-     T_NULL = 364,
-     T_TRUE = 365,
-     T_VOID = 366,
-     T_NAN = 367,
-     T_INFINITY = 368,
-     T_UPLUS = 369,
-     T_UMINUS = 370,
-     T_EVAL = 371,
-     T_POSTDECREMENT = 372,
-     T_POSTINCREMENT = 373,
-     T_IGNOREPROP = 374,
-     T_PROPACCESS = 375,
-     T_ARG = 376,
-     T_EXPANDARG = 377,
-     T_INLINEARRAY = 378,
-     T_ARRAYARG = 379,
-     T_INLINEDIC = 380,
-     T_DICELM = 381,
-     T_WITHDOT = 382,
-     T_THIS_PROXY = 383,
-     T_WITHDOT_PROXY = 384,
-     T_CONSTVAL = 385,
-     T_SYMBOL = 386,
-     T_REGEXP = 387,
-     T_VARIANT = 388
+     T_ARROW = 325,
+     T_DEBUGGER = 326,
+     T_DEFAULT = 327,
+     T_CASE = 328,
+     T_EXTENDS = 329,
+     T_FINALLY = 330,
+     T_PROPERTY = 331,
+     T_PRIVATE = 332,
+     T_PUBLIC = 333,
+     T_PROTECTED = 334,
+     T_STATIC = 335,
+     T_RETURN = 336,
+     T_BREAK = 337,
+     T_EXPORT = 338,
+     T_IMPORT = 339,
+     T_SWITCH = 340,
+     T_IN = 341,
+     T_INCONTEXTOF = 342,
+     T_FOR = 343,
+     T_WHILE = 344,
+     T_DO = 345,
+     T_IF = 346,
+     T_VAR = 347,
+     T_CONST = 348,
+     T_ENUM = 349,
+     T_GOTO = 350,
+     T_THROW = 351,
+     T_TRY = 352,
+     T_SETTER = 353,
+     T_GETTER = 354,
+     T_ELSE = 355,
+     T_CATCH = 356,
+     T_OMIT = 357,
+     T_SYNCHRONIZED = 358,
+     T_WITH = 359,
+     T_INT = 360,
+     T_REAL = 361,
+     T_STRING = 362,
+     T_OCTET = 363,
+     T_FALSE = 364,
+     T_NULL = 365,
+     T_TRUE = 366,
+     T_VOID = 367,
+     T_NAN = 368,
+     T_INFINITY = 369,
+     T_UPLUS = 370,
+     T_UMINUS = 371,
+     T_EVAL = 372,
+     T_POSTDECREMENT = 373,
+     T_POSTINCREMENT = 374,
+     T_IGNOREPROP = 375,
+     T_PROPACCESS = 376,
+     T_ARG = 377,
+     T_EXPANDARG = 378,
+     T_INLINEARRAY = 379,
+     T_ARRAYARG = 380,
+     T_INLINEDIC = 381,
+     T_DICELM = 382,
+     T_WITHDOT = 383,
+     T_THIS_PROXY = 384,
+     T_WITHDOT_PROXY = 385,
+     T_CONSTVAL = 386,
+     T_SYMBOL = 387,
+     T_REGEXP = 388,
+     T_VARIANT = 389
    };
 #endif
 
@@ -180,7 +180,7 @@ namespace TJS {
 typedef union YYSTYPE
 {
 
-/* Line 1676 of yacc.c  */
+/* Line 1685 of yacc.c  */
 #line 60 "tjs.y"
 
 	tjs_int			num;
@@ -188,7 +188,7 @@ typedef union YYSTYPE
 
 
 
-/* Line 1676 of yacc.c  */
+/* Line 1685 of yacc.c  */
 #line 192 "tjs.tab.hpp"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1

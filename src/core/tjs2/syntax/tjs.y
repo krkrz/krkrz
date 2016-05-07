@@ -55,7 +55,7 @@ int __yyerror(char * msg, void *pm);
 
 %pure_parser
 
-%expect 2
+%expect 3
 
 %union{
 	tjs_int			num;
@@ -131,6 +131,7 @@ int __yyerror(char * msg, void *pm);
 	T_RBRACE				"}"
 	T_CONTINUE				"continue"
 	T_FUNCTION				"function"
+	T_ARROW					"->"
 	T_DEBUGGER				"debugger"
 	T_DEFAULT				"default"
 	T_CASE					"case"
@@ -206,7 +207,7 @@ int __yyerror(char * msg, void *pm);
 	logical_and_expr inclusive_or_expr exclusive_or_expr and_expr identical_expr
 	compare_expr shift_expr add_sub_expr mul_div_expr mul_div_expr_and_asterisk
 	unary_expr incontextof_expr priority_expr factor_expr call_arg call_arg_list
-	func_expr_def func_call_expr expr_no_comma inline_array array_elm inline_dic dic_elm
+	func_expr_def arrow_expr_def func_call_expr expr_no_comma inline_array array_elm inline_dic dic_elm
 	const_inline_array const_inline_dic
 
 %%
@@ -427,6 +428,39 @@ func_decl_arg_collapse
 	| T_SYMBOL "*" "=" inline_array			{ ; }
 	| T_SYMBOL "*=" inline_array			{ ; }
 */
+;
+
+/* # a function expression using arrow notation
+ * ## syntax
+ *     -> ( args ) { ... }
+ *     -> arg { ... }    (single argument)
+ *     -> arg [ expr ]   (syntactic sugar of "{ return `expr`; }")
+ * ## example
+ * 	var f1 = -> x [ x * 2 ];
+ * 	var f2 = -> { return 10; };
+ * 	var f3 = -> (a : int, b : int = 10) : int [ a * b ];
+ */
+arrow_expr_def
+	: "->"									{ sb->PushContextStack(TJS_W("(anonymous)"),
+											  ctExprFunction); cc->EnterBlock(); }
+	  arrow_expr_arg_opt
+	  variable_type
+	  arrow_expr_body						{ cc->ExitBlock();
+											  tTJSVariant v(cc);
+											  sb->PopContextStack();
+											  $$ = cc->MakeNP0(T_CONSTVAL);
+											  $$->SetValue(v); }
+;
+
+arrow_expr_arg_opt
+	: T_SYMBOL variable_type				{ cc->AddFunctionDeclArg(lx->GetString($1), NULL); }
+	| func_decl_arg_opt
+;
+
+arrow_expr_body
+	: "[" "]"								{ cc->ReturnFromFunc(NULL); }
+	| "[" expr "]"							{ cc->ReturnFromFunc($2); }
+	| block
 ;
 
 /* a property handler definition */
@@ -720,6 +754,7 @@ factor_expr
 	| "this"									{ $$ = cc->MakeNP0(T_THIS); }
 	| "super"									{ $$ = cc->MakeNP0(T_SUPER); }
 	| func_expr_def								{ $$ = $1; }
+	| arrow_expr_def							{ $$ = $1; }
 	| "global"									{ $$ = cc->MakeNP0(T_GLOBAL); }
 	| "void"									{ $$ = cc->MakeNP0(T_VOID); }
 	| inline_array								{ $$ = $1; }

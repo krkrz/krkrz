@@ -970,6 +970,7 @@ static void TJSInitReservedWordsHashTable()
 	if(TJSReservedWordHashInit) return;
 	TJSReservedWordHashInit = true;
 
+	TJS_REG_RES_WORD("->", T_ARROW);
 	TJS_REG_RES_WORD("break", T_BREAK);
 	TJS_REG_RES_WORD("continue", T_CONTINUE);
 	TJS_REG_RES_WORD("const", T_CONST);
@@ -1400,6 +1401,7 @@ re_match:
 	case TJS_W('-'):
 		TJS_MATCH_S("-=", T_MINUSEQUAL);
 		TJS_MATCH_S("--", T_DECREMENT);
+		TJS_MATCH_S("->", T_ARROW);
 		TJS_1CHAR(T_MINUS);
 
 	case TJS_W('*'):
