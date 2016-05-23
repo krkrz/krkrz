@@ -344,12 +344,14 @@ struct sse2_box_blur_avg_16_d_sse {
 		__m128 fmsum = _mm_cvtepi32_ps(msum);
 		__m128 fa = _mm_cvtepi32_ps(alpha);
 		fa = _mm_rcp_ps( fa );
-		fa = _mm_mul_ps( fa, f255_ );
-		fa = _mm_shuffle_ps( fa, fa, _MM_SHUFFLE( 0, 0, 0, 0 ) );
+		//fa = _mm_mul_ps( fa, f255_ );
+		//fa = _mm_shuffle_ps( fa, fa, _MM_SHUFFLE( 0, 0, 0, 0 ) );
+		fa = _mm_shuffle_ps( fa, fa, _MM_SHUFFLE( 2, 2, 2, 2 ) );
 		fmsum = _mm_mul_ps( fmsum, f255_ );
 		fmsum = _mm_mul_ps( fmsum, fa );
 		msum = _mm_cvttps_epi32( fmsum );
 		alpha = _mm_slli_epi64( alpha, 48 );		// alpha << 48
+		msum = _mm_packs_epi32( msum, msum );
 		msum = _mm_and_si128( msum, c_0000ffffffffffff_ );
 		msum = _mm_or_si128( msum, alpha );
 		msum = _mm_packus_epi16( msum, msum );		// A8|R8|G8|B8|A8|R8|G8|B8
@@ -434,9 +436,12 @@ inline void sse2_box_blur_avg16(tjs_uint32 *dest, tjs_uint16 *sum, const tjs_uin
 	mhalf_n = _mm_shuffle_epi32( mhalf_n, _MM_SHUFFLE( 0, 0, 0, 0 ) );
 	__m128i msum = _mm_loadl_epi64((__m128i const*)sum);			// A16R16G16B16
 
-	avg_func_t func( n );
-	// 1pixelˆ—
 	__m128i tmp = msum;
+	tmp = _mm_slli_si128( tmp, 8 );		// << 64 ‰ºˆÊpixel‚ðãˆÊ‚Ö
+	msum = _mm_or_si128( msum, tmp );	// ãˆÊ‚Æ‰ºˆÊ‚ð“¯‚¶‚É
+
+	// 1pixelˆ—
+	avg_func_t func( n );
 	func.one( dest, msum, mhalf_n );
 	dest++;
 	len--;
@@ -507,6 +512,7 @@ void TVPDoBoxBlurAvg16_d_sse2_c_3(tjs_uint32 *dest, tjs_uint16 *sum, const tjs_u
 // ¸“x‚àl‚¦‚é‚Æ 1 ‚Ì•û‚ª‚¢‚¢‚©‚È
 void TVPDoBoxBlurAvg16_d_sse2_c(tjs_uint32 *dest, tjs_uint16 *sum, const tjs_uint16 * add, const tjs_uint16 * sub, tjs_int n, tjs_int len) {
 	sse2_box_blur_avg16<sse2_box_blur_avg_16_d_sse>( dest, sum, add, sub, n, len );
+	//sse2_box_blur_avg16<sse2_box_blur_avg_16_d_table>( dest, sum, add, sub, n, len );
 }
 
 struct sse2_box_blur_avg_32 {
