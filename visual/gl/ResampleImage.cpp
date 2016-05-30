@@ -314,10 +314,10 @@ static void AxisParamCalculateAxis( TParam& param, int srcstart, int srcend, int
 			}
 			param.start_.push_back( start );
 			int len = right - left;
-			float dist = std::abs(left + 0.5f - cx);
+			float dist = left + 0.5f - cx;
 			float* w = weight;
 			for( int sx = 0; sx < len; sx++ ) {
-				*w = func(dist);
+				*w = func( std::abs(dist) );
 				dist += 1.0f;
 				w++;
 			}
@@ -354,10 +354,10 @@ static void AxisParamCalculateAxis( TParam& param, int srcstart, int srcend, int
 			param.start_.push_back( start );
 			// “]‘—æÀ•W‚Å‚ÌˆÊ’u
 			int len = right-left;
-			float dist = (left+0.5f) * delta -(x+0.5f);
+			float dist = (left+0.5f-cx) * delta;
 			float* w = weight;
 			for( int sx = 0; sx < len; sx++ ) {
-				*w = func(dist);
+				*w = func( std::abs(dist) );
 				dist += delta;
 				w++;
 			}
@@ -372,7 +372,7 @@ static void AxisParamCalculateAxis( TParam& param, int srcstart, int srcend, int
  */
 template<typename TParam>
 static void AxisParamCalculateAxisAreaAvg( TParam& param, int srcstart, int srcend, int srclength, int dstlength ) {
-	if( dstlength < srclength ) { // k¬‚Ì‚Ý
+	if( dstlength <= srclength ) { // k¬‚Ì‚Ý
 		TVPCalculateAxisAreaAvg( srcstart, srcend, srclength, dstlength, param.start_, param.length_, param.weight_ );
 		TVPNormalizeAxisAreaAvg( param.length_, param.weight_ );
 	}
