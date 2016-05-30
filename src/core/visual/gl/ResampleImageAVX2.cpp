@@ -259,7 +259,7 @@ struct AxisParamAVX2 {
 				start_.push_back( start );
 				// “]‘—æÀ•W‚Å‚ÌˆÊ’u
 				int len = right-left;
-				float dx = (left+0.5f) * delta -(x+0.5f);
+				float dx = (left+0.5f-cx) * delta;
 				__m256 dist8 = _mm256_set1_ps(dx);
 				int len8 = ((len+7)>>3)<<3;	// 8 ‚Ì”{”‰»
 				float* w = weight;
@@ -407,7 +407,7 @@ struct AxisParamAVX2 {
 		}
 	}
 	void calculateAxisAreaAvg( int srcstart, int srcend, int srclength, int dstlength, bool strip ) {
-		if( dstlength < srclength ) { // k¬‚Ì‚İ
+		if( dstlength <= srclength ) { // k¬‚Ì‚İ
 			std::vector<float> weight;
 			TVPCalculateAxisAreaAvg( srcstart, srcend, srclength, dstlength, start_, length_, weight );
 			// ÀÛ‚ÌƒTƒCƒY‚ğ‹‚ß‚é

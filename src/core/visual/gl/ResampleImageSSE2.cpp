@@ -22,7 +22,7 @@
 #include "ResampleImageInternal.h"
 
 static const __m128 M128_PS_STEP( _mm_set_ps(3.0f,2.0f,1.0f,0.0f) );
-static const __m128 M128_PS_8_0( _mm_set1_ps( 8.0f ) );
+static const __m128 M128_PS_4_0( _mm_set1_ps( 4.0f ) );
 static const __m128 M128_PS_FIXED15( _mm_set1_ps( (float)(1<<15) ) );
 static const __m128i M128_U32_FIXED_ROUND( (_mm_set1_epi32(0x00200020)) );
 static const __m128i M128_U32_FIXED_COLOR_MASK( (_mm_set1_epi32(0x00ff00ff)) );
@@ -174,7 +174,7 @@ struct AxisParamSSE2 {
 #else
 			weight_.reserve( length );
 #endif
-			const __m128 delta4 = M128_PS_8_0;
+			const __m128 delta4 = M128_PS_4_0;
 			const __m128 deltafirst = M128_PS_STEP;
 			const __m128 absmask = M128_ABS_MASK;
 			TWeight* output = &weight_[0];
@@ -254,7 +254,7 @@ struct AxisParamSSE2 {
 				start_.push_back( start );
 				// ì]ëóêÊç¿ïWÇ≈ÇÃà íu
 				int len = right-left;
-				float dx = (left+0.5f) * delta -(x+0.5f);
+				float dx = (left+0.5f-cx) * delta;
 				__m128 dist4 = _mm_set1_ps(dx);
 				int len4 = ((len+3)>>2)<<2;	// 4 ÇÃî{êîâª
 				float* w = weight;
@@ -402,7 +402,7 @@ struct AxisParamSSE2 {
 		}
 	}
 	void calculateAxisAreaAvg( int srcstart, int srcend, int srclength, int dstlength, bool strip ) {
-		if( dstlength < srclength ) { // èkè¨ÇÃÇ›
+		if( dstlength <= srclength ) { // èkè¨ÇÃÇ›
 			std::vector<float> weight;
 			TVPCalculateAxisAreaAvg( srcstart, srcend, srclength, dstlength, start_, length_, weight );
 			// é¿ç€ÇÃÉTÉCÉYÇãÅÇﬂÇÈ
