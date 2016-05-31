@@ -1053,7 +1053,11 @@ tTVPPluginHolder::tTVPPluginHolder(const ttstr &aname)
 			return;
 		}
 
+#ifdef TJS_64BIT_OS
+		pname = exepath + TJS_W("plugin64\\") + aname;
+#else
 		pname = exepath + TJS_W("plugin\\") + aname;
+#endif
 		if(TVPCheckExistentLocalFile(pname))
 		{
 			LocalName = pname;

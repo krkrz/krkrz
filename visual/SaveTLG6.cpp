@@ -13,6 +13,51 @@
 #include <memory.h>
 #include <sstream>
 
+#include "tjsDictionary.h"
+#include "ScriptMgnIntf.h"
+
+static const tjs_char * const LAYER_BLEND_MODES[] = {
+	TJS_W("opaque"), TJS_W("alpha"), TJS_W("add"), TJS_W("sub"), TJS_W("mul"),
+	TJS_W("dodge"), TJS_W("darken"), TJS_W("lighten"), TJS_W("screen"), TJS_W("addalpha"),
+	TJS_W("psnormal"), TJS_W("psadd"), TJS_W("pssub"), TJS_W("psmul"), TJS_W("psscreen"), TJS_W("psoverlay"),
+	TJS_W("pshlight"), TJS_W("psslight"), TJS_W("psdodge"), TJS_W("psdodge5"), TJS_W("psburn"), TJS_W("pslighten"),
+	TJS_W("psdarken"), TJS_W("psdiff"), TJS_W("psdiff5"), TJS_W("psexcl"), TJS_W("opaque"), NULL
+};
+bool TVPAcceptSaveAsTLG(void* formatdata, const ttstr & type, class iTJSDispatch2** dic )
+{
+	bool result = false;
+	if( type.StartsWith(TJS_W("tlg")) ) result = true;
+	else if( type == TJS_W(".tlg") ) result = true;
+	else if( type == TJS_W(".tlg5") ) result = true;
+	else if( type == TJS_W(".tlg6") ) result = true;
+	if( result && dic ) {
+		// mode : select text : opaque, alpha, add, sub, mul, dodge, darken, lighten, screen, addalpha
+		//        psnormal, psadd, pssub, psmul, psscreen, psoverlay, pshlight, psslight, psdodge
+		//        psdodge5, psburn, pslighten, psdarken, psdiff, psdiff5, psexcl, opaque
+		// offs_x : integer
+		// offs_y : integer
+		// offs_unit : select text : pixel
+		tTJSVariant result;
+		TVPExecuteExpression(
+			TJS_W("(const)%[")
+			TJS_W("\"mode\"=>(const)%[\"type\"=>\"select text\",\"items\"=>")
+				TJS_W("(const)[\"opaque\", \"alpha\", \"add\", \"sub\", \"mul\", \"dodge\", \"darken\", \"lighten\", \"screen\", \"addalpha\",")
+				TJS_W("\"psnormal\", \"psadd\", \"pssub\", \"psmul\", \"psscreen\", \"psoverlay\", \"pshlight\", \"psslight\", \"psdodge\",")
+				TJS_W("\"psdodge5\", \"psburn\", \"pslighten\", \"psdarken\", \"psdiff\", \"psdiff5\", \"psexcl\", \"opaque\"],")
+			TJS_W("\"desc\"=>\"blending mode\",\"default\"=>\"alpha\"],")
+
+			TJS_W("\"offs_x\"=>(const)%[\"type\"=>\"integer\",\"desc\"=>\"offset x\",\"default\"=>0],")
+			TJS_W("\"offs_y\"=>(const)%[\"type\"=>\"integer\",\"desc\"=>\"offset y\",\"default\"=>0],")
+			TJS_W("\"offs_unit\"=>(const)%[\"type\"=>\"select text\",\"items\"=>(const)[\"pixel\"],\"desc\"=>\"offset unit\",\"default\"=>\"pixel\"]")
+			TJS_W("]"),
+			NULL, &result );
+		if( result.Type() == tvtObject ) {
+			*dic = result.AsObject();
+		}
+	}
+	return result;
+}
+
 // Table for 'k' (predicted bit length) of golomb encoding
 #define TVP_TLG6_GOLOMB_N_COUNT 4
 
@@ -1312,22 +1357,52 @@ void SaveTLG6( tTJSBinaryStream* stream, const tTVPBaseBitmap* bmp, bool is24 )
 //---------------------------------------------------------------------------
 extern void SaveTLG5( tTJSBinaryStream* stream, const tTVPBaseBitmap* image, bool is24 );
 //---------------------------------------------------------------------------
-void TVPSaveAsTLG( const ttstr & storagename, const ttstr & mode, const tTVPBaseBitmap* image, const std::vector<std::string>& tags ) {
+void TVPSaveAsTLG(void* formatdata, tTJSBinaryStream* dst, const tTVPBaseBitmap* image, const ttstr & mode, iTJSDispatch2* meta )
+{
+	std::vector<std::string> tags;
+	if( meta ) {
+		struct MetaDictionaryEnumCallback : public tTJSDispatch {
+			std::vector<std::string>& Tags;
+			MetaDictionaryEnumCallback( std::vector<std::string>& tags ) : Tags(tags) {}
+			tjs_error TJS_INTF_METHOD FuncCall(tjs_uint32 flag, const tjs_char * membername,
+				tjs_uint32 *hint, tTJSVariant *result, tjs_int numparams,
+				tTJSVariant **param, iTJSDispatch2 *objthis) {
+				// called from tTJSCustomObject::EnumMembers
+				if(numparams < 3) return TJS_E_BADPARAMCOUNT;
+
+				// hidden members are not processed
+				tjs_uint32 flags = (tjs_int)*param[1];
+				if(flags & TJS_HIDDENMEMBER) {
+					if(result) *result = (tjs_int)1;
+					return TJS_S_OK;
+				}
+				// push items
+				ttstr value = *param[0];
+				Tags.push_back( value.AsNarrowStdString() );
+				value = *param[2];
+				Tags.push_back( value.AsNarrowStdString() );
+				if(result) *result = (tjs_int)1;
+				return TJS_S_OK;
+			}
+		} callback(tags);
+		meta->EnumMembers(TJS_IGNOREPROP, &tTJSVariantClosure(&callback, NULL), meta);
+	}
+
 	bool istls6 = false;
 	if( mode.StartsWith( TJS_W("tlg5") ) ) {
 		istls6 = false;
 	} else if( mode.StartsWith( TJS_W("tlg6") ) ) {
 		istls6 = true;
 	} else {
-		TVPThrowExceptionMessage(TVPInvalidImageSaveType, mode);
+		istls6 = false;	// default : TLG5
 	}
-	
+
 	tjs_uint height = image->GetHeight();
 	tjs_uint width = image->GetWidth();
 	if( height == 0 || width == 0 ) TVPThrowInternalError;
 
 	// open stream
-	tTJSBinaryStream *stream = TVPCreateStream(TVPNormalizeStorageName(storagename), TJS_BS_WRITE);
+	tTJSBinaryStream *stream = dst;
 	try {
 		if( tags.size() ) {
 			// write TLG0.0 Structured Data Stream header
@@ -1368,7 +1443,7 @@ void TVPSaveAsTLG( const ttstr & storagename, const ttstr & mode, const tTVPBase
 
 			// write chunk size
 			std::string tagstr = tag.str();
-			size = tagstr.length();
+			size = (tjs_uint)tagstr.length();
 			bin[0] = size & 0xff;
 			bin[1] = (size >> 8) & 0xff;
 			bin[2] = (size >> 16) & 0xff;
@@ -1376,7 +1451,7 @@ void TVPSaveAsTLG( const ttstr & storagename, const ttstr & mode, const tTVPBase
 			stream->WriteBuffer(bin, 4);
 
 			// write chunk data
-			stream->WriteBuffer( tagstr.c_str(), tagstr.length() );
+			stream->WriteBuffer( tagstr.c_str(), (tjs_uint)tagstr.length() );
 		} else {
 			if( istls6 ) {
 				SaveTLG6( stream, image, mode == TJS_W("tlg624") );
@@ -1385,8 +1460,6 @@ void TVPSaveAsTLG( const ttstr & storagename, const ttstr & mode, const tTVPBase
 			}
 		}
 	} catch(...) {
-		delete stream;
 		throw;
 	}
-	delete stream;
 }

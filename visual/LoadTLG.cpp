@@ -14,6 +14,7 @@
 #include "MsgIntf.h"
 #include "tjsUtils.h"
 #include "tvpgl.h"
+#include "tjsDictionary.h"
 
 #include <stdlib.h>
 
@@ -78,12 +79,12 @@ void TVPLoadTLG5(void* formatdata, void *callbackdata,
 
 	try
 	{
-		text = (tjs_uint8*)TJSAlignedAlloc(4096, 4);
+		text = (tjs_uint8*)TJSAlignedAlloc(4096+16, 4);
 		memset(text, 0, 4096);
 
-		inbuf = (tjs_uint8*)TJSAlignedAlloc(blockheight * width + 10, 4);
+		inbuf = (tjs_uint8*)TJSAlignedAlloc(blockheight * width + 10+16, 4);
 		for(tjs_int i = 0; i < colors; i++)
-			outbuf[i] = (tjs_uint8*)TJSAlignedAlloc(blockheight * width + 10, 4);
+			outbuf[i] = (tjs_uint8*)TJSAlignedAlloc(blockheight * width + 10+16, 4);
 
 		tjs_uint8 *prevline = NULL;
 		for(tjs_int y_blk = 0; y_blk < height; y_blk += blockheight)
@@ -266,9 +267,10 @@ void TVPLoadTLG6(void* formatdata, void *callbackdata,
 		pixelbuf = (tjs_uint32 *)TJSAlignedAlloc(
 			sizeof(tjs_uint32) * width * TVP_TLG6_H_BLOCK_SIZE + 1, 4);
 		filter_types = (tjs_uint8 *)TJSAlignedAlloc(
-			x_block_count * y_block_count, 4);
+			x_block_count * y_block_count+16, 4);
 		zeroline = (tjs_uint32 *)TJSAlignedAlloc(width * sizeof(tjs_uint32), 4);
-		LZSS_text = (tjs_uint8*)TJSAlignedAlloc(4096, 4);
+		LZSS_text = (tjs_uint8*)TJSAlignedAlloc(4096+16, 4);
+
 
 		// initialize zero line (virtual y=-1 line)
 		TVPFillARGB(zeroline, width, colors==3?0xff000000:0x00000000);
@@ -288,7 +290,7 @@ void TVPLoadTLG6(void* formatdata, void *callbackdata,
 		// chroma filter types are compressed via LZSS as used by TLG5.
 		{
 			tjs_int inbuf_size = src->ReadI32LE();
-			tjs_uint8* inbuf = (tjs_uint8*)TJSAlignedAlloc(inbuf_size, 4);
+			tjs_uint8* inbuf = (tjs_uint8*)TJSAlignedAlloc(inbuf_size+16, 4);
 			try
 			{
 				src->ReadBuffer(inbuf, inbuf_size);
@@ -565,4 +567,67 @@ void TVPLoadTLG(void* formatdata, void *callbackdata, tTVPGraphicSizeCallback si
 
 }
 //---------------------------------------------------------------------------
+void TVPLoadHeaderTLG(void* formatdata, tTJSBinaryStream *src, iTJSDispatch2** dic )
+{
+	if( dic == NULL ) return;
 
+	// read header
+	unsigned char mark[12];
+	src->ReadBuffer(mark, 11);
+
+	tjs_int width = 0;
+	tjs_int height = 0;
+	tjs_int colors = 0;
+	// check for TLG0.0 sds
+	if(!memcmp("TLG0.0\x00sds\x1a\x00", mark, 11))
+	{
+		// read raw data size
+		tjs_uint rawlen = src->ReadI32LE();
+		src->ReadBuffer(mark, 11);
+		if(!memcmp("TLG5.0\x00raw\x1a\x00", mark, 11))
+		{
+			src->ReadBuffer(mark, 1);
+			colors = mark[0];
+			width = src->ReadI32LE();
+			height = src->ReadI32LE();
+		}
+		else if(!memcmp("TLG6.0\x00raw\x1a\x00", mark, 11))
+		{
+			src->ReadBuffer(mark, 4);
+			colors = mark[0]; // color component count
+			width = src->ReadI32LE();
+			height = src->ReadI32LE();
+		}
+		else
+		{
+			TVPThrowExceptionMessage(TVPTLGLoadError, (const tjs_char*)TVPInvalidTlgHeaderOrVersion );
+		}
+	}
+	else if(!memcmp("TLG5.0\x00raw\x1a\x00", mark, 11))
+	{
+		src->ReadBuffer(mark, 1);
+		colors = mark[0];
+		width = src->ReadI32LE();
+		height = src->ReadI32LE();
+	}
+	else if(!memcmp("TLG6.0\x00raw\x1a\x00", mark, 11))
+	{
+		src->ReadBuffer(mark, 4);
+		colors = mark[0]; // color component count
+		width = src->ReadI32LE();
+		height = src->ReadI32LE();
+	}
+	else
+	{
+		TVPThrowExceptionMessage(TVPTLGLoadError, (const tjs_char*)TVPInvalidTlgHeaderOrVersion );
+	}
+	tjs_int bpp = colors * 8;
+	*dic = TJSCreateDictionaryObject();
+	tTJSVariant val(width);
+	(*dic)->PropSet(TJS_MEMBERENSURE, TJS_W("width"), 0, &val, (*dic) );
+	val = tTJSVariant(height);
+	(*dic)->PropSet(TJS_MEMBERENSURE, TJS_W("height"), 0, &val, (*dic) );
+	val = tTJSVariant(bpp);
+	(*dic)->PropSet(TJS_MEMBERENSURE, TJS_W("bpp"), 0, &val, (*dic) );
+}
+//---------------------------------------------------------------------------

@@ -33,6 +33,7 @@
 #include "FontRasterizer.h"
 #include "RectItf.h"
 #include "FontSystem.h"
+#include "tjsDictionary.h"
 
 extern void TVPSetFontRasterizer( tjs_int index );
 extern tjs_int TVPGetFontRasterizer();
@@ -434,11 +435,7 @@ tTJSNI_BaseLayer::Construct(tjs_int numparams, tTJSVariant **param,
 	tTJSVariant iface_v;
 	if(TJS_FAILED(clo.PropGet(0, TJS_W("layerTreeOwnerInterface"), NULL, &iface_v, NULL)))
 		TVPThrowExceptionMessage( TJS_W("Cannot Retrive Layer Tree Owner Interface.") );
-#ifndef TJS_64BIT_OS
-	lto = reinterpret_cast<iTVPLayerTreeOwner *>((long)(tjs_int64)iface_v);
-#else
-	lto = reinterpret_cast<iTVPLayerTreeOwner *>((tjs_int64)iface_v);
-#endif
+	lto = reinterpret_cast<iTVPLayerTreeOwner *>((tjs_intptr_t)(tjs_int64)iface_v);
 
 	// get the layer native instance
 	clo = param[1]->AsObjectClosureNoAddRef();
@@ -2439,60 +2436,59 @@ void tTJSNI_BaseLayer::IndependProvinceImage(bool copy)
 void tTJSNI_BaseLayer::SaveLayerImage(const ttstr &name, const ttstr &type)
 {
 	if(!MainImage) TVPThrowExceptionMessage(TVPNotDrawableLayerType);
-
-	if( type.StartsWith(TJS_W("bmp")) )
-		TVPSaveAsBMP(name, type, MainImage);
-	else if( type.StartsWith(TJS_W("png")) )
-		TVPSaveAsPNG(name, type, MainImage);
-	else if( type.StartsWith(TJS_W("jpg")) )
-		TVPSaveAsJPG(name, type, MainImage);
-	else if( type.StartsWith(TJS_W("tlg")) ) {
-		std::vector<std::string> tags;
-		tags.push_back("mode");
+	
+	iTJSDispatch2 *dic = TJSCreateDictionaryObject();
+	try {
+		tTJSVariant val;
 		switch(Type) {
-		case ltOpaque:				tags.push_back("opaque");		break;
-		case ltAlpha:				tags.push_back("alpha");		break;
-		case ltAdditive:			tags.push_back("add");			break;
-		case ltSubtractive:			tags.push_back("sub");			break;
-		case ltMultiplicative:		tags.push_back("mul");			break;
-		case ltDodge:				tags.push_back("dodge");		break;
-		case ltDarken:				tags.push_back("darken");		break;
-		case ltLighten:				tags.push_back("lighten");		break;
-		case ltScreen:				tags.push_back("screen");		break;
-		case ltAddAlpha:			tags.push_back("addalpha");		break;
-		case ltPsNormal:			tags.push_back("psnormal");		break;
-		case ltPsAdditive:			tags.push_back("psadd");		break;
-		case ltPsSubtractive:		tags.push_back("pssub");		break;
-		case ltPsMultiplicative:	tags.push_back("psmul");		break;
-		case ltPsScreen:			tags.push_back("psscreen");		break;
-		case ltPsOverlay:			tags.push_back("psoverlay");	break;
-		case ltPsHardLight:			tags.push_back("pshlight");		break;
-		case ltPsSoftLight:			tags.push_back("psslight");		break;
-		case ltPsColorDodge:		tags.push_back("psdodge");		break;
-		case ltPsColorDodge5:		tags.push_back("psdodge5");		break;
-		case ltPsColorBurn:			tags.push_back("psburn");		break;
-		case ltPsLighten:			tags.push_back("pslighten");	break;
-		case ltPsDarken:			tags.push_back("psdarken");		break;
-		case ltPsDifference:	 	tags.push_back("psdiff");		break;
-		case ltPsDifference5:	 	tags.push_back("psdiff5");		break;
-		case ltPsExclusion:			tags.push_back("psexcl");		break;
-		default:					tags.push_back("opaque");		break;
+		case ltOpaque:				val = tTJSVariant(TJS_W("opaque"));		break;
+		case ltAlpha:				val = tTJSVariant(TJS_W("alpha"));		break;
+		case ltAdditive:			val = tTJSVariant(TJS_W("add"));		break;
+		case ltSubtractive:			val = tTJSVariant(TJS_W("sub"));		break;
+		case ltMultiplicative:		val = tTJSVariant(TJS_W("mul"));		break;
+		case ltDodge:				val = tTJSVariant(TJS_W("dodge"));		break;
+		case ltDarken:				val = tTJSVariant(TJS_W("darken"));		break;
+		case ltLighten:				val = tTJSVariant(TJS_W("lighten"));	break;
+		case ltScreen:				val = tTJSVariant(TJS_W("screen"));		break;
+		case ltAddAlpha:			val = tTJSVariant(TJS_W("addalpha"));	break;
+		case ltPsNormal:			val = tTJSVariant(TJS_W("psnormal"));	break;
+		case ltPsAdditive:			val = tTJSVariant(TJS_W("psadd"));		break;
+		case ltPsSubtractive:		val = tTJSVariant(TJS_W("pssub"));		break;
+		case ltPsMultiplicative:	val = tTJSVariant(TJS_W("psmul"));		break;
+		case ltPsScreen:			val = tTJSVariant(TJS_W("psscreen"));	break;
+		case ltPsOverlay:			val = tTJSVariant(TJS_W("psoverlay"));	break;
+		case ltPsHardLight:			val = tTJSVariant(TJS_W("pshlight"));	break;
+		case ltPsSoftLight:			val = tTJSVariant(TJS_W("psslight"));	break;
+		case ltPsColorDodge:		val = tTJSVariant(TJS_W("psdodge"));	break;
+		case ltPsColorDodge5:		val = tTJSVariant(TJS_W("psdodge5"));	break;
+		case ltPsColorBurn:			val = tTJSVariant(TJS_W("psburn"));		break;
+		case ltPsLighten:			val = tTJSVariant(TJS_W("pslighten"));	break;
+		case ltPsDarken:			val = tTJSVariant(TJS_W("psdarken"));	break;
+		case ltPsDifference:	 	val = tTJSVariant(TJS_W("psdiff"));		break;
+		case ltPsDifference5:	 	val = tTJSVariant(TJS_W("psdiff5"));	break;
+		case ltPsExclusion:			val = tTJSVariant(TJS_W("psexcl"));		break;
+		default:					val = tTJSVariant(TJS_W("opaque"));		break;
 		}
+		dic->PropSet(TJS_MEMBERENSURE, TJS_W("mode"), 0, &val, dic );
+
 		if( ImageLeft > 0 ) {
-			tags.push_back("offs_x");
-			tags.push_back(ttstr(ImageLeft).AsNarrowStdString() );
+			val = tTJSVariant(ImageLeft);
+			dic->PropSet(TJS_MEMBERENSURE, TJS_W("offs_x"), 0, &val, dic );
 		}
 		if( ImageTop > 0 ) {
-			tags.push_back("offs_y");
-			tags.push_back(ttstr(ImageTop).AsNarrowStdString() );
+			val = tTJSVariant(ImageTop);
+			dic->PropSet(TJS_MEMBERENSURE, TJS_W("offs_y"), 0, &val, dic );
 		}
 		if( ImageLeft > 0 || ImageTop > 0 ) {
-			tags.push_back("offs_unit");
-			tags.push_back("pixel");
+			val = tTJSVariant(TJS_W("pixel"));
+			dic->PropSet(TJS_MEMBERENSURE, TJS_W("offs_unit"), 0, &val, dic );
 		}
-		TVPSaveAsTLG( name, type, MainImage, tags );
+		TVPSaveImage( name, type, MainImage, dic );
+	} catch(...) {
+		dic->Release();
+		throw;
 	}
-
+	dic->Release();
 }
 //---------------------------------------------------------------------------
 iTJSDispatch2 * tTJSNI_BaseLayer::LoadImages(const ttstr &name, tjs_uint32 colorkey)
@@ -4213,8 +4209,28 @@ void tTJSNI_BaseLayer::CopyRect(tjs_int dx, tjs_int dy, tTVPBaseBitmap *src, tTV
 	}
 }
 //---------------------------------------------------------------------------
+bool tTJSNI_BaseLayer::Copy9Patch( const tTVPBaseBitmap *src, tTVPRect &margin )
+{
+	if(!MainImage) TVPThrowExceptionMessage(TVPNotDrawableLayerType);
+	ImageModified = MainImage->Copy9Patch( src, margin );
+	if( ImageModified )
+	{
+		tTVPRect ur(0,0,GetImageWidth(),GetImageHeight());
+		if(ImageLeft != 0 || ImageTop != 0)
+		{
+			ur.add_offsets(ImageLeft, ImageTop);
+			Update(ur);
+		}
+		else
+		{
+			Update(ur);
+		}
+	}
+	return ImageModified;
+}
+//---------------------------------------------------------------------------
 void tTJSNI_BaseLayer::StretchCopy(const tTVPRect &destrect, tTVPBaseBitmap *src,
-		const tTVPRect &srcrect, tTVPBBStretchType type)
+		const tTVPRect &srcrect, tTVPBBStretchType type, tjs_real typeopt)
 {
 	// stretching copy
 	tTVPRect ur = destrect;
@@ -4230,7 +4246,7 @@ void tTJSNI_BaseLayer::StretchCopy(const tTVPRect &destrect, tTVPBaseBitmap *src
 		if(!src) TVPThrowExceptionMessage(TVPSourceLayerHasNoImage);
 		ImageModified =
 			MainImage->StretchBlt(ClipRect, destrect, src, srcrect, bmCopy, 255, false,
-				type) || ImageModified;
+				type, typeopt) || ImageModified;
 		break;
 
 	case dfOpaque:
@@ -4238,7 +4254,7 @@ void tTJSNI_BaseLayer::StretchCopy(const tTVPRect &destrect, tTVPBaseBitmap *src
 		if(!src) TVPThrowExceptionMessage(TVPSourceLayerHasNoImage);
 		ImageModified =
 			MainImage->StretchBlt(ClipRect, destrect, src, srcrect,
-				bmCopy, 255, HoldAlpha, type) || ImageModified;
+				bmCopy, 255, HoldAlpha, type, typeopt) || ImageModified;
 		break;
 
 	default:
@@ -4378,7 +4394,7 @@ void tTJSNI_BaseLayer::OperateRect(tjs_int dx, tjs_int dy, tTVPBaseBitmap *src,
 //---------------------------------------------------------------------------
 void tTJSNI_BaseLayer::OperateStretch(const tTVPRect &destrect,
 	tTVPBaseBitmap *src, const tTVPRect &srcrect, tTVPBlendOperationMode mode, tjs_int opacity,
-			tTVPBBStretchType type)
+			tTVPBBStretchType type, tjs_real typeopt)
 {
 	// stretching operation (add/mul/sub etc.)
 
@@ -4401,7 +4417,7 @@ void tTJSNI_BaseLayer::OperateStretch(const tTVPRect &destrect,
 	if(!MainImage) TVPThrowExceptionMessage(TVPNotDrawableLayerType);
 	if(!src) TVPThrowExceptionMessage(TVPSourceLayerHasNoImage);
 	ImageModified = MainImage->StretchBlt(ClipRect, destrect, src, srcrect, met,
-		opacity, HoldAlpha, type) || ImageModified;
+		opacity, HoldAlpha, type, typeopt) || ImageModified;
 
 	if(ImageLeft != 0 || ImageTop != 0)
 	{
@@ -7143,6 +7159,51 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/copyRect)
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/copyRect)
 //----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/copy9Patch)
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
+	if(numparams < 1) return TJS_E_BADPARAMCOUNT;
+
+	tTVPBaseBitmap* src = NULL;
+	tTJSVariantClosure clo = param[0]->AsObjectClosureNoAddRef();
+	if(clo.Object)
+	{
+		tTJSNI_BaseLayer * srclayer = NULL;
+		if(TJS_FAILED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE,
+			tTJSNC_Layer::ClassID, (iTJSNativeInstance**)&srclayer)))
+			src = NULL;
+		else
+		{
+			src = srclayer->GetMainImage();
+		}
+
+		if( src == NULL )
+		{	// try to get bitmap interface
+			tTJSNI_Bitmap * srcbmp = NULL;
+			if(TJS_FAILED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE,
+				tTJSNC_Bitmap::ClassID, (iTJSNativeInstance**)&srcbmp)))
+				src = NULL;
+			else
+				src = srcbmp->GetBitmap();
+		}
+	}
+	if(!src) TVPThrowExceptionMessage(TVPSpecifyLayerOrBitmap);
+
+	tTVPRect margin;
+	bool updated = _this->Copy9Patch( src, margin );
+	if( result ) {
+		if( updated ) {
+			iTJSDispatch2 *ret = TVPCreateRectObject( margin.left, margin.top, margin.right, margin.bottom );
+			*result = tTJSVariant(ret, ret);
+			ret->Release();
+		} else {
+			result->Clear();
+		}
+	}
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/copy9Patch)
+//----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/operateRect)
 {
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
@@ -7239,7 +7300,13 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/stretchCopy)
 	if(numparams >= 10)
 		type = (tTVPBBStretchType)(tjs_int)*param[9];
 
-	_this->StretchCopy(destrect, src, srcrect, type);
+	tjs_real typeopt = 0.0;
+	if(numparams >= 11)
+		typeopt = (tjs_real)*param[10];
+	else if( type == stFastCubic || type == stCubic )
+		typeopt = -1.0;
+
+	_this->StretchCopy(destrect, src, srcrect, type, typeopt);
 
 	return TJS_S_OK;
 }
@@ -7298,10 +7365,16 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/operateStretch)
 	if(numparams >= 12 && param[11]->Type() != tvtVoid)
 		type = (tTVPBBStretchType)(tjs_int)*param[11];
 
+	tjs_real typeopt = 0.0;
+	if(numparams >= 13)
+		typeopt = (tjs_real)*param[12];
+	else if( type == stFastCubic || type == stCubic )
+		typeopt = -1.0;
+
 	// get correct blend mode if the mode is omAuto
 	if(mode == omAuto) mode = automode;
 
-	_this->OperateStretch(destrect, src, srcrect, mode, opa, type);
+	_this->OperateStretch(destrect, src, srcrect, mode, opa, type, typeopt);
 
 	return TJS_S_OK;
 }
@@ -9442,7 +9515,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(mainImageBuffer)
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);;
-		*result = reinterpret_cast<tjs_int>(_this->GetMainImagePixelBuffer());
+		*result = reinterpret_cast<tjs_intptr_t>(_this->GetMainImagePixelBuffer());
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_GETTER
@@ -9456,7 +9529,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(mainImageBufferForWrite)
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);;
-		*result = reinterpret_cast<tjs_int>(_this->GetMainImagePixelBufferForWrite());
+		*result = reinterpret_cast<tjs_intptr_t>(_this->GetMainImagePixelBufferForWrite());
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_GETTER
@@ -9484,7 +9557,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(provinceImageBuffer)
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);;
-		*result = reinterpret_cast<tjs_int>(_this->GetProvinceImagePixelBuffer());
+		*result = reinterpret_cast<tjs_intptr_t>(_this->GetProvinceImagePixelBuffer());
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_GETTER
@@ -9498,7 +9571,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(provinceImageBufferForWrite)
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);;
-		*result = reinterpret_cast<tjs_int>(_this->GetProvinceImagePixelBufferForWrite());
+		*result = reinterpret_cast<tjs_intptr_t>(_this->GetProvinceImagePixelBufferForWrite());
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_GETTER

@@ -537,7 +537,7 @@ void tTVPApplication::Run() {
 	TVPTerminateCode = 0;
 
 	// メイン メッセージ ループ:
-	while( windows_list_.size() > 0 && tarminate_ == false ) {
+	while( tarminate_ == false ) {
 		HandleMessage();
 	}
 	tarminate_ = true;
@@ -557,7 +557,7 @@ bool tTVPApplication::ProcessMessage( MSG &msg ) {
 				DispatchMessage(&msg);
 			}
 		} else {
-			TVPTerminateCode = msg.wParam;
+			TVPTerminateCode = (int)msg.wParam;
 			tarminate_ = true;
 		}
 	}

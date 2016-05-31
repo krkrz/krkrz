@@ -103,45 +103,7 @@ void tTJSNI_Bitmap::Save(const ttstr &name, const ttstr &type, iTJSDispatch2* me
 	if( Loading ) TVPThrowExceptionMessage(TVPCurrentlyAsyncLoadBitmap);
 	if(!Bitmap) TVPThrowExceptionMessage(TVPNotDrawableLayerType);
 
-	if( type.StartsWith(TJS_W("bmp")) )
-		TVPSaveAsBMP(name, type, Bitmap);
-	else if( type.StartsWith(TJS_W("png")) )
-		TVPSaveAsPNG(name, type, Bitmap);
-	else if( type.StartsWith(TJS_W("jpg")) )
-		TVPSaveAsJPG(name, type, Bitmap);
-	else if( type.StartsWith(TJS_W("tlg")) ) {
-		std::vector<std::string> tags;
-		if( meta ) {
-			struct MetaDictionaryEnumCallback : public tTJSDispatch {
-				std::vector<std::string>& Tags;
-	
-				MetaDictionaryEnumCallback( std::vector<std::string>& tags ) : Tags(tags) {}
-
-				tjs_error TJS_INTF_METHOD FuncCall(tjs_uint32 flag, const tjs_char * membername,
-					tjs_uint32 *hint, tTJSVariant *result, tjs_int numparams,
-					tTJSVariant **param, iTJSDispatch2 *objthis) {
-					// called from tTJSCustomObject::EnumMembers
-					if(numparams < 3) return TJS_E_BADPARAMCOUNT;
-
-					// hidden members are not processed
-					tjs_uint32 flags = (tjs_int)*param[1];
-					if(flags & TJS_HIDDENMEMBER) {
-						if(result) *result = (tjs_int)1;
-						return TJS_S_OK;
-					}
-					// push items
-					ttstr value = *param[0];
-					Tags.push_back( value.AsNarrowStdString() );
-					value = *param[2];
-					Tags.push_back( value.AsNarrowStdString() );
-					if(result) *result = (tjs_int)1;
-					return TJS_S_OK;
-				}
-			} callback(tags);
-			meta->EnumMembers(TJS_IGNOREPROP, &tTJSVariantClosure(&callback, NULL), meta);
-		}
-		TVPSaveAsTLG( name, type, Bitmap, tags );
-	}
+	TVPSaveImage( name, type, Bitmap, meta );
 }
 //----------------------------------------------------------------------
 void tTJSNI_Bitmap::SetSize(tjs_uint width, tjs_uint height, bool keepimage) {
@@ -362,6 +324,52 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/loadAsync)
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/loadAsync)
 //----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/loadHeader)
+{
+	if(numparams < 1) return TJS_E_BADPARAMCOUNT;
+	ttstr name(*param[0]);
+	iTJSDispatch2 * dic = NULL;
+	try {
+		if(result) {
+			TVPLoadImageHeader( name, &dic );
+			if(dic) {
+				*result = dic;
+			} else {
+				*result = tTJSVariant();
+			}
+		}
+	} catch(...) {
+		if(dic) dic->Release();
+		throw;
+	}
+	if(dic) dic->Release();
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_STATIC_METHOD_DECL(/*func. name*/loadHeader)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/getSaveOption)
+{
+	if(numparams < 1) return TJS_E_BADPARAMCOUNT;
+	ttstr type(*param[0]);
+	iTJSDispatch2 * dic = NULL;
+	try {
+		if(result) {
+			bool ret = TVPGetSaveOption( type, &dic );
+			if(ret&&dic) {
+				*result = dic;
+			} else {
+				*result = tTJSVariant();
+			}
+		}
+	} catch(...) {
+		if(dic) dic->Release();
+		throw;
+	}
+	if(dic) dic->Release();
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_STATIC_METHOD_DECL(/*func. name*/getSaveOption)
+//----------------------------------------------------------------------
 
 //-- events
 
@@ -436,7 +444,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(buffer)
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Bitmap);
 		if( _this->IsLoading() ) TVPThrowExceptionMessage(TVPCurrentlyAsyncLoadBitmap);
-		*result = reinterpret_cast<tjs_int>(_this->GetPixelBuffer());
+		*result = reinterpret_cast<tjs_intptr_t>(_this->GetPixelBuffer());
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_GETTER
@@ -451,7 +459,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(bufferForWrite)
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Bitmap);
 		if( _this->IsLoading() ) TVPThrowExceptionMessage(TVPCurrentlyAsyncLoadBitmap);
-		*result = reinterpret_cast<tjs_int>(_this->GetPixelBufferForWrite());
+		*result = reinterpret_cast<tjs_intptr_t>(_this->GetPixelBufferForWrite());
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_GETTER

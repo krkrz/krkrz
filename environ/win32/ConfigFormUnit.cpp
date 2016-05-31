@@ -85,7 +85,7 @@ private:
 	}
 	void UpdateItemList( const TreeItem& item ) {
 		ClearOptionList();
-		tjs_uint count = item.Select.size();
+		tjs_uint count = (tjs_uint)item.Select.size();
 		for( tjs_uint i = 0; i < count; i++ ) {
 			std::wstring itemstr = item.Select[i].second + std::wstring(L" / ") + item.Select[i].first;
 			ComboBox_InsertString( OptionList, -1, itemstr.c_str() );
@@ -243,9 +243,9 @@ public:
 		tTJSBinaryStream *stream = TVPCreateBinaryStreamForWrite( ttstr(filename), L"" );
 		if( stream ) {
 			try {
-				stream->Write( warnings, strlen(warnings) );
+				stream->Write( warnings, (tjs_uint)strlen(warnings) );
 				std::string option = ToStringOption();
-				stream->Write( option.c_str(), option.length() );
+				stream->Write( option.c_str(), (tjs_uint)option.length() );
 			} catch(...) {
 				delete stream;
 				throw;
@@ -307,17 +307,22 @@ void ConfigFormUnit::LoadOptionTree() {
 	if( options ) {
 		LoadPluginOptionDesc( options, L"\\", L"dll" );
 		LoadPluginOptionDesc( options, L"\\", L"tpm" );
+#ifdef TJS_64BIT_OS
+		LoadPluginOptionDesc( options, L"plugin64\\", L"dll" );
+		LoadPluginOptionDesc( options, L"plugin64\\", L"tpm" );
+#else
 		LoadPluginOptionDesc( options, L"plugin\\", L"dll" );
 		LoadPluginOptionDesc( options, L"plugin\\", L"tpm" );
+#endif
 
 		tTJSVariant val;
 		HTREEITEM hFirst = NULL;
 		// 有効なアイテム数をカウント
 		tjs_uint itemcount = 0;
-		tjs_uint count = options->Categories.size();
+		tjs_uint count = (tjs_uint)options->Categories.size();
 		for( tjs_uint i = 0; i < count; i++ ) {
 			const tTVPCommandOptionCategory& category = options->Categories[i];
-			tjs_uint optcount = category.Options.size();
+			tjs_uint optcount = (tjs_uint)category.Options.size();
 			for( tjs_uint j = 0; j < optcount; j++ ) {
 				if( category.Options[j].User ) itemcount++;
 			}
@@ -327,7 +332,7 @@ void ConfigFormUnit::LoadOptionTree() {
 		tjs_uint itemidx = 0;
 		for( tjs_uint i = 0; i < count; i++ ) {
 			const tTVPCommandOptionCategory& category = options->Categories[i];
-			tjs_uint optcount = category.Options.size();
+			tjs_uint optcount = (tjs_uint)category.Options.size();
 			// まずはカテゴリに有効なアイテムがあるかチェックする
 			bool hasitem = false;
 			for( tjs_uint j = 0; j < optcount; j++ ) {
@@ -347,7 +352,7 @@ void ConfigFormUnit::LoadOptionTree() {
 					curitem.Parameter = option.Name;
 					curitem.Description = std::wstring(L"-")+option.Name+std::wstring(L"\n")+option.Description;
 					ConvertReturnCode( curitem.Description );
-					tjs_uint valcount = option.Values.size();
+					tjs_uint valcount = (tjs_uint)option.Values.size();
 					curitem.Select.resize( valcount );
 					curitem.Defalut = -1;
 					std::wstring argname( std::wstring(L"-") + option.Name );

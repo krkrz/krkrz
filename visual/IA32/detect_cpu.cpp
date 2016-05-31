@@ -41,15 +41,15 @@ static inline int __cpuidex(int CPUInfo[4],int InfoType,int ECXValue) {
 }
 #endif
 
-
+extern "C" {
 tjs_uint32 TVPCPUFeatures;
 tjs_uint32 TVPCPUID1_EAX;
 tjs_uint32 TVPCPUID1_EBX;
 tjs_nchar TVPCPUVendor[16];
 tjs_nchar TVPCPUName[52];
 tjs_uint32 TVPCPUPhysicalCore;
-tjs_uint32 TVPCPUType;
-
+extern tjs_uint32 TVPCPUType;
+}
 
 static void GetCpuid( int op, int& eax, int& ebx, int& ecx, int& edx) {
 	int info[4] = {0,0,0,0};
@@ -182,7 +182,7 @@ static void GetCPUName() {
 //---------------------------------------------------------------------------
 tjs_uint32 TVPCheckCPU()
 {
-	TVPCPUFeatures = TVPCPUID1_EAX = TVPCPUID1_EBX = TVPCPUType = 0;
+	TVPCPUFeatures = TVPCPUID1_EAX = TVPCPUID1_EBX = 0;
 	TVPCPUPhysicalCore = 1;
 	memset( TVPCPUVendor, 0, sizeof(TVPCPUVendor) );
 	memset( TVPCPUName, 0, sizeof(TVPCPUName) );

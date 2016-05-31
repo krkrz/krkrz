@@ -18,6 +18,21 @@
 #include <intrin.h>
 #endif
 
+/*
+ * core/utils/cp932_uni.cpp
+ * core/utils/uni_cp932.cpp
+ * を一緒にリンクしてください。
+ * CP932(ShiftJIS) と Unicode 変換に使用しています。
+ * Win32 APIの同等の関数は互換性等の問題があることやマルチプラットフォームの足かせとなる
+ * ため使用が中止されました。
+ */
+extern tjs_size SJISToUnicodeString(const char * in, tjs_char *out);
+extern tjs_size SJISToUnicodeString(const char * in, tjs_char *out, tjs_size limit );
+extern bool IsSJISLeadByte( tjs_nchar b );
+extern tjs_uint UnicodeToSJIS(tjs_char in);
+extern tjs_size UnicodeToSJISString(const tjs_char *in, tjs_nchar* out );
+extern tjs_size UnicodeToSJISString(const tjs_char *in, tjs_nchar* out, tjs_size limit );
+
 namespace TJS
 {
 
@@ -193,13 +208,6 @@ void TJS_cdecl TJS_debug_out(const tjs_char *format, ...)
 //---------------------------------------------------------------------------
 
 
-#ifdef __WIN32__
-//---------------------------------------------------------------------------
-// Wide<->narrow conversion functions.
-// These functions (Win32 only) are as same as the RTL's, but
-// alwayes uses Win32 current code page.
-// Code algorithms are taken from borland's RTL source, but totally rewritten
-// to avoid copyright problems.
 //---------------------------------------------------------------------------
 #define TJS_MB_MAX_CHARLEN 2
 //---------------------------------------------------------------------------
@@ -209,36 +217,16 @@ size_t TJS_mbstowcs(tjs_char *pwcs, const tjs_nchar *s, size_t n)
 
 	if(pwcs)
 	{
-		// Try converting to wide characters. Here assumes pwcs is large enough
-		// to store the result.
-		int count = MultiByteToWideChar(CP_ACP,
-			MB_PRECOMPOSED|MB_ERR_INVALID_CHARS, s, -1, pwcs, n);
-		if(count != 0) return count - 1;
-
-		if(GetLastError() != ERROR_INSUFFICIENT_BUFFER) return (size_t) -1;
-
-		// pwcs is not enough to store the result ...
-
-		// count number of source characters to fit the destination buffer
-		int charcnt = n;
-		const unsigned char *p;
-		for(p = (const unsigned char*)s; charcnt-- && *p; p++)
+		size_t count = SJISToUnicodeString( s, pwcs, n );
+		if( n > count )
 		{
-			if(IsDBCSLeadByte(*p)) p++;
+			pwcs[count] = TJS_W('\0');
 		}
-		int bytecnt = (int)(p - (const unsigned char *)s);
-
-		count = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, s, bytecnt, pwcs, n);
-		if(count == 0) return (size_t) -1;
-
 		return count;
 	}
 	else
-	{
-		int count = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED|MB_ERR_INVALID_CHARS,
-			s, -1, NULL, 0);
-		if(count == 0) return (size_t)-1;
-		return count - 1;
+	{	// count length
+		return SJISToUnicodeString( s, NULL );
 	}
 }
 //---------------------------------------------------------------------------
@@ -246,53 +234,23 @@ size_t TJS_wcstombs(tjs_nchar *s, const tjs_char *pwcs, size_t n)
 {
 	if(s && !n) return 0;
 
-	BOOL useddefault = FALSE;
 	if(s)
 	{
-		// Try converting to multibyte. Here assumes s is large enough to
-		// store the result.
-		size_t pwcs_len = TJS_strlen(pwcs);
-		size_t count = WideCharToMultiByte(CP_ACP, 0,
-			pwcs, pwcs_len, s, n, NULL, &useddefault);
-
-		if(count != 0/* && !useddefault*/)
-			return count;
-
-		if(/*useddefault || */GetLastError () != ERROR_INSUFFICIENT_BUFFER)
-			return (size_t) -1; // may a conversion error
-
-		// Buffer is not enough to store the result ...
-		while(count < n)
+		tjs_size count = UnicodeToSJISString( pwcs, s, n );
+		if( n > count )
 		{
-			char buffer[TJS_MB_MAX_CHARLEN + 1];
-			int retval = WideCharToMultiByte(CP_ACP, 0, pwcs, 1, buffer,
-				TJS_MB_MAX_CHARLEN, NULL, &useddefault);
-			if(retval == 0/* || useddefault*/)
-				return (size_t) -1;
-
-			if(count + retval > n)
-				return count;
-
-			for(int i = 0; i < retval; i++, count++)
-			{
-				if((s[count] = buffer[i]) == '\0') return count;
-			}
-
-			pwcs ++;
+			s[count] = '\0';
 		}
-
 		return count;
 	}
 	else
 	{
 		// Returns the buffer size to store the result
-		int count = WideCharToMultiByte(CP_ACP, 0,
-			pwcs, -1, NULL, 0, NULL, &useddefault);
-		if(count == 0/* || useddefault*/) return (size_t) -1;
-		return count - 1;
+		return UnicodeToSJISString(pwcs,NULL);
 	}
 }
 //---------------------------------------------------------------------------
+// 使われていないようなので未確認注意
 int TJS_mbtowc(tjs_char *pwc, const tjs_nchar *s, size_t n)
 {
 	if(!s || !n) return 0;
@@ -305,39 +263,43 @@ int TJS_mbtowc(tjs_char *pwc, const tjs_nchar *s, size_t n)
 
 	/* Borland's RTL seems to assume always MB_MAX_CHARLEN = 2. */
 	/* This may true while we use Win32 platforms ... */
-	if(IsDBCSLeadByte((BYTE)(*s)))
+	if( IsSJISLeadByte( *s ) )
 	{
 		// multi(double) byte character
 		if((int)n < TJS_MB_MAX_CHARLEN) return -1;
-		if(MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED|MB_ERR_INVALID_CHARS,
-			s, TJS_MB_MAX_CHARLEN, pwc, pwc ? 1:0) == 0)
+		tjs_size count = SJISToUnicodeString( s, pwc, 1 );
+		if( count <= 0 )
 		{
-			if(s[1] == 0) return -1;
+			return -1;
 		}
 		return TJS_MB_MAX_CHARLEN;
 	}
 	else
 	{
 		// single byte character
-		if(MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED|MB_ERR_INVALID_CHARS, s,
-			1, pwc, pwc ? 1:0) == 0)
-			return -1;
-		return 1;
+		return (int)SJISToUnicodeString( s, pwc, 1 );
 	}
 }
 //---------------------------------------------------------------------------
+// 使われていないようなので未確認注意
 int TJS_wctomb(tjs_nchar *s, tjs_char wc)
 {
 	if(!s) return 0;
-	BOOL useddefault = FALSE;
-	int size = WideCharToMultiByte(CP_ACP, 0, &wc, 1, s,
-		TJS_MB_MAX_CHARLEN, NULL, &useddefault);
-//	if(useddefault) return -1;
-	if(size == 0) return -1;
+	tjs_uint c = UnicodeToSJIS(wc);
+	if( c == 0 ) return -1;
+	int size = 0;
+	if( c & 0xff00 )
+	{
+		*s = static_cast<tjs_nchar>((c>>8)&0xff);
+		s++;
+		size++;
+	}
+	*s = static_cast<tjs_nchar>( c&0xff );
+	size++;
 	return size;
 }
 //---------------------------------------------------------------------------
-#endif
+
 //---------------------------------------------------------------------------
 
 
@@ -350,7 +312,7 @@ tTJSNarrowStringHolder::tTJSNarrowStringHolder(const wchar_t * wide)
 	if(!wide)
 		n = -1;
 	else
-		n = TJS_wcstombs(NULL, wide, 0);
+		n = (int)TJS_wcstombs(NULL, wide, 0);
 
 	if( n == -1 )
 	{
@@ -402,38 +364,51 @@ void TJSNativeDebuggerBreak()
 #if defined(__WIN32__) && !defined(__GNUC__)
 static unsigned int TJSDefaultFPUCW = 0;
 static unsigned int TJSNewFPUCW = 0;
+static unsigned int TJSDefaultMMCW = 0;
 static bool TJSFPUInit = false;
 #endif
+// FPU例外をマスク
 void TJSSetFPUE()
 {
-#if defined(__WIN32__) && !defined(__GNUC__) && !defined(_M_X64)
+#if defined(__WIN32__) && !defined(__GNUC__)
 	if(!TJSFPUInit)
 	{
 		TJSFPUInit = true;
+#if defined(_M_X64)
+		TJSDefaultMMCW = _MM_GET_EXCEPTION_MASK();
+#else
 		TJSDefaultFPUCW = _control87(0, 0);
-		
+
 #ifdef _MSC_VER
 		TJSNewFPUCW = _control87(MCW_EM, MCW_EM);
 #else
 		_default87 = TJSNewFPUCW = _control87(MCW_EM, MCW_EM);
-#endif
+#endif	// _MSC_VER
 #ifdef TJS_SUPPORT_VCL
 		Default8087CW = TJSNewFPUCW;
-#endif
+#endif	// TJS_SUPPORT_VCL
+#endif	// _M_X64
 	}
 
+#if defined(_M_X64)
+	_MM_SET_EXCEPTION_MASK(_MM_MASK_INVALID|_MM_MASK_DIV_ZERO|_MM_MASK_DENORM|_MM_MASK_OVERFLOW|_MM_MASK_UNDERFLOW|_MM_MASK_INEXACT);
+#else
 //	_fpreset();
 	_control87(TJSNewFPUCW, 0xffff);
 #endif
+#endif	// defined(__WIN32__) && !defined(__GNUC__)
 
 }
-
+// 例外マスクを解除し元に戻す
 void TJSRestoreFPUE()
 {
-
-#if defined(__WIN32__) && !defined(__GNUC__) && !defined(_M_X64)
 	if(!TJSFPUInit) return;
+#if defined(__WIN32__) && !defined(__GNUC__)
+#if defined(_M_X64)
+	_MM_SET_EXCEPTION_MASK(TJSDefaultMMCW);
+#else
 	_control87(TJSDefaultFPUCW, 0xffff);
+#endif
 #endif
 }
 

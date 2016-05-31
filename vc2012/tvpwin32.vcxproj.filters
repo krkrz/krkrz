@@ -58,6 +58,15 @@
     <Filter Include="extension">
       <UniqueIdentifier>{00466776-e92e-48d6-905d-db6c36ab46cc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="visual\gl">
+      <UniqueIdentifier>{f40130cb-77be-4493-bb7e-e204ddf45037}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="movie">
+      <UniqueIdentifier>{ab526f18-de12-4994-9262-a4f779202f79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="movie\win32">
+      <UniqueIdentifier>{2b2298b4-9c07-4290-803e-9f80182128f7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -308,9 +317,6 @@
     <ClInclude Include="..\visual\LoadTLG.h">
       <Filter>visual</Filter>
     </ClInclude>
-    <ClInclude Include="..\visual\Resampler.h">
-      <Filter>visual</Filter>
-    </ClInclude>
     <ClInclude Include="..\visual\transhandler.h">
       <Filter>visual</Filter>
     </ClInclude>
@@ -542,6 +548,138 @@
     <ClInclude Include="..\extension\Extension.h">
       <Filter>extension</Filter>
     </ClInclude>
+    <ClInclude Include="..\visual\gl\blend_functor_c.h">
+      <Filter>visual\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\gl\blend_functor_sse2.h">
+      <Filter>visual\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\gl\blend_ps_functor_sse2.h">
+      <Filter>visual\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\gl\blend_util_func.h">
+      <Filter>visual\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\gl\blend_variation.h">
+      <Filter>visual\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\gl\simd_def_x86x64.h">
+      <Filter>visual\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\gl\sse_mathfun.h">
+      <Filter>visual\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\gl\x86simdutil.h">
+      <Filter>visual\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\gl\interpolation_functor_sse2.h">
+      <Filter>visual\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sound\MathAlgorithms.h">
+      <Filter>sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sound\RealFFT.h">
+      <Filter>sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sound\xmmlib.h">
+      <Filter>sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\asyncio.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\asyncrdr.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\BufferRenderer.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\CDemuxOutputPin.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\CDemuxSource.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\CDLLLoader.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\CIStream.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\CMediaSeekingProxy.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\CVMRCustomAllocatorPresenter9.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\CWMAllocator.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\CWMBuffer.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\CWMReader.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\DShowException.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\dslayerd.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\dsmixer.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\dsmovie.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\dsoverlay.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\IBufferRenderer.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\IDemuxReader.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\IRendererBufferAccess.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\IRendererBufferVideo.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\MFPlayer.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\PlayWindow.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\OptionInfo.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\TVPVideoOverlay.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\gl\aligned_allocator.h">
+      <Filter>visual\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\gl\ResampleImage.h">
+      <Filter>visual\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\gl\ResampleImageInternal.h">
+      <Filter>visual\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\gl\WeightFunctor.h">
+      <Filter>visual\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\gl\WeightFunctorAVX.h">
+      <Filter>visual\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\gl\WeightFunctorSSE.h">
+      <Filter>visual\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\gl\blend_functor_avx2.h">
+      <Filter>visual\gl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\tjs2\tjs.cpp">
@@ -772,9 +910,6 @@
     <ClCompile Include="..\visual\LoadTLG.cpp">
       <Filter>visual</Filter>
     </ClCompile>
-    <ClCompile Include="..\visual\Resampler.cpp">
-      <Filter>visual</Filter>
-    </ClCompile>
     <ClCompile Include="..\visual\TransIntf.cpp">
       <Filter>visual</Filter>
     </ClCompile>
@@ -976,6 +1111,147 @@
     <ClCompile Include="..\visual\IA32\detect_cpu.cpp">
       <Filter>visual\IA32</Filter>
     </ClCompile>
+    <ClCompile Include="..\visual\gl\blend_function.cpp">
+      <Filter>visual\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\gl\blend_function_sse2.cpp">
+      <Filter>visual\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\gl\univtrans_sse2.cpp">
+      <Filter>visual\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\gl\adjust_color_sse2.cpp">
+      <Filter>visual\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\gl\x86simdutil.cpp">
+      <Filter>visual\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\gl\boxblur_sse2.cpp">
+      <Filter>visual\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\gl\colorfill_sse2.cpp">
+      <Filter>visual\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\gl\colormap_sse2.cpp">
+      <Filter>visual\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\gl\pixelformat_sse2.cpp">
+      <Filter>visual\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\gl\tlg_sse2.cpp">
+      <Filter>visual\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sound\MathAlgorithms.cpp">
+      <Filter>sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sound\MathAlgorithms_SSE.cpp">
+      <Filter>sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sound\RealFFT.cpp">
+      <Filter>sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sound\RealFFT_SSE.cpp">
+      <Filter>sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sound\WaveFormatConverter.cpp">
+      <Filter>sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sound\WaveFormatConverter_SSE.cpp">
+      <Filter>sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sound\xmmlib.cpp">
+      <Filter>sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\asyncio.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\asyncrdr.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\BufferRenderer.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\CDemuxOutputPin.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\CDemuxSource.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\CMediaSeekingProxy.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\CVMRCustomAllocatorPresenter9.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\CWMAllocator.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\CWMBuffer.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\CWMReader.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\DShowException.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\dslayerd.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\dsmixer.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\dsmovie.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\dsoverlay.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\IBufferRenderer_i.c">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\IRendererBufferAccess_i.c">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\IRendererBufferVideo_i.c">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\krlmovie.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\krmmovie.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\krmovie.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\MFPlayer.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\PlayWindow.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\TVPVideoOverlay.cpp">
+      <Filter>movie\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\gl\ResampleImage.cpp">
+      <Filter>visual\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\gl\ResampleImageAVX2.cpp">
+      <Filter>visual\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\gl\ResampleImageSSE2.cpp">
+      <Filter>visual\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\gl\WeightFunctor.cpp">
+      <Filter>visual\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\gl\x86simdutilAVX2.cpp">
+      <Filter>visual\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\gl\blend_function_avx2.cpp">
+      <Filter>visual\gl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="tvpwin32.rc">
@@ -992,5 +1268,13 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="option_desc_ja.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\visual\IA32\tlg6_chroma.nas">
+      <Filter>visual\IA32</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\visual\IA32\tlg6_golomb.nas">
+      <Filter>visual\IA32</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>
