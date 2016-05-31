@@ -398,7 +398,7 @@ static tTJSString TJSExtractNumber(tjs_int (*validdigits)(tjs_char ch),
 	bool exp_found = false;
 	while(true)
 	{
-		if(validdigits(**ptr) != -1)
+		if(validdigits(**ptr) != -1 && !exp_found)
 		{
 			tmp += **ptr;
 			if(!TJSNext(ptr)) break;
@@ -427,6 +427,11 @@ static tTJSString TJSExtractNumber(tjs_int (*validdigits)(tjs_char ch),
 				if(!TJSNext(ptr)) break;
 				if(!TJSSkipSpace(ptr)) break;
 			}
+		}
+		else if (TJSDecNum(**ptr) != -1 && exp_found)
+		{
+			tmp += **ptr;
+			if(!TJSNext(ptr)) break;
 		}
 		else
 		{
