@@ -76,7 +76,7 @@ static UINT_PTR APIENTRY TVPOFNHookProc(HWND hdlg, UINT uiMsg, WPARAM wParam,
 //---------------------------------------------------------------------------
 static void TVPPushFilterPair(std::vector<std::wstring> &filters, std::wstring filter)
 {
-	int vpos = filter.find_first_of(L"|");
+	std::wstring::size_type vpos = filter.find_first_of(L"|");
 	if( vpos != std::wstring::npos )
 	{
 		std::wstring name = filter.substr(0, vpos);
@@ -155,7 +155,7 @@ bool TVPSelectFile(iTJSDispatch2 *params)
 			tjs_int bufsize = 2;
 			for(std::vector<std::wstring>::iterator i = filterlist.begin(); i != filterlist.end(); i++)
 			{
-				bufsize += i->length() + 1;
+				bufsize += (tjs_int)(i->length() + 1);
 			}
 
 			filter = new wchar_t[bufsize];

@@ -1,0 +1,24 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wuvorbis64", "wuvorbis64.vcxproj", "{3E17C634-1092-42A8-88C2-14E3E9811069}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Debug|x64 = Debug|x64
+		Release|Win32 = Release|Win32
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3E17C634-1092-42A8-88C2-14E3E9811069}.Debug|Win32.ActiveCfg = Debug|x64
+		{3E17C634-1092-42A8-88C2-14E3E9811069}.Debug|x64.ActiveCfg = Debug|x64
+		{3E17C634-1092-42A8-88C2-14E3E9811069}.Debug|x64.Build.0 = Debug|x64
+		{3E17C634-1092-42A8-88C2-14E3E9811069}.Release|Win32.ActiveCfg = Release|x64
+		{3E17C634-1092-42A8-88C2-14E3E9811069}.Release|x64.ActiveCfg = Release|x64
+		{3E17C634-1092-42A8-88C2-14E3E9811069}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

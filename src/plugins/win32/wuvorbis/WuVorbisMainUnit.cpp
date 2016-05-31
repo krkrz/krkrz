@@ -12,6 +12,7 @@ extern "C" {
 #include <math.h>
 #include <string.h>
 #include <stdlib.h>
+#include <malloc.h>
 
 #ifndef NOT_HAVE_TP_STUB
 #include "tp_stub.h"
@@ -420,7 +421,8 @@ HRESULT VorbisWaveDecoder::SetStream(IStream *stream, LPWSTR url)
 			}
 		}
 	}
-
+	
+#ifndef _M_X64
 	if(Look_Replay_Gain)
 	{
 		for(int i = 0; i < InputFile.links; i++)
@@ -441,6 +443,7 @@ HRESULT VorbisWaveDecoder::SetStream(IStream *stream, LPWSTR url)
 			vorbis_info_set_global_gain(ov_info(&InputFile, i), gain);
 		}
 	}
+#endif
 #endif
 
 	return S_OK;
@@ -569,10 +572,14 @@ extern "C" __declspec(dllexport) HRESULT _stdcall V2Link(iTVPFunctionExporter *e
 	InternalSetCPUType(cputype);
 
 	ttstr debug_str(L"wuvorbis:");
-
+	
+#ifndef _M_X64
 	if(CPU_SSE) debug_str += L" SSE enabled."; else debug_str += L" SSE disabled.";
 	if(CPU_MMX) debug_str += L" MMX enabled."; else debug_str += L" MMX disabled.";
 	if(CPU_3DN) debug_str += L" 3DNow! enabled."; else debug_str += L" 3DNow! disabled.";
+#else
+	debug_str += L" SSE/SSE2 enabled.";	// x64 always enabled.
+#endif
 
 	TVPAddImportantLog(debug_str); 
 
@@ -707,6 +714,22 @@ void * dee_ogg_realloc(void *block, size_t bytes)
 	return newptr;
 }
 //---------------------------------------------------------------------------
+void * dee_ogg_alloca(size_t bytes)
+{
+	bytes += 16;
+	tjs_int align = 16;
+	void *ptr = _alloca(bytes + align + sizeof(alloc_record));
+	if(!ptr) return NULL;
+	void *org_ptr = ptr;
+	DWORD *iptr =
+		reinterpret_cast<DWORD *>(&ptr);
+	*iptr += align + sizeof(alloc_record);
+	*iptr &= ~(DWORD)(align - 1);
+	(reinterpret_cast<alloc_record*>(ptr))[-1].org_ptr = org_ptr;
+	(reinterpret_cast<alloc_record*>(ptr))[-1].org_size = bytes;
+	return ptr;
+}
+//---------------------------------------------------------------------------
 }
 
 //---------------------------------------------------------------------------
@@ -728,12 +751,12 @@ extern "C" void SetCPUType(unsigned __int32 type)
 	InternalSetCPUType(type);
 }
 //---------------------------------------------------------------------------
-extern "C"  unsigned __int32 _cdecl TVPCheckCPU(void);
+extern tjs_uint32 TVPCheckCPU();
 extern "C"  unsigned __int32 TVPCPUType = 0;
 extern "C" unsigned __int32 DetectCPU(void)
 {
 	TVPCPUType = TVPCheckCPU();
-
+#ifndef _M_X64
 	if(TVPCPUType & TVP_CPU_HAS_SSE)
 	{
 		// do SSE check
@@ -749,7 +772,7 @@ extern "C" unsigned __int32 DetectCPU(void)
 			TVPCPUType &=~ TVP_CPU_HAS_SSE2;
 		}
 	}
-	
+#endif
 	return TVPCPUType;
 }
 //---------------------------------------------------------------------------

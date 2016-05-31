@@ -19,6 +19,8 @@
 
 //---------------------------------------------------------------------------
 tjs_uint UnicodeToSJIS(tjs_char in);
+tjs_size UnicodeToSJISString(const tjs_char *in, tjs_nchar* out );
+tjs_size UnicodeToSJISString(const tjs_char *in, tjs_nchar* out, tjs_size limit );
 //---------------------------------------------------------------------------
 
 

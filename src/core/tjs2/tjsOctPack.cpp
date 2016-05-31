@@ -306,7 +306,7 @@ static void encodeBase64( const tjs_uint8* inbuf, tjs_uint insize, std::wstring&
 	}
 }
 static void decodeBase64( const std::wstring& inbuf, std::vector<tjs_uint8>& outbuf ) {
-	tjs_int len = inbuf.length();
+	tjs_int len = (tjs_int)inbuf.length();
 	const tjs_char* data = inbuf.c_str();
 	if( len < 4 ) { // too short
 		return;
@@ -358,9 +358,9 @@ static void decodeBase64( const std::wstring& inbuf, std::vector<tjs_uint8>& out
 static tTJSVariantOctet* Pack( const std::vector<OctPackTemplate>& templ, const std::vector<tTJSVariant>& args ) {
 	tjs_int numargs = static_cast<tjs_int>(args.size());
 	std::vector<tjs_uint8> result;
-	tjs_int count = templ.size();
+	tjs_size count = templ.size();
 	tjs_int argindex = 0;
-	for( tjs_int i = 0; i < count && argindex < numargs; argindex++ ) {
+	for( tjs_size i = 0; i < count && argindex < numargs; argindex++ ) {
 		OctPackType t = templ[i].Type;
 		tjs_int len = templ[i].Length;
 		switch( t ) {
@@ -443,8 +443,8 @@ static tTJSVariantOctet* Pack( const std::vector<OctPackTemplate>& templ, const 
 			argindex--;
 			break;
 		case OctPack_fill: {		// @ : 絶対位置までヌル文字を埋める
-			tjs_int count = result.size();
-			for( tjs_int i = count; i < len; i++ ) {
+			tjs_size count = result.size();
+			for( tjs_size i = count; i < (tjs_size)len; i++ ) {
 				result.push_back( 0 );
 			}
 			argindex--;
@@ -461,7 +461,7 @@ static tTJSVariantOctet* Pack( const std::vector<OctPackTemplate>& templ, const 
 		}
 	}
 	if( result.size() > 0 )
-		return TJSAllocVariantOctet( &(result[0]), result.size() );
+		return TJSAllocVariantOctet( &(result[0]), (tjs_uint)result.size() );
 	else
 		return NULL;
 }
@@ -515,7 +515,7 @@ static void BinToBitString( const tjs_uint8 *data, const tjs_uint8 *tail, tjs_ui
 // TRet : 最終的に出力する型
 template<typename TRet, int NBYTE>
 static void BinToNumberLE( std::vector<TRet>& result, const tjs_uint8 *data, const tjs_uint8 *tail, tjs_uint len ) {
-	if( len < 0 ) len = ((tail - data)+NBYTE-1)/NBYTE;
+	if( len < 0 ) len = (tjs_uint)(((tail - data)+NBYTE-1)/NBYTE);
 	if( (data+len*NBYTE) < tail ) tail = data+len*NBYTE;
 	TRet val = 0;
 	tjs_uint bytes = 0;
@@ -536,7 +536,7 @@ static void BinToNumberLE( std::vector<TRet>& result, const tjs_uint8 *data, con
 
 template<typename TRet, typename TTmp, int NBYTE>
 static void BinToNumberLEReal( std::vector<TRet>& result, const tjs_uint8 *data, const tjs_uint8 *tail, tjs_uint len ) {
-	if( len < 0 ) len = ((tail - data)+NBYTE-1)/NBYTE;
+	if( len < 0 ) len = (tjs_uint)(((tail - data)+NBYTE-1)/NBYTE);
 	if( (data+len*NBYTE) < tail ) tail = data+len*NBYTE;
 	TTmp val = 0;
 	tjs_uint bytes = 0;
@@ -556,7 +556,7 @@ static void BinToNumberLEReal( std::vector<TRet>& result, const tjs_uint8 *data,
 }
 template<typename TRet, int NBYTE>
 static void BinToNumberBE( std::vector<TRet>& result, const tjs_uint8 *data, const tjs_uint8 *tail, tjs_uint len ) {
-	if( len < 0 ) len = ((tail - data)+NBYTE-1)/NBYTE;
+	if( len < 0 ) len = (tjs_uint)(((tail - data)+NBYTE-1)/NBYTE);
 	if( (data+len*NBYTE) < tail ) tail = data+len*NBYTE;
 	TRet val = 0;
 	tjs_uint bytes = NBYTE-1;
@@ -634,17 +634,17 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 
 	const tjs_uint8 *current = data;
 	const tjs_uint8 *tail = data + length;
-	tjs_uint len = length;
-	tjs_int count = templ.size();
+	tjs_size len = length;
+	tjs_size count = templ.size();
 	tjs_int argindex = 0;
-	for( tjs_int i = 0; i < count && current < tail; argindex++ ) {
+	for( tjs_int i = 0; i < (tjs_int)count && current < tail; argindex++ ) {
 		OctPackType t = templ[i].Type;
-		tjs_int len = templ[i].Length;
+		tjs_size len = templ[i].Length;
 		switch( t ) {
 		case OctPack_ascii:{ 	// a : ASCII string(ヌル文字が補完される)
 			if( len < 0 ) len = (tail - current);
 			ttstr ret;
-			BinToAscii( current, tail, len, ret );
+			BinToAscii( current, tail, (tjs_uint)len, ret );
 			result->Add( ni, tTJSVariant( ret ) );
 			current += len;
 			break;
@@ -652,7 +652,7 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 		case OctPack_ASCII: {		// A : ASCII string(スペースが補完される)
 			if( len < 0 ) len = (tail - current);
 			ttstr ret;
-			BinToAscii( current, tail, len, ret );
+			BinToAscii( current, tail, (tjs_uint)len, ret );
 			result->Add( ni, tTJSVariant( ret ) );
 			current += len;
 			break;
@@ -660,7 +660,7 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 		case OctPack_bitstring: {	// b : bit string(下位ビットから上位ビットの順)
 			if( len < 0 ) len = (tail - current)*8;
 			ttstr ret;
-			BinToBitString( current, tail, len, ret, false );
+			BinToBitString( current, tail, (tjs_uint)len, ret, false );
 			result->Add( ni, tTJSVariant( ret ) );
 			current += (len+7)/8;
 			break;
@@ -668,7 +668,7 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 		case OctPack_BITSTRING: {	// B : bit string(上位ビットから下位ビットの順)
 			if( len < 0 ) len = (tail - current)*8;
 			ttstr ret;
-			BinToBitString( current, tail, len, ret, true );
+			BinToBitString( current, tail, (tjs_uint)len, ret, true );
 			result->Add( ni, tTJSVariant( ret ) );
 			current += (len+7)/8;
 			break;
@@ -676,7 +676,7 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 		case OctPack_char: {		// c : 符号付き1バイト数値(-128 ～ 127)
 			if( len < 0 ) len = tail - current;
 			std::vector<tjs_int8> ret;
-			BinToNumber<tjs_int8,1>( ret, current, tail, len );
+			BinToNumber<tjs_int8,1>( ret, current, tail, (tjs_uint)len );
 			for( std::vector<tjs_int8>::const_iterator iter = ret.begin(); iter != ret.end(); iter++ ) {
 				result->Add( ni, tTJSVariant( (tjs_int)*iter ) );
 			}
@@ -686,7 +686,7 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 		case OctPack_CHAR: {		// C : 符号無し1バイト数値(0～255)
 			if( len < 0 ) len = tail - current;
 			std::vector<tjs_uint8> ret;
-			BinToNumber<tjs_uint8,1>( ret, current, tail, len );
+			BinToNumber<tjs_uint8,1>( ret, current, tail, (tjs_uint)len );
 			for( std::vector<tjs_uint8>::const_iterator iter = ret.begin(); iter != ret.end(); iter++ ) {
 				result->Add( ni, tTJSVariant( (tjs_int)*iter ) );
 			}
@@ -696,7 +696,7 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 		case OctPack_double: {	// d : 倍精度浮動小数点
 			if( len < 0 ) len = (tail - current)/8;
 			std::vector<tjs_real> ret;
-			BinToReal<tjs_real,tjs_uint64,8>( ret, current, tail, len );
+			BinToReal<tjs_real,tjs_uint64,8>( ret, current, tail, (tjs_uint)len );
 			for( std::vector<tjs_real>::const_iterator iter = ret.begin(); iter != ret.end(); iter++ ) {
 				result->Add( ni, tTJSVariant( (tjs_real)*iter ) );
 			}
@@ -706,7 +706,7 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 		case OctPack_float: {		// f : 単精度浮動小数点
 			if( len < 0 ) len = (tail - current)/4;
 			std::vector<float> ret;
-			BinToReal<float,tjs_uint32,4>( ret, current, tail, len );
+			BinToReal<float,tjs_uint32,4>( ret, current, tail, (tjs_uint)len );
 			for( std::vector<float>::const_iterator iter = ret.begin(); iter != ret.end(); iter++ ) {
 				result->Add( ni, tTJSVariant( (tjs_real)*iter ) );
 			}
@@ -716,7 +716,7 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 		case OctPack_hex: {		// h : hex string(low nybble first)
 			if( len < 0 ) len = (tail - current)*2;
 			ttstr ret;
-			BinToHex( current, tail, len, ret, false );
+			BinToHex( current, tail, (tjs_uint)len, ret, false );
 			result->Add( ni, tTJSVariant( ret ) );
 			current += (len+1)/2;
 			break;
@@ -724,7 +724,7 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 		case OctPack_HEX: {		// H : hex string(high nybble first)
 			if( len < 0 ) len = (tail - current)*2;
 			ttstr ret;
-			BinToHex( current, tail, len, ret, true );
+			BinToHex( current, tail, (tjs_uint)len, ret, true );
 			result->Add( ni, tTJSVariant( ret ) );
 			current += (len+1)/2;
 			break;
@@ -733,7 +733,7 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 		case OctPack_long: {	// l : 符号付きlong数値(通常4バイト)
 			if( len < 0 ) len = (tail - current)/4;
 			std::vector<tjs_int> ret;
-			BinToNumber<tjs_int,4>( ret, current, tail, len );
+			BinToNumber<tjs_int,4>( ret, current, tail, (tjs_uint)len );
 			for( std::vector<tjs_int>::const_iterator iter = ret.begin(); iter != ret.end(); iter++ ) {
 				result->Add( ni, tTJSVariant( (tjs_int)*iter ) );
 			}
@@ -744,7 +744,7 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 		case OctPack_LONG: {	// L : 符号無しlong数値(通常4バイト)
 			if( len < 0 ) len = (tail - current)/4;
 			std::vector<tjs_uint> ret;
-			BinToNumber<tjs_uint,4>( ret, current, tail, len );
+			BinToNumber<tjs_uint,4>( ret, current, tail, (tjs_uint)len );
 			for( std::vector<tjs_uint>::const_iterator iter = ret.begin(); iter != ret.end(); iter++ ) {
 				result->Add( ni, tTJSVariant( (tjs_int64)*iter ) );
 			}
@@ -754,7 +754,7 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 		case OctPack_noshort: {	// n : unsigned short数値(ネットワークバイトオーダ) network byte order short
 			if( len < 0 ) len = (tail - current)/2;
 			std::vector<tjs_uint16> ret;
-			BinToNumberBE<tjs_uint16,2>( ret, current, tail, len );
+			BinToNumberBE<tjs_uint16,2>( ret, current, tail, (tjs_uint)len );
 			for( std::vector<tjs_uint16>::const_iterator iter = ret.begin(); iter != ret.end(); iter++ ) {
 				result->Add( ni, tTJSVariant( (tjs_int)*iter ) );
 			}
@@ -762,9 +762,9 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 			break;
 		}
 		case OctPack_NOLONG: {	// N : unsigned long数値(ネットワークバイトオーダ) network byte order long
-			if( len < 0 ) len = (tail - current)/4;
+			if( len < 0 ) len = ((tail - current)/4);
 			std::vector<tjs_uint> ret;
-			BinToNumberBE<tjs_uint,4>( ret, current, tail, len );
+			BinToNumberBE<tjs_uint,4>( ret, current, tail, (tjs_uint)len );
 			for( std::vector<tjs_uint>::const_iterator iter = ret.begin(); iter != ret.end(); iter++ ) {
 				result->Add( ni, tTJSVariant( (tjs_int64)*iter ) );
 			}
@@ -778,9 +778,9 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 			TJS_eTJSError( TJSNotSupportedUnpackP );
 			break;
 		case OctPack_short: {	// s : 符号付きshort数値(通常2バイト) sign
-			if( len < 0 ) len = (tail - current)/2;
+			if( len < 0 ) len = ((tail - current)/2);
 			std::vector<tjs_int16> ret;
-			BinToNumber<tjs_int16,2>( ret, current, tail, len );
+			BinToNumber<tjs_int16,2>( ret, current, tail, (tjs_uint)len );
 			for( std::vector<tjs_int16>::const_iterator iter = ret.begin(); iter != ret.end(); iter++ ) {
 				result->Add( ni, tTJSVariant( (tjs_int)*iter ) );
 			}
@@ -788,9 +788,9 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 			break;
 		}
 		case OctPack_SHORT: {		// S : 符号無しshort数値(通常2バイト) unsign
-			if( len < 0 ) len = (tail - current)/2;
+			if( len < 0 ) len = ((tail - current)/2);
 			std::vector<tjs_uint16> ret;
-			BinToNumber<tjs_uint16,2>( ret, current, tail, len );
+			BinToNumber<tjs_uint16,2>( ret, current, tail, (tjs_uint)len );
 			for( std::vector<tjs_uint16>::const_iterator iter = ret.begin(); iter != ret.end(); iter++ ) {
 				result->Add( ni, tTJSVariant( (tjs_int)*iter ) );
 			}
@@ -798,9 +798,9 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 			break;
 		}
 		case OctPack_leshort: {	// v : リトルエンディアンによるunsigned short値 little endian short
-			if( len < 0 ) len = (tail - current)/2;
+			if( len < 0 ) len = ((tail - current)/2);
 			std::vector<tjs_uint16> ret;
-			BinToNumberLE<tjs_uint16,2>( ret, current, tail, len );
+			BinToNumberLE<tjs_uint16,2>( ret, current, tail, (tjs_uint)len );
 			for( std::vector<tjs_uint16>::const_iterator iter = ret.begin(); iter != ret.end(); iter++ ) {
 				result->Add( ni, tTJSVariant( (tjs_int)*iter ) );
 			}
@@ -808,9 +808,9 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 			break;
 		}
 		case OctPack_LELONG: {	// V : リトルエンディアンによるunsigned long値 little endian long
-			if( len < 0 ) len = (tail - current)/4;
+			if( len < 0 ) len = ((tail - current)/4);
 			std::vector<tjs_uint> ret;
-			BinToNumberLE<tjs_uint,4>( ret, current, tail, len );
+			BinToNumberLE<tjs_uint,4>( ret, current, tail, (tjs_uint)len );
 			for( std::vector<tjs_uint>::const_iterator iter = ret.begin(); iter != ret.end(); iter++ ) {
 				result->Add( ni, tTJSVariant( (tjs_int64)*iter ) );
 			}
@@ -824,26 +824,26 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 			TJS_eTJSError( TJSNotSupportedBER );
 			break;
 		case OctPack_null:		// x : ヌル文字
-			if( len < 0 ) len = tail - current;
-			for( tjs_int x = 0; x < len; x++ ) {
+			if( len < 0 ) len = (tail - current);
+			for( tjs_int x = 0; x < (tjs_int)len; x++ ) {
 				current++;
 			}
 			break;
 		case OctPack_NULL:		// X : back up a byte
-			if( len < 0 ) len = current - data;
-			for( tjs_int x = 0; x < len; x++ ) {
+			if( len < 0 ) len = (current - data);
+			for( tjs_int x = 0; x < (tjs_int)len; x++ ) {
 				if( data != current ) current--;
 				else break;
 			}
 			break;
 		case OctPack_fill: {		// @ : 絶対位置までヌル文字を埋める
-			if( len < 0 ) len = tail - current;
+			if( len < 0 ) len = (tail - current);
 			current = &(data[len]);
 			break;
 		}
 		case OctPack_base64: {	// m : Base64 encode / decode
 			std::wstring ret;
-			encodeBase64( current, tail-current, ret );
+			encodeBase64( current, (tjs_uint)(tail-current), ret );
 			result->Add( ni, tTJSVariant( ret.c_str() ) );
 			current = tail;
 			break;

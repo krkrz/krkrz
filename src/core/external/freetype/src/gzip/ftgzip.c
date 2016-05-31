@@ -8,7 +8,7 @@
 /*  parse compressed PCF fonts, as found with many X11 server              */
 /*  distributions.                                                         */
 /*                                                                         */
-/*  Copyright 2002-2006, 2009-2013 by                                      */
+/*  Copyright 2002-2016 by                                                 */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -30,7 +30,7 @@
 
 #include FT_MODULE_ERRORS_H
 
-#undef __FTERRORS_H__
+#undef FTERRORS_H_
 
 #undef  FT_ERR_PREFIX
 #define FT_ERR_PREFIX  Gzip_Err_
@@ -58,7 +58,6 @@
  /* conflicts when a program is linked with both FreeType and the    */
  /* original ZLib.                                                   */
 
-#define NO_DUMMY_DECL
 #ifndef USE_ZLIB_ZCALLOC
 #define MY_ZCALLOC /* prevent all zcalloc() & zfree() in zutils.c */
 #endif
@@ -208,8 +207,8 @@
 
     /* head[0] && head[1] are the magic numbers;    */
     /* head[2] is the method, and head[3] the flags */
-    if ( head[0] != 0x1f              ||
-         head[1] != 0x8b              ||
+    if ( head[0] != 0x1F              ||
+         head[1] != 0x8B              ||
          head[2] != Z_DEFLATED        ||
         (head[3] & FT_GZIP_RESERVED)  )
     {
@@ -378,7 +377,10 @@
       size = stream->read( stream, stream->pos, zip->input,
                            FT_GZIP_BUFFER_SIZE );
       if ( size == 0 )
+      {
+        zip->limit = zip->cursor;
         return FT_THROW( Invalid_Stream_Operation );
+      }
     }
     else
     {
@@ -387,7 +389,10 @@
         size = FT_GZIP_BUFFER_SIZE;
 
       if ( size == 0 )
+      {
+        zip->limit = zip->cursor;
         return FT_THROW( Invalid_Stream_Operation );
+      }
 
       FT_MEM_COPY( zip->input, stream->base + stream->pos, size );
     }
@@ -434,7 +439,8 @@
       }
       else if ( err != Z_OK )
       {
-        error = FT_THROW( Invalid_Stream_Operation );
+        zip->limit = zip->cursor;
+        error      = FT_THROW( Invalid_Stream_Operation );
         break;
       }
     }
@@ -558,19 +564,22 @@
 
       stream->descriptor.pointer = NULL;
     }
+
+    if ( !stream->read )
+      FT_FREE( stream->base );
   }
 
 
-  static FT_ULong
-  ft_gzip_stream_io( FT_Stream  stream,
-                     FT_ULong   pos,
-                     FT_Byte*   buffer,
-                     FT_ULong   count )
+  static unsigned long
+  ft_gzip_stream_io( FT_Stream       stream,
+                     unsigned long   offset,
+                     unsigned char*  buffer,
+                     unsigned long   count )
   {
     FT_GZipFile  zip = (FT_GZipFile)stream->descriptor.pointer;
 
 
-    return ft_gzip_file_io( zip, pos, buffer, count );
+    return ft_gzip_file_io( zip, offset, buffer, count );
   }
 
 
@@ -585,7 +594,7 @@
     old_pos = stream->pos;
     if ( !FT_Stream_Seek( stream, stream->size - 4 ) )
     {
-      result = FT_Stream_ReadULong( stream, &error );
+      result = FT_Stream_ReadULongLE( stream, &error );
       if ( error )
         result = 0;
 
@@ -596,14 +605,24 @@
   }
 
 
+  /* documentation is in ftgzip.h */
+
   FT_EXPORT_DEF( FT_Error )
   FT_Stream_OpenGzip( FT_Stream  stream,
                       FT_Stream  source )
   {
     FT_Error     error;
-    FT_Memory    memory = source->memory;
+    FT_Memory    memory;
     FT_GZipFile  zip = NULL;
 
+
+    if ( !stream || !source )
+    {
+      error = FT_THROW( Invalid_Stream_Handle );
+      goto Exit;
+    }
+
+    memory = source->memory;
 
     /*
      *  check the header right now; this prevents allocating un-necessary
@@ -672,11 +691,15 @@
         }
         error = FT_Err_Ok;
       }
+
+      if ( zip_size )
+        stream->size = zip_size;
+      else
+        stream->size  = 0x7FFFFFFFL;  /* don't know the real size! */
     }
 
-    stream->size  = 0x7FFFFFFFL;  /* don't know the real size! */
     stream->pos   = 0;
-    stream->base  = 0;
+    stream->base  = NULL;
     stream->read  = ft_gzip_stream_io;
     stream->close = ft_gzip_stream_close;
 
@@ -684,7 +707,69 @@
     return error;
   }
 
-#else  /* !FT_CONFIG_OPTION_USE_ZLIB */
+
+  /* documentation is in ftgzip.h */
+
+  FT_EXPORT_DEF( FT_Error )
+  FT_Gzip_Uncompress( FT_Memory       memory,
+                      FT_Byte*        output,
+                      FT_ULong*       output_len,
+                      const FT_Byte*  input,
+                      FT_ULong        input_len )
+  {
+    z_stream  stream;
+    int       err;
+
+
+    /* check for `input' delayed to `inflate' */
+
+    if ( !memory || ! output_len || !output )
+      return FT_THROW( Invalid_Argument );
+
+    /* this function is modeled after zlib's `uncompress' function */
+
+    stream.next_in  = (Bytef*)input;
+    stream.avail_in = (uInt)input_len;
+
+    stream.next_out  = output;
+    stream.avail_out = (uInt)*output_len;
+
+    stream.zalloc = (alloc_func)ft_gzip_alloc;
+    stream.zfree  = (free_func) ft_gzip_free;
+    stream.opaque = memory;
+
+    err = inflateInit2( &stream, MAX_WBITS );
+    if ( err != Z_OK )
+      return FT_THROW( Invalid_Argument );
+
+    err = inflate( &stream, Z_FINISH );
+    if ( err != Z_STREAM_END )
+    {
+      inflateEnd( &stream );
+      if ( err == Z_OK )
+        err = Z_BUF_ERROR;
+    }
+    else
+    {
+      *output_len = stream.total_out;
+
+      err = inflateEnd( &stream );
+    }
+
+    if ( err == Z_MEM_ERROR )
+      return FT_THROW( Out_Of_Memory );
+
+    if ( err == Z_BUF_ERROR )
+      return FT_THROW( Array_Too_Large );
+
+    if ( err == Z_DATA_ERROR )
+      return FT_THROW( Invalid_Table );
+
+    return FT_Err_Ok;
+  }
+
+
+#else /* !FT_CONFIG_OPTION_USE_ZLIB */
 
   FT_EXPORT_DEF( FT_Error )
   FT_Stream_OpenGzip( FT_Stream  stream,
@@ -692,6 +777,23 @@
   {
     FT_UNUSED( stream );
     FT_UNUSED( source );
+
+    return FT_THROW( Unimplemented_Feature );
+  }
+
+
+  FT_EXPORT_DEF( FT_Error )
+  FT_Gzip_Uncompress( FT_Memory       memory,
+                      FT_Byte*        output,
+                      FT_ULong*       output_len,
+                      const FT_Byte*  input,
+                      FT_ULong        input_len )
+  {
+    FT_UNUSED( memory );
+    FT_UNUSED( output );
+    FT_UNUSED( output_len );
+    FT_UNUSED( input );
+    FT_UNUSED( input_len );
 
     return FT_THROW( Unimplemented_Feature );
   }

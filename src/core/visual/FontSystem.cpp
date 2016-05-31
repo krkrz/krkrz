@@ -16,8 +16,8 @@ void FontSystem::InitFontNames() {
 
 	std::vector<std::wstring> list;
 	TVPGetAllFontList( list );
-	int count = list.size();
-	for( int i = 0; i < count; i++ ) {
+	size_t count = list.size();
+	for( size_t i = 0; i < count; i++ ) {
 		AddFont( list[i] );
 	}
 
@@ -66,7 +66,7 @@ std::wstring FontSystem::GetBeingFont(std::wstring fonts) {
 	bool prev_empty_name = false;
 	while(fonts!=TJS_W("")) {
 		std::wstring fontname;
-		int pos = fonts.find_first_of(TJS_W(","));
+		std::wstring::size_type pos = fonts.find_first_of(TJS_W(","));
 		if( pos != std::string::npos ) {
 			fontname = Trim( fonts.substr( 0, pos) );
 			fonts = fonts.c_str()+pos+1;

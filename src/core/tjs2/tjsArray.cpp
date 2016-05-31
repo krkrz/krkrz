@@ -283,7 +283,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/* func. name */load)
 		{
 			if(*p == TJS_W('\r') || *p == TJS_W('\n'))
 			{
-				tjs_uint l = p - sp;
+				tjs_uint l = (tjs_uint)(p - sp);
 
 				p++;
 				if(p[-1] == TJS_W('\r') && p[0] == TJS_W('\n')) p++;
@@ -296,7 +296,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/* func. name */load)
 			p++;
 		}
 
-		l = p - sp;
+		l = (tjs_uint)(p - sp);
 		if(l)
 		{
 			lines++;
@@ -317,7 +317,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/* func. name */load)
 			{
 				if(*p == TJS_W('\r') || *p == TJS_W('\n'))
 				{
-					tjs_uint l = p - sp;
+					tjs_uint l = (tjs_uint)(p - sp);
 
 					p++;
 					if(p[-1] == TJS_W('\r') && p[0] == TJS_W('\n')) p++;
@@ -332,7 +332,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/* func. name */load)
 				p++;
 			}
 
-			l = p - sp;
+			l = (tjs_uint)(p - sp);
 			if(l)
 			{
 				vs = TJSAllocVariantString(sp, l);
@@ -549,7 +549,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/* func.name */split)
 			// delimiter found
 			if(!purgeempty || (purgeempty && (s-sstart)!=0) )
 			{
-				ni->Items.push_back(tTJSString(sstart, s-sstart));
+				ni->Items.push_back(tTJSString(sstart, (int)(s-sstart)));
 			}
 			s++;
 			sstart = s;
@@ -562,7 +562,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/* func.name */split)
 
 	if(!purgeempty || (purgeempty && (s-sstart)!=0) )
 	{
-		ni->Items.push_back(tTJSString(sstart, s-sstart));
+		ni->Items.push_back(tTJSString(sstart, (int)(s-sstart)));
 	}
 
 	if(result) *result = tTJSVariant(objthis, objthis);
@@ -869,7 +869,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/* func.name */push)
 
 	TJS_GET_NATIVE_INSTANCE(/* var. name */ni, /* var. type */tTJSArrayNI);
 
-	((tTJSArrayObject*)objthis)->Insert(ni, param, numparams, ni->Items.size());
+	((tTJSArrayObject*)objthis)->Insert(ni, param, numparams, (tjs_int)ni->Items.size());
 
 	if(result) *result = (tTVInteger)(ni->Items.size());
 
@@ -890,7 +890,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/* func.name */pop)
 	else
 	{
 		if(result) *result = ni->Items[ni->Items.size() - 1];
-		((tTJSArrayObject*)objthis)->Erase(ni, ni->Items.size() - 1);
+		((tTJSArrayObject*)objthis)->Erase(ni, (tjs_int)(ni->Items.size() - 1));
 	}
 
 	return TJS_S_OK;
@@ -944,7 +944,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/* func.name */find)
 		tTJSVariant & val = *param[0];
 		tjs_int start = 0;
 		if(numparams >= 2) start = *param[1];
-		if(start < 0) start += ni->Items.size();
+		if(start < 0) start += (tjs_int)ni->Items.size();
 		if(start < 0) start = 0;
 		if(start >= (tjs_int)ni->Items.size()) { *result = -1; return TJS_S_OK; }
 
@@ -1208,7 +1208,7 @@ void tTJSArrayNI::SaveStructuredDataForObject(iTJSDispatch2 *dsp,
 //---------------------------------------------------------------------------
 void tTJSArrayNI::SaveStructuredBinary(std::vector<iTJSDispatch2 *> &stack, tTJSBinaryStream &stream )
 {
-	tjs_uint count = Items.size();
+	tjs_uint count = (tjs_uint)Items.size();
 	tTJSBinarySerializer::PutStartArray( &stream, count );
 
 	tArrayItemIterator i;
@@ -1508,7 +1508,7 @@ tjs_int tTJSArrayObject::Remove(tTJSArrayNI * ni, const tTJSVariant &ref, bool r
 		}
 
 		// remove items found
-		for(tjs_int i = todelete.size() -1; i>=0; i--)
+		for(tjs_int i = (tjs_int)todelete.size() -1; i>=0; i--)
 		{
 			ni->Items.erase(ni->Items.begin() + todelete[i]);
 		}
@@ -1536,7 +1536,7 @@ tjs_int tTJSArrayObject::Remove(tTJSArrayNI * ni, const tTJSVariant &ref, bool r
 //---------------------------------------------------------------------------
 void tTJSArrayObject::Erase(tTJSArrayNI * ni, tjs_int num)
 {
-	if(num < 0) num += ni->Items.size();
+	if(num < 0) num += (tjs_int)ni->Items.size();
 	if(num < 0) TJS_eTJSError(TJSRangeError);
 	if((unsigned)num >= ni->Items.size()) TJS_eTJSError(TJSRangeError);
 
@@ -1546,7 +1546,7 @@ void tTJSArrayObject::Erase(tTJSArrayNI * ni, tjs_int num)
 //---------------------------------------------------------------------------
 void tTJSArrayObject::Insert(tTJSArrayNI *ni, const tTJSVariant &val, tjs_int num)
 {
-	if(num < 0) num += ni->Items.size();
+	if(num < 0) num += (tjs_int)ni->Items.size();
 	if(num < 0) TJS_eTJSError(TJSRangeError);
 	tjs_int count = (tjs_int)ni->Items.size();
 	if(num > count) TJS_eTJSError(TJSRangeError);
@@ -1557,7 +1557,7 @@ void tTJSArrayObject::Insert(tTJSArrayNI *ni, const tTJSVariant &val, tjs_int nu
 //---------------------------------------------------------------------------
 void tTJSArrayObject::Insert(tTJSArrayNI *ni, tTJSVariant *const *val, tjs_int numvals, tjs_int num)
 {
-	if(num < 0) num += ni->Items.size();
+	if(num < 0) num += (tjs_int)ni->Items.size();
 	if(num < 0) TJS_eTJSError(TJSRangeError);
 	tjs_int count = (tjs_int)ni->Items.size();
 	if(num > count) TJS_eTJSError(TJSRangeError);
@@ -1638,7 +1638,7 @@ tjs_error TJS_INTF_METHOD
 		return TJS_E_INVALIDOBJECT;
 
 	ARRAY_GET_NI;
-	if(num < 0) num += ni->Items.size();
+	if(num < 0) num += (tjs_int)ni->Items.size();
 	if(num >= (tjs_int)ni->Items.size())
 	{
 		if(flag & TJS_MEMBERMUSTEXIST) return TJS_E_MEMBERNOTFOUND;
@@ -1690,7 +1690,7 @@ tjs_error TJS_INTF_METHOD
 		return TJS_E_INVALIDOBJECT;
 
 	ARRAY_GET_NI;
-	if(num < 0) num += ni->Items.size();
+	if(num < 0) num += (tjs_int)ni->Items.size();
 	if(num < 0 || (tjs_uint)num>=ni->Items.size()) return TJS_E_MEMBERNOTFOUND;
 	CheckObjectClosureRemove(ni->Items[num]);
 	std::deque<tTJSVariant>::iterator i;
@@ -1810,7 +1810,7 @@ tjs_error TJS_INTF_METHOD
 		return TJS_E_INVALIDOBJECT;
 
 	ARRAY_GET_NI;
-	if(num < 0) num += ni->Items.size();
+	if(num < 0) num += (tjs_int)ni->Items.size();
 	if(num >= (tjs_int)ni->Items.size())
 	{
 		if(flag & TJS_MEMBERMUSTEXIST) return TJS_E_MEMBERNOTFOUND;
@@ -1881,7 +1881,7 @@ tjs_int TJSGetArrayElementCount(iTJSDispatch2 * dsp)
 	if(TJS_FAILED(dsp->NativeInstanceSupport(TJS_NIS_GETINSTANCE,
 		ClassID_Array, (iTJSNativeInstance**)&ni)))
 			TJS_eTJSError(TJSSpecifyArray);
-	return ni->Items.size();
+	return (tjs_int)ni->Items.size();
 }
 //---------------------------------------------------------------------------
 tjs_int TJSCopyArrayElementTo(iTJSDispatch2 * dsp,
@@ -1894,7 +1894,7 @@ tjs_int TJSCopyArrayElementTo(iTJSDispatch2 * dsp,
 		ClassID_Array, (iTJSNativeInstance**)&ni)))
 			TJS_eTJSError(TJSSpecifyArray);
 
-	if(count < 0) count = ni->Items.size();
+	if(count < 0) count = (tjs_int)ni->Items.size();
 
 	if(start >= ni->Items.size()) return 0;
 

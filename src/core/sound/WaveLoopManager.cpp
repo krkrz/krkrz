@@ -534,7 +534,7 @@ bool tTVPWaveLoopManager::GetNearestEvent(tjs_int64 current,
 	}
 
 	// search nearest next event using binary search
-	tjs_int s = 0, e = Links.size();
+	tjs_int s = 0, e = (tjs_int)Links.size();
 	while(e - s > 1)
 	{
 		tjs_int m = (s+e)/2;
@@ -630,7 +630,7 @@ void tTVPWaveLoopManager::GetLabelAt(tjs_int64 from, tjs_int64 to,
 	}
 
 	// search nearest label using binary search
-	tjs_int s = 0, e = Labels.size();
+	tjs_int s = 0, e = (tjs_int)Labels.size();
 	while(e - s > 1)
 	{
 		tjs_int m = (s+e)/2;

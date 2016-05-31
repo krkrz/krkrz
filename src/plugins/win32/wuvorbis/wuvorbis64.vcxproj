@@ -1,0 +1,149 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{3E17C634-1092-42A8-88C2-14E3E9811069}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>wuvorbis64</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>.\..\..\..\..\bin\win64\plugin64\</OutDir>
+    <TargetName>wuvorbis</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>.\..\..\..\..\bin\win64\plugin64\</OutDir>
+    <TargetName>wuvorbis</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;WUVORBIS64_EXPORTS;DECODE_ONLY;__SSE__;__SSE2__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>x64/vorbis/include;x64/ogg/include;..\;</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OutputFile>.\..\..\..\..\bin\win64\plugin64\wuvorbis.dll</OutputFile>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>wuvorbis64.def</ModuleDefinitionFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;WUVORBIS64_EXPORTS;DECODE_ONLY;__SSE__;__SSE2__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>x64/vorbis/include;x64/ogg/include;..\;</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <OutputFile>.\..\..\..\..\bin\win64\plugin64\wuvorbis.dll</OutputFile>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>.\wuvorbis64.def</ModuleDefinitionFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\tp_stub.h" />
+    <ClInclude Include="x64\vorbis\lib\backends.h" />
+    <ClInclude Include="x64\vorbis\lib\bitrate.h" />
+    <ClInclude Include="x64\vorbis\lib\codebook.h" />
+    <ClInclude Include="x64\vorbis\lib\codec_internal.h" />
+    <ClInclude Include="x64\vorbis\lib\lookup.h" />
+    <ClInclude Include="x64\vorbis\lib\lookup_data.h" />
+    <ClInclude Include="x64\vorbis\lib\lpc.h" />
+    <ClInclude Include="x64\vorbis\lib\lsp.h" />
+    <ClInclude Include="x64\vorbis\lib\masking.h" />
+    <ClInclude Include="x64\vorbis\lib\mdct.h" />
+    <ClInclude Include="x64\vorbis\lib\os.h" />
+    <ClInclude Include="x64\vorbis\lib\psy.h" />
+    <ClInclude Include="x64\vorbis\lib\registry.h" />
+    <ClInclude Include="x64\vorbis\lib\scales.h" />
+    <ClInclude Include="x64\vorbis\lib\window.h" />
+    <ClInclude Include="x64\vorbis\lib\xmmlib.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\tp_stub.cpp" />
+    <ClCompile Include="detect_cpu.cpp" />
+    <ClCompile Include="tvpsnd.c" />
+    <ClCompile Include="WuVorbisMainUnit.cpp" />
+    <ClCompile Include="x64\ogg\src\bitwise.c" />
+    <ClCompile Include="x64\ogg\src\framing.c" />
+    <ClCompile Include="x64\vorbis\lib\block.c" />
+    <ClCompile Include="x64\vorbis\lib\codebook.c" />
+    <ClCompile Include="x64\vorbis\lib\floor0.c" />
+    <ClCompile Include="x64\vorbis\lib\floor1.c" />
+    <ClCompile Include="x64\vorbis\lib\info.c" />
+    <ClCompile Include="x64\vorbis\lib\lpc.c" />
+    <ClCompile Include="x64\vorbis\lib\lsp.c" />
+    <ClCompile Include="x64\vorbis\lib\mapping0.c" />
+    <ClCompile Include="x64\vorbis\lib\mdct.c" />
+    <ClCompile Include="x64\vorbis\lib\registry.c" />
+    <ClCompile Include="x64\vorbis\lib\res0.c" />
+    <ClCompile Include="x64\vorbis\lib\sharedbook.c" />
+    <ClCompile Include="x64\vorbis\lib\synthesis.c" />
+    <ClCompile Include="x64\vorbis\lib\vorbisfile.c" />
+    <ClCompile Include="x64\vorbis\lib\window.c" />
+    <ClCompile Include="x64\vorbis\lib\xmmlib.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="wuvorbis.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="wuvorbis64.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

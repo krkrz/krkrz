@@ -407,6 +407,34 @@ TJS_BEGIN_NATIVE_PROP_DECL(processorNum)
 }
 TJS_END_NATIVE_STATIC_PROP_DECL(processorNum)
 //----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(exeBits)
+{
+        TJS_BEGIN_NATIVE_PROP_GETTER
+          {
+#ifdef TJS_64BIT_OS
+            *result = 64;
+#else
+            *result = 32;
+#endif
+            return TJS_S_OK;
+          }
+        TJS_END_NATIVE_PROP_GETTER
+	TJS_DENY_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_STATIC_PROP_DECL(exeBits)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(osBits)
+{
+        TJS_BEGIN_NATIVE_PROP_GETTER
+          {
+          	*result = TVPGetOSBits();
+            return TJS_S_OK;
+          }
+        TJS_END_NATIVE_PROP_GETTER
+	TJS_DENY_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_STATIC_PROP_DECL(osBits)
+//----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_PROP_DECL(exitOnNoWindowStartup)
 {
 	TJS_BEGIN_NATIVE_PROP_GETTER

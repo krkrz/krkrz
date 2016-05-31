@@ -12,6 +12,34 @@
 #include "pnginfo.h"
 
 #include "DebugIntf.h"
+#include "tjsDictionary.h"
+#include "ScriptMgnIntf.h"
+
+bool TVPAcceptSaveAsPNG(void* formatdata, const ttstr & type, class iTJSDispatch2** dic )
+{
+	bool result = false;
+	if( type.StartsWith(TJS_W("png")) ) result = true;
+	else if( type == TJS_W(".png") ) result = true;
+
+	if( result && dic ) {
+#if 0
+		tTJSVariant result;
+		TVPExecuteExpression(
+			TJS_W("(const)%["),
+			TJS_W("\"offs_x\"=>(const)%[\"type\"=>\"integer\",\"desc\"=>\"offset x\",\"default\"=>0]")
+			TJS_W("\"offs_y\"=>(const)%[\"type\"=>\"integer\",\"desc\"=>\"offset y\",\"default\"=>0]")
+			TJS_W("\"offs_unit\"=>(const)%[\"type\"=>\"select text\",\"items\"=>[\"pixel\",\"micrometer\"],\"desc\"=>\"offset unit\",\"default\"=>\"pixel\"]")
+			TJS_W("]"),
+			NULL, &result );
+		if( result.Type() == tvtObject ) {
+			*dic = result.AsObject();
+		}
+#endif
+		// タグ書き出し等には対応していない
+		*dic = TJSCreateDictionaryObject();
+	}
+	return result;
+}
 //---------------------------------------------------------------------------
 // PNG loading handler
 //---------------------------------------------------------------------------
@@ -65,7 +93,7 @@ static void PNG_warning (png_structp ps, png_const_charp msg)
 // user_read_data
 static void PNG_read_data(png_structp png_ptr,png_bytep data,png_size_t length)
 {
-	((tTJSBinaryStream *)png_get_io_ptr(png_ptr))->ReadBuffer((void*)data, length);
+	((tTJSBinaryStream *)png_get_io_ptr(png_ptr))->ReadBuffer((void*)data, (tjs_uint)length);
 }
 //---------------------------------------------------------------------------
 // read_row_callback
@@ -340,7 +368,7 @@ void TVPLoadPNG(void* formatdata, void *callbackdata, tTVPGraphicSizeCallback si
 			// non-interlace
 			if(do_convert_rgb_gray)
 			{
-				png_uint_32 rowbytes = png_get_rowbytes(png_ptr, info_ptr);
+				png_size_t rowbytes = png_get_rowbytes(png_ptr, info_ptr);
 				image = new tjs_uint8[rowbytes];
 			}
 #if 1
@@ -390,7 +418,7 @@ void TVPLoadPNG(void* formatdata, void *callbackdata, tTVPGraphicSizeCallback si
 			// load the image at once
 
 			row_pointers = new png_bytep[height];
-			png_uint_32 rowbytes = png_get_rowbytes(png_ptr, info_ptr);
+			png_size_t rowbytes = png_get_rowbytes(png_ptr, info_ptr);
 			image = new tjs_uint8[rowbytes * height];
 			for(i=0; i<height; i++)
 			{
@@ -460,18 +488,15 @@ static void PNG_write_write( png_structp png_ptr, png_bytep buf, png_size_t size
 /**
  * PNG書き込み
  * フルカラーでの書き込みのみ対応
- * @param storagename : 出力ファイル名
- * @param mode : モード (現在はpngのみ可)
+ * @param dst : 出力先
  * @param image : 書き出しイメージデータ
+ * @param mode : モード (現在はpngのみ可)
+ * @param meta : 追加オプション (現在は無視)
  */
-void TVPSaveAsPNG( const ttstr & storagename, const ttstr & mode, const tTVPBaseBitmap* image )
+void TVPSaveAsPNG(void* formatdata, tTJSBinaryStream* dst, const tTVPBaseBitmap* image, const ttstr & mode, iTJSDispatch2* meta )
 {
-	if(!image->Is32BPP())
-		TVPThrowInternalError;
-	
 	int bpp = 32;
-	if( !mode.StartsWith(TJS_W("png")) ) TVPThrowExceptionMessage(TVPInvalidImageSaveType, mode);
-	if( mode.length() > 3 ) {
+	if( mode.StartsWith(TJS_W("png")) && mode.length() > 3 ) {
 		if( mode == TJS_W("png24") ) {
 			bpp = 24;
 		}
@@ -482,7 +507,7 @@ void TVPSaveAsPNG( const ttstr & storagename, const ttstr & mode, const tTVPBase
 	if( height == 0 || width == 0 ) TVPThrowInternalError;
 
 	// open stream
-	tTJSBinaryStream *stream = TVPCreateStream(TVPNormalizeStorageName(storagename), TJS_BS_WRITE);
+	tTJSBinaryStream *stream = dst;
 
 	try {
 		TVPClearGraphicCache();
@@ -540,9 +565,113 @@ void TVPSaveAsPNG( const ttstr & storagename, const ttstr & mode, const tTVPBase
 		png_destroy_write_struct( &png_ptr, &info_ptr );
 		delete buff;
 	} catch(...) {
-		delete stream;
 		throw;
 	}
-	delete stream;
+}
+
+void TVPLoadHeaderPNG(void* formatdata, tTJSBinaryStream *src, iTJSDispatch2** dic )
+{
+	png_structp png_ptr=NULL;
+	png_infop info_ptr=NULL;
+	png_infop end_info=NULL;
+	try
+	{
+		// create png_struct
+		png_ptr=png_create_read_struct_2(PNG_LIBPNG_VER_STRING,
+			(png_voidp)NULL, (png_error_ptr)PNG_error, (png_error_ptr)PNG_warning,
+			(png_voidp)NULL, (png_malloc_ptr)PNG_malloc, (png_free_ptr)PNG_free);
+
+		if( !png_ptr ) TVPThrowExceptionMessage(TVPPNGLoadError, (const tjs_char*)TVPLibpngError );
+
+		// create png_info
+		info_ptr=png_create_info_struct(png_ptr);
+		if( !info_ptr ) TVPThrowExceptionMessage(TVPPNGLoadError, (const tjs_char*)TVPLibpngError );
+
+		// create end_info
+		end_info=png_create_info_struct(png_ptr);
+		if( !end_info ) TVPThrowExceptionMessage(TVPPNGLoadError, (const tjs_char*)TVPLibpngError );
+
+		// set stream interface
+		png_set_read_fn(png_ptr,(png_voidp)src, (png_rw_ptr)PNG_read_data);
+
+		// set read_row_callback
+		png_set_read_status_fn(png_ptr, (png_read_status_ptr)PNG_read_row_callback);
+
+		// set png_read_info
+		png_read_info(png_ptr,info_ptr);
+
+		// retrieve IHDR
+		png_uint_32 width,height;
+		int bit_depth,color_type,interlace_type,compression_type,filter_type;
+		png_get_IHDR(png_ptr,info_ptr,&width,&height,&bit_depth,&color_type,
+			&interlace_type,&compression_type,&filter_type);
+		switch(color_type) {
+		case PNG_COLOR_TYPE_GRAY:	bit_depth *= 1; break;
+		case PNG_COLOR_TYPE_PALETTE:bit_depth *= 1; break;
+		case PNG_COLOR_TYPE_RGB:	bit_depth *= 3; break;
+		case PNG_COLOR_TYPE_RGBA:	bit_depth *= 4; break;
+		case PNG_COLOR_TYPE_GA:		bit_depth *= 2; break;
+		}
+
+		*dic = TJSCreateDictionaryObject();
+		tTJSVariant val((tjs_int64)width);
+		(*dic)->PropSet(TJS_MEMBERENSURE, TJS_W("width"), 0, &val, (*dic) );
+		val = tTJSVariant((tjs_int64)height);
+		(*dic)->PropSet(TJS_MEMBERENSURE, TJS_W("height"), 0, &val, (*dic) );
+		val = tTJSVariant(bit_depth);
+		(*dic)->PropSet(TJS_MEMBERENSURE, TJS_W("bpp"), 0, &val, (*dic) );
+		// color_type,interlace_type,compression_type,filter_type も入れた方がいいが……
+
+		// retrieve offset information
+		png_int_32 offset_x, offset_y;
+		int offset_unit_type;
+		if( png_get_oFFs(png_ptr, info_ptr, &offset_x, &offset_y, &offset_unit_type) )
+		{
+			val = tTJSVariant(offset_x);
+			(*dic)->PropSet(TJS_MEMBERENSURE, TJS_W("offset x"), 0, &val, (*dic) );
+			val = tTJSVariant(offset_y);
+			(*dic)->PropSet(TJS_MEMBERENSURE, TJS_W("offset y"), 0, &val, (*dic) );
+			switch(offset_unit_type)
+			{
+			case PNG_OFFSET_PIXEL:
+				val = tTJSVariant(TJS_W("pixel"));
+				break;
+			case PNG_OFFSET_MICROMETER:
+				val = tTJSVariant(TJS_W("micro meter"));
+				break;
+			default:
+				val = tTJSVariant(TJS_W("unknown"));
+				break;
+			}
+			(*dic)->PropSet(TJS_MEMBERENSURE, TJS_W("offset unit"), 0, &val, (*dic) );
+		}
+
+		png_uint_32 reso_x, reso_y;
+		int reso_unit_type;
+		if( png_get_pHYs(png_ptr, info_ptr, &reso_x, &reso_y, &reso_unit_type) )
+		{
+			val = tTJSVariant((tjs_int64)reso_x);
+			(*dic)->PropSet(TJS_MEMBERENSURE, TJS_W("resolution x"), 0, &val, (*dic) );
+			val = tTJSVariant((tjs_int64)reso_y);
+			(*dic)->PropSet(TJS_MEMBERENSURE, TJS_W("resolution y"), 0, &val, (*dic) );
+			switch(reso_unit_type)
+			{
+			case PNG_RESOLUTION_METER:
+				val = tTJSVariant(TJS_W("meter"));
+				break;
+			default:
+				val = tTJSVariant(TJS_W("unknown"));
+				break;
+			}
+			(*dic)->PropSet(TJS_MEMBERENSURE, TJS_W("resolution unit"), 0, &val, (*dic) );
+		}
+	}
+	catch(...)
+	{
+		png_destroy_read_struct(&png_ptr,&info_ptr,&end_info);
+		if( *dic ) (*dic)->Release();
+		throw;
+	}
+	png_destroy_read_struct(&png_ptr,&info_ptr,&end_info);
 }
 

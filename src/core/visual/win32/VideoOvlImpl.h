@@ -41,7 +41,6 @@ class tTJSNI_VideoOverlay : public tTJSNI_BaseVideoOverlay
 	NativeEventQueue<tTJSNI_VideoOverlay> EventQueue;
 
 	tTVPLocalTempStorageHolder *LocalTempStorageHolder;
-// Start:	Add:	T.Imoto
 	class tTJSNI_BaseLayer	*Layer1;
 	class tTJSNI_BaseLayer	*Layer2;
 	tTVPVideoOverlayMode	Mode;	//!< Modeの動的な変更は出来ない。open前にセットしておくこと
@@ -59,7 +58,6 @@ class tTJSNI_VideoOverlay : public tTJSNI_BaseVideoOverlay
 	//! イベントが設定されているフレームより前に現在フレームが移動した時、このフラグは解除される。
 	bool	IsEventPast;
 	int		EventFrame;		//!< イベントを発生させるフレーム
-// End:		Add:	T.Imoto
 
 public:
 	tTJSNI_VideoOverlay();
@@ -76,7 +74,6 @@ public:
 
 	void Play();
 	void Stop();
-// Start:	Add:	T.Imoto
 	void Pause();
 	void Rewind();
 	void Prepare();
@@ -88,7 +85,6 @@ public:
 	void SetStopFrame( tjs_int f );
 	void SetDefaultStopFrame();
 	tjs_int GetStopFrame();
-// End:		Add:	T.Imoto
 
 public:
 	void SetRectangleToVideoOverlay();
@@ -109,7 +105,6 @@ public:
 	void SetVisible(bool b);
 	bool GetVisible() const { return Visible; }
 
-// Start:	Add:	T.Imoto
 	void SetTimePosition( tjs_uint64 p );
 	tjs_uint64 GetTimePosition();
 
@@ -187,7 +182,6 @@ public:
 	tjs_real GetSaturationStepSize();
 	tjs_real GetSaturation();
 	void SetSaturation( tjs_real v );
-// End:		Add:	T.Imoto
 
 	tjs_int GetOriginalWidth();
 	tjs_int GetOriginalHeight();
@@ -197,7 +191,6 @@ public:
 	void DetachVideoOverlay();
 
 private:
-	//void __fastcall WndProc(Messages::TMessage &Msg);
 	void WndProc( NativeEvent& ev );
 		// UtilWindow's window procedure
 	void ClearWndProcMessages(); // clear WndProc's message queue

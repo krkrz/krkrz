@@ -55,6 +55,13 @@ typedef double tjs_real;
 #define TJS_I64_VAL(x) ((tjs_int64)(x##i64))
 #define TJS_UI64_VAL(x) ((tjs_uint64)(x##i64))
 
+#ifdef _M_X64
+#define TJS_64BIT_OS	/* 64bit windows */
+#endif
+
+typedef intptr_t tjs_intptr_t;
+typedef uintptr_t tjs_uintptr_t;
+
 
 
 #define TJS_W(X) L##X
@@ -66,6 +73,8 @@ typedef tjs_int32 tjs_error;
 typedef tjs_int64 tTVInteger;
 typedef tjs_real tTVReal;
 
+typedef size_t tjs_size;
+typedef ptrdiff_t tjs_offset;
 
 /* IEEE double manipulation support
  (TJS requires IEEE double(64-bit float) native support on machine or C++ compiler) */
@@ -1233,7 +1242,10 @@ extern class tTJSBinaryStream * (*TJSCreateBinaryStreamForWrite)(const tTJSStrin
 #define TJS_BS_APPEND 2
 #define TJS_BS_UPDATE 3
 
+#define TJS_BS_DELETE_ON_CLOSE	0x10
+
 #define TJS_BS_ACCESS_MASK 0x0f
+#define TJS_BS_OPTION_MASK 0xf0
 
 #define TJS_BS_SEEK_SET 0
 #define TJS_BS_SEEK_CUR 1
@@ -1928,6 +1940,8 @@ extern void * TVPImportFuncPtrd9b1c73516daea6a9c6564e2b731615a;
 extern void * TVPImportFuncPtr003f9d3de568fcd71dd532f33d38839c;
 extern void * TVPImportFuncPtr5da29a19bbe279a89be00e16c59d7641;
 extern void * TVPImportFuncPtrc1b52e8f3578d11f369552a887e13c5b;
+extern void * TVPImportFuncPtrb94ead6de9316bc65758c5aefb564078;
+extern void * TVPImportFuncPtr8a35be936d2aca049e398a081e511c97;
 extern void * TVPImportFuncPtr5b1fa785e397e643dd09cb43c2f2f4db;
 extern void * TVPImportFuncPtr29af78765c764c566e6adc77e0ea7041;
 extern void * TVPImportFuncPtr9e0df54e4c24ee28d5517c1743faa3a3;
@@ -2203,6 +2217,8 @@ extern void * TVPImportFuncPtr923884216edf134d07d8e70f8f57e827;
 extern void * TVPImportFuncPtre48798dc69498f80b6633bb405eda6eb;
 extern void * TVPImportFuncPtr998a5e1aa5cd85689795348fc540a655;
 extern void * TVPImportFuncPtr5f6d263c0d48d03f6eb0dc44c9dd0be2;
+extern void * TVPImportFuncPtrbf363ba3d5b54df9d6df35a518deb6b0;
+extern void * TVPImportFuncPtr6cc8a24cc7ce23179d1d4ccab7a8c97b;
 
 
 //---------------------------------------------------------------------------
@@ -4707,6 +4723,64 @@ struct IDirectSound;
 
 
 //---------------------------------------------------------------------------
+// Graphic Loading Handler Type
+//---------------------------------------------------------------------------
+typedef void (*tTVPGraphicSizeCallback)
+	(void *callbackdata, tjs_uint w, tjs_uint h);
+/*
+	callback type to inform the image's size.
+	call this once before TVPGraphicScanLineCallback.
+*/
+
+typedef void * (*tTVPGraphicScanLineCallback)
+	(void *callbackdata, tjs_int y);
+/*
+	callback type to ask the scanline buffer for the decoded image, per a line.
+	returning null can stop the processing.
+
+	passing of y=-1 notifies the scan line image had been written to the buffer that
+	was given by previous calling of TVPGraphicScanLineCallback. in this time,
+	this callback function must return NULL.
+*/
+
+typedef const void * (*tTVPGraphicSaveScanLineCallback)
+	(void *callbackdata, tjs_int y);
+
+typedef void (*tTVPMetaInfoPushCallback)
+	(void *callbackdata, const ttstr & name, const ttstr & value);
+/*
+	callback type to push meta-information of the image.
+	this can be null.
+*/
+
+enum tTVPGraphicLoadMode
+{
+	glmNormal, // normal, ie. 32bit ARGB graphic
+	glmPalettized, // palettized 8bit mode
+	glmGrayscale // grayscale 8bit mode
+};
+
+
+typedef bool (*tTVPGraphicAcceptSaveHandler)(void* formatdata, const ttstr & type, class iTJSDispatch2** dic );
+
+
+/* For grahpic load and save */
+typedef void (*tTVPGraphicLoadingHandlerForPlugin)(void* formatdata,
+	void *callbackdata,
+	tTVPGraphicSizeCallback sizecallback,
+	tTVPGraphicScanLineCallback scanlinecallback,
+	tTVPMetaInfoPushCallback metainfopushcallback,
+	struct IStream *src,
+	tjs_int32 keyidx,
+	tTVPGraphicLoadMode mode);
+typedef void (*tTVPGraphicHeaderLoadingHandlerForPlugin)(void* formatdata, struct IStream* src, class iTJSDispatch2** dic );
+typedef void (*tTVPGraphicSaveHandlerForPlugin)(void* formatdata, void* callbackdata, struct IStream* dst, const ttstr & mode,
+	tjs_uint width, tjs_uint height,
+	tTVPGraphicSaveScanLineCallback scanlinecallback,
+	class iTJSDispatch2* meta );
+
+
+//---------------------------------------------------------------------------
 // font ralated constants
 //---------------------------------------------------------------------------
 #define TVP_TF_ITALIC    0x0100
@@ -5463,9 +5537,9 @@ enum tTVPWMRRegMode { wrmRegister=0, wrmUnregister=1 };
 struct tTVPWindowMessage
 {
 	unsigned int Msg; // window message
-	int WParam;  // WPARAM
-	int LParam;  // LPARAM
-	int Result;  // result
+	WPARAM WParam;  // WPARAM
+	LPARAM LParam;  // LPARAM
+	LRESULT Result;  // result
 };
 #pragma pack(pop)
 typedef bool (__stdcall * tTVPWindowMessageReceiver)
@@ -5889,6 +5963,7 @@ enum tTVPVideoOverlayMode {
 	vomOverlay,		// Overlay
 	vomLayer,		// Draw Layer
 	vomMixer,		// VMR
+	vomMFEVR,		// Media Foundation with EVR
 };
 
 
@@ -6288,73 +6363,46 @@ typedef struct
 //---------------------------------------------------------------------------
 
 
-#define TVP_CPU_HAS_FPU 0x000010000
-#define TVP_CPU_HAS_MMX 0x000020000
-#define TVP_CPU_HAS_3DN 0x000040000
-#define TVP_CPU_HAS_SSE 0x000080000
-#define TVP_CPU_HAS_CMOV 0x000100000
-#define TVP_CPU_HAS_E3DN 0x000200000
-#define TVP_CPU_HAS_EMMX 0x000400000
-#define TVP_CPU_HAS_SSE2 0x000800000
-#define TVP_CPU_HAS_TSC 0x001000000
-#define TVP_CPU_FEATURE_MASK 0x0ffff0000
-#define TVP_CPU_IS_INTEL 0x000000010
-#define TVP_CPU_IS_AMD 0x000000020
-#define TVP_CPU_IS_IDT 0x000000030
-#define TVP_CPU_IS_CYRIX 0x000000040
-#define TVP_CPU_IS_NEXGEN 0x000000050
-#define TVP_CPU_IS_RISE 0x000000060
-#define TVP_CPU_IS_UMC 0x000000070
-#define TVP_CPU_IS_TRANSMETA 0x000000080
-#define TVP_CPU_IS_UNKNOWN 0x000000000
-#define TVP_CPU_VENDOR_MASK 0x000000ff0
-#define TVP_CPU_FAMILY_MASK 0x00000000f
+#define TVP_CPU_HAS_FPU      0x00010000
+#define TVP_CPU_HAS_MMX      0x00020000
+#define TVP_CPU_HAS_3DN      0x00040000
+#define TVP_CPU_HAS_SSE      0x00080000
+#define TVP_CPU_HAS_CMOV     0x00100000
+#define TVP_CPU_HAS_E3DN     0x00200000
+#define TVP_CPU_HAS_EMMX     0x00400000
+#define TVP_CPU_HAS_SSE2     0x00800000
+#define TVP_CPU_HAS_TSC      0x01000000
+#define TVP_CPU_HAS_SSE3     0x02000000
+#define TVP_CPU_HAS_SSSE3    0x04000000
+#define TVP_CPU_HAS_SSE41    0x08000000
+#define TVP_CPU_HAS_SSE42    0x10000000
+#define TVP_CPU_HAS_SSE4a    0x20000000
+#define TVP_CPU_HAS_AVX      0x40000000
+#define TVP_CPU_HAS_AVX2     0x80000000
+#define TVP_CPU_HAS_FMA3     0x00001000
+#define TVP_CPU_HAS_AES      0x00002000
+#define TVP_CPU_HAS_TSCP     0x00004000
+#define TVP_CPU_HAS_RDRAND   0x00008000
+#define TVP_CPU_HAS_RDSEED   0x00000100
+#define TVP_CPU_FEATURE_MASK 0xffffff00
+
+#define TVP_CPU_IS_UNKNOWN   0x00000000
+#define TVP_CPU_IS_INTEL     0x00000010
+#define TVP_CPU_IS_AMD       0x00000020
+#define TVP_CPU_IS_IDT       0x00000030
+#define TVP_CPU_IS_CYRIX     0x00000040
+#define TVP_CPU_IS_NEXGEN    0x00000050
+#define TVP_CPU_IS_RISE      0x00000060
+#define TVP_CPU_IS_UMC       0x00000070
+#define TVP_CPU_IS_TRANSMETA 0x00000080
+#define TVP_CPU_IS_NSC       0x00000090
+#define TVP_CPU_IS_COMPAQ    0x000000a0
+#define TVP_CPU_VENDOR_MASK  0x000000f0
+
+#define TVP_CPU_FAMILY_MASK  0x0000000f
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+typedef void* (*tTVPCreateDSFilter)( void* formatdata );
 
 //---------------------------------------------------------------------------
 
@@ -8124,6 +8172,26 @@ inline IDirectSound * TVPGetDirectSound()
 	}
 	typedef IDirectSound * (__stdcall * __functype)();
 	return ((__functype)(TVPImportFuncPtrc1b52e8f3578d11f369552a887e13c5b))();
+}
+inline void TVPRegisterGraphicLoadingHandler(const ttstr & name , tTVPGraphicLoadingHandlerForPlugin loading , tTVPGraphicHeaderLoadingHandlerForPlugin header , tTVPGraphicSaveHandlerForPlugin save , tTVPGraphicAcceptSaveHandler accept , void * formatdata)
+{
+	if(!TVPImportFuncPtrb94ead6de9316bc65758c5aefb564078)
+	{
+		static char funcname[] = "void ::TVPRegisterGraphicLoadingHandler(const ttstr &,tTVPGraphicLoadingHandlerForPlugin,tTVPGraphicHeaderLoadingHandlerForPlugin,tTVPGraphicSaveHandlerForPlugin,tTVPGraphicAcceptSaveHandler,void *)";
+		TVPImportFuncPtrb94ead6de9316bc65758c5aefb564078 = TVPGetImportFuncPtr(funcname);
+	}
+	typedef void (__stdcall * __functype)(const ttstr &, tTVPGraphicLoadingHandlerForPlugin , tTVPGraphicHeaderLoadingHandlerForPlugin , tTVPGraphicSaveHandlerForPlugin , tTVPGraphicAcceptSaveHandler , void *);
+	((__functype)(TVPImportFuncPtrb94ead6de9316bc65758c5aefb564078))(name, loading, header, save, accept, formatdata);
+}
+inline void TVPUnregisterGraphicLoadingHandler(const ttstr & name , tTVPGraphicLoadingHandlerForPlugin loading , tTVPGraphicHeaderLoadingHandlerForPlugin header , tTVPGraphicSaveHandlerForPlugin save , tTVPGraphicAcceptSaveHandler accept , void * formatdata)
+{
+	if(!TVPImportFuncPtr8a35be936d2aca049e398a081e511c97)
+	{
+		static char funcname[] = "void ::TVPUnregisterGraphicLoadingHandler(const ttstr &,tTVPGraphicLoadingHandlerForPlugin,tTVPGraphicHeaderLoadingHandlerForPlugin,tTVPGraphicSaveHandlerForPlugin,tTVPGraphicAcceptSaveHandler,void *)";
+		TVPImportFuncPtr8a35be936d2aca049e398a081e511c97 = TVPGetImportFuncPtr(funcname);
+	}
+	typedef void (__stdcall * __functype)(const ttstr &, tTVPGraphicLoadingHandlerForPlugin , tTVPGraphicHeaderLoadingHandlerForPlugin , tTVPGraphicSaveHandlerForPlugin , tTVPGraphicAcceptSaveHandler , void *);
+	((__functype)(TVPImportFuncPtr8a35be936d2aca049e398a081e511c97))(name, loading, header, save, accept, formatdata);
 }
 inline void TVPClearGraphicCache()
 {
@@ -10874,6 +10942,26 @@ inline void TVPPsExclusionBlend_HDA_o(tjs_uint32 * dest , const tjs_uint32 * src
 	}
 	typedef void (__stdcall * __functype)(tjs_uint32 *, const tjs_uint32 *, tjs_int , tjs_int);
 	((__functype)(TVPImportFuncPtr5f6d263c0d48d03f6eb0dc44c9dd0be2))(dest, src, len, opa);
+}
+inline void TVPRegisterDSVideoCodec(const ttstr & name , void * guid , tTVPCreateDSFilter splitter , tTVPCreateDSFilter video , tTVPCreateDSFilter audio , void * formatdata)
+{
+	if(!TVPImportFuncPtrbf363ba3d5b54df9d6df35a518deb6b0)
+	{
+		static char funcname[] = "void ::TVPRegisterDSVideoCodec(const ttstr &,void *,tTVPCreateDSFilter,tTVPCreateDSFilter,tTVPCreateDSFilter,void *)";
+		TVPImportFuncPtrbf363ba3d5b54df9d6df35a518deb6b0 = TVPGetImportFuncPtr(funcname);
+	}
+	typedef void (__stdcall * __functype)(const ttstr &, void *, tTVPCreateDSFilter , tTVPCreateDSFilter , tTVPCreateDSFilter , void *);
+	((__functype)(TVPImportFuncPtrbf363ba3d5b54df9d6df35a518deb6b0))(name, guid, splitter, video, audio, formatdata);
+}
+inline void TVPUnregisterDSVideoCodec(const ttstr & name , void * guid , tTVPCreateDSFilter splitter , tTVPCreateDSFilter video , tTVPCreateDSFilter audio , void * formatdata)
+{
+	if(!TVPImportFuncPtr6cc8a24cc7ce23179d1d4ccab7a8c97b)
+	{
+		static char funcname[] = "void ::TVPUnregisterDSVideoCodec(const ttstr &,void *,tTVPCreateDSFilter,tTVPCreateDSFilter,tTVPCreateDSFilter,void *)";
+		TVPImportFuncPtr6cc8a24cc7ce23179d1d4ccab7a8c97b = TVPGetImportFuncPtr(funcname);
+	}
+	typedef void (__stdcall * __functype)(const ttstr &, void *, tTVPCreateDSFilter , tTVPCreateDSFilter , tTVPCreateDSFilter , void *);
+	((__functype)(TVPImportFuncPtr6cc8a24cc7ce23179d1d4ccab7a8c97b))(name, guid, splitter, video, audio, formatdata);
 }
 
 #ifdef __BORLANDC__

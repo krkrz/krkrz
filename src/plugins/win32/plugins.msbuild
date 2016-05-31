@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build;CleanMisc" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+	<MSBuildCommunityTasksPath>$(MSBuildProjectDirectory)\.build</MSBuildCommunityTasksPath>
+	<OutputDir>$(MSBuildProjectDirectory)\..\..\..\bin\win32\plugin</OutputDir>
+	<OutputDir64>$(MSBuildProjectDirectory)\..\..\..\bin\win64\plugin64</OutputDir64>
+  </PropertyGroup>
+  <Target Name="CleanDll">
+  	<ItemGroup>
+		<RemoveFiles Include="$(OutputDir)\*.dll" />
+		<RemoveFiles Include="$(OutputDir64)\*.dll" />
+	</ItemGroup>
+	<Delete Files="@(RemoveFiles)" />
+  </Target>
+  <Target Name="CleanMisc">
+  	<ItemGroup>
+		<RemoveFiles Include="$(OutputDir)\*.exp" />
+		<RemoveFiles Include="$(OutputDir)\*.lib" />
+		<RemoveFiles Include="$(OutputDir)\*.pdb" />
+		<RemoveFiles Include="$(OutputDir)\*.ilk" />
+		<RemoveFiles Include="$(OutputDir)\*.bsc" />
+		<RemoveFiles Include="$(OutputDir64)\*.exp" />
+		<RemoveFiles Include="$(OutputDir64)\*.lib" />
+		<RemoveFiles Include="$(OutputDir64)\*.pdb" />
+		<RemoveFiles Include="$(OutputDir64)\*.ilk" />
+		<RemoveFiles Include="$(OutputDir64)\*.bsc" />
+	</ItemGroup>
+	<Delete Files="@(RemoveFiles)" />
+  </Target>
+  <Target Name="Build">
+	<MSBuild Targets="Rebuild" Projects=".\extrans\extrans.vcxproj" Properties="Configuration=Release;Platform=Win32" />
+	<MSBuild Targets="Rebuild" Projects=".\extrans\extrans.vcxproj" Properties="Configuration=Release;Platform=x64" />
+
+	<MSBuild Targets="Rebuild" Projects=".\KAGParser\vc2012\KAGParser.vcxproj" Properties="Configuration=Release;Platform=Win32" />
+	<MSBuild Targets="Rebuild" Projects=".\KAGParser\vc2012\KAGParser.vcxproj" Properties="Configuration=Release;Platform=x64" />
+
+	<MSBuild Targets="Rebuild" Projects=".\menu\vc2012\menu.vcxproj" Properties="Configuration=Release;Platform=Win32" />
+	<MSBuild Targets="Rebuild" Projects=".\menu\vc2012\menu.vcxproj" Properties="Configuration=Release;Platform=x64" />
+
+	<MSBuild Targets="Rebuild" Projects=".\opus\libogg\win32\VS2012\libogg_static.vcxproj" Properties="Configuration=Release;Platform=Win32" />
+	<MSBuild Targets="Rebuild" Projects=".\opus\opus\win32\VS2012\celt.vcxproj" Properties="Configuration=Release;Platform=Win32" />
+	<MSBuild Targets="Rebuild" Projects=".\opus\opus\win32\VS2012\opus.vcxproj" Properties="Configuration=Release;Platform=Win32" />
+	<MSBuild Targets="Rebuild" Projects=".\opus\opus\win32\VS2012\silk_common.vcxproj" Properties="Configuration=Release;Platform=Win32" />
+	<MSBuild Targets="Rebuild" Projects=".\opus\opus\win32\VS2012\silk_fixed.vcxproj" Properties="Configuration=Release;Platform=Win32" />
+	<MSBuild Targets="Rebuild" Projects=".\opus\opus\win32\VS2012\silk_float.vcxproj" Properties="Configuration=Release;Platform=Win32" />
+	<MSBuild Targets="Rebuild" Projects=".\opus\opusfile\win32\VS2012\opusfile.vcxproj" Properties="Configuration=Release;Platform=Win32" />
+	<MSBuild Targets="Rebuild" Projects=".\opus\kropus.vcxproj" Properties="Configuration=Release;Platform=Win32" />
+
+	<MSBuild Targets="Rebuild" Projects=".\opus\libogg\win32\VS2012\libogg_static.vcxproj" Properties="Configuration=Release;Platform=x64" />
+	<MSBuild Targets="Rebuild" Projects=".\opus\opus\win32\VS2012\celt.vcxproj" Properties="Configuration=Release;Platform=x64" />
+	<MSBuild Targets="Rebuild" Projects=".\opus\opus\win32\VS2012\opus.vcxproj" Properties="Configuration=Release;Platform=x64" />
+	<MSBuild Targets="Rebuild" Projects=".\opus\opus\win32\VS2012\silk_common.vcxproj" Properties="Configuration=Release;Platform=x64" />
+	<MSBuild Targets="Rebuild" Projects=".\opus\opus\win32\VS2012\silk_fixed.vcxproj" Properties="Configuration=Release;Platform=x64" />
+	<MSBuild Targets="Rebuild" Projects=".\opus\opus\win32\VS2012\silk_float.vcxproj" Properties="Configuration=Release;Platform=x64" />
+	<MSBuild Targets="Rebuild" Projects=".\opus\opusfile\win32\VS2012\opusfile.vcxproj" Properties="Configuration=Release;Platform=x64" />
+	<MSBuild Targets="Rebuild" Projects=".\opus\kropus.vcxproj" Properties="Configuration=Release;Platform=x64" />
+
+	<MSBuild Targets="Rebuild" Projects=".\wic\krwic.vcxproj" Properties="Configuration=Release;Platform=Win32" />
+	<MSBuild Targets="Rebuild" Projects=".\wic\krwic.vcxproj" Properties="Configuration=Release;Platform=x64" />
+
+	<MSBuild Targets="Rebuild" Projects=".\wuvorbis\wuvorbis.vcxproj" Properties="Configuration=Release;Platform=Win32" />
+	<MSBuild Targets="Rebuild" Projects=".\wuvorbis\wuvorbis64.vcxproj" Properties="Configuration=Release;Platform=x64" />
+  </Target>
+  
+</Project>
+
+
+

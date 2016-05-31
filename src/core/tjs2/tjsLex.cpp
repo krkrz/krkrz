@@ -1051,7 +1051,7 @@ tTJSLexicalAnalyzer::tTJSLexicalAnalyzer(tTJSScriptBlock *block,
 	ExprMode = exprmode;
 	ResultNeeded = resneeded;
 	PrevToken = -1;
-	tjs_int len = TJS_strlen(script);
+	tjs_int len = (tjs_int)TJS_strlen(script);
 	Script = new tjs_char[len+2];
 	TJS_strcpy(Script, script);
 	if(ExprMode)
@@ -1106,13 +1106,13 @@ tTJSSkipCommentResult tTJSLexicalAnalyzer::SkipUntil_endif()
 			switch(TJSSkipComment(&Current))
 			{
 			case scrEnded:
-				TJS_eTJSCompileError(TJSPPError, Block, Current-Script);
+				TJS_eTJSCompileError(TJSPPError, Block, (tjs_int)(Current-Script));
 				break;
 			case scrContinue:
 				break;
 			case scrNotComment:
 				if(!TJSNext(&Current))
-					TJS_eTJSCompileError(TJSPPError, Block, Current-Script);
+					TJS_eTJSCompileError(TJSPPError, Block, (tjs_int)(Current-Script));
 				break;
 			}
 		}
@@ -1154,10 +1154,10 @@ tTJSSkipCommentResult tTJSLexicalAnalyzer::SkipUntil_endif()
 			{
 				// skip parenthesises
 				if(!TJSSkipSpace(&Current))
-					TJS_eTJSCompileError(TJSPPError, Block, Current-Script);
+					TJS_eTJSCompileError(TJSPPError, Block, (tjs_int)(Current-Script));
 
 				if(*Current!=TJS_W('('))
-					TJS_eTJSCompileError(TJSPPError, Block, Current-Script);
+					TJS_eTJSCompileError(TJSPPError, Block, (tjs_int)(Current-Script));
 
 				TJSNext(&Current);
 				tjs_int plevel = 0;
@@ -1168,16 +1168,16 @@ tTJSSkipCommentResult tTJSLexicalAnalyzer::SkipUntil_endif()
 					TJSNext(&Current);
 				}
 				if(!*Current)
-					TJS_eTJSCompileError(TJSPPError, Block, Current-Script);
+					TJS_eTJSCompileError(TJSPPError, Block, (tjs_int)(Current-Script));
 				TJSNext(&Current);
 				if(!*Current)
-					TJS_eTJSCompileError(TJSPPError, Block, Current-Script);
+					TJS_eTJSCompileError(TJSPPError, Block, (tjs_int)(Current-Script));
 			}
 		}
 		else
 		{
 			if(!TJSNext(&Current))
-				TJS_eTJSCompileError(TJSPPError, Block, Current-Script);
+				TJS_eTJSCompileError(TJSPPError, Block, (tjs_int)(Current-Script));
 		}
 	}
 }
@@ -1196,10 +1196,10 @@ tTJSSkipCommentResult tTJSLexicalAnalyzer::ProcessPPStatement()
 		Block->NotifyUsingPreProcessor();
 		Current+=3;
 		if(!TJSSkipSpace(&Current))
-			TJS_eTJSCompileError(TJSPPError, Block, Current-Script);
+			TJS_eTJSCompileError(TJSPPError, Block, (tjs_int)(Current-Script));
 
 		if(*Current!=TJS_W('('))
-			TJS_eTJSCompileError(TJSPPError, Block, Current-Script);
+			TJS_eTJSCompileError(TJSPPError, Block, (tjs_int)(Current-Script));
 
 		TJSNext(&Current);
 		const tjs_char *st = Current;
@@ -1216,11 +1216,11 @@ tTJSSkipCommentResult tTJSLexicalAnalyzer::ProcessPPStatement()
 
 		try
 		{
-			ParsePPExpression(st, ed-st); // evaluate exp
+			ParsePPExpression(st, (tjs_int)(ed-st)); // evaluate exp
 		}
 		catch(...)
 		{
-			TJS_eTJSCompileError(TJSPPError, Block, Current-Script);
+			TJS_eTJSCompileError(TJSPPError, Block, (tjs_int)(Current-Script));
 		}
 
 		TJSSkipSpace(&Current);
@@ -1236,10 +1236,10 @@ tTJSSkipCommentResult tTJSLexicalAnalyzer::ProcessPPStatement()
 		Block->NotifyUsingPreProcessor();
 		Current += 2;
 		if(!TJSSkipSpace(&Current))
-			TJS_eTJSCompileError(TJSPPError, Block, Current-Script);
+			TJS_eTJSCompileError(TJSPPError, Block, (tjs_int)(Current-Script));
 
 		if(*Current!=TJS_W('('))
-			TJS_eTJSCompileError(TJSPPError, Block, Current-Script);
+			TJS_eTJSCompileError(TJSPPError, Block, (tjs_int)(Current-Script));
 
 		TJSNext(&Current);
 		const tjs_char *st = Current;
@@ -1258,11 +1258,11 @@ tTJSSkipCommentResult tTJSLexicalAnalyzer::ProcessPPStatement()
 
 		try
 		{
-			ret = ParsePPExpression(st, ed-st); // evaluate exp
+			ret = ParsePPExpression(st, (tjs_int)(ed-st)); // evaluate exp
 		}
 		catch(...)
 		{
-			TJS_eTJSCompileError(TJSPPError, Block, Current-Script);
+			TJS_eTJSCompileError(TJSPPError, Block, (tjs_int)(Current-Script));
 		}
 
 		if(!ret) return SkipUntil_endif();  // skip to endif
@@ -1280,7 +1280,7 @@ tTJSSkipCommentResult tTJSLexicalAnalyzer::ProcessPPStatement()
 		Current += 5;
 		IfLevel --;
 		if(IfLevel < 0)
-			TJS_eTJSCompileError(TJSPPError, Block, Current-Script);
+			TJS_eTJSCompileError(TJSPPError, Block, (tjs_int)(Current-Script));
 
 		TJSSkipSpace(&Current);
 		if(!*Current) return scrEnded;
@@ -1325,7 +1325,7 @@ tjs_int tTJSLexicalAnalyzer::GetToken(tjs_int &n)
 
 re_match:
 
-	PrevPos = Current - Script; // remember current position as "PrevPos"
+	PrevPos = (tjs_int)(Current - Script); // remember current position as "PrevPos"
 
 	switch(*Current)
 	{
@@ -1538,7 +1538,7 @@ re_match:
 	  {
 		tTJSVariant v;
 		bool r = TJSParseNumber(v, &Current);
-		if(!r) TJS_eTJSCompileError(TJSNumberError, Block, Current-Script);
+		if(!r) TJS_eTJSCompileError(TJSNumberError, Block, (tjs_int)(Current-Script));
 		n=PutValue(v);
 		return T_CONSTVAL;
 	  }
@@ -1697,7 +1697,7 @@ tjs_int tTJSLexicalAnalyzer::PutValue(const tTJSVariant &val)
 {
 	tTJSVariant *v = new tTJSVariant(val);
 	Values.push_back(v);
-	return Values.size() -1;
+	return (tjs_int)(Values.size() -1);
 }
 //---------------------------------------------------------------------------
 void tTJSLexicalAnalyzer::Free(void)
@@ -1720,7 +1720,7 @@ void tTJSLexicalAnalyzer::NextBraceIsBlockBrace()
 //---------------------------------------------------------------------------
 tjs_int tTJSLexicalAnalyzer::GetCurrentPosition()
 {
-	return Current - Script;
+	return (tjs_int)(Current - Script);
 }
 //---------------------------------------------------------------------------
 tjs_int tTJSLexicalAnalyzer::GetNext(tjs_int &value)
@@ -1894,7 +1894,7 @@ tjs_int tTJSLexicalAnalyzer::GetNext(tjs_int &value)
 			if(n == 0)
 			{
 				if(IfLevel != 0)
-					TJS_eTJSCompileError(TJSPPError, Block, Current-Script);
+					TJS_eTJSCompileError(TJSPPError, Block, (tjs_int)(Current-Script));
 			}
 		}
 		catch(eTJSCompileError &e)

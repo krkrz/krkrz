@@ -194,9 +194,6 @@ LONG_PTR _SetWindowLongPtr(HWND hwnd, int nIndex, T p)
 
 
 
-#else
-    #ifdef DEBUG
-    #pragma message("STREAMS.H included TWICE")
-    #endif
+
 #endif // __STREAMS__
 

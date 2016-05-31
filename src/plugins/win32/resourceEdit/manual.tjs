@@ -1,0 +1,25 @@
+/**
+ * 擬似コードによるマニュアル
+ */
+class ResourceEdit
+{
+	/**
+	 * 実装ファイルのアイコンを置き換えます
+	 *
+	 * 実行ファイル名で指定した実行ファイルのアイコンをアイコンファイル名で指定したアイコンで置き換えます
+	 * @param exeFileName 実行ファイル名
+	 * @param iconFileName アイコンファイル名
+	 * @return エラーコード。1の時成功で、負の値の時エラー
+	 */
+	function updateIcon(exeFileName, iconFileName);
+
+	/**
+	 * 実装ファイルのバイナリリソースを追加/置き換えします。
+	 * @param exeFileName 実行ファイル名
+	 * @param binaryFileName リソースに追加するファイルの名前
+	 * @param resourceType リソースのタイプ名
+	 * @param resourceName リソースの名前
+	 * @return エラーコード。1の時成功で、負の値の時エラー
+	 */
+	function UpdateBinaryResource( exeFileName, binaryFileName, resourceType, resourceName );
+};

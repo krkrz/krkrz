@@ -95,8 +95,9 @@
       <OutputFile>.\..\..\..\..\bin\win32\plugin\wuvorbis.dll</OutputFile>
       <ImportLibrary>.\..\..\..\..\bin\win32\plugin\wuvorbis.lib</ImportLibrary>
       <BaseAddress>0x11000000</BaseAddress>
-      <AdditionalDependencies>odbc32.lib;odbccp32.lib;tvpgl_ia32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalOptions> /COMMENT:"(--has-option--)"</AdditionalOptions>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>
+      </AdditionalOptions>
       <ModuleDefinitionFile>.\wuvorbis.def</ModuleDefinitionFile>
       <AdditionalLibraryDirectories>../../../core/vc2012/lib</AdditionalLibraryDirectories>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
@@ -152,6 +153,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="detect_cpu.cpp" />
     <ClCompile Include="ogg\src\bitwise.c" />
     <ClCompile Include="vorbis\lib\block.c" />
     <ClCompile Include="vorbis\lib\codebook.c" />
