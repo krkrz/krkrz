@@ -106,7 +106,7 @@ protected:
 			return 0;
 		}
 	}
-	inline int GetShiftState( int wParam ) const {
+	inline int GetShiftState( WPARAM wParam ) const {
 		int shift = GET_KEYSTATE_WPARAM(wParam) & (MK_SHIFT|MK_CONTROL);
 		shift |= GetAltKeyState();
 		return shift;
@@ -125,7 +125,7 @@ protected:
 		if(TVPGetAsyncKeyState(VK_MBUTTON)) s |= ssMiddle;
 		return s;
 	}
-	inline bool IsTouchEvent(DWORD extraInfo) const {
+	inline bool IsTouchEvent(LPARAM extraInfo) const {
 		return (extraInfo & SIGNATURE_MASK) == MI_WP_SIGNATURE;
 	}
 
@@ -280,19 +280,19 @@ public:
 	virtual void OnKeyDown( WORD vk, int shift, int repeat, bool prevkeystate ){}
 	virtual void OnKeyPress( WORD vk, int repeat, bool prevkeystate, bool convertkey ){}
 	virtual void OnMove( int x, int y ) {}
-	virtual void OnResize( int state, int w, int h ) {}
+	virtual void OnResize( UINT_PTR state, int w, int h ) {}
 	virtual void OnDropFile( HDROP hDrop ) {}
 	virtual int OnMouseActivate( HWND hTopLevelParentWnd, WORD hitTestCode, WORD MouseMsg ) { return MA_ACTIVATE; }
 	virtual bool OnSetCursor( HWND hContainsCursorWnd, WORD hitTestCode, WORD MouseMsg ) { return false; }
 	virtual void OnEnable( bool enabled ) {}
 	virtual void OnEnterMenuLoop( bool entered ) {}
 	virtual void OnExitMenuLoop( bool isShortcutMenu ) {}
-	virtual void OnDeviceChange( int event, void *data ) {}
-	virtual void OnNonClientMouseDown( int button, int hittest, int x, int y ){}
+	virtual void OnDeviceChange( UINT_PTR event, void *data ) {}
+	virtual void OnNonClientMouseDown( int button, UINT_PTR hittest, int x, int y ){}
 	virtual void OnMouseEnter() {}
 	virtual void OnMouseLeave() {}
-	virtual void OnShow( int status ) {}
-	virtual void OnHide( int status ) {}
+	virtual void OnShow( UINT_PTR status ) {}
+	virtual void OnHide( UINT_PTR status ) {}
 
 	virtual void OnTouchDown( double x, double y, double cx, double cy, DWORD id, DWORD tick ) {}
 	virtual void OnTouchMove( double x, double y, double cx, double cy, DWORD id, DWORD tick ) {}
@@ -300,7 +300,7 @@ public:
 	virtual void OnTouchSequenceStart() {}
 	virtual void OnTouchSequenceEnd() {}
 
-	virtual void OnDisplayChange( DWORD bpp, WORD hres, WORD vres ) {}
+	virtual void OnDisplayChange( UINT_PTR bpp, WORD hres, WORD vres ) {}
 	virtual void OnApplicationActivateChange( bool activated, DWORD thread_id ) {}
 };
 

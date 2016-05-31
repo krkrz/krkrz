@@ -1634,7 +1634,7 @@ void tTVPWaveSoundBufferThread::CheckBufferSleep()
 	tTJSCriticalSectionHolder holder(TVPWaveSoundBufferVectorCS);
 	tjs_uint size, nonwork_count;
 	nonwork_count = 0;
-	size = TVPWaveSoundBufferVector.size();
+	size = (tjs_uint)TVPWaveSoundBufferVector.size();
 	std::vector<tTJSNI_WaveSoundBuffer *>::iterator i;
 	for(i = TVPWaveSoundBufferVector.begin();
 		i != TVPWaveSoundBufferVector.end(); i++)

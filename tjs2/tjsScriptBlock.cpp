@@ -157,7 +157,7 @@ tjs_char * tTJSScriptBlock::GetLine(tjs_int line, tjs_int *linelength) const
 tjs_int tTJSScriptBlock::SrcPosToLine(tjs_int pos) const
 {
 	tjs_uint s = 0;
-	tjs_uint e = LineVector.size();
+	tjs_uint e = (tjs_uint)LineVector.size();
 	while(true)
 	{
 		if(e-s <= 1) return s + LineOffset; // LineOffset is added
@@ -520,7 +520,7 @@ const tjs_uint8 tTJSScriptBlock::BYTECODE_OBJ_TAG[BYTECODE_TAG_SIZE] = { 'O', 'B
 const tjs_uint8 tTJSScriptBlock::BYTECODE_DATA_TAG[BYTECODE_TAG_SIZE] = { 'D', 'A', 'T', 'A' };
 //---------------------------------------------------------------------------
 void tTJSScriptBlock::ExportByteCode( bool outputdebug, tTJSBinaryStream* output ) {
-	const int count = InterCodeContextList.size();
+	const int count = (int)InterCodeContextList.size();
 	std::vector<std::vector<tjs_uint8>* > objarray;
 	objarray.reserve( count * 2 );
 	tjsConstArrayData* constarray = new tjsConstArrayData();
@@ -529,12 +529,12 @@ void tTJSScriptBlock::ExportByteCode( bool outputdebug, tTJSBinaryStream* output
 		tTJSInterCodeContext* obj = (*i);
 		std::vector<tjs_uint8>* buf = obj->ExportByteCode( outputdebug, this, *constarray );
 		objarray.push_back( buf );
-		objsize += buf->size() + BYTECODE_TAG_SIZE + BYTECODE_CHUNK_SIZE_LEN; // tag + size
+		objsize += (int)buf->size() + BYTECODE_TAG_SIZE + BYTECODE_CHUNK_SIZE_LEN; // tag + size
 	}
 
 	objsize += BYTECODE_TAG_SIZE + BYTECODE_CHUNK_SIZE_LEN + 4 + 4; // OBJS tag + size + toplevel + count
 	std::vector<tjs_uint8>* dataarea = constarray->ExportBuffer();
-	int datasize = dataarea->size() + BYTECODE_TAG_SIZE + BYTECODE_CHUNK_SIZE_LEN; // DATA tag + size
+	int datasize = (int)dataarea->size() + BYTECODE_TAG_SIZE + BYTECODE_CHUNK_SIZE_LEN; // DATA tag + size
 	int filesize = objsize + datasize + BYTECODE_FILE_TAG_SIZE + BYTECODE_CHUNK_SIZE_LEN; // TJS2 tag + file size
 	int toplevel = -1;
 	if( TopLevelContext != NULL ) {
@@ -547,7 +547,7 @@ void tTJSScriptBlock::ExportByteCode( bool outputdebug, tTJSBinaryStream* output
 	output->Write( BYTECODE_DATA_TAG, 4 );
 	Write4Byte( tmp, datasize );
 	output->Write( tmp, 4 );
-	output->Write( &((*dataarea)[0]), dataarea->size() );
+	output->Write( &((*dataarea)[0]), (tjs_uint)dataarea->size() );
 	output->Write( BYTECODE_OBJ_TAG, 4 );
 	Write4Byte( tmp, objsize );
 	output->Write( tmp, 4 );
@@ -557,7 +557,7 @@ void tTJSScriptBlock::ExportByteCode( bool outputdebug, tTJSBinaryStream* output
 	output->Write( tmp, 4 );
 	for( int i = 0; i < count; i++ ) {
 		std::vector<tjs_uint8>* buf = objarray[i];
-		int size = buf->size();
+		int size = (int)buf->size();
 		output->Write( BYTECODE_CODE_TAG, 4 );
 		Write4Byte( tmp, size );
 		output->Write( tmp, 4 );

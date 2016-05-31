@@ -71,7 +71,7 @@ static void TVPUnregisterWindowToList(tTJSNI_Window *window)
 //---------------------------------------------------------------------------
 tTJSNI_Window * TVPGetWindowListAt(tjs_int idx) { return TVPWindowVector[idx]; }
 //---------------------------------------------------------------------------
-tjs_int TVPGetWindowCount() { return TVPWindowVector.size(); }
+tjs_int TVPGetWindowCount() { return (tjs_int)TVPWindowVector.size(); }
 //---------------------------------------------------------------------------
 void TVPClearAllWindowInputEvents()
 {
@@ -291,13 +291,8 @@ void tTJSNI_BaseWindow::SetDrawDeviceObject(const tTJSVariant & val)
 		tTJSVariant iface_v;
 		if(TJS_FAILED(clo.PropGet(0, TJS_W("interface"), NULL, &iface_v, NULL)))
 			TVPThrowExceptionMessage( TVPCannotRetriveInterfaceFromDrawDevice );
-#ifndef TJS_64BIT_OS
 		DrawDevice =
-			reinterpret_cast<iTVPDrawDevice *>((long)(tjs_int64)iface_v);
-#else	// x64
-		DrawDevice =
-			reinterpret_cast<iTVPDrawDevice *>((tjs_int64)iface_v);
-#endif
+			reinterpret_cast<iTVPDrawDevice *>((tjs_intptr_t)(tjs_int64)iface_v);
 		DrawDevice->SetWindowInterface(const_cast<tTJSNI_BaseWindow*>(this));
 		ResetDrawDevice();
 	}

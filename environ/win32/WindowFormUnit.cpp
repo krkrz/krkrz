@@ -882,7 +882,7 @@ void TTVPWindowForm::CallWindowAttach() {
 
 	tTVPWindowMessage msg;
 	msg.Msg = TVP_WM_ATTACH;
-	msg.LParam = reinterpret_cast<int>(GetWindowHandleForPlugin());
+	msg.LParam = reinterpret_cast<LPARAM>(GetWindowHandleForPlugin());
 	msg.WParam = 0;
 	msg.Result = 0;
 
@@ -904,7 +904,7 @@ void TTVPWindowForm::CallFullScreenChanged() {
 void TTVPWindowForm::CallFullScreenChanging() {
 	tTVPWindowMessage msg;
 	msg.Msg = TVP_WM_FULLSCREEN_CHANGING;
-	msg.LParam = reinterpret_cast<int>(GetWindowHandleForPlugin());
+	msg.LParam = reinterpret_cast<LPARAM>(GetWindowHandleForPlugin());
 	msg.WParam = 0;
 	msg.Result = 0;
 	DeliverMessageToReceiver(msg);
@@ -1729,7 +1729,7 @@ void TTVPWindowForm::OnTouchUp( double x, double y, double cx, double cy, DWORD 
 	}
 	touch_points_.TouchUp( x, y, cx, cy, id, tick );
 
-	TouchVelocityTracker.end( id );
+	//TouchVelocityTracker.end( id );
 }
 
 void TTVPWindowForm::OnTouchScaling( double startdist, double currentdist, double cx, double cy, int flag ) {
@@ -1777,7 +1777,7 @@ void TTVPWindowForm::OnMove( int x, int y ) {
 		TJSNativeInstance->WindowMoved();
 	}
 }
-void TTVPWindowForm::OnResize( int state, int w, int h ) {
+void TTVPWindowForm::OnResize( UINT_PTR state, int w, int h ) {
 	if( state == SIZE_MINIMIZED || state == SIZE_MAXSHOW || state == SIZE_MAXHIDE ) return;
 	// state == SIZE_RESTORED, SIZE_MAXIMIZED, 
 	// on resize
@@ -1842,14 +1842,14 @@ void TTVPWindowForm::OnEnable( bool enabled ) {
 		TVPPostInputEvent( new tTVPOnReleaseCaptureInputEvent(TJSNativeInstance));
 	}
 }
-void TTVPWindowForm::OnDeviceChange( int event, void *data ) {
+void TTVPWindowForm::OnDeviceChange( UINT_PTR event, void *data ) {
 	if( event == DBT_DEVNODES_CHANGED ) {
 		// reload DInput device
 		ReloadDevice = true; // to reload device
 		ReloadDeviceTick = GetTickCount() + 4000; // reload at 4secs later
 	}
 }
-void TTVPWindowForm::OnNonClientMouseDown( int button, int hittest, int x, int y ) {
+void TTVPWindowForm::OnNonClientMouseDown( int button, UINT_PTR hittest, int x, int y ) {
 	if(!CanSendPopupHide()) {
 		DeliverPopupHide();
 	}
@@ -1878,11 +1878,11 @@ void TTVPWindowForm::OnMouseLeave() {
 		TVPPostInputEvent( new tTVPOnMouseLeaveInputEvent(TJSNativeInstance));
 	}
 }
-void TTVPWindowForm::OnShow( int status ) {
+void TTVPWindowForm::OnShow( UINT_PTR status ) {
 	::DragAcceptFiles( GetHandle(), TRUE );
 	::PostMessage( GetHandle(), TVP_WM_ACQUIREIMECONTROL, 0, 0);
 }
-void TTVPWindowForm::OnHide( int status ) {
+void TTVPWindowForm::OnHide( UINT_PTR status ) {
 }
 void TTVPWindowForm::OnFocus(HWND hFocusLostWnd) {
 	::PostMessage( GetHandle(), TVP_WM_ACQUIREIMECONTROL, 0, 0);
@@ -1957,7 +1957,7 @@ bool TTVPWindowForm::GetOrientation( int& orientation, int& rotate ) const {
 	}
 	return ret != FALSE;
 }
-void TTVPWindowForm::OnDisplayChange( DWORD bpp, WORD hres, WORD vres ) {
+void TTVPWindowForm::OnDisplayChange( UINT_PTR bpp, WORD hres, WORD vres ) {
 	if( GetFullScreenMode() )
 		RelocateFullScreenMode();
 
@@ -1967,7 +1967,7 @@ void TTVPWindowForm::OnDisplayChange( DWORD bpp, WORD hres, WORD vres ) {
 		if( DisplayOrientation != orient || DisplayRotate != rot ) {
 			DisplayOrientation = orient;
 			DisplayRotate = rot;
-			OnDisplayRotate( orient, rot, bpp, hres, vres );
+			OnDisplayRotate( orient, rot, (int)bpp, hres, vres );
 		}
 	}
 }

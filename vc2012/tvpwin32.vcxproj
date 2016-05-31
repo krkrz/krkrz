@@ -132,7 +132,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);__WIN32__;NO_STRICT;TJS_TEXT_OUT_CRLF;TJS_JP_LOCALIZED;TJS_DEBUG_DUMP_STRING;_CRT_SECURE_NO_WARNING;TVP_LOG_TO_COMMANDLINE_CONSOLE;TVP_REPORT_HW_EXCEPTION;TVP_ENABLE_EXECUTE_AT_EXCEPTION;</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>../extension;../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../platform/win32;../external;../external/zlib;../external/lpng;../external/jpeg-6bx;../external/onig;../external/freetype/include;../external/jxrlib/jxrgluelib;../external/jxrlib/image/sys;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../external/baseclasses;../movie/win32;../visual/gl;../extension;../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../platform/win32;../external;../external/zlib;../external/lpng;../external/libjpeg-turbo;../external/onig;../external/freetype/include;../external/jxrlib/jxrgluelib;../external/jxrlib/image/sys;</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -140,8 +140,8 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>./lib;./lib\$(Configuration);</AdditionalLibraryDirectories>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;dsound.lib;version.lib;mpr.lib;shlwapi.lib;vfw32.lib;imm32.lib;zlib_d.lib;jpeg-6bx_d.lib;libpng_d.lib;onig_s_d.lib;freetype250MT_D.lib;tvpgl_ia32.lib;tvpsnd_ia32.lib;JXRCommonLib.lib;JXRDecodeLib.lib;JXREncodeLib.lib;JXRGlueLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib\$(Platform)\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;dsound.lib;version.lib;mpr.lib;shlwapi.lib;vfw32.lib;imm32.lib;zlib_d.lib;libpng_d.lib;onig_s_d.lib;freetype_d.lib;tvpgl_ia32.lib;turbojpeg-static_d.lib;strmbasd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>dpi.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
@@ -155,7 +155,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);__WIN32__;NO_STRICT;TJS_TEXT_OUT_CRLF;TJS_JP_LOCALIZED;TJS_DEBUG_DUMP_STRING;_CRT_SECURE_NO_WARNING;TVP_LOG_TO_COMMANDLINE_CONSOLE;TVP_REPORT_HW_EXCEPTION;TVP_ENABLE_EXECUTE_AT_EXCEPTION;</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>../extension;../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../platform/win32;../external;../external/zlib;../external/lpng;../external/jpeg-6bx;../external/onig;../external/freetype/include;../external/jxrlib/jxrgluelib;../external/jxrlib/image/sys;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../external/baseclasses;../movie/win32;../visual/gl;../extension;../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../platform/win32;../external;../external/zlib;../external/lpng;../external/libjpeg-turbo;../external/onig;../external/freetype/include;../external/jxrlib/jxrgluelib;../external/jxrlib/image/sys;</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -163,8 +163,8 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>./x64\$(Configuration);</AdditionalLibraryDirectories>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;dsound.lib;version.lib;mpr.lib;shlwapi.lib;vfw32.lib;imm32.lib;zlib_d.lib;libpng_d.lib;onig_s_d.lib;freetype250MT_D.lib;JXRCommonLib.lib;JXRDecodeLib.lib;JXREncodeLib.lib;JXRGlueLib.lib;tvpgl_ia32.lib;tvpsnd_ia32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib\$(Platform)\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;dsound.lib;version.lib;mpr.lib;shlwapi.lib;vfw32.lib;imm32.lib;zlib_d.lib;libpng_d.lib;onig_s_d.lib;freetype_d.lib;turbojpeg-static_d.lib;strmbasd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LargeAddressAware>true</LargeAddressAware>
     </Link>
     <Manifest>
@@ -181,7 +181,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);__WIN32__;NO_STRICT;TJS_TEXT_OUT_CRLF;TJS_JP_LOCALIZED;TJS_DEBUG_DUMP_STRING;TVP_LOG_TO_COMMANDLINE_CONSOLE;DISABLE_EMBEDDED_GAME_PAD;TVP_REPORT_HW_EXCEPTION;TVP_ENABLE_EXECUTE_AT_EXCEPTION;</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>../extension;../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../platform/win32;../external;../external/zlib;../external/lpng;../external/jpeg-6bx;../external/onig;../external/freetype/include;../external/jxrlib/jxrgluelib;../external/jxrlib/image/sys;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../external/baseclasses;../movie/win32;../visual/gl;../extension;../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../platform/win32;../external;../external/zlib;../external/lpng;../external/libjpeg-turbo;../external/onig;../external/freetype/include;../external/jxrlib/jxrgluelib;../external/jxrlib/image/sys;</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -192,8 +192,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>./lib;./lib\$(Configuration);</AdditionalLibraryDirectories>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;dsound.lib;version.lib;mpr.lib;shlwapi.lib;vfw32.lib;imm32.lib;zlib.lib;jpeg-6bx.lib;libpng.lib;onig_s.lib;freetype250MT.lib;tvpgl_ia32.lib;tvpsnd_ia32.lib;JXRCommonLib.lib;JXRDecodeLib.lib;JXREncodeLib.lib;JXRGlueLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib\$(Platform)\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;dsound.lib;version.lib;mpr.lib;shlwapi.lib;vfw32.lib;imm32.lib;zlib.lib;libpng.lib;onig_s.lib;freetype.lib;tvpgl_ia32.lib;turbojpeg-static.lib;strmbase.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>true</ImageHasSafeExceptionHandlers>
       <GenerateMapFile>true</GenerateMapFile>
       <MapFileName>$(ProjectName).map</MapFileName>
@@ -220,7 +220,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);__WIN32__;NO_STRICT;TJS_TEXT_OUT_CRLF;TJS_JP_LOCALIZED;TJS_DEBUG_DUMP_STRING;TVP_LOG_TO_COMMANDLINE_CONSOLE;DISABLE_EMBEDDED_GAME_PAD;TVP_REPORT_HW_EXCEPTION;TVP_ENABLE_EXECUTE_AT_EXCEPTION;</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>../extension;../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../platform/win32;../external;../external/zlib;../external/lpng;../external/jpeg-6bx;../external/onig;../external/freetype/include;../external/jxrlib/jxrgluelib;../external/jxrlib/image/sys;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../external/baseclasses;../movie/win32;../visual/gl;../extension;../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../platform/win32;../external;../external/zlib;../external/lpng;../external/libjpeg-turbo;../external/onig;../external/freetype/include;../external/jxrlib/jxrgluelib;../external/jxrlib/image/sys;</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -231,8 +231,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>./x64\$(Configuration);</AdditionalLibraryDirectories>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;dsound.lib;version.lib;mpr.lib;shlwapi.lib;vfw32.lib;imm32.lib;zlib.lib;libpng.lib;onig_s.lib;freetype250MT.lib;tvpgl_ia32.lib;tvpsnd_ia32.lib;JXRCommonLib.lib;JXRDecodeLib.lib;JXREncodeLib.lib;JXRGlueLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib\$(Platform)\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;dsound.lib;version.lib;mpr.lib;shlwapi.lib;vfw32.lib;imm32.lib;zlib.lib;libpng.lib;onig_s.lib;freetype.lib;turbojpeg-static.lib;strmbase.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <GenerateMapFile>true</GenerateMapFile>
       <MapFileName>$(ProjectName).map</MapFileName>
@@ -259,7 +259,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);__WIN32__;NO_STRICT;TJS_TEXT_OUT_CRLF;TJS_JP_LOCALIZED;TJS_DEBUG_DUMP_STRING;TVP_LOG_TO_COMMANDLINE_CONSOLE;DISABLE_EMBEDDED_GAME_PAD;TVP_REPORT_HW_EXCEPTION;ENABLE_DEBUGGER;</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>../extension;../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../platform/win32;../external;../external/zlib;../external/lpng;../external/jpeg-6bx;../external/onig;../external/freetype/include;../external/jxrlib/jxrgluelib;../external/jxrlib/image/sys;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../external/baseclasses;../movie/win32;../visual/gl;../extension;../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../platform/win32;../external;../external/zlib;../external/lpng;../external/libjpeg-turbo;../external/onig;../external/freetype/include;../external/jxrlib/jxrgluelib;../external/jxrlib/image/sys;</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -270,8 +270,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>./lib;./lib\Release;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;dsound.lib;version.lib;mpr.lib;shlwapi.lib;vfw32.lib;imm32.lib;zlib.lib;jpeg-6bx.lib;libpng.lib;onig_s.lib;freetype250MT.lib;tvpgl_ia32.lib;tvpsnd_ia32.lib;JXRCommonLib.lib;JXRDecodeLib.lib;JXREncodeLib.lib;JXRGlueLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib\$(Platform)\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;dsound.lib;version.lib;mpr.lib;shlwapi.lib;vfw32.lib;imm32.lib;zlib.lib;libpng.lib;onig_s.lib;freetype.lib;tvpgl_ia32.lib;turbojpeg-static.lib;strmbase.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>true</ImageHasSafeExceptionHandlers>
       <GenerateMapFile>true</GenerateMapFile>
       <MapFileName>$(ProjectName).map</MapFileName>
@@ -298,7 +298,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);__WIN32__;NO_STRICT;TJS_TEXT_OUT_CRLF;TJS_JP_LOCALIZED;TJS_DEBUG_DUMP_STRING;TVP_LOG_TO_COMMANDLINE_CONSOLE;DISABLE_EMBEDDED_GAME_PAD;TVP_REPORT_HW_EXCEPTION;ENABLE_DEBUGGER;</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>../extension;../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../platform/win32;../external;../external/zlib;../external/lpng;../external/jpeg-6bx;../external/onig;../external/freetype/include;../external/jxrlib/jxrgluelib;../external/jxrlib/image/sys;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../external/baseclasses;../movie/win32;../visual/gl;../extension;../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../platform/win32;../external;../external/zlib;../external/lpng;../external/libjpeg-turbo;../external/onig;../external/freetype/include;../external/jxrlib/jxrgluelib;../external/jxrlib/image/sys;</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -309,9 +309,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>./lib;./lib\Release;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;dsound.lib;version.lib;mpr.lib;shlwapi.lib;vfw32.lib;imm32.lib;zlib.lib;jpeg-6bx.lib;libpng.lib;onig_s.lib;freetype250MT.lib;tvpgl_ia32.lib;tvpsnd_ia32.lib;JXRCommonLib.lib;JXRDecodeLib.lib;JXREncodeLib.lib;JXRGlueLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ImageHasSafeExceptionHandlers>true</ImageHasSafeExceptionHandlers>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib\$(Platform)\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;dsound.lib;version.lib;mpr.lib;shlwapi.lib;vfw32.lib;imm32.lib;zlib.lib;libpng.lib;onig_s.lib;freetype.lib;turbojpeg-static.lib;strmbase.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <GenerateMapFile>true</GenerateMapFile>
       <MapFileName>$(ProjectName).map</MapFileName>
       <MapExports>true</MapExports>
@@ -367,12 +367,39 @@
     <ClInclude Include="..\environ\win32\WindowFormUnit.h" />
     <ClInclude Include="..\environ\win32\WindowsUtil.h" />
     <ClInclude Include="..\extension\Extension.h" />
+    <ClInclude Include="..\movie\win32\asyncio.h" />
+    <ClInclude Include="..\movie\win32\asyncrdr.h" />
+    <ClInclude Include="..\movie\win32\BufferRenderer.h" />
+    <ClInclude Include="..\movie\win32\CDemuxOutputPin.h" />
+    <ClInclude Include="..\movie\win32\CDemuxSource.h" />
+    <ClInclude Include="..\movie\win32\CDLLLoader.h" />
+    <ClInclude Include="..\movie\win32\CIStream.h" />
+    <ClInclude Include="..\movie\win32\CMediaSeekingProxy.h" />
+    <ClInclude Include="..\movie\win32\CVMRCustomAllocatorPresenter9.h" />
+    <ClInclude Include="..\movie\win32\CWMAllocator.h" />
+    <ClInclude Include="..\movie\win32\CWMBuffer.h" />
+    <ClInclude Include="..\movie\win32\CWMReader.h" />
+    <ClInclude Include="..\movie\win32\DShowException.h" />
+    <ClInclude Include="..\movie\win32\dslayerd.h" />
+    <ClInclude Include="..\movie\win32\dsmixer.h" />
+    <ClInclude Include="..\movie\win32\dsmovie.h" />
+    <ClInclude Include="..\movie\win32\dsoverlay.h" />
+    <ClInclude Include="..\movie\win32\IBufferRenderer.h" />
+    <ClInclude Include="..\movie\win32\IDemuxReader.h" />
+    <ClInclude Include="..\movie\win32\IRendererBufferAccess.h" />
+    <ClInclude Include="..\movie\win32\IRendererBufferVideo.h" />
+    <ClInclude Include="..\movie\win32\MFPlayer.h" />
+    <ClInclude Include="..\movie\win32\OptionInfo.h" />
+    <ClInclude Include="..\movie\win32\PlayWindow.h" />
+    <ClInclude Include="..\movie\win32\TVPVideoOverlay.h" />
     <ClInclude Include="..\msg\MsgIntf.h" />
     <ClInclude Include="..\msg\svn_revision.h" />
     <ClInclude Include="..\msg\win32\MsgImpl.h" />
     <ClInclude Include="..\msg\win32\ReadOptionDesc.h" />
+    <ClInclude Include="..\sound\MathAlgorithms.h" />
     <ClInclude Include="..\sound\PhaseVocoderDSP.h" />
     <ClInclude Include="..\sound\PhaseVocoderFilter.h" />
+    <ClInclude Include="..\sound\RealFFT.h" />
     <ClInclude Include="..\sound\RingBuffer.h" />
     <ClInclude Include="..\sound\SoundBufferBaseIntf.h" />
     <ClInclude Include="..\sound\WaveIntf.h" />
@@ -383,6 +410,7 @@
     <ClInclude Include="..\sound\win32\SoundBufferBaseImpl.h" />
     <ClInclude Include="..\sound\win32\tvpsnd.h" />
     <ClInclude Include="..\sound\win32\WaveImpl.h" />
+    <ClInclude Include="..\sound\xmmlib.h" />
     <ClInclude Include="..\tjs2\tjs.h" />
     <ClInclude Include="..\tjs2\tjs.tab.hpp" />
     <ClInclude Include="..\tjs2\tjsArray.h" />
@@ -453,6 +481,22 @@
     <ClInclude Include="..\visual\FreeType.h" />
     <ClInclude Include="..\visual\FreeTypeFace.h" />
     <ClInclude Include="..\visual\FreeTypeFontRasterizer.h" />
+    <ClInclude Include="..\visual\gl\aligned_allocator.h" />
+    <ClInclude Include="..\visual\gl\blend_functor_avx2.h" />
+    <ClInclude Include="..\visual\gl\blend_functor_c.h" />
+    <ClInclude Include="..\visual\gl\blend_functor_sse2.h" />
+    <ClInclude Include="..\visual\gl\blend_ps_functor_sse2.h" />
+    <ClInclude Include="..\visual\gl\blend_util_func.h" />
+    <ClInclude Include="..\visual\gl\blend_variation.h" />
+    <ClInclude Include="..\visual\gl\interpolation_functor_sse2.h" />
+    <ClInclude Include="..\visual\gl\ResampleImage.h" />
+    <ClInclude Include="..\visual\gl\ResampleImageInternal.h" />
+    <ClInclude Include="..\visual\gl\simd_def_x86x64.h" />
+    <ClInclude Include="..\visual\gl\sse_mathfun.h" />
+    <ClInclude Include="..\visual\gl\WeightFunctor.h" />
+    <ClInclude Include="..\visual\gl\WeightFunctorAVX.h" />
+    <ClInclude Include="..\visual\gl\WeightFunctorSSE.h" />
+    <ClInclude Include="..\visual\gl\x86simdutil.h" />
     <ClInclude Include="..\visual\GraphicsLoaderIntf.h" />
     <ClInclude Include="..\visual\GraphicsLoadThread.h" />
     <ClInclude Include="..\visual\IA32\tvpgl_ia32_intf.h" />
@@ -465,7 +509,6 @@
     <ClInclude Include="..\visual\LoadTLG.h" />
     <ClInclude Include="..\visual\PrerenderedFont.h" />
     <ClInclude Include="..\visual\RectItf.h" />
-    <ClInclude Include="..\visual\Resampler.h" />
     <ClInclude Include="..\visual\SaveTLG.h" />
     <ClInclude Include="..\visual\transhandler.h" />
     <ClInclude Include="..\visual\TransIntf.h" />
@@ -528,19 +571,50 @@
     <ClCompile Include="..\environ\win32\WindowFormUnit.cpp" />
     <ClCompile Include="..\environ\win32\WindowsUtil.cpp" />
     <ClCompile Include="..\extension\Extension.cpp" />
+    <ClCompile Include="..\movie\win32\asyncio.cpp" />
+    <ClCompile Include="..\movie\win32\asyncrdr.cpp" />
+    <ClCompile Include="..\movie\win32\BufferRenderer.cpp" />
+    <ClCompile Include="..\movie\win32\CDemuxOutputPin.cpp" />
+    <ClCompile Include="..\movie\win32\CDemuxSource.cpp" />
+    <ClCompile Include="..\movie\win32\CMediaSeekingProxy.cpp" />
+    <ClCompile Include="..\movie\win32\CVMRCustomAllocatorPresenter9.cpp" />
+    <ClCompile Include="..\movie\win32\CWMAllocator.cpp" />
+    <ClCompile Include="..\movie\win32\CWMBuffer.cpp" />
+    <ClCompile Include="..\movie\win32\CWMReader.cpp" />
+    <ClCompile Include="..\movie\win32\DShowException.cpp" />
+    <ClCompile Include="..\movie\win32\dslayerd.cpp" />
+    <ClCompile Include="..\movie\win32\dsmixer.cpp" />
+    <ClCompile Include="..\movie\win32\dsmovie.cpp" />
+    <ClCompile Include="..\movie\win32\dsoverlay.cpp" />
+    <ClCompile Include="..\movie\win32\IBufferRenderer_i.c" />
+    <ClCompile Include="..\movie\win32\IRendererBufferAccess_i.c" />
+    <ClCompile Include="..\movie\win32\IRendererBufferVideo_i.c" />
+    <ClCompile Include="..\movie\win32\krlmovie.cpp" />
+    <ClCompile Include="..\movie\win32\krmmovie.cpp" />
+    <ClCompile Include="..\movie\win32\krmovie.cpp" />
+    <ClCompile Include="..\movie\win32\MFPlayer.cpp" />
+    <ClCompile Include="..\movie\win32\PlayWindow.cpp" />
+    <ClCompile Include="..\movie\win32\TVPVideoOverlay.cpp" />
     <ClCompile Include="..\msg\MsgIntf.cpp" />
     <ClCompile Include="..\msg\win32\MsgImpl.cpp" />
     <ClCompile Include="..\msg\win32\MsgLoad.cpp" />
     <ClCompile Include="..\msg\win32\ReadOptionDesc.cpp" />
+    <ClCompile Include="..\sound\MathAlgorithms.cpp" />
+    <ClCompile Include="..\sound\MathAlgorithms_SSE.cpp" />
     <ClCompile Include="..\sound\PhaseVocoderDSP.cpp" />
     <ClCompile Include="..\sound\PhaseVocoderFilter.cpp" />
+    <ClCompile Include="..\sound\RealFFT.cpp" />
+    <ClCompile Include="..\sound\RealFFT_SSE.cpp" />
     <ClCompile Include="..\sound\SoundBufferBaseIntf.cpp" />
+    <ClCompile Include="..\sound\WaveFormatConverter.cpp" />
+    <ClCompile Include="..\sound\WaveFormatConverter_SSE.cpp" />
     <ClCompile Include="..\sound\WaveIntf.cpp" />
     <ClCompile Include="..\sound\WaveLoopManager.cpp" />
     <ClCompile Include="..\sound\WaveSegmentQueue.cpp" />
     <ClCompile Include="..\sound\win32\SoundBufferBaseImpl.cpp" />
     <ClCompile Include="..\sound\win32\tvpsnd.c" />
     <ClCompile Include="..\sound\win32\WaveImpl.cpp" />
+    <ClCompile Include="..\sound\xmmlib.cpp" />
     <ClCompile Include="..\tjs2\tjs.cpp" />
     <ClCompile Include="..\tjs2\tjs.tab.cpp" />
     <ClCompile Include="..\tjs2\tjsArray.cpp" />
@@ -601,6 +675,43 @@
     <ClCompile Include="..\visual\FontSystem.cpp" />
     <ClCompile Include="..\visual\FreeType.cpp" />
     <ClCompile Include="..\visual\FreeTypeFontRasterizer.cpp" />
+    <ClCompile Include="..\visual\gl\adjust_color_sse2.cpp" />
+    <ClCompile Include="..\visual\gl\blend_function.cpp" />
+    <ClCompile Include="..\visual\gl\blend_function_avx2.cpp">
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release Enable Debugger|Win32'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release Enable Debugger|x64'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+    </ClCompile>
+    <ClCompile Include="..\visual\gl\blend_function_sse2.cpp" />
+    <ClCompile Include="..\visual\gl\boxblur_sse2.cpp" />
+    <ClCompile Include="..\visual\gl\colorfill_sse2.cpp" />
+    <ClCompile Include="..\visual\gl\colormap_sse2.cpp" />
+    <ClCompile Include="..\visual\gl\pixelformat_sse2.cpp" />
+    <ClCompile Include="..\visual\gl\ResampleImage.cpp" />
+    <ClCompile Include="..\visual\gl\ResampleImageAVX2.cpp">
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release Enable Debugger|Win32'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release Enable Debugger|x64'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+    </ClCompile>
+    <ClCompile Include="..\visual\gl\ResampleImageSSE2.cpp" />
+    <ClCompile Include="..\visual\gl\tlg_sse2.cpp" />
+    <ClCompile Include="..\visual\gl\univtrans_sse2.cpp" />
+    <ClCompile Include="..\visual\gl\WeightFunctor.cpp" />
+    <ClCompile Include="..\visual\gl\x86simdutil.cpp" />
+    <ClCompile Include="..\visual\gl\x86simdutilAVX2.cpp">
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release Enable Debugger|Win32'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release Enable Debugger|x64'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+    </ClCompile>
     <ClCompile Include="..\visual\GraphicsLoaderIntf.cpp" />
     <ClCompile Include="..\visual\GraphicsLoadThread.cpp" />
     <ClCompile Include="..\visual\IA32\detect_cpu.cpp" />
@@ -617,7 +728,6 @@
     <ClCompile Include="..\visual\LoadTLG.cpp" />
     <ClCompile Include="..\visual\PrerenderedFont.cpp" />
     <ClCompile Include="..\visual\RectItf.cpp" />
-    <ClCompile Include="..\visual\Resampler.cpp" />
     <ClCompile Include="..\visual\SaveTLG5.cpp" />
     <ClCompile Include="..\visual\SaveTLG6.cpp" />
     <ClCompile Include="..\visual\TransIntf.cpp" />
@@ -647,6 +757,34 @@
     <Image Include="tvpwin32.ico" />
   </ItemGroup>
   <ItemGroup>
+    <CustomBuild Include="..\visual\IA32\tlg6_chroma.nas">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -I../visual/IA32/ -o ./$(Configuration)/%(Filename).obj ../visual/IA32/%(Filename).nas</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).nas</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release Enable Debugger|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -I../visual/IA32/ -o "./$(Configuration)/%(Filename).obj" ../visual/IA32/%(Filename).nas</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release Enable Debugger|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release Enable Debugger|Win32'">%(Filename).nas</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -I../visual/IA32/ -o ./$(Configuration)/%(Filename).obj ../visual/IA32/%(Filename).nas</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).nas</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Enable Debugger|x64'">true</ExcludedFromBuild>
+    </CustomBuild>
+    <CustomBuild Include="..\visual\IA32\tlg6_golomb.nas">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -I../visual/IA32/ -o ./$(Configuration)/%(Filename).obj ../visual/IA32/%(Filename).nas</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).nas</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release Enable Debugger|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -I../visual/IA32/ -o "./$(Configuration)/%(Filename).obj" ../visual/IA32/%(Filename).nas</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release Enable Debugger|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release Enable Debugger|Win32'">%(Filename).nas</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">nasm -safeseh -Xvc -fwin32 -DWIN32 -I./ -I../visual/IA32/ -o ./$(Configuration)/%(Filename).obj ../visual/IA32/%(Filename).nas</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).nas</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\%(Filename).obj</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Enable Debugger|x64'">true</ExcludedFromBuild>
+    </CustomBuild>
     <None Include="option_desc_ja.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

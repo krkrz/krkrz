@@ -19,6 +19,7 @@ class tTVPBaseBitmap;
 class TJS::tTJSBinaryStream;
 
 
+/*[*/
 //---------------------------------------------------------------------------
 // Graphic Loading Handler Type
 //---------------------------------------------------------------------------
@@ -39,6 +40,10 @@ typedef void * (*tTVPGraphicScanLineCallback)
 	was given by previous calling of TVPGraphicScanLineCallback. in this time,
 	this callback function must return NULL.
 */
+
+typedef const void * (*tTVPGraphicSaveScanLineCallback)
+	(void *callbackdata, tjs_int y);
+
 typedef void (*tTVPMetaInfoPushCallback)
 	(void *callbackdata, const ttstr & name, const ttstr & value);
 /*
@@ -52,6 +57,7 @@ enum tTVPGraphicLoadMode
 	glmPalettized, // palettized 8bit mode
 	glmGrayscale // grayscale 8bit mode
 };
+/*]*/
 
 typedef void (*tTVPGraphicLoadingHandler)(void* formatdata,
 	void *callbackdata,
@@ -76,20 +82,65 @@ typedef void (*tTVPGraphicLoadingHandler)(void* formatdata,
 	the function may throw an exception if error.
 */
 
-//---------------------------------------------------------------------------
+typedef void (*tTVPGraphicHeaderLoadingHandler)(void* formatdata,  tTJSBinaryStream *src, class iTJSDispatch2** dic );
+typedef void (*tTVPGraphicSaveHandler)(void* formatdata,  tTJSBinaryStream* dst, const class tTVPBaseBitmap* image,
+	const ttstr & mode, class iTJSDispatch2* meta );
 
+/*[*/
+typedef bool (*tTVPGraphicAcceptSaveHandler)(void* formatdata, const ttstr & type, class iTJSDispatch2** dic );
+/*]*/
+
+//---------------------------------------------------------------------------
 
 
 //---------------------------------------------------------------------------
 // Graphics Format Management
 //---------------------------------------------------------------------------
 void TVPRegisterGraphicLoadingHandler(const ttstr & name,
-	tTVPGraphicLoadingHandler handler, void* formatdata);
+	tTVPGraphicLoadingHandler loading,
+	tTVPGraphicHeaderLoadingHandler header,
+	tTVPGraphicSaveHandler save,
+	tTVPGraphicAcceptSaveHandler accept,
+	void* formatdata);
 void TVPUnregisterGraphicLoadingHandler(const ttstr & name,
-	tTVPGraphicLoadingHandler handler, void * formatdata);
+	tTVPGraphicLoadingHandler loading,
+	tTVPGraphicHeaderLoadingHandler header,
+	tTVPGraphicSaveHandler save,
+	tTVPGraphicAcceptSaveHandler accept,
+	void* formatdata);
+
+
+/*[*/
+/* For grahpic load and save */
+typedef void (*tTVPGraphicLoadingHandlerForPlugin)(void* formatdata,
+	void *callbackdata,
+	tTVPGraphicSizeCallback sizecallback,
+	tTVPGraphicScanLineCallback scanlinecallback,
+	tTVPMetaInfoPushCallback metainfopushcallback,
+	struct IStream *src,
+	tjs_int32 keyidx,
+	tTVPGraphicLoadMode mode);
+typedef void (*tTVPGraphicHeaderLoadingHandlerForPlugin)(void* formatdata, struct IStream* src, class iTJSDispatch2** dic );
+typedef void (*tTVPGraphicSaveHandlerForPlugin)(void* formatdata, void* callbackdata, struct IStream* dst, const ttstr & mode,
+	tjs_uint width, tjs_uint height,
+	tTVPGraphicSaveScanLineCallback scanlinecallback,
+	class iTJSDispatch2* meta );
+/*]*/
+
+TJS_EXP_FUNC_DEF( void, TVPRegisterGraphicLoadingHandler, (const ttstr & name,
+	tTVPGraphicLoadingHandlerForPlugin loading,
+	tTVPGraphicHeaderLoadingHandlerForPlugin header,
+	tTVPGraphicSaveHandlerForPlugin save,
+	tTVPGraphicAcceptSaveHandler accept,
+	void* formatdata));
+
+TJS_EXP_FUNC_DEF( void, TVPUnregisterGraphicLoadingHandler, (const ttstr & name,
+	tTVPGraphicLoadingHandlerForPlugin loading,
+	tTVPGraphicHeaderLoadingHandlerForPlugin header,
+	tTVPGraphicSaveHandlerForPlugin save,
+	tTVPGraphicAcceptSaveHandler accept,
+	void* formatdata));
 //---------------------------------------------------------------------------
-
-
 
 
 //---------------------------------------------------------------------------
@@ -107,32 +158,56 @@ extern void TVPLoadPNG(void* formatdata, void *callbackdata, tTVPGraphicSizeCall
 	tTVPGraphicScanLineCallback scanlinecallback, tTVPMetaInfoPushCallback metainfopushcallback,
 	tTJSBinaryStream *src, tjs_int keyidx,  tTVPGraphicLoadMode mode);
 
-extern void TVPLoadERI(void* formatdata, void *callbackdata, tTVPGraphicSizeCallback sizecallback,
-	tTVPGraphicScanLineCallback scanlinecallback, tTVPMetaInfoPushCallback metainfopushcallback,
-	tTJSBinaryStream *src, tjs_int keyidx,  tTVPGraphicLoadMode mode);
-
 extern void TVPLoadJXR(void* formatdata, void *callbackdata, tTVPGraphicSizeCallback sizecallback,
 	tTVPGraphicScanLineCallback scanlinecallback, tTVPMetaInfoPushCallback metainfopushcallback,
 	tTJSBinaryStream *src, tjs_int keyidx,  tTVPGraphicLoadMode mode);
+
+extern void TVPLoadTLG(void* formatdata, void *callbackdata, tTVPGraphicSizeCallback sizecallback,
+	tTVPGraphicScanLineCallback scanlinecallback, tTVPMetaInfoPushCallback metainfopushcallback,
+	tTJSBinaryStream *src, tjs_int keyidx, tTVPGraphicLoadMode mode);
 //---------------------------------------------------------------------------
 
 
+//---------------------------------------------------------------------------
+// Image header handler
+// dic = %[
+//    "width" => (int)width,
+//    "height" => (int)height,
+//    "bpp" => (int)bpp, // (option)
+//    "palette" => (bool)palette, // (option)
+//    "grayscale" => (bool)grayscale, // (option)
+//    "comment" => (string)comment, // (option)
+//    etc...
+// ]
+//---------------------------------------------------------------------------
+extern void TVPLoadHeaderBMP(void* formatdata, tTJSBinaryStream *src, iTJSDispatch2** dic );
+extern void TVPLoadHeaderJPG(void* formatdata, tTJSBinaryStream *src, iTJSDispatch2** dic );
+extern void TVPLoadHeaderPNG(void* formatdata, tTJSBinaryStream *src, iTJSDispatch2** dic );
+extern void TVPLoadHeaderJXR(void* formatdata, tTJSBinaryStream *src, iTJSDispatch2** dic );
+extern void TVPLoadHeaderTLG(void* formatdata, tTJSBinaryStream *src, iTJSDispatch2** dic );
+//---------------------------------------------------------------------------
 
 
 //---------------------------------------------------------------------------
 // Image saving handler
 //---------------------------------------------------------------------------
-extern void TVPSaveAsBMP(const ttstr & storagename, const ttstr & mode,
-	tTVPBaseBitmap *bmp);
-extern void TVPSaveAsPNG( const ttstr & storagename, const ttstr & mode,
-	const tTVPBaseBitmap* image );
-extern void TVPSaveAsJPG( const ttstr & storagename, const ttstr & mode,
-	const tTVPBaseBitmap* image );
-extern void TVPSaveAsTLG( const ttstr & storagename, const ttstr & mode,
-	const tTVPBaseBitmap* image, const std::vector<std::string>& tags );
+extern void TVPSaveAsBMP(void* formatdata, tTJSBinaryStream* dst, const tTVPBaseBitmap* image, const ttstr & mode, iTJSDispatch2* meta );
+extern void TVPSaveAsPNG(void* formatdata, tTJSBinaryStream* dst, const tTVPBaseBitmap* image, const ttstr & mode, iTJSDispatch2* meta );
+extern void TVPSaveAsJPG(void* formatdata, tTJSBinaryStream* dst, const tTVPBaseBitmap* image, const ttstr & mode, iTJSDispatch2* meta );
+extern void TVPSaveAsJXR(void* formatdata, tTJSBinaryStream* dst, const tTVPBaseBitmap* image, const ttstr & mode, iTJSDispatch2* meta );
+extern void TVPSaveAsTLG(void* formatdata, tTJSBinaryStream* dst, const tTVPBaseBitmap* image, const ttstr & mode, iTJSDispatch2* meta );
 //---------------------------------------------------------------------------
 
 
+//---------------------------------------------------------------------------
+// is accept
+//---------------------------------------------------------------------------
+extern bool TVPAcceptSaveAsBMP(void* formatdata, const ttstr & type, iTJSDispatch2** dic );
+extern bool TVPAcceptSaveAsPNG(void* formatdata, const ttstr & type, iTJSDispatch2** dic );
+extern bool TVPAcceptSaveAsJPG(void* formatdata, const ttstr & type, iTJSDispatch2** dic );
+extern bool TVPAcceptSaveAsJXR(void* formatdata, const ttstr & type, iTJSDispatch2** dic );
+extern bool TVPAcceptSaveAsTLG(void* formatdata, const ttstr & type, iTJSDispatch2** dic );
+//---------------------------------------------------------------------------
 
 
 //---------------------------------------------------------------------------
@@ -241,6 +316,7 @@ enum tTVPBMPAlphaType
 };
 
 
+
 extern void TVPInternalLoadBMP(void *callbackdata,
 	tTVPGraphicSizeCallback sizecallback,
 	tTVPGraphicScanLineCallback scanlinecallback,
@@ -251,28 +327,95 @@ extern void TVPInternalLoadBMP(void *callbackdata,
 	tTVPBMPAlphaType alphatype,
 	tTVPGraphicLoadMode mode);
 
+extern const void* tTVPBitmapScanLineCallbackForSave(void *callbackdata, tjs_int y);
+
 struct tTVPGraphicHandlerType
 {
+	bool IsPlugin;
 	ttstr Extension;
-	tTVPGraphicLoadingHandler Handler;
+	union {
+		tTVPGraphicLoadingHandler LoadHandler;
+		tTVPGraphicLoadingHandlerForPlugin LoadHandlerPlugin;
+	};
+	union {
+		tTVPGraphicHeaderLoadingHandler HeaderHandler;
+		tTVPGraphicHeaderLoadingHandlerForPlugin HeaderHandlerPlugin;
+	};
+	union {
+		tTVPGraphicSaveHandler SaveHandler;
+		tTVPGraphicSaveHandlerForPlugin SaveHandlerPlugin;
+	};
+	tTVPGraphicAcceptSaveHandler AcceptHandler;
 	void * FormatData;
 
 	tTVPGraphicHandlerType(const ttstr &ext,
-		tTVPGraphicLoadingHandler handler, void * data)
-	{ Extension = ext, Handler = handler, FormatData = data; }
+		tTVPGraphicLoadingHandler loading,
+		tTVPGraphicHeaderLoadingHandler header,
+		tTVPGraphicSaveHandler save,
+		tTVPGraphicAcceptSaveHandler accept,
+		void * data) : IsPlugin(false)
+	{
+		Extension = ext;
+		LoadHandler = loading;
+		HeaderHandler = header;
+		SaveHandler = save;
+		AcceptHandler = accept;
+		FormatData = data;
+	}
+
+	tTVPGraphicHandlerType(const ttstr &ext,
+		tTVPGraphicLoadingHandlerForPlugin loading,
+		tTVPGraphicHeaderLoadingHandlerForPlugin header,
+		tTVPGraphicSaveHandlerForPlugin save,
+		tTVPGraphicAcceptSaveHandler accept,
+		void * data) : IsPlugin(true)
+	{
+		Extension = ext;
+		LoadHandlerPlugin = loading;
+		HeaderHandlerPlugin = header;
+		SaveHandlerPlugin = save;
+		AcceptHandler = accept;
+		FormatData = data;
+	}
 
 	tTVPGraphicHandlerType(const tTVPGraphicHandlerType & ref)
 	{
+		IsPlugin = ref.IsPlugin;
+		if( IsPlugin )
+		{
+			LoadHandlerPlugin = ref.LoadHandlerPlugin;
+			HeaderHandlerPlugin = ref.HeaderHandlerPlugin;
+			SaveHandlerPlugin = ref.SaveHandlerPlugin;
+		}
+		else
+		{
+			LoadHandler = ref.LoadHandler;
+			HeaderHandler = ref.HeaderHandler;
+			SaveHandler = ref.SaveHandler;
+		}
+		AcceptHandler = ref.AcceptHandler;
 		Extension = ref.Extension;
-		Handler = ref.Handler;
 		FormatData = ref.FormatData;
 	}
 
 	bool operator == (const tTVPGraphicHandlerType & ref) const
 	{
 		return FormatData == ref.FormatData &&
-			Handler == ref.Handler &&
+			IsPlugin == ref.IsPlugin &&
+			LoadHandler == ref.LoadHandler &&
+			HeaderHandler == ref.HeaderHandler &&
+			SaveHandler == ref.SaveHandler &&
+			AcceptHandler == ref.AcceptHandler &&
 			Extension == ref.Extension;
+	}
+	void Load( void* formatdata, void *callbackdata, tTVPGraphicSizeCallback sizecallback, tTVPGraphicScanLineCallback scanlinecallback,
+		tTVPMetaInfoPushCallback metainfopushcallback, tTJSBinaryStream *src, tjs_int32 keyidx, tTVPGraphicLoadMode mode);
+	void Save( const ttstr & storagename, const ttstr & mode, const tTVPBaseBitmap* image, iTJSDispatch2* meta );
+	void Header( tTJSBinaryStream *src, iTJSDispatch2** dic );
+	bool AcceptSave( const ttstr & type, iTJSDispatch2** dic )
+	{
+		if( AcceptHandler == NULL ) return false;
+		return AcceptHandler( FormatData, type, dic );
 	}
 };
 struct tTVPGraphicMetaInfoPair
@@ -292,6 +435,9 @@ extern bool TVPCheckImageCache( const ttstr& nname, tTVPBaseBitmap* dest,
 	iTJSDispatch2** metainfo );
 extern bool TVPHasImageCache( const ttstr& nname, tTVPGraphicLoadMode mode,
 	tjs_uint dw, tjs_uint dh, tjs_int32 keyidx );
+extern void TVPLoadImageHeader( const ttstr & storagename, iTJSDispatch2** dic );
+extern void TVPSaveImage( const ttstr & storagename, const ttstr & mode, const tTVPBaseBitmap* image, iTJSDispatch2* meta );
+extern bool TVPGetSaveOption( const ttstr & type, iTJSDispatch2** dic );
 //---------------------------------------------------------------------------
 
 

@@ -41,7 +41,7 @@ public:
 	void Append(const tjs_char *string, tjs_int len);
 
 	void operator += (const tjs_char * string)
-		{ Append(string, TJS_strlen(string)); }
+		{ Append(string, (tjs_int)TJS_strlen(string)); }
 
 	void operator += (const ttstr & string)
 		{ Append(string.c_str(), string.GetLen()); }

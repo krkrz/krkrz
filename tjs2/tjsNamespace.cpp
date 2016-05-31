@@ -84,7 +84,7 @@ tjs_int tTJSLocalSymbolList::Find(const tjs_char *name)
 		if(sym)
 		{
 			if(!TJS_strcmp(sym->Name,name))
-				return i;
+				return (tjs_int)i;
 		}
 	}
 	return -1;
@@ -182,7 +182,7 @@ tjs_int tTJSLocalNamespace::Find(const tjs_char *name)
 #endif
 	// search "name"
 	tjs_int i;  /* signed */
-	for(i=Levels.size()-1; i>=0; i--)
+	for(i=(tjs_int)(Levels.size()-1); i>=0; i--)
 	{
 		tTJSLocalSymbolList* list = Levels[i];
 		tjs_int lidx = list->Find(name);
@@ -198,7 +198,7 @@ tjs_int tTJSLocalNamespace::Find(const tjs_char *name)
 tjs_int tTJSLocalNamespace::GetLevel(void)
 {
 	// gets current namespace depth
-	return Levels.size();
+	return (tjs_int)Levels.size();
 }
 //---------------------------------------------------------------------------
 void tTJSLocalNamespace::Add(const tjs_char * name)
@@ -218,7 +218,7 @@ void tTJSLocalNamespace::Remove(const tjs_char *name)
 	tTJSTimeProfiler prof(time_ns_Remove);
 #endif
 	tjs_int i;
-	for(i=Levels.size()-1; i>=0; i--)
+	for(i=(tjs_int)(Levels.size()-1); i>=0; i--)
 	{
 		tTJSLocalSymbolList* list = Levels[i];
 		tjs_int lidx = list->Find(name);
@@ -238,7 +238,7 @@ void tTJSLocalNamespace::Commit(void)
 	// compute MaxCount
 	tjs_int i;
 	tjs_int count = 0;
-	for(i=Levels.size()-1; i>=0; i--)
+	for(i=(tjs_int)(Levels.size()-1); i>=0; i--)
 	{
 		tTJSLocalSymbolList* list = Levels[i];
 		count += list->GetCount();

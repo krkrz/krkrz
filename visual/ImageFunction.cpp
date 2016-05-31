@@ -405,13 +405,19 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/operateStretch)
 	if(numparams >= 10 && param[9]->Type() != tvtVoid)
 		hda = ((tjs_int)*param[9]) ? true : false;
 
+	tjs_real typeopt = 0.0;
+	if(numparams >= 11)
+		typeopt = (tjs_real)*param[10];
+	else if( type == stFastCubic || type == stCubic )
+		typeopt = -1.0;
+
 	bool updated = false;
 	tTVPRect ur = dstRect;
 	if(ur.right < ur.left) std::swap(ur.right, ur.left);
 	if(ur.bottom < ur.top) std::swap(ur.bottom, ur.top);
 	if( TVPIntersectRect(&ur, ur, clipRect) ) {
 		tTVPBBBltMethod met = GetBltMethodFromOperationMode( mode, face );
-		updated = dst->GetBitmap()->StretchBlt( clipRect, dstRect, src->GetBitmap(), srcRect, met, opa, hda, type);
+		updated = dst->GetBitmap()->StretchBlt( clipRect, dstRect, src->GetBitmap(), srcRect, met, opa, hda, type, typeopt);
 	}
 	if( result ) {
 		if( updated ) {

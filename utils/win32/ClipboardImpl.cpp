@@ -43,7 +43,7 @@ void TVPClipboardSetText(const ttstr & text)
 		try {
 			// store ANSI string
 			std::string ansistr = text.AsNarrowStdString();
-			int ansistrlen = (ansistr.length() + 1)*sizeof(char);
+			int ansistrlen = (int)((ansistr.length() + 1)*sizeof(char));
 			ansihandle = ::GlobalAlloc(GMEM_DDESHARE | GMEM_MOVEABLE, ansistrlen);
 			if( !ansihandle ) TVPThrowExceptionMessage( TVPFaildClipboardCopy );
 
