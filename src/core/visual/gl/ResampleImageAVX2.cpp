@@ -22,15 +22,31 @@
 #include "WeightFunctorAVX.h"
 #include "ResampleImageInternal.h"
 
-static const __m256 M256_PS_STEP( _mm256_set_ps(7.0f,6.0f,5.0f,4.0f,3.0f,2.0f,1.0f,0.0f) );
-static const __m256 M256_PS_8_0( _mm256_set1_ps( 8.0f ) );
-static const __m256 M256_PS_FIXED15( _mm256_set1_ps( (float)(1<<15) ) );
-static const __m256i M256_U32_FIXED_ROUND( (_mm256_set1_epi32(0x00200020)) );
-static const __m256i M256_U32_FIXED_COLOR_MASK( (_mm256_set1_epi32(0x00ff00ff)) );
-static const __m256i M256_U32_FIXED_COLOR_MASK8( (_mm256_set1_epi32(0x000000ff)) );
-static const __m256i M256_U32_TOP_MASK( _mm256_set_epi32(0, 0, 0, 0, 0, 0, 0, 0xffffffff) );
-static const __m256 M256_EPSILON( _mm256_set1_ps( FLT_EPSILON ) );
-static const __m256 M256_ABS_MASK( _mm256_castsi256_ps(_mm256_set1_epi32(0x7fffffff)) );
+static __m256 M256_PS_STEP;
+static __m256 M256_PS_8_0;
+static __m256 M256_PS_FIXED15;
+static __m256i M256_U32_FIXED_ROUND;
+static __m256i M256_U32_FIXED_COLOR_MASK;
+static __m256i M256_U32_FIXED_COLOR_MASK8;
+static __m256i M256_U32_TOP_MASK;
+static __m256 M256_EPSILON;
+static __m256 M256_ABS_MASK;
+
+static bool InitializedResampleAVX2 = false;
+void TVPInitializeResampleAVX2() {
+	if( !InitializedResampleAVX2 ) {
+		M256_PS_STEP = ( _mm256_set_ps(7.0f,6.0f,5.0f,4.0f,3.0f,2.0f,1.0f,0.0f) );
+		M256_PS_8_0 = ( _mm256_set1_ps( 8.0f ) );
+		M256_PS_FIXED15 = ( _mm256_set1_ps( (float)(1<<15) ) );
+		M256_U32_FIXED_ROUND = ( (_mm256_set1_epi32(0x00200020)) );
+		M256_U32_FIXED_COLOR_MASK = ( (_mm256_set1_epi32(0x00ff00ff)) );
+		M256_U32_FIXED_COLOR_MASK8 = ( (_mm256_set1_epi32(0x000000ff)) );
+		M256_U32_TOP_MASK = ( _mm256_set_epi32(0, 0, 0, 0, 0, 0, 0, 0xffffffff) );
+		M256_EPSILON = ( _mm256_set1_ps( FLT_EPSILON ) );
+		M256_ABS_MASK = ( _mm256_castsi256_ps(_mm256_set1_epi32(0x7fffffff)) );
+		InitializedResampleAVX2 = true;
+	}
+}
 
 void TJS_USERENTRY ResamplerAVX2FixFunc( void* p );
 void TJS_USERENTRY ResamplerAVX2Func( void* p );
