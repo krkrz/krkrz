@@ -249,7 +249,7 @@ DEFINE_BLEND_FUNCTION_MIN_VARIATION( PsDiffBlend, ps_diff_blend )
 DEFINE_BLEND_FUNCTION_MIN_VARIATION( PsDiff5Blend, ps_diff5_blend )
 DEFINE_BLEND_FUNCTION_MIN_VARIATION( PsExclusionBlend, ps_exclusion_blend )
 */
-
+extern void TVPInitializeResampleAVX2();
 void TVPGL_AVX2_Init() {
 	if( TVPCPUType & TVP_CPU_HAS_AVX2 ) {
 		TVPAdditiveAlphaBlend = TVPAdditiveAlphaBlend_avx2_c;
@@ -375,6 +375,7 @@ void TVPGL_AVX2_Init() {
 		TVPInterpLinTransCopy = TVPInterpLinTransCopy_avx2_c;
 		TVPInterpLinTransConstAlphaBlend = TVPInterpLinTransConstAlphaBlend_avx2_c;
 #endif
+		TVPInitializeResampleAVX2();
 	}
 }
 

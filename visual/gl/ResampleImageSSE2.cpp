@@ -21,14 +21,30 @@
 #include "WeightFunctorSSE.h"
 #include "ResampleImageInternal.h"
 
-static const __m128 M128_PS_STEP( _mm_set_ps(3.0f,2.0f,1.0f,0.0f) );
-static const __m128 M128_PS_4_0( _mm_set1_ps( 4.0f ) );
-static const __m128 M128_PS_FIXED15( _mm_set1_ps( (float)(1<<15) ) );
-static const __m128i M128_U32_FIXED_ROUND( (_mm_set1_epi32(0x00200020)) );
-static const __m128i M128_U32_FIXED_COLOR_MASK( (_mm_set1_epi32(0x00ff00ff)) );
-static const __m128i M128_U32_FIXED_COLOR_MASK8( (_mm_set1_epi32(0x000000ff)) );
-static const __m128 M128_EPSILON( _mm_set1_ps( FLT_EPSILON ) );
-static const __m128 M128_ABS_MASK( _mm_castsi128_ps(_mm_set1_epi32(0x7fffffff)) );
+static __m128 M128_PS_STEP( _mm_set_ps(3.0f,2.0f,1.0f,0.0f) );
+static __m128 M128_PS_4_0( _mm_set1_ps( 4.0f ) );
+static __m128 M128_PS_FIXED15( _mm_set1_ps( (float)(1<<15) ) );
+static __m128i M128_U32_FIXED_ROUND( (_mm_set1_epi32(0x00200020)) );
+static __m128i M128_U32_FIXED_COLOR_MASK( (_mm_set1_epi32(0x00ff00ff)) );
+static __m128i M128_U32_FIXED_COLOR_MASK8( (_mm_set1_epi32(0x000000ff)) );
+static __m128 M128_EPSILON( _mm_set1_ps( FLT_EPSILON ) );
+static __m128 M128_ABS_MASK( _mm_castsi128_ps(_mm_set1_epi32(0x7fffffff)) );
+
+static bool InitializedResampleSSE2 = false;
+void TVPInitializeResampleSSE2() {
+	if( !InitializedResampleSSE2) {
+		M128_PS_STEP = ( _mm_set_ps(3.0f,2.0f,1.0f,0.0f) );
+		M128_PS_4_0 = ( _mm_set1_ps( 4.0f ) );
+		M128_PS_FIXED15 = ( _mm_set1_ps( (float)(1<<15) ) );
+		M128_U32_FIXED_ROUND = ( (_mm_set1_epi32(0x00200020)) );
+		M128_U32_FIXED_COLOR_MASK = ( (_mm_set1_epi32(0x00ff00ff)) );
+		M128_U32_FIXED_COLOR_MASK8 = ( (_mm_set1_epi32(0x000000ff)) );
+		M128_EPSILON = ( _mm_set1_ps( FLT_EPSILON ) );
+		M128_ABS_MASK = ( _mm_castsi128_ps(_mm_set1_epi32(0x7fffffff)) );
+		InitializedResampleSSE2 = true;
+	}
+}
+
 void TJS_USERENTRY ResamplerSSE2FixFunc( void* p );
 void TJS_USERENTRY ResamplerSSE2Func( void* p );
 
