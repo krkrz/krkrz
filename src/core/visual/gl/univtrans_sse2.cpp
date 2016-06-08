@@ -306,6 +306,7 @@ static inline void sse2_univ_trans_switch(tjs_uint32 *dest, const tjs_uint32 *sr
 				dest++; src1++; src2++, rule++;
 			}
 		}
+		len -= count;
 	}
 	tjs_uint32 rem = (len>>2)<<2;
 	tjs_uint32* limit = dest + rem;

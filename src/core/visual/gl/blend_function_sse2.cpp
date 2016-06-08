@@ -707,6 +707,7 @@ void sse2_interpolation_line_transform_copy(tjs_uint32 *dest, tjs_int len, const
 			mxy = _mm_add_epi32( mxy, mstep1 );	// sx,sy += stepx,stepy
 			dest++;
 		}
+		len -= count;
 	}
 
 	tjs_uint32 rem = (len>>2)<<2;
