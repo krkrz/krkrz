@@ -196,12 +196,12 @@ bool TVPCheckProcessLog()
 {
 	// process object hash map log
 	int argc = Application->ArgC;
-	char** argv = Application->ArgV;
+	wchar_t** argv = Application->ArgV;
 
 	tjs_int i;
 	for(i=1; i<argc; i++)
 	{
-		if(!strcmp(argv[i], "-@processohmlog")) // this does not refer TVPGetCommandLine
+		if(!wcscmp(argv[i], L"-@processohmlog")) // this does not refer TVPGetCommandLine
 		{
 			// create object hash map
 			TJSAddRefObjectHashMap();

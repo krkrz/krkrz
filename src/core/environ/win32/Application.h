@@ -10,7 +10,7 @@ std::wstring ExePath();
 
 // å©í ÇµÇÃÇÊÇ¢ï˚ñ@Ç…ïœçXÇµÇΩï˚Ç™ó«Ç¢
 extern int _argc;
-extern char ** _argv;
+extern wchar_t ** _wargv;
 
 enum {
 	mrOk,
@@ -86,7 +86,7 @@ private:
 public:
 	tTVPApplication();
 	~tTVPApplication();
-	bool StartApplication( int argc, char* argv[] );
+	bool StartApplication( int argc, wchar_t* argv[] );
 
 	void PrintConsole( const wchar_t* mes, unsigned long len, bool iserror = false );
 	bool IsAttachConsole() { return is_attach_console_; }
@@ -137,7 +137,7 @@ public:
 	HWND GetMainWindowHandle() const;
 
 	int ArgC;
-	char ** ArgV;
+	wchar_t ** ArgV;
 
 	void PostMessageToMainWindow(UINT message, WPARAM wParam, LPARAM lParam);
 
