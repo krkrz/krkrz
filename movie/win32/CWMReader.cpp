@@ -320,7 +320,7 @@ HRESULT CWMReader::OpenStream( IStream *stream )
 		if( m_WmvDll.IsLoaded() == false )
 			return m_WmvDll.GetLastError();
 
-		typedef HRESULT (*FuncWMCreateSyncReader)( IUnknown *pUnkCert, DWORD dwRights, IWMSyncReader **ppSyncReader );
+		typedef HRESULT (WINAPI *FuncWMCreateSyncReader)( IUnknown *pUnkCert, DWORD dwRights, IWMSyncReader **ppSyncReader );
 		FuncWMCreateSyncReader pWMCreateSyncReader = (FuncWMCreateSyncReader)m_WmvDll.GetProcAddress("WMCreateSyncReader");
 		if( pWMCreateSyncReader == NULL )
 			return m_WmvDll.GetLastError();
