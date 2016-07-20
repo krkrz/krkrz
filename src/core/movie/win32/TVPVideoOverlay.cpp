@@ -98,9 +98,10 @@ tTVPDSFilterHandlerType* TVPGetDSFilterHandler( const GUID& guid )
 	tTJSHashTable<ttstr, tTVPDSFilterHandlerType>::tIterator i;
 	for(i = TVPDSFilterType.Hash.GetFirst(); !i.IsNull(); i++)
 	{
-		handler = & i.GetValue();
-		if( IsEqualGUID( guid, *handler->Guid ) )
+		tTVPDSFilterHandlerType *value = & i.GetValue();
+		if( IsEqualGUID( guid, *value->Guid ) )
 		{
+			handler = value;
 			break;
 		}
 	}
