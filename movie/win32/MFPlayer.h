@@ -35,6 +35,8 @@ protected:
 	bool		HasVideo;
 	float		PlayRate;
 	float		ZoomLevel;	// (1.0 == 100%)
+	long		AudioVolumeValue;
+	long		AudioBalanceValue;
 
 	UINT32		FPSNumerator;
 	UINT32		FPSDenominator;
@@ -87,6 +89,38 @@ protected:
 		return hr;
 	}
 	*/
+	float CalcLeftVolume() const {
+		// Attenuation (dB) = 20 * log10(Level)
+		// Level = 10 ^ dB / 20
+		float level = std::pow( 10.0f, AudioVolumeValue / (20.0f*100) );
+		if( AudioBalanceValue > 0 ) {
+			float balance = std::pow( 10.0f, (-AudioBalanceValue) / (20.0f*100) );
+			level *= balance;
+		}
+		if( level < 0.0f ) level = 0.0f;
+		if( level > 1.0f ) level = 1.0f;
+		return level;
+	}
+
+	float CalcRightVolume() const {
+		// Attenuation (dB) = 20 * log10(Level)
+		// Level = 10 ^ dB / 20
+		float level = std::pow( 10.0f, AudioVolumeValue / (20.0f*100) );
+		if( AudioBalanceValue < 0 ) {
+			float balance = std::pow( 10.0f, AudioBalanceValue / (20.0f*100) );
+			level *= balance;
+		}
+		if( level < 0.0f ) level = 0.0f;
+		if( level > 1.0f ) level = 1.0f;
+		return level;
+	}
+	float CalcVolume() const {
+		float level = std::pow( 10.0f, AudioVolumeValue / (20.0f*100) );
+		if( level < 0.0f ) level = 0.0f;
+		if( level > 1.0f ) level = 1.0f;
+		return level;
+	}
+	HRESULT SetVolumeToMF();
 public:
 	IMFMediaSession* GetMediaSession() { return MediaSession; }
 

@@ -138,6 +138,10 @@ tTVPMFPlayer::tTVPMFPlayer() {
 	//Stream = NULL;
 
 	HnsDuration = 0;
+
+	
+	AudioVolumeValue = 0;
+	AudioBalanceValue = 0;
 	//StartPositionSpecify = false;
 }
 tTVPMFPlayer::~tTVPMFPlayer() {
@@ -586,6 +590,8 @@ void __stdcall tTVPMFPlayer::SetVisible(bool b) {
 void __stdcall tTVPMFPlayer::Play() {
 	HRESULT hr = E_FAIL;
 	if( MediaSession.p ) {
+		SetVolumeToMF();
+
 		PROPVARIANT varStart;
 		PropVariantInit(&varStart);
 		/*
@@ -810,38 +816,44 @@ void __stdcall tTVPMFPlayer::GetPlayRate( double *rate ) {
 		TVPThrowExceptionMessage(L"Faild to get play rate.");
 	}
 }
-// ステレオの場合のみバランスは有効
-void __stdcall tTVPMFPlayer::SetAudioBalance( long balance ) {
+HRESULT tTVPMFPlayer::SetVolumeToMF() {
 	HRESULT hr = S_OK;
 	if( AudioVolume.p ) {
 		UINT32 count;
 		if( SUCCEEDED(hr = AudioVolume->GetChannelCount( &count )) ) {
 			if( count == 2 ) {
 				float channels[2];
-				float left = 1.0f;
-				float right = 1.0f;
-				if( balance == 0 ) {
-					left = right = 1.0f;
-				} else if( balance > 0 ) {
-					left = (float)(10000 - balance) / 10000.0f;
-					if( left > 1.0f ) left = 1.0f;
-					else if( left < 0.0f ) left = 0.0f;
-				} else {
-					right = (float)(10000 + balance) / 10000.0f;
-					if( right > 1.0f ) right = 1.0f;
-					else if( right < 0.0f ) right = 0.0f;
-				}
-				channels[0] = left;
-				channels[1] = right;
+				channels[0] = CalcLeftVolume();
+				channels[1] = CalcRightVolume();
 				hr = AudioVolume->SetAllVolumes( count, &channels[0] );
+			} else if( count == 1 ) {
+				hr = AudioVolume->SetChannelVolume( 0, CalcVolume() );
+			} else {
+				float volume = CalcVolume();
+				for( UINT32 i = 0; i < count; i++ ) {
+					hr = AudioVolume->SetChannelVolume( i, volume );
+				}
 			}
 		}
 	}
-	if( FAILED(hr) ) {
-		TVPThrowExceptionMessage(L"Faild to set audio balance.");
+	return hr;
+}
+// ステレオの場合のみバランスは有効
+void __stdcall tTVPMFPlayer::SetAudioBalance( long balance ) {
+	if( AudioBalanceValue != balance ) {
+		if( balance < -10000 ) AudioBalanceValue = -10000;
+		else if( balance > 10000 ) AudioBalanceValue = 10000;
+		else AudioBalanceValue = balance;
+
+		HRESULT hr = SetVolumeToMF();
+		if( FAILED(hr) ) {
+			TVPThrowExceptionMessage(L"Faild to set audio balance.");
+		} 
 	}
 }
 void __stdcall tTVPMFPlayer::GetAudioBalance( long *balance ) {
+	*balance = AudioBalanceValue;
+	/*
 	HRESULT hr = S_OK;
 	*balance = 0;
 	if( AudioVolume.p ) {
@@ -865,20 +877,23 @@ void __stdcall tTVPMFPlayer::GetAudioBalance( long *balance ) {
 	if( FAILED(hr) ) {
 		TVPThrowExceptionMessage(L"Faild to get audio balance.");
 	}
+	*/
 }
 void __stdcall tTVPMFPlayer::SetAudioVolume( long volume ) {
-	HRESULT hr = E_FAIL;
-	if( SimpleAudioVolume.p ) {
-		float v = (10000 + volume)/10000.0f;
-		if( v > 1.0f ) v = 1.0f;
-		else if( v < 0.0f ) v = 0.0f;
-		hr = SimpleAudioVolume->SetMasterVolume( v );
-	}
-	if( FAILED(hr) ) {
-		TVPThrowExceptionMessage(L"Faild to set audio volume.");
+	if( AudioVolumeValue != volume ) {
+		if( volume > 0 ) AudioVolumeValue = 0;
+		else if( volume < -10000 ) AudioVolumeValue = -10000;
+		else AudioVolumeValue = volume;
+		
+		HRESULT hr = SetVolumeToMF();
+		if( FAILED(hr) ) {
+			TVPThrowExceptionMessage(L"Faild to set audio volume.");
+		} 
 	}
 }
 void __stdcall tTVPMFPlayer::GetAudioVolume( long *volume ) {
+	*volume = AudioVolumeValue;
+	/*
 	HRESULT hr = E_FAIL;
 	float vol = 1.0f;
 	if( SimpleAudioVolume.p ) {
@@ -891,6 +906,7 @@ void __stdcall tTVPMFPlayer::GetAudioVolume( long *volume ) {
 	} else {
 		*volume = (long)((vol - 1.0f) * 10000);
 	}
+	*/
 }
 
 void __stdcall tTVPMFPlayer::GetNumberOfAudioStream( unsigned long *streamCount ){
