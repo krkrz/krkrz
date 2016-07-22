@@ -592,7 +592,7 @@ struct sse2_ch_blur_add_mul_copy65_functor {
 		, levello_(_mm_set1_epi16(level&0xffff)), levelhi_(_mm_set1_epi16(level>>16)) {}
 	inline tjs_uint8 operator()( tjs_uint8 d, tjs_uint8 s ) const {
 		tjs_int a = d+(s * level32_ >> 18);
-		if(a>=255) a = 255;
+		if(a>=64) a = 64;
 		return (tjs_uint8)a;
 	}
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s ) const {
@@ -739,11 +739,23 @@ static inline void sse2_ch_blur_copy_func( tjs_uint8 *dest, tjs_int destpitch, t
 		}
 	}
 }
+extern void TVP_ch_blur_copy65( tjs_uint8 *dest, tjs_int destpitch, tjs_int destwidth, tjs_int destheight, const tjs_uint8 * src, tjs_int srcpitch, tjs_int srcwidth, tjs_int srcheight, tjs_int blurwidth, tjs_int blurlevel );
+extern void TVP_ch_blur_copy( tjs_uint8 *dest, tjs_int destpitch, tjs_int destwidth, tjs_int destheight, const tjs_uint8 * src, tjs_int srcpitch, tjs_int srcwidth, tjs_int srcheight, tjs_int blurwidth, tjs_int blurlevel );
 void TVPChBlurCopy65_sse2_c( tjs_uint8 *dest, tjs_int destpitch, tjs_int destwidth, tjs_int destheight, const tjs_uint8 * src, tjs_int srcpitch, tjs_int srcwidth, tjs_int srcheight, tjs_int blurwidth, tjs_int blurlevel ) {
-	sse2_ch_blur_copy_func<sse2_ch_blur_add_mul_copy65_functor>( dest, destpitch, destwidth, destheight, src, srcpitch, srcwidth, srcheight, blurwidth, blurlevel );
+	tjs_uint64 vmax = ((1ULL<<18)*(blurwidth+1)*blurlevel)>>8;
+	if( vmax >= (1<<24) ) {
+		TVP_ch_blur_copy65( dest, destpitch, destwidth, destheight, src, srcpitch, srcwidth, srcheight, blurwidth, blurlevel );
+	} else {
+		sse2_ch_blur_copy_func<sse2_ch_blur_add_mul_copy65_functor>( dest, destpitch, destwidth, destheight, src, srcpitch, srcwidth, srcheight, blurwidth, blurlevel );
+	}
 }
 void TVPChBlurCopy_sse2_c( tjs_uint8 *dest, tjs_int destpitch, tjs_int destwidth, tjs_int destheight, const tjs_uint8 * src, tjs_int srcpitch, tjs_int srcwidth, tjs_int srcheight, tjs_int blurwidth, tjs_int blurlevel ) {
-	sse2_ch_blur_copy_func<sse2_ch_blur_add_mul_copy_functor>( dest, destpitch, destwidth, destheight, src, srcpitch, srcwidth, srcheight, blurwidth, blurlevel );
+	tjs_uint64 vmax = ((1ULL<<18)*(blurwidth+1)*blurlevel)>>8;
+	if( vmax >= (1<<24) ) {
+		TVP_ch_blur_copy( dest, destpitch, destwidth, destheight, src, srcpitch, srcwidth, srcheight, blurwidth, blurlevel );
+	} else {
+		sse2_ch_blur_copy_func<sse2_ch_blur_add_mul_copy_functor>( dest, destpitch, destwidth, destheight, src, srcpitch, srcwidth, srcheight, blurwidth, blurlevel );
+	}
 }
 //TVPChBlurMulCopy65 = TVPChBlurMulCopy65_sse2_c;
 //TVPChBlurAddMulCopy65 = TVPChBlurAddMulCopy65_sse2_c;
