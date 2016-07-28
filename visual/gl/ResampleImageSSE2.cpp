@@ -835,7 +835,7 @@ public:
 			}
 			{	// SSE
 				__m128i color = _mm_cvtps_epi32( color_elm );
-				color = _mm_packus_epi32( color, color );
+				color = _mm_packs_epi32( color, color );
 				color = _mm_packus_epi16( color, color );
 				*dstbits = _mm_cvtsi128_si32( color );
 			}
