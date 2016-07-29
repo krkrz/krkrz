@@ -2,6 +2,7 @@
 #include "tjsTypes.h"
 #include "tvpgl.h"
 #include "tvpgl_ia32_intf.h"
+#include "tvpgl_mathutil.h"
 #include "simd_def_x86x64.h"
 #include <string.h>
 
@@ -690,17 +691,6 @@ void TVPChBlurMulCopy_sse2_c( tjs_uint8 *dest, const tjs_uint8 *src, tjs_int len
 	blend_func_sse2( dest, src, len, func );
 }
 
-/* fast_int_hypot from http://demo.and.or.jp/makedemo/effect/math/hypot/fast_hypot.c */
-static inline tjs_uint fast_int_hypot(tjs_int lx, tjs_int ly) {
-	tjs_uint len1, len2,t,length;
-	if(lx<0) lx = -lx;
-	if(ly<0) ly = -ly;
-	if (lx >= ly) { len1 = lx ; len2 = ly; }
-	else len1 = ly ; len2 = lx;
-	t = len2 + (len2 >> 1) ;
-	length = len1 - (len1 >> 5) - (len1 >> 7) + (t >> 2) + (t >> 6) ;
-	return length;
-}
 /* simple blur for character data */
 /* shuld be more optimized */
 template<typename functor>
