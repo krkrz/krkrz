@@ -24,6 +24,7 @@
 #include "tjsTypes.h"
 #include "tvpgl.h"
 #include "tvpgl_ia32_intf.h"
+#include "tvpgl_mathutil.h"
 
 extern "C" {
 extern unsigned char TVPDivTable[256*256];
@@ -355,17 +356,6 @@ DEFINE_CONVERT_FUNCTION( convet_alpha_to_premulalpha );
 DEFINE_ALPHA_COPY_FUNCTION( bind_mask_to_main );
 DEFINE_CONVERT_FUNCTION( do_gray_scale );
 
-/* fast_int_hypot from http://demo.and.or.jp/makedemo/effect/math/hypot/fast_hypot.c */
-static inline tjs_uint fast_int_hypot(tjs_int lx, tjs_int ly) {
-	tjs_uint len1, len2,t,length;
-	if(lx<0) lx = -lx;
-	if(ly<0) ly = -ly;
-	if (lx >= ly) { len1 = lx ; len2 = ly; }
-	else len1 = ly ; len2 = lx;
-	t = len2 + (len2 >> 1) ;
-	length = len1 - (len1 >> 5) - (len1 >> 7) + (t >> 2) + (t >> 6) ;
-	return length;
-}
 /* simple blur for character data */
 /* shuld be more optimized */
 template<typename functor>
