@@ -163,9 +163,25 @@ void* tTVPBitmapBitsAlloc::Alloc( tjs_uint size, tjs_uint width, tjs_uint height
 	tjs_uint allocbytes = 16 + size + sizeof(tTVPLayerBitmapMemoryRecord) + sizeof(tjs_uint32)*2;
 
 	ptr = ptrorg = (tjs_uint8*)Allocator->allocate(allocbytes);
-	if(!ptr) TVPThrowExceptionMessage(TVPCannotAllocateBitmapBits,
-		TJS_W("at TVPAllocBitmapBits"), ttstr((tjs_int)allocbytes) + TJS_W("(") +
+	if(!ptr) {
+		// Do GC
+		TVPDeliverCompactEvent(TVP_COMPACT_LEVEL_MAX);
+#ifdef WIN32
+		// Do compact CRT and Global Heap
+		HANDLE hHeap = ::GetProcessHeap();
+		if( hHeap ) {
+			::HeapCompact( hHeap, 0 );
+		}
+		HANDLE hCrtHeap = (HANDLE)_get_heap_handle();
+		if( hCrtHeap && hCrtHeap != hHeap ) {
+			::HeapCompact( hCrtHeap, 0 );
+		}
+#endif
+		ptr = ptrorg = (tjs_uint8*)Allocator->allocate(allocbytes);
+		if(!ptr) TVPThrowExceptionMessage(TVPCannotAllocateBitmapBits,
+			TJS_W("at TVPAllocBitmapBits"), ttstr((tjs_int)allocbytes) + TJS_W("(") +
 			ttstr((int)width) + TJS_W("x") + ttstr((int)height) + TJS_W(")"));
+	}
 	// align to a paragraph ( 16-bytes )
 	ptr += 16 + sizeof(tTVPLayerBitmapMemoryRecord);
 	*reinterpret_cast<tTJSPointerSizedInteger*>(&ptr) >>= 4;
