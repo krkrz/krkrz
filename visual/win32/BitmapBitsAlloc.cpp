@@ -13,7 +13,7 @@ public:
 	BasicAllocator() {
 		TVPAddLog( TJS_W("(info) Use malloc for Bitmap") );
 	}
-	void* allocate( size_t size ) { return malloc(size); }
+	void* allocate( size_t size ) { return malloc(size); }	// Windows‚Å‚Í ::HeapAlloc( _get_heap_handle(), 0, size ); ‚Æ“¯‚¶‚Í‚¸
 	void free( void* mem ) { ::free( mem ); }
 };
 #ifdef WIN32
@@ -99,6 +99,24 @@ public:
 		}
 	}
 };
+class ProcessHeapAllocAllocator : public iTVPMemoryAllocator
+{
+public:
+	ProcessHeapAllocAllocator() {
+		TVPAddLog( TJS_W("(info) Use Process HeadAlloc allocater for Bitmap") );
+	}
+	void* allocate( size_t size ) {
+		void* result = ::HeapAlloc( ::GetProcessHeap(), 0, size );
+		if( result == NULL ) {
+			::HeapCompact( ::GetProcessHeap(), 0 );	// try compact
+			result = ::HeapAlloc( ::GetProcessHeap(), 0, size ); // retry
+		}
+		return result;
+	}
+	void free( void* mem ) {
+		::HeapFree(::GetProcessHeap(), 0, mem);
+	}
+};
 #endif
 
 iTVPMemoryAllocator* tTVPBitmapBitsAlloc::Allocator = NULL;
@@ -114,12 +132,15 @@ void tTVPBitmapBitsAlloc::InitializeAllocator() {
 				Allocator = new GlobalAllocAllocator();
 			else if(str == TJS_W("separateheap"))
 				Allocator = new HeapAllocAllocator();
+			else if(str == TJS_W("processheap"))
+				Allocator = new ProcessHeapAllocAllocator();
 			else    // malloc
 #endif
 				Allocator = new BasicAllocator();
 		} else {
 #ifdef WIN32
-			Allocator = new GlobalAllocAllocator();
+			//Allocator = new GlobalAllocAllocator();
+			Allocator = new ProcessHeapAllocAllocator();
 #else
 			Allocator = new BasicAllocator();
 #endif
