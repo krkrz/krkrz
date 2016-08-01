@@ -74,7 +74,7 @@ DEFINE_BLEND_VARIATION( alpha_blend )
 
 //------------------------------------------------------------------------------
 struct alpha_blend_a_functor {
-	premulalpha_blend_a_d_func blend_;
+	premulalpha_blend_a_a_func blend_;
 	alpha_to_premulalpha_func topremulalpha_;
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s ) const {
 		return blend_( d, topremulalpha_(s) );
