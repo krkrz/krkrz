@@ -659,7 +659,8 @@
 				"type":"select",
 				"user":true,
 				"values":[
-					{ "value":"globalalloc", "desc":"GlobalAllocで確保", "default":true },
+					{ "value":"processheap", "desc":"プロセスヒープを使用", "default":true },
+					{ "value":"globalalloc", "desc":"GlobalAllocで確保" },
 					{ "value":"separateheap", "desc":"分割ヒープを使用" },
 					{ "value":"malloc", "desc":"mallocを使用" }
 				]
