@@ -654,7 +654,7 @@
 			},
 			{
 				"caption":"ビットマップメモリ確保方式",
-				"description":"ビットマップ用のメモリをどのようにして確保するかを指定します。\n\n通常はglobalallocのままで問題ありません。",
+				"description":"ビットマップ用のメモリをどのようにして確保するかを指定します。\n\n通常はprocessheapのままで問題ありません。",
 				"name":"bitmapallocator",
 				"type":"select",
 				"user":true,
