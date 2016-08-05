@@ -350,6 +350,10 @@ void tTVPBasicDrawDevice::TryRecreateWhenDeviceLost()
 		if( hr == D3DERR_DEVICENOTRESET ) {
 			hr = Direct3DDevice->Reset(&D3dPP);
 		}
+		if( hr == D3DERR_DEVICELOST ) {
+			// •œ‹A‚Å‚«‚È‚¢
+			return;
+		}
 		if( FAILED(hr) ) {
 			success = CreateD3DDevice();
 		} else {
