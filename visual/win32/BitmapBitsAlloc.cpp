@@ -154,6 +154,7 @@ void tTVPBitmapBitsAlloc::FreeAllocator() {
 static tTVPAtExit
 	TVPUninitMessageLoad(TVP_ATEXIT_PRI_CLEANUP, tTVPBitmapBitsAlloc::FreeAllocator);
 
+extern void TVPHeapDump();
 void* tTVPBitmapBitsAlloc::Alloc( tjs_uint size, tjs_uint width, tjs_uint height ) {
 	if(size == 0) return NULL;
 	tTJSCriticalSectionHolder Lock(AllocCS);	// Lock
@@ -178,9 +179,12 @@ void* tTVPBitmapBitsAlloc::Alloc( tjs_uint size, tjs_uint width, tjs_uint height
 		}
 #endif
 		ptr = ptrorg = (tjs_uint8*)Allocator->allocate(allocbytes);
-		if(!ptr) TVPThrowExceptionMessage(TVPCannotAllocateBitmapBits,
-			TJS_W("at TVPAllocBitmapBits"), ttstr((tjs_int)allocbytes) + TJS_W("(") +
-			ttstr((int)width) + TJS_W("x") + ttstr((int)height) + TJS_W(")"));
+		if(!ptr) {
+			TVPHeapDump();
+			TVPThrowExceptionMessage(TVPCannotAllocateBitmapBits,
+				TJS_W("at TVPAllocBitmapBits"), ttstr((tjs_int)allocbytes) + TJS_W("(") +
+				ttstr((int)width) + TJS_W("x") + ttstr((int)height) + TJS_W(")"));
+		}
 	}
 	// align to a paragraph ( 16-bytes )
 	ptr += 16 + sizeof(tTVPLayerBitmapMemoryRecord);

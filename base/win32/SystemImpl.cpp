@@ -625,7 +625,7 @@ static void TVPOnApplicationActivate(bool activate_or_deactivate)
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-static void TVPHeapDump()
+void TVPHeapDump()
 {
 	tjs_char buff[128];
 	HANDLE heaps[100];
