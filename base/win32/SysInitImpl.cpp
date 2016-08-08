@@ -1190,8 +1190,8 @@ void TVPBeforeSystemInit()
 //---------------------------------------------------------------------------
 static void TVPDumpOptions();
 //---------------------------------------------------------------------------
-extern bool TVPEnableGlobalHeapCompaction;
 extern void TVPGL_SSE2_Init();
+extern void TVPAddGlobalHeapCompactCallback();
 static bool TVPHighTimerPeriod = false;
 static UINT TVPTimeBeginPeriodRes = 0;
 //---------------------------------------------------------------------------
@@ -1355,7 +1355,7 @@ void TVPAfterSystemInit()
 	if(TVPGetCommandLine(TJS_W("-ghcompact"), &opt)) {
 		ttstr str(opt);
 		if(str == TJS_W("yes") || str == TJS_W("true")) {
-			TVPEnableGlobalHeapCompaction = true;
+			TVPAddGlobalHeapCompactCallback();
 		}
 	}
 }
