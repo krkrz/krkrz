@@ -51,7 +51,11 @@ public:
 			if( size == 0 ) {
 				MEMORYSTATUSEX status = { sizeof(MEMORYSTATUSEX) };
 				::GlobalMemoryStatusEx(&status);
-				size = status.ullAvailVirtual / 2;
+				if( status.ullAvailVirtual < status.ullTotalPhys ) {
+					size = status.ullAvailVirtual / 2;
+				} else {
+					size = status.ullTotalPhys / 2;
+				}
 			}
 			while( HeapHandle == NULL && size > (1024*1024) ) {
 				HeapHandle = ::HeapCreate( HeapFlag, (SIZE_T)size, 0 );
