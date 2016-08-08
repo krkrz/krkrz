@@ -1190,8 +1190,8 @@ void TVPBeforeSystemInit()
 //---------------------------------------------------------------------------
 static void TVPDumpOptions();
 //---------------------------------------------------------------------------
-extern bool TVPEnableGlobalHeapCompaction;
 extern void TVPGL_SSE2_Init();
+extern void TVPAddGlobalHeapCompactCallback();
 static bool TVPHighTimerPeriod = false;
 static UINT TVPTimeBeginPeriodRes = 0;
 //---------------------------------------------------------------------------
@@ -1214,39 +1214,44 @@ void TVPAfterSystemInit()
 			limitmb = opt.AsInteger();
 	}
 
-
+	// 物理メモリより仮想メモリの方が小さい(32bitでメモリ搭載量が多い)場合、仮想メモリの方でキャッシュ計算する
+	MEMORYSTATUSEX status = { sizeof(MEMORYSTATUSEX) };
+	::GlobalMemoryStatusEx(&status);
+	tjs_uint64 totalMemory = TVPTotalPhysMemory;
+	if( totalMemory > status.ullTotalVirtual ) {
+		totalMemory = status.ullTotalVirtual;
+	}
 	if(limitmb == -1)
 	{
-		if(TVPTotalPhysMemory <= 32*1024*1024)
+		if(totalMemory <= 32*1024*1024)
 			TVPGraphicCacheSystemLimit = 0;
-		else if(TVPTotalPhysMemory <= 48*1024*1024)
+		else if(totalMemory <= 48*1024*1024)
 			TVPGraphicCacheSystemLimit = 0;
-		else if(TVPTotalPhysMemory <= 64*1024*1024)
+		else if(totalMemory <= 64*1024*1024)
 			TVPGraphicCacheSystemLimit = 0;
-		else if(TVPTotalPhysMemory <= 96*1024*1024)
+		else if(totalMemory <= 96*1024*1024)
 			TVPGraphicCacheSystemLimit = 4;
-		else if(TVPTotalPhysMemory <= 128*1024*1024)
+		else if(totalMemory <= 128*1024*1024)
 			TVPGraphicCacheSystemLimit = 8;
-		else if(TVPTotalPhysMemory <= 192*1024*1024)
+		else if(totalMemory <= 192*1024*1024)
 			TVPGraphicCacheSystemLimit = 12;
-		else if(TVPTotalPhysMemory <= 256*1024*1024)
+		else if(totalMemory <= 256*1024*1024)
 			TVPGraphicCacheSystemLimit = 20;
-		else if(TVPTotalPhysMemory <= 512*1024*1024)
+		else if(totalMemory <= 512*1024*1024)
 			TVPGraphicCacheSystemLimit = 40;
 		else
-			TVPGraphicCacheSystemLimit = tjs_uint64(TVPTotalPhysMemory / (1024*1024*10));	// cachemem = physmem / 10
+			TVPGraphicCacheSystemLimit = tjs_uint64(totalMemory / (1024*1024*10));	// cachemem = physmem / 10
 		TVPGraphicCacheSystemLimit *= 1024*1024;
 	}
 	else
 	{
 		TVPGraphicCacheSystemLimit = limitmb * 1024*1024;
 	}
-	// 32bit なので 512MB までに制限
+	// キャッシュは 512MB までに制限
 	if( TVPGraphicCacheSystemLimit >= 512*1024*1024 )
 		TVPGraphicCacheSystemLimit = 512*1024*1024;
 
-
-	if(TVPTotalPhysMemory <= 64*1024*1024)
+	if(totalMemory <= 64*1024*1024)
 		TVPSetFontCacheForLowMem();
 
 //	TVPGraphicCacheSystemLimit = 1*1024*1024; // DEBUG 
@@ -1355,7 +1360,7 @@ void TVPAfterSystemInit()
 	if(TVPGetCommandLine(TJS_W("-ghcompact"), &opt)) {
 		ttstr str(opt);
 		if(str == TJS_W("yes") || str == TJS_W("true")) {
-			TVPEnableGlobalHeapCompaction = true;
+			TVPAddGlobalHeapCompactCallback();
 		}
 	}
 }

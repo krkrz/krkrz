@@ -625,7 +625,7 @@ static void TVPOnApplicationActivate(bool activate_or_deactivate)
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-static void TVPHeapDump()
+void TVPHeapDump()
 {
 	tjs_char buff[128];
 	HANDLE heaps[100];
@@ -698,6 +698,35 @@ static void TVPHeapDump()
 			TJS_sprintf( buff, 128, L"  Unused: %d, size: %lld, overhead: %lld", unused.count, unused.total, unused.overhead );
 			TVPAddLog( buff );
 		}
+	}
+}
+//---------------------------------------------------------------------------
+struct tTVPGlobalHeapCompactCallback : public tTVPCompactEventCallbackIntf
+{
+	virtual void TJS_INTF_METHOD OnCompact(tjs_int level)
+	{
+		if(level >= TVP_COMPACT_LEVEL_IDLE)
+		{	// Do compact CRT and Global Heap
+			HANDLE hHeap = ::GetProcessHeap();
+			if( hHeap ) {
+				::HeapCompact( hHeap, 0 );
+			}
+			HANDLE hCrtHeap = (HANDLE)_get_heap_handle();
+			if( hCrtHeap && hCrtHeap != hHeap ) {
+				::HeapCompact( hCrtHeap, 0 );
+			}
+		}
+	}
+} static TVPGlobalHeapCompactCallback;
+static bool TVPGlobalHeapCompactCallbackInit = false;
+//---------------------------------------------------------------------------
+void TVPAddGlobalHeapCompactCallback()
+{
+	// compact interface initialization
+	if(!TVPGlobalHeapCompactCallbackInit)
+	{
+		TVPAddCompactEventHook(&TVPGlobalHeapCompactCallback);
+		TVPGlobalHeapCompactCallbackInit = true;
 	}
 }
 //---------------------------------------------------------------------------

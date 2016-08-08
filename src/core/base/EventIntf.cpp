@@ -1115,7 +1115,6 @@ void TVPRemoveContinuousHandler(tTJSVariantClosure clo)
 // or etc ...
 //---------------------------------------------------------------------------
 static std::vector<tTVPCompactEventCallbackIntf *> TVPCompactEventVector;
-bool TVPEnableGlobalHeapCompaction = false;
 //---------------------------------------------------------------------------
 void TVPAddCompactEventHook(tTVPCompactEventCallbackIntf *cb)
 {
@@ -1171,19 +1170,6 @@ void TVPDeliverCompactEvent(tjs_int level)
 			}
 		}
 	}
-#ifdef WIN32
-	if( level >= TVP_COMPACT_LEVEL_MAX && TVPEnableGlobalHeapCompaction )
-	{	// Do compact CRT and Global Heap
-		HANDLE hHeap = ::GetProcessHeap();
-		if( hHeap ) {
-			::HeapCompact( hHeap, 0 );
-		}
-		HANDLE hCrtHeap = (HANDLE)_get_heap_handle();
-		if( hCrtHeap && hCrtHeap != hHeap ) {
-			::HeapCompact( hCrtHeap, 0 );
-		}
-	}
-#endif
 }
 //---------------------------------------------------------------------------
 
