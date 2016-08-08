@@ -678,7 +678,7 @@
 					{ "value":"128", "desc":"128MB" },
 					{ "value":"256", "desc":"256MB" },
 					{ "value":"512", "desc":"512MB" },
-					{ "value":"1024", "desc":"1GMB" },
+					{ "value":"1024", "desc":"1GB" },
 					{ "value":"2048", "desc":"2GB" }
 				]
 			}
