@@ -51,24 +51,12 @@ public:
 			if( size == 0 ) {
 				MEMORYSTATUSEX status = { sizeof(MEMORYSTATUSEX) };
 				::GlobalMemoryStatusEx(&status);
-				size = status.ullAvailVirtual;
-				if( size > (512LL*1024*1024) ) {
-					size -= (128LL*1024*1024);
-				} else {
-					size /= 2;
-				}
-				if( size > (512LL*1024*1024) ) {
-					size = (512LL*1024*1024); // 512MB‚É§ŒÀ
-				}
+				size = status.ullAvailVirtual / 2;
 			}
 			while( HeapHandle == NULL && size > (1024*1024) ) {
 				HeapHandle = ::HeapCreate( HeapFlag, (SIZE_T)size, 0 );
 				if( HeapHandle == NULL ) {
-					if( size > (128LL*1024*1024) ) {
-						size -= (128LL*1024*1024);
-					} else {
-						size /= 2;
-					}
+					size /= 2;
 				}
 			} 
 		}
