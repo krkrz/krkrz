@@ -119,6 +119,17 @@
 					{ "value":"no", "desc":"しない", "default":true },
 					{ "value":"yes", "desc":"する" }
 				]
+			},
+			{
+				"caption":"プロセス・CRTヒープのコンパクションを行う",
+				"description":"ガベージ・コレクションが実行される時、プロセス・CRTヒープのコンパクションも行います。\n\nメモリ不足エラーが頻発する時に有効にすると改善する可能性がありますが、コンパクション実行に少し処理時間がかかります。",
+				"name":"ghcompact",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"no", "desc":"しない", "default":true },
+					{ "value":"yes", "desc":"する" }
+				]
 			}
 		]
 	},
