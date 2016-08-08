@@ -701,6 +701,35 @@ static void TVPHeapDump()
 	}
 }
 //---------------------------------------------------------------------------
+struct tTVPGlobalHeapCompactCallback : public tTVPCompactEventCallbackIntf
+{
+	virtual void TJS_INTF_METHOD OnCompact(tjs_int level)
+	{
+		if(level >= TVP_COMPACT_LEVEL_IDLE)
+		{	// Do compact CRT and Global Heap
+			HANDLE hHeap = ::GetProcessHeap();
+			if( hHeap ) {
+				::HeapCompact( hHeap, 0 );
+			}
+			HANDLE hCrtHeap = (HANDLE)_get_heap_handle();
+			if( hCrtHeap && hCrtHeap != hHeap ) {
+				::HeapCompact( hCrtHeap, 0 );
+			}
+		}
+	}
+} static TVPGlobalHeapCompactCallback;
+static bool TVPGlobalHeapCompactCallbackInit = false;
+//---------------------------------------------------------------------------
+void TVPAddGlobalHeapCompactCallback()
+{
+	// compact interface initialization
+	if(!TVPGlobalHeapCompactCallbackInit)
+	{
+		TVPAddCompactEventHook(&TVPGlobalHeapCompactCallback);
+		TVPGlobalHeapCompactCallbackInit = true;
+	}
+}
+//---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
 // TVPCreateNativeClass_System
