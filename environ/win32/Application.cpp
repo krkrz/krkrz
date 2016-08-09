@@ -78,7 +78,7 @@ bool TVPCheckPrintDataPath();
 void TVPOnError();
 
 int _argc;
-char ** _argv;
+tjs_char ** _wargv;
 extern void TVPInitCompatibleNativeFunctions();
 extern void TVPLoadMessage();
 
@@ -189,7 +189,7 @@ void AcceleratorKey::DelKey( WORD id ) {
 	keys_ = table;
 }
 
-int APIENTRY WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow ) {
+int APIENTRY wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow ) {
 	try {
 		CheckMemoryLeaksStart();
 		// ウォッチで _crtBreakAlloc にセットする
@@ -201,11 +201,11 @@ int APIENTRY WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		TVPLoadMessage();
 
 		_argc = __argc;
-		_argv = __argv;
+		_wargv = __wargv;
 
 		MouseCursor::Initialize();
 		Application = new tTVPApplication();
-		Application->StartApplication( __argc, __argv );
+		Application->StartApplication( __argc, __wargv );
 	
 		// delete application and exit forcely
 		// this prevents ugly exception message on exit
@@ -311,13 +311,13 @@ const wchar_t* SECodeToMessage( unsigned int code ) {
 	return L"Unknown";
 }
 
-bool tTVPApplication::StartApplication( int argc, char* argv[] ) {
+bool tTVPApplication::StartApplication( int argc, tjs_char* argv[] ) {
 	_set_se_translator(se_translator_function);
 
 	ArgC = argc;
 	ArgV = argv;
 	for( int i = 0; i < argc; i++ ) {
-		if(!strcmp(argv[i], "-@processohmlog")) {
+		if(!TJS_strcmp(argv[i], TJS_W("-@processohmlog"))) {
 			has_map_report_process_ = true;
 		}
 	}
