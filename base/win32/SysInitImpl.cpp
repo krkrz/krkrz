@@ -1009,14 +1009,14 @@ void TVPBeforeSystemInit()
 			TJS_strcpy(exeDir, IncludeTrailingBackslash(ExtractFileDir(ExePath())).c_str());
 			for(tjs_int i = 1; i<_argc; i++)
 			{
-				if(_argv[i][0] == '-' && _argv[i][1] == '-' && _argv[i][2] == 0)
+				if(_wargv[i][0] == TJS_W('-') && _wargv[i][1] == TJS_W('-') && _wargv[i][2] == 0)
 					break;
 
-				if(_argv[i][0] != '-')
+				if(_wargv[i][0] != TJS_W('-'))
 				{
 					// TODO: set the current directory
 					::SetCurrentDirectory( exeDir );
-					TJS_strncpy(buf, ttstr(_argv[i]).c_str(), MAX_PATH-1);
+					TJS_strncpy(buf, ttstr(_wargv[i]).c_str(), MAX_PATH-1);
 					buf[MAX_PATH-1] = TJS_W('\0');
 					if(DirectoryExists(buf)) // is directory?
 						TJS_strcat(buf, TJS_W("\\"));
@@ -1573,22 +1573,22 @@ static void PushAllCommandlineArguments()
 		if(argument_stopped)
 		{
 			ttstr arg_name_and_value = TJS_W("-arg") + ttstr(file_argument_count) + TJS_W("=")
-				+ ttstr(_argv[i]);
+				+ ttstr(_wargv[i]);
 			file_argument_count++;
 			TVPProgramArguments.push_back(arg_name_and_value);
 		}
 		else
 		{
-			if(_argv[i][0] == '-')
+			if(_wargv[i][0] == TJS_W('-'))
 			{
-				if(_argv[i][1] == '-' && _argv[i][2] == 0)
+				if(_wargv[i][1] == TJS_W('-') && _wargv[i][2] == 0)
 				{
 					// argument stopper
 					argument_stopped = true;
 				}
 				else
 				{
-					ttstr value(_argv[i]);
+					ttstr value(_wargv[i]);
 					if(!TJS_strchr(value.c_str(), TJS_W('=')))
 						value += TJS_W("=yes");
 					TVPProgramArguments.push_back(TVPParseCommandLineOne(value));
@@ -1758,7 +1758,7 @@ bool TVPCheckPrintDataPath()
 	// print current datapath to stdout, then exit
 	for(int i=1; i<_argc; i++)
 	{
-		if(!strcmp(_argv[i], "-printdatapath")) // this does not refer TVPGetCommandLine
+		if(!TJS_strcmp(_wargv[i], TJS_W("-printdatapath"))) // this does not refer TVPGetCommandLine
 		{
 			TVPInitProgramArgumentsAndDataPath(true);
 			wprintf(L"%s\n", TVPNativeDataPath.c_str());
@@ -1888,7 +1888,7 @@ bool TVPExecuteUserConfig()
 	bool process = false;
 	for(i=1; i<_argc; i++)
 	{
-		if(!strcmp(_argv[i], "-userconf")) // this does not refer TVPGetCommandLine
+		if(!TJS_strcmp(_wargv[i], TJS_W("-userconf"))) // this does not refer TVPGetCommandLine
 			process = true;
 	}
 
