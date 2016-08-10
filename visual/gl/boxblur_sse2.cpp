@@ -316,12 +316,12 @@ struct sse2_box_blur_avg_16_d_sse {
 		fa = _mm_rcp_ps( fa );
 		// fa = m128_rcp_22bit_ps( fa ); // 精度上げるのなら
 		__m128 fa1 = fa;
-		fa1 = _mm_shuffle_ps( fa1, fa1, _MM_SHUFFLE( 0, 0, 0, 0 ) );
+		fa1 = _mm_shuffle_ps( fa1, fa1, _MM_SHUFFLE( 2, 2, 2, 2 ) );
 		fmsum1 = _mm_mul_ps( fmsum1, f255_ );
 		fmsum1 = _mm_mul_ps( fmsum1, fa1 );
 		msum1 = _mm_cvttps_epi32( fmsum1 );
 
-		fa = _mm_shuffle_ps( fa, fa, _MM_SHUFFLE( 2, 2, 2, 2 ) );
+		fa = _mm_shuffle_ps( fa, fa, _MM_SHUFFLE( 0, 0, 0, 0 ) );
 		msum0 = _mm_unpacklo_epi16( msum0, zero_ );	// 16bit -> 32bit
 		__m128 fmsum0 = _mm_cvtepi32_ps(msum0);
 		fmsum0 = _mm_mul_ps( fmsum0, f255_ );
@@ -344,9 +344,8 @@ struct sse2_box_blur_avg_16_d_sse {
 		__m128 fmsum = _mm_cvtepi32_ps(msum);
 		__m128 fa = _mm_cvtepi32_ps(alpha);
 		fa = _mm_rcp_ps( fa );
-		//fa = _mm_mul_ps( fa, f255_ );
-		//fa = _mm_shuffle_ps( fa, fa, _MM_SHUFFLE( 0, 0, 0, 0 ) );
-		fa = _mm_shuffle_ps( fa, fa, _MM_SHUFFLE( 2, 2, 2, 2 ) );
+		// fa = m128_rcp_22bit_ps( fa );
+		fa = _mm_shuffle_ps( fa, fa, _MM_SHUFFLE( 0, 0, 0, 0 ) );
 		fmsum = _mm_mul_ps( fmsum, f255_ );
 		fmsum = _mm_mul_ps( fmsum, fa );
 		msum = _mm_cvttps_epi32( fmsum );
@@ -364,7 +363,7 @@ struct sse2_box_blur_avg_16_d {
 	__m128i mrcp_;
 	const __m128 f255_;
 	const __m128i c_0100000000000000_;
-	inline sse2_box_blur_avg_16_d( tjs_int n ) : f255_(_mm_set1_ps(255.0f)),
+	inline sse2_box_blur_avg_16_d( tjs_int n ) : f255_(_mm_set1_ps(0x10000)),
 	  	c_0100000000000000_(_mm_set_epi32(0x01000000,0x00000000,0x01000000,0x00000000)){
 		mrcp_ = _mm_cvtsi32_si128( (1<<16) / n );
 		mrcp_ = _mm_shufflelo_epi16( mrcp_, _MM_SHUFFLE( 0, 0, 0, 0 ) );
@@ -377,12 +376,14 @@ struct sse2_box_blur_avg_16_d {
 		alpha = _mm_srli_epi64( alpha, 48 );		// color >> 48 = alpha
 		__m128 fa = _mm_cvtepi32_ps(alpha);
 		fa = _mm_rcp_ps( fa );
+		//fa = m128_rcp_22bit_ps( fa );
 		fa = _mm_mul_ps( fa, f255_ );
 		alpha = _mm_cvttps_epi32( fa );	// color*255/alpha
 		alpha = _mm_shufflelo_epi16( alpha, _MM_SHUFFLE( 2, 0, 0, 0 ) );	// 0 A A A
 		alpha = _mm_shufflehi_epi16( alpha, _MM_SHUFFLE( 2, 0, 0, 0 ) );	// 0 A A A
 		alpha = _mm_or_si128( alpha, c_0100000000000000_ );
-		msum = _mm_mullo_epi16( msum, alpha );
+		msum = _mm_slli_epi16( msum, 8 );
+		msum = _mm_mulhi_epu16( msum, alpha );
 		msum = _mm_packus_epi16( msum, msum );		// A8|R8|G8|B8|A8|R8|G8|B8
 		_mm_storel_epi64( (__m128i *)dest, msum );	// 2pixelストア
 	}
@@ -393,11 +394,13 @@ struct sse2_box_blur_avg_16_d {
 		alpha = _mm_srli_epi64( alpha, 48 );		// color >> 48 = alpha
 		__m128 fa = _mm_cvtepi32_ps(alpha);
 		fa = _mm_rcp_ps( fa );
+		//fa = m128_rcp_22bit_ps( fa );
 		fa = _mm_mul_ps( fa, f255_ );
 		alpha = _mm_cvttps_epi32( fa );	// color*255/alpha
 		alpha = _mm_shufflelo_epi16( alpha, _MM_SHUFFLE( 2, 0, 0, 0 ) );	// 0 A A A
 		alpha = _mm_or_si128( alpha, c_0100000000000000_ );
-		msum = _mm_mullo_epi16( msum, alpha );
+		msum = _mm_slli_epi16( msum, 8 );
+		msum = _mm_mulhi_epu16( msum, alpha );
 		msum = _mm_packus_epi16( msum, msum );		// A8|R8|G8|B8|A8|R8|G8|B8
 		*dest = _mm_cvtsi128_si32(msum);
 	}
@@ -509,9 +512,9 @@ void TVPDoBoxBlurAvg16_d_sse2_c_3(tjs_uint32 *dest, tjs_uint16 *sum, const tjs_u
 	sse2_box_blur_avg16<sse2_box_blur_avg_16_d_table>( dest, sum, add, sub, n, len );
 }
 // 速度的には 2 < 1 << 3  となる
-// 精度も考えると 1 の方がいいかな
 void TVPDoBoxBlurAvg16_d_sse2_c(tjs_uint32 *dest, tjs_uint16 *sum, const tjs_uint16 * add, const tjs_uint16 * sub, tjs_int n, tjs_int len) {
-	sse2_box_blur_avg16<sse2_box_blur_avg_16_d_sse>( dest, sum, add, sub, n, len );
+	//sse2_box_blur_avg16<sse2_box_blur_avg_16_d_sse>( dest, sum, add, sub, n, len );
+	sse2_box_blur_avg16<sse2_box_blur_avg_16_d>( dest, sum, add, sub, n, len );
 	//sse2_box_blur_avg16<sse2_box_blur_avg_16_d_table>( dest, sum, add, sub, n, len );
 }
 
