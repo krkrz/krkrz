@@ -97,33 +97,34 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>..\</OutDir>
+    <OutDir>..\..\</OutDir>
     <TargetName>$(ProjectName)_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetName>tvpwin64_d</TargetName>
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>..\</OutDir>
+    <OutDir>..\..\</OutDir>
     <IntDir>$(Configuration)64\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>..\</OutDir>
+    <OutDir>..\..\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IntDir>$(Configuration)64\</IntDir>
-    <OutDir>..\</OutDir>
+    <OutDir>..\..\</OutDir>
     <TargetName>tvpwin64</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Enable Debugger|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>..\</OutDir>
+    <OutDir>..\..\</OutDir>
     <TargetName>$(ProjectName)_dbg</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Enable Debugger|x64'">
     <TargetName>$(ProjectName)_dbg</TargetName>
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>..\..\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
