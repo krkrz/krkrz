@@ -621,7 +621,7 @@ void TVPDumpOSContext(const CONTEXT &ctx)
 	}
 
 	// -- Cr0NpxState
-	TJS_snprintf(buf, BUF_SIZE,TJS_W("FP CR0 NPX State  : 0x%08X"), ctx.FloatSave.Cr0NpxState);
+	TJS_snprintf(buf, BUF_SIZE,TJS_W("FP CR0 NPX State  : 0x%08X"), ctx.FloatSave.Spare0);
 	TVPAddLog(buf);
 #endif
 
