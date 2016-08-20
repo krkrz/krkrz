@@ -4,7 +4,7 @@
 #include "tvpgl_ia32_intf.h"
 #include "simd_def_x86x64.h"
 
-#if 0	// •Î‚è‚ª‘½‚¢ê‡‚Í‘¬‚¢‚ªA’ÊíƒP[ƒX‚Å‚Í’x‚¢
+#if 0	// åã‚ŠãŒå¤šã„å ´åˆã¯é€Ÿã„ãŒã€é€šå¸¸ã‚±ãƒ¼ã‚¹ã§ã¯é…ã„
 // MMX + SSE
 tjs_int TVPTLG5DecompressSlide_sse_c( tjs_uint8 *out, const tjs_uint8 *in, tjs_int insize, tjs_uint8 *text, tjs_int initialr ) {
 	tjs_int r = initialr;
@@ -129,7 +129,7 @@ tjs_int TVPTLG5DecompressSlide_sse2_c( tjs_uint8 *out, const tjs_uint8 *in, tjs_
 	tjs_int r = initialr;
 	tjs_uint flags = 0;
 	const tjs_uint8 *inlim = in + insize;
-	// text ‚Æ outAin ‚ÍA+16—]•ª‚ÉŠm•Û‚µ‚ÄA‚Í‚İo‚µ‚Ä‚à‚¢‚¢‚æ‚¤‚É‚µ‚Ä‚¨‚­
+	// text ã¨ outã€in ã¯ã€+16ä½™åˆ†ã«ç¢ºä¿ã—ã¦ã€ã¯ã¿å‡ºã—ã¦ã‚‚ã„ã„ã‚ˆã†ã«ã—ã¦ãŠã
 	//const __m128i mask = _mm_set1_epi32(0xffffffff);
 	const __m128i mask = _mm_set_epi32(0,0,0xffffffff,0xffffffff);
 	while(in < inlim ) {
@@ -140,7 +140,7 @@ tjs_int TVPTLG5DecompressSlide_sse2_c( tjs_uint8 *out, const tjs_uint8 *in, tjs_
 			if( flags == 0xff00 && r < (4096-8) && in < (inlim-8)  ) {	// copy 8byte
 				__m128i c = _mm_loadl_epi64( (__m128i const*)in );
 				_mm_storel_epi64( (__m128i *)out, c );
-				_mm_storel_epi64( (__m128i *)&text[r], c );	// ––”ö‚Í‚İo‚·‚Ì‚ğ‹C‚É‚¹‚¸ƒRƒs[
+				_mm_storel_epi64( (__m128i *)&text[r], c );	// æœ«å°¾ã¯ã¿å‡ºã™ã®ã‚’æ°—ã«ã›ãšã‚³ãƒ”ãƒ¼
 				r += 8;
 #if 0
 				if( r > 4095 ) {
@@ -166,11 +166,11 @@ tjs_int TVPTLG5DecompressSlide_sse2_c( tjs_uint8 *out, const tjs_uint8 *in, tjs_
 			mlen += 3;
 			if(mlen == 18) {
 				mlen += in[0]; in++;
-				// ”ƒoƒCƒg‚Ì×Ø‚ê‚¾‚Æ’x‚¢‚Æv‚¤‚¯‚ÇA‚»‚¤‚¶‚á‚È‚¯‚ê‚Î‘¬‚¢‚©‚ÈH
-				// 8ƒoƒCƒg’PˆÊ 128bitƒVƒtƒg‚Íimm‚Å‚È‚¢‚Æ‚¢‚¯‚È‚¢‚Ì‚ÅA64bit‚²‚Æ‚Éˆ—
-				// Šæ’£‚ê‚Î16ƒoƒCƒg’PˆÊ‚Å‚às‚¯‚»‚¤‚¾‚¯‚ÇA•ªŠò‚ª‘½‚­‚È‚è‚»‚¤‚È‚Ì‚Å
+				// æ•°ãƒã‚¤ãƒˆã®ç´°åˆ‡ã‚Œã ã¨é…ã„ã¨æ€ã†ã‘ã©ã€ãã†ã˜ã‚ƒãªã‘ã‚Œã°é€Ÿã„ã‹ãªï¼Ÿ
+				// 8ãƒã‚¤ãƒˆå˜ä½ 128bitã‚·ãƒ•ãƒˆã¯immã§ãªã„ã¨ã„ã‘ãªã„ã®ã§ã€64bitã”ã¨ã«å‡¦ç†
+				// é ‘å¼µã‚Œã°16ãƒã‚¤ãƒˆå˜ä½ã§ã‚‚è¡Œã‘ãã†ã ã‘ã©ã€åˆ†å²ãŒå¤šããªã‚Šãã†ãªã®ã§
 				if( (mpos+mlen) < 4096 && (r+mlen) < 4096 ) {
-					// ––”ö‹C‚É‚¹‚¸ƒRƒs[‚µ‚Ä‚¢‚¢‚Í16byte’PˆÊ‚Å‚Ü‚Æ‚ß‚ÄƒRƒs[
+					// æœ«å°¾æ°—ã«ã›ãšã‚³ãƒ”ãƒ¼ã—ã¦ã„ã„æ™‚ã¯16byteå˜ä½ã§ã¾ã¨ã‚ã¦ã‚³ãƒ”ãƒ¼
 					tjs_int count = mlen >> 4;
 					while( count-- ) {
 						__m128i c = _mm_loadu_si128( (__m128i const*)&text[mpos] );
@@ -178,7 +178,7 @@ tjs_int TVPTLG5DecompressSlide_sse2_c( tjs_uint8 *out, const tjs_uint8 *in, tjs_
 						_mm_storeu_si128( (__m128i *)&text[r], c );
 						mpos += 16; r += 16; out += 16;
 					}
-					mlen &= 0x0f;	// —]‚è
+					mlen &= 0x0f;	// ä½™ã‚Š
 					while(mlen--) {
 						out[0] = text[r++] = text[mpos++]; out++;
 					}
@@ -280,7 +280,7 @@ tjs_int TVPTLG5DecompressSlide_sse2_c( tjs_uint8 *out, const tjs_uint8 *in, tjs_
 
 void TVPTLG5ComposeColors3To4_sse2_c(tjs_uint8 *outp, const tjs_uint8 *upper, tjs_uint8 * const * buf, tjs_int width) {
 	tjs_int len = (width>>2)<<2;
-	// 4‚Â‚¸‚Âˆ—
+	// 4ã¤ãšã¤å‡¦ç†
 	tjs_uint32* b0 = (tjs_uint32*)buf[0];
 	tjs_uint32* b1 = (tjs_uint32*)buf[1];
 	tjs_uint32* b2 = (tjs_uint32*)buf[2];
@@ -340,7 +340,7 @@ void TVPTLG5ComposeColors3To4_sse2_c(tjs_uint8 *outp, const tjs_uint8 *upper, tj
 }
 void TVPTLG5ComposeColors4To4_sse2_c(tjs_uint8 *outp, const tjs_uint8 *upper, tjs_uint8 * const * buf, tjs_int width) {
 	tjs_int len = (width>>2)<<2;
-	// 4‚Â‚¸‚Âˆ—
+	// 4ã¤ãšã¤å‡¦ç†
 	tjs_uint32* b0 = (tjs_uint32*)buf[0];
 	tjs_uint32* b1 = (tjs_uint32*)buf[1];
 	tjs_uint32* b2 = (tjs_uint32*)buf[2];
@@ -641,7 +641,7 @@ struct filter_insts_15_sse2 {
 	}
 };
 #if 1
-// v ‚ÅƒGƒ‰[‚ªo‚é‚Ì‚ÅAc‚ğQÆ“n‚µ‚Æ‚µ‚Ä‚¨‚­AƒCƒ“ƒ‰ƒCƒ“‰»‚³‚ê‚Ä‰e‹¿‚Í‚È‚¢‚Í‚¸
+// v ã§ã‚¨ãƒ©ãƒ¼ãŒå‡ºã‚‹ã®ã§ã€cã‚’å‚ç…§æ¸¡ã—ã¨ã—ã¦ãŠãã€ã‚¤ãƒ³ãƒ©ã‚¤ãƒ³åŒ–ã•ã‚Œã¦å½±éŸ¿ã¯ãªã„ã¯ãš
 static inline __m128i do_med_sse2( __m128i a, __m128i b, const __m128i& c, __m128i v ) {
 	__m128i a2 = a;
 	a = _mm_max_epu8( a, b );	// = max_a_b
@@ -682,11 +682,11 @@ struct filter_forward_input_sse2 {
 struct filter_backward_input_sse2 {
 	inline __m128i first(tjs_uint32 *in) const {
 		__m128i minput = _mm_loadu_si128( (__m128i const*)&in[4] );
-		return _mm_shuffle_epi32( minput, _MM_SHUFFLE( 0, 1, 2, 3 ) );	// ‹t“]
+		return _mm_shuffle_epi32( minput, _MM_SHUFFLE( 0, 1, 2, 3 ) );	// é€†è»¢
 	}
 	inline __m128i second(tjs_uint32 *in) const {
 		__m128i minput = _mm_loadu_si128( (__m128i const*)&in[0] );
-		return _mm_shuffle_epi32( minput, _MM_SHUFFLE( 0, 1, 2, 3 ) );	// ‹t“]
+		return _mm_shuffle_epi32( minput, _MM_SHUFFLE( 0, 1, 2, 3 ) );	// é€†è»¢
 	}
 };
 
@@ -750,14 +750,14 @@ static inline void do_filter_med_sse2( tjs_uint32& inp, tjs_uint32& inup, tjs_ui
 	inup =  _mm_cvtsi128_si32( u );
 }
 
-// c = up : ‚Íg‚Á‚Ä‚È‚¢‚Ì‚ÅA—v‚ç‚È‚¢
+// c = up : ã¯ä½¿ã£ã¦ãªã„ã®ã§ã€è¦ã‚‰ãªã„
 // p, u, up, in
 static inline __m128i do_avg_sse2( __m128i a, __m128i b, /*__m128i c, */__m128i v ) {
 	a = _mm_avg_epu8( a, b );
 	return _mm_add_epi8( a, v );
 }
 // TVP_TLG6_W_BLOCK_SIZE == 8
-// SSE2 ‚È‚ç 2‰ñ‚È‚Ì‚ÅAƒAƒ“ƒ[ƒ‹‚µ‚Ä‚µ‚Ü‚Á‚Ä‚¢‚¢‚©‚à
+// SSE2 ãªã‚‰ 2å›ãªã®ã§ã€ã‚¢ãƒ³ãƒ­ãƒ¼ãƒ«ã—ã¦ã—ã¾ã£ã¦ã„ã„ã‹ã‚‚
 template<typename tfilter, typename tinput>
 inline void do_filter_avg_sse2( tjs_uint32& inp, tjs_uint32& up, tjs_uint32 *in, tjs_uint32 *prevline, tjs_uint32 *curline ) {
 	tfilter filter;
@@ -808,7 +808,7 @@ inline void do_filter_avg_sse2( tjs_uint32& inp, tjs_uint32& up, tjs_uint32 *in,
 	inp = _mm_cvtsi128_si32( p );
 	up =  _mm_cvtsi128_si32( u );
 }
-#if 0 // MMX(SSE) g‚¤”Å’x‚¢
+#if 0 // MMX(SSE) ä½¿ã†ç‰ˆé…ã„
 static inline __m64 do_med_sse( __m64 a, __m64 b, const __m64& c, __m64 v ) {
 	__m64 a2 = a;
 	a = _mm_max_pu8( a, b );	// = max_a_b
@@ -1039,7 +1039,7 @@ void TVPTLG6DecodeLine_sse2_c(tjs_uint32 *prevline, tjs_uint32 *curline, tjs_int
 	TVPTLG6DecodeLineGeneric_sse2_c(prevline, curline, width, 0, block_count,
 		filtertypes, skipblockbytes, in, initialp, oddskip, dir);
 }
-#if 0 // SSE2/SSE/MMX ‚ğg‚¤ƒo[ƒWƒ‡ƒ“
+#if 0 // SSE2/SSE/MMX ã‚’ä½¿ã†ãƒãƒ¼ã‚¸ãƒ§ãƒ³
 void TVPTLG6DecodeLineGeneric_sse2_sse_c(tjs_uint32 *prevline, tjs_uint32 *curline, tjs_int width, tjs_int start_block, tjs_int block_limit, tjs_uint8 *filtertypes, tjs_int skipblockbytes, tjs_uint32 *in, tjs_uint32 initialp, tjs_int oddskip, tjs_int dir) {
 	tjs_uint32 p, up;
 	if(start_block) {
@@ -1140,7 +1140,7 @@ void TVPTLG6DecodeLine_sse2_sse_c(tjs_uint32 *prevline, tjs_uint32 *curline, tjs
 #include "tjsUtils.h"
 
 extern "C" void TVPTLG6DecodeLine_c(tjs_uint32 *prevline, tjs_uint32 *curline, tjs_int width, tjs_int block_count, tjs_uint8 *filtertypes, tjs_int skipblockbytes, tjs_uint32 *in, tjs_uint32 initialp, tjs_int oddskip, tjs_int dir);
-// C”Å‚Æ”äŠr‚·‚é‚Æ4”{ˆÈã‚¾‚¯‚ÇAMMX2(SSE)‚É”äŠr‚·‚é‚Æ­‚µ’x‚¢‚©cc
+// Cç‰ˆã¨æ¯”è¼ƒã™ã‚‹ã¨4å€ä»¥ä¸Šã ã‘ã©ã€MMX2(SSE)ã«æ¯”è¼ƒã™ã‚‹ã¨å°‘ã—é…ã„ã‹â€¦â€¦
 void TVPTLG6DecodeLine_test(tjs_uint32 *prevline, tjs_uint32 *curline, tjs_int width, tjs_int block_count, tjs_uint8 *filtertypes, tjs_int skipblockbytes, tjs_uint32 *in, tjs_uint32 initialp, tjs_int oddskip, tjs_int dir) {
 	tjs_uint32 *curline0 = (tjs_uint32*)TJSAlignedAlloc(block_count*TVP_TLG6_W_BLOCK_SIZE*sizeof(tjs_uint32), 4);
 	tjs_uint32 *curline1 = (tjs_uint32*)TJSAlignedAlloc(block_count*TVP_TLG6_W_BLOCK_SIZE*sizeof(tjs_uint32), 4);
@@ -1338,7 +1338,7 @@ void TVPTLG5ComposeColors4To4_test(tjs_uint8 *outp, const tjs_uint8 *upper, tjs_
 	TJSAlignedDealloc( outp1 );
 }
 /*
-tlg6_golomb ‚ÍAMMX g‚Á‚Ä‚¢‚é‚ªAˆê•Ï”‚Æ‚µ‚Äg‚í‚ê‚Ä‚¢‚é‚Ì‚ÆƒvƒŠƒtƒFƒbƒ`‚Ì‚İBSSE2 ‚ÍˆÓ–¡‚È‚³‚°
-tlg6_chroma ‚ÍAMMX(SSE)‚ªg‚í‚ê‚Ä‚¢‚é
+tlg6_golomb ã¯ã€MMX ä½¿ã£ã¦ã„ã‚‹ãŒã€ä¸€æ™‚å¤‰æ•°ã¨ã—ã¦ä½¿ã‚ã‚Œã¦ã„ã‚‹ã®ã¨ãƒ—ãƒªãƒ•ã‚§ãƒƒãƒã®ã¿ã€‚SSE2 ã¯æ„å‘³ãªã•ã’
+tlg6_chroma ã¯ã€MMX(SSE)ãŒä½¿ã‚ã‚Œã¦ã„ã‚‹
 */
 #endif

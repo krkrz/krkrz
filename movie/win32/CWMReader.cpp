@@ -2,7 +2,7 @@
 /*! @file
 @brief Windows Media Reader
 
-Windows Mediaƒtƒ@ƒCƒ‹‚ğ“Ç‚İ‚Ş
+Windows Mediaãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã¿è¾¼ã‚€
 -----------------------------------------------------------------------------
 	Copyright (C) 2005 T.Imoto <http://www.kaede-software.com>
 -----------------------------------------------------------------------------
@@ -22,26 +22,26 @@ Windows Mediaƒtƒ@ƒCƒ‹‚ğ“Ç‚İ‚Ş
 CWMOutput::~CWMOutput()
 {}
 //----------------------------------------------------------------------------
-//! @brief	  	—v‹‚³‚ê‚½ƒCƒ“ƒ^[ƒtƒFƒCƒX‚ğ•Ô‚·
-//! @param		riid : ƒCƒ“ƒ^[ƒtƒFƒCƒX‚ÌIID
-//! @param		ppv : ƒCƒ“ƒ^[ƒtƒFƒCƒX‚ğ•Ô‚·ƒ|ƒCƒ“ƒ^[‚Ö‚Ìƒ|ƒCƒ“ƒ^
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	è¦æ±‚ã•ã‚ŒãŸã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã‚’è¿”ã™
+//! @param		riid : ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã®IID
+//! @param		ppv : ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã‚’è¿”ã™ãƒã‚¤ãƒ³ã‚¿ãƒ¼ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 STDMETHODIMP CWMOutput::NonDelegatingQueryInterface( REFIID riid, void ** ppv )
 {
 	return CUnknown::NonDelegatingQueryInterface(riid, ppv);
 }
 //----------------------------------------------------------------------------
-//! @brief	  	IWMSyncReader‚ğæ“¾‚·‚é
-//! @return		IWMSyncReader‚Ö‚Ìƒ|ƒCƒ“ƒ^
+//! @brief	  	IWMSyncReaderã‚’å–å¾—ã™ã‚‹
+//! @return		IWMSyncReaderã¸ã®ãƒã‚¤ãƒ³ã‚¿
 //----------------------------------------------------------------------------
 IWMSyncReader *CWMOutput::WMReader()
 {
 	return Reader()->Reader();
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒXƒgƒŠ[ƒ€‚Ìİ’è‚ğs‚¤
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ã‚¹ãƒˆãƒªãƒ¼ãƒ ã®è¨­å®šã‚’è¡Œã†
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CWMOutput::SetStream(void)
 {
@@ -58,12 +58,12 @@ HRESULT CWMOutput::SetStream(void)
 	return hr;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒTƒ|[ƒg‚µ‚Ä‚¢‚éƒƒfƒBƒAƒ^ƒCƒv‚ğæ“¾‚·‚é
+//! @brief	  	ã‚µãƒãƒ¼ãƒˆã—ã¦ã„ã‚‹ãƒ¡ãƒ‡ã‚£ã‚¢ã‚¿ã‚¤ãƒ—ã‚’å–å¾—ã™ã‚‹
 //!
-//! ˆ³kƒtƒH[ƒ}ƒbƒg‚Ì‚İo—Í‚·‚é‚æ‚¤‚É‚È‚Á‚Ä‚¢‚éB
-//! @param		iPosition : ƒƒfƒBƒAƒ^ƒCƒv‚Ì˜”
-//! @param		pmt : ƒƒfƒBƒAƒ^ƒCƒv
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! åœ§ç¸®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã®ã¿å‡ºåŠ›ã™ã‚‹ã‚ˆã†ã«ãªã£ã¦ã„ã‚‹ã€‚
+//! @param		iPosition : ãƒ¡ãƒ‡ã‚£ã‚¢ã‚¿ã‚¤ãƒ—ã®åºæ•°
+//! @param		pmt : ãƒ¡ãƒ‡ã‚£ã‚¢ã‚¿ã‚¤ãƒ—
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CWMOutput::GetMediaType( int iPosition, CMediaType *pmt )
 {
@@ -104,9 +104,9 @@ HRESULT CWMOutput::GetMediaType( int iPosition, CMediaType *pmt )
 	return VFW_S_NO_MORE_ITEMS;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒƒfƒBƒAƒ^ƒCƒv‚ğİ’è‚·‚é
-//! @param		pmt : ƒƒfƒBƒAƒ^ƒCƒv
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ãƒ¡ãƒ‡ã‚£ã‚¢ã‚¿ã‚¤ãƒ—ã‚’è¨­å®šã™ã‚‹
+//! @param		pmt : ãƒ¡ãƒ‡ã‚£ã‚¢ã‚¿ã‚¤ãƒ—
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CWMOutput::SetMediaType( const CMediaType *pmt )
 {
@@ -126,10 +126,10 @@ HRESULT CWMOutput::SetMediaType( const CMediaType *pmt )
 	return VFW_E_INVALIDMEDIATYPE;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	•K—v‚Èƒoƒbƒtƒ@ƒTƒCƒY‚ğæ“¾‚·‚é
-//! @param		buffers : ƒoƒbƒtƒ@‚Ì”
-//! @param		bufsize : ƒoƒbƒtƒ@‚ÌƒTƒCƒY
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	å¿…è¦ãªãƒãƒƒãƒ•ã‚¡ã‚µã‚¤ã‚ºã‚’å–å¾—ã™ã‚‹
+//! @param		buffers : ãƒãƒƒãƒ•ã‚¡ã®æ•°
+//! @param		bufsize : ãƒãƒƒãƒ•ã‚¡ã®ã‚µã‚¤ã‚º
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CWMOutput::GetNeedBufferSize( long &buffers, long &bufsize )
 {
@@ -144,28 +144,28 @@ HRESULT CWMOutput::GetNeedBufferSize( long &buffers, long &bufsize )
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒoƒbƒtƒ@ƒTƒCƒY‚ÌŒˆ’è‚ğ’Ê’m‚·‚é
-//! @param		buffers : ƒoƒbƒtƒ@‚Ì”
-//! @param		bufsize : ƒoƒbƒtƒ@‚ÌƒTƒCƒY
-//! @param		aling : ƒAƒ‰ƒCƒƒ“ƒg
-//! @param		prefix : ƒvƒŠƒtƒBƒbƒNƒX
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ãƒãƒƒãƒ•ã‚¡ã‚µã‚¤ã‚ºã®æ±ºå®šã‚’é€šçŸ¥ã™ã‚‹
+//! @param		buffers : ãƒãƒƒãƒ•ã‚¡ã®æ•°
+//! @param		bufsize : ãƒãƒƒãƒ•ã‚¡ã®ã‚µã‚¤ã‚º
+//! @param		aling : ã‚¢ãƒ©ã‚¤ãƒ¡ãƒ³ãƒˆ
+//! @param		prefix : ãƒ—ãƒªãƒ•ã‚£ãƒƒã‚¯ã‚¹
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CWMOutput::SetDecidedBufferSize( long buffers, long bufsize, long aling, long prefix )
 {
-	// “Á‚É‰½‚à‚µ‚È‚¢
+	// ç‰¹ã«ä½•ã‚‚ã—ãªã„
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	Ÿ‚ÌƒTƒ“ƒvƒ‹‚ğ“¾‚é
-//! @param		pSample : ƒTƒ“ƒvƒ‹‚ğ•Ô‚·ƒ|ƒCƒ“ƒ^‚Ìƒ|ƒCƒ“ƒ^
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	æ¬¡ã®ã‚µãƒ³ãƒ—ãƒ«ã‚’å¾—ã‚‹
+//! @param		pSample : ã‚µãƒ³ãƒ—ãƒ«ã‚’è¿”ã™ãƒã‚¤ãƒ³ã‚¿ã®ãƒã‚¤ãƒ³ã‚¿
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CWMOutput::GetNextSample( IMediaSample **pSample )
 {
 	HRESULT hr;
 	if( m_StreamNum == 0 || pSample == NULL )
-		return S_FALSE;	// ‚±‚ÌƒXƒgƒŠ[ƒ€‚Í‚È‚¢
+		return S_FALSE;	// ã“ã®ã‚¹ãƒˆãƒªãƒ¼ãƒ ã¯ãªã„
 
 	INSSBuffer	*pWMSample = NULL;
 	QWORD	cnsSampleTime;
@@ -199,9 +199,9 @@ HRESULT CWMOutput::GetNextSample( IMediaSample **pSample )
 	return hr;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒAƒƒP[ƒ^[‚ğİ’è‚·‚é
-//! @param		alloc : ƒAƒƒP[ƒ^[
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ã‚¢ãƒ­ã‚±ãƒ¼ã‚¿ãƒ¼ã‚’è¨­å®šã™ã‚‹
+//! @param		alloc : ã‚¢ãƒ­ã‚±ãƒ¼ã‚¿ãƒ¼
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CWMOutput::SetAllocator( IMemAllocator *alloc )
 {
@@ -222,11 +222,11 @@ HRESULT CWMOutput::SetAllocator( IMemAllocator *alloc )
 	return hr;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒƒfƒBƒAƒ^ƒCƒv‚ªDXVA‚©‚Ç‚¤‚©Šm”F‚·‚é
+//! @brief	  	ãƒ¡ãƒ‡ã‚£ã‚¢ã‚¿ã‚¤ãƒ—ãŒDXVAã‹ã©ã†ã‹ç¢ºèªã™ã‚‹
 //! 
-//! ”»’è•û–@‚ÍWMF SDK Help‚Ì "Enabling DirectX Video Acceleration" ‚É‹Lq‚³‚ê‚Ä‚¢‚é‚à‚Ì
-//! @param		pmt : ƒƒfƒBƒAƒ^ƒCƒv
-//! @return		DXVA‚©‚Ç‚¤‚©
+//! åˆ¤å®šæ–¹æ³•ã¯WMF SDK Helpã® "Enabling DirectX Video Acceleration" ã«è¨˜è¿°ã•ã‚Œã¦ã„ã‚‹ã‚‚ã®
+//! @param		pmt : ãƒ¡ãƒ‡ã‚£ã‚¢ã‚¿ã‚¤ãƒ—
+//! @return		DXVAã‹ã©ã†ã‹
 //----------------------------------------------------------------------------
 bool CWMOutput::IsDXVASubtype( const AM_MEDIA_TYPE *pmt )
 {
@@ -243,7 +243,7 @@ bool CWMOutput::IsDXVASubtype( const AM_MEDIA_TYPE *pmt )
 
 
 //## CWMReader
-#pragma warning(disable: 4355)	// ƒRƒ“ƒXƒgƒ‰ƒNƒ^‚Ìƒx[ƒXƒƒ“ƒo‰Šú‰»‚Éthis‚ğg‚¤‚Æƒ[ƒjƒ“ƒO‚ªo‚é‚Ì‚Å‚»‚ê‚ğ—}~
+#pragma warning(disable: 4355)	// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã®ãƒ™ãƒ¼ã‚¹ãƒ¡ãƒ³ãƒåˆæœŸåŒ–æ™‚ã«thisã‚’ä½¿ã†ã¨ãƒ¯ãƒ¼ãƒ‹ãƒ³ã‚°ãŒå‡ºã‚‹ã®ã§ãã‚Œã‚’æŠ‘æ­¢
 //----------------------------------------------------------------------------
 //! @brief	  	CWMReader constructor
 //----------------------------------------------------------------------------
@@ -266,17 +266,17 @@ CWMReader::~CWMReader()
 		m_WMReader.Release();
 }
 //----------------------------------------------------------------------------
-//! @brief	  	o—Í”‚ğæ“¾‚·‚é ( ‰f‘œ‚Æ‰¹º‚È‚ç2‚Â‚È‚Ç )
-//! @return		o—Í”
+//! @brief	  	å‡ºåŠ›æ•°ã‚’å–å¾—ã™ã‚‹ ( æ˜ åƒã¨éŸ³å£°ãªã‚‰2ã¤ãªã© )
+//! @return		å‡ºåŠ›æ•°
 //----------------------------------------------------------------------------
 int CWMReader::GetNumberOfOutput(void)
 {
 	return (m_AudioOut.IsEnable() != 0 ? 1 : 0) + (m_VideoOut.IsEnable() != 0 ? 1 : 0);
 }
 //----------------------------------------------------------------------------
-//! @brief	  	o—ÍƒXƒgƒŠ[ƒ€‚ğ“¾‚é
-//! @param		num : o—ÍƒXƒgƒŠ[ƒ€”Ô†
-//! @return		o—ÍƒXƒgƒŠ[ƒ€
+//! @brief	  	å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‚’å¾—ã‚‹
+//! @param		num : å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ ç•ªå·
+//! @return		å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
 //----------------------------------------------------------------------------
 IOutputStream* CWMReader::GetOutputStream( int num )
 {
@@ -303,9 +303,9 @@ IOutputStream* CWMReader::GetOutputStream( int num )
 		return NULL;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒXƒgƒŠ[ƒ€‚ğŠJ‚­
-//! @param		stream : ƒXƒgƒŠ[ƒ€
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‚’é–‹ã
+//! @param		stream : ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CWMReader::OpenStream( IStream *stream )
 {
@@ -314,7 +314,7 @@ HRESULT CWMReader::OpenStream( IStream *stream )
 		return E_INVALIDARG;
 
 	if( m_WMReader.p == NULL )
-	{	// DLL‚©‚çWMCreateSyncReader‚ğ“Ç‚İ‚ñ‚Åg—p‚·‚é
+	{	// DLLã‹ã‚‰WMCreateSyncReaderã‚’èª­ã¿è¾¼ã‚“ã§ä½¿ç”¨ã™ã‚‹
 		if( m_WmvDll.IsLoaded() == false )
 			m_WmvDll.Load(_T("wmvcore.dll"));
 		if( m_WmvDll.IsLoaded() == false )
@@ -348,8 +348,8 @@ HRESULT CWMReader::OpenStream( IStream *stream )
 	return hr;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	Ä¶ŠJn‚ÉƒR[ƒ‹‚³‚ê‚é
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	å†ç”Ÿé–‹å§‹æ™‚ã«ã‚³ãƒ¼ãƒ«ã•ã‚Œã‚‹
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CWMReader::OnStart()
 {
@@ -362,8 +362,8 @@ HRESULT CWMReader::OnStart()
 	return hr;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒXƒgƒŠ[ƒ€‚ª•Â‚¶‚ç‚ê‚é‚ÉƒR[ƒ‹‚³‚ê‚é
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ã‚¹ãƒˆãƒªãƒ¼ãƒ ãŒé–‰ã˜ã‚‰ã‚Œã‚‹æ™‚ã«ã‚³ãƒ¼ãƒ«ã•ã‚Œã‚‹
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CWMReader::Close(void)
 {
@@ -376,9 +376,9 @@ HRESULT CWMReader::Close(void)
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ŠJnŠÔ‚ğİ’è‚·‚é
-//! @param		start : ŠJnŠÔ
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	é–‹å§‹æ™‚é–“ã‚’è¨­å®šã™ã‚‹
+//! @param		start : é–‹å§‹æ™‚é–“
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CWMReader::SetStartTime( QWORD start )
 {
@@ -386,9 +386,9 @@ HRESULT CWMReader::SetStartTime( QWORD start )
 	return SetRange();
 }
 //----------------------------------------------------------------------------
-//! @brief	  	’â~ŠÔ‚ğİ’è‚·‚é
-//! @param		end : ’â~ŠÔ
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	åœæ­¢æ™‚é–“ã‚’è¨­å®šã™ã‚‹
+//! @param		end : åœæ­¢æ™‚é–“
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CWMReader::SetEndTime( QWORD end )
 {
@@ -396,19 +396,19 @@ HRESULT CWMReader::SetEndTime( QWORD end )
 	return SetRange();
 }
 //----------------------------------------------------------------------------
-//! @brief	  	Ä¶ƒŒ[ƒg‚ğİ’è‚·‚é
-//! @param		rate : Ä¶ƒŒ[ƒg
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	å†ç”Ÿãƒ¬ãƒ¼ãƒˆã‚’è¨­å®šã™ã‚‹
+//! @param		rate : å†ç”Ÿãƒ¬ãƒ¼ãƒˆ
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CWMReader::SetRate( double rate )
 {
 	m_Rate = rate;
-	// “Á‚Ég‚í‚È‚¢
+	// ç‰¹ã«ä½¿ã‚ãªã„
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	Ä¶”ÍˆÍ‚Ìİ’è‚ğ”½‰f‚·‚é
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	å†ç”Ÿç¯„å›²ã®è¨­å®šã‚’åæ˜ ã™ã‚‹
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CWMReader::SetRange(void)
 {
@@ -420,8 +420,8 @@ HRESULT CWMReader::SetRange(void)
 	return Reader()->SetRange( m_StartTime, duration );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	o—Í‚·‚éƒXƒgƒŠ[ƒ€‚Ìİ’è‚ğs‚¤
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	å‡ºåŠ›ã™ã‚‹ã‚¹ãƒˆãƒªãƒ¼ãƒ ã®è¨­å®šã‚’è¡Œã†
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CWMReader::SetStream(void)
 {
@@ -432,9 +432,9 @@ HRESULT CWMReader::SetStream(void)
 	return hr;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒƒfƒBƒA‚ÌŠeí’l‚ğæ“¾‚·‚é
-//! @param		name : —v‹‚·‚é‚à‚Ì‚Ì–¼‘O
-//! @return		—v‹‚µ‚½’l
+//! @brief	  	ãƒ¡ãƒ‡ã‚£ã‚¢ã®å„ç¨®å€¤ã‚’å–å¾—ã™ã‚‹
+//! @param		name : è¦æ±‚ã™ã‚‹ã‚‚ã®ã®åå‰
+//! @return		è¦æ±‚ã—ãŸå€¤
 //----------------------------------------------------------------------------
 QWORD CWMReader::GetAttributeQWORD( LPCWSTR name )
 {
@@ -451,9 +451,9 @@ QWORD CWMReader::GetAttributeQWORD( LPCWSTR name )
 	return result;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒƒfƒBƒA‚ÌŠeí’l‚ğæ“¾‚·‚é
-//! @param		name : —v‹‚·‚é‚à‚Ì‚Ì–¼‘O
-//! @return		—v‹‚µ‚½’l
+//! @brief	  	ãƒ¡ãƒ‡ã‚£ã‚¢ã®å„ç¨®å€¤ã‚’å–å¾—ã™ã‚‹
+//! @param		name : è¦æ±‚ã™ã‚‹ã‚‚ã®ã®åå‰
+//! @return		è¦æ±‚ã—ãŸå€¤
 //----------------------------------------------------------------------------
 DWORD CWMReader::GetAttributeDWORD( LPCWSTR name )
 {
@@ -470,52 +470,52 @@ DWORD CWMReader::GetAttributeDWORD( LPCWSTR name )
 	return result;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒƒfƒBƒA‚ÌŠÔ•‚ğæ“¾‚·‚é
-//! @return		ŠÔ•
+//! @brief	  	ãƒ¡ãƒ‡ã‚£ã‚¢ã®æ™‚é–“å¹…ã‚’å–å¾—ã™ã‚‹
+//! @return		æ™‚é–“å¹…
 //----------------------------------------------------------------------------
 QWORD CWMReader::GetDuration(void)
 {
 	return GetAttributeQWORD(g_wszWMDuration);
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒƒfƒBƒA‚ÌƒtƒŒ[ƒ€”‚ğæ“¾‚·‚é
-//! @return		ƒtƒŒ[ƒ€”
+//! @brief	  	ãƒ¡ãƒ‡ã‚£ã‚¢ã®ãƒ•ãƒ¬ãƒ¼ãƒ æ•°ã‚’å–å¾—ã™ã‚‹
+//! @return		ãƒ•ãƒ¬ãƒ¼ãƒ æ•°
 //----------------------------------------------------------------------------
 QWORD CWMReader::GetNumberOfFrame(void)
 {
 	return GetAttributeQWORD(g_wszWMNumberOfFrames);
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒrƒfƒI‚Ì•‚ğæ“¾‚·‚é
-//! @return		ƒrƒfƒI‚Ì•
+//! @brief	  	ãƒ“ãƒ‡ã‚ªã®å¹…ã‚’å–å¾—ã™ã‚‹
+//! @return		ãƒ“ãƒ‡ã‚ªã®å¹…
 //----------------------------------------------------------------------------
 DWORD CWMReader::GetVideoWidth(void)
 {
 	return GetAttributeDWORD(g_wszWMVideoWidth);
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒrƒfƒI‚Ì‚‚³‚ğæ“¾‚·‚é
-//! @return		ƒrƒfƒI‚Ì‚‚³
+//! @brief	  	ãƒ“ãƒ‡ã‚ªã®é«˜ã•ã‚’å–å¾—ã™ã‚‹
+//! @return		ãƒ“ãƒ‡ã‚ªã®é«˜ã•
 //----------------------------------------------------------------------------
 DWORD CWMReader::GetVideoHeight(void)
 {
 	return GetAttributeDWORD(g_wszWMVideoHeight);
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒrƒfƒI‚ÌƒtƒŒ[ƒ€ƒŒ[ƒg‚ğæ“¾‚·‚é
-//! @return		ƒrƒfƒI‚ÌƒtƒŒ[ƒ€ƒŒ[ƒg
+//! @brief	  	ãƒ“ãƒ‡ã‚ªã®ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆã‚’å–å¾—ã™ã‚‹
+//! @return		ãƒ“ãƒ‡ã‚ªã®ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆ
 //----------------------------------------------------------------------------
 DWORD CWMReader::GetVideoFrameRate(void)
 {
 	return GetAttributeDWORD(g_wszWMVideoFrameRate);
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒXƒgƒŠ[ƒ€”Ô†‚ğæ“¾‚·‚é
+//! @brief	  	ã‚¹ãƒˆãƒªãƒ¼ãƒ ç•ªå·ã‚’å–å¾—ã™ã‚‹
 //!
-//! m_AudioOut.m_StreamNum‚Æm_VideoOut.m_StreamNum‚Ö’l‚ğİ’è‚·‚é;
-//! ƒXƒgƒŠ[ƒ€”Ô†‚Í1-63‚Ì’l‚ğ‚Æ‚é
-//! @param		pProfile : ƒvƒƒtƒ@ƒCƒ‹
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! m_AudioOut.m_StreamNumã¨m_VideoOut.m_StreamNumã¸å€¤ã‚’è¨­å®šã™ã‚‹;
+//! ã‚¹ãƒˆãƒªãƒ¼ãƒ ç•ªå·ã¯1-63ã®å€¤ã‚’ã¨ã‚‹
+//! @param		pProfile : ãƒ—ãƒ­ãƒ•ã‚¡ã‚¤ãƒ«
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CWMReader::GetStreamNumbers( IWMProfile* pProfile )
 {
@@ -545,7 +545,7 @@ HRESULT CWMReader::GetStreamNumbers( IWMProfile* pProfile )
 		if( FAILED(hr = pStream->GetStreamType( &streamType ) ) )
 			break;
 
-		// ˆê”Ô‰‚ß‚ÉŒ©‚Â‚©‚Á‚½ƒXƒgƒŠ[ƒ€‚ğg‚¤
+		// ä¸€ç•ªåˆã‚ã«è¦‹ã¤ã‹ã£ãŸã‚¹ãƒˆãƒªãƒ¼ãƒ ã‚’ä½¿ã†
 		if( WMMEDIATYPE_Audio == streamType && m_AudioOut.GetStreamNumber() == 0 )
 			m_AudioOut.SetStreamNumber( streamNumber );
 		else if( WMMEDIATYPE_Video == streamType && m_VideoOut.GetStreamNumber() == 0 )

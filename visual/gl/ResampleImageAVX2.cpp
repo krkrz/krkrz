@@ -53,41 +53,41 @@ void TJS_USERENTRY ResamplerAVX2Func( void* p );
 
 template<typename TWeight>
 struct AxisParamAVX2 {
-	std::vector<int> start_;	// ŠJnƒCƒ“ƒfƒbƒNƒX
-	std::vector<int> length_;	// Še—v‘f’·‚³
-	std::vector<int> length_min_;	// Še—v‘f’·‚³, ƒAƒ‰ƒCƒƒ“ƒg‰»‚³‚ê‚Ä‚¢‚È‚¢Å¬’·‚³
+	std::vector<int> start_;	// é–‹å§‹ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
+	std::vector<int> length_;	// å„è¦ç´ é•·ã•
+	std::vector<int> length_min_;	// å„è¦ç´ é•·ã•, ã‚¢ãƒ©ã‚¤ãƒ¡ãƒ³ãƒˆåŒ–ã•ã‚Œã¦ã„ãªã„æœ€å°é•·ã•
 	std::vector<TWeight,aligned_allocator<TWeight,32> > weight_;
 
 	/**
-	 * ‚Í‚İo‚µ‚Ä‚¢‚é•”•ª‚ğƒJƒbƒg‚·‚é
+	 * ã¯ã¿å‡ºã—ã¦ã„ã‚‹éƒ¨åˆ†ã‚’ã‚«ãƒƒãƒˆã™ã‚‹
 	 */
 	static inline void calculateEdge( float* weight, int& len, int leftedge, int rightedge ) {
-		// ¶’[or‰E’[‚ÌA‚Í‚İo‚·•ª‚ÌƒEƒFƒCƒg‚ğ’[‚É‰ÁZ‚·‚é
+		// å·¦ç«¯orå³ç«¯ã®æ™‚ã€ã¯ã¿å‡ºã™åˆ†ã®ã‚¦ã‚§ã‚¤ãƒˆã‚’ç«¯ã«åŠ ç®—ã™ã‚‹
 		if( leftedge ) {
-			// ¶’[‚©‚ç‚Í‚İo‚·•ª‚ğ‰ÁZ
+			// å·¦ç«¯ã‹ã‚‰ã¯ã¿å‡ºã™åˆ†ã‚’åŠ ç®—
 			int i = 1;
 			for( ; i <= leftedge; i++ ) {
 				weight[0] += weight[i];
 			}
-			// ‰ÁZ‚µ‚½•ª‚ğˆÚ“®
+			// åŠ ç®—ã—ãŸåˆ†ã‚’ç§»å‹•
 			for( int j = 1; i < len; i++, j++ ) {
 				weight[j] = weight[i];
 			}
-			// ‚Í‚İo‚µ‚½•ª‚Ì’·‚³‚ğƒJƒbƒg
+			// ã¯ã¿å‡ºã—ãŸåˆ†ã®é•·ã•ã‚’ã‚«ãƒƒãƒˆ
 			len -= leftedge;
 		}
 		if( rightedge ) {
-			// ‰E’[‚©‚ç‚Í‚İo‚·•ª‚ğ‰ÁZ
+			// å³ç«¯ã‹ã‚‰ã¯ã¿å‡ºã™åˆ†ã‚’åŠ ç®—
 			int i = len - rightedge;
 			int r = i - 1;
 			for( ; i < len; i++ ) {
 				weight[r] += weight[i];
 			}
-			// ‚Í‚İo‚µ‚½•ª‚Ì’·‚³‚ğƒJƒbƒg
+			// ã¯ã¿å‡ºã—ãŸåˆ†ã®é•·ã•ã‚’ã‚«ãƒƒãƒˆ
 			len -= rightedge;
 		}
 	}
-	// ‡Œv’l‚ğ‹‚ß‚é
+	// åˆè¨ˆå€¤ã‚’æ±‚ã‚ã‚‹
 	static inline __m256 sumWeight( float* weight, int len8 ) {
 		float* w = weight;
 		__m256 sum = _mm256_setzero_ps();
@@ -99,27 +99,27 @@ struct AxisParamAVX2 {
 		return m256_hsum_avx_ps(sum);
 	}
 	static inline void normalizeAndFixed( float* weight, tjs_uint32*& output, int& len, int len8, bool strip ) {
-		// ‡Œv’l‚ğ‹‚ß‚é
+		// åˆè¨ˆå€¤ã‚’æ±‚ã‚ã‚‹
 		__m256 sum = sumWeight( weight, len8 );
 
-		// EPSILON ‚æ‚è¬‚³‚¢ê‡‚Í 0 ‚ğİ’è
-		const __m256 one = M256_PS_FIXED15; // •„†•t‚È‚Ì‚ÅB‚ ‚Æ³‹K‰»‚³‚ê‚Ä‚¢‚é‚©‚çAÅ‘å’l‚Í1‚É‚È‚é
+		// EPSILON ã‚ˆã‚Šå°ã•ã„å ´åˆã¯ 0 ã‚’è¨­å®š
+		const __m256 one = M256_PS_FIXED15; // ç¬¦å·ä»˜ãªã®ã§ã€‚ã‚ã¨æ­£è¦åŒ–ã•ã‚Œã¦ã„ã‚‹ã‹ã‚‰ã€æœ€å¤§å€¤ã¯1ã«ãªã‚‹
 		__m256 onemask = _mm256_cmp_ps( sum, M256_EPSILON, _CMP_GT_OS ); // sum > FLT_EPSILON ? 0xffffffff : 0; _mm_cmpgt_ps
 		__m256 rcp = m256_rcp_22bit_ps( sum );
-		rcp = _mm256_mul_ps( rcp, one );	// æ‚ÉƒVƒtƒg•ª‚àŠ|‚¯‚Ä‚¨‚­
+		rcp = _mm256_mul_ps( rcp, one );	// å…ˆã«ã‚·ãƒ•ãƒˆåˆ†ã‚‚æ›ã‘ã¦ãŠã
 		rcp = _mm256_and_ps( rcp, onemask );
 		float* w = weight;
-		// ³‹K‰»‚ÆŒÅ’è¬”“_‰»
+		// æ­£è¦åŒ–ã¨å›ºå®šå°æ•°ç‚¹åŒ–
 		for( int i = 0; i < len8; i+=8 ) {
 			__m256 weight8 = _mm256_load_ps( w ); w += 8;
 			weight8 = _mm256_mul_ps( weight8, rcp );
 
-			// ŒÅ’è¬”“_‰»
+			// å›ºå®šå°æ•°ç‚¹åŒ–
 			__m256i fix = _mm256_cvtps_epi32( weight8 );
-			fix = _mm256_packs_epi32( fix, fix );		// 16bit‰» [01 02 03 04 01 02 03 04]
+			fix = _mm256_packs_epi32( fix, fix );		// 16bitåŒ– [01 02 03 04 01 02 03 04]
 			fix = _mm256_unpacklo_epi16( fix, fix );	// 01 01 02 02 03 03 04 04
-			//_mm256_store_si256( (__m256i*)output, fix );	// tjs_uint32 ‚É short*2 ‚Å“¯‚¶’l‚ğŠi”[‚·‚é
-			_mm256_storeu_si256( (__m256i*)output, fix );	// tjs_uint32 ‚É short*2 ‚Å“¯‚¶’l‚ğŠi”[‚·‚é
+			//_mm256_store_si256( (__m256i*)output, fix );	// tjs_uint32 ã« short*2 ã§åŒã˜å€¤ã‚’æ ¼ç´ã™ã‚‹
+			_mm256_storeu_si256( (__m256i*)output, fix );	// tjs_uint32 ã« short*2 ã§åŒã˜å€¤ã‚’æ ¼ç´ã™ã‚‹
 			output += 8;
 		}
 		if( strip ) {
@@ -127,28 +127,28 @@ struct AxisParamAVX2 {
 		}
 	}
 	static inline void calculateWeight( float* weight, tjs_uint32*& output, int& len, int leftedge, int rightedge, bool strip=false ) {
-		// len ‚É‚Í‚Í‚İo‚µ‚½•ª‚àŠÜ‚Ü‚ê‚Ä‚¢‚é‚Ì‚ÅA‚Ü‚¸‚Í‚»‚Ì•”•ª‚ğƒJƒbƒg‚·‚é
+		// len ã«ã¯ã¯ã¿å‡ºã—ãŸåˆ†ã‚‚å«ã¾ã‚Œã¦ã„ã‚‹ã®ã§ã€ã¾ãšã¯ãã®éƒ¨åˆ†ã‚’ã‚«ãƒƒãƒˆã™ã‚‹
 		calculateEdge( weight, len, leftedge, rightedge );
 
-		// 8 ‚Ì”{”‰»
+		// 8 ã®å€æ•°åŒ–
 		int len8 = ((len+7)>>3)<<3;
 
-		// ƒ_ƒ~[•”•ª‚ğ0‚Éİ’è
+		// ãƒ€ãƒŸãƒ¼éƒ¨åˆ†ã‚’0ã«è¨­å®š
 		for( int i = len; i < len8; i++ ) weight[i] = 0.0f;
 
-		// ³‹K‰»‚ÆŒÅ’è¬”“_‰»
+		// æ­£è¦åŒ–ã¨å›ºå®šå°æ•°ç‚¹åŒ–
 		normalizeAndFixed( weight, output, len, len8, strip );
 	}
 	static inline void normalize( float* weight, float*& output, int& len, int len8, bool strip ) {
-		// ‡Œv’l‚ğ‹‚ß‚é
+		// åˆè¨ˆå€¤ã‚’æ±‚ã‚ã‚‹
 		__m256 sum = sumWeight( weight, len8 );
 
-		// EPSILON ‚æ‚è¬‚³‚¢ê‡‚Í 0 ‚ğİ’è
+		// EPSILON ã‚ˆã‚Šå°ã•ã„å ´åˆã¯ 0 ã‚’è¨­å®š
 		__m256 onemask = _mm256_cmp_ps( sum, M256_EPSILON, _CMP_GT_OS ); // sum > FLT_EPSILON ? 0xffffffff : 0; _mm_cmpgt_ps
 		__m256 rcp = m256_rcp_22bit_ps( sum );
 		rcp = _mm256_and_ps( rcp, onemask );
 		float* w = weight;
-		// ³‹K‰»
+		// æ­£è¦åŒ–
 		for( int i = 0; i < len8; i+=8 ) {
 			__m256 weight8 = _mm256_load_ps( w ); w += 8;
 			weight8 = _mm256_mul_ps( weight8, rcp );
@@ -160,16 +160,16 @@ struct AxisParamAVX2 {
 		}
 	}
 	static inline void calculateWeight( float* weight, float*& output, int& len, int leftedge, int rightedge, bool strip=false ) {
-		// len ‚É‚Í‚Í‚İo‚µ‚½•ª‚àŠÜ‚Ü‚ê‚Ä‚¢‚é‚Ì‚ÅA‚Ü‚¸‚Í‚»‚Ì•”•ª‚ğƒJƒbƒg‚·‚é
+		// len ã«ã¯ã¯ã¿å‡ºã—ãŸåˆ†ã‚‚å«ã¾ã‚Œã¦ã„ã‚‹ã®ã§ã€ã¾ãšã¯ãã®éƒ¨åˆ†ã‚’ã‚«ãƒƒãƒˆã™ã‚‹
 		calculateEdge( weight, len, leftedge, rightedge );
 
-		// 8 ‚Ì”{”‰»
+		// 8 ã®å€æ•°åŒ–
 		int len8 = ((len+7)>>3)<<3;
 
-		// ƒ_ƒ~[•”•ª‚ğ0‚Éİ’è
+		// ãƒ€ãƒŸãƒ¼éƒ¨åˆ†ã‚’0ã«è¨­å®š
 		for( int i = len; i < len8; i++ ) weight[i] = 0.0f;
 
-		// ³‹K‰»‚ÆŒÅ’è¬”“_‰»
+		// æ­£è¦åŒ–ã¨å›ºå®šå°æ•°ç‚¹åŒ–
 		normalize( weight, output, len, len8, strip );
 	}
 
@@ -181,9 +181,9 @@ struct AxisParamAVX2 {
 		length_.reserve( dstlength );
 		length_min_.clear();
 		length_min_.reserve( dstlength );
-		// ‚Ü‚¸‚Í‹——£‚ğŒvZ
-		// left/right”»’è‚àŠO‚Éo‚·‚Æ­‚µ‚¾‚¯‘¬‚­‚È‚é‚Æ‚Ív‚Á‚½‚ª’x‚­‚È‚Á‚½Ainline‰»‚³‚ê‚È‚¢‚Ì‚©‚à‚µ‚ê‚È‚¢
-		if( srclength <= dstlength ) { // Šg‘å
+		// ã¾ãšã¯è·é›¢ã‚’è¨ˆç®—
+		// left/rightåˆ¤å®šã‚‚å¤–ã«å‡ºã™ã¨å°‘ã—ã ã‘é€Ÿããªã‚‹ã¨ã¯æ€ã£ãŸãŒé…ããªã£ãŸã€inlineåŒ–ã•ã‚Œãªã„ã®ã‹ã‚‚ã—ã‚Œãªã„
+		if( srclength <= dstlength ) { // æ‹¡å¤§
 			float rangex = tap;
 			int maxrange = ((((int)rangex*2+2)+7)>>3)<<3;
 			std::vector<float,aligned_allocator<float,32> > work( maxrange, 0.0f );
@@ -215,15 +215,15 @@ struct AxisParamAVX2 {
 				start_.push_back( start );
 				int len = right - left;
 				__m256 dist8 = _mm256_set1_ps((float)left+0.5f-cx);
-				int len8 = ((len+7)>>3)<<3;	// 8 ‚Ì”{”‰»
+				int len8 = ((len+7)>>3)<<3;	// 8 ã®å€æ•°åŒ–
 				float* w = weight;
-				// ‚Ü‚¸‚ÍÅ‰‚Ì—v‘f‚Ì‚İˆ—‚·‚é
+				// ã¾ãšã¯æœ€åˆã®è¦ç´ ã®ã¿å‡¦ç†ã™ã‚‹
 				dist8 = _mm256_add_ps( dist8, deltafirst );
-				_mm256_store_ps( w, func( _mm256_and_ps( dist8, absmask ) ) );	// â‘Î’l+weightŒvZ
+				_mm256_store_ps( w, func( _mm256_and_ps( dist8, absmask ) ) );	// çµ¶å¯¾å€¤+weightè¨ˆç®—
 				w += 8;
 				for( int sx = 8; sx < len8; sx+=8 ) {
-					dist8 = _mm256_add_ps( dist8, delta8 );	// 8‚Â‚¸‚ÂƒXƒ‰ƒCƒh
-					_mm256_store_ps( w, func( _mm256_and_ps( dist8, absmask ) ) );	// â‘Î’l+weightŒvZ
+					dist8 = _mm256_add_ps( dist8, delta8 );	// 8ã¤ãšã¤ã‚¹ãƒ©ã‚¤ãƒ‰
+					_mm256_store_ps( w, func( _mm256_and_ps( dist8, absmask ) ) );	// çµ¶å¯¾å€¤+weightè¨ˆç®—
 					w += 8;
 				}
 				calculateWeight( weight, output, len, leftedge, rightedge, strip );
@@ -236,7 +236,7 @@ struct AxisParamAVX2 {
 					length_min_.push_back( len );
 				}
 			}
-		} else { // k¬
+		} else { // ç¸®å°
 			float rangex = tap*(float)srclength/(float)dstlength;
 			int maxrange = ((((int)rangex*2+2)+7)>>3)<<3;
 			std::vector<float,aligned_allocator<float,32> > work( maxrange, 0.0f );
@@ -248,13 +248,13 @@ struct AxisParamAVX2 {
 			weight_.reserve( length );
 #endif
 			TWeight* output = &weight_[0];
-			const float delta = (float)dstlength/(float)srclength; // “]‘—æÀ•W‚Å‚ÌˆÊ’u‘•ª
+			const float delta = (float)dstlength/(float)srclength; // è»¢é€å…ˆåº§æ¨™ã§ã®ä½ç½®å¢—åˆ†
 
 			__m256 delta8 = _mm256_set1_ps(delta);
 			__m256 deltafirst = M256_PS_STEP;//_mm256_set_ps( 7.0f, 6.0f, 5.0f, 4.0f, 3.0f, 2.0f, 1.0f, 0.0f );
 			const __m256 absmask = M256_ABS_MASK;
-			deltafirst = _mm256_mul_ps( deltafirst, delta8 );	// 0 1 2 3 ‚Æ‡‚É‰ÁZ‚³‚ê‚é‚æ‚¤‚É‚·‚é
-			// 8”{‚·‚é
+			deltafirst = _mm256_mul_ps( deltafirst, delta8 );	// 0 1 2 3 ã¨é †ã«åŠ ç®—ã•ã‚Œã‚‹ã‚ˆã†ã«ã™ã‚‹
+			// 8å€ã™ã‚‹
 			delta8 = _mm256_add_ps( delta8, delta8 );
 			delta8 = _mm256_add_ps( delta8, delta8 );
 			delta8 = _mm256_add_ps( delta8, delta8 );
@@ -273,19 +273,19 @@ struct AxisParamAVX2 {
 					rightedge = right - srcend;
 				}
 				start_.push_back( start );
-				// “]‘—æÀ•W‚Å‚ÌˆÊ’u
+				// è»¢é€å…ˆåº§æ¨™ã§ã®ä½ç½®
 				int len = right-left;
 				float dx = (left+0.5f-cx) * delta;
 				__m256 dist8 = _mm256_set1_ps(dx);
-				int len8 = ((len+7)>>3)<<3;	// 8 ‚Ì”{”‰»
+				int len8 = ((len+7)>>3)<<3;	// 8 ã®å€æ•°åŒ–
 				float* w = weight;
-				// ‚Ü‚¸‚ÍÅ‰‚Ì—v‘f‚Ì‚İˆ—‚·‚é
+				// ã¾ãšã¯æœ€åˆã®è¦ç´ ã®ã¿å‡¦ç†ã™ã‚‹
 				dist8 = _mm256_add_ps( dist8, deltafirst );
-				_mm256_store_ps( w, func( _mm256_and_ps( dist8, absmask ) ) );	// â‘Î’l+weightŒvZ
+				_mm256_store_ps( w, func( _mm256_and_ps( dist8, absmask ) ) );	// çµ¶å¯¾å€¤+weightè¨ˆç®—
 				w += 8;
 				for( int sx = 8; sx < len8; sx+=8 ) {
-					dist8 = _mm256_add_ps( dist8, delta8 );	// 8‚Â‚¸‚ÂƒXƒ‰ƒCƒh
-					_mm256_store_ps( w, func( _mm256_and_ps( dist8, absmask ) ) );	// â‘Î’l+weightŒvZ
+					dist8 = _mm256_add_ps( dist8, delta8 );	// 8ã¤ãšã¤ã‚¹ãƒ©ã‚¤ãƒ‰
+					_mm256_store_ps( w, func( _mm256_and_ps( dist8, absmask ) ) );	// çµ¶å¯¾å€¤+weightè¨ˆç®—
 					w += 8;
 				}
 				calculateWeight( weight, output, len, leftedge, rightedge, strip );
@@ -300,7 +300,7 @@ struct AxisParamAVX2 {
 			}
 		}
 	}
-	// ‡Œv’l‚ğ‹‚ß‚é
+	// åˆè¨ˆå€¤ã‚’æ±‚ã‚ã‚‹
 	static inline __m256 sumWeightUnalign( float* weight, int len8 ) {
 		float* w = weight;
 		__m256 sum = _mm256_setzero_ps();
@@ -311,7 +311,7 @@ struct AxisParamAVX2 {
 		}
 		return m256_hsum_avx_ps(sum);
 	}
-	// ³‹K‰»
+	// æ­£è¦åŒ–
 	void normalizeAreaAvg( float* wstart, float* dweight, tjs_uint size, bool strip ) {
 		const int count = (const int)length_.size();
 		int dwindex = 0;
@@ -320,7 +320,7 @@ struct AxisParamAVX2 {
 			float* dw = dweight;
 			int len = length_[i];
 			float* w = wstart;
-			int len8 = ((len+7)>>3)<<3;	// 8 ‚Ì”{”‰»
+			int len8 = ((len+7)>>3)<<3;	// 8 ã®å€æ•°åŒ–
 			int idx = 0;
 			for( ; idx < len; idx++ ) {
 				*dw = *w;
@@ -329,14 +329,14 @@ struct AxisParamAVX2 {
 			}
 			wstart = w;
 			w = dweight;
-			// ƒAƒ‰ƒCƒƒ“ƒg
+			// ã‚¢ãƒ©ã‚¤ãƒ¡ãƒ³ãƒˆ
 			for( ; idx < len8; idx++ ) {
 				*dw = 0.0f;
 				dw++;
 			}
 			dweight = dw;
 
-			// ‡Œv’l‚ğ‹‚ß‚é
+			// åˆè¨ˆå€¤ã‚’æ±‚ã‚ã‚‹
 			__m256 sum;
 			if( strip ) {
 				sum = sumWeightUnalign( w, len8 );
@@ -344,11 +344,11 @@ struct AxisParamAVX2 {
 				sum = sumWeight( w, len8 );
 			}
 
-			// EPSILON ‚æ‚è¬‚³‚¢ê‡‚Í 0 ‚ğİ’è
+			// EPSILON ã‚ˆã‚Šå°ã•ã„å ´åˆã¯ 0 ã‚’è¨­å®š
 			__m256 onemask = _mm256_cmp_ps( sum, epsilon, _CMP_GT_OS ); // sum > FLT_EPSILON ? 0xffffffff : 0; _mm_cmpgt_ps
 			__m256 rcp = m256_rcp_22bit_ps( sum );
 			rcp = _mm256_and_ps( rcp, onemask );
-			// ³‹K‰»
+			// æ­£è¦åŒ–
 			for( int j = 0; j < len8; j += 8 ) {
 				__m256 weight8 = _mm256_loadu_ps( w );
 				weight8 = _mm256_mul_ps( weight8, rcp );
@@ -373,13 +373,13 @@ struct AxisParamAVX2 {
 		work.reserve( size );
 #endif
 		int dwindex = 0;
-		const __m256 one = M256_PS_FIXED15; // •„†•t‚È‚Ì‚ÅB‚ ‚Æ³‹K‰»‚³‚ê‚Ä‚¢‚é‚©‚çAÅ‘å’l‚Í1‚É‚È‚é
+		const __m256 one = M256_PS_FIXED15; // ç¬¦å·ä»˜ãªã®ã§ã€‚ã‚ã¨æ­£è¦åŒ–ã•ã‚Œã¦ã„ã‚‹ã‹ã‚‰ã€æœ€å¤§å€¤ã¯1ã«ãªã‚‹
 		const __m256 epsilon = M256_EPSILON;
 		for( int i = 0; i < count; i++ ) {
 			float* dw = &work[0];
 			int len = length_[i];
 			float* w = wstart;
-			int len8 = ((len+7)>>3)<<3;	// 8 ‚Ì”{”‰»
+			int len8 = ((len+7)>>3)<<3;	// 8 ã®å€æ•°åŒ–
 			int idx = 0;
 			for( ; idx < len; idx++ ) {
 				*dw = *w;
@@ -388,29 +388,29 @@ struct AxisParamAVX2 {
 			}
 			wstart = w;
 			w = &work[0];
-			// ƒAƒ‰ƒCƒƒ“ƒg
+			// ã‚¢ãƒ©ã‚¤ãƒ¡ãƒ³ãƒˆ
 			for( ; idx < len8; idx++ ) {
 				*dw = 0.0f;
 				dw++;
 			}
 
-			// ‡Œv’l‚ğ‹‚ß‚é
+			// åˆè¨ˆå€¤ã‚’æ±‚ã‚ã‚‹
 			__m256 sum = sumWeight( w, len8 );
 
-			// EPSILON ‚æ‚è¬‚³‚¢ê‡‚Í 0 ‚ğİ’è
+			// EPSILON ã‚ˆã‚Šå°ã•ã„å ´åˆã¯ 0 ã‚’è¨­å®š
 			__m256 onemask = _mm256_cmp_ps( sum, epsilon, _CMP_GT_OS ); // sum > FLT_EPSILON ? 0xffffffff : 0; _mm_cmpgt_ps
 			__m256 rcp = m256_rcp_22bit_ps( sum );
-			rcp = _mm256_mul_ps( rcp, one );	// æ‚ÉƒVƒtƒg•ª‚àŠ|‚¯‚Ä‚¨‚­
+			rcp = _mm256_mul_ps( rcp, one );	// å…ˆã«ã‚·ãƒ•ãƒˆåˆ†ã‚‚æ›ã‘ã¦ãŠã
 			rcp = _mm256_and_ps( rcp, onemask );
-			// ³‹K‰»
+			// æ­£è¦åŒ–
 			for( int j = 0; j < len8; j += 8 ) {
 				__m256 weight8 = _mm256_load_ps( w ); w += 8;
 				weight8 = _mm256_mul_ps( weight8, rcp );
-				// ŒÅ’è¬”“_‰»
+				// å›ºå®šå°æ•°ç‚¹åŒ–
 				__m256i fix = _mm256_cvtps_epi32( weight8 );
-				fix = _mm256_packs_epi32( fix, fix );		// 16bit‰» [01 02 03 04 01 02 03 04]
+				fix = _mm256_packs_epi32( fix, fix );		// 16bitåŒ– [01 02 03 04 01 02 03 04]
 				fix = _mm256_unpacklo_epi16( fix, fix );	// 01 01 02 02 03 03 04 04
-				_mm256_storeu_si256( (__m256i*)dweight, fix );	// tjs_uint32 ‚É short*2 ‚Å“¯‚¶’l‚ğŠi”[‚·‚é
+				_mm256_storeu_si256( (__m256i*)dweight, fix );	// tjs_uint32 ã« short*2 ã§åŒã˜å€¤ã‚’æ ¼ç´ã™ã‚‹
 				dweight += 8;
 			}
 			if( strip ) {
@@ -423,16 +423,16 @@ struct AxisParamAVX2 {
 		}
 	}
 	void calculateAxisAreaAvg( int srcstart, int srcend, int srclength, int dstlength, bool strip ) {
-		if( dstlength <= srclength ) { // k¬‚Ì‚İ
+		if( dstlength <= srclength ) { // ç¸®å°ã®ã¿
 			std::vector<float> weight;
 			TVPCalculateAxisAreaAvg( srcstart, srcend, srclength, dstlength, start_, length_, weight );
-			// ÀÛ‚ÌƒTƒCƒY‚ğ‹‚ß‚é
+			// å®Ÿéš›ã®ã‚µã‚¤ã‚ºã‚’æ±‚ã‚ã‚‹
 			int maxsize = 0;
 			if( strip == false ) {
 				int count = (int)length_.size();
 				for( int i = 0; i < count; i++ ) {
 					int len = length_[i];
-					maxsize += ((len+7)>>3)<<3;	// 8 ‚Ì”{”‰»
+					maxsize += ((len+7)>>3)<<3;	// 8 ã®å€æ•°åŒ–
 				}
 			} else {
 				maxsize = (int)weight.size();
@@ -454,7 +454,7 @@ class ResamplerAVX2Fix {
 
 public:
 	/**
-	 * ƒ}ƒ‹ƒ`ƒXƒŒƒbƒh‰»—p
+	 * ãƒãƒ«ãƒã‚¹ãƒ¬ãƒƒãƒ‰åŒ–ç”¨
 	 */
 	struct ThreadParameterHV {
 		ResamplerAVX2Fix* sampler_;
@@ -472,11 +472,11 @@ public:
 		const tTVPImageCopyFuncBase* blendfunc_;
 	};
 	/**
-	 * ‰¡•ûŒü‚Ìˆ—‚ğŒã‚É‚µ‚½ê‡‚ÌÀ‘•
+	 * æ¨ªæ–¹å‘ã®å‡¦ç†ã‚’å¾Œã«ã—ãŸå ´åˆã®å®Ÿè£…
 	 */
 	inline void samplingHorizontal( tjs_uint32* dstbits, const int offsetx, const int dstwidth, const tjs_uint32* srcbits ) {
 		const tjs_uint32* weightx = &paramx_.weight_[0];
-		// ‚Ü‚¸offset•ª‚ğƒXƒLƒbƒv
+		// ã¾ãšoffsetåˆ†ã‚’ã‚¹ã‚­ãƒƒãƒ—
 		for( int x = 0; x < offsetx; x++ ) {
 			weightx += paramx_.length_[x];
 		}
@@ -489,10 +489,10 @@ public:
 			int right = left + paramx_.length_[x];
 			__m256i color_lo = _mm256_setzero_si256();
 			__m256i color_hi = _mm256_setzero_si256();
-			// 8ƒsƒNƒZƒ‹‚¸‚Âˆ—‚·‚é
+			// 8ãƒ”ã‚¯ã‚»ãƒ«ãšã¤å‡¦ç†ã™ã‚‹
 			for( int sx = left; sx < right; sx+=8 ) {
-				__m256i col8 = _mm256_loadu_si256( (const __m256i*)&src[sx] ); // 8ƒsƒNƒZƒ‹“Ç‚İ‚İ
-				__m256i weight8 = _mm256_loadu_si256( (const __m256i*)weightx ); // ƒEƒFƒCƒg(ŒÅ’è­”)8‚Â(16bit‚Å16)“Ç‚İ‚İ 0 1 2 3 ƒAƒ‰ƒCƒƒ“ƒgÏ‚İ
+				__m256i col8 = _mm256_loadu_si256( (const __m256i*)&src[sx] ); // 8ãƒ”ã‚¯ã‚»ãƒ«èª­ã¿è¾¼ã¿
+				__m256i weight8 = _mm256_loadu_si256( (const __m256i*)weightx ); // ã‚¦ã‚§ã‚¤ãƒˆ(å›ºå®šå°‘æ•°)8ã¤(16bitã§16)èª­ã¿è¾¼ã¿ 0 1 2 3 ã‚¢ãƒ©ã‚¤ãƒ¡ãƒ³ãƒˆæ¸ˆã¿
 				weightx += 8;
 
 				__m256i col = _mm256_and_si256( col8, cmask );	// 00 RR 00 BB & 0x00ff00ff
@@ -505,26 +505,26 @@ public:
 				col = _mm256_mulhi_epi16( col, weight8 );
 				color_hi = _mm256_adds_epi16( color_hi, col );
 			}
-			{	// AVX - …•½‰ÁZ
+			{	// AVX - æ°´å¹³åŠ ç®—
 				__m256i sumlo = color_lo;
 				color_lo = _mm256_shuffle_epi32( color_lo, _MM_SHUFFLE(1,0,3,2) ); // 0 1 2 3 + 1 0 3 2
 				sumlo = _mm256_adds_epi16( sumlo, color_lo );
 				color_lo = _mm256_shuffle_epi32( sumlo, _MM_SHUFFLE(2,3,0,1) ); // 3 2 1 0
 				sumlo = _mm256_adds_epi16( sumlo, color_lo );
-				color_lo = _mm256_permute2x128_si256( sumlo, sumlo, 0 << 4 | 1 ); // 128bit ‚Å‘OŒã”½“]
+				color_lo = _mm256_permute2x128_si256( sumlo, sumlo, 0 << 4 | 1 ); // 128bit ã§å‰å¾Œåè»¢
 				sumlo = _mm256_adds_epi16( sumlo, color_lo );
 				sumlo = _mm256_adds_epi16( sumlo, fixround );
-				sumlo = _mm256_srai_epi16( sumlo, 6 ); // ŒÅ’è¬”“_‚©‚ç®”‰» - << 15, << 7, >> 16 = 6
+				sumlo = _mm256_srai_epi16( sumlo, 6 ); // å›ºå®šå°æ•°ç‚¹ã‹ã‚‰æ•´æ•°åŒ– - << 15, << 7, >> 16 = 6
 
 				__m256i sumhi = color_hi;
 				color_hi = _mm256_shuffle_epi32( color_hi, _MM_SHUFFLE(1,0,3,2) ); // 0 1 2 3 + 1 0 3 2
 				sumhi = _mm256_adds_epi16( sumhi, color_hi );
 				color_hi = _mm256_shuffle_epi32( sumhi, _MM_SHUFFLE(2,3,0,1) ); // 3 2 1 0
 				sumhi = _mm256_adds_epi16( sumhi, color_hi );
-				color_hi = _mm256_permute2x128_si256( sumhi, sumhi, 0 << 4 | 1 ); // 128bit ‚Å‘OŒã”½“]
+				color_hi = _mm256_permute2x128_si256( sumhi, sumhi, 0 << 4 | 1 ); // 128bit ã§å‰å¾Œåè»¢
 				sumhi = _mm256_adds_epi16( sumhi, color_hi );
 				sumhi = _mm256_adds_epi16( sumhi, fixround );
-				sumhi = _mm256_srai_epi16( sumhi, 6 ); // ŒÅ’è¬”“_‚©‚ç®”‰»
+				sumhi = _mm256_srai_epi16( sumhi, 6 ); // å›ºå®šå°æ•°ç‚¹ã‹ã‚‰æ•´æ•°åŒ–
 
 				sumlo = _mm256_unpacklo_epi16( sumlo, sumhi );
 				sumlo = _mm256_packus_epi16( sumlo, sumlo );
@@ -534,9 +534,9 @@ public:
 		}
 	}
 	/**
-	 * 8ƒ‰ƒCƒ“”Å‚ÍAc‚ğ‚â‚Á‚Ä‚©‚ç‰¡‚ğ‚â‚é‚Æ‚¢‚¢‚Ì‚©‚È
-	 * ‚»‚µ‚½‚çA“¯“Ç‚İ‚İ‚ªo—ˆ‚é‚©
-	 * @dstheight : k¬Œã‚Ìc‚Ì’·‚³
+	 * 8ãƒ©ã‚¤ãƒ³ç‰ˆã¯ã€ç¸¦ã‚’ã‚„ã£ã¦ã‹ã‚‰æ¨ªã‚’ã‚„ã‚‹ã¨ã„ã„ã®ã‹ãª
+	 * ãã—ãŸã‚‰ã€åŒæ™‚èª­ã¿è¾¼ã¿ãŒå‡ºæ¥ã‚‹ã‹
+	 * @dstheight : ç¸®å°å¾Œã®ç¸¦ã®é•·ã•
 	 */
 	inline void samplingVertical( int y, tjs_uint32* dstbits, int dstheight, int srcwidth, const tTVPBaseBitmap *src, const tTVPRect &srcrect, const tjs_uint32*& wstarty ) {
 		const int top = paramy_.start_[y];
@@ -546,7 +546,7 @@ public:
 		const __m256i cmask = M256_U32_FIXED_COLOR_MASK;
 		const __m256i fixround = M256_U32_FIXED_ROUND;
 		//const tjs_uint32* srctop = (const tjs_uint32*)src->GetScanLine(top+srcrect.top) + srcrect.left;
-		const tjs_uint32* srctop = (const tjs_uint32*)src->GetScanLine(top) + srcrect.left;	// ²ŒvZ‚ÉƒIƒtƒZƒbƒg‚ÍŒvZÏ‚İ
+		const tjs_uint32* srctop = (const tjs_uint32*)src->GetScanLine(top) + srcrect.left;	// è»¸è¨ˆç®—æ™‚ã«ã‚ªãƒ•ã‚»ãƒƒãƒˆã¯è¨ˆç®—æ¸ˆã¿
 		tjs_int stride = src->GetPitchBytes()/(int)sizeof(tjs_uint32);
 		for( int x = 0; x < srcwidth; x+=8 ) {
 			weighty = wstarty;
@@ -554,9 +554,9 @@ public:
 			__m256i color_hi = _mm256_setzero_si256();
 			const tjs_uint32* srcbits = &srctop[x];
 			for( int sy = top; sy < bottom; sy++ ) {
-				__m256i col8 = _mm256_loadu_si256( (const __m256i*)srcbits ); // 8—ñ“Ç‚İ‚İ
+				__m256i col8 = _mm256_loadu_si256( (const __m256i*)srcbits ); // 8åˆ—èª­ã¿è¾¼ã¿
 				srcbits += stride;
-				__m256i weight8 = _mm256_set1_epi32( (int)*weighty ); // weight ‚ÍA“¯‚¶’l‚ğİ’è
+				__m256i weight8 = _mm256_set1_epi32( (int)*weighty ); // weight ã¯ã€åŒã˜å€¤ã‚’è¨­å®š
 				weighty++;
 
 				__m256i col = _mm256_and_si256( col8, cmask );	// 00 RR 00 BB
@@ -572,8 +572,8 @@ public:
 			{
 				color_lo = _mm256_adds_epi16( color_lo, fixround );
 				color_hi = _mm256_adds_epi16( color_hi, fixround );
-				color_lo = _mm256_srai_epi16( color_lo, 6 ); // ŒÅ’è¬”“_‚©‚ç®”‰» - << 15, << 7, >> 16 = 6
-				color_hi = _mm256_srai_epi16( color_hi, 6 ); // ŒÅ’è¬”“_‚©‚ç®”‰»
+				color_lo = _mm256_srai_epi16( color_lo, 6 ); // å›ºå®šå°æ•°ç‚¹ã‹ã‚‰æ•´æ•°åŒ– - << 15, << 7, >> 16 = 6
+				color_hi = _mm256_srai_epi16( color_hi, 6 ); // å›ºå®šå°æ•°ç‚¹ã‹ã‚‰æ•´æ•°åŒ–
 				__m256i lo = _mm256_unpacklo_epi16( color_lo, color_hi );
 				__m256i hi = _mm256_unpackhi_epi16( color_lo, color_hi );
 				color_lo = _mm256_packus_epi16( lo, hi );
@@ -595,7 +595,7 @@ public:
 		work.reserve( alingnwidth );
 #endif
 		const tjs_uint32* wstarty = &paramy_.weight_[0];
-		// ƒNƒŠƒbƒsƒ“ƒO•”•ªƒXƒLƒbƒv
+		// ã‚¯ãƒªãƒƒãƒ”ãƒ³ã‚°éƒ¨åˆ†ã‚¹ã‚­ãƒƒãƒ—
 		for( int y = 0; y < clip.offsety_; y++ ) {
 			wstarty += paramy_.length_[y];
 		}
@@ -608,17 +608,17 @@ public:
 				samplingHorizontal( dstbits, clip.offsetx_, clip.width_, workbits );
 				dstbits += dststride;
 			}
-		} else {	// ’PƒƒRƒs[ˆÈŠO‚ÍAˆê“xƒeƒ“ƒ|ƒ‰ƒŠ‚É‘‚«o‚µ‚Ä‚©‚ç‡¬‚·‚é
+		} else {	// å˜ç´”ã‚³ãƒ”ãƒ¼ä»¥å¤–ã¯ã€ä¸€åº¦ãƒ†ãƒ³ãƒãƒ©ãƒªã«æ›¸ãå‡ºã—ã¦ã‹ã‚‰åˆæˆã™ã‚‹
 #ifdef _DEBUG
 			std::vector<tjs_uint32> dstwork(clip.getDestWidth()+7);
 #else
 			std::vector<tjs_uint32> dstwork;
 			dstwork.reserve( clip.getDestWidth()+7 );
 #endif
-			tjs_uint32* midbits = &dstwork[0];	// “r’†ˆ——pƒoƒbƒtƒ@
+			tjs_uint32* midbits = &dstwork[0];	// é€”ä¸­å‡¦ç†ç”¨ãƒãƒƒãƒ•ã‚¡
 			for( int y = clip.offsety_; y < clip.height_; y++ ) {
 				samplingVertical( y, workbits, dstheight, srcwidth, src, srcrect, wstarty );
-				samplingHorizontal( midbits, clip.offsetx_, clip.width_, workbits ); // ˆêƒoƒbƒtƒ@‚É‚Ü‚¸ƒRƒs[, ”ÍˆÍŠO‚Íˆ—‚µ‚È‚¢
+				samplingHorizontal( midbits, clip.offsetx_, clip.width_, workbits ); // ä¸€æ™‚ãƒãƒƒãƒ•ã‚¡ã«ã¾ãšã‚³ãƒ”ãƒ¼, ç¯„å›²å¤–ã¯å‡¦ç†ã—ãªã„
 				(*blendfunc)( dstbits, midbits, clip.getDestWidth() );
 				dstbits += dststride;
 			}
@@ -628,7 +628,7 @@ public:
 		const int srcwidth = srcrect.get_width();
 		const int alingnwidth = ((srcwidth+7)>>3)<<3;
 		const tjs_uint32* wstarty = &paramy_.weight_[0];
-		// ƒNƒŠƒbƒsƒ“ƒO•”•ªƒXƒLƒbƒv
+		// ã‚¯ãƒªãƒƒãƒ”ãƒ³ã‚°éƒ¨åˆ†ã‚¹ã‚­ãƒƒãƒ—
 		for( int y = 0; y < clip.offsety_; y++ ) {
 			wstarty += paramy_.length_[y];
 		}
@@ -688,7 +688,7 @@ public:
 		if( pixelNum >= 50 * 500 ) {
 			threadNum = TVPGetThreadNum();
 		}
-		if( threadNum == 1 ) { // –ÊÏ‚ª­‚È‚­ƒXƒŒƒbƒh‚ª1‚Ì‚Í‚»‚Ì‚Ü‚ÜÀs
+		if( threadNum == 1 ) { // é¢ç©ãŒå°‘ãªãã‚¹ãƒ¬ãƒƒãƒ‰ãŒ1ã®æ™‚ã¯ãã®ã¾ã¾å®Ÿè¡Œ
 			Resample( clip, blendfunc, dest, destrect, src, srcrect, tap, func );
 			return;
 		}
@@ -722,7 +722,7 @@ public:
 		if( pixelNum >= 50 * 500 ) {
 			threadNum = TVPGetThreadNum();
 		}
-		if( threadNum == 1 ) { // –ÊÏ‚ª­‚È‚­ƒXƒŒƒbƒh‚ª1‚Ì‚Í‚»‚Ì‚Ü‚ÜÀs
+		if( threadNum == 1 ) { // é¢ç©ãŒå°‘ãªãã‚¹ãƒ¬ãƒƒãƒ‰ãŒ1ã®æ™‚ã¯ãã®ã¾ã¾å®Ÿè¡Œ
 			ResampleAreaAvg( clip, blendfunc, dest, destrect, src, srcrect );
 			return;
 		}
@@ -761,17 +761,17 @@ void TJS_USERENTRY ResamplerAVX2FixFunc( void* p ) {
 			param->sampler_->samplingHorizontal( dstbits, param->clip_->offsetx_, param->clip_->width_, workbits );
 			dstbits += dststride;
 		}
-	} else {	// ’PƒƒRƒs[ˆÈŠO
+	} else {	// å˜ç´”ã‚³ãƒ”ãƒ¼ä»¥å¤–
 #ifdef _DEBUG
 		std::vector<tjs_uint32> dstwork(param->clip_->getDestWidth()+7);
 #else
 		std::vector<tjs_uint32> dstwork;
 		dstwork.reserve( param->clip_->getDestWidth()+7 );
 #endif
-		tjs_uint32* midbits = &dstwork[0];	// “r’†ˆ——pƒoƒbƒtƒ@
+		tjs_uint32* midbits = &dstwork[0];	// é€”ä¸­å‡¦ç†ç”¨ãƒãƒƒãƒ•ã‚¡
 		for( int y = param->start_; y < param->end_; y++ ) {
 			param->sampler_->samplingVertical( y, workbits, dstheight, srcwidth, src, srcrect, wstarty );
-			param->sampler_->samplingHorizontal( midbits, param->clip_->offsetx_, param->clip_->width_, workbits ); // ˆêƒoƒbƒtƒ@‚É‚Ü‚¸ƒRƒs[, ”ÍˆÍŠO‚Íˆ—‚µ‚È‚¢
+			param->sampler_->samplingHorizontal( midbits, param->clip_->offsetx_, param->clip_->width_, workbits ); // ä¸€æ™‚ãƒãƒƒãƒ•ã‚¡ã«ã¾ãšã‚³ãƒ”ãƒ¼, ç¯„å›²å¤–ã¯å‡¦ç†ã—ãªã„
 			(*param->blendfunc_)( dstbits, midbits, param->clip_->getDestWidth() );
 			dstbits += dststride;
 		}
@@ -783,7 +783,7 @@ class ResamplerAVX2 {
 	AxisParamAVX2<float> paramy_;
 
 public:
-	/** ƒ}ƒ‹ƒ`ƒXƒŒƒbƒh‰»—p */
+	/** ãƒãƒ«ãƒã‚¹ãƒ¬ãƒƒãƒ‰åŒ–ç”¨ */
 	struct ThreadParameterHV {
 		ResamplerAVX2* sampler_;
 		int start_;
@@ -800,12 +800,12 @@ public:
 		const tTVPImageCopyFuncBase* blendfunc_;
 	};
 	/**
-	 * ‰¡•ûŒü‚Ìˆ— (Œã‚Éˆ—)
+	 * æ¨ªæ–¹å‘ã®å‡¦ç† (å¾Œã«å‡¦ç†)
 	 */
 	inline void samplingHorizontal( tjs_uint32* dstbits, const int offsetx, const int dstwidth, const tjs_uint32* srcbits ) {
-		const __m256i cmask = M256_U32_FIXED_COLOR_MASK8;	// 8bit‰»‚·‚é‚½‚ß‚Ìƒ}ƒXƒN
+		const __m256i cmask = M256_U32_FIXED_COLOR_MASK8;	// 8bitåŒ–ã™ã‚‹ãŸã‚ã®ãƒã‚¹ã‚¯
 		const float* weightx = &paramx_.weight_[0];
-		// ‚Ü‚¸offset•ª‚ğƒXƒLƒbƒv
+		// ã¾ãšoffsetåˆ†ã‚’ã‚¹ã‚­ãƒƒãƒ—
 		for( int x = 0; x < offsetx; x++ ) {
 			weightx += paramx_.length_[x];
 		}
@@ -816,13 +816,13 @@ public:
 			const int left = paramx_.start_[x];
 			int right = left + paramx_.length_[x];
 			__m256 color_elm = _mm256_setzero_ps();
-			// 8ƒsƒNƒZƒ‹‚¸‚Âˆ—‚·‚é
+			// 8ãƒ”ã‚¯ã‚»ãƒ«ãšã¤å‡¦ç†ã™ã‚‹
 			for( int sx = left; sx < right; sx+=8 ) {
-				__m256i col8 = _mm256_loadu_si256( (const __m256i*)&src[sx] ); // 8ƒsƒNƒZƒ‹“Ç‚İ‚İ
-				__m256 weight8 = _mm256_loadu_ps( (const float*)weightx ); // ƒEƒFƒCƒg8‚Â
+				__m256i col8 = _mm256_loadu_si256( (const __m256i*)&src[sx] ); // 8ãƒ”ã‚¯ã‚»ãƒ«èª­ã¿è¾¼ã¿
+				__m256 weight8 = _mm256_loadu_ps( (const float*)weightx ); // ã‚¦ã‚§ã‚¤ãƒˆ8ã¤
 				weightx += 8;
 
-				// a r g b | a r g b ‚Æ 2‚Â‚¸‚Âˆ—‚·‚é‚©‚çAweight ‚à‚»‚ÌŒ`‚ÉƒCƒ“ƒ^[ƒŠ[ƒu
+				// a r g b | a r g b ã¨ 2ã¤ãšã¤å‡¦ç†ã™ã‚‹ã‹ã‚‰ã€weight ã‚‚ãã®å½¢ã«ã‚¤ãƒ³ã‚¿ãƒ¼ãƒªãƒ¼ãƒ–
 				__m256i collo = _mm256_unpacklo_epi8( col8, zero );		// 00 01 00 02 00 03 0 04 00 05 00 06...
 				__m256i col = _mm256_unpacklo_epi16( collo, zero );		// 00 00 00 01 00 00 00 02...
 				__m256 colf = _mm256_cvtepi32_ps( col );
@@ -851,8 +851,8 @@ public:
 				colf = _mm256_mul_ps( colf, w );
 				color_elm = _mm256_add_ps( color_elm, colf );
 			}
-			{	// AVX - ‘OŒã128bit‰ÁZ
-				__m256 color_rev = _mm256_permute2f128_ps(color_elm, color_elm, 0 << 4 | 1 );	// ‘OŒã“ü‚ê‚©‚¦
+			{	// AVX - å‰å¾Œ128bitåŠ ç®—
+				__m256 color_rev = _mm256_permute2f128_ps(color_elm, color_elm, 0 << 4 | 1 );	// å‰å¾Œå…¥ã‚Œã‹ãˆ
 				color_elm = _mm256_add_ps( color_elm, color_rev );
 				__m256i color = _mm256_cvtps_epi32( color_elm );
 				color = _mm256_packus_epi32( color, color );
@@ -863,7 +863,7 @@ public:
 		}
 	}
 	/**
-	 * c•ûŒüˆ—
+	 * ç¸¦æ–¹å‘å‡¦ç†
 	 */
 	inline void samplingVertical( int y, tjs_uint32* dstbits, int dstheight, int srcwidth, const tTVPBaseBitmap *src, const tTVPRect &srcrect, const float*& wstarty ) {
 		const int top = paramy_.start_[y];
@@ -881,9 +881,9 @@ public:
 			__m256 color_b = _mm256_setzero_ps();
 			const tjs_uint32* srcbits = &srctop[x];
 			for( int sy = top; sy < bottom; sy++ ) {
-				__m256i col8 = _mm256_loadu_si256( (const __m256i*)srcbits ); // 8—ñ“Ç‚İ‚İ
+				__m256i col8 = _mm256_loadu_si256( (const __m256i*)srcbits ); // 8åˆ—èª­ã¿è¾¼ã¿
 				srcbits += stride;
-				__m256 weight8 = _mm256_set1_ps( *weighty ); // weight ‚ÍA“¯‚¶’l‚ğİ’è
+				__m256 weight8 = _mm256_set1_ps( *weighty ); // weight ã¯ã€åŒã˜å€¤ã‚’è¨­å®š
 				weighty++;
 				
 				__m256i c = _mm256_srli_epi32( col8, 24 );
@@ -913,7 +913,7 @@ public:
 				__m256i r = _mm256_cvtps_epi32( color_r );
 				__m256i g = _mm256_cvtps_epi32( color_g );
 				__m256i b = _mm256_cvtps_epi32( color_b );
-				// ƒCƒ“ƒ^[ƒŠ[ƒu
+				// ã‚¤ãƒ³ã‚¿ãƒ¼ãƒªãƒ¼ãƒ–
 				__m256i arl = _mm256_unpacklo_epi32( r, a );
 				__m256i arh = _mm256_unpackhi_epi32( r, a );
 				arl = _mm256_packs_epi32( arl, arh );	// a r a r a r ar
@@ -940,7 +940,7 @@ public:
 		work.reserve( alingnwidth );
 #endif
 		const float* wstarty = &paramy_.weight_[0];
-		// ƒNƒŠƒbƒsƒ“ƒO•”•ªƒXƒLƒbƒv
+		// ã‚¯ãƒªãƒƒãƒ”ãƒ³ã‚°éƒ¨åˆ†ã‚¹ã‚­ãƒƒãƒ—
 		for( int y = 0; y < clip.offsety_; y++ ) {
 			wstarty += paramy_.length_[y];
 		}
@@ -953,17 +953,17 @@ public:
 				samplingHorizontal( dstbits, clip.offsetx_, clip.width_, workbits );
 				dstbits += dststride;
 			}
-		} else {	// ’PƒƒRƒs[ˆÈŠO‚ÍAˆê“xƒeƒ“ƒ|ƒ‰ƒŠ‚É‘‚«o‚µ‚Ä‚©‚ç‡¬‚·‚é
+		} else {	// å˜ç´”ã‚³ãƒ”ãƒ¼ä»¥å¤–ã¯ã€ä¸€åº¦ãƒ†ãƒ³ãƒãƒ©ãƒªã«æ›¸ãå‡ºã—ã¦ã‹ã‚‰åˆæˆã™ã‚‹
 #ifdef _DEBUG
 			std::vector<tjs_uint32> dstwork(clip.getDestWidth()+7);
 #else
 			std::vector<tjs_uint32> dstwork;
 			dstwork.reserve( clip.getDestWidth()+7 );
 #endif
-			tjs_uint32* midbits = &dstwork[0];	// “r’†ˆ——pƒoƒbƒtƒ@
+			tjs_uint32* midbits = &dstwork[0];	// é€”ä¸­å‡¦ç†ç”¨ãƒãƒƒãƒ•ã‚¡
 			for( int y = clip.offsety_; y < clip.height_; y++ ) {
 				samplingVertical( y, workbits, dstheight, srcwidth, src, srcrect, wstarty );
-				samplingHorizontal( midbits, clip.offsetx_, clip.width_, workbits ); // ˆêƒoƒbƒtƒ@‚É‚Ü‚¸ƒRƒs[, ”ÍˆÍŠO‚Íˆ—‚µ‚È‚¢
+				samplingHorizontal( midbits, clip.offsetx_, clip.width_, workbits ); // ä¸€æ™‚ãƒãƒƒãƒ•ã‚¡ã«ã¾ãšã‚³ãƒ”ãƒ¼, ç¯„å›²å¤–ã¯å‡¦ç†ã—ãªã„
 				(*blendfunc)( dstbits, midbits, clip.getDestWidth() );
 				dstbits += dststride;
 			}
@@ -973,7 +973,7 @@ public:
 		const int srcwidth = srcrect.get_width();
 		const int alingnwidth = ((srcwidth+7)>>3)<<3;
 		const float* wstarty = &paramy_.weight_[0];
-		// ƒNƒŠƒbƒsƒ“ƒO•”•ªƒXƒLƒbƒv
+		// ã‚¯ãƒªãƒƒãƒ”ãƒ³ã‚°éƒ¨åˆ†ã‚¹ã‚­ãƒƒãƒ—
 		for( int y = 0; y < clip.offsety_; y++ ) {
 			wstarty += paramy_.length_[y];
 		}
@@ -1008,7 +1008,7 @@ public:
 		TVPEndThreadTask();
 	}
 public:
-	/** 8ƒ‰ƒCƒ“‚¸‚Âˆ—‚·‚é */
+	/** 8ãƒ©ã‚¤ãƒ³ãšã¤å‡¦ç†ã™ã‚‹ */
 	template<typename TWeightFunc>
 	void Resample( const tTVPResampleClipping &clip, const tTVPImageCopyFuncBase* blendfunc, tTVPBaseBitmap *dest, const tTVPRect &destrect, const tTVPBaseBitmap *src, const tTVPRect &srcrect, float tap, TWeightFunc& func ) {
 		const int srcwidth = srcrect.get_width();
@@ -1032,7 +1032,7 @@ public:
 		if( pixelNum >= 50 * 500 ) {
 			threadNum = TVPGetThreadNum();
 		}
-		if( threadNum == 1 ) { // –ÊÏ‚ª­‚È‚­ƒXƒŒƒbƒh‚ª1‚Ì‚Í‚»‚Ì‚Ü‚ÜÀs
+		if( threadNum == 1 ) { // é¢ç©ãŒå°‘ãªãã‚¹ãƒ¬ãƒƒãƒ‰ãŒ1ã®æ™‚ã¯ãã®ã¾ã¾å®Ÿè¡Œ
 			Resample( clip, blendfunc, dest, destrect, src, srcrect, tap, func );
 			return;
 		}
@@ -1065,7 +1065,7 @@ public:
 		if( pixelNum >= 50 * 500 ) {
 			threadNum = TVPGetThreadNum();
 		}
-		if( threadNum == 1 ) { // –ÊÏ‚ª­‚È‚­ƒXƒŒƒbƒh‚ª1‚Ì‚Í‚»‚Ì‚Ü‚ÜÀs
+		if( threadNum == 1 ) { // é¢ç©ãŒå°‘ãªãã‚¹ãƒ¬ãƒƒãƒ‰ãŒ1ã®æ™‚ã¯ãã®ã¾ã¾å®Ÿè¡Œ
 			ResampleAreaAvg( clip, blendfunc, dest, destrect, src, srcrect );
 			return;
 		}
@@ -1103,17 +1103,17 @@ void TJS_USERENTRY ResamplerAVX2Func( void* p ) {
 			param->sampler_->samplingHorizontal( dstbits, param->clip_->offsetx_, param->clip_->width_, workbits );
 			dstbits += dststride;
 		}
-	} else {	// ’PƒƒRƒs[ˆÈŠO
+	} else {	// å˜ç´”ã‚³ãƒ”ãƒ¼ä»¥å¤–
 #ifdef _DEBUG
 		std::vector<tjs_uint32> dstwork(param->clip_->getDestWidth()+7);
 #else
 		std::vector<tjs_uint32> dstwork;
 		dstwork.reserve( param->clip_->getDestWidth()+7 );
 #endif
-		tjs_uint32* midbits = &dstwork[0];	// “r’†ˆ——pƒoƒbƒtƒ@
+		tjs_uint32* midbits = &dstwork[0];	// é€”ä¸­å‡¦ç†ç”¨ãƒãƒƒãƒ•ã‚¡
 		for( int y = param->start_; y < param->end_; y++ ) {
 			param->sampler_->samplingVertical( y, workbits, dstheight, srcwidth, src, srcrect, wstarty );
-			param->sampler_->samplingHorizontal( midbits, param->clip_->offsetx_, param->clip_->width_, workbits ); // ˆêƒoƒbƒtƒ@‚É‚Ü‚¸ƒRƒs[, ”ÍˆÍŠO‚Íˆ—‚µ‚È‚¢
+			param->sampler_->samplingHorizontal( midbits, param->clip_->offsetx_, param->clip_->width_, workbits ); // ä¸€æ™‚ãƒãƒƒãƒ•ã‚¡ã«ã¾ãšã‚³ãƒ”ãƒ¼, ç¯„å›²å¤–ã¯å‡¦ç†ã—ãªã„
 			(*param->blendfunc_)( dstbits, midbits, param->clip_->getDestWidth() );
 			dstbits += dststride;
 		}
@@ -1159,16 +1159,16 @@ void TVPWeightResampleAVX2( const tTVPResampleClipping &clip, const tTVPImageCop
 	_mm256_zeroupper();
 }
 /**
- * Šg‘åk¬‚·‚é AVX2 ”Å
- * @param dest : ‘‚«‚İæ‰æ‘œ
- * @param destrect : ‘‚«‚İæ‹éŒ`
- * @param src : “Ç‚İ‚İŒ³‰æ‘œ
- * @param srcrect : “Ç‚İ‚İŒ³‹éŒ`
- * @param type : Šg‘åk¬ƒtƒBƒ‹ƒ^ƒ^ƒCƒv
- * @param typeopt : Šg‘åk¬ƒtƒBƒ‹ƒ^ƒ^ƒCƒvƒIƒvƒVƒ‡ƒ“
- * @param method : ƒuƒŒƒ“ƒh•û–@
- * @param opa : •s“§–¾“x
- * @param hda : ‘‚«‚İæƒAƒ‹ƒtƒ@•Û
+ * æ‹¡å¤§ç¸®å°ã™ã‚‹ AVX2 ç‰ˆ
+ * @param dest : æ›¸ãè¾¼ã¿å…ˆç”»åƒ
+ * @param destrect : æ›¸ãè¾¼ã¿å…ˆçŸ©å½¢
+ * @param src : èª­ã¿è¾¼ã¿å…ƒç”»åƒ
+ * @param srcrect : èª­ã¿è¾¼ã¿å…ƒçŸ©å½¢
+ * @param type : æ‹¡å¤§ç¸®å°ãƒ•ã‚£ãƒ«ã‚¿ã‚¿ã‚¤ãƒ—
+ * @param typeopt : æ‹¡å¤§ç¸®å°ãƒ•ã‚£ãƒ«ã‚¿ã‚¿ã‚¤ãƒ—ã‚ªãƒ—ã‚·ãƒ§ãƒ³
+ * @param method : ãƒ–ãƒ¬ãƒ³ãƒ‰æ–¹æ³•
+ * @param opa : ä¸é€æ˜åº¦
+ * @param hda : æ›¸ãè¾¼ã¿å…ˆã‚¢ãƒ«ãƒ•ã‚¡ä¿æŒ
  */
 void TVPResampleImageAVX2( const tTVPResampleClipping &clip, const tTVPImageCopyFuncBase* blendfunc,
 	tTVPBaseBitmap *dest, const tTVPRect &destrect, const tTVPBaseBitmap *src, const tTVPRect &srcrect,

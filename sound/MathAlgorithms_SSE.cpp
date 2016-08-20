@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------
 /*
-	Risa [‚è‚³]      alias ‹g—¢‹g—¢3 [kirikiri-3]
+	Risa [ã‚Šã•]      alias å‰é‡Œå‰é‡Œ3 [kirikiri-3]
 	 stands for "Risa Is a Stagecraft Architecture"
 	Copyright (C) 2000 W.Dee <dee@kikyou.info> and contributors
 
@@ -9,7 +9,7 @@
 //---------------------------------------------------------------------------
 /**
  * @file	
- * ”ŠwŠÖ”ŒQ
+ * æ•°å­¦é–¢æ•°ç¾¤
  */
 //---------------------------------------------------------------------------
 
@@ -28,7 +28,7 @@
 #define vat_c1_i 0x3f490fdbL
 #define vat_c2 (vat_c1*3)
 #define vat_c2_i 0x4016cbe4L
-// vat_c1_i ‚Æ vat_c2_i ‚Í‚»‚ê‚¼‚êIEEE float ‚Å‚Ì”’l•\Œ»‚ğ16i”‚Å•\‚µ‚½•¨
+// vat_c1_i ã¨ vat_c2_i ã¯ãã‚Œãã‚ŒIEEE float ã§ã®æ•°å€¤è¡¨ç¾ã‚’16é€²æ•°ã§è¡¨ã—ãŸç‰©
 
 #define vat_e  1e-10f
 
@@ -91,7 +91,7 @@ void DeinterleaveApplyingWindow_sse(float * __restrict dest[], const float * __r
 				} \
 				break
 
-			// ‚»‚ê‚¼‚ê‚ÌƒAƒ‰ƒCƒ“ƒƒ“ƒg‚É‰‚¶‚½ˆ—‚ğs‚¤
+			// ãã‚Œãã‚Œã®ã‚¢ãƒ©ã‚¤ãƒ³ãƒ¡ãƒ³ãƒˆã«å¿œã˜ãŸå‡¦ç†ã‚’è¡Œã†
 			if(len >= 8)
 				switch(condition)
 				{

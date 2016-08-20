@@ -1,13 +1,13 @@
 /******************************************************************************/
 /**
- * ���w�֐� sin, cos, exp �� SIMD ����������
+ * 数学関数 sin, cos, exp を SIMD 化したもの
  * ----------------------------------------------------------------------------
  * 	Copyright (C) T.Imoto <http://www.kaede-software.com>
  * ----------------------------------------------------------------------------
  * @author		T.Imoto
  * @date		2014/04/01
- * @note		sse_mathfun �� AVX �ɈڐA�������́B�ꕔ AVX2 ���߂��g�p���Ă���
- *				�̂ŁAAVX2 ���K�v�B
+ * @note		sse_mathfun を AVX に移植したもの。一部 AVX2 命令を使用している
+ *				ので、AVX2 も必要。
  *****************************************************************************/
 
 #include <immintrin.h> // AVX/AVX2
@@ -138,7 +138,7 @@ _PS_CONST256(coscof_p1, -1.388731625493765E-003f);
 _PS_CONST256(coscof_p2,  4.166664568298827E-002f);
 _PS_CONST256(cephes_FOPI, 1.27323954473516f); // 4 / M_PI
 /**
- * SSE �ł̂��̂� AVX �ł����
+ * SSE 版のものを AVX でも作る
  */
 __m256 mm256_sin_ps(__m256 x) { // any x
   __m256 xmm1, xmm2 = _mm256_setzero_ps(), xmm3, sign_bit, y;

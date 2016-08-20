@@ -2,7 +2,7 @@
 #ifndef __NATIVE_EVENT_QUEUE_H__
 #define __NATIVE_EVENT_QUEUE_H__
 
-// ŒÄ‚Ño‚³‚ê‚éƒnƒ“ƒhƒ‰‚ªƒVƒ“ƒOƒ‹ƒXƒŒƒbƒh‚Å“®ì‚·‚éƒCƒxƒ“ƒgƒLƒ…[
+// å‘¼ã³å‡ºã•ã‚Œã‚‹ãƒãƒ³ãƒ‰ãƒ©ãŒã‚·ãƒ³ã‚°ãƒ«ã‚¹ãƒ¬ãƒƒãƒ‰ã§å‹•ä½œã™ã‚‹ã‚¤ãƒ™ãƒ³ãƒˆã‚­ãƒ¥ãƒ¼
 
 class NativeEvent {
 public:
@@ -18,13 +18,13 @@ public:
 
 class NativeEventQueueIntarface {
 public:
-	// ƒfƒtƒHƒ‹ƒgƒnƒ“ƒhƒ‰
+	// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆãƒãƒ³ãƒ‰ãƒ©
 	virtual void HandlerDefault( class NativeEvent& event ) = 0;
 
-	// Queue ‚Ì¶¬
+	// Queue ã®ç”Ÿæˆ
 	virtual void Allocate() = 0;
 
-	// Queue ‚Ìíœ
+	// Queue ã®å‰Šé™¤
 	virtual void Deallocate() = 0;
 
 	virtual void Dispatch( class NativeEvent& event ) = 0;
@@ -42,13 +42,13 @@ class NativeEventQueueImplement : public NativeEventQueueIntarface {
 public:
 	NativeEventQueueImplement() : window_handle_(NULL) {}
 
-	// ƒfƒtƒHƒ‹ƒgƒnƒ“ƒhƒ‰
+	// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆãƒãƒ³ãƒ‰ãƒ©
 	void HandlerDefault( NativeEvent& event );
 
-	// Queue ‚Ì¶¬
+	// Queue ã®ç”Ÿæˆ
 	void Allocate();
 
-	// Queue ‚Ìíœ
+	// Queue ã®å‰Šé™¤
 	void Deallocate();
 
 	void PostEvent( const NativeEvent& event );

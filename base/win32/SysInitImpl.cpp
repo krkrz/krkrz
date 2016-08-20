@@ -912,7 +912,7 @@ void TVPInitializeBaseSystems()
 //---------------------------------------------------------------------------
 // system initializer / uninitializer
 //---------------------------------------------------------------------------
-// ƒtƒHƒ‹ƒ_‘I‘ðƒ_ƒCƒAƒƒO‚ÌƒR[ƒ‹ƒoƒbƒNŠÖ”
+// ãƒ•ã‚©ãƒ«ãƒ€é¸æŠžãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°
 static int CALLBACK TVPBrowseCallbackProc(HWND hwnd,UINT uMsg,LPARAM lParam,LPARAM lpData)
 {
     if(uMsg==BFFM_INITIALIZED){
@@ -1214,7 +1214,7 @@ void TVPAfterSystemInit()
 			limitmb = opt.AsInteger();
 	}
 
-	// •¨—ƒƒ‚ƒŠ‚æ‚è‰¼‘zƒƒ‚ƒŠ‚Ì•û‚ª¬‚³‚¢(32bit‚Åƒƒ‚ƒŠ“‹Ú—Ê‚ª‘½‚¢)ê‡A‰¼‘zƒƒ‚ƒŠ‚Ì•û‚ÅƒLƒƒƒbƒVƒ…ŒvŽZ‚·‚é
+	// ç‰©ç†ãƒ¡ãƒ¢ãƒªã‚ˆã‚Šä»®æƒ³ãƒ¡ãƒ¢ãƒªã®æ–¹ãŒå°ã•ã„(32bitã§ãƒ¡ãƒ¢ãƒªæ­è¼‰é‡ãŒå¤šã„)å ´åˆã€ä»®æƒ³ãƒ¡ãƒ¢ãƒªã®æ–¹ã§ã‚­ãƒ£ãƒƒã‚·ãƒ¥è¨ˆç®—ã™ã‚‹
 	MEMORYSTATUSEX status = { sizeof(MEMORYSTATUSEX) };
 	::GlobalMemoryStatusEx(&status);
 	tjs_uint64 totalMemory = TVPTotalPhysMemory;
@@ -1247,7 +1247,7 @@ void TVPAfterSystemInit()
 	{
 		TVPGraphicCacheSystemLimit = limitmb * 1024*1024;
 	}
-	// ƒLƒƒƒbƒVƒ…‚Í 512MB ‚Ü‚Å‚É§ŒÀ
+	// ã‚­ãƒ£ãƒƒã‚·ãƒ¥ã¯ 512MB ã¾ã§ã«åˆ¶é™
 	if( TVPGraphicCacheSystemLimit >= 512*1024*1024 )
 		TVPGraphicCacheSystemLimit = 512*1024*1024;
 

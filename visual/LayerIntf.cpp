@@ -429,7 +429,7 @@ tTJSNI_BaseLayer::Construct(tjs_int numparams, tTJSVariant **param,
 	// get the window native instance
 	tTJSVariantClosure clo = param[0]->AsObjectClosureNoAddRef();
 	//if(clo.Object == NULL) TVPThrowExceptionMessage(TVPSpecifyWindow);
-	if(clo.Object == NULL) TVPThrowExceptionMessage(TJS_W("layerTreeOwnerInterface‚ğ‚ÂƒIƒuƒWƒFƒNƒg‚ğw’è‚µ‚Ä‚­‚¾‚³‚¢"));
+	if(clo.Object == NULL) TVPThrowExceptionMessage(TJS_W("layerTreeOwnerInterfaceã‚’æŒã¤ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’æŒ‡å®šã—ã¦ãã ã•ã„"));
 
 	class iTVPLayerTreeOwner* lto = NULL;
 	tTJSVariant iface_v;
@@ -6805,7 +6805,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/loadImages)
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
 	if(numparams < 1) return TJS_E_BADPARAMCOUNT;
 	ttstr name(*param[0]);
-	tjs_uint32 key = clNone; // TODO Intf‚È‚Ì‚ÉŒÅ—L’l‚ª
+	tjs_uint32 key = clNone; // TODO Intfãªã®ã«å›ºæœ‰å€¤ãŒ
 	if(numparams >=2 && param[1]->Type() != tvtVoid)
 		key = (tjs_uint32)param[1]->AsInteger();
 	iTJSDispatch2 * metainfo = _this->LoadImages(name, key);
@@ -10194,7 +10194,7 @@ TJS_END_NATIVE_PROP_DECL(angle)
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_PROP_DECL(faceIsFileName)
 {
-	// Face–¼‚ğƒtƒ@ƒCƒ‹–¼‚Æ‚µ‚ÄŠJ‚­AFreeType‚Å‚Ì‚İ—LŒøB‚½‚¾‚µA‚»‚ÌƒŒƒCƒ„[‚ÅIME‚ğ—LŒø‚µ‚½ê‡“®ì‚Í•s’è
+	// Faceåã‚’ãƒ•ã‚¡ã‚¤ãƒ«åã¨ã—ã¦é–‹ãã€FreeTypeã§ã®ã¿æœ‰åŠ¹ã€‚ãŸã ã—ã€ãã®ãƒ¬ã‚¤ãƒ¤ãƒ¼ã§IMEã‚’æœ‰åŠ¹ã—ãŸå ´åˆå‹•ä½œã¯ä¸å®š
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Font);

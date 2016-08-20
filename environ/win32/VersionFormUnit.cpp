@@ -43,7 +43,7 @@ static LRESULT WINAPI DlgProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 	}
 	case WM_COMMAND:
 		if(LOWORD(wParam) == IDOK) {
-			//OKƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚½‚Æ‚«‚Ìˆ—
+			//OKãƒœã‚¿ãƒ³ãŒæŠ¼ã•ã‚ŒãŸã¨ãã®å‡¦ç†
 			::EndDialog(hWnd, IDOK);
 			return TRUE;
 		} else if(LOWORD(wParam) == IDC_COPY_INFO_BUTTON) {

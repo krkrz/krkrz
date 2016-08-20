@@ -11,33 +11,33 @@ namespace TJS
 {
 
 enum OctPackType {
-	OctPack_ascii,		// a : ASCII string(ƒkƒ‹•¶š‚ª•âŠ®‚³‚ê‚é)
-	OctPack_ASCII,		// A : ASCII string(ƒXƒy[ƒX‚ª•âŠ®‚³‚ê‚é)
-	OctPack_bitstring,	// b : bit string(‰ºˆÊƒrƒbƒg‚©‚çãˆÊƒrƒbƒg‚Ì‡)
-	OctPack_BITSTRING,	// B : bit string(ãˆÊƒrƒbƒg‚©‚ç‰ºˆÊƒrƒbƒg‚Ì‡)
-	OctPack_char,		// c : •„†•t‚«1ƒoƒCƒg”’l(-128 ` 127)
-	OctPack_CHAR,		// C : •„†–³‚µ1ƒoƒCƒg”’l(0`255)
-	OctPack_double,		// d : ”{¸“x•‚“®¬”“_
-	OctPack_float,		// f : ’P¸“x•‚“®¬”“_
+	OctPack_ascii,		// a : ASCII string(ãƒŒãƒ«æ–‡å­—ãŒè£œå®Œã•ã‚Œã‚‹)
+	OctPack_ASCII,		// A : ASCII string(ã‚¹ãƒšãƒ¼ã‚¹ãŒè£œå®Œã•ã‚Œã‚‹)
+	OctPack_bitstring,	// b : bit string(ä¸‹ä½ãƒ“ãƒƒãƒˆã‹ã‚‰ä¸Šä½ãƒ“ãƒƒãƒˆã®é †)
+	OctPack_BITSTRING,	// B : bit string(ä¸Šä½ãƒ“ãƒƒãƒˆã‹ã‚‰ä¸‹ä½ãƒ“ãƒƒãƒˆã®é †)
+	OctPack_char,		// c : ç¬¦å·ä»˜ã1ãƒã‚¤ãƒˆæ•°å€¤(-128 ï½ 127)
+	OctPack_CHAR,		// C : ç¬¦å·ç„¡ã—1ãƒã‚¤ãƒˆæ•°å€¤(0ï½255)
+	OctPack_double,		// d : å€ç²¾åº¦æµ®å‹•å°æ•°ç‚¹
+	OctPack_float,		// f : å˜ç²¾åº¦æµ®å‹•å°æ•°ç‚¹
 	OctPack_hex,		// h : hex string(low nybble first)
 	OctPack_HEX,		// H : hex string(high nybble first)
-	OctPack_int,		// i : •„†•t‚«int”’l(’Êí4ƒoƒCƒg)
-	OctPack_INT,		// I : •„†–³‚µint”’l(’Êí4ƒoƒCƒg)
-	OctPack_long,		// l : •„†•t‚«long”’l(’Êí4ƒoƒCƒg)
-	OctPack_LONG,		// L : •„†–³‚µlong”’l(’Êí4ƒoƒCƒg)
-	OctPack_noshort,	// n : short”’l(ƒlƒbƒgƒ[ƒNƒoƒCƒgƒI[ƒ_) network byte order short
-	OctPack_NOLONG,		// N : long”’l(ƒlƒbƒgƒ[ƒNƒoƒCƒgƒI[ƒ_) network byte order long
-	OctPack_pointer,	// p : •¶š—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^ null terminate char
-	OctPack_POINTER,	// P : \‘¢‘Ì(ŒÅ’è’·•¶š—ñ)‚Ö‚Ìƒ|ƒCƒ“ƒ^ fix length char
-	OctPack_short,		// s : •„†•t‚«short”’l(’Êí2ƒoƒCƒg) sign
-	OctPack_SHORT,		// S : •„†–³‚µshort”’l(’Êí2ƒoƒCƒg) unsign
-	OctPack_leshort,	// v : ƒŠƒgƒ‹ƒGƒ“ƒfƒBƒAƒ“‚É‚æ‚éshort’l little endian short
-	OctPack_LELONG,		// V : ƒŠƒgƒ‹ƒGƒ“ƒfƒBƒAƒ“‚É‚æ‚élong’l little endian long
-	OctPack_uuencode,	// u : uuencode‚³‚ê‚½•¶š—ñ
-	OctPack_BRE,		// w : BERˆ³k‚³‚ê‚½®”’l
-	OctPack_null,		// x : ƒkƒ‹•¶š
+	OctPack_int,		// i : ç¬¦å·ä»˜ãintæ•°å€¤(é€šå¸¸4ãƒã‚¤ãƒˆ)
+	OctPack_INT,		// I : ç¬¦å·ç„¡ã—intæ•°å€¤(é€šå¸¸4ãƒã‚¤ãƒˆ)
+	OctPack_long,		// l : ç¬¦å·ä»˜ãlongæ•°å€¤(é€šå¸¸4ãƒã‚¤ãƒˆ)
+	OctPack_LONG,		// L : ç¬¦å·ç„¡ã—longæ•°å€¤(é€šå¸¸4ãƒã‚¤ãƒˆ)
+	OctPack_noshort,	// n : shortæ•°å€¤(ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯ãƒã‚¤ãƒˆã‚ªãƒ¼ãƒ€) network byte order short
+	OctPack_NOLONG,		// N : longæ•°å€¤(ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯ãƒã‚¤ãƒˆã‚ªãƒ¼ãƒ€) network byte order long
+	OctPack_pointer,	// p : æ–‡å­—åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿ null terminate char
+	OctPack_POINTER,	// P : æ§‹é€ ä½“(å›ºå®šé•·æ–‡å­—åˆ—)ã¸ã®ãƒã‚¤ãƒ³ã‚¿ fix length char
+	OctPack_short,		// s : ç¬¦å·ä»˜ãshortæ•°å€¤(é€šå¸¸2ãƒã‚¤ãƒˆ) sign
+	OctPack_SHORT,		// S : ç¬¦å·ç„¡ã—shortæ•°å€¤(é€šå¸¸2ãƒã‚¤ãƒˆ) unsign
+	OctPack_leshort,	// v : ãƒªãƒˆãƒ«ã‚¨ãƒ³ãƒ‡ã‚£ã‚¢ãƒ³ã«ã‚ˆã‚‹shortå€¤ little endian short
+	OctPack_LELONG,		// V : ãƒªãƒˆãƒ«ã‚¨ãƒ³ãƒ‡ã‚£ã‚¢ãƒ³ã«ã‚ˆã‚‹longå€¤ little endian long
+	OctPack_uuencode,	// u : uuencodeã•ã‚ŒãŸæ–‡å­—åˆ—
+	OctPack_BRE,		// w : BERåœ§ç¸®ã•ã‚ŒãŸæ•´æ•°å€¤
+	OctPack_null,		// x : ãƒŒãƒ«æ–‡å­—
 	OctPack_NULL,		// X : back up a byte
-	OctPack_fill,		// @ : â‘ÎˆÊ’u‚Ü‚Åƒkƒ‹•¶š‚ğ–„‚ß‚é
+	OctPack_fill,		// @ : çµ¶å¯¾ä½ç½®ã¾ã§ãƒŒãƒ«æ–‡å­—ã‚’åŸ‹ã‚ã‚‹
 	OctPack_base64,		// m : Base64 encode / decode
 	OctPack_EOT
 };
@@ -135,8 +135,8 @@ static void AsciiToBin( std::vector<tjs_uint8>& bin, const ttstr& arg, tjs_nchar
 		bin.push_back( fillchar );
 	}
 }
-// mtol : true : ãˆÊƒrƒbƒg‚©‚ç‰ºˆÊƒrƒbƒg, false : ‰ºˆÊƒrƒbƒg‚©‚çãˆÊƒrƒbƒg
-// w’è‚µ‚½”’l‚Ì•û‚ª‘å‚«‚­‚Ä‚àA‚»‚Ì•ª‚Í–³‹
+// mtol : true : ä¸Šä½ãƒ“ãƒƒãƒˆã‹ã‚‰ä¸‹ä½ãƒ“ãƒƒãƒˆ, false : ä¸‹ä½ãƒ“ãƒƒãƒˆã‹ã‚‰ä¸Šä½ãƒ“ãƒƒãƒˆ
+// æŒ‡å®šã—ãŸæ•°å€¤ã®æ–¹ãŒå¤§ããã¦ã‚‚ã€ãã®åˆ†ã¯ç„¡è¦–
 static void BitStringToBin( std::vector<tjs_uint8>& bin, const ttstr& arg, bool mtol, tjs_int len ) {
 	const tjs_char* str = arg.c_str();
 	if( len < 0 ) len = arg.length();
@@ -190,7 +190,7 @@ static void HexToBin( std::vector<tjs_uint8>& bin, const ttstr& arg, bool mtol, 
 	if( len < 0 ) len = arg.length();
 	tjs_uint8 val = 0;
 	tjs_int pos = 0;
-	if( mtol ) { // ãˆÊƒjƒuƒ‹‚ªæ
+	if( mtol ) { // ä¸Šä½ãƒ‹ãƒ–ãƒ«ãŒå…ˆ
 		pos = 1;
 		for( tjs_int i = 0; i < len && *str != NULL; str++, i++ ) {
 			if( *str >= L'0' && *str <= L'9' ) {
@@ -213,7 +213,7 @@ static void HexToBin( std::vector<tjs_uint8>& bin, const ttstr& arg, bool mtol, 
 		if( pos < 1 ) {
 			bin.push_back( val );
 		}
-	} else { // ‰ºˆÊƒjƒuƒ‹‚ªæ
+	} else { // ä¸‹ä½ãƒ‹ãƒ–ãƒ«ãŒå…ˆ
 		for( tjs_int i = 0; i < len && *str != NULL; str++, i++ ) {
 			if( *str >= L'0' && *str <= L'9' ) {
 				val |= (*str - L'0') << (pos*4);
@@ -236,8 +236,8 @@ static void HexToBin( std::vector<tjs_uint8>& bin, const ttstr& arg, bool mtol, 
 		}
 	}
 }
-// TRet : ÅI“I‚Éo—Í‚·‚éŒ^
-// TTmp : ˆê“I‚Éo—Í‚·‚éŒ^ variant ‚Íˆê“I‚É tjs_int ‚É‚µ‚È‚¢‚Æ‚¢‚¯‚È‚¢‚È‚Ç
+// TRet : æœ€çµ‚çš„ã«å‡ºåŠ›ã™ã‚‹å‹
+// TTmp : ä¸€æ™‚çš„ã«å‡ºåŠ›ã™ã‚‹å‹ variant ã¯ä¸€æ™‚çš„ã« tjs_int ã«ã—ãªã„ã¨ã„ã‘ãªã„ãªã©
 template<typename TRet, typename TTmp, int NBYTE, typename TRetTmp>
 static void ReadNumberLE( std::vector<tjs_uint8>& result, const std::vector<tTJSVariant>& args, tjs_int numargs, tjs_int& argindex, tjs_int len ) {
 	if( len < 0 ) len = numargs - argindex;
@@ -272,10 +272,10 @@ static void ReadNumberBE( std::vector<tjs_uint8>& result, const std::vector<tTJS
 #endif
 
 // from base64 plug-in (C) 2009 Kiyobee
-// ˆµ‚¢‚â‚·‚¢‚æ‚¤‚Éˆê•”‘‚«Š·‚¦‚Ä‚¢‚é
-//	inbuf ‚Ì“à—e‚ğ base64 ƒGƒ“ƒR[ƒh‚µ‚ÄAoutbuf ‚É•¶š—ñ‚Æ‚µ‚Äo—Í
-//	outbuf ‚ÌƒTƒCƒY‚ÍAinsize / 4 * 3 •K—v
-// outbuf ‚ÌƒTƒCƒY‚ÍA(insize+2)/3 * 4 •K—v
+// æ‰±ã„ã‚„ã™ã„ã‚ˆã†ã«ä¸€éƒ¨æ›¸ãæ›ãˆã¦ã„ã‚‹
+//	inbuf ã®å†…å®¹ã‚’ base64 ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‰ã—ã¦ã€outbuf ã«æ–‡å­—åˆ—ã¨ã—ã¦å‡ºåŠ›
+//	outbuf ã®ã‚µã‚¤ã‚ºã¯ã€insize / 4 * 3 å¿…è¦
+// outbuf ã®ã‚µã‚¤ã‚ºã¯ã€(insize+2)/3 * 4 å¿…è¦
 static void encodeBase64( const tjs_uint8* inbuf, tjs_uint insize, std::wstring& outbuf) {
 	outbuf.reserve( outbuf.size() + ((insize+2)/3) * 4 );
 	static const char* base64str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -364,28 +364,28 @@ static tTJSVariantOctet* Pack( const std::vector<OctPackTemplate>& templ, const 
 		OctPackType t = templ[i].Type;
 		tjs_int len = templ[i].Length;
 		switch( t ) {
-		case OctPack_ascii:		// a : ASCII string(ƒkƒ‹•¶š‚ª•âŠ®‚³‚ê‚é)
+		case OctPack_ascii:		// a : ASCII string(ãƒŒãƒ«æ–‡å­—ãŒè£œå®Œã•ã‚Œã‚‹)
 			AsciiToBin( result, args[argindex], '\0', len );
 			break;
-		case OctPack_ASCII:		// A : ASCII string(ƒXƒy[ƒX‚ª•âŠ®‚³‚ê‚é)
+		case OctPack_ASCII:		// A : ASCII string(ã‚¹ãƒšãƒ¼ã‚¹ãŒè£œå®Œã•ã‚Œã‚‹)
 			AsciiToBin( result, args[argindex], ' ', len );
 			break;
-		case OctPack_bitstring:	// b : bit string(‰ºˆÊƒrƒbƒg‚©‚çãˆÊƒrƒbƒg‚Ì‡)
+		case OctPack_bitstring:	// b : bit string(ä¸‹ä½ãƒ“ãƒƒãƒˆã‹ã‚‰ä¸Šä½ãƒ“ãƒƒãƒˆã®é †)
 			BitStringToBin( result, args[argindex], false, len );
 			break;
-		case OctPack_BITSTRING:	// B : bit string(ãˆÊƒrƒbƒg‚©‚ç‰ºˆÊƒrƒbƒg‚Ì‡)
+		case OctPack_BITSTRING:	// B : bit string(ä¸Šä½ãƒ“ãƒƒãƒˆã‹ã‚‰ä¸‹ä½ãƒ“ãƒƒãƒˆã®é †)
 			BitStringToBin( result, args[argindex], true, len );
 			break;
-		case OctPack_char:		// c : •„†•t‚«1ƒoƒCƒg”’l(-128 ` 127)
+		case OctPack_char:		// c : ç¬¦å·ä»˜ã1ãƒã‚¤ãƒˆæ•°å€¤(-128 ï½ 127)
 			ReadNumber<tjs_int8,tjs_int,1,tjs_int8>( result, args, numargs, argindex, len );
 			break;
-		case OctPack_CHAR:		// C : •„†–³‚µ1ƒoƒCƒg”’l(0`255)
+		case OctPack_CHAR:		// C : ç¬¦å·ç„¡ã—1ãƒã‚¤ãƒˆæ•°å€¤(0ï½255)
 			ReadNumber<tjs_uint8,tjs_int,1,tjs_uint8>( result, args, numargs, argindex, len );
 			break;
-		case OctPack_double:	// d : ”{¸“x•‚“®¬”“_
+		case OctPack_double:	// d : å€ç²¾åº¦æµ®å‹•å°æ•°ç‚¹
 			ReadNumber<tjs_real,tjs_real,8,tjs_uint64>( result, args, numargs, argindex, len );
 			break;
-		case OctPack_float:		// f : ’P¸“x•‚“®¬”“_
+		case OctPack_float:		// f : å˜ç²¾åº¦æµ®å‹•å°æ•°ç‚¹
 			ReadNumber<float,tjs_real,4,tjs_uint32>( result, args, numargs, argindex, len );
 			break;
 		case OctPack_hex:		// h : hex string(low nybble first)
@@ -394,43 +394,43 @@ static tTJSVariantOctet* Pack( const std::vector<OctPackTemplate>& templ, const 
 		case OctPack_HEX:		// H : hex string(high nybble first)
 			HexToBin( result, args[argindex], true, len );
 			break;
-		case OctPack_int:		// i : •„†•t‚«int”’l(’Êí4ƒoƒCƒg)
-		case OctPack_long:		// l : •„†•t‚«long”’l(’Êí4ƒoƒCƒg)
+		case OctPack_int:		// i : ç¬¦å·ä»˜ãintæ•°å€¤(é€šå¸¸4ãƒã‚¤ãƒˆ)
+		case OctPack_long:		// l : ç¬¦å·ä»˜ãlongæ•°å€¤(é€šå¸¸4ãƒã‚¤ãƒˆ)
 			ReadNumber<tjs_int,tjs_int,4,tjs_int32>( result, args, numargs, argindex, len );
 			break;
-		case OctPack_INT:		// I : •„†–³‚µint”’l(’Êí4ƒoƒCƒg)
-		case OctPack_LONG:		// L : •„†–³‚µlong”’l(’Êí4ƒoƒCƒg)
+		case OctPack_INT:		// I : ç¬¦å·ç„¡ã—intæ•°å€¤(é€šå¸¸4ãƒã‚¤ãƒˆ)
+		case OctPack_LONG:		// L : ç¬¦å·ç„¡ã—longæ•°å€¤(é€šå¸¸4ãƒã‚¤ãƒˆ)
 			ReadNumber<tjs_uint,tjs_int64,4,tjs_uint32>( result, args, numargs, argindex, len );
 			break;
-		case OctPack_noshort:	// n : unsigned short”’l(ƒlƒbƒgƒ[ƒNƒoƒCƒgƒI[ƒ_) network byte order short
+		case OctPack_noshort:	// n : unsigned shortæ•°å€¤(ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯ãƒã‚¤ãƒˆã‚ªãƒ¼ãƒ€) network byte order short
 			ReadNumberBE<tjs_uint16,tjs_int,2,tjs_uint16>( result, args, numargs, argindex, len );
 			break;
-		case OctPack_NOLONG:	// N : unsigned long”’l(ƒlƒbƒgƒ[ƒNƒoƒCƒgƒI[ƒ_) network byte order long
+		case OctPack_NOLONG:	// N : unsigned longæ•°å€¤(ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯ãƒã‚¤ãƒˆã‚ªãƒ¼ãƒ€) network byte order long
 			ReadNumberBE<tjs_uint,tjs_int64,4,tjs_uint32>( result, args, numargs, argindex, len );
 			break;
-		case OctPack_pointer:	// p : •¶š—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^ null terminate char
-		case OctPack_POINTER:	// P : \‘¢‘Ì(ŒÅ’è’·•¶š—ñ)‚Ö‚Ìƒ|ƒCƒ“ƒ^ fix length char
+		case OctPack_pointer:	// p : æ–‡å­—åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿ null terminate char
+		case OctPack_POINTER:	// P : æ§‹é€ ä½“(å›ºå®šé•·æ–‡å­—åˆ—)ã¸ã®ãƒã‚¤ãƒ³ã‚¿ fix length char
 			// TODO
 			break;
-		case OctPack_short:		// s : •„†•t‚«short”’l(’Êí2ƒoƒCƒg) sign
+		case OctPack_short:		// s : ç¬¦å·ä»˜ãshortæ•°å€¤(é€šå¸¸2ãƒã‚¤ãƒˆ) sign
 			ReadNumber<tjs_int16,tjs_int,2,tjs_int16>( result, args, numargs, argindex, len );
 			break;
-		case OctPack_SHORT:		// S : •„†–³‚µshort”’l(’Êí2ƒoƒCƒg) unsign
+		case OctPack_SHORT:		// S : ç¬¦å·ç„¡ã—shortæ•°å€¤(é€šå¸¸2ãƒã‚¤ãƒˆ) unsign
 			ReadNumber<tjs_uint16,tjs_int,2,tjs_uint16>( result, args, numargs, argindex, len );
 			break;
-		case OctPack_leshort:	// v : ƒŠƒgƒ‹ƒGƒ“ƒfƒBƒAƒ“‚É‚æ‚éunsigned short’l little endian short
+		case OctPack_leshort:	// v : ãƒªãƒˆãƒ«ã‚¨ãƒ³ãƒ‡ã‚£ã‚¢ãƒ³ã«ã‚ˆã‚‹unsigned shortå€¤ little endian short
 			ReadNumberLE<tjs_uint16,tjs_int,2,tjs_uint16>( result, args, numargs, argindex, len );
 			break;
-		case OctPack_LELONG:	// V : ƒŠƒgƒ‹ƒGƒ“ƒfƒBƒAƒ“‚É‚æ‚éunsigned long’l little endian long
+		case OctPack_LELONG:	// V : ãƒªãƒˆãƒ«ã‚¨ãƒ³ãƒ‡ã‚£ã‚¢ãƒ³ã«ã‚ˆã‚‹unsigned longå€¤ little endian long
 			ReadNumberLE<tjs_uint,tjs_int64,4,tjs_uint32>( result, args, numargs, argindex, len );
 			break;
-		case OctPack_uuencode:	// u : uuencode‚³‚ê‚½•¶š—ñ
+		case OctPack_uuencode:	// u : uuencodeã•ã‚ŒãŸæ–‡å­—åˆ—
 			TJS_eTJSError( TJSNotSupportedUuencode );
 			break;
-		case OctPack_BRE:		// w : BERˆ³k‚³‚ê‚½®”’l
+		case OctPack_BRE:		// w : BERåœ§ç¸®ã•ã‚ŒãŸæ•´æ•°å€¤
 			TJS_eTJSError( TJSNotSupportedBER );
 			break;
-		case OctPack_null:		// x : ƒkƒ‹•¶š
+		case OctPack_null:		// x : ãƒŒãƒ«æ–‡å­—
 			for( tjs_int a = 0; a < len; a++ ) {
 				result.push_back( 0 );
 			}
@@ -442,7 +442,7 @@ static tTJSVariantOctet* Pack( const std::vector<OctPackTemplate>& templ, const 
 			}
 			argindex--;
 			break;
-		case OctPack_fill: {		// @ : â‘ÎˆÊ’u‚Ü‚Åƒkƒ‹•¶š‚ğ–„‚ß‚é
+		case OctPack_fill: {		// @ : çµ¶å¯¾ä½ç½®ã¾ã§ãƒŒãƒ«æ–‡å­—ã‚’åŸ‹ã‚ã‚‹
 			tjs_size count = result.size();
 			for( tjs_size i = count; i < (tjs_size)len; i++ ) {
 				result.push_back( 0 );
@@ -456,7 +456,7 @@ static tTJSVariantOctet* Pack( const std::vector<OctPackTemplate>& templ, const 
 			break;
 		}
 		}
-		if( len >= 0 ) { // '*' ‚Ì‚Í-1‚ª“ü‚èAƒŠƒXƒg‚Ì––”ö‚Ü‚Å“Ç‚Ş
+		if( len >= 0 ) { // '*' ã®æ™‚ã¯-1ãŒå…¥ã‚Šã€ãƒªã‚¹ãƒˆã®æœ«å°¾ã¾ã§èª­ã‚€
 			i++;
 		}
 	}
@@ -478,8 +478,8 @@ static void BinToAscii( const tjs_uint8 *data, const tjs_uint8 *tail, tjs_uint l
 	tmp.push_back( (tjs_nchar)'\0' );
 	result = tTJSString( &(tmp[0]) );
 }
-// mtol : true : ãˆÊƒrƒbƒg‚©‚ç‰ºˆÊƒrƒbƒg, false : ‰ºˆÊƒrƒbƒg‚©‚çãˆÊƒrƒbƒg
-// w’è‚µ‚½”’l‚Ì•û‚ª‘å‚«‚­‚Ä‚àA‚»‚Ì•ª‚Í–³‹
+// mtol : true : ä¸Šä½ãƒ“ãƒƒãƒˆã‹ã‚‰ä¸‹ä½ãƒ“ãƒƒãƒˆ, false : ä¸‹ä½ãƒ“ãƒƒãƒˆã‹ã‚‰ä¸Šä½ãƒ“ãƒƒãƒˆ
+// æŒ‡å®šã—ãŸæ•°å€¤ã®æ–¹ãŒå¤§ããã¦ã‚‚ã€ãã®åˆ†ã¯ç„¡è¦–
 static void BinToBitString( const tjs_uint8 *data, const tjs_uint8 *tail, tjs_uint len, ttstr& result, bool mtol ) {
 	//std::vector<tjs_char> tmp(len+1);
 	std::vector<tjs_char> tmp;
@@ -512,7 +512,7 @@ static void BinToBitString( const tjs_uint8 *data, const tjs_uint8 *tail, tjs_ui
 	result = tTJSString( &(tmp[0]) );
 }
 
-// TRet : ÅI“I‚Éo—Í‚·‚éŒ^
+// TRet : æœ€çµ‚çš„ã«å‡ºåŠ›ã™ã‚‹å‹
 template<typename TRet, int NBYTE>
 static void BinToNumberLE( std::vector<TRet>& result, const tjs_uint8 *data, const tjs_uint8 *tail, tjs_uint len ) {
 	if( len < 0 ) len = (tjs_uint)(((tail - data)+NBYTE-1)/NBYTE);
@@ -589,7 +589,7 @@ static void BinToHex( const tjs_uint8 *data, const tjs_uint8 *tail, tjs_uint len
 	std::vector<tjs_char> tmp;
 	tmp.reserve(len+1);
 	tjs_int pos = 0;
-	if( mtol ) { // ãˆÊƒjƒuƒ‹‚ªæ
+	if( mtol ) { // ä¸Šä½ãƒ‹ãƒ–ãƒ«ãŒå…ˆ
 		pos = 1;
 		for( tjs_int i = 0; i < static_cast<tjs_int>(len) && data < tail; i++ ) {
 			tjs_char ch = ((*data)&(0xF<<(pos*4)))>>(pos*4);
@@ -606,7 +606,7 @@ static void BinToHex( const tjs_uint8 *data, const tjs_uint8 *tail, tjs_uint len
 				pos--;
 			}
 		}
-	} else { // ‰ºˆÊƒjƒuƒ‹‚ªæ
+	} else { // ä¸‹ä½ãƒ‹ãƒ–ãƒ«ãŒå…ˆ
 		for( tjs_int i = 0; i < static_cast<tjs_int>(len) && data < tail; i++ ) {
 			tjs_char ch = ((*data)&(0xF<<(pos*4)))>>(pos*4);
 			if( ch > 9 ) {
@@ -641,7 +641,7 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 		OctPackType t = templ[i].Type;
 		tjs_size len = templ[i].Length;
 		switch( t ) {
-		case OctPack_ascii:{ 	// a : ASCII string(ƒkƒ‹•¶š‚ª•âŠ®‚³‚ê‚é)
+		case OctPack_ascii:{ 	// a : ASCII string(ãƒŒãƒ«æ–‡å­—ãŒè£œå®Œã•ã‚Œã‚‹)
 			if( len < 0 ) len = (tail - current);
 			ttstr ret;
 			BinToAscii( current, tail, (tjs_uint)len, ret );
@@ -649,7 +649,7 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 			current += len;
 			break;
 		}
-		case OctPack_ASCII: {		// A : ASCII string(ƒXƒy[ƒX‚ª•âŠ®‚³‚ê‚é)
+		case OctPack_ASCII: {		// A : ASCII string(ã‚¹ãƒšãƒ¼ã‚¹ãŒè£œå®Œã•ã‚Œã‚‹)
 			if( len < 0 ) len = (tail - current);
 			ttstr ret;
 			BinToAscii( current, tail, (tjs_uint)len, ret );
@@ -657,7 +657,7 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 			current += len;
 			break;
 		}
-		case OctPack_bitstring: {	// b : bit string(‰ºˆÊƒrƒbƒg‚©‚çãˆÊƒrƒbƒg‚Ì‡)
+		case OctPack_bitstring: {	// b : bit string(ä¸‹ä½ãƒ“ãƒƒãƒˆã‹ã‚‰ä¸Šä½ãƒ“ãƒƒãƒˆã®é †)
 			if( len < 0 ) len = (tail - current)*8;
 			ttstr ret;
 			BinToBitString( current, tail, (tjs_uint)len, ret, false );
@@ -665,7 +665,7 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 			current += (len+7)/8;
 			break;
 		}
-		case OctPack_BITSTRING: {	// B : bit string(ãˆÊƒrƒbƒg‚©‚ç‰ºˆÊƒrƒbƒg‚Ì‡)
+		case OctPack_BITSTRING: {	// B : bit string(ä¸Šä½ãƒ“ãƒƒãƒˆã‹ã‚‰ä¸‹ä½ãƒ“ãƒƒãƒˆã®é †)
 			if( len < 0 ) len = (tail - current)*8;
 			ttstr ret;
 			BinToBitString( current, tail, (tjs_uint)len, ret, true );
@@ -673,7 +673,7 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 			current += (len+7)/8;
 			break;
 		}
-		case OctPack_char: {		// c : •„†•t‚«1ƒoƒCƒg”’l(-128 ` 127)
+		case OctPack_char: {		// c : ç¬¦å·ä»˜ã1ãƒã‚¤ãƒˆæ•°å€¤(-128 ï½ 127)
 			if( len < 0 ) len = tail - current;
 			std::vector<tjs_int8> ret;
 			BinToNumber<tjs_int8,1>( ret, current, tail, (tjs_uint)len );
@@ -683,7 +683,7 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 			current += len;
 			break;
 		}
-		case OctPack_CHAR: {		// C : •„†–³‚µ1ƒoƒCƒg”’l(0`255)
+		case OctPack_CHAR: {		// C : ç¬¦å·ç„¡ã—1ãƒã‚¤ãƒˆæ•°å€¤(0ï½255)
 			if( len < 0 ) len = tail - current;
 			std::vector<tjs_uint8> ret;
 			BinToNumber<tjs_uint8,1>( ret, current, tail, (tjs_uint)len );
@@ -693,7 +693,7 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 			current += len;
 			break;
 		}
-		case OctPack_double: {	// d : ”{¸“x•‚“®¬”“_
+		case OctPack_double: {	// d : å€ç²¾åº¦æµ®å‹•å°æ•°ç‚¹
 			if( len < 0 ) len = (tail - current)/8;
 			std::vector<tjs_real> ret;
 			BinToReal<tjs_real,tjs_uint64,8>( ret, current, tail, (tjs_uint)len );
@@ -703,7 +703,7 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 			current += len*8;
 			break;
 		}
-		case OctPack_float: {		// f : ’P¸“x•‚“®¬”“_
+		case OctPack_float: {		// f : å˜ç²¾åº¦æµ®å‹•å°æ•°ç‚¹
 			if( len < 0 ) len = (tail - current)/4;
 			std::vector<float> ret;
 			BinToReal<float,tjs_uint32,4>( ret, current, tail, (tjs_uint)len );
@@ -729,8 +729,8 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 			current += (len+1)/2;
 			break;
 		}
-		case OctPack_int:		// i : •„†•t‚«int”’l(’Êí4ƒoƒCƒg)
-		case OctPack_long: {	// l : •„†•t‚«long”’l(’Êí4ƒoƒCƒg)
+		case OctPack_int:		// i : ç¬¦å·ä»˜ãintæ•°å€¤(é€šå¸¸4ãƒã‚¤ãƒˆ)
+		case OctPack_long: {	// l : ç¬¦å·ä»˜ãlongæ•°å€¤(é€šå¸¸4ãƒã‚¤ãƒˆ)
 			if( len < 0 ) len = (tail - current)/4;
 			std::vector<tjs_int> ret;
 			BinToNumber<tjs_int,4>( ret, current, tail, (tjs_uint)len );
@@ -740,8 +740,8 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 			current += len*4;
 			break;
 		}
-		case OctPack_INT:		// I : •„†–³‚µint”’l(’Êí4ƒoƒCƒg)
-		case OctPack_LONG: {	// L : •„†–³‚µlong”’l(’Êí4ƒoƒCƒg)
+		case OctPack_INT:		// I : ç¬¦å·ç„¡ã—intæ•°å€¤(é€šå¸¸4ãƒã‚¤ãƒˆ)
+		case OctPack_LONG: {	// L : ç¬¦å·ç„¡ã—longæ•°å€¤(é€šå¸¸4ãƒã‚¤ãƒˆ)
 			if( len < 0 ) len = (tail - current)/4;
 			std::vector<tjs_uint> ret;
 			BinToNumber<tjs_uint,4>( ret, current, tail, (tjs_uint)len );
@@ -751,7 +751,7 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 			current += len*4;
 			break;
 		}
-		case OctPack_noshort: {	// n : unsigned short”’l(ƒlƒbƒgƒ[ƒNƒoƒCƒgƒI[ƒ_) network byte order short
+		case OctPack_noshort: {	// n : unsigned shortæ•°å€¤(ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯ãƒã‚¤ãƒˆã‚ªãƒ¼ãƒ€) network byte order short
 			if( len < 0 ) len = (tail - current)/2;
 			std::vector<tjs_uint16> ret;
 			BinToNumberBE<tjs_uint16,2>( ret, current, tail, (tjs_uint)len );
@@ -761,7 +761,7 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 			current += len*2;
 			break;
 		}
-		case OctPack_NOLONG: {	// N : unsigned long”’l(ƒlƒbƒgƒ[ƒNƒoƒCƒgƒI[ƒ_) network byte order long
+		case OctPack_NOLONG: {	// N : unsigned longæ•°å€¤(ãƒãƒƒãƒˆãƒ¯ãƒ¼ã‚¯ãƒã‚¤ãƒˆã‚ªãƒ¼ãƒ€) network byte order long
 			if( len < 0 ) len = ((tail - current)/4);
 			std::vector<tjs_uint> ret;
 			BinToNumberBE<tjs_uint,4>( ret, current, tail, (tjs_uint)len );
@@ -771,13 +771,13 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 			current += len*4;
 			break;
 		}
-		case OctPack_pointer:	// p : •¶š—ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^ null terminate char
+		case OctPack_pointer:	// p : æ–‡å­—åˆ—ã¸ã®ãƒã‚¤ãƒ³ã‚¿ null terminate char
 			TJS_eTJSError( TJSNotSupportedUnpackLP );
 			break;
-		case OctPack_POINTER:	// P : \‘¢‘Ì(ŒÅ’è’·•¶š—ñ)‚Ö‚Ìƒ|ƒCƒ“ƒ^ fix length char
+		case OctPack_POINTER:	// P : æ§‹é€ ä½“(å›ºå®šé•·æ–‡å­—åˆ—)ã¸ã®ãƒã‚¤ãƒ³ã‚¿ fix length char
 			TJS_eTJSError( TJSNotSupportedUnpackP );
 			break;
-		case OctPack_short: {	// s : •„†•t‚«short”’l(’Êí2ƒoƒCƒg) sign
+		case OctPack_short: {	// s : ç¬¦å·ä»˜ãshortæ•°å€¤(é€šå¸¸2ãƒã‚¤ãƒˆ) sign
 			if( len < 0 ) len = ((tail - current)/2);
 			std::vector<tjs_int16> ret;
 			BinToNumber<tjs_int16,2>( ret, current, tail, (tjs_uint)len );
@@ -787,7 +787,7 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 			current += len*2;
 			break;
 		}
-		case OctPack_SHORT: {		// S : •„†–³‚µshort”’l(’Êí2ƒoƒCƒg) unsign
+		case OctPack_SHORT: {		// S : ç¬¦å·ç„¡ã—shortæ•°å€¤(é€šå¸¸2ãƒã‚¤ãƒˆ) unsign
 			if( len < 0 ) len = ((tail - current)/2);
 			std::vector<tjs_uint16> ret;
 			BinToNumber<tjs_uint16,2>( ret, current, tail, (tjs_uint)len );
@@ -797,7 +797,7 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 			current += len*2;
 			break;
 		}
-		case OctPack_leshort: {	// v : ƒŠƒgƒ‹ƒGƒ“ƒfƒBƒAƒ“‚É‚æ‚éunsigned short’l little endian short
+		case OctPack_leshort: {	// v : ãƒªãƒˆãƒ«ã‚¨ãƒ³ãƒ‡ã‚£ã‚¢ãƒ³ã«ã‚ˆã‚‹unsigned shortå€¤ little endian short
 			if( len < 0 ) len = ((tail - current)/2);
 			std::vector<tjs_uint16> ret;
 			BinToNumberLE<tjs_uint16,2>( ret, current, tail, (tjs_uint)len );
@@ -807,7 +807,7 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 			current += len*2;
 			break;
 		}
-		case OctPack_LELONG: {	// V : ƒŠƒgƒ‹ƒGƒ“ƒfƒBƒAƒ“‚É‚æ‚éunsigned long’l little endian long
+		case OctPack_LELONG: {	// V : ãƒªãƒˆãƒ«ã‚¨ãƒ³ãƒ‡ã‚£ã‚¢ãƒ³ã«ã‚ˆã‚‹unsigned longå€¤ little endian long
 			if( len < 0 ) len = ((tail - current)/4);
 			std::vector<tjs_uint> ret;
 			BinToNumberLE<tjs_uint,4>( ret, current, tail, (tjs_uint)len );
@@ -817,13 +817,13 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 			current += len*4;
 			break;
 		}
-		case OctPack_uuencode:	// u : uuencode‚³‚ê‚½•¶š—ñ
+		case OctPack_uuencode:	// u : uuencodeã•ã‚ŒãŸæ–‡å­—åˆ—
 			TJS_eTJSError( TJSNotSupportedUuencode );
 			break;
-		case OctPack_BRE:		// w : BERˆ³k‚³‚ê‚½®”’l
+		case OctPack_BRE:		// w : BERåœ§ç¸®ã•ã‚ŒãŸæ•´æ•°å€¤
 			TJS_eTJSError( TJSNotSupportedBER );
 			break;
-		case OctPack_null:		// x : ƒkƒ‹•¶š
+		case OctPack_null:		// x : ãƒŒãƒ«æ–‡å­—
 			if( len < 0 ) len = (tail - current);
 			for( tjs_int x = 0; x < (tjs_int)len; x++ ) {
 				current++;
@@ -836,7 +836,7 @@ static iTJSDispatch2* Unpack( const std::vector<OctPackTemplate>& templ, const t
 				else break;
 			}
 			break;
-		case OctPack_fill: {		// @ : â‘ÎˆÊ’u‚Ü‚Åƒkƒ‹•¶š‚ğ–„‚ß‚é
+		case OctPack_fill: {		// @ : çµ¶å¯¾ä½ç½®ã¾ã§ãƒŒãƒ«æ–‡å­—ã‚’åŸ‹ã‚ã‚‹
 			if( len < 0 ) len = (tail - current);
 			current = &(data[len]);
 			break;

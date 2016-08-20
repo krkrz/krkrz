@@ -1,6 +1,6 @@
 /******************************************************************************/
 /**
- * ŠeíƒtƒBƒ‹ƒ^[‚ÌƒEƒFƒCƒg‚ğŒvZ‚·‚é AVX ”Å
+ * å„ç¨®ãƒ•ã‚£ãƒ«ã‚¿ãƒ¼ã®ã‚¦ã‚§ã‚¤ãƒˆã‚’è¨ˆç®—ã™ã‚‹ AVX ç‰ˆ
  * ----------------------------------------------------------------------------
  * 	Copyright (C) T.Imoto <http://www.kaede-software.com>
  * ----------------------------------------------------------------------------
@@ -16,23 +16,23 @@
 #include "WeightFunctor.h"
 
 /**
- * ƒoƒCƒŠƒjƒA
+ * ãƒã‚¤ãƒªãƒ‹ã‚¢
  */
 struct BilinearWeightAVX : public BilinearWeight {
 	const __m256 absmask;
 	const __m256 one;
 	inline BilinearWeightAVX() : absmask( _mm256_castsi256_ps(_mm256_set1_epi32(0x7fffffff)) ), one(_mm256_set1_ps(1.0f)){}
 	inline __m256 operator() ( __m256 distance ) const {
-		__m256 x = _mm256_and_ps( distance, absmask );	// â‘Î’l
-		// 1.0f ˆÈã‚Í0‚ğİ’è‚·‚é‚½‚ß‚Ìƒ}ƒXƒN
+		__m256 x = _mm256_and_ps( distance, absmask );	// çµ¶å¯¾å€¤
+		// 1.0f ä»¥ä¸Šã¯0ã‚’è¨­å®šã™ã‚‹ãŸã‚ã®ãƒã‚¹ã‚¯
 		__m256 zeromask = _mm256_cmp_ps( x, one, _CMP_LT_OS ); // x < 1.0f
 		x = _mm256_sub_ps( one, x ); // 1.0f - x
-		return _mm256_and_ps( x, zeromask );	// x >= 1.0f ‚Í0‚Ö
+		return _mm256_and_ps( x, zeromask );	// x >= 1.0f ã¯0ã¸
 	}
 };
 /**
- * ƒoƒCƒLƒ…[ƒrƒbƒN
- * SIMD ‰»‚µ‚½‚¯‚ÇAload‘½—p‚µ‚Ä‚¢‚é‚Ì‚Åd‚¢‚©‚à‚µ‚ê‚È‚¢
+ * ãƒã‚¤ã‚­ãƒ¥ãƒ¼ãƒ“ãƒƒã‚¯
+ * SIMD åŒ–ã—ãŸã‘ã©ã€loadå¤šç”¨ã—ã¦ã„ã‚‹ã®ã§é‡ã„ã‹ã‚‚ã—ã‚Œãªã„
  */
 struct BicubicWeightAVX : public BicubicWeight {
 	const __m256 M256_P0;
@@ -46,7 +46,7 @@ struct BicubicWeightAVX : public BicubicWeight {
 	const __m256 two;
 
 	/**
-	 * @param c : ƒVƒƒ[ƒv‚³B¬‚³‚­‚È‚é‚É‚µ‚½‚ª‚Á‚Ä‹­‚­‚È‚é
+	 * @param c : ã‚·ãƒ£ãƒ¼ãƒ—ã•ã€‚å°ã•ããªã‚‹ã«ã—ãŸãŒã£ã¦å¼·ããªã‚‹
 	 */
 	BicubicWeightAVX( float c = -1 ) : BicubicWeight(c),
 		M256_P0( _mm256_set1_ps( c + 3.0f ) ),
@@ -61,18 +61,18 @@ struct BicubicWeightAVX : public BicubicWeight {
 	{}
 
 
-	// ‘f’¼‚ÉÀ‘•‚·‚é‚Æ’x‚¢‚©‚à
+	// ç´ ç›´ã«å®Ÿè£…ã™ã‚‹ã¨é…ã„ã‹ã‚‚
 	inline __m256 operator() ( __m256 distance ) const {
-		__m256 x = _mm256_and_ps( distance, absmask );	// â‘Î’l
+		__m256 x = _mm256_and_ps( distance, absmask );	// çµ¶å¯¾å€¤
 		__m256 x2 = _mm256_mul_ps(x, x);
 		__m256 x3 = _mm256_mul_ps(x, x2);
 
-		// 1.0ˆÈ‰º‚Ì‚Ì’l
+		// 1.0ä»¥ä¸‹ã®æ™‚ã®å€¤
 		__m256 t2 = _mm256_mul_ps( M256_P0, x2 );
 		__m256 t3 = _mm256_mul_ps( M256_P1, x3 );
 		__m256 onev = _mm256_add_ps( _mm256_sub_ps( one, t2 ), t3 );
 
-		// 2.0ˆÈ‰º‚Ì‚Ì’l
+		// 2.0ä»¥ä¸‹ã®æ™‚ã®å€¤
 		t2 = _mm256_mul_ps( M256_P3, x );
 		t3 = _mm256_mul_ps( M256_P4, x2 );
 		__m256 t4 = _mm256_mul_ps( M256_COEFF, x3 );
@@ -81,9 +81,9 @@ struct BicubicWeightAVX : public BicubicWeight {
 		__m256 onemask = _mm256_cmp_ps( x, one, _CMP_LE_OS ); // x <= 1.0f
 		__m256 twomask = _mm256_cmp_ps( x, two, _CMP_LE_OS ); // x <= 2.0f
 		twomask = _mm256_andnot_ps( onemask, twomask );	// x > 1.0f && x <= 2.0f
-		onev = _mm256_and_ps( onev, onemask );	// 1.0ˆÈ‰º‚Ì‚Ì’l
-		twov = _mm256_and_ps( twov, twomask );	// 1.0‚æ‚è‘å‚«‚­A2.0ˆÈ‰º‚Ì‚Ì’l
-		return _mm256_or_ps( onev, twov );	// 2.0ˆÈ‰º‚Ì’l‚ğ or ‚µ‚ÄA‚»‚êˆÈŠO‚Í0‚É
+		onev = _mm256_and_ps( onev, onemask );	// 1.0ä»¥ä¸‹ã®æ™‚ã®å€¤
+		twov = _mm256_and_ps( twov, twomask );	// 1.0ã‚ˆã‚Šå¤§ããã€2.0ä»¥ä¸‹ã®æ™‚ã®å€¤
+		return _mm256_or_ps( onev, twov );	// 2.0ä»¥ä¸‹ã®å€¤ã‚’ or ã—ã¦ã€ãã‚Œä»¥å¤–ã¯0ã«
 	}
 };
 /**
@@ -108,10 +108,10 @@ struct LanczosWeightAVX : public LanczosWeight<TTap> {
 		pidist = m256_rcp_22bit_ps( pidist );
 		result = _mm256_mul_ps( result, pidist );	// std::sin(M_PI*phase)*std::sin(M_PI*phase/TTap)/(M_PI*M_PI*phase*phase/TTap)
 		
-		// EPSILON ‚æ‚è¬‚³‚¢ê‡‚ÍA1‚ğİ’è
+		// EPSILON ã‚ˆã‚Šå°ã•ã„å ´åˆã¯ã€1ã‚’è¨­å®š
 		__m256 onemask = _mm256_cmp_ps( dist, M256_EPSILON, _CMP_LT_OS );
 		result = _mm256_or_ps( _mm256_andnot_ps( onemask, result ), _mm256_and_ps( M256_1_0, onemask ) );
-		// TAP ˆÈã‚Íƒ[ƒ‚ğİ’è
+		// TAP ä»¥ä¸Šã¯ã‚¼ãƒ­ã‚’è¨­å®š
 		__m256 zeromask = _mm256_cmp_ps( dist, tap, _CMP_GE_OS );
 		result = _mm256_or_ps( _mm256_andnot_ps( zeromask, result ), _mm256_and_ps( _mm256_setzero_ps(), zeromask ) );
 		return result;
@@ -119,7 +119,7 @@ struct LanczosWeightAVX : public LanczosWeight<TTap> {
 };
 
 /**
- * Spline16 —pƒEƒFƒCƒgŠÖ”
+ * Spline16 ç”¨ã‚¦ã‚§ã‚¤ãƒˆé–¢æ•°
  */
 struct Spline16WeightAVX : public Spline16Weight {
 	const __m256 one;
@@ -136,34 +136,34 @@ struct Spline16WeightAVX : public Spline16Weight {
 		M256_8_0__5_0(_mm256_set1_ps(8.0f/5.0f))
 	{}
 	inline __m256 operator() ( __m256 distance ) const {
-		__m256 x = _mm256_and_ps( distance, absmask );	// â‘Î’l
+		__m256 x = _mm256_and_ps( distance, absmask );	// çµ¶å¯¾å€¤
 		__m256 x2 = _mm256_mul_ps( x, x );
 		__m256 x3 = _mm256_mul_ps( x, x2 );
 
-		// 1ˆÈ‰º‚Ì
+		// 1ä»¥ä¸‹ã®æ™‚
 		__m256 t2_95 = M256_9_0__5_0;
 		__m256 t2 = _mm256_mul_ps( x2, t2_95 );	// x*x*9/5
 		__m256 t3 = _mm256_mul_ps( x3, M256_1_0__5_0 );	// x*1/5
 		__m256 onev = _mm256_add_ps( _mm256_sub_ps( _mm256_sub_ps( x3, t2 ), t3 ), one );
 
-		// 2ˆÈ‰º‚Ì
+		// 2ä»¥ä¸‹ã®æ™‚
 		__m256 t1 = _mm256_mul_ps( x3, M256_1_0__3_0 );	// x*x*x*1/3
 		t2 = _mm256_mul_ps( x2, t2_95 );	// x*x*9/5
 		t3 = _mm256_mul_ps( x, M256_46_0__15_0 );	// x*46.0f/15.0f
 		__m256 twov = _mm256_add_ps( _mm256_sub_ps( _mm256_sub_ps( t2, t1 ), t3 ), M256_8_0__5_0 );
 
-		// Œ‹‰Ê‚ğ‡¬
+		// çµæœã‚’åˆæˆ
 		__m256 onemask = _mm256_cmp_ps( x, one, _CMP_LE_OS ); // x <= 1.0f
 		__m256 twomask = _mm256_cmp_ps( x, two, _CMP_LE_OS ); // x <= 2.0f
 		twomask = _mm256_andnot_ps( onemask, twomask );	// x > 1.0f && x <= 2.0f
-		onev = _mm256_and_ps( onev, onemask );	// 1.0ˆÈ‰º‚Ì‚Ì’l
-		twov = _mm256_and_ps( twov, twomask );	// 1.0‚æ‚è‘å‚«‚­A2.0ˆÈ‰º‚Ì‚Ì’l
-		return _mm256_or_ps( onev, twov );	// 2.0ˆÈ‰º‚Ì’l‚ğ or ‚µ‚ÄA‚»‚êˆÈŠO‚Í0‚É
+		onev = _mm256_and_ps( onev, onemask );	// 1.0ä»¥ä¸‹ã®æ™‚ã®å€¤
+		twov = _mm256_and_ps( twov, twomask );	// 1.0ã‚ˆã‚Šå¤§ããã€2.0ä»¥ä¸‹ã®æ™‚ã®å€¤
+		return _mm256_or_ps( onev, twov );	// 2.0ä»¥ä¸‹ã®å€¤ã‚’ or ã—ã¦ã€ãã‚Œä»¥å¤–ã¯0ã«
 	}
 };
 
 /**
- * Spline36 —pƒEƒFƒCƒgŠÖ”
+ * Spline36 ç”¨ã‚¦ã‚§ã‚¤ãƒˆé–¢æ•°
  */
 struct Spline36WeightAVX : public Spline36Weight {
 	const __m256 one;
@@ -195,43 +195,43 @@ struct Spline36WeightAVX : public Spline36Weight {
 		M256_434_0__209_0(_mm256_set1_ps(434.0f/209.0f)), 
 		M256_384_0__209_0(_mm256_set1_ps(384.0f/209.0f)) {}
 	inline __m256 operator() ( __m256 distance ) const {
-		__m256 x = _mm256_and_ps( distance, absmask );	// â‘Î’l
+		__m256 x = _mm256_and_ps( distance, absmask );	// çµ¶å¯¾å€¤
 		__m256 x2 = _mm256_mul_ps( x, x );
 		__m256 x3 = _mm256_mul_ps( x, x2 );
 
-		// 1.0ˆÈ‰º‚Ì
+		// 1.0ä»¥ä¸‹ã®æ™‚
 		__m256 t1 = _mm256_mul_ps( x3, M256_13_0__11_0 );
 		__m256 t2 = _mm256_mul_ps( x2, M256_453_0__209_0 );
 		__m256 t3 = _mm256_mul_ps( x, M256_3_0__209_0 );
 		__m256 onev = _mm256_add_ps( _mm256_sub_ps( _mm256_sub_ps( t1, t2 ), t3 ), one );
 
-		// 2.0ˆÈ‰º‚Ì
+		// 2.0ä»¥ä¸‹ã®æ™‚
 		t1 = _mm256_mul_ps( x3, M256_6_0__11_0 );
 		t2 = _mm256_mul_ps( x2, M256_612_0__209_0 );
 		t3 = _mm256_mul_ps( x, M256_1038_0__209_0 );
 		__m256 twov = _mm256_add_ps( _mm256_sub_ps( _mm256_sub_ps( t2, t1 ), t3 ), M256_540_0__209_0 );
 
-		// 3.0ˆÈ‰º‚Ì
+		// 3.0ä»¥ä¸‹ã®æ™‚
 		t1 = _mm256_mul_ps( x3, M256_1_0__11_0 );
 		t2 = _mm256_mul_ps( x2, M256_159_0__209_0 );
 		t3 = _mm256_mul_ps( x, M256_434_0__209_0 );
 		__m256 thrv = _mm256_sub_ps( _mm256_add_ps( _mm256_sub_ps( t1, t2 ), t3 ), M256_384_0__209_0 );
 
-		// Œ‹‰Ê‚ğ‡¬
+		// çµæœã‚’åˆæˆ
 		__m256 onemask = _mm256_cmp_ps( x, one, _CMP_LE_OS ); // x <= 1.0f
 		__m256 twomask = _mm256_cmp_ps( x, two, _CMP_LE_OS ); // x <= 2.0f
 		__m256 thrmask = _mm256_cmp_ps( x, three, _CMP_LE_OS ); // x <= 3.0f
 		thrmask = _mm256_andnot_ps( twomask, thrmask );	// x > 2.0f && x <= 3.0f
 		twomask = _mm256_andnot_ps( onemask, twomask );	// x > 1.0f && x <= 2.0f
-		onev = _mm256_and_ps( onev, onemask );	// 1.0ˆÈ‰º‚Ì‚Ì’l
-		twov = _mm256_and_ps( twov, twomask );	// 1.0‚æ‚è‘å‚«‚­A2.0ˆÈ‰º‚Ì‚Ì’l
-		thrv = _mm256_and_ps( thrv, thrmask );	// 2.0‚æ‚è‘å‚«‚­A3.0ˆÈ‰º‚Ì‚Ì’l
+		onev = _mm256_and_ps( onev, onemask );	// 1.0ä»¥ä¸‹ã®æ™‚ã®å€¤
+		twov = _mm256_and_ps( twov, twomask );	// 1.0ã‚ˆã‚Šå¤§ããã€2.0ä»¥ä¸‹ã®æ™‚ã®å€¤
+		thrv = _mm256_and_ps( thrv, thrmask );	// 2.0ã‚ˆã‚Šå¤§ããã€3.0ä»¥ä¸‹ã®æ™‚ã®å€¤
 		return _mm256_or_ps( _mm256_or_ps( onev, twov ), thrv );
 	}
 };
 
 /**
- * ƒKƒEƒXŠÖ”
+ * ã‚¬ã‚¦ã‚¹é–¢æ•°
  */
 struct GaussianWeightAVX : public GaussianWeight {
 	const __m256 M256_SQ2PI;
@@ -245,7 +245,7 @@ struct GaussianWeightAVX : public GaussianWeight {
 };
 
 /**
- * Blackman-Sinc ŠÖ”
+ * Blackman-Sinc é–¢æ•°
  */
 struct BlackmanSincWeightAVX : public BlackmanSincWeight {
 	const __m256 absmask;
@@ -267,7 +267,7 @@ struct BlackmanSincWeightAVX : public BlackmanSincWeight {
 		M256_0_08(_mm256_set1_ps(0.08f)),
 		M256_0_42(_mm256_set1_ps(0.42f)) {}
 	inline __m256 operator() ( __m256 distance ) const {
-		__m256 x = _mm256_and_ps( distance, absmask );	// â‘Î’l
+		__m256 x = _mm256_and_ps( distance, absmask );	// çµ¶å¯¾å€¤
 		__m256 pix = _mm256_mul_ps( x, M256_PI );	// PI * x
 
 		__m256 coeff = M256_COEFF;

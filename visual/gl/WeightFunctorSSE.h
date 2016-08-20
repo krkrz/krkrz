@@ -1,6 +1,6 @@
 /******************************************************************************/
 /**
- * ŠeíƒtƒBƒ‹ƒ^[‚ÌƒEƒFƒCƒg‚ğŒvZ‚·‚é SSE ”Å
+ * å„ç¨®ãƒ•ã‚£ãƒ«ã‚¿ãƒ¼ã®ã‚¦ã‚§ã‚¤ãƒˆã‚’è¨ˆç®—ã™ã‚‹ SSE ç‰ˆ
  * ----------------------------------------------------------------------------
  * 	Copyright (C) T.Imoto <http://www.kaede-software.com>
  * ----------------------------------------------------------------------------
@@ -16,23 +16,23 @@
 #include "WeightFunctor.h"
 
 /**
- * ƒoƒCƒŠƒjƒA
+ * ãƒã‚¤ãƒªãƒ‹ã‚¢
  */
 struct BilinearWeightSSE : public BilinearWeight {
 	const __m128 absmask;
 	const __m128 one;
 	inline BilinearWeightSSE() : absmask( _mm_castsi128_ps(_mm_set1_epi32(0x7fffffff)) ), one(_mm_set1_ps(1.0f)){}
 	inline __m128 operator() ( __m128 distance ) const {
-		__m128 x = _mm_and_ps( distance, absmask );	// â‘Î’l
-		// 1.0f ˆÈã‚Í0‚ğİ’è‚·‚é‚½‚ß‚Ìƒ}ƒXƒN
+		__m128 x = _mm_and_ps( distance, absmask );	// çµ¶å¯¾å€¤
+		// 1.0f ä»¥ä¸Šã¯0ã‚’è¨­å®šã™ã‚‹ãŸã‚ã®ãƒã‚¹ã‚¯
 		//__m128 zeromask = _mm_cmp_ps( x, one, _CMP_LT_OS ); // x < 1.0f
 		__m128 zeromask = _mm_cmplt_ps( x, one ); // x < 1.0f
 		x = _mm_sub_ps( one, x ); // 1.0f - x
-		return _mm_and_ps( x, zeromask );	// x >= 1.0f ‚Í0‚Ö
+		return _mm_and_ps( x, zeromask );	// x >= 1.0f ã¯0ã¸
 	}
 };
 /**
- * ƒoƒCƒLƒ…[ƒrƒbƒN
+ * ãƒã‚¤ã‚­ãƒ¥ãƒ¼ãƒ“ãƒƒã‚¯
  */
 struct BicubicWeightSSE : public BicubicWeight {
 	const __m128 M128_P0;
@@ -46,7 +46,7 @@ struct BicubicWeightSSE : public BicubicWeight {
 	const __m128 two;
 
 	/**
-	 * @param c : ƒVƒƒ[ƒv‚³B¬‚³‚­‚È‚é‚É‚µ‚½‚ª‚Á‚Ä‹­‚­‚È‚é
+	 * @param c : ã‚·ãƒ£ãƒ¼ãƒ—ã•ã€‚å°ã•ããªã‚‹ã«ã—ãŸãŒã£ã¦å¼·ããªã‚‹
 	 */
 	inline BicubicWeightSSE( float c = -1 ) : BicubicWeight(c),
 		M128_P0( _mm_set1_ps( c + 3.0f ) ),
@@ -60,18 +60,18 @@ struct BicubicWeightSSE : public BicubicWeight {
 		two(_mm_set1_ps(2.0f))
 	{}
 
-	// ‘f’¼‚ÉÀ‘•‚·‚é‚Æ’x‚¢‚©‚à
+	// ç´ ç›´ã«å®Ÿè£…ã™ã‚‹ã¨é…ã„ã‹ã‚‚
 	inline __m128 operator() ( __m128 distance ) const {
-		__m128 x = _mm_and_ps( distance, absmask );	// â‘Î’l
+		__m128 x = _mm_and_ps( distance, absmask );	// çµ¶å¯¾å€¤
 		__m128 x2 = _mm_mul_ps(x, x);
 		__m128 x3 = _mm_mul_ps(x, x2);
 
-		// 1.0ˆÈ‰º‚Ì‚Ì’l
+		// 1.0ä»¥ä¸‹ã®æ™‚ã®å€¤
 		__m128 t2 = _mm_mul_ps( M128_P0, x2 );
 		__m128 t3 = _mm_mul_ps( M128_P1, x3 );
 		__m128 onev = _mm_add_ps( _mm_sub_ps( one, t2 ), t3 );
 
-		// 2.0ˆÈ‰º‚Ì‚Ì’l
+		// 2.0ä»¥ä¸‹ã®æ™‚ã®å€¤
 		t2 = _mm_mul_ps( M128_P3, x );
 		t3 = _mm_mul_ps( M128_P4, x2 );
 		__m128 t4 = _mm_mul_ps( M128_COEFF, x3 );
@@ -82,9 +82,9 @@ struct BicubicWeightSSE : public BicubicWeight {
 		//__m128 twomask = _mm_cmp_ps( x, two, _CMP_LE_OS ); // x <= 2.0f
 		__m128 twomask = _mm_cmple_ps( x, two ); // x <= 2.0f
 		twomask = _mm_andnot_ps( onemask, twomask );	// x > 1.0f && x <= 2.0f
-		onev = _mm_and_ps( onev, onemask );	// 1.0ˆÈ‰º‚Ì‚Ì’l
-		twov = _mm_and_ps( twov, twomask );	// 1.0‚æ‚è‘å‚«‚­A2.0ˆÈ‰º‚Ì‚Ì’l
-		return _mm_or_ps( onev, twov );	// 2.0ˆÈ‰º‚Ì’l‚ğ or ‚µ‚ÄA‚»‚êˆÈŠO‚Í0‚É
+		onev = _mm_and_ps( onev, onemask );	// 1.0ä»¥ä¸‹ã®æ™‚ã®å€¤
+		twov = _mm_and_ps( twov, twomask );	// 1.0ã‚ˆã‚Šå¤§ããã€2.0ä»¥ä¸‹ã®æ™‚ã®å€¤
+		return _mm_or_ps( onev, twov );	// 2.0ä»¥ä¸‹ã®å€¤ã‚’ or ã—ã¦ã€ãã‚Œä»¥å¤–ã¯0ã«
 	}
 };
 /**
@@ -109,10 +109,10 @@ struct LanczosWeightSSE : public LanczosWeight<TTap> {
 		pidist = m128_rcp_22bit_ps( pidist );
 		result = _mm_mul_ps( result, pidist );	// std::sin(M_PI*phase)*std::sin(M_PI*phase/TTap)/(M_PI*M_PI*phase*phase/TTap)
 		
-		// EPSILON ‚æ‚è¬‚³‚¢ê‡‚ÍA1‚ğİ’è
+		// EPSILON ã‚ˆã‚Šå°ã•ã„å ´åˆã¯ã€1ã‚’è¨­å®š
 		__m128 onemask = _mm_cmplt_ps( dist, M128_EPSILON );
 		result = _mm_or_ps( _mm_andnot_ps( onemask, result ), _mm_and_ps( M128_1_0, onemask ) );
-		// TAP ˆÈã‚Íƒ[ƒ‚ğİ’è
+		// TAP ä»¥ä¸Šã¯ã‚¼ãƒ­ã‚’è¨­å®š
 		__m128 zeromask = _mm_cmpge_ps( dist, tap );
 		result = _mm_or_ps( _mm_andnot_ps( zeromask, result ), _mm_and_ps( _mm_setzero_ps(), zeromask ) );
 		return result;
@@ -120,7 +120,7 @@ struct LanczosWeightSSE : public LanczosWeight<TTap> {
 };
 
 /**
- * Spline16 —pƒEƒFƒCƒgŠÖ”
+ * Spline16 ç”¨ã‚¦ã‚§ã‚¤ãƒˆé–¢æ•°
  */
 struct Spline16WeightSSE : public Spline16Weight {
 	const __m128 one;
@@ -137,34 +137,34 @@ struct Spline16WeightSSE : public Spline16Weight {
 		M128_8_0__5_0(_mm_set1_ps(8.0f/5.0f))
 	{}
 	inline __m128 operator() ( __m128 distance ) const {
-		__m128 x = _mm_and_ps( distance, absmask );	// â‘Î’l
+		__m128 x = _mm_and_ps( distance, absmask );	// çµ¶å¯¾å€¤
 		__m128 x2 = _mm_mul_ps( x, x );
 		__m128 x3 = _mm_mul_ps( x, x2 );
 
-		// 1ˆÈ‰º‚Ì
+		// 1ä»¥ä¸‹ã®æ™‚
 		const __m128 t2_95 = M128_9_0__5_0;
 		__m128 t2 = _mm_mul_ps( x2, t2_95 );	// x*x*9/5
 		__m128 t3 = _mm_mul_ps( x3, M128_1_0__5_0 );	// x*1/5
 		__m128 onev = _mm_add_ps( _mm_sub_ps( _mm_sub_ps( x3, t2 ), t3 ), one );
 
-		// 2ˆÈ‰º‚Ì
+		// 2ä»¥ä¸‹ã®æ™‚
 		__m128 t1 = _mm_mul_ps( x3, M128_1_0__3_0 );	// x*x*x*1/3
 		t2 = _mm_mul_ps( x2, t2_95 );	// x*x*9/5
 		t3 = _mm_mul_ps( x, M128_46_0__15_0 );	// x*46.0f/15.0f
 		__m128 twov = _mm_add_ps( _mm_sub_ps( _mm_sub_ps( t2, t1 ), t3 ), M128_8_0__5_0 );
 
-		// Œ‹‰Ê‚ğ‡¬
+		// çµæœã‚’åˆæˆ
 		__m128 onemask = _mm_cmple_ps( x, one ); // x <= 1.0f
 		__m128 twomask = _mm_cmple_ps( x, two );
 		twomask = _mm_andnot_ps( onemask, twomask );	// x > 1.0f && x <= 2.0f
-		onev = _mm_and_ps( onev, onemask );	// 1.0ˆÈ‰º‚Ì‚Ì’l
-		twov = _mm_and_ps( twov, twomask );	// 1.0‚æ‚è‘å‚«‚­A2.0ˆÈ‰º‚Ì‚Ì’l
-		return _mm_or_ps( onev, twov );	// 2.0ˆÈ‰º‚Ì’l‚ğ or ‚µ‚ÄA‚»‚êˆÈŠO‚Í0‚É
+		onev = _mm_and_ps( onev, onemask );	// 1.0ä»¥ä¸‹ã®æ™‚ã®å€¤
+		twov = _mm_and_ps( twov, twomask );	// 1.0ã‚ˆã‚Šå¤§ããã€2.0ä»¥ä¸‹ã®æ™‚ã®å€¤
+		return _mm_or_ps( onev, twov );	// 2.0ä»¥ä¸‹ã®å€¤ã‚’ or ã—ã¦ã€ãã‚Œä»¥å¤–ã¯0ã«
 	}
 };
 
 /**
- * Spline36 —pƒEƒFƒCƒgŠÖ”
+ * Spline36 ç”¨ã‚¦ã‚§ã‚¤ãƒˆé–¢æ•°
  */
 struct Spline36WeightSSE : public Spline36Weight {
 	const __m128 one;
@@ -196,43 +196,43 @@ struct Spline36WeightSSE : public Spline36Weight {
 		M128_434_0__209_0(_mm_set1_ps(434.0f/209.0f)), 
 		M128_384_0__209_0(_mm_set1_ps(384.0f/209.0f)) {}
 	inline __m128 operator() ( __m128 distance ) const {
-		__m128 x = _mm_and_ps( distance, absmask );	// â‘Î’l
+		__m128 x = _mm_and_ps( distance, absmask );	// çµ¶å¯¾å€¤
 		__m128 x2 = _mm_mul_ps( x, x );
 		__m128 x3 = _mm_mul_ps( x, x2 );
 
-		// 1.0ˆÈ‰º‚Ì
+		// 1.0ä»¥ä¸‹ã®æ™‚
 		__m128 t1 = _mm_mul_ps( x3, M128_13_0__11_0 );
 		__m128 t2 = _mm_mul_ps( x2, M128_453_0__209_0 );
 		__m128 t3 = _mm_mul_ps( x, M128_3_0__209_0 );
 		__m128 onev = _mm_add_ps( _mm_sub_ps( _mm_sub_ps( t1, t2 ), t3 ), one );
 
-		// 2.0ˆÈ‰º‚Ì
+		// 2.0ä»¥ä¸‹ã®æ™‚
 		t1 = _mm_mul_ps( x3, M128_6_0__11_0 );
 		t2 = _mm_mul_ps( x2, M128_612_0__209_0 );
 		t3 = _mm_mul_ps( x, M128_1038_0__209_0 );
 		__m128 twov = _mm_add_ps( _mm_sub_ps( _mm_sub_ps( t2, t1 ), t3 ), M128_540_0__209_0 );
 
-		// 3.0ˆÈ‰º‚Ì
+		// 3.0ä»¥ä¸‹ã®æ™‚
 		t1 = _mm_mul_ps( x3, M128_1_0__11_0 );
 		t2 = _mm_mul_ps( x2, M128_159_0__209_0 );
 		t3 = _mm_mul_ps( x, M128_434_0__209_0 );
 		__m128 thrv = _mm_sub_ps( _mm_add_ps( _mm_sub_ps( t1, t2 ), t3 ), M128_384_0__209_0 );
 
-		// Œ‹‰Ê‚ğ‡¬
+		// çµæœã‚’åˆæˆ
 		__m128 onemask = _mm_cmple_ps( x, one ); // x <= 1.0f
 		__m128 twomask = _mm_cmple_ps( x, two ); // x <= 2.0f
 		__m128 thrmask = _mm_cmple_ps( x, three ); // x <= 3.0f
 		thrmask = _mm_andnot_ps( twomask, thrmask );	// x > 2.0f && x <= 3.0f
 		twomask = _mm_andnot_ps( onemask, twomask );	// x > 1.0f && x <= 2.0f
-		onev = _mm_and_ps( onev, onemask );	// 1.0ˆÈ‰º‚Ì‚Ì’l
-		twov = _mm_and_ps( twov, twomask );	// 1.0‚æ‚è‘å‚«‚­A2.0ˆÈ‰º‚Ì‚Ì’l
-		thrv = _mm_and_ps( thrv, thrmask );	// 2.0‚æ‚è‘å‚«‚­A3.0ˆÈ‰º‚Ì‚Ì’l
+		onev = _mm_and_ps( onev, onemask );	// 1.0ä»¥ä¸‹ã®æ™‚ã®å€¤
+		twov = _mm_and_ps( twov, twomask );	// 1.0ã‚ˆã‚Šå¤§ããã€2.0ä»¥ä¸‹ã®æ™‚ã®å€¤
+		thrv = _mm_and_ps( thrv, thrmask );	// 2.0ã‚ˆã‚Šå¤§ããã€3.0ä»¥ä¸‹ã®æ™‚ã®å€¤
 		return _mm_or_ps( _mm_or_ps( onev, twov ), thrv );
 	}
 };
 
 /**
- * ƒKƒEƒXŠÖ”
+ * ã‚¬ã‚¦ã‚¹é–¢æ•°
  */
 struct GaussianWeightSSE : public GaussianWeight {
 	const __m128 M128_SQ2PI;
@@ -246,7 +246,7 @@ struct GaussianWeightSSE : public GaussianWeight {
 };
 
 /**
- * Blackman-Sinc ŠÖ”
+ * Blackman-Sinc é–¢æ•°
  */
 struct BlackmanSincWeightSSE : public BlackmanSincWeight {
 	const __m128 absmask;
@@ -268,7 +268,7 @@ struct BlackmanSincWeightSSE : public BlackmanSincWeight {
 		M128_0_08(_mm_set1_ps(0.08f)),
 		M128_0_42(_mm_set1_ps(0.42f)) {}
 	inline __m128 operator() ( __m128 distance ) const {
-		__m128 x = _mm_and_ps( distance, absmask );	// â‘Î’l
+		__m128 x = _mm_and_ps( distance, absmask );	// çµ¶å¯¾å€¤
 		__m128 pix = _mm_mul_ps( x, M128_PI );	// PI * x
 
 		__m128 coeff = M128_COEFF;

@@ -2,7 +2,7 @@
 /*! @file
 @brief DirectShow
 
-ƒoƒbƒtƒ@ƒwƒŒƒ“ƒ_ƒŠƒ“ƒO‚·‚é
+ãƒãƒƒãƒ•ã‚¡ãƒ˜ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã™ã‚‹
 -----------------------------------------------------------------------------
 	Copyright (C) 2004 T.Imoto
 -----------------------------------------------------------------------------
@@ -26,13 +26,13 @@ class TBufferRendererInputPin;
 class TBufferRenderer;
 
 //----------------------------------------------------------------------------
-//! @brief Buffer Renderer‚ÌƒAƒƒP[ƒ^[
+//! @brief Buffer Rendererã®ã‚¢ãƒ­ã‚±ãƒ¼ã‚¿ãƒ¼
 //----------------------------------------------------------------------------
 class TBufferRendererAllocator : public CBaseAllocator
 {
 private:
-	CMediaSample	*m_pMediaSample;	//!< Œ»İ‚ÌƒƒfƒBƒAƒTƒ“ƒvƒ‹‚Ö‚Ìƒ|ƒCƒ“ƒ^
-	TBufferRenderer	*m_pRenderer;		//!< ‚±‚ÌƒAƒƒP[ƒ^[‚ğ‚ÂƒŒƒ“ƒ_[‚Ö‚Ìƒ|ƒCƒ“ƒ^
+	CMediaSample	*m_pMediaSample;	//!< ç¾åœ¨ã®ãƒ¡ãƒ‡ã‚£ã‚¢ã‚µãƒ³ãƒ—ãƒ«ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+	TBufferRenderer	*m_pRenderer;		//!< ã“ã®ã‚¢ãƒ­ã‚±ãƒ¼ã‚¿ãƒ¼ã‚’æŒã¤ãƒ¬ãƒ³ãƒ€ãƒ¼ã¸ã®ãƒã‚¤ãƒ³ã‚¿
 
 protected:
 	void Free(void);
@@ -43,40 +43,40 @@ public:
 	TBufferRendererAllocator( TCHAR *, LPUNKNOWN, HRESULT * );
 	virtual ~TBufferRendererAllocator();
 
-	// ƒI[ƒo[ƒ‰ƒCƒh
+	// ã‚ªãƒ¼ãƒãƒ¼ãƒ©ã‚¤ãƒ‰
 	STDMETHODIMP SetProperties( ALLOCATOR_PROPERTIES* pRequest, ALLOCATOR_PROPERTIES* pActual );
 
-	// ƒ_ƒuƒ‹ƒoƒbƒtƒ@ƒŠƒ“ƒO—pƒ|ƒCƒ“ƒ^·‚µ‘Ö‚¦ƒƒ\ƒbƒh
+	// ãƒ€ãƒ–ãƒ«ãƒãƒƒãƒ•ã‚¡ãƒªãƒ³ã‚°ç”¨ãƒã‚¤ãƒ³ã‚¿å·®ã—æ›¿ãˆãƒ¡ã‚½ãƒƒãƒ‰
 	void SetPointer( IMediaSample *media, BYTE *ptr );
 	void SetPointer( BYTE *ptr ) { SetPointer(m_pMediaSample,ptr); };
 };
 
 //----------------------------------------------------------------------------
-//! @brief Buffer Renderer‚ÌƒCƒ“ƒvƒbƒgƒsƒ“
+//! @brief Buffer Rendererã®ã‚¤ãƒ³ãƒ—ãƒƒãƒˆãƒ”ãƒ³
 //----------------------------------------------------------------------------
 class TBufferRendererInputPin : public CRendererInputPin
 {
 private:
-	TBufferRenderer	*m_pRenderer;		//!< ‚±‚Ìƒsƒ“‚ğ‚ÂƒŒƒ“ƒ_[‚Ö‚Ìƒ|ƒCƒ“ƒ^
-	CCritSec		*m_pInterfaceLock;	//!< ƒƒbƒN—pƒŠƒ\[ƒX
-	bool			m_ActiveAllocator;	//!< ‚±‚Ìƒsƒ“‚ğ‚ÂƒŒƒ“ƒ_[‚ÌƒAƒƒP[ƒ^[‚ªg‚í‚ê‚Ä‚¢‚é‚©‚Ç‚¤‚©
+	TBufferRenderer	*m_pRenderer;		//!< ã“ã®ãƒ”ãƒ³ã‚’æŒã¤ãƒ¬ãƒ³ãƒ€ãƒ¼ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+	CCritSec		*m_pInterfaceLock;	//!< ãƒ­ãƒƒã‚¯ç”¨ãƒªã‚½ãƒ¼ã‚¹
+	bool			m_ActiveAllocator;	//!< ã“ã®ãƒ”ãƒ³ã‚’æŒã¤ãƒ¬ãƒ³ãƒ€ãƒ¼ã®ã‚¢ãƒ­ã‚±ãƒ¼ã‚¿ãƒ¼ãŒä½¿ã‚ã‚Œã¦ã„ã‚‹ã‹ã©ã†ã‹
 
 public:
 	TBufferRendererInputPin( TBufferRenderer *pRenderer, CCritSec *pInterfaceLock, HRESULT *phr, LPCWSTR name );
 	virtual ~TBufferRendererInputPin();
 	bool ActiveAllocator( void ) const;
 
-	//ƒI[ƒo[ƒ‰ƒCƒh
+	//ã‚ªãƒ¼ãƒãƒ¼ãƒ©ã‚¤ãƒ‰
 	STDMETHODIMP GetAllocator( IMemAllocator **ppAllocator );
 	STDMETHODIMP NotifyAllocator( IMemAllocator * pAllocator, BOOL bReadOnly );
 
-	// ƒ_ƒuƒ‹ƒoƒbƒtƒ@ƒŠƒ“ƒO—pƒ|ƒCƒ“ƒ^·‚µ‘Ö‚¦ƒƒ\ƒbƒh
+	// ãƒ€ãƒ–ãƒ«ãƒãƒƒãƒ•ã‚¡ãƒªãƒ³ã‚°ç”¨ãƒã‚¤ãƒ³ã‚¿å·®ã—æ›¿ãˆãƒ¡ã‚½ãƒƒãƒ‰
 	void SetPointer( IMediaSample *media, BYTE *ptr );
 	void SetPointer( BYTE *ptr );
 };
 
 //----------------------------------------------------------------------------
-//! @brief ƒoƒbƒtƒ@ƒwƒŒƒ“ƒ_ƒŠƒ“ƒO‚·‚é
+//! @brief ãƒãƒƒãƒ•ã‚¡ãƒ˜ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã™ã‚‹
 //----------------------------------------------------------------------------
 class TBufferRenderer : public CBaseVideoRenderer, public IRendererBufferAccess, public IRendererBufferVideo
 {
@@ -84,19 +84,19 @@ class TBufferRenderer : public CBaseVideoRenderer, public IRendererBufferAccess,
 	friend class TBufferRendererAllocator;
 
 private:
-	long	m_VideoWidth;		//!< ƒrƒfƒI‚Ì•
-	long	m_VideoHeight;		//!< ƒrƒfƒI‚Ì‚‚³
-	long	m_VideoPitch;		//!< ƒrƒfƒI‚Ìƒsƒbƒ`(1s‚ÌƒoƒCƒg”)
-	BYTE	*m_Buffer[2];		//!< ƒŒƒ“ƒ_ƒŠƒ“ƒO‚·‚éƒoƒbƒtƒ@‚Ö‚Ìƒ|ƒCƒ“ƒ^
-	bool	m_IsBufferOwner[2];	//!< ƒoƒbƒtƒ@‚ª‚±‚ÌƒNƒ‰ƒX‚ÉŠ„‚è“–‚Ä‚ç‚ê‚½‚à‚Ì‚©‚Ç‚¤‚©‚ğ•Û
-	int		m_FrontBuffer;		//!< Œ»İ‚Ìƒtƒƒ“ƒgƒoƒbƒtƒ@‚ª‚Ç‚¿‚ç‚©‚ğ•Û
+	long	m_VideoWidth;		//!< ãƒ“ãƒ‡ã‚ªã®å¹…
+	long	m_VideoHeight;		//!< ãƒ“ãƒ‡ã‚ªã®é«˜ã•
+	long	m_VideoPitch;		//!< ãƒ“ãƒ‡ã‚ªã®ãƒ”ãƒƒãƒ(1è¡Œã®ãƒã‚¤ãƒˆæ•°)
+	BYTE	*m_Buffer[2];		//!< ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã™ã‚‹ãƒãƒƒãƒ•ã‚¡ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+	bool	m_IsBufferOwner[2];	//!< ãƒãƒƒãƒ•ã‚¡ãŒã“ã®ã‚¯ãƒ©ã‚¹ã«å‰²ã‚Šå½“ã¦ã‚‰ã‚ŒãŸã‚‚ã®ã‹ã©ã†ã‹ã‚’ä¿æŒ
+	int		m_FrontBuffer;		//!< ç¾åœ¨ã®ãƒ•ãƒ­ãƒ³ãƒˆãƒãƒƒãƒ•ã‚¡ãŒã©ã¡ã‚‰ã‹ã‚’ä¿æŒ
 	LONG	m_StartFrame;
 	LONG	m_StopFrame;
 
-	TBufferRendererInputPin		m_InputPin;		//!< “ü—Íƒsƒ“
-	TBufferRendererAllocator	m_Allocator;	//!< ƒƒ‚ƒŠ‚ÌŠ„‚è“–‚Ä
+	TBufferRendererInputPin		m_InputPin;		//!< å…¥åŠ›ãƒ”ãƒ³
+	TBufferRendererAllocator	m_Allocator;	//!< ãƒ¡ãƒ¢ãƒªã®å‰²ã‚Šå½“ã¦
 
-	CCritSec		m_BufferLock;	//!< ƒoƒbƒtƒ@‚ÖƒAƒNƒZƒX‚·‚é‚ÉƒƒbƒN‚·‚é
+	CCritSec		m_BufferLock;	//!< ãƒãƒƒãƒ•ã‚¡ã¸ã‚¢ã‚¯ã‚»ã‚¹ã™ã‚‹æ™‚ã«ãƒ­ãƒƒã‚¯ã™ã‚‹
 	CMediaType		m_MtIn;			//!< Source connection media type
 
 public:
@@ -125,8 +125,8 @@ public:
 			/* [retval][out] */ long *pVideoHeight);
 
 protected:
-	// ƒI[ƒo[ƒ‰ƒCƒh
-	// DShow‚ªŸè‚ÉƒR[ƒ‹‚·‚é
+	// ã‚ªãƒ¼ãƒãƒ¼ãƒ©ã‚¤ãƒ‰
+	// DShowãŒå‹æ‰‹ã«ã‚³ãƒ¼ãƒ«ã™ã‚‹
 	HRESULT CheckMediaType( const CMediaType *pmt );		// Format acceptable?
 	HRESULT DoRenderSample( IMediaSample *pMediaSample );	// New video sample
 	HRESULT SetMediaType( const CMediaType *pmt );			// Video format notification
@@ -149,7 +149,7 @@ protected:
 	BYTE *GetFrontBuffer();
 	BYTE *GetBackBuffer();
 
-	//! ƒ_ƒuƒ‹ƒoƒbƒtƒ@ƒŠƒ“ƒO—pƒ|ƒCƒ“ƒ^·‚µ‘Ö‚¦ƒƒ\ƒbƒh
+	//! ãƒ€ãƒ–ãƒ«ãƒãƒƒãƒ•ã‚¡ãƒªãƒ³ã‚°ç”¨ãƒã‚¤ãƒ³ã‚¿å·®ã—æ›¿ãˆãƒ¡ã‚½ãƒƒãƒ‰
 	void SetPointer( IMediaSample *media, BYTE *ptr )
 	{
 		m_InputPin.SetPointer( media, ptr );

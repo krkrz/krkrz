@@ -26,181 +26,181 @@ class iTVPLayerManager
 {
 public:
 //-- object lifetime management
-	//! @brief	QÆƒJƒEƒ“ƒ^‚ğƒCƒ“ƒNƒŠƒƒ“ƒg‚·‚é
+	//! @brief	å‚ç…§ã‚«ã‚¦ãƒ³ã‚¿ã‚’ã‚¤ãƒ³ã‚¯ãƒªãƒ¡ãƒ³ãƒˆã™ã‚‹
 	virtual void TJS_INTF_METHOD AddRef() = 0;
 
-	//! @brief	QÆƒJƒEƒ“ƒ^‚ğƒfƒNƒŠƒƒ“ƒg‚·‚é
+	//! @brief	å‚ç…§ã‚«ã‚¦ãƒ³ã‚¿ã‚’ãƒ‡ã‚¯ãƒªãƒ¡ãƒ³ãƒˆã™ã‚‹
 	virtual void TJS_INTF_METHOD Release() = 0;
 
 //-- draw device specific information
-	//! @brief	•`‰æƒfƒoƒCƒXŒÅ—L‚Ìî•ñ‚ğİ’è‚·‚é
-	//! @param	data	•`‰æƒfƒoƒCƒXŒÅ—L‚Ìî•ñ
-	//! @note	•`‰æƒfƒoƒCƒXŒÅ—L‚Ìî•ñ‚ğƒŒƒCƒ„ƒ}ƒl[ƒWƒƒ‚Éİ’è‚·‚éB
-	//!			ƒŒƒCƒ„ƒ}ƒl[ƒWƒƒ‚Å‚Í‚±‚Ìî•ñ‚Ì’†g‚É‚Â‚¢‚Ä‚ÍŠÖ’m‚µ‚È‚¢B
-	//!			•`‰æƒfƒoƒCƒX‘¤‚Å–Úˆó‚Ég‚Á‚½‚èA“Á’è‚Ìî•ñ‚ÆŒ‹‚Ñ‚Â‚¯‚ÄŠÇ—‚·‚éB
+	//! @brief	æç”»ãƒ‡ãƒã‚¤ã‚¹å›ºæœ‰ã®æƒ…å ±ã‚’è¨­å®šã™ã‚‹
+	//! @param	data	æç”»ãƒ‡ãƒã‚¤ã‚¹å›ºæœ‰ã®æƒ…å ±
+	//! @note	æç”»ãƒ‡ãƒã‚¤ã‚¹å›ºæœ‰ã®æƒ…å ±ã‚’ãƒ¬ã‚¤ãƒ¤ãƒãƒãƒ¼ã‚¸ãƒ£ã«è¨­å®šã™ã‚‹ã€‚
+	//!			ãƒ¬ã‚¤ãƒ¤ãƒãƒãƒ¼ã‚¸ãƒ£ã§ã¯ã“ã®æƒ…å ±ã®ä¸­èº«ã«ã¤ã„ã¦ã¯é–¢çŸ¥ã—ãªã„ã€‚
+	//!			æç”»ãƒ‡ãƒã‚¤ã‚¹å´ã§ç›®å°ã«ä½¿ã£ãŸã‚Šã€ç‰¹å®šã®æƒ…å ±ã¨çµã³ã¤ã‘ã¦ç®¡ç†ã™ã‚‹ã€‚
 	virtual void TJS_INTF_METHOD SetDrawDeviceData(void * data) = 0;
 
-	//! @brief	•`‰æƒfƒoƒCƒXŒÅ—L‚Ìî•ñ‚ğæ“¾‚·‚é
-	//! @return	•`‰æƒfƒoƒCƒXŒÅ—L‚Ìî•ñ
+	//! @brief	æç”»ãƒ‡ãƒã‚¤ã‚¹å›ºæœ‰ã®æƒ…å ±ã‚’å–å¾—ã™ã‚‹
+	//! @return	æç”»ãƒ‡ãƒã‚¤ã‚¹å›ºæœ‰ã®æƒ…å ±
 	virtual void * TJS_INTF_METHOD GetDrawDeviceData() const = 0;
 
 //-- layer metrics
-	//! @brief	ƒvƒ‰ƒCƒ}ƒŠƒŒƒCƒ„‚ÌƒTƒCƒY‚ğæ“¾‚·‚é
-	//! @param	w	ƒŒƒCƒ„‚Ì‰¡•(ƒsƒNƒZƒ‹’PˆÊ)
-	//! @param	h	ƒŒƒCƒ„‚Ìc•(ƒsƒNƒZƒ‹’PˆÊ)
-	//! @return	æ“¾‚É¬Œ÷‚·‚ê‚Î^A¸”s‚·‚ê‚Î‹U
+	//! @brief	ãƒ—ãƒ©ã‚¤ãƒãƒªãƒ¬ã‚¤ãƒ¤ã®ã‚µã‚¤ã‚ºã‚’å–å¾—ã™ã‚‹
+	//! @param	w	ãƒ¬ã‚¤ãƒ¤ã®æ¨ªå¹…(ãƒ”ã‚¯ã‚»ãƒ«å˜ä½)
+	//! @param	h	ãƒ¬ã‚¤ãƒ¤ã®ç¸¦å¹…(ãƒ”ã‚¯ã‚»ãƒ«å˜ä½)
+	//! @return	å–å¾—ã«æˆåŠŸã™ã‚Œã°çœŸã€å¤±æ•—ã™ã‚Œã°å½
 	virtual bool TJS_INTF_METHOD GetPrimaryLayerSize(tjs_int &w, tjs_int &h) const = 0;
 
 //-- layer structure information
-	//! @brief	ƒvƒ‰ƒCƒ}ƒŠƒŒƒCƒ„‚Ìæ“¾
-	//! @return	ƒvƒ‰ƒCƒ}ƒŠƒŒƒCƒ„
+	//! @brief	ãƒ—ãƒ©ã‚¤ãƒãƒªãƒ¬ã‚¤ãƒ¤ã®å–å¾—
+	//! @return	ãƒ—ãƒ©ã‚¤ãƒãƒªãƒ¬ã‚¤ãƒ¤
 	virtual tTJSNI_BaseLayer * TJS_INTF_METHOD GetPrimaryLayer() const = 0;
 
-	//! @brief	ƒtƒH[ƒJƒX‚Ì‚ ‚éƒŒƒCƒ„‚Ìæ“¾
-	//! @return	ƒtƒH[ƒJƒX‚Ì‚ ‚éƒŒƒCƒ„
+	//! @brief	ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã®ã‚ã‚‹ãƒ¬ã‚¤ãƒ¤ã®å–å¾—
+	//! @return	ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã®ã‚ã‚‹ãƒ¬ã‚¤ãƒ¤
 	virtual tTJSNI_BaseLayer * TJS_INTF_METHOD GetFocusedLayer() const = 0;
 
-	//! @brief	ƒtƒH[ƒJƒX‚Ì‚ ‚éƒŒƒCƒ„‚Ìİ’è
-	//! @param	layer	ƒtƒH[ƒJƒX‚Ì‚ ‚éƒŒƒCƒ„
+	//! @brief	ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã®ã‚ã‚‹ãƒ¬ã‚¤ãƒ¤ã®è¨­å®š
+	//! @param	layer	ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã®ã‚ã‚‹ãƒ¬ã‚¤ãƒ¤
 	virtual void TJS_INTF_METHOD SetFocusedLayer(tTJSNI_BaseLayer * layer) = 0;
 
 //-- HID releted
-	//! @brief		ƒNƒŠƒbƒN‚³‚ê‚½
-	//! @param		x		ƒvƒ‰ƒCƒ}ƒŠƒŒƒCƒ„À•Wã‚É‚¨‚¯‚é x ˆÊ’u
-	//! @param		y		ƒvƒ‰ƒCƒ}ƒŠƒŒƒCƒ„À•Wã‚É‚¨‚¯‚é y ˆÊ’u
+	//! @brief		ã‚¯ãƒªãƒƒã‚¯ã•ã‚ŒãŸ
+	//! @param		x		ãƒ—ãƒ©ã‚¤ãƒãƒªãƒ¬ã‚¤ãƒ¤åº§æ¨™ä¸Šã«ãŠã‘ã‚‹ x ä½ç½®
+	//! @param		y		ãƒ—ãƒ©ã‚¤ãƒãƒªãƒ¬ã‚¤ãƒ¤åº§æ¨™ä¸Šã«ãŠã‘ã‚‹ y ä½ç½®
 	virtual void TJS_INTF_METHOD NotifyClick(tjs_int x, tjs_int y) = 0;
 
-	//! @brief		ƒ_ƒuƒ‹ƒNƒŠƒbƒN‚³‚ê‚½
-	//! @param		x		ƒvƒ‰ƒCƒ}ƒŠƒŒƒCƒ„À•Wã‚É‚¨‚¯‚é x ˆÊ’u
-	//! @param		y		ƒvƒ‰ƒCƒ}ƒŠƒŒƒCƒ„À•Wã‚É‚¨‚¯‚é y ˆÊ’u
+	//! @brief		ãƒ€ãƒ–ãƒ«ã‚¯ãƒªãƒƒã‚¯ã•ã‚ŒãŸ
+	//! @param		x		ãƒ—ãƒ©ã‚¤ãƒãƒªãƒ¬ã‚¤ãƒ¤åº§æ¨™ä¸Šã«ãŠã‘ã‚‹ x ä½ç½®
+	//! @param		y		ãƒ—ãƒ©ã‚¤ãƒãƒªãƒ¬ã‚¤ãƒ¤åº§æ¨™ä¸Šã«ãŠã‘ã‚‹ y ä½ç½®
 	virtual void TJS_INTF_METHOD NotifyDoubleClick(tjs_int x, tjs_int y) = 0;
 
-	//! @brief		ƒ}ƒEƒXƒ{ƒ^ƒ“‚ª‰Ÿ‰º‚³‚ê‚½
-	//! @param		x		ƒvƒ‰ƒCƒ}ƒŠƒŒƒCƒ„À•Wã‚É‚¨‚¯‚é x ˆÊ’u
-	//! @param		y		ƒvƒ‰ƒCƒ}ƒŠƒŒƒCƒ„À•Wã‚É‚¨‚¯‚é y ˆÊ’u
-	//! @param		mb		‚Ç‚Ìƒ}ƒEƒXƒ{ƒ^ƒ“‚©
-	//! @param		flags	ƒtƒ‰ƒO(TVP_SS_*’è”‚Ì‘g‚İ‡‚í‚¹)
+	//! @brief		ãƒã‚¦ã‚¹ãƒœã‚¿ãƒ³ãŒæŠ¼ä¸‹ã•ã‚ŒãŸ
+	//! @param		x		ãƒ—ãƒ©ã‚¤ãƒãƒªãƒ¬ã‚¤ãƒ¤åº§æ¨™ä¸Šã«ãŠã‘ã‚‹ x ä½ç½®
+	//! @param		y		ãƒ—ãƒ©ã‚¤ãƒãƒªãƒ¬ã‚¤ãƒ¤åº§æ¨™ä¸Šã«ãŠã‘ã‚‹ y ä½ç½®
+	//! @param		mb		ã©ã®ãƒã‚¦ã‚¹ãƒœã‚¿ãƒ³ã‹
+	//! @param		flags	ãƒ•ãƒ©ã‚°(TVP_SS_*å®šæ•°ã®çµ„ã¿åˆã‚ã›)
 	virtual void TJS_INTF_METHOD NotifyMouseDown(tjs_int x, tjs_int y, tTVPMouseButton mb, tjs_uint32 flags) = 0;
 
-	//! @brief		ƒ}ƒEƒXƒ{ƒ^ƒ“‚ª—£‚³‚ê‚½
-	//! @param		x		ƒvƒ‰ƒCƒ}ƒŠƒŒƒCƒ„À•Wã‚É‚¨‚¯‚é x ˆÊ’u
-	//! @param		y		ƒvƒ‰ƒCƒ}ƒŠƒŒƒCƒ„À•Wã‚É‚¨‚¯‚é y ˆÊ’u
-	//! @param		mb		‚Ç‚Ìƒ}ƒEƒXƒ{ƒ^ƒ“‚©
-	//! @param		flags	ƒtƒ‰ƒO(TVP_SS_*’è”‚Ì‘g‚İ‡‚í‚¹)
+	//! @brief		ãƒã‚¦ã‚¹ãƒœã‚¿ãƒ³ãŒé›¢ã•ã‚ŒãŸ
+	//! @param		x		ãƒ—ãƒ©ã‚¤ãƒãƒªãƒ¬ã‚¤ãƒ¤åº§æ¨™ä¸Šã«ãŠã‘ã‚‹ x ä½ç½®
+	//! @param		y		ãƒ—ãƒ©ã‚¤ãƒãƒªãƒ¬ã‚¤ãƒ¤åº§æ¨™ä¸Šã«ãŠã‘ã‚‹ y ä½ç½®
+	//! @param		mb		ã©ã®ãƒã‚¦ã‚¹ãƒœã‚¿ãƒ³ã‹
+	//! @param		flags	ãƒ•ãƒ©ã‚°(TVP_SS_*å®šæ•°ã®çµ„ã¿åˆã‚ã›)
 	virtual void TJS_INTF_METHOD NotifyMouseUp(tjs_int x, tjs_int y, tTVPMouseButton mb, tjs_uint32 flags) = 0;
 
-	//! @brief		ƒ}ƒEƒX‚ªˆÚ“®‚µ‚½
-	//! @param		x		ƒvƒ‰ƒCƒ}ƒŠƒŒƒCƒ„À•Wã‚É‚¨‚¯‚é x ˆÊ’u
-	//! @param		y		ƒvƒ‰ƒCƒ}ƒŠƒŒƒCƒ„À•Wã‚É‚¨‚¯‚é y ˆÊ’u
-	//! @param		flags	ƒtƒ‰ƒO(TVP_SS_*’è”‚Ì‘g‚İ‡‚í‚¹)
+	//! @brief		ãƒã‚¦ã‚¹ãŒç§»å‹•ã—ãŸ
+	//! @param		x		ãƒ—ãƒ©ã‚¤ãƒãƒªãƒ¬ã‚¤ãƒ¤åº§æ¨™ä¸Šã«ãŠã‘ã‚‹ x ä½ç½®
+	//! @param		y		ãƒ—ãƒ©ã‚¤ãƒãƒªãƒ¬ã‚¤ãƒ¤åº§æ¨™ä¸Šã«ãŠã‘ã‚‹ y ä½ç½®
+	//! @param		flags	ãƒ•ãƒ©ã‚°(TVP_SS_*å®šæ•°ã®çµ„ã¿åˆã‚ã›)
 	virtual void TJS_INTF_METHOD NotifyMouseMove(tjs_int x, tjs_int y, tjs_uint32 flags) = 0;
 
-	//! @brief		ƒ}ƒEƒXƒLƒƒƒvƒ`ƒƒ‚ğ‰ğ•ú‚·‚é
-	//! @note		ƒ}ƒEƒXƒLƒƒƒvƒ`ƒƒ‚ğ‰ğ•ú‚·‚×‚«ê‡‚ÉƒEƒBƒ“ƒhƒE‚©‚çŒÄ‚Î‚ê‚éB
+	//! @brief		ãƒã‚¦ã‚¹ã‚­ãƒ£ãƒ—ãƒãƒ£ã‚’è§£æ”¾ã™ã‚‹
+	//! @note		ãƒã‚¦ã‚¹ã‚­ãƒ£ãƒ—ãƒãƒ£ã‚’è§£æ”¾ã™ã¹ãå ´åˆã«ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‹ã‚‰å‘¼ã°ã‚Œã‚‹ã€‚
 	virtual void TJS_INTF_METHOD ReleaseCapture() = 0;
 
-	//! @brief		ƒ}ƒEƒX‚ªƒvƒ‰ƒCƒ}ƒŠƒŒƒCƒ„ŠO‚ÉˆÚ“®‚µ‚½
+	//! @brief		ãƒã‚¦ã‚¹ãŒãƒ—ãƒ©ã‚¤ãƒãƒªãƒ¬ã‚¤ãƒ¤å¤–ã«ç§»å‹•ã—ãŸ
 	virtual void TJS_INTF_METHOD NotifyMouseOutOfWindow() = 0;
 
-	//! @brief		ƒL[‚ª‰Ÿ‚³‚ê‚½
-	//! @param		key		‰¼‘zƒL[ƒR[ƒh
-	//! @param		shift	ƒVƒtƒgƒL[‚Ìó‘Ô
+	//! @brief		ã‚­ãƒ¼ãŒæŠ¼ã•ã‚ŒãŸ
+	//! @param		key		ä»®æƒ³ã‚­ãƒ¼ã‚³ãƒ¼ãƒ‰
+	//! @param		shift	ã‚·ãƒ•ãƒˆã‚­ãƒ¼ã®çŠ¶æ…‹
 	virtual void TJS_INTF_METHOD NotifyKeyDown(tjs_uint key, tjs_uint32 shift) = 0;
 
-	//! @brief		ƒL[‚ª—£‚³‚ê‚½
-	//! @param		key		‰¼‘zƒL[ƒR[ƒh
-	//! @param		shift	ƒVƒtƒgƒL[‚Ìó‘Ô
+	//! @brief		ã‚­ãƒ¼ãŒé›¢ã•ã‚ŒãŸ
+	//! @param		key		ä»®æƒ³ã‚­ãƒ¼ã‚³ãƒ¼ãƒ‰
+	//! @param		shift	ã‚·ãƒ•ãƒˆã‚­ãƒ¼ã®çŠ¶æ…‹
 	virtual void TJS_INTF_METHOD NotifyKeyUp(tjs_uint key, tjs_uint32 shift) = 0;
 
-	//! @brief		ƒL[‚É‚æ‚é“ü—Í
-	//! @param		key		•¶šƒR[ƒh
+	//! @brief		ã‚­ãƒ¼ã«ã‚ˆã‚‹å…¥åŠ›
+	//! @param		key		æ–‡å­—ã‚³ãƒ¼ãƒ‰
 	virtual void TJS_INTF_METHOD NotifyKeyPress(tjs_char key) = 0;
 
-	//! @brief		ƒ}ƒEƒXƒzƒC[ƒ‹‚ª‰ñ“]‚µ‚½
-	//! @param		shift	ƒVƒtƒgƒL[‚Ìó‘Ô
-	//! @param		delta	‰ñ“]Šp
-	//! @param		x		ƒvƒ‰ƒCƒ}ƒŠƒŒƒCƒ„À•Wã‚É‚¨‚¯‚é x ˆÊ’u
-	//! @param		y		ƒvƒ‰ƒCƒ}ƒŠƒŒƒCƒ„À•Wã‚É‚¨‚¯‚é y ˆÊ’u
+	//! @brief		ãƒã‚¦ã‚¹ãƒ›ã‚¤ãƒ¼ãƒ«ãŒå›è»¢ã—ãŸ
+	//! @param		shift	ã‚·ãƒ•ãƒˆã‚­ãƒ¼ã®çŠ¶æ…‹
+	//! @param		delta	å›è»¢è§’
+	//! @param		x		ãƒ—ãƒ©ã‚¤ãƒãƒªãƒ¬ã‚¤ãƒ¤åº§æ¨™ä¸Šã«ãŠã‘ã‚‹ x ä½ç½®
+	//! @param		y		ãƒ—ãƒ©ã‚¤ãƒãƒªãƒ¬ã‚¤ãƒ¤åº§æ¨™ä¸Šã«ãŠã‘ã‚‹ y ä½ç½®
 	virtual void TJS_INTF_METHOD NotifyMouseWheel(tjs_uint32 shift, tjs_int delta, tjs_int x, tjs_int y) = 0;
 
-	//! @brief		‰æ–Ê‚ªƒ^ƒbƒ`‚³‚ê‚½
-	//! @param		x		•`‰æ‹éŒ`“à‚É‚¨‚¯‚é x ˆÊ’u(•`‰æ‹éŒ`‚Ì¶ã‚ªŒ´“_)
-	//! @param		y		•`‰æ‹éŒ`“à‚É‚¨‚¯‚é y ˆÊ’u(•`‰æ‹éŒ`‚Ì¶ã‚ªŒ´“_)
-	//! @param		cx		G‚ê‚Ä‚¢‚é•
-	//! @param		cy		G‚ê‚Ä‚¢‚é‚‚³
-	//! @param		id		ƒ^ƒbƒ`¯•Ê—pID
+	//! @brief		ç”»é¢ãŒã‚¿ãƒƒãƒã•ã‚ŒãŸ
+	//! @param		x		æç”»çŸ©å½¢å†…ã«ãŠã‘ã‚‹ x ä½ç½®(æç”»çŸ©å½¢ã®å·¦ä¸ŠãŒåŸç‚¹)
+	//! @param		y		æç”»çŸ©å½¢å†…ã«ãŠã‘ã‚‹ y ä½ç½®(æç”»çŸ©å½¢ã®å·¦ä¸ŠãŒåŸç‚¹)
+	//! @param		cx		è§¦ã‚Œã¦ã„ã‚‹å¹…
+	//! @param		cy		è§¦ã‚Œã¦ã„ã‚‹é«˜ã•
+	//! @param		id		ã‚¿ãƒƒãƒè­˜åˆ¥ç”¨ID
 	virtual void TJS_INTF_METHOD NotifyTouchDown( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id ) = 0;
 
-	//! @brief		ƒ^ƒbƒ`‚ª—£‚³‚ê‚½
-	//! @param		x		•`‰æ‹éŒ`“à‚É‚¨‚¯‚é x ˆÊ’u(•`‰æ‹éŒ`‚Ì¶ã‚ªŒ´“_)
-	//! @param		y		•`‰æ‹éŒ`“à‚É‚¨‚¯‚é y ˆÊ’u(•`‰æ‹éŒ`‚Ì¶ã‚ªŒ´“_)
-	//! @param		cx		G‚ê‚Ä‚¢‚é•
-	//! @param		cy		G‚ê‚Ä‚¢‚é‚‚³
-	//! @param		id		ƒ^ƒbƒ`¯•Ê—pID
+	//! @brief		ã‚¿ãƒƒãƒãŒé›¢ã•ã‚ŒãŸ
+	//! @param		x		æç”»çŸ©å½¢å†…ã«ãŠã‘ã‚‹ x ä½ç½®(æç”»çŸ©å½¢ã®å·¦ä¸ŠãŒåŸç‚¹)
+	//! @param		y		æç”»çŸ©å½¢å†…ã«ãŠã‘ã‚‹ y ä½ç½®(æç”»çŸ©å½¢ã®å·¦ä¸ŠãŒåŸç‚¹)
+	//! @param		cx		è§¦ã‚Œã¦ã„ã‚‹å¹…
+	//! @param		cy		è§¦ã‚Œã¦ã„ã‚‹é«˜ã•
+	//! @param		id		ã‚¿ãƒƒãƒè­˜åˆ¥ç”¨ID
 	virtual void TJS_INTF_METHOD NotifyTouchUp( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id ) = 0;
 
-	//! @brief		ƒ^ƒbƒ`‚ªˆÚ“®‚µ‚½
-	//! @param		x		•`‰æ‹éŒ`“à‚É‚¨‚¯‚é x ˆÊ’u(•`‰æ‹éŒ`‚Ì¶ã‚ªŒ´“_)
-	//! @param		y		•`‰æ‹éŒ`“à‚É‚¨‚¯‚é y ˆÊ’u(•`‰æ‹éŒ`‚Ì¶ã‚ªŒ´“_)
-	//! @param		cx		G‚ê‚Ä‚¢‚é•
-	//! @param		cy		G‚ê‚Ä‚¢‚é‚‚³
-	//! @param		id		ƒ^ƒbƒ`¯•Ê—pID
+	//! @brief		ã‚¿ãƒƒãƒãŒç§»å‹•ã—ãŸ
+	//! @param		x		æç”»çŸ©å½¢å†…ã«ãŠã‘ã‚‹ x ä½ç½®(æç”»çŸ©å½¢ã®å·¦ä¸ŠãŒåŸç‚¹)
+	//! @param		y		æç”»çŸ©å½¢å†…ã«ãŠã‘ã‚‹ y ä½ç½®(æç”»çŸ©å½¢ã®å·¦ä¸ŠãŒåŸç‚¹)
+	//! @param		cx		è§¦ã‚Œã¦ã„ã‚‹å¹…
+	//! @param		cy		è§¦ã‚Œã¦ã„ã‚‹é«˜ã•
+	//! @param		id		ã‚¿ãƒƒãƒè­˜åˆ¥ç”¨ID
 	virtual void TJS_INTF_METHOD NotifyTouchMove( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id ) = 0;
 
-	//! @brief		Šg‘åƒ^ƒbƒ`‘€ì‚ªs‚í‚ê‚½
-	//! @param		startdist	ŠJn‚Ì2“_ŠÔ‚Ì•
-	//! @param		curdist	Œ»İ‚Ì2“_ŠÔ‚Ì•
-	//! @param		cx		G‚ê‚Ä‚¢‚é•
-	//! @param		cy		G‚ê‚Ä‚¢‚é‚‚³
-	//! @param		flag	ƒ^ƒbƒ`ó‘Ôƒtƒ‰ƒO
+	//! @brief		æ‹¡å¤§ã‚¿ãƒƒãƒæ“ä½œãŒè¡Œã‚ã‚ŒãŸ
+	//! @param		startdist	é–‹å§‹æ™‚ã®2ç‚¹é–“ã®å¹…
+	//! @param		curdist	ç¾åœ¨ã®2ç‚¹é–“ã®å¹…
+	//! @param		cx		è§¦ã‚Œã¦ã„ã‚‹å¹…
+	//! @param		cy		è§¦ã‚Œã¦ã„ã‚‹é«˜ã•
+	//! @param		flag	ã‚¿ãƒƒãƒçŠ¶æ…‹ãƒ•ãƒ©ã‚°
 	virtual void TJS_INTF_METHOD NotifyTouchScaling( tjs_real startdist, tjs_real curdist, tjs_real cx, tjs_real cy, tjs_int flag ) = 0;
 
-	//! @brief		‰ñ“]ƒ^ƒbƒ`‘€ì‚ªs‚í‚ê‚½
-	//! @param		startangle	ŠJn‚ÌŠp“x
-	//! @param		curangle	Œ»İ‚ÌŠp“x
-	//! @param		dist	Œ»İ‚Ì2“_ŠÔ‚Ì•
-	//! @param		cx		G‚ê‚Ä‚¢‚é•
-	//! @param		cy		G‚ê‚Ä‚¢‚é‚‚³
-	//! @param		flag	ƒ^ƒbƒ`ó‘Ôƒtƒ‰ƒO
+	//! @brief		å›è»¢ã‚¿ãƒƒãƒæ“ä½œãŒè¡Œã‚ã‚ŒãŸ
+	//! @param		startangle	é–‹å§‹æ™‚ã®è§’åº¦
+	//! @param		curangle	ç¾åœ¨ã®è§’åº¦
+	//! @param		dist	ç¾åœ¨ã®2ç‚¹é–“ã®å¹…
+	//! @param		cx		è§¦ã‚Œã¦ã„ã‚‹å¹…
+	//! @param		cy		è§¦ã‚Œã¦ã„ã‚‹é«˜ã•
+	//! @param		flag	ã‚¿ãƒƒãƒçŠ¶æ…‹ãƒ•ãƒ©ã‚°
 	virtual void TJS_INTF_METHOD NotifyTouchRotate( tjs_real startangle, tjs_real curangle, tjs_real dist, tjs_real cx, tjs_real cy, tjs_int flag ) = 0;
 
-	//! @brief		ƒ}ƒ‹ƒ`ƒ^ƒbƒ`ó‘Ô‚ªXV‚³‚ê‚½
+	//! @brief		ãƒãƒ«ãƒã‚¿ãƒƒãƒçŠ¶æ…‹ãŒæ›´æ–°ã•ã‚ŒãŸ
 	virtual void TJS_INTF_METHOD NotifyMultiTouch() = 0;
 
-	//! @brief		“ü—Íó‘Ô‚Ìƒ`ƒFƒbƒN
-	//! @note		ƒEƒBƒ“ƒhƒE‚©‚ç–ñ1•b‚¨‚«‚ÉAƒŒƒCƒ„ƒ}ƒl[ƒWƒƒ‚ªƒ†[ƒU‚©‚ç‚Ì“ü—Í‚Ìó‘Ô‚ğ
-	//!				Äƒ`ƒFƒbƒN‚·‚é‚½‚ß‚ÉŒÄ‚Î‚ê‚éBƒŒƒCƒ„ó‘Ô‚Ì•Ï‰»‚ªƒ†[ƒU‚Ì“ü—Í‚Æ‚Í
-	//!				”ñ“¯Šú‚És‚í‚ê‚½ê‡A‚½‚Æ‚¦‚Îƒ}ƒEƒXƒJ[ƒ\ƒ‹‚Ì‰º‚ÉƒŒƒCƒ„‚ªoŒ»‚µ‚½
-	//!				‚Ì‚É‚à‚©‚©‚í‚ç‚¸Aƒ}ƒEƒXƒJ[ƒ\ƒ‹‚ª‚»‚ÌƒŒƒCƒ„‚Ìw’è‚·‚éŒ`ó‚É•ÏX‚³‚ê‚È‚¢
-	//!				‚Æ‚¢‚Á‚½ó‹µ‚ª”­¶‚µ‚¤‚éB‚±‚Ì‚æ‚¤‚Èó‹µ‚É‘Îˆ‚·‚é‚½‚ßAƒEƒBƒ“ƒhƒE‚©‚ç
-	//!				‚±‚Ìƒƒ\ƒbƒh‚ª–ñ1•b‚¨‚«‚ÉŒÄ‚Î‚ê‚éB
+	//! @brief		å…¥åŠ›çŠ¶æ…‹ã®ãƒã‚§ãƒƒã‚¯
+	//! @note		ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‹ã‚‰ç´„1ç§’ãŠãã«ã€ãƒ¬ã‚¤ãƒ¤ãƒãƒãƒ¼ã‚¸ãƒ£ãŒãƒ¦ãƒ¼ã‚¶ã‹ã‚‰ã®å…¥åŠ›ã®çŠ¶æ…‹ã‚’
+	//!				å†ãƒã‚§ãƒƒã‚¯ã™ã‚‹ãŸã‚ã«å‘¼ã°ã‚Œã‚‹ã€‚ãƒ¬ã‚¤ãƒ¤çŠ¶æ…‹ã®å¤‰åŒ–ãŒãƒ¦ãƒ¼ã‚¶ã®å…¥åŠ›ã¨ã¯
+	//!				éåŒæœŸã«è¡Œã‚ã‚ŒãŸå ´åˆã€ãŸã¨ãˆã°ãƒã‚¦ã‚¹ã‚«ãƒ¼ã‚½ãƒ«ã®ä¸‹ã«ãƒ¬ã‚¤ãƒ¤ãŒå‡ºç¾ã—ãŸ
+	//!				ã®ã«ã‚‚ã‹ã‹ã‚ã‚‰ãšã€ãƒã‚¦ã‚¹ã‚«ãƒ¼ã‚½ãƒ«ãŒãã®ãƒ¬ã‚¤ãƒ¤ã®æŒ‡å®šã™ã‚‹å½¢çŠ¶ã«å¤‰æ›´ã•ã‚Œãªã„
+	//!				ã¨ã„ã£ãŸçŠ¶æ³ãŒç™ºç”Ÿã—ã†ã‚‹ã€‚ã“ã®ã‚ˆã†ãªçŠ¶æ³ã«å¯¾å‡¦ã™ã‚‹ãŸã‚ã€ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‹ã‚‰
+	//!				ã“ã®ãƒ¡ã‚½ãƒƒãƒ‰ãŒç´„1ç§’ãŠãã«å‘¼ã°ã‚Œã‚‹ã€‚
 	virtual void TJS_INTF_METHOD RecheckInputState() = 0;
 
 //-- invalidation/update
-	//! @brief		•`‰æƒfƒoƒCƒX‚ª–]‚ŞƒŒƒCƒ„‚Ìo—ÍŒ`®‚ğİ’è‚·‚é
-	//! @param		type	ƒŒƒCƒ„Œ`®
-	//! @note		ƒfƒtƒHƒ‹ƒg‚Í ltOpaque B•`‰æƒfƒoƒCƒX‚ª‘¼‚ÌŒ`®‚Ì‰æ‘œ‚ğo—Í‚Æ‚µ‚Ä
-	//!				–]‚Ş‚È‚ç‚Î‚»‚ÌŒ`®‚ğw’è‚·‚éB‚½‚¾‚µAƒvƒ‰ƒCƒ}ƒŠƒŒƒCƒ„‚Ì type
-	//!				ƒvƒƒpƒeƒB‚à“¯—l‚É•ÏX‚·‚é‚±‚ÆB
+	//! @brief		æç”»ãƒ‡ãƒã‚¤ã‚¹ãŒæœ›ã‚€ãƒ¬ã‚¤ãƒ¤ã®å‡ºåŠ›å½¢å¼ã‚’è¨­å®šã™ã‚‹
+	//! @param		type	ãƒ¬ã‚¤ãƒ¤å½¢å¼
+	//! @note		ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯ ltOpaque ã€‚æç”»ãƒ‡ãƒã‚¤ã‚¹ãŒä»–ã®å½¢å¼ã®ç”»åƒã‚’å‡ºåŠ›ã¨ã—ã¦
+	//!				æœ›ã‚€ãªã‚‰ã°ãã®å½¢å¼ã‚’æŒ‡å®šã™ã‚‹ã€‚ãŸã ã—ã€ãƒ—ãƒ©ã‚¤ãƒãƒªãƒ¬ã‚¤ãƒ¤ã® type
+	//!				ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã‚‚åŒæ§˜ã«å¤‰æ›´ã™ã‚‹ã“ã¨ã€‚
 	virtual void TJS_INTF_METHOD SetDesiredLayerType(tTVPLayerType type) = 0;
 
-	//! @brief		“Á’è‚Ì‹éŒ`‚ÌÄ•`‰æ‚ğ—v‹‚·‚é
-	//! @param		r		ƒvƒ‰ƒCƒ}ƒŠƒŒƒCƒ„À•Wã‚É‚¨‚¯‚é‹éŒ`
-	//! @note		“Á’è‚Ì‹éŒ`‚ÌÄ•`‰æ‚ğƒŒƒCƒ„ƒ}ƒl[ƒWƒƒ‚É‘Î‚µ‚Ä—v‹‚·‚éB
-	//!				—v‹‚Í‹L˜^‚³‚ê‚é‚¾‚¯‚Å‚±‚Ìƒƒ\ƒbƒh‚Í‚·‚®‚É–ß‚éBÀÛ‚É‚»‚ê‚ª
-	//!				‰‰Z‚³‚ê‚é‚Ì‚Í UpdateToDrawDevice() ‚ğŒÄ‚ñ‚¾‚Æ‚«‚Å‚ ‚éB
+	//! @brief		ç‰¹å®šã®çŸ©å½¢ã®å†æç”»ã‚’è¦æ±‚ã™ã‚‹
+	//! @param		r		ãƒ—ãƒ©ã‚¤ãƒãƒªãƒ¬ã‚¤ãƒ¤åº§æ¨™ä¸Šã«ãŠã‘ã‚‹çŸ©å½¢
+	//! @note		ç‰¹å®šã®çŸ©å½¢ã®å†æç”»ã‚’ãƒ¬ã‚¤ãƒ¤ãƒãƒãƒ¼ã‚¸ãƒ£ã«å¯¾ã—ã¦è¦æ±‚ã™ã‚‹ã€‚
+	//!				è¦æ±‚ã¯è¨˜éŒ²ã•ã‚Œã‚‹ã ã‘ã§ã“ã®ãƒ¡ã‚½ãƒƒãƒ‰ã¯ã™ãã«æˆ»ã‚‹ã€‚å®Ÿéš›ã«ãã‚ŒãŒ
+	//!				æ¼”ç®—ã•ã‚Œã‚‹ã®ã¯ UpdateToDrawDevice() ã‚’å‘¼ã‚“ã ã¨ãã§ã‚ã‚‹ã€‚
 	virtual void TJS_INTF_METHOD RequestInvalidation(const tTVPRect &r) = 0; // draw device -> layer
 
-	//! @brief		“à—e‚ÌÄ•`‰æ‚ğs‚¤
-	//! @note		“à—e‚ÌÄ•`‰æ‚ğs‚¤Û‚ÉŒÄ‚ÔB‚±‚Ìƒƒ\ƒbƒh“à‚Å‚ÍAƒŒƒCƒ„ƒ}ƒl[ƒWƒƒ‚Í
+	//! @brief		å†…å®¹ã®å†æç”»ã‚’è¡Œã†
+	//! @note		å†…å®¹ã®å†æç”»ã‚’è¡Œã†éš›ã«å‘¼ã¶ã€‚ã“ã®ãƒ¡ã‚½ãƒƒãƒ‰å†…ã§ã¯ã€ãƒ¬ã‚¤ãƒ¤ãƒãƒãƒ¼ã‚¸ãƒ£ã¯
 	//!				iTVPDrawDevice::StartBitmapCompletion()
 	//!				iTVPDrawDevice::NotifyBitmapCompleted()
-	//!				iTVPDrawDevice::EndBitmapCompletion() ‚ÌŠeƒƒ\ƒbƒh‚ğ—p‚¢A
-	//!				‚¢‚Ü‚Ü‚Å‚É•ÏX‚ªs‚í‚ê‚½—Ìˆæ‚È‚Ç‚ğ‡Ÿ•`‰æƒfƒoƒCƒX‚É‘—‚éB
+	//!				iTVPDrawDevice::EndBitmapCompletion() ã®å„ãƒ¡ã‚½ãƒƒãƒ‰ã‚’ç”¨ã„ã€
+	//!				ã„ã¾ã¾ã§ã«å¤‰æ›´ãŒè¡Œã‚ã‚ŒãŸé ˜åŸŸãªã©ã‚’é †æ¬¡æç”»ãƒ‡ãƒã‚¤ã‚¹ã«é€ã‚‹ã€‚
 	virtual void TJS_INTF_METHOD UpdateToDrawDevice() = 0;
 
 //-- debug assist
-	//! @brief		(Window->DrawDevice) ƒŒƒCƒ„\‘¢‚ğƒRƒ“ƒ\[ƒ‹‚Éƒ_ƒ“ƒv‚·‚é
+	//! @brief		(Window->DrawDevice) ãƒ¬ã‚¤ãƒ¤æ§‹é€ ã‚’ã‚³ãƒ³ã‚½ãƒ¼ãƒ«ã«ãƒ€ãƒ³ãƒ—ã™ã‚‹
 	virtual void TJS_INTF_METHOD DumpLayerStructure() = 0;
 };
 //---------------------------------------------------------------------------
@@ -232,7 +232,7 @@ class tTVPLayerManager : public iTVPLayerManager, public tTVPDrawable
 
 	tTJSNI_BaseLayer * CaptureOwner;
 	tTJSNI_BaseLayer * LastMouseMoveSent;
-	std::vector<tTVPTouchCaptureLayer> TouchCapture;	//!< “¯ƒ^ƒbƒ`”‚Í‘½‚­‚Ä‚à10“_’ö“x‚È‚Ì‚Åvector‚Å‚Â(‚Ù‚Ú1or2“_)
+	std::vector<tTVPTouchCaptureLayer> TouchCapture;	//!< åŒæ™‚ã‚¿ãƒƒãƒæ•°ã¯å¤šãã¦ã‚‚10ç‚¹ç¨‹åº¦ãªã®ã§vectorã§æŒã¤(ã»ã¼1or2ç‚¹)
 	tjs_int64 ReleaseTouchCaptureIDMark;	//!< last touch down id
 
 	std::vector<tTJSNI_BaseLayer *> ModalLayerVector;

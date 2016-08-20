@@ -1,4 +1,4 @@
-// ŠÂ‹«ˆË‘¶‚Å‚Í‚È‚¢‚ª‚¢‚Á‚½‚ñ‚±‚±‚É
+// ç’°å¢ƒä¾å­˜ã§ã¯ãªã„ãŒã„ã£ãŸã‚“ã“ã“ã«
 
 #ifndef __TOUCH_POINT_H__
 #define __TOUCH_POINT_H__
@@ -109,7 +109,7 @@ public:
 	}
 	void TouchMove( double x, double y, double cx, double cy, tjs_uint32 id, tjs_uint32 tick ) {
 		int num_of_points = CountUsePoint();
-		// 2“_ƒ^ƒbƒ`‚Ì‚İ”½‰
+		// 2ç‚¹ã‚¿ãƒƒãƒã®ã¿åå¿œ
 		if( num_of_points == 2 ) {
 			int targetidx = FindOtherEntry(id);
 			int selfidx = FindEntry( id );

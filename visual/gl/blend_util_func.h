@@ -9,14 +9,14 @@
 */
 /******************************************************************************/
 /**
- * ƒuƒŒƒ“ƒhˆ—‚ğ C ‚Ì‚İ‚Åˆ—‚·‚éê‡‚Ìƒ†[ƒeƒBƒŠƒeƒBƒNƒ‰ƒX
+ * ãƒ–ãƒ¬ãƒ³ãƒ‰å‡¦ç†ã‚’ C ã®ã¿ã§å‡¦ç†ã™ã‚‹å ´åˆã®ãƒ¦ãƒ¼ãƒ†ã‚£ãƒªãƒ†ã‚£ã‚¯ãƒ©ã‚¹
  *****************************************************************************/
 
 
 #ifndef __BLEND_UTIL_FUNC_H__
 #define __BLEND_UTIL_FUNC_H__
 
-/** –O˜a‰ÁZ‰‰Z(8bit) */
+/** é£½å’ŒåŠ ç®—æ¼”ç®—(8bit) */
 struct saturated_u8_add_func {
 	inline tjs_uint32 operator()( tjs_uint32 a, tjs_uint32 b ) const {
 		/* Add each byte of packed 8bit values in two 32bit uint32, with saturation. */
@@ -58,7 +58,7 @@ struct premulalpha_blend_n_a_func {	// TVPAddAlphaBlend_n_a
 	}
 };*/
 
-/** ƒAƒ‹ƒtƒ@æZÏ‚İƒJƒ‰[“¯m‚ÌƒuƒŒƒ“ƒh
+/** ã‚¢ãƒ«ãƒ•ã‚¡ä¹—ç®—æ¸ˆã¿ã‚«ãƒ©ãƒ¼åŒå£«ã®ãƒ–ãƒ¬ãƒ³ãƒ‰
  *
  * Di = sat(Si, (1-Sa)*Di)
  * Da = Sa + Da - SaDa
@@ -122,14 +122,14 @@ struct premulalpha_blend_a_ca_func {	// = TVPAddAlphaBlend_a_ca
 
 
 //------------------------------------------------------------------------------
-// ƒJƒ‰[¬•ª‚Éfac‚ğ‚©‚¯‚é
+// ã‚«ãƒ©ãƒ¼æˆåˆ†ã«facã‚’ã‹ã‘ã‚‹
 struct mul_color_func {
 	inline tjs_uint32 operator()(tjs_uint32 color, tjs_uint32 fac) const {
 		return (((((color & 0x00ff00) * fac) & 0x00ff0000) + (((color & 0xff00ff) * fac) & 0xff00ff00) ) >> 8);
 	}
 };
 //------------------------------------------------------------------------------
-// ƒJƒ‰[¬•ª‚ÉƒAƒ‹ƒtƒ@‚ğ‚©‚¯‚éAƒAƒ‹ƒtƒ@‚ÍˆÛ‚·‚é
+// ã‚«ãƒ©ãƒ¼æˆåˆ†ã«ã‚¢ãƒ«ãƒ•ã‚¡ã‚’ã‹ã‘ã‚‹ã€ã‚¢ãƒ«ãƒ•ã‚¡ã¯ç¶­æŒã™ã‚‹
 struct alpha_and_color_to_premulalpha_func {
 	mul_color_func func_;
 	inline tjs_uint32 operator()( tjs_uint32 alpha, tjs_uint32 color ) const {
@@ -137,7 +137,7 @@ struct alpha_and_color_to_premulalpha_func {
 	}
 };
 //------------------------------------------------------------------------------
-// ’Êí‚ÌƒAƒ‹ƒtƒ@‚ğ‚ÂF‚©‚çƒvƒŒƒ}ƒ‹ƒ`ƒvƒ‰ƒCƒh(æZÏ‚İ)ƒAƒ‹ƒtƒ@Œ`®‚ÌF‚É•ÏŠ·‚·‚é
+// é€šå¸¸ã®ã‚¢ãƒ«ãƒ•ã‚¡ã‚’æŒã¤è‰²ã‹ã‚‰ãƒ—ãƒ¬ãƒãƒ«ãƒãƒ—ãƒ©ã‚¤ãƒ‰(ä¹—ç®—æ¸ˆã¿)ã‚¢ãƒ«ãƒ•ã‚¡å½¢å¼ã®è‰²ã«å¤‰æ›ã™ã‚‹
 struct alpha_to_premulalpha_func {
 	alpha_and_color_to_premulalpha_func func_;
 	inline tjs_uint32 operator()(tjs_uint32 a) const {

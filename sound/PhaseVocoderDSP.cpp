@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------
 /*
-	Risa [‚и‚і]      alias ‹g—ў‹g—ў3 [kirikiri-3]
+	Risa [г‚ЉгЃ•]      alias еђ‰й‡Њеђ‰й‡Њ3 [kirikiri-3]
 	 stands for "Risa Is a Stagecraft Architecture"
 	Copyright (C) 2000 W.Dee <dee@kikyou.info> and contributors
 
@@ -8,26 +8,26 @@
 */
 //---------------------------------------------------------------------------
 //! @file
-//! @brief Phase Vocoder ‚МЋА‘•
+//! @brief Phase Vocoder гЃ®е®џиЈ…
 //---------------------------------------------------------------------------
 
 /*
-	Phase Vocoder (ѓtѓFЃ[ѓY ѓ{ѓRЃ[ѓ_ ; €К‘Љѓ{ѓRЃ[ѓ_)‚МЋА‘•
+	Phase Vocoder (гѓ•г‚§гѓјг‚є гѓњг‚ігѓјгѓЂ ; дЅЌз›ёгѓњг‚ігѓјгѓЂ)гЃ®е®џиЈ…
 
-	ЋQЌlЋ‘—ї:
+	еЏ‚иЂѓиі‡ж–™:
 
 		http://www.panix.com/~jens/pvoc-dolson.par
-			Phase Vocoder ‚Мѓ`ѓ…Ѓ[ѓgѓЉѓAѓ‹ЃBЃuѓ~ѓ…Ѓ[ѓWѓVѓѓѓ“‚Й‚а‚н‚©‚й‚ж‚¤‚ЙЃv
-			Џ‘‚©‚к‚Д‚Ё‚иЃAђ”Љw‰№’sѓtѓЊѓ“ѓhѓЉЃ[ЃB
+			Phase Vocoder гЃ®гѓЃгѓҐгѓјгѓ€гѓЄг‚ўгѓ«гЂ‚гЂЊгѓџгѓҐгѓјг‚ёг‚·гѓЈгѓігЃ«г‚‚г‚ЏгЃ‹г‚‹г‚€гЃ†гЃ«гЂЌ
+			ж›ёгЃ‹г‚ЊгЃ¦гЃЉг‚ЉгЂЃж•°е­¦йџіз—ґгѓ•гѓ¬гѓігѓ‰гѓЄгѓјгЂ‚
 
 		http://www.dspdimension.com/
-			–і—ї(ѓIЃ[ѓvѓ“ѓ\Ѓ[ѓX‚Е‚Н‚И‚ў)‚М Time Stretcher/Pitch Shifter‚М
-			DIRAC‚вЃAЉeЋнѓAѓ‹ѓSѓЉѓYѓЂ‚Мђа–ѕЃA
-			Pitch Shifter ‚Мђа–ѕ“I‚Иѓ\Ѓ[ѓXѓRЃ[ѓh‚И‚ЗЃB
+			з„Ўж–™(г‚Єгѓјгѓ—гѓіг‚Ѕгѓјг‚№гЃ§гЃЇгЃЄгЃ„)гЃ® Time Stretcher/Pitch ShifterгЃ®
+			DIRACг‚„гЂЃеђ„зЁ®г‚ўгѓ«г‚ґгѓЄг‚єгѓ гЃ®иЄ¬жЋгЂЃ
+			Pitch Shifter гЃ®иЄ¬жЋзљ„гЃЄг‚Ѕгѓјг‚№г‚ігѓјгѓ‰гЃЄгЃ©гЂ‚
 
 		http://soundlab.cs.princeton.edu/software/rt_pvc/
 			real-time phase vocoder analysis/synthesis library + visualization
-			ѓ\Ѓ[ѓX‚ ‚иЃB
+			г‚Ѕгѓјг‚№гЃ‚г‚ЉгЂ‚
 */
 
 #include "tjsCommHead.h"
@@ -62,12 +62,12 @@ tRisaPhaseVocoderDSP::tRisaPhaseVocoderDSP(
 				unsigned int frequency, unsigned int channels) :
 					InputBuffer(framesize * 4 * channels),
 					OutputBuffer(framesize * 4 * channels)
-		// InputBuffer ‚НЌЕ’б‚Е‚а
-		// channels * (framesize + (framesize/oversamp)) •K—v‚ЕЃA
-		// OutputBuffer ‚НЌЕ’б‚Е‚а
-		// channels * (framesize + (framesize/oversamp)*MAX_TIME_SCALE) •K—v
+		// InputBuffer гЃЇжњЂдЅЋгЃ§г‚‚
+		// channels * (framesize + (framesize/oversamp)) еї…и¦ЃгЃ§гЂЃ
+		// OutputBuffer гЃЇжњЂдЅЋгЃ§г‚‚
+		// channels * (framesize + (framesize/oversamp)*MAX_TIME_SCALE) еї…и¦Ѓ
 {
-	// ѓtѓBЃ[ѓ‹ѓh‚МЏ‰Љъ‰»
+	// гѓ•г‚Јгѓјгѓ«гѓ‰гЃ®е€ќжњџеЊ–
 	FFTWorkIp = NULL;
 	FFTWorkW = NULL;
 	InputWindow = NULL;
@@ -85,13 +85,13 @@ tRisaPhaseVocoderDSP::tRisaPhaseVocoderDSP(
 
 	TimeScale = 1.0;
 	FrequencyScale = 1.0;
-	RebuildParams = true; // •K‚ёЏ‰‰с‚Йѓpѓ‰ѓЃЃ[ѓ^‚рЌДЌ\’z‚·‚й‚ж‚¤‚Йђ^
+	RebuildParams = true; // еї…гЃље€ќе›ћгЃ«гѓ‘гѓ©гѓЎгѓјг‚їг‚’е†Ќж§‹зЇ‰гЃ™г‚‹г‚€гЃ†гЃ«зњџ
 
 	LastSynthPhaseAdjustCounter = 0;
 
 	try
 	{
-		// ѓЏЃ[ѓN‚И‚З‚МЉm•Ы
+		// гѓЇгѓјг‚ЇгЃЄгЃ©гЃ®зўєдїќ
 		AnalWork  = (float **)TJSAlignedAlloc(sizeof(float *) * Channels, 4);
 		SynthWork = (float **)TJSAlignedAlloc(sizeof(float *) * Channels, 4);
 		for(unsigned int ch = 0; ch < Channels; ch++)
@@ -108,7 +108,7 @@ tRisaPhaseVocoderDSP::tRisaPhaseVocoderDSP(
 		for(unsigned int ch = 0; ch < Channels; ch++)
 		{
 			LastAnalPhase[ch] = (float *)TJSAlignedAlloc(sizeof(float) * (FrameSize/2), 4);
-			memset(LastAnalPhase[ch], 0, FrameSize/2 * sizeof(float)); // 0 ‚ЕѓNѓЉѓA
+			memset(LastAnalPhase[ch], 0, FrameSize/2 * sizeof(float)); // 0 гЃ§г‚ЇгѓЄг‚ў
 		}
 
 		LastSynthPhase = (float **)TJSAlignedAlloc(sizeof(float *) * Channels, 4);
@@ -117,7 +117,7 @@ tRisaPhaseVocoderDSP::tRisaPhaseVocoderDSP(
 		for(unsigned int ch = 0; ch < Channels; ch++)
 		{
 			LastSynthPhase[ch] = (float *)TJSAlignedAlloc(sizeof(float) * (FrameSize/2), 4);
-			memset(LastSynthPhase[ch], 0, FrameSize/2 * sizeof(float)); // 0 ‚ЕѓNѓЉѓA
+			memset(LastSynthPhase[ch], 0, FrameSize/2 * sizeof(float)); // 0 гЃ§г‚ЇгѓЄг‚ў
 		}
 
 		FFTWorkIp = (int *)TJSAlignedAlloc(sizeof(int) * (static_cast<int>(2+sqrt((double)FrameSize/4))), 4);
@@ -132,7 +132,7 @@ tRisaPhaseVocoderDSP::tRisaPhaseVocoderDSP(
 		throw;
 	}
 
-	// “ьЏo—Нѓoѓbѓtѓ@‚М“а—e‚рѓNѓЉѓA
+	// е…Ґе‡єеЉ›гѓђгѓѓгѓ•г‚ЎгЃ®е†…е®№г‚’г‚ЇгѓЄг‚ў
 	float *bufp1;
 	size_t buflen1;
 	float *bufp2;
@@ -168,10 +168,10 @@ void tRisaPhaseVocoderDSP::SetTimeScale(float v)
 		RebuildParams = true;
 		InputHopSize = OutputHopSize = FrameSize / OverSampling;
 		OutputHopSize = static_cast<unsigned int>(InputHopSize * TimeScale) & ~1;
-			// ЃЄ ‹фђ”‚ЙѓAѓ‰ѓCѓ“(Џd—v)
-			// •Ў‘fђ” re,im, re,im, ... ‚М”z—с‚Є‹tFFT‚Й‚ж‚и“Їђ”‚М(•Ў‘fђ”‚МЊВђ”Ѓ~2‚М)
-			// PCMѓTѓ“ѓvѓ‹‚Й•ПЉ·‚і‚к‚й‚Ѕ‚ЯЃAPCMѓTѓ“ѓvѓ‹‚а‚QЊВ‚ё‚В‚Е€µ‚н‚И‚ў‚Ж‚И‚з‚И‚ў.
-			// ‚±‚МЋАЌЫ‚М OutputHopSize ‚ЙЏ]‚Б‚Д ExactTimeScale ‚ЄЊvЋZ‚і‚к‚й.
+			// в†‘ еЃ¶ж•°гЃ«г‚ўгѓ©г‚¤гѓі(й‡Ќи¦Ѓ)
+			// и¤‡зґ ж•° re,im, re,im, ... гЃ®й…Ќе€—гЃЊйЂ†FFTгЃ«г‚€г‚ЉеђЊж•°гЃ®(и¤‡зґ ж•°гЃ®еЂ‹ж•°Г—2гЃ®)
+			// PCMг‚µгѓігѓ—гѓ«гЃ«е¤‰жЏ›гЃ•г‚Њг‚‹гЃџг‚ЃгЂЃPCMг‚µгѓігѓ—гѓ«г‚‚пј’еЂ‹гЃљгЃ¤гЃ§ж‰±г‚ЏгЃЄгЃ„гЃЁгЃЄг‚‰гЃЄгЃ„.
+			// гЃ“гЃ®е®џйљ›гЃ® OutputHopSize гЃ«еѕ“гЃЈгЃ¦ ExactTimeScale гЃЊиЁ€з®—гЃ•г‚Њг‚‹.
 	}
 }
 //---------------------------------------------------------------------------
@@ -194,9 +194,9 @@ void tRisaPhaseVocoderDSP::SetOverSampling(unsigned int v)
 {
 	if(v == 0)
 	{
-		// TimeScale ‚ЙЏ]‚Б‚Д’l‚рђЭ’и
-		// ‚±‚к‚з‚Ми‡’l‚НЋАЌЫ‚МѓЉѓXѓjѓ“ѓO‚Й‚ж‚иЊ€’и‚і‚к‚Ѕђ”’l‚Е‚ ‚иЃA
-		// _—ќ“I‚ИЌЄ‹’‚Н‚И‚ўЃB
+		// TimeScale гЃ«еѕ“гЃЈгЃ¦еЂ¤г‚’иЁ­е®љ
+		// гЃ“г‚Њг‚‰гЃ®й–ѕеЂ¤гЃЇе®џйљ›гЃ®гѓЄг‚№гѓ‹гѓіг‚°гЃ«г‚€г‚Љж±єе®љгЃ•г‚ЊгЃџж•°еЂ¤гЃ§гЃ‚г‚ЉгЂЃ
+		// и«–зђ†зљ„гЃЄж №ж‹ гЃЇгЃЄгЃ„гЂ‚
 		if(TimeScale <= 0.2) v = 2;
 		else if(TimeScale <= 1.2) v = 4;
 		else v = 8;
@@ -207,8 +207,8 @@ void tRisaPhaseVocoderDSP::SetOverSampling(unsigned int v)
 		OverSampling = v;
 		InputHopSize = OutputHopSize = FrameSize / OverSampling;
 		OutputHopSize = static_cast<unsigned int>(InputHopSize * TimeScale) & ~1;
-		// ‚±‚±‚МOutputHopSize‚МЊvЋZ‚Й‚В‚ў‚Д‚Н tRisaPhaseVocoderDSP::SetTimeScale
-		// ‚аЋQЏЖ‚М‚±‚Ж
+		// гЃ“гЃ“гЃ®OutputHopSizeгЃ®иЁ€з®—гЃ«гЃ¤гЃ„гЃ¦гЃЇ tRisaPhaseVocoderDSP::SetTimeScale
+		// г‚‚еЏ‚з…§гЃ®гЃ“гЃЁ
 		RebuildParams = true;
 	}
 }
@@ -218,7 +218,7 @@ void tRisaPhaseVocoderDSP::SetOverSampling(unsigned int v)
 //---------------------------------------------------------------------------
 void tRisaPhaseVocoderDSP::Clear()
 {
-	// ‘S‚Д‚Мѓoѓbѓtѓ@‚И‚З‚р‰р•ъ‚·‚й
+	// е…ЁгЃ¦гЃ®гѓђгѓѓгѓ•г‚ЎгЃЄгЃ©г‚’и§Јж”ѕгЃ™г‚‹
 	if(AnalWork)
 	{
 		for(unsigned int ch = 0; ch < Channels; ch++)
@@ -267,7 +267,7 @@ bool tRisaPhaseVocoderDSP::GetInputBuffer(
 {
 	size_t numsamples = numsamplegranules * Channels;
 
-	if(InputBuffer.GetFreeSize() < numsamples) return false; // Џ\•Є‚И‹у‚«—e—К‚Є‚И‚ў
+	if(InputBuffer.GetFreeSize() < numsamples) return false; // еЌЃе€†гЃЄз©єгЃЌе®№й‡ЏгЃЊгЃЄгЃ„
 
 	InputBuffer.GetWritePointer(numsamples, p1, p1size, p2, p2size);
 
@@ -297,7 +297,7 @@ bool tRisaPhaseVocoderDSP::GetOutputBuffer(
 {
 	size_t numsamples = numsamplegranules * Channels;
 
-	if(OutputBuffer.GetDataSize() < numsamples) return false; // Џ\•Є‚ИЏЂ”хЌП‚ЭѓTѓ“ѓvѓ‹‚Є‚И‚ў
+	if(OutputBuffer.GetDataSize() < numsamples) return false; // еЌЃе€†гЃЄжє–е‚™жё€гЃїг‚µгѓігѓ—гѓ«гЃЊгЃЄгЃ„
 
 	OutputBuffer.GetReadPointer(numsamples, p1, p1size, p2, p2size);
 
@@ -320,13 +320,13 @@ tRisaPhaseVocoderDSP::tStatus tRisaPhaseVocoderDSP::Process()
 			(TVPCPUType & TVP_CPU_HAS_CMOV);
 
 
-	// ѓpѓ‰ѓЃЃ[ѓ^‚МЌДЊvЋZ‚М•K—v‚Є‚ ‚йЏкЌ‡‚НЌДЊvЋZ‚р‚·‚й
+	// гѓ‘гѓ©гѓЎгѓјг‚їгЃ®е†ЌиЁ€з®—гЃ®еї…и¦ЃгЃЊгЃ‚г‚‹е ґеђ€гЃЇе†ЌиЁ€з®—г‚’гЃ™г‚‹
 	if(RebuildParams)
 	{
-		// ‘‹ЉЦђ”‚МЊvЋZ(‚±‚±‚Е‚НVorbis I ‘‹)
+		// зЄ“й–ўж•°гЃ®иЁ€з®—(гЃ“гЃ“гЃ§гЃЇVorbis I зЄ“)
 		float recovery_of_loss_of_vorbis_window = 2.0;
 				//         1            1         2
-				//  2  =  Ѓз  1dx  /   Ѓз   vorbis (x) dx
+				//  2  =  в€«  1dx  /   в€«   vorbis (x) dx
 				//         0            0
 				// where vobis = vorbis I window function
 		float output_volume =
@@ -340,27 +340,27 @@ tRisaPhaseVocoderDSP::tStatus tRisaPhaseVocoderDSP::Process()
 			OutputWindow[i] = (float)(window *output_volume);
 		}
 
-		// ‚»‚М‚Щ‚©‚Мѓpѓ‰ѓЃЃ[ѓ^‚МЌДЊvЋZ
+		// гЃќгЃ®гЃ»гЃ‹гЃ®гѓ‘гѓ©гѓЎгѓјг‚їгЃ®е†ЌиЁ€з®—
 		OverSamplingRadian = (float)((2.0*M_PI)/OverSampling);
 		OverSamplingRadianRecp = (float)(1.0/OverSamplingRadian);
 		FrequencyPerFilterBand = (float)((double)Frequency/FrameSize);
 		FrequencyPerFilterBandRecp = (float)(1.0/FrequencyPerFilterBand);
 		ExactTimeScale = (float)OutputHopSize / InputHopSize;
 
-		// ѓtѓ‰ѓO‚р“|‚·
+		// гѓ•гѓ©г‚°г‚’еЂ’гЃ™
 		RebuildParams = false;
 	}
 
-	// “ь—Нѓoѓbѓtѓ@“а‚МѓfЃ[ѓ^‚НЏ\•Є‚©ЃH
+	// е…ҐеЉ›гѓђгѓѓгѓ•г‚Ўе†…гЃ®гѓ‡гѓјг‚їгЃЇеЌЃе€†гЃ‹пјџ
 	if(InputBuffer.GetDataSize() < FrameSize * Channels)
-		return psInputNotEnough; // ‘«‚и‚И‚ў
+		return psInputNotEnough; // и¶іг‚ЉгЃЄгЃ„
 
-	// Џo—Нѓoѓbѓtѓ@‚М‹у‚«‚НЏ\•Є‚©ЃH
+	// е‡єеЉ›гѓђгѓѓгѓ•г‚ЎгЃ®з©єгЃЌгЃЇеЌЃе€†гЃ‹пјџ
 	if(OutputBuffer.GetFreeSize() < FrameSize * Channels)
-		return psOutputFull; // ‘«‚и‚И‚ў
+		return psOutputFull; // и¶іг‚ЉгЃЄгЃ„
 
-	// ‚±‚к‚©‚зЏ‘‚«Ќћ‚а‚¤‚Ж‚·‚й OutputBuffer ‚М—М€ж‚МЌЕЊг‚М OutputHopSize ѓTѓ“ѓvѓ‹
-	// ѓOѓ‰ѓjѓ…Ѓ[ѓ‹‚Н 0 ‚Е–„‚Я‚й (ѓIЃ[ѓoЃ[ѓ‰ѓbѓvЋћ‚Й‚Н‚ЭЏo‚·•”•Є‚И‚М‚Е)
+	// гЃ“г‚ЊгЃ‹г‚‰ж›ёгЃЌиѕјг‚‚гЃ†гЃЁгЃ™г‚‹ OutputBuffer гЃ®й еџџгЃ®жњЂеѕЊгЃ® OutputHopSize г‚µгѓігѓ—гѓ«
+	// г‚°гѓ©гѓ‹гѓҐгѓјгѓ«гЃЇ 0 гЃ§еџ‹г‚Ѓг‚‹ (г‚Єгѓјгѓђгѓјгѓ©гѓѓгѓ—ж™‚гЃ«гЃЇгЃїе‡єгЃ™йѓЁе€†гЃЄгЃ®гЃ§)
 	{
 		float *p1, *p2;
 		size_t p1len, p2len;
@@ -371,7 +371,7 @@ tRisaPhaseVocoderDSP::tStatus tRisaPhaseVocoderDSP::Process()
 		if(p2) memset(p2, 0, p2len * sizeof(float));
 	}
 
-	// ‘‹ЉЦђ”‚р“K—p‚µ‚В‚ВЃA“ь—Нѓoѓbѓtѓ@‚©‚з AnalWork ‚Й“З‚ЭЌћ‚Ю
+	// зЄ“й–ўж•°г‚’йЃ©з”ЁгЃ—гЃ¤гЃ¤гЂЃе…ҐеЉ›гѓђгѓѓгѓ•г‚ЎгЃ‹г‚‰ AnalWork гЃ«иЄ­гЃїиѕјг‚Ђ
 	{
 		const float *p1, *p2;
 		size_t p1len, p2len;
@@ -395,14 +395,14 @@ tRisaPhaseVocoderDSP::tStatus tRisaPhaseVocoderDSP::Process()
 #endif
 	}
 
-	// ѓ`ѓѓѓ“ѓlѓ‹‚І‚Ж‚ЙЏ€—ќ
+	// гѓЃгѓЈгѓігѓЌгѓ«гЃ”гЃЁгЃ«е‡¦зђ†
 	for(unsigned int ch = 0; ch < Channels; ch++)
 	{
 		//------------------------------------------------
-		// ‰рђН
+		// и§Јжћђ
 		//------------------------------------------------
 
-		// ‰‰ЋZ‚МЌЄЉІ•”•Є‚рЋАЌs‚·‚й
+		// жј”з®—гЃ®ж №е№№йѓЁе€†г‚’е®џиЎЊгЃ™г‚‹
 #if defined(_M_IX86)||defined(_M_X64)
 		if(use_sse) ProcessCore_sse(ch);
 		else ProcessCore(ch);
@@ -411,7 +411,7 @@ tRisaPhaseVocoderDSP::tStatus tRisaPhaseVocoderDSP::Process()
 #endif
 	}
 
-	// ‘‹ЉЦђ”‚р“K—p‚µ‚В‚ВЃASynthWork ‚©‚зЏo—Нѓoѓbѓtѓ@‚ЙЏ‘‚«Ќћ‚Ю
+	// зЄ“й–ўж•°г‚’йЃ©з”ЁгЃ—гЃ¤гЃ¤гЂЃSynthWork гЃ‹г‚‰е‡єеЉ›гѓђгѓѓгѓ•г‚ЎгЃ«ж›ёгЃЌиѕјг‚Ђ
 	{
 		float *p1, *p2;
 		size_t p1len, p2len;
@@ -436,19 +436,19 @@ tRisaPhaseVocoderDSP::tStatus tRisaPhaseVocoderDSP::Process()
 #endif
 	}
 
-	// LastSynthPhase ‚рЌД’Іђ®‚·‚й‚©
+	// LastSynthPhase г‚’е†ЌиЄїж•ґгЃ™г‚‹гЃ‹
 	LastSynthPhaseAdjustCounter += LastSynthPhaseAdjustIncrement;
 	if(LastSynthPhaseAdjustCounter >= LastSynthPhaseAdjustInterval)
 	{
-		// LastSynthPhase ‚рЌД’Іђ®‚·‚йѓJѓEѓ“ѓg‚Й‚И‚Б‚Ѕ
+		// LastSynthPhase г‚’е†ЌиЄїж•ґгЃ™г‚‹г‚«г‚¦гѓігѓ€гЃ«гЃЄгЃЈгЃџ
 		LastSynthPhaseAdjustCounter = 0;
 
-		// ‚±‚±‚ЕЌs‚¤’Іђ®‚Н LastSynthPhase ‚М unwrapping ‚Е‚ ‚йЃB
-		// LastSynthPhase ‚Н€К‘Љ‚МЌ·‚Є—ЭђП‚і‚к‚й‚М‚Е‘е‚«‚Иђ”’l‚Й‚И‚Б‚Д‚ў‚­‚ЄЃA
-		// “K“–‚ИЉФЉu‚Е‚±‚к‚р unwrapping ‚µ‚И‚ў‚ЖЃA‚ў‚ё‚к(ђ”’l‚Є‘е‚«‚·‚¬‚Д)ђё“x
-		// —Ћ‚ї‚Є”­ђ¶‚µЃAђіЏн‚ЙЌ‡ђ¬‚ЄЏo—€‚И‚­‚И‚Б‚Д‚µ‚Ь‚¤ЃB
-		// ‚Ѕ‚ѕ‚µЃAђё“x‚Є•Ы‚Ѕ‚к‚к‚О‚ж‚ў‚Ѕ‚ЯЃA–€‰с‚±‚М unwrapping ‚рЌs‚¤•K—v‚Н‚И‚ўЃB
-		// ‚±‚±‚Е‚Н LastSynthPhaseAdjustInterval/LastSynthPhaseAdjustIncrement ‰с‚І‚Ж‚Й’Іђ®‚рЌs‚¤ЃB
+		// гЃ“гЃ“гЃ§иЎЊгЃ†иЄїж•ґгЃЇ LastSynthPhase гЃ® unwrapping гЃ§гЃ‚г‚‹гЂ‚
+		// LastSynthPhase гЃЇдЅЌз›ёгЃ®е·®гЃЊзґЇз©ЌгЃ•г‚Њг‚‹гЃ®гЃ§е¤§гЃЌгЃЄж•°еЂ¤гЃ«гЃЄгЃЈгЃ¦гЃ„гЃЏгЃЊгЂЃ
+		// йЃ©еЅ“гЃЄй–“йљ”гЃ§гЃ“г‚Њг‚’ unwrapping гЃ—гЃЄгЃ„гЃЁгЂЃгЃ„гЃљг‚Њ(ж•°еЂ¤гЃЊе¤§гЃЌгЃ™гЃЋгЃ¦)зІѕеє¦
+		// иђЅгЃЎгЃЊз™єз”џгЃ—гЂЃж­ЈеёёгЃ«еђ€ж€ђгЃЊе‡єжќҐгЃЄгЃЏгЃЄгЃЈгЃ¦гЃ—гЃѕгЃ†гЂ‚
+		// гЃџгЃ гЃ—гЂЃзІѕеє¦гЃЊдїќгЃџг‚Њг‚ЊгЃ°г‚€гЃ„гЃџг‚ЃгЂЃжЇЋе›ћгЃ“гЃ® unwrapping г‚’иЎЊгЃ†еї…и¦ЃгЃЇгЃЄгЃ„гЂ‚
+		// гЃ“гЃ“гЃ§гЃЇ LastSynthPhaseAdjustInterval/LastSynthPhaseAdjustIncrement е›ћгЃ”гЃЁгЃ«иЄїж•ґг‚’иЎЊгЃ†гЂ‚
 		for(unsigned int ch = 0; ch < Channels; ch++)
 		{
 			unsigned int framesize_d2 = FrameSize / 2;
@@ -460,11 +460,11 @@ tRisaPhaseVocoderDSP::tStatus tRisaPhaseVocoderDSP::Process()
 		}
 	}
 
-	// “ьЏo—Нѓoѓbѓtѓ@‚Мѓ|ѓCѓ“ѓ^‚рђi‚Я‚й
+	// е…Ґе‡єеЉ›гѓђгѓѓгѓ•г‚ЎгЃ®гѓќг‚¤гѓіг‚їг‚’йЂІг‚Ѓг‚‹
 	OutputBuffer.AdvanceWritePos(OutputHopSize * Channels);
 	InputBuffer.AdvanceReadPos(InputHopSize * Channels);
 
-	// ѓXѓeЃ[ѓ^ѓX = no error
+	// г‚№гѓ†гѓјг‚їг‚№ = no error
 	return psNoError;
 }
 //---------------------------------------------------------------------------
@@ -476,75 +476,75 @@ void tRisaPhaseVocoderDSP::ProcessCore(int ch)
 	float * analwork = AnalWork[ch];
 	float * synthwork = SynthWork[ch];
 
-	// FFT ‚рЋАЌs‚·‚й
+	// FFT г‚’е®џиЎЊгЃ™г‚‹
 	rdft(FrameSize, 1, analwork, FFTWorkIp, FFTWorkW); // Real DFT
-	analwork[1] = 0.0; // analwork[1] = nyquist freq. power (‚З‚Б‚ї‚Э‚їЋg‚¦‚И‚ў‚М‚Е0‚Й)
+	analwork[1] = 0.0; // analwork[1] = nyquist freq. power (гЃ©гЃЈгЃЎгЃїгЃЎдЅїгЃ€гЃЄгЃ„гЃ®гЃ§0гЃ«)
 
 	if(FrequencyScale != 1.0)
 	{
-		// ЉeѓtѓBѓ‹ѓ^ѓoѓ“ѓh‚І‚Ж‚Й•ПЉ·
-		//-- ЉeѓtѓBѓ‹ѓ^ѓoѓ“ѓh‚І‚Ж‚М‰№—К‚ЖЋь”gђ”‚р‹Ѓ‚Я‚йЃB
-		//-- FFT ‚рЋАЌs‚·‚й‚ЖЉeѓtѓBѓ‹ѓ^ѓoѓ“ѓh‚І‚Ж‚М’l‚ЄЏo‚Д‚­‚й‚ЄЃA
-		//-- ѓtѓBѓ‹ѓ^ѓoѓ“ѓh‚Ж‚ў‚¤ѓoѓ“ѓhѓpѓXѓtѓBѓ‹ѓ^‚М•ќ‚М’†‚Е
-		//-- Ћь”gђ”‚МѓsЃ[ѓN‚Є–{“–‚Н‚З‚±‚Й‚ ‚й‚М‚©‚НЃA‘O‰сЊvЋZ‚µ‚Ѕ
-		//-- €К‘Љ‚Ж‚МЌ·‚р‚Ж‚Б‚Д‚Э‚И‚ў‚Ж‚н‚©‚з‚И‚ўЃB
+		// еђ„гѓ•г‚Јгѓ«г‚їгѓђгѓігѓ‰гЃ”гЃЁгЃ«е¤‰жЏ›
+		//-- еђ„гѓ•г‚Јгѓ«г‚їгѓђгѓігѓ‰гЃ”гЃЁгЃ®йџій‡ЏгЃЁе‘Ёжіўж•°г‚’ж±‚г‚Ѓг‚‹гЂ‚
+		//-- FFT г‚’е®џиЎЊгЃ™г‚‹гЃЁеђ„гѓ•г‚Јгѓ«г‚їгѓђгѓігѓ‰гЃ”гЃЁгЃ®еЂ¤гЃЊе‡єгЃ¦гЃЏг‚‹гЃЊгЂЃ
+		//-- гѓ•г‚Јгѓ«г‚їгѓђгѓігѓ‰гЃЁгЃ„гЃ†гѓђгѓігѓ‰гѓ‘г‚№гѓ•г‚Јгѓ«г‚їгЃ®е№…гЃ®дё­гЃ§
+		//-- е‘Ёжіўж•°гЃ®гѓ”гѓјг‚ЇгЃЊжњ¬еЅ“гЃЇгЃ©гЃ“гЃ«гЃ‚г‚‹гЃ®гЃ‹гЃЇгЂЃе‰Ќе›ћиЁ€з®—гЃ—гЃџ
+		//-- дЅЌз›ёгЃЁгЃ®е·®г‚’гЃЁгЃЈгЃ¦гЃїгЃЄгЃ„гЃЁг‚ЏгЃ‹г‚‰гЃЄгЃ„гЂ‚
 		for(unsigned int i = 0; i < framesize_d2; i ++)
 		{
-			// ’јЊрЌА•WЊnЃЁ‹ЙЌА•WЊn
+			// з›ґдє¤еє§жЁ™зі»в†’жҐµеє§жЁ™зі»
 			float re = analwork[i*2  ];
 			float im = analwork[i*2+1];
 
-			float mag = sqrt(re*re + im*im); // mag = Ѓг(re^2+im^2)
+			float mag = sqrt(re*re + im*im); // mag = в€љ(re^2+im^2)
 			float ang = VFast_arctan2(im, re); // ang = atan(im/re)
 
-			// ‘O‰с‚М€К‘Љ‚Ж‚МЌ·‚р‚Ж‚й
-			// --’Ќ€У: ‚±‚±‚ЕЋg—p‚µ‚Д‚ў‚йFFTѓpѓbѓPЃ[ѓW‚НЃA
-			// --      ѓ\Ѓ[ѓXђж“Є‚МЋQЌlЋ‘—ї‚И‚З‚ЕЋ¦‚µ‚Д‚ў‚йFFT‚Ж
-			// --      Џo—Н‚і‚к‚й•Ў‘fђ”‚М‹•ђ”•”‚М•„Ќ†‚Є‹t‚И‚М‚Е
-			// --      (‹¤–р‚Є‚Е‚Д‚­‚й‚М‚Е)’Ќ€У‚Є•K—vЃB‚±‚±‚Е‚а•„Ќ†‚р
-			// --      ‹t‚М•Ё‚Ж‚µ‚Д€µ‚¤ЃB
+			// е‰Ќе›ћгЃ®дЅЌз›ёгЃЁгЃ®е·®г‚’гЃЁг‚‹
+			// --жіЁж„Џ: гЃ“гЃ“гЃ§дЅїз”ЁгЃ—гЃ¦гЃ„г‚‹FFTгѓ‘гѓѓг‚±гѓјг‚ёгЃЇгЂЃ
+			// --      г‚Ѕгѓјг‚№е…€й ­гЃ®еЏ‚иЂѓиі‡ж–™гЃЄгЃ©гЃ§з¤єгЃ—гЃ¦гЃ„г‚‹FFTгЃЁ
+			// --      е‡єеЉ›гЃ•г‚Њг‚‹и¤‡зґ ж•°гЃ®и™љж•°йѓЁгЃ®з¬¦еЏ·гЃЊйЂ†гЃЄгЃ®гЃ§
+			// --      (е…±еЅ№гЃЊгЃ§гЃ¦гЃЏг‚‹гЃ®гЃ§)жіЁж„ЏгЃЊеї…и¦ЃгЂ‚гЃ“гЃ“гЃ§г‚‚з¬¦еЏ·г‚’
+			// --      йЂ†гЃ®з‰©гЃЁгЃ—гЃ¦ж‰±гЃ†гЂ‚
 			float tmp = LastAnalPhase[ch][i] - ang;
-			LastAnalPhase[ch][i] = ang; // ЌЎ‰с‚М’l‚р•Ы‘¶
+			LastAnalPhase[ch][i] = ang; // д»Ље›ћгЃ®еЂ¤г‚’дїќе­
 
-			// over sampling ‚М‰e‹ї‚рЌl—¶‚·‚й
-			// -- ’КЏнЃAFrameSize ‚Е FFT ‚М‚PЋьЉъ‚Е‚ ‚й‚Ж‚±‚л‚рЃA
-			// -- ђё“x‚р•в‚¤‚Ѕ‚ЯЃAOverSampling ”{‚МЋьЉъ‚Е‰‰ЋZ‚р‚µ‚Д‚ў‚йЃB
-			// -- ‚»‚М‚Ѕ‚Я‚Йђ¶‚¶‚й€К‘Љ‚М‚ё‚к‚рЏCђі‚·‚йЃB
+			// over sampling гЃ®еЅ±йџїг‚’иЂѓж…®гЃ™г‚‹
+			// -- йЂљеёёгЂЃFrameSize гЃ§ FFT гЃ®пј‘е‘ЁжњџгЃ§гЃ‚г‚‹гЃЁгЃ“г‚Ќг‚’гЂЃ
+			// -- зІѕеє¦г‚’иЈњгЃ†гЃџг‚ЃгЂЃOverSampling еЂЌгЃ®е‘ЁжњџгЃ§жј”з®—г‚’гЃ—гЃ¦гЃ„г‚‹гЂ‚
+			// -- гЃќгЃ®гЃџг‚ЃгЃ«з”џгЃг‚‹дЅЌз›ёгЃ®гЃљг‚Њг‚’дї®ж­ЈгЃ™г‚‹гЂ‚
 			tmp -= i * OverSamplingRadian;
 
-			// unwrapping ‚р‚·‚й
-			// -- tmp ‚Є -M_PI Ѓ` +M_PI ‚М”Н€Н‚ЙЋы‚Ь‚й‚ж‚¤‚Й‚·‚й
+			// unwrapping г‚’гЃ™г‚‹
+			// -- tmp гЃЊ -M_PI пЅћ +M_PI гЃ®зЇ„е›ІгЃ«еЏЋгЃѕг‚‹г‚€гЃ†гЃ«гЃ™г‚‹
 			tmp = WrapPi_F1(tmp);
 
-			// -M_PIЃ`+M_PI‚р-1.0Ѓ`+1.0‚М•П€К‚Й•ПЉ·
+			// -M_PIпЅћ+M_PIг‚’-1.0пЅћ+1.0гЃ®е¤‰дЅЌгЃ«е¤‰жЏ›
 			tmp =  tmp * OverSamplingRadianRecp;
 
-			// tmp ‚рѓtѓBѓ‹ѓ^ѓoѓ“ѓh’†‰›‚©‚з‚МЋь”gђ”‚М•П€К‚Й•ПЉ·‚µЃA
-			// ‚»‚к‚ЙѓtѓBѓ‹ѓ^ѓoѓ“ѓh‚М’†‰›Ћь”gђ”‚р‰БЋZ‚·‚й
-			// -- i * FrequencyPerFilterBand ‚НѓtѓBѓ‹ѓ^ѓoѓ“ѓh‚М’†‰›Ћь”gђ”‚р
-			// -- •\‚µЃAtmp * FrequencyPerFilterBand ‚Н ѓtѓBѓ‹ѓ^ѓoѓ“ѓh’†‰›‚©‚з
-			// -- ‚МЋь”gђ”‚М•П€К‚р•\‚·ЃB‚±‚к‚з‚р‚ ‚н‚№‚Ѕ•Ё‚ЄЃA‚»‚МѓtѓBѓ‹ѓ^
-			// -- ѓoѓ“ѓh“а‚Е‚МЃuђ^Ѓv‚МЋь”gђ”‚Е‚ ‚йЃB
+			// tmp г‚’гѓ•г‚Јгѓ«г‚їгѓђгѓігѓ‰дё­е¤®гЃ‹г‚‰гЃ®е‘Ёжіўж•°гЃ®е¤‰дЅЌгЃ«е¤‰жЏ›гЃ—гЂЃ
+			// гЃќг‚ЊгЃ«гѓ•г‚Јгѓ«г‚їгѓђгѓігѓ‰гЃ®дё­е¤®е‘Ёжіўж•°г‚’еЉ з®—гЃ™г‚‹
+			// -- i * FrequencyPerFilterBand гЃЇгѓ•г‚Јгѓ«г‚їгѓђгѓігѓ‰гЃ®дё­е¤®е‘Ёжіўж•°г‚’
+			// -- иЎЁгЃ—гЂЃtmp * FrequencyPerFilterBand гЃЇ гѓ•г‚Јгѓ«г‚їгѓђгѓігѓ‰дё­е¤®гЃ‹г‚‰
+			// -- гЃ®е‘Ёжіўж•°гЃ®е¤‰дЅЌг‚’иЎЁгЃ™гЂ‚гЃ“г‚Њг‚‰г‚’гЃ‚г‚ЏгЃ›гЃџз‰©гЃЊгЂЃгЃќгЃ®гѓ•г‚Јгѓ«г‚ї
+			// -- гѓђгѓігѓ‰е†…гЃ§гЃ®гЂЊзњџгЂЌгЃ®е‘Ёжіўж•°гЃ§гЃ‚г‚‹гЂ‚
 			float freq = (i + tmp) *FrequencyPerFilterBand;
 
-			// analwork ‚Й’l‚рЉi”[‚·‚й
+			// analwork гЃ«еЂ¤г‚’ж јзґЌгЃ™г‚‹
 			analwork[i*2  ] = mag;
 			analwork[i*2+1] = freq;
 		}
 
 
 		//------------------------------------------------
-		// •ПЉ·
+		// е¤‰жЏ›
 		//------------------------------------------------
 
-		// Ћь”gђ”ЋІ•ыЊь‚МѓЉѓTѓ“ѓvѓЉѓ“ѓO‚рЌs‚¤
+		// е‘Ёжіўж•°и»ёж–№еђ‘гЃ®гѓЄг‚µгѓігѓ—гѓЄгѓіг‚°г‚’иЎЊгЃ†
 		float FrequencyScale_rcp = 1.0f / FrequencyScale;
 		for(unsigned int i = 0; i < framesize_d2; i ++)
 		{
-			// i ‚Й‘О‰ћ‚·‚йѓCѓ“ѓfѓbѓNѓX‚р“ѕ‚й
+			// i гЃ«еЇѕеїњгЃ™г‚‹г‚¤гѓігѓ‡гѓѓг‚Їг‚№г‚’еѕ—г‚‹
 			float fi = i * FrequencyScale_rcp;
 
-			// floor(x) ‚Ж floor(x) + 1 ‚МЉФ‚ЕѓoѓCѓЉѓjѓA•вЉФ‚рЌs‚¤
+			// floor(x) гЃЁ floor(x) + 1 гЃ®й–“гЃ§гѓђг‚¤гѓЄгѓ‹г‚ўиЈњй–“г‚’иЎЊгЃ†
 			unsigned int index = static_cast<unsigned int>(fi); // floor
 			float frac = fi - index;
 
@@ -572,38 +572,38 @@ void tRisaPhaseVocoderDSP::ProcessCore(int ch)
 
 
 		//------------------------------------------------
-		// Ќ‡ђ¬
+		// еђ€ж€ђ
 		//------------------------------------------------
 
-		// ЉeѓtѓBѓ‹ѓ^ѓoѓ“ѓh‚І‚Ж‚Й•ПЉ·
-		// Љо–{“I‚Й‚Н‰рђН‚М‹t•ПЉ·‚Е‚ ‚й
+		// еђ„гѓ•г‚Јгѓ«г‚їгѓђгѓігѓ‰гЃ”гЃЁгЃ«е¤‰жЏ›
+		// еџєжњ¬зљ„гЃ«гЃЇи§ЈжћђгЃ®йЂ†е¤‰жЏ›гЃ§гЃ‚г‚‹
 		for(unsigned int i = 0; i < framesize_d2; i ++)
 		{
 			float mag  = synthwork[i*2  ];
 			float freq = synthwork[i*2+1];
 
-			// Ћь”gђ”‚©‚зЉeѓtѓBѓ‹ѓ^ѓoѓ“ѓh‚М’†‰›Ћь”gђ”‚рЊёЋZ‚µЃA
-			// ѓtѓBѓ‹ѓ^ѓoѓ“ѓh‚М’†‰›Ћь”gђ”‚©‚з‚М-1.0Ѓ`+1.0‚М•П€К
-			// ‚Й•ПЉ·‚·‚й
+			// е‘Ёжіўж•°гЃ‹г‚‰еђ„гѓ•г‚Јгѓ«г‚їгѓђгѓігѓ‰гЃ®дё­е¤®е‘Ёжіўж•°г‚’жё›з®—гЃ—гЂЃ
+			// гѓ•г‚Јгѓ«г‚їгѓђгѓігѓ‰гЃ®дё­е¤®е‘Ёжіўж•°гЃ‹г‚‰гЃ®-1.0пЅћ+1.0гЃ®е¤‰дЅЌ
+			// гЃ«е¤‰жЏ›гЃ™г‚‹
 			float tmp = freq * FrequencyPerFilterBandRecp - (float)i;
 
-			// -1.0Ѓ`+1.0‚М•П€К‚р-M_PIЃ`+M_PI‚М€К‘Љ‚Й•ПЉ·
+			// -1.0пЅћ+1.0гЃ®е¤‰дЅЌг‚’-M_PIпЅћ+M_PIгЃ®дЅЌз›ёгЃ«е¤‰жЏ›
 			tmp =  tmp * OverSamplingRadian;
 
-			// OverSampling ‚Й‚ж‚й€К‘Љ‚М•вђі
+			// OverSampling гЃ«г‚€г‚‹дЅЌз›ёгЃ®иЈњж­Ј
 			tmp += i   * OverSamplingRadian;
 
-			// TimeScale ‚Й‚ж‚й€К‘Љ‚М•вђі
-			// TimeScale ‚ЕЏo—Н‚ЄЋћЉФЋІ•ыЊь‚Й‚М‚С‚к‚О(‚ ‚й‚ў‚НЏk‚Я‚О)ЃA
-			// €К‘Љ‚МЌ·•Є‚а‚»‚к‚Й”є‚Б‚Д‚М‚С‚й(Џk‚Ю)
+			// TimeScale гЃ«г‚€г‚‹дЅЌз›ёгЃ®иЈњж­Ј
+			// TimeScale гЃ§е‡єеЉ›гЃЊж™‚й–“и»ёж–№еђ‘гЃ«гЃ®гЃіг‚ЊгЃ°(гЃ‚г‚‹гЃ„гЃЇзё®г‚ЃгЃ°)гЂЃ
+			// дЅЌз›ёгЃ®е·®е€†г‚‚гЃќг‚ЊгЃ«дјґгЃЈгЃ¦гЃ®гЃіг‚‹(зё®г‚Ђ)
 			tmp *= ExactTimeScale;
 
-			// ‘O‰с‚М€К‘Љ‚Ж‰БЋZ‚·‚й
-			// ‚±‚±‚Е‚а‹•ђ”•”‚М•„Ќ†‚Є‹t‚Й‚И‚й‚М‚Е’Ќ€У
+			// е‰Ќе›ћгЃ®дЅЌз›ёгЃЁеЉ з®—гЃ™г‚‹
+			// гЃ“гЃ“гЃ§г‚‚и™љж•°йѓЁгЃ®з¬¦еЏ·гЃЊйЂ†гЃ«гЃЄг‚‹гЃ®гЃ§жіЁж„Џ
 			LastSynthPhase[ch][i] -= tmp;
 			float ang = LastSynthPhase[ch][i];
 
-			// ‹ЙЌА•WЊnЃЁ’јЊрЌА•WЊn
+			// жҐµеє§жЁ™зі»в†’з›ґдє¤еє§жЁ™зі»
 			float c, s;
 			VFast_sincos(ang, s, c);
 			synthwork[i*2  ] = mag * c;
@@ -612,60 +612,60 @@ void tRisaPhaseVocoderDSP::ProcessCore(int ch)
 	}
 	else
 	{
-		// Ћь”gђ”ЋІ•ыЊь‚ЙѓVѓtѓg‚Є‚И‚ўЏкЌ‡
+		// е‘Ёжіўж•°и»ёж–№еђ‘гЃ«г‚·гѓ•гѓ€гЃЊгЃЄгЃ„е ґеђ€
 
-		// ЉeѓtѓBѓ‹ѓ^ѓoѓ“ѓh‚І‚Ж‚Й•ПЉ·
-		//-- ЉeѓtѓBѓ‹ѓ^ѓoѓ“ѓh‚І‚Ж‚М‰№—К‚ЖЋь”gђ”‚р‹Ѓ‚Я‚йЃB
-		//-- FFT ‚рЋАЌs‚·‚й‚ЖЉeѓtѓBѓ‹ѓ^ѓoѓ“ѓh‚І‚Ж‚М’l‚ЄЏo‚Д‚­‚й‚ЄЃA
-		//-- ѓtѓBѓ‹ѓ^ѓoѓ“ѓh‚Ж‚ў‚¤ѓoѓ“ѓhѓpѓXѓtѓBѓ‹ѓ^‚М•ќ‚М’†‚Е
-		//-- Ћь”gђ”‚МѓsЃ[ѓN‚Є–{“–‚Н‚З‚±‚Й‚ ‚й‚М‚©‚НЃA‘O‰сЊvЋZ‚µ‚Ѕ
-		//-- €К‘Љ‚Ж‚МЌ·‚р‚Ж‚Б‚Д‚Э‚И‚ў‚Ж‚н‚©‚з‚И‚ўЃB
+		// еђ„гѓ•г‚Јгѓ«г‚їгѓђгѓігѓ‰гЃ”гЃЁгЃ«е¤‰жЏ›
+		//-- еђ„гѓ•г‚Јгѓ«г‚їгѓђгѓігѓ‰гЃ”гЃЁгЃ®йџій‡ЏгЃЁе‘Ёжіўж•°г‚’ж±‚г‚Ѓг‚‹гЂ‚
+		//-- FFT г‚’е®џиЎЊгЃ™г‚‹гЃЁеђ„гѓ•г‚Јгѓ«г‚їгѓђгѓігѓ‰гЃ”гЃЁгЃ®еЂ¤гЃЊе‡єгЃ¦гЃЏг‚‹гЃЊгЂЃ
+		//-- гѓ•г‚Јгѓ«г‚їгѓђгѓігѓ‰гЃЁгЃ„гЃ†гѓђгѓігѓ‰гѓ‘г‚№гѓ•г‚Јгѓ«г‚їгЃ®е№…гЃ®дё­гЃ§
+		//-- е‘Ёжіўж•°гЃ®гѓ”гѓјг‚ЇгЃЊжњ¬еЅ“гЃЇгЃ©гЃ“гЃ«гЃ‚г‚‹гЃ®гЃ‹гЃЇгЂЃе‰Ќе›ћиЁ€з®—гЃ—гЃџ
+		//-- дЅЌз›ёгЃЁгЃ®е·®г‚’гЃЁгЃЈгЃ¦гЃїгЃЄгЃ„гЃЁг‚ЏгЃ‹г‚‰гЃЄгЃ„гЂ‚
 		for(unsigned int i = 0; i < framesize_d2; i ++)
 		{
-			// ’јЊрЌА•WЊnЃЁ‹ЙЌА•WЊn
+			// з›ґдє¤еє§жЁ™зі»в†’жҐµеє§жЁ™зі»
 			float re = analwork[i*2  ];
 			float im = analwork[i*2+1];
 
-			float mag = sqrt(re*re + im*im); // mag = Ѓг(re^2+im^2)
+			float mag = sqrt(re*re + im*im); // mag = в€љ(re^2+im^2)
 			float ang = VFast_arctan2(im, re); // ang = atan(im/re)
 
-			// ‘O‰с‚М€К‘Љ‚Ж‚МЌ·‚р‚Ж‚й
-			// --’Ќ€У: ‚±‚±‚ЕЋg—p‚µ‚Д‚ў‚йFFTѓpѓbѓPЃ[ѓW‚НЃA
-			// --      ѓ\Ѓ[ѓXђж“Є‚МЋQЌlЋ‘—ї‚И‚З‚ЕЋ¦‚µ‚Д‚ў‚йFFT‚Ж
-			// --      Џo—Н‚і‚к‚й•Ў‘fђ”‚М‹•ђ”•”‚М•„Ќ†‚Є‹t‚И‚М‚Е
-			// --      (‹¤–р‚Є‚Е‚Д‚­‚й‚М‚Е)’Ќ€У‚Є•K—vЃB‚±‚±‚Е‚а•„Ќ†‚р
-			// --      ‹t‚М•Ё‚Ж‚µ‚Д€µ‚¤ЃB
+			// е‰Ќе›ћгЃ®дЅЌз›ёгЃЁгЃ®е·®г‚’гЃЁг‚‹
+			// --жіЁж„Џ: гЃ“гЃ“гЃ§дЅїз”ЁгЃ—гЃ¦гЃ„г‚‹FFTгѓ‘гѓѓг‚±гѓјг‚ёгЃЇгЂЃ
+			// --      г‚Ѕгѓјг‚№е…€й ­гЃ®еЏ‚иЂѓиі‡ж–™гЃЄгЃ©гЃ§з¤єгЃ—гЃ¦гЃ„г‚‹FFTгЃЁ
+			// --      е‡єеЉ›гЃ•г‚Њг‚‹и¤‡зґ ж•°гЃ®и™љж•°йѓЁгЃ®з¬¦еЏ·гЃЊйЂ†гЃЄгЃ®гЃ§
+			// --      (е…±еЅ№гЃЊгЃ§гЃ¦гЃЏг‚‹гЃ®гЃ§)жіЁж„ЏгЃЊеї…и¦ЃгЂ‚гЃ“гЃ“гЃ§г‚‚з¬¦еЏ·г‚’
+			// --      йЂ†гЃ®з‰©гЃЁгЃ—гЃ¦ж‰±гЃ†гЂ‚
 			float tmp = LastAnalPhase[ch][i] - ang;
-			LastAnalPhase[ch][i] = ang; // ЌЎ‰с‚М’l‚р•Ы‘¶
+			LastAnalPhase[ch][i] = ang; // д»Ље›ћгЃ®еЂ¤г‚’дїќе­
 
 			// phase shift
 			float phase_shift = i * OverSamplingRadian;
 
-			// over sampling ‚М‰e‹ї‚рЌl—¶‚·‚й
-			// -- ’КЏнЃAFrameSize ‚Е FFT ‚М‚PЋьЉъ‚Е‚ ‚й‚Ж‚±‚л‚рЃA
-			// -- ђё“x‚р•в‚¤‚Ѕ‚ЯЃAOverSampling ”{‚МЋьЉъ‚Е‰‰ЋZ‚р‚µ‚Д‚ў‚йЃB
-			// -- ‚»‚М‚Ѕ‚Я‚Йђ¶‚¶‚й€К‘Љ‚М‚ё‚к‚рЏCђі‚·‚йЃB
+			// over sampling гЃ®еЅ±йџїг‚’иЂѓж…®гЃ™г‚‹
+			// -- йЂљеёёгЂЃFrameSize гЃ§ FFT гЃ®пј‘е‘ЁжњџгЃ§гЃ‚г‚‹гЃЁгЃ“г‚Ќг‚’гЂЃ
+			// -- зІѕеє¦г‚’иЈњгЃ†гЃџг‚ЃгЂЃOverSampling еЂЌгЃ®е‘ЁжњџгЃ§жј”з®—г‚’гЃ—гЃ¦гЃ„г‚‹гЂ‚
+			// -- гЃќгЃ®гЃџг‚ЃгЃ«з”џгЃг‚‹дЅЌз›ёгЃ®гЃљг‚Њг‚’дї®ж­ЈгЃ™г‚‹гЂ‚
 			tmp -= phase_shift;
 
-			// unwrapping ‚р‚·‚й
-			// -- tmp ‚Є -M_PI Ѓ` +M_PI ‚М”Н€Н‚ЙЋы‚Ь‚й‚ж‚¤‚Й‚·‚й
+			// unwrapping г‚’гЃ™г‚‹
+			// -- tmp гЃЊ -M_PI пЅћ +M_PI гЃ®зЇ„е›ІгЃ«еЏЋгЃѕг‚‹г‚€гЃ†гЃ«гЃ™г‚‹
 			tmp = WrapPi_F1(tmp);
 
 //--
-			// OverSampling ‚Й‚ж‚й€К‘Љ‚М•вђі
+			// OverSampling гЃ«г‚€г‚‹дЅЌз›ёгЃ®иЈњж­Ј
 			tmp += phase_shift;
 
-			// TimeScale ‚Й‚ж‚й€К‘Љ‚М•вђі
-			// TimeScale ‚ЕЏo—Н‚ЄЋћЉФЋІ•ыЊь‚Й‚М‚С‚к‚О(‚ ‚й‚ў‚НЏk‚Я‚О)ЃA
-			// €К‘Љ‚МЌ·•Є‚а‚»‚к‚Й”є‚Б‚Д‚М‚С‚й(Џk‚Ю)
+			// TimeScale гЃ«г‚€г‚‹дЅЌз›ёгЃ®иЈњж­Ј
+			// TimeScale гЃ§е‡єеЉ›гЃЊж™‚й–“и»ёж–№еђ‘гЃ«гЃ®гЃіг‚ЊгЃ°(гЃ‚г‚‹гЃ„гЃЇзё®г‚ЃгЃ°)гЂЃ
+			// дЅЌз›ёгЃ®е·®е€†г‚‚гЃќг‚ЊгЃ«дјґгЃЈгЃ¦гЃ®гЃіг‚‹(зё®г‚Ђ)
 			tmp *= ExactTimeScale;
 
-			// ‘O‰с‚М€К‘Љ‚Ж‰БЋZ‚·‚й
-			// ‚±‚±‚Е‚а‹•ђ”•”‚М•„Ќ†‚Є‹t‚Й‚И‚й‚М‚Е’Ќ€У
+			// е‰Ќе›ћгЃ®дЅЌз›ёгЃЁеЉ з®—гЃ™г‚‹
+			// гЃ“гЃ“гЃ§г‚‚и™љж•°йѓЁгЃ®з¬¦еЏ·гЃЊйЂ†гЃ«гЃЄг‚‹гЃ®гЃ§жіЁж„Џ
 			LastSynthPhase[ch][i] -= tmp;
 			ang = LastSynthPhase[ch][i];
 
-			// ‹ЙЌА•WЊnЃЁ’јЊрЌА•WЊn
+			// жҐµеє§жЁ™зі»в†’з›ґдє¤еє§жЁ™зі»
 			float c, s;
 			VFast_sincos(ang, s, c);
 			synthwork[i*2  ] = mag * c;
@@ -673,8 +673,8 @@ void tRisaPhaseVocoderDSP::ProcessCore(int ch)
 		}
 	}
 
-	// FFT ‚рЋАЌs‚·‚й
-	synthwork[1] = 0.0; // synthwork[1] = nyquist freq. power (‚З‚Б‚ї‚Э‚їЋg‚¦‚И‚ў‚М‚Е0‚Й)
+	// FFT г‚’е®џиЎЊгЃ™г‚‹
+	synthwork[1] = 0.0; // synthwork[1] = nyquist freq. power (гЃ©гЃЈгЃЎгЃїгЃЎдЅїгЃ€гЃЄгЃ„гЃ®гЃ§0гЃ«)
 	rdft(FrameSize, -1, SynthWork[ch], FFTWorkIp, FFTWorkW); // Inverse Real DFT
 }
 //---------------------------------------------------------------------------
@@ -684,9 +684,9 @@ void tRisaPhaseVocoderDSP::ProcessCore(int ch)
 
 
 /*
-	‚±‚Мѓ\Ѓ[ѓXѓRЃ[ѓh‚Е‚НЏЪ‚µ‚ўѓAѓ‹ѓSѓЉѓYѓЂ‚Мђа–ѕ‚НЌs‚н‚И‚ўЃB
-	Љо–{“I‚И—¬‚к‚НѓvѓЊЃ[ѓ“‚ИCЊѕЊк”Е‚Ж•П‚н‚и‚И‚ў‚М‚ЕЃA
-	../opt_default/PhaseVocoderDSP_default.cpp ‚рЋQЏЖ‚М‚±‚ЖЃB
+	гЃ“гЃ®г‚Ѕгѓјг‚№г‚ігѓјгѓ‰гЃ§гЃЇи©ігЃ—гЃ„г‚ўгѓ«г‚ґгѓЄг‚єгѓ гЃ®иЄ¬жЋгЃЇиЎЊг‚ЏгЃЄгЃ„гЂ‚
+	еџєжњ¬зљ„гЃЄжµЃг‚ЊгЃЇгѓ—гѓ¬гѓјгѓігЃЄCиЁЂиЄћз‰€гЃЁе¤‰г‚Џг‚ЉгЃЄгЃ„гЃ®гЃ§гЂЃ
+	../opt_default/PhaseVocoderDSP_default.cpp г‚’еЏ‚з…§гЃ®гЃ“гЃЁгЂ‚
 */
 
 //---------------------------------------------------------------------------
@@ -698,26 +698,26 @@ void tRisaPhaseVocoderDSP::ProcessCore_sse(int ch)
 	float * analwork = AnalWork[ch];
 	float * synthwork = SynthWork[ch];
 
-	// ЉЫ‚Яѓ‚Ѓ[ѓh‚рђЭ’и
+	// дёёг‚Ѓгѓўгѓјгѓ‰г‚’иЁ­е®љ
 	SetRoundingModeToNearest_SSE();
 
-	// FFT ‚рЋАЌs‚·‚й
+	// FFT г‚’е®џиЎЊгЃ™г‚‹
 	rdft(FrameSize, 1, analwork, FFTWorkIp, FFTWorkW); // Real DFT
-	analwork[1] = 0.0; // analwork[1] = nyquist freq. power (‚З‚Б‚ї‚Э‚їЋg‚¦‚И‚ў‚М‚Е0‚Й)
+	analwork[1] = 0.0; // analwork[1] = nyquist freq. power (гЃ©гЃЈгЃЎгЃїгЃЎдЅїгЃ€гЃЄгЃ„гЃ®гЃ§0гЃ«)
 
 	__m128 exact_time_scale = _mm_load1_ps(&ExactTimeScale);
 	__m128 over_sampling_radian_v = _mm_load1_ps(&OverSamplingRadian);
 
 	if(FrequencyScale != 1.0)
 	{
-		// ‚±‚±‚Е‚Н 4 •Ў‘fђ” (8ЋАђ”) ‚І‚Ж‚ЙЏ€—ќ‚рЌs‚¤ЃB
+		// гЃ“гЃ“гЃ§гЃЇ 4 и¤‡зґ ж•° (8е®џж•°) гЃ”гЃЁгЃ«е‡¦зђ†г‚’иЎЊгЃ†гЂ‚
 		__m128 over_sampling_radian_recp = _mm_load1_ps(&OverSamplingRadianRecp);
 		__m128 frequency_per_filter_band = _mm_load1_ps(&FrequencyPerFilterBand);
 		__m128 frequency_per_filter_band_recp = _mm_load1_ps(&FrequencyPerFilterBandRecp);
 
 		for(unsigned int i = 0; i < framesize_d2; i += 4)
 		{
-			// ѓCѓ“ѓ^Ѓ[ѓЉЃ[ѓu‰рЏњ +  ’јЊрЌА•WЊnЃЁ‹ЙЌА•WЊn
+			// г‚¤гѓіг‚їгѓјгѓЄгѓјгѓ–и§Јй™¤ +  з›ґдє¤еє§жЁ™зі»в†’жҐµеє§жЁ™зі»
 			__m128 aw3120 = *(__m128*)(analwork + i*2    );
 			__m128 aw7654 = *(__m128*)(analwork + i*2 + 4);
 
@@ -727,12 +727,12 @@ void tRisaPhaseVocoderDSP::ProcessCore_sse(int ch)
 			__m128 mag = _mm_sqrt_ps(_mm_add_ps(_mm_mul_ps(re3210,re3210), _mm_mul_ps(im3210,im3210)));
 			__m128 ang = VFast_arctan2_F4_SSE(im3210, re3210);
 
-			// ‘O‰с‚М€К‘Љ‚Ж‚МЌ·‚р‚Ж‚й
+			// е‰Ќе›ћгЃ®дЅЌз›ёгЃЁгЃ®е·®г‚’гЃЁг‚‹
 			__m128 lastp = *(__m128*)(LastAnalPhase[ch] + i);
 			*(__m128*)(LastAnalPhase[ch] + i) = ang;
 			ang = _mm_sub_ps(lastp, ang);
 
-			// over sampling ‚М‰e‹ї‚рЌl—¶‚·‚й
+			// over sampling гЃ®еЅ±йџїг‚’иЂѓж…®гЃ™г‚‹
 			__m128 i_3210;
 			i_3210 = _mm_cvtsi32_ss(i_3210, i);
 			i_3210 = _mm_shuffle_ps(i_3210, i_3210, _MM_SHUFFLE(0,0,0,0));
@@ -741,17 +741,17 @@ void tRisaPhaseVocoderDSP::ProcessCore_sse(int ch)
 			__m128 phase_shift = _mm_mul_ps(i_3210, over_sampling_radian_v);
 			ang = _mm_sub_ps( ang, phase_shift );
 
-			// unwrapping ‚р‚·‚й
+			// unwrapping г‚’гЃ™г‚‹
 			ang = Wrap_Pi_F4_SSE(ang);
 
-			// -M_PIЃ`+M_PI‚р-1.0Ѓ`+1.0‚М•П€К‚Й•ПЉ·
+			// -M_PIпЅћ+M_PIг‚’-1.0пЅћ+1.0гЃ®е¤‰дЅЌгЃ«е¤‰жЏ›
 			ang = _mm_mul_ps( ang, over_sampling_radian_recp );
 
-			// tmp ‚рѓtѓBѓ‹ѓ^ѓoѓ“ѓh’†‰›‚©‚з‚МЋь”gђ”‚М•П€К‚Й•ПЉ·‚µЃA
-			// ‚»‚к‚ЙѓtѓBѓ‹ѓ^ѓoѓ“ѓh‚М’†‰›Ћь”gђ”‚р‰БЋZ‚·‚й
+			// tmp г‚’гѓ•г‚Јгѓ«г‚їгѓђгѓігѓ‰дё­е¤®гЃ‹г‚‰гЃ®е‘Ёжіўж•°гЃ®е¤‰дЅЌгЃ«е¤‰жЏ›гЃ—гЂЃ
+			// гЃќг‚ЊгЃ«гѓ•г‚Јгѓ«г‚їгѓђгѓігѓ‰гЃ®дё­е¤®е‘Ёжіўж•°г‚’еЉ з®—гЃ™г‚‹
 			__m128 freq = _mm_mul_ps( _mm_add_ps(ang, i_3210), frequency_per_filter_band );
 
-			// analwork ‚Й’l‚рЉi”[‚·‚й
+			// analwork гЃ«еЂ¤г‚’ж јзґЌгЃ™г‚‹
 			re3210 = mag;
 			im3210 = freq;
 			__m128 im10re10 = _mm_movelh_ps(re3210, im3210);
@@ -764,16 +764,16 @@ void tRisaPhaseVocoderDSP::ProcessCore_sse(int ch)
 
 
 		//------------------------------------------------
-		// •ПЉ·
+		// е¤‰жЏ›
 		//------------------------------------------------
-		// Ћь”gђ”ЋІ•ыЊь‚МѓЉѓTѓ“ѓvѓЉѓ“ѓO‚рЌs‚¤
+		// е‘Ёжіўж•°и»ёж–№еђ‘гЃ®гѓЄг‚µгѓігѓ—гѓЄгѓіг‚°г‚’иЎЊгЃ†
 		float FrequencyScale_rcp = 1.0f / FrequencyScale;
 		for(unsigned int i = 0; i < framesize_d2; i ++)
 		{
-			// i ‚Й‘О‰ћ‚·‚йѓCѓ“ѓfѓbѓNѓX‚р“ѕ‚й
+			// i гЃ«еЇѕеїњгЃ™г‚‹г‚¤гѓігѓ‡гѓѓг‚Їг‚№г‚’еѕ—г‚‹
 			float fi = i * FrequencyScale_rcp;
 
-			// floor(x) ‚Ж floor(x) + 1 ‚МЉФ‚ЕѓoѓCѓЉѓjѓA•вЉФ‚рЌs‚¤
+			// floor(x) гЃЁ floor(x) + 1 гЃ®й–“гЃ§гѓђг‚¤гѓЄгѓ‹г‚ўиЈњй–“г‚’иЎЊгЃ†
 			unsigned int index = static_cast<unsigned int>(fi); // floor
 			float frac = fi - index;
 
@@ -800,52 +800,52 @@ void tRisaPhaseVocoderDSP::ProcessCore_sse(int ch)
 		}
 
 		//------------------------------------------------
-		// Ќ‡ђ¬
+		// еђ€ж€ђ
 		//------------------------------------------------
 
-		// ЉeѓtѓBѓ‹ѓ^ѓoѓ“ѓh‚І‚Ж‚Й•ПЉ·
-		// Љо–{“I‚Й‚Н‰рђН‚М‹t•ПЉ·‚Е‚ ‚й
+		// еђ„гѓ•г‚Јгѓ«г‚їгѓђгѓігѓ‰гЃ”гЃЁгЃ«е¤‰жЏ›
+		// еџєжњ¬зљ„гЃ«гЃЇи§ЈжћђгЃ®йЂ†е¤‰жЏ›гЃ§гЃ‚г‚‹
 		for(unsigned int i = 0; i < framesize_d2; i += 4)
 		{
-			// ѓCѓ“ѓ^Ѓ[ѓЉЃ[ѓu‰рЏњ
+			// г‚¤гѓіг‚їгѓјгѓЄгѓјгѓ–и§Јй™¤
 			__m128 sw3120 = *(__m128*)(synthwork + i*2    );
 			__m128 sw7654 = *(__m128*)(synthwork + i*2 + 4);
 
 			__m128 mag  = _mm_shuffle_ps(sw3120, sw7654, _MM_SHUFFLE(2,0,2,0));
 			__m128 freq = _mm_shuffle_ps(sw3120, sw7654, _MM_SHUFFLE(3,1,3,1));
 
-			// i+3 i+2 i+1 i+0 ‚рЏЂ”х
+			// i+3 i+2 i+1 i+0 г‚’жє–е‚™
 			__m128 i_3210;
 			i_3210 = _mm_cvtsi32_ss(i_3210, i);
 			i_3210 = _mm_shuffle_ps(i_3210, i_3210, _MM_SHUFFLE(0,0,0,0));
 			i_3210 = _mm_add_ps(i_3210, PM128(PFV_INIT));
 
-			// Ћь”gђ”‚©‚зЉeѓtѓBѓ‹ѓ^ѓoѓ“ѓh‚М’†‰›Ћь”gђ”‚рЊёЋZ‚µЃA
-			// ѓtѓBѓ‹ѓ^ѓoѓ“ѓh‚М’†‰›Ћь”gђ”‚©‚з‚М-1.0Ѓ`+1.0‚М•П€К
-			// ‚Й•ПЉ·‚·‚й
+			// е‘Ёжіўж•°гЃ‹г‚‰еђ„гѓ•г‚Јгѓ«г‚їгѓђгѓігѓ‰гЃ®дё­е¤®е‘Ёжіўж•°г‚’жё›з®—гЃ—гЂЃ
+			// гѓ•г‚Јгѓ«г‚їгѓђгѓігѓ‰гЃ®дё­е¤®е‘Ёжіўж•°гЃ‹г‚‰гЃ®-1.0пЅћ+1.0гЃ®е¤‰дЅЌ
+			// гЃ«е¤‰жЏ›гЃ™г‚‹
 			__m128 ang = _mm_sub_ps(_mm_mul_ps(freq, frequency_per_filter_band_recp), i_3210);
 
-			// -1.0Ѓ`+1.0‚М•П€К‚р-M_PIЃ`+M_PI‚М€К‘Љ‚Й•ПЉ·
+			// -1.0пЅћ+1.0гЃ®е¤‰дЅЌг‚’-M_PIпЅћ+M_PIгЃ®дЅЌз›ёгЃ«е¤‰жЏ›
 			ang = _mm_mul_ps( ang, over_sampling_radian_v );
 
-			// OverSampling ‚Й‚ж‚й€К‘Љ‚М•вђі
+			// OverSampling гЃ«г‚€г‚‹дЅЌз›ёгЃ®иЈњж­Ј
 			ang = _mm_add_ps( ang, _mm_mul_ps( i_3210, over_sampling_radian_v ) );
 
-			// TimeScale ‚Й‚ж‚й€К‘Љ‚М•вђі
+			// TimeScale гЃ«г‚€г‚‹дЅЌз›ёгЃ®иЈњж­Ј
 			ang = _mm_mul_ps( ang, exact_time_scale );
 
-			// ‘O‰с‚М€К‘Љ‚Ж‰БЋZ‚·‚й
-			// ‚±‚±‚Е‚а‹•ђ”•”‚М•„Ќ†‚Є‹t‚Й‚И‚й‚М‚Е’Ќ€У
+			// е‰Ќе›ћгЃ®дЅЌз›ёгЃЁеЉ з®—гЃ™г‚‹
+			// гЃ“гЃ“гЃ§г‚‚и™љж•°йѓЁгЃ®з¬¦еЏ·гЃЊйЂ†гЃ«гЃЄг‚‹гЃ®гЃ§жіЁж„Џ
 			ang = _mm_sub_ps( *(__m128*)(LastSynthPhase[ch] + i), ang );
 			*(__m128*)(LastSynthPhase[ch] + i) = ang;
 
-			// ‹ЙЌА•WЊnЃЁ’јЊрЌА•WЊn
+			// жҐµеє§жЁ™зі»в†’з›ґдє¤еє§жЁ™зі»
 			__m128 sin, cos;
 			VFast_sincos_F4_SSE(ang, sin, cos);
 			__m128 re3210 = _mm_mul_ps( mag, cos );
 			__m128 im3210 = _mm_mul_ps( mag, sin );
 
-			// ѓCѓ“ѓ^Ѓ[ѓЉЃ[ѓu
+			// г‚¤гѓіг‚їгѓјгѓЄгѓјгѓ–
 			__m128 im10re10 = _mm_movelh_ps(re3210, im3210);
 			__m128 im32re32 = _mm_movehl_ps(im3210, re3210);
 			__m128 im1re1im0re0 = _mm_shuffle_ps(im10re10, im10re10, _MM_SHUFFLE(3,1,2,0));
@@ -856,11 +856,11 @@ void tRisaPhaseVocoderDSP::ProcessCore_sse(int ch)
 	}
 	else
 	{
-		// Ћь”gђ”ЋІ•ыЊь‚ЙѓVѓtѓg‚Є‚И‚ўЏкЌ‡
-		// ‚±‚±‚Е‚а 4 •Ў‘fђ” (8ЋАђ”) ‚І‚Ж‚ЙЏ€—ќ‚рЌs‚¤ЃB
+		// е‘Ёжіўж•°и»ёж–№еђ‘гЃ«г‚·гѓ•гѓ€гЃЊгЃЄгЃ„е ґеђ€
+		// гЃ“гЃ“гЃ§г‚‚ 4 и¤‡зґ ж•° (8е®џж•°) гЃ”гЃЁгЃ«е‡¦зђ†г‚’иЎЊгЃ†гЂ‚
 		for(unsigned int i = 0; i < framesize_d2; i += 4)
 		{
-			// ѓCѓ“ѓ^Ѓ[ѓЉЃ[ѓu‰рЏњ +  ’јЊрЌА•WЊnЃЁ‹ЙЌА•WЊn
+			// г‚¤гѓіг‚їгѓјгѓЄгѓјгѓ–и§Јй™¤ +  з›ґдє¤еє§жЁ™зі»в†’жҐµеє§жЁ™зі»
 			__m128 aw3120 = *(__m128*)(analwork + i*2    );
 			__m128 aw7654 = *(__m128*)(analwork + i*2 + 4);
 
@@ -870,12 +870,12 @@ void tRisaPhaseVocoderDSP::ProcessCore_sse(int ch)
 			__m128 mag = _mm_sqrt_ps( _mm_add_ps(_mm_mul_ps(re3210,re3210), _mm_mul_ps(im3210,im3210)) );
 			__m128 ang = VFast_arctan2_F4_SSE(im3210, re3210);
 
-			// ‘O‰с‚М€К‘Љ‚Ж‚МЌ·‚р‚Ж‚й
+			// е‰Ќе›ћгЃ®дЅЌз›ёгЃЁгЃ®е·®г‚’гЃЁг‚‹
 			__m128 lastp = *(__m128*)(LastAnalPhase[ch] + i);
 			*(__m128*)(LastAnalPhase[ch] + i) = ang;
 			ang = _mm_sub_ps( lastp, ang );
 
-			// over sampling ‚М‰e‹ї‚рЌl—¶‚·‚й
+			// over sampling гЃ®еЅ±йџїг‚’иЂѓж…®гЃ™г‚‹
 			__m128 i_3210;
 			i_3210 = _mm_cvtsi32_ss(i_3210, i);
 			i_3210 = _mm_shuffle_ps(i_3210, i_3210, _MM_SHUFFLE(0,0,0,0));
@@ -884,27 +884,27 @@ void tRisaPhaseVocoderDSP::ProcessCore_sse(int ch)
 			__m128 phase_shift = _mm_mul_ps( i_3210, over_sampling_radian_v );
 			ang = _mm_sub_ps( ang, phase_shift );
 
-			// unwrapping ‚р‚·‚й
+			// unwrapping г‚’гЃ™г‚‹
 			ang = Wrap_Pi_F4_SSE(ang);
 
-			// OverSampling ‚Й‚ж‚й€К‘Љ‚М•вђі
+			// OverSampling гЃ«г‚€г‚‹дЅЌз›ёгЃ®иЈњж­Ј
 			ang = _mm_add_ps( ang, phase_shift );
 
-			// TimeScale ‚Й‚ж‚й€К‘Љ‚М•вђі
+			// TimeScale гЃ«г‚€г‚‹дЅЌз›ёгЃ®иЈњж­Ј
 			ang = _mm_mul_ps( ang, exact_time_scale );
 
-			// ‘O‰с‚М€К‘Љ‚Ж‰БЋZ‚·‚й
-			// ‚±‚±‚Е‚а‹•ђ”•”‚М•„Ќ†‚Є‹t‚Й‚И‚й‚М‚Е’Ќ€У
+			// е‰Ќе›ћгЃ®дЅЌз›ёгЃЁеЉ з®—гЃ™г‚‹
+			// гЃ“гЃ“гЃ§г‚‚и™љж•°йѓЁгЃ®з¬¦еЏ·гЃЊйЂ†гЃ«гЃЄг‚‹гЃ®гЃ§жіЁж„Џ
 			ang = _mm_sub_ps( *(__m128*)(LastSynthPhase[ch] + i), ang );
 			*(__m128*)(LastSynthPhase[ch] + i) = ang;
 
-			// ‹ЙЌА•WЊnЃЁ’јЊрЌА•WЊn
+			// жҐµеє§жЁ™зі»в†’з›ґдє¤еє§жЁ™зі»
 			__m128 sin, cos;
 			VFast_sincos_F4_SSE(ang, sin, cos);
 			re3210 = _mm_mul_ps( mag, cos );
 			im3210 = _mm_mul_ps( mag, sin );
 
-			// ѓCѓ“ѓ^Ѓ[ѓЉЃ[ѓu
+			// г‚¤гѓіг‚їгѓјгѓЄгѓјгѓ–
 			__m128 im10re10 = _mm_movelh_ps(re3210, im3210);
 			__m128 im32re32 = _mm_movehl_ps(im3210, re3210);
 			__m128 im1re1im0re0 = _mm_shuffle_ps(im10re10, im10re10, _MM_SHUFFLE(3,1,2,0));
@@ -914,8 +914,8 @@ void tRisaPhaseVocoderDSP::ProcessCore_sse(int ch)
 		}
 	}
 
-	// FFT ‚рЋАЌs‚·‚й
-	synthwork[1] = 0.0; // synthwork[1] = nyquist freq. power (‚З‚Б‚ї‚Э‚їЋg‚¦‚И‚ў‚М‚Е0‚Й)
+	// FFT г‚’е®џиЎЊгЃ™г‚‹
+	synthwork[1] = 0.0; // synthwork[1] = nyquist freq. power (гЃ©гЃЈгЃЎгЃїгЃЎдЅїгЃ€гЃЄгЃ„гЃ®гЃ§0гЃ«)
 	rdft_sse(FrameSize, -1, synthwork, FFTWorkIp, FFTWorkW); // Inverse Real DFT
 }
 //---------------------------------------------------------------------------

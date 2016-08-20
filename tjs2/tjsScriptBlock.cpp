@@ -626,7 +626,7 @@ void tTJSScriptBlock::Compile( const tjs_char *text, bool isexpression, bool isr
 #define TJS_OFFSET_VM_REG_ADDR( x ) ( (x) = TJS_FROM_VM_REG_ADDR(x) )
 #define TJS_OFFSET_VM_CODE_ADDR( x ) ( (x) = TJS_FROM_VM_CODE_ADDR(x) )
 /**
- * �o�C�g�R�[�h���̃A�h���X�͔z��̃C���f�b�N�X���w���̂ŁA����ɍ��킹�ĕϊ�
+ * バイトコード中のアドレスは配列のインデックスを指すので、それに合わせて変換
  */
 void tTJSScriptBlock::TranslateCodeAddress( tjs_int32* code, const tjs_int32 codeSize )
 {

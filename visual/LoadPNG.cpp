@@ -35,7 +35,7 @@ bool TVPAcceptSaveAsPNG(void* formatdata, const ttstr & type, class iTJSDispatch
 			*dic = result.AsObject();
 		}
 #endif
-		// ƒ^ƒO‘‚«o‚µ“™‚É‚Í‘Î‰‚µ‚Ä‚¢‚È‚¢
+		// ã‚¿ã‚°æ›¸ãå‡ºã—ç­‰ã«ã¯å¯¾å¿œã—ã¦ã„ãªã„
 		*dic = TJSCreateDictionaryObject();
 	}
 	return result;
@@ -465,19 +465,19 @@ void TVPLoadPNG(void* formatdata, void *callbackdata, tTVPGraphicSizeCallback si
 }
 //---------------------------------------------------------------------------
 /**
- * PNG‘‚«‚İƒtƒ‰ƒbƒVƒ…
- * @param png_ptr : PNGî•ñ
+ * PNGæ›¸ãè¾¼ã¿ãƒ•ãƒ©ãƒƒã‚·ãƒ¥
+ * @param png_ptr : PNGæƒ…å ±
  */
 static void PNG_write_flash( png_structp png_ptr )
 {
-	// ‰½‚à‚µ‚È‚¢
+	// ä½•ã‚‚ã—ãªã„
 }
 //---------------------------------------------------------------------------
 /**
- * PNG‘‚«‚İ
- * @param png_ptr : PNGî•ñ
- * @param buf : ‘‚«‚İƒf[ƒ^
- * @param size : ƒf[ƒ^ƒTƒCƒY
+ * PNGæ›¸ãè¾¼ã¿
+ * @param png_ptr : PNGæƒ…å ±
+ * @param buf : æ›¸ãè¾¼ã¿ãƒ‡ãƒ¼ã‚¿
+ * @param size : ãƒ‡ãƒ¼ã‚¿ã‚µã‚¤ã‚º
  */
 static void PNG_write_write( png_structp png_ptr, png_bytep buf, png_size_t size )
 {
@@ -486,12 +486,12 @@ static void PNG_write_write( png_structp png_ptr, png_bytep buf, png_size_t size
 }
 //---------------------------------------------------------------------------
 /**
- * PNG‘‚«‚İ
- * ƒtƒ‹ƒJƒ‰[‚Å‚Ì‘‚«‚İ‚Ì‚İ‘Î‰
- * @param dst : o—Íæ
- * @param image : ‘‚«o‚µƒCƒ[ƒWƒf[ƒ^
- * @param mode : ƒ‚[ƒh (Œ»İ‚Ípng‚Ì‚İ‰Â)
- * @param meta : ’Ç‰ÁƒIƒvƒVƒ‡ƒ“ (Œ»İ‚Í–³‹)
+ * PNGæ›¸ãè¾¼ã¿
+ * ãƒ•ãƒ«ã‚«ãƒ©ãƒ¼ã§ã®æ›¸ãè¾¼ã¿ã®ã¿å¯¾å¿œ
+ * @param dst : å‡ºåŠ›å…ˆ
+ * @param image : æ›¸ãå‡ºã—ã‚¤ãƒ¡ãƒ¼ã‚¸ãƒ‡ãƒ¼ã‚¿
+ * @param mode : ãƒ¢ãƒ¼ãƒ‰ (ç¾åœ¨ã¯pngã®ã¿å¯)
+ * @param meta : è¿½åŠ ã‚ªãƒ—ã‚·ãƒ§ãƒ³ (ç¾åœ¨ã¯ç„¡è¦–)
  */
 void TVPSaveAsPNG(void* formatdata, tTJSBinaryStream* dst, const tTVPBaseBitmap* image, const ttstr & mode, iTJSDispatch2* meta )
 {
@@ -535,11 +535,11 @@ void TVPSaveAsPNG(void* formatdata, tTJSBinaryStream* dst, const tTVPBaseBitmap*
 		sig_bit.alpha = bpp == 32 ? 8 : 0;
 		png_set_sBIT( png_ptr, info_ptr, &sig_bit );
 
-		/* ----- ƒCƒ“ƒtƒHƒ[ƒVƒ‡ƒ“ƒwƒbƒ_[‘o‚µ */
+		/* ----- ã‚¤ãƒ³ãƒ•ã‚©ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ãƒ˜ãƒƒãƒ€ãƒ¼æ›¸å‡ºã— */
 		png_write_info( png_ptr, info_ptr );
 		png_set_bgr( png_ptr );
 
-		/* ----- ƒsƒNƒZƒ‹‘o‚µ */
+		/* ----- ãƒ”ã‚¯ã‚»ãƒ«æ›¸å‡ºã— */
 		tjs_uint width_byte = (bpp*width)/8;
 		tjs_uint8* buff = new tjs_uint8[width_byte];
 		if( bpp == 32 ) {
@@ -560,7 +560,7 @@ void TVPSaveAsPNG(void* formatdata, tTJSBinaryStream* dst, const tTVPBaseBitmap*
 				png_write_row( png_ptr, (png_bytep)buff );
 			}
 		}
-		/* ----- ‘‚«o‚µ‚ÌI—¹AŒãn–– */
+		/* ----- æ›¸ãå‡ºã—ã®çµ‚äº†ã€å¾Œå§‹æœ« */
 		png_write_end( png_ptr, info_ptr );
 		png_destroy_write_struct( &png_ptr, &info_ptr );
 		delete buff;
@@ -620,7 +620,7 @@ void TVPLoadHeaderPNG(void* formatdata, tTJSBinaryStream *src, iTJSDispatch2** d
 		(*dic)->PropSet(TJS_MEMBERENSURE, TJS_W("height"), 0, &val, (*dic) );
 		val = tTJSVariant(bit_depth);
 		(*dic)->PropSet(TJS_MEMBERENSURE, TJS_W("bpp"), 0, &val, (*dic) );
-		// color_type,interlace_type,compression_type,filter_type ‚à“ü‚ê‚½•û‚ª‚¢‚¢‚ªcc
+		// color_type,interlace_type,compression_type,filter_type ã‚‚å…¥ã‚ŒãŸæ–¹ãŒã„ã„ãŒâ€¦â€¦
 
 		// retrieve offset information
 		png_int_32 offset_x, offset_y;

@@ -1,11 +1,11 @@
 //---------------------------------------------------------------------------
 /**
- * •`‰ææ‚ğ Bitmap ‚Æ‚·‚é Layer Tree Owner
- * ƒŒƒCƒ„[‚É•`‚©‚ê‚ÄA‡¬‚³‚ê‚½“à—e‚ÍA‚±‚ÌƒNƒ‰ƒX‚Ì•Û‚·‚é Bitmap ‚É•`‚©‚ê‚é
- * İ’è‚Ì‚½‚ß‚ÉŒÄ‚Ñ‚ê‚½ƒƒ\ƒbƒh‚àƒCƒxƒ“ƒg‚Æ‚µ‚Ä’Ê’m‚³‚ê‚é
+ * æç”»å…ˆã‚’ Bitmap ã¨ã™ã‚‹ Layer Tree Owner
+ * ãƒ¬ã‚¤ãƒ¤ãƒ¼ã«æã‹ã‚Œã¦ã€åˆæˆã•ã‚ŒãŸå†…å®¹ã¯ã€ã“ã®ã‚¯ãƒ©ã‚¹ã®ä¿æŒã™ã‚‹ Bitmap ã«æã‹ã‚Œã‚‹
+ * è¨­å®šã®ãŸã‚ã«å‘¼ã³ã‚ŒãŸãƒ¡ã‚½ãƒƒãƒ‰ã‚‚ã‚¤ãƒ™ãƒ³ãƒˆã¨ã—ã¦é€šçŸ¥ã•ã‚Œã‚‹
  */
 //---------------------------------------------------------------------------
-//!@file ƒŒƒCƒ„[ƒcƒŠ[ƒI[ƒi[
+//!@file ãƒ¬ã‚¤ãƒ¤ãƒ¼ãƒ„ãƒªãƒ¼ã‚ªãƒ¼ãƒŠãƒ¼
 //---------------------------------------------------------------------------
 
 #include "tjsCommHead.h"
@@ -69,12 +69,12 @@ void TJS_INTF_METHOD tTJSNI_BitmapLayerTreeOwner::NotifyBitmapCompleted(class iT
 	}
 	tjs_uint8* dstbits = (tjs_uint8*)BitmapNI->GetPixelBufferForWrite();
 	tjs_int dstpitch = BitmapNI->GetPixelBufferPitch();
-	// cliprect ‚ª‚Í‚İo‚µ‚Ä‚¢‚¢‚È‚¢‚±‚Æ‚ğŠm”F
+	// cliprect ãŒã¯ã¿å‡ºã—ã¦ã„ã„ãªã„ã“ã¨ã‚’ç¢ºèª
 	if( !(x < 0 || y < 0 || x + cliprect.get_width() > w || y + cliprect.get_height() > h) &&
 		!(cliprect.left < 0 || cliprect.top < 0 ||
 			cliprect.right > bitmapinfo->GetWidth() || cliprect.bottom > bitmapinfo->GetHeight()) )
 	{
-		// bitmapinfo ‚Å•\‚³‚ê‚½ cliprect ‚Ì—Ìˆæ‚ğ x,y ‚ÉƒRƒs[‚·‚é
+		// bitmapinfo ã§è¡¨ã•ã‚ŒãŸ cliprect ã®é ˜åŸŸã‚’ x,y ã«ã‚³ãƒ”ãƒ¼ã™ã‚‹
 		long src_y       = cliprect.top;
 		long src_y_limit = cliprect.bottom;
 		long src_x       = cliprect.left;
@@ -144,7 +144,7 @@ void tTJSNI_BitmapLayerTreeOwner::OnSetHintText(iTJSDispatch2* sender, const tts
 
 void tTJSNI_BitmapLayerTreeOwner::OnResizeLayer( tjs_int w, tjs_int h ) {
 	if( BitmapNI ) {
-		BitmapNI->SetSize( w, h ); // ƒTƒCƒY•ÏX‚É‰‚¶‚ÄA“à•”‚ÌBitmap‚àƒTƒCƒY•ÏX‚·‚é
+		BitmapNI->SetSize( w, h ); // ã‚µã‚¤ã‚ºå¤‰æ›´ã«å¿œã˜ã¦ã€å†…éƒ¨ã®Bitmapã‚‚ã‚µã‚¤ã‚ºå¤‰æ›´ã™ã‚‹
 	}
 	if( Owner ) {
 		tTJSVariant arg[2] = { w, h };

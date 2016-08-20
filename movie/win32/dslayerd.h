@@ -1,6 +1,6 @@
 /****************************************************************************/
 /*! @file
-@brief DirectShow‚ğ—˜—p‚µ‚½ƒ€[ƒr[‚ÌƒŒƒCƒ„[•`‰æÄ¶
+@brief DirectShowã‚’åˆ©ç”¨ã—ãŸãƒ ãƒ¼ãƒ“ãƒ¼ã®ãƒ¬ã‚¤ãƒ¤ãƒ¼æç”»å†ç”Ÿ
 
 -----------------------------------------------------------------------------
 	Copyright (C) 2004 T.Imoto <http://www.kaede-software.com>
@@ -20,7 +20,7 @@
 
 class tTVPBaseBitmap;
 //----------------------------------------------------------------------------
-//! @brief ƒŒƒCƒ„[•`‰æƒrƒfƒIƒNƒ‰ƒX
+//! @brief ãƒ¬ã‚¤ãƒ¤ãƒ¼æç”»ãƒ“ãƒ‡ã‚ªã‚¯ãƒ©ã‚¹
 //----------------------------------------------------------------------------
 class tTVPDSLayerVideo : public tTVPDSMovie
 {
@@ -30,8 +30,8 @@ private:
 
 	BYTE			*m_BmpBits[2];
 	//----------------------------------------------------------------------------
-	//! @brief	  	IRendererBufferAccess‚ğæ“¾‚·‚é
-	//! @return		IRendererBufferAccessƒCƒ“ƒ^[ƒtƒFƒCƒX
+	//! @brief	  	IRendererBufferAccessã‚’å–å¾—ã™ã‚‹
+	//! @return		IRendererBufferAccessã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹
 	//----------------------------------------------------------------------------
 	IRendererBufferAccess *BufferAccess()
 	{
@@ -39,8 +39,8 @@ private:
 		return m_BuffAccess;
 	}
 	//----------------------------------------------------------------------------
-	//! @brief	  	IRendererBufferVideo‚ğæ“¾‚·‚é
-	//! @return		IRendererBufferVideoƒCƒ“ƒ^[ƒtƒFƒCƒX
+	//! @brief	  	IRendererBufferVideoã‚’å–å¾—ã™ã‚‹
+	//! @return		IRendererBufferVideoã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹
 	//----------------------------------------------------------------------------
 	IRendererBufferVideo *BufferVideo()
 	{

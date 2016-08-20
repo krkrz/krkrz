@@ -7,17 +7,17 @@
 #include "tvpfontstruc.h"
 
 /**
- * ‚PƒOƒŠƒt‚ÌƒƒgƒŠƒbƒN‚ğ•\‚·\‘¢‘Ì
+ * ï¼‘ã‚°ãƒªãƒ•ã®ãƒ¡ãƒˆãƒªãƒƒã‚¯ã‚’è¡¨ã™æ§‹é€ ä½“
  */
 struct tGlyphMetrics
 {
-	tjs_int CellIncX;		//!< ˆê•¶ši‚ß‚é‚Ì•K—v‚ÈX•ûŒü‚ÌƒsƒNƒZƒ‹”
-	tjs_int CellIncY;		//!< ˆê•¶ši‚ß‚é‚Ì•K—v‚ÈY•ûŒü‚ÌƒsƒNƒZƒ‹”
+	tjs_int CellIncX;		//!< ä¸€æ–‡å­—é€²ã‚ã‚‹ã®å¿…è¦ãªXæ–¹å‘ã®ãƒ”ã‚¯ã‚»ãƒ«æ•°
+	tjs_int CellIncY;		//!< ä¸€æ–‡å­—é€²ã‚ã‚‹ã®å¿…è¦ãªYæ–¹å‘ã®ãƒ”ã‚¯ã‚»ãƒ«æ•°
 };
 
 //---------------------------------------------------------------------------
 /**
- * ‚PƒOƒŠƒt‚ğ•\‚·ƒNƒ‰ƒX
+ * ï¼‘ã‚°ãƒªãƒ•ã‚’è¡¨ã™ã‚¯ãƒ©ã‚¹
  */
 class tTVPCharacterData
 {
@@ -27,15 +27,15 @@ private:
 	tjs_int RefCount;
 
 public:
-	tjs_int OriginX; //!< •¶šBitmap‚ğ•`‰æ‚·‚éascentˆÊ’u‚Æ‚Ì‰¡ƒIƒtƒZƒbƒg
-	tjs_int OriginY; //!< •¶šBitmap‚ğ•`‰æ‚·‚éascentˆÊ’u‚Æ‚ÌcƒIƒtƒZƒbƒg
-	tGlyphMetrics	Metrics; //!< ƒƒgƒŠƒbƒNA‘—‚è•‚Æ‚‚³‚ğ•Û
-	tjs_int Pitch; //!< •Û‚µ‚Ä‚¢‚é‰æ‘œƒsƒbƒ`
-	tjs_uint BlackBoxX; //!< •Û‚µ‚Ä‚¢‚é‰æ‘œ•
-	tjs_uint BlackBoxY; //!< •Û‚µ‚Ä‚¢‚é‰æ‘œ‚‚³
+	tjs_int OriginX; //!< æ–‡å­—Bitmapã‚’æç”»ã™ã‚‹ascentä½ç½®ã¨ã®æ¨ªã‚ªãƒ•ã‚»ãƒƒãƒˆ
+	tjs_int OriginY; //!< æ–‡å­—Bitmapã‚’æç”»ã™ã‚‹ascentä½ç½®ã¨ã®ç¸¦ã‚ªãƒ•ã‚»ãƒƒãƒˆ
+	tGlyphMetrics	Metrics; //!< ãƒ¡ãƒˆãƒªãƒƒã‚¯ã€é€ã‚Šå¹…ã¨é«˜ã•ã‚’ä¿æŒ
+	tjs_int Pitch; //!< ä¿æŒã—ã¦ã„ã‚‹ç”»åƒãƒ”ãƒƒãƒ
+	tjs_uint BlackBoxX; //!< ä¿æŒã—ã¦ã„ã‚‹ç”»åƒå¹…
+	tjs_uint BlackBoxY; //!< ä¿æŒã—ã¦ã„ã‚‹ç”»åƒé«˜ã•
 	tjs_int BlurLevel;
 	tjs_int BlurWidth;
-	tjs_uint Gray; // ŠK’²
+	tjs_uint Gray; // éšèª¿
 
 	bool Antialiased;
 	bool Blured;
@@ -80,10 +80,10 @@ public:
 	void Resample8();
 
 	/**
-	 * …•½ü‚ğ’Ç‰Á‚·‚é(æ‚èÁ‚µüAƒAƒ“ƒ_[ƒ‰ƒCƒ“—p)
-	 * @param liney : ƒ‰ƒCƒ“’†SˆÊ’u
-	 * @param thickness : ƒ‰ƒCƒ“‘¾‚³
-	 * @param val : ƒ‰ƒCƒ“’l
+	 * æ°´å¹³ç·šã‚’è¿½åŠ ã™ã‚‹(å–ã‚Šæ¶ˆã—ç·šã€ã‚¢ãƒ³ãƒ€ãƒ¼ãƒ©ã‚¤ãƒ³ç”¨)
+	 * @param liney : ãƒ©ã‚¤ãƒ³ä¸­å¿ƒä½ç½®
+	 * @param thickness : ãƒ©ã‚¤ãƒ³å¤ªã•
+	 * @param val : ãƒ©ã‚¤ãƒ³å€¤
 	 */
 	void AddHorizontalLine( tjs_int liney, tjs_int thickness, tjs_uint8 val );
 };

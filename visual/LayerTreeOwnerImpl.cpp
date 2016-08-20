@@ -3,7 +3,7 @@
  * 
  */
 //---------------------------------------------------------------------------
-//!@file ƒŒƒCƒ„[ƒcƒŠ[ƒI[ƒi[
+//!@file ãƒ¬ã‚¤ãƒ¤ãƒ¼ãƒ„ãƒªãƒ¼ã‚ªãƒ¼ãƒŠãƒ¼
 //---------------------------------------------------------------------------
 #include "tjsCommHead.h"
 
@@ -32,10 +32,10 @@ const iTVPLayerManager* tTVPLayerTreeOwner::GetLayerManagerAt(size_t index) cons
 bool tTVPLayerTreeOwner::TransformToPrimaryLayerManager(tjs_int &x, tjs_int &y) {
 	iTVPLayerManager * manager = GetLayerManagerAt(PrimaryLayerManagerIndex);
 	if(!manager) return false;
-	// ƒvƒ‰ƒCƒ}ƒŠƒŒƒCƒ„ƒ}ƒl[ƒWƒƒ‚Ìƒvƒ‰ƒCƒ}ƒŠƒŒƒCƒ„‚ÌƒTƒCƒY‚ğ“¾‚é
+	// ãƒ—ãƒ©ã‚¤ãƒãƒªãƒ¬ã‚¤ãƒ¤ãƒãƒãƒ¼ã‚¸ãƒ£ã®ãƒ—ãƒ©ã‚¤ãƒãƒªãƒ¬ã‚¤ãƒ¤ã®ã‚µã‚¤ã‚ºã‚’å¾—ã‚‹
 	tjs_int pl_w, pl_h;
 	if(!manager->GetPrimaryLayerSize(pl_w, pl_h)) return false;
-	// x , y ‚Í DestRect ‚Ì 0, 0 ‚ğŒ´“_‚Æ‚µ‚½À•W‚Æ‚µ‚Ä“n‚³‚ê‚Ä‚«‚Ä‚¢‚é
+	// x , y ã¯ DestRect ã® 0, 0 ã‚’åŸç‚¹ã¨ã—ãŸåº§æ¨™ã¨ã—ã¦æ¸¡ã•ã‚Œã¦ãã¦ã„ã‚‹
 	tjs_int w = DestRect.get_width();
 	tjs_int h = DestRect.get_height();
 	x = w ? (x * pl_w / w) : 0;
@@ -45,10 +45,10 @@ bool tTVPLayerTreeOwner::TransformToPrimaryLayerManager(tjs_int &x, tjs_int &y) 
 bool tTVPLayerTreeOwner::TransformToPrimaryLayerManager(tjs_real &x, tjs_real &y) {
 	iTVPLayerManager * manager = GetLayerManagerAt(PrimaryLayerManagerIndex);
 	if(!manager) return false;
-	// ƒvƒ‰ƒCƒ}ƒŠƒŒƒCƒ„ƒ}ƒl[ƒWƒƒ‚Ìƒvƒ‰ƒCƒ}ƒŠƒŒƒCƒ„‚ÌƒTƒCƒY‚ğ“¾‚é
+	// ãƒ—ãƒ©ã‚¤ãƒãƒªãƒ¬ã‚¤ãƒ¤ãƒãƒãƒ¼ã‚¸ãƒ£ã®ãƒ—ãƒ©ã‚¤ãƒãƒªãƒ¬ã‚¤ãƒ¤ã®ã‚µã‚¤ã‚ºã‚’å¾—ã‚‹
 	tjs_int pl_w, pl_h;
 	if(!manager->GetPrimaryLayerSize(pl_w, pl_h)) return false;
-	// x , y ‚Í DestRect ‚Ì 0, 0 ‚ğŒ´“_‚Æ‚µ‚½À•W‚Æ‚µ‚Ä“n‚³‚ê‚Ä‚«‚Ä‚¢‚é
+	// x , y ã¯ DestRect ã® 0, 0 ã‚’åŸç‚¹ã¨ã—ãŸåº§æ¨™ã¨ã—ã¦æ¸¡ã•ã‚Œã¦ãã¦ã„ã‚‹
 	x = pl_w ? (x * DestRect.get_width()  / pl_w) : 0.0;
 	y = pl_h ? (y * DestRect.get_height() / pl_h) : 0.0;
 	return true;
@@ -56,10 +56,10 @@ bool tTVPLayerTreeOwner::TransformToPrimaryLayerManager(tjs_real &x, tjs_real &y
 bool tTVPLayerTreeOwner::TransformFromPrimaryLayerManager(tjs_int &x, tjs_int &y) {
 	iTVPLayerManager * manager = GetLayerManagerAt(PrimaryLayerManagerIndex);
 	if(!manager) return false;
-	// ƒvƒ‰ƒCƒ}ƒŠƒŒƒCƒ„ƒ}ƒl[ƒWƒƒ‚Ìƒvƒ‰ƒCƒ}ƒŠƒŒƒCƒ„‚ÌƒTƒCƒY‚ğ“¾‚é
+	// ãƒ—ãƒ©ã‚¤ãƒãƒªãƒ¬ã‚¤ãƒ¤ãƒãƒãƒ¼ã‚¸ãƒ£ã®ãƒ—ãƒ©ã‚¤ãƒãƒªãƒ¬ã‚¤ãƒ¤ã®ã‚µã‚¤ã‚ºã‚’å¾—ã‚‹
 	tjs_int pl_w, pl_h;
 	if(!manager->GetPrimaryLayerSize(pl_w, pl_h)) return false;
-	// x , y ‚Í DestRect ‚Ì 0, 0 ‚ğŒ´“_‚Æ‚µ‚½À•W‚Æ‚µ‚Ä“n‚³‚ê‚Ä‚«‚Ä‚¢‚é
+	// x , y ã¯ DestRect ã® 0, 0 ã‚’åŸç‚¹ã¨ã—ãŸåº§æ¨™ã¨ã—ã¦æ¸¡ã•ã‚Œã¦ãã¦ã„ã‚‹
 	x = pl_w ? (x * DestRect.get_width()  / pl_w) : 0;
 	y = pl_h ? (y * DestRect.get_height() / pl_h) : 0;
 	return true;
@@ -74,12 +74,12 @@ void tTVPLayerTreeOwner::GetPrimaryLayerSize( tjs_int &w, tjs_int &h ) const {
 }
 
 void TJS_INTF_METHOD tTVPLayerTreeOwner::RegisterLayerManager( class iTVPLayerManager* manager ) {
-	// Managers ‚É manager ‚ğ push ‚·‚éBAddRef‚·‚é‚Ì‚ğ–Y‚ê‚È‚¢‚±‚ÆB
+	// Managers ã« manager ã‚’ push ã™ã‚‹ã€‚AddRefã™ã‚‹ã®ã‚’å¿˜ã‚Œãªã„ã“ã¨ã€‚
 	Managers.push_back(manager);
 	manager->AddRef();
 }
 void TJS_INTF_METHOD tTVPLayerTreeOwner::UnregisterLayerManager( class iTVPLayerManager* manager ) {
-	// Managers ‚©‚ç manager ‚ğíœ‚·‚éBRelease‚·‚éB
+	// Managers ã‹ã‚‰ manager ã‚’å‰Šé™¤ã™ã‚‹ã€‚Releaseã™ã‚‹ã€‚
 	std::vector<iTVPLayerManager *>::iterator i = std::find(Managers.begin(), Managers.end(), manager);
 	if(i == Managers.end())
 		TVPThrowInternalError;
@@ -99,7 +99,7 @@ void TJS_INTF_METHOD tTVPLayerTreeOwner::GetCursorPos(class iTVPLayerManager* ma
 	if(!primary_manager) return;
 	OnGetCursorPos(x, y);
 	if(primary_manager != manager || !TransformToPrimaryLayerManager(x, y)) {
-		// ƒvƒ‰ƒCƒ}ƒŠƒŒƒCƒ„ƒ}ƒl[ƒWƒƒˆÈŠO‚É‚ÍÀ•W 0,0 ‚Å“n‚µ‚Ä‚¨‚­
+		// ãƒ—ãƒ©ã‚¤ãƒãƒªãƒ¬ã‚¤ãƒ¤ãƒãƒãƒ¼ã‚¸ãƒ£ä»¥å¤–ã«ã¯åº§æ¨™ 0,0 ã§æ¸¡ã—ã¦ãŠã
 		 x = y = 0;
 	}
 }
@@ -276,7 +276,7 @@ void tTVPLayerTreeOwner::FireKeyPress(tjs_char key) {
 }
 
 void tTVPLayerTreeOwner::FireDisplayRotate( tjs_int orientation, tjs_int rotate, tjs_int bpp, tjs_int hresolution, tjs_int vresolution ) {
-	// ‰½‚à‚µ‚È‚¢
+	// ä½•ã‚‚ã—ãªã„
 }
 
 void tTVPLayerTreeOwner::FireRecheckInputState() {

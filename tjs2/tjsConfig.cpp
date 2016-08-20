@@ -21,10 +21,10 @@
 /*
  * core/utils/cp932_uni.cpp
  * core/utils/uni_cp932.cpp
- * ‚ğˆê‚ÉƒŠƒ“ƒN‚µ‚Ä‚­‚¾‚³‚¢B
- * CP932(ShiftJIS) ‚Æ Unicode •ÏŠ·‚Ég—p‚µ‚Ä‚¢‚Ü‚·B
- * Win32 API‚Ì“¯“™‚ÌŠÖ”‚ÍŒİŠ·«“™‚Ì–â‘è‚ª‚ ‚é‚±‚Æ‚âƒ}ƒ‹ƒ`ƒvƒ‰ƒbƒgƒtƒH[ƒ€‚Ì‘«‚©‚¹‚Æ‚È‚é
- * ‚½‚ßg—p‚ª’†~‚³‚ê‚Ü‚µ‚½B
+ * ã‚’ä¸€ç·’ã«ãƒªãƒ³ã‚¯ã—ã¦ãã ã•ã„ã€‚
+ * CP932(ShiftJIS) ã¨ Unicode å¤‰æ›ã«ä½¿ç”¨ã—ã¦ã„ã¾ã™ã€‚
+ * Win32 APIã®åŒç­‰ã®é–¢æ•°ã¯äº’æ›æ€§ç­‰ã®å•é¡ŒãŒã‚ã‚‹ã“ã¨ã‚„ãƒãƒ«ãƒãƒ—ãƒ©ãƒƒãƒˆãƒ•ã‚©ãƒ¼ãƒ ã®è¶³ã‹ã›ã¨ãªã‚‹
+ * ãŸã‚ä½¿ç”¨ãŒä¸­æ­¢ã•ã‚Œã¾ã—ãŸã€‚
  */
 extern tjs_size SJISToUnicodeString(const char * in, tjs_char *out);
 extern tjs_size SJISToUnicodeString(const char * in, tjs_char *out, tjs_size limit );
@@ -250,7 +250,7 @@ size_t TJS_wcstombs(tjs_nchar *s, const tjs_char *pwcs, size_t n)
 	}
 }
 //---------------------------------------------------------------------------
-// g‚í‚ê‚Ä‚¢‚È‚¢‚æ‚¤‚È‚Ì‚Å–¢Šm”F’ˆÓ
+// ä½¿ã‚ã‚Œã¦ã„ãªã„ã‚ˆã†ãªã®ã§æœªç¢ºèªæ³¨æ„
 int TJS_mbtowc(tjs_char *pwc, const tjs_nchar *s, size_t n)
 {
 	if(!s || !n) return 0;
@@ -281,7 +281,7 @@ int TJS_mbtowc(tjs_char *pwc, const tjs_nchar *s, size_t n)
 	}
 }
 //---------------------------------------------------------------------------
-// g‚í‚ê‚Ä‚¢‚È‚¢‚æ‚¤‚È‚Ì‚Å–¢Šm”F’ˆÓ
+// ä½¿ã‚ã‚Œã¦ã„ãªã„ã‚ˆã†ãªã®ã§æœªç¢ºèªæ³¨æ„
 int TJS_wctomb(tjs_nchar *s, tjs_char wc)
 {
 	if(!s) return 0;
@@ -367,7 +367,7 @@ static unsigned int TJSNewFPUCW = 0;
 static unsigned int TJSDefaultMMCW = 0;
 static bool TJSFPUInit = false;
 #endif
-// FPU—áŠO‚ğƒ}ƒXƒN
+// FPUä¾‹å¤–ã‚’ãƒã‚¹ã‚¯
 void TJSSetFPUE()
 {
 #if defined(__WIN32__) && !defined(__GNUC__)
@@ -399,7 +399,7 @@ void TJSSetFPUE()
 #endif	// defined(__WIN32__) && !defined(__GNUC__)
 
 }
-// —áŠOƒ}ƒXƒN‚ğ‰ğœ‚µŒ³‚É–ß‚·
+// ä¾‹å¤–ãƒã‚¹ã‚¯ã‚’è§£é™¤ã—å…ƒã«æˆ»ã™
 void TJSRestoreFPUE()
 {
 	if(!TJSFPUInit) return;

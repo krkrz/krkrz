@@ -8,7 +8,7 @@
 #include "NativeEventQueue.h"
 #include "GraphicsLoaderIntf.h"
 
-// BaseBitmap ���g���ƃ��G���g�����g�ł͂Ȃ��̂ŁA�ʂ̍\���̂ɓƎ��Ƀ��[�h����K�v������
+// BaseBitmap を使うとリエントラントではないので、別の構造体に独自にロードする必要がある
 struct tTVPTmpBitmapImage {
 	tjs_uint32 w;
 	tjs_uint32 h;
@@ -17,7 +17,7 @@ struct tTVPTmpBitmapImage {
 	std::vector<tTVPGraphicMetaInfoPair> * MetaInfo;
 	tTVPTmpBitmapImage();
 	~tTVPTmpBitmapImage();
-// �p���b�g�֘A�͌���ǂ܂Ȃ��A�t�@�C���ɏ]���̂ł͂Ȃ��A���O�w������Ȃ̂�
+// パレット関連は現状読まない、ファイルに従うのではなく、事前指定方式なので
 };
 
 struct tTVPImageLoadCommand {
@@ -31,56 +31,56 @@ struct tTVPImageLoadCommand {
 };
 
 class tTVPAsyncImageLoader : public tTVPThread {
-	/** �Ǎ��ݗv���R�}���h�̃L���[�pCS */
+	/** 読込み要求コマンドのキュー用CS */
 	tTJSCriticalSection CommandQueueCS;
-	/** �Ǎ��ݍς݉摜�L���[�pCS */
+	/** 読込み済み画像キュー用CS */
 	tTJSCriticalSection ImageQueueCS;
 
-	/** ���[�h�����チ�C���X���b�h�ŏ������邽�߂̃��b�Z�[�W�L���[ */
+	/** ロード完了後メインスレッドで処理するためのメッセージキュー */
 	NativeEventQueue<tTVPAsyncImageLoader> EventQueue;
-	/**  �Ǎ��݃X���b�h�֓Ǎ��ݗv�������������Ƃ�`����C�x���g */
+	/**  読込みスレッドへ読込み要求があったことを伝えるイベント */
 	tTVPThreadEvent PushCommandQueueEvent;
 
-	/** �Ǎ��ݗv���R�}���h�L���[ */
+	/** 読込み要求コマンドキュー */
 	std::queue<tTVPImageLoadCommand*> CommandQueue;
-	/** �Ǎ��݊����摜�L���[ */
+	/** 読込み完了画像キュー */
 	std::queue<tTVPImageLoadCommand*> LoadedQueue;
 
 private:
 	/**
-	 * �Ǎ��݃X���b�h���烁�C���X���b�h�֓Ǎ��݂������������Ƃ�ʒm����
+	 * 読込みスレッドからメインスレッドへ読込みが完了したことを通知する
 	 */
 	void SendToLoadFinish();
 	/**
-	 * �Ǎ��݊��������摜�����C���X���b�h��Bitmap�֊i�[���āA�C�x���g�ʒm����
+	 * 読込み完了した画像をメインスレッドでBitmapへ格納して、イベント通知する
 	 */
 	void HandleLoadedImage();
 
 	/**
-	 * �Ǎ��݂�Ǎ��݃X���b�h�ɗv������(�L���[�֓����)
+	 * 読込みを読込みスレッドに要求する(キューへ入れる)
 	 */
 	void PushLoadQueue( iTJSDispatch2 *owner, tTJSNI_Bitmap *bmp, const ttstr &nname );
 	
 	/**
-	 * �Ǎ��݃X���b�h����
-	 * �L���[�ɃR�}���h������̂�҂��A�C�x���g��������L���[����R�}���h�����o���ēǍ��ݏ��������s
-	 * �Ǎ��݂�����������Ǎ��ݍς݉摜�L���[�ɓ���ă��C���X���b�h�֊�����ʒm����
+	 * 読込みスレッド実体
+	 * キューにコマンドが入るのを待ち、イベントが来たらキューからコマンドを取り出して読込み処理を実行
+	 * 読込みが完了したら読込み済み画像キューに入れてメインスレッドへ完了を通知する
 	 */
 	void LoadingThread();
 	
 	/**
-	 * �摜�Ǎ��ݏ���
+	 * 画像読込み処理
 	 */
 	void LoadImageFromCommand( tTVPImageLoadCommand* cmd );
 	
 	/**
-	 * �Ǎ��݃X���b�h���C��
+	 * 読込みスレッドメイン
 	 */
 	void Execute();
 
 	/**
-	 * ���C���X���b�h�n���h��
-	 * ���C���X���b�h�ւ̃C�x���g(���b�Z�[�W)�ʒm���󂯂�
+	 * メインスレッドハンドラ
+	 * メインスレッドへのイベント(メッセージ)通知を受ける
 	 */
 	void Proc( NativeEvent& ev );
 
@@ -89,15 +89,15 @@ public:
 	~tTVPAsyncImageLoader();
 
 	/**
-	 �Ǎ��݃X���b�h�̏I����v������(�I���͑҂��Ȃ�)
+	 読込みスレッドの終了を要求する(終了は待たない)
 	 */
 	void ExitRequest();
 	
 	/**
-	 * �Ǎ��ݗv��
-	 * ���C���X���b�h����Ǎ��݃X���b�h�֓Ǎ��݂�v������B
-	 * �Ǎ��ݑO�ɃG���[�����������ꍇ��L���b�V����ɉ摜���������ꍇ�͗v���͍s��ꂸ
-	 * �����ɏI�����AonLoaded �C�x���g�𔭐�������B
+	 * 読込み要求
+	 * メインスレッドから読込みスレッドへ読込みを要求する。
+	 * 読込み前にエラーが発生した場合やキャッシュ上に画像があった場合は要求は行われず
+	 * 即座に終了し、onLoaded イベントを発生させる。
 	 */
 	void LoadRequest( iTJSDispatch2 *owner, tTJSNI_Bitmap* bmp, const ttstr &name );
 };

@@ -1,6 +1,6 @@
 /******************************************************************************/
 /**
- * Šg‘åk¬‚ğÀ‘•‚·‚é
+ * æ‹¡å¤§ç¸®å°ã‚’å®Ÿè£…ã™ã‚‹
  * ----------------------------------------------------------------------------
  * 	Copyright (C) T.Imoto <http://www.kaede-software.com>
  * ----------------------------------------------------------------------------
@@ -189,28 +189,28 @@ void tTVPResampleClipping::setClipping( const tTVPRect &cliprect, const tTVPRect
 	dst_left_ = destrect.left;
 	dst_top_ = destrect.top;
 
-	// ã•”ƒNƒŠƒbƒsƒ“ƒO
+	// ä¸Šéƒ¨ã‚¯ãƒªãƒƒãƒ”ãƒ³ã‚°
 	if( cliprect.top > destrect.top ) {
-		offsety_ = cliprect.top - destrect.top;			// ƒNƒŠƒbƒsƒ“ƒOƒIƒtƒZƒbƒg
+		offsety_ = cliprect.top - destrect.top;			// ã‚¯ãƒªãƒƒãƒ”ãƒ³ã‚°ã‚ªãƒ•ã‚»ãƒƒãƒˆ
 		dst_top_ = cliprect.top;
 	}
-	// ‰º•”ƒNƒŠƒbƒsƒ“ƒO
+	// ä¸‹éƒ¨ã‚¯ãƒªãƒƒãƒ”ãƒ³ã‚°
 	if( cliprect.bottom < destrect.bottom ) {
-		height_ -= destrect.bottom - cliprect.bottom;	// ‚Í‚İo‚µ•ª
+		height_ -= destrect.bottom - cliprect.bottom;	// ã¯ã¿å‡ºã—åˆ†
 	}
-	// ¶ƒNƒŠƒbƒsƒ“ƒO
+	// å·¦ã‚¯ãƒªãƒƒãƒ”ãƒ³ã‚°
 	if( cliprect.left > destrect.left ) {
-		offsetx_ = cliprect.left - destrect.left;	// ƒNƒŠƒbƒsƒ“ƒOƒIƒtƒZƒbƒg
+		offsetx_ = cliprect.left - destrect.left;	// ã‚¯ãƒªãƒƒãƒ”ãƒ³ã‚°ã‚ªãƒ•ã‚»ãƒƒãƒˆ
 		dst_left_ = cliprect.left;
 	}
-	// ‰EƒNƒŠƒbƒsƒ“ƒO
+	// å³ã‚¯ãƒªãƒƒãƒ”ãƒ³ã‚°
 	if( cliprect.right < destrect.right ) {
-		width_ -= destrect.right - cliprect.right;	// ‚Í‚İo‚µ•ª
+		width_ -= destrect.right - cliprect.right;	// ã¯ã¿å‡ºã—åˆ†
 	}
 }
 
 /**
- * Še²‚Å‚ÌƒEƒFƒCƒg‚ğ‚ ‚ç‚©‚¶‚ßŒvZ‚µ‚Ä‚¨‚­
+ * å„è»¸ã§ã®ã‚¦ã‚§ã‚¤ãƒˆã‚’ã‚ã‚‰ã‹ã˜ã‚è¨ˆç®—ã—ã¦ãŠã
  */
 template<typename TWeight=float, int NAlign=4>
 struct AxisParam {
@@ -219,8 +219,8 @@ struct AxisParam {
 	static const int ALIGN_DIV = (NAlign/4);
 	static const int ALIGN_OFFSET = ALIGN_DIV-1;
 
-	std::vector<int> start_;	// ŠJnƒCƒ“ƒfƒbƒNƒX
-	std::vector<int> length_;	// Še—v‘f’·‚³
+	std::vector<int> start_;	// é–‹å§‹ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
+	std::vector<int> length_;	// å„è¦ç´ é•·ã•
 	std::vector<int> min_length_;
 	weight_vector_t weight_;
 
@@ -230,32 +230,32 @@ struct AxisParam {
 };
 
 static inline void AxisParamCalculateWeight( float* weight, float*& output, int& len, int leftedge, int rightedge ) {
-	// len ‚É‚Í‚Í‚İo‚µ‚½•ª‚àŠÜ‚Ü‚ê‚Ä‚¢‚é‚Ì‚ÅA‚Ü‚¸‚Í‚»‚Ì•”•ª‚ğƒJƒbƒg‚·‚é
-	// ¶’[or‰E’[‚ÌA‚Í‚İo‚·•ª‚ÌƒEƒFƒCƒg‚ğ’[‚É‰ÁZ‚·‚é
+	// len ã«ã¯ã¯ã¿å‡ºã—ãŸåˆ†ã‚‚å«ã¾ã‚Œã¦ã„ã‚‹ã®ã§ã€ã¾ãšã¯ãã®éƒ¨åˆ†ã‚’ã‚«ãƒƒãƒˆã™ã‚‹
+	// å·¦ç«¯orå³ç«¯ã®æ™‚ã€ã¯ã¿å‡ºã™åˆ†ã®ã‚¦ã‚§ã‚¤ãƒˆã‚’ç«¯ã«åŠ ç®—ã™ã‚‹
 	if( leftedge ) {
-		// ¶’[‚©‚ç‚Í‚İo‚·•ª‚ğ‰ÁZ
+		// å·¦ç«¯ã‹ã‚‰ã¯ã¿å‡ºã™åˆ†ã‚’åŠ ç®—
 		int i = 1;
 		for( ; i <= leftedge; i++ ) {
 			weight[0] += weight[i];
 		}
-		// ‰ÁZ‚µ‚½•ª‚ğˆÚ“®
+		// åŠ ç®—ã—ãŸåˆ†ã‚’ç§»å‹•
 		for( int j = 1; i < len; i++, j++ ) {
 			weight[j] = weight[i];
 		}
-		// ‚Í‚İo‚µ‚½•ª‚Ì’·‚³‚ğƒJƒbƒg
+		// ã¯ã¿å‡ºã—ãŸåˆ†ã®é•·ã•ã‚’ã‚«ãƒƒãƒˆ
 		len -= leftedge;
 	}
 	if( rightedge ) {
-		// ‰E’[‚©‚ç‚Í‚İo‚·•ª‚ğ‰ÁZ
+		// å³ç«¯ã‹ã‚‰ã¯ã¿å‡ºã™åˆ†ã‚’åŠ ç®—
 		int i = len - rightedge;
 		int r = i - 1;
 		for( ; i < len; i++ ) {
 			weight[r] += weight[i];
 		}
-		// ‚Í‚İo‚µ‚½•ª‚Ì’·‚³‚ğƒJƒbƒg
+		// ã¯ã¿å‡ºã—ãŸåˆ†ã®é•·ã•ã‚’ã‚«ãƒƒãƒˆ
 		len -= rightedge;
 	}
-	// ‡Œv’l‚ğ‹‚ß‚é
+	// åˆè¨ˆå€¤ã‚’æ±‚ã‚ã‚‹
 	float* w = weight;
 	float sum = 0.0f;
 	for( int i = 0; i < len; i++ ) {
@@ -263,14 +263,14 @@ static inline void AxisParamCalculateWeight( float* weight, float*& output, int&
 		w++;
 	}
 
-	// EPSILON ‚æ‚è¬‚³‚¢ê‡‚Í 0 ‚ğİ’è
+	// EPSILON ã‚ˆã‚Šå°ã•ã„å ´åˆã¯ 0 ã‚’è¨­å®š
 	float rcp;
 	if( sum < FLT_EPSILON ) {
 		rcp = 0.0f;
 	} else {
 		rcp = 1.0f / sum;
 	}
-	// ³‹K‰»
+	// æ­£è¦åŒ–
 	w = weight;
 	for( int i = 0; i < len; i++ ) {
 		*output = (*w) * rcp;
@@ -285,8 +285,8 @@ static void AxisParamCalculateAxis( TParam& param, int srcstart, int srcend, int
 	param.start_.reserve( dstlength );
 	param.length_.clear();
 	param.length_.reserve( dstlength );
-	// ‚Ü‚¸‚Í‹——£‚ğŒvZ
-	if( srclength <= dstlength ) { // Šg‘å
+	// ã¾ãšã¯è·é›¢ã‚’è¨ˆç®—
+	if( srclength <= dstlength ) { // æ‹¡å¤§
 		float rangex = tap;
 		int maxrange = ((int)rangex*2+2);
 		std::vector<float> work( maxrange, 0.0f );
@@ -324,7 +324,7 @@ static void AxisParamCalculateAxis( TParam& param, int srcstart, int srcend, int
 			AxisParamCalculateWeight( weight, output, len, leftedge, rightedge );
 			param.length_.push_back( len );
 		}
-	} else { // k¬
+	} else { // ç¸®å°
 		float rangex = tap*(float)srclength/(float)dstlength;
 		int maxrange = ((int)rangex*2+2);
 		std::vector<float> work( maxrange, 0.0f );
@@ -336,7 +336,7 @@ static void AxisParamCalculateAxis( TParam& param, int srcstart, int srcend, int
 		param.weight_.reserve( length );
 #endif
 		TParam::weight_t* output = &param.weight_[0];
-		const float delta = (float)dstlength/(float)srclength; // “]‘—æÀ•W‚Å‚ÌˆÊ’u‘•ª
+		const float delta = (float)dstlength/(float)srclength; // è»¢é€å…ˆåº§æ¨™ã§ã®ä½ç½®å¢—åˆ†
 		for( int x = 0; x < dstlength; x++ ) {
 			float cx = (x+0.5f)*(float)srclength/(float)dstlength + srcstart;
 			int left = (int)std::floor(cx-rangex);
@@ -352,7 +352,7 @@ static void AxisParamCalculateAxis( TParam& param, int srcstart, int srcend, int
 				rightedge = right - srcend;
 			}
 			param.start_.push_back( start );
-			// “]‘—æÀ•W‚Å‚ÌˆÊ’u
+			// è»¢é€å…ˆåº§æ¨™ã§ã®ä½ç½®
 			int len = right-left;
 			float dist = (left+0.5f-cx) * delta;
 			float* w = weight;
@@ -368,11 +368,11 @@ static void AxisParamCalculateAxis( TParam& param, int srcstart, int srcend, int
 }
 
 /**
- * —Ìˆæ•½‹Ïƒo[ƒWƒ‡ƒ“
+ * é ˜åŸŸå¹³å‡ãƒãƒ¼ã‚¸ãƒ§ãƒ³
  */
 template<typename TParam>
 static void AxisParamCalculateAxisAreaAvg( TParam& param, int srcstart, int srcend, int srclength, int dstlength ) {
-	if( dstlength <= srclength ) { // k¬‚Ì‚İ
+	if( dstlength <= srclength ) { // ç¸®å°ã®ã¿
 		TVPCalculateAxisAreaAvg( srcstart, srcend, srclength, dstlength, param.start_, param.length_, param.weight_ );
 		TVPNormalizeAxisAreaAvg( param.length_, param.weight_ );
 	}
@@ -386,7 +386,7 @@ class Resampler {
 	AxisParam<> paramy_;
 
 public:
-	/** ƒ}ƒ‹ƒ`ƒXƒŒƒbƒh‰»—p */
+	/** ãƒãƒ«ãƒã‚¹ãƒ¬ãƒƒãƒ‰åŒ–ç”¨ */
 	struct ThreadParameter {
 		Resampler* sampler_;
 		int start_;
@@ -403,7 +403,7 @@ public:
 		const tTVPImageCopyFuncBase* blendfunc_;
 	};
 
-	/** c•ûŒü‚ÌŠg‘åk¬ˆ— */
+	/** ç¸¦æ–¹å‘ã®æ‹¡å¤§ç¸®å°å‡¦ç† */
 	inline void samplingVertical( int y, tjs_uint32* dstbits, int dstheight, int srcwidth, const tTVPBaseBitmap *src, const tTVPRect &srcrect, const float*& wstarty ) {
 		const int top = paramy_.start_[y];
 		const int len = paramy_.length_[y];
@@ -435,10 +435,10 @@ public:
 		wstarty = weighty;
 	}
 
-	/** ‰¡•ûŒü‚ÌŠg‘åk¬ˆ— */
+	/** æ¨ªæ–¹å‘ã®æ‹¡å¤§ç¸®å°å‡¦ç† */
 	inline void samplingHorizontal( tjs_uint32* dstbits, const int offsetx, const int dstwidth, const tjs_uint32* srcbits ) {
 		const float* weightx = &paramx_.weight_[0];
-		// ‚Ü‚¸offset•ª‚ğƒXƒLƒbƒv
+		// ã¾ãšoffsetåˆ†ã‚’ã‚¹ã‚­ãƒƒãƒ—
 		for( int x = 0; x < offsetx; x++ ) {
 			weightx += paramx_.length_[x];
 		}
@@ -475,7 +475,7 @@ public:
 		work.reserve( srcwidth );
 #endif
 		const float* wstarty = &paramy_.weight_[0];
-		// ƒNƒŠƒbƒsƒ“ƒO•”•ªƒXƒLƒbƒv
+		// ã‚¯ãƒªãƒƒãƒ”ãƒ³ã‚°éƒ¨åˆ†ã‚¹ã‚­ãƒƒãƒ—
 		for( int y = 0; y < clip.offsety_; y++ ) {
 			wstarty += paramy_.length_[y];
 		}
@@ -488,17 +488,17 @@ public:
 				samplingHorizontal( dstbits, clip.offsetx_, clip.width_, workbits );
 				dstbits += dststride;
 			}
-		} else {	// ’PƒƒRƒs[ˆÈŠO‚ÍAˆê“xƒeƒ“ƒ|ƒ‰ƒŠ‚É‘‚«o‚µ‚Ä‚©‚ç‡¬‚·‚é
+		} else {	// å˜ç´”ã‚³ãƒ”ãƒ¼ä»¥å¤–ã¯ã€ä¸€åº¦ãƒ†ãƒ³ãƒãƒ©ãƒªã«æ›¸ãå‡ºã—ã¦ã‹ã‚‰åˆæˆã™ã‚‹
 #ifdef _DEBUG
 			std::vector<tjs_uint32> dstwork(clip.getDestWidth());
 #else
 			std::vector<tjs_uint32> dstwork;
 			dstwork.reserve( clip.getDestWidth() );
 #endif
-			tjs_uint32* midbits = &dstwork[0];	// “r’†ˆ——pƒoƒbƒtƒ@
+			tjs_uint32* midbits = &dstwork[0];	// é€”ä¸­å‡¦ç†ç”¨ãƒãƒƒãƒ•ã‚¡
 			for( int y = clip.offsety_; y < clip.height_; y++ ) {
 				samplingVertical( y, workbits, dstheight, srcwidth, src, srcrect, wstarty );
-				samplingHorizontal( midbits, clip.offsetx_, clip.width_, workbits ); // ˆêƒoƒbƒtƒ@‚É‚Ü‚¸ƒRƒs[, ”ÍˆÍŠO‚Íˆ—‚µ‚È‚¢
+				samplingHorizontal( midbits, clip.offsetx_, clip.width_, workbits ); // ä¸€æ™‚ãƒãƒƒãƒ•ã‚¡ã«ã¾ãšã‚³ãƒ”ãƒ¼, ç¯„å›²å¤–ã¯å‡¦ç†ã—ãªã„
 				(*blendfunc)( dstbits, midbits, clip.getDestWidth() );
 				dstbits += dststride;
 			}
@@ -507,7 +507,7 @@ public:
 	void ResampleImageMT( const tTVPResampleClipping &clip, const tTVPImageCopyFuncBase* blendfunc, tTVPBaseBitmap *dest, const tTVPRect &destrect, const tTVPBaseBitmap *src, const tTVPRect &srcrect, tjs_int threadNum ) {
 		const int srcwidth = srcrect.get_width();
 		const float* wstarty = &paramy_.weight_[0];
-		// ƒNƒŠƒbƒsƒ“ƒO•”•ªƒXƒLƒbƒv
+		// ã‚¯ãƒªãƒƒãƒ”ãƒ³ã‚°éƒ¨åˆ†ã‚¹ã‚­ãƒƒãƒ—
 		for( int y = 0; y < clip.offsety_; y++ ) {
 			wstarty += paramy_.length_[y];
 		}
@@ -542,7 +542,7 @@ public:
 		TVPEndThreadTask();
 	}
 public:
-	/** ƒVƒ“ƒOƒ‹ƒXƒŒƒbƒh */
+	/** ã‚·ãƒ³ã‚°ãƒ«ã‚¹ãƒ¬ãƒƒãƒ‰ */
 	template<typename TWeightFunc>
 	void Resample( const tTVPResampleClipping &clip, const tTVPImageCopyFuncBase* blendfunc, tTVPBaseBitmap *dest, const tTVPRect &destrect, const tTVPBaseBitmap *src, const tTVPRect &srcrect, float tap, TWeightFunc& func ) {
 		const int srcwidth = srcrect.get_width();
@@ -566,7 +566,7 @@ public:
 		if( pixelNum >= 50 * 500 ) {
 			threadNum = TVPGetThreadNum();
 		}
-		if( threadNum == 1 ) { // –ÊÏ‚ª­‚È‚­ƒXƒŒƒbƒh‚ª1‚Ì‚Í‚»‚Ì‚Ü‚ÜÀs
+		if( threadNum == 1 ) { // é¢ç©ãŒå°‘ãªãã‚¹ãƒ¬ãƒƒãƒ‰ãŒ1ã®æ™‚ã¯ãã®ã¾ã¾å®Ÿè¡Œ
 			Resample( clip, blendfunc, dest, destrect, src, srcrect, tap, func );
 			return;
 		}
@@ -597,7 +597,7 @@ public:
 		if( pixelNum >= 50 * 500 ) {
 			threadNum = TVPGetThreadNum();
 		}
-		if( threadNum == 1 ) { // –ÊÏ‚ª­‚È‚­ƒXƒŒƒbƒh‚ª1‚Ì‚Í‚»‚Ì‚Ü‚ÜÀs
+		if( threadNum == 1 ) { // é¢ç©ãŒå°‘ãªãã‚¹ãƒ¬ãƒƒãƒ‰ãŒ1ã®æ™‚ã¯ãã®ã¾ã¾å®Ÿè¡Œ
 			ResampleAreaAvg( clip, blendfunc, dest, destrect, src, srcrect );
 			return;
 		}
@@ -635,17 +635,17 @@ void TJS_USERENTRY ResamplerFunc( void* p ) {
 			param->sampler_->samplingHorizontal( dstbits, param->clip_->offsetx_, param->clip_->width_, workbits );
 			dstbits += dststride;
 		}
-	} else {	// ’PƒƒRƒs[ˆÈŠO
+	} else {	// å˜ç´”ã‚³ãƒ”ãƒ¼ä»¥å¤–
 #ifdef _DEBUG
 		std::vector<tjs_uint32> dstwork(param->clip_->getDestWidth());
 #else
 		std::vector<tjs_uint32> dstwork;
 		dstwork.reserve( param->clip_->getDestWidth() );
 #endif
-		tjs_uint32* midbits = &dstwork[0];	// “r’†ˆ——pƒoƒbƒtƒ@
+		tjs_uint32* midbits = &dstwork[0];	// é€”ä¸­å‡¦ç†ç”¨ãƒãƒƒãƒ•ã‚¡
 		for( int y = param->start_; y < param->end_; y++ ) {
 			param->sampler_->samplingVertical( y, workbits, dstheight, srcwidth, src, srcrect, wstarty );
-			param->sampler_->samplingHorizontal( midbits, param->clip_->offsetx_, param->clip_->width_, workbits ); // ˆêƒoƒbƒtƒ@‚É‚Ü‚¸ƒRƒs[, ”ÍˆÍŠO‚Íˆ—‚µ‚È‚¢
+			param->sampler_->samplingHorizontal( midbits, param->clip_->offsetx_, param->clip_->width_, workbits ); // ä¸€æ™‚ãƒãƒƒãƒ•ã‚¡ã«ã¾ãšã‚³ãƒ”ãƒ¼, ç¯„å›²å¤–ã¯å‡¦ç†ã—ãªã„
 			(*param->blendfunc_)( dstbits, midbits, param->clip_->getDestWidth() );
 			dstbits += dststride;
 		}
@@ -669,25 +669,25 @@ void TVPWeightResample( const tTVPResampleClipping &clip, const tTVPImageCopyFun
 }
 
 /**
- * Šg‘åk¬‚·‚é
- * @param dest : ‘‚«‚İæ‰æ‘œ
- * @param destrect : ‘‚«‚İæ‹éŒ`
- * @param src : “Ç‚İ‚İŒ³‰æ‘œ
- * @param srcrect : “Ç‚İ‚İŒ³‹éŒ`
- * @param type : Šg‘åk¬ƒtƒBƒ‹ƒ^ƒ^ƒCƒv
- * @param typeopt : Šg‘åk¬ƒtƒBƒ‹ƒ^ƒ^ƒCƒvƒIƒvƒVƒ‡ƒ“
- * @param method : ƒuƒŒƒ“ƒh•û–@
- * @param opa : •s“§–¾“x
- * @param hda : ‘‚«‚İæƒAƒ‹ƒtƒ@•Û
+ * æ‹¡å¤§ç¸®å°ã™ã‚‹
+ * @param dest : æ›¸ãè¾¼ã¿å…ˆç”»åƒ
+ * @param destrect : æ›¸ãè¾¼ã¿å…ˆçŸ©å½¢
+ * @param src : èª­ã¿è¾¼ã¿å…ƒç”»åƒ
+ * @param srcrect : èª­ã¿è¾¼ã¿å…ƒçŸ©å½¢
+ * @param type : æ‹¡å¤§ç¸®å°ãƒ•ã‚£ãƒ«ã‚¿ã‚¿ã‚¤ãƒ—
+ * @param typeopt : æ‹¡å¤§ç¸®å°ãƒ•ã‚£ãƒ«ã‚¿ã‚¿ã‚¤ãƒ—ã‚ªãƒ—ã‚·ãƒ§ãƒ³
+ * @param method : ãƒ–ãƒ¬ãƒ³ãƒ‰æ–¹æ³•
+ * @param opa : ä¸é€æ˜åº¦
+ * @param hda : æ›¸ãè¾¼ã¿å…ˆã‚¢ãƒ«ãƒ•ã‚¡ä¿æŒ
  */
 void TVPResampleImage( const tTVPRect &cliprect, tTVPBaseBitmap *dest, const tTVPRect &destrect, const tTVPBaseBitmap *src, const tTVPRect &srcrect,
 	tTVPBBStretchType type, tjs_real typeopt, tTVPBBBltMethod method, tjs_int opa, bool hda ) {
-	// ƒNƒŠƒbƒsƒ“ƒOˆ—
+	// ã‚¯ãƒªãƒƒãƒ”ãƒ³ã‚°å‡¦ç†
 	tTVPResampleClipping clip;
 	clip.setClipping( cliprect, destrect );
 	if( clip.getDestWidth() <= 0 || clip.getDestHeight() <= 0 ) return;
 
-	// ƒuƒŒƒ“ƒhˆ—ŠÖ”‚ğ“o˜^
+	// ãƒ–ãƒ¬ãƒ³ãƒ‰å‡¦ç†é–¢æ•°ã‚’ç™»éŒ²
 	tTVPImageCopyFuncBase* func = NULL;
 	if( hda || opa != 255 || method != bmCopy ) {
 		tTVPBlendParameter blendparam( method, opa, hda );
@@ -706,7 +706,7 @@ void TVPResampleImage( const tTVPRect &cliprect, tTVPBaseBitmap *dest, const tTV
 		} else if( (CpuFeature & TVP_CPU_HAS_SSE2) ) {
 			TVPResampleImageSSE2( clip, func, dest, destrect, src, srcrect, type, typeopt );
 		} else {
-			 // Cƒo[ƒWƒ‡ƒ“‚ÍŒÅ’è¬”“_”Å‚È‚µB’x‚­‚È‚éB
+			 // Cãƒãƒ¼ã‚¸ãƒ§ãƒ³ã¯å›ºå®šå°æ•°ç‚¹ç‰ˆãªã—ã€‚é…ããªã‚‹ã€‚
 			switch( type ) {
 			case stLinear:
 				TVPWeightResample<BilinearWeight>(clip, func, dest, destrect, src, srcrect );

@@ -154,7 +154,7 @@ tTVPCharacterData* FreeTypeFontRasterizer::GetBitmap( const tTVPFontAndCharacter
 }
 //---------------------------------------------------------------------------
 void FreeTypeFontRasterizer::GetGlyphDrawRect( const ttstr & text, tTVPRect& area ) {
-	// アンチエイリアスとヒンティングは有効にする
+	// 繧｢繝ｳ繝√お繧､繝ｪ繧｢繧ｹ縺ｨ繝偵Φ繝�繧｣繝ｳ繧ｰ縺ｯ譛牙柑縺ｫ縺吶ｋ
 	Face->ClearOption( TVP_FACE_OPTIONS_NO_ANTIALIASING );
 	Face->ClearOption( TVP_FACE_OPTIONS_NO_HINTING );
 

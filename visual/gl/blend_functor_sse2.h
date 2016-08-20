@@ -8,7 +8,7 @@ extern unsigned char TVPOpacityOnOpacityTable[256*256];
 extern unsigned char TVPNegativeMulTable[256*256];
 };
 
-// ƒ\[ƒX‚ÌƒAƒ‹ƒtƒ@‚ğg‚¤
+// ã‚½ãƒ¼ã‚¹ã®ã‚¢ãƒ«ãƒ•ã‚¡ã‚’ä½¿ã†
 template<typename blend_func>
 struct sse2_variation : public blend_func {
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s ) const {
@@ -22,7 +22,7 @@ struct sse2_variation : public blend_func {
 	}
 };
 
-// ƒ\[ƒX‚ÌƒAƒ‹ƒtƒ@‚Æopacity’l‚ğg‚¤
+// ã‚½ãƒ¼ã‚¹ã®ã‚¢ãƒ«ãƒ•ã‚¡ã¨opacityå€¤ã‚’ä½¿ã†
 template<typename blend_func>
 struct sse2_variation_opa : public blend_func {
 	const tjs_int32 opa_;
@@ -30,7 +30,7 @@ struct sse2_variation_opa : public blend_func {
 	inline sse2_variation_opa( tjs_int32 opa ) : opa_(opa), opa128_(_mm_set1_epi32(opa)) {}
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s ) const {
 		//tjs_uint32 a = ((s>>24)*opa_) >> 8;
-		tjs_uint32 a = (tjs_uint32)( ((tjs_uint64)s*(tjs_uint64)opa_) >> 32 );	// Å“K‰»‚Å‚¤‚Ü‚­mul‚ÌãˆÊƒrƒbƒg“ü‚é‚Í‚¸
+		tjs_uint32 a = (tjs_uint32)( ((tjs_uint64)s*(tjs_uint64)opa_) >> 32 );	// æœ€é©åŒ–ã§ã†ã¾ãmulã®ä¸Šä½ãƒ“ãƒƒãƒˆå…¥ã‚‹ã¯ãš
 		return blend_func::operator()( d, s, a );
 	}
 	inline __m128i operator()( __m128i d, __m128i s ) const {
@@ -42,7 +42,7 @@ struct sse2_variation_opa : public blend_func {
 	}
 };
 
-// ƒ\[ƒX‚ÆƒfƒXƒeƒBƒl[ƒVƒ‡ƒ“‚ÌƒAƒ‹ƒtƒ@‚ğg‚¤
+// ã‚½ãƒ¼ã‚¹ã¨ãƒ‡ã‚¹ãƒ†ã‚£ãƒãƒ¼ã‚·ãƒ§ãƒ³ã®ã‚¢ãƒ«ãƒ•ã‚¡ã‚’ä½¿ã†
 //template<typename blend_func>
 struct sse2_alpha_blend_d_functor {
 	const __m128i colormask_;
@@ -72,8 +72,8 @@ struct sse2_alpha_blend_d_functor {
 		addr ^= 0xffff; // (a = 255-a, b = 255-b) : ^=xor
 		tjs_uint32 tmp = addr;
 		addr = (addr&0xff) * (tmp>>8);	// (255-a)*(255-b)
-		addr = ~addr;	// result = 255-result : ƒrƒbƒg”½“]
-		addr = (addr&0xff00) << 16;	// /255 : Å‰ºˆÊ‚Å‚Í‚È‚­Aˆê‚Âã‚ğ‘I‘ğ‚·‚é‚±‚Æ‚Å/255‚Æ“¯“™
+		addr = ~addr;	// result = 255-result : ãƒ“ãƒƒãƒˆåè»¢
+		addr = (addr&0xff00) << 16;	// /255 : æœ€ä¸‹ä½ã§ã¯ãªãã€ä¸€ã¤ä¸Šã‚’é¸æŠã™ã‚‹ã“ã¨ã§/255ã¨åŒç­‰
 #endif
 		addr = TVPNegativeMulTable[addr] << 24;
 		return (ret&0x00ffffff) | addr;
@@ -111,7 +111,7 @@ struct sse2_alpha_blend_d_functor {
 		mopa2 = _mm_unpacklo_epi32( mopa2, mopa3 );
 
 		mopa = _mm_unpacklo_epi64( mopa, mopa2 );
-#else	// ˆÈ‰º‚Ì‚æ‚¤‚ÉƒRƒ“ƒpƒCƒ‰”C‚¹‚Ì•û‚ª‚¢‚¢‚©‚à
+#else	// ä»¥ä¸‹ã®ã‚ˆã†ã«ã‚³ãƒ³ãƒ‘ã‚¤ãƒ©ä»»ã›ã®æ–¹ãŒã„ã„ã‹ã‚‚
 		__m128i ma1 = _mm_set_epi32(
 			TVPOpacityOnOpacityTable[maddr.m128i_u32[3]],
 			TVPOpacityOnOpacityTable[maddr.m128i_u32[2]],
@@ -156,14 +156,14 @@ struct sse2_alpha_blend_d_functor {
 		dopa = _mm_xor_si128( dopa, mask );	// (a = 255-a, b = 255-b) : ^=xor
 		__m128i mtmp = dopa;
 
-		dopa = _mm_slli_epi32( dopa, 8 );		// 00ff|ff00	ãˆÊ << 8
-		mtmp = _mm_slli_epi16( mtmp, 8 );		// 0000|ff00	‰ºˆÊ << 8
+		dopa = _mm_slli_epi32( dopa, 8 );		// 00ff|ff00	ä¸Šä½ << 8
+		mtmp = _mm_slli_epi16( mtmp, 8 );		// 0000|ff00	ä¸‹ä½ << 8
 		mtmp = _mm_slli_epi32( mtmp, 8 );		// 00ff|0000
-		dopa = _mm_mullo_epi16( dopa, mtmp );	// ãˆÊ‚Å‰‰ZA‰ºˆÊ•”•ª‚Í‚²‚İ
-		dopa = _mm_srli_epi32( dopa, 16 );		// addr >> 16 | ‰ºˆÊ‚ğÌ‚Ä‚é
+		dopa = _mm_mullo_epi16( dopa, mtmp );	// ä¸Šä½ã§æ¼”ç®—ã€ä¸‹ä½éƒ¨åˆ†ã¯ã”ã¿
+		dopa = _mm_srli_epi32( dopa, 16 );		// addr >> 16 | ä¸‹ä½ã‚’æ¨ã¦ã‚‹
 		dopa = _mm_andnot_si128( dopa, mask );	// ~addr&0x0000ffff
 		dopa = _mm_srli_epi16( dopa, 8 );		// addr>>8
-		dopa = _mm_slli_epi32( dopa, 24 );		// ƒAƒ‹ƒtƒ@ˆÊ’u‚Ö
+		dopa = _mm_slli_epi32( dopa, 24 );		// ã‚¢ãƒ«ãƒ•ã‚¡ä½ç½®ã¸
 
 		md1 = _mm_and_si128( md1, colormask_ );
 		return _mm_or_si128( md1, dopa );
@@ -276,12 +276,12 @@ struct sse2_variation_straight : public sse2_alpha_blend {
 	}
 };
 
-// ‚à‚Á‚Æ‚àƒVƒ“ƒvƒ‹‚ÈƒRƒs[ dst = src
+// ã‚‚ã£ã¨ã‚‚ã‚·ãƒ³ãƒ—ãƒ«ãªã‚³ãƒ”ãƒ¼ dst = src
 struct sse2_const_copy_functor {
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s ) const { return s; }
 	inline __m128i operator()( __m128i md1, __m128i ms1 ) const { return ms1; }
 };
-// ’PƒƒRƒs[‚¾‚¯‚Ç alpha ‚ğƒRƒs[‚µ‚È‚¢(HDA‚Æ“¯‚¶)
+// å˜ç´”ã‚³ãƒ”ãƒ¼ã ã‘ã© alpha ã‚’ã‚³ãƒ”ãƒ¼ã—ãªã„(HDAã¨åŒã˜)
 struct sse2_color_copy_functor {
 	const __m128i colormask_;
 	const __m128i alphamask_;
@@ -295,7 +295,7 @@ struct sse2_color_copy_functor {
 		return _mm_or_si128( md1, ms1 );
 	}
 };
-// alpha‚¾‚¯ƒRƒs[‚·‚é : color_copy ‚Ì src dest‚ğ”½“]‚µ‚½‚¾‚¯
+// alphaã ã‘ã‚³ãƒ”ãƒ¼ã™ã‚‹ : color_copy ã® src destã‚’åè»¢ã—ãŸã ã‘
 struct sse2_alpha_copy_functor : public sse2_color_copy_functor {
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s ) const {
 		return sse2_color_copy_functor::operator()( s, d );
@@ -304,14 +304,14 @@ struct sse2_alpha_copy_functor : public sse2_color_copy_functor {
 		return sse2_color_copy_functor::operator()( ms1, md1 );
 	}
 };
-// ‚±‚Ì‚Ü‚ÜƒRƒs[‚·‚é‚ªƒAƒ‹ƒtƒ@‚ğ0xff‚Å–„‚ß‚é dst = 0xff000000 | src
+// ã“ã®ã¾ã¾ã‚³ãƒ”ãƒ¼ã™ã‚‹ãŒã‚¢ãƒ«ãƒ•ã‚¡ã‚’0xffã§åŸ‹ã‚ã‚‹ dst = 0xff000000 | src
 struct sse2_color_opaque_functor {
 	const __m128i alphamask_;
 	inline sse2_color_opaque_functor() : alphamask_(_mm_set1_epi32(0xff000000)) {}
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s ) const { return 0xff000000 | s; }
 	inline __m128i operator()( __m128i md1, __m128i ms1 ) const { return _mm_or_si128( alphamask_, ms1 ); }
 };
-// ‹éŒ`”Å–¢À‘•
+// çŸ©å½¢ç‰ˆæœªå®Ÿè£…
 struct sse2_alpha_blend_a_functor {
 	const __m128i mask_;
 	const __m128i zero_;
@@ -403,7 +403,7 @@ struct sse2_premul_alpha_blend_functor {
 		__m128i md = _mm_cvtsi32_si128( d );
 		mo = _mm_unpacklo_epi16( mo, mo );	// 0000000000oo00oo
 		mo = _mm_unpacklo_epi32( mo, mo );	// 00oo00oo00oo00oo
-		//mo = _mm_shufflelo_epi16( mo, _MM_SHUFFLE( 0, 0, 0, 0 )  );	// 0000000000000000 00oo00oo00oo00oo ‚É‚Å‚«‚é‚©
+		//mo = _mm_shufflelo_epi16( mo, _MM_SHUFFLE( 0, 0, 0, 0 )  );	// 0000000000000000 00oo00oo00oo00oo ã«ã§ãã‚‹ã‹
 		md = _mm_unpacklo_epi8( md, zero_ );// 00dd00dd00dd00dd
 		__m128i md2 = md;
 		md = _mm_mullo_epi16( md, mo );	// md * sopa
@@ -619,7 +619,7 @@ struct sse2_premul_alpha_blend_a_functor {
 	}
 };
 
-// opacity’l‚ğg‚¤
+// opacityå€¤ã‚’ä½¿ã†
 struct sse2_const_alpha_blend_functor {
 	const __m128i opa_;
 	const __m128i zero_;
@@ -655,7 +655,7 @@ struct sse2_const_alpha_blend_functor {
 		md2 = _mm_add_epi8( md2, ms2 );		// d += s
 		return _mm_packus_epi16( md1, md2 );
 	}
-	// 2pixel”Å‚ÅunpackÏ‚İ(16bit’PˆÊ)
+	// 2pixelç‰ˆã§unpackæ¸ˆã¿(16bitå˜ä½)
 	inline __m128i two( __m128i md1, __m128i ms1 ) const {
 		ms1 = _mm_sub_epi16( ms1, md1 );	// s -= d
 		ms1 = _mm_mullo_epi16( ms1, opa_ );	// s *= a
@@ -740,20 +740,20 @@ struct sse2_const_alpha_blend_d_functor {
 		// 257 * 255 = 65535
 		__m128i mask = colormask_;
 		mask = _mm_srli_epi32( mask, 8 );	// 0x00ffffff >> 8 = 0x0000ffff
-		dopa = _mm_xor_si128( dopa, mask );	// (a = 255-a, b = 255-b) : ^=xor : •’Ê‚É8bit’PˆÊ‚Åˆø‚¢‚Ä‚àˆê‚©cc
+		dopa = _mm_xor_si128( dopa, mask );	// (a = 255-a, b = 255-b) : ^=xor : æ™®é€šã«8bitå˜ä½ã§å¼•ã„ã¦ã‚‚ä¸€ç·’ã‹â€¦â€¦
 		__m128i mtmp = dopa;
 
-		dopa = _mm_slli_epi32( dopa, 8 );		// 00ff|ff00	ãˆÊ << 8
-		mtmp = _mm_slli_epi16( mtmp, 8 );		// 0000|ff00	‰ºˆÊ << 8
+		dopa = _mm_slli_epi32( dopa, 8 );		// 00ff|ff00	ä¸Šä½ << 8
+		mtmp = _mm_slli_epi16( mtmp, 8 );		// 0000|ff00	ä¸‹ä½ << 8
 		mtmp = _mm_slli_epi32( mtmp, 8 );		// 00ff|0000
-		dopa = _mm_mullo_epi16( dopa, mtmp );	// ãˆÊ‚Å‰‰ZA‰ºˆÊ•”•ª‚Í‚²‚İ
-		dopa = _mm_srli_epi32( dopa, 16 );		// addr >> 16 | ‰ºˆÊ‚ğÌ‚Ä‚é
+		dopa = _mm_mullo_epi16( dopa, mtmp );	// ä¸Šä½ã§æ¼”ç®—ã€ä¸‹ä½éƒ¨åˆ†ã¯ã”ã¿
+		dopa = _mm_srli_epi32( dopa, 16 );		// addr >> 16 | ä¸‹ä½ã‚’æ¨ã¦ã‚‹
 		dopa = _mm_andnot_si128( dopa, mask );	// ~addr&0x0000ffff
 		dopa = _mm_srli_epi16( dopa, 8 );		// addr>>8
-		dopa = _mm_slli_epi32( dopa, 24 );		// ƒAƒ‹ƒtƒ@ˆÊ’u‚Ö
+		dopa = _mm_slli_epi32( dopa, 24 );		// ã‚¢ãƒ«ãƒ•ã‚¡ä½ç½®ã¸
 
 		md1 = _mm_and_si128( md1, colormask_ );
-		//md1 = _mm_slli_epi32( md1, 8 ); // ƒAƒ‹ƒtƒ@‚ğ—‚Æ‚· colormask_ ‚ğg‚í‚È‚­‚Ä‚¢‚¢‚ªcc
+		//md1 = _mm_slli_epi32( md1, 8 ); // ã‚¢ãƒ«ãƒ•ã‚¡ã‚’è½ã¨ã™ colormask_ ã‚’ä½¿ã‚ãªãã¦ã„ã„ãŒâ€¦â€¦
 		//md1 = _mm_srli_epi32( md1, 8 );
 		return _mm_or_si128( md1, dopa );
 	}
@@ -778,11 +778,11 @@ struct sse2_const_alpha_blend_a_functor {
 typedef sse2_const_alpha_blend_functor								sse2_const_alpha_blend_sd_functor;
 // tjs_uint32 sse2_const_alpha_blend_functor::operator()( tjs_uint32 d, tjs_uint32 s )
 // tjs_uint32 sse2_const_alpha_blend_sd_functor::operator()( tjs_uint32 s1, tjs_uint32 s2 )
-// ‚Æˆø”‚ÍˆÙ‚È‚é‚ªAˆ—“à—e‚Í“¯‚¶
-// const_alpha_blend ‚ÍAdest ‚Æ src1 ‚ğ‹¤—L‚µ‚Ä‚¢‚é‚æ‚¤‚È‚à‚Ì dest = dest * src
-// const_alpha_blend_sd ‚ÍAdest = src1 * src2
+// ã¨å¼•æ•°ã¯ç•°ãªã‚‹ãŒã€å‡¦ç†å†…å®¹ã¯åŒã˜
+// const_alpha_blend ã¯ã€dest ã¨ src1 ã‚’å…±æœ‰ã—ã¦ã„ã‚‹ã‚ˆã†ãªã‚‚ã® dest = dest * src
+// const_alpha_blend_sd ã¯ã€dest = src1 * src2
 
-// sse2_const_copy_functor = TVPCopy ‚Í‚È‚¢Amemcpy ‚É‚È‚Á‚Ä‚é
+// sse2_const_copy_functor = TVPCopy ã¯ãªã„ã€memcpy ã«ãªã£ã¦ã‚‹
 // sse2_color_copy_functor = TVPCopyColor / TVPLinTransColorCopy
 // sse2_alpha_copy_functor = TVPCopyMask
 // sse2_color_opaque_functor = TVPCopyOpaqueImage
@@ -792,8 +792,8 @@ typedef sse2_const_alpha_blend_functor								sse2_const_alpha_blend_sd_functor;
 // sse2_const_alpha_blend_a_functor = TVPConstAlphaBlend_a
 
 //--------------------------------------------------------------------
-// ‚±‚±‚Ü‚ÅƒAƒ‹ƒtƒ@ƒuƒŒƒ“ƒh
-// ‚±‚±‚©‚ç‰ÁZ‡¬‚È‚ÇAps‚Å‚È‚¢ƒuƒŒƒ“ƒh‚Íƒ\[ƒXƒAƒ‹ƒtƒ@‚ªl—¶‚³‚ê‚È‚¢
+// ã“ã“ã¾ã§ã‚¢ãƒ«ãƒ•ã‚¡ãƒ–ãƒ¬ãƒ³ãƒ‰
+// ã“ã“ã‹ã‚‰åŠ ç®—åˆæˆãªã©ã€psã§ãªã„ãƒ–ãƒ¬ãƒ³ãƒ‰ã¯ã‚½ãƒ¼ã‚¹ã‚¢ãƒ«ãƒ•ã‚¡ãŒè€ƒæ…®ã•ã‚Œãªã„
 //--------------------------------------------------------------------
 struct sse2_add_blend_functor {
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s ) const {
@@ -973,7 +973,7 @@ struct sse2_mul_blend_hda_functor {
 		__m128i ms = _mm_cvtsi32_si128( s );
 		ms = _mm_unpacklo_epi8( ms, zero_ );	// 00ss00ss00ss00ss
 		ms = _mm_and_si128( ms, mulmask_ );	// src & 0x00ffffff (mask)
-		ms = _mm_or_si128( ms, bitmask_ );	// src | 0x100ffffff (bit) ‚©‚¯‚½‚ÉdstƒAƒ‹ƒtƒ@‚ªÁ‚¦‚È‚¢‚æ‚¤‚É
+		ms = _mm_or_si128( ms, bitmask_ );	// src | 0x100ffffff (bit) ã‹ã‘ãŸæ™‚ã«dstã‚¢ãƒ«ãƒ•ã‚¡ãŒæ¶ˆãˆãªã„ã‚ˆã†ã«
 		md = _mm_mullo_epi16( md, ms );	// d * s
 		md = _mm_srli_epi16( md, 8 );	// d * s >> 8
 		md = _mm_packus_epi16( md, zero_ );	// pack
@@ -1150,7 +1150,7 @@ struct sse2_darken_blend_hda_functor {
 	inline sse2_darken_blend_hda_functor() : mask_(_mm_set1_epi32(0x00ffffff)) {}
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s ) const {
 		__m128i md = _mm_cvtsi32_si128( d );
-		//md = _mm_or_si128( md, mask_ ); // ƒIƒŠƒWƒiƒ‹‚É‚ ‚é‚±‚ê‰½H
+		//md = _mm_or_si128( md, mask_ ); // ã‚ªãƒªã‚¸ãƒŠãƒ«ã«ã‚ã‚‹ã“ã‚Œä½•ï¼Ÿ
 		__m128i md2 = md;
 		__m128i ms = _mm_cvtsi32_si128( s );
 		md2 = _mm_subs_epu8( md2, ms );
@@ -1214,7 +1214,7 @@ struct sse2_screen_blend_hda_functor {
 		md = _mm_unpacklo_epi8( md, zero_ );
 		__m128i ms = _mm_cvtsi32_si128( s );
 		ms = _mm_xor_si128( ms, mulmask_ );	// not src
-		ms = _mm_and_si128( ms, mulmask_ );	// mask src ƒIƒŠƒWƒiƒ‹‚Å‚Í”²‚¯‚Ä‚éH
+		ms = _mm_and_si128( ms, mulmask_ );	// mask src ã‚ªãƒªã‚¸ãƒŠãƒ«ã§ã¯æŠœã‘ã¦ã‚‹ï¼Ÿ
 		ms = _mm_unpacklo_epi8( ms, zero_ );
 		ms = _mm_or_si128( ms, mul100_ );	// 1 or-1
 		md = _mm_mullo_epi16( md, ms );

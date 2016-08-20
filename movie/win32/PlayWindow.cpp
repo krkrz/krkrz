@@ -16,8 +16,8 @@ PlayWindow::~PlayWindow() {
 	DestroyChildWindow();
 }
 //----------------------------------------------------------------------------
-//! @brief	  	qƒEƒBƒ“ƒhƒE‚ğ¶¬‚·‚é
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	å­ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ç”Ÿæˆã™ã‚‹
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT PlayWindow::CreateChildWindow() {
 	if( m_ChildWnd != NULL ) return S_OK;
@@ -49,10 +49,10 @@ HRESULT PlayWindow::CreateChildWindow() {
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	qƒEƒBƒ“ƒhƒE‚ÌˆÊ’u‚ğŒvZ‚·‚é
+//! @brief	  	å­ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ä½ç½®ã‚’è¨ˆç®—ã™ã‚‹
 //!
-//! eƒEƒBƒ“ƒhƒE‚ÌƒTƒCƒY‚ğ’´‚¦‚È‚¢‚æ‚¤‚ÈqƒEƒBƒ“ƒhƒE‚ÌˆÊ’u‚Æ‘å‚«‚³‚ğ‹‚ß‚é
-//! @param		childRect : qƒEƒBƒ“ƒhƒE‚Ì—Ìˆæ
+//! è¦ªã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã‚µã‚¤ã‚ºã‚’è¶…ãˆãªã„ã‚ˆã†ãªå­ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ä½ç½®ã¨å¤§ãã•ã‚’æ±‚ã‚ã‚‹
+//! @param		childRect : å­ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®é ˜åŸŸ
 //----------------------------------------------------------------------------
 void PlayWindow::CalcChildWindowSize( RECT& childRect ) {
 	childRect = m_Rect;
@@ -81,7 +81,7 @@ void PlayWindow::CalcChildWindowSize( RECT& childRect ) {
 	m_ChildRect = childRect;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	qƒEƒBƒ“ƒhƒE‚ğ”jŠü‚·‚é
+//! @brief	  	å­ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ç ´æ£„ã™ã‚‹
 //----------------------------------------------------------------------------
 void PlayWindow::DestroyChildWindow() {
 	CAutoLock Lock(&m_Lock);
@@ -93,12 +93,12 @@ void PlayWindow::DestroyChildWindow() {
 }
 
 //----------------------------------------------------------------------------
-//! @brief	  	ƒEƒBƒ“ƒhƒEƒvƒƒV[ƒWƒƒ
-//! @param		hWnd : ƒEƒBƒ“ƒhƒEƒnƒ“ƒhƒ‹
-//! @param		msg : ƒƒbƒZ[ƒWID
-//! @param		wParam : ƒpƒ‰ƒƒ^
-//! @param		lParam : ƒpƒ‰ƒƒ^
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒ—ãƒ­ã‚·ãƒ¼ã‚¸ãƒ£
+//! @param		hWnd : ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒãƒ³ãƒ‰ãƒ«
+//! @param		msg : ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ID
+//! @param		wParam : ãƒ‘ãƒ©ãƒ¡ã‚¿
+//! @param		lParam : ãƒ‘ãƒ©ãƒ¡ã‚¿
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 LRESULT WINAPI PlayWindow::WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam ) {
 	PlayWindow	*win = reinterpret_cast<PlayWindow*>(GetWindowLongPtr(hWnd,GWLP_USERDATA));
@@ -108,12 +108,12 @@ LRESULT WINAPI PlayWindow::WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM l
 	return ::DefWindowProc(hWnd,msg,wParam,lParam);
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒEƒBƒ“ƒhƒEƒvƒƒV[ƒWƒƒ
-//! @param		hWnd : ƒEƒBƒ“ƒhƒEƒnƒ“ƒhƒ‹
-//! @param		msg : ƒƒbƒZ[ƒWID
-//! @param		wParam : ƒpƒ‰ƒƒ^
-//! @param		lParam : ƒpƒ‰ƒƒ^
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒ—ãƒ­ã‚·ãƒ¼ã‚¸ãƒ£
+//! @param		hWnd : ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒãƒ³ãƒ‰ãƒ«
+//! @param		msg : ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ID
+//! @param		wParam : ãƒ‘ãƒ©ãƒ¡ã‚¿
+//! @param		lParam : ãƒ‘ãƒ©ãƒ¡ã‚¿
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 LRESULT WINAPI PlayWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam ) {
 	if( msg == WM_PAINT ) {
@@ -130,8 +130,8 @@ LRESULT WINAPI PlayWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 	return ::DefWindowProc(hWnd,msg,wParam,lParam);
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒTƒCƒY‚ğİ’è‚·‚é
-//! @param		rect : —v‹‚·‚éƒTƒCƒY
+//! @brief	  	ã‚µã‚¤ã‚ºã‚’è¨­å®šã™ã‚‹
+//! @param		rect : è¦æ±‚ã™ã‚‹ã‚µã‚¤ã‚º
 //----------------------------------------------------------------------------
 void PlayWindow::SetRect( RECT *rect ) {
 	m_Rect = *rect;
@@ -146,8 +146,8 @@ void PlayWindow::SetRect( RECT *rect ) {
 	}
 }
 //----------------------------------------------------------------------------
-//! @brief	  	•\¦/”ñ•\¦‚ğİ’è‚·‚é
-//! @param		b : •\¦/”ñ•\¦
+//! @brief	  	è¡¨ç¤º/éè¡¨ç¤ºã‚’è¨­å®šã™ã‚‹
+//! @param		b : è¡¨ç¤º/éè¡¨ç¤º
 //----------------------------------------------------------------------------
 void PlayWindow::SetVisible( bool b ) {
 	m_Visible = b;

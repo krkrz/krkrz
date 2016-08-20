@@ -410,7 +410,7 @@ METHODDEF(void) JPEG_write_init_destination( j_compress_ptr cinfo ) {
 METHODDEF(boolean) JPEG_write_empty_output_buffer( j_compress_ptr cinfo ) {
 	stream_dest_ptr dest = (stream_dest_ptr)cinfo->dest;
 	
-	// ‘«‚è‚È‚­‚È‚Á‚½‚ç“r’†‘‚«‚İ
+	// è¶³ã‚Šãªããªã£ãŸã‚‰é€”ä¸­æ›¸ãè¾¼ã¿
 	size_t	wrotelen = dest->bufsizeinit - dest->pub.free_in_buffer;
 	dest->stream->WriteBuffer( dest->buffer, (tjs_uint)wrotelen );
 
@@ -452,11 +452,11 @@ struct tTVPJPGOption
 };
 //---------------------------------------------------------------------------
 /**
- * JPG‘‚«‚İ
- * ƒtƒ‹ƒJƒ‰[‚Å‚Ì‘‚«‚İ‚Ì‚İ‘Î‰
- * @param storagename : o—Íƒtƒ@ƒCƒ‹–¼
- * @param mode : ƒ‚[ƒh "jpg" ‚Æ•K—v‚È‚çˆ³k—¦‚ğ”’l‚ÅŒã‚É•t‚¯‘«‚·
- * @param image : ‘‚«o‚µƒCƒ[ƒWƒf[ƒ^
+ * JPGæ›¸ãè¾¼ã¿
+ * ãƒ•ãƒ«ã‚«ãƒ©ãƒ¼ã§ã®æ›¸ãè¾¼ã¿ã®ã¿å¯¾å¿œ
+ * @param storagename : å‡ºåŠ›ãƒ•ã‚¡ã‚¤ãƒ«å
+ * @param mode : ãƒ¢ãƒ¼ãƒ‰ "jpg" ã¨å¿…è¦ãªã‚‰åœ§ç¸®ç‡ã‚’æ•°å€¤ã§å¾Œã«ä»˜ã‘è¶³ã™
+ * @param image : æ›¸ãå‡ºã—ã‚¤ãƒ¡ãƒ¼ã‚¸ãƒ‡ãƒ¼ã‚¿
  */
 void TVPSaveAsJPG(void* formatdata, tTJSBinaryStream* dst, const tTVPBaseBitmap* image, const ttstr & mode, iTJSDispatch2* meta )
 {
@@ -475,7 +475,7 @@ void TVPSaveAsJPG(void* formatdata, tTJSBinaryStream* dst, const tTVPBaseBitmap*
 	}
 
 	{
-		// EnumCallback ‚ğg‚Á‚ÄƒvƒƒpƒeƒB‚ğİ’è‚·‚é
+		// EnumCallback ã‚’ä½¿ã£ã¦ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã‚’è¨­å®šã™ã‚‹
 		struct MetaDictionaryEnumCallback : public tTJSDispatch {
 			tTVPJPGOption *opt_;
 			MetaDictionaryEnumCallback( tTVPJPGOption *opt ) : opt_(opt) {}
@@ -540,7 +540,7 @@ void TVPSaveAsJPG(void* formatdata, tTJSBinaryStream* dst, const tTVPBaseBitmap*
 		jerr.error_exit = my_error_exit;
 		jerr.output_message = my_output_message;
 		jerr.reset_error_mgr = my_reset_error_mgr;
-		// emit_message, format_message ‚ÍƒfƒtƒHƒ‹ƒg‚Ì‚ğg‚¤
+		// emit_message, format_message ã¯ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ã‚’ä½¿ã†
 
 		jpeg_create_compress( &cinfo );
 		

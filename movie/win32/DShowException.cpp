@@ -1,6 +1,6 @@
 /****************************************************************************/
 /*! @file
-@brief DirectShow‚ÌHRESULT‚ğƒƒbƒZ[ƒW‚É•Ï‚¦‚é—áŠOƒNƒ‰ƒX
+@brief DirectShowã®HRESULTã‚’ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã«å¤‰ãˆã‚‹ä¾‹å¤–ã‚¯ãƒ©ã‚¹
 
 -----------------------------------------------------------------------------
 	Copyright (C) 2004 T.Imoto <http://www.kaede-software.com>
@@ -27,7 +27,7 @@ DShowException::DShowException()
 }
 //----------------------------------------------------------------------------
 //! @brief	  	DShowException constructor
-//! @param 		hr : DirectShow‚ÌŠÖ”‚Ì•Ô’l
+//! @param 		hr : DirectShowã®é–¢æ•°ã®è¿”å€¤
 //----------------------------------------------------------------------------
 DShowException::DShowException( HRESULT hr ) : m_Hr(hr)
 {
@@ -36,7 +36,7 @@ DShowException::DShowException( HRESULT hr ) : m_Hr(hr)
 
 //----------------------------------------------------------------------------
 //! @brief	  	DShowException constructor
-//! @param 		right : ƒRƒs[‚à‚Æ
+//! @param 		right : ã‚³ãƒ”ãƒ¼ã‚‚ã¨
 //----------------------------------------------------------------------------
 DShowException::DShowException(const DShowException& right)
 {
@@ -44,9 +44,9 @@ DShowException::DShowException(const DShowException& right)
 }
 
 //----------------------------------------------------------------------------
-//! @brief	  	‘ã“ü
-//! @param 		right : ƒRƒs[‚à‚Æ
-//! @return		©g
+//! @brief	  	ä»£å…¥
+//! @param 		right : ã‚³ãƒ”ãƒ¼ã‚‚ã¨
+//! @return		è‡ªèº«
 //----------------------------------------------------------------------------
 DShowException& DShowException::operator=(const DShowException& right)
 {
@@ -57,9 +57,9 @@ DShowException& DShowException::operator=(const DShowException& right)
 
 
 //----------------------------------------------------------------------------
-//! @brief	  	ƒGƒ‰[ƒR[ƒh‚ğ‘ã“ü‚µAƒƒbƒZ[ƒW‚ğ¶¬‚·‚é
-//! @param 		right : ƒRƒs[‚à‚Æ
-//! @return		©g
+//! @brief	  	ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰ã‚’ä»£å…¥ã—ã€ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’ç”Ÿæˆã™ã‚‹
+//! @param 		right : ã‚³ãƒ”ãƒ¼ã‚‚ã¨
+//! @return		è‡ªèº«
 //----------------------------------------------------------------------------
 void DShowException::SetHResult( HRESULT hr )
 {
@@ -69,14 +69,14 @@ void DShowException::SetHResult( HRESULT hr )
 
 
 //----------------------------------------------------------------------------
-//! @brief	  	ƒfƒXƒgƒ‰ƒNƒ^‚Å‚Í“Á‚É‰½‚à‚µ‚È‚¢
+//! @brief	  	ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã§ã¯ç‰¹ã«ä½•ã‚‚ã—ãªã„
 //----------------------------------------------------------------------------
 DShowException::~DShowException()
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒGƒ‰[‚ÌÚ×‚ğ–â‚¢‡‚í‚¹‚é
-//! @return		ƒGƒ‰[ƒƒbƒZ[ƒW
+//! @brief	  	ã‚¨ãƒ©ãƒ¼ã®è©³ç´°ã‚’å•ã„åˆã‚ã›ã‚‹
+//! @return		ã‚¨ãƒ©ãƒ¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
 //----------------------------------------------------------------------------
 const TCHAR *DShowException::what( ) const
 {
@@ -86,9 +86,9 @@ const TCHAR *DShowException::what( ) const
 
 
 //----------------------------------------------------------------------------
-//! @brief	  	DirectShow —áŠO‚ğ ‹g—¢‹g—¢—áŠO‚Æ‚µ‚Ä‘—o
-//! ‚±‚ÌŠÖ”‚Í–ß‚ç‚È‚¢(—áŠO‚ª”­¶‚·‚é‚½‚ß)
-//! @param 		comment : ƒRƒƒ“ƒg
+//! @brief	  	DirectShow ä¾‹å¤–ã‚’ å‰é‡Œå‰é‡Œä¾‹å¤–ã¨ã—ã¦é€å‡º
+//! ã“ã®é–¢æ•°ã¯æˆ»ã‚‰ãªã„(ä¾‹å¤–ãŒç™ºç”Ÿã™ã‚‹ãŸã‚)
+//! @param 		comment : ã‚³ãƒ¡ãƒ³ãƒˆ
 //! @param		hr : HRESULT
 //----------------------------------------------------------------------------
 void ThrowDShowException(const tjs_char *comment, HRESULT hr)

@@ -13,7 +13,7 @@ public:
 	BasicAllocator() {
 		TVPAddLog( TJS_W("(info) Use malloc for Bitmap") );
 	}
-	void* allocate( size_t size ) { return malloc(size); }	// WindowsÇ≈ÇÕ ::HeapAlloc( _get_heap_handle(), 0, size ); Ç∆ìØÇ∂ÇÕÇ∏
+	void* allocate( size_t size ) { return malloc(size); }	// Windows„Åß„ÅØ ::HeapAlloc( _get_heap_handle(), 0, size ); „Å®Âêå„Åò„ÅØ„Åö
 	void free( void* mem ) { ::free( mem ); }
 };
 #ifdef WIN32

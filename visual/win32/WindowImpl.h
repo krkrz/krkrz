@@ -264,7 +264,7 @@ private:
 	bool GetWindowActive();
 	void UpdateVSyncThread();
 	/**
-	 * �t���X�N���[�����ɑ���ł��Ȃ��l��ς��悤�Ƃ������Ɋm�F�̂��ߌĂяo���A�t���X�N���[���̎���O���o��
+	 * フルスクリーン時に操作できない値を変えようとした時に確認のため呼び出し、フルスクリーンの時例外を出す
 	 */
 	void FullScreenGuard() const;
 

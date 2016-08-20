@@ -3,59 +3,59 @@
 class IWaveUnpacker
 {
 public:
-// IUnknown ”h¶ƒNƒ‰ƒX‚Å‚Í‚È‚¢‚Ì‚Å’ˆÓ
+// IUnknown æ´¾ç”Ÿã‚¯ãƒ©ã‚¹ã§ã¯ãªã„ã®ã§æ³¨æ„
 	virtual ULONG STDMETHODCALLTYPE AddRef(void) = 0;
 	virtual ULONG STDMETHODCALLTYPE Release(void) = 0;
 
 // IWaveUnpacker
 	virtual HRESULT STDMETHODCALLTYPE GetTypeName(char *buf,long buflen)=0;
 		/*
-			buf ‚ÉA‚±‚Ì Wave Œ`®‚ğ•\‚·•¶š—ñ‚ğ *buf ‚Éİ’è‚µ‚Ä‚­‚¾‚³‚¢B
-			buflen ‚ÍAbuf ‚ÉŠm•Û‚³‚ê‚½•¶š—ñ‚ÅAnull terminater ‚àŠÜ‚Ş‚Ì‚Å
-			’ˆÓB
+			buf ã«ã€ã“ã® Wave å½¢å¼ã‚’è¡¨ã™æ–‡å­—åˆ—ã‚’ *buf ã«è¨­å®šã—ã¦ãã ã•ã„ã€‚
+			buflen ã¯ã€buf ã«ç¢ºä¿ã•ã‚ŒãŸæ–‡å­—åˆ—ã§ã€null terminater ã‚‚å«ã‚€ã®ã§
+			æ³¨æ„ã€‚
 		*/
 
 	virtual HRESULT STDMETHODCALLTYPE GetWaveFormat(long *samplepersec,
 		long *channels,long *bitspersample)=0;
 		/*
-			o—Í‚·‚é Wave ‚ÌŒ`®‚ğ *samplepersec, *channels, *bitspersample ‚É
-			•Ô‚µ‚Ä‚­‚¾‚³‚¢B
+			å‡ºåŠ›ã™ã‚‹ Wave ã®å½¢å¼ã‚’ *samplepersec, *channels, *bitspersample ã«
+			è¿”ã—ã¦ãã ã•ã„ã€‚
 		*/
 
 	virtual HRESULT STDMETHODCALLTYPE Render(void *buffer,long bufsize,
 		long *numwrite) =0;
 		/*
-			ƒfƒR[ƒh‚µ‚Ä‚­‚¾‚³‚¢B
-			bufsize ‚É‚Í buffer ‚ÌƒTƒCƒY‚ªƒoƒCƒg’PˆÊ‚Åw’è‚³‚ê‚Ü‚·B
-			numwrite ‚É‚ÍAƒoƒbƒtƒ@‚É‘‚©‚ê‚½ƒf[ƒ^‚Ì”‚ğƒoƒCƒg’PˆÊ‚Å•Ô‚µ‚Ü‚·B
-			‚½‚¾‚µAWaveUnpacker ‚ÍAnumwrite<bufsize ‚Ìê‡‚ÍAc‚è‚ğ
-			0 ‚Å–„‚ß‚Ä‚­‚¾‚³‚¢B
+			ãƒ‡ã‚³ãƒ¼ãƒ‰ã—ã¦ãã ã•ã„ã€‚
+			bufsize ã«ã¯ buffer ã®ã‚µã‚¤ã‚ºãŒãƒã‚¤ãƒˆå˜ä½ã§æŒ‡å®šã•ã‚Œã¾ã™ã€‚
+			numwrite ã«ã¯ã€ãƒãƒƒãƒ•ã‚¡ã«æ›¸ã‹ã‚ŒãŸãƒ‡ãƒ¼ã‚¿ã®æ•°ã‚’ãƒã‚¤ãƒˆå˜ä½ã§è¿”ã—ã¾ã™ã€‚
+			ãŸã ã—ã€WaveUnpacker ã¯ã€numwrite<bufsize ã®å ´åˆã¯ã€æ®‹ã‚Šã‚’
+			0 ã§åŸ‹ã‚ã¦ãã ã•ã„ã€‚
 		*/
 	
 	virtual HRESULT STDMETHODCALLTYPE GetLength(long *length)=0;
 		/*
-			ƒf[ƒ^’·‚ğ ms ’PˆÊ‚Å *length ‚É•Ô‚µ‚Ä‚­‚¾‚³‚¢B
-			‘Î‰‚Å‚«‚È‚¢ê‡‚Í E_NOTIMPL ‚ğ•Ô‚µ‚Ä‚­‚¾‚³‚¢B‚»‚Ìê‡‚Í
-			WaveSoundBuffer ‚Ì totalTime ƒvƒƒpƒeƒB‚Í 0 ‚ğ•\‚·‚æ‚¤‚É‚È‚è‚Ü‚·B
+			ãƒ‡ãƒ¼ã‚¿é•·ã‚’ ms å˜ä½ã§ *length ã«è¿”ã—ã¦ãã ã•ã„ã€‚
+			å¯¾å¿œã§ããªã„å ´åˆã¯ E_NOTIMPL ã‚’è¿”ã—ã¦ãã ã•ã„ã€‚ãã®å ´åˆã¯
+			WaveSoundBuffer ã® totalTime ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã¯ 0 ã‚’è¡¨ã™ã‚ˆã†ã«ãªã‚Šã¾ã™ã€‚
 		*/
 
 	virtual HRESULT STDMETHODCALLTYPE GetCurrentPosition(long *pos)=0;
 		/*
-			Œ»İ‚ÌƒfƒR[ƒhˆÊ’u‚ğ *pos ‚É•Ô‚µ‚Ä‚­‚¾‚³‚¢B
-			‘Î‰‚Å‚«‚È‚¢ê‡‚Í E_NOTIMPL ‚ğ•Ô‚µ‚Ä‚­‚¾‚³‚¢B‚»‚Ìê‡‚Í
-			WaveSoundBuffer ‚Ì position ƒvƒƒpƒeƒB‚ÍˆÓ–¡‚Ì‚È‚¢”’l‚ğ
-			¦‚·‚æ‚¤‚É‚È‚è‚Ü‚·B
+			ç¾åœ¨ã®ãƒ‡ã‚³ãƒ¼ãƒ‰ä½ç½®ã‚’ *pos ã«è¿”ã—ã¦ãã ã•ã„ã€‚
+			å¯¾å¿œã§ããªã„å ´åˆã¯ E_NOTIMPL ã‚’è¿”ã—ã¦ãã ã•ã„ã€‚ãã®å ´åˆã¯
+			WaveSoundBuffer ã® position ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã¯æ„å‘³ã®ãªã„æ•°å€¤ã‚’
+			ç¤ºã™ã‚ˆã†ã«ãªã‚Šã¾ã™ã€‚
 		*/
 
 	virtual HRESULT STDMETHODCALLTYPE SetCurrentPosition(long pos)=0;
 		/*
-			Œ»İ‚ÌƒfƒR[ƒhˆÊ’u‚ğİ’è‚µ‚Ä‚­‚¾‚³‚¢Bpos ‚Í ms ’PˆÊ‚Å‚Ì
-			ˆÊ’u‚Å‚·B
-			Å’á‚Å‚à pos=0 ‚Æ‚µ‚ÄŒÄ‚Î‚ê‚½‚Æ‚«‚ÉAæ“ª‚Ö‚ÌŠª‚«–ß‚µ‚ª
-			o—ˆ‚æ‚¤‚É‚µ‚Ä‚­‚¾‚³‚¢B
+			ç¾åœ¨ã®ãƒ‡ã‚³ãƒ¼ãƒ‰ä½ç½®ã‚’è¨­å®šã—ã¦ãã ã•ã„ã€‚pos ã¯ ms å˜ä½ã§ã®
+			ä½ç½®ã§ã™ã€‚
+			æœ€ä½ã§ã‚‚ pos=0 ã¨ã—ã¦å‘¼ã°ã‚ŒãŸã¨ãã«ã€å…ˆé ­ã¸ã®å·»ãæˆ»ã—ãŒ
+			å‡ºæ¥ã‚ˆã†ã«ã—ã¦ãã ã•ã„ã€‚
 
-			‚»‚Ì‚Ù‚©‚Ìê‡A‘Î‰‚Å‚«‚È‚¢ê‡‚Í E_NOTIMPL ‚ğ•Ô‚µ‚Ä‚­‚¾‚³‚¢B
-			‚»‚Ìê‡‚ÍWaveSoundBuffer ‚Ì position ƒvƒƒpƒeƒB‚Ö‚Ì‘ã“ü‚Í–³‹‚³‚ê‚Ü‚·B
+			ãã®ã»ã‹ã®å ´åˆã€å¯¾å¿œã§ããªã„å ´åˆã¯ E_NOTIMPL ã‚’è¿”ã—ã¦ãã ã•ã„ã€‚
+			ãã®å ´åˆã¯WaveSoundBuffer ã® position ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã¸ã®ä»£å…¥ã¯ç„¡è¦–ã•ã‚Œã¾ã™ã€‚
 		*/
 
 	virtual HRESULT STDMETHODCALLTYPE Invoke(); // reserved

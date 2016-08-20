@@ -298,8 +298,8 @@ public:
 		tTVPRect refrect, tjs_int plane = (TVP_BB_COPY_MAIN|TVP_BB_COPY_MASK));
 
     /**
-     * @param ref : ƒRƒs[Œ³‰æ‘œ(9patchŒ`®)
-     * @param margin : 9patch‚Ì‰E‰º‚É‚ ‚é•`‰æ—Ìˆæw’è‚ğæ“¾‚·‚é
+     * @param ref : ã‚³ãƒ”ãƒ¼å…ƒç”»åƒ(9patchå½¢å¼)
+     * @param margin : 9patchã®å³ä¸‹ã«ã‚ã‚‹æç”»é ˜åŸŸæŒ‡å®šã‚’å–å¾—ã™ã‚‹
      */
     bool Copy9Patch( const tTVPBaseBitmap *ref, tTVPRect& margin );
 

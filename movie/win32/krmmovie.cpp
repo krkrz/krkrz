@@ -2,14 +2,14 @@
 /*! @file
 @brief part of KRLMOVIE.DLL
 
-Às‚É‚ÍDirectX9ˆÈ~‚ª•K—v
+å®Ÿè¡Œã«ã¯DirectX9ä»¥é™ãŒå¿…è¦
 -----------------------------------------------------------------------------
 	Copyright (C) 2005 T.Imoto <http://www.kaede-software.com>
 -----------------------------------------------------------------------------
 @author		T.Imoto
 @date		2005/09/25
 @note
-			2005/09/25	T.Imoto		ì¬
+			2005/09/25	T.Imoto		ä½œæˆ
 *****************************************************************************/
 
 #include "tjsCommHead.h"
@@ -25,14 +25,14 @@
 
 
 //----------------------------------------------------------------------------
-//! @brief	  	VideoOverlay Object (ƒ~ƒLƒVƒ“ƒOÄ¶—p) ‚ğæ“¾‚·‚é
-//! @param		callbackwin : ƒR[ƒ‹ƒoƒbƒNƒEƒBƒ“ƒhƒE‚Ìƒnƒ“ƒhƒ‹
-//! @param		stream : “ü—ÍƒXƒgƒŠ[ƒ€
-//! @param		streamname : ƒXƒgƒŠ[ƒ€‚Ì–¼‘O
-//! @param		type : ƒXƒgƒŠ[ƒ€‚ÌŠg’£q
-//! @param		size : ƒXƒgƒŠ[ƒ€‚ÌƒTƒCƒY
+//! @brief	  	VideoOverlay Object (ãƒŸã‚­ã‚·ãƒ³ã‚°å†ç”Ÿç”¨) ã‚’å–å¾—ã™ã‚‹
+//! @param		callbackwin : ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ãƒãƒ³ãƒ‰ãƒ«
+//! @param		stream : å…¥åŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+//! @param		streamname : ã‚¹ãƒˆãƒªãƒ¼ãƒ ã®åå‰
+//! @param		type : ã‚¹ãƒˆãƒªãƒ¼ãƒ ã®æ‹¡å¼µå­
+//! @param		size : ã‚¹ãƒˆãƒªãƒ¼ãƒ ã®ã‚µã‚¤ã‚º
 //! @param		out : VideoOverlay Object
-//! @return		ƒGƒ‰[•¶š—ñ
+//! @return		ã‚¨ãƒ©ãƒ¼æ–‡å­—åˆ—
 //----------------------------------------------------------------------------
 void __stdcall GetMixingVideoOverlayObject(
 	HWND callbackwin, IStream *stream, const wchar_t * streamname,

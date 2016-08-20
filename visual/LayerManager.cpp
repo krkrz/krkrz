@@ -675,7 +675,7 @@ void tTVPLayerManager::SetTouchCapture( tjs_uint32 id, tTJSNI_BaseLayer* layer )
 	std::vector<tTVPTouchCaptureLayer>::iterator itr = std::find_if( TouchCapture.begin(), TouchCapture.end(), pred );
 	if( itr != TouchCapture.end() )
 	{
-		// Šù‚É“¯ˆêID‚Ì‚à‚Ì‚ª‚ ‚éê‡‚ÍA“¯‚¶êŠ‚Å’u‚«Š·‚¦‚é
+		// æ—¢ã«åŒä¸€IDã®ã‚‚ã®ãŒã‚ã‚‹å ´åˆã¯ã€åŒã˜å ´æ‰€ã§ç½®ãæ›ãˆã‚‹
 		tTJSNI_BaseLayer* old = itr->Owner;
 		if( old && old->Owner ) old->Owner->Release();
 		itr->Owner = layer;
@@ -683,7 +683,7 @@ void tTVPLayerManager::SetTouchCapture( tjs_uint32 id, tTJSNI_BaseLayer* layer )
 	}
 	else
 	{
-		// ‚È‚¢ê‡‚ÍA––”ö‚É’Ç‰ÁB
+		// ãªã„å ´åˆã¯ã€æœ«å°¾ã«è¿½åŠ ã€‚
 		TouchCapture.push_back( tTVPTouchCaptureLayer( id, layer ) );
 		if( layer->Owner ) layer->Owner->AddRef();
 	}

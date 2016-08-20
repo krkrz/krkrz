@@ -2,7 +2,7 @@
 /*! @file
 @brief DirectShow
 
-ƒoƒbƒtƒ@ƒwƒŒƒ“ƒ_ƒŠƒ“ƒO‚·‚é
+ãƒãƒƒãƒ•ã‚¡ãƒ˜ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã™ã‚‹
 -----------------------------------------------------------------------------
 	Copyright (C) 2004 T.Imoto
 -----------------------------------------------------------------------------
@@ -26,8 +26,8 @@
 //##	TBufferRenderer
 //----------------------------------------------------------------------------
 //! @brief	  	This goes in the factory template table to create new filter instances
-//! @param		pUnk : W¬‚µ‚½ IUnknown ƒCƒ“ƒ^[ƒtƒFƒCƒX‚Ö‚Ìƒ|ƒCƒ“ƒ^B
-//! @param		phr : ƒƒ\ƒbƒh‚Ì¬Œ÷E¸”s‚ğ¦‚· HRESULT ’l‚ğó‚¯æ‚é•Ï”‚Ö‚Ìƒ|ƒCƒ“ƒ^B
+//! @param		pUnk : é›†æˆã—ãŸ IUnknown ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã€‚
+//! @param		phr : ãƒ¡ã‚½ãƒƒãƒ‰ã®æˆåŠŸãƒ»å¤±æ•—ã‚’ç¤ºã™ HRESULT å€¤ã‚’å—ã‘å–ã‚‹å¤‰æ•°ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã€‚
 //----------------------------------------------------------------------------
 CUnknown * WINAPI TBufferRenderer::CreateInstance( LPUNKNOWN pUnk, HRESULT *phr )
 {
@@ -36,19 +36,19 @@ CUnknown * WINAPI TBufferRenderer::CreateInstance( LPUNKNOWN pUnk, HRESULT *phr 
 		*phr = E_OUTOFMEMORY;
 	return punk;
 }
-#pragma warning(disable: 4355)	// ƒRƒ“ƒXƒgƒ‰ƒNƒ^‚Ìƒx[ƒXƒƒ“ƒo‰Šú‰»‚Éthis‚ğg‚¤‚Æƒ[ƒjƒ“ƒO‚ªo‚é‚Ì‚Å‚»‚ê‚ğ—}~
+#pragma warning(disable: 4355)	// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã®ãƒ™ãƒ¼ã‚¹ãƒ¡ãƒ³ãƒåˆæœŸåŒ–æ™‚ã«thisã‚’ä½¿ã†ã¨ãƒ¯ãƒ¼ãƒ‹ãƒ³ã‚°ãŒå‡ºã‚‹ã®ã§ãã‚Œã‚’æŠ‘æ­¢
 //----------------------------------------------------------------------------
 //! @brief	  	TBufferRenderer constructor
-//! @param		pName : ƒfƒoƒbƒO‚Ì‚½‚ß‚Ég—p‚³‚ê‚é‹Lq‚Ö‚Ìƒ|ƒCƒ“ƒ^B
-//! @param		pUnk : W¬‚³‚ê‚½Š—LÒƒIƒuƒWƒFƒNƒg‚Ö‚Ìƒ|ƒCƒ“ƒ^B
-//! @param		phr : HRESULT ’l‚Ö‚Ìƒ|ƒCƒ“ƒ^B
+//! @param		pName : ãƒ‡ãƒãƒƒã‚°ã®ãŸã‚ã«ä½¿ç”¨ã•ã‚Œã‚‹è¨˜è¿°ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã€‚
+//! @param		pUnk : é›†æˆã•ã‚ŒãŸæ‰€æœ‰è€…ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã¸ã®ãƒã‚¤ãƒ³ã‚¿ã€‚
+//! @param		phr : HRESULT å€¤ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã€‚
 //----------------------------------------------------------------------------
 TBufferRenderer::TBufferRenderer( TCHAR *pName, LPUNKNOWN pUnk, HRESULT *phr )
  : CBaseVideoRenderer( CLSID_BufferRenderer, pName, pUnk, phr )
 , m_InputPin( this, &m_InterfaceLock, phr, L"Input" )
 , m_Allocator( this, NAME("Allocator"), GetOwner(), phr )
 {
-	//CBaseRender::m_pInputPin‚Éƒ|ƒCƒ“ƒ^‚ğİ’è‚·‚éB
+	//CBaseRender::m_pInputPinã«ãƒã‚¤ãƒ³ã‚¿ã‚’è¨­å®šã™ã‚‹ã€‚
 	m_pInputPin = &m_InputPin;
 
 	// Store and AddRef the texture for our use.
@@ -69,21 +69,21 @@ TBufferRenderer::TBufferRenderer( TCHAR *pName, LPUNKNOWN pUnk, HRESULT *phr )
 //----------------------------------------------------------------------------
 TBufferRenderer::~TBufferRenderer()
 {
-	//CBaseRender::m_pInputPin‚Éƒ|ƒCƒ“ƒ^‚ğƒŠƒZƒbƒg‚·‚éB
-	//‚±‚ê‚ğ‚µ‚È‚¢‚ÆCBaseRender‚ÌƒfƒXƒgƒ‰ƒNƒ^‚Ådelete‚³‚ê‚Ä‚µ‚Ü‚¤‚Ì‚Å’ˆÓI
+	//CBaseRender::m_pInputPinã«ãƒã‚¤ãƒ³ã‚¿ã‚’ãƒªã‚»ãƒƒãƒˆã™ã‚‹ã€‚
+	//ã“ã‚Œã‚’ã—ãªã„ã¨CBaseRenderã®ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã§deleteã•ã‚Œã¦ã—ã¾ã†ã®ã§æ³¨æ„ï¼
     m_pInputPin = NULL;
 
-	// ©•ª‚ÅŠm•Û‚µ‚Ä‚¢‚éê‡ƒoƒbƒtƒ@‚Ì‰ğ•ú
+	// è‡ªåˆ†ã§ç¢ºä¿ã—ã¦ã„ã‚‹å ´åˆãƒãƒƒãƒ•ã‚¡ã®è§£æ”¾
 	FreeFrontBuffer();
 	FreeBackBuffer();
 }
 //----------------------------------------------------------------------------
-//! @brief	  	—v‹‚³‚ê‚½ƒCƒ“ƒ^[ƒtƒFƒCƒX‚ğ•Ô‚·
+//! @brief	  	è¦æ±‚ã•ã‚ŒãŸã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã‚’è¿”ã™
 //! 
 //! Overriden to say what interfaces we support and where
-//! @param		riid : ƒCƒ“ƒ^[ƒtƒFƒCƒX‚ÌIID
-//! @param		ppv : ƒCƒ“ƒ^[ƒtƒFƒCƒX‚ğ•Ô‚·ƒ|ƒCƒ“ƒ^[‚Ö‚Ìƒ|ƒCƒ“ƒ^
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @param		riid : ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã®IID
+//! @param		ppv : ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã‚’è¿”ã™ãƒã‚¤ãƒ³ã‚¿ãƒ¼ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 STDMETHODIMP TBufferRenderer::NonDelegatingQueryInterface( REFIID riid, void **ppv )
 {
@@ -100,13 +100,13 @@ STDMETHODIMP TBufferRenderer::NonDelegatingQueryInterface( REFIID riid, void **p
 	return CBaseVideoRenderer::NonDelegatingQueryInterface( riid, ppv );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	“Á’è‚ÌƒƒfƒBƒA ƒ^ƒCƒv‚ğƒtƒBƒ‹ƒ^‚ªó‚¯“ü‚ê‚é‚©‚Ç‚¤‚©‚ğŠm”F‚·‚é
+//! @brief	  	ç‰¹å®šã®ãƒ¡ãƒ‡ã‚£ã‚¢ ã‚¿ã‚¤ãƒ—ã‚’ãƒ•ã‚£ãƒ«ã‚¿ãŒå—ã‘å…¥ã‚Œã‚‹ã‹ã©ã†ã‹ã‚’ç¢ºèªã™ã‚‹
 //! 
 //! This method forces the graph to give us an R8G8B8 video type, making our copy 
 //! to texture memory trivial.
-//! @param		pmt : ’ñˆÄ‚³‚ê‚½ƒƒfƒBƒA ƒ^ƒCƒv‚ğŠÜ‚Ş CMediaType ƒIƒuƒWƒFƒNƒg‚Ö‚Ìƒ|ƒCƒ“ƒ^
-//! @return		’ñˆÄ‚³‚ê‚½ƒƒfƒBƒA ƒ^ƒCƒv‚ªó‚¯“ü‚ê‚ç‚ê‚é‚È‚ç S_OK ‚ğ•Ô‚·B
-//!				‚»‚¤‚Å‚È‚¯‚ê‚Î S_FALSE ‚©ƒGƒ‰[ ƒR[ƒh‚ğ•Ô‚·B
+//! @param		pmt : ææ¡ˆã•ã‚ŒãŸãƒ¡ãƒ‡ã‚£ã‚¢ ã‚¿ã‚¤ãƒ—ã‚’å«ã‚€ CMediaType ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã¸ã®ãƒã‚¤ãƒ³ã‚¿
+//! @return		ææ¡ˆã•ã‚ŒãŸãƒ¡ãƒ‡ã‚£ã‚¢ ã‚¿ã‚¤ãƒ—ãŒå—ã‘å…¥ã‚Œã‚‰ã‚Œã‚‹ãªã‚‰ S_OK ã‚’è¿”ã™ã€‚
+//!				ãã†ã§ãªã‘ã‚Œã° S_FALSE ã‹ã‚¨ãƒ©ãƒ¼ ã‚³ãƒ¼ãƒ‰ã‚’è¿”ã™ã€‚
 //----------------------------------------------------------------------------
 HRESULT TBufferRenderer::CheckMediaType( const CMediaType *pmt )
 {
@@ -133,19 +133,19 @@ HRESULT TBufferRenderer::CheckMediaType( const CMediaType *pmt )
 }
 //----------------------------------------------------------------------------
 //! @brief	  	Graph connection has been made. 
-//! @param		pmt : ƒƒfƒBƒA ƒ^ƒCƒv‚ğw’è‚·‚é CMediaType ƒIƒuƒWƒFƒNƒg‚Ö‚Ìƒ|ƒCƒ“ƒ^
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @param		pmt : ãƒ¡ãƒ‡ã‚£ã‚¢ ã‚¿ã‚¤ãƒ—ã‚’æŒ‡å®šã™ã‚‹ CMediaType ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã¸ã®ãƒã‚¤ãƒ³ã‚¿
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT TBufferRenderer::SetMediaType( const CMediaType *pmt )
 {
-	CAutoLock cAutoLock(&m_BufferLock);	// ƒNƒŠƒeƒBƒJƒ‹ƒZƒNƒVƒ‡ƒ“
+	CAutoLock cAutoLock(&m_BufferLock);	// ã‚¯ãƒªãƒ†ã‚£ã‚«ãƒ«ã‚»ã‚¯ã‚·ãƒ§ãƒ³
 
 	// Retrive the size of this media type
 	VIDEOINFO *pviBmp;						// Bitmap info header
 	pviBmp = (VIDEOINFO *)pmt->Format();
 	m_VideoWidth  = pviBmp->bmiHeader.biWidth;
 	m_VideoHeight = abs(pviBmp->bmiHeader.biHeight);
-	m_VideoPitch = m_VideoWidth * 4;	// RGB32‚ÉŒˆ‚ß‘Å‚¿
+	m_VideoPitch = m_VideoWidth * 4;	// RGB32ã«æ±ºã‚æ‰“ã¡
 
 	if( !IsAllocatedFrontBuffer() )
 		AllocFrontBuffer( GetBufferSize() );
@@ -157,8 +157,8 @@ HRESULT TBufferRenderer::SetMediaType( const CMediaType *pmt )
 }
 //----------------------------------------------------------------------------
 //! @brief	  	A sample has been delivered. Copy it to the texture.
-//! @param		pSample : ƒTƒ“ƒvƒ‹‚Ì IMediaSample ƒCƒ“ƒ^[ƒtƒFƒCƒX‚Ö‚Ìƒ|ƒCƒ“ƒ^
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @param		pSample : ã‚µãƒ³ãƒ—ãƒ«ã® IMediaSample ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT TBufferRenderer::DoRenderSample( IMediaSample * pSample )
 {
@@ -167,7 +167,7 @@ HRESULT TBufferRenderer::DoRenderSample( IMediaSample * pSample )
 
 //	if( m_bEOS ) return S_OK;
 
-	CAutoLock cAutoLock(&m_BufferLock);	// ƒNƒŠƒeƒBƒJƒ‹ƒZƒNƒVƒ‡ƒ“
+	CAutoLock cAutoLock(&m_BufferLock);	// ã‚¯ãƒªãƒ†ã‚£ã‚«ãƒ«ã‚»ã‚¯ã‚·ãƒ§ãƒ³
 
 	// Get the video bitmap buffer
 	pSample->GetPointer( reinterpret_cast<BYTE**>(&pBmpBuffer) );
@@ -186,19 +186,19 @@ HRESULT TBufferRenderer::DoRenderSample( IMediaSample * pSample )
 		EventParam1 = (LONG)TimeStart;
 	}
 	if( m_StopFrame && EventParam1 >= m_StopFrame )
-		return S_OK;	// Ä¶‚µ‚È‚¢ƒtƒŒ[ƒ€
+		return S_OK;	// å†ç”Ÿã—ãªã„ãƒ•ãƒ¬ãƒ¼ãƒ 
 
-	if( pTxtBuffer == pBmpBuffer )	// ©‘O‚ÌƒAƒƒP[ƒ^[‚ªg‚í‚ê‚Ä‚¢‚é
+	if( pTxtBuffer == pBmpBuffer )	// è‡ªå‰ã®ã‚¢ãƒ­ã‚±ãƒ¼ã‚¿ãƒ¼ãŒä½¿ã‚ã‚Œã¦ã„ã‚‹
 	{
-		SwapBuffer( pSample );	// Front‚ÆBackƒoƒbƒtƒ@‚ğ“ü‚ê‘Ö‚¦‚é
+		SwapBuffer( pSample );	// Frontã¨Backãƒãƒƒãƒ•ã‚¡ã‚’å…¥ã‚Œæ›¿ãˆã‚‹
 		if( m_pSink )
 			m_pSink->Notify( EC_UPDATE, EventParam1, NULL );
 		return S_OK;
 	}
 
-	// ©‘O‚ÌƒAƒƒP[ƒ^[‚Å‚Í‚È‚¢‚Ì‚Åƒƒ‚ƒŠ‚ğƒRƒs[‚·‚é
+	// è‡ªå‰ã®ã‚¢ãƒ­ã‚±ãƒ¼ã‚¿ãƒ¼ã§ã¯ãªã„ã®ã§ãƒ¡ãƒ¢ãƒªã‚’ã‚³ãƒ”ãƒ¼ã™ã‚‹
 #if 0
-	// ‰º‚©‚çã‚ÉƒRƒs[(ã‰º”½“]‰»)
+	// ä¸‹ã‹ã‚‰ä¸Šã«ã‚³ãƒ”ãƒ¼(ä¸Šä¸‹åè»¢åŒ–)
 	{
 		int		height = m_VideoHeight;
 		int		width = m_VideoWidth;
@@ -214,7 +214,7 @@ HRESULT TBufferRenderer::DoRenderSample( IMediaSample * pSample )
 		}
 	}
 #else
-	// ã‚©‚ç‰º‚ÉƒRƒs[
+	// ä¸Šã‹ã‚‰ä¸‹ã«ã‚³ãƒ”ãƒ¼
 	{
 		int		height = m_VideoHeight;
 		int		width = m_VideoWidth;
@@ -231,16 +231,16 @@ HRESULT TBufferRenderer::DoRenderSample( IMediaSample * pSample )
 #endif
 	if( m_pSink )
 		m_pSink->Notify( EC_UPDATE, EventParam1, NULL );
-	SwapBuffer( pSample );	// Front‚ÆBackƒoƒbƒtƒ@‚ğ“ü‚ê‘Ö‚¦‚é
+	SwapBuffer( pSample );	// Frontã¨Backãƒãƒƒãƒ•ã‚¡ã‚’å…¥ã‚Œæ›¿ãˆã‚‹
 	return S_OK;
 }
 //---------------------------------------------------------------------------
-//! @brief	  	ƒtƒƒ“ƒgƒoƒbƒtƒ@‚ÆƒoƒbƒNƒoƒbƒtƒ@‚ğ“ü‚ê‘Ö‚¦‚é
-//! @param		pSample : ƒTƒ“ƒvƒ‹B‚±‚Ì’†‚Ìƒ|ƒCƒ“ƒ^‚ğ•ÏX‚·‚é
+//! @brief	  	ãƒ•ãƒ­ãƒ³ãƒˆãƒãƒƒãƒ•ã‚¡ã¨ãƒãƒƒã‚¯ãƒãƒƒãƒ•ã‚¡ã‚’å…¥ã‚Œæ›¿ãˆã‚‹
+//! @param		pSample : ã‚µãƒ³ãƒ—ãƒ«ã€‚ã“ã®ä¸­ã®ãƒã‚¤ãƒ³ã‚¿ã‚’å¤‰æ›´ã™ã‚‹
 //----------------------------------------------------------------------------
 void TBufferRenderer::SwapBuffer( IMediaSample *pSample )
 {
-	CAutoLock cAutoLock(&m_BufferLock);	// ƒNƒŠƒeƒBƒJƒ‹ƒZƒNƒVƒ‡ƒ“
+	CAutoLock cAutoLock(&m_BufferLock);	// ã‚¯ãƒªãƒ†ã‚£ã‚«ãƒ«ã‚»ã‚¯ã‚·ãƒ§ãƒ³
 	if( m_FrontBuffer == 1 )
 	{
 		SetPointer( pSample, m_Buffer[1] );
@@ -253,12 +253,12 @@ void TBufferRenderer::SwapBuffer( IMediaSample *pSample )
 	}
 }
 //---------------------------------------------------------------------------
-//! @brief	  	ƒtƒƒ“ƒgƒoƒbƒtƒ@‚Éƒƒ‚ƒŠ‚ğŠ„‚è“–‚Ä‚é
-//! @param		size : Š„‚è“–‚Ä‚éƒTƒCƒY
+//! @brief	  	ãƒ•ãƒ­ãƒ³ãƒˆãƒãƒƒãƒ•ã‚¡ã«ãƒ¡ãƒ¢ãƒªã‚’å‰²ã‚Šå½“ã¦ã‚‹
+//! @param		size : å‰²ã‚Šå½“ã¦ã‚‹ã‚µã‚¤ã‚º
 //----------------------------------------------------------------------------
 void TBufferRenderer::AllocFrontBuffer( size_t size )
 {
-	CAutoLock cAutoLock(&m_BufferLock);	// ƒNƒŠƒeƒBƒJƒ‹ƒZƒNƒVƒ‡ƒ“
+	CAutoLock cAutoLock(&m_BufferLock);	// ã‚¯ãƒªãƒ†ã‚£ã‚«ãƒ«ã‚»ã‚¯ã‚·ãƒ§ãƒ³
 	BYTE	*buff = NULL;
 
 	FreeFrontBuffer();
@@ -277,12 +277,12 @@ void TBufferRenderer::AllocFrontBuffer( size_t size )
 		throw L"Cannot allocate memory in filter.";
 }
 //---------------------------------------------------------------------------
-//! @brief	  	ƒoƒbƒNƒoƒbƒtƒ@‚Éƒƒ‚ƒŠ‚ğŠ„‚è“–‚Ä‚éB
-//! @param		size : Š„‚è“–‚Ä‚éƒTƒCƒY
+//! @brief	  	ãƒãƒƒã‚¯ãƒãƒƒãƒ•ã‚¡ã«ãƒ¡ãƒ¢ãƒªã‚’å‰²ã‚Šå½“ã¦ã‚‹ã€‚
+//! @param		size : å‰²ã‚Šå½“ã¦ã‚‹ã‚µã‚¤ã‚º
 //----------------------------------------------------------------------------
 void TBufferRenderer::AllocBackBuffer( size_t size )
 {
-	CAutoLock cAutoLock(&m_BufferLock);	// ƒNƒŠƒeƒBƒJƒ‹ƒZƒNƒVƒ‡ƒ“
+	CAutoLock cAutoLock(&m_BufferLock);	// ã‚¯ãƒªãƒ†ã‚£ã‚«ãƒ«ã‚»ã‚¯ã‚·ãƒ§ãƒ³
 	BYTE	*buff = NULL;
 
 	FreeBackBuffer();
@@ -301,14 +301,14 @@ void TBufferRenderer::AllocBackBuffer( size_t size )
 		throw L"Cannot allocate memory in filter.";
 }
 //---------------------------------------------------------------------------
-//! @brief	  	ƒtƒƒ“ƒgƒoƒbƒtƒ@‚ÉŠ„‚è“–‚Ä‚ç‚ê‚Ä‚¢‚éƒƒ‚ƒŠ‚ğŠJ•ú‚·‚é
+//! @brief	  	ãƒ•ãƒ­ãƒ³ãƒˆãƒãƒƒãƒ•ã‚¡ã«å‰²ã‚Šå½“ã¦ã‚‰ã‚Œã¦ã„ã‚‹ãƒ¡ãƒ¢ãƒªã‚’é–‹æ”¾ã™ã‚‹
 //!
-//! ‚à‚µAŠ„‚è“–‚Ä‚ç‚ê‚Ä‚¢‚éƒƒ‚ƒŠ‚ªA‚±‚ÌƒNƒ‰ƒX‚É‚æ‚Á‚ÄŠ„‚è“–‚Ä‚ç‚ê‚½‚à‚Ì‚Å‚È‚¢ê‡‚ÍA
-//! ‰ğ•ú‚µ‚È‚¢B
+//! ã‚‚ã—ã€å‰²ã‚Šå½“ã¦ã‚‰ã‚Œã¦ã„ã‚‹ãƒ¡ãƒ¢ãƒªãŒã€ã“ã®ã‚¯ãƒ©ã‚¹ã«ã‚ˆã£ã¦å‰²ã‚Šå½“ã¦ã‚‰ã‚ŒãŸã‚‚ã®ã§ãªã„å ´åˆã¯ã€
+//! è§£æ”¾ã—ãªã„ã€‚
 //----------------------------------------------------------------------------
 void TBufferRenderer::FreeFrontBuffer()
 {
-	CAutoLock cAutoLock(&m_BufferLock);	// ƒNƒŠƒeƒBƒJƒ‹ƒZƒNƒVƒ‡ƒ“
+	CAutoLock cAutoLock(&m_BufferLock);	// ã‚¯ãƒªãƒ†ã‚£ã‚«ãƒ«ã‚»ã‚¯ã‚·ãƒ§ãƒ³
 	if( m_FrontBuffer == 1 )
 	{
 		if( m_Buffer[1] != NULL )
@@ -331,14 +331,14 @@ void TBufferRenderer::FreeFrontBuffer()
 	}
 }
 //---------------------------------------------------------------------------
-//! @brief	  	ƒoƒbƒNƒoƒbƒtƒ@‚ÉŠ„‚è“–‚Ä‚ç‚ê‚Ä‚¢‚éƒƒ‚ƒŠ‚ğŠJ•ú‚·‚é
+//! @brief	  	ãƒãƒƒã‚¯ãƒãƒƒãƒ•ã‚¡ã«å‰²ã‚Šå½“ã¦ã‚‰ã‚Œã¦ã„ã‚‹ãƒ¡ãƒ¢ãƒªã‚’é–‹æ”¾ã™ã‚‹
 //!
-//! ‚à‚µAŠ„‚è“–‚Ä‚ç‚ê‚Ä‚¢‚éƒƒ‚ƒŠ‚ªA‚±‚ÌƒNƒ‰ƒX‚É‚æ‚Á‚ÄŠ„‚è“–‚Ä‚ç‚ê‚½‚à‚Ì‚Å‚È‚¢ê‡‚ÍA
-//! ‰ğ•ú‚µ‚È‚¢B
+//! ã‚‚ã—ã€å‰²ã‚Šå½“ã¦ã‚‰ã‚Œã¦ã„ã‚‹ãƒ¡ãƒ¢ãƒªãŒã€ã“ã®ã‚¯ãƒ©ã‚¹ã«ã‚ˆã£ã¦å‰²ã‚Šå½“ã¦ã‚‰ã‚ŒãŸã‚‚ã®ã§ãªã„å ´åˆã¯ã€
+//! è§£æ”¾ã—ãªã„ã€‚
 //----------------------------------------------------------------------------
 void TBufferRenderer::FreeBackBuffer()
 {
-	CAutoLock cAutoLock(&m_BufferLock);	// ƒNƒŠƒeƒBƒJƒ‹ƒZƒNƒVƒ‡ƒ“
+	CAutoLock cAutoLock(&m_BufferLock);	// ã‚¯ãƒªãƒ†ã‚£ã‚«ãƒ«ã‚»ã‚¯ã‚·ãƒ§ãƒ³
 	if( m_FrontBuffer == 1 )
 	{
 		if( m_Buffer[0] != NULL )
@@ -361,12 +361,12 @@ void TBufferRenderer::FreeBackBuffer()
 	}
 }
 //---------------------------------------------------------------------------
-//! @brief	  	ƒtƒƒ“ƒgƒoƒbƒtƒ@‚Éƒoƒbƒtƒ@‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ğİ’è‚·‚é
-//! @param		buff : ƒoƒbƒtƒ@‚Ö‚Ìƒ|ƒCƒ“ƒ^
+//! @brief	  	ãƒ•ãƒ­ãƒ³ãƒˆãƒãƒƒãƒ•ã‚¡ã«ãƒãƒƒãƒ•ã‚¡ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã‚’è¨­å®šã™ã‚‹
+//! @param		buff : ãƒãƒƒãƒ•ã‚¡ã¸ã®ãƒã‚¤ãƒ³ã‚¿
 //----------------------------------------------------------------------------
 void TBufferRenderer::SetFrontBuffer( BYTE *buff )
 {
-	CAutoLock cAutoLock(&m_BufferLock);	// ƒNƒŠƒeƒBƒJƒ‹ƒZƒNƒVƒ‡ƒ“
+	CAutoLock cAutoLock(&m_BufferLock);	// ã‚¯ãƒªãƒ†ã‚£ã‚«ãƒ«ã‚»ã‚¯ã‚·ãƒ§ãƒ³
 	FreeFrontBuffer();
 	if( m_FrontBuffer == 1 )
 		m_Buffer[1] = buff;
@@ -374,12 +374,12 @@ void TBufferRenderer::SetFrontBuffer( BYTE *buff )
 		m_Buffer[0] = buff;
 }
 //---------------------------------------------------------------------------
-//! @brief	  	ƒoƒbƒNƒoƒbƒtƒ@‚Éƒoƒbƒtƒ@‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ğİ’è‚·‚é
-//! @param		buff : ƒoƒbƒtƒ@‚Ö‚Ìƒ|ƒCƒ“ƒ^
+//! @brief	  	ãƒãƒƒã‚¯ãƒãƒƒãƒ•ã‚¡ã«ãƒãƒƒãƒ•ã‚¡ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã‚’è¨­å®šã™ã‚‹
+//! @param		buff : ãƒãƒƒãƒ•ã‚¡ã¸ã®ãƒã‚¤ãƒ³ã‚¿
 //----------------------------------------------------------------------------
 void TBufferRenderer::SetBackBuffer( BYTE *buff )
 {
-	CAutoLock cAutoLock(&m_BufferLock);	// ƒNƒŠƒeƒBƒJƒ‹ƒZƒNƒVƒ‡ƒ“
+	CAutoLock cAutoLock(&m_BufferLock);	// ã‚¯ãƒªãƒ†ã‚£ã‚«ãƒ«ã‚»ã‚¯ã‚·ãƒ§ãƒ³
 	FreeBackBuffer();
 	if( m_FrontBuffer == 1 )
 		m_Buffer[0] = buff;
@@ -389,42 +389,42 @@ void TBufferRenderer::SetBackBuffer( BYTE *buff )
 	SetPointer( buff );
 }
 //---------------------------------------------------------------------------
-//! @brief	  	ƒtƒƒ“ƒgƒoƒbƒtƒ@‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ğæ“¾‚·‚é
-//! @return		ƒoƒbƒtƒ@‚Ö‚Ìƒ|ƒCƒ“ƒ^
+//! @brief	  	ãƒ•ãƒ­ãƒ³ãƒˆãƒãƒƒãƒ•ã‚¡ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã‚’å–å¾—ã™ã‚‹
+//! @return		ãƒãƒƒãƒ•ã‚¡ã¸ã®ãƒã‚¤ãƒ³ã‚¿
 //----------------------------------------------------------------------------
 BYTE *TBufferRenderer::GetFrontBuffer()
 {
-	CAutoLock cAutoLock(&m_BufferLock);	// ƒNƒŠƒeƒBƒJƒ‹ƒZƒNƒVƒ‡ƒ“
+	CAutoLock cAutoLock(&m_BufferLock);	// ã‚¯ãƒªãƒ†ã‚£ã‚«ãƒ«ã‚»ã‚¯ã‚·ãƒ§ãƒ³
 	if( m_FrontBuffer == 1 )
 		return m_Buffer[1];
 	else
 		return m_Buffer[0];
 }
 //---------------------------------------------------------------------------
-//! @brief	  	ƒoƒbƒNƒoƒbƒtƒ@‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ğæ“¾‚·‚é
-//! @return		ƒoƒbƒtƒ@‚Ö‚Ìƒ|ƒCƒ“ƒ^
+//! @brief	  	ãƒãƒƒã‚¯ãƒãƒƒãƒ•ã‚¡ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã‚’å–å¾—ã™ã‚‹
+//! @return		ãƒãƒƒãƒ•ã‚¡ã¸ã®ãƒã‚¤ãƒ³ã‚¿
 //----------------------------------------------------------------------------
 BYTE *TBufferRenderer::GetBackBuffer()
 {
-	CAutoLock cAutoLock(&m_BufferLock);	// ƒNƒŠƒeƒBƒJƒ‹ƒZƒNƒVƒ‡ƒ“
+	CAutoLock cAutoLock(&m_BufferLock);	// ã‚¯ãƒªãƒ†ã‚£ã‚«ãƒ«ã‚»ã‚¯ã‚·ãƒ§ãƒ³
 	if( m_FrontBuffer == 1 )
 		return m_Buffer[0];
 	else
 		return m_Buffer[1];
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒtƒƒ“ƒgƒoƒbƒtƒ@‚ğİ’è‚µ‚Ü‚·B
-//! @param		buff : ƒtƒƒ“ƒgƒoƒbƒtƒ@—pƒoƒbƒtƒ@‚Ö‚Ìƒ|ƒCƒ“ƒ^
-//! @param		size : ƒoƒbƒtƒ@‚ÌƒTƒCƒY‚ğ“n‚·•Ï”‚Ö‚Ìƒ|ƒCƒ“ƒ^B@n
-//!					buff‚ªNULL‚ÌA‚±‚±‚É—~‚µ‚¢ƒTƒCƒY‚ª•Ô‚é
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ãƒ•ãƒ­ãƒ³ãƒˆãƒãƒƒãƒ•ã‚¡ã‚’è¨­å®šã—ã¾ã™ã€‚
+//! @param		buff : ãƒ•ãƒ­ãƒ³ãƒˆãƒãƒƒãƒ•ã‚¡ç”¨ãƒãƒƒãƒ•ã‚¡ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+//! @param		size : ãƒãƒƒãƒ•ã‚¡ã®ã‚µã‚¤ã‚ºã‚’æ¸¡ã™å¤‰æ•°ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã€‚@n
+//!					buffãŒNULLã®æ™‚ã€ã“ã“ã«æ¬²ã—ã„ã‚µã‚¤ã‚ºãŒè¿”ã‚‹
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT TBufferRenderer::SetFrontBuffer( BYTE *buff, long *size )
 {
 	if( m_State == State_Running )
 		return S_FALSE;
 
-	CAutoLock cAutoLock(&m_BufferLock);	// ƒNƒŠƒeƒBƒJƒ‹ƒZƒNƒVƒ‡ƒ“
+	CAutoLock cAutoLock(&m_BufferLock);	// ã‚¯ãƒªãƒ†ã‚£ã‚«ãƒ«ã‚»ã‚¯ã‚·ãƒ§ãƒ³
 	if( buff == NULL && size != NULL )
 	{
 		*size = GetBufferSize();
@@ -441,18 +441,18 @@ HRESULT TBufferRenderer::SetFrontBuffer( BYTE *buff, long *size )
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒoƒbƒNƒoƒbƒtƒ@‚ğİ’è‚µ‚Ü‚·B
-//! @param		buff : ƒoƒbƒNƒoƒbƒtƒ@—pƒoƒbƒtƒ@‚Ö‚Ìƒ|ƒCƒ“ƒ^
-//! @param		size : ƒoƒbƒtƒ@‚ÌƒTƒCƒY‚ğ“n‚·•Ï”‚Ö‚Ìƒ|ƒCƒ“ƒ^B@n
-//!					buff‚ªNULL‚ÌA‚±‚±‚É—~‚µ‚¢ƒTƒCƒY‚ª•Ô‚é
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ãƒãƒƒã‚¯ãƒãƒƒãƒ•ã‚¡ã‚’è¨­å®šã—ã¾ã™ã€‚
+//! @param		buff : ãƒãƒƒã‚¯ãƒãƒƒãƒ•ã‚¡ç”¨ãƒãƒƒãƒ•ã‚¡ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+//! @param		size : ãƒãƒƒãƒ•ã‚¡ã®ã‚µã‚¤ã‚ºã‚’æ¸¡ã™å¤‰æ•°ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã€‚@n
+//!					buffãŒNULLã®æ™‚ã€ã“ã“ã«æ¬²ã—ã„ã‚µã‚¤ã‚ºãŒè¿”ã‚‹
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT TBufferRenderer::SetBackBuffer( BYTE *buff, long *size )
 {
 	if( m_State == State_Running )
 		return S_FALSE;
 
-	CAutoLock cAutoLock(&m_BufferLock);	// ƒNƒŠƒeƒBƒJƒ‹ƒZƒNƒVƒ‡ƒ“
+	CAutoLock cAutoLock(&m_BufferLock);	// ã‚¯ãƒªãƒ†ã‚£ã‚«ãƒ«ã‚»ã‚¯ã‚·ãƒ§ãƒ³
 	if( buff == NULL && size != NULL )
 	{
 		*size = GetBufferSize();
@@ -469,35 +469,35 @@ HRESULT TBufferRenderer::SetBackBuffer( BYTE *buff, long *size )
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief		ƒtƒƒ“ƒgƒoƒbƒtƒ@‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ğæ“¾‚µ‚Ü‚·B
-//! @param		buff : ƒtƒƒ“ƒgƒoƒbƒtƒ@‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ğ•Ô‚·‚½‚ß‚Ìƒoƒbƒtƒ@‚Ö‚Ìƒ|ƒCƒ“ƒ^
-//! @param		size : ƒoƒbƒtƒ@‚ÌƒTƒCƒY‚ğ•Ô‚·•Ï”‚Ö‚Ìƒ|ƒCƒ“ƒ^
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief		ãƒ•ãƒ­ãƒ³ãƒˆãƒãƒƒãƒ•ã‚¡ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã‚’å–å¾—ã—ã¾ã™ã€‚
+//! @param		buff : ãƒ•ãƒ­ãƒ³ãƒˆãƒãƒƒãƒ•ã‚¡ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã‚’è¿”ã™ãŸã‚ã®ãƒãƒƒãƒ•ã‚¡ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+//! @param		size : ãƒãƒƒãƒ•ã‚¡ã®ã‚µã‚¤ã‚ºã‚’è¿”ã™å¤‰æ•°ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT TBufferRenderer::GetFrontBuffer( BYTE **buff, long *size )
 {
-	CAutoLock cAutoLock(&m_BufferLock);	// ƒNƒŠƒeƒBƒJƒ‹ƒZƒNƒVƒ‡ƒ“
+	CAutoLock cAutoLock(&m_BufferLock);	// ã‚¯ãƒªãƒ†ã‚£ã‚«ãƒ«ã‚»ã‚¯ã‚·ãƒ§ãƒ³
 	*buff = GetFrontBuffer();
 	*size = GetBufferSize();
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒoƒbƒNƒoƒbƒtƒ@‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ğæ“¾‚µ‚Ü‚·B
-//! @param		buff : ƒoƒbƒNƒoƒbƒtƒ@‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ğ•Ô‚·‚½‚ß‚Ìƒoƒbƒtƒ@‚Ö‚Ìƒ|ƒCƒ“ƒ^
-//! @param		size : ƒoƒbƒtƒ@‚ÌƒTƒCƒY‚ğ•Ô‚·•Ï”‚Ö‚Ìƒ|ƒCƒ“ƒ^
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ãƒãƒƒã‚¯ãƒãƒƒãƒ•ã‚¡ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã‚’å–å¾—ã—ã¾ã™ã€‚
+//! @param		buff : ãƒãƒƒã‚¯ãƒãƒƒãƒ•ã‚¡ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã‚’è¿”ã™ãŸã‚ã®ãƒãƒƒãƒ•ã‚¡ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+//! @param		size : ãƒãƒƒãƒ•ã‚¡ã®ã‚µã‚¤ã‚ºã‚’è¿”ã™å¤‰æ•°ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT TBufferRenderer::GetBackBuffer( BYTE **buff, long *size )
 {
-	CAutoLock cAutoLock(&m_BufferLock);	// ƒNƒŠƒeƒBƒJƒ‹ƒZƒNƒVƒ‡ƒ“
+	CAutoLock cAutoLock(&m_BufferLock);	// ã‚¯ãƒªãƒ†ã‚£ã‚«ãƒ«ã‚»ã‚¯ã‚·ãƒ§ãƒ³
 	*buff = GetBackBuffer();
 	*size = GetBufferSize();
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	1ƒtƒŒ[ƒ€‚Ì•½‹Ï•\¦ŠÔ‚ğæ“¾‚µ‚Ü‚·
-//! @param		pAvgTimePerFrame : 1ƒtƒŒ[ƒ€‚Ì•½‹Ï•\¦ŠÔ
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	1ãƒ•ãƒ¬ãƒ¼ãƒ ã®å¹³å‡è¡¨ç¤ºæ™‚é–“ã‚’å–å¾—ã—ã¾ã™
+//! @param		pAvgTimePerFrame : 1ãƒ•ãƒ¬ãƒ¼ãƒ ã®å¹³å‡è¡¨ç¤ºæ™‚é–“
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT TBufferRenderer::get_AvgTimePerFrame( REFTIME *pAvgTimePerFrame )
 {
@@ -509,9 +509,9 @@ HRESULT TBufferRenderer::get_AvgTimePerFrame( REFTIME *pAvgTimePerFrame )
 		return E_POINTER;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒrƒfƒI‚Ì•‚ğæ“¾‚µ‚Ü‚·
-//! @param		pVideoWidth : ƒrƒfƒI‚Ì•
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ãƒ“ãƒ‡ã‚ªã®å¹…ã‚’å–å¾—ã—ã¾ã™
+//! @param		pVideoWidth : ãƒ“ãƒ‡ã‚ªã®å¹…
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT TBufferRenderer::get_VideoWidth( long *pVideoWidth )
 {
@@ -523,9 +523,9 @@ HRESULT TBufferRenderer::get_VideoWidth( long *pVideoWidth )
 		return E_POINTER;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒrƒfƒI‚Ì‚‚³‚ğæ“¾‚µ‚Ü‚·
-//! @param		pVideoHeight : ƒrƒfƒI‚Ì‚‚³
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ãƒ“ãƒ‡ã‚ªã®é«˜ã•ã‚’å–å¾—ã—ã¾ã™
+//! @param		pVideoHeight : ãƒ“ãƒ‡ã‚ªã®é«˜ã•
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT TBufferRenderer::get_VideoHeight( long *pVideoHeight )
 {
@@ -537,10 +537,10 @@ HRESULT TBufferRenderer::get_VideoHeight( long *pVideoHeight )
 		return E_POINTER;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒXƒgƒŠ[ƒ~ƒ“ƒO‚ªŠJn‚³‚ê‚½‚ÉƒR[ƒ‹‚³‚ê‚é
+//! @brief	  	ã‚¹ãƒˆãƒªãƒ¼ãƒŸãƒ³ã‚°ãŒé–‹å§‹ã•ã‚ŒãŸæ™‚ã«ã‚³ãƒ¼ãƒ«ã•ã‚Œã‚‹
 //!
-//! ŠJnƒtƒŒ[ƒ€‚ğ‹L˜^‚·‚éB
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! é–‹å§‹ãƒ•ãƒ¬ãƒ¼ãƒ ã‚’è¨˜éŒ²ã™ã‚‹ã€‚
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT TBufferRenderer::OnStartStreaming(void)
 {
@@ -556,7 +556,7 @@ HRESULT TBufferRenderer::OnStartStreaming(void)
 	bool		bGetTime = false;
 	LONGLONG	Current = 0;
 	if( mediaSeeking.p != NULL )
-	{	// IMediaSeeking‚ğg‚Á‚ÄŠÔ‚Ìæ“¾‚ğ‚İ‚é
+	{	// IMediaSeekingã‚’ä½¿ã£ã¦æ™‚é–“ã®å–å¾—ã‚’è©¦ã¿ã‚‹
 		GUID	Format;
 		if( SUCCEEDED(hr = mediaSeeking->GetTimeFormat( &Format ) ) )
 		{
@@ -565,7 +565,7 @@ HRESULT TBufferRenderer::OnStartStreaming(void)
 				if( IsEqualGUID( TIME_FORMAT_MEDIA_TIME, Format ) )
 				{
 					double	renderTime = Current / 10000000.0;
-					REFTIME	AvgTimePerFrame;	// REFTIME :  •b”‚ğ¦‚·¬”‚ğ•\‚·”{¸“x•‚“®¬”“_”B
+					REFTIME	AvgTimePerFrame;	// REFTIME :  ç§’æ•°ã‚’ç¤ºã™å°æ•°ã‚’è¡¨ã™å€ç²¾åº¦æµ®å‹•å°æ•°ç‚¹æ•°ã€‚
 					if( SUCCEEDED( hr = get_AvgTimePerFrame( &AvgTimePerFrame ) ) )
 					{
 						m_StartFrame = (LONG)(renderTime / AvgTimePerFrame + 0.5);
@@ -588,15 +588,15 @@ HRESULT TBufferRenderer::OnStartStreaming(void)
 	return CBaseVideoRenderer::OnStartStreaming();
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒŒƒ“ƒ_ƒŠƒ“ƒO‘O‚ÉƒR[ƒ‹‚³‚ê‚é
+//! @brief	  	ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°å‰ã«ã‚³ãƒ¼ãƒ«ã•ã‚Œã‚‹
 //!
-//! ƒƒfƒBƒAƒTƒ“ƒvƒ‹‚ÉƒƒfƒBƒAƒ^ƒCƒ€‚ğ‹L˜^‚·‚éB
-//! ƒƒfƒBƒAƒ^ƒCƒ€‚ÍŠJnƒtƒŒ[ƒ€‚ÉŒ»İ‚ÌƒXƒgƒŠ[ƒ€ŠÔ‚ğ‰ÁZ‚µ‚½‚à‚Ì‚É‚È‚éB
-//! ‚à‚µAƒtƒBƒ‹ƒ^‚ÌIMediaSeekingƒCƒ“ƒ^[ƒtƒFƒCƒX‚ª—˜—p‚Å‚«‚È‚¢ê‡‚ÍA
-//! ‚±‚ÌƒŒƒ“ƒ_[ƒtƒBƒ‹ƒ^‚ª•`‰æ‚µ‚½ƒtƒŒ[ƒ€”‚Æƒhƒƒbƒv‚µ‚½ƒtƒŒ[ƒ€”‚ğ‰ÁZ‚·‚éB
-//! ‚±‚Ìê‡A‚æ‚èãˆÊ‚ÌƒtƒBƒ‹ƒ^‚Åƒhƒƒbƒv‚µ‚½ƒtƒŒ[ƒ€”‚Í‚í‚©‚ç‚È‚¢‚Ì‚ÅA
-//! áŠ±¸“x‚ª—‚¿‚éB
-//! @param		pMediaSample : ƒƒfƒBƒAƒTƒ“ƒvƒ‹
+//! ãƒ¡ãƒ‡ã‚£ã‚¢ã‚µãƒ³ãƒ—ãƒ«ã«ãƒ¡ãƒ‡ã‚£ã‚¢ã‚¿ã‚¤ãƒ ã‚’è¨˜éŒ²ã™ã‚‹ã€‚
+//! ãƒ¡ãƒ‡ã‚£ã‚¢ã‚¿ã‚¤ãƒ ã¯é–‹å§‹ãƒ•ãƒ¬ãƒ¼ãƒ ã«ç¾åœ¨ã®ã‚¹ãƒˆãƒªãƒ¼ãƒ æ™‚é–“ã‚’åŠ ç®—ã—ãŸã‚‚ã®ã«ãªã‚‹ã€‚
+//! ã‚‚ã—ã€ãƒ•ã‚£ãƒ«ã‚¿ã®IMediaSeekingã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ãŒåˆ©ç”¨ã§ããªã„å ´åˆã¯ã€
+//! ã“ã®ãƒ¬ãƒ³ãƒ€ãƒ¼ãƒ•ã‚£ãƒ«ã‚¿ãŒæç”»ã—ãŸãƒ•ãƒ¬ãƒ¼ãƒ æ•°ã¨ãƒ‰ãƒ­ãƒƒãƒ—ã—ãŸãƒ•ãƒ¬ãƒ¼ãƒ æ•°ã‚’åŠ ç®—ã™ã‚‹ã€‚
+//! ã“ã®å ´åˆã€ã‚ˆã‚Šä¸Šä½ã®ãƒ•ã‚£ãƒ«ã‚¿ã§ãƒ‰ãƒ­ãƒƒãƒ—ã—ãŸãƒ•ãƒ¬ãƒ¼ãƒ æ•°ã¯ã‚ã‹ã‚‰ãªã„ã®ã§ã€
+//! è‹¥å¹²ç²¾åº¦ãŒè½ã¡ã‚‹ã€‚
+//! @param		pMediaSample : ãƒ¡ãƒ‡ã‚£ã‚¢ã‚µãƒ³ãƒ—ãƒ«
 //----------------------------------------------------------------------------
 void TBufferRenderer::OnRenderStart( IMediaSample *pMediaSample )
 {
@@ -618,7 +618,7 @@ void TBufferRenderer::OnRenderStart( IMediaSample *pMediaSample )
 				{
 					double	renderTime = Current / 10000000.0;
 					double	stopTime = Stop / 10000000.0;
-					REFTIME	AvgTimePerFrame;	// REFTIME :  •b”‚ğ¦‚·¬”‚ğ•\‚·”{¸“x•‚“®¬”“_”B
+					REFTIME	AvgTimePerFrame;	// REFTIME :  ç§’æ•°ã‚’ç¤ºã™å°æ•°ã‚’è¡¨ã™å€ç²¾åº¦æµ®å‹•å°æ•°ç‚¹æ•°ã€‚
 					if( SUCCEEDED( hr = get_AvgTimePerFrame( &AvgTimePerFrame ) ) )
 					{
 						Current = (LONGLONG)(renderTime / AvgTimePerFrame + 0.5);
@@ -654,12 +654,12 @@ void TBufferRenderer::OnRenderStart( IMediaSample *pMediaSample )
 //----------------------------------------------------------------------------
 //##	TBufferRendererInputPin
 //----------------------------------------------------------------------------
-//! @brief	  	“ü—Íƒsƒ“ƒIƒuƒWƒFƒNƒg‚ğ\’z‚µ‚Ü‚·B
-//! @param		pRenderer : ƒŒƒ“ƒ_[ƒIƒuƒWƒFƒNƒg‚ğw’è‚µ‚Ü‚·B
-//! @param		pInterfaceLock : CCritSec ƒƒbƒN‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ÅAó‘ÔˆÚs‚ğŒp‘±‚·‚é‚½‚ß‚Ég—p‚·‚éB@n
-//!					‚±‚ê‚ÍƒtƒBƒ‹ƒ^ ƒƒbƒN CBaseFilter.m_pLock ‚Æ“¯—l‚ÌƒNƒŠƒeƒBƒJƒ‹ ƒZƒNƒVƒ‡ƒ“‚Æ‚È‚è‚¤‚éB 
-//! @param		phr : ƒƒ\ƒbƒh‚Ì¬Œ÷E¸”s‚ğ¦‚· HRESULT ’l‚ğæ“¾‚·‚é•Ï”‚Ìƒ|ƒCƒ“ƒ^B
-//! @param		name : ƒIƒuƒWƒFƒNƒg‚ÌƒfƒoƒbƒO—p‚Ì–¼‘O‚ª“ü‚é•¶š—ñB
+//! @brief	  	å…¥åŠ›ãƒ”ãƒ³ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’æ§‹ç¯‰ã—ã¾ã™ã€‚
+//! @param		pRenderer : ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’æŒ‡å®šã—ã¾ã™ã€‚
+//! @param		pInterfaceLock : CCritSec ãƒ­ãƒƒã‚¯ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã§ã€çŠ¶æ…‹ç§»è¡Œã‚’ç¶™ç¶šã™ã‚‹ãŸã‚ã«ä½¿ç”¨ã™ã‚‹ã€‚@n
+//!					ã“ã‚Œã¯ãƒ•ã‚£ãƒ«ã‚¿ ãƒ­ãƒƒã‚¯ CBaseFilter.m_pLock ã¨åŒæ§˜ã®ã‚¯ãƒªãƒ†ã‚£ã‚«ãƒ« ã‚»ã‚¯ã‚·ãƒ§ãƒ³ã¨ãªã‚Šã†ã‚‹ã€‚ 
+//! @param		phr : ãƒ¡ã‚½ãƒƒãƒ‰ã®æˆåŠŸãƒ»å¤±æ•—ã‚’ç¤ºã™ HRESULT å€¤ã‚’å–å¾—ã™ã‚‹å¤‰æ•°ã®ãƒã‚¤ãƒ³ã‚¿ã€‚
+//! @param		name : ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ãƒ‡ãƒãƒƒã‚°ç”¨ã®åå‰ãŒå…¥ã‚‹æ–‡å­—åˆ—ã€‚
 //----------------------------------------------------------------------------
 TBufferRendererInputPin::TBufferRendererInputPin( TBufferRenderer *pRenderer, CCritSec *pInterfaceLock, HRESULT *phr, LPCWSTR name)
  : CRendererInputPin( pRenderer, phr, name ), m_pRenderer( pRenderer ), m_pInterfaceLock( pInterfaceLock ),
@@ -667,71 +667,71 @@ TBufferRendererInputPin::TBufferRendererInputPin( TBufferRenderer *pRenderer, CC
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒfƒXƒgƒ‰ƒNƒ^BŒ»İ‚Í‰½‚à‚µ‚È‚¢B
+//! @brief	  	ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã€‚ç¾åœ¨ã¯ä½•ã‚‚ã—ãªã„ã€‚
 //----------------------------------------------------------------------------
 TBufferRendererInputPin::~TBufferRendererInputPin()
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	©‘O‚ÌƒAƒƒP[ƒ^‚ª—LŒø‚©‚Ç‚¤‚©’²‚×‚Ü‚·B
-//! @return		—LŒø‚È‚çTRUE‚ğ•Ô‚µ‚Ü‚·B
+//! @brief	  	è‡ªå‰ã®ã‚¢ãƒ­ã‚±ãƒ¼ã‚¿ãŒæœ‰åŠ¹ã‹ã©ã†ã‹èª¿ã¹ã¾ã™ã€‚
+//! @return		æœ‰åŠ¹ãªã‚‰TRUEã‚’è¿”ã—ã¾ã™ã€‚
 //----------------------------------------------------------------------------
 bool TBufferRendererInputPin::ActiveAllocator( void ) const
 {
 	return m_ActiveAllocator;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	©‘O‚ÌƒAƒƒP[ƒ^ƒIƒuƒWƒFƒNƒg‚ğŠ„‚è“–‚Ä‚Ü‚·B
-//! @param		ppAllocator : •Ô‚·ƒAƒƒP[ƒ^[
+//! @brief	  	è‡ªå‰ã®ã‚¢ãƒ­ã‚±ãƒ¼ã‚¿ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’å‰²ã‚Šå½“ã¦ã¾ã™ã€‚
+//! @param		ppAllocator : è¿”ã™ã‚¢ãƒ­ã‚±ãƒ¼ã‚¿ãƒ¼
 //----------------------------------------------------------------------------
 STDMETHODIMP TBufferRendererInputPin::GetAllocator( IMemAllocator **ppAllocator )
 {
 	CAutoLock cInterfaceLock(m_pInterfaceLock);
 	CheckPointer(ppAllocator,E_POINTER);
 
-	// ƒAƒƒP[ƒ^‚ª‚Ü‚¾İ’è‚³‚ê‚Ä‚¢‚È‚¢‚Æ‚«
+	// ã‚¢ãƒ­ã‚±ãƒ¼ã‚¿ãŒã¾ã è¨­å®šã•ã‚Œã¦ã„ãªã„ã¨ã
 	if (m_pAllocator == NULL) {
 		m_pAllocator = &(m_pRenderer->m_Allocator);
 		m_pAllocator->AddRef();
 	}
-	// QÆƒJƒEƒ“ƒg‚ğc‚·‚Ì‚ÍƒCƒ“ƒ^ƒtƒF[ƒX‚Ìd—l‚Å‚·B
+	// å‚ç…§ã‚«ã‚¦ãƒ³ãƒˆã‚’æ®‹ã™ã®ã¯ã‚¤ãƒ³ã‚¿ãƒ•ã‚§ãƒ¼ã‚¹ã®ä»•æ§˜ã§ã™ã€‚
 	m_pAllocator->AddRef();
 	*ppAllocator = m_pAllocator;
 
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒAƒƒP[ƒ^‚ªŒˆ‚Ü‚Á‚½‚Æ‚«‚ÉŒÄ‚Ño‚³‚ê‚Ü‚·B
-//! @param		pAllocator ¡‰ñ‚ÌÚ‘±‚Åg—p‚·‚éƒAƒƒP[ƒ^‚ğw’è‚µ‚Ü‚·B
-//! @param		bReadOnly ‚±‚ÌƒAƒƒP[ƒ^‚©‚ç‚ÌƒTƒ“ƒvƒ‹‚ª“Ç‚İ‚Æ‚èê—p‚È‚çTRUE‚ğw’è‚µ‚Ü‚·B
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ã‚¢ãƒ­ã‚±ãƒ¼ã‚¿ãŒæ±ºã¾ã£ãŸã¨ãã«å‘¼ã³å‡ºã•ã‚Œã¾ã™ã€‚
+//! @param		pAllocator ä»Šå›ã®æ¥ç¶šã§ä½¿ç”¨ã™ã‚‹ã‚¢ãƒ­ã‚±ãƒ¼ã‚¿ã‚’æŒ‡å®šã—ã¾ã™ã€‚
+//! @param		bReadOnly ã“ã®ã‚¢ãƒ­ã‚±ãƒ¼ã‚¿ã‹ã‚‰ã®ã‚µãƒ³ãƒ—ãƒ«ãŒèª­ã¿ã¨ã‚Šå°‚ç”¨ãªã‚‰TRUEã‚’æŒ‡å®šã—ã¾ã™ã€‚
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 STDMETHODIMP TBufferRendererInputPin::NotifyAllocator( IMemAllocator * pAllocator, BOOL bReadOnly )
 {
 	CAutoLock cInterfaceLock(m_pInterfaceLock);
 
-	// Šî’êƒNƒ‰ƒXŒÄ‚Ño‚µ
+	// åŸºåº•ã‚¯ãƒ©ã‚¹å‘¼ã³å‡ºã—
 	HRESULT hr = CBaseInputPin::NotifyAllocator(pAllocator, bReadOnly);
 	if( FAILED(hr) )
 		return hr;
 
-	//©‘O‚ÌƒAƒƒP[ƒ^‚ª—LŒø‚©‚Ç‚¤‚©‚ğ‹L˜^‚µ‚Ü‚·
+	//è‡ªå‰ã®ã‚¢ãƒ­ã‚±ãƒ¼ã‚¿ãŒæœ‰åŠ¹ã‹ã©ã†ã‹ã‚’è¨˜éŒ²ã—ã¾ã™
 	m_ActiveAllocator = (pAllocator == (&(m_pRenderer->m_Allocator)));
 
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	w’è‚µ‚½ƒƒfƒBƒAƒTƒ“ƒvƒ‹‚Éƒ|ƒCƒ“ƒ^‚ğİ’è‚µ‚Ü‚·
-//! @param		media : ƒƒfƒBƒAƒTƒ“ƒvƒ‹
-//! @param		ptr : İ’è‚·‚éƒ|ƒCƒ“ƒ^
+//! @brief	  	æŒ‡å®šã—ãŸãƒ¡ãƒ‡ã‚£ã‚¢ã‚µãƒ³ãƒ—ãƒ«ã«ãƒã‚¤ãƒ³ã‚¿ã‚’è¨­å®šã—ã¾ã™
+//! @param		media : ãƒ¡ãƒ‡ã‚£ã‚¢ã‚µãƒ³ãƒ—ãƒ«
+//! @param		ptr : è¨­å®šã™ã‚‹ãƒã‚¤ãƒ³ã‚¿
 //----------------------------------------------------------------------------
 void TBufferRendererInputPin::SetPointer( IMediaSample *media, BYTE *ptr )
 {
 	m_pRenderer->m_Allocator.SetPointer( media, ptr );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒAƒƒP[ƒ^[‚ª‚ÂƒƒfƒBƒAƒTƒ“ƒvƒ‹‚Éƒ|ƒCƒ“ƒ^‚ğİ’è‚µ‚Ü‚·
-//! @param		ptr : İ’è‚·‚éƒ|ƒCƒ“ƒ^
+//! @brief	  	ã‚¢ãƒ­ã‚±ãƒ¼ã‚¿ãƒ¼ãŒæŒã¤ãƒ¡ãƒ‡ã‚£ã‚¢ã‚µãƒ³ãƒ—ãƒ«ã«ãƒã‚¤ãƒ³ã‚¿ã‚’è¨­å®šã—ã¾ã™
+//! @param		ptr : è¨­å®šã™ã‚‹ãƒã‚¤ãƒ³ã‚¿
 //----------------------------------------------------------------------------
 void TBufferRendererInputPin::SetPointer( BYTE *ptr )
 {
@@ -740,17 +740,17 @@ void TBufferRendererInputPin::SetPointer( BYTE *ptr )
 //----------------------------------------------------------------------------
 //## TBufferRendererAllocator
 //----------------------------------------------------------------------------
-//! @brief	  	ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-//! @param		pRenderer : ƒŒƒ“ƒ_[ƒIƒuƒWƒFƒNƒg‚ğw’è‚µ‚Ü‚·B
-//! @param		pName : ƒIƒuƒWƒFƒNƒg‚ÌƒfƒoƒbƒO—p‚Ì–¼‘O‚ª“ü‚é•¶š—ñB
-//! @param		pUnk : W¬‚³‚ê‚½Š—LÒƒIƒuƒWƒFƒNƒg‚Ö‚Ìƒ|ƒCƒ“ƒ^B
-//! @param		phr : ƒƒ\ƒbƒh‚Ì¬Œ÷E¸”s‚ğ¦‚· HRESULT ’l‚ğæ“¾‚·‚é•Ï”‚Ìƒ|ƒCƒ“ƒ^B
+//! @brief	  	ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+//! @param		pRenderer : ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’æŒ‡å®šã—ã¾ã™ã€‚
+//! @param		pName : ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®ãƒ‡ãƒãƒƒã‚°ç”¨ã®åå‰ãŒå…¥ã‚‹æ–‡å­—åˆ—ã€‚
+//! @param		pUnk : é›†æˆã•ã‚ŒãŸæ‰€æœ‰è€…ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã¸ã®ãƒã‚¤ãƒ³ã‚¿ã€‚
+//! @param		phr : ãƒ¡ã‚½ãƒƒãƒ‰ã®æˆåŠŸãƒ»å¤±æ•—ã‚’ç¤ºã™ HRESULT å€¤ã‚’å–å¾—ã™ã‚‹å¤‰æ•°ã®ãƒã‚¤ãƒ³ã‚¿ã€‚
 //----------------------------------------------------------------------------
 TBufferRendererAllocator::TBufferRendererAllocator( TBufferRenderer *pRenderer, TCHAR *pName, LPUNKNOWN pUnk, HRESULT *phr)
  : CBaseAllocator(pName, pUnk, phr), m_pMediaSample(NULL), m_pRenderer(pRenderer)
 {}
 //----------------------------------------------------------------------------
-//! @brief	  	CBaseAllocator::Decommit‚ğƒR[ƒ‹‚µ‚È‚¯‚ê‚Î‚È‚ç‚È‚¢‚Ì‚ÅAƒR[ƒ‹‚·‚éB
+//! @brief	  	CBaseAllocator::Decommitã‚’ã‚³ãƒ¼ãƒ«ã—ãªã‘ã‚Œã°ãªã‚‰ãªã„ã®ã§ã€ã‚³ãƒ¼ãƒ«ã™ã‚‹ã€‚
 //----------------------------------------------------------------------------
 TBufferRendererAllocator::~TBufferRendererAllocator()
 {
@@ -769,14 +769,14 @@ TBufferRendererAllocator::~TBufferRendererAllocator()
 	m_lAllocated = 0;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	‰½‚à‚µ‚È‚¢BƒAƒƒP[ƒ^[‚ªƒƒ‚ƒŠ‚ğ‰ğ•ú‚·‚é‚±‚Æ‚Í‚È‚¢B
+//! @brief	  	ä½•ã‚‚ã—ãªã„ã€‚ã‚¢ãƒ­ã‚±ãƒ¼ã‚¿ãƒ¼ãŒãƒ¡ãƒ¢ãƒªã‚’è§£æ”¾ã™ã‚‹ã“ã¨ã¯ãªã„ã€‚
 //----------------------------------------------------------------------------
 void TBufferRendererAllocator::Free( void )
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒƒ‚ƒŠ‚ğŠ„‚è“–‚Ä‚ÄA‚»‚ê‚ğƒŠƒXƒg‚É’Ç‰Á‚·‚é
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ãƒ¡ãƒ¢ãƒªã‚’å‰²ã‚Šå½“ã¦ã¦ã€ãã‚Œã‚’ãƒªã‚¹ãƒˆã«è¿½åŠ ã™ã‚‹
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT TBufferRendererAllocator::Alloc( void )
 {
@@ -807,10 +807,10 @@ HRESULT TBufferRendererAllocator::Alloc( void )
 }
 
 //----------------------------------------------------------------------------
-//! @brief	  	—v‹‚·‚éƒƒ‚ƒŠ‚ÌÚ×‚ğİ’è‚·‚éB
-//! @param		pRequest : ƒoƒbƒtƒ@—v‹‚ğŠÜ‚Ş ALLOCATOR_PROPERTIES \‘¢‘Ì‚Ìƒ|ƒCƒ“ƒ^
-//! @param		pActual : ÀÛ‚Ìƒoƒbƒtƒ@ ƒvƒƒpƒeƒB‚ğó‚¯æ‚é ALLOCATOR_PROPERTIES \‘¢‘Ì‚Ìƒ|ƒCƒ“ƒ^
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	è¦æ±‚ã™ã‚‹ãƒ¡ãƒ¢ãƒªã®è©³ç´°ã‚’è¨­å®šã™ã‚‹ã€‚
+//! @param		pRequest : ãƒãƒƒãƒ•ã‚¡è¦æ±‚ã‚’å«ã‚€ ALLOCATOR_PROPERTIES æ§‹é€ ä½“ã®ãƒã‚¤ãƒ³ã‚¿
+//! @param		pActual : å®Ÿéš›ã®ãƒãƒƒãƒ•ã‚¡ ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã‚’å—ã‘å–ã‚‹ ALLOCATOR_PROPERTIES æ§‹é€ ä½“ã®ãƒã‚¤ãƒ³ã‚¿
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 STDMETHODIMP TBufferRendererAllocator::SetProperties( ALLOCATOR_PROPERTIES* pRequest, ALLOCATOR_PROPERTIES* pActual )
 {
@@ -823,7 +823,7 @@ STDMETHODIMP TBufferRendererAllocator::SetProperties( ALLOCATOR_PROPERTIES* pReq
 	if( m_bCommitted == TRUE)
 		return VFW_E_ALREADY_COMMITTED;
 
-	if( m_lFree.GetCount() < m_lAllocated )	// m_lAllocated‚ª1ŒÂˆÈã‚Ì‚ÍƒGƒ‰[‚É‚µ‚½•û‚ª‚æ‚¢H
+	if( m_lFree.GetCount() < m_lAllocated )	// m_lAllocatedãŒ1å€‹ä»¥ä¸Šã®æ™‚ã¯ã‚¨ãƒ©ãƒ¼ã«ã—ãŸæ–¹ãŒã‚ˆã„ï¼Ÿ
 		return VFW_E_BUFFERS_OUTSTANDING;
 
 	if( pRequest->cBuffers == 1 && pRequest->cbBuffer == m_pRenderer->GetBufferSize() &&
@@ -841,9 +841,9 @@ STDMETHODIMP TBufferRendererAllocator::SetProperties( ALLOCATOR_PROPERTIES* pReq
 	return VFW_E_BADALIGN;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	w’è‚µ‚½ƒƒfƒBƒAƒTƒ“ƒvƒ‹‚Éƒ|ƒCƒ“ƒ^‚ğİ’è‚µ‚Ü‚·
-//! @param		media : ƒƒfƒBƒAƒTƒ“ƒvƒ‹
-//! @param		ptr : İ’è‚·‚éƒ|ƒCƒ“ƒ^
+//! @brief	  	æŒ‡å®šã—ãŸãƒ¡ãƒ‡ã‚£ã‚¢ã‚µãƒ³ãƒ—ãƒ«ã«ãƒã‚¤ãƒ³ã‚¿ã‚’è¨­å®šã—ã¾ã™
+//! @param		media : ãƒ¡ãƒ‡ã‚£ã‚¢ã‚µãƒ³ãƒ—ãƒ«
+//! @param		ptr : è¨­å®šã™ã‚‹ãƒã‚¤ãƒ³ã‚¿
 //----------------------------------------------------------------------------
 void TBufferRendererAllocator::SetPointer( IMediaSample *media, BYTE *ptr )
 {
@@ -854,9 +854,9 @@ void TBufferRendererAllocator::SetPointer( IMediaSample *media, BYTE *ptr )
 		if( m_pMediaSample != NULL )
 		{
 			m_pMediaSample->GetPointer( &pBufferOwn );
-			if( pBufferOwn == pBufferParam )	// “¯‚¶ƒoƒbƒtƒ@‚ğw‚µ‚Ä‚¢‚é‚Ì‚ÅA•Û‚µ‚Ä‚¢‚éƒTƒ“ƒvƒ‹‚Æ“¯‚¶‚ÆŒ©‚È‚·
+			if( pBufferOwn == pBufferParam )	// åŒã˜ãƒãƒƒãƒ•ã‚¡ã‚’æŒ‡ã—ã¦ã„ã‚‹ã®ã§ã€ä¿æŒã—ã¦ã„ã‚‹ã‚µãƒ³ãƒ—ãƒ«ã¨åŒã˜ã¨è¦‹ãªã™
 			{
-				LONG	cBytes = m_pMediaSample->GetSize();	// ƒTƒCƒY‚Í•Ï‚í‚Á‚Ä‚¢‚È‚¢‚ÆŒ©‚È‚·A–‘O‚Éƒ`ƒFƒbƒN‚µ‚Ä‚¨‚­‚±‚Æ
+				LONG	cBytes = m_pMediaSample->GetSize();	// ã‚µã‚¤ã‚ºã¯å¤‰ã‚ã£ã¦ã„ãªã„ã¨è¦‹ãªã™ã€äº‹å‰ã«ãƒã‚§ãƒƒã‚¯ã—ã¦ãŠãã“ã¨
 				m_pMediaSample->SetPointer( ptr, cBytes );
 			}
 		}

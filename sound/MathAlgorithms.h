@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------
 /*
-	Risa [‚è‚³]      alias ‹g—¢‹g—¢3 [kirikiri-3]
+	Risa [ã‚Šã•]      alias å‰é‡Œå‰é‡Œ3 [kirikiri-3]
 	 stands for "Risa Is a Stagecraft Architecture"
 	Copyright (C) 2000 W.Dee <dee@kikyou.info> and contributors
 
@@ -8,7 +8,7 @@
 */
 //---------------------------------------------------------------------------
 //! @file
-//! @brief ”ŠwŠÖ”ŒQ
+//! @brief æ•°å­¦é–¢æ•°ç¾¤
 //---------------------------------------------------------------------------
 
 #ifndef TVP_MATHALGOLITHMS_H
@@ -21,13 +21,13 @@
 
 //---------------------------------------------------------------------------
 
-// ‹¤’Ê
+// å…±é€š
 
 //---------------------------------------------------------------------------
 /**
- * atan2 ‚Ì‚‘¬”Å (1x float, CŒ¾Œê”Å)
- * @note	¸“x‚Í‚ ‚Ü‚è—Ç‚­‚È‚¢B10bit‚®‚ç‚¢B @r
- *			Œ´“T: http://www.dspguru.com/comp.dsp/tricks/alg/fxdatan2.htm
+ * atan2 ã®é«˜é€Ÿç‰ˆ (1x float, Cè¨€èªç‰ˆ)
+ * @note	ç²¾åº¦ã¯ã‚ã¾ã‚Šè‰¯ããªã„ã€‚10bitãã‚‰ã„ã€‚ @r
+ *			åŸå…¸: http://www.dspguru.com/comp.dsp/tricks/alg/fxdatan2.htm
  */
 static inline float VFast_arctan2(float y, float x)
 {
@@ -60,8 +60,8 @@ static inline float VFast_atan2_nmsub(float a, float b, float c) { return -(a*b-
 static inline float VFast_atan2_round(float a) { return (float)((a>0)?(int)(a+0.5):(int)(a-0.5)); }
 
 /**
- * sincos ‚Ì‚‘¬”Å (1x float, CŒ¾Œê”Å)
- * @note	Œ´“T: http://arxiv.org/PS_cache/cs/pdf/0406/0406049.pdf
+ * sincos ã®é«˜é€Ÿç‰ˆ (1x float, Cè¨€èªç‰ˆ)
+ * @note	åŸå…¸: http://arxiv.org/PS_cache/cs/pdf/0406/0406049.pdf
  */
 static inline void VFast_sincos(float v, float &sin, float &cos)
 {
@@ -120,7 +120,7 @@ static inline void VFast_sincos(float v, float &sin, float &cos)
 
 //---------------------------------------------------------------------------
 /**
- * Phase Wrapping(radian‚ğ-PI`PI‚Éƒ‰ƒbƒv‚·‚é) (1x float, CŒ¾Œê”Å)
+ * Phase Wrapping(radianã‚’-PIï½PIã«ãƒ©ãƒƒãƒ—ã™ã‚‹) (1x float, Cè¨€èªç‰ˆ)
  */
 static inline float WrapPi_F1(float v)
 {
@@ -135,15 +135,15 @@ static inline float WrapPi_F1(float v)
 
 //---------------------------------------------------------------------------
 /**
- * ‘‹ŠÖ”‚ğ“K—p‚µ‚È‚ª‚ç‚ÌƒCƒ“ƒ^[ƒŠ[ƒu‰ğœ
- * @param dest		Ši”[æ(•¡”)
- * @param src		ƒ\[ƒX
- * @param win		‘‹ŠÖ”
- * @param numch		ƒ`ƒƒƒ“ƒlƒ‹”
- * @param destofs	dest‚Ìˆ—ŠJnˆÊ’u
- * @param len		ˆ—‚·‚éƒTƒ“ƒvƒ‹”
- *					(Šeƒ`ƒƒƒ“ƒlƒ‹‚²‚Æ‚Ì”; ÀÛ‚Éˆ—‚³‚ê‚éƒTƒ“ƒvƒ‹
- *					”‚Ì‘Œv‚Ílen*numch‚É‚È‚é)
+ * çª“é–¢æ•°ã‚’é©ç”¨ã—ãªãŒã‚‰ã®ã‚¤ãƒ³ã‚¿ãƒ¼ãƒªãƒ¼ãƒ–è§£é™¤
+ * @param dest		æ ¼ç´å…ˆ(è¤‡æ•°)
+ * @param src		ã‚½ãƒ¼ã‚¹
+ * @param win		çª“é–¢æ•°
+ * @param numch		ãƒãƒ£ãƒ³ãƒãƒ«æ•°
+ * @param destofs	destã®å‡¦ç†é–‹å§‹ä½ç½®
+ * @param len		å‡¦ç†ã™ã‚‹ã‚µãƒ³ãƒ—ãƒ«æ•°
+ *					(å„ãƒãƒ£ãƒ³ãƒãƒ«ã”ã¨ã®æ•°; å®Ÿéš›ã«å‡¦ç†ã•ã‚Œã‚‹ã‚µãƒ³ãƒ—ãƒ«
+ *					æ•°ã®ç·è¨ˆã¯len*numchã«ãªã‚‹)
  */
 void DeinterleaveApplyingWindow(float * __restrict dest[], const float * __restrict src,
 					float * __restrict win, int numch, size_t destofs, size_t len);
@@ -152,15 +152,15 @@ void DeinterleaveApplyingWindow(float * __restrict dest[], const float * __restr
 
 //---------------------------------------------------------------------------
 /**
- * ‘‹ŠÖ”‚ğ“K—p‚µ‚È‚ª‚ç‚ÌƒCƒ“ƒ^[ƒŠ[ƒu+ƒI[ƒo[ƒ‰ƒbƒsƒ“ƒO
- * @param dest		Ši”[æ
- * @param src		ƒ\[ƒX(•¡”)
- * @param win		‘‹ŠÖ”
- * @param numch		ƒ`ƒƒƒ“ƒlƒ‹”
- * @param srcofs	src‚Ìˆ—ŠJnˆÊ’u
- * @param len		ˆ—‚·‚éƒTƒ“ƒvƒ‹”
- *					(Šeƒ`ƒƒƒ“ƒlƒ‹‚²‚Æ‚Ì”; ÀÛ‚Éˆ—‚³‚ê‚éƒTƒ“ƒvƒ‹
- *					”‚Ì‘Œv‚Ílen*numch‚É‚È‚é)
+ * çª“é–¢æ•°ã‚’é©ç”¨ã—ãªãŒã‚‰ã®ã‚¤ãƒ³ã‚¿ãƒ¼ãƒªãƒ¼ãƒ–+ã‚ªãƒ¼ãƒãƒ¼ãƒ©ãƒƒãƒ”ãƒ³ã‚°
+ * @param dest		æ ¼ç´å…ˆ
+ * @param src		ã‚½ãƒ¼ã‚¹(è¤‡æ•°)
+ * @param win		çª“é–¢æ•°
+ * @param numch		ãƒãƒ£ãƒ³ãƒãƒ«æ•°
+ * @param srcofs	srcã®å‡¦ç†é–‹å§‹ä½ç½®
+ * @param len		å‡¦ç†ã™ã‚‹ã‚µãƒ³ãƒ—ãƒ«æ•°
+ *					(å„ãƒãƒ£ãƒ³ãƒãƒ«ã”ã¨ã®æ•°; å®Ÿéš›ã«å‡¦ç†ã•ã‚Œã‚‹ã‚µãƒ³ãƒ—ãƒ«
+ *					æ•°ã®ç·è¨ˆã¯len*numchã«ãªã‚‹)
  */
 void  InterleaveOverlappingWindow(float * __restrict dest,
 	const float * __restrict const * __restrict src,
@@ -175,7 +175,7 @@ void  InterleaveOverlappingWindow(float * __restrict dest,
 
 #if defined(_M_IX86)||defined(_M_X64)
 //---------------------------------------------------------------------------
-// ’è”‚È‚Ç
+// å®šæ•°ãªã©
 //---------------------------------------------------------------------------
 extern _ALIGN16(const tjs_uint32) TVP_VFASTATAN2_C1[4] ;
 extern _ALIGN16(const tjs_uint32) TVP_VFASTATAN2_C1_XOR_C2[4] ;
@@ -199,9 +199,9 @@ extern _ALIGN16(const tjs_uint32) TVP_V_I32_1[4];
 
 //---------------------------------------------------------------------------
 /**
- * atan2 ‚Ì‚‘¬”Å (4x float, SSE”Å)
- * @note	¸“x‚Í‚ ‚Ü‚è—Ç‚­‚È‚¢B10bit‚®‚ç‚¢B @r
- *			Œ´“T: http://www.dspguru.com/comp.dsp/tricks/alg/fxdatan2.htm
+ * atan2 ã®é«˜é€Ÿç‰ˆ (4x float, SSEç‰ˆ)
+ * @note	ç²¾åº¦ã¯ã‚ã¾ã‚Šè‰¯ããªã„ã€‚10bitãã‚‰ã„ã€‚ @r
+ *			åŸå…¸: http://www.dspguru.com/comp.dsp/tricks/alg/fxdatan2.htm
  */
 static inline __m128 VFast_arctan2_F4_SSE(__m128 y, __m128 x)
 {
@@ -249,12 +249,12 @@ static inline __m128 VFast_arctan2_F4_SSE(__m128 y, __m128 x)
 
 //---------------------------------------------------------------------------
 /**
- * SSE‚ÌŠÛ‚ßƒ‚[ƒh‚ğÅ‹ß’l‚Éİ’è‚·‚é
- * @note	‚±‚Ìƒƒ\ƒbƒh‚Í SSE ‚Åg—p‚·‚éŠÛ‚ßƒ‚[ƒh
- *			‚ğİ’è‚·‚éB‚±‚ê‚ğ•K—v‚Æ‚·‚éŠeŠÙ”‚ğŒÄ‚Ño‚·‘O‚É‚P‰ñŒÄ‚Ño‚·‚±‚ÆB
- *			‘¼‚ÌSSE‚ğg—p‚µ‚Ä‚¢‚éŠÖ”‚ªŠÔ‚É‹²‚Ü‚é‚ÆŠÛ‚ßƒ‚[ƒh‚ª•Ï‚í‚é‰Â”\«
- *			‚ª‚ ‚é‚Ì‚Å’ˆÓ‚·‚é‚±‚ÆB‚»‚Ì‚æ‚¤‚Èê‡‚ÍÄ‚Ñ‚±‚ê‚ğŒÄ‚Ño‚µ‚Ä
- *			ŠÛ‚ßƒ‚[ƒh‚ğÄİ’è‚·‚é‚±‚ÆB
+ * SSEã®ä¸¸ã‚ãƒ¢ãƒ¼ãƒ‰ã‚’æœ€è¿‘å€¤ã«è¨­å®šã™ã‚‹
+ * @note	ã“ã®ãƒ¡ã‚½ãƒƒãƒ‰ã¯ SSE ã§ä½¿ç”¨ã™ã‚‹ä¸¸ã‚ãƒ¢ãƒ¼ãƒ‰
+ *			ã‚’è¨­å®šã™ã‚‹ã€‚ã“ã‚Œã‚’å¿…è¦ã¨ã™ã‚‹å„é¤¨æ•°ã‚’å‘¼ã³å‡ºã™å‰ã«ï¼‘å›å‘¼ã³å‡ºã™ã“ã¨ã€‚
+ *			ä»–ã®SSEã‚’ä½¿ç”¨ã—ã¦ã„ã‚‹é–¢æ•°ãŒé–“ã«æŒŸã¾ã‚‹ã¨ä¸¸ã‚ãƒ¢ãƒ¼ãƒ‰ãŒå¤‰ã‚ã‚‹å¯èƒ½æ€§
+ *			ãŒã‚ã‚‹ã®ã§æ³¨æ„ã™ã‚‹ã“ã¨ã€‚ãã®ã‚ˆã†ãªå ´åˆã¯å†ã³ã“ã‚Œã‚’å‘¼ã³å‡ºã—ã¦
+ *			ä¸¸ã‚ãƒ¢ãƒ¼ãƒ‰ã‚’å†è¨­å®šã™ã‚‹ã“ã¨ã€‚
  */
 static inline void SetRoundingModeToNearest_SSE()
 {
@@ -265,9 +265,9 @@ static inline void SetRoundingModeToNearest_SSE()
 
 //---------------------------------------------------------------------------
 /**
- * sincos ‚Ì‚‘¬”Å (4x float, SSE”Å)
- * @note	Œ´“T: http://arxiv.org/PS_cache/cs/pdf/0406/0406049.pdf  @r
- *			ŒÄ‚Ño‚µ‚Éæ—§‚Á‚Ä Risa_SetRoundingModeToNearest_SSE ‚ğŒÄ‚Ô‚±‚ÆB
+ * sincos ã®é«˜é€Ÿç‰ˆ (4x float, SSEç‰ˆ)
+ * @note	åŸå…¸: http://arxiv.org/PS_cache/cs/pdf/0406/0406049.pdf  @r
+ *			å‘¼ã³å‡ºã—ã«å…ˆç«‹ã£ã¦ Risa_SetRoundingModeToNearest_SSE ã‚’å‘¼ã¶ã“ã¨ã€‚
  */
 static inline void VFast_sincos_F4_SSE2(__m128 v, __m128 &sin, __m128 &cos)
 {
@@ -443,16 +443,16 @@ static inline void VFast_sincos_F4_SSE(__m128 v, __m128 &sin, __m128 &cos)
 
 //---------------------------------------------------------------------------
 /**
- * Phase Wrapping(radian‚ğ-PI`PI‚Éƒ‰ƒbƒv‚·‚é) (4x float, SSE”Å)
+ * Phase Wrapping(radianã‚’-PIï½PIã«ãƒ©ãƒƒãƒ—ã™ã‚‹) (4x float, SSEç‰ˆ)
  */
 static inline __m128 Wrap_Pi_F4_SSE2(__m128 v)
 {
-	// v ‚ğ M_PI ‚ÅŠ„‚é
+	// v ã‚’ M_PI ã§å‰²ã‚‹
 	__m128 v_quant = _mm_mul_ps(v, PM128(TVP_V_R_PI)); // v_quant = v/M_PI
 
-	// v_quant‚ğ¬”“_ˆÈ‰º‚ğØ‚èÌ‚Ä‚Ä®”‚É•ÏŠ·
+	// v_quantã‚’å°æ•°ç‚¹ä»¥ä¸‹ã‚’åˆ‡ã‚Šæ¨ã¦ã¦æ•´æ•°ã«å¤‰æ›
 	__m128i q = _mm_cvttps_epi32(v_quant);
-	// ³‚Ìê‡‚Ív_quant&1‚ğ‘«‚µA•‰‚Ìê‡‚Íˆø‚­
+	// æ­£ã®å ´åˆã¯v_quant&1ã‚’è¶³ã—ã€è² ã®å ´åˆã¯å¼•ã
 	// a = v_quant,    v_quant = a + ( (0 - (a&1)) & ((a>>31)|1) )
 	q =
 		_mm_add_epi32(
@@ -468,27 +468,27 @@ static inline __m128 Wrap_Pi_F4_SSE2(__m128 v)
 				)
 			)
 		);
-	// ‚»‚ê‚ç‚ğÀ”‚É–ß‚µAM_PI ‚ğ‚©‚¯‚é
+	// ãã‚Œã‚‰ã‚’å®Ÿæ•°ã«æˆ»ã—ã€M_PI ã‚’ã‹ã‘ã‚‹
 	v_quant = _mm_cvtepi32_ps(q);
 	v_quant = _mm_mul_ps(v_quant, PM128(TVP_V_PI));
 
-	// ‚»‚ê‚ğ v ‚©‚çˆø‚­
+	// ãã‚Œã‚’ v ã‹ã‚‰å¼•ã
 	v = _mm_sub_ps(v, v_quant);
 
-	// –ß‚é
+	// æˆ»ã‚‹
 	return v;
 }
 #if defined(_M_IX86)
 static inline __m128 Wrap_Pi_F4_SSE(__m128 v)
 {
-	// v ‚ğ M_PI ‚ÅŠ„‚é
+	// v ã‚’ M_PI ã§å‰²ã‚‹
 	__m128 v_quant = _mm_mul_ps(v, PM128(TVP_V_R_PI)); // v_quant = v/M_PI
 
-	// v_quant‚ğ¬”“_ˆÈ‰º‚ğØ‚èÌ‚Ä‚Ä®”‚É•ÏŠ·
+	// v_quantã‚’å°æ•°ç‚¹ä»¥ä¸‹ã‚’åˆ‡ã‚Šæ¨ã¦ã¦æ•´æ•°ã«å¤‰æ›
 	__m64 q0 = _mm_cvtt_ps2pi(v_quant); 
 	__m64 q1 = _mm_cvtt_ps2pi(_mm_movehl_ps(v_quant, v_quant));
 
-	// ³‚Ìê‡‚Ív_quant&1‚ğ‘«‚µA•‰‚Ìê‡‚Íˆø‚­
+	// æ­£ã®å ´åˆã¯v_quant&1ã‚’è¶³ã—ã€è² ã®å ´åˆã¯å¼•ã
 	// a = v_quant,    v_quant = a + ( (0 - (a&1)) & ((a>>31)|1) )
 
 	q0 =
@@ -521,21 +521,21 @@ static inline __m128 Wrap_Pi_F4_SSE(__m128 v)
 			)
 		);
 
-	// ‚»‚ê‚ç‚ğÀ”‚É–ß‚µAM_PI ‚ğ‚©‚¯‚é
+	// ãã‚Œã‚‰ã‚’å®Ÿæ•°ã«æˆ»ã—ã€M_PI ã‚’ã‹ã‘ã‚‹
 	v_quant = _mm_movelh_ps(_mm_cvtpi32_ps(v, q0), _mm_cvtpi32_ps(v, q1));
 	v_quant = _mm_mul_ps(v_quant, PM128(TVP_V_PI));
 
-	// ‚»‚ê‚ğ v ‚©‚çˆø‚­
+	// ãã‚Œã‚’ v ã‹ã‚‰å¼•ã
 	v = _mm_sub_ps(v, v_quant);
 
-	// MMXg‚¢I‚í‚è
+	// MMXä½¿ã„çµ‚ã‚ã‚Š
 	_mm_empty();
 
-	// –ß‚é
+	// æˆ»ã‚‹
 	return v;
 }
 #elif defined(_M_X64)
-// x64 ‚Ì‚ÍSSE2‚ğg‚¤
+// x64 ã®æ™‚ã¯SSE2ã‚’ä½¿ã†
 #define Wrap_Pi_F4_SSE Wrap_Pi_F4_SSE2
 #endif
 //---------------------------------------------------------------------------
@@ -544,15 +544,15 @@ static inline __m128 Wrap_Pi_F4_SSE(__m128 v)
 
 //---------------------------------------------------------------------------
 /**
- * ‘‹ŠÖ”‚ğ“K—p‚µ‚È‚ª‚ç‚ÌƒCƒ“ƒ^[ƒŠ[ƒu‰ğœ
- * @param dest		Ši”[æ(•¡”)
- * @param src		ƒ\[ƒX
- * @param win		‘‹ŠÖ”
- * @param numch		ƒ`ƒƒƒ“ƒlƒ‹”
- * @param destofs	dest‚Ìˆ—ŠJnˆÊ’u
- * @param len		ˆ—‚·‚éƒTƒ“ƒvƒ‹”
- *					(Šeƒ`ƒƒƒ“ƒlƒ‹‚²‚Æ‚Ì”; ÀÛ‚Éˆ—‚³‚ê‚éƒTƒ“ƒvƒ‹
- *					”‚Ì‘Œv‚Ílen*numch‚É‚È‚é)
+ * çª“é–¢æ•°ã‚’é©ç”¨ã—ãªãŒã‚‰ã®ã‚¤ãƒ³ã‚¿ãƒ¼ãƒªãƒ¼ãƒ–è§£é™¤
+ * @param dest		æ ¼ç´å…ˆ(è¤‡æ•°)
+ * @param src		ã‚½ãƒ¼ã‚¹
+ * @param win		çª“é–¢æ•°
+ * @param numch		ãƒãƒ£ãƒ³ãƒãƒ«æ•°
+ * @param destofs	destã®å‡¦ç†é–‹å§‹ä½ç½®
+ * @param len		å‡¦ç†ã™ã‚‹ã‚µãƒ³ãƒ—ãƒ«æ•°
+ *					(å„ãƒãƒ£ãƒ³ãƒãƒ«ã”ã¨ã®æ•°; å®Ÿéš›ã«å‡¦ç†ã•ã‚Œã‚‹ã‚µãƒ³ãƒ—ãƒ«
+ *					æ•°ã®ç·è¨ˆã¯len*numchã«ãªã‚‹)
  */
 void DeinterleaveApplyingWindow_sse(float * __restrict dest[], const float * __restrict src,
 					float * __restrict win, int numch, size_t destofs, size_t len);
@@ -561,15 +561,15 @@ void DeinterleaveApplyingWindow_sse(float * __restrict dest[], const float * __r
 
 //---------------------------------------------------------------------------
 /**
- * ‘‹ŠÖ”‚ğ“K—p‚µ‚È‚ª‚ç‚ÌƒCƒ“ƒ^[ƒŠ[ƒu+ƒI[ƒo[ƒ‰ƒbƒsƒ“ƒO
- * @param dest		Ši”[æ
- * @param src		ƒ\[ƒX(•¡”)
- * @param win		‘‹ŠÖ”
- * @param numch		ƒ`ƒƒƒ“ƒlƒ‹”
- * @param srcofs	src‚Ìˆ—ŠJnˆÊ’u
- * @param len		ˆ—‚·‚éƒTƒ“ƒvƒ‹”
- *					(Šeƒ`ƒƒƒ“ƒlƒ‹‚²‚Æ‚Ì”; ÀÛ‚Éˆ—‚³‚ê‚éƒTƒ“ƒvƒ‹
- *					”‚Ì‘Œv‚Ílen*numch‚É‚È‚é)
+ * çª“é–¢æ•°ã‚’é©ç”¨ã—ãªãŒã‚‰ã®ã‚¤ãƒ³ã‚¿ãƒ¼ãƒªãƒ¼ãƒ–+ã‚ªãƒ¼ãƒãƒ¼ãƒ©ãƒƒãƒ”ãƒ³ã‚°
+ * @param dest		æ ¼ç´å…ˆ
+ * @param src		ã‚½ãƒ¼ã‚¹(è¤‡æ•°)
+ * @param win		çª“é–¢æ•°
+ * @param numch		ãƒãƒ£ãƒ³ãƒãƒ«æ•°
+ * @param srcofs	srcã®å‡¦ç†é–‹å§‹ä½ç½®
+ * @param len		å‡¦ç†ã™ã‚‹ã‚µãƒ³ãƒ—ãƒ«æ•°
+ *					(å„ãƒãƒ£ãƒ³ãƒãƒ«ã”ã¨ã®æ•°; å®Ÿéš›ã«å‡¦ç†ã•ã‚Œã‚‹ã‚µãƒ³ãƒ—ãƒ«
+ *					æ•°ã®ç·è¨ˆã¯len*numchã«ãªã‚‹)
  */
 void  InterleaveOverlappingWindow_sse(float * __restrict dest, const float * __restrict const * __restrict src,
 					float * __restrict win, int numch, size_t srcofs, size_t len);

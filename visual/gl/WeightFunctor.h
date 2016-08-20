@@ -1,6 +1,6 @@
 /******************************************************************************/
 /**
- * ŠeíƒtƒBƒ‹ƒ^[‚ÌƒEƒFƒCƒg‚ğŒvZ‚·‚é
+ * å„ç¨®ãƒ•ã‚£ãƒ«ã‚¿ãƒ¼ã®ã‚¦ã‚§ã‚¤ãƒˆã‚’è¨ˆç®—ã™ã‚‹
  * ----------------------------------------------------------------------------
  * 	Copyright (C) T.Imoto <http://www.kaede-software.com>
  * ----------------------------------------------------------------------------
@@ -14,7 +14,7 @@
 #define __WEIGHT_FUNCTOR_H__
 
 /**
- * ƒoƒCƒŠƒjƒA
+ * ãƒã‚¤ãƒªãƒ‹ã‚¢
  */
 struct BilinearWeight {
 	static const float RANGE;
@@ -29,7 +29,7 @@ struct BilinearWeight {
 };
 
 /**
- * ƒoƒCƒLƒ…[ƒrƒbƒN
+ * ãƒã‚¤ã‚­ãƒ¥ãƒ¼ãƒ“ãƒƒã‚¯
  */
 struct BicubicWeight {
 	static const float RANGE;
@@ -37,7 +37,7 @@ struct BicubicWeight {
 	float coeff;
 	float p[5];
 	/**
-	 * @param c : ƒVƒƒ[ƒv‚³B¬‚³‚­‚È‚é‚É‚µ‚½‚ª‚Á‚Ä‹­‚­‚È‚é
+	 * @param c : ã‚·ãƒ£ãƒ¼ãƒ—ã•ã€‚å°ã•ããªã‚‹ã«ã—ãŸãŒã£ã¦å¼·ããªã‚‹
 	 */
 	BicubicWeight( float c = -1 ) : coeff(c) {
 		p[0] = coeff + 3.0f;
@@ -75,7 +75,7 @@ template<int TTap>
 const float LanczosWeight<TTap>::RANGE = (float)TTap;
 
 /**
- * Spline16 —pƒEƒFƒCƒgŠÖ”
+ * Spline16 ç”¨ã‚¦ã‚§ã‚¤ãƒˆé–¢æ•°
  */
 struct Spline16Weight {
 	static const float RANGE;
@@ -92,7 +92,7 @@ struct Spline16Weight {
 };
 
 /**
- * Spline36 —pƒEƒFƒCƒgŠÖ”
+ * Spline36 ç”¨ã‚¦ã‚§ã‚¤ãƒˆé–¢æ•°
  */
 struct Spline36Weight {
 	static const float RANGE;
@@ -110,7 +110,7 @@ struct Spline36Weight {
 	}
 };
 /**
- * ƒKƒEƒXŠÖ”
+ * ã‚¬ã‚¦ã‚¹é–¢æ•°
  */
 struct GaussianWeight {
 	static const float RANGE;
@@ -124,7 +124,7 @@ struct GaussianWeight {
 };
 
 /**
- * Blackman-Sinc ŠÖ”
+ * Blackman-Sinc é–¢æ•°
  * Blackman(x) = 0.42 - 0.5 cos( 2 pi x ) + 0.08 cos( 4 pi x ); if 0 <= x <= 1
  * Sinc(x) = sin( pi x ) / (pi x)
  */

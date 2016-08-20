@@ -1,6 +1,6 @@
 /****************************************************************************/
 /*! @file
-@brief VMR9‚ÌƒŒƒ“ƒ_[ƒŒƒXƒ‚[ƒh—pƒAƒƒP[ƒ^‚ÆƒvƒŒƒ[ƒ“ƒ^
+@brief VMR9ã®ãƒ¬ãƒ³ãƒ€ãƒ¼ãƒ¬ã‚¹ãƒ¢ãƒ¼ãƒ‰ç”¨ã‚¢ãƒ­ã‚±ãƒ¼ã‚¿ã¨ãƒ—ãƒ¬ã‚¼ãƒ³ã‚¿
 
 -----------------------------------------------------------------------------
 	Copyright (C) 2005 T.Imoto ( http://www.kaede-software.com/ )
@@ -35,8 +35,8 @@ static const GUID IID_IDirect3DTexture9 =
 
 //----------------------------------------------------------------------------
 //! @brief	  	CVMRCustomAllocatorPresenter9 constructor
-//! @param		owner : ‚±‚ÌƒNƒ‰ƒX‚ğ•Û‚µ‚Ä‚¢‚éƒNƒ‰ƒX
-//! @param		lock : ƒƒbƒNƒIƒuƒWƒFƒNƒg
+//! @param		owner : ã“ã®ã‚¯ãƒ©ã‚¹ã‚’ä¿æŒã—ã¦ã„ã‚‹ã‚¯ãƒ©ã‚¹
+//! @param		lock : ãƒ­ãƒƒã‚¯ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
 //----------------------------------------------------------------------------
 CVMRCustomAllocatorPresenter9::CVMRCustomAllocatorPresenter9( tTVPDSMixerVideoOverlay* owner, CCritSec &lock )
  : CUnknown(NAME("VMR Custom Allocator Presenter"),NULL), m_ChildWnd(NULL), m_Visible(false)
@@ -62,7 +62,7 @@ CVMRCustomAllocatorPresenter9::~CVMRCustomAllocatorPresenter9()
 	ReleaseAll();
 }
 //----------------------------------------------------------------------------
-//! @brief	  	‰Šú‰»ˆ—
+//! @brief	  	åˆæœŸåŒ–å‡¦ç†
 //----------------------------------------------------------------------------
 void CVMRCustomAllocatorPresenter9::Initialize()
 {
@@ -75,10 +75,10 @@ void CVMRCustomAllocatorPresenter9::Initialize()
 		ThrowDShowException(L"Failed to create device.", hr );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	—v‹‚³‚ê‚½ƒCƒ“ƒ^[ƒtƒFƒCƒX‚ğ•Ô‚·
-//! @param		riid : ƒCƒ“ƒ^[ƒtƒFƒCƒX‚ÌIID
-//! @param		ppv : ƒCƒ“ƒ^[ƒtƒFƒCƒX‚ğ•Ô‚·ƒ|ƒCƒ“ƒ^[‚Ö‚Ìƒ|ƒCƒ“ƒ^
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	è¦æ±‚ã•ã‚ŒãŸã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã‚’è¿”ã™
+//! @param		riid : ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã®IID
+//! @param		ppv : ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã‚’è¿”ã™ãƒã‚¤ãƒ³ã‚¿ãƒ¼ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 STDMETHODIMP CVMRCustomAllocatorPresenter9::NonDelegatingQueryInterface( REFIID riid, void ** ppv )
 {
@@ -91,7 +91,7 @@ STDMETHODIMP CVMRCustomAllocatorPresenter9::NonDelegatingQueryInterface( REFIID 
 	}
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒCƒ“ƒ^[ƒtƒFƒCƒX‚ğ‰ğ•ú‚·‚é
+//! @brief	  	ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã‚’è§£æ”¾ã™ã‚‹
 //----------------------------------------------------------------------------
 void CVMRCustomAllocatorPresenter9::ReleaseAll()
 {
@@ -104,11 +104,11 @@ void CVMRCustomAllocatorPresenter9::ReleaseAll()
 	DestroyChildWindow();
 }
 //----------------------------------------------------------------------------
-//! @brief	  	Direct3D ƒfƒoƒCƒX‚ğ‰Šú‰»‚·‚é ( ÀÛ‚ÍƒT[ƒtƒFƒCƒX‚ğŠm•Û‚·‚é)
-//! @param		dwUserID : VMR ‚Ì‚±‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ğw’è‚·‚é
-//! @param		lpAllocInfo : ‰Šú‰»ˆø”
-//! @param		lpNumBuffers : “ü—Í‚Å‚ÍAì¬‚·‚éƒoƒbƒtƒ@‚Ì”‚ğw’è‚·‚éBƒƒ\ƒbƒh‚ª•Ô‚é‚ÆA‚±‚Ìˆø”‚É‚ÍÀÛ‚ÉŠ„‚è“–‚Ä‚ç‚ê‚½ƒoƒbƒtƒ@‚Ì”‚ªŠi”[‚³‚ê‚Ä‚¢‚é
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	Direct3D ãƒ‡ãƒã‚¤ã‚¹ã‚’åˆæœŸåŒ–ã™ã‚‹ ( å®Ÿéš›ã¯ã‚µãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã‚’ç¢ºä¿ã™ã‚‹)
+//! @param		dwUserID : VMR ã®ã“ã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’æŒ‡å®šã™ã‚‹
+//! @param		lpAllocInfo : åˆæœŸåŒ–å¼•æ•°
+//! @param		lpNumBuffers : å…¥åŠ›ã§ã¯ã€ä½œæˆã™ã‚‹ãƒãƒƒãƒ•ã‚¡ã®æ•°ã‚’æŒ‡å®šã™ã‚‹ã€‚ãƒ¡ã‚½ãƒƒãƒ‰ãŒè¿”ã‚‹ã¨ã€ã“ã®å¼•æ•°ã«ã¯å®Ÿéš›ã«å‰²ã‚Šå½“ã¦ã‚‰ã‚ŒãŸãƒãƒƒãƒ•ã‚¡ã®æ•°ãŒæ ¼ç´ã•ã‚Œã¦ã„ã‚‹
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT STDMETHODCALLTYPE CVMRCustomAllocatorPresenter9::InitializeDevice( DWORD_PTR dwUserID, VMR9AllocationInfo *lpAllocInfo, DWORD *lpNumBuffers )
 {
@@ -125,8 +125,8 @@ HRESULT STDMETHODCALLTYPE CVMRCustomAllocatorPresenter9::InitializeDevice( DWORD
 	D3DCAPS9	d3dcaps;
 	D3DDevice()->GetDeviceCaps( &d3dcaps );
 	if( d3dcaps.TextureCaps & D3DPTEXTURECAPS_POW2 )
-	{	// 2‚Ì—İæ‚Ì‚İ‹–‰Â‚·‚é‚©‚Ç‚¤‚©”»’è
-		// ƒ€[ƒr[‚È‚Ì‚ÅAÅ’á’l‚Í64‚É‚µ‚Ä‚¨‚­
+	{	// 2ã®ç´¯ä¹—ã®ã¿è¨±å¯ã™ã‚‹ã‹ã©ã†ã‹åˆ¤å®š
+		// ãƒ ãƒ¼ãƒ“ãƒ¼ãªã®ã§ã€æœ€ä½å€¤ã¯64ã«ã—ã¦ãŠã
 		DWORD		dwWidth = 64;
 		DWORD		dwHeight = 64;
 
@@ -143,7 +143,7 @@ HRESULT STDMETHODCALLTYPE CVMRCustomAllocatorPresenter9::InitializeDevice( DWORD
 		TVPAddLog( ttstr("krmovie : Use power of two surface.") );
 	}
 
-	// ƒeƒNƒXƒ`ƒƒ‚Æ‚µ‚Äg‚¦‚é‚æ‚¤‚É‚·‚é
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã¨ã—ã¦ä½¿ãˆã‚‹ã‚ˆã†ã«ã™ã‚‹
 	lpAllocInfo->dwFlags |= VMR9AllocFlag_TextureSurface;
 	ReleaseSurfaces();
 	m_Surfaces.resize(*lpNumBuffers);
@@ -151,10 +151,10 @@ HRESULT STDMETHODCALLTYPE CVMRCustomAllocatorPresenter9::InitializeDevice( DWORD
 
 	if( FAILED(hr) && !(lpAllocInfo->dwFlags & VMR9AllocFlag_3DRenderTarget) )
 	{
-		// ƒeƒNƒXƒ`ƒƒ¶¬¸”s
+		// ãƒ†ã‚¯ã‚¹ãƒãƒ£ç”Ÿæˆå¤±æ•—
 		ReleaseSurfaces();
 
-		// YUV ƒT[ƒtƒFƒCƒX‚©‚Ç‚¤‚©
+		// YUV ã‚µãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã‹ã©ã†ã‹
 		if( lpAllocInfo->Format > '0000' )
 		{
 			D3DDISPLAYMODE dm; 
@@ -168,7 +168,7 @@ HRESULT STDMETHODCALLTYPE CVMRCustomAllocatorPresenter9::InitializeDevice( DWORD
 		} else {
 			TVPAddLog( ttstr("krmovie : Use offscreen surface.") );
 		}
-		// ƒeƒNƒXƒ`ƒƒ‚Í~‚ß‚ÄƒIƒtƒXƒNƒŠ[ƒ“‚É
+		// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã¯æ­¢ã‚ã¦ã‚ªãƒ•ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã«
 		lpAllocInfo->dwFlags &= ~VMR9AllocFlag_TextureSurface;
 		lpAllocInfo->dwFlags |= VMR9AllocFlag_OffscreenSurface;
 		m_Surfaces.resize(*lpNumBuffers);
@@ -186,14 +186,14 @@ HRESULT STDMETHODCALLTYPE CVMRCustomAllocatorPresenter9::InitializeDevice( DWORD
 	return hr;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	’¸“_ƒoƒbƒtƒ@‚ğ¶¬‚µA‰Šú’l‚ğ“ü‚ê‚é
-//! @param		texWidth : ƒeƒNƒXƒ`ƒƒ‚Ì•
-//! @param		texHeight : ƒeƒNƒXƒ`ƒƒ‚Ì‚‚³
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã‚’ç”Ÿæˆã—ã€åˆæœŸå€¤ã‚’å…¥ã‚Œã‚‹
+//! @param		texWidth : ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®å¹…
+//! @param		texHeight : ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®é«˜ã•
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CVMRCustomAllocatorPresenter9::CreateVertexBuffer( int texWidth, int texHeight )
 {
-	// ’¸“_î•ñ‚ğŒvZ‚µ‚Ä‚¨‚­
+	// é ‚ç‚¹æƒ…å ±ã‚’è¨ˆç®—ã—ã¦ãŠã
 	HRESULT		hr;
 
 	CAutoLock Lock(m_Lock);
@@ -257,15 +257,15 @@ HRESULT CVMRCustomAllocatorPresenter9::CreateVertexBuffer( int texWidth, int tex
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	’¸“_ƒoƒbƒtƒ@‚Ì’¸“_î•ñ‚ğXV‚·‚é
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã®é ‚ç‚¹æƒ…å ±ã‚’æ›´æ–°ã™ã‚‹
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CVMRCustomAllocatorPresenter9::UpdateVertex()
 {
 	HRESULT	hr;
 	CAutoLock Lock(m_Lock);
 
-	// ’¸“_ƒoƒbƒtƒ@‚ª‚Ü‚¾Šm•Û‚³‚ê‚Ä‚¢‚È‚¢‚ÍƒXƒ‹[
+	// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ãŒã¾ã ç¢ºä¿ã•ã‚Œã¦ã„ãªã„æ™‚ã¯ã‚¹ãƒ«ãƒ¼
 	if( m_VertexBuffer == NULL )
 		return S_OK;
 
@@ -301,9 +301,9 @@ HRESULT CVMRCustomAllocatorPresenter9::UpdateVertex()
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	Direct3D ƒfƒoƒCƒX‚ğ‰ğ•ú‚·‚é ( ÀÛ‚ÍƒT[ƒtƒFƒCƒX‚ğ‰ğ•ú‚·‚é)
-//! @param		dwID : VMR ‚Ì‚±‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ğ¦‚· ID ‚ğw’è‚·‚é
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	Direct3D ãƒ‡ãƒã‚¤ã‚¹ã‚’è§£æ”¾ã™ã‚‹ ( å®Ÿéš›ã¯ã‚µãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã‚’è§£æ”¾ã™ã‚‹)
+//! @param		dwID : VMR ã®ã“ã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’ç¤ºã™ ID ã‚’æŒ‡å®šã™ã‚‹
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT STDMETHODCALLTYPE CVMRCustomAllocatorPresenter9::TerminateDevice( DWORD_PTR dwID )
 {
@@ -318,12 +318,12 @@ HRESULT STDMETHODCALLTYPE CVMRCustomAllocatorPresenter9::TerminateDevice( DWORD_
 	}
 }
 //----------------------------------------------------------------------------
-//! @brief	  	Direct3D ƒT[ƒtƒFƒCƒX‚ğæ“¾‚·‚é
-//! @param		dwUserID : VMR ‚Ì‚±‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ğ¦‚· ID ‚ğw’è‚·‚é
-//! @param		SurfaceIndex : æ“¾‚·‚éƒT[ƒtƒFƒCƒX‚ÌƒCƒ“ƒfƒbƒNƒX‚ğw’è‚·‚é
-//! @param		SurfaceFlags : ƒT[ƒtƒFƒCƒX ƒtƒ‰ƒO‚ğw’è‚·‚é ( ‰½‚Ég‚¤‚ÌH )
-//! @param		lplpSurface : IDirect3DSurface9 ƒCƒ“ƒ^[ƒtƒFƒCƒX ƒ|ƒCƒ“ƒ^‚ğó‚¯æ‚é•Ï”‚ÌƒAƒhƒŒƒXBŒÄ‚Ño‚µŒ³‚ÍƒCƒ“ƒ^[ƒtƒFƒCƒX‚ğ•K‚¸‰ğ•ú‚·‚é‚±‚Æ
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	Direct3D ã‚µãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã‚’å–å¾—ã™ã‚‹
+//! @param		dwUserID : VMR ã®ã“ã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’ç¤ºã™ ID ã‚’æŒ‡å®šã™ã‚‹
+//! @param		SurfaceIndex : å–å¾—ã™ã‚‹ã‚µãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‚’æŒ‡å®šã™ã‚‹
+//! @param		SurfaceFlags : ã‚µãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ ãƒ•ãƒ©ã‚°ã‚’æŒ‡å®šã™ã‚‹ ( ä½•ã«ä½¿ã†ã®ï¼Ÿ )
+//! @param		lplpSurface : IDirect3DSurface9 ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ ãƒã‚¤ãƒ³ã‚¿ã‚’å—ã‘å–ã‚‹å¤‰æ•°ã®ã‚¢ãƒ‰ãƒ¬ã‚¹ã€‚å‘¼ã³å‡ºã—å…ƒã¯ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã‚’å¿…ãšè§£æ”¾ã™ã‚‹ã“ã¨
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT STDMETHODCALLTYPE CVMRCustomAllocatorPresenter9::GetSurface( DWORD_PTR dwUserID, DWORD SurfaceIndex, DWORD SurfaceFlags, IDirect3DSurface9 **lplpSurface )
 {
@@ -350,9 +350,9 @@ HRESULT STDMETHODCALLTYPE CVMRCustomAllocatorPresenter9::GetSurface( DWORD_PTR d
 	return E_INVALIDARG;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	VMR ‚©‚çŒÄ‚Ño‚³‚êAƒAƒƒP[ƒ^ƒvƒŒƒ[ƒ“ƒ^‚É’Ê’mƒR[ƒ‹ƒoƒbƒN‚ÌƒCƒ“ƒ^[ƒtƒFƒCƒX ƒ|ƒCƒ“ƒ^‚ğ’ñ‹Ÿ‚·‚é
-//! @param		lpIVMRSurfAllocNotify : ƒAƒƒP[ƒ^ƒvƒŒƒ[ƒ“ƒ^‚ª’Ê’mƒR[ƒ‹ƒoƒbƒN‚ğ VMR ‚É“n‚·‚½‚ß‚Ég‚¤AIVMRSurfaceAllocatorNotify9 ƒCƒ“ƒ^[ƒtƒFƒCƒX‚ğw’è‚·‚é
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	VMR ã‹ã‚‰å‘¼ã³å‡ºã•ã‚Œã€ã‚¢ãƒ­ã‚±ãƒ¼ã‚¿ãƒ—ãƒ¬ã‚¼ãƒ³ã‚¿ã«é€šçŸ¥ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã®ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ ãƒã‚¤ãƒ³ã‚¿ã‚’æä¾›ã™ã‚‹
+//! @param		lpIVMRSurfAllocNotify : ã‚¢ãƒ­ã‚±ãƒ¼ã‚¿ãƒ—ãƒ¬ã‚¼ãƒ³ã‚¿ãŒé€šçŸ¥ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯ã‚’ VMR ã«æ¸¡ã™ãŸã‚ã«ä½¿ã†ã€IVMRSurfaceAllocatorNotify9 ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã‚’æŒ‡å®šã™ã‚‹
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT STDMETHODCALLTYPE CVMRCustomAllocatorPresenter9::AdviseNotify( IVMRSurfaceAllocatorNotify9 *lpIVMRSurfAllocNotify )
 {
@@ -366,8 +366,8 @@ HRESULT STDMETHODCALLTYPE CVMRCustomAllocatorPresenter9::AdviseNotify( IVMRSurfa
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	Direct3DŠÖ˜A‚Ì‚à‚Ì‚ğŠJ•ú‚·‚é
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	Direct3Dé–¢é€£ã®ã‚‚ã®ã‚’é–‹æ”¾ã™ã‚‹
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CVMRCustomAllocatorPresenter9::ReleaseD3D()
 {
@@ -383,8 +383,8 @@ HRESULT CVMRCustomAllocatorPresenter9::ReleaseD3D()
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒT[ƒtƒFƒCƒX‚ğŠJ•ú‚·‚é
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ã‚µãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã‚’é–‹æ”¾ã™ã‚‹
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CVMRCustomAllocatorPresenter9::ReleaseSurfaces()
 {
@@ -401,9 +401,9 @@ HRESULT CVMRCustomAllocatorPresenter9::ReleaseSurfaces()
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒrƒfƒI‚ªÄ¶‚ğŠJn‚·‚é’¼‘O‚ÉŒÄ‚Ño‚·BƒAƒƒP[ƒ^ƒvƒŒƒ[ƒ“ƒ^‚ÍA‚±‚Ìƒƒ\ƒbƒh‚Ì•K—v‚È\¬‚ğÀs‚·‚é•K—v‚ª‚ ‚é
-//! @param		dwUserID : ƒAƒƒP[ƒ^ƒvƒŒƒ[ƒ“ƒ^‚Ì 1 ‚Â‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ª•¡”‚Ì VMR ƒCƒ“ƒXƒ^ƒ“ƒX‚Åg‚í‚ê‚éê‡‚Ég‚¤AVMR ‚Ì‚±‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ğˆêˆÓ‚É¯•Ê‚·‚éƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚ª’è‹`‚µ‚½ DWORD_PTR ƒNƒbƒL[
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ãƒ“ãƒ‡ã‚ªãŒå†ç”Ÿã‚’é–‹å§‹ã™ã‚‹ç›´å‰ã«å‘¼ã³å‡ºã™ã€‚ã‚¢ãƒ­ã‚±ãƒ¼ã‚¿ãƒ—ãƒ¬ã‚¼ãƒ³ã‚¿ã¯ã€ã“ã®ãƒ¡ã‚½ãƒƒãƒ‰ã®å¿…è¦ãªæ§‹æˆã‚’å®Ÿè¡Œã™ã‚‹å¿…è¦ãŒã‚ã‚‹
+//! @param		dwUserID : ã‚¢ãƒ­ã‚±ãƒ¼ã‚¿ãƒ—ãƒ¬ã‚¼ãƒ³ã‚¿ã® 1 ã¤ã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ãŒè¤‡æ•°ã® VMR ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã§ä½¿ã‚ã‚Œã‚‹å ´åˆã«ä½¿ã†ã€VMR ã®ã“ã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’ä¸€æ„ã«è­˜åˆ¥ã™ã‚‹ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ãŒå®šç¾©ã—ãŸ DWORD_PTR ã‚¯ãƒƒã‚­ãƒ¼
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT STDMETHODCALLTYPE CVMRCustomAllocatorPresenter9::StartPresenting( DWORD_PTR dwUserID )
 {
@@ -414,10 +414,10 @@ HRESULT STDMETHODCALLTYPE CVMRCustomAllocatorPresenter9::StartPresenting( DWORD_
 }
 
 //----------------------------------------------------------------------------
-//! @brief	  	ƒrƒfƒIƒeƒNƒXƒ`ƒƒ‚ğƒ|ƒŠƒSƒ“‚É“\‚è•t‚¯‚Ä•`‰æ‚·‚é
+//! @brief	  	ãƒ“ãƒ‡ã‚ªãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ãƒãƒªã‚´ãƒ³ã«è²¼ã‚Šä»˜ã‘ã¦æç”»ã™ã‚‹
 //! @param		device : Direct3D Device
-//! @param		tex : ƒeƒNƒXƒ`ƒƒ
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @param		tex : ãƒ†ã‚¯ã‚¹ãƒãƒ£
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CVMRCustomAllocatorPresenter9::DrawVideoPlane( IDirect3DDevice9* device, IDirect3DTexture9* tex )
 {
@@ -450,10 +450,10 @@ HRESULT CVMRCustomAllocatorPresenter9::DrawVideoPlane( IDirect3DDevice9* device,
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	‚±‚ÌƒrƒfƒI ƒtƒŒ[ƒ€‚ğ•\¦‚µ‚È‚¯‚ê‚Î‚È‚ç‚È‚¢‚Æ‚«‚ÉŒÄ‚Ño‚³‚ê‚é
-//! @param		dwUserID : ƒAƒƒP[ƒ^ƒvƒŒƒ[ƒ“ƒ^‚Ì 1 ‚Â‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ª•¡”‚Ì VMR ƒCƒ“ƒXƒ^ƒ“ƒX‚Åg‚í‚ê‚éê‡‚Ég‚¤AVMR ‚Ì‚±‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ğˆêˆÓ‚É¯•Ê‚·‚éƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚ª’è‹`‚µ‚½ DWORD_PTR ƒNƒbƒL[
-//! @param		lpPresInfo : ƒrƒfƒI ƒtƒŒ[ƒ€‚ÉŠÖ‚·‚éî•ñ‚ğŠi”[‚·‚é VMR9PresentationInfo \‘¢‘Ì‚ğw’è‚·‚é
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ã“ã®ãƒ“ãƒ‡ã‚ª ãƒ•ãƒ¬ãƒ¼ãƒ ã‚’è¡¨ç¤ºã—ãªã‘ã‚Œã°ãªã‚‰ãªã„ã¨ãã«å‘¼ã³å‡ºã•ã‚Œã‚‹
+//! @param		dwUserID : ã‚¢ãƒ­ã‚±ãƒ¼ã‚¿ãƒ—ãƒ¬ã‚¼ãƒ³ã‚¿ã® 1 ã¤ã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ãŒè¤‡æ•°ã® VMR ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã§ä½¿ã‚ã‚Œã‚‹å ´åˆã«ä½¿ã†ã€VMR ã®ã“ã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’ä¸€æ„ã«è­˜åˆ¥ã™ã‚‹ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ãŒå®šç¾©ã—ãŸ DWORD_PTR ã‚¯ãƒƒã‚­ãƒ¼
+//! @param		lpPresInfo : ãƒ“ãƒ‡ã‚ª ãƒ•ãƒ¬ãƒ¼ãƒ ã«é–¢ã™ã‚‹æƒ…å ±ã‚’æ ¼ç´ã™ã‚‹ VMR9PresentationInfo æ§‹é€ ä½“ã‚’æŒ‡å®šã™ã‚‹
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT STDMETHODCALLTYPE CVMRCustomAllocatorPresenter9::PresentImage( DWORD_PTR dwUserID, VMR9PresentationInfo *lpPresInfo )
 {
@@ -464,29 +464,29 @@ HRESULT STDMETHODCALLTYPE CVMRCustomAllocatorPresenter9::PresentImage( DWORD_PTR
 	if( m_dwUserID == dwUserID ) {
 		CAutoLock Lock(m_Lock);
 //		AllocatorNotify()->NotifyEvent(EC_UPDATE,0,0);
-		if( m_RebuildingWindow ) return S_OK;	// ƒtƒ‹ƒXƒNƒŠ[ƒ“Ø‚è‘Ö‚¦’†‚Í•`‰æ‚µ‚È‚¢
+		if( m_RebuildingWindow ) return S_OK;	// ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³åˆ‡ã‚Šæ›¿ãˆä¸­ã¯æç”»ã—ãªã„
 		hr = PresentHelper( lpPresInfo );
 		if( hr == D3DERR_DEVICELOST)
 		{
 			TVPAddLog( ttstr("krmovie warning : Device lost.") );
 			hr = D3DDevice()->TestCooperativeLevel();
 			if( hr == D3DERR_DEVICENOTRESET )
-			{	// ƒŠƒZƒbƒg‰Â”\
+			{	// ãƒªã‚»ãƒƒãƒˆå¯èƒ½
 				ReleaseSurfaces();
 				RebuildD3DDevice();
 //				if( FAILED(hr = RebuildD3DDevice()) )
 //					AllocatorNotify()->NotifyEvent(EC_ERRORABORT,hr,0);
-				// ¸”s‚µ‚Ä‚à’Ê’m‚µ‚È‚¢B
-				// ‚Ç‚¤‚â‚çƒtƒ‹ƒXƒNƒŠ[ƒ“Ø‚è‘Ö‚¦‚È‚Ç‚É‰½“x‚©¸”s‚·‚é‚±‚Æ‚ª‚ ‚é‚æ‚¤‚¾
+				// å¤±æ•—ã—ã¦ã‚‚é€šçŸ¥ã—ãªã„ã€‚
+				// ã©ã†ã‚„ã‚‰ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³åˆ‡ã‚Šæ›¿ãˆæ™‚ãªã©ã«ä½•åº¦ã‹å¤±æ•—ã™ã‚‹ã“ã¨ãŒã‚ã‚‹ã‚ˆã†ã 
 			}
 		}
 	}
 	return hr;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒrƒfƒI ƒtƒŒ[ƒ€‚ğ•`‰æ‚·‚é
-//! @param		lpPresInfo : ƒrƒfƒI ƒtƒŒ[ƒ€‚ÉŠÖ‚·‚éî•ñ‚ğŠi”[‚·‚é VMR9PresentationInfo \‘¢‘Ì‚ğw’è‚·‚é
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ãƒ“ãƒ‡ã‚ª ãƒ•ãƒ¬ãƒ¼ãƒ ã‚’æç”»ã™ã‚‹
+//! @param		lpPresInfo : ãƒ“ãƒ‡ã‚ª ãƒ•ãƒ¬ãƒ¼ãƒ ã«é–¢ã™ã‚‹æƒ…å ±ã‚’æ ¼ç´ã™ã‚‹ VMR9PresentationInfo æ§‹é€ ä½“ã‚’æŒ‡å®šã™ã‚‹
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CVMRCustomAllocatorPresenter9::PresentHelper( VMR9PresentationInfo *lpPresInfo )
 {
@@ -521,7 +521,7 @@ HRESULT CVMRCustomAllocatorPresenter9::PresentHelper( VMR9PresentationInfo *lpPr
 	return hr;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒrƒfƒI ƒtƒŒ[ƒ€‚ğ‰æ–Ê‚É”½‰f‚·‚é
+//! @brief	  	ãƒ“ãƒ‡ã‚ª ãƒ•ãƒ¬ãƒ¼ãƒ ã‚’ç”»é¢ã«åæ˜ ã™ã‚‹
 //----------------------------------------------------------------------------
 void CVMRCustomAllocatorPresenter9::PresentVideoImage()
 {
@@ -534,7 +534,7 @@ void CVMRCustomAllocatorPresenter9::PresentVideoImage()
 		{
 			hr = D3DDevice()->TestCooperativeLevel();
 			if( hr == D3DERR_DEVICENOTRESET )
-			{	// ƒŠƒZƒbƒg‰Â”\
+			{	// ãƒªã‚»ãƒƒãƒˆå¯èƒ½
 				ReleaseSurfaces();
 				RebuildD3DDevice();
 			}
@@ -542,8 +542,8 @@ void CVMRCustomAllocatorPresenter9::PresentVideoImage()
 	}
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒEƒBƒ“ƒhƒE‚Ì‚ ‚éƒ‚ƒjƒ^‚Ì˜”‚ğæ“¾‚·‚é
-//! @return		ƒEƒBƒ“ƒhƒE‚Ì‚ ‚éƒ‚ƒjƒ^‚Ì˜”
+//! @brief	  	ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã‚ã‚‹ãƒ¢ãƒ‹ã‚¿ã®åºæ•°ã‚’å–å¾—ã™ã‚‹
+//! @return		ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã‚ã‚‹ãƒ¢ãƒ‹ã‚¿ã®åºæ•°
 //----------------------------------------------------------------------------
 UINT CVMRCustomAllocatorPresenter9::GetMonitorNumber()
 {
@@ -563,9 +563,9 @@ UINT CVMRCustomAllocatorPresenter9::GetMonitorNumber()
 }
 
 //----------------------------------------------------------------------------
-//! @brief	  	ƒvƒŒƒ[ƒ“ƒg ƒpƒ‰ƒ[ƒ^‚ğŒˆ’è‚·‚é
+//! @brief	  	ãƒ—ãƒ¬ã‚¼ãƒ³ãƒˆ ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’æ±ºå®šã™ã‚‹
 //! @param		d3dpp : D3DPRESENT_PARAMETERS
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CVMRCustomAllocatorPresenter9::DecideD3DPresentParameters( D3DPRESENT_PARAMETERS& d3dpp )
 {
@@ -579,18 +579,18 @@ HRESULT CVMRCustomAllocatorPresenter9::DecideD3DPresentParameters( D3DPRESENT_PA
 	UINT	height = 0;
 	LONG_PTR	ownerStyle = ::GetWindowLongPtr( Owner()->OwnerWindow, GWL_STYLE );
 	if( !(ownerStyle&WS_THICKFRAME) ) {
-		// ƒI[ƒi[‚ÍƒTƒCƒY•ÏX•s‰Â
+		// ã‚ªãƒ¼ãƒŠãƒ¼ã¯ã‚µã‚¤ã‚ºå¤‰æ›´ä¸å¯
 		RECT	clientRect;
 		if( ::GetClientRect( Owner()->OwnerWindow, &clientRect ) ) {
 			width = clientRect.right - clientRect.left;
 			height = clientRect.bottom - clientRect.top;
-			// ‰‰ñ‚ÍAƒTƒCƒY0‚ÌƒEƒBƒ“ƒhƒEƒnƒ“ƒhƒ‹‚ª“n‚³‚ê‚é‚Ì‚ÅA‚±‚±‚Í0‚É‚È‚éB
-			// ‚»‚Ì‚ÍAƒEƒBƒ“ƒhƒE‚ÌƒNƒ‰ƒCƒAƒ“ƒg—Ìˆæ‚Æ“¯‚¶ƒTƒCƒY‚ÌƒoƒbƒNƒoƒbƒtƒ@‚ªì‚ç‚ê‚é‚±‚Æ‚É‚È‚éB
-			// ‚½‚¾‚µA’¼Œã‚É³‚µ‚¢ƒEƒBƒ“ƒhƒEƒnƒ“ƒhƒ‹‚ª“n‚³‚ê‚ÄAŠú‘Ò‚µ‚½‘å‚«‚³‚ÌƒoƒbƒNƒoƒbƒtƒ@‚É‚È‚é‚Í‚¸B
+			// åˆå›ã¯ã€ã‚µã‚¤ã‚º0ã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒãƒ³ãƒ‰ãƒ«ãŒæ¸¡ã•ã‚Œã‚‹ã®ã§ã€ã“ã“ã¯0ã«ãªã‚‹ã€‚
+			// ãã®æ™‚ã¯ã€ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆé ˜åŸŸã¨åŒã˜ã‚µã‚¤ã‚ºã®ãƒãƒƒã‚¯ãƒãƒƒãƒ•ã‚¡ãŒä½œã‚‰ã‚Œã‚‹ã“ã¨ã«ãªã‚‹ã€‚
+			// ãŸã ã—ã€ç›´å¾Œã«æ­£ã—ã„ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒãƒ³ãƒ‰ãƒ«ãŒæ¸¡ã•ã‚Œã¦ã€æœŸå¾…ã—ãŸå¤§ãã•ã®ãƒãƒƒã‚¯ãƒãƒƒãƒ•ã‚¡ã«ãªã‚‹ã¯ãšã€‚
 		}
 	} else {
 //	if( width == 0 || height == 0 ) {
-		// ƒTƒCƒY•ÏX‰Â‚Ì‚ÍA‰æ–ÊƒTƒCƒY‚Æ“¯‚¶‘å‚«‚³‚ÌƒoƒbƒNƒoƒbƒtƒ@ƒTƒCƒY‚É‚µ‚Ä‚µ‚Ü‚¤
+		// ã‚µã‚¤ã‚ºå¤‰æ›´å¯ã®æ™‚ã¯ã€ç”»é¢ã‚µã‚¤ã‚ºã¨åŒã˜å¤§ãã•ã®ãƒãƒƒã‚¯ãƒãƒƒãƒ•ã‚¡ã‚µã‚¤ã‚ºã«ã—ã¦ã—ã¾ã†
 		width = dm.Width;
 		height = dm.Height;
 	}
@@ -609,8 +609,8 @@ HRESULT CVMRCustomAllocatorPresenter9::DecideD3DPresentParameters( D3DPRESENT_PA
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	Direct3D‚ğ‰Šú‰»‚·‚é
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	Direct3Dã‚’åˆæœŸåŒ–ã™ã‚‹
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CVMRCustomAllocatorPresenter9::CreateD3D()
 {
@@ -663,8 +663,8 @@ HRESULT CVMRCustomAllocatorPresenter9::CreateD3D()
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	Direct3D‚ÌƒXƒe[ƒg‚ğ‰Šú‰»‚·‚é
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	Direct3Dã®ã‚¹ãƒ†ãƒ¼ãƒˆã‚’åˆæœŸåŒ–ã™ã‚‹
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CVMRCustomAllocatorPresenter9::InitializeDirect3DState()
 {
@@ -711,8 +711,8 @@ HRESULT CVMRCustomAllocatorPresenter9::InitializeDirect3DState()
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	Direct3DƒfƒoƒCƒX‚Ì•ÏX‚ğ’Ê’m‚·‚é
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	Direct3Dãƒ‡ãƒã‚¤ã‚¹ã®å¤‰æ›´ã‚’é€šçŸ¥ã™ã‚‹
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CVMRCustomAllocatorPresenter9::ChangeD3DDevice()
 {
@@ -732,8 +732,8 @@ HRESULT CVMRCustomAllocatorPresenter9::ChangeD3DDevice()
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	Direct3DƒfƒoƒCƒX‚ğÄ\’z‚·‚é
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	Direct3Dãƒ‡ãƒã‚¤ã‚¹ã‚’å†æ§‹ç¯‰ã™ã‚‹
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CVMRCustomAllocatorPresenter9::RebuildD3DDevice()
 {
@@ -746,8 +746,8 @@ HRESULT CVMRCustomAllocatorPresenter9::RebuildD3DDevice()
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒoƒbƒNƒoƒbƒtƒ@‚ÌƒTƒCƒY‚ğ•ÏX‚·‚é
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ãƒãƒƒã‚¯ãƒãƒƒãƒ•ã‚¡ã®ã‚µã‚¤ã‚ºã‚’å¤‰æ›´ã™ã‚‹
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CVMRCustomAllocatorPresenter9::ResizeBackbuffer()
 {
@@ -786,8 +786,8 @@ HRESULT CVMRCustomAllocatorPresenter9::ResizeBackbuffer()
 	return hr;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	qƒEƒBƒ“ƒhƒE‚ğ¶¬‚·‚é
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	å­ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ç”Ÿæˆã™ã‚‹
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CVMRCustomAllocatorPresenter9::CreateChildWindow()
 {
@@ -820,10 +820,10 @@ HRESULT CVMRCustomAllocatorPresenter9::CreateChildWindow()
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	qƒEƒBƒ“ƒhƒE‚ÌˆÊ’u‚ğŒvZ‚·‚é
+//! @brief	  	å­ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ä½ç½®ã‚’è¨ˆç®—ã™ã‚‹
 //!
-//! eƒEƒBƒ“ƒhƒE‚ÌƒTƒCƒY‚ğ’´‚¦‚È‚¢‚æ‚¤‚ÈqƒEƒBƒ“ƒhƒE‚ÌˆÊ’u‚Æ‘å‚«‚³‚ğ‹‚ß‚é
-//! @param		childRect : qƒEƒBƒ“ƒhƒE‚Ì—Ìˆæ
+//! è¦ªã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã‚µã‚¤ã‚ºã‚’è¶…ãˆãªã„ã‚ˆã†ãªå­ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ä½ç½®ã¨å¤§ãã•ã‚’æ±‚ã‚ã‚‹
+//! @param		childRect : å­ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®é ˜åŸŸ
 //----------------------------------------------------------------------------
 void CVMRCustomAllocatorPresenter9::CalcChildWindowSize( RECT& childRect )
 {
@@ -853,7 +853,7 @@ void CVMRCustomAllocatorPresenter9::CalcChildWindowSize( RECT& childRect )
 	m_ChildRect = childRect;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	qƒEƒBƒ“ƒhƒE‚ğ”jŠü‚·‚é
+//! @brief	  	å­ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ç ´æ£„ã™ã‚‹
 //----------------------------------------------------------------------------
 void CVMRCustomAllocatorPresenter9::DestroyChildWindow()
 {
@@ -867,12 +867,12 @@ void CVMRCustomAllocatorPresenter9::DestroyChildWindow()
 
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒEƒBƒ“ƒhƒEƒvƒƒV[ƒWƒƒ
-//! @param		hWnd : ƒEƒBƒ“ƒhƒEƒnƒ“ƒhƒ‹
-//! @param		msg : ƒƒbƒZ[ƒWID
-//! @param		wParam : ƒpƒ‰ƒƒ^
-//! @param		lParam : ƒpƒ‰ƒƒ^
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒ—ãƒ­ã‚·ãƒ¼ã‚¸ãƒ£
+//! @param		hWnd : ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒãƒ³ãƒ‰ãƒ«
+//! @param		msg : ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ID
+//! @param		wParam : ãƒ‘ãƒ©ãƒ¡ã‚¿
+//! @param		lParam : ãƒ‘ãƒ©ãƒ¡ã‚¿
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 LRESULT WINAPI CVMRCustomAllocatorPresenter9::WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
@@ -884,12 +884,12 @@ LRESULT WINAPI CVMRCustomAllocatorPresenter9::WndProc( HWND hWnd, UINT msg, WPAR
 	return DefWindowProc(hWnd,msg,wParam,lParam);
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒEƒBƒ“ƒhƒEƒvƒƒV[ƒWƒƒ
-//! @param		hWnd : ƒEƒBƒ“ƒhƒEƒnƒ“ƒhƒ‹
-//! @param		msg : ƒƒbƒZ[ƒWID
-//! @param		wParam : ƒpƒ‰ƒƒ^
-//! @param		lParam : ƒpƒ‰ƒƒ^
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒ—ãƒ­ã‚·ãƒ¼ã‚¸ãƒ£
+//! @param		hWnd : ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒãƒ³ãƒ‰ãƒ«
+//! @param		msg : ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ID
+//! @param		wParam : ãƒ‘ãƒ©ãƒ¡ã‚¿
+//! @param		lParam : ãƒ‘ãƒ©ãƒ¡ã‚¿
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 LRESULT WINAPI CVMRCustomAllocatorPresenter9::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
@@ -912,8 +912,8 @@ LRESULT WINAPI CVMRCustomAllocatorPresenter9::Proc( HWND hWnd, UINT msg, WPARAM 
 	return DefWindowProc(hWnd,msg,wParam,lParam);
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒrƒfƒI‚ÌƒTƒCƒY‚ğİ’è‚·‚é
-//! @param		rect : —v‹‚·‚éƒTƒCƒY
+//! @brief	  	ãƒ“ãƒ‡ã‚ªã®ã‚µã‚¤ã‚ºã‚’è¨­å®šã™ã‚‹
+//! @param		rect : è¦æ±‚ã™ã‚‹ã‚µã‚¤ã‚º
 //----------------------------------------------------------------------------
 void CVMRCustomAllocatorPresenter9::SetRect( RECT *rect )
 {
@@ -943,8 +943,8 @@ void CVMRCustomAllocatorPresenter9::SetRect( RECT *rect )
 	}
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒrƒfƒI‚Ì•\¦/”ñ•\¦‚ğİ’è‚·‚é
-//! @param		b : •\¦/”ñ•\¦
+//! @brief	  	ãƒ“ãƒ‡ã‚ªã®è¡¨ç¤º/éè¡¨ç¤ºã‚’è¨­å®šã™ã‚‹
+//! @param		b : è¡¨ç¤º/éè¡¨ç¤º
 //----------------------------------------------------------------------------
 void CVMRCustomAllocatorPresenter9::SetVisible( bool b )
 {
@@ -967,7 +967,7 @@ void CVMRCustomAllocatorPresenter9::SetVisible( bool b )
 	}
 }
 //----------------------------------------------------------------------------
-//! @brief	  	Direct3D Device‚ğƒŠƒZƒbƒg‚·‚é
+//! @brief	  	Direct3D Deviceã‚’ãƒªã‚»ãƒƒãƒˆã™ã‚‹
 //----------------------------------------------------------------------------
 void CVMRCustomAllocatorPresenter9::Reset()
 {

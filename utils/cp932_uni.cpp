@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------
 /*
-	Risa [‚è‚³]      alias ‹g—¢‹g—¢3 [kirikiri-3]
+	Risa [ã‚Šã•]      alias å‰é‡Œå‰é‡Œ3 [kirikiri-3]
 	 stands for "Risa Is a Stagecraft Architecture"
 	Copyright (C) 2000 W.Dee <dee@kikyou.info> and contributors
 
@@ -8,9 +8,9 @@
 */
 //---------------------------------------------------------------------------
 //! @file
-//! @brief CP932(àSJIS)->UNICODE •ÏŠ·
+//! @brief CP932(â‰’SJIS)->UNICODE å¤‰æ›
 //---------------------------------------------------------------------------
-// UNICODE‚ÆSJIS(cp932)‚Ì•ÏŠ·ƒ}ƒbƒv‚É‚Â‚¢‚Ä‚Í unicode.org ‚ğQÆ‚Ì‚±‚Æ
+// UNICODEã¨SJIS(cp932)ã®å¤‰æ›ãƒãƒƒãƒ—ã«ã¤ã„ã¦ã¯ unicode.org ã‚’å‚ç…§ã®ã“ã¨
 
 
 #include "tjsCommHead.h"
@@ -1349,16 +1349,16 @@ static const tSJIS2UNICODE_Submap SJIS2UNICODE_Submap[128] = {
 
 //---------------------------------------------------------------------------
 /**
- * CP932ˆê•¶š‚ğUNICODE‚É•ÏŠ·‚·‚é
- * @param in	“ü—Í MBCS
- * @param out	o—Í UNICODE (wchar_t)
- * @return	•ÏŠ·‚É¬Œ÷‚·‚ê‚Î^A¸”s‚·‚ê‚Î‹U
+ * CP932ä¸€æ–‡å­—ã‚’UNICODEã«å¤‰æ›ã™ã‚‹
+ * @param in	å…¥åŠ› MBCS
+ * @param out	å‡ºåŠ› UNICODE (wchar_t)
+ * @return	å¤‰æ›ã«æˆåŠŸã™ã‚Œã°çœŸã€å¤±æ•—ã™ã‚Œã°å½
  */
 static bool inline TVPSJISToUnicode(const char * & in, tjs_char *out)
 {
 	const unsigned char * & p = (const unsigned char * &)in;
 
-	// 1 byte •¶š‚ğƒ`ƒFƒbƒN
+	// 1 byte æ–‡å­—ã‚’ãƒã‚§ãƒƒã‚¯
 	tjs_uint16 ch = SJIS2UNICODE_Submap_map_00[p[0]];
 	if(ch != 0x0000U)
 	{
@@ -1393,9 +1393,9 @@ static bool inline TVPSJISToUnicode(const char * & in, tjs_char *out)
 
 //---------------------------------------------------------------------------
 /**
- * CP932ˆê•¶š‚ğUNICODE‚É•ÏŠ·‚·‚é
- * @param in	“ü—Í sjisƒR[ƒh  —á: 'Š¿' = 0x8abf  '0' = 0x0030
- * @return	o—Í UNICODE (wchar_t) •ÏŠ·‚É¸”s‚·‚ê‚Î 0
+ * CP932ä¸€æ–‡å­—ã‚’UNICODEã«å¤‰æ›ã™ã‚‹
+ * @param in	å…¥åŠ› sjisã‚³ãƒ¼ãƒ‰  ä¾‹: 'æ¼¢' = 0x8abf  '0' = 0x0030
+ * @return	å‡ºåŠ› UNICODE (wchar_t) å¤‰æ›ã«å¤±æ•—ã™ã‚Œã° 0
  */
 tjs_char SJISToUnicode(tjs_uint sjis)
 {
@@ -1422,12 +1422,12 @@ tjs_char SJISToUnicode(tjs_uint sjis)
 
 //---------------------------------------------------------------------------
 /**
- * CP932•¶š—ñ‚ğUNICODE‚É•ÏŠ·‚·‚é
- * @param in	“ü—Í MBCS •¶š—ñ
- * @param out	o—Í UNICODE (wchar_t) •¶š—ñ (NULL‚Ìê‡‚Í‘‚«‚Ü‚ê‚È‚¢)
- * @return	o—Í‚³‚ê‚½•¶š”
- *			(ÅŒã‚É\0‚Í‘‚«‚Ü‚ê‚È‚¢‚µ‚»‚Ì•¶š”‚àŠÜ‚Ü‚ê‚È‚¢‚Ì‚Å’ˆÓ)
- *			(tjs_size)-1 = ˆÙí‚È•¶š‚ªŒ©‚Â‚©‚Á‚½
+ * CP932æ–‡å­—åˆ—ã‚’UNICODEã«å¤‰æ›ã™ã‚‹
+ * @param in	å…¥åŠ› MBCS æ–‡å­—åˆ—
+ * @param out	å‡ºåŠ› UNICODE (wchar_t) æ–‡å­—åˆ— (NULLã®å ´åˆã¯æ›¸ãè¾¼ã¾ã‚Œãªã„)
+ * @return	å‡ºåŠ›ã•ã‚ŒãŸæ–‡å­—æ•°
+ *			(æœ€å¾Œã«\0ã¯æ›¸ãè¾¼ã¾ã‚Œãªã„ã—ãã®æ–‡å­—æ•°ã‚‚å«ã¾ã‚Œãªã„ã®ã§æ³¨æ„)
+ *			(tjs_size)-1 = ç•°å¸¸ãªæ–‡å­—ãŒè¦‹ã¤ã‹ã£ãŸ
  */
 tjs_size SJISToUnicodeString(const char * in, tjs_char *out)
 {
@@ -1455,13 +1455,13 @@ tjs_size SJISToUnicodeString(const char * in, tjs_char *out)
 
 //---------------------------------------------------------------------------
 /**
- * CP932•¶š—ñ‚ğUNICODE‚É•ÏŠ·‚·‚é
- * @param in	“ü—Í MBCS •¶š—ñ
- * @param out	o—Í UNICODE (wchar_t) •¶š—ñ (NULL‚Ìê‡‚Í‘‚«‚Ü‚ê‚È‚¢)
- * @param limit o—Íƒoƒbƒtƒ@ƒTƒCƒY
- * @return	o—Í‚³‚ê‚½•¶š”
- *			(ÅŒã‚É\0‚Í‘‚«‚Ü‚ê‚È‚¢‚µ‚»‚Ì•¶š”‚àŠÜ‚Ü‚ê‚È‚¢‚Ì‚Å’ˆÓ)
- *			(tjs_size)-1 = ˆÙí‚È•¶š‚ªŒ©‚Â‚©‚Á‚½
+ * CP932æ–‡å­—åˆ—ã‚’UNICODEã«å¤‰æ›ã™ã‚‹
+ * @param in	å…¥åŠ› MBCS æ–‡å­—åˆ—
+ * @param out	å‡ºåŠ› UNICODE (wchar_t) æ–‡å­—åˆ— (NULLã®å ´åˆã¯æ›¸ãè¾¼ã¾ã‚Œãªã„)
+ * @param limit å‡ºåŠ›ãƒãƒƒãƒ•ã‚¡ã‚µã‚¤ã‚º
+ * @return	å‡ºåŠ›ã•ã‚ŒãŸæ–‡å­—æ•°
+ *			(æœ€å¾Œã«\0ã¯æ›¸ãè¾¼ã¾ã‚Œãªã„ã—ãã®æ–‡å­—æ•°ã‚‚å«ã¾ã‚Œãªã„ã®ã§æ³¨æ„)
+ *			(tjs_size)-1 = ç•°å¸¸ãªæ–‡å­—ãŒè¦‹ã¤ã‹ã£ãŸ
  */
 tjs_size SJISToUnicodeString(const char * in, tjs_char *out, tjs_size limit )
 {
@@ -1484,9 +1484,9 @@ tjs_size SJISToUnicodeString(const char * in, tjs_char *out, tjs_size limit )
 
 //---------------------------------------------------------------------------
 /**
- * CP932•¶š‚Å2ƒoƒCƒg•¶šƒR[ƒh‚Ì1ƒoƒCƒg–Ú‚©Šm”F‚·‚é
- * @param b	“ü—Í MBCS •¶š—ñ
- * @return	true 2ƒoƒCƒg•¶š‚Ì1ƒoƒCƒg–Ú, false 1ƒoƒCƒg•¶š
+ * CP932æ–‡å­—ã§2ãƒã‚¤ãƒˆæ–‡å­—ã‚³ãƒ¼ãƒ‰ã®1ãƒã‚¤ãƒˆç›®ã‹ç¢ºèªã™ã‚‹
+ * @param b	å…¥åŠ› MBCS æ–‡å­—åˆ—
+ * @return	true 2ãƒã‚¤ãƒˆæ–‡å­—ã®1ãƒã‚¤ãƒˆç›®, false 1ãƒã‚¤ãƒˆæ–‡å­—
  */
 bool IsSJISLeadByte( tjs_nchar b )
 {

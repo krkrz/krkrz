@@ -22,7 +22,7 @@ struct sse2_adjust_gamma_a_func {
 			ret |= param_->G[(dst>>8)&0xff] << 8;		// look table G up  (GG')
 			ret |= param_->R[(dst>>16)&0xff] << 16;	// look table R up  (RR')
 			return 0xff000000|ret;
-		} else if( dst != 0 ) {	// premul ‚È‚Ì‚ÅŠ®‘S“§–¾‚Ì‚Í0‚É‚È‚é‚Í‚¸ //} else if( dst > 0x00ffffff ) {
+		} else if( dst != 0 ) {	// premul ãªã®ã§å®Œå…¨é€æ˜ã®æ™‚ã¯0ã«ãªã‚‹ã¯ãš //} else if( dst > 0x00ffffff ) {
 			__m128i md = _mm_cvtsi32_si128( dst );
 			tjs_uint32 alpha = dst >> 24;
 			tjs_uint32 recip = TVPRecipTable256_16[alpha];	// 65536/opacity (rcp)
@@ -82,7 +82,7 @@ void TVPAdjustGamma_a_sse2_c(tjs_uint32 *dest, tjs_int len, tTVPGLGammaAdjustTem
 
 	sse2_adjust_gamma_a_func func(param);
 
-	// ƒAƒ‰ƒCƒƒ“ƒgˆ—
+	// ã‚¢ãƒ©ã‚¤ãƒ¡ãƒ³ãƒˆå‡¦ç†
 	tjs_int count = (tjs_int)((unsigned)dest & 0xF);
 	if( count ) {
 		count = (16 - count)>>2;
@@ -107,7 +107,7 @@ void TVPAdjustGamma_a_sse2_c(tjs_uint32 *dest, tjs_int len, tTVPGLGammaAdjustTem
 		cmp = _mm_cmpeq_epi32( cmp, alphamask );	// alpha == 0xff
 		int opaque = _mm_movemask_epi8(cmp);
 		if( opaque == 0xffff ) {
-			// 4pixelŠ®‘S•s“§–¾
+			// 4pixelå®Œå…¨ä¸é€æ˜
 			tjs_uint32 dst = dest[0];
 			tjs_uint32 ret = param->B[dst&0xff];		// look table B up  (BB')
 			ret |= param->G[(dst>>8)&0xff] << 8;		// look table G up  (GG')
@@ -133,22 +133,22 @@ void TVPAdjustGamma_a_sse2_c(tjs_uint32 *dest, tjs_int len, tTVPGLGammaAdjustTem
 			cmp = _mm_cmpeq_epi32( cmp, zero );	// alpha == 0
 			int transparent = _mm_movemask_epi8(cmp);
 			if( transparent == 0 && opaque == 0 ) {
-				// 4pixel‚Ì’†‚ÉŠ®‘S•s“§–¾/Š®‘S“§–¾‚È‚à‚Ì‚Í‚È‚¢
+				// 4pixelã®ä¸­ã«å®Œå…¨ä¸é€æ˜/å®Œå…¨é€æ˜ãªã‚‚ã®ã¯ãªã„
 				__m128i msa = ma0;
 				ma0 = _mm_srli_epi32( ma0, 24 );	// ma >>= 24
 
 #ifndef TVP_USE_RCP_TABLE
-				// ˆÈ‰ºATVPRecipTable256_16 ‚ğˆø‚­‚Ì‚Æ“¯‚¶B‘¬“x“I‚É‚Í‚í‚¸‚©‚É‘¬‚¢‚ªA­‚µ¸“x‚ª—‚¿‚Ä‚µ‚Ü‚¤A‚È‚Ì‚ÅŠî–{ƒe[ƒuƒ‹‚ğg‚¤•û‚É‚µ‚Ä‚¨‚­
+				// ä»¥ä¸‹ã€TVPRecipTable256_16 ã‚’å¼•ãã®ã¨åŒã˜ã€‚é€Ÿåº¦çš„ã«ã¯ã‚ãšã‹ã«é€Ÿã„ãŒã€å°‘ã—ç²¾åº¦ãŒè½ã¡ã¦ã—ã¾ã†ã€ãªã®ã§åŸºæœ¬ãƒ†ãƒ¼ãƒ–ãƒ«ã‚’ä½¿ã†æ–¹ã«ã—ã¦ãŠã
 				__m128 mrcp = _mm_cvtepi32_ps(ma0);
 				mrcp = _mm_rcp_ps(mrcp);			// 1 / rcp
-				//mrcp = m128_rcp_22bit_ps(mrcp);	// 1 / rcp : ¸“xã‚°‚é‚Æ­‚µ’x‚¢
+				//mrcp = m128_rcp_22bit_ps(mrcp);	// 1 / rcp : ç²¾åº¦ä¸Šã’ã‚‹ã¨å°‘ã—é…ã„
 				const __m128 val65536 = _mm_set1_ps(65536.0f);
 				mrcp = _mm_mul_ps( mrcp, val65536 );	// 65536 / rcp
 				__m128i mrcpi0 = _mm_cvtps_epi32(mrcp);
 
-				mrcpi0 = _mm_packs_epi32( mrcpi0, mrcpi0 );	// 0 1 2 3 0 1 2 3 0x7fff‚Åsaturate
+				mrcpi0 = _mm_packs_epi32( mrcpi0, mrcpi0 );	// 0 1 2 3 0 1 2 3 0x7fffã§saturate
 				__m128i mask;
-#if 0	// ˆÈ‰º‚Ì•û–@‚Åsaturate‚·‚é‚Æ’x‚¢‚ÆŒ¾‚¤‚©A_mm_packs_epi32‚Å‘å•‚ÉÈ‚¯‚é‚Æ‹C•t‚¢‚½
+#if 0	// ä»¥ä¸‹ã®æ–¹æ³•ã§saturateã™ã‚‹ã¨é…ã„ã¨è¨€ã†ã‹ã€_mm_packs_epi32ã§å¤§å¹…ã«çœã‘ã‚‹ã¨æ°—ä»˜ã„ãŸ
 				const __m128i mmax = _mm_set1_epi32(0x7fff);
 				__m128i mask = mrcpi0;
 				mask = _mm_cmplt_epi32( mask, mmax );	// rcp < 0x7fff ? 0xffff : 0000
@@ -165,7 +165,7 @@ void TVPAdjustGamma_a_sse2_c(tjs_uint32 *dest, tjs_int len, tTVPGLGammaAdjustTem
 				mrcpi0 = _mm_packs_epi32( mrcpi0, mrcpi0 );		// 0 1 2 3 0 1 2 3
 #endif
 
-				// rcp‚Æalpha‚Ìunpack
+				// rcpã¨alphaã®unpack
 				mrcpi0 = _mm_unpacklo_epi16( mrcpi0, mrcpi0 );	// 0 0 1 1 2 2 3 3
 				__m128i mrcpi1 = mrcpi0;
 
@@ -192,7 +192,7 @@ void TVPAdjustGamma_a_sse2_c(tjs_uint32 *dest, tjs_int len, tTVPGLGammaAdjustTem
 				__m128i madj = ma0;
 				madj = _mm_srli_epi16( madj, 7 );
 				ma0 = _mm_add_epi16( ma0, madj );	// adjust alpha = alpha + (alpha>>7)
-				// md0 ‚Æ ma0 ‚Íƒe[ƒuƒ‹QÆŒã‚Ü‚½g‚í‚ê‚é
+				// md0 ã¨ ma0 ã¯ãƒ†ãƒ¼ãƒ–ãƒ«å‚ç…§å¾Œã¾ãŸä½¿ã‚ã‚Œã‚‹
 
 				// higher pixel
 				mrcpi1 = _mm_unpackhi_epi16( mrcpi1, mrcpi1 );	// 2 2 2 2 3 3 3 3
@@ -211,11 +211,11 @@ void TVPAdjustGamma_a_sse2_c(tjs_uint32 *dest, tjs_int len, tTVPGLGammaAdjustTem
 				madj = ma1;
 				madj = _mm_srli_epi16( madj, 7 );
 				ma1 = _mm_add_epi16( ma1, madj );	// adjust alpha = alpha + (alpha>>7)
-				// md1 ‚Æ ma1 ‚Íƒe[ƒuƒ‹QÆŒã‚Ü‚½g‚í‚ê‚é
+				// md1 ã¨ ma1 ã¯ãƒ†ãƒ¼ãƒ–ãƒ«å‚ç…§å¾Œã¾ãŸä½¿ã‚ã‚Œã‚‹
 
 				mrcpi0 = _mm_packus_epi16( mrcpi0, mrcpi1 );	// rcp*AA>>8 rcp*RR>>8 rcp*GG>>8 rcp*BB>>8
 
-				// 4pixel•ª‚Ìƒe[ƒuƒ‹QÆ
+				// 4pixelåˆ†ã®ãƒ†ãƒ¼ãƒ–ãƒ«å‚ç…§
 				tjs_uint32 idx = _mm_cvtsi128_si32( mrcpi0 );
 				tjs_uint32 col = param->B[idx&0xff];	// look table B up  (BB')
 				col |= param->G[(idx>>8)&0xff] << 8;	// look table G up  (GG')
@@ -255,17 +255,17 @@ void TVPAdjustGamma_a_sse2_c(tjs_uint32 *dest, tjs_int len, tTVPGLGammaAdjustTem
 				mcol0 = _mm_or_si128( mcol0, msa );		// | src alpha
 				_mm_store_si128( (__m128i*)dest, mcol0 );
 			} else if( transparent != 0xffff ) {
-				// ¬İ‚µ‚Ä‚¢‚éê‡‚Í‰ºè‚É•ªŠò‚·‚é‚æ‚è‚à‘f’¼‚É1pixelˆ—‚ğ4‰ñ‰ñ‚µ‚½•û‚ª—Ç‚³‚»‚¤‚È
+				// æ··åœ¨ã—ã¦ã„ã‚‹å ´åˆã¯ä¸‹æ‰‹ã«åˆ†å²ã™ã‚‹ã‚ˆã‚Šã‚‚ç´ ç›´ã«1pixelå‡¦ç†ã‚’4å›å›ã—ãŸæ–¹ãŒè‰¯ã•ãã†ãª
 				dest[0] = func( dest[0] );
 				dest[1] = func( dest[1] );
 				dest[2] = func( dest[2] );
 				dest[3] = func( dest[3] );
-			}	// else 4pixel Š®‘S“§–¾‚Ì‚Í‰½‚à‚µ‚È‚¢
+			}	// else 4pixel å®Œå…¨é€æ˜ã®æ™‚ã¯ä½•ã‚‚ã—ãªã„
 		}
 		dest += 4;
 	}
 
-	// c‚è‚Ì’[”ˆ—
+	// æ®‹ã‚Šã®ç«¯æ•°å‡¦ç†
 	limit += (len-rem);
 	while( dest < limit ) {
 		*dest = func( *dest );
@@ -341,8 +341,8 @@ void TVPInitGammaAdjustTempData_sse2_c( tTVPGLGammaAdjustTempData *temp, const t
 	}
 }
 #endif
-// C”Å‚Æ”äŠr‚µ‚Äã‚Ì2‚Â‚Í3”{’ö“xA‰º‚Ì‚à‚Ì‚Í4”{’ö“x‚Æ“¯‰‰Z”‚É]‚Á‚Ä‘¬‚­‚È‚Á‚Ä‚¢‚é
-// ’è”‚ª‘½‚¢‚Ì‚ÅƒŒƒWƒXƒ^g‚¢‚Ü‚í‚µ‚È‚Ç‚Å•s—˜‚©‚Æv‚Á‚½‚ª‹C‚É‚·‚é‚Ù‚Ç‚Å‚Í‚È‚³‚»‚¤B
+// Cç‰ˆã¨æ¯”è¼ƒã—ã¦ä¸Šã®2ã¤ã¯3å€ç¨‹åº¦ã€ä¸‹ã®ã‚‚ã®ã¯4å€ç¨‹åº¦ã¨åŒæ™‚æ¼”ç®—æ•°ã«å¾“ã£ã¦é€Ÿããªã£ã¦ã„ã‚‹
+// å®šæ•°ãŒå¤šã„ã®ã§ãƒ¬ã‚¸ã‚¹ã‚¿ä½¿ã„ã¾ã‚ã—ãªã©ã§ä¸åˆ©ã‹ã¨æ€ã£ãŸãŒæ°—ã«ã™ã‚‹ã»ã©ã§ã¯ãªã•ãã†ã€‚
 void TVPInitGammaAdjustTempData_sse2_c( tTVPGLGammaAdjustTempData *temp, const tTVPGLGammaAdjustData *data )
 {
 	const __m128 ramp = _mm_set1_ps((float)(data->RCeil - data->RFloor));

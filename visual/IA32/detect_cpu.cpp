@@ -1,6 +1,6 @@
 /******************************************************************************/
 /**
- * CPUî•ñ‚ğæ“¾‚·‚é
+ * CPUæƒ…å ±ã‚’å–å¾—ã™ã‚‹
  * ----------------------------------------------------------------------------
  * 	Copyright (C) T.Imoto <http://www.kaede-software.com>
  * ----------------------------------------------------------------------------
@@ -23,7 +23,7 @@ static bool __os_has_avx_support() {
 	return (xcrFeatureMask & 6) == 6;
 }
 #else
-// VC ˆÈŠO‚Í“®ì–¢Šm”F
+// VC ä»¥å¤–ã¯å‹•ä½œæœªç¢ºèª
 static inline int __cpuid(int CPUInfo[4],int InfoType) {
   int highest;
   asm volatile("cpuid":"=a"(*CPUInfo),"=b"(*(CPUInfo+1)),
@@ -254,7 +254,7 @@ tjs_uint32 TVPCheckCPU()
 #ifdef _MSC_VER
 	if( flags & (TVP_CPU_HAS_AVX|TVP_CPU_HAS_AVX2) ) {
 		__try {
-			// YMMƒŒƒWƒXƒ^(AVX)‚ÍWindows‚È‚ç7 SP1ˆÈ~
+			// YMMãƒ¬ã‚¸ã‚¹ã‚¿(AVX)ã¯Windowsãªã‚‰7 SP1ä»¥é™
 			if( !__os_has_avx_support() ) {
 				flags &= ~(TVP_CPU_HAS_AVX|TVP_CPU_HAS_AVX2);
 			}

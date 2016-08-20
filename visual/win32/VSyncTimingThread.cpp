@@ -16,7 +16,7 @@ tTVPVSyncTimingThread::tTVPVSyncTimingThread(tTJSNI_Window* owner)
 {
 	SleepTime = 1;
 	LastVBlankTick = 0;
-	VSyncInterval = 16; // –ñ60FPS
+	VSyncInterval = 16; // ç´„60FPS
 	Enabled = false;
 	EventQueue.Allocate();
 	MeasureVSyncInterval();
@@ -42,7 +42,7 @@ void tTVPVSyncTimingThread::Execute()
 {
 	while(!GetTerminated())
 	{
-		// SleepTime ‚Æ LastVBlankTick ‚ğ“¾‚é
+		// SleepTime ã¨ LastVBlankTick ã‚’å¾—ã‚‹
 		DWORD sleep_time, last_vblank_tick;
 		{	// thread-protected
 			tTJSCriticalSectionHolder holder(CS);
@@ -50,8 +50,8 @@ void tTVPVSyncTimingThread::Execute()
 			last_vblank_tick = LastVBlankTick;
 		}
 
-		// SleepTime •ª–°‚é
-		// LastVBlankTick ‚©‚ç‹NZ‚µASleepTime •ª–°‚é
+		// SleepTime åˆ†çœ ã‚‹
+		// LastVBlankTick ã‹ã‚‰èµ·ç®—ã—ã€SleepTime åˆ†çœ ã‚‹
 		DWORD sleep_start_tick = timeGetTime();
 
 		DWORD sleep_time_adj = sleep_start_tick - last_vblank_tick;
@@ -62,23 +62,23 @@ void tTVPVSyncTimingThread::Execute()
 		}
 		else
 		{
-			// •’ÊAƒƒCƒ“ƒXƒŒƒbƒh“à‚Å Event.Set() ‚µ‚½‚È‚ç‚ÎA
-			// ƒ^ƒCƒ€ƒXƒ‰ƒCƒX(’·‚­‚Ä10ms) ‚ªI‚í‚é ‚Í
-			// ‚±‚±‚É—ˆ‚Ä‚¢‚é‚Í‚¸‚Å‚ ‚éB
-			// sleep_time ‚Í’Êí 10ms ‚æ‚è’·‚¢‚Ì‚ÅA
-			// ‚±‚±‚É—ˆ‚é‚Á‚Ä‚Ì‚ÍˆÙíB
-			// ‚æ‚Ù‚ÇƒVƒXƒeƒ€‚ªd‚½‚¢ó‘Ô‚É‚È‚Á‚Ä‚é‚Æl‚¦‚ç‚ê‚éB
-			// ‚»‚±‚Å—§‚Ä‘±‚¯‚É ƒCƒxƒ“ƒg‚ğƒ|ƒXƒg‚·‚é‚í‚¯‚É‚Í‚¢‚©‚È‚¢‚Ì‚Å
-			// “K“–‚ÈŠÔ(–{“–‚É“K“–) –°‚éB
+			// æ™®é€šã€ãƒ¡ã‚¤ãƒ³ã‚¹ãƒ¬ãƒƒãƒ‰å†…ã§ Event.Set() ã—ãŸãªã‚‰ã°ã€
+			// ã‚¿ã‚¤ãƒ ã‚¹ãƒ©ã‚¤ã‚¹(é•·ãã¦10ms) ãŒçµ‚ã‚ã‚‹é ƒã¯
+			// ã“ã“ã«æ¥ã¦ã„ã‚‹ã¯ãšã§ã‚ã‚‹ã€‚
+			// sleep_time ã¯é€šå¸¸ 10ms ã‚ˆã‚Šé•·ã„ã®ã§ã€
+			// ã“ã“ã«æ¥ã‚‹ã£ã¦ã®ã¯ç•°å¸¸ã€‚
+			// ã‚ˆã»ã©ã‚·ã‚¹ãƒ†ãƒ ãŒé‡ãŸã„çŠ¶æ…‹ã«ãªã£ã¦ã‚‹ã¨è€ƒãˆã‚‰ã‚Œã‚‹ã€‚
+			// ãã“ã§ç«‹ã¦ç¶šã‘ã« ã‚¤ãƒ™ãƒ³ãƒˆã‚’ãƒã‚¹ãƒˆã™ã‚‹ã‚ã‘ã«ã¯ã„ã‹ãªã„ã®ã§
+			// é©å½“ãªæ™‚é–“(æœ¬å½“ã«é©å½“) çœ ã‚‹ã€‚
 			::Sleep(5);
 		}
 
-		// ƒCƒxƒ“ƒg‚ğƒ|ƒXƒg‚·‚é
+		// ã‚¤ãƒ™ãƒ³ãƒˆã‚’ãƒã‚¹ãƒˆã™ã‚‹
 		NativeEvent ev(TVP_EV_VSYNC_TIMING_THREAD);
 		ev.LParam = (LPARAM)sleep_start_tick;
 		EventQueue.PostEvent(ev);
 
-		Event.WaitFor(0x7fffffff); // vsync ‚Ü‚Å‘Ò‚Â
+		Event.WaitFor(0x7fffffff); // vsync ã¾ã§å¾…ã¤
 	}
 }
 //---------------------------------------------------------------------------
@@ -93,62 +93,62 @@ void tTVPVSyncTimingThread::Proc( NativeEvent& ev )
 	}
 	if( OwnerWindow == NULL ) return;
 
-	// tTVPVSyncTimingThread ‚©‚ç“Š‚°‚ç‚ê‚½ƒƒbƒZ[ƒW
+	// tTVPVSyncTimingThread ã‹ã‚‰æŠ•ã’ã‚‰ã‚ŒãŸãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
 
 	tjs_int in_vblank = 0;
 	tjs_int delayed = 0;
 	bool supportvwait = OwnerWindow->WaitForVBlank( &in_vblank, &delayed );
 	if( supportvwait == false )
-	{	// VBlank‘Ò‚¿‚ÍƒTƒ|[ƒg‚³‚ê‚Ä‚¢‚È‚¢‚Ì‚ÅA‹C‚É‚¹‚¸‚»‚Ì‚Ü‚Üis(‘Ò‚¿ŠÔ‚Í‚¢‚¢‰ÁŒ¸‚¾‚ª‹C‚É‚µ‚È‚¢‚±‚Æ‚É‚·‚é)
+	{	// VBlankå¾…ã¡ã¯ã‚µãƒãƒ¼ãƒˆã•ã‚Œã¦ã„ãªã„ã®ã§ã€æ°—ã«ã›ãšãã®ã¾ã¾é€²è¡Œ(å¾…ã¡æ™‚é–“ã¯ã„ã„åŠ æ¸›ã ãŒæ°—ã«ã—ãªã„ã“ã¨ã«ã™ã‚‹)
 		in_vblank = 0;
 		delayed = 0;
 	}
 
-	// ƒ^ƒCƒ}‚ÌŠÔŒ´“_‚ğİ’è‚·‚é
+	// ã‚¿ã‚¤ãƒã®æ™‚é–“åŸç‚¹ã‚’è¨­å®šã™ã‚‹
 	if(!delayed)
 	{
 		tTJSCriticalSectionHolder holder(CS);
-		LastVBlankTick = timeGetTime(); // ‚±‚ê‚ªŸ‚É–°‚éŠÔ‚Ì‹NZ“_‚É‚È‚é
+		LastVBlankTick = timeGetTime(); // ã“ã‚ŒãŒæ¬¡ã«çœ ã‚‹æ™‚é–“ã®èµ·ç®—ç‚¹ã«ãªã‚‹
 	}
 	else
 	{
 		tTJSCriticalSectionHolder holder(CS);
-		LastVBlankTick += VSyncInterval; // ‚±‚ê‚ªŸ‚É–°‚éŠÔ‚Ì‹NZ“_‚É‚È‚é(‚¨‚¨‚´‚Á‚Ï)
+		LastVBlankTick += VSyncInterval; // ã“ã‚ŒãŒæ¬¡ã«çœ ã‚‹æ™‚é–“ã®èµ·ç®—ç‚¹ã«ãªã‚‹(ãŠãŠã–ã£ã±)
 		if((long) (timeGetTime() - (LastVBlankTick + SleepTime)) <= 0)
 		{
-			// –°‚Á‚½ŒãAŸ‚É‹N‚«‚æ‚¤‚Æ‚·‚éŠÔ‚ª‚·‚Å‚É‰ß‹‚È‚Ì‚Å–°‚ê‚Ü‚¹‚ñ
-			LastVBlankTick = timeGetTime(); // ‹­§“I‚É¡‚Ì‚É‚µ‚Ü‚·
+			// çœ ã£ãŸå¾Œã€æ¬¡ã«èµ·ãã‚ˆã†ã¨ã™ã‚‹æ™‚é–“ãŒã™ã§ã«éå»ãªã®ã§çœ ã‚Œã¾ã›ã‚“
+			LastVBlankTick = timeGetTime(); // å¼·åˆ¶çš„ã«ä»Šã®æ™‚åˆ»ã«ã—ã¾ã™
 		}
 	}
 
-	// ‰æ–Ê‚ÌXV‚ğs‚¤ (DrawDevice‚ÌShowƒƒ\ƒbƒh‚ğŒÄ‚Ô)
+	// ç”»é¢ã®æ›´æ–°ã‚’è¡Œã† (DrawDeviceã®Showãƒ¡ã‚½ãƒƒãƒ‰ã‚’å‘¼ã¶)
 	OwnerWindow->DeliverDrawDeviceShow();
 
-	// ‚à‚µ vsync ‘Ò‚¿‚ğs‚¤’¼‘OA‚·‚Å‚É vblank ‚É“ü‚Á‚Ä‚¢‚½ê‡‚ÍA
-	// ‘Ò‚ÂŠÔ‚ª’·‚·‚¬‚½‚ÆŒ¾‚¤‚±‚Æ‚Å‚ ‚é
+	// ã‚‚ã— vsync å¾…ã¡ã‚’è¡Œã†ç›´å‰ã€ã™ã§ã« vblank ã«å…¥ã£ã¦ã„ãŸå ´åˆã¯ã€
+	// å¾…ã¤æ™‚é–“ãŒé•·ã™ããŸã¨è¨€ã†ã“ã¨ã§ã‚ã‚‹
 	if(in_vblank)
 	{
-		// ‚»‚Ìê‡‚Í SleepTime ‚ğŒ¸‚ç‚·
+		// ãã®å ´åˆã¯ SleepTime ã‚’æ¸›ã‚‰ã™
 		tTJSCriticalSectionHolder holder(CS);
 		if(SleepTime > 8) SleepTime --;
 	}
 	else
 	{
-		// vblank ‚Å–³‚©‚Á‚½ê‡‚Í“ñ‚Â‚Ìê‡‚ªl‚¦‚ç‚ê‚é
-		// 1. vblank ‘O‚¾‚Á‚½
-		// 2. vblank Œã‚¾‚Á‚½
-		// ‚Ç‚Á‚¿‚©‚Í•ª‚©‚ç‚È‚¢‚ª
-		// SleepTime ‚ğ‘‚â‚·B‚½‚¾‚µ‚±‚ê‚ª VSyncInterval ‚ğ’´‚¦‚é‚Í‚¸‚Í‚È‚¢B
+		// vblank ã§ç„¡ã‹ã£ãŸå ´åˆã¯äºŒã¤ã®å ´åˆãŒè€ƒãˆã‚‰ã‚Œã‚‹
+		// 1. vblank å‰ã ã£ãŸ
+		// 2. vblank å¾Œã ã£ãŸ
+		// ã©ã£ã¡ã‹ã¯åˆ†ã‹ã‚‰ãªã„ãŒ
+		// SleepTime ã‚’å¢—ã‚„ã™ã€‚ãŸã ã—ã“ã‚ŒãŒ VSyncInterval ã‚’è¶…ãˆã‚‹ã¯ãšã¯ãªã„ã€‚
 		tTJSCriticalSectionHolder holder(CS);
 		SleepTime ++;
 		if(SleepTime > VSyncInterval) SleepTime = VSyncInterval;
 	}
 
-	// ƒ^ƒCƒ}‚ğ‹N“®‚·‚é
+	// ã‚¿ã‚¤ãƒã‚’èµ·å‹•ã™ã‚‹
 	Event.Set();
 
-	// ContinuousHandler ‚ğŒÄ‚Ô
-	// ‚±‚ê‚Í\•ª‚ÈŠÔ‚ğ‚Æ‚ê‚é‚æ‚¤Avsync ‘Ò‚¿‚Ì’¼Œã‚ÉŒÄ‚Î‚ê‚é
+	// ContinuousHandler ã‚’å‘¼ã¶
+	// ã“ã‚Œã¯ååˆ†ãªæ™‚é–“ã‚’ã¨ã‚Œã‚‹ã‚ˆã†ã€vsync å¾…ã¡ã®ç›´å¾Œã«å‘¼ã°ã‚Œã‚‹
 	TVPProcessContinuousHandlerEventFlag = true; // set flag to invoke continuous handler on next idle
 }
 //---------------------------------------------------------------------------
@@ -173,7 +173,7 @@ void tTVPVSyncTimingThread::MeasureVSyncInterval()
 
 	TVPAddLog( TVPFormatMessage(TVPRoughVsyncIntervalReadFromApi,ttstr((int)vsync_interval)) );
 
-	// vsync üŠú‚Í“KØ‚Á‚Û‚¢H
+	// vsync å‘¨æœŸã¯é©åˆ‡ã£ã½ã„ï¼Ÿ
 	if(vsync_interval < 6 || vsync_interval > 66)
 	{
 		TVPAddLog( (const tjs_char*)TVPRoughVsyncIntervalStillSeemsWrong );

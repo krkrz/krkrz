@@ -22,7 +22,7 @@ tjsConstArrayData::~tjsConstArrayData() {
 }
 
 int tjsConstArrayData::PutByteBuffer( tTJSVariantOctet* val ) {
-	// ƒIƒNƒeƒbƒg‚Ì‚Í‘Sƒ`ƒFƒbƒN
+	// ã‚ªã‚¯ãƒ†ãƒƒãƒˆã®æ™‚ã¯å…¨ãƒã‚§ãƒƒã‚¯
 	tjs_uint len = 0;
 	const tjs_uint8* data = NULL;
 	if( val ) {
@@ -165,14 +165,14 @@ int tjsConstArrayData::PutVariant( tTJSVariant& v, tTJSScriptBlock* block ) {
 	int type = GetType( v, block );
 	switch( type ) {
 	case TYPE_VOID:
-		return 0; // í‚É0
+		return 0; // å¸¸ã«0
 	case TYPE_OBJECT: {
 		iTJSDispatch2* obj = v.AsObjectNoAddRef();
 		iTJSDispatch2* objthis = v.AsObjectThisNoAddRef();
 		if( obj == NULL && objthis == NULL ) {
-			return 0; // null ‚Ì VariantClosure ‚Íó‚¯“ü‚ê‚é
+			return 0; // null ã® VariantClosure ã¯å—ã‘å…¥ã‚Œã‚‹
 		} else {
-			return -1; // ‚»‚Ì‘¼‚Í“ü‚ê‚È‚¢B
+			return -1; // ãã®ä»–ã¯å…¥ã‚Œãªã„ã€‚
 		}
 	}
 	case TYPE_INTER_OBJECT: {
@@ -208,7 +208,7 @@ std::vector<tjs_uint8>* tjsConstArrayData::ExportBuffer() {
 		len = ((len + 1) / 2) * 2;
 		stralllen += len * 2;
 	}
-	stralllen = ((stralllen+3) / 4) * 4; // ƒAƒ‰ƒCƒƒ“ƒg
+	stralllen = ((stralllen+3) / 4) * 4; // ã‚¢ãƒ©ã‚¤ãƒ¡ãƒ³ãƒˆ
 	size += stralllen + count*4 + 4;
 
 	// byte buffer
@@ -219,17 +219,17 @@ std::vector<tjs_uint8>* tjsConstArrayData::ExportBuffer() {
 		len = ((len+3)/4)*4;
 		bytealllen += len;
 	}
-	bytealllen = ((bytealllen+3) / 4) * 4; // ƒAƒ‰ƒCƒƒ“ƒg
+	bytealllen = ((bytealllen+3) / 4) * 4; // ã‚¢ãƒ©ã‚¤ãƒ¡ãƒ³ãƒˆ
 	size += bytealllen + count*4 + 4;
 
 	// byte
 	count = (int)Byte.size();
-	count = ((count+3) / 4) * 4; // ƒAƒ‰ƒCƒƒ“ƒg
+	count = ((count+3) / 4) * 4; // ã‚¢ãƒ©ã‚¤ãƒ¡ãƒ³ãƒˆ
 	size += count + 4;
 
 	// short
 	count = (int)(Short.size() * 2);
-	count = ((count+3) / 4) * 4; // ƒAƒ‰ƒCƒƒ“ƒg
+	count = ((count+3) / 4) * 4; // ã‚¢ãƒ©ã‚¤ãƒ¡ãƒ³ãƒˆ
 	size += count + 4;
 
 	// int
@@ -250,7 +250,7 @@ std::vector<tjs_uint8>* tjsConstArrayData::ExportBuffer() {
 	for( int i = 0; i < count; i++ ) {
 		buf->push_back( Byte[i] );
 	}
-	count = (((count+3) / 4) * 4) - count; // ƒAƒ‰ƒCƒƒ“ƒg·•ª
+	count = (((count+3) / 4) * 4) - count; // ã‚¢ãƒ©ã‚¤ãƒ¡ãƒ³ãƒˆå·®åˆ†
 	for( int i = 0; i < count; i++ ) {
 		buf->push_back( 0 );
 	}
@@ -262,7 +262,7 @@ std::vector<tjs_uint8>* tjsConstArrayData::ExportBuffer() {
 		Add2ByteToVector( buf, Short[i] );
 	}
 	count *= 2;
-	count = (((count+3) / 4) * 4) - count; // ƒAƒ‰ƒCƒƒ“ƒg·•ª
+	count = (((count+3) / 4) * 4) - count; // ã‚¢ãƒ©ã‚¤ãƒ¡ãƒ³ãƒˆå·®åˆ†
 	for( int i = 0; i < count; i++ ) {
 		buf->push_back( 0 );
 	}
@@ -299,7 +299,7 @@ std::vector<tjs_uint8>* tjsConstArrayData::ExportBuffer() {
 		for( int s = 0; s < len; s++ ) {
 			Add2ByteToVector( buf, str[s] );
 		}
-		if( (len % 2) == 1 ) { // ƒAƒ‰ƒCƒƒ“ƒg·•ª
+		if( (len % 2) == 1 ) { // ã‚¢ãƒ©ã‚¤ãƒ¡ãƒ³ãƒˆå·®åˆ†
 			Add2ByteToVector( buf, 0 );
 		}
 	}
@@ -314,7 +314,7 @@ std::vector<tjs_uint8>* tjsConstArrayData::ExportBuffer() {
 		for( int b = 0; b < cap; b++ ) {
 			buf->push_back( (*by)[b] );
 		}
-		cap = ((cap+3)/4)*4 - cap; // ƒAƒ‰ƒCƒƒ“ƒg·•ª
+		cap = ((cap+3)/4)*4 - cap; // ã‚¢ãƒ©ã‚¤ãƒ¡ãƒ³ãƒˆå·®åˆ†
 		for( int b = 0; b < cap; b++ ) {
 			buf->push_back( 0 );
 		}

@@ -1,10 +1,10 @@
 #ifndef __TARGET_VER_H__
 #define __TARGET_VER_H__
 
-// SDKDDKVer.h ‚ðƒCƒ“ƒNƒ‹[ƒh‚·‚é‚ÆA—˜—p‚Å‚«‚éÅ‚àãˆÊ‚Ì Windows ƒvƒ‰ƒbƒgƒtƒH[ƒ€‚ª’è‹`‚³‚ê‚Ü‚·B
+// SDKDDKVer.h ã‚’ã‚¤ãƒ³ã‚¯ãƒ«ãƒ¼ãƒ‰ã™ã‚‹ã¨ã€åˆ©ç”¨ã§ãã‚‹æœ€ã‚‚ä¸Šä½ã® Windows ãƒ—ãƒ©ãƒƒãƒˆãƒ•ã‚©ãƒ¼ãƒ ãŒå®šç¾©ã•ã‚Œã¾ã™ã€‚
 
-// ˆÈ‘O‚Ì Windows ƒvƒ‰ƒbƒgƒtƒH[ƒ€—p‚ÉƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚ðƒrƒ‹ƒh‚·‚éê‡‚ÍAWinSDKVer.h ‚ðƒCƒ“ƒNƒ‹[ƒh‚µA
-// SDKDDKVer.h ‚ðƒCƒ“ƒNƒ‹[ƒh‚·‚é‘O‚ÉAƒTƒ|[ƒg‘ÎÛ‚Æ‚·‚éƒvƒ‰ƒbƒgƒtƒH[ƒ€‚ðŽ¦‚·‚æ‚¤‚É _WIN32_WINNT ƒ}ƒNƒ‚ðÝ’è‚µ‚Ü‚·B
+// ä»¥å‰ã® Windows ãƒ—ãƒ©ãƒƒãƒˆãƒ•ã‚©ãƒ¼ãƒ ç”¨ã«ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã‚’ãƒ“ãƒ«ãƒ‰ã™ã‚‹å ´åˆã¯ã€WinSDKVer.h ã‚’ã‚¤ãƒ³ã‚¯ãƒ«ãƒ¼ãƒ‰ã—ã€
+// SDKDDKVer.h ã‚’ã‚¤ãƒ³ã‚¯ãƒ«ãƒ¼ãƒ‰ã™ã‚‹å‰ã«ã€ã‚µãƒãƒ¼ãƒˆå¯¾è±¡ã¨ã™ã‚‹ãƒ—ãƒ©ãƒƒãƒˆãƒ•ã‚©ãƒ¼ãƒ ã‚’ç¤ºã™ã‚ˆã†ã« _WIN32_WINNT ãƒžã‚¯ãƒ­ã‚’è¨­å®šã—ã¾ã™ã€‚
 //#define WINVER 0x0501 // Windows XP
 //#define _WIN32_WINNT 0x0501 // Windows XP
 // for touch device

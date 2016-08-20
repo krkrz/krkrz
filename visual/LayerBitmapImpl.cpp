@@ -91,8 +91,8 @@ static tTVPAtExit
 void TVPSetFontRasterizer( tjs_int index ) {
 	if( TVPCurrentFontRasterizers != index && index >= 0 && index < FONT_RASTER_EOT ) {
 		TVPCurrentFontRasterizers = index;
-		TVPClearFontCache(); // ���X�^���C�U���؂�ւ�鎞�A�L���b�V���̓N���A���Ă��܂�
-		TVPGlobalFontStateMagic++; // ApplyFont ������悤�ɂ���
+		TVPClearFontCache(); // ラスタライザが切り替わる時、キャッシュはクリアしてしまう
+		TVPGlobalFontStateMagic++; // ApplyFont が走るようにする
 	}
 }
 tjs_int TVPGetFontRasterizer() {

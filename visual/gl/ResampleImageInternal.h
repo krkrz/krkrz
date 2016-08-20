@@ -1,6 +1,6 @@
 /******************************************************************************/
 /**
- * Šg‘åk¬“à•”g—pƒwƒbƒ_
+ * æ‹¡å¤§ç¸®å°å†…éƒ¨ä½¿ç”¨ãƒ˜ãƒƒãƒ€
  * ----------------------------------------------------------------------------
  * 	Copyright (C) T.Imoto <http://www.kaede-software.com>
  * ----------------------------------------------------------------------------
@@ -38,51 +38,51 @@ struct tTVPCopyImageFunc : public tTVPImageCopyFuncBase {
 	}
 };
 /**
- * ƒuƒŒƒ“ƒhƒpƒ‰ƒ[ƒ^
- * ƒuƒŒƒ“ƒhŠÖ”ƒ|ƒCƒ“ƒ^‚ÍŠg‘åk¬“™l—¶‚µ‚È‚¢‚à‚Ì
+ * ãƒ–ãƒ¬ãƒ³ãƒ‰ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
+ * ãƒ–ãƒ¬ãƒ³ãƒ‰é–¢æ•°ãƒã‚¤ãƒ³ã‚¿ã¯æ‹¡å¤§ç¸®å°ç­‰è€ƒæ…®ã—ãªã„ã‚‚ã®
  */
 struct tTVPBlendParameter {
-	/** ƒuƒŒƒ“ƒh•û® */
+	/** ãƒ–ãƒ¬ãƒ³ãƒ‰æ–¹å¼ */
 	tTVPBBBltMethod method_;
-	/** •s“§–¾“x */
+	/** ä¸é€æ˜åº¦ */
 	tjs_int opa_;
-	/** “]‘—æƒAƒ‹ƒtƒ@•Û—L–³ */
+	/** è»¢é€å…ˆã‚¢ãƒ«ãƒ•ã‚¡ä¿æŒæœ‰ç„¡ */
 	bool hda_;
-	/** •s“§–¾“x‚ğl—¶‚µ‚ÄƒuƒŒƒ“ƒh‚·‚é */
+	/** ä¸é€æ˜åº¦ã‚’è€ƒæ…®ã—ã¦ãƒ–ãƒ¬ãƒ³ãƒ‰ã™ã‚‹ */
 	void (*blend_func)(tjs_uint32 *dest, const tjs_uint32 *src, tjs_int len, tjs_int opa);
-	/** ƒRƒs[‚·‚é(ƒ\[ƒX‚âƒfƒXƒeƒBƒl[ƒVƒ‡ƒ“‚ÌƒAƒ‹ƒtƒ@‚ªl—¶‚³‚ê‚éê‡‚à‚ ‚è) */
+	/** ã‚³ãƒ”ãƒ¼ã™ã‚‹(ã‚½ãƒ¼ã‚¹ã‚„ãƒ‡ã‚¹ãƒ†ã‚£ãƒãƒ¼ã‚·ãƒ§ãƒ³ã®ã‚¢ãƒ«ãƒ•ã‚¡ãŒè€ƒæ…®ã•ã‚Œã‚‹å ´åˆã‚‚ã‚ã‚Š) */
 	void (*copy_func)(tjs_uint32 *dest, const tjs_uint32 *src, tjs_int len);
 
 	tTVPBlendParameter() : method_(bmCopy), opa_(255), hda_(false), blend_func(NULL), copy_func(NULL) {}
 	tTVPBlendParameter( tTVPBBBltMethod method, tjs_int opa, bool hda ) : method_(method), opa_(opa), hda_(hda), blend_func(NULL), copy_func(NULL) {}
 
 	/**
-	 * ƒpƒ‰ƒ[ƒ^‚ğŒ³‚ÉŠÖ”ƒ|ƒCƒ“ƒ^‚ğŒˆ’è‚·‚é
+	 * ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’å…ƒã«é–¢æ•°ãƒã‚¤ãƒ³ã‚¿ã‚’æ±ºå®šã™ã‚‹
 	 */
 	void setFunctionFromParam();
 };
 /**
- * ƒNƒŠƒbƒsƒ“ƒOƒpƒ‰ƒ[ƒ^
+ * ã‚¯ãƒªãƒƒãƒ”ãƒ³ã‚°ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
  */
 struct tTVPResampleClipping {
-	tjs_int offsetx_;	// ƒNƒŠƒbƒsƒ“ƒO‚³‚ê‚é¶’[—Ê
-	tjs_int offsety_;	// ƒNƒŠƒbƒsƒ“ƒO‚³‚ê‚éã’[—Ê
-	tjs_int width_;		// ƒRƒs[•Aoffsetx_‚àŠÜ‚ñ‚Å‚¢‚é
-	tjs_int height_;	// ƒRƒs[‚‚³Aoffsety_‚àŠÜ‚ñ‚Å‚¢‚é
-	tjs_int dst_left_;	// ÀÛ‚ÌƒRƒs[æ¶’[
-	tjs_int dst_top_;	// ÀÛ‚ÌƒRƒs[æã’[
+	tjs_int offsetx_;	// ã‚¯ãƒªãƒƒãƒ”ãƒ³ã‚°ã•ã‚Œã‚‹å·¦ç«¯é‡
+	tjs_int offsety_;	// ã‚¯ãƒªãƒƒãƒ”ãƒ³ã‚°ã•ã‚Œã‚‹ä¸Šç«¯é‡
+	tjs_int width_;		// ã‚³ãƒ”ãƒ¼å¹…ã€offsetx_ã‚‚å«ã‚“ã§ã„ã‚‹
+	tjs_int height_;	// ã‚³ãƒ”ãƒ¼é«˜ã•ã€offsety_ã‚‚å«ã‚“ã§ã„ã‚‹
+	tjs_int dst_left_;	// å®Ÿéš›ã®ã‚³ãƒ”ãƒ¼å…ˆå·¦ç«¯
+	tjs_int dst_top_;	// å®Ÿéš›ã®ã‚³ãƒ”ãƒ¼å…ˆä¸Šç«¯
 
 	void setClipping( const tTVPRect &cliprect, const tTVPRect &destrect );
 
-	/** ÀÛ‚ÉƒRƒs[‚³‚ê‚é• */
+	/** å®Ÿéš›ã«ã‚³ãƒ”ãƒ¼ã•ã‚Œã‚‹å¹… */
 	inline tjs_int getDestWidth() const { return width_ - offsetx_; }
-	/** ÀÛ‚ÉƒRƒs[‚³‚ê‚é‚‚³ */
+	/** å®Ÿéš›ã«ã‚³ãƒ”ãƒ¼ã•ã‚Œã‚‹é«˜ã• */
 	inline tjs_int getDestHeight() const { return height_ - offsety_; }
 };
 
 
 /**
- * –ÊÏ•½‹Ïƒpƒ‰ƒ[ƒ^—p
+ * é¢ç©å¹³å‡ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ç”¨
  */
 template<typename TVector>
 void TVPCalculateAxisAreaAvg( int srcstart, int srcend, int srclength, int dstlength, std::vector<int>& start, std::vector<int>& length, TVector& weight ) {
@@ -98,12 +98,12 @@ void TVPCalculateAxisAreaAvg( int srcstart, int srcend, int srclength, int dstle
 	int len = 0;
 	start.push_back( 0 );
 	for( int x = 0; x < srclength; x++ ) {
-		if( (delta + dstlength) <= srctarget ) {	// ‹«ŠE‚É’B‚µ‚Ä‚¢‚È‚¢
+		if( (delta + dstlength) <= srctarget ) {	// å¢ƒç•Œã«é”ã—ã¦ã„ãªã„
 			weight.push_back( 1.0f );
 			len++;
-		} else { // ‹«ŠE‚ğ‚Ü‚½‚¢‚¾
+		} else { // å¢ƒç•Œã‚’ã¾ãŸã„ã 
 			int d = (delta + dstlength) - srctarget;
-			weight.push_back( (float)(dstlength - d) / (float)dstlength ); // ‘O‚Ì—Ìˆæ
+			weight.push_back( (float)(dstlength - d) / (float)dstlength ); // å‰ã®é ˜åŸŸ
 			length.push_back( len+1 );
 
 			start.push_back( x );
@@ -117,16 +117,16 @@ void TVPCalculateAxisAreaAvg( int srcstart, int srcend, int srclength, int dstle
 }
 
 /**
- * –ÊÏ•½‹Ïƒpƒ‰ƒ[ƒ^³‹K‰»—p
+ * é¢ç©å¹³å‡ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿æ­£è¦åŒ–ç”¨
  */
 template<typename TVector>
 void TVPNormalizeAxisAreaAvg( std::vector<int>& length, TVector& weight ) {
-	// ³‹K‰»
+	// æ­£è¦åŒ–
 	const int count = (const int)length.size();
 	float* wstart = &weight[0];
 	for( int i = 0; i < count; i++ ) {
 		int len = length[i];
-		// ‡Œv’l‚ğ‹‚ß‚é
+		// åˆè¨ˆå€¤ã‚’æ±‚ã‚ã‚‹
 		float* w = wstart;
 		float sum = 0.0f;
 		for( int j = 0; j < len; j++ ) {
@@ -134,14 +134,14 @@ void TVPNormalizeAxisAreaAvg( std::vector<int>& length, TVector& weight ) {
 			w++;
 		}
 
-		// EPSILON ‚æ‚è¬‚³‚¢ê‡‚Í 0 ‚ğİ’è
+		// EPSILON ã‚ˆã‚Šå°ã•ã„å ´åˆã¯ 0 ã‚’è¨­å®š
 		float rcp;
 		if( sum < FLT_EPSILON ) {
 			rcp = 0.0f;
 		} else {
 			rcp = 1.0f / sum;
 		}
-		// ³‹K‰»
+		// æ­£è¦åŒ–
 		w = wstart;
 		for( int i = 0; i < len; i++ ) {
 			*w *= rcp;

@@ -47,7 +47,7 @@ LRESULT WINAPI NativeEventQueueImplement::WndProc( HWND hWnd, UINT msg, WPARAM w
 	}
 }
 
-// デフォルトハンドラ
+// 繝�繝輔か繝ｫ繝医ワ繝ｳ繝峨Λ
 void NativeEventQueueImplement::HandlerDefault( NativeEvent& event ) {
 	event.Result = ::DefWindowProc(event.HWnd,event.Message,event.WParam,event.LParam);
 }

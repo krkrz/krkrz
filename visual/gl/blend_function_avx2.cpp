@@ -24,8 +24,8 @@ extern unsigned char TVP252DitherPalette[3][256];
 extern tjs_uint32 TVPRecipTable256[256];
 extern tjs_uint16 TVPRecipTable256_16[256];
 }
-// AVX2 ¢‘ã‚É‚È‚é‚ÆƒAƒ‰ƒCƒƒ“ƒg‚Í‚ ‚Ü‚è‹C‚É‚µ‚È‚­‚Ä‚à‘¬“x·­‚È‚¢AƒAƒ‰ƒCƒƒ“ƒg‘µ‚¦‚éˆ—‚ÌƒI[ƒo[ƒwƒbƒh‚Ì•û‚ª‘å‚«‚¢‚±‚Æ‚à
-// SSE2 ‚Å‚àACore iŒn‚ÌNehalemˆÈ~‚Í“¯‚¶ó‹µ‚¾‚ªA‚»‚ê‚æ‚è‘O‚Ì‚±‚Æ‚àl—¶‚µ‚ÄƒAƒ‰ƒCƒƒ“ƒg‘µ‚¦‚éˆ—‚ğ“ü‚ê‚Ä‚¢‚é
+// AVX2 ä¸–ä»£ã«ãªã‚‹ã¨ã‚¢ãƒ©ã‚¤ãƒ¡ãƒ³ãƒˆã¯ã‚ã¾ã‚Šæ°—ã«ã—ãªãã¦ã‚‚é€Ÿåº¦å·®å°‘ãªã„ã€ã‚¢ãƒ©ã‚¤ãƒ¡ãƒ³ãƒˆæƒãˆã‚‹å‡¦ç†ã®ã‚ªãƒ¼ãƒãƒ¼ãƒ˜ãƒƒãƒ‰ã®æ–¹ãŒå¤§ãã„ã“ã¨ã‚‚
+// SSE2 ã§ã‚‚ã€Core iç³»ã®Nehalemä»¥é™ã¯åŒã˜çŠ¶æ³ã ãŒã€ãã‚Œã‚ˆã‚Šå‰ã®ã“ã¨ã‚‚è€ƒæ…®ã—ã¦ã‚¢ãƒ©ã‚¤ãƒ¡ãƒ³ãƒˆæƒãˆã‚‹å‡¦ç†ã‚’å…¥ã‚Œã¦ã„ã‚‹
 template<typename functor>
 static inline void blend_func_avx2( tjs_uint32 * __restrict dest, const tjs_uint32 * __restrict src, tjs_int len, const functor& func ) {
 	if( len <= 0 ) return;
@@ -50,22 +50,22 @@ static void copy_func_avx2( tjs_uint32 * __restrict dest, const tjs_uint32 * __r
 	blend_func_avx2<functor>( dest, src, len, func );
 }
 
-// src ‚Æ dest ‚ªd•¡‚µ‚Ä‚¢‚é‰Â”\«‚Ì‚ ‚é‚à‚Ì
+// src ã¨ dest ãŒé‡è¤‡ã—ã¦ã„ã‚‹å¯èƒ½æ€§ã®ã‚ã‚‹ã‚‚ã®
 template<typename functor>
 static inline void overlap_blend_func_avx2( tjs_uint32 * dest, const tjs_uint32 * src, tjs_int len, const functor& func ) {
 	if( len <= 0 ) return;
 	
 	const tjs_uint32 *src_end = src + len;
 	if( dest > src && dest < src_end ) {
-		// backward ƒI[ƒo[ƒ‰ƒbƒv‚·‚é‚Ì‚ÅŒã‚ë‚©‚çƒRƒs[
-		tjs_int remain = (len>>3)<<3;	// 8–¢–‚Ì’[”ƒJƒbƒg
+		// backward ã‚ªãƒ¼ãƒãƒ¼ãƒ©ãƒƒãƒ—ã™ã‚‹ã®ã§å¾Œã‚ã‹ã‚‰ã‚³ãƒ”ãƒ¼
+		tjs_int remain = (len>>3)<<3;	// 8æœªæº€ã®ç«¯æ•°ã‚«ãƒƒãƒˆ
 		len--;
 		while( len >= remain ) {
 			dest[len] = func( dest[len], src[len] );
 			len--;
 		}
 		while( len >= 0 ) {
-			// 8ƒsƒNƒZƒ‹‚¸‚ÂƒRƒs[
+			// 8ãƒ”ã‚¯ã‚»ãƒ«ãšã¤ã‚³ãƒ”ãƒ¼
 			__m256i md = _mm256_loadu_si256( (__m256i const*)&(dest[len-7]) );
 			__m256i ms = _mm256_loadu_si256( (__m256i const*)&(src[len-7]) );
 			md = func( md, ms );
@@ -82,7 +82,7 @@ static void overlap_copy_func_avx2( tjs_uint32 * __restrict dest, const tjs_uint
 	functor func;
 	overlap_blend_func_avx2<functor>( dest, src, len, func );
 }
-// dest = src1 * src2 ‚Æ‚È‚Á‚Ä‚¢‚é‚à‚Ì
+// dest = src1 * src2 ã¨ãªã£ã¦ã„ã‚‹ã‚‚ã®
 template<typename functor>
 static inline void sd_blend_func_avx2( tjs_uint32 *dest, const tjs_uint32 *src1, const tjs_uint32 *src2, tjs_int len, const functor& func ) {
 	if( len <= 0 ) return;
@@ -102,7 +102,7 @@ static inline void sd_blend_func_avx2( tjs_uint32 *dest, const tjs_uint32 *src1,
 	}
 }
 
-// Š®‘S“§–¾‚Å‚ÍƒRƒs[‚¹‚¸AŠ®‘S•s“§–¾‚Í‚»‚Ì‚Ü‚ÜƒRƒs[‚·‚é
+// å®Œå…¨é€æ˜ã§ã¯ã‚³ãƒ”ãƒ¼ã›ãšã€å®Œå…¨ä¸é€æ˜ã¯ãã®ã¾ã¾ã‚³ãƒ”ãƒ¼ã™ã‚‹
 template<typename functor>
 static void blend_src_branch_func_avx2( tjs_uint32 * __restrict dest, const tjs_uint32 * __restrict src, tjs_int len, const functor& func ) {
 	if( len <= 0 ) return;
@@ -169,7 +169,7 @@ static void TVP##NAME##_HDA_avx2_c( tjs_uint32 *dest, const tjs_uint32 *src, tjs
 	copy_func_avx2<avx2_##FUNC##_hda_functor>( dest, src, len );										\
 }
 
-// AlphaBlend‚Íƒ\[ƒX‚ªŠ®‘S“§–¾/•s“§–¾‚Å•ªŠò‚·‚é“Áê”Å‚ğg‚¤‚Ì‚ÅAŒÂ•Ê‚É‘‚­
+// AlphaBlendã¯ã‚½ãƒ¼ã‚¹ãŒå®Œå…¨é€æ˜/ä¸é€æ˜ã§åˆ†å²ã™ã‚‹ç‰¹æ®Šç‰ˆã‚’ä½¿ã†ã®ã§ã€å€‹åˆ¥ã«æ›¸ã
 static void TVPAlphaBlend_avx2_c( tjs_uint32 *dest, const tjs_uint32 *src, tjs_int len ) {
 	copy_src_branch_func_avx2<avx2_alpha_blend_functor>( dest, src, len );
 }
@@ -354,7 +354,7 @@ void TVPGL_AVX2_Init() {
 		}
 		TVPAdjustGamma_a = TVPAdjustGamma_a_avx2_c;
 
-		// ƒAƒtƒBƒ“•ÏŠ·—p
+		// ã‚¢ãƒ•ã‚£ãƒ³å¤‰æ›ç”¨
 		TVPLinTransAlphaBlend = TVPLinTransAlphaBlend_avx2_c;
 		TVPLinTransAlphaBlend_HDA = TVPLinTransAlphaBlend_HDA_avx2_c;
 		TVPLinTransAlphaBlend_o = TVPLinTransAlphaBlend_o_avx2_c;

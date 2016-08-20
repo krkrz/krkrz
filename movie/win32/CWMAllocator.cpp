@@ -2,7 +2,7 @@
 /*! @file
 @brief DirectShow allocator wrapper for Windows media format
 
-DirectShow‚ÌƒAƒƒP[ƒ^[‚ğƒ‰ƒbƒv‚µ‚½Windows Media Format SDK—p‚ÌƒAƒƒP[ƒ^[
+DirectShowã®ã‚¢ãƒ­ã‚±ãƒ¼ã‚¿ãƒ¼ã‚’ãƒ©ãƒƒãƒ—ã—ãŸWindows Media Format SDKç”¨ã®ã‚¢ãƒ­ã‚±ãƒ¼ã‚¿ãƒ¼
 -----------------------------------------------------------------------------
 	Copyright (C) 2005 T.Imoto <http://www.kaede-software.com>
 -----------------------------------------------------------------------------
@@ -17,17 +17,17 @@ DirectShow‚ÌƒAƒƒP[ƒ^[‚ğƒ‰ƒbƒv‚µ‚½Windows Media Format SDK—p‚ÌƒAƒƒP[ƒ^[
 
 
 //----------------------------------------------------------------------------
-//! @brief	  	ƒfƒXƒgƒ‰ƒNƒ^
+//! @brief	  	ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 //----------------------------------------------------------------------------
 CWMAllocator::~CWMAllocator()
 {
 }
 
 //----------------------------------------------------------------------------
-//! @brief	  	—v‹‚³‚ê‚½ƒCƒ“ƒ^[ƒtƒFƒCƒX‚ğ•Ô‚·
-//! @param		riid : ƒCƒ“ƒ^[ƒtƒFƒCƒX‚ÌIID
-//! @param		ppv : ƒCƒ“ƒ^[ƒtƒFƒCƒX‚ğ•Ô‚·ƒ|ƒCƒ“ƒ^[‚Ö‚Ìƒ|ƒCƒ“ƒ^
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	è¦æ±‚ã•ã‚ŒãŸã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã‚’è¿”ã™
+//! @param		riid : ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã®IID
+//! @param		ppv : ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã‚’è¿”ã™ãƒã‚¤ãƒ³ã‚¿ãƒ¼ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 STDMETHODIMP CWMAllocator::NonDelegatingQueryInterface( REFIID riid, void ** ppv )
 {
@@ -40,15 +40,15 @@ STDMETHODIMP CWMAllocator::NonDelegatingQueryInterface( REFIID riid, void ** ppv
 	}
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒoƒbƒtƒ@‚ğŠm•Û‚·‚é ( ƒXƒgƒŠ[ƒ€‚©‚ç—v‹‚³‚ê‚½ê‡‚É‚±‚Ìƒƒ\ƒbƒh‚ªŒÄ‚Î‚ê‚é )
-//! @param		wStreamNum : ƒXƒgƒŠ[ƒ€”Ô†
-//! @param		cbBuffer : —v‹‚³‚ê‚½ƒoƒbƒtƒ@ƒTƒCƒY
-//! @param		ppBuffer : ƒoƒbƒtƒ@‚ğ•Ô‚·ƒ|ƒCƒ“ƒ^‚Ìƒ|ƒCƒ“ƒ^
-//! @param		dwFlags : —p“rƒtƒ‰ƒO
-//! @param		cnsSampleTime : ƒTƒ“ƒvƒ‹ƒ^ƒCƒ€
-//! @param		cnsSampleDuration : ƒTƒ“ƒvƒ‹•\¦ŠÔ
-//! @param		pvContext : IWMReader::StartƒR[ƒ‹‚É“n‚³‚ê‚½ƒ|ƒCƒ“ƒ^
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ãƒãƒƒãƒ•ã‚¡ã‚’ç¢ºä¿ã™ã‚‹ ( ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‹ã‚‰è¦æ±‚ã•ã‚ŒãŸå ´åˆã«ã“ã®ãƒ¡ã‚½ãƒƒãƒ‰ãŒå‘¼ã°ã‚Œã‚‹ )
+//! @param		wStreamNum : ã‚¹ãƒˆãƒªãƒ¼ãƒ ç•ªå·
+//! @param		cbBuffer : è¦æ±‚ã•ã‚ŒãŸãƒãƒƒãƒ•ã‚¡ã‚µã‚¤ã‚º
+//! @param		ppBuffer : ãƒãƒƒãƒ•ã‚¡ã‚’è¿”ã™ãƒã‚¤ãƒ³ã‚¿ã®ãƒã‚¤ãƒ³ã‚¿
+//! @param		dwFlags : ç”¨é€”ãƒ•ãƒ©ã‚°
+//! @param		cnsSampleTime : ã‚µãƒ³ãƒ—ãƒ«ã‚¿ã‚¤ãƒ 
+//! @param		cnsSampleDuration : ã‚µãƒ³ãƒ—ãƒ«è¡¨ç¤ºæ™‚é–“
+//! @param		pvContext : IWMReader::Startã‚³ãƒ¼ãƒ«æ™‚ã«æ¸¡ã•ã‚ŒãŸãƒã‚¤ãƒ³ã‚¿
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 STDMETHODIMP CWMAllocator::AllocateForStreamEx( WORD wStreamNum, DWORD cbBuffer, INSSBuffer **ppBuffer,
 	DWORD dwFlags, QWORD cnsSampleTime, QWORD cnsSampleDuration, void *pvContext )
@@ -59,7 +59,7 @@ STDMETHODIMP CWMAllocator::AllocateForStreamEx( WORD wStreamNum, DWORD cbBuffer,
 		return E_INVALIDARG;
 
 	DWORD	flag = 0;
-	if( dwFlags & WM_SFEX_NOTASYNCPOINT )	// ”ñ Key frame
+	if( dwFlags & WM_SFEX_NOTASYNCPOINT )	// é Key frame
 		flag |= AM_GBF_NOTASYNCPOINT;
 
 	REFERENCE_TIME	StartTime = cnsSampleTime;
@@ -72,21 +72,21 @@ STDMETHODIMP CWMAllocator::AllocateForStreamEx( WORD wStreamNum, DWORD cbBuffer,
 		*ppBuffer = new CWMBuffer(pSample);
 		(*ppBuffer)->AddRef();
 		(*ppBuffer)->SetLength(cbBuffer);
-		pSample->Release();	// CWMBuffer‚Ö“n‚µ‚½“_‚ÅQÆƒJƒEƒ“ƒg‚ª‘‚¦‚é
+		pSample->Release();	// CWMBufferã¸æ¸¡ã—ãŸæ™‚ç‚¹ã§å‚ç…§ã‚«ã‚¦ãƒ³ãƒˆãŒå¢—ãˆã‚‹
 	}
 	return hr;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒoƒbƒtƒ@‚ğŠm•Û‚·‚é ( ƒAƒEƒgƒvƒbƒg‚©‚ç—v‹‚³‚ê‚½ê‡‚É‚±‚Ìƒƒ\ƒbƒh‚ªŒÄ‚Î‚ê‚é )
-//! @param		wStreamNum : ƒXƒgƒŠ[ƒ€”Ô†
-//! @param		cbBuffer : —v‹‚³‚ê‚½ƒoƒbƒtƒ@ƒTƒCƒY
-//! @param		ppBuffer : ƒoƒbƒtƒ@‚ğ•Ô‚·ƒ|ƒCƒ“ƒ^‚Ìƒ|ƒCƒ“ƒ^
-//! @param		dwFlags : —p“rƒtƒ‰ƒO
-//! @param		cnsSampleTime : ƒTƒ“ƒvƒ‹ƒ^ƒCƒ€
-//! @param		cnsSampleDuration : ƒTƒ“ƒvƒ‹•\¦ŠÔ
-//! @param		pvContext : IWMReader::StartƒR[ƒ‹‚É“n‚³‚ê‚½ƒ|ƒCƒ“ƒ^
-//! @return		ƒGƒ‰[ƒR[ƒh
-//! @note		Œ»İ‚±‚Ìƒƒ\ƒbƒh‚Íg‚Á‚Ä‚¢‚È‚¢B‚½‚Ô‚ñ³í‚É‹@”\‚µ‚È‚¢B
+//! @brief	  	ãƒãƒƒãƒ•ã‚¡ã‚’ç¢ºä¿ã™ã‚‹ ( ã‚¢ã‚¦ãƒˆãƒ—ãƒƒãƒˆã‹ã‚‰è¦æ±‚ã•ã‚ŒãŸå ´åˆã«ã“ã®ãƒ¡ã‚½ãƒƒãƒ‰ãŒå‘¼ã°ã‚Œã‚‹ )
+//! @param		wStreamNum : ã‚¹ãƒˆãƒªãƒ¼ãƒ ç•ªå·
+//! @param		cbBuffer : è¦æ±‚ã•ã‚ŒãŸãƒãƒƒãƒ•ã‚¡ã‚µã‚¤ã‚º
+//! @param		ppBuffer : ãƒãƒƒãƒ•ã‚¡ã‚’è¿”ã™ãƒã‚¤ãƒ³ã‚¿ã®ãƒã‚¤ãƒ³ã‚¿
+//! @param		dwFlags : ç”¨é€”ãƒ•ãƒ©ã‚°
+//! @param		cnsSampleTime : ã‚µãƒ³ãƒ—ãƒ«ã‚¿ã‚¤ãƒ 
+//! @param		cnsSampleDuration : ã‚µãƒ³ãƒ—ãƒ«è¡¨ç¤ºæ™‚é–“
+//! @param		pvContext : IWMReader::Startã‚³ãƒ¼ãƒ«æ™‚ã«æ¸¡ã•ã‚ŒãŸãƒã‚¤ãƒ³ã‚¿
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
+//! @note		ç¾åœ¨ã“ã®ãƒ¡ã‚½ãƒƒãƒ‰ã¯ä½¿ã£ã¦ã„ãªã„ã€‚ãŸã¶ã‚“æ­£å¸¸ã«æ©Ÿèƒ½ã—ãªã„ã€‚
 //----------------------------------------------------------------------------
 STDMETHODIMP CWMAllocator::AllocateForOutputEx( DWORD dwOutputNum, DWORD cbBuffer, INSSBuffer **ppBuffer,
 	DWORD dwFlags, QWORD cnsSampleTime, QWORD cnsSampleDuration, void *pvContext )
@@ -97,7 +97,7 @@ STDMETHODIMP CWMAllocator::AllocateForOutputEx( DWORD dwOutputNum, DWORD cbBuffe
 		return E_INVALIDARG;
 
 	DWORD	flag = 0;
-	if( dwFlags & WM_SFEX_NOTASYNCPOINT )	// ”ñ Key frame
+	if( dwFlags & WM_SFEX_NOTASYNCPOINT )	// é Key frame
 		flag |= AM_GBF_NOTASYNCPOINT;
 
 	REFERENCE_TIME	StartTime = cnsSampleTime;
@@ -109,7 +109,7 @@ STDMETHODIMP CWMAllocator::AllocateForOutputEx( DWORD dwOutputNum, DWORD cbBuffe
 	{
 		*ppBuffer = new CWMBuffer(pSample);
 		(*ppBuffer)->AddRef();
-		pSample->Release();	// CWMBuffer‚Ö“n‚µ‚½“_‚ÅQÆƒJƒEƒ“ƒg‚ª‘‚¦‚é
+		pSample->Release();	// CWMBufferã¸æ¸¡ã—ãŸæ™‚ç‚¹ã§å‚ç…§ã‚«ã‚¦ãƒ³ãƒˆãŒå¢—ãˆã‚‹
 	}
 	return hr;
 }

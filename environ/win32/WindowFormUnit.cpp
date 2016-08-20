@@ -1108,7 +1108,7 @@ void TTVPWindowForm::OnCloseQueryCalled( bool b ) {
 					// this is the main window
 					iTJSDispatch2 * obj = TJSNativeInstance->GetOwnerNoAddRef();
 					obj->Invalidate(0, NULL, NULL, obj);
-					// TJSNativeInstance = NULL; // ‚±‚Ì’iŠK‚Å‚ÍŠù‚Éthis‚ªíœ‚³‚ê‚Ä‚¢‚é‚½‚ßAƒƒ“ƒo[‚ÖƒAƒNƒZƒX‚µ‚Ä‚Í‚¢‚¯‚È‚¢
+					// TJSNativeInstance = NULL; // ã“ã®æ®µéšã§ã¯æ—¢ã«thisãŒå‰Šé™¤ã•ã‚Œã¦ã„ã‚‹ãŸã‚ã€ãƒ¡ãƒ³ãƒãƒ¼ã¸ã‚¢ã‚¯ã‚»ã‚¹ã—ã¦ã¯ã„ã‘ãªã„
 				}
 			} else {
 				delete this;
@@ -1342,7 +1342,7 @@ void TTVPWindowForm::SetMouseCursor( tjs_int handle ) {
 	}
 }
 /**
- * ƒNƒ‰ƒCƒAƒ“ƒg—ÌˆæÀ•W‚©‚çƒEƒBƒ“ƒhƒE—ÌˆæÀ•W‚Ö•ÏŠ·‚·‚é
+ * ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆé ˜åŸŸåº§æ¨™ã‹ã‚‰ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦é ˜åŸŸåº§æ¨™ã¸å¤‰æ›ã™ã‚‹
  */
 void TTVPWindowForm::OffsetClientPoint( int &x, int &y ) {
 	POINT origin = {0,0};
@@ -1350,7 +1350,7 @@ void TTVPWindowForm::OffsetClientPoint( int &x, int &y ) {
 	x = -origin.x;
 	y = -origin.y;
 }
-// Layer.cursorX/cursorY‚ÅŒÄ‚Î‚ê‚é
+// Layer.cursorX/cursorYã§å‘¼ã°ã‚Œã‚‹
 void TTVPWindowForm::GetCursorPos(tjs_int &x, tjs_int &y) {
 	// get mouse cursor position in client
 	POINT origin = {0,0};
@@ -1544,7 +1544,7 @@ void TTVPWindowForm::OnKeyUp( WORD vk, int shift ) {
 void TTVPWindowForm::OnKeyPress( WORD vk, int repeat, bool prevkeystate, bool convertkey ) {
 	if( TJSNativeInstance && vk ) {
 		if(UseMouseKey && (vk == 0x1b || vk == 13 || vk == 32)) return;
-		// UNICODE ‚È‚Ì‚Å‚»‚Ì‚Ü‚Ü“n‚µ‚Ä‚µ‚Ü‚¤
+		// UNICODE ãªã®ã§ãã®ã¾ã¾æ¸¡ã—ã¦ã—ã¾ã†
 		TVPPostInputEvent(new tTVPOnKeyPressInputEvent(TJSNativeInstance, vk));
 	}
 }
@@ -1748,7 +1748,7 @@ void TTVPWindowForm::OnMultiTouch() {
 	}
 }
 void TTVPWindowForm::OnTouchSequenceStart() {
-	// ‰½‚à‚µ‚È‚¢
+	// ä½•ã‚‚ã—ãªã„
 }
 void TTVPWindowForm::OnTouchSequenceEnd() {
 }
@@ -1929,10 +1929,10 @@ bool TTVPWindowForm::GetOrientation( int& orientation, int& rotate ) const {
 		} else {
 			orientation = orientUnknown;
 		}
-		/* dmDisplayOrientation ‚Æ‹¤—L(union‚È‚Ì‚Å)‚³‚ê‚Ä‚¢‚é‚Ì‚ÅAˆÈ‰º‚Å‚Íæ“¾‚Å‚«‚È‚¢
-		if( mode.dmOrientation == DMORIENT_PORTRAIT ) {	// ‰¡
+		/* dmDisplayOrientation ã¨å…±æœ‰(unionãªã®ã§)ã•ã‚Œã¦ã„ã‚‹ã®ã§ã€ä»¥ä¸‹ã§ã¯å–å¾—ã§ããªã„
+		if( mode.dmOrientation == DMORIENT_PORTRAIT ) {	// æ¨ª
 			orientation = orientPortrait;
-		} else if( mode.dmOrientation == DMORIENT_LANDSCAPE ) {	// c
+		} else if( mode.dmOrientation == DMORIENT_LANDSCAPE ) {	// ç¸¦
 			orientation = orientLandscape;
 		} else {	// unknown
 			orientation = orientUnknown;

@@ -2,7 +2,7 @@
 /*! @file
 @brief DirectShow media sample wrapper for Windows media format
 
-DirectShow‚ÌMedia Sample‚ğƒ‰ƒbƒv‚µ‚½Windows Media Format SDK—p‚ÌBuffer
+DirectShowã®Media Sampleã‚’ãƒ©ãƒƒãƒ—ã—ãŸWindows Media Format SDKç”¨ã®Buffer
 -----------------------------------------------------------------------------
 	Copyright (C) 2005 T.Imoto <http://www.kaede-software.com>
 -----------------------------------------------------------------------------
@@ -14,10 +14,10 @@ DirectShow‚ÌMedia Sample‚ğƒ‰ƒbƒv‚µ‚½Windows Media Format SDK—p‚ÌBuffer
 #include "CWMBuffer.h"
 
 //----------------------------------------------------------------------------
-//! @brief	  	—v‹‚³‚ê‚½ƒCƒ“ƒ^[ƒtƒFƒCƒX‚ğ•Ô‚·
-//! @param		riid : ƒCƒ“ƒ^[ƒtƒFƒCƒX‚ÌIID
-//! @param		ppv : ƒCƒ“ƒ^[ƒtƒFƒCƒX‚ğ•Ô‚·ƒ|ƒCƒ“ƒ^[‚Ö‚Ìƒ|ƒCƒ“ƒ^
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	è¦æ±‚ã•ã‚ŒãŸã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã‚’è¿”ã™
+//! @param		riid : ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã®IID
+//! @param		ppv : ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã‚’è¿”ã™ãƒã‚¤ãƒ³ã‚¿ãƒ¼ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 STDMETHODIMP CWMBuffer::NonDelegatingQueryInterface( REFIID riid, void ** ppv )
 {
@@ -30,19 +30,19 @@ STDMETHODIMP CWMBuffer::NonDelegatingQueryInterface( REFIID riid, void ** ppv )
 	}
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒoƒbƒtƒ@‚ğæ“¾‚·‚é
-//! @param		ppdwBuffer : ƒ|ƒCƒ“ƒ^‚Ìƒ|ƒCƒ“ƒ^
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ãƒãƒƒãƒ•ã‚¡ã‚’å–å¾—ã™ã‚‹
+//! @param		ppdwBuffer : ãƒã‚¤ãƒ³ã‚¿ã®ãƒã‚¤ãƒ³ã‚¿
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 STDMETHODIMP CWMBuffer::GetBuffer( BYTE **ppdwBuffer )
 {
 	return Sample()->GetPointer( ppdwBuffer );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒoƒbƒtƒ@‚ÆƒTƒCƒY‚ğæ“¾‚·‚é
-//! @param		ppdwBuffer : ƒ|ƒCƒ“ƒ^‚Ìƒ|ƒCƒ“ƒ^
-//! @param		pdwLength : ƒTƒCƒY
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ãƒãƒƒãƒ•ã‚¡ã¨ã‚µã‚¤ã‚ºã‚’å–å¾—ã™ã‚‹
+//! @param		ppdwBuffer : ãƒã‚¤ãƒ³ã‚¿ã®ãƒã‚¤ãƒ³ã‚¿
+//! @param		pdwLength : ã‚µã‚¤ã‚º
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 STDMETHODIMP CWMBuffer::GetBufferAndLength( BYTE **ppdwBuffer, DWORD *pdwLength )
 {
@@ -50,9 +50,9 @@ STDMETHODIMP CWMBuffer::GetBufferAndLength( BYTE **ppdwBuffer, DWORD *pdwLength 
 	return Sample()->GetPointer( ppdwBuffer );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒf[ƒ^‚ªŠi”[‚³‚ê‚Ä‚¢‚éÀƒTƒCƒY‚ğæ“¾‚·‚é
-//! @param		pdwLength : ƒTƒCƒY
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ãƒ‡ãƒ¼ã‚¿ãŒæ ¼ç´ã•ã‚Œã¦ã„ã‚‹å®Ÿã‚µã‚¤ã‚ºã‚’å–å¾—ã™ã‚‹
+//! @param		pdwLength : ã‚µã‚¤ã‚º
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 STDMETHODIMP CWMBuffer::GetLength( DWORD *pdwLength )
 {
@@ -60,9 +60,9 @@ STDMETHODIMP CWMBuffer::GetLength( DWORD *pdwLength )
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒoƒbƒtƒ@‚ÌƒTƒCƒY‚ğæ“¾‚·‚é
-//! @param		pdwLength : ƒTƒCƒY
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ãƒãƒƒãƒ•ã‚¡ã®ã‚µã‚¤ã‚ºã‚’å–å¾—ã™ã‚‹
+//! @param		pdwLength : ã‚µã‚¤ã‚º
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 STDMETHODIMP CWMBuffer::GetMaxLength( DWORD *pdwLength )
 {
@@ -70,9 +70,9 @@ STDMETHODIMP CWMBuffer::GetMaxLength( DWORD *pdwLength )
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒTƒCƒY‚ğİ’è‚·‚é
-//! @param		dwLength : ƒTƒCƒY
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ã‚µã‚¤ã‚ºã‚’è¨­å®šã™ã‚‹
+//! @param		dwLength : ã‚µã‚¤ã‚º
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 STDMETHODIMP CWMBuffer::SetLength( DWORD dwLength )
 {

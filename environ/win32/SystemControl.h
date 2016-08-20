@@ -16,7 +16,7 @@
 //---------------------------------------------------------------------------
 class tTVPSystemControl
 {
-private:	// ÉÜÅ[ÉUÅ[êÈåæ
+private:	// „É¶„Éº„Ç∂„ÉºÂÆ£Ë®Ä
 	bool ContinuousEventCalling;
 	bool AutoShowConsoleOnError;
 

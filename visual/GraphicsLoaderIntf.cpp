@@ -1424,7 +1424,7 @@ bool TVPCheckImageCache( const ttstr& nname, tTVPBaseBitmap* dest, tTVPGraphicLo
 	return false;
 }
 //---------------------------------------------------------------------------
-// ŒŸõ‚¾‚¯‚·‚é
+// æ¤œç´¢ã ã‘ã™ã‚‹
 bool TVPHasImageCache( const ttstr& nname, tTVPGraphicLoadMode mode, tjs_uint dw, tjs_uint dh, tjs_int32 keyidx )
 {
 	tjs_uint32 hash;

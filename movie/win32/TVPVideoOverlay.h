@@ -28,9 +28,9 @@ TJS_EXP_FUNC_DEF( void, TVPRegisterDSVideoCodec, ( const ttstr & name, void* gui
 TJS_EXP_FUNC_DEF( void, TVPUnregisterDSVideoCodec, (const ttstr & name, void* guid, tTVPCreateDSFilter splitter,
 	tTVPCreateDSFilter video, tTVPCreateDSFilter audio, void* formatdata ) );
 
-// ��C�ɓo�^����`�ɂȂ��Ă��邯�ǁA�g���q�Ƃ��̃t�H�[�}�b�g��GUID
-// ���W���[�^�C�v�ƃT�u�^�C�v��GUID�ƃt�B���^�̃y�A��o�^����悤�ɂȂ��Ă�������ėp�I����
-// �ł����������DShow�̂悤�ɂ��ׂ����o�^�ł�������������Ă��ƂɂȂ��Ă܂���ς�
+// 一気に登録する形になっているけど、拡張子とそのフォーマットのGUID
+// メジャータイプとサブタイプのGUIDとフィルタのペアを登録するようになっている方が汎用的かな
+// でもそうするとDShowのようにより細かく登録できる方がいいってことになってまた大変か
 
 struct tTVPDSFilterHandlerType
 {

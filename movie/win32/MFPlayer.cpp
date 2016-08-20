@@ -35,14 +35,14 @@
 //#pragma comment( lib, "evr.lib" )
 
 //----------------------------------------------------------------------------
-//! @brief	  	VideoOverlay MediaFoundation‚ğæ“¾‚·‚é
+//! @brief	  	VideoOverlay MediaFoundationã‚’å–å¾—ã™ã‚‹
 //! @param		callbackwin : 
 //! @param		stream : 
 //! @param		streamname : 
 //! @param		type : 
 //! @param		size : 
 //! @param		out : VideoOverlay Object
-//! @return		ƒGƒ‰[•¶š—ñ
+//! @return		ã‚¨ãƒ©ãƒ¼æ–‡å­—åˆ—
 //----------------------------------------------------------------------------
 void __stdcall GetMFVideoOverlayObject(
 	HWND callbackwin, IStream *stream, const wchar_t * streamname,
@@ -183,7 +183,7 @@ void __stdcall tTVPMFPlayer::BuildGraph( HWND callbackwin, IStream *stream,
 	//Stream = stream;
 
 	HRESULT hr = S_OK;
-	// MFCreateMFByteStreamOnStream ‚ÍAWindows 7 ˆÈ~‚É‚Ì‚İ‚ ‚é API ‚È‚Ì‚ÅA“®“Iƒ[ƒh‚µ‚Ä Vista ‚Å‚Ì‹N“®‚Éxá‚ª‚È‚¢‚æ‚¤‚É‚·‚é
+	// MFCreateMFByteStreamOnStream ã¯ã€Windows 7 ä»¥é™ã«ã®ã¿ã‚ã‚‹ API ãªã®ã§ã€å‹•çš„ãƒ­ãƒ¼ãƒ‰ã—ã¦ Vista ã§ã®èµ·å‹•ã«æ”¯éšœãŒãªã„ã‚ˆã†ã«ã™ã‚‹
 	if( MfplatDLL.IsLoaded() == false ) MfplatDLL.Load(L"mfplat.dll");
 	typedef HRESULT (WINAPI *FuncMFCreateMFByteStreamOnStream)(IStream *pStream,IMFByteStream **ppByteStream);
 	FuncMFCreateMFByteStreamOnStream pCreateMFByteStream = (FuncMFCreateMFByteStreamOnStream)MfplatDLL.GetProcAddress("MFCreateMFByteStreamOnStream");
@@ -259,7 +259,7 @@ void tTVPMFPlayer::OnTopologyStatus(UINT32 status) {
 
 HRESULT tTVPMFPlayer::CreateVideoPlayer() {
 	if( MediaSession.p ) {
-		return S_OK;	// Šù‚Éì¬Ï‚İ
+		return S_OK;	// æ—¢ã«ä½œæˆæ¸ˆã¿
 	}
 
 	HRESULT hr = CreateChildWindow();
@@ -331,7 +331,7 @@ HRESULT tTVPMFPlayer::AddBranchToPartialTopology( IMFTopology *pTopology, IMFMed
 		// Create the media sink activation object.
 		CComPtr<IMFActivate> pSinkActivate;
 		if( FAILED(hr = CreateMediaSinkActivate(pSD, hVideoWnd, &pSinkActivate)) ) {
-			return S_OK;	// video ‚Æ audio ˆÈŠO‚Í–³‹
+			return S_OK;	// video ã¨ audio ä»¥å¤–ã¯ç„¡è¦–
 		}
 		// Add a source node for this stream.
 		CComPtr<IMFTopologyNode> pSourceNode;
@@ -379,8 +379,8 @@ HRESULT tTVPMFPlayer::CreateMediaSinkActivate( IMFStreamDescriptor *pSourceSD, H
         if( FAILED(hr = MFCreateVideoRendererActivate(hVideoWindow, &pActivate) ) ) {
 			TVPThrowExceptionMessage(L"Faild to create video render.");
 		}
-		// ‚±‚±‚ÅƒJƒXƒ^ƒ€EVR‚ğ‚Â‚È‚®‚æ‚¤‚É‚·‚é‚Æ©‘O‚ÅFX•`‰æ‚Å‚«‚é‚æ‚¤‚É‚È‚é
-		// Œ»ó‚Í•W€‚Ì‚à‚Ì‚ğg‚Á‚Ä‚¢‚é
+		// ã“ã“ã§ã‚«ã‚¹ã‚¿ãƒ EVRã‚’ã¤ãªãã‚ˆã†ã«ã™ã‚‹ã¨è‡ªå‰ã§è‰²ã€…æç”»ã§ãã‚‹ã‚ˆã†ã«ãªã‚‹
+		// ç¾çŠ¶ã¯æ¨™æº–ã®ã‚‚ã®ã‚’ä½¿ã£ã¦ã„ã‚‹
 #if 0
 		tTVPEVRCustomPresenter* my_activate_obj = new tTVPEVRCustomPresenter(hr);
 		my_activate_obj->AddRef();
@@ -483,7 +483,7 @@ HRESULT tTVPMFPlayer::AddOutputNode( IMFTopology *pTopology, IMFStreamSink *pStr
 }
 */
 //----------------------------------------------------------------------------
-//! @brief	  	ƒCƒ“ƒ^[ƒtƒFƒCƒX‚ğ‰ğ•ú‚·‚é
+//! @brief	  	ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã‚’è§£æ”¾ã™ã‚‹
 //----------------------------------------------------------------------------
 void __stdcall tTVPMFPlayer::ReleaseAll()
 {
@@ -571,13 +571,13 @@ void __stdcall tTVPMFPlayer::SetMessageDrainWindow(HWND window) {
 void __stdcall tTVPMFPlayer::SetRect(RECT *rect) {
 	PlayWindow::SetRect( rect );
 	if( VideoDisplayControl.p ) {
-		// ƒEƒBƒ“ƒhƒEˆÊ’u‚Å•`‰æˆÊ’u‚ğ§Œä‚µ‚Ä‚¢‚é‚Ì‚ÅA“à•”‚Ì“®‰æ‚ÍˆÊ’u‚ÌƒIƒtƒZƒbƒg‚Ís‚í‚È‚¢
+		// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ä½ç½®ã§æç”»ä½ç½®ã‚’åˆ¶å¾¡ã—ã¦ã„ã‚‹ã®ã§ã€å†…éƒ¨ã®å‹•ç”»ã¯ä½ç½®ã®ã‚ªãƒ•ã‚»ãƒƒãƒˆã¯è¡Œã‚ãªã„
 		RECT vr;
 		vr.left = 0;
 		vr.top = 0;
 		vr.right = rect->right - rect->left;
 		vr.bottom = rect->bottom - rect->top;
-		// MF ‚Å‚ÍAƒ\[ƒX‹éŒ`‚àw’è‰Â”\‚É‚È‚Á‚Ä‚¢‚é
+		// MF ã§ã¯ã€ã‚½ãƒ¼ã‚¹çŸ©å½¢ã‚‚æŒ‡å®šå¯èƒ½ã«ãªã£ã¦ã„ã‚‹
 		HRESULT hr = VideoDisplayControl->SetVideoPosition( NULL, &vr );
 		if( FAILED(hr) ) {
 			TVPThrowExceptionMessage(L"Faild to set rect.");
@@ -662,7 +662,7 @@ void __stdcall tTVPMFPlayer::GetPosition(unsigned __int64 *tick) {
 		if( SUCCEEDED(hr = PresentationClock->GetTime(&mftime)) ) {
 			*tick = mftime / (ONE_SECOND / ONE_MSEC);
 		} else {
-			// ¸”s‚µ‚½ê‡‚Í 0 ‚ğ•Ô‚·‚æ‚¤‚É‚µ‚Ä‚¨‚­
+			// å¤±æ•—ã—ãŸå ´åˆã¯ 0 ã‚’è¿”ã™ã‚ˆã†ã«ã—ã¦ãŠã
 			hr = S_OK;
 			*tick = 0;
 		}
@@ -696,10 +696,10 @@ void __stdcall tTVPMFPlayer::GetStatus(tTVPVideoStatus *status) {
 	}
 }
 void __stdcall tTVPMFPlayer::GetEvent(long *evcode, LONG_PTR *param1, LONG_PTR *param2, bool *got) {
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::FreeEventParams(long evcode, LONG_PTR param1, LONG_PTR param2) {
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::Rewind() {
 	SetPosition( 0 );
@@ -743,8 +743,8 @@ void __stdcall tTVPMFPlayer::GetNumberOfFrame( int *f ) {
 	}
 }
 /**
- * @brief ƒ€[ƒr[‚Ì’·‚³(msec)‚ğæ“¾‚·‚é
- * @param f ƒ€[ƒr[‚Ì’·‚³‚ğ“ü‚ê‚é•Ï”‚Ö‚Ìƒ|ƒCƒ“ƒ^
+ * @brief ãƒ ãƒ¼ãƒ“ãƒ¼ã®é•·ã•(msec)ã‚’å–å¾—ã™ã‚‹
+ * @param f ãƒ ãƒ¼ãƒ“ãƒ¼ã®é•·ã•ã‚’å…¥ã‚Œã‚‹å¤‰æ•°ã¸ã®ãƒã‚¤ãƒ³ã‚¿
  * 
  * http://msdn.microsoft.com/en-us/library/windows/desktop/dd979590%28v=vs.85%29.aspx
  */
@@ -774,21 +774,21 @@ void __stdcall tTVPMFPlayer::GetVideoSize( long *width, long *height ){
 	}
 }
 void __stdcall tTVPMFPlayer::GetFrontBuffer( BYTE **buff ){
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::SetVideoBuffer( BYTE *buff1, BYTE *buff2, long size ){
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 
 // http://msdn.microsoft.com/en-us/library/windows/desktop/gg583862%28v=vs.85%29.aspx
 void __stdcall tTVPMFPlayer::SetStopFrame( int frame ) {
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::GetStopFrame( int *frame ) {
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::SetDefaultStopFrame() {
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 
 void __stdcall tTVPMFPlayer::SetPlayRate( double rate ) {
@@ -838,7 +838,7 @@ HRESULT tTVPMFPlayer::SetVolumeToMF() {
 	}
 	return hr;
 }
-// ƒXƒeƒŒƒI‚Ìê‡‚Ì‚İƒoƒ‰ƒ“ƒX‚Í—LŒø
+// ã‚¹ãƒ†ãƒ¬ã‚ªã®å ´åˆã®ã¿ãƒãƒ©ãƒ³ã‚¹ã¯æœ‰åŠ¹
 void __stdcall tTVPMFPlayer::SetAudioBalance( long balance ) {
 	if( AudioBalanceValue != balance ) {
 		if( balance < -10000 ) AudioBalanceValue = -10000;
@@ -910,120 +910,120 @@ void __stdcall tTVPMFPlayer::GetAudioVolume( long *volume ) {
 }
 
 void __stdcall tTVPMFPlayer::GetNumberOfAudioStream( unsigned long *streamCount ){
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::SelectAudioStream( unsigned long num ){
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::GetEnableAudioStreamNum( long *num ){
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::DisableAudioStream( void ){
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 
 void __stdcall tTVPMFPlayer::GetNumberOfVideoStream( unsigned long *streamCount ){
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::SelectVideoStream( unsigned long num ){
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::GetEnableVideoStreamNum( long *num ){
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 
 void __stdcall tTVPMFPlayer::SetMixingBitmap( HDC hdc, RECT *dest, float alpha ) {
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::ResetMixingBitmap() {
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::SetMixingMovieAlpha( float a ) {
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::GetMixingMovieAlpha( float *a ) {
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::SetMixingMovieBGColor( unsigned long col ) {
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::GetMixingMovieBGColor( unsigned long *col ) {
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::PresentVideoImage() {
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::GetContrastRangeMin( float *v ) {
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::GetContrastRangeMax( float *v ) {
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::GetContrastDefaultValue( float *v ) {
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::GetContrastStepSize( float *v ) {
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::GetContrast( float *v ) {
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::SetContrast( float v ) {
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::GetBrightnessRangeMin( float *v ) {
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::GetBrightnessRangeMax( float *v ) {
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::GetBrightnessDefaultValue( float *v ) {
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::GetBrightnessStepSize( float *v ) {
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::GetBrightness( float *v ) {
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::SetBrightness( float v ) {
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::GetHueRangeMin( float *v ) {
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::GetHueRangeMax( float *v ) {
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::GetHueDefaultValue( float *v ) {
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::GetHueStepSize( float *v ) {
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::GetHue( float *v ) {
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::SetHue( float v ) {
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::GetSaturationRangeMin( float *v ) {
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::GetSaturationRangeMax( float *v ) {
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::GetSaturationDefaultValue( float *v ) {
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::GetSaturationStepSize( float *v ) {
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::GetSaturation( float *v ) {
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 void __stdcall tTVPMFPlayer::SetSaturation( float v ) {
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 }
 
 

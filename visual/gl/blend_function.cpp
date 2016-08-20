@@ -9,8 +9,8 @@
 */
 /******************************************************************************/
 /**
- * ƒeƒ“ƒvƒŒ[ƒgƒx[ƒX‚ÌGL
- * @note		]—ˆ‚Ì TVP GL ‚ğ’u‚«Š·‚¦‚é
+ * ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆãƒ™ãƒ¼ã‚¹ã®GL
+ * @note		å¾“æ¥ã® TVP GL ã‚’ç½®ãæ›ãˆã‚‹
  *****************************************************************************/
 
 #define TVPPS_USE_OVERLAY_TABLE
@@ -48,7 +48,7 @@ unsigned char ps_color_burn_table::TABLE[256][256];
 #ifdef TVPPS_USE_OVERLAY_TABLE
 unsigned char ps_overlay_table::TABLE[256][256];
 #endif
-// •ÏŠ·‚·‚é
+// å¤‰æ›ã™ã‚‹
 template<typename functor>
 static inline void convert_func_c( tjs_uint32 *dest, tjs_int len ) {
 	functor func;
@@ -63,7 +63,7 @@ static inline void convert_func_c( tjs_uint32 *dest, tjs_int len, const functor&
 	}
 }
 
-// ƒuƒŒƒ“ƒh‚µ‚Â‚ÂƒRƒs[
+// ãƒ–ãƒ¬ãƒ³ãƒ‰ã—ã¤ã¤ã‚³ãƒ”ãƒ¼
 template<typename functor>
 static inline void copy_func_c( tjs_uint32 * __restrict dest, const tjs_uint32 * __restrict src, tjs_int len ) {
 	functor func;
@@ -77,19 +77,19 @@ static inline void blend_func_c( tjs_uint32 * __restrict dest, const tjs_uint32 
 		dest[i] = func( dest[i], src[i] );
 	}
 }
-// 8bit”Å
+// 8bitç‰ˆ
 template<typename functor>
 static inline void blend_func_c( tjs_uint8 * __restrict dest, const tjs_uint8 * __restrict src, tjs_int len, const functor& func ) {
 	for( int i = 0; i < len; i++ ) {
 		dest[i] = func( dest[i], src[i] );
 	}
 }
-// src ‚Æ dest ‚ªd•¡‚µ‚Ä‚¢‚é‰Â”\«‚Ì‚ ‚é‚à‚Ì
+// src ã¨ dest ãŒé‡è¤‡ã—ã¦ã„ã‚‹å¯èƒ½æ€§ã®ã‚ã‚‹ã‚‚ã®
 template<typename functor>
 static inline void overlap_blend_func_c( tjs_uint32 * dest, const tjs_uint32 * src, tjs_int len, const functor& func ) {
 	const tjs_uint32 *src_end = src + len;
 	if( dest > src && dest < src_end ) {
-		// backward ƒI[ƒo[ƒ‰ƒbƒv‚·‚é‚Ì‚ÅŒã‚ë‚©‚çƒRƒs[
+		// backward ã‚ªãƒ¼ãƒãƒ¼ãƒ©ãƒƒãƒ—ã™ã‚‹ã®ã§å¾Œã‚ã‹ã‚‰ã‚³ãƒ”ãƒ¼
 		len--;
 		while( len >= 0 ) {
 			dest[len] = func( dest[len], src[len] );
@@ -105,14 +105,14 @@ static void overlap_copy_func_c( tjs_uint32 * dest, const tjs_uint32 * src, tjs_
 	functor func;
 	overlap_blend_func_c<functor>( dest, src, len, func );
 }
-// dest = src1 * src2 ‚Æ‚È‚Á‚Ä‚¢‚é‚à‚Ì
+// dest = src1 * src2 ã¨ãªã£ã¦ã„ã‚‹ã‚‚ã®
 template<typename functor>
 static inline void sd_blend_func_c( tjs_uint32 *__restrict dest, const tjs_uint32 * __restrict src1, const tjs_uint32 * __restrict src2, tjs_int len, const functor& func ) {
 	for( int i = 0; i < len; i++ ) {
 		dest[i] = func( src1[i], src2[i] );
 	}
 }
-// å‚É•¶š•`‰æ‚ÉƒAƒ‹ƒtƒ@’l‚ÆF‚ğg‚Á‚Ä•`‰æ‚ğs‚¤
+// ä¸»ã«æ–‡å­—æç”»æ™‚ã«ã‚¢ãƒ«ãƒ•ã‚¡å€¤ã¨è‰²ã‚’ä½¿ã£ã¦æç”»ã‚’è¡Œã†
 template<typename functor>
 static inline void apply_color_map_o_func_c( tjs_uint32 * __restrict dest, const tjs_uint8 * __restrict src, tjs_int len, tjs_uint32 color, tjs_int opa ) {
 	functor func(color,opa);
@@ -231,7 +231,7 @@ static void TVP_##FUNC##( tjs_uint8 *dest, const tjs_uint8 *src, tjs_int len, tj
 	FUNC##_functor func(opa);																	\
 	blend_func_c( dest, src, len, func );														\
 }
-// ˆÈ‰º2‚Â‚Íƒ_ƒ~[
+// ä»¥ä¸‹2ã¤ã¯ãƒ€ãƒŸãƒ¼
 struct premulalpha_blend_d_functor {
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s ) const { return 0; }
 };
@@ -239,7 +239,7 @@ struct premulalpha_blend_do_functor {
 	inline premulalpha_blend_do_functor( tjs_int opa ){}
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s ) const { return 0; }
 };
-// ˆÈ‰º‚Ì2‚Â‚ÍÀ‘•‚³‚ê‚È‚¢
+// ä»¥ä¸‹ã®2ã¤ã¯å®Ÿè£…ã•ã‚Œãªã„
 // TVPAdditiveAlphaBlend_d_c
 // TVPAdditiveAlphaBlend_do_c
 
@@ -501,11 +501,11 @@ extern void TVP_ch_blur_add_mul_copy_sse2_c( tjs_uint8 *dest, const tjs_uint8 *s
 extern void TVP_ch_blur_mul_copy65_sse2_c( tjs_uint8 *dest, const tjs_uint8 *src, tjs_int len, tjs_int opa );
 extern void TVP_ch_blur_mul_copy_sse2_c( tjs_uint8 *dest, const tjs_uint8 *src, tjs_int len, tjs_int opa );
 /**
- * GL‰Šú‰»BŠÖ”ƒ|ƒCƒ“ƒ^‚ğİ’è‚·‚é
+ * GLåˆæœŸåŒ–ã€‚é–¢æ•°ãƒã‚¤ãƒ³ã‚¿ã‚’è¨­å®šã™ã‚‹
  */
 void TVPGL_C_Init() {
 
-	// ŠeíƒuƒŒƒ“ƒh‚ğŠÖ”ƒIƒuƒWƒFƒNƒg‰»‚·‚é‚±‚Æ‚ÅƒAƒtƒBƒ“•ÏŠ·‚âŠgk‚É“WŠJ‚µ‚â‚·‚­‚·‚é
+	// å„ç¨®ãƒ–ãƒ¬ãƒ³ãƒ‰ã‚’é–¢æ•°ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆåŒ–ã™ã‚‹ã“ã¨ã§ã‚¢ãƒ•ã‚£ãƒ³å¤‰æ›ã‚„æ‹¡ç¸®ã«å±•é–‹ã—ã‚„ã™ãã™ã‚‹
 	SET_BLEND_FUNCTIONS( AlphaBlend, alpha_blend );
 	SET_BLEND_FUNCTIONS( AdditiveAlphaBlend, premulalpha_blend );
 	SET_BLEND_MIN_FUNCTIONS( AddBlend, add_blend );

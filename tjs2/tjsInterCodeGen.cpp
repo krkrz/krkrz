@@ -300,7 +300,7 @@ tTJSInterCodeContext::tTJSInterCodeContext(tTJSInterCodeContext *parent,
 		throw;
 	}
 #ifdef ENABLE_DEBUGGER
-	// ŒÃ‚¢ƒ[ƒJƒ‹•Ï”‚Ííœ‚µ‚Ä‚µ‚Ü‚¤
+	// å¤ã„ãƒ­ãƒ¼ã‚«ãƒ«å¤‰æ•°ã¯å‰Šé™¤ã—ã¦ã—ã¾ã†
 	TJSDebuggerClearLocalVariable( GetClassName().c_str(), GetName(), Block->GetName(), FunctionRegisterCodePoint );
 #endif	// ENABLE_DEBUGGER
 }
@@ -3875,7 +3875,7 @@ tTJSExprNode * tTJSInterCodeContext::MakeNP3(tjs_int opecode, tTJSExprNode * nod
 //---------------------------------------------------------------------------
 
 /**
- * ƒoƒCƒgƒR[ƒh‚ğo—Í‚·‚é
+ * ãƒã‚¤ãƒˆã‚³ãƒ¼ãƒ‰ã‚’å‡ºåŠ›ã™ã‚‹
  * @return
  */
 std::vector<tjs_uint8>* tTJSInterCodeContext::ExportByteCode( bool outputdebug, tTJSScriptBlock *block, tjsConstArrayData& constarray )
@@ -3900,7 +3900,7 @@ std::vector<tjs_uint8>* tTJSInterCodeContext::ExportByteCode( bool outputdebug, 
 	if( Name != NULL ) {
 		name = constarray.PutString(Name);
 	}
-	// 13 * 4 ƒf[ƒ^•”•ª‚ÌƒTƒCƒY
+	// 13 * 4 ãƒ‡ãƒ¼ã‚¿éƒ¨åˆ†ã®ã‚µã‚¤ã‚º
 	int srcpossize = 0;
 	if( outputdebug ) {
 		srcpossize = SourcePosArraySize * 8;

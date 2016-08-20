@@ -159,7 +159,7 @@ namespace picojson {
   inline value& value::operator=(const value& x) {
     if (this != &x) {
       this->~value();
-#if 1 // C++11 ‚ªg‚¦‚È‚¢‚Ì‚Å
+#if 1 // C++11 ãŒä½¿ãˆãªã„ã®ã§
 	  type_ = x.type_;
     switch (type_) {
 #define INIT(p, v) case p##type: p = v; break
@@ -540,7 +540,7 @@ namespace picojson {
     }
     //char* endp;
     //out = value(strtod(num_str.c_str(), &endp));
-  	out = value(num_str); // string‚Å“ü‚ê‚é TODO
+  	out = value(num_str); // stringã§å…¥ã‚Œã‚‹ TODO
     //return endp == num_str.c_str() + num_str.size();
 	return (num_str.c_str() + num_str.size()) ? true : false;
   }

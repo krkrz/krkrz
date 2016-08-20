@@ -8,7 +8,7 @@
 #include <streams.h>
 
 /**
- * Media Foundation で再生するときに使用する子Window
+ * Media Foundation 縺ｧ蜀咲函縺吶ｋ縺ｨ縺阪↓菴ｿ逕ｨ縺吶ｋ蟄晋indow
  */
 class PlayWindow {
 	HWND			m_ChildWnd;
@@ -17,7 +17,7 @@ class PlayWindow {
 	HWND			m_MessageDrainWindow;
 
 	bool		m_Visible;
-	RECT		m_Rect;			//!< 指定されたムービーの表示矩形領域を保持
+	RECT		m_Rect;			//!< 謖�螳壹＆繧後◆繝繝ｼ繝薙�ｼ縺ｮ陦ｨ遉ｺ遏ｩ蠖｢鬆伜沺繧剃ｿ晄戟
 	RECT		m_ChildRect;
 
 protected:

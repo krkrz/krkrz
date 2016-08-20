@@ -16,7 +16,7 @@
 #define __DLL_LOADER_H__
 
 //----------------------------------------------------------------------------
-//! @brief DLL‚ğ“Ç‚İ‚Ş‚½‚ß‚ÌƒNƒ‰ƒX
+//! @brief DLLã‚’èª­ã¿è¾¼ã‚€ãŸã‚ã®ã‚¯ãƒ©ã‚¹
 //----------------------------------------------------------------------------
 class CDLLLoader
 {
@@ -44,7 +44,7 @@ public:
 	}
 	HRESULT GetLastError() { return HRESULT_FROM_WIN32( ::GetLastError() ); }
 
-	//! @param lpProcName : ŠÖ”–¼
+	//! @param lpProcName : é–¢æ•°å
 	FARPROC GetProcAddress( LPCSTR lpProcName )
 	{
 		return ::GetProcAddress( m_hModule, lpProcName );

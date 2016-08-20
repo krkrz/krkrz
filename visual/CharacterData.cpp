@@ -12,11 +12,11 @@ tTVPCharacterData::tTVPCharacterData( const tjs_uint8 * indata,
 : Antialiased(false), Blured(false)
 {
 
-	// ƒtƒB[ƒ‹ƒh‚ÌƒNƒŠƒA
-	RefCount = 1; // ŽQÆƒJƒEƒ“ƒ^‚Ì‰Šú’l‚Í 1
+	// ãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰ã®ã‚¯ãƒªã‚¢
+	RefCount = 1; // å‚ç…§ã‚«ã‚¦ãƒ³ã‚¿ã®åˆæœŸå€¤ã¯ 1
 	Data = NULL;
 
-	// Metrics ‚âƒrƒbƒgƒ}ƒbƒvî•ñ‚ÌƒRƒs[
+	// Metrics ã‚„ãƒ“ãƒƒãƒˆãƒžãƒƒãƒ—æƒ…å ±ã®ã‚³ãƒ”ãƒ¼
 	Metrics = metrics;
 	OriginX = originx;
 	OriginY = originy;
@@ -25,32 +25,32 @@ tTVPCharacterData::tTVPCharacterData( const tjs_uint8 * indata,
 	Gray = 65;
 	FullColored = fullcolor;
 
-	// ƒTƒCƒY‚Ìƒ`ƒFƒbƒN
+	// ã‚µã‚¤ã‚ºã®ãƒã‚§ãƒƒã‚¯
 	if( BlackBoxX != 0 && BlackBoxY != 0 ) {
 		try {
-			// ƒrƒbƒgƒ}ƒbƒv‚ðƒRƒs[
+			// ãƒ“ãƒƒãƒˆãƒžãƒƒãƒ—ã‚’ã‚³ãƒ”ãƒ¼
 			if( fullcolor ) {
-				//- ‰¡•ûŒü‚Ìƒsƒbƒ`‚ðŒvŽZ
-				// MMX “™‚ÌŽg—p‚ðl‚¦‚Ä‰¡•ûŒü‚Í 8 ƒoƒCƒg‚ÅƒAƒ‰ƒCƒ“
+				//- æ¨ªæ–¹å‘ã®ãƒ”ãƒƒãƒã‚’è¨ˆç®—
+				// MMX ç­‰ã®ä½¿ç”¨ã‚’è€ƒãˆã¦æ¨ªæ–¹å‘ã¯ 8 ãƒã‚¤ãƒˆã§ã‚¢ãƒ©ã‚¤ãƒ³
 				Pitch = (((blackboxw*4 - 1) >> 3) + 1) << 3;
 
-				//- ƒoƒCƒg”‚ðŒvŽZ‚µ‚Äƒƒ‚ƒŠ‚ðŠm•Û
+				//- ãƒã‚¤ãƒˆæ•°ã‚’è¨ˆç®—ã—ã¦ãƒ¡ãƒ¢ãƒªã‚’ç¢ºä¿
 				Data = new tjs_uint8 [Pitch * blackboxh];
 
-				//- ƒrƒbƒgƒ}ƒbƒv‚ðƒRƒs[
+				//- ãƒ“ãƒƒãƒˆãƒžãƒƒãƒ—ã‚’ã‚³ãƒ”ãƒ¼
 				inpitch *= 4;
 				for(tjs_uint y = 0; y < blackboxh; y++) {
 					memcpy( Data + Pitch * y, indata + inpitch * y, blackboxw*4);
 				}
 			} else {
-				//- ‰¡•ûŒü‚Ìƒsƒbƒ`‚ðŒvŽZ
-				// MMX “™‚ÌŽg—p‚ðl‚¦‚Ä‰¡•ûŒü‚Í 8 ƒoƒCƒg‚ÅƒAƒ‰ƒCƒ“
+				//- æ¨ªæ–¹å‘ã®ãƒ”ãƒƒãƒã‚’è¨ˆç®—
+				// MMX ç­‰ã®ä½¿ç”¨ã‚’è€ƒãˆã¦æ¨ªæ–¹å‘ã¯ 8 ãƒã‚¤ãƒˆã§ã‚¢ãƒ©ã‚¤ãƒ³
 				Pitch = (((blackboxw - 1) >> 3) + 1) << 3;
 
-				//- ƒoƒCƒg”‚ðŒvŽZ‚µ‚Äƒƒ‚ƒŠ‚ðŠm•Û
+				//- ãƒã‚¤ãƒˆæ•°ã‚’è¨ˆç®—ã—ã¦ãƒ¡ãƒ¢ãƒªã‚’ç¢ºä¿
 				Data = new tjs_uint8 [Pitch * blackboxh];
 
-				//- ƒrƒbƒgƒ}ƒbƒv‚ðƒRƒs[
+				//- ãƒ“ãƒƒãƒˆãƒžãƒƒãƒ—ã‚’ã‚³ãƒ”ãƒ¼
 				for(tjs_uint y = 0; y < blackboxh; y++) {
 					memcpy( Data + Pitch * y, indata + inpitch * y, blackboxw);
 				}
@@ -64,11 +64,11 @@ tTVPCharacterData::tTVPCharacterData( const tjs_uint8 * indata,
 
 //---------------------------------------------------------------------------
 /**
- * ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^
- * @param ref	ŽQÆƒIƒuƒWƒFƒNƒg
+ * ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+ * @param ref	å‚ç…§ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
  */
 tTVPCharacterData::tTVPCharacterData(const tTVPCharacterData & ref) {
-	// ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^‚Í–¢ƒTƒ|[ƒg
+	// ã‚³ãƒ”ãƒ¼ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã¯æœªã‚µãƒãƒ¼ãƒˆ
 	TVPThrowExceptionMessage( TJS_W("unimplemented: tTVPCharacterData::tTVPCharacterData(const tTVPCharacterData & ref)") );
 }
 //---------------------------------------------------------------------------
@@ -400,26 +400,26 @@ void tTVPCharacterData::AddHorizontalLine( tjs_int liney, tjs_int thickness, tjs
 	tjs_int newwidth = BlackBoxX;
 	tjs_int newheight = BlackBoxY;
 	tjs_int overlapx = 0;
-	if( OriginX < 0 ) overlapx = -OriginX;	// ‘O‚Ì•¶Žš‚É‚©‚Ô‚é‚æ‚¤‚É•`‰æ‚³‚ê‚é‚±‚Æ‚ª‚ ‚é
+	if( OriginX < 0 ) overlapx = -OriginX;	// å‰ã®æ–‡å­—ã«ã‹ã¶ã‚‹ã‚ˆã†ã«æç”»ã•ã‚Œã‚‹ã“ã¨ãŒã‚ã‚‹
 	if( BlackBoxX != (Metrics.CellIncX+overlapx) ) {
 		newwidth = Metrics.CellIncX+overlapx;
 	}
 	int top = OriginY;
 	int bottom = top + BlackBoxY;
-	if( linetop < top ) { // ã‰ß‚¬‚é
+	if( linetop < top ) { // ä¸ŠéŽãŽã‚‹
 		top = linetop;
-	} else if( linebottom > bottom ) { // ‰º‰ß‚¬‚é
+	} else if( linebottom > bottom ) { // ä¸‹éŽãŽã‚‹
 		bottom = linebottom;
 	}
 	newheight = bottom - top;
-	// ‘å‚«‚³‚ª•Ï‰»‚·‚éŽž‚Íì‚è’¼‚·
+	// å¤§ãã•ãŒå¤‰åŒ–ã™ã‚‹æ™‚ã¯ä½œã‚Šç›´ã™
 	if( newwidth != BlackBoxX || newheight != BlackBoxY ) {
 		//tjs_int newpitch =  (((newwidth -1)>>2)+1)<<2;
 		tjs_int newpitch =  (((newwidth*4 - 1) >> 3) + 1) << 3;
 		tjs_uint8 *newdata = new tjs_uint8[newpitch * newheight];
 		memset( newdata, 0, sizeof(tjs_uint8)*newpitch*newheight );
-		// x ‚Í OriginX •ª‚¸‚ê‚é
-		// y ‚Í OriginY - top•ª‚¸‚ê‚é
+		// x ã¯ OriginX åˆ†ãšã‚Œã‚‹
+		// y ã¯ OriginY - topåˆ†ãšã‚Œã‚‹
 		tjs_int offsetx = OriginX;
 		if( offsetx < 0 ) offsetx =0;
 		tjs_int offsety = OriginY - top;

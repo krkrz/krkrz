@@ -48,11 +48,11 @@ bool TVPAcceptSaveAsJXR(void* formatdata, const ttstr & type, class iTJSDispatch
 	}
 	return result;
 }
-// jxrlib ‚ğg‚¤ƒo[ƒWƒ‡ƒ“‚Å‚Í‘‚«‚İ‚ª‚¤‚Ü‚­‚Å‚«‚Ä‚¢‚È‚¢
+// jxrlib ã‚’ä½¿ã†ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã§ã¯æ›¸ãè¾¼ã¿ãŒã†ã¾ãã§ãã¦ã„ãªã„
 
 #define TVP_JPEG_XR_USE_WIN_CODEC
 #if defined( WIN32 ) && defined( TVP_JPEG_XR_USE_WIN_CODEC )
-// Windows ‘g‚İ‚İ‹@”\‚Å JPEG XR ‚ğŠJ‚­ê‡‚Í‚±‚¿‚ç
+// Windows çµ„ã¿è¾¼ã¿æ©Ÿèƒ½ã§ JPEG XR ã‚’é–‹ãå ´åˆã¯ã“ã¡ã‚‰
 #include <wincodec.h>
 #include <wincodecsdk.h>
 #include <atlbase.h>
@@ -140,11 +140,11 @@ void TVPSaveAsJXR(void* formatdata, tTJSBinaryStream* dst, const class tTVPBaseB
 			WICPixelFormatGUID format = GUID_WICPixelFormat32bppBGRA;
 			if( SUCCEEDED(hr) && meta ) {
 				PROPBAG2 option = { 0 };
-				option.pstrName = L"UseCodecOptions";	// Ú×‚ÈƒIƒvƒVƒ‡ƒ“‚ğw’è‚·‚é
+				option.pstrName = L"UseCodecOptions";	// è©³ç´°ãªã‚ªãƒ—ã‚·ãƒ§ãƒ³ã‚’æŒ‡å®šã™ã‚‹
 				_variant_t varValue( true );
 				hr = property->Write( 1, &option, &varValue );
 
-				// EnumCallback ‚ğg‚Á‚ÄƒvƒƒpƒeƒB‚ğİ’è‚·‚é
+				// EnumCallback ã‚’ä½¿ã£ã¦ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã‚’è¨­å®šã™ã‚‹
 				struct MetaDictionaryEnumCallback : public tTJSDispatch {
 					IPropertyBag2 *prop_;
 					WICPixelFormatGUID *format_;
@@ -166,11 +166,11 @@ void TVPSaveAsJXR(void* formatdata, tTJSBinaryStream* dst, const class tTVPBaseB
 							v = v < 1 ? 1 : v > 255 ? 255 : v;
 							UCHAR q = (UCHAR)v;
 							PROPBAG2 option = { 0 };
-							option.pstrName = L"Quality";	//  1 : lossless mode, 2 - 255 : ’l‚ª¬‚³‚¢•û‚ª‚‰æ¿
+							option.pstrName = L"Quality";	//  1 : lossless mode, 2 - 255 : å€¤ãŒå°ã•ã„æ–¹ãŒé«˜ç”»è³ª
 							_variant_t varValue( q );
 							hr = prop_->Write( 1, &option, &varValue );
 							if( q == 1 ) {
-								option.pstrName = L"Lossless";	// ƒƒXƒŒƒXƒ‚[ƒh
+								option.pstrName = L"Lossless";	// ãƒ­ã‚¹ãƒ¬ã‚¹ãƒ¢ãƒ¼ãƒ‰
 								_variant_t var( VARIANT_TRUE );
 								hr = prop_->Write( 1, &option, &var );
 							}
@@ -187,7 +187,7 @@ void TVPSaveAsJXR(void* formatdata, tTJSBinaryStream* dst, const class tTVPBaseB
 								_variant_t varValue( VARIANT_FALSE );
 								hr = prop_->Write( 1, &option, &varValue );
 							}
-							option.pstrName = L"AlphaQuality";	//  1 : lossless mode, 2 - 255 : ’l‚ª¬‚³‚¢•û‚ª‚‰æ¿
+							option.pstrName = L"AlphaQuality";	//  1 : lossless mode, 2 - 255 : å€¤ãŒå°ã•ã„æ–¹ãŒé«˜ç”»è³ª
 							_variant_t varValue( q );
 							hr = prop_->Write( 1, &option, &varValue );
 						} else if( value == TJS_W("subsampling") ) {
@@ -397,12 +397,12 @@ void TVPLoadHeaderJXR(void* formatdata, tTJSBinaryStream *src, iTJSDispatch2** d
 #include "JXRGlue.h"
 
 /*
-jxrlib‚Å“Ç‚İ‚İ‚ğs‚¤ê‡‚Í
+jxrlibã§èª­ã¿è¾¼ã¿ã‚’è¡Œã†å ´åˆã¯
 external/jxrlib/image/vc11projects/CommonLib_vc11.vcxproj
 external/jxrlib/image/vc11projects/DecodeLib_vc11.vcxproj
 external/jxrlib/image/vc11projects/EncodeLib_vc11.vcxproj
 external/jxrlib/jxrgluelib/JXRGlueLib_vc11.vcxproj
-‚ğƒ\ƒŠƒ…[ƒVƒ‡ƒ“‚É‰Á‚¦‚Äƒrƒ‹ƒh‚·‚é‚±‚Æ
+ã‚’ã‚½ãƒªãƒ¥ãƒ¼ã‚·ãƒ§ãƒ³ã«åŠ ãˆã¦ãƒ“ãƒ«ãƒ‰ã™ã‚‹ã“ã¨
 */
 #if defined( WIN32 )
 #ifdef _DEBUG
@@ -419,7 +419,7 @@ external/jxrlib/jxrgluelib/JXRGlueLib_vc11.vcxproj
 #endif
 
 static ERR JXR_close( WMPStream** ppWS ) {
-	/* ‰½‚à‚µ‚È‚¢ */
+	/* ä½•ã‚‚ã—ãªã„ */
 	return WMP_errSuccess;
 }
 static Bool JXR_EOS(struct WMPStream* pWS) {
@@ -533,7 +533,7 @@ void TVPLoadJXR(void* formatdata, void *callbackdata, tTVPGraphicSizeCallback si
 		std::vector<tjs_uint8> buff;
 		buff.reserve(stride*height*sizeof(tjs_uint8));
 #endif
-		// rect ‚Å1ƒ‰ƒCƒ“‚¸‚Âw’è‚µ‚ÄƒfƒR[ƒh‚·‚é•û–@‚Íjxrlib‚Å‚Í‚¤‚Ü‚­‚¢‚©‚È‚¢—lq
+		// rect ã§1ãƒ©ã‚¤ãƒ³ãšã¤æŒ‡å®šã—ã¦ãƒ‡ã‚³ãƒ¼ãƒ‰ã™ã‚‹æ–¹æ³•ã¯jxrlibã§ã¯ã†ã¾ãã„ã‹ãªã„æ§˜å­
 		int offset = 0;
 		if( !IsEqualGUID( srcFormat, GUID_PKPixelFormat32bppPBGRA ) ) {
 			if( IsEqualGUID( srcFormat, GUID_PKPixelFormat24bppRGB ) ) {
@@ -557,13 +557,13 @@ void TVPLoadJXR(void* formatdata, void *callbackdata, tTVPGraphicSizeCallback si
 				TVPThrowExceptionMessage( TJS_W("JPEG XR read error/%1"), TJS_W("Not supported this file format yet.") );
 			}
 			/*
-			Converter ‚Í‚Ç‚¤‚à‚¨‚©‚µ‚¢‚Ì‚Åg‚í‚È‚¢B
+			Converter ã¯ã©ã†ã‚‚ãŠã‹ã—ã„ã®ã§ä½¿ã‚ãªã„ã€‚
 			SAFE_CALL( pCodecFactory->CreateFormatConverter(&pConverter) );
 			SAFE_CALL( pConverter->Initialize(pConverter, pDecoder, NULL, GUID_PKPixelFormat32bppPBGRA) );
 			pConverter->Copy( pConverter, &rect, (U8*)&buff[0], width*sizeof(int));
 			*/
 		} else {
-			// ƒAƒ‹ƒtƒ@ƒ`ƒƒƒ“ƒlƒ‹‚ª“ü‚Á‚Ä‚¢‚éƒƒ‚ƒŠƒŠ[ƒN‚µ‚Ä‚¢‚é(jxrlib’¼‚µ‚½)
+			// ã‚¢ãƒ«ãƒ•ã‚¡ãƒãƒ£ãƒ³ãƒãƒ«ãŒå…¥ã£ã¦ã„ã‚‹æ™‚ãƒ¡ãƒ¢ãƒªãƒªãƒ¼ã‚¯ã—ã¦ã„ã‚‹(jxrlibç›´ã—ãŸ)
 			pDecoder->Copy( pDecoder, &rect, (U8*)&buff[0], stride );
 			for( int i = 0; i < height; i++) {
 				void *scanline = scanlinecallback(callbackdata, i);
@@ -613,7 +613,7 @@ static int DPK_QPS_8[12][6] = {
     {  7, 17, 21,  8, 17, 21 }, // Photoshop 100%
     {  2,  5,  6,  2,  5,  6 }
 };
-// TODO : ˆÈ‰º‚Ìˆ—‚Å‚Í‚¤‚Ü‚­‘‚«‚ß‚Ä‚¢‚È‚¢B‚Ç‚¤‚àİ’è‚ª•s–¡‚¢—lq
+// TODO : ä»¥ä¸‹ã®å‡¦ç†ã§ã¯ã†ã¾ãæ›¸ãè¾¼ã‚ã¦ã„ãªã„ã€‚ã©ã†ã‚‚è¨­å®šãŒä¸å‘³ã„æ§˜å­
 void TVPSaveAsJXR(void* formatdata, tTJSBinaryStream* dst, const class tTVPBaseBitmap* image, const ttstr & mode, class iTJSDispatch2* meta )
 {
 	PKImageEncode* pEncoder = NULL;
@@ -690,7 +690,7 @@ void TVPSaveAsJXR(void* formatdata, tTJSBinaryStream* dst, const class tTVPBaseB
 
 		pEncoder->WMP.wmiSCP.olOverlap = OL_ONE;
 
-		// ˆÈ‰º‚ÅƒAƒ‹ƒtƒ@‚Ìİ’è‚©
+		// ä»¥ä¸‹ã§ã‚¢ãƒ«ãƒ•ã‚¡ã®è¨­å®šã‹
 		// pEncoder->WMP.wmiI_Alpha;
         // pEncoder->WMP.wmiSCP_Alpha;
 		//pEncoder->SetPixelFormat(pEncoder, GUID_PKPixelFormat32bppBGRA);

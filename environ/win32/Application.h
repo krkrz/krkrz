@@ -8,7 +8,7 @@
 
 std::wstring ExePath();
 
-// Œ©’Ê‚µ‚Ì‚æ‚¢•û–@‚É•ÏX‚µ‚½•û‚ª—Ç‚¢
+// è¦‹é€šã—ã®ã‚ˆã„æ–¹æ³•ã«å¤‰æ›´ã—ãŸæ–¹ãŒè‰¯ã„
 extern int _argc;
 extern tjs_char ** _wargv;
 
@@ -99,7 +99,7 @@ public:
 		if( hWnd != INVALID_HANDLE_VALUE ) {
 			return 0 != ::IsIconic(hWnd);
 		}
-		return true; // ‚»‚à‚»‚àƒEƒBƒ“ƒhƒE‚ª‚È‚¢
+		return true; // ãã‚‚ãã‚‚ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãŒãªã„
 	}
 	void Minimize();
 	void Restore();
@@ -163,7 +163,7 @@ public:
 	bool GetNotMinimizing() const;
 
 	/**
-	 * ‰æ‘œ‚Ì”ñ“¯Šú“Ç‚İ—v‹
+	 * ç”»åƒã®éåŒæœŸèª­è¾¼ã¿è¦æ±‚
 	 */
 	void LoadImageRequest( class iTJSDispatch2 *owner, class tTJSNI_Bitmap* bmp, const ttstr &name );
 };

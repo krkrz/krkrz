@@ -9,7 +9,7 @@
 */
 /******************************************************************************/
 /**
- * Additive alpha ‚ÍApre-multiplied alpha ‚ÆŒ¾‚¤•\‹L‚Ö
+ * Additive alpha ã¯ã€pre-multiplied alpha ã¨è¨€ã†è¡¨è¨˜ã¸
  *****************************************************************************/
 
 #ifndef __ALPHA_BLEND_C_H__
@@ -26,13 +26,13 @@ typedef hda_translucent_op<FUNC##_func >		FUNC##_HDA_o_functor;	\
 typedef dest_alpha_op<FUNC##_func >				FUNC##_d_functor;		\
 typedef dest_alpha_translucent_op<FUNC##_func >	FUNC##_do_functor;
 
-/** 4ƒpƒ^[ƒ“‚Ìƒo[ƒWƒ‡ƒ“ */
+/** 4ãƒ‘ã‚¿ãƒ¼ãƒ³ã®ãƒãƒ¼ã‚¸ãƒ§ãƒ³ */
 #define DEFINE_BLEND_MIN_VARIATION( FUNC ) \
 typedef translucent_nsa_op<FUNC##_func>			FUNC##_o_functor;		\
 typedef hda_nsa_op<FUNC##_functor>				FUNC##_HDA_functor;		\
 typedef hda_translucent_nsa_op<FUNC##_func>		FUNC##_HDA_o_functor;
 
-/** 4ƒpƒ^[ƒ“‚ÌPSŒnƒo[ƒWƒ‡ƒ“ */
+/** 4ãƒ‘ã‚¿ãƒ¼ãƒ³ã®PSç³»ãƒãƒ¼ã‚¸ãƒ§ãƒ³ */
 #define DEFINE_BLEND_PS_VARIATION( FUNC ) \
 typedef normal_op<FUNC##_func >					FUNC##_functor;			\
 typedef translucent_op<FUNC##_func >			FUNC##_o_functor;		\
@@ -48,19 +48,19 @@ extern unsigned char TVPNegativeMulTable65[65*256];
 }
 //------------------------------------------------------------------------------
 /**
- * alpha_blend_functor;			// dstƒAƒ‹ƒtƒ@–³‹
- * alpha_blend_HDA_functor;		// dstƒAƒ‹ƒtƒ@–³‹, dst ƒAƒ‹ƒtƒ@•ÛŒì
- * alpha_blend_o_functor;		// dstƒAƒ‹ƒtƒ@–³‹, opacity w’è
- * alpha_blend_HDA_o_functor;	// dstƒAƒ‹ƒtƒ@–³‹, dst ƒAƒ‹ƒtƒ@•ÛŒì, opacity w’è
+ * alpha_blend_functor;			// dstã‚¢ãƒ«ãƒ•ã‚¡ç„¡è¦–
+ * alpha_blend_HDA_functor;		// dstã‚¢ãƒ«ãƒ•ã‚¡ç„¡è¦–, dst ã‚¢ãƒ«ãƒ•ã‚¡ä¿è­·
+ * alpha_blend_o_functor;		// dstã‚¢ãƒ«ãƒ•ã‚¡ç„¡è¦–, opacity æŒ‡å®š
+ * alpha_blend_HDA_o_functor;	// dstã‚¢ãƒ«ãƒ•ã‚¡ç„¡è¦–, dst ã‚¢ãƒ«ãƒ•ã‚¡ä¿è­·, opacity æŒ‡å®š
  *
- * alpha_blend_d_functor;		// dstƒAƒ‹ƒtƒ@—LŒø
- * alpha_blend_do_functor;		// dstƒAƒ‹ƒtƒ@—LŒø, opacity w’è
+ * alpha_blend_d_functor;		// dstã‚¢ãƒ«ãƒ•ã‚¡æœ‰åŠ¹
+ * alpha_blend_do_functor;		// dstã‚¢ãƒ«ãƒ•ã‚¡æœ‰åŠ¹, opacity æŒ‡å®š
  *
- * alpha_blend_a_functor;		// dstƒAƒ‹ƒtƒ@—LŒø, addalpha(pre-multiplied alpha)
- * alpha_blend_ao_functor;		// dstƒAƒ‹ƒtƒ@—LŒø, opacity w’è, addalpha(pre-multiplied alpha)
+ * alpha_blend_a_functor;		// dstã‚¢ãƒ«ãƒ•ã‚¡æœ‰åŠ¹, addalpha(pre-multiplied alpha)
+ * alpha_blend_ao_functor;		// dstã‚¢ãƒ«ãƒ•ã‚¡æœ‰åŠ¹, opacity æŒ‡å®š, addalpha(pre-multiplied alpha)
  */
 //------------------------------------------------------------------------------
-/** ƒAƒ‹ƒtƒ@ƒuƒŒƒ“ƒh */
+/** ã‚¢ãƒ«ãƒ•ã‚¡ãƒ–ãƒ¬ãƒ³ãƒ‰ */
 struct alpha_blend_func {
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s, tjs_uint32 a ) const {
 		tjs_uint32 d1 = d & 0xff00ff;
@@ -93,7 +93,7 @@ struct alpha_blend_ao_functor : public premulalpha_blend_a_d_o_func {
 	}
 };
 //------------------------------------------------------------------------------
-/** pre-multiplied ƒAƒ‹ƒtƒ@‡¬ */
+/** pre-multiplied ã‚¢ãƒ«ãƒ•ã‚¡åˆæˆ */
 /*
 struct premulalpha_blend_func {
 	premulalpha_blend_n_a_func add_alpha_;
@@ -121,7 +121,7 @@ struct premulalpha_blend_HDA_o_functor : public premulalpha_blend_o_functor {
 	}
 };
 */
-// ƒtƒ@ƒ“ƒNƒ^‚ğd‚Ë‚·‚¬‚é‚Æ©“®ƒxƒNƒgƒ‹‰»‚ª‚¤‚Ü‚­‚¢‚©‚È‚¢‚æ‚¤‚È‚Ì‚ÅA‚±‚±‚Å‚Í“WŠJ‚µ‚½‚à‚Ì‚ğ‹Lq‚·‚é
+// ãƒ•ã‚¡ãƒ³ã‚¯ã‚¿ã‚’é‡ã­ã™ãã‚‹ã¨è‡ªå‹•ãƒ™ã‚¯ãƒˆãƒ«åŒ–ãŒã†ã¾ãã„ã‹ãªã„ã‚ˆã†ãªã®ã§ã€ã“ã“ã§ã¯å±•é–‹ã—ãŸã‚‚ã®ã‚’è¨˜è¿°ã™ã‚‹
 struct premulalpha_blend_HDA_o_functor {
 	tjs_int opa_;
 	inline premulalpha_blend_HDA_o_functor( tjs_int opa ) : opa_(opa) {}
@@ -146,28 +146,28 @@ typedef translucent_nsa_op<premulalpha_blend_a_a_o_func> premulalpha_blend_ao_fu
 
 
 
-// ‚à‚Á‚Æ‚àƒVƒ“ƒvƒ‹‚ÈƒRƒs[ dst = src
+// ã‚‚ã£ã¨ã‚‚ã‚·ãƒ³ãƒ—ãƒ«ãªã‚³ãƒ”ãƒ¼ dst = src
 struct const_copy_functor {
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s ) const { return s; }
 };
-// ’PƒƒRƒs[‚¾‚¯‚Ç alpha ‚ğƒRƒs[‚µ‚È‚¢(HDA‚Æ“¯‚¶)
+// å˜ç´”ã‚³ãƒ”ãƒ¼ã ã‘ã© alpha ã‚’ã‚³ãƒ”ãƒ¼ã—ãªã„(HDAã¨åŒã˜)
 struct color_copy_functor {
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s ) const {
 		return (d&0xff000000) + (s&0x00ffffff);
 	}
 };
-// alpha‚¾‚¯ƒRƒs[‚·‚é : color_copy ‚Ì src dest‚ğ”½“]‚µ‚½‚¾‚¯
+// alphaã ã‘ã‚³ãƒ”ãƒ¼ã™ã‚‹ : color_copy ã® src destã‚’åè»¢ã—ãŸã ã‘
 struct alpha_copy_functor {
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s ) const {
 		return (s&0xff000000) + (d&0x00ffffff);
 	}
 };
-// ‚±‚Ì‚Ü‚ÜƒRƒs[‚·‚é‚ªƒAƒ‹ƒtƒ@‚ğ0xff‚Å–„‚ß‚é dst = 0xff000000 | src
+// ã“ã®ã¾ã¾ã‚³ãƒ”ãƒ¼ã™ã‚‹ãŒã‚¢ãƒ«ãƒ•ã‚¡ã‚’0xffã§åŸ‹ã‚ã‚‹ dst = 0xff000000 | src
 struct color_opaque_functor {
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s ) const { return 0xff000000 | s; }
 };
 //------------------------------------------------------------------------------
-/** ‰ÁZ‡¬ */
+/** åŠ ç®—åˆæˆ */
 //typedef saturated_u8_add_func add_blend_functor;
 struct add_blend_functor {	// == saturated_u8_add_func
 	inline tjs_uint32 operator()( tjs_uint32 a, tjs_uint32 b ) const {
@@ -186,7 +186,7 @@ struct add_blend_func : public add_blend_functor {
 DEFINE_BLEND_MIN_VARIATION( add_blend )
 
 //------------------------------------------------------------------------------
-/** Œ¸Z‡¬ */ // ƒIƒŠƒWƒiƒ‹‚ÌHDA‚¿‚å‚Á‚Æ‚¨‚©‚µ‚¢H
+/** æ¸›ç®—åˆæˆ */ // ã‚ªãƒªã‚¸ãƒŠãƒ«ã®HDAã¡ã‚‡ã£ã¨ãŠã‹ã—ã„ï¼Ÿ
 struct sub_blend_functor {
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s ) const {
 		tjs_uint32 tmp = (  ( s & d ) + ( ((s^d)>>1) & 0x7f7f7f7f)  ) & 0x80808080;
@@ -204,7 +204,7 @@ struct sub_blend_func : public sub_blend_functor {
 DEFINE_BLEND_MIN_VARIATION( sub_blend )
 
 //------------------------------------------------------------------------------
-/** æZ‡¬ */
+/** ä¹—ç®—åˆæˆ */
 struct mul_blend_functor {
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s ) const {
 		tjs_uint32 tmp  = (d & 0xff) * (s & 0xff) & 0xff00;
@@ -223,7 +223,7 @@ struct mul_blend_func : public mul_blend_functor {
 DEFINE_BLEND_MIN_VARIATION( mul_blend )
 
 //------------------------------------------------------------------------------
-/** •¢‚¢Ä‚«‡¬ */
+/** è¦†ã„ç„¼ãåˆæˆ */
 struct color_dodge_blend_functor {
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s ) const {
 		tjs_uint32 tmp2 = ~s;
@@ -245,7 +245,7 @@ struct color_dodge_blend_func : public color_dodge_blend_functor {
 DEFINE_BLEND_MIN_VARIATION( color_dodge_blend )
 
 //------------------------------------------------------------------------------
-/** ”äŠr(ˆÃ)‡¬ */
+/** æ¯”è¼ƒ(æš—)åˆæˆ */
 struct darken_blend_functor {
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s ) const {
 		tjs_uint32 m_src = ~s;
@@ -271,7 +271,7 @@ struct darken_blend_func {
 DEFINE_BLEND_MIN_VARIATION( darken_blend )
 
 //------------------------------------------------------------------------------
-/** ”äŠr(–¾)‡¬ */
+/** æ¯”è¼ƒ(æ˜)åˆæˆ */
 struct lighten_blend_functor {
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s ) const {
 		tjs_uint32 m_dest = ~d;
@@ -297,7 +297,7 @@ struct lighten_blend_func {
 DEFINE_BLEND_MIN_VARIATION( lighten_blend )
 
 //------------------------------------------------------------------------------
-/** ƒXƒNƒŠ[ƒ“‡¬ */
+/** ã‚¹ã‚¯ãƒªãƒ¼ãƒ³åˆæˆ */
 struct screen_blend_functor {
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s ) const {
 		s = ~s;
@@ -341,7 +341,7 @@ typedef translucent_nsa_op<screen_blend_HDA_o_func>	screen_blend_HDA_o_functor;
   (c)2004-2005 Kengo Takagi (Kenjo) <kenjo@ceres.dti.ne.jp>
 */
 
-/** PhotoshopŒİŠ·‚ÌƒAƒ‹ƒtƒ@‡¬ */
+/** Photoshopäº’æ›ã®ã‚¢ãƒ«ãƒ•ã‚¡åˆæˆ */
 struct ps_alpha_blend_func {
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s, tjs_uint32 a ) const {
 		tjs_uint32 d1 = d & 0x00ff00ff;
@@ -351,7 +351,7 @@ struct ps_alpha_blend_func {
 };
 DEFINE_BLEND_PS_VARIATION( ps_alpha_blend )
 
-/** PhotoshopŒİŠ·‚Ìu•¢‚¢Ä‚«(ƒŠƒjƒA)v‡¬ */
+/** Photoshopäº’æ›ã®ã€Œè¦†ã„ç„¼ã(ãƒªãƒ‹ã‚¢)ã€åˆæˆ */
 struct ps_add_blend_func : public ps_alpha_blend_func {
 //	ps_alpha_blend_func func;
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s, tjs_uint32 a ) const {
@@ -365,7 +365,7 @@ struct ps_add_blend_func : public ps_alpha_blend_func {
 DEFINE_BLEND_PS_VARIATION( ps_add_blend )
 
 //--------------------------------------------------------------------------------------------------------
-//! PhotoshopŒİŠ·‚ÌuÄ‚«‚İ(ƒŠƒjƒA)v‡¬
+//! Photoshopäº’æ›ã®ã€Œç„¼ãè¾¼ã¿(ãƒªãƒ‹ã‚¢)ã€åˆæˆ
 struct ps_sub_blend_func : public ps_alpha_blend_func {
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s, tjs_uint32 a ) const {
 		tjs_uint32		n;
@@ -379,7 +379,7 @@ struct ps_sub_blend_func : public ps_alpha_blend_func {
 DEFINE_BLEND_PS_VARIATION( ps_sub_blend )
 
 //--------------------------------------------------------------------------------------------------------
-//! PhotoshopŒİŠ·‚ÌuæZv‡¬
+//! Photoshopäº’æ›ã®ã€Œä¹—ç®—ã€åˆæˆ
 struct ps_mul_blend_func : public ps_alpha_blend_func {
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s, tjs_uint32 a ) const {
 		s = ( ((((d>>16)&0xff)*(s&0x00ff0000))&0xff000000) |
@@ -391,7 +391,7 @@ struct ps_mul_blend_func : public ps_alpha_blend_func {
 DEFINE_BLEND_PS_VARIATION( ps_mul_blend )
 
 //--------------------------------------------------------------------------------------------------------
-//! PhotoshopŒİŠ·‚ÌuƒXƒNƒŠ[ƒ“v‡¬
+//! Photoshopäº’æ›ã®ã€Œã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã€åˆæˆ
 struct ps_screen_blend_func {
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s, tjs_uint32 a ) const {
 		/* c = ((s+d-(s*d)/255)-d)*a + d = (s-(s*d)/255)*a + d */
@@ -406,7 +406,7 @@ struct ps_screen_blend_func {
 DEFINE_BLEND_PS_VARIATION( ps_screen_blend )
 
 //--------------------------------------------------------------------------------------------------------
-//! ƒe[ƒuƒ‹g—p‡¬
+//! ãƒ†ãƒ¼ãƒ–ãƒ«ä½¿ç”¨åˆæˆ
 template<typename TTable>
 struct ps_table_blend_func : public ps_alpha_blend_func {
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s, tjs_uint32 a ) const {
@@ -417,41 +417,41 @@ struct ps_table_blend_func : public ps_alpha_blend_func {
 	}
 };
 //--------------------------------------------------------------------------------------------------------
-//! PhotoshopŒİŠ·‚Ìuƒ\ƒtƒgƒ‰ƒCƒgv‡¬ƒe[ƒuƒ‹
+//! Photoshopäº’æ›ã®ã€Œã‚½ãƒ•ãƒˆãƒ©ã‚¤ãƒˆã€åˆæˆãƒ†ãƒ¼ãƒ–ãƒ«
 struct ps_soft_light_table { static unsigned char TABLE[256][256]; };
 //--------------------------------------------------------------------------------------------------------
-//! PhotoshopŒİŠ·‚Ìu•¢‚¢Ä‚«ƒJƒ‰[v‡¬ƒe[ƒuƒ‹
+//! Photoshopäº’æ›ã®ã€Œè¦†ã„ç„¼ãã‚«ãƒ©ãƒ¼ã€åˆæˆãƒ†ãƒ¼ãƒ–ãƒ«
 struct ps_color_dodge_table { static unsigned char TABLE[256][256]; };
 //--------------------------------------------------------------------------------------------------------
-//! PhotoshopŒİŠ·‚ÌuÄ‚«‚İƒJƒ‰[v‡¬ƒe[ƒuƒ‹
+//! Photoshopäº’æ›ã®ã€Œç„¼ãè¾¼ã¿ã‚«ãƒ©ãƒ¼ã€åˆæˆãƒ†ãƒ¼ãƒ–ãƒ«
 struct ps_color_burn_table { static unsigned char TABLE[256][256]; };
 //--------------------------------------------------------------------------------------------------------
 #ifdef TVPPS_USE_OVERLAY_TABLE
-//! PhotoshopŒİŠ·‚ÌuƒI[ƒo[ƒŒƒCv‡¬ƒe[ƒuƒ‹
+//! Photoshopäº’æ›ã®ã€Œã‚ªãƒ¼ãƒãƒ¼ãƒ¬ã‚¤ã€åˆæˆãƒ†ãƒ¼ãƒ–ãƒ«
 struct ps_overlay_table { static unsigned char TABLE[256][256]; };
 #endif
 
 //--------------------------------------------------------------------------------------------------------
-//! PhotoshopŒİŠ·‚Ìuƒ\ƒtƒgƒ‰ƒCƒgv‡¬
+//! Photoshopäº’æ›ã®ã€Œã‚½ãƒ•ãƒˆãƒ©ã‚¤ãƒˆã€åˆæˆ
 //typedef ps_table_blend_func<ps_soft_light_table> ps_soft_light_blend_func
 struct ps_soft_light_blend_func : public ps_table_blend_func<ps_soft_light_table> {};
 DEFINE_BLEND_PS_VARIATION( ps_soft_light_blend )
 
 //--------------------------------------------------------------------------------------------------------
-//! PhotoshopŒİŠ·‚Ìu•¢‚¢Ä‚«ƒJƒ‰[v‡¬
+//! Photoshopäº’æ›ã®ã€Œè¦†ã„ç„¼ãã‚«ãƒ©ãƒ¼ã€åˆæˆ
 //typedef ps_table_blend_func<ps_color_dodge_table> ps_color_dodge_blend_func
 struct ps_color_dodge_blend_func : public ps_table_blend_func<ps_color_dodge_table> {};
 DEFINE_BLEND_PS_VARIATION( ps_color_dodge_blend )
 
 //--------------------------------------------------------------------------------------------------------
-//! PhotoshopŒİŠ·‚ÌuÄ‚«‚İƒJƒ‰[v‡¬
+//! Photoshopäº’æ›ã®ã€Œç„¼ãè¾¼ã¿ã‚«ãƒ©ãƒ¼ã€åˆæˆ
 //typedef ps_table_blend_func<ps_color_burn_table> ps_color_burn_blend_func
 struct ps_color_burn_blend_func : public ps_table_blend_func<ps_color_burn_table> {};
 DEFINE_BLEND_PS_VARIATION( ps_color_burn_blend )
 
 #ifdef TVPPS_USE_OVERLAY_TABLE
 //--------------------------------------------------------------------------------------------------------
-//! PhotoshopŒİŠ·‚ÌuƒI[ƒo[ƒŒƒCv‡¬
+//! Photoshopäº’æ›ã®ã€Œã‚ªãƒ¼ãƒãƒ¼ãƒ¬ã‚¤ã€åˆæˆ
 //typedef ps_table_blend_func<ps_overlay_table> ps_overlay_blend_func
 struct ps_overlay_blend_func : public ps_table_blend_func<ps_overlay_table> {};
 #else
@@ -474,7 +474,7 @@ struct ps_overlay_blend_func : public ps_alpha_blend_func {
 DEFINE_BLEND_PS_VARIATION( ps_overlay_blend )
 
 //--------------------------------------------------------------------------------------------------------
-//! PhotoshopŒİŠ·‚Ìuƒn[ƒhƒ‰ƒCƒgv‡¬
+//! Photoshopäº’æ›ã®ã€Œãƒãƒ¼ãƒ‰ãƒ©ã‚¤ãƒˆã€åˆæˆ
 struct ps_hard_light_blend_func : public ps_alpha_blend_func {
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s, tjs_uint32 a ) const {
 #ifdef TVPPS_USE_OVERLAY_TABLE
@@ -499,7 +499,7 @@ struct ps_hard_light_blend_func : public ps_alpha_blend_func {
 DEFINE_BLEND_PS_VARIATION( ps_hard_light_blend )
 
 //--------------------------------------------------------------------------------------------------------
-//! PhotoshopŒİŠ·‚Ìu•¢‚¢Ä‚«ƒJƒ‰[v‡¬(Photoshop 5.x ˆÈ‰º‚ÆŒİŠ·)
+//! Photoshopäº’æ›ã®ã€Œè¦†ã„ç„¼ãã‚«ãƒ©ãƒ¼ã€åˆæˆ(Photoshop 5.x ä»¥ä¸‹ã¨äº’æ›)
 struct ps_color_dodge5_blend_func {
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s, tjs_uint32 a ) const {
 		s = ((((s&0x00ff00ff)*a)>>8)&0x00ff00ff)|((((s&0x0000ff00)*a)>>8)&0x0000ff00);
@@ -511,7 +511,7 @@ struct ps_color_dodge5_blend_func {
 DEFINE_BLEND_PS_VARIATION( ps_color_dodge5_blend )
 
 //--------------------------------------------------------------------------------------------------------
-//! PhotoshopŒİŠ·‚Ìu”äŠr(–¾)v‡¬
+//! Photoshopäº’æ›ã®ã€Œæ¯”è¼ƒ(æ˜)ã€åˆæˆ
 struct ps_lighten_blend_func : public ps_alpha_blend_func {
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s, tjs_uint32 a ) const {
 		tjs_uint32	n;
@@ -525,7 +525,7 @@ struct ps_lighten_blend_func : public ps_alpha_blend_func {
 DEFINE_BLEND_PS_VARIATION( ps_lighten_blend )
 
 //--------------------------------------------------------------------------------------------------------
-//! PhotoshopŒİŠ·‚Ìu”äŠr(ˆÃ)v‡¬
+//! Photoshopäº’æ›ã®ã€Œæ¯”è¼ƒ(æš—)ã€åˆæˆ
 struct ps_darken_blend_func : public ps_alpha_blend_func {
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s, tjs_uint32 a ) const {
 		tjs_uint32	n;
@@ -539,7 +539,7 @@ struct ps_darken_blend_func : public ps_alpha_blend_func {
 DEFINE_BLEND_PS_VARIATION( ps_darken_blend )
 
 //--------------------------------------------------------------------------------------------------------
-//! PhotoshopŒİŠ·‚Ìu·‚Ìâ‘Î’lv‡¬
+//! Photoshopäº’æ›ã®ã€Œå·®ã®çµ¶å¯¾å€¤ã€åˆæˆ
 struct ps_diff_blend_func : public ps_alpha_blend_func {
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s, tjs_uint32 a ) const {
 		tjs_uint32	n;
@@ -553,7 +553,7 @@ struct ps_diff_blend_func : public ps_alpha_blend_func {
 DEFINE_BLEND_PS_VARIATION( ps_diff_blend )
 
 //--------------------------------------------------------------------------------------------------------
-//! PhotoshopŒİŠ·‚Ìu·‚Ìâ‘Î’lv‡¬(Photoshop 5.x ˆÈ‰º‚ÆŒİŠ·)
+//! Photoshopäº’æ›ã®ã€Œå·®ã®çµ¶å¯¾å€¤ã€åˆæˆ(Photoshop 5.x ä»¥ä¸‹ã¨äº’æ›)
 struct ps_diff5_blend_func {
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s, tjs_uint32 a ) const {
 		s = ((((s&0x00ff00ff)*a)>>8)&0x00ff00ff)|((((s&0x0000ff00)*a)>>8)&0x0000ff00);	/* Fade src first */
@@ -567,7 +567,7 @@ struct ps_diff5_blend_func {
 DEFINE_BLEND_PS_VARIATION( ps_diff5_blend )
 
 //--------------------------------------------------------------------------------------------------------
-//! PhotoshopŒİŠ·‚ÌuœŠOv‡¬
+//! Photoshopäº’æ›ã®ã€Œé™¤å¤–ã€åˆæˆ
 struct ps_exclusion_blend_func {
 	inline tjs_uint32 operator()( tjs_uint32 d, tjs_uint32 s, tjs_uint32 a ) const {
 		/* c = ((s+d-(s*d*2)/255)-d)*a + d = (s-(s*d*2)/255)*a + d */
@@ -844,7 +844,7 @@ struct make_alpha_from_key_functor {
 		return d;
 	}
 };
-// const_alpha_fill_blend_functor ‚Ì‹tAw’ècolor‚ªdest‚Æ‚µ‚Ä‰‰Z‚·‚éŒ`
+// const_alpha_fill_blend_functor ã®é€†ã€æŒ‡å®šcolorãŒdestã¨ã—ã¦æ¼”ç®—ã™ã‚‹å½¢
 struct alpha_color_mat_functor {
 	const tjs_uint32 color_;
 	inline alpha_color_mat_functor( tjs_uint32 color ) : color_(color) {}

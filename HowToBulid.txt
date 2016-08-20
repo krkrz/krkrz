@@ -21,61 +21,61 @@ Build instructions:
 - Enjoy!
 
 -------------------------------------------------------------------------------
-* ‚Æ‚è‚ ‚¦‚¸ƒRƒ“ƒpƒCƒ‹‚µ‚½‚¢lŒü‚¯‚Ìà–¾
+* ã¨ã‚Šã‚ãˆãšã‚³ãƒ³ãƒ‘ã‚¤ãƒ«ã—ãŸã„äººå‘ã‘ã®èª¬æ˜
 
-‹g—¢‹g—¢Z‚ÌƒRƒ“ƒpƒCƒ‹‚É‚Í‰º‹L‚ª•K—v‚Å‚·B
+å‰é‡Œå‰é‡ŒZã®ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«ã«ã¯ä¸‹è¨˜ãŒå¿…è¦ã§ã™ã€‚
 
-- Visual Studio 2012 Update 4 ˆÈ~
+- Visual Studio 2012 Update 4 ä»¥é™
 
-- nasm 2.10.09 (ÅV”Å‚Í–¢ƒ`ƒFƒbƒN)
-	http://www.nasm.us/ ‚©‚çƒ_ƒEƒ“ƒ[ƒh‚µ‚Ä
-	‚ ‚ç‚©‚¶‚ß nasm.exe ‚ÌƒpƒX‚ğŠÂ‹«•Ï” PATH ‚É“o˜^‚µ‚Ä‚¨‚¢‚Ä‚­‚¾‚³‚¢B
+- nasm 2.10.09 (æœ€æ–°ç‰ˆã¯æœªãƒã‚§ãƒƒã‚¯)
+	http://www.nasm.us/ ã‹ã‚‰ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã—ã¦
+	ã‚ã‚‰ã‹ã˜ã‚ nasm.exe ã®ãƒ‘ã‚¹ã‚’ç’°å¢ƒå¤‰æ•° PATH ã«ç™»éŒ²ã—ã¦ãŠã„ã¦ãã ã•ã„ã€‚
 
-ƒRƒ“ƒpƒCƒ‹•û–@F
+ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«æ–¹æ³•ï¼š
 
-- src/core/vc2012/tvpwin32.sln ‚ğ VS2012‚ÅŠJ‚«‚Ü‚·
+- src/core/vc2012/tvpwin32.sln ã‚’ VS2012ã§é–‹ãã¾ã™
 
-- “¯ƒ\ƒŠƒ…[ƒVƒ‡ƒ““à‚Ì tvpwin32 ƒvƒƒWƒFƒNƒg‚ğƒrƒ‹ƒh‚µ‚Ü‚·
+- åŒã‚½ãƒªãƒ¥ãƒ¼ã‚·ãƒ§ãƒ³å†…ã® tvpwin32 ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ãƒˆã‚’ãƒ“ãƒ«ãƒ‰ã—ã¾ã™
 
-- bin/win32/tvpwin32(_d).exe ‚ÉƒoƒCƒiƒŠ‚ªo—Í‚³‚ê‚Ü‚·
+- bin/win32/tvpwin32(_d).exe ã«ãƒã‚¤ãƒŠãƒªãŒå‡ºåŠ›ã•ã‚Œã¾ã™
 
 
 -------------------------------------------------------------------------------
 * Detailed information (in Japanese)
 
-jpeg-6bx ( SIMD”Å libjpg )
-nasm 2.10.09 ‚ª•K—v‚Å‚·B
+jpeg-6bx ( SIMDç‰ˆ libjpg )
+nasm 2.10.09 ãŒå¿…è¦ã§ã™ã€‚
 http://www.nasm.us/
 
 zlib
-MASM‚ª•K—v‚Å‚·B
-Visual Studio 2012 ‚É“ü‚Á‚Ä‚¢‚Ü‚·B
+MASMãŒå¿…è¦ã§ã™ã€‚
+Visual Studio 2012 ã«å…¥ã£ã¦ã„ã¾ã™ã€‚
 
-‚»‚Ì‘¼‚Ìƒ‰ƒCƒuƒ‰ƒŠ‚É‚Í“Á‚É•Ê“r•K—v‚È‚à‚Ì‚Í‚ ‚è‚Ü‚¹‚ñB
+ãã®ä»–ã®ãƒ©ã‚¤ãƒ–ãƒ©ãƒªã«ã¯ç‰¹ã«åˆ¥é€”å¿…è¦ãªã‚‚ã®ã¯ã‚ã‚Šã¾ã›ã‚“ã€‚
 
 tvpsnd_ia32
-nasm 2.10.09 ‚ª•K—v‚Å‚·B
+nasm 2.10.09 ãŒå¿…è¦ã§ã™ã€‚
 
 
 tvpgl_ia32
-nasm 2.10.09 ‚ª•K—v‚Å‚·B
+nasm 2.10.09 ãŒå¿…è¦ã§ã™ã€‚
 
 
 
-©“®¶¬ƒtƒ@ƒCƒ‹
-‹g—¢‹g—¢Z–{‘Ì‚É‚Í‚¢‚­‚Â‚©‚Ì©“®¶¬ƒtƒ@ƒCƒ‹‚ª‘¶İ‚µ‚Ü‚·B
-©“®¶¬ƒtƒ@ƒCƒ‹‚Í’¼Ú•ÒW‚¹‚¸A¶¬Œ³‚Ìƒtƒ@ƒCƒ‹‚ğ•ÒW‚µ‚Ü‚·B
-¶¬‚É‚Íå‚Ébatƒtƒ@ƒCƒ‹‚Æperl‚ªg—p‚³‚ê‚Ä‚¢‚é‚Ì‚ÅAperl‚ÌƒCƒ“ƒXƒg[ƒ‹‚ª•K—v‚Å‚·B
-Še¶¬ƒtƒ@ƒCƒ‹‚ğ¶‚É ':' ˆÈ~‚É¶¬Œ³ƒtƒ@ƒCƒ‹‚ğ—ñ‹“‚µ‚Ü‚·B
+è‡ªå‹•ç”Ÿæˆãƒ•ã‚¡ã‚¤ãƒ«
+å‰é‡Œå‰é‡ŒZæœ¬ä½“ã«ã¯ã„ãã¤ã‹ã®è‡ªå‹•ç”Ÿæˆãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã—ã¾ã™ã€‚
+è‡ªå‹•ç”Ÿæˆãƒ•ã‚¡ã‚¤ãƒ«ã¯ç›´æ¥ç·¨é›†ã›ãšã€ç”Ÿæˆå…ƒã®ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ç·¨é›†ã—ã¾ã™ã€‚
+ç”Ÿæˆã«ã¯ä¸»ã«batãƒ•ã‚¡ã‚¤ãƒ«ã¨perlãŒä½¿ç”¨ã•ã‚Œã¦ã„ã‚‹ã®ã§ã€perlã®ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ãŒå¿…è¦ã§ã™ã€‚
+å„ç”Ÿæˆãƒ•ã‚¡ã‚¤ãƒ«ã‚’å·¦ã« ':' ä»¥é™ã«ç”Ÿæˆå…ƒãƒ•ã‚¡ã‚¤ãƒ«ã‚’åˆ—æŒ™ã—ã¾ã™ã€‚
 
-src/core/tjs2/syntax/compile.bat ‚ÅˆÈ‰º‚Ìƒtƒ@ƒCƒ‹‚ª¶¬‚³‚ê‚Ü‚·B
+src/core/tjs2/syntax/compile.bat ã§ä»¥ä¸‹ã®ãƒ•ã‚¡ã‚¤ãƒ«ãŒç”Ÿæˆã•ã‚Œã¾ã™ã€‚
 tjs.tab.cpp/tjs.tab.hpp : tjs.y
 tjsdate.tab.cpp/tjsdate.tab.hpp : tjsdate.y
 tjspp.tab.cpp/tjspp.tab.hpp : tjspp.y
 tjsDateWordMap.cc : gen_wordtable.bat
 
-‚±‚ê‚ç‚Ìƒtƒ@ƒCƒ‹‚Ì¶¬‚É‚Í bison ‚ª•K—v‚Å‚·B
-bison ‚É‚Í libiconv2.dll libintl3.dll regex2.dll ‚ª•K—v‚È‚Ì‚Åˆê‚ÉƒCƒ“ƒXƒg[ƒ‹‚·‚é•K—v‚ª‚ ‚è‚Ü‚·B
+ã“ã‚Œã‚‰ã®ãƒ•ã‚¡ã‚¤ãƒ«ã®ç”Ÿæˆã«ã¯ bison ãŒå¿…è¦ã§ã™ã€‚
+bison ã«ã¯ libiconv2.dll libintl3.dll regex2.dll ãŒå¿…è¦ãªã®ã§ä¸€ç·’ã«ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ã™ã‚‹å¿…è¦ãŒã‚ã‚Šã¾ã™ã€‚
 http://gnuwin32.sourceforge.net/packages/bison.htm
 http://gnuwin32.sourceforge.net/packages/libintl.htm
 http://gnuwin32.sourceforge.net/packages/libiconv.htm
@@ -84,16 +84,16 @@ http://gnuwin32.sourceforge.net/packages/regex.htm
 
 
 
-src/core/visual/glgen/gengl.bat ‚ÅˆÈ‰º‚Ìƒtƒ@ƒCƒ‹‚ª¶¬‚³‚ê‚Ü‚·B
+src/core/visual/glgen/gengl.bat ã§ä»¥ä¸‹ã®ãƒ•ã‚¡ã‚¤ãƒ«ãŒç”Ÿæˆã•ã‚Œã¾ã™ã€‚
 tvpgl.c/tvpgl.h : maketab.c/tvpps.c
 
-src/core/visual/IA32/compile.bat ‚ÅˆÈ‰º‚Ìƒtƒ@ƒCƒ‹‚ª¶¬‚³‚ê‚Ü‚·B
+src/core/visual/IA32/compile.bat ã§ä»¥ä¸‹ã®ãƒ•ã‚¡ã‚¤ãƒ«ãŒç”Ÿæˆã•ã‚Œã¾ã™ã€‚
 tvpgl_ia32_intf.c/tvpgl_ia32_intf.h : *.nas
 
-src/core/msg/win32/gen_optdesc_res.bat ‚ÅˆÈ‰º‚Ìƒtƒ@ƒCƒ‹‚ª¶¬‚³‚ê‚Ü‚·B
+src/core/msg/win32/gen_optdesc_res.bat ã§ä»¥ä¸‹ã®ãƒ•ã‚¡ã‚¤ãƒ«ãŒç”Ÿæˆã•ã‚Œã¾ã™ã€‚
 OptionsDesc.cpp : option_desc_ja.txt
 
-src/core/base/win32/makestub.bat ‚ÅˆÈ‰º‚Ìƒtƒ@ƒCƒ‹‚ª¶¬‚³‚ê‚Ü‚·B
-FuncStubs.cpp/FuncStubs.h : makestub.pl“à‚Åw’è‚³‚ê‚½ƒwƒbƒ_[ƒtƒ@ƒCƒ‹“à‚ÌTJS_EXP_FUNC_DEF/TVP_GL_FUNC_PTR_EXTERN_DECLƒ}ƒNƒ‚Å‹Lq‚³‚ê‚½ŠÖ”
-tp_stub.cpp/tp_stub.h : “¯ã
+src/core/base/win32/makestub.bat ã§ä»¥ä¸‹ã®ãƒ•ã‚¡ã‚¤ãƒ«ãŒç”Ÿæˆã•ã‚Œã¾ã™ã€‚
+FuncStubs.cpp/FuncStubs.h : makestub.plå†…ã§æŒ‡å®šã•ã‚ŒãŸãƒ˜ãƒƒãƒ€ãƒ¼ãƒ•ã‚¡ã‚¤ãƒ«å†…ã®TJS_EXP_FUNC_DEF/TVP_GL_FUNC_PTR_EXTERN_DECLãƒã‚¯ãƒ­ã§è¨˜è¿°ã•ã‚ŒãŸé–¢æ•°
+tp_stub.cpp/tp_stub.h : åŒä¸Š
 

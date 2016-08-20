@@ -23,10 +23,10 @@ namespace TJS
 
 #ifdef ENABLE_DEBUGGER
 struct ScopeKey {
-	int ClassIndex;	//!< ƒNƒ‰ƒX–¼ƒCƒ“ƒfƒbƒNƒX
-	int FuncIndex;	//!< ŠÖ”–¼ƒCƒ“ƒfƒbƒNƒX
-	int FileIndex;	//!< ƒtƒ@ƒCƒ‹–¼ƒCƒ“ƒfƒbƒNƒX
-	int CodeOffset;	//!< VM ƒR[ƒhƒIƒtƒZƒbƒg
+	int ClassIndex;	//!< ã‚¯ãƒ©ã‚¹åã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
+	int FuncIndex;	//!< é–¢æ•°åã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
+	int FileIndex;	//!< ãƒ•ã‚¡ã‚¤ãƒ«åã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
+	int CodeOffset;	//!< VM ã‚³ãƒ¼ãƒ‰ã‚ªãƒ•ã‚»ãƒƒãƒˆ
 
 	ScopeKey()
 	: ClassIndex(-1), FuncIndex(-1), FileIndex(-1), CodeOffset(-1)
@@ -48,7 +48,7 @@ struct ScopeKey {
 		return( ClassIndex != rhs.ClassIndex || FuncIndex != rhs.FuncIndex || FileIndex != rhs.FileIndex || CodeOffset != rhs.CodeOffset );
 	}
 	bool operator < ( const ScopeKey& rhs ) const {
-		// ƒNƒ‰ƒXAŠÖ”–¼
+		// ã‚¯ãƒ©ã‚¹ã€é–¢æ•°å
 		if( ClassIndex == rhs.ClassIndex ) {
 			if( FuncIndex == rhs.FuncIndex ) {
 				if( FileIndex == rhs.FileIndex ) {

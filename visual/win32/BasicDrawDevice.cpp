@@ -18,7 +18,7 @@
 #include <algorithm>
 
 //---------------------------------------------------------------------------
-// ƒIƒvƒVƒ‡ƒ“
+// ã‚ªãƒ—ã‚·ãƒ§ãƒ³
 //---------------------------------------------------------------------------
 static tjs_int TVPBasicDrawDeviceOptionsGeneration = 0;
 bool TVPZoomInterpolation = true;
@@ -80,15 +80,15 @@ void tTVPBasicDrawDevice::DestroyTexture() {
 //---------------------------------------------------------------------------
 void tTVPBasicDrawDevice::InvalidateAll()
 {
-	// ƒŒƒCƒ„‰‰ZŒ‹‰Ê‚ğ‚·‚×‚ÄƒŠƒNƒGƒXƒg‚·‚é
-	// ƒT[ƒtƒF[ƒX‚ª lost ‚µ‚½Û‚É“à—e‚ğÄ\’z‚·‚é–Ú“I‚Å—p‚¢‚é
+	// ãƒ¬ã‚¤ãƒ¤æ¼”ç®—çµæœã‚’ã™ã¹ã¦ãƒªã‚¯ã‚¨ã‚¹ãƒˆã™ã‚‹
+	// ã‚µãƒ¼ãƒ•ã‚§ãƒ¼ã‚¹ãŒ lost ã—ãŸéš›ã«å†…å®¹ã‚’å†æ§‹ç¯‰ã™ã‚‹ç›®çš„ã§ç”¨ã„ã‚‹
 	RequestInvalidation(tTVPRect(0, 0, DestRect.get_width(), DestRect.get_height()));
 }
 //---------------------------------------------------------------------------
 void tTVPBasicDrawDevice::CheckMonitorMoved() {
 	UINT iCurrentMonitor = GetMonitorNumber( TargetWindow );
 	if( CurrentMonitor != iCurrentMonitor ) {
-		// ƒ‚ƒjƒ^ˆÚ“®‚ª”­¶‚µ‚Ä‚¢‚é‚Ì‚ÅAƒfƒoƒCƒX‚ğÄ¶¬‚·‚é
+		// ãƒ¢ãƒ‹ã‚¿ç§»å‹•ãŒç™ºç”Ÿã—ã¦ã„ã‚‹ã®ã§ã€ãƒ‡ãƒã‚¤ã‚¹ã‚’å†ç”Ÿæˆã™ã‚‹
 		CreateD3DDevice();
 	}
 }
@@ -248,7 +248,7 @@ HRESULT tTVPBasicDrawDevice::DecideD3DPresentParameters() {
 //---------------------------------------------------------------------------
 bool tTVPBasicDrawDevice::CreateD3DDevice()
 {
-	// Direct3D ƒfƒoƒCƒXAƒeƒNƒXƒ`ƒƒ‚È‚Ç‚ğì¬‚·‚é
+	// Direct3D ãƒ‡ãƒã‚¤ã‚¹ã€ãƒ†ã‚¯ã‚¹ãƒãƒ£ãªã©ã‚’ä½œæˆã™ã‚‹
 	DestroyD3DDevice();
 	if( TargetWindow ) {
 		tjs_int w, h;
@@ -284,7 +284,7 @@ bool tTVPBasicDrawDevice::CreateTexture() {
 		DWORD dwWidth = 64;
 		DWORD dwHeight = 64;
 		if( d3dcaps.TextureCaps & D3DPTEXTURECAPS_POW2 ) {
-			// 2‚Ì—İæ‚Ì‚İ‹–‰Â‚·‚é‚©‚Ç‚¤‚©”»’è
+			// 2ã®ç´¯ä¹—ã®ã¿è¨±å¯ã™ã‚‹ã‹ã©ã†ã‹åˆ¤å®š
 			while( dwWidth < TextureWidth ) dwWidth = dwWidth << 1;
 			while( dwHeight < TextureHeight ) dwHeight = dwHeight << 1;
 			TextureWidth = dwWidth;
@@ -351,7 +351,7 @@ void tTVPBasicDrawDevice::TryRecreateWhenDeviceLost()
 			hr = Direct3DDevice->Reset(&D3dPP);
 		}
 		if( hr == D3DERR_DEVICELOST ) {
-			// •œ‹A‚Å‚«‚È‚¢
+			// å¾©å¸°ã§ããªã„
 			return;
 		}
 		if( FAILED(hr) ) {
@@ -365,7 +365,7 @@ void tTVPBasicDrawDevice::TryRecreateWhenDeviceLost()
 		success = CreateD3DDevice();
 	}
 	if( success ) {
-		InvalidateAll();	// ‰æ‘œ‚ÌÄ•`‰æ(Layer Update)‚ğ—v‹‚·‚é
+		InvalidateAll();	// ç”»åƒã®å†æç”»(Layer Update)ã‚’è¦æ±‚ã™ã‚‹
 	}
 }
 //---------------------------------------------------------------------------
@@ -482,12 +482,12 @@ void TJS_INTF_METHOD tTVPBasicDrawDevice::AddLayerManager(iTVPLayerManager * man
 {
 	if(inherited::Managers.size() > 0)
 	{
-		// "Basic" ƒfƒoƒCƒX‚Å‚Í‚Q‚ÂˆÈã‚ÌLayer Manager‚ğ“o˜^‚Å‚«‚È‚¢
+		// "Basic" ãƒ‡ãƒã‚¤ã‚¹ã§ã¯ï¼’ã¤ä»¥ä¸Šã®Layer Managerã‚’ç™»éŒ²ã§ããªã„
 		TVPThrowExceptionMessage(TVPBasicDrawDeviceDoesNotSupporteLayerManagerMoreThanOne);
 	}
 	inherited::AddLayerManager(manager);
 
-	manager->SetDesiredLayerType(ltOpaque); // ltOpaque ‚Èo—Í‚ğó‚¯æ‚è‚½‚¢
+	manager->SetDesiredLayerType(ltOpaque); // ltOpaque ãªå‡ºåŠ›ã‚’å—ã‘å–ã‚ŠãŸã„
 }
 //---------------------------------------------------------------------------
 void TJS_INTF_METHOD tTVPBasicDrawDevice::SetTargetWindow(HWND wnd, bool is_main)
@@ -501,14 +501,14 @@ void TJS_INTF_METHOD tTVPBasicDrawDevice::SetTargetWindow(HWND wnd, bool is_main
 void TJS_INTF_METHOD tTVPBasicDrawDevice::SetDestRectangle(const tTVPRect & rect)
 {
 	BackBufferDirty = true;
-	// ˆÊ’u‚¾‚¯‚Ì•ÏX‚Ìê‡‚©‚Ç‚¤‚©‚ğƒ`ƒFƒbƒN‚·‚é
+	// ä½ç½®ã ã‘ã®å¤‰æ›´ã®å ´åˆã‹ã©ã†ã‹ã‚’ãƒã‚§ãƒƒã‚¯ã™ã‚‹
 	if(rect.get_width() == DestRect.get_width() && rect.get_height() == DestRect.get_height()) {
-		// ˆÊ’u‚¾‚¯‚Ì•ÏX‚¾
+		// ä½ç½®ã ã‘ã®å¤‰æ›´ã 
 		inherited::SetDestRectangle(rect);
 	} else {
-		// ƒTƒCƒY‚àˆá‚¤
+		// ã‚µã‚¤ã‚ºã‚‚é•ã†
 		if( rect.get_width() > (tjs_int)D3dPP.BackBufferWidth || rect.get_height() > (tjs_int)D3dPP.BackBufferHeight ) {
-			// ƒoƒbƒNƒoƒbƒtƒ@ƒTƒCƒY‚æ‚è‚à‘å‚«‚¢ƒTƒCƒY‚ªw’è‚³‚ê‚½ê‡ˆê“x”jŠü‚·‚éBŒã‚ÌEnsureDevice‚ÅÄ¶¬‚³‚ê‚éB
+			// ãƒãƒƒã‚¯ãƒãƒƒãƒ•ã‚¡ã‚µã‚¤ã‚ºã‚ˆã‚Šã‚‚å¤§ãã„ã‚µã‚¤ã‚ºãŒæŒ‡å®šã•ã‚ŒãŸå ´åˆä¸€åº¦ç ´æ£„ã™ã‚‹ã€‚å¾Œã®EnsureDeviceã§å†ç”Ÿæˆã•ã‚Œã‚‹ã€‚
 			DestroyD3DDevice();
 		}
 		bool success = true;
@@ -535,7 +535,7 @@ void TJS_INTF_METHOD tTVPBasicDrawDevice::NotifyLayerResize(iTVPLayerManager * m
 
 	BackBufferDirty = true;
 
-	// ƒeƒNƒXƒ`ƒƒ‚ğÌ‚Ä‚Äì‚è’¼‚·B
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’æ¨ã¦ã¦ä½œã‚Šç›´ã™ã€‚
 	CreateTexture();
 }
 //---------------------------------------------------------------------------
@@ -582,10 +582,10 @@ bool TJS_INTF_METHOD tTVPBasicDrawDevice::WaitForVBlank( tjs_int* in_vblank, tjs
 		inVsync = rs.InVBlank == TRUE;
 	}
 
-	// VSync ‘Ò‚¿‚ğs‚¤
+	// VSync å¾…ã¡ã‚’è¡Œã†
 	bool isdelayed = false;
 	if(!inVsync) {
-		// vblank ‚©‚ç”²‚¯‚é‚Ü‚Å‘Ò‚Â
+		// vblank ã‹ã‚‰æŠœã‘ã‚‹ã¾ã§å¾…ã¤
 		DWORD timeout_target_tick = ::timeGetTime() + 1;
 		rs.InVBlank = FALSE;
 		HRESULT hr = D3D_OK;
@@ -593,14 +593,14 @@ bool TJS_INTF_METHOD tTVPBasicDrawDevice::WaitForVBlank( tjs_int* in_vblank, tjs
 			hr = Direct3DDevice->GetRasterStatus(0,&rs);
 		} while( D3D_OK == hr && rs.InVBlank == TRUE && (long)(::timeGetTime() - timeout_target_tick) <= 0);
 
-		// vblank ‚É“ü‚é‚Ü‚Å‘Ò‚Â
+		// vblank ã«å…¥ã‚‹ã¾ã§å¾…ã¤
 		rs.InVBlank = TRUE;
 		do {
 			hr = Direct3DDevice->GetRasterStatus(0,&rs);
 		} while( D3D_OK == hr && rs.InVBlank == FALSE && (long)(::timeGetTime() - timeout_target_tick) <= 0);
 
 		if((int)(::timeGetTime() - timeout_target_tick) > 0) {
-			// ƒtƒŒ[ƒ€ƒXƒLƒbƒv‚ª”­¶‚µ‚½‚Æl‚¦‚Ä‚æ‚¢
+			// ãƒ•ãƒ¬ãƒ¼ãƒ ã‚¹ã‚­ãƒƒãƒ—ãŒç™ºç”Ÿã—ãŸã¨è€ƒãˆã¦ã‚ˆã„
 			isdelayed  = true;
 		}
 		inVsync = rs.InVBlank == TRUE;
@@ -642,9 +642,9 @@ void TJS_INTF_METHOD tTVPBasicDrawDevice::NotifyBitmapCompleted(iTVPLayerManager
 	tjs_int x, tjs_int y, const void * bits, const BITMAPINFO * bitmapinfo,
 	const tTVPRect &cliprect, tTVPLayerType type, tjs_int opacity)
 {
-	// bits, bitmapinfo ‚Å•\‚³‚ê‚éƒrƒbƒgƒ}ƒbƒv‚Ì cliprect ‚Ì—Ìˆæ‚ğAx, y ‚É•`‰æ
-	// ‚·‚éB
-	// opacity ‚Æ type ‚Í–³‹‚·‚é‚µ‚©‚È‚¢‚Ì‚Å–³‹‚·‚é
+	// bits, bitmapinfo ã§è¡¨ã•ã‚Œã‚‹ãƒ“ãƒƒãƒˆãƒãƒƒãƒ—ã® cliprect ã®é ˜åŸŸã‚’ã€x, y ã«æç”»
+	// ã™ã‚‹ã€‚
+	// opacity ã¨ type ã¯ç„¡è¦–ã™ã‚‹ã—ã‹ãªã„ã®ã§ç„¡è¦–ã™ã‚‹
 	tjs_int w, h;
 	GetSrcSize( w, h );
 	if( TextureBuffer && TargetWindow &&
@@ -655,10 +655,10 @@ void TJS_INTF_METHOD tTVPBasicDrawDevice::NotifyBitmapCompleted(iTVPLayerManager
 			cliprect.right > bitmapinfo->bmiHeader.biWidth ||
 			cliprect.bottom > bitmapinfo->bmiHeader.biHeight))
 	{
-		// ”ÍˆÍŠO‚Ì“]‘—‚Í(ˆê•”‚¾‚¯“]‘—‚·‚é‚Ì‚Å‚Í‚È‚­‚Ä)–³‹‚µ‚Ä‚æ‚¢
+		// ç¯„å›²å¤–ã®è»¢é€ã¯(ä¸€éƒ¨ã ã‘è»¢é€ã™ã‚‹ã®ã§ã¯ãªãã¦)ç„¡è¦–ã—ã¦ã‚ˆã„
 		ShouldShow = true;
 
-		// bitmapinfo ‚Å•\‚³‚ê‚½ cliprect ‚Ì—Ìˆæ‚ğ x,y ‚ÉƒRƒs[‚·‚é
+		// bitmapinfo ã§è¡¨ã•ã‚ŒãŸ cliprect ã®é ˜åŸŸã‚’ x,y ã«ã‚³ãƒ”ãƒ¼ã™ã‚‹
 		long src_y       = cliprect.top;
 		long src_y_limit = cliprect.bottom;
 		long src_x       = cliprect.left;
@@ -707,7 +707,7 @@ void TJS_INTF_METHOD tTVPBasicDrawDevice::EndBitmapCompletion(iTVPLayerManager *
 		float tu, tv;
 	};
 
-	// “]‘—æ‚ğƒNƒŠƒbƒsƒ“ƒO‹éŒ`‚ÉŠî‚Ã‚«ƒNƒŠƒbƒsƒ“ƒO
+	// è»¢é€å…ˆã‚’ã‚¯ãƒªãƒƒãƒ”ãƒ³ã‚°çŸ©å½¢ã«åŸºã¥ãã‚¯ãƒªãƒƒãƒ”ãƒ³ã‚°
 	float dl = (float)( DestRect.left < ClipRect.left ? ClipRect.left : DestRect.left );
 	float dt = (float)( DestRect.top < ClipRect.top ? ClipRect.top : DestRect.top );
 	float dr = (float)( DestRect.right > ClipRect.right ? ClipRect.right : DestRect.right );
@@ -715,13 +715,13 @@ void TJS_INTF_METHOD tTVPBasicDrawDevice::EndBitmapCompletion(iTVPLayerManager *
 	float dw = (float)DestRect.get_width();
 	float dh = (float)DestRect.get_height();
 
-	// ‚Í‚İo‚µ‚Ä‚¢‚é•‚ğ‹‚ß‚é
+	// ã¯ã¿å‡ºã—ã¦ã„ã‚‹å¹…ã‚’æ±‚ã‚ã‚‹
 	float cl = dl - (float)DestRect.left;
 	float ct = dt - (float)DestRect.top;
 	float cr = (float)DestRect.right - dr;
 	float cb = (float)DestRect.bottom - db;
 
-	// ‚Í‚İo‚µ‚Ä‚¢‚é•‚ğl—¶‚µ‚ÄA“]‘—Œ³‰æ‘œ‚ğƒNƒŠƒbƒsƒ“ƒO
+	// ã¯ã¿å‡ºã—ã¦ã„ã‚‹å¹…ã‚’è€ƒæ…®ã—ã¦ã€è»¢é€å…ƒç”»åƒã‚’ã‚¯ãƒªãƒƒãƒ”ãƒ³ã‚°
 	tjs_int w, h;
 	GetSrcSize( w, h );
 	float sl = (float)(cl * w / dw ) / (float)TextureWidth;
@@ -739,7 +739,7 @@ void TJS_INTF_METHOD tTVPBasicDrawDevice::EndBitmapCompletion(iTVPLayerManager *
 
 	HRESULT hr;
 
-// ƒtƒ‹ƒXƒNƒŠ[ƒ“‰»ŒãA1‰ñ‚Í‘S‘ÌÁ‹A‚»‚êˆÈ~‚ÍƒEƒBƒ“ƒhƒE‚Ì”ÍˆÍ“à‚Ì‚İ‚É‚µ‚½•û‚ªŒø—¦“IB
+// ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³åŒ–å¾Œã€1å›ã¯å…¨ä½“æ¶ˆå»ã€ãã‚Œä»¥é™ã¯ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ç¯„å›²å†…ã®ã¿ã«ã—ãŸæ–¹ãŒåŠ¹ç‡çš„ã€‚
 	D3DVIEWPORT9 vp;
 	vp.X  = 0;
 	vp.Y  = 0;
@@ -818,10 +818,10 @@ void TJS_INTF_METHOD tTVPBasicDrawDevice::SetShowUpdateRect(bool b)
 //---------------------------------------------------------------------------
 bool TJS_INTF_METHOD tTVPBasicDrawDevice::SwitchToFullScreen( HWND window, tjs_uint w, tjs_uint h, tjs_uint bpp, tjs_uint color, bool changeresolution )
 {
-	// ƒtƒ‹ƒXƒNƒŠ[ƒ“‰»‚Ìˆ—‚Í‚È‚É‚às‚í‚È‚¢AŒİŠ·«‚Ì‚½‚ß‚ÉƒEƒBƒ“ƒhƒE‚ğ‘S‰æ–Ê‰»‚·‚é‚Ì‚İ‚Åˆ—‚·‚é
-	// Direct3D9 ‚Åƒtƒ‹ƒXƒNƒŠ[ƒ“‰»‚·‚é‚ÆƒtƒH[ƒJƒX‚ğ¸‚¤‚ÆƒfƒoƒCƒX‚ğƒƒXƒg‚·‚é‚Ì‚ÅA‚»‚Ì‚½‚Ñ‚ÉƒŠƒZƒbƒgorì‚è’¼‚µ‚ª•K—v‚É‚È‚éB
-	// ƒ‚[ƒ_ƒ‹ƒEƒBƒ“ƒhƒE‚ğg—p‚·‚éƒVƒXƒeƒ€‚Å‚ÍA‚±‚ê‚Í¢‚é‚Ì‚Åí‚ÉƒEƒBƒ“ƒhƒEƒ‚[ƒh‚Ås‚¤B
-	// ƒ‚[ƒ_ƒ‹ƒEƒBƒ“ƒhƒE‚ğg—p‚µ‚È‚¢ƒVƒXƒeƒ€‚É‚·‚é‚Ì‚È‚çAƒtƒ‹ƒXƒNƒŠ[ƒ“‚ğg—p‚·‚éDrawDevice‚ğì‚é‚Æ—Ç‚¢B
+	// ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³åŒ–ã®å‡¦ç†ã¯ãªã«ã‚‚è¡Œã‚ãªã„ã€äº’æ›æ€§ã®ãŸã‚ã«ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’å…¨ç”»é¢åŒ–ã™ã‚‹ã®ã¿ã§å‡¦ç†ã™ã‚‹
+	// Direct3D9 ã§ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³åŒ–ã™ã‚‹ã¨ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã‚’å¤±ã†ã¨ãƒ‡ãƒã‚¤ã‚¹ã‚’ãƒ­ã‚¹ãƒˆã™ã‚‹ã®ã§ã€ãã®ãŸã³ã«ãƒªã‚»ãƒƒãƒˆorä½œã‚Šç›´ã—ãŒå¿…è¦ã«ãªã‚‹ã€‚
+	// ãƒ¢ãƒ¼ãƒ€ãƒ«ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ä½¿ç”¨ã™ã‚‹ã‚·ã‚¹ãƒ†ãƒ ã§ã¯ã€ã“ã‚Œã¯å›°ã‚‹ã®ã§å¸¸ã«ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒ¢ãƒ¼ãƒ‰ã§è¡Œã†ã€‚
+	// ãƒ¢ãƒ¼ãƒ€ãƒ«ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’ä½¿ç”¨ã—ãªã„ã‚·ã‚¹ãƒ†ãƒ ã«ã™ã‚‹ã®ãªã‚‰ã€ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã‚’ä½¿ç”¨ã™ã‚‹DrawDeviceã‚’ä½œã‚‹ã¨è‰¯ã„ã€‚
 	BackBufferDirty = true;
 	ShouldShow = true;
 	CheckMonitorMoved();

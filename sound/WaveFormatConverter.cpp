@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------
 /*
-	Risa [りさ]      alias 吉里吉里3 [kirikiri-3]
+	Risa [繧翫＆]      alias 蜷蛾㈹蜷蛾㈹3 [kirikiri-3]
 	 stands for "Risa Is a Stagecraft Architecture"
 	Copyright (C) 2000 W.Dee <dee@kikyou.info> and contributors
 
@@ -8,7 +8,7 @@
 */
 //---------------------------------------------------------------------------
 //! @file
-//! @brief Waveフォーマットコンバータのコア関数
+//! @brief Wave繝輔か繝ｼ繝槭ャ繝医さ繝ｳ繝舌�ｼ繧ｿ縺ｮ繧ｳ繧｢髢｢謨ｰ
 //---------------------------------------------------------------------------
 
 #include "tjsCommHead.h"
@@ -18,7 +18,7 @@
 
 //---------------------------------------------------------------------------
 /**
- * int16→float32変換
+ * int16竊断loat32螟画鋤
  */
 void PCMConvertLoopInt16ToFloat32(void * __restrict dest, const void * __restrict src, size_t numsamples)
 {
@@ -37,7 +37,7 @@ void PCMConvertLoopInt16ToFloat32(void * __restrict dest, const void * __restric
 
 //---------------------------------------------------------------------------
 /**
- * float32→int16変換
+ * float32竊段nt16螟画鋤
  */
 void PCMConvertLoopFloat32ToInt16(void * __restrict dest, const void * __restrict src, size_t numsamples)
 {

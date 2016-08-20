@@ -8,7 +8,7 @@
 void TVPAddSubVertSum16_sse2_c(tjs_uint16 *dest, const tjs_uint32 *addline, const tjs_uint32 *subline, tjs_int len) {
 	if( len <= 0 ) return;
 
-	tjs_uint32 rem = (len>>2)<<2;	// 4pixel‚¸‚Â
+	tjs_uint32 rem = (len>>2)<<2;	// 4pixelãšã¤
 	tjs_uint16* limit = dest + rem * 4;
 	const __m128i zero = _mm_setzero_si128();
 	while( dest < limit ) {
@@ -66,7 +66,7 @@ struct sse2_to_premul_alpha_functor {
 		return _mm_srli_epi16( src, 8 );
 	}
 };
-/* ˆÈ‰º‚Ì‚æ‚¤‚Èfunctor‚ğg‚Á‚ÄTVPAddSubVertSum16_d_sse2_c‚ğ”Ä—p‰»‚µ‚Ä‚à‚¢‚¢‚ªcc
+/* ä»¥ä¸‹ã®ã‚ˆã†ãªfunctorã‚’ä½¿ã£ã¦TVPAddSubVertSum16_d_sse2_cã‚’æ±ç”¨åŒ–ã—ã¦ã‚‚ã„ã„ãŒâ€¦â€¦
 struct sse2_to_passthru_functor {
 	inline __m128i operator()( __m128i src ) const { return src; }
 };
@@ -74,10 +74,10 @@ struct sse2_to_passthru_functor {
 void TVPAddSubVertSum16_d_sse2_c(tjs_uint16 *dest, const tjs_uint32 *addline, const tjs_uint32 *subline, tjs_int len) {
 	if( len <= 0 ) return;
 
-	tjs_uint32 rem = (len>>2)<<2;	// 4pixel‚¸‚Â
+	tjs_uint32 rem = (len>>2)<<2;	// 4pixelãšã¤
 	tjs_uint16* limit = dest + rem * 4;
 	const __m128i zero = _mm_setzero_si128();
-	sse2_to_premul_alpha_functor to_premul;	// ‰½‚à‚µ‚È‚¢”Å‚Ìƒtƒ@ƒ“ƒNƒ^ì‚Á‚ÄA‹¤’Êƒ\[ƒX‚É‚Å‚«‚»‚¤B
+	sse2_to_premul_alpha_functor to_premul;	// ä½•ã‚‚ã—ãªã„ç‰ˆã®ãƒ•ã‚¡ãƒ³ã‚¯ã‚¿ä½œã£ã¦ã€å…±é€šã‚½ãƒ¼ã‚¹ã«ã§ããã†ã€‚
 	while( dest < limit ) {
 		__m128i md1 = _mm_load_si128( (__m128i const*)dest );
 		__m128i madd1 = _mm_loadu_si128( (__m128i const*)addline );
@@ -126,7 +126,7 @@ void TVPAddSubVertSum16_d_sse2_c(tjs_uint16 *dest, const tjs_uint32 *addline, co
 void TVPAddSubVertSum32_sse2_c(tjs_uint32 *dest, const tjs_uint32 *addline, const tjs_uint32 *subline, tjs_int len) {
 	if( len <= 0 ) return;
 
-	tjs_uint32 rem = (len>>2)<<2;	// 4pixel‚¸‚Â
+	tjs_uint32 rem = (len>>2)<<2;	// 4pixelãšã¤
 	tjs_uint32* limit = dest + rem * 4;
 	const __m128i zero = _mm_setzero_si128();
 	while( dest < limit ) {
@@ -195,7 +195,7 @@ void TVPAddSubVertSum32_sse2_c(tjs_uint32 *dest, const tjs_uint32 *addline, cons
 void TVPAddSubVertSum32_d_sse2_c(tjs_uint32 *dest, const tjs_uint32 *addline, const tjs_uint32 *subline, tjs_int len) {
 	if( len <= 0 ) return;
 
-	tjs_uint32 rem = (len>>2)<<2;	// 4pixel‚¸‚Â
+	tjs_uint32 rem = (len>>2)<<2;	// 4pixelãšã¤
 	tjs_uint32* limit = dest + rem * 4;
 	const __m128i zero = _mm_setzero_si128();
 	sse2_to_premul_alpha_functor func;
@@ -268,7 +268,7 @@ void TVPAddSubVertSum32_d_sse2_c(tjs_uint32 *dest, const tjs_uint32 *addline, co
 	}
 }
 
-// _mm_mulhi_epu16 ‚ªg‚¦‚é‚©‚çA16bit‚Å‚à–â‘è‚È‚¢
+// _mm_mulhi_epu16 ãŒä½¿ãˆã‚‹ã‹ã‚‰ã€16bitã§ã‚‚å•é¡Œãªã„
 struct sse2_box_blur_avg_16 {
 	__m128i mrcp_;
 	inline sse2_box_blur_avg_16( tjs_int n ) {
@@ -278,18 +278,18 @@ struct sse2_box_blur_avg_16 {
 	}
 	inline void two( tjs_uint32 *dest, __m128i msum, const __m128i mhalf_n ) const {
 		msum = _mm_add_epi16( msum, mhalf_n );		// sum + n/2
-		msum = _mm_mulhi_epu16( msum, mrcp_ );		// (sum + n/2) * rcp, rcp ‚ÍA16bit‚²‚Æ‚É‚·‚é
+		msum = _mm_mulhi_epu16( msum, mrcp_ );		// (sum + n/2) * rcp, rcp ã¯ã€16bitã”ã¨ã«ã™ã‚‹
 		msum = _mm_packus_epi16( msum, msum );		// A8|R8|G8|B8|A8|R8|G8|B8
-		_mm_storel_epi64( (__m128i *)dest, msum );	// 2pixelƒXƒgƒA
+		_mm_storel_epi64( (__m128i *)dest, msum );	// 2pixelã‚¹ãƒˆã‚¢
 	}
 	inline void one( tjs_uint32 *dest, __m128i msum, const __m128i mhalf_n ) const {
 		msum = _mm_add_epi16( msum, mhalf_n );		// sum + n/2
-		msum = _mm_mulhi_epu16( msum, mrcp_ );		// (sum + n/2) * rcp, rcp ‚ÍA16bit‚²‚Æ‚É‚·‚é
+		msum = _mm_mulhi_epu16( msum, mrcp_ );		// (sum + n/2) * rcp, rcp ã¯ã€16bitã”ã¨ã«ã™ã‚‹
 		msum = _mm_packus_epi16( msum, msum );		// A8|R8|G8|B8|A8|R8|G8|B8
 		*dest = _mm_cvtsi128_si32(msum);
 	}
 };
-// SSEg‚¢ˆê•”•‚“®¬”“_‚Å‰‰Z
+// SSEä½¿ã„ä¸€éƒ¨æµ®å‹•å°æ•°ç‚¹ã§æ¼”ç®—
 struct sse2_box_blur_avg_16_d_sse {
 	__m128i mrcp_;
 	const __m128 f255_;
@@ -304,7 +304,7 @@ struct sse2_box_blur_avg_16_d_sse {
 	}
 	inline void two( tjs_uint32 *dest, __m128i msum0, const __m128i mhalf_n ) const {
 		msum0 = _mm_add_epi16( msum0, mhalf_n );		// sum + n/2
-		msum0 = _mm_mulhi_epu16( msum0, mrcp_ );		// (sum + n/2) * rcp, rcp ‚ÍA16bit‚²‚Æ‚É‚·‚é
+		msum0 = _mm_mulhi_epu16( msum0, mrcp_ );		// (sum + n/2) * rcp, rcp ã¯ã€16bitã”ã¨ã«ã™ã‚‹
 
 		__m128i msum1 = msum0;
 		msum1 = _mm_unpackhi_epi16( msum1, zero_ );	// 16bit -> 32bit
@@ -314,7 +314,7 @@ struct sse2_box_blur_avg_16_d_sse {
 		alpha = _mm_srli_epi64( alpha, 48 );		// color >> 48 = alpha
 		__m128 fa = _mm_cvtepi32_ps(alpha);
 		fa = _mm_rcp_ps( fa );
-		// fa = m128_rcp_22bit_ps( fa ); // ¸“xã‚°‚é‚Ì‚È‚ç
+		// fa = m128_rcp_22bit_ps( fa ); // ç²¾åº¦ä¸Šã’ã‚‹ã®ãªã‚‰
 		__m128 fa1 = fa;
 		fa1 = _mm_shuffle_ps( fa1, fa1, _MM_SHUFFLE( 2, 2, 2, 2 ) );
 		fmsum1 = _mm_mul_ps( fmsum1, f255_ );
@@ -333,11 +333,11 @@ struct sse2_box_blur_avg_16_d_sse {
 		msum0 = _mm_and_si128( msum0, c_0000ffffffffffff_ );
 		msum0 = _mm_or_si128( msum0, alpha );
 		msum0 = _mm_packus_epi16( msum0, msum0 );		// A8|R8|G8|B8|A8|R8|G8|B8
-		_mm_storel_epi64( (__m128i *)dest, msum0 );	// 2pixelƒXƒgƒA
+		_mm_storel_epi64( (__m128i *)dest, msum0 );	// 2pixelã‚¹ãƒˆã‚¢
 	}
 	inline void one( tjs_uint32 *dest, __m128i msum, const __m128i mhalf_n ) const {
 		msum = _mm_add_epi16( msum, mhalf_n );		// sum + n/2
-		msum = _mm_mulhi_epu16( msum, mrcp_ );		// (sum + n/2) * rcp, rcp ‚ÍA16bit‚²‚Æ‚É‚·‚é
+		msum = _mm_mulhi_epu16( msum, mrcp_ );		// (sum + n/2) * rcp, rcp ã¯ã€16bitã”ã¨ã«ã™ã‚‹
 		__m128i alpha = msum;
 		alpha = _mm_srli_epi64( alpha, 48 );		// color >> 48 = alpha
 		msum = _mm_unpacklo_epi16( msum, zero_ );	// 16bit -> 32bit
@@ -358,7 +358,7 @@ struct sse2_box_blur_avg_16_d_sse {
 	}
 };
 
-// 255/alpha ‚ğŒvZ‚µ‚Ä‚©‚ç color ‚É‚©‚¯‚Ä‚¢‚é‚Ì‚Å­‚µ¸“x’á‚¢
+// 255/alpha ã‚’è¨ˆç®—ã—ã¦ã‹ã‚‰ color ã«ã‹ã‘ã¦ã„ã‚‹ã®ã§å°‘ã—ç²¾åº¦ä½ã„
 struct sse2_box_blur_avg_16_d {
 	__m128i mrcp_;
 	const __m128 f255_;
@@ -371,7 +371,7 @@ struct sse2_box_blur_avg_16_d {
 	}
 	inline void two( tjs_uint32 *dest, __m128i msum, const __m128i mhalf_n ) const {
 		msum = _mm_add_epi16( msum, mhalf_n );		// sum + n/2
-		msum = _mm_mulhi_epu16( msum, mrcp_ );		// (sum + n/2) * rcp, rcp ‚ÍA16bit‚²‚Æ‚É‚·‚é
+		msum = _mm_mulhi_epu16( msum, mrcp_ );		// (sum + n/2) * rcp, rcp ã¯ã€16bitã”ã¨ã«ã™ã‚‹
 		__m128i alpha = msum;
 		alpha = _mm_srli_epi64( alpha, 48 );		// color >> 48 = alpha
 		__m128 fa = _mm_cvtepi32_ps(alpha);
@@ -385,11 +385,11 @@ struct sse2_box_blur_avg_16_d {
 		msum = _mm_slli_epi16( msum, 8 );
 		msum = _mm_mulhi_epu16( msum, alpha );
 		msum = _mm_packus_epi16( msum, msum );		// A8|R8|G8|B8|A8|R8|G8|B8
-		_mm_storel_epi64( (__m128i *)dest, msum );	// 2pixelƒXƒgƒA
+		_mm_storel_epi64( (__m128i *)dest, msum );	// 2pixelã‚¹ãƒˆã‚¢
 	}
 	inline void one( tjs_uint32 *dest, __m128i msum, const __m128i mhalf_n ) const {
 		msum = _mm_add_epi16( msum, mhalf_n );		// sum + n/2
-		msum = _mm_mulhi_epu16( msum, mrcp_ );		// (sum + n/2) * rcp, rcp ‚ÍA16bit‚²‚Æ‚É‚·‚é
+		msum = _mm_mulhi_epu16( msum, mrcp_ );		// (sum + n/2) * rcp, rcp ã¯ã€16bitã”ã¨ã«ã™ã‚‹
 		__m128i alpha = msum;
 		alpha = _mm_srli_epi64( alpha, 48 );		// color >> 48 = alpha
 		__m128 fa = _mm_cvtepi32_ps(alpha);
@@ -405,7 +405,7 @@ struct sse2_box_blur_avg_16_d {
 		*dest = _mm_cvtsi128_si32(msum);
 	}
 };
-// ƒe[ƒuƒ‹ƒo[ƒWƒ‡ƒ“A‚©‚È‚è‚ÌÅ“K‰»”C‚¹B‘¬“x‚Æ¸“x‚©‚ç‚±‚ê‚É‚È‚é‚©H
+// ãƒ†ãƒ¼ãƒ–ãƒ«ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã€ã‹ãªã‚Šã®æœ€é©åŒ–ä»»ã›ã€‚é€Ÿåº¦ã¨ç²¾åº¦ã‹ã‚‰ã“ã‚Œã«ãªã‚‹ã‹ï¼Ÿ
 struct sse2_box_blur_avg_16_d_table {
 	__m128i mrcp_;
 	inline sse2_box_blur_avg_16_d_table( tjs_int n ) {
@@ -415,7 +415,7 @@ struct sse2_box_blur_avg_16_d_table {
 	}
 	inline void two( tjs_uint32 *dest, __m128i msum, const __m128i mhalf_n ) const {
 		msum = _mm_add_epi16( msum, mhalf_n );		// sum + n/2
-		msum = _mm_mulhi_epu16( msum, mrcp_ );		// (sum + n/2) * rcp, rcp ‚ÍA16bit‚²‚Æ‚É‚·‚é
+		msum = _mm_mulhi_epu16( msum, mrcp_ );		// (sum + n/2) * rcp, rcp ã¯ã€16bitã”ã¨ã«ã™ã‚‹
 		msum = _mm_packus_epi16( msum, msum );		// A8|R8|G8|B8|A8|R8|G8|B8
 		unsigned char* lo = &TVPDivTable[msum.m128i_u8[3]<<8];
 		unsigned char* hi = &TVPDivTable[msum.m128i_u8[7]<<8];
@@ -424,7 +424,7 @@ struct sse2_box_blur_avg_16_d_table {
 	}
 	inline void one( tjs_uint32 *dest, __m128i msum, const __m128i mhalf_n ) const {
 		msum = _mm_add_epi16( msum, mhalf_n );		// sum + n/2
-		msum = _mm_mulhi_epu16( msum, mrcp_ );		// (sum + n/2) * rcp, rcp ‚ÍA16bit‚²‚Æ‚É‚·‚é
+		msum = _mm_mulhi_epu16( msum, mrcp_ );		// (sum + n/2) * rcp, rcp ã¯ã€16bitã”ã¨ã«ã™ã‚‹
 		msum = _mm_packus_epi16( msum, msum );		// A8|R8|G8|B8|A8|R8|G8|B8
 		unsigned char* lo = &TVPDivTable[msum.m128i_u8[3]<<8];
 		dest[0] = (msum.m128i_u8[3]<<24) | (lo[msum.m128i_u8[2]]<<16) | (lo[msum.m128i_u8[1]]<<8) | lo[msum.m128i_u8[0]];
@@ -440,10 +440,10 @@ inline void sse2_box_blur_avg16(tjs_uint32 *dest, tjs_uint16 *sum, const tjs_uin
 	__m128i msum = _mm_loadl_epi64((__m128i const*)sum);			// A16R16G16B16
 
 	__m128i tmp = msum;
-	tmp = _mm_slli_si128( tmp, 8 );		// << 64 ‰ºˆÊpixel‚ğãˆÊ‚Ö
-	msum = _mm_or_si128( msum, tmp );	// ãˆÊ‚Æ‰ºˆÊ‚ğ“¯‚¶‚É
+	tmp = _mm_slli_si128( tmp, 8 );		// << 64 ä¸‹ä½pixelã‚’ä¸Šä½ã¸
+	msum = _mm_or_si128( msum, tmp );	// ä¸Šä½ã¨ä¸‹ä½ã‚’åŒã˜ã«
 
-	// 1pixelˆ—
+	// 1pixelå‡¦ç†
 	avg_func_t func( n );
 	func.one( dest, msum, mhalf_n );
 	dest++;
@@ -451,13 +451,13 @@ inline void sse2_box_blur_avg16(tjs_uint32 *dest, tjs_uint16 *sum, const tjs_uin
 
 	__m128i madd = _mm_loadu_si128( (__m128i const*)add );
 	tmp = madd;
-	tmp = _mm_slli_si128( tmp, 8 );		// << 64 ‰ºˆÊpixel‚ğãˆÊ‚Ö
-	msum = _mm_add_epi16( msum, tmp );	// sum += add ‚Ü‚¸A‰ºˆÊ•ª‚ğãˆÊ‚Å‰ÁZ
+	tmp = _mm_slli_si128( tmp, 8 );		// << 64 ä¸‹ä½pixelã‚’ä¸Šä½ã¸
+	msum = _mm_add_epi16( msum, tmp );	// sum += add ã¾ãšã€ä¸‹ä½åˆ†ã‚’ä¸Šä½ã§åŠ ç®—
 	__m128i msub = _mm_loadu_si128( (__m128i const*)sub );
 	tmp = msub;
-	tmp = _mm_slli_si128( tmp, 8 );		// << 64 ‰ºˆÊpixel‚ğãˆÊ‚Ö
-	msum = _mm_sub_epi16( msum, tmp );	// sum -= sub ‰ºˆÊ•ª‚ğãˆÊ‚ÅŒ¸Z
-	// 2pixel •ª (‰ºˆÊ‚Í1i‚İAãˆÊ‚Í2i‚Ş)
+	tmp = _mm_slli_si128( tmp, 8 );		// << 64 ä¸‹ä½pixelã‚’ä¸Šä½ã¸
+	msum = _mm_sub_epi16( msum, tmp );	// sum -= sub ä¸‹ä½åˆ†ã‚’ä¸Šä½ã§æ¸›ç®—
+	// 2pixel åˆ† (ä¸‹ä½ã¯1é€²ã¿ã€ä¸Šä½ã¯2é€²ã‚€)
 	msum = _mm_add_epi16( msum, madd );	// sum += add
 	msum = _mm_sub_epi16( msum, msub );	// sum -= sub
 	add += 8;
@@ -469,34 +469,34 @@ inline void sse2_box_blur_avg16(tjs_uint32 *dest, tjs_uint16 *sum, const tjs_uin
 		func.two( dest, msum, mhalf_n );
 		dest += 2;
 
-		// ‰ºˆÊ‚ÍAˆÈ‘O‚ÌãˆÊ•ª‰ÁZ‚³‚ê‚Ä‚¢‚È‚¢‚Ì‚ÅA‚»‚Ì•ª‰ÁZŒ¸Z
-		madd = _mm_srli_si128( madd, 8 );	// << 64 ãˆÊpixel‚ğ‰ºˆÊ‚Ö
-		msub = _mm_srli_si128( msub, 8 );	// << 64 ãˆÊpixel‚ğ‰ºˆÊ‚Ö
+		// ä¸‹ä½ã¯ã€ä»¥å‰ã®ä¸Šä½åˆ†åŠ ç®—ã•ã‚Œã¦ã„ãªã„ã®ã§ã€ãã®åˆ†åŠ ç®—æ¸›ç®—
+		madd = _mm_srli_si128( madd, 8 );	// << 64 ä¸Šä½pixelã‚’ä¸‹ä½ã¸
+		msub = _mm_srli_si128( msub, 8 );	// << 64 ä¸Šä½pixelã‚’ä¸‹ä½ã¸
 		msum = _mm_add_epi16( msum, madd );	// sum += add
 		msum = _mm_sub_epi16( msum, msub );	// sum -= sub
 
-		// Ÿ‚Ì 2px ‰ÁZŒ¸Z
+		// æ¬¡ã® 2px åŠ ç®—æ¸›ç®—
 		madd = _mm_loadu_si128( (__m128i const*)add );
 		tmp = madd;
-		tmp = _mm_slli_si128( tmp, 8 );	// << 64 ‰ºˆÊpixel‚ğãˆÊ‚Ö
-		msum = _mm_add_epi16( msum, tmp );	// sum += add ‚Ü‚¸A‰ºˆÊ‚ğ‰ÁZ
+		tmp = _mm_slli_si128( tmp, 8 );	// << 64 ä¸‹ä½pixelã‚’ä¸Šä½ã¸
+		msum = _mm_add_epi16( msum, tmp );	// sum += add ã¾ãšã€ä¸‹ä½ã‚’åŠ ç®—
 		msub = _mm_loadu_si128( (__m128i const*)sub );
 		tmp = msub;
-		tmp = _mm_slli_si128( tmp, 8 );	// << 64 ‰ºˆÊpixel‚ğãˆÊ‚Ö
-		msum = _mm_sub_epi16( msum, tmp );	// sum -= sub ‰ºˆÊ‚ğŒ¸Z
+		tmp = _mm_slli_si128( tmp, 8 );	// << 64 ä¸‹ä½pixelã‚’ä¸Šä½ã¸
+		msum = _mm_sub_epi16( msum, tmp );	// sum -= sub ä¸‹ä½ã‚’æ¸›ç®—
 
 		msum = _mm_add_epi16( msum, madd );	// sum += add
 		msum = _mm_sub_epi16( msum, msub );	// sum -= sub
-		// madd, msub ‚ÍŸ‚Ìˆ—‚Åg‚¤
+		// madd, msub ã¯æ¬¡ã®å‡¦ç†ã§ä½¿ã†
 		add += 8;
 		sub += 8;
 	}
-	// 2pixel ‚¸‚Âˆ—‚È‚Ì‚ÅA—]‚è‚Í1‚©0
+	// 2pixel ãšã¤å‡¦ç†ãªã®ã§ã€ä½™ã‚Šã¯1ã‹0
 	if( (len-rem) > 0 ) {
 		func.one( dest, msum, mhalf_n );
-		msum = _mm_srli_si128( msum, 8 );		// ãˆÊ‚ªŸ‚É‚È‚Á‚Ä‚¢‚é‚Ì‚Å‰ºˆÊ‚Ö
+		msum = _mm_srli_si128( msum, 8 );		// ä¸Šä½ãŒæ¬¡ã«ãªã£ã¦ã„ã‚‹ã®ã§ä¸‹ä½ã¸
 	}
-	_mm_storel_epi64( (__m128i *)sum, msum );	// msum‚ğ‘‚«–ß‚µ
+	_mm_storel_epi64( (__m128i *)sum, msum );	// msumã‚’æ›¸ãæˆ»ã—
 }
 
 void TVPDoBoxBlurAvg16_sse2_c(tjs_uint32 *dest, tjs_uint16 *sum, const tjs_uint16 * add, const tjs_uint16 * sub, tjs_int n, tjs_int len) {
@@ -511,7 +511,7 @@ void TVPDoBoxBlurAvg16_d_sse2_c_2(tjs_uint32 *dest, tjs_uint16 *sum, const tjs_u
 void TVPDoBoxBlurAvg16_d_sse2_c_3(tjs_uint32 *dest, tjs_uint16 *sum, const tjs_uint16 * add, const tjs_uint16 * sub, tjs_int n, tjs_int len) {
 	sse2_box_blur_avg16<sse2_box_blur_avg_16_d_table>( dest, sum, add, sub, n, len );
 }
-// ‘¬“x“I‚É‚Í 2 < 1 << 3  ‚Æ‚È‚é
+// é€Ÿåº¦çš„ã«ã¯ 2 < 1 << 3  ã¨ãªã‚‹
 void TVPDoBoxBlurAvg16_d_sse2_c(tjs_uint32 *dest, tjs_uint16 *sum, const tjs_uint16 * add, const tjs_uint16 * sub, tjs_int n, tjs_int len) {
 	//sse2_box_blur_avg16<sse2_box_blur_avg_16_d_sse>( dest, sum, add, sub, n, len );
 	sse2_box_blur_avg16<sse2_box_blur_avg_16_d>( dest, sum, add, sub, n, len );
@@ -532,7 +532,7 @@ struct sse2_box_blur_avg_32 {
 		tmp2 = _mm_unpackhi_epi32( tmp2, zero_ );// 0000|As+HalfN|0000|Rs+HalfN 32bit -> 64bit
 		tmp = _mm_mul_epu32( tmp, mrcp_ );		// (sum + n/2) * rcp
 		tmp2 = _mm_mul_epu32( tmp2, mrcp_ );	// (sum + n/2) * rcp
-		tmp = _mm_srli_epi64( tmp, 32 );		// pack‚µ‚Ä‚©‚ç‚â‚é‚ÆŒ…‘«‚è‚È‚¢
+		tmp = _mm_srli_epi64( tmp, 32 );		// packã—ã¦ã‹ã‚‰ã‚„ã‚‹ã¨æ¡è¶³ã‚Šãªã„
 		tmp2 = _mm_srli_epi64( tmp2, 32 );
 		// pack
 		tmp = _mm_packs_epi32( tmp, tmp2 );		// ARGB (32bit)
@@ -541,8 +541,8 @@ struct sse2_box_blur_avg_32 {
 		*dest = _mm_cvtsi128_si32(tmp);
 	}
 };
-// SSE g‚¤B•‚“®¬”“_‚È‚Ì‚Å 23bit ’´‚¦‚é‚Æ¸“x‚ª—‚¿‚é
-// SSE2 ”Å‚Æ”äŠr‚µ‚Ä‘¬‚¢‚©‚Ícc
+// SSE ä½¿ã†ã€‚æµ®å‹•å°æ•°ç‚¹ãªã®ã§ 23bit è¶…ãˆã‚‹ã¨ç²¾åº¦ãŒè½ã¡ã‚‹
+// SSE2 ç‰ˆã¨æ¯”è¼ƒã—ã¦é€Ÿã„ã‹ã¯â€¦â€¦
 struct sse2_box_blur_avg_32f {
 	const __m128 mrcp_;
 	inline sse2_box_blur_avg_32f( tjs_int n ) : mrcp_(_mm_set1_ps(1.0f/n)) {}
@@ -556,7 +556,7 @@ struct sse2_box_blur_avg_32f {
 		*dest = _mm_cvtsi128_si32(tmp);
 	}
 };
-// ¸“x—‚¿‚é‚©‚à‚µ‚ê‚È‚¢‚ªA“r’†‚ÌŒvZ‚ªSSE‚Åo—ˆ‚Äƒe[ƒuƒ‹QÆ‚ÌèŠÔ‚ª‚È‚¢
+// ç²¾åº¦è½ã¡ã‚‹ã‹ã‚‚ã—ã‚Œãªã„ãŒã€é€”ä¸­ã®è¨ˆç®—ãŒSSEã§å‡ºæ¥ã¦ãƒ†ãƒ¼ãƒ–ãƒ«å‚ç…§ã®æ‰‹é–“ãŒãªã„
 struct sse2_box_blur_avg_32_d {
 	const __m128 mrcp_;
 	const __m128 f255_;
@@ -573,7 +573,7 @@ struct sse2_box_blur_avg_32_d {
 		__m128 alpha = tmp2;
 		alpha = _mm_shuffle_ps( alpha, one_,  _MM_SHUFFLE( 0, 0, 3, 3 ) );	// 1.0 1.0 a a
 		//alpha = _mm_rcp_ss( alpha );			// 1/alpha
-		alpha = m128_rcp_22bit_ss( alpha );		// 1/alpha : ¸“xã‚°‚é‚Ì‚È‚ç
+		alpha = m128_rcp_22bit_ss( alpha );		// 1/alpha : ç²¾åº¦ä¸Šã’ã‚‹ã®ãªã‚‰
 		tmp2 = _mm_mul_ps( tmp2, f255_ );		// sum*1.0 sum*255 sum*255 sum*255
 		alpha = _mm_shuffle_ps( alpha, alpha, _MM_SHUFFLE( 3, 0, 0, 0 ) );	// 1.0 1/a 1/a 1/a
 		tmp2 = _mm_mul_ps( tmp2, alpha );		// sum*1.0 sum*255/alpha sum*255/alpha sum*255/alpha
@@ -602,7 +602,7 @@ void sse2_box_blur_avg32(tjs_uint32 *dest, tjs_uint32 *sum, const tjs_uint32 * a
 		msum = _mm_sub_epi32( msum, msub );	// sum -= sub
 		dest++; add += 4; sub += 4;
 	}
-	_mm_storeu_si128( (__m128i *)sum, msum );	// msum‚ğ‘‚«–ß‚µ
+	_mm_storeu_si128( (__m128i *)sum, msum );	// msumã‚’æ›¸ãæˆ»ã—
 }
 void TVPDoBoxBlurAvg32_sse2_c(tjs_uint32 *dest, tjs_uint32 *sum, const tjs_uint32 * add, const tjs_uint32 * sub, tjs_int n, tjs_int len) {
 	sse2_box_blur_avg32<sse2_box_blur_avg_32>( dest, sum, add, sub, n, len );
@@ -614,7 +614,7 @@ void TVPDoBoxBlurAvg32_d_sse2_c(tjs_uint32 *dest, tjs_uint32 *sum, const tjs_uin
 	sse2_box_blur_avg32<sse2_box_blur_avg_32_d>( dest, sum, add, sub, n, len );
 }
 
-// SSE4.1 ‚È‚ç _mm_mullo_epi32 ‚ªg‚¦‚ÄA4‚Â“¯‚É mull o—ˆ‚é‚ñ‚¾‚ª
-// _mm_ cvtepu8_epi32 ‚àg‚¦‚é
-// _mm_mul_epu32 ‚Å 64bit * 2 ‚Å mul ‚Å‚«‚é
+// SSE4.1 ãªã‚‰ _mm_mullo_epi32 ãŒä½¿ãˆã¦ã€4ã¤åŒæ™‚ã« mull å‡ºæ¥ã‚‹ã‚“ã ãŒ
+// _mm_ cvtepu8_epi32 ã‚‚ä½¿ãˆã‚‹
+// _mm_mul_epu32 ã§ 64bit * 2 ã§ mul ã§ãã‚‹
 // _mm_unpacklo_epi32
