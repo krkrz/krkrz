@@ -14,13 +14,17 @@
 #include "tjsVariant.h"
 #include "tjsString.h"
 
+#ifdef __WIN32__
+#include <windows.h>
+#else
+#include <semaphore.h>
+#endif
 namespace TJS
 {
 //---------------------------------------------------------------------------
 // tTJSCriticalSection ( implement on each platform for multi-threading support )
 //---------------------------------------------------------------------------
 #ifdef __WIN32__
-#include <Windows.h>
 class tTJSCriticalSection
 {
 	CRITICAL_SECTION CS;
@@ -32,14 +36,16 @@ public:
 	void Leave() { LeaveCriticalSection(&CS); }
 };
 #else
+// implements Semaphore
 class tTJSCriticalSection
 {
+	sem_t Handle;
 public:
-	tTJSCriticalSection() { ; }
-	~tTJSCriticalSection() { ; }
+	tTJSCriticalSection() { sem_init( &Handle, 0, 1 ); }
+	~tTJSCriticalSection() { sem_destroy( &Handle ); }
 
-	void Enter() { ; }
-	void Leave() { ; }
+	void Enter() { sem_wait( &Handle ); }
+	void Leave() { sem_post( &Handle ); }
 };
 #endif
 //---------------------------------------------------------------------------

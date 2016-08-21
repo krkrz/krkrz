@@ -46,7 +46,7 @@ static tjs_int inline TVPWideCharToUtf8(tjs_char in, char * out)
 #if 1
 	else
 	{
-		TVPThrowExceptionMessage(TJS_W("UTF-16では発生し得ないUTF-8への変換"));
+		TVPThrowExceptionMessage( TVPIllegalCharacterConversionUTF16toUTF8 );
 	}
 #else
 	// 以下オリジナルのコードだけど、通らないはず。
@@ -258,4 +258,37 @@ tjs_int TVPUtf8ToWideCharString(const char * in, tjs_uint length, tjs_char *out)
 	return count;
 }
 //---------------------------------------------------------------------------
-
+bool TVPUtf8ToUtf16( std::wstring& out, const std::string& in ) {
+	tjs_int len = TVPUtf8ToWideCharString( in.c_str(), NULL );
+	if( len < 0 ) return false;
+	wchar_t* buf = new wchar_t[len];
+	if( buf ) {
+		try {
+			len = TVPUtf8ToWideCharString( in.c_str(), buf );
+			if( len > 0 ) out.assign( buf, len );
+			delete[] buf;
+		} catch(...) {
+			delete[] buf;
+			throw;
+		}
+	}
+	return len > 0;
+}
+//---------------------------------------------------------------------------
+bool TVPUtf16ToUtf8( std::string& out, const std::wstring& in ) {
+	tjs_int len = TVPWideCharToUtf8String( in.c_str(), NULL );
+	if( len < 0 ) return false;
+	char* buf = new char[len];
+	if( buf ) {
+		try {
+			len = TVPWideCharToUtf8String( in.c_str(), buf );
+			if( len > 0 ) out.assign( buf, len );
+			delete[] buf;
+		} catch(...) {
+			delete[] buf;
+			throw;
+		}
+	}
+	return len > 0;
+}
+//---------------------------------------------------------------------------

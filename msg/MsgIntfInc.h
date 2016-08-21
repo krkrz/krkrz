@@ -153,4 +153,6 @@ TVP_MSG_DECL_NULL(TVPInvalidHeaderVersion)
 TVP_MSG_DECL_NULL(TVPTlgInsufficientMemory)
 TVP_MSG_DECL_NULL(TVPTlgTooLargeBitLength)
 TVP_MSG_DECL_NULL(TVPCannotRetriveInterfaceFromDrawDevice)
+TVP_MSG_DECL_NULL(TVPIllegalCharacterConversionUTF16toUTF8)
+TVP_MSG_DECL_NULL(TVPRequireLayerTreeOwnerInterfaceInterface)
 #endif

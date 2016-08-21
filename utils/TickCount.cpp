@@ -21,15 +21,15 @@
 // ( 32bit is clearly insufficient )
 //---------------------------------------------------------------------------
 static tjs_uint64 TVPTickCountBias = 0;
-static DWORD TVPWatchLastTick;
+static tjs_uint TVPWatchLastTick;
 static tTJSCriticalSection TVPTickWatchCS;
 //---------------------------------------------------------------------------
 
 
 //---------------------------------------------------------------------------
-static DWORD TVPCheckTickOverflow()
+static tjs_uint TVPCheckTickOverflow()
 {
-	DWORD curtick;
+	tjs_uint curtick;
 	{	// thread-protected
 		tTJSCriticalSectionHolder holder(TVPTickWatchCS);
 
@@ -123,7 +123,7 @@ tjs_uint64 TVPGetTickCount()
 {
 	TVPWatchThreadInit();
 
-	DWORD curtick = TVPCheckTickOverflow();
+	tjs_uint curtick = TVPCheckTickOverflow();
 
 	return curtick + TVPTickCountBias;
 }

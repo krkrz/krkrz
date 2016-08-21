@@ -18,7 +18,11 @@
 #include "UtilStreams.h"
 #include "SysInitIntf.h"
 
+#ifdef ANDROID
+#include <zlib.h>
+#else
 #include <zlib/zlib.h>
+#endif
 #include <algorithm>
 
 bool TVPAllowExtractProtectedStorage = true;

@@ -25,20 +25,28 @@
 #include "SysInitImpl.h"
 #include "StorageIntf.h"
 #include "DebugIntf.h"
+#ifdef _WIN32
 #include "WindowFormUnit.h"
+#endif
 #include "UtilStreams.h"
 
 //#include "FontSelectFormUnit.h"
 
 #include "StringUtil.h"
-#include "TVPSysFont.h"
 #include "CharacterData.h"
 #include "PrerenderedFont.h"
 #include "FontSystem.h"
 #include "FreeType.h"
 #include "FreeTypeFontRasterizer.h"
+#ifdef _WIN32
+#include "TVPSysFont.h"
 #include "GDIFontRasterizer.h"
+#endif
 #include "BitmapBitsAlloc.h"
+
+#ifdef __ANDROID__
+#include "VirtualKey.h"
+#endif
 
 //---------------------------------------------------------------------------
 // prototypes
@@ -57,17 +65,24 @@ static tjs_int TVPGlobalFontStateMagic = 0;
 
 enum {
 	FONT_RASTER_FREE_TYPE,
+#ifdef _WIN32
 	FONT_RASTER_GDI,
+#endif
 	FONT_RASTER_EOT
 };
 static FontRasterizer* TVPFontRasterizers[FONT_RASTER_EOT];
 static bool TVPFontRasterizersInit = false;
-//static tjs_int TVPCurrentFontRasterizers = FONT_RASTER_FREE_TYPE;
+#ifdef _WIN32
 static tjs_int TVPCurrentFontRasterizers = FONT_RASTER_GDI;
+#else
+static tjs_int TVPCurrentFontRasterizers = FONT_RASTER_FREE_TYPE;
+#endif
 void TVPInializeFontRasterizers() {
 	if( TVPFontRasterizersInit == false ) {
 		TVPFontRasterizers[FONT_RASTER_FREE_TYPE] = new FreeTypeFontRasterizer();
+#ifdef _WIN32
 		TVPFontRasterizers[FONT_RASTER_GDI] = new GDIFontRasterizer();
+#endif
 
 		TVPFontSystem = new FontSystem();
 		TVPFontRasterizersInit = true;
@@ -369,9 +384,9 @@ static tTVPCharacterData * TVPGetCharacter(const tTVPFontAndCharacterData & font
 tTVPBitmap::tTVPBitmap(tjs_uint width, tjs_uint height, tjs_uint bpp)
 {
 	// tTVPBitmap constructor
-
+#ifdef _WIN32
 	TVPInitWindowOptions(); // ensure window/bitmap usage options are initialized
-
+#endif
 	RefCount = 1;
 
 	Allocate(width, height, bpp); // allocate initial bitmap
@@ -380,8 +395,9 @@ tTVPBitmap::tTVPBitmap(tjs_uint width, tjs_uint height, tjs_uint bpp)
 tTVPBitmap::tTVPBitmap(tjs_uint width, tjs_uint height, tjs_uint bpp, void* bits)
 {
 	// tTVPBitmap constructor
+#ifdef _WIN32
 	TVPInitWindowOptions(); // ensure window/bitmap usage options are initialized
-
+#endif
 	RefCount = 1;
 
 	BitmapInfo = new BitmapInfomation( width, height, bpp );
@@ -420,8 +436,9 @@ tTVPBitmap::~tTVPBitmap()
 tTVPBitmap::tTVPBitmap(const tTVPBitmap & r)
 {
 	// constructor for cloning bitmap
+#ifdef _WIN32
 	TVPInitWindowOptions(); // ensure window/bitmap usage options are initialized
-
+#endif
 	RefCount = 1;
 
 	// allocate bitmap which has the same metrics to r
@@ -747,10 +764,14 @@ void tTVPNativeBaseBitmap::SetFont(const tTVPFont &font)
 void tTVPNativeBaseBitmap::GetFontList(tjs_uint32 flags, std::vector<ttstr> &list)
 {
 	ApplyFont();
+#ifdef _WIN32
 	std::vector<std::wstring> ansilist;
 	TVPGetFontList(ansilist, flags, GetFont() );
 	for(std::vector<std::wstring>::iterator i = ansilist.begin(); i != ansilist.end(); i++)
 		list.push_back(i->c_str());
+#else
+	list.clear();
+#endif
 }
 //---------------------------------------------------------------------------
 void tTVPNativeBaseBitmap::MapPrerenderedFont(const ttstr & storage)

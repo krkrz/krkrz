@@ -225,6 +225,8 @@ BEGIN
     IDS_TVP_TLG_INSUFFICIENT_MEMORY                                           "SaveTLG6: Insufficient memory"
     IDS_TVP_TLG_TOO_LARGE_BIT_LENGTH                                          "SaveTLG6: Too large bit length (given image may be too large)"
     IDS_TVP_CANNOT_RETRIVE_INTERFACE_FROM_DRAW_DEVICE                         "Could not retrive interface from given draw device"
+    IDS_TVP_ILLEGAL_CHARACTER_CONVERSION_UTF16TO_UTF8                         "Illegal character conversion. UTF-16 to UTF-8."
+    IDS_TVP_REQUIRE_LAYER_TREE_OWNER_INTERFACE_INTERFACE                      "require layerTreeOwnerInterface interface"
     IDS_TVP_SCRIPT_EXCEPTION_RAISED                                           "Script exception raised"
     IDS_TVP_HARDWARE_EXCEPTION_RAISED                                         "Hardware exception raised"
     IDS_TVP_MAIN_CDPNAME                                                      "Script Editor (Main)"

@@ -153,38 +153,6 @@ tTVPCommandOptionList* OptionDescReader::Parse( const picojson::value& v ) {
 	return result;
 }
 
-bool TVPUtf8ToUtf16( std::wstring& out, const std::string& in ) {
-	tjs_int len = TVPUtf8ToWideCharString( in.c_str(), NULL );
-	if( len < 0 ) return false;
-	wchar_t* buf = new wchar_t[len];
-	if( buf ) {
-		try {
-			len = TVPUtf8ToWideCharString( in.c_str(), buf );
-			if( len > 0 ) out.assign( buf, len );
-			delete[] buf;
-		} catch(...) {
-			delete[] buf;
-			throw;
-		}
-	}
-	return len > 0;
-}
-bool TVPUtf16ToUtf8( std::string& out, const std::wstring& in ) {
-	tjs_int len = TVPWideCharToUtf8String( in.c_str(), NULL );
-	if( len < 0 ) return false;
-	char* buf = new char[len];
-	if( buf ) {
-		try {
-			len = TVPWideCharToUtf8String( in.c_str(), buf );
-			if( len > 0 ) out.assign( buf, len );
-			delete[] buf;
-		} catch(...) {
-			delete[] buf;
-			throw;
-		}
-	}
-	return len > 0;
-}
 tTVPCommandOptionList* ParseCommandDesc( const char *buf, unsigned int size ) {
 	if( buf == NULL || size <= 0 ) return NULL;
 

@@ -30,8 +30,6 @@ struct tTVPCommandOptionList {
 	std::vector<tTVPCommandOptionCategory> Categories;
 };
 
-extern bool TVPUtf8ToUtf16( std::wstring& out, const std::string& in );
-extern bool TVPUtf16ToUtf8( std::string& out, const std::wstring& in );
 extern tTVPCommandOptionList* TVPGetPluginCommandDesc( const wchar_t* name );
 extern tTVPCommandOptionList* TVPGetEngineCommandDesc();
 void TVPMargeCommandDesc( tTVPCommandOptionList& dest, const tTVPCommandOptionList& src );

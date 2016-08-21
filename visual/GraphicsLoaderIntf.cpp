@@ -23,7 +23,7 @@
 #include "DebugIntf.h"
 #include "tvpgl.h"
 #include "TickCount.h"
-#include "DetectCPU.h"
+//#include "DetectCPU.h"
 #include "UtilStreams.h"
 #include "tjsDictionary.h"
 #include "ScriptMgnIntf.h"
@@ -1537,7 +1537,7 @@ static bool TVPInternalLoadGraphic(tTVPBaseBitmap *dest, const ttstr &_name,
 		keyidx = -1;
 	}
 
-	handler->Load(handler->FormatData, (void*)&data, TVPLoadGraphic_SizeCallback,
+	(handler->Load)(handler->FormatData, (void*)&data, TVPLoadGraphic_SizeCallback,
 		TVPLoadGraphic_ScanLineCallback, TVPLoadGraphic_MetaInfoPushCallback,
 		holder.Get(), keyidx, mode);
 
@@ -1637,7 +1637,7 @@ static bool TVPInternalLoadGraphic(tTVPBaseBitmap *dest, const ttstr &_name,
 	    try
 	    {
 			// load image via handler
-			handler->Load(handler->FormatData, (void*)&data,
+			(handler->Load)(handler->FormatData, (void*)&data,
 				TVPLoadGraphic_SizeCallback, TVPLoadGraphic_ScanLineCallback,
 				NULL,
 				holder.Get(), -1, glmGrayscale);

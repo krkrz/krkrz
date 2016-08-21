@@ -225,6 +225,8 @@ BEGIN
     IDS_TVP_TLG_INSUFFICIENT_MEMORY                                           "SaveTLG6: メモリ不足です"
     IDS_TVP_TLG_TOO_LARGE_BIT_LENGTH                                          "SaveTLG6: ビット長が長すぎます (渡された画像が大きすぎる可能性があります)"
     IDS_TVP_CANNOT_RETRIVE_INTERFACE_FROM_DRAW_DEVICE                         "渡された Draw Device からインターフェイスを取得できません"
+    IDS_TVP_ILLEGAL_CHARACTER_CONVERSION_UTF16TO_UTF8                         "UTF-16では発生し得ないUTF-8への変換"
+    IDS_TVP_REQUIRE_LAYER_TREE_OWNER_INTERFACE_INTERFACE                      "layerTreeOwnerInterfaceを持つオブジェクトを指定してください"
     IDS_TVP_SCRIPT_EXCEPTION_RAISED                                           "スクリプトで例外が発生しました"
     IDS_TVP_HARDWARE_EXCEPTION_RAISED                                         "ハードウェア例外が発生しました"
     IDS_TVP_MAIN_CDPNAME                                                      "スクリプトエディタ (メイン)"

@@ -13,7 +13,7 @@
 
 #include "tvpgl.h"
 //---------------------------------------------------------------------------
-#ifdef __WIN32__
+#if defined(__WIN32__) || defined(__GNUC__)
 	// for assembler compatibility
 	#pragma pack(push,1)
 #endif
@@ -99,25 +99,25 @@ struct tTVPARGB
 //---------------------------------------------------------------------------
 // special member functions for tjs_uint8
 template <>
-void tTVPARGB<tjs_uint8>::Zero()
+inline void tTVPARGB<tjs_uint8>::Zero()
 {
 	*(tjs_uint32 *)this = 0;
 }
 
 template <>
-void tTVPARGB<tjs_uint8>::operator = (tjs_uint32 v)
+inline void tTVPARGB<tjs_uint8>::operator = (tjs_uint32 v)
 {
 	*(tjs_uint32 *)this = v;
 }
 
 template <>
-tTVPARGB<tjs_uint8>::operator tjs_uint32() const
+inline tTVPARGB<tjs_uint8>::operator tjs_uint32() const
 {
 	return *(const tjs_uint32 *)this;
 }
 
 template <>
-void tTVPARGB<tjs_uint8>::average(tjs_int n)
+inline void tTVPARGB<tjs_uint8>::average(tjs_int n)
 {
 	tjs_int half_n = n >> 1;
 
@@ -132,7 +132,7 @@ void tTVPARGB<tjs_uint8>::average(tjs_int n)
 //---------------------------------------------------------------------------
 // special member functions for tjs_uint16
 template <>
-void tTVPARGB<tjs_uint16>::average(tjs_int n)
+inline void tTVPARGB<tjs_uint16>::average(tjs_int n)
 {
 	tjs_int half_n = n >> 1;
 
@@ -147,7 +147,7 @@ void tTVPARGB<tjs_uint16>::average(tjs_int n)
 //---------------------------------------------------------------------------
 // special member functions for tjs_uint32
 template <>
-void tTVPARGB<tjs_uint32>::average(tjs_int n)
+inline void tTVPARGB<tjs_uint32>::average(tjs_int n)
 {
 	tjs_int half_n = n >> 1;
 
@@ -165,10 +165,10 @@ template <typename base_type>
 struct tTVPARGB_AA : public tTVPARGB<base_type>
 {
 	void operator += (const tTVPARGB_AA & rhs)
-		{ b += rhs.b; g += rhs.g; r += rhs.r; a += rhs.a; }
+		{ this->b += rhs.b; this->g += rhs.g; this->r += rhs.r; this->a += rhs.a; }
 
 	void operator -= (const tTVPARGB_AA & rhs)
-		{ b -= rhs.b; g -= rhs.g; r -= rhs.r; a -= rhs.a; }
+		{ this->b -= rhs.b; this->g -= rhs.g; this->r -= rhs.r; this->a -= rhs.a; }
 
 	// Four methods, which convert itself from/to tjs_uint32 (packed ARGB),
 	// are overrided.
@@ -176,36 +176,36 @@ struct tTVPARGB_AA : public tTVPARGB<base_type>
 	void operator += (tjs_uint32 v)
 	{
 		tjs_int aadj;
-		a += (aadj = (v>>24));
+		this->a += (aadj = (v>>24));
 		aadj += aadj >> 7;
-		b += (v & 0xff) * aadj >> 8;
-		g += ((v>>8) & 0xff) * aadj >> 8;
-		r += ((v>>16) & 0xff) * aadj >> 8;
+		this->b += (v & 0xff) * aadj >> 8;
+		this->g += ((v>>8) & 0xff) * aadj >> 8;
+		this->r += ((v>>16) & 0xff) * aadj >> 8;
 	}
 
 	void operator -= (tjs_uint32 v)
 	{
 		tjs_int aadj;
-		a -= (aadj = (v>>24));
+		this->a -= (aadj = (v>>24));
 		aadj += aadj >> 7;
-		b -= (v & 0xff) * aadj >> 8;
-		g -= ((v>>8) & 0xff) * aadj >> 8;
-		r -= ((v>>16) & 0xff) * aadj >> 8;
+		this->b -= (v & 0xff) * aadj >> 8;
+		this->g -= ((v>>8) & 0xff) * aadj >> 8;
+		this->r -= ((v>>16) & 0xff) * aadj >> 8;
 	}
 
 	void operator = (tjs_uint32 v)
 	{
-		a = v >> 24,
-		tjs_int aadj = a + (a >> 7); // adjusted alpha
-		r = ((v >> 16) & 0xff) * aadj >> 8,
-		g = ((v >> 8) & 0xff) * aadj >> 8,
-		b = (v & 0xff) * aadj >> 8;
+		this->a = v >> 24;
+		tjs_int aadj = this->a + (this->a >> 7); // adjusted alpha
+		this->r = ((v >> 16) & 0xff) * aadj >> 8,
+		this->g = ((v >> 8) & 0xff) * aadj >> 8,
+		this->b = (v & 0xff) * aadj >> 8;
 	}
 
 	operator tjs_uint32() const
 	{
-		tjs_uint8 *t = TVPDivTable + (a << 8);
-		return t[b] + (t[g] << 8) + (t[r] << 16) + (a << 24);
+		tjs_uint8 *t = TVPDivTable + (this->a << 8);
+		return t[this->b] + (t[this->g] << 8) + (t[this->r] << 16) + (this->a << 24);
 	}
 
 };
@@ -213,7 +213,7 @@ struct tTVPARGB_AA : public tTVPARGB<base_type>
 
 
 //---------------------------------------------------------------------------
-#ifdef __WIN32__
+#if defined(__WIN32__) || defined(__GNUC__)
 	// for assembler compatibility
 	#pragma pack(pop)
 #endif

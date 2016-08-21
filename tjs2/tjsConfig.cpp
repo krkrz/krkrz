@@ -36,6 +36,17 @@ extern tjs_size UnicodeToSJISString(const tjs_char *in, tjs_nchar* out, tjs_size
 namespace TJS
 {
 
+#if defined(__GNUC__)
+int TJS_snprintf( wchar_t* buffer, size_t cnt, const wchar_t * format, ...  )
+{
+	va_list arg;
+	va_start(arg, format);
+	int ret = vswprintf( buffer, cnt, format, arg );
+	va_end(arg);
+	return ret;
+}
+#endif
+	
 //---------------------------------------------------------------------------
 // debug support
 //---------------------------------------------------------------------------

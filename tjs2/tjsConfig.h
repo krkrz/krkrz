@@ -83,7 +83,8 @@ extern int TJS_wctomb(tjs_nchar *s, tjs_char wc);
 	#define TJS_vsnprintf		vswprintf
 	extern tjs_int TJS_sprintf(tjs_char *s, const tjs_char *format, ...);
 	#define TJS_timezone timezone
-	#define TJS_snprintf wsnprintf
+//	#define TJS_snprintf wsnprintf
+	extern "C" int TJS_snprintf( wchar_t* buffer, size_t cnt, const wchar_t * format, ...  );
 #elif __WIN32__
 	#define TJS_cdecl __cdecl
 #ifdef _MSC_VER
@@ -114,6 +115,11 @@ void TJS_debug_out(const tjs_char *format, ...);
 #define __STR2__(x) #x
 #define __STR1__(x) __STR2__(x)
 #define __LOC__ __FILE__ "("__STR1__(__LINE__)") : Warning Msg: "
+#endif
+
+
+#ifdef ANDROID
+#define MAX_PATH 256
 #endif
 
 extern void TJSNativeDebuggerBreak();

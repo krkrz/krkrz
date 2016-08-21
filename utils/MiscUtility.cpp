@@ -13,6 +13,10 @@ tjs_uint32 TVPGetRoughTickCount32()
 {
 #ifdef _WIN32
 	return timeGetTime();
+#elif defined(ANDROID)
+	struct timespec now;
+	clock_gettime(CLOCK_MONOTONIC, &now);
+	return now.tv_sec*1000LL + now.tv_nsec/1000000LL;
 #else
 	#error Not implemented yet.
 #endif

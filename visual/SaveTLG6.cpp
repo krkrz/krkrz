@@ -8,6 +8,7 @@
 #include "StorageIntf.h"
 #include "SaveTLG.h"
 #include "UtilStreams.h"
+#include "TickCount.h"
 
 #include <stdlib.h>
 #include <memory.h>
@@ -1174,7 +1175,7 @@ void SaveTLG6( tTJSBinaryStream* stream, const tTVPBaseBitmap* bmp, bool is24 )
 					// Odd lines are stored backward (right to left).
 
 					wp = 0;
-					DWORD reorderstart = GetTickCount();
+					tjs_uint32 reorderstart = TVPGetRoughTickCount32();
 					for(int yy = y; yy < ylim; yy++)
 					{
 						int ofs;
@@ -1224,7 +1225,7 @@ void SaveTLG6( tTJSBinaryStream* stream, const tTVPBaseBitmap* bmp, bool is24 )
 							}
 						}
 					}
-					reordertick += GetTickCount() - reorderstart;
+					reordertick += TVPGetRoughTickCount32() - reorderstart;
 				}
 
 

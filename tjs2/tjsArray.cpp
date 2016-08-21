@@ -24,6 +24,7 @@
 #include "tjsRegExp.h"
 #endif
 
+#include <ctype.h>
 // TODO: Check the deque's exception handling on deleting
 
 
@@ -40,13 +41,13 @@ static tjs_int32 ClassID_Array;
 static bool inline TJS_iswspace(tjs_char ch)
 {
 	// the standard iswspace misses when non-zero page code
-	if(ch&0xff00) return false; else return 0!=isspace(ch);
+	if(ch&0xff00) return false; else return 0!=::isspace(ch);
 }
 //---------------------------------------------------------------------------
 static bool inline TJS_iswdigit(tjs_char ch)
 {
 	// the standard iswdigit misses when non-zero page code
-	if(ch&0xff00) return false; else return 0!=isdigit(ch);
+	if(ch&0xff00) return false; else return 0!=::isdigit(ch);
 }
 //---------------------------------------------------------------------------
 // Utility Function(s)
@@ -1078,7 +1079,8 @@ void tTJSArrayNI::Assign(iTJSDispatch2 * dsp)
 		tDictionaryEnumCallback callback;
 		callback.Items = &Items;
 
-		dsp->EnumMembers(TJS_IGNOREPROP, &tTJSVariantClosure(&callback, NULL), dsp);
+		tTJSVariantClosure clo(&callback, NULL);
+		dsp->EnumMembers(TJS_IGNOREPROP, &clo, dsp);
 
 	}
 }
@@ -1115,7 +1117,7 @@ void tTJSArrayNI::SaveStructuredData(std::vector<iTJSDispatch2 *> &stack,
 #ifdef TJS_TEXT_OUT_CRLF
 	stream.Write(TJS_W("(const) [\r\n"));
 #else
-	stream>Write(TJS_W("(const) [\n"));
+	stream.Write(TJS_W("(const) [\n"));
 #endif
 
 	ttstr indentstr2 = indentstr + TJS_W(" ");

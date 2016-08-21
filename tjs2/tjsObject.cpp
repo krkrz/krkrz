@@ -1199,7 +1199,7 @@ bool tTJSCustomObject::CallEnumCallbackForData(
 	}
 
 	tTJSVariant res;
-	if(TJS_FAILED(callback.FuncCall(NULL, NULL, NULL, &res,
+	if(TJS_FAILED(callback.FuncCall( 0, NULL, NULL, &res,
 		(flags & TJS_ENUM_NO_VALUE) ? 2 : 3, params, NULL))) return false;
 	return 0!=(tjs_int)(res);
 }
