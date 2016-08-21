@@ -18,6 +18,11 @@
 class iTVPWindow;
 class tTJSNI_BaseLayer;
 
+#ifndef _WIN32
+typedef void* HWND;
+struct BITMAPINFO;
+#endif
+
 /*[*/
 //---------------------------------------------------------------------------
 //! @brief		描画デバイスインターフェース
@@ -533,4 +538,9 @@ public:
 // ほかのメソッドについては実装しない
 };
 //---------------------------------------------------------------------------
+
+
+
+extern tTJSNativeClass* TVPCreateDefaultDrawDevice();
+
 #endif

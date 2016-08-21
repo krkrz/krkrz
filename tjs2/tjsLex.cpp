@@ -21,6 +21,8 @@
 #include "tjsObject.h"
 #include "tjsMath.h"
 
+#include <ctype.h>
+
 namespace TJS
 {
 
@@ -39,17 +41,17 @@ const tjs_char TJS_SKIP_CODE = (tjs_char)~((tjs_char)0);
 //---------------------------------------------------------------------------
 static bool inline TJS_iswspace(tjs_char ch)
 {
-	if(ch&0xff00) return false; else return 0!=isspace(ch);
+	if(ch&0xff00) return false; else return 0!=::isspace(ch);
 }
 //---------------------------------------------------------------------------
 static bool inline TJS_iswdigit(tjs_char ch)
 {
-	if(ch&0xff00) return false; else return 0!=isdigit(ch);
+	if(ch&0xff00) return false; else return 0!=::isdigit(ch);
 }
 //---------------------------------------------------------------------------
 static bool inline TJS_iswalpha(tjs_char ch)
 {
-	if(ch&0xff00) return true; else return 0!=isalpha(ch);
+	if(ch&0xff00) return true; else return 0!=::isalpha(ch);
 }
 //---------------------------------------------------------------------------
 

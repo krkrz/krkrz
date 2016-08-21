@@ -28,6 +28,11 @@
 // so we must trigger only porocess-able quantity of the event.
 #define TVP_LEAST_TIMER_INTERVAL 3
 
+#ifdef WIN32
+#define TVP_TIME_INFINITE INFINITE
+#else
+#define TVP_TIME_INFINITE 0xFFFFFFFF
+#endif
 
 
 //---------------------------------------------------------------------------
@@ -103,7 +108,7 @@ void tTVPTimerThread::Execute()
 	{
 		tjs_uint64 step_next = (tjs_uint64)(tjs_int64)-1L; // invalid value
 		tjs_uint64 curtick = TVPGetTickCount() << TVP_SUBMILLI_FRAC_BITS;
-		DWORD sleeptime;
+		tjs_uint sleeptime;
 
 		{	// thread-protected
 			tTJSCriticalSectionHolder holder(TVPTimerCS);
@@ -153,18 +158,18 @@ void tTVPTimerThread::Execute()
 
 			if(step_next != (tjs_uint64)(tjs_int64)-1L)
 			{
-				// too large step_next must be diminished to size of DWORD.
+				// too large step_next must be diminished to size of tjs_uint.
 				if(step_next >= 0x80000000)
 					sleeptime = 0x7fffffff; // smaller value than step_next is OK
 				else
-					sleeptime = static_cast<DWORD>( step_next );
+					sleeptime = static_cast<tjs_uint>( step_next );
 			}
 			else
 			{
-				sleeptime = INFINITE;
+				sleeptime = TVP_TIME_INFINITE;
 			}
 
-			if(List.size() == 0) sleeptime = INFINITE;
+			if(List.size() == 0) sleeptime = TVP_TIME_INFINITE;
 
 			if(any_triggered)
 			{
@@ -180,12 +185,12 @@ void tTVPTimerThread::Execute()
 
 		// now, sleeptime has sub-milliseconds precision but we need millisecond
 		// precision time.
-		if(sleeptime != INFINITE)
+		if(sleeptime != TVP_TIME_INFINITE)
 			sleeptime = (sleeptime >> TVP_SUBMILLI_FRAC_BITS) +
 							(sleeptime & ((1<<TVP_SUBMILLI_FRAC_BITS)-1) ? 1: 0); // round up
 
 		// clamp to TVP_LEAST_TIMER_INTERVAL ...
-		if(sleeptime != INFINITE && sleeptime < TVP_LEAST_TIMER_INTERVAL)
+		if(sleeptime != TVP_TIME_INFINITE && sleeptime < TVP_LEAST_TIMER_INTERVAL)
 			sleeptime = TVP_LEAST_TIMER_INTERVAL;
 
 		Event.WaitFor(sleeptime); // wait until sleeptime is elapsed or
@@ -377,7 +382,7 @@ tjs_error TJS_INTF_METHOD tTJSNI_Timer::Construct(tjs_int numparams,
 	inherited::Construct(numparams, param, tjs_obj);
 
 	tTVPTimerThread::Add(this);
-	return S_OK;
+	return TJS_S_OK;
 }
 //---------------------------------------------------------------------------
 void TJS_INTF_METHOD tTJSNI_Timer::Invalidate()

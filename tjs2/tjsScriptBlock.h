@@ -78,7 +78,7 @@ public:
 	bool IsReusable() const { return GetContextCount() == 1 &&
 		TopLevelContext != NULL && !UsingPreProcessor; }
 
-	tjs_char * GetLine(tjs_int line, tjs_int *linelength) const;
+	const tjs_char * GetLine(tjs_int line, tjs_int *linelength) const;
 	tjs_int SrcPosToLine(tjs_int pos) const;
 	tjs_int LineToSrcPos(tjs_int line) const;
 

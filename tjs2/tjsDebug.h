@@ -16,7 +16,7 @@
 #ifdef ENABLE_DEBUGGER
 #include <list>
 #include <string>
-#endif ENABLE_DEBUGGER
+#endif // ENABLE_DEBUGGER
 
 namespace TJS
 {

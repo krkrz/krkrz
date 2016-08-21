@@ -680,6 +680,9 @@
     <ClInclude Include="..\visual\gl\blend_functor_avx2.h">
       <Filter>visual\gl</Filter>
     </ClInclude>
+    <ClInclude Include="..\utils\NativeFile.h">
+      <Filter>utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\tjs2\tjs.cpp">

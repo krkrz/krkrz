@@ -614,27 +614,27 @@ public:
 	void Add(const KeyT &key, const ValueT &value)
 	{
 		inherited::Add(key, value);
-		if(GetCount() > MaxCount)
+		if(inherited::GetCount() > MaxCount)
 		{
-			ChopLast(GetCount() - MaxCount);
+			ChopLast(inherited::GetCount() - MaxCount);
 		}
 	}
 
 	void AddWithHash(const KeyT &key, tjs_uint32 hash, const ValueT &value)
 	{
 		inherited::AddWithHash(key, hash, value);
-		if(GetCount() > MaxCount)
+		if(inherited::GetCount() > MaxCount)
 		{
-			ChopLast(GetCount() - MaxCount);
+			ChopLast(inherited::GetCount() - MaxCount);
 		}
 	}
 
 	void SetMaxCount(tjs_uint maxcount)
 	{
 		MaxCount = maxcount;
-		if(GetCount() > MaxCount)
+		if(inherited::GetCount() > MaxCount)
 		{
-			ChopLast(GetCount() - MaxCount);
+			ChopLast(inherited::GetCount() - MaxCount);
 		}
 	}
 

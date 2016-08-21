@@ -363,14 +363,16 @@ void tTJSDictionaryNI::Assign(iTJSDispatch2 * dsp, bool clear)
 		if(clear) Owner->Clear();
 		
 		tSaveMemberCountCallback countCallback;
-		dsp->EnumMembers(TJS_IGNOREPROP, &tTJSVariantClosure(&countCallback, NULL), dsp);
+		tTJSVariantClosure clo(&countCallback, NULL);
+		dsp->EnumMembers(TJS_IGNOREPROP, &clo, dsp);
 		tjs_int reqcount = countCallback.Count + Owner->Count;
 		Owner->RebuildHash( reqcount );
 
 		tAssignCallback callback;
 		callback.Owner = Owner;
 
-		dsp->EnumMembers(TJS_IGNOREPROP, &tTJSVariantClosure(&callback, NULL), dsp);
+		tTJSVariantClosure clo2(&callback, NULL);
+		dsp->EnumMembers(TJS_IGNOREPROP, &clo2, dsp);
 
 	}
 }
@@ -420,7 +422,8 @@ void tTJSDictionaryNI::SaveStructuredData(std::vector<iTJSDispatch2 *> &stack,
 	callback.IndentStr = &indentstr2;
 	callback.First = true;
 
-	Owner->EnumMembers(TJS_IGNOREPROP, &tTJSVariantClosure(&callback, NULL), Owner);
+	tTJSVariantClosure clo(&callback, NULL);
+	Owner->EnumMembers(TJS_IGNOREPROP, &clo, Owner);
 
 #ifdef TJS_TEXT_OUT_CRLF
 	if(!callback.First) stream.Write(TJS_W("\r\n"));
@@ -482,7 +485,8 @@ tjs_error TJS_INTF_METHOD tTJSDictionaryNI::tSaveStructCallback::FuncCall(
 void tTJSDictionaryNI::SaveStructuredBinary(std::vector<iTJSDispatch2 *> &stack, tTJSBinaryStream &stream )
 {
 	tSaveMemberCountCallback countCallback;
-	Owner->EnumMembers(TJS_IGNOREPROP, &tTJSVariantClosure(&countCallback, NULL), Owner);
+	tTJSVariantClosure clo(&countCallback, NULL);
+	Owner->EnumMembers(TJS_IGNOREPROP, &clo, Owner);
 
 	tjs_int count = countCallback.Count;
 	tTJSBinarySerializer::PutStartMap( &stream, count );
@@ -490,7 +494,8 @@ void tTJSDictionaryNI::SaveStructuredBinary(std::vector<iTJSDispatch2 *> &stack,
 	tSaveStructBinayCallback callback;
 	callback.Stack = &stack;
 	callback.Stream = &stream;
-	Owner->EnumMembers(TJS_IGNOREPROP, &tTJSVariantClosure(&callback, NULL), Owner);
+	tTJSVariantClosure clo2(&callback, NULL);
+	Owner->EnumMembers(TJS_IGNOREPROP, &clo2, Owner);
 }
 //---------------------------------------------------------------------------
 tjs_error TJS_INTF_METHOD tTJSDictionaryNI::tSaveStructBinayCallback::FuncCall(
@@ -557,7 +562,8 @@ void tTJSDictionaryNI::AssignStructure(iTJSDispatch2 * dsp,
 			
 			// reserve area
 			tSaveMemberCountCallback countCallback;
-			dsp->EnumMembers(TJS_IGNOREPROP, &tTJSVariantClosure(&countCallback, NULL), dsp);
+			tTJSVariantClosure clo(&countCallback, NULL);
+			dsp->EnumMembers(TJS_IGNOREPROP, &clo, dsp);
 			tjs_int reqcount = countCallback.Count + Owner->Count;
 			Owner->RebuildHash( reqcount );
 
@@ -565,7 +571,8 @@ void tTJSDictionaryNI::AssignStructure(iTJSDispatch2 * dsp,
 			callback.Dest = Owner;
 			callback.Stack = &stack;
 
-			dsp->EnumMembers(TJS_IGNOREPROP, &tTJSVariantClosure(&callback, NULL), dsp);
+			tTJSVariantClosure clo2(&callback, NULL);
+			dsp->EnumMembers(TJS_IGNOREPROP, &clo2, dsp);
 		}
 		catch(...)
 		{

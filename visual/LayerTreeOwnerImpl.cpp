@@ -7,11 +7,13 @@
 //---------------------------------------------------------------------------
 #include "tjsCommHead.h"
 
+#include "drawable.h"
+#include "tvpinputdefs.h"
 #include "ComplexRect.h"
 #include "LayerTreeOwnerImpl.h"
 
 #include <algorithm>
-#include "DrawDevice.h"
+//#include "DrawDevice.h"
 #include "MsgIntf.h"
 #include "LayerIntf.h"
 #include "LayerManager.h"

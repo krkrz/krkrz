@@ -35,7 +35,7 @@ tjs_error TJS_INTF_METHOD tTJSNI_BitmapLayerTreeOwner::Construct(tjs_int numpara
 	if(TJS_FAILED(BitmapObject->NativeInstanceSupport(TJS_NIS_GETINSTANCE, tTJSNC_Bitmap::ClassID, (iTJSNativeInstance**)&BitmapNI)))
 		return TJS_E_INVALIDPARAM;
 
-	return S_OK;
+	return TJS_S_OK;
 }
 void TJS_INTF_METHOD tTJSNI_BitmapLayerTreeOwner::Invalidate() {
 	// invalidate bitmap object

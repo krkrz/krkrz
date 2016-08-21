@@ -35,6 +35,10 @@
 #include "FontSystem.h"
 #include "tjsDictionary.h"
 
+#ifdef __ANDROID__
+#include "VirtualKey.h"
+#endif
+
 extern void TVPSetFontRasterizer( tjs_int index );
 extern tjs_int TVPGetFontRasterizer();
 extern FontRasterizer* GetCurrentRasterizer();
@@ -428,8 +432,7 @@ tTJSNI_BaseLayer::Construct(tjs_int numparams, tTJSVariant **param,
 
 	// get the window native instance
 	tTJSVariantClosure clo = param[0]->AsObjectClosureNoAddRef();
-	//if(clo.Object == NULL) TVPThrowExceptionMessage(TVPSpecifyWindow);
-	if(clo.Object == NULL) TVPThrowExceptionMessage(TJS_W("layerTreeOwnerInterfaceを持つオブジェクトを指定してください"));
+	if(clo.Object == NULL) TVPThrowExceptionMessage( TVPRequireLayerTreeOwnerInterfaceInterface );
 
 	class iTVPLayerTreeOwner* lto = NULL;
 	tTJSVariant iface_v;
@@ -5863,7 +5866,7 @@ void tTJSNI_BaseLayer::DrawCompleted(const tTVPRect &destrect,
 			tTVPComplexRect nr; // new region
 			nr.Or(destrect);
 			nr.Sub(DrawnRegion);
-			tTVPComplexRect or; // operation region
+			tTVPComplexRect orcr; // operation region
 			// now nr is a client region which is not overlapped by children
 			// at this time
 			if(DisplayType == type && opacity == 255)
@@ -5885,8 +5888,8 @@ void tTJSNI_BaseLayer::DrawCompleted(const tTVPRect &destrect,
 						bmp, sr);
 				}
 				// calculate operation region
-				or.Or(destrect);
-				or.Sub(nr);
+				orcr.Or(destrect);
+				orcr.Sub(nr);
 			}
 			else
 			{
@@ -5903,11 +5906,11 @@ void tTJSNI_BaseLayer::DrawCompleted(const tTVPRect &destrect,
 							// CopySelf of MainImage == NULL actually
 							// fills target rectangle with full transparency
 				}
-				or.Or(destrect);
+				orcr.Or(destrect);
 			}
 
 			// operate r
-			tTVPComplexRect::tIterator it = or.GetIterator();
+			tTVPComplexRect::tIterator it = orcr.GetIterator();
 			while(it.Step())
 			{
 				tTVPRect r(*it);
@@ -5982,27 +5985,27 @@ void tTJSNI_BaseLayer::InternalComplete2(tTVPComplexRect & updateregion,
 
 			// split to some stripes
 			tjs_int y;
-			tTVPRect or;
-			or.left = r.left;
-			or.right = r.right;
+			tTVPRect orr;
+			orr.left = r.left;
+			orr.right = r.right;
 			if(TVPGraphicSplitOperationType == gsotInterlace)
 			{
 				// interlaced split
 				for(y = r.top; y < r.bottom; y+= oh*2)
 				{
-					or.top = y;
-					or.bottom = (y+oh < r.bottom) ? y+oh: r.bottom;
+					orr.top = y;
+					orr.bottom = (y+oh < r.bottom) ? y+oh: r.bottom;
 
 					// call "Draw" to draw to the window
-					Draw(drawable, or, false);
+					Draw(drawable, orr, false);
 				}
 				for(y = r.top + oh; y < r.bottom; y+= oh*2)
 				{
-					or.top = y;
-					or.bottom = (y+oh < r.bottom) ? y+oh: r.bottom;
+					orr.top = y;
+					orr.bottom = (y+oh < r.bottom) ? y+oh: r.bottom;
 
 					// call "Draw" to draw to the window
-					Draw(drawable, or, false);
+					Draw(drawable, orr, false);
 				}
 			}
 			else if(TVPGraphicSplitOperationType == gsotSimple)
@@ -6010,11 +6013,11 @@ void tTJSNI_BaseLayer::InternalComplete2(tTVPComplexRect & updateregion,
 				// non-interlaced
 				for(y = r.top; y < r.bottom; y+=oh)
 				{
-					or.top = y;
-					or.bottom = (y+oh < r.bottom) ? y+oh: r.bottom;
+					orr.top = y;
+					orr.bottom = (y+oh < r.bottom) ? y+oh: r.bottom;
 
 					// call "Draw" to draw to the window
-					Draw(drawable, or, false);
+					Draw(drawable, orr, false);
 				}
 			}
 			else if(TVPGraphicSplitOperationType == gsotBiDirection)
@@ -6025,11 +6028,11 @@ void tTJSNI_BaseLayer::InternalComplete2(tTVPComplexRect & updateregion,
 				{
 					for(y = r.top; y < r.bottom; y+=oh)
 					{
-						or.top = y;
-						or.bottom = (y+oh < r.bottom) ? y+oh: r.bottom;
+						orr.top = y;
+						orr.bottom = (y+oh < r.bottom) ? y+oh: r.bottom;
 
 						// call "Draw" to draw to the window
-						Draw(drawable, or, false);
+						Draw(drawable, orr, false);
 					}
 				}
 				else
@@ -6038,13 +6041,13 @@ void tTJSNI_BaseLayer::InternalComplete2(tTVPComplexRect & updateregion,
 					if(y < r.top) y = r.top;
 					while(1)
 					{
-						or.top = (y < r.top ? r.top : y);
-						or.bottom = (y+oh < r.bottom) ? y+oh: r.bottom;
+						orr.top = (y < r.top ? r.top : y);
+						orr.bottom = (y+oh < r.bottom) ? y+oh: r.bottom;
 
-						if(or.bottom <= r.top) break;
+						if(orr.bottom <= r.top) break;
 
 						// call "Draw" to draw to the window
-						Draw(drawable, or, false);
+						Draw(drawable, orr, false);
 
 						y-=oh;
 					}
@@ -9866,10 +9869,14 @@ void tTJSNI_Font::GetFontList(tjs_uint32 flags, std::vector<ttstr> & list)
 	if( Layer ) Layer->GetFontList(flags,list);
 	else
 	{
+#ifdef _WIN32
 		std::vector<std::wstring> ansilist;
 		TVPGetFontList(ansilist, flags, Font );
 		for(std::vector<std::wstring>::iterator i = ansilist.begin(); i != ansilist.end(); i++)
 			list.push_back(i->c_str());
+#else
+		list.clear();
+#endif
 	}
 }
 //---------------------------------------------------------------------------

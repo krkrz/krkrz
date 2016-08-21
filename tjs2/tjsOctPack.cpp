@@ -128,7 +128,7 @@ static void AsciiToBin( std::vector<tjs_uint8>& bin, const ttstr& arg, tjs_nchar
 	const tjs_char* str = arg.c_str();
 	if( len < 0 ) len = arg.length();
 	tjs_int i = 0;
-	for( ; i < len && *str != NULL; str++, i++ ) {
+	for( ; i < len && *str != L'\0'; str++, i++ ) {
 		bin.push_back( (tjs_uint8)*str );
 	}
 	for( ; i < len; i++ ) {
@@ -144,7 +144,7 @@ static void BitStringToBin( std::vector<tjs_uint8>& bin, const ttstr& arg, bool 
 	tjs_int pos = 0;
 	if( mtol ) {
 		pos = 7;
-		for( tjs_int i = 0; i < len && *str != NULL; str++, i++ ) {
+		for( tjs_int i = 0; i < len && *str != L'\0'; str++, i++ ) {
 			if( *str == L'0' ) {
 				// val |= 0;
 			} else if( *str == L'1' ) {
@@ -164,7 +164,7 @@ static void BitStringToBin( std::vector<tjs_uint8>& bin, const ttstr& arg, bool 
 			bin.push_back( val );
 		}
 	} else {
-		for( tjs_int i = 0; i < len && *str != NULL; str++, i++ ) {
+		for( tjs_int i = 0; i < len && *str != L'\0'; str++, i++ ) {
 			if( *str == L'0' ) {
 				// val |= 0;
 			} else if( *str == L'1' ) {
@@ -192,7 +192,7 @@ static void HexToBin( std::vector<tjs_uint8>& bin, const ttstr& arg, bool mtol, 
 	tjs_int pos = 0;
 	if( mtol ) { // 上位ニブルが先
 		pos = 1;
-		for( tjs_int i = 0; i < len && *str != NULL; str++, i++ ) {
+		for( tjs_int i = 0; i < len && *str != L'\0'; str++, i++ ) {
 			if( *str >= L'0' && *str <= L'9' ) {
 				val |= (*str - L'0') << (pos*4);
 			} else if( *str >= L'a' && *str <= L'f' ) {
@@ -214,7 +214,7 @@ static void HexToBin( std::vector<tjs_uint8>& bin, const ttstr& arg, bool mtol, 
 			bin.push_back( val );
 		}
 	} else { // 下位ニブルが先
-		for( tjs_int i = 0; i < len && *str != NULL; str++, i++ ) {
+		for( tjs_int i = 0; i < len && *str != L'\0'; str++, i++ ) {
 			if( *str >= L'0' && *str <= L'9' ) {
 				val |= (*str - L'0') << (pos*4);
 			} else if( *str >= L'a' && *str <= L'f' ) {

@@ -18,6 +18,17 @@
 #include "LayerManager.h"
 #include "WindowIntf.h"
 #include "DebugIntf.h"
+#ifdef _WIN32
+#include "BasicDrawDevice.h"
+#endif
+
+tTJSNativeClass* TVPCreateDefaultDrawDevice() {
+#ifdef _WIN32
+	return new tTJSNC_BasicDrawDevice();
+#else
+	return NULL;
+#endif
+}
 
 //---------------------------------------------------------------------------
 tTVPDrawDevice::tTVPDrawDevice()
@@ -637,6 +648,7 @@ bool TJS_INTF_METHOD tTVPDrawDevice::SwitchToFullScreen( HWND window, tjs_uint w
 {
 	// ChangeDisplaySettings を使用したフルスクリーン化
 	bool success = false;
+#ifdef _WIN32
 	DEVMODE dm;
 	ZeroMemory(&dm, sizeof(DEVMODE));
 	dm.dmSize = sizeof(DEVMODE);
@@ -673,12 +685,15 @@ bool TJS_INTF_METHOD tTVPDrawDevice::SwitchToFullScreen( HWND window, tjs_uint w
 		TVPAddLog( TVPFormatMessage(TVPChangeDisplaySettingsFailedUnknownReason,ttstr((tjs_int)ret)) );
 		break;
 	}
+#endif
 	return success;
 }
 //---------------------------------------------------------------------------
 void TJS_INTF_METHOD tTVPDrawDevice::RevertFromFullScreen( HWND window, tjs_uint w, tjs_uint h, tjs_uint bpp, tjs_uint color )
 {
+#ifdef _WIN32
 	// ChangeDisplaySettings を使用したフルスクリーン解除
 	::ChangeDisplaySettings(NULL, 0);
+#endif
 }
 //---------------------------------------------------------------------------

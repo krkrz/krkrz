@@ -13,7 +13,9 @@
 
 #include "tjsCommHead.h"
 #include "FreeType.h"
+#ifdef _WIN32
 #include "NativeFreeTypeFace.h"
+#endif
 #include "uni_cp932.h"
 #include "cp932_uni.h"
 
@@ -287,7 +289,7 @@ tFreeTypeFace::tFreeTypeFace(const std::wstring &fontname, tjs_uint32 options)
 	Options = options;
 	Height = 10;
 
-
+#ifdef _WIN32
 	// フォントを開く
 	if(options & TVP_FACE_OPTIONS_FILE)
 	{
@@ -301,6 +303,9 @@ tFreeTypeFace::tFreeTypeFace(const std::wstring &fontname, tjs_uint32 options)
 		Face = new tNativeFreeTypeFace(fontname, options);
 			// 例外がここで発生する可能性があるので注意
 	}
+#else
+	Face = new tGenericFreeTypeFace(fontname, options);
+#endif
 	FTFace = Face->GetFTFace();
 
 	// マッピングを確認する

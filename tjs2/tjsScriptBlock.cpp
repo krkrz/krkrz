@@ -148,7 +148,7 @@ tjs_uint tTJSScriptBlock::GetTotalVMDataSize() const
 	return size;
 }
 //---------------------------------------------------------------------------
-tjs_char * tTJSScriptBlock::GetLine(tjs_int line, tjs_int *linelength) const
+const tjs_char * tTJSScriptBlock::GetLine(tjs_int line, tjs_int *linelength) const
 {
 	if( Script == NULL ) {
 		*linelength = 10;

@@ -24,6 +24,7 @@
 
 #include "Application.h"
 #include "SystemControl.h"
+#include "NativeFile.h"
 //---------------------------------------------------------------------------
 // global variables
 //---------------------------------------------------------------------------
@@ -235,13 +236,13 @@ static void TVPRemoveLoggingHandler(tTJSVariantClosure clo)
 //---------------------------------------------------------------------------
 class tTVPLogStreamHolder
 {
-	FILE * Stream;
+	NativeFile Stream;
 	bool Alive;
 	bool OpenFailed;
 
 public:
-	tTVPLogStreamHolder() { Stream = NULL; Alive = true; OpenFailed = false; }
-	~tTVPLogStreamHolder() { if(Stream) fclose(Stream); Alive = false; }
+	tTVPLogStreamHolder() { Alive = true; OpenFailed = false; }
+	~tTVPLogStreamHolder() { Stream.Close(); Alive = false; }
 
 private:
 	void Open(const wchar_t *mode);
@@ -250,7 +251,7 @@ public:
 	void Clear(); // clear log stream
 	void Log(const ttstr & text); // log given text
 
-	void Reopen() { if(Stream) fclose(Stream); Stream = NULL; Alive = false; OpenFailed = false; } // reopen log stream
+	void Reopen() { Stream.Close(); Alive = false; OpenFailed = false; } // reopen log stream
 
 } static TVPLogStreamHolder;
 //---------------------------------------------------------------------------
@@ -263,7 +264,7 @@ void tTVPLogStreamHolder::Open(const wchar_t *mode)
 		wchar_t filename[MAX_PATH];
 		if(TVPLogLocation.GetLen() == 0)
 		{
-			Stream = NULL;
+			Stream.Close();
 			OpenFailed = true;
 		}
 		else
@@ -272,18 +273,18 @@ void tTVPLogStreamHolder::Open(const wchar_t *mode)
 			TJS_strcpy(filename, TVPNativeLogLocation);
 			TJS_strcat(filename, TJS_W("\\krkr.console.log"));
 			TVPEnsureDataPathDirectory();
-			Stream = _wfopen(filename, mode);
-			if(!Stream) OpenFailed = true;
+			Stream.Open( filename, mode );
+			if(!Stream.IsOpen()) OpenFailed = true;
 		}
 
-		if(Stream)
+		if(Stream.IsOpen())
 		{
-			fseek(Stream, 0, SEEK_END);
-			if(ftell(Stream) == 0)
+			Stream.Seek(0, SEEK_END);
+			if(Stream.Tell() == 0)
 			{
 				// write BOM
 				// TODO: 32-bit unicode support
-				fwrite(TJS_N("\xff\xfe"), 1, 2, Stream); // indicate unicode text
+				Stream.Write( TJS_N("\xff\xfe"), 2 ); // indicate unicode text
 			}
 
 #ifdef TJS_TEXT_OUT_CRLF
@@ -316,42 +317,42 @@ void tTVPLogStreamHolder::Open(const wchar_t *mode)
 void tTVPLogStreamHolder::Clear()
 {
 	// clear log text
-	if(Stream) fclose(Stream);
+	Stream.Close();
 
 	Open(TJS_W("wb"));
 }
 //---------------------------------------------------------------------------
 void tTVPLogStreamHolder::Log(const ttstr & text)
 {
-	if(!Stream) Open(TJS_W("ab"));
+	if(!Stream.IsOpen()) Open(TJS_W("ab"));
 
 	try
 	{
-		if(Stream)
+		if(Stream.IsOpen())
 		{
 			size_t len = text.GetLen() * sizeof(tjs_char);
-			if(len != fwrite(text.c_str(), 1, len, Stream))
+			if( len != Stream.Write( text.c_str(), len) )
 			{
 				// cannot write
-				fclose(Stream);
+				Stream.Close();
 				OpenFailed = true;
 				return;
 			}
-	#ifdef TJS_TEXT_OUT_CRLF
-			fwrite(TJS_W("\r\n"), 1, 2 * sizeof(tjs_char), Stream);
-	#else
-			fwrite(TJS_W("\n"), 1, 1 * sizeof(tjs_char), Stream);
-	#endif
+#ifdef TJS_TEXT_OUT_CRLF
+			Stream.Write(TJS_W("\r\n"), 2 * sizeof(tjs_char) );
+#else
+			Stream.Write(TJS_W("\n"), 1 * sizeof(tjs_char) );
+#endif
 
 			// flush
-			fflush(Stream);
+			Stream.Flush();
 		}
 	}
 	catch(...)
 	{
 		try
 		{
-			if(Stream) fclose(Stream);
+			Stream.Close();
 		}
 		catch(...)
 		{
@@ -849,7 +850,7 @@ class tTVPTJS2ConsoleOutputGateway : public iTJSConsoleOutput
 // TJS2 Dump Output Gateway
 //---------------------------------------------------------------------------
 static ttstr TVPDumpOutFileName;
-static FILE *TVPDumpOutFile = NULL; // use traditional output routine
+static NativeFile TVPDumpOutFile; // use traditional output routine
 //---------------------------------------------------------------------------
 class tTVPTJS2DumpOutputGateway : public iTJSConsoleOutput
 {
@@ -857,13 +858,13 @@ class tTVPTJS2DumpOutputGateway : public iTJSConsoleOutput
 
 	void Print(const tjs_char *msg)
 	{
-		if(TVPDumpOutFile)
+		if(TVPDumpOutFile.IsOpen())
 		{
-			fwrite(msg, 1, TJS_strlen(msg)*sizeof(tjs_char), TVPDumpOutFile);
+			TVPDumpOutFile.Write( msg, TJS_strlen(msg)*sizeof(tjs_char) );
 #ifdef TJS_TEXT_OUT_CRLF
-			fwrite(TJS_W("\r\n"), 1, 2 * sizeof(tjs_char), TVPDumpOutFile);
+			TVPDumpOutFile.Write( TJS_W("\r\n"), 2 * sizeof(tjs_char) );
 #else
-			fwrite(TJS_W("\n"), 1, 1 * sizeof(tjs_char), TVPDumpOutFile);
+			TVPDumpOutFile.Write( TJS_W("\n"), 1 * sizeof(tjs_char) );
 #endif
 		}
 	}
@@ -872,22 +873,26 @@ class tTVPTJS2DumpOutputGateway : public iTJSConsoleOutput
 void TVPTJS2StartDump()
 {
 	wchar_t filename[MAX_PATH];
+#ifndef ANDROID
 	TJS_strcpy(filename, ExePath().c_str());
+#else
+	TJS_strcpy(filename, Application->GetInternalDataPath().c_str());
+#endif
 	TJS_strcat(filename, TJS_W(".dump.txt"));
 	TVPDumpOutFileName = filename;
-	TVPDumpOutFile = _wfopen(filename, TJS_W("wb+"));
-	if(TVPDumpOutFile)
+	TVPDumpOutFile.Open(filename, TJS_W("wb+"));
+	if(TVPDumpOutFile.IsOpen())
 	{
 		// TODO: 32-bit unicode support
-		fwrite(TJS_N("\xff\xfe"), 1, 2, TVPDumpOutFile); // indicate unicode text
+		TVPDumpOutFile.Write( TJS_N("\xff\xfe"), 2 ); // indicate unicode text
 	}
 }
 //---------------------------------------------------------------------------
 void TVPTJS2EndDump()
 {
-	if(TVPDumpOutFile)
+	if(TVPDumpOutFile.IsOpen())
 	{
-		fclose(TVPDumpOutFile), TVPDumpOutFile = NULL;
+		TVPDumpOutFile.Close();
 		TVPAddLog(ttstr(TJS_W("Dumped to ")) + TVPDumpOutFileName);
 	}
 }

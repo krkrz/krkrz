@@ -20,6 +20,7 @@
 #include "FilePathUtil.h"
 #include "ApplicationSpecialPath.h"
 #include "BinaryStream.h"
+#include "CharacterSet.h"
 /*
 IDC_DESCRIPTION_EDIT : 説明テキスト
 IDC_DEFAULT_BUTTON : デフォルトボタン

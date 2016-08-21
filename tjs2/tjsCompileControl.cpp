@@ -17,7 +17,7 @@
 #include "tjspp.tab.hpp"
 #include "tjsError.h"
 
-
+#include <ctype.h>
 
 namespace TJS
 {
@@ -36,7 +36,7 @@ static bool inline TJS_iswspace(tjs_char ch)
 	}
 	else
 	{
-		return 0!=isspace(ch);
+		return 0!=::isspace(ch);
 	}
 }
 //---------------------------------------------------------------------------
@@ -50,7 +50,7 @@ static bool inline TJS_iswdigit(tjs_char ch)
 	}
 	else
 	{
-		return 0!=isdigit(ch);
+		return 0!=::isdigit(ch);
 	}
 }
 //---------------------------------------------------------------------------
@@ -64,7 +64,7 @@ static bool inline TJS_iswalpha(tjs_char ch)
 	}
 	else
 	{
-		return 0!=isalpha(ch);
+		return 0!=::isalpha(ch);
 	}
 }
 //---------------------------------------------------------------------------

@@ -51,6 +51,12 @@ typedef struct
 #define TVP_GL_FUNC_PTR_DECL(rettype, funcname, arg) rettype (__cdecl * funcname) arg
 #define TVP_GL_FUNC_PTR_EXTERN_DECL_(rettype, funcname, arg) extern rettype (__cdecl * funcname) arg
 #define TVP_GL_FUNC_PTR_EXTERN_DECL TVP_GL_FUNC_PTR_EXTERN_DECL_
+#elif defined(__GNUC__)
+#define TVP_GL_FUNC_DECL(rettype, funcname, arg)  rettype funcname arg
+#define TVP_GL_FUNC_EXTERN_DECL(rettype, funcname, arg)  extern rettype funcname arg
+#define TVP_GL_FUNC_PTR_DECL(rettype, funcname, arg) rettype (*funcname) arg
+#define TVP_GL_FUNC_PTR_EXTERN_DECL_(rettype, funcname, arg) extern rettype (*funcname) arg
+#define TVP_GL_FUNC_PTR_EXTERN_DECL TVP_GL_FUNC_PTR_EXTERN_DECL_
 #endif
 
 extern unsigned char TVPDivTable[256*256];
@@ -65,8 +71,10 @@ extern unsigned char TVP252DitherPalette[3][256];
 /* add here compiler specific inline directives */
 #if defined( __BORLANDC__ ) || ( _MSC_VER )
 	#define TVP_INLINE_FUNC __inline
+#elif defined(__GNUC__)
+	#define TVP_INLINE_FUNC inline
 #else
-	#define TVP_INLINE_FUNC 
+	#define TVP_INLINE_FUNC
 #endif
 
 static tjs_uint32 TVP_INLINE_FUNC TVPSaturatedAdd(tjs_uint32 a, tjs_uint32 b)
