@@ -1,0 +1,145 @@
+02-08 01:35:16.987: I/krkrz(26568): Font file : AndroidClock.ttf
+02-08 01:35:16.987: I/krkrz(26568):   Face name : AndroidClock
+02-08 01:35:16.997: I/krkrz(26568): Font file : AndroidClock_Highlight.ttf
+02-08 01:35:16.997: I/krkrz(26568):   Face name : AndroidClock-Large
+02-08 01:35:16.997: I/krkrz(26568): Font file : AndroidClock_Solid.ttf
+02-08 01:35:16.997: I/krkrz(26568):   Face name : AndroidClock-Large
+02-08 01:35:16.997: I/krkrz(26568): Font file : AndroidEmoji.ttf
+02-08 01:35:16.997: I/krkrz(26568):   Face name : Android Emoji
+02-08 01:35:16.997: I/krkrz(26568): Font file : Clockopia.ttf
+02-08 01:35:16.997: I/krkrz(26568):   Face name : Clockopia
+02-08 01:35:16.997: I/krkrz(26568): Font file : DroidNaskh-Regular.ttf
+02-08 01:35:16.997: I/krkrz(26568):   Face name : Droid Arabic Naskh
+02-08 01:35:16.997: I/krkrz(26568): Font file : DroidNaskhUI-Regular.ttf
+02-08 01:35:16.997: I/krkrz(26568):   Face name : Droid Naskh Shift Alt
+02-08 01:35:16.997: I/krkrz(26568): Font file : DroidSansArmenian.ttf
+02-08 01:35:16.997: I/krkrz(26568):   Face name : Droid Sans Armenian
+02-08 01:35:16.997: I/krkrz(26568): Font file : NotoColorEmoji.ttf
+02-08 01:35:16.997: I/krkrz(26568):   Face name : 
+02-08 01:35:16.997: I/krkrz(26568): Font file : DroidSansEthiopic-Regular.ttf
+02-08 01:35:16.997: I/krkrz(26568):   Face name : Droid Sans Ethiopic
+02-08 01:35:17.007: I/krkrz(26568): Font file : DroidSansFallback.ttf
+02-08 01:35:17.007: I/krkrz(26568):   Face name : Droid Sans Fallback
+02-08 01:35:17.007: I/krkrz(26568): Font file : DroidSansGeorgian.ttf
+02-08 01:35:17.007: I/krkrz(26568):   Face name : Droid Sans Georgian
+02-08 01:35:17.007: I/krkrz(26568): Font file : DroidSansHebrew-Bold.ttf
+02-08 01:35:17.007: I/krkrz(26568):   Face name : Droid Sans Hebrew
+02-08 01:35:17.007: I/krkrz(26568): Font file : DroidSansHebrew-Regular.ttf
+02-08 01:35:17.007: I/krkrz(26568):   Face name : Droid Sans Hebrew
+02-08 01:35:17.007: I/krkrz(26568): Font file : DroidSansMono.ttf
+02-08 01:35:17.007: I/krkrz(26568):   Face name : Droid Sans Mono
+02-08 01:35:17.027: I/krkrz(26568): Font file : NotoSansDevanagari-Bold.ttf
+02-08 01:35:17.027: I/krkrz(26568):   Face name : Noto Sans Devanagari
+02-08 01:35:17.027: I/krkrz(26568): Font file : NotoSansDevanagari-Regular.ttf
+02-08 01:35:17.027: I/krkrz(26568):   Face name : Noto Sans Devanagari
+02-08 01:35:17.027: I/krkrz(26568): Font file : DroidSerif-Bold.ttf
+02-08 01:35:17.027: I/krkrz(26568):   Face name : Droid Serif
+02-08 01:35:17.027: I/krkrz(26568): Font file : DroidSerif-BoldItalic.ttf
+02-08 01:35:17.027: I/krkrz(26568):   Face name : Droid Serif
+02-08 01:35:17.027: I/krkrz(26568): Font file : DroidSerif-Italic.ttf
+02-08 01:35:17.027: I/krkrz(26568):   Face name : Droid Serif
+02-08 01:35:17.027: I/krkrz(26568): Font file : DroidSerif-Regular.ttf
+02-08 01:35:17.027: I/krkrz(26568):   Face name : Droid Serif
+02-08 01:35:17.027: I/krkrz(26568): Font file : MTLmr3m.ttf
+02-08 01:35:17.027: I/krkrz(26568):   Face name : MotoyaLMaru
+02-08 01:35:17.027: I/krkrz(26568): Font file : NanumGothic.ttf
+02-08 01:35:17.027: I/krkrz(26568):   Face name : NanumGothic
+02-08 01:35:17.027: I/krkrz(26568): Font file : NotoSansBengali-Bold.ttf
+02-08 01:35:17.027: I/krkrz(26568):   Face name : Noto Sans Bengali
+02-08 01:35:17.027: I/krkrz(26568): Font file : NotoSansBengali-Regular.ttf
+02-08 01:35:17.027: I/krkrz(26568):   Face name : Noto Sans Bengali
+02-08 01:35:17.027: I/krkrz(26568): Font file : NotoSansBengaliUI-Bold.ttf
+02-08 01:35:17.027: I/krkrz(26568):   Face name : Noto Sans Bengali UI
+02-08 01:35:17.027: I/krkrz(26568): Font file : NotoSansBengaliUI-Regular.ttf
+02-08 01:35:17.027: I/krkrz(26568):   Face name : Noto Sans Bengali UI
+02-08 01:35:17.027: I/krkrz(26568): Font file : NotoSansKannada-Bold.ttf
+02-08 01:35:17.027: I/krkrz(26568):   Face name : Noto Sans Kannada
+02-08 01:35:17.027: I/krkrz(26568): Font file : NotoSansKannada-Regular.ttf
+02-08 01:35:17.027: I/krkrz(26568):   Face name : Noto Sans Kannada
+02-08 01:35:17.027: I/krkrz(26568): Font file : NotoSansKannadaUI-Bold.ttf
+02-08 01:35:17.027: I/krkrz(26568):   Face name : Noto Sans Kannada UI
+02-08 01:35:17.027: I/krkrz(26568): Font file : NotoSansKannadaUI-Regular.ttf
+02-08 01:35:17.027: I/krkrz(26568):   Face name : Noto Sans Kannada UI
+02-08 01:35:17.027: I/krkrz(26568): Font file : NotoSansMalayalam-Bold.ttf
+02-08 01:35:17.027: I/krkrz(26568):   Face name : Noto Sans Malayalam
+02-08 01:35:17.027: I/krkrz(26568): Font file : NotoSansMalayalam-Regular.ttf
+02-08 01:35:17.027: I/krkrz(26568):   Face name : Noto Sans Malayalam
+02-08 01:35:17.037: I/krkrz(26568): Font file : NotoSansMalayalamUI-Bold.ttf
+02-08 01:35:17.037: I/krkrz(26568):   Face name : Noto Sans Malayalam UI
+02-08 01:35:17.037: I/krkrz(26568): Font file : NotoSansMalayalamUI-Regular.ttf
+02-08 01:35:17.037: I/krkrz(26568):   Face name : Noto Sans Malayalam UI
+02-08 01:35:17.037: I/krkrz(26568): Font file : NotoSansTelugu-Bold.ttf
+02-08 01:35:17.037: I/krkrz(26568):   Face name : Noto Sans Telugu
+02-08 01:35:17.037: I/krkrz(26568): Font file : NotoSansTelugu-Regular.ttf
+02-08 01:35:17.037: I/krkrz(26568):   Face name : Noto Sans Telugu
+02-08 01:35:17.037: I/krkrz(26568): Font file : NotoSansTeluguUI-Bold.ttf
+02-08 01:35:17.037: I/krkrz(26568):   Face name : Noto Sans Telugu UI
+02-08 01:35:17.037: I/krkrz(26568): Font file : NotoSansTeluguUI-Regular.ttf
+02-08 01:35:17.037: I/krkrz(26568):   Face name : Noto Sans Telugu UI
+02-08 01:35:17.037: I/krkrz(26568): Font file : Roboto-Bold.ttf
+02-08 01:35:17.037: I/krkrz(26568):   Face name : Roboto
+02-08 01:35:17.037: I/krkrz(26568): Font file : Roboto-BoldItalic.ttf
+02-08 01:35:17.037: I/krkrz(26568):   Face name : Roboto
+02-08 01:35:17.037: I/krkrz(26568): Font file : Roboto-Italic.ttf
+02-08 01:35:17.037: I/krkrz(26568):   Face name : Roboto
+02-08 01:35:17.037: I/krkrz(26568): Font file : Roboto-Light.ttf
+02-08 01:35:17.037: I/krkrz(26568):   Face name : Roboto
+02-08 01:35:17.037: I/krkrz(26568): Font file : Roboto-LightItalic.ttf
+02-08 01:35:17.037: I/krkrz(26568):   Face name : Roboto
+02-08 01:35:17.037: I/krkrz(26568): Font file : Roboto-Regular.ttf
+02-08 01:35:17.037: I/krkrz(26568):   Face name : Roboto
+02-08 01:35:17.037: I/krkrz(26568): Font file : Roboto-Thin.ttf
+02-08 01:35:17.037: I/krkrz(26568):   Face name : Roboto
+02-08 01:35:17.037: I/krkrz(26568): Font file : Roboto-ThinItalic.ttf
+02-08 01:35:17.037: I/krkrz(26568):   Face name : Roboto
+02-08 01:35:17.037: I/krkrz(26568): Font file : RobotoCondensed-Bold.ttf
+02-08 01:35:17.037: I/krkrz(26568):   Face name : Roboto Condensed
+02-08 01:35:17.047: I/krkrz(26568): Font file : RobotoCondensed-BoldItalic.ttf
+02-08 01:35:17.047: I/krkrz(26568):   Face name : Roboto Condensed
+02-08 01:35:17.047: I/krkrz(26568): Font file : RobotoCondensed-Italic.ttf
+02-08 01:35:17.047: I/krkrz(26568):   Face name : Roboto Condensed
+02-08 01:35:17.047: I/krkrz(26568): Font file : RobotoCondensed-Regular.ttf
+02-08 01:35:17.047: I/krkrz(26568):   Face name : Roboto Condensed
+02-08 01:35:17.047: I/krkrz(26568): Font file : NotoSansDevanagariUI-Bold.ttf
+02-08 01:35:17.047: I/krkrz(26568):   Face name : Noto Sans Devanagari UI
+02-08 01:35:17.047: I/krkrz(26568): Font file : NotoSansDevanagariUI-Regular.ttf
+02-08 01:35:17.047: I/krkrz(26568):   Face name : Noto Sans Devanagari UI
+02-08 01:35:17.047: I/krkrz(26568): Font file : NotoSansKhmer-Bold.ttf
+02-08 01:35:17.047: I/krkrz(26568):   Face name : Noto Sans
+02-08 01:35:17.047: I/krkrz(26568): Font file : NotoSansKhmer-Regular.ttf
+02-08 01:35:17.047: I/krkrz(26568):   Face name : Noto Sans
+02-08 01:35:17.047: I/krkrz(26568): Font file : NotoSansKhmerUI-Bold.ttf
+02-08 01:35:17.047: I/krkrz(26568):   Face name : Noto Sans
+02-08 01:35:17.047: I/krkrz(26568): Font file : NotoSansKhmerUI-Regular.ttf
+02-08 01:35:17.047: I/krkrz(26568):   Face name : Noto Sans
+02-08 01:35:17.047: I/krkrz(26568): Font file : NotoSansLao-Bold.ttf
+02-08 01:35:17.047: I/krkrz(26568):   Face name : Noto Sans Lao
+02-08 01:35:17.047: I/krkrz(26568): Font file : NotoSansLao-Regular.ttf
+02-08 01:35:17.047: I/krkrz(26568):   Face name : Noto Sans Lao
+02-08 01:35:17.047: I/krkrz(26568): Font file : NotoSansLaoUI-Bold.ttf
+02-08 01:35:17.047: I/krkrz(26568):   Face name : Noto Sans Lao UI
+02-08 01:35:17.047: I/krkrz(26568): Font file : NotoSansLaoUI-Regular.ttf
+02-08 01:35:17.047: I/krkrz(26568):   Face name : Noto Sans Lao UI
+02-08 01:35:17.047: I/krkrz(26568): Font file : NotoSansSymbols-Regular.ttf
+02-08 01:35:17.047: I/krkrz(26568):   Face name : Noto Sans Symbols
+02-08 01:35:17.057: I/krkrz(26568): Font file : NotoSansTamil-Bold.ttf
+02-08 01:35:17.057: I/krkrz(26568):   Face name : Noto Sans Tamil
+02-08 01:35:17.057: I/krkrz(26568): Font file : NotoSansTamil-Regular.ttf
+02-08 01:35:17.057: I/krkrz(26568):   Face name : Noto Sans Tamil
+02-08 01:35:17.057: I/krkrz(26568): Font file : NotoSansTamilUI-Bold.ttf
+02-08 01:35:17.057: I/krkrz(26568):   Face name : Noto Sans Tamil UI
+02-08 01:35:17.057: I/krkrz(26568): Font file : NotoSansTamilUI-Regular.ttf
+02-08 01:35:17.057: I/krkrz(26568):   Face name : Noto Sans Tamil UI
+02-08 01:35:17.057: I/krkrz(26568): Font file : NotoSansThai-Bold.ttf
+02-08 01:35:17.057: I/krkrz(26568):   Face name : Noto Sans Thai
+02-08 01:35:17.057: I/krkrz(26568): Font file : NotoSansThai-Regular.ttf
+02-08 01:35:17.057: I/krkrz(26568):   Face name : Noto Sans Thai
+02-08 01:35:17.057: I/krkrz(26568): Font file : NotoSansThaiUI-Bold.ttf
+02-08 01:35:17.057: I/krkrz(26568):   Face name : Noto Sans Thai UI
+02-08 01:35:17.057: I/krkrz(26568): Font file : NotoSansThaiUI-Regular.ttf
+02-08 01:35:17.057: I/krkrz(26568):   Face name : Noto Sans Thai UI
+02-08 01:35:17.057: I/krkrz(26568): Font file : Padauk-book.ttf
+02-08 01:35:17.057: I/krkrz(26568):   Face name : Padauk Book
+02-08 01:35:17.057: I/krkrz(26568): Font file : Padauk-bookbold.ttf
+02-08 01:35:17.057: I/krkrz(26568):   Face name : Padauk Book
+
