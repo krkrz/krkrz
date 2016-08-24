@@ -275,9 +275,6 @@
     <ClInclude Include="..\visual\win32\DInputMgn.h">
       <Filter>visual\win32</Filter>
     </ClInclude>
-    <ClInclude Include="..\visual\win32\DrawDevice.h">
-      <Filter>visual\win32</Filter>
-    </ClInclude>
     <ClInclude Include="..\visual\win32\GraphicsLoaderImpl.h">
       <Filter>visual\win32</Filter>
     </ClInclude>
@@ -509,9 +506,6 @@
     <ClInclude Include="..\environ\win32\ApplicationSpecialPath.h">
       <Filter>environ\win32</Filter>
     </ClInclude>
-    <ClInclude Include="..\visual\win32\TVPColor.h">
-      <Filter>visual\win32</Filter>
-    </ClInclude>
     <ClInclude Include="..\utils\Exception.h">
       <Filter>utils</Filter>
     </ClInclude>
@@ -682,6 +676,12 @@
     </ClInclude>
     <ClInclude Include="..\utils\NativeFile.h">
       <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\DrawDevice.h">
+      <Filter>visual</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\TVPColor.h">
+      <Filter>visual</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -872,9 +872,6 @@
       <Filter>tjs2</Filter>
     </ClCompile>
     <ClCompile Include="..\visual\win32\DInputMgn.cpp">
-      <Filter>visual\win32</Filter>
-    </ClCompile>
-    <ClCompile Include="..\visual\win32\DrawDevice.cpp">
       <Filter>visual\win32</Filter>
     </ClCompile>
     <ClCompile Include="..\visual\win32\GraphicsLoaderImpl.cpp">
@@ -1254,6 +1251,9 @@
     </ClCompile>
     <ClCompile Include="..\visual\gl\blend_function_avx2.cpp">
       <Filter>visual\gl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\DrawDevice.cpp">
+      <Filter>visual</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
