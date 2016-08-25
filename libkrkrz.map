@@ -1,0 +1,4 @@
+{
+  global: CreateApplication; DestroyApplication;
+  local: *;
+};
