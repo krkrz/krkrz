@@ -58,7 +58,7 @@ static T TJSRestoreLog()
 }
 //---------------------------------------------------------------------------
 template <>
-static void TJSStoreLog<ttstr>(const ttstr & which)
+void TJSStoreLog<ttstr>(const ttstr & which)
 {
 	// store a string into log stream
 	tjs_int length = which.GetLen();
@@ -68,7 +68,7 @@ static void TJSStoreLog<ttstr>(const ttstr & which)
 }
 //---------------------------------------------------------------------------
 template <>
-static ttstr TJSRestoreLog<ttstr>()
+ttstr TJSRestoreLog<ttstr>()
 {
 	// restore a string from log stream
 	tjs_int length;
@@ -82,7 +82,7 @@ static ttstr TJSRestoreLog<ttstr>()
 }
 //---------------------------------------------------------------------------
 template <>
-static void TJSStoreLog<tTJSObjectHashMapLogItemId>(const tTJSObjectHashMapLogItemId & id)
+void TJSStoreLog<tTJSObjectHashMapLogItemId>(const tTJSObjectHashMapLogItemId & id)
 {
 	// log item id
 	char cid = id;
@@ -90,7 +90,7 @@ static void TJSStoreLog<tTJSObjectHashMapLogItemId>(const tTJSObjectHashMapLogIt
 }
 //---------------------------------------------------------------------------
 template <>
-static tTJSObjectHashMapLogItemId TJSRestoreLog<tTJSObjectHashMapLogItemId>()
+tTJSObjectHashMapLogItemId TJSRestoreLog<tTJSObjectHashMapLogItemId>()
 {
 	// restore item id
 	char cid;

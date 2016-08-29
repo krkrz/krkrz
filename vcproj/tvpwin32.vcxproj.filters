@@ -371,9 +371,6 @@
     <ClInclude Include="..\sound\win32\oldwaveunpacker.h">
       <Filter>sound\win32</Filter>
     </ClInclude>
-    <ClInclude Include="..\sound\win32\SoundBufferBaseImpl.h">
-      <Filter>sound\win32</Filter>
-    </ClInclude>
     <ClInclude Include="..\sound\win32\tvpsnd.h">
       <Filter>sound\win32</Filter>
     </ClInclude>
@@ -683,6 +680,9 @@
     <ClInclude Include="..\visual\TVPColor.h">
       <Filter>visual</Filter>
     </ClInclude>
+    <ClInclude Include="..\sound\SoundBufferBaseImpl.h">
+      <Filter>sound</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\tjs2\tjs.cpp">
@@ -945,9 +945,6 @@
     </ClCompile>
     <ClCompile Include="..\utils\TimerIntf.cpp">
       <Filter>utils</Filter>
-    </ClCompile>
-    <ClCompile Include="..\sound\win32\SoundBufferBaseImpl.cpp">
-      <Filter>sound\win32</Filter>
     </ClCompile>
     <ClCompile Include="..\sound\win32\tvpsnd.c">
       <Filter>sound\win32</Filter>
@@ -1254,6 +1251,9 @@
     </ClCompile>
     <ClCompile Include="..\visual\DrawDevice.cpp">
       <Filter>visual</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sound\SoundBufferBaseImpl.cpp">
+      <Filter>sound</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
