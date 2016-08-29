@@ -467,7 +467,7 @@ public:
 		}
 	}
 
-	~tTVPTextWriteStream()
+	~tTVPTextWriteStream() noexcept(false)
 	{
 		if(CryptMode == 2)
 		{
