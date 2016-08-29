@@ -616,7 +616,7 @@ public:
 		inherited::Add(key, value);
 		if(inherited::GetCount() > MaxCount)
 		{
-			ChopLast(inherited::GetCount() - MaxCount);
+			inherited::ChopLast(inherited::GetCount() - MaxCount);
 		}
 	}
 
@@ -625,7 +625,7 @@ public:
 		inherited::AddWithHash(key, hash, value);
 		if(inherited::GetCount() > MaxCount)
 		{
-			ChopLast(inherited::GetCount() - MaxCount);
+			inherited::ChopLast(inherited::GetCount() - MaxCount);
 		}
 	}
 
@@ -634,7 +634,7 @@ public:
 		MaxCount = maxcount;
 		if(inherited::GetCount() > MaxCount)
 		{
-			ChopLast(inherited::GetCount() - MaxCount);
+			inherited::ChopLast(inherited::GetCount() - MaxCount);
 		}
 	}
 

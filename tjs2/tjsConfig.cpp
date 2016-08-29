@@ -413,8 +413,8 @@ void TJSSetFPUE()
 // 例外マスクを解除し元に戻す
 void TJSRestoreFPUE()
 {
-	if(!TJSFPUInit) return;
 #if defined(__WIN32__) && !defined(__GNUC__)
+	if(!TJSFPUInit) return;
 #if defined(_M_X64)
 	_MM_SET_EXCEPTION_MASK(TJSDefaultMMCW);
 #else

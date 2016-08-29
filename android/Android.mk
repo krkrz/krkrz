@@ -44,6 +44,7 @@ $(LOCAL_PATH)/base \
 $(LOCAL_PATH)/base/android \
 $(LOCAL_PATH)/extension \
 $(LOCAL_PATH)/sound \
+$(LOCAL_PATH)/sound/android \
 $(LOCAL_PATH)/movie \
 $(LOCAL_PATH)/msg \
 $(LOCAL_PATH)/msg/android \
@@ -117,10 +118,12 @@ $(LOCAL_PATH)/sound/PhaseVocoderDSP.cpp \
 $(LOCAL_PATH)/sound/PhaseVocoderFilter.cpp \
 $(LOCAL_PATH)/sound/RealFFT.cpp \
 $(LOCAL_PATH)/sound/SoundBufferBaseIntf.cpp \
+$(LOCAL_PATH)/sound/SoundBufferBaseImpl.cpp \
 $(LOCAL_PATH)/sound/WaveFormatConverter.cpp \
 $(LOCAL_PATH)/sound/WaveIntf.cpp \
 $(LOCAL_PATH)/sound/WaveLoopManager.cpp \
 $(LOCAL_PATH)/sound/WaveSegmentQueue.cpp \
+$(LOCAL_PATH)/sound/android/WaveImpl.cpp \
 $(LOCAL_PATH)/utils/ClipboardIntf.cpp \
 $(LOCAL_PATH)/utils/cp932_uni.cpp \
 $(LOCAL_PATH)/utils/DebugIntf.cpp \
