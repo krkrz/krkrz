@@ -490,7 +490,8 @@ public:
 	tTJSExprNode * MakeNP2(tjs_int opecode, tTJSExprNode * node1, tTJSExprNode * node2);
 	tTJSExprNode * MakeNP3(tjs_int opecode, tTJSExprNode * node1, tTJSExprNode * node2,
 		tTJSExprNode * node3);
-
+	
+	bool CopyConstData( tTJSVariant* result );
 	//---------------------------------------------------------- disassembler
 	// implemented in tjsDisassemble.cpp
 

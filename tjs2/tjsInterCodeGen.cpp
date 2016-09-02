@@ -3986,7 +3986,18 @@ std::vector<tjs_uint8>* tTJSInterCodeContext::ExportByteCode( bool outputdebug, 
 	return result;
 }
 //---------------------------------------------------------------------------
-
+bool tTJSInterCodeContext::CopyConstData( tTJSVariant* result )
+{
+	if( DataArea != NULL && DataAreaSize == 1 && 
+		CodeAreaSize > 5 && CodeArea[0] == VM_CONST && CodeArea[3] == VM_SRV && CodeArea[5] == VM_RET ) {
+		result->CopyRef( DataArea[CodeArea[2]] );
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
 //---------------------------------------------------------------------------
 } // namespace TJS
 

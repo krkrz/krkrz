@@ -604,6 +604,28 @@ void tTJS::CompileScript( const tjs_char *script, class tTJSBinaryStream* output
 	blk->Release();
 }
 //---------------------------------------------------------------------------
+bool tTJS::LoadTextDictionaryArray( class iTJSTextReadStream* stream, tTJSVariant *result )
+{
+	ttstr buffer;
+	try {
+		stream->Read(buffer, 0);
+	} catch(...) {
+		stream->Destruct();
+		throw;
+	}
+	stream->Destruct();
+	
+	tTJSScriptBlock *blk = new tTJSScriptBlock(true);
+	try {
+		blk->SetText(result, buffer.c_str(), NULL, true);
+	} catch(...) {
+		blk->Release();
+		throw;
+	}
+	blk->Release();
+	return true;
+}
+//---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
 // TextStream Creation
