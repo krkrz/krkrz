@@ -69,40 +69,53 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/loadStruct)
 	ttstr mode;
 	if(numparams >= 2 && param[1]->Type() != tvtVoid) mode =*param[1];
 
-	tTJSBinaryStream* stream = TJSCreateBinaryStreamForRead(name, mode);
-	if( !stream ) return TJS_E_INVALIDPARAM;
+	{
+		tTJSBinaryStream* stream = TJSCreateBinaryStreamForRead(name, mode);
+		if( !stream ) return TJS_E_INVALIDPARAM;
 
-	bool isbin = false;
-	try {
-		tjs_uint64 streamlen = stream->GetSize();
-		if( streamlen >= tTJSBinarySerializer::HEADER_LENGTH ) {
-			tjs_uint8 header[tTJSBinarySerializer::HEADER_LENGTH];
-			stream->Read( header, tTJSBinarySerializer::HEADER_LENGTH );
-			if( tTJSBinarySerializer::IsBinary( header ) ) {
-				if( !dic ) dic = (tTJSDictionaryObject*)TJSCreateDictionaryObject();
-				tTJSBinarySerializer binload(dic);
-				tTJSVariant* var = binload.Read( stream );
-				if( var ) {
-					if( result ) *result = *var;
-					delete var;
-					isbin = true;
-				}
-				if( dicfree ) {
-					if( dic ) dic->Release();
-					dic = NULL;
+		bool isbin = false;
+		try {
+			tjs_uint64 streamlen = stream->GetSize();
+			if( streamlen >= tTJSBinarySerializer::HEADER_LENGTH ) {
+				tjs_uint8 header[tTJSBinarySerializer::HEADER_LENGTH];
+				stream->Read( header, tTJSBinarySerializer::HEADER_LENGTH );
+				if( tTJSBinarySerializer::IsBinary( header ) ) {
+					if( !dic ) dic = (tTJSDictionaryObject*)TJSCreateDictionaryObject();
+					tTJSBinarySerializer binload(dic);
+					tTJSVariant* var = binload.Read( stream );
+					if( var ) {
+						if( result ) *result = *var;
+						delete var;
+						isbin = true;
+					}
+					if( dicfree ) {
+						if( dic ) dic->Release();
+						dic = NULL;
+					}
 				}
 			}
+		} catch(...) {
+			delete stream;
+			if( dicfree ) {
+				if( dic ) dic->Release();
+				dic = NULL;
+			}
+			throw;
 		}
-	} catch(...) {
 		delete stream;
-		if( dicfree ) {
-			if( dic ) dic->Release();
-			dic = NULL;
-		}
-		throw;
+		if( isbin ) return TJS_S_OK;
 	}
-	delete stream;
-	if( isbin ) return TJS_S_OK;
+	if( result )
+	{
+		iTJSTextReadStream * stream = TJSCreateTextStreamForRead(name, mode);
+		if( tTJS::LoadTextDictionaryArray( stream, result ) ) {
+			return TJS_S_OK;
+		}
+	}
+	else
+	{
+		return TJS_S_OK;
+	}
 	return TJS_E_INVALIDPARAM;
 }
 TJS_END_NATIVE_STATIC_METHOD_DECL(/*func. name*/loadStruct)
