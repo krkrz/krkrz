@@ -5,14 +5,14 @@
 
 #include <intrin.h>
 
-// SIMD”Å”ŠwŒnŠÖ” ( SSE+SSE2g—p ) 4—v‘fˆê‹C‚ÉŒvZ‚·‚é
+// SIMDç‰ˆæ•°å­¦ç³»é–¢æ•° ( SSE+SSE2ä½¿ç”¨ ) 4è¦ç´ ä¸€æ°—ã«è¨ˆç®—ã™ã‚‹
 extern __m128 log_ps(__m128 x);
 extern __m128 exp_ps(__m128 x);
 extern __m128 sin_ps(__m128 x);
 extern __m128 cos_ps(__m128 x);
 extern void sincos_ps(__m128 x, __m128 *s, __m128 *c);
 
-// SIMD”Å”ŠwŒnŠÖ” ( AVX+AVX2g—p ) 8—v‘fˆê‹C‚ÉŒvZ‚·‚é
+// SIMDç‰ˆæ•°å­¦ç³»é–¢æ•° ( AVX+AVX2ä½¿ç”¨ ) 8è¦ç´ ä¸€æ°—ã«è¨ˆç®—ã™ã‚‹
 extern __m256 mm256_sin_ps(__m256 x);
 extern __m256 mm256_exp_ps(__m256 x);
 extern __m256 mm256_cos_ps(__m256 x);
@@ -23,8 +23,8 @@ inline __m128 pow_ps( __m128 x, __m128 y ) {
 }
 
 /**
- * 22bit ¸“x‚Å‹t”‚ğ‹‚ß‚é(4—v‘f”Å)
- * a‚Ì‹t” = 2 * a - rcpa * a * a ‚ğ—p‚¢‚é
+ * 22bit ç²¾åº¦ã§é€†æ•°ã‚’æ±‚ã‚ã‚‹(4è¦ç´ ç‰ˆ)
+ * aã®é€†æ•° = 2 * a - rcpa * a * a ã‚’ç”¨ã„ã‚‹
  */
 inline __m128 m128_rcp_22bit_ps( const __m128& a ) {
 	__m128 xm0 = a;
@@ -34,7 +34,7 @@ inline __m128 m128_rcp_22bit_ps( const __m128& a ) {
 	return _mm_sub_ps( xm1, xm0 );
 }
 /**
- * 22bit ¸“x‚Å‹t”‚ğ‹‚ß‚é(1—v‘f”Å)
+ * 22bit ç²¾åº¦ã§é€†æ•°ã‚’æ±‚ã‚ã‚‹(1è¦ç´ ç‰ˆ)
  */
 inline __m128 m128_rcp_22bit_ss( const __m128& a ) {
 	__m128 xm0 = a;
@@ -44,7 +44,7 @@ inline __m128 m128_rcp_22bit_ss( const __m128& a ) {
 	return _mm_sub_ss( xm1, xm0 );
 }
 /**
- * 22bit ¸“x‚Å‹t”‚ğ‹‚ß‚é(float”Å)
+ * 22bit ç²¾åº¦ã§é€†æ•°ã‚’æ±‚ã‚ã‚‹(floatç‰ˆ)
  */
 inline float rcp_sse( float a ) {
 	float  ret;
@@ -54,8 +54,8 @@ inline float rcp_sse( float a ) {
 }
 
 /**
- * 22bit ¸“x‚Å‹t”‚ğ‹‚ß‚é(8—v‘f”Å)
- * a‚Ì‹t” = 2 * a - rcpa * a * a ‚ğ—p‚¢‚é
+ * 22bit ç²¾åº¦ã§é€†æ•°ã‚’æ±‚ã‚ã‚‹(8è¦ç´ ç‰ˆ)
+ * aã®é€†æ•° = 2 * a - rcpa * a * a ã‚’ç”¨ã„ã‚‹
  */
 inline __m256 m256_rcp_22bit_ps( const __m256& a ) {
 	__m256 xm0 = a;
@@ -66,9 +66,9 @@ inline __m256 m256_rcp_22bit_ps( const __m256& a ) {
 }
 
 /**
- * 22bit ¸“x‚Å‹t”‚ğ‹‚ß‚é(8—v‘f”Å)
- * a‚Ì‹t” = 2 * a - rcpa * a * a ‚ğ—p‚¢‚é
- * FMA3 ‚ğg‚Á‚ÄA­‚µ‘¬‚­‚·‚é –¢Šm”F
+ * 22bit ç²¾åº¦ã§é€†æ•°ã‚’æ±‚ã‚ã‚‹(8è¦ç´ ç‰ˆ)
+ * aã®é€†æ•° = 2 * a - rcpa * a * a ã‚’ç”¨ã„ã‚‹
+ * FMA3 ã‚’ä½¿ã£ã¦ã€å°‘ã—é€Ÿãã™ã‚‹ æœªç¢ºèª
  */
 inline __m256 m256_rcp_22bit_fma_ps( const __m256& a ) {
 	__m256 xm0 = a;
@@ -77,8 +77,8 @@ inline __m256 m256_rcp_22bit_fma_ps( const __m256& a ) {
 }
 
 /**
- * SSE‚Å4—v‘f‚Ì‡Œv’l‚ğ‹‚ß‚é
- * ‡Œv’l‚Í‘S—v‘f‚É“ü‚é
+ * SSEã§4è¦ç´ ã®åˆè¨ˆå€¤ã‚’æ±‚ã‚ã‚‹
+ * åˆè¨ˆå€¤ã¯å…¨è¦ç´ ã«å…¥ã‚‹
  */
 inline __m128 m128_hsum_sse1_ps( __m128 sum ) {
 	__m128 tmp = sum;
@@ -89,9 +89,9 @@ inline __m128 m128_hsum_sse1_ps( __m128 sum ) {
 	return _mm_add_ps( sum, tmp );
 }
 /**
- * SSE‚Å4—v‘f‚Ì‡Œv’l‚ğ‹‚ß‚é
- * ‡Œv’l‚Í‘S—v‘f‚É“ü‚é
- * SSE3 ‚¾‚Æ­‚È‚¢–½—ß‚ÅÀs‚Å‚«‚é
+ * SSEã§4è¦ç´ ã®åˆè¨ˆå€¤ã‚’æ±‚ã‚ã‚‹
+ * åˆè¨ˆå€¤ã¯å…¨è¦ç´ ã«å…¥ã‚‹
+ * SSE3 ã ã¨å°‘ãªã„å‘½ä»¤ã§å®Ÿè¡Œã§ãã‚‹
  */
 inline __m128 m128_hsum_sse3_ps( __m128 sum ) {
 	sum = _mm_hadd_ps( sum, sum );
@@ -99,8 +99,8 @@ inline __m128 m128_hsum_sse3_ps( __m128 sum ) {
 }
 
 /**
- * AVX‚Å8—v‘f‚Ì‡Œv’l‚ğ‹‚ß‚é
- * ‡Œv’l‚Í‘S—v‘f‚É“ü‚é
+ * AVXã§8è¦ç´ ã®åˆè¨ˆå€¤ã‚’æ±‚ã‚ã‚‹
+ * åˆè¨ˆå€¤ã¯å…¨è¦ç´ ã«å…¥ã‚‹
  */
 inline __m256 m256_hsum_avx_ps( __m256 sum ) {
 	sum = _mm256_hadd_ps( sum, sum );
@@ -111,8 +111,8 @@ inline __m256 m256_hsum_avx_ps( __m256 sum ) {
 	return sum;
 }
 /**
- * AVX2‚Å16—v‘f‚Ì‡Œv’l‚ğ‹‚ß‚é
- * ‡Œv’l‚Í‘S—v‘f‚É“ü‚é
+ * AVX2ã§16è¦ç´ ã®åˆè¨ˆå€¤ã‚’æ±‚ã‚ã‚‹
+ * åˆè¨ˆå€¤ã¯å…¨è¦ç´ ã«å…¥ã‚‹
  */
 /*
 inline __m256 m256_hsum_avx_epi16( __m256 sum ) {

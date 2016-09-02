@@ -6,7 +6,7 @@
 #define SLIDE_M (18+255)
 class SlideCompressor
 {
-	// ƒXƒ‰ƒCƒh«‘–@ ˆ³kƒNƒ‰ƒX
+	// ã‚¹ãƒ©ã‚¤ãƒ‰è¾æ›¸æ³• åœ§ç¸®ã‚¯ãƒ©ã‚¹
 	struct Chain
 	{
 		int Prev;

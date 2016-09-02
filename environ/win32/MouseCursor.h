@@ -7,33 +7,33 @@
 
 class MouseCursor {
 	enum {
-		CURSOR_APPSTARTING,	// •W€–îˆóƒJ[ƒ\ƒ‹‚¨‚æ‚Ñ¬Œ^»ŽžŒvƒJ[ƒ\ƒ‹
-		CURSOR_ARROW,		// •W€–îˆóƒJ[ƒ\ƒ‹
-		CURSOR_CROSS,		// \ŽšƒJ[ƒ\ƒ‹
-		CURSOR_HAND,		// ƒnƒ“ƒhƒJ[ƒ\ƒ‹
-		CURSOR_IBEAM,		// ƒAƒCƒr[ƒ€ (cü) ƒJ[ƒ\ƒ‹
-		CURSOR_HELP,		// –îˆó‚Æ‹^–â•„
-		CURSOR_NO,			// ‹ÖŽ~ƒJ[ƒ\ƒ‹
-		CURSOR_SIZEALL,		// 4 •ûŒü–îˆóƒJ[ƒ\ƒ‹
-		CURSOR_SIZENESW,	// ŽÎ‚ß¶‰º‚ª‚è‚Ì—¼•ûŒü–îˆóƒJ[ƒ\ƒ‹
-		CURSOR_SIZENS,		// ã‰º—¼•ûŒü–îˆóƒJ[ƒ\ƒ‹
-		CURSOR_SIZENWSE,	// ŽÎ‚ß‰E‰º‚ª‚è‚Ì—¼•ûŒü–îˆóƒJ[ƒ\ƒ‹
-		CURSOR_SIZEWE,		// ¶‰E—¼•ûŒü–îˆóƒJ[ƒ\ƒ‹
-		CURSOR_UPARROW,		// ‚’¼‚Ì–îˆóƒJ[ƒ\ƒ‹
-		CURSOR_WAIT,		// »ŽžŒvƒJ[ƒ\ƒ‹ 
+		CURSOR_APPSTARTING,	// æ¨™æº–çŸ¢å°ã‚«ãƒ¼ã‚½ãƒ«ãŠã‚ˆã³å°åž‹ç ‚æ™‚è¨ˆã‚«ãƒ¼ã‚½ãƒ«
+		CURSOR_ARROW,		// æ¨™æº–çŸ¢å°ã‚«ãƒ¼ã‚½ãƒ«
+		CURSOR_CROSS,		// åå­—ã‚«ãƒ¼ã‚½ãƒ«
+		CURSOR_HAND,		// ãƒãƒ³ãƒ‰ã‚«ãƒ¼ã‚½ãƒ«
+		CURSOR_IBEAM,		// ã‚¢ã‚¤ãƒ“ãƒ¼ãƒ  (ç¸¦ç·š) ã‚«ãƒ¼ã‚½ãƒ«
+		CURSOR_HELP,		// çŸ¢å°ã¨ç–‘å•ç¬¦
+		CURSOR_NO,			// ç¦æ­¢ã‚«ãƒ¼ã‚½ãƒ«
+		CURSOR_SIZEALL,		// 4 æ–¹å‘çŸ¢å°ã‚«ãƒ¼ã‚½ãƒ«
+		CURSOR_SIZENESW,	// æ–œã‚å·¦ä¸‹ãŒã‚Šã®ä¸¡æ–¹å‘çŸ¢å°ã‚«ãƒ¼ã‚½ãƒ«
+		CURSOR_SIZENS,		// ä¸Šä¸‹ä¸¡æ–¹å‘çŸ¢å°ã‚«ãƒ¼ã‚½ãƒ«
+		CURSOR_SIZENWSE,	// æ–œã‚å³ä¸‹ãŒã‚Šã®ä¸¡æ–¹å‘çŸ¢å°ã‚«ãƒ¼ã‚½ãƒ«
+		CURSOR_SIZEWE,		// å·¦å³ä¸¡æ–¹å‘çŸ¢å°ã‚«ãƒ¼ã‚½ãƒ«
+		CURSOR_UPARROW,		// åž‚ç›´ã®çŸ¢å°ã‚«ãƒ¼ã‚½ãƒ«
+		CURSOR_WAIT,		// ç ‚æ™‚è¨ˆã‚«ãƒ¼ã‚½ãƒ« 
 		CURSOR_EOT,
 	};
 	static const int CURSOR_OFFSET = 22;
 	static const int CURSOR_INDEXES_NUM = 24;
-	static const int CURSOR_INDEXES[CURSOR_INDEXES_NUM]; // “à•”‚ÌƒJ[ƒ\ƒ‹ƒCƒ“ƒfƒbƒNƒX‚ÆŒöŠJƒJ[ƒ\ƒ‹ƒCƒ“ƒfƒbƒNƒX‚Ì•ÏŠ·ƒe[ƒuƒ‹
-	static std::vector<HCURSOR> CURSOR_HANDLES_FOR_INDEXES;	// ‘SƒJ[ƒ\ƒ‹‚Ìƒnƒ“ƒhƒ‹AV‹K“Çž‚Ý‚³‚ê‚½‚à‚Ì‚Í’Ç‰Á‚³‚ê‚é
+	static const int CURSOR_INDEXES[CURSOR_INDEXES_NUM]; // å†…éƒ¨ã®ã‚«ãƒ¼ã‚½ãƒ«ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã¨å…¬é–‹ã‚«ãƒ¼ã‚½ãƒ«ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã®å¤‰æ›ãƒ†ãƒ¼ãƒ–ãƒ«
+	static std::vector<HCURSOR> CURSOR_HANDLES_FOR_INDEXES;	// å…¨ã‚«ãƒ¼ã‚½ãƒ«ã®ãƒãƒ³ãƒ‰ãƒ«ã€æ–°è¦èª­è¾¼ã¿ã•ã‚ŒãŸã‚‚ã®ã¯è¿½åŠ ã•ã‚Œã‚‹
 
-	static const LPTSTR CURSORS[CURSOR_EOT];	// ƒJ[ƒ\ƒ‹‚ÆƒŠƒ\[ƒXID‚Ì‘Î‰žƒe[ƒuƒ‹
-	static HCURSOR CURSOR_HANDLES[CURSOR_EOT];	// ƒfƒtƒHƒ‹ƒgƒJ[ƒ\ƒ‹‚Ìƒnƒ“ƒhƒ‹ƒe[ƒuƒ‹
-	static const int INVALID_CURSOR_INDEX = 0x7FFFFFFF;	// –³Œø‚ÈƒJ[ƒ\ƒ‹ƒCƒ“ƒfƒbƒNƒX
-	static bool CURSOR_INITIALIZED;	// ƒJ[ƒ\ƒ‹‰Šú‰»Ï‚Ý‚©”Û‚©
+	static const LPTSTR CURSORS[CURSOR_EOT];	// ã‚«ãƒ¼ã‚½ãƒ«ã¨ãƒªã‚½ãƒ¼ã‚¹IDã®å¯¾å¿œãƒ†ãƒ¼ãƒ–ãƒ«
+	static HCURSOR CURSOR_HANDLES[CURSOR_EOT];	// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã‚«ãƒ¼ã‚½ãƒ«ã®ãƒãƒ³ãƒ‰ãƒ«ãƒ†ãƒ¼ãƒ–ãƒ«
+	static const int INVALID_CURSOR_INDEX = 0x7FFFFFFF;	// ç„¡åŠ¹ãªã‚«ãƒ¼ã‚½ãƒ«ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
+	static bool CURSOR_INITIALIZED;	// ã‚«ãƒ¼ã‚½ãƒ«åˆæœŸåŒ–æ¸ˆã¿ã‹å¦ã‹
 
-	static bool is_cursor_hide_;	// ƒJ[ƒ\ƒ‹‚ªcrNone‚Å”ñ•\Ž¦‚É‚È‚Á‚Ä‚¢‚é‚©‚Ç‚¤‚©
+	static bool is_cursor_hide_;	// ã‚«ãƒ¼ã‚½ãƒ«ãŒcrNoneã§éžè¡¨ç¤ºã«ãªã£ã¦ã„ã‚‹ã‹ã©ã†ã‹
 
 public:
 	static void Initialize();

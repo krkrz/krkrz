@@ -48,7 +48,7 @@
 static const GUID CLSID_WMReaderSource = 
 { 0xbae59473, 0x19e, 0x4f1f, { 0x8a, 0x8c, 0x3d, 0x41, 0xa9, 0xf4, 0x92, 0x1e } };
 
-// WMV��WMA��Decoder�̃N���XID
+// WMVとWMAのDecoderのクラスID
 static const GUID CLSID_WMVDecoderDMO = 
 { 0x82d353df, 0x90bd, 0x4382, { 0x8b, 0xc2, 0x3f, 0x61, 0x92, 0xb7, 0x6e, 0x34 } };
 static const GUID CLSID_WMADecoderDMO = 
@@ -82,14 +82,14 @@ tTVPDSMovie::~tTVPDSMovie()
 	CoUninitialize();
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�Q�ƃJ�E���^�̃C���N�������g
+//! @brief	  	参照カウンタのインクリメント
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::AddRef()
 {
 	RefCount++;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�Q�ƃJ�E���^�̃f�N�������g�B1�Ȃ�delete�B
+//! @brief	  	参照カウンタのデクリメント。1ならdelete。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::Release()
 {
@@ -99,14 +99,14 @@ void __stdcall tTVPDSMovie::Release()
 		RefCount--;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�C���^�[�t�F�C�X���������
+//! @brief	  	インターフェイスを解放する
 //!
-//! �f�o�b�N���AROT�ɂ܂��o�^����Ă���ꍇ�́A�����œo�^����������B@n
-//! �������A�{���͂��̃N���X���p�������N���X�Ŏ��O�ɓo�^�������R�[�����������悢
+//! デバック時、ROTにまだ登録されている場合は、ここで登録を解除する。@n
+//! しかし、本来はこのクラスを継承したクラスで事前に登録解除をコールした方がよい
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::ReleaseAll()
 {
-	if( m_RegisteredROT )	// �o�^���܂���������Ă��Ȃ����͂����ŉ���
+	if( m_RegisteredROT )	// 登録がまだ解除されていない時はここで解除
 		RemoveFromROT( m_dwROTReg );
 
 	if( m_MediaControl.p != NULL )
@@ -142,7 +142,7 @@ void __stdcall tTVPDSMovie::ReleaseAll()
 	}
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�r�f�I���Đ�����
+//! @brief	  	ビデオを再生する
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::Play()
 {
@@ -153,7 +153,7 @@ void __stdcall tTVPDSMovie::Play()
 	}
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�r�f�I���~����
+//! @brief	  	ビデオを停止する
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::Stop()
 {
@@ -164,7 +164,7 @@ void __stdcall tTVPDSMovie::Stop()
 	}
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�r�f�I���ꎞ��~����
+//! @brief	  	ビデオを一時停止する
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::Pause()
 {
@@ -175,8 +175,8 @@ void __stdcall tTVPDSMovie::Pause()
 	}
 }
 //----------------------------------------------------------------------------
-//! @brief	  	���݂̃��[�r�[���Ԃ�ݒ肷��
-//! @param 		tick : �ݒ肷�錻�݂̎���
+//! @brief	  	現在のムービー時間を設定する
+//! @param 		tick : 設定する現在の時間
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::SetPosition( unsigned __int64 tick )
 {
@@ -214,8 +214,8 @@ void __stdcall tTVPDSMovie::SetPosition( unsigned __int64 tick )
 	}
 }
 //----------------------------------------------------------------------------
-//! @brief	  	���݂̃��[�r�[���Ԃ��擾����
-//! @param 		tick : ���݂̎��Ԃ�Ԃ��ϐ�
+//! @brief	  	現在のムービー時間を取得する
+//! @param 		tick : 現在の時間を返す変数
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetPosition( unsigned __int64 *tick )
 {
@@ -234,7 +234,7 @@ void __stdcall tTVPDSMovie::GetPosition( unsigned __int64 *tick )
 	}
 	if( IsEqualGUID( TIME_FORMAT_MEDIA_TIME, Format ) )
 	{
-		LONGLONG	curTime = (Current + 5000) / 10000; // �ꉞ�A�l�̌ܓ����Ă���
+		LONGLONG	curTime = (Current + 5000) / 10000; // 一応、四捨五入しておく
 		*tick = (unsigned __int64)( curTime < 0 ? 0 : curTime);
 	}
 	else if( IsEqualGUID( TIME_FORMAT_FRAME, Format ) )
@@ -253,8 +253,8 @@ void __stdcall tTVPDSMovie::GetPosition( unsigned __int64 *tick )
 	}
 }
 //----------------------------------------------------------------------------
-//! @brief	  	���݂̃��[�r�[�̏�Ԃ��擾����
-//! @param 		status : ���݂̏�Ԃ�Ԃ��ϐ�
+//! @brief	  	現在のムービーの状態を取得する
+//! @param 		status : 現在の状態を返す変数
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetStatus(tTVPVideoStatus *status)
 {
@@ -273,10 +273,10 @@ void __stdcall tTVPDSMovie::GetStatus(tTVPVideoStatus *status)
 }
 //----------------------------------------------------------------------------
 //! @brief	  	A sample has been delivered. Copy it to the texture.
-//! @param 		evcode : �C�x���g�R�[�h
-//! @param 		param1 : �p�����[�^1�B���e�̓C�x���g�R�[�h�ɂ��قȂ�B
-//! @param 		param2 : �p�����[�^2�B���e�̓C�x���g�R�[�h�ɂ��قȂ�B
-//! @param 		got : �擾�̐���
+//! @param 		evcode : イベントコード
+//! @param 		param1 : パラメータ1。内容はイベントコードにより異なる。
+//! @param 		param2 : パラメータ2。内容はイベントコードにより異なる。
+//! @param 		got : 取得の正否
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetEvent( long *evcode, LONG_PTR *param1, LONG_PTR *param2, bool *got )
 {
@@ -295,12 +295,12 @@ void __stdcall tTVPDSMovie::GetEvent( long *evcode, LONG_PTR *param1, LONG_PTR *
 	return;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�C�x���g���������
+//! @brief	  	イベントを解放する
 //! 
-//! GetEvent�ŃC�x���g�𓾂āA����������A���̃��\�b�h�ɂ���ăC�x���g��������邱��
-//! @param 		evcode : �������C�x���g�R�[�h
-//! @param 		param1 : �������p�����[�^1�B���e�̓C�x���g�R�[�h�ɂ��قȂ�B
-//! @param 		param2 : �������p�����[�^2�B���e�̓C�x���g�R�[�h�ɂ��قȂ�B
+//! GetEventでイベントを得て、処理した後、このメソッドによってイベントを解放すること
+//! @param 		evcode : 解放するイベントコード
+//! @param 		param1 : 解放するパラメータ1。内容はイベントコードにより異なる。
+//! @param 		param2 : 解放するパラメータ2。内容はイベントコードにより異なる。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::FreeEventParams(long evcode, LONG_PTR param1, LONG_PTR param2)
 {
@@ -310,9 +310,9 @@ void __stdcall tTVPDSMovie::FreeEventParams(long evcode, LONG_PTR param1, LONG_P
 	return;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	���[�r�[���ŏ��̈ʒu�܂Ŋ����߂�
-//! @note		IMediaPosition�͔񐄏��̂悤�����A�T���v���ł͎g�p����Ă����̂ŁA
-//! 			�����܂܂ɂ��Ă����B
+//! @brief	  	ムービーを最初の位置まで巻き戻す
+//! @note		IMediaPositionは非推奨のようだが、サンプルでは使用されていたので、
+//! 			同じままにしておく。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::Rewind()
 {
@@ -326,11 +326,11 @@ void __stdcall tTVPDSMovie::Rewind()
 	return;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�w�肳�ꂽ�t���[���ֈړ�����
+//! @brief	  	指定されたフレームへ移動する
 //! 
-//! ���̃��\�b�h�ɂ���Đݒ肳�ꂽ�ʒu�́A�w�肵���t���[���Ɗ��S�Ɉ�v����킯�ł͂Ȃ��B
-//! �t���[���́A�w�肵���t���[���ɍł��߂��L�[�t���[���̈ʒu�ɐݒ肳���B
-//! @param		f : �ړ�����t���[��
+//! このメソッドによって設定された位置は、指定したフレームと完全に一致するわけではない。
+//! フレームは、指定したフレームに最も近いキーフレームの位置に設定される。
+//! @param		f : 移動するフレーム
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::SetFrame( int f )
 {
@@ -369,8 +369,8 @@ void __stdcall tTVPDSMovie::SetFrame( int f )
 	}
 }
 //----------------------------------------------------------------------------
-//! @brief	  	���݂̃t���[�����擾����
-//! @param		f : ���݂̃t���[��������ϐ��ւ̃|�C���^
+//! @brief	  	現在のフレームを取得する
+//! @param		f : 現在のフレームを入れる変数へのポインタ
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetFrame( int *f )
 {
@@ -408,8 +408,8 @@ void __stdcall tTVPDSMovie::GetFrame( int *f )
 }
 
 //----------------------------------------------------------------------------
-//! @brief	  	�w�肳�ꂽ�t���[���ōĐ����~������
-//! @param		f : �Đ����~������t���[��
+//! @brief	  	指定されたフレームで再生を停止させる
+//! @param		f : 再生を停止させるフレーム
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::SetStopFrame( int f )
 {
@@ -448,8 +448,8 @@ void __stdcall tTVPDSMovie::SetStopFrame( int f )
 	}
 }
 //----------------------------------------------------------------------------
-//! @brief	  	���݂̍Đ�����~����t���[�����擾����
-//! @param		f : ���݂̍Đ�����~����t���[��������ϐ��ւ̃|�C���^
+//! @brief	  	現在の再生が停止するフレームを取得する
+//! @param		f : 現在の再生が停止するフレームを入れる変数へのポインタ
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetStopFrame( int *f )
 {
@@ -486,7 +486,7 @@ void __stdcall tTVPDSMovie::GetStopFrame( int *f )
 	}
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�Đ����~����t���[����������Ԃɖ߂��B
+//! @brief	  	再生を停止するフレームを初期状態に戻す。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::SetDefaultStopFrame()
 {
@@ -528,8 +528,8 @@ void __stdcall tTVPDSMovie::SetDefaultStopFrame()
 	}
 }
 //----------------------------------------------------------------------------
-//! @brief	  	FPS���擾����
-//! @param		f : FPS������ϐ��ւ̃|�C���^
+//! @brief	  	FPSを取得する
+//! @param		f : FPSを入れる変数へのポインタ
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetFPS( double *f )
 {
@@ -544,8 +544,8 @@ void __stdcall tTVPDSMovie::GetFPS( double *f )
 	*f = 1.0 / AvgTimePerFrame;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�S�t���[�������擾����
-//! @param		f : �S�t���[����������ϐ��ւ̃|�C���^
+//! @brief	  	全フレーム数を取得する
+//! @param		f : 全フレーム数を入れる変数へのポインタ
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetNumberOfFrame( int *f )
 {
@@ -582,8 +582,8 @@ void __stdcall tTVPDSMovie::GetNumberOfFrame( int *f )
 	}
 }
 //----------------------------------------------------------------------------
-//! @brief	  	���[�r�[�̒���(msec)���擾����
-//! @param		f : ���[�r�[�̒���������ϐ��ւ̃|�C���^
+//! @brief	  	ムービーの長さ(msec)を取得する
+//! @param		f : ムービーの長さを入れる変数へのポインタ
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetTotalTime( __int64 *t )
 {
@@ -611,7 +611,7 @@ void __stdcall tTVPDSMovie::GetTotalTime( __int64 *t )
 		{
 			ThrowDShowException(L"Failed to call IBasicVideo::get_AvgTimePerFrame (in tTVPDSMovie::GetTotalTime).", hr);
 		}
-		// �t���[������b�ցA�b����msec��
+		// フレームから秒へ、秒からmsecへ
 		*t = (__int64)((totalTime * AvgTimePerFrame) * 1000.0 );
 	}
 	else
@@ -620,9 +620,9 @@ void __stdcall tTVPDSMovie::GetTotalTime( __int64 *t )
 	}
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�r�f�I�̉摜�T�C�Y���擾����
-//! @param		width : ��
-//! @param		height : ����
+//! @brief	  	ビデオの画像サイズを取得する
+//! @param		width : 幅
+//! @param		height : 高さ
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetVideoSize( long *width, long *height )
 {
@@ -635,7 +635,7 @@ void __stdcall tTVPDSMovie::GetVideoSize( long *width, long *height )
 		Video()->get_SourceHeight( height );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	buff��NULL��ݒ肷��B
+//! @brief	  	buffにNULLを設定する。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetFrontBuffer( BYTE **buff )
 {
@@ -643,38 +643,38 @@ void __stdcall tTVPDSMovie::GetFrontBuffer( BYTE **buff )
 	return;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�������Ȃ�
+//! @brief	  	何もしない
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::SetVideoBuffer( BYTE *buff1, BYTE *buff2, long size )
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�������Ȃ��B
+//! @brief	  	何もしない。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::SetWindow( HWND window )
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�������Ȃ��B
+//! @brief	  	何もしない。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::SetMessageDrainWindow( HWND window )
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�������Ȃ��B
+//! @brief	  	何もしない。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::SetRect( RECT *rect )
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�������Ȃ��B
+//! @brief	  	何もしない。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::SetVisible( bool b )
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�Đ����x��ݒ肷��
-//! @param	rate : �Đ����[�g�B1.0�������B
+//! @brief	  	再生速度を設定する
+//! @param	rate : 再生レート。1.0が等速。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::SetPlayRate( double rate )
 {
@@ -688,8 +688,8 @@ void __stdcall tTVPDSMovie::SetPlayRate( double rate )
 	}
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�Đ����x���擾����
-//! @param	*rate : �Đ����[�g�B1.0�������B
+//! @brief	  	再生速度を取得する
+//! @param	*rate : 再生レート。1.0が等速。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetPlayRate( double *rate )
 {
@@ -703,12 +703,12 @@ void __stdcall tTVPDSMovie::GetPlayRate( double *rate )
 	}
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�I�[�f�B�I�o�����X��ݒ肷��
-//! @param	balance : �o�����X���w�肷��B�l�� -10,000 �` 10,000 �͈̔͂Ŏw��ł���B
-//! �l�� -10,000 �̏ꍇ�A�E�`�����l���� 100 dB ��������A�����ƂȂ邱�Ƃ��Ӗ����Ă���B
-//! �l�� 10,000 �̏ꍇ�A���`�����l���������ł��邱�Ƃ��Ӗ����Ă���B
-//! �^���̒l�� 0 �ŁA����͗����̃`�����l�����t�� �{�����[���ł��邱�Ƃ��Ӗ����Ă���B
-//! ����̃`�����l������������Ă��A��������̃`�����l���̓t�� �{�����[���̂܂܂ł���B 
+//! @brief	  	オーディオバランスを設定する
+//! @param	balance : バランスを指定する。値は -10,000 ～ 10,000 の範囲で指定できる。
+//! 値が -10,000 の場合、右チャンネルは 100 dB 減衰され、無音となることを意味している。
+//! 値が 10,000 の場合、左チャンネルが無音であることを意味している。
+//! 真中の値は 0 で、これは両方のチャンネルがフル ボリュームであることを意味している。
+//! 一方のチャンネルが減衰されても、もう一方のチャンネルはフル ボリュームのままである。 
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::SetAudioBalance( long balance )
 {
@@ -725,12 +725,12 @@ void __stdcall tTVPDSMovie::SetAudioBalance( long balance )
 	}
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�I�[�f�B�I�o�����X���擾����
-//! @param	*balance : �o�����X�͈̔͂� -10,000 �` 10,000�܂łł���B
-//! �l�� -10,000 �̏ꍇ�A�E�`�����l���� 100 dB ��������A�����ƂȂ邱�Ƃ��Ӗ����Ă���B
-//! �l�� 10,000 �̏ꍇ�A���`�����l���������ł��邱�Ƃ��Ӗ����Ă���B
-//! �^���̒l�� 0 �ŁA����͗����̃`�����l�����t�� �{�����[���ł��邱�Ƃ��Ӗ����Ă���B
-//! ����̃`�����l������������Ă��A��������̃`�����l���̓t�� �{�����[���̂܂܂ł���B 
+//! @brief	  	オーディオバランスを取得する
+//! @param	*balance : バランスの範囲は -10,000 ～ 10,000までである。
+//! 値が -10,000 の場合、右チャンネルは 100 dB 減衰され、無音となることを意味している。
+//! 値が 10,000 の場合、左チャンネルが無音であることを意味している。
+//! 真中の値は 0 で、これは両方のチャンネルがフル ボリュームであることを意味している。
+//! 一方のチャンネルが減衰されても、もう一方のチャンネルはフル ボリュームのままである。 
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetAudioBalance( long *balance )
 {
@@ -744,10 +744,10 @@ void __stdcall tTVPDSMovie::GetAudioBalance( long *balance )
 	}
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�I�[�f�B�I�{�����[����ݒ肷��
-//! @param volume : �{�����[���� -10,000 �` 0 �̐��l�Ŏw�肷��B
-//! �ő�{�����[���� 0�A������ -10,000�B
-//! �K�v�ȃf�V�x���l�� 100 �{����B���Ƃ��΁A-10,000 = -100 dB�B 
+//! @brief	  	オーディオボリュームを設定する
+//! @param volume : ボリュームを -10,000 ～ 0 の数値で指定する。
+//! 最大ボリュームは 0、無音は -10,000。
+//! 必要なデシベル値を 100 倍する。たとえば、-10,000 = -100 dB。 
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::SetAudioVolume( long volume )
 {
@@ -764,10 +764,10 @@ void __stdcall tTVPDSMovie::SetAudioVolume( long volume )
 	}
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�I�[�f�B�I�{�����[����ݒ肷��
-//! @param volume : �{�����[���� -10,000 �` 0 �̐��l�Ŏw�肷��B
-//! �ő�{�����[���� 0�A������ -10,000�B
-//! �K�v�ȃf�V�x���l�� 100 �{����B���Ƃ��΁A-10,000 = -100 dB�B 
+//! @brief	  	オーディオボリュームを設定する
+//! @param volume : ボリュームを -10,000 ～ 0 の数値で指定する。
+//! 最大ボリュームは 0、無音は -10,000。
+//! 必要なデシベル値を 100 倍する。たとえば、-10,000 = -100 dB。 
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetAudioVolume( long *volume )
 {
@@ -781,8 +781,8 @@ void __stdcall tTVPDSMovie::GetAudioVolume( long *volume )
 	}
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�I�[�f�B�I�X�g���[�������擾����
-//! @param streamCount : �I�[�f�B�I�X�g���[����������ϐ��ւ̃|�C���^
+//! @brief	  	オーディオストリーム数を取得する
+//! @param streamCount : オーディオストリーム数を入れる変数へのポインタ
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetNumberOfAudioStream( unsigned long *streamCount )
 {
@@ -792,8 +792,8 @@ void __stdcall tTVPDSMovie::GetNumberOfAudioStream( unsigned long *streamCount )
 		*streamCount = (unsigned long)m_AudioStreamInfo.size();
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�w�肵���I�[�f�B�I�X�g���[���ԍ��̃X�g���[����L���ɂ���
-//! @param num : �L���ɂ���I�[�f�B�I�X�g���[���ԍ�
+//! @brief	  	指定したオーディオストリーム番号のストリームを有効にする
+//! @param num : 有効にするオーディオストリーム番号
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::SelectAudioStream( unsigned long num )
 {
@@ -802,9 +802,9 @@ void __stdcall tTVPDSMovie::SelectAudioStream( unsigned long num )
 	SelectStream( num, m_AudioStreamInfo );
 }
 //----------------------------------------------------------------------------
-// @brief		�L���ȃI�[�f�B�I�X�g���[���ԍ��𓾂�
-// ��ԏ��߂Ɍ��������L���ȃX�g���[���ԍ���Ԃ��B
-// �O���[�v���̂��ׂẴX�g���[�����L���ł���\�������邪�AtTVPDSMovie::SelectAudioStream���g�p�����ꍇ�A�O���[�v����1�������L���ɂȂ�B
+// @brief		有効なオーディオストリーム番号を得る
+// 一番初めに見つかった有効なストリーム番号を返す。
+// グループ内のすべてのストリームが有効である可能性もあるが、tTVPDSMovie::SelectAudioStreamを使用した場合、グループ内で1つだけか有効になる。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetEnableAudioStreamNum( long *num )
 {
@@ -813,8 +813,8 @@ void __stdcall tTVPDSMovie::GetEnableAudioStreamNum( long *num )
 	GetEnableStreamNum( num, m_AudioStreamInfo );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�r�f�I�X�g���[�������擾����
-//! @param streamCount : �r�f�I�X�g���[����������ϐ��ւ̃|�C���^
+//! @brief	  	ビデオストリーム数を取得する
+//! @param streamCount : ビデオストリーム数を入れる変数へのポインタ
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetNumberOfVideoStream( unsigned long *streamCount )
 {
@@ -824,8 +824,8 @@ void __stdcall tTVPDSMovie::GetNumberOfVideoStream( unsigned long *streamCount )
 		*streamCount = (unsigned long)m_VideoStreamInfo.size();
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�w�肵���r�f�I�X�g���[���ԍ��̃X�g���[����L���ɂ���
-//! @param num : �L���ɂ���r�f�I�X�g���[���ԍ�
+//! @brief	  	指定したビデオストリーム番号のストリームを有効にする
+//! @param num : 有効にするビデオストリーム番号
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::SelectVideoStream( unsigned long num )
 {
@@ -834,9 +834,9 @@ void __stdcall tTVPDSMovie::SelectVideoStream( unsigned long num )
 	SelectStream( num, m_VideoStreamInfo );
 }
 //----------------------------------------------------------------------------
-// @brief		�L���ȃr�f�I�X�g���[���ԍ��𓾂�
-// ��ԏ��߂Ɍ��������L���ȃX�g���[���ԍ���Ԃ��B
-// �O���[�v���̂��ׂẴX�g���[�����L���ł���\�������邪�AtTVPDSMovie::SelectAudioStream���g�p�����ꍇ�A�O���[�v����1�������L���ɂȂ�B
+// @brief		有効なビデオストリーム番号を得る
+// 一番初めに見つかった有効なストリーム番号を返す。
+// グループ内のすべてのストリームが有効である可能性もあるが、tTVPDSMovie::SelectAudioStreamを使用した場合、グループ内で1つだけか有効になる。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetEnableVideoStreamNum( long *num )
 {
@@ -845,9 +845,9 @@ void __stdcall tTVPDSMovie::GetEnableVideoStreamNum( long *num )
 	GetEnableStreamNum( num, m_VideoStreamInfo );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�w�肵���X�g���[���ԍ��̃X�g���[����L���ɂ���
-//! @param num : �L���ɂ���X�g���[���ԍ�
-//! @param si : �r�f�I���I�[�f�B�I�̃X�g���[�����
+//! @brief	  	指定したストリーム番号のストリームを有効にする
+//! @param num : 有効にするストリーム番号
+//! @param si : ビデオかオーディオのストリーム情報
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::SelectStream( unsigned long num, std::vector<StreamInfo> &si )
 {
@@ -861,9 +861,9 @@ void __stdcall tTVPDSMovie::SelectStream( unsigned long num, std::vector<StreamI
 	}
 }
 //----------------------------------------------------------------------------
-// @brief		�L���ȃr�f�I�X�g���[���ԍ��𓾂�
-//! @param num : �L���ȃX�g���[���ԍ�������ϐ��ւ̃|�C���^
-//! @param si : �r�f�I���I�[�f�B�I�̃X�g���[�����
+// @brief		有効なビデオストリーム番号を得る
+//! @param num : 有効なストリーム番号を入れる変数へのポインタ
+//! @param si : ビデオかオーディオのストリーム情報
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetEnableStreamNum( long *num, std::vector<StreamInfo> &si )
 {
@@ -890,8 +890,8 @@ void __stdcall tTVPDSMovie::GetEnableStreamNum( long *num, std::vector<StreamInf
 	}
 }
 //----------------------------------------------------------------------------
-// @brief		�I�[�f�B�I�X�g���[���𖳌��ɂ���
-// MPEG I�̎��A���̑���͏o���Ȃ�
+// @brief		オーディオストリームを無効にする
+// MPEG Iの時、この操作は出来ない
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::DisableAudioStream( void )
 {
@@ -912,202 +912,202 @@ void __stdcall tTVPDSMovie::DisableAudioStream( void )
 	}
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�������Ȃ��B
+//! @brief	  	何もしない。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::SetMixingBitmap( HDC hdc, RECT *dest, float alpha )
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�������Ȃ��B
+//! @brief	  	何もしない。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::ResetMixingBitmap()
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�������Ȃ��B
+//! @brief	  	何もしない。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::SetMixingMovieAlpha( float a )
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�������Ȃ��B
+//! @brief	  	何もしない。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetMixingMovieAlpha( float *a )
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�������Ȃ��B
+//! @brief	  	何もしない。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::SetMixingMovieBGColor( unsigned long col )
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�������Ȃ��B
+//! @brief	  	何もしない。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetMixingMovieBGColor( unsigned long *col )
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�������Ȃ��B
+//! @brief	  	何もしない。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::PresentVideoImage()
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�������Ȃ��B
+//! @brief	  	何もしない。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetContrastRangeMin( float *v )
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�������Ȃ��B
+//! @brief	  	何もしない。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetContrastRangeMax( float *v )
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�������Ȃ��B
+//! @brief	  	何もしない。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetContrastDefaultValue( float *v )
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�������Ȃ��B
+//! @brief	  	何もしない。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetContrastStepSize( float *v )
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�������Ȃ��B
+//! @brief	  	何もしない。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetContrast( float *v )
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�������Ȃ��B
+//! @brief	  	何もしない。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::SetContrast( float v )
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�������Ȃ��B
+//! @brief	  	何もしない。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetBrightnessRangeMin( float *v )
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�������Ȃ��B
+//! @brief	  	何もしない。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetBrightnessRangeMax( float *v )
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�������Ȃ��B
+//! @brief	  	何もしない。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetBrightnessDefaultValue( float *v )
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�������Ȃ��B
+//! @brief	  	何もしない。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetBrightnessStepSize( float *v )
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�������Ȃ��B
+//! @brief	  	何もしない。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetBrightness( float *v )
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�������Ȃ��B
+//! @brief	  	何もしない。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::SetBrightness( float v )
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�������Ȃ��B
+//! @brief	  	何もしない。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetHueRangeMin( float *v )
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�������Ȃ��B
+//! @brief	  	何もしない。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetHueRangeMax( float *v )
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�������Ȃ��B
+//! @brief	  	何もしない。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetHueDefaultValue( float *v )
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�������Ȃ��B
+//! @brief	  	何もしない。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetHueStepSize( float *v )
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�������Ȃ��B
+//! @brief	  	何もしない。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetHue( float *v )
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�������Ȃ��B
+//! @brief	  	何もしない。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::SetHue( float v )
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�������Ȃ��B
+//! @brief	  	何もしない。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetSaturationRangeMin( float *v )
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�������Ȃ��B
+//! @brief	  	何もしない。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetSaturationRangeMax( float *v )
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�������Ȃ��B
+//! @brief	  	何もしない。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetSaturationDefaultValue( float *v )
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�������Ȃ��B
+//! @brief	  	何もしない。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetSaturationStepSize( float *v )
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�������Ȃ��B
+//! @brief	  	何もしない。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::GetSaturation( float *v )
 {
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�������Ȃ��B
+//! @brief	  	何もしない。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::SetSaturation( float v )
 {
 }
 
 //----------------------------------------------------------------------------
-//! @brief	  	ROT ( Running Object Table )�ɃO���t��o�^����B
+//! @brief	  	ROT ( Running Object Table )にグラフを登録する。
 //!
 //! Running Object Table functions: Used to debug. By registering the graph
 //! in the running object table, GraphEdit is able to connect to the running
 //! graph. This code should be removed before the application is shipped in
 //! order to avoid third parties from spying on your graph.
-//! @param		ROTreg : �o�^I.D.�B�Ȃ񂩁A������ۂ��̂�n���΂�����łȂ��́B@n
-//! 				�T���v���ł�dwROTReg = 0xfedcba98�Ƃ����̂�n���Ă���B
-//! @return		����
+//! @param		ROTreg : 登録I.D.。なんか、それっぽいのを渡せばいいんでないの。@n
+//! 				サンプルではdwROTReg = 0xfedcba98というのを渡している。
+//! @return		正否
 //----------------------------------------------------------------------------
 HRESULT __stdcall tTVPDSMovie::AddToROT( DWORD ROTreg )
 {
@@ -1134,8 +1134,8 @@ HRESULT __stdcall tTVPDSMovie::AddToROT( DWORD ROTreg )
 }
 
 //----------------------------------------------------------------------------
-//! @brief	  	ROT ( Running Object Table )����O���t�̓o�^����������B
-//! @param		ROTreg : AddToROT�œn�����̂Ɠ�������n���B
+//! @brief	  	ROT ( Running Object Table )からグラフの登録を解除する。
+//! @param		ROTreg : AddToROTで渡したのと同じ物を渡す。
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMovie::RemoveFromROT( DWORD ROTreg )
 {
@@ -1148,9 +1148,9 @@ void __stdcall tTVPDSMovie::RemoveFromROT( DWORD ROTreg )
 	}
 }
 //----------------------------------------------------------------------------
-//! @brief	  	1�t���[���̕��ϕ\�����Ԃ��擾���܂�
-//! @param		pAvgTimePerFrame : 1�t���[���̕��ϕ\������
-//! @return		�G���[�R�[�h
+//! @brief	  	1フレームの平均表示時間を取得します
+//! @param		pAvgTimePerFrame : 1フレームの平均表示時間
+//! @return		エラーコード
 //----------------------------------------------------------------------------
 HRESULT __stdcall tTVPDSMovie::GetAvgTimePerFrame( REFTIME *pAvgTimePerFrame )
 {
@@ -1159,9 +1159,9 @@ HRESULT __stdcall tTVPDSMovie::GetAvgTimePerFrame( REFTIME *pAvgTimePerFrame )
 	return Video()->get_AvgTimePerFrame( pAvgTimePerFrame );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�g���q���烀�[�r�[�̃^�C�v�𔻕ʂ��܂�
-//! @param		mt : ���f�B�A�^�C�v��Ԃ��ϐ��ւ̎Q��
-//! @param		type : ���[�r�[�t�@�C���̊g���q
+//! @brief	  	拡張子からムービーのタイプを判別します
+//! @param		mt : メディアタイプを返す変数への参照
+//! @param		type : ムービーファイルの拡張子
 //----------------------------------------------------------------------------
 void tTVPDSMovie::ParseVideoType( CMediaType &mt, const wchar_t *type )
 {
@@ -1192,9 +1192,9 @@ void tTVPDSMovie::ParseVideoType( CMediaType &mt, const wchar_t *type )
 	}
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�g���q���烀�[�r�[��Windows Media File���ǂ������ʂ��܂�
-//! @param		type : ���[�r�[�t�@�C���̊g���q
-//! @return		Windows Media File���ǂ���
+//! @brief	  	拡張子からムービーがWindows Media Fileかどうか判別します
+//! @param		type : ムービーファイルの拡張子
+//! @return		Windows Media Fileかどうか
 //----------------------------------------------------------------------------
 bool tTVPDSMovie::IsWindowsMediaFile( const wchar_t *type ) const
 {
@@ -1209,9 +1209,9 @@ bool tTVPDSMovie::IsWindowsMediaFile( const wchar_t *type ) const
 	}
 }
 //----------------------------------------------------------------------------
-//! @brief	  	���f�B�A�^�C�v�̊J��
-//!				IEnumMediaTypes�Ŏ擾����AM_MEDIA_TYPE�́A���̃��\�b�h�ō폜���邱��
-//! @param		pmt : IEnumMediaTypes�Ŏ擾����AM_MEDIA_TYPE
+//! @brief	  	メディアタイプの開放
+//!				IEnumMediaTypesで取得したAM_MEDIA_TYPEは、このメソッドで削除すること
+//! @param		pmt : IEnumMediaTypesで取得したAM_MEDIA_TYPE
 //----------------------------------------------------------------------------
 void tTVPDSMovie::UtilDeleteMediaType( AM_MEDIA_TYPE *pmt )
 {
@@ -1240,8 +1240,8 @@ void tTVPDSMovie::UtilDeleteMediaType( AM_MEDIA_TYPE *pmt )
 	CoTaskMemFree((PVOID)pmt);
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�s���ɐڑ��\�ȃ��f�B�A�^�C�v���f�o�b�O�o�͂ɓf��
-//! @param		pPin : �o�͑ΏۂƂȂ�s��
+//! @brief	  	ピンに接続可能なメディアタイプをデバッグ出力に吐く
+//! @param		pPin : 出力対象となるピン
 //----------------------------------------------------------------------------
 void tTVPDSMovie::DebugOutputPinMediaType( IPin *pPin )
 {
@@ -1265,10 +1265,10 @@ void tTVPDSMovie::DebugOutputPinMediaType( IPin *pPin )
 	}
 }
 //----------------------------------------------------------------------------
-//! @brief	  	���f�B�A�^�C�v�̊J��
+//! @brief	  	メディアタイプの開放
 //!
-//! AM_MEDIA_TYPE���ێ����Ă���f�[�^�݂̂��J������
-//! @param		mt : �J������f�[�^��ێ����Ă���AM_MEDIA_TYPE
+//! AM_MEDIA_TYPEが保持しているデータのみを開放する
+//! @param		mt : 開放するデータを保持しているAM_MEDIA_TYPE
 //----------------------------------------------------------------------------
 void tTVPDSMovie::UtilFreeMediaType(AM_MEDIA_TYPE& mt)
 {
@@ -1287,10 +1287,10 @@ void tTVPDSMovie::UtilFreeMediaType(AM_MEDIA_TYPE& mt)
 	}
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�O���t�����烌���_�[�t�B���^��T���āA�擾����
-//! @param		mediatype : �ΏۂƂ��郌���_�[�t�B���^���T�|�[�g���郁�f�B�A�^�C�v
-//! @param		ppFilter : �������������_�[�t�B���^���󂯎��|�C���^�ւ̃|�C���^
-//! @return		�G���[�R�[�h
+//! @brief	  	グラフ内からレンダーフィルタを探して、取得する
+//! @param		mediatype : 対象とするレンダーフィルタがサポートするメディアタイプ
+//! @param		ppFilter : 見つかったレンダーフィルタを受け取るポインタへのポインタ
+//! @return		エラーコード
 //----------------------------------------------------------------------------
 HRESULT tTVPDSMovie::FindRenderer( const GUID *mediatype, IBaseFilter **ppFilter)
 {
@@ -1383,21 +1383,21 @@ HRESULT tTVPDSMovie::FindRenderer( const GUID *mediatype, IBaseFilter **ppFilter
 	return hr;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�O���t������r�f�I�����_�[�t�B���^��T���āA�擾����
-//! @param		ppFilter : ���������r�f�I�����_�[�t�B���^���󂯎��|�C���^�ւ̃|�C���^
-//! @return		�G���[�R�[�h
+//! @brief	  	グラフ内からビデオレンダーフィルタを探して、取得する
+//! @param		ppFilter : 見つかったビデオレンダーフィルタを受け取るポインタへのポインタ
+//! @return		エラーコード
 //----------------------------------------------------------------------------
 HRESULT tTVPDSMovie::FindVideoRenderer( IBaseFilter **ppFilter)
 {
 	return FindRenderer( &MEDIATYPE_Video, ppFilter);
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�s�����擾����
-//! @param		ppFilter : �s����ێ����Ă���t�B���^
-//! @param		dirrequired : �s���̕��� INPUT or OUTPUT
-//! @param		iNum : �擾�������s���̔ԍ� 0�`
-//! @param		ppPin : �s�����󂯎��|�C���^�ւ̃|�C���^
-//! @return		�G���[�R�[�h
+//! @brief	  	ピンを取得する
+//! @param		ppFilter : ピンを保持しているフィルタ
+//! @param		dirrequired : ピンの方向 INPUT or OUTPUT
+//! @param		iNum : 取得したいピンの番号 0～
+//! @param		ppPin : ピンを受け取るポインタへのポインタ
+//! @return		エラーコード
 //----------------------------------------------------------------------------
 HRESULT tTVPDSMovie::GetPin( IBaseFilter * pFilter, PIN_DIRECTION dirrequired, int iNum, IPin **ppPin)
 {
@@ -1435,10 +1435,10 @@ HRESULT tTVPDSMovie::GetPin( IBaseFilter * pFilter, PIN_DIRECTION dirrequired, i
 	return hr;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	���̓s�����擾����
-//! @param		ppFilter : �s����ێ����Ă���t�B���^
-//! @param		nPin : �擾�������s���̔ԍ� 0�`
-//! @return		�s���ւ̃|�C���^
+//! @brief	  	入力ピンを取得する
+//! @param		ppFilter : ピンを保持しているフィルタ
+//! @param		nPin : 取得したいピンの番号 0～
+//! @return		ピンへのポインタ
 //----------------------------------------------------------------------------
 IPin *tTVPDSMovie::GetInPin( IBaseFilter * pFilter, int nPin )
 {
@@ -1447,10 +1447,10 @@ IPin *tTVPDSMovie::GetInPin( IBaseFilter * pFilter, int nPin )
 	return pComPin;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�o�̓s�����擾����
-//! @param		ppFilter : �s����ێ����Ă���t�B���^
-//! @param		nPin : �擾�������s���̔ԍ� 0�`
-//! @return		�s���ւ̃|�C���^
+//! @brief	  	出力ピンを取得する
+//! @param		ppFilter : ピンを保持しているフィルタ
+//! @param		nPin : 取得したいピンの番号 0～
+//! @return		ピンへのポインタ
 //----------------------------------------------------------------------------
 IPin *tTVPDSMovie::GetOutPin( IBaseFilter * pFilter, int nPin )
 {
@@ -1459,11 +1459,11 @@ IPin *tTVPDSMovie::GetOutPin( IBaseFilter * pFilter, int nPin )
     return pComPin;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�t�B���^���ێ����Ă���s���̐����擾����
-//! @param		ppFilter : �s����ێ����Ă���t�B���^
-//! @param		pulInPins : ���̓s���̐����󂯎�邽�߂̕ϐ��ւ̃|�C���^
-//! @param		pulOutPins : �o�̓s���̐����󂯎�邽�߂̕ϐ��ւ̃|�C���^
-//! @return		�G���[�R�[�h
+//! @brief	  	フィルタが保持しているピンの数を取得する
+//! @param		ppFilter : ピンを保持しているフィルタ
+//! @param		pulInPins : 入力ピンの数を受け取るための変数へのポインタ
+//! @param		pulOutPins : 出力ピンの数を受け取るための変数へのポインタ
+//! @return		エラーコード
 //----------------------------------------------------------------------------
 HRESULT tTVPDSMovie::CountFilterPins(IBaseFilter *pFilter, ULONG *pulInPins, ULONG *pulOutPins)
 {
@@ -1503,9 +1503,9 @@ HRESULT tTVPDSMovie::CountFilterPins(IBaseFilter *pFilter, ULONG *pulInPins, ULO
 }
 
 //----------------------------------------------------------------------------
-//! @brief	  	MPEG1 �p�̃O���t���蓮�ō\�z����
-//! @param		pRdr : �O���t�ɎQ�����Ă��郌���_�[�t�B���^
-//! @param		pSrc : �O���t�ɎQ�����Ă���\�[�X�t�B���^
+//! @brief	  	MPEG1 用のグラフを手動で構築する
+//! @param		pRdr : グラフに参加しているレンダーフィルタ
+//! @param		pSrc : グラフに参加しているソースフィルタ
 //----------------------------------------------------------------------------
 void tTVPDSMovie::BuildMPEGGraph( IBaseFilter *pRdr, IBaseFilter *pSrc )
 {
@@ -1596,9 +1596,9 @@ void tTVPDSMovie::BuildMPEGGraph( IBaseFilter *pRdr, IBaseFilter *pSrc )
 }
 
 //----------------------------------------------------------------------------
-//! @brief	  	WMV �p�̃O���t���蓮�ō\�z����
-//! @param		pRdr : �����_�[�t�B���^
-//! @param		pStream : �\�[�X�X�g���[�� (WMV�ł��邱��)
+//! @brief	  	WMV 用のグラフを手動で構築する
+//! @param		pRdr : レンダーフィルタ
+//! @param		pStream : ソースストリーム (WMVであること)
 //----------------------------------------------------------------------------
 void tTVPDSMovie::BuildWMVGraph( IBaseFilter *pRdr, IStream *pStream )
 {
@@ -1655,7 +1655,7 @@ void tTVPDSMovie::BuildWMVGraph( IBaseFilter *pRdr, IStream *pStream )
 
 	// Connect to decoder filter
 	if( FAILED(hr = ConnectFilters( pWMSource, pWMADec )) )
-	{	// �I�[�f�B�I���Ȃ�
+	{	// オーディオがない
 		if( FAILED(hr = GraphBuilder()->RemoveFilter( pWMADec)) )
 			ThrowDShowException(L"Failed to call GraphBuilder()->RemoveFilter( pDDSRenderer).", hr);
 		return;
@@ -1671,9 +1671,9 @@ void tTVPDSMovie::BuildWMVGraph( IBaseFilter *pRdr, IStream *pStream )
 
 }
 //----------------------------------------------------------------------------
-//! @brief	  	�v���O�C���œo�^���ꂽ�t�B���^�ŃO���t���蓮�ō\�z����
-//! @param		pRdr : �O���t�ɎQ�����Ă��郌���_�[�t�B���^
-//! @param		pSrc : �O���t�ɎQ�����Ă���\�[�X�t�B���^
+//! @brief	  	プラグインで登録されたフィルタでグラフを手動で構築する
+//! @param		pRdr : グラフに参加しているレンダーフィルタ
+//! @param		pSrc : グラフに参加しているソースフィルタ
 //----------------------------------------------------------------------------
 void tTVPDSMovie::BuildPluginGraph( struct tTVPDSFilterHandlerType* handler, IBaseFilter *pRdr, IBaseFilter *pSrc )
 {
@@ -1725,9 +1725,9 @@ void tTVPDSMovie::BuildPluginGraph( struct tTVPDSFilterHandlerType* handler, IBa
 }
 #ifdef ENABLE_THEORA
 //----------------------------------------------------------------------------
-//! @brief	  	Theora(ogg) �p�̃O���t���蓮�ō\�z����
-//! @param		pRdr : �O���t�ɎQ�����Ă��郌���_�[�t�B���^
-//! @param		pSrc : �O���t�ɎQ�����Ă���\�[�X�t�B���^
+//! @brief	  	Theora(ogg) 用のグラフを手動で構築する
+//! @param		pRdr : グラフに参加しているレンダーフィルタ
+//! @param		pSrc : グラフに参加しているソースフィルタ
 //----------------------------------------------------------------------------
 void tTVPDSMovie::BuildTheoraGraph( IBaseFilter *pRdr, IBaseFilter *pSrc )
 {
@@ -1781,10 +1781,10 @@ void tTVPDSMovie::BuildTheoraGraph( IBaseFilter *pRdr, IBaseFilter *pSrc )
 }
 #endif
 //----------------------------------------------------------------------------
-//! @brief	  	2�̃t�B���^�[��ڑ�����
-//! @param		pFilterUpstream : �A�b�v�X�g���[���t�B���^
-//! @param		pFilterDownstream : �_�E���X�g���[���t�B���^
-//! @return		�G���[�R�[�h
+//! @brief	  	2つのフィルターを接続する
+//! @param		pFilterUpstream : アップストリームフィルタ
+//! @param		pFilterDownstream : ダウンストリームフィルタ
+//! @return		エラーコード
 //----------------------------------------------------------------------------
 HRESULT tTVPDSMovie::ConnectFilters( IBaseFilter* pFilterUpstream, IBaseFilter* pFilterDownstream )
 {

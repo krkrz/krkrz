@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------
 /*
-	Risa [‚è‚³]      alias ‹g—¢‹g—¢3 [kirikiri-3]
+	Risa [ã‚Šã•]      alias å‰é‡Œå‰é‡Œ3 [kirikiri-3]
 	 stands for "Risa Is a Stagecraft Architecture"
 	Copyright (C) 2000 W.Dee <dee@kikyou.info> and contributors
 
@@ -8,7 +8,7 @@
 */
 //---------------------------------------------------------------------------
 //! @file
-//! @brief WaveƒtƒH[ƒ}ƒbƒgƒRƒ“ƒo[ƒ^‚ÌƒRƒAŠÖ”
+//! @brief Waveãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã‚³ãƒ³ãƒãƒ¼ã‚¿ã®ã‚³ã‚¢é–¢æ•°
 //---------------------------------------------------------------------------
 
 #include "tjsCommHead.h"
@@ -41,7 +41,7 @@ static inline void Float32ToInt16_sse2( tjs_uint16 * d, const float * s ) {
 	_mm_store_si128( (__m128i *)d, _mm_packs_epi32(mlo, mlo) );
 }
 #ifdef TJS_64BIT_OS
-// 64bit ‚Ì‚Í MMX ‚ğg‚í‚¸ASSE2/SSE ‚Åˆ—
+// 64bit ã®æ™‚ã¯ MMX ã‚’ä½¿ã‚ãšã€SSE2/SSE ã§å‡¦ç†
 #define Int16ToFloat32_sse Int16ToFloat32_sse2
 #define Float32ToInt16_sse Float32ToInt16_sse2
 #else
@@ -71,7 +71,7 @@ static inline void Float32ToInt16_sse( tjs_uint16 * d, const float * s ) {
 
 //---------------------------------------------------------------------------
 /**
- * int16¨float32•ÏŠ·
+ * int16â†’float32å¤‰æ›
  */
 void PCMConvertLoopInt16ToFloat32_sse(void * __restrict dest, const void * __restrict src, size_t numsamples)
 {
@@ -79,13 +79,13 @@ void PCMConvertLoopInt16ToFloat32_sse(void * __restrict dest, const void * __res
 	const tjs_int16 * s = static_cast<const tjs_int16*>(src);
 	size_t n;
 
-	// d ‚ªƒAƒ‰ƒCƒ“ƒƒ“ƒg‚³‚ê‚é‚Ü‚Åˆê‚Â‚¸‚Âˆ—‚ğ‚·‚é
+	// d ãŒã‚¢ãƒ©ã‚¤ãƒ³ãƒ¡ãƒ³ãƒˆã•ã‚Œã‚‹ã¾ã§ä¸€ã¤ãšã¤å‡¦ç†ã‚’ã™ã‚‹
 	for(n = 0  ; n < numsamples && !IsAlignedTo128bits(d+n); n ++)
 	{
 		d[n] = s[n] * (1.0f/32767.0f);
 	}
 
-	// ƒƒCƒ“‚Ì•”•ª
+	// ãƒ¡ã‚¤ãƒ³ã®éƒ¨åˆ†
 	if(numsamples >= 8)
 	{
 		for(       ; n < numsamples - 7; n += 8)
@@ -97,7 +97,7 @@ void PCMConvertLoopInt16ToFloat32_sse(void * __restrict dest, const void * __res
 #endif
 	}
 
-	// ‚Ì‚±‚è
+	// ã®ã“ã‚Š
 	for(       ; n < numsamples; n ++)
 	{
 		d[n] = s[n] * (1.0f/32767.0f);
@@ -108,7 +108,7 @@ void PCMConvertLoopInt16ToFloat32_sse(void * __restrict dest, const void * __res
 
 //---------------------------------------------------------------------------
 /**
- * float32¨int16•ÏŠ·
+ * float32â†’int16å¤‰æ›
  */
 void PCMConvertLoopFloat32ToInt16_sse(void * __restrict dest, const void * __restrict src, size_t numsamples)
 {
@@ -116,7 +116,7 @@ void PCMConvertLoopFloat32ToInt16_sse(void * __restrict dest, const void * __res
 	const float * s = reinterpret_cast<const float*>(src);
 	size_t n;
 
-	// s ‚ªƒAƒ‰ƒCƒ“ƒƒ“ƒg‚³‚ê‚é‚Ü‚Åˆê‚Â‚¸‚Âˆ—‚ğ‚·‚é
+	// s ãŒã‚¢ãƒ©ã‚¤ãƒ³ãƒ¡ãƒ³ãƒˆã•ã‚Œã‚‹ã¾ã§ä¸€ã¤ãšã¤å‡¦ç†ã‚’ã™ã‚‹
 	for(n = 0; n < numsamples && !IsAlignedTo128bits(s+n); n ++)
 	{
 		float v = (float)(s[n] * 32767.0);
@@ -126,7 +126,7 @@ void PCMConvertLoopFloat32ToInt16_sse(void * __restrict dest, const void * __res
 			 	v < 0 ? (tjs_int16)(v - 0.5) : (tjs_int16)(v + 0.5);
 	}
 
-	// ƒƒCƒ“‚Ì•”•ª
+	// ãƒ¡ã‚¤ãƒ³ã®éƒ¨åˆ†
 	if(numsamples >= 8)
 	{
 		SetRoundingModeToNearest_SSE();
@@ -139,7 +139,7 @@ void PCMConvertLoopFloat32ToInt16_sse(void * __restrict dest, const void * __res
 #endif
 	}
 
-	// ‚Ì‚±‚è
+	// ã®ã“ã‚Š
 	for(     ; n < numsamples; n ++)
 	{
 		float v = (float)(s[n] * 32767.0);

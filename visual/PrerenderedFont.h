@@ -29,8 +29,8 @@ private:
 	ttstr Storage;
 	// HANDLE FileHandle; // tft file handle
 	// HANDLE MappingHandle; // file mapping handle
-	// ƒtƒ@ƒCƒ‹ƒ}ƒbƒsƒ“ƒO‚Å‚Í‚È‚­A‘S‚ÄÅ‰‚Éƒf[ƒ^‚ğ“Ç‚İ‚ñ‚Å‚µ‚Ü‚¤Œ`‚É‚·‚éB
-	// BinaryStream ‚Å“Ç‚İ‚Ş
+	// ãƒ•ã‚¡ã‚¤ãƒ«ãƒãƒƒãƒ”ãƒ³ã‚°ã§ã¯ãªãã€å…¨ã¦æœ€åˆã«ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã‚“ã§ã—ã¾ã†å½¢ã«ã™ã‚‹ã€‚
+	// BinaryStream ã§èª­ã¿è¾¼ã‚€
 	const tjs_uint8 * Image; // tft mapped memory
 	tjs_uint64 FileLength;
 	tjs_uint RefCount;

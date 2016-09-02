@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * -------------------------------------------------------------------
- * ���̃\�[�X�R�[�h�� Android �̃\�[�X�R�[�h����g���g��Z�ɍ����悤��
- * �C���������̂ł��B
- * �����|�C���g�����Ǘ����Ă������̂́AID�̊��蓖�ĕ���Windows�ł͈ق�
- * ��(���͈̔͂Ɏ��܂�Ȃ�)���߁A�o���o���ŊǗ�����`�ɕύX�B
- * ���Ԃ�ms�P�ʂɕύX�B
+ * このソースコードは Android のソースコードから吉里吉里Zに合うように
+ * 修正したものです。
+ * 複数ポイント同時管理していたものは、IDの割り当て方がWindowsでは異な
+ * る(一定の範囲に収まらない)ため、バラバラで管理する形に変更。
+ * 時間はms単位に変更。
  */
 
 #ifndef _LIBINPUT_VELOCITY_TRACKER_H
@@ -121,7 +121,7 @@ private:
 
 /*
  * Calculates the velocity of pointer movements over time.
- * �|�C���^�̓����̑��x���v�Z����
+ * ポインタの動きの速度を計算する
  */
 class VelocityTracker {
 public:
@@ -177,7 +177,7 @@ private:
 };
 
 
-// �]������̂��������ł͂Ȃ����A�������Ȃ��̂Ŗ��Ȃ����x�̂͂�
+// 余り効率のいい実装ではないが、数が少ないので問題ない速度のはず
 class VelocityTrackers {
 public:
 	static const tjs_int MAX_TRACKING = 10;

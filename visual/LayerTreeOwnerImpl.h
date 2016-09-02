@@ -3,7 +3,7 @@
  * 
  */
 //---------------------------------------------------------------------------
-//!@file ƒŒƒCƒ„[ƒcƒŠ[ƒI[ƒi[
+//!@file ãƒ¬ã‚¤ãƒ¤ãƒ¼ãƒ„ãƒªãƒ¼ã‚ªãƒ¼ãƒŠãƒ¼
 //---------------------------------------------------------------------------
 #ifndef LayerTreeOwnerImple_H
 #define LayerTreeOwnerImple_H
@@ -11,16 +11,16 @@
 #include "LayerTreeOwner.h"
 
 /**
- * Å¬ŒÀ‚ÌLayerTreeOwner‹@”\‚ğ’ñ‹Ÿ‚·‚éB
- * ‚Ù‚Ú iTVPLayerManager ŠÖ˜Aƒƒ\ƒbƒh‚Ì‚İ
- * ‚¢‚­‚Â‚©‚Ìƒƒ\ƒbƒh‚Í–¢À‘•‚È‚Ì‚ÅAŒp³‚µ‚½æ‚ÅÀ‘•‚·‚é•K—v‚ª‚ ‚é
+ * æœ€å°é™ã®LayerTreeOwneræ©Ÿèƒ½ã‚’æä¾›ã™ã‚‹ã€‚
+ * ã»ã¼ iTVPLayerManager é–¢é€£ãƒ¡ã‚½ãƒƒãƒ‰ã®ã¿
+ * ã„ãã¤ã‹ã®ãƒ¡ã‚½ãƒƒãƒ‰ã¯æœªå®Ÿè£…ãªã®ã§ã€ç¶™æ‰¿ã—ãŸå…ˆã§å®Ÿè£…ã™ã‚‹å¿…è¦ãŒã‚ã‚‹
  */
 class tTVPLayerTreeOwner : public iTVPLayerTreeOwner
 {
 protected:
-	size_t PrimaryLayerManagerIndex; //!< ƒvƒ‰ƒCƒ}ƒŠƒŒƒCƒ„ƒ}ƒl[ƒWƒƒ
-	std::vector<iTVPLayerManager *> Managers; //!< ƒŒƒCƒ„ƒ}ƒl[ƒWƒƒ‚Ì”z—ñ
-	tTVPRect DestRect; //!< •`‰ææˆÊ’u
+	size_t PrimaryLayerManagerIndex; //!< ãƒ—ãƒ©ã‚¤ãƒãƒªãƒ¬ã‚¤ãƒ¤ãƒãƒãƒ¼ã‚¸ãƒ£
+	std::vector<iTVPLayerManager *> Managers; //!< ãƒ¬ã‚¤ãƒ¤ãƒãƒãƒ¼ã‚¸ãƒ£ã®é…åˆ—
+	tTVPRect DestRect; //!< æç”»å…ˆä½ç½®
 
 protected:
 	iTVPLayerManager* GetLayerManagerAt(size_t index);
@@ -38,7 +38,7 @@ public:
 	virtual void TJS_INTF_METHOD RegisterLayerManager( class iTVPLayerManager* manager );
 	virtual void TJS_INTF_METHOD UnregisterLayerManager( class iTVPLayerManager* manager );
 
-	/* ÀÛ‚Ì•`‰æ
+	/* å®Ÿéš›ã®æç”»
 	virtual void TJS_INTF_METHOD StartBitmapCompletion(iTVPLayerManager * manager) = 0;
 	virtual void TJS_INTF_METHOD NotifyBitmapCompleted(class iTVPLayerManager * manager,
 		tjs_int x, tjs_int y, const void * bits, const class BitmapInfomation * bitmapinfo,
@@ -46,7 +46,7 @@ public:
 	virtual void TJS_INTF_METHOD EndBitmapCompletion(iTVPLayerManager * manager) = 0;
 	*/
 
-	// ˆÈ‰º‚Í‰½‚à‚µ‚È‚¢
+	// ä»¥ä¸‹ã¯ä½•ã‚‚ã—ãªã„
 	virtual void TJS_INTF_METHOD SetMouseCursor(class iTVPLayerManager* manager, tjs_int cursor);
 	virtual void TJS_INTF_METHOD GetCursorPos(class iTVPLayerManager* manager, tjs_int &x, tjs_int &y);
 	virtual void TJS_INTF_METHOD SetCursorPos(class iTVPLayerManager* manager, tjs_int x, tjs_int y);
@@ -65,8 +65,8 @@ public:
 
 	// virtual iTJSDispatch2 * TJS_INTF_METHOD GetOwnerNoAddRef() const = 0;
 
-	// ˆÈ‰º‚Íãq‚Ìƒƒ\ƒbƒh‚ªƒR[ƒ‹‚³‚ê‚½Œã‚ÉAÀÛ‚É’l‚ğİ’è‚·‚é‚½‚ß‚ÉŒÄ‚Î‚ê‚é
-	// cursor == 0 ‚Í default
+	// ä»¥ä¸‹ã¯ä¸Šè¿°ã®ãƒ¡ã‚½ãƒƒãƒ‰ãŒã‚³ãƒ¼ãƒ«ã•ã‚ŒãŸå¾Œã«ã€å®Ÿéš›ã«å€¤ã‚’è¨­å®šã™ã‚‹ãŸã‚ã«å‘¼ã°ã‚Œã‚‹
+	// cursor == 0 ã¯ default
 	virtual void OnSetMouseCursor( tjs_int cursor ) = 0;
 	virtual void OnGetCursorPos(tjs_int &x, tjs_int &y) = 0;
 	virtual void OnSetCursorPos(tjs_int x, tjs_int y) = 0;
@@ -74,12 +74,12 @@ public:
 	virtual void OnSetHintText(iTJSDispatch2* sender, const ttstr &hint) = 0;
 
 	/**
-	 * ƒvƒ‰ƒCƒ}ƒŠ[ƒŒƒCƒ„[‚ÌƒTƒCƒY‚ª•ÏX‚³‚ê‚½‚ÉŒÄ‚Î‚ê‚é
+	 * ãƒ—ãƒ©ã‚¤ãƒãƒªãƒ¼ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ã‚µã‚¤ã‚ºãŒå¤‰æ›´ã•ã‚ŒãŸæ™‚ã«å‘¼ã°ã‚Œã‚‹
 	 */
 	virtual void OnResizeLayer( tjs_int w, tjs_int h ) = 0;
 	/**
-	 * ƒvƒ‰ƒCƒ}ƒŠ[ƒŒƒCƒ„[‚Ì‰æ‘œ‚ª•ÏX‚³‚ê‚½‚Ì‚ÅA•K—v‚É‰‚¶‚ÄÄ•`‰æ‚ğs‚¤
-	 * NotifyLayerImageChange ‚©‚çŒÄ‚Î‚ê‚Ä‚¢‚é
+	 * ãƒ—ãƒ©ã‚¤ãƒãƒªãƒ¼ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ç”»åƒãŒå¤‰æ›´ã•ã‚ŒãŸã®ã§ã€å¿…è¦ã«å¿œã˜ã¦å†æç”»ã‚’è¡Œã†
+	 * NotifyLayerImageChange ã‹ã‚‰å‘¼ã°ã‚Œã¦ã„ã‚‹
 	 */
 	virtual void OnChangeLayerImage() = 0;
 
@@ -89,7 +89,7 @@ public:
 	virtual void OnResetImeMode() = 0;
 
 	// LTO -> LayerManager/Layer
-	// LayerManager ‚É‘Î‚µ‚ÄƒCƒxƒ“ƒg‚ğ’Ê’m‚·‚é‚½‚ß‚Ìƒƒ\ƒbƒh
+	// LayerManager ã«å¯¾ã—ã¦ã‚¤ãƒ™ãƒ³ãƒˆã‚’é€šçŸ¥ã™ã‚‹ãŸã‚ã®ãƒ¡ã‚½ãƒƒãƒ‰
 	void FireClick(tjs_int x, tjs_int y);
 	void FireDoubleClick(tjs_int x, tjs_int y);
 	void FireMouseDown(tjs_int x, tjs_int y, enum tTVPMouseButton mb, tjs_uint32 flags);
@@ -115,7 +115,7 @@ public:
 
 	void FireRecheckInputState();
 
-	// ƒŒƒCƒ„[ŠÇ—•â•
+	// ãƒ¬ã‚¤ãƒ¤ãƒ¼ç®¡ç†è£œåŠ©
 	tTJSNI_BaseLayer* GetPrimaryLayer();
 	tTJSNI_BaseLayer* GetFocusedLayer();
 	void SetFocusedLayer(tTJSNI_BaseLayer * layer);

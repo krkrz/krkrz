@@ -46,10 +46,10 @@ static tjs_int inline TVPWideCharToUtf8(tjs_char in, char * out)
 #if 1
 	else
 	{
-		TVPThrowExceptionMessage(TJS_W("UTF-16�ł͔��������Ȃ�UTF-8�ւ̕ϊ�"));
+		TVPThrowExceptionMessage(TJS_W("UTF-16では発生し得ないUTF-8への変換"));
 	}
 #else
-	// �ȉ��I���W�i���̃R�[�h�����ǁA�ʂ�Ȃ��͂��B
+	// 以下オリジナルのコードだけど、通らないはず。
 	else if(in < (1<<21))
 	{
 		if(out)

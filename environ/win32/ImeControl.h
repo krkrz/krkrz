@@ -62,7 +62,7 @@ public:
 		HKL hKl = ::GetKeyboardLayout(0);
 		return 0!=::ImmIsIME(hKl);
 	}
-	// ImmSetStatusWindowPos �֐����Ăяo���ƁA�A�v���P�[�V������ IMN_SETSTATUSWINDOWPOS ���b�Z�[�W�����M����܂��B
+	// ImmSetStatusWindowPos 関数を呼び出すと、アプリケーションに IMN_SETSTATUSWINDOWPOS メッセージが送信されます。
 	void SetStatusPosition( int x, int y ) {
 		POINT pt = {x,y};
 		HIMC hImc = ::ImmGetContext(hWnd_);
@@ -83,7 +83,7 @@ public:
 		}
 	}
 	/**
-	 ���̃X���b�h��IME�𖳌��ɂ���
+	 このスレッドのIMEを無効にする
 	 */
 	void Disable() {
 		if( hOldImc_ == INVALID_HANDLE_VALUE ) {
@@ -96,7 +96,7 @@ public:
 			hOldImc_ = INVALID_HANDLE_VALUE;
 		}
 	}
-	// ���̊֐����Ăяo���ƁA�A�v���P�[�V������ IMN_SETCOMPOSITIONFONT ���b�Z�[�W�����M����܂��B
+	// この関数を呼び出すと、アプリケーションに IMN_SETCOMPOSITIONFONT メッセージが送信されます。
 	void SetCompositionFont( tTVPSysFont* font ) {
 		LOGFONT logfont={0};
 		font->GetFont(&logfont);
@@ -123,27 +123,27 @@ public:
 		y = pos.ptCurrentPos.y;
 	}
 	/**
-	 * conversion : ���̓��[�h�̒l���w�肵�܂��B
-	 * 		IME_CMODE_ALPHANUMERIC(0x0000)	�p�����[�h
-	 * 		IME_CMODE_NATIVE(0x0001)		�Ή��������(ON)�E�p������(OFF) ���[�h
+	 * conversion : 入力モードの値を指定します。
+	 * 		IME_CMODE_ALPHANUMERIC(0x0000)	英数モード
+	 * 		IME_CMODE_NATIVE(0x0001)		対応言語入力(ON)・英数入力(OFF) モード
 	 * 		IME_CMODE_CHINESE
 	 * 		IME_CMODE_HANGEUL
-	 * 		IME_CMODE_JAPANESE �ł���`���Ă���
-	 * 		IME_CMODE_KATAKANA(0x0002)		�J�^�J�i(ON)�E�Ђ炪��(OFF) ���[�h
-	 * 		IME_CMODE_FULLSHAPE(0x0008)		�S�p���[�h
-	 * 		IME_CMODE_ROMAN(0x0010)			���[�}�����[�h
-	 * 		IME_CMODE_CHARCODE(0x0020)		�L�����N�^���̓��[�h
-	 * 		IME_CMODE_HANJACONVERT(0x0040)	�n���O�������ϊ����[�h
-	 * 		IME_CMODE_SOFTKBD(0x0080)		�\�t�g�L�[�{�[�h���[�h
-	 * 		IME_CMODE_NOCONVERSION(0x0100)	���ϊ����[�h
-	 * 		IME_CMODE_EUDC(0x0200)			EUD�ϊ����[�h
-	 * 		IME_CMODE_SYMBOL(0x0400)		�V���{�����[�h
-	 * sentence : �ϊ����[�h�̒l���w�肵�܂��B
-	 * 		IME_SMODE_NONE(0x0000)			���ϊ�
-	 * 		IME_SMODE_PLURALCLAUSE(0x0001)	������D��
-	 * 		IME_SMODE_SINGLECONVERT(0x0002)	�P�ϊ�
-	 * 		IME_SMODE_AUTOMATIC(0x0004)		�����ϊ�
-	 * 		IME_SMODE_PHRASEPREDICT(0x0008)	�A���ߕϊ�
+	 * 		IME_CMODE_JAPANESE でも定義してある
+	 * 		IME_CMODE_KATAKANA(0x0002)		カタカナ(ON)・ひらがな(OFF) モード
+	 * 		IME_CMODE_FULLSHAPE(0x0008)		全角モード
+	 * 		IME_CMODE_ROMAN(0x0010)			ローマ字モード
+	 * 		IME_CMODE_CHARCODE(0x0020)		キャラクタ入力モード
+	 * 		IME_CMODE_HANJACONVERT(0x0040)	ハングル文字変換モード
+	 * 		IME_CMODE_SOFTKBD(0x0080)		ソフトキーボードモード
+	 * 		IME_CMODE_NOCONVERSION(0x0100)	無変換モード
+	 * 		IME_CMODE_EUDC(0x0200)			EUD変換モード
+	 * 		IME_CMODE_SYMBOL(0x0400)		シンボルモード
+	 * sentence : 変換モードの値を指定します。
+	 * 		IME_SMODE_NONE(0x0000)			無変換
+	 * 		IME_SMODE_PLURALCLAUSE(0x0001)	複合語優先
+	 * 		IME_SMODE_SINGLECONVERT(0x0002)	単変換
+	 * 		IME_SMODE_AUTOMATIC(0x0004)		自動変換
+	 * 		IME_SMODE_PHRASEPREDICT(0x0008)	連文節変換
 	 */
 	/*
 	bool SetConversionStatus( int conversion, int sentence ) {
@@ -152,18 +152,18 @@ public:
 	*/
 	/**
 	 * @param mode : 
-ModeDisable ���w�肷��ƁAIME�͖����ɂȂ�܂��BIME���g�p�������͂͂ł��܂��񂵁A���[�U�̑���ł�IME��L���ɂ��邱�Ƃ͂ł��܂���B : Disable
-ModeClose ���w�肷��ƁAIME�͖����ɂȂ�܂��BimDisable�ƈقȂ�A���[�U�̑����IME��L���ɂ��邱�Ƃ��ł��܂��B : Close
-ModeOpen ���w�肷��ƁAIME�͗L���ɂȂ�܂��B : Open
-ModeDontCare ���w�肷��ƁAIME�̗L��/�����̏�Ԃ́A�O�̏�Ԃ������p���܂��B���[�U�̑���ɂ����IME��L���ɂ����薳���ɂ����肷�邱�Ƃ��ł��܂��B���{����͂ɂ����ẮA���p/�S�p���������[�U�Ɏ��R�ɓ��͂�����ꍇ�̈�ʓI�ȃ��[�h�ł��B
-ModeSAlpha ���w�肷��ƁAIME�͗L���ɂȂ�A���p�A���t�@�x�b�g���̓��[�h�ɂȂ�܂��B : IME_CMODE_ALPHANUMERIC
-ModeAlpha ���w�肷��ƁAIME�͗L���ɂȂ�A�S�p�A���t�@�x�b�g���̓��[�h�ɂȂ�܂��B : IME_CMODE_FULLSHAPE
-ModeHira ���w�肷��ƁAIME�͗L���ɂȂ�A�Ђ炪�ȓ��̓��[�h�ɂȂ�܂��B
-ModeSKata ���w�肷��ƁAIME�͗L���ɂȂ�A���p�J�^�J�i���̓��[�h�ɂȂ�܂��B : IME_CMODE_KATAKANA
-ModeKata ���w�肷��ƁAIME�͗L���ɂȂ�A�S�p�J�^�J�i���̓��[�h�ɂȂ�܂��B : IME_CMODE_KATAKANA IME_CMODE_NATIVE
-ModeChinese ���w�肷��ƁAIME�͗L���ɂȂ�A2�o�C�g��������͂��󂯕t���郂�[�h�ɂȂ�܂��B���{����ł͎g�p�ł��܂���B : IME_CMODE_CHINESE
-ModeSHanguel ���w�肷��ƁAIME�͗L���ɂȂ�A1�o�C�g�؍�����͂��󂯕t���郂�[�h�ɂȂ�܂��B���{����ł͎g�p�ł��܂���B : IME_CMODE_HANJACONVERT
-ModeHanguel ���w�肷��ƁAIME�͗L���ɂȂ�A2�o�C�g�؍�����͂��󂯕t���郂�[�h�ɂȂ�܂��B���{����ł͎g�p�ł��܂���B : IME_CMODE_HANGEUL
+ModeDisable を指定すると、IMEは無効になります。IMEを使用した入力はできませんし、ユーザの操作でもIMEを有効にすることはできません。 : Disable
+ModeClose を指定すると、IMEは無効になります。imDisableと異なり、ユーザの操作でIMEを有効にすることができます。 : Close
+ModeOpen を指定すると、IMEは有効になります。 : Open
+ModeDontCare を指定すると、IMEの有効/無効の状態は、前の状態を引き継ぎます。ユーザの操作によってIMEを有効にしたり無効にしたりすることができます。日本語入力においては、半角/全角文字をユーザに自由に入力させる場合の一般的なモードです。
+ModeSAlpha を指定すると、IMEは有効になり、半角アルファベット入力モードになります。 : IME_CMODE_ALPHANUMERIC
+ModeAlpha を指定すると、IMEは有効になり、全角アルファベット入力モードになります。 : IME_CMODE_FULLSHAPE
+ModeHira を指定すると、IMEは有効になり、ひらがな入力モードになります。
+ModeSKata を指定すると、IMEは有効になり、半角カタカナ入力モードになります。 : IME_CMODE_KATAKANA
+ModeKata を指定すると、IMEは有効になり、全角カタカナ入力モードになります。 : IME_CMODE_KATAKANA IME_CMODE_NATIVE
+ModeChinese を指定すると、IMEは有効になり、2バイト中国語入力を受け付けるモードになります。日本語環境では使用できません。 : IME_CMODE_CHINESE
+ModeSHanguel を指定すると、IMEは有効になり、1バイト韓国語入力を受け付けるモードになります。日本語環境では使用できません。 : IME_CMODE_HANJACONVERT
+ModeHanguel を指定すると、IMEは有効になり、2バイト韓国語入力を受け付けるモードになります。日本語環境では使用できません。 : IME_CMODE_HANGEUL
 	 */
 	void SetIme( int mode ) {
 		mode_ = mode;

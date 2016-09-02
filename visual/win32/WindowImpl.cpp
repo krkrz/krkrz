@@ -118,7 +118,7 @@ static tjs_int TVPGetDisplayColorFormat()
 	// 0   : other modes
 
 	if( TVPDirect3D ) {
-		// ‚Ü‚¸‚Í Direct3D ‚ğ—p‚¢‚Ä 16bit color format æ“¾‚ğ‚İ‚é
+		// ã¾ãšã¯ Direct3D ã‚’ç”¨ã„ã¦ 16bit color format å–å¾—ã‚’è©¦ã¿ã‚‹
 		D3DDISPLAYMODE mode = {0};
 		if( SUCCEEDED( TVPDirect3D->GetAdapterDisplayMode( D3DADAPTER_DEFAULT, &mode ) ) ) {
 			if( mode.Format == D3DFMT_R5G6B5 ) {
@@ -517,7 +517,7 @@ void TVPEnumerateAllDisplayModes(std::vector<tTVPScreenMode> & modes)
 				//D3DFMT_A2R10G10B10, // not support display
 				//D3DFMT_A8R8G8B8, // not support display
 				D3DFMT_R5G6B5,
-				// D3DFMT_X1R5G5B5, // IDirect3D9::EnumAdapterModes ‚Å‚Í D3DFMT_R5G6B5 ‚Æ“¯“™‚Æˆ—‚³‚ê‚é
+				// D3DFMT_X1R5G5B5, // IDirect3D9::EnumAdapterModes ã§ã¯ D3DFMT_R5G6B5 ã¨åŒç­‰ã¨å‡¦ç†ã•ã‚Œã‚‹
 				D3DFMT_X8R8G8B8
 			};
 			static const int NumOfFormat = sizeof(PixelFormatTypes) / sizeof(PixelFormatTypes[0]);
@@ -542,7 +542,7 @@ void TVPEnumerateAllDisplayModes(std::vector<tTVPScreenMode> & modes)
 							sm.BitsPerPixel = 32;
 							modes.push_back(sm);
 						} else {
-							// unknown ‚±‚±‚Å‚Í–³‹
+							// unknown ã“ã“ã§ã¯ç„¡è¦–
 						}
 					}
 				}
@@ -620,7 +620,7 @@ static void TVPMakeFullScreenModeCandidates(
 	std::vector<tTVPScreenMode> modes;
 	TVPEnumerateAllDisplayModes(modes);
 	std::sort(modes.begin(), modes.end()); // sort by area, and bpp
-	{	// d•¡‚·‚é€–Ú‚ğíœ‚·‚é(ƒŠƒtƒŒƒbƒVƒ…ƒŒ[ƒg‚Åd•¡‚·‚é‰Â”\«‚ª‚ ‚é)
+	{	// é‡è¤‡ã™ã‚‹é …ç›®ã‚’å‰Šé™¤ã™ã‚‹(ãƒªãƒ•ãƒ¬ãƒƒã‚·ãƒ¥ãƒ¬ãƒ¼ãƒˆã§é‡è¤‡ã™ã‚‹å¯èƒ½æ€§ãŒã‚ã‚‹)
 		std::vector<tTVPScreenMode>::iterator new_end = std::unique(modes.begin(),modes.end());
 		modes.erase(new_end, modes.end());
 	}

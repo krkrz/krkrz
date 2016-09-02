@@ -23,7 +23,7 @@
 
 // Nanoseconds per milliseconds.
 //static const nsecs_t NANOS_PER_MS = 1000000;
-// tick ’l‚ÅŒvZ‚·‚é‚Ì‚ÅAŒ³‚Ì•ª‰ğ”\‚Íƒ~ƒŠ•b
+// tick å€¤ã§è¨ˆç®—ã™ã‚‹ã®ã§ã€å…ƒã®åˆ†è§£èƒ½ã¯ãƒŸãƒªç§’
 static const tjs_uint64 NANOS_PER_MS = 1;
 
 // Threshold for determining that a pointer has stopped moving.

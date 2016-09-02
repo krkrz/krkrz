@@ -181,7 +181,7 @@ struct sse2_apply_color_map65_d_functor {
 		da = _mm_srli_epi32( da, 24 );	// >>= 24
 		__m128i opa = _mm_cvtsi32_si128( s );
 		opa = _mm_unpacklo_epi8( opa, zero_ );	// 0000 | 0 s 0 s 0 s 0 s
-		__m128i dopa = opa;	// 4”{‚µ‚Ä–O˜a‚µ‚Ä‚Á‚Äˆ—’·‚¢‚©‚çƒe[ƒuƒ‹‚Ì•û‚ª‚¢‚¢‚©‚àc
+		__m128i dopa = opa;	// 4å€ã—ã¦é£½å’Œã—ã¦ã£ã¦å‡¦ç†é•·ã„ã‹ã‚‰ãƒ†ãƒ¼ãƒ–ãƒ«ã®æ–¹ãŒã„ã„ã‹ã‚‚â€¦
 		dopa = _mm_slli_epi16( dopa, 2 );			// *= 4
 		dopa = _mm_packus_epi16( dopa, zero_ );		// dopa > 255 ? 255 : dopa
 		dopa = _mm_unpacklo_epi8( dopa, zero_ );	// 0000 | 0 s 0 s 0 s 0 s
@@ -226,16 +226,16 @@ struct sse2_apply_color_map65_d_functor {
 		// ( 255 - (255-a)*(255-b)/ 255 ); 
 		__m128i mask = colormask_;
 		mask = _mm_srli_epi32( mask, 8 );	// 0x00ffffff >> 8 = 0x0000ffff
-		dopa = _mm_xor_si128( dopa, mask );	// (a = 255-a, b = 255-b) : ^=xor : •’Ê‚É8bit’PˆÊ‚Åˆø‚¢‚Ä‚àˆê‚©cc
+		dopa = _mm_xor_si128( dopa, mask );	// (a = 255-a, b = 255-b) : ^=xor : æ™®é€šã«8bitå˜ä½ã§å¼•ã„ã¦ã‚‚ä¸€ç·’ã‹â€¦â€¦
 		__m128i mtmp = dopa;
-		dopa = _mm_slli_epi32( dopa, 8 );		// 00ff|ff00	ãˆÊ << 8
-		mtmp = _mm_slli_epi16( mtmp, 8 );		// 0000|ff00	‰ºˆÊ << 8
+		dopa = _mm_slli_epi32( dopa, 8 );		// 00ff|ff00	ä¸Šä½ << 8
+		mtmp = _mm_slli_epi16( mtmp, 8 );		// 0000|ff00	ä¸‹ä½ << 8
 		mtmp = _mm_slli_epi32( mtmp, 8 );		// 00ff|0000
-		dopa = _mm_mullo_epi16( dopa, mtmp );	// ãˆÊ‚Å‰‰ZA‰ºˆÊ•”•ª‚Í‚²‚İ
-		dopa = _mm_srli_epi32( dopa, 16 );		// addr >> 16 | ‰ºˆÊ‚ğÌ‚Ä‚é
+		dopa = _mm_mullo_epi16( dopa, mtmp );	// ä¸Šä½ã§æ¼”ç®—ã€ä¸‹ä½éƒ¨åˆ†ã¯ã”ã¿
+		dopa = _mm_srli_epi32( dopa, 16 );		// addr >> 16 | ä¸‹ä½ã‚’æ¨ã¦ã‚‹
 		dopa = _mm_andnot_si128( dopa, mask );	// ~addr&0x0000ffff
 		dopa = _mm_srli_epi16( dopa, 8 );		// addr>>8
-		dopa = _mm_slli_epi32( dopa, 24 );		// ƒAƒ‹ƒtƒ@ˆÊ’u‚Ö
+		dopa = _mm_slli_epi32( dopa, 24 );		// ã‚¢ãƒ«ãƒ•ã‚¡ä½ç½®ã¸
 
 		md1 = _mm_and_si128( md1, colormask_ );
 		return _mm_or_si128( md1, dopa );

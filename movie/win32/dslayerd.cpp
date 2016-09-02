@@ -1,6 +1,6 @@
 /****************************************************************************/
 /*! @file
-@brief DirectShow‚ğ—˜—p‚µ‚½ƒ€[ƒr[‚ÌƒŒƒCƒ„[•`‰æÄ¶
+@brief DirectShowã‚’åˆ©ç”¨ã—ãŸãƒ ãƒ¼ãƒ“ãƒ¼ã®ãƒ¬ã‚¤ãƒ¤ãƒ¼æç”»å†ç”Ÿ
 
 -----------------------------------------------------------------------------
 	Copyright (C) 2004 T.Imoto <http://www.kaede-software.com>
@@ -25,7 +25,7 @@
 #include "TVPVideoOverlay.h"
 
 //----------------------------------------------------------------------------
-//! @brief	  	m_BmpBits‚ÉNULL‚ğİ’è‚·‚é
+//! @brief	  	m_BmpBitsã«NULLã‚’è¨­å®šã™ã‚‹
 //----------------------------------------------------------------------------
 tTVPDSLayerVideo::tTVPDSLayerVideo()
 {
@@ -33,7 +33,7 @@ tTVPDSLayerVideo::tTVPDSLayerVideo()
 	m_BmpBits[1] = NULL;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	m_BmpBits‚ÉNULL‚ğİ’è‚·‚é
+//! @brief	  	m_BmpBitsã«NULLã‚’è¨­å®šã™ã‚‹
 //----------------------------------------------------------------------------
 tTVPDSLayerVideo::~tTVPDSLayerVideo()
 {
@@ -44,12 +44,12 @@ tTVPDSLayerVideo::~tTVPDSLayerVideo()
 	ReleaseAll();
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒtƒBƒ‹ƒ^ƒOƒ‰ƒt‚Ì\’z
-//! @param 		callbackwin : ƒƒbƒZ[ƒW‚ğ‘—M‚·‚éƒEƒBƒ“ƒhƒE
-//! @param 		stream : “Ç‚İ‚İŒ³ƒXƒgƒŠ[ƒ€
-//! @param 		streamname : ƒXƒgƒŠ[ƒ€‚Ì–¼‘O
-//! @param 		type : ƒƒfƒBƒAƒ^ƒCƒv(Šg’£q)
-//! @param 		size : ƒƒfƒBƒAƒTƒCƒY
+//! @brief	  	ãƒ•ã‚£ãƒ«ã‚¿ã‚°ãƒ©ãƒ•ã®æ§‹ç¯‰
+//! @param 		callbackwin : ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’é€ä¿¡ã™ã‚‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦
+//! @param 		stream : èª­ã¿è¾¼ã¿å…ƒã‚¹ãƒˆãƒªãƒ¼ãƒ 
+//! @param 		streamname : ã‚¹ãƒˆãƒªãƒ¼ãƒ ã®åå‰
+//! @param 		type : ãƒ¡ãƒ‡ã‚£ã‚¢ã‚¿ã‚¤ãƒ—(æ‹¡å¼µå­)
+//! @param 		size : ãƒ¡ãƒ‡ã‚£ã‚¢ã‚µã‚¤ã‚º
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSLayerVideo::BuildGraph( HWND callbackwin, IStream *stream,
 	const wchar_t * streamname, const wchar_t *type, unsigned __int64 size )
@@ -64,7 +64,7 @@ void __stdcall tTVPDSLayerVideo::BuildGraph( HWND callbackwin, IStream *stream,
 		if( FAILED(hr = m_GraphBuilder.CoCreateInstance(CLSID_FilterGraph, NULL, CLSCTX_INPROC)) )
 			ThrowDShowException(L"Failed to create FilterGraph.", hr);
 
-// ƒƒO‚ğ‘‚«o‚·‚É—LŒø‚É‚·‚éB‚Å‚àA‚ ‚ñ‚Ü‚è–ğ‚É—§‚½‚È‚¢‚æ‚¤‚ÈBBB
+// ãƒ­ã‚°ã‚’æ›¸ãå‡ºã™æ™‚ã«æœ‰åŠ¹ã«ã™ã‚‹ã€‚ã§ã‚‚ã€ã‚ã‚“ã¾ã‚Šå½¹ã«ç«‹ãŸãªã„ã‚ˆã†ãªã€‚ã€‚ã€‚
 #if	0
 		{
 			HANDLE	hFile = CreateFile( "C:\\krdslog.txt", GENERIC_WRITE|GENERIC_READ, FILE_SHARE_WRITE|FILE_SHARE_READ, NULL, CREATE_ALWAYS,
@@ -115,13 +115,13 @@ void __stdcall tTVPDSLayerVideo::BuildGraph( HWND callbackwin, IStream *stream,
 			if( FAILED(hr = GraphBuilder()->AddFilter( m_Reader, L"Stream Reader")) )
 				ThrowDShowException(L"Failed to call GraphBuilder()->AddFilter( m_Reader, L\"Stream Reader\").", hr);
 
-			// AddFilter ‚µ‚½‚Ì‚ÅƒŠƒŠ[ƒX‚·‚éB
+			// AddFilter ã—ãŸã®ã§ãƒªãƒªãƒ¼ã‚¹ã™ã‚‹ã€‚
 			m_Reader->Release();
 	
 			if( mt.subtype == MEDIASUBTYPE_Avi || mt.subtype == MEDIASUBTYPE_QTMovie )
 			{
-// GraphBuilder‚É©“®“I‚ÉƒOƒ‰ƒt‚ğ\’z‚³‚¹‚½ŒãAVideo Renderer‚ğ‚·‚°‘Ö‚¦‚é
-// ©‚çƒOƒ‰ƒt‚ğ\’z‚µ‚Ä‚¢‚­‚æ‚è‚àAAVIƒtƒ@ƒCƒ‹‚Ö‚Ì‘Î‰ó‹µ‚ª—Ç‚­‚È‚é‚Í‚¸
+// GraphBuilderã«è‡ªå‹•çš„ã«ã‚°ãƒ©ãƒ•ã‚’æ§‹ç¯‰ã•ã›ãŸå¾Œã€Video Rendererã‚’ã™ã’æ›¿ãˆã‚‹
+// è‡ªã‚‰ã‚°ãƒ©ãƒ•ã‚’æ§‹ç¯‰ã—ã¦ã„ãã‚ˆã‚Šã‚‚ã€AVIãƒ•ã‚¡ã‚¤ãƒ«ã¸ã®å¯¾å¿œçŠ¶æ³ãŒè‰¯ããªã‚‹ã¯ãš
 #if 1
 				if( FAILED(hr = GraphBuilder()->Render(m_Reader->GetPin(0))) )
 					ThrowDShowException(L"Failed to call IGraphBuilder::Render.", hr);
@@ -184,7 +184,7 @@ void __stdcall tTVPDSLayerVideo::BuildGraph( HWND callbackwin, IStream *stream,
 					pinInfo.pFilter->Release();
 					if( FAILED(hr = ConnectFilters( pSpliter, pDDSRenderer ) ) )
 					{
-						if( FAILED(hr = GraphBuilder()->RemoveFilter( pDDSRenderer)) )	// ‰¹–³‚µ‚Æ‚İ‚È‚µ‚ÄAƒtƒBƒ‹ƒ^‚ğíœ‚·‚é
+						if( FAILED(hr = GraphBuilder()->RemoveFilter( pDDSRenderer)) )	// éŸ³ç„¡ã—ã¨ã¿ãªã—ã¦ã€ãƒ•ã‚£ãƒ«ã‚¿ã‚’å‰Šé™¤ã™ã‚‹
 							ThrowDShowException(L"Failed to call GraphBuilder()->RemoveFilter( pDDSRenderer).", hr);
 					}
 				}
@@ -216,7 +216,7 @@ void __stdcall tTVPDSLayerVideo::BuildGraph( HWND callbackwin, IStream *stream,
 			}
 		}
 
-#if 0	// ‹g—¢‹g—¢‚ÌBitmap‚Íã‰º‹t‚ÌŒ`®‚ç‚µ‚¢‚Ì‚ÅAã‰º”½“]‚Ì‚½‚ß‚ÌÄÚ‘±‚Í•K—v‚È‚¢
+#if 0	// å‰é‡Œå‰é‡Œã®Bitmapã¯ä¸Šä¸‹é€†ã®å½¢å¼ã‚‰ã—ã„ã®ã§ã€ä¸Šä¸‹åè»¢ã®ãŸã‚ã®å†æ¥ç¶šã¯å¿…è¦ãªã„
 		{	// Reconnect buffer render filter
 			// get decoder output pin
 			CComPtr<IPin>			pDecoderPinOut;
@@ -294,11 +294,11 @@ void __stdcall tTVPDSLayerVideo::BuildGraph( HWND callbackwin, IStream *stream,
 	}
 
 	MakeAPause(false);
-//	CoUninitialize();	// ‚±‚±‚Å‚±‚ê‚ğŒÄ‚Ô‚Æ‚Ü‚¸‚»‚¤‚È‹C‚ª‚·‚é‚¯‚ÇA‘åä•v‚È‚Ì‚©‚È‚Ÿ
+//	CoUninitialize();	// ã“ã“ã§ã“ã‚Œã‚’å‘¼ã¶ã¨ã¾ãšãã†ãªæ°—ãŒã™ã‚‹ã‘ã©ã€å¤§ä¸ˆå¤«ãªã®ã‹ãªã
 }
 
 //----------------------------------------------------------------------------
-//! @brief	  	ƒCƒ“ƒ^[ƒtƒFƒCƒX‚ğ‰ğ•ú‚·‚é
+//! @brief	  	ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã‚’è§£æ”¾ã™ã‚‹
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSLayerVideo::ReleaseAll()
 {
@@ -316,10 +316,10 @@ void __stdcall tTVPDSLayerVideo::ReleaseAll()
 	tTVPDSMovie::ReleaseAll();
 }
 //----------------------------------------------------------------------------
-//! @brief	  	•`‰æ‚·‚éƒoƒbƒtƒ@‚ğİ’è‚·‚é
-//! @param		buff1 : ƒoƒbƒtƒ@1
-//! @param		buff2 : ƒoƒbƒtƒ@2
-//! @param		size : ƒoƒbƒtƒ@‚ÌƒTƒCƒY
+//! @brief	  	æç”»ã™ã‚‹ãƒãƒƒãƒ•ã‚¡ã‚’è¨­å®šã™ã‚‹
+//! @param		buff1 : ãƒãƒƒãƒ•ã‚¡1
+//! @param		buff2 : ãƒãƒƒãƒ•ã‚¡2
+//! @param		size : ãƒãƒƒãƒ•ã‚¡ã®ã‚µã‚¤ã‚º
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSLayerVideo::SetVideoBuffer( BYTE *buff1, BYTE *buff2, long size )
 {
@@ -335,8 +335,8 @@ void __stdcall tTVPDSLayerVideo::SetVideoBuffer( BYTE *buff1, BYTE *buff2, long 
 		ThrowDShowException(L"Failed to call IBufferAccess::SetBackBuffer.", hr);
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒtƒƒ“ƒgƒoƒbƒtƒ@‚ğæ“¾‚·‚é
-//! @param		buff : ƒoƒbƒtƒ@
+//! @brief	  	ãƒ•ãƒ­ãƒ³ãƒˆãƒãƒƒãƒ•ã‚¡ã‚’å–å¾—ã™ã‚‹
+//! @param		buff : ãƒãƒƒãƒ•ã‚¡
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSLayerVideo::GetFrontBuffer( BYTE **buff )
 {
@@ -346,9 +346,9 @@ void __stdcall tTVPDSLayerVideo::GetFrontBuffer( BYTE **buff )
 		ThrowDShowException(L"Failed to call IBufferAccess::GetFrontBuffer.", hr);
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒrƒfƒI‚Ì‰æ‘œƒTƒCƒY‚ğæ“¾‚·‚é
-//! @param		width : •
-//! @param		height : ‚‚³
+//! @brief	  	ãƒ“ãƒ‡ã‚ªã®ç”»åƒã‚µã‚¤ã‚ºã‚’å–å¾—ã™ã‚‹
+//! @param		width : å¹…
+//! @param		height : é«˜ã•
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSLayerVideo::GetVideoSize( long *width, long *height )
 {
@@ -359,9 +359,9 @@ void __stdcall tTVPDSLayerVideo::GetVideoSize( long *width, long *height )
 		BufferVideo()->get_VideoHeight( height );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	1ƒtƒŒ[ƒ€‚Ì•½‹Ï•\¦ŠÔ‚ğæ“¾‚µ‚Ü‚·
-//! @param		pAvgTimePerFrame : 1ƒtƒŒ[ƒ€‚Ì•½‹Ï•\¦ŠÔ
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	1ãƒ•ãƒ¬ãƒ¼ãƒ ã®å¹³å‡è¡¨ç¤ºæ™‚é–“ã‚’å–å¾—ã—ã¾ã™
+//! @param		pAvgTimePerFrame : 1ãƒ•ãƒ¬ãƒ¼ãƒ ã®å¹³å‡è¡¨ç¤ºæ™‚é–“
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT __stdcall tTVPDSLayerVideo::GetAvgTimePerFrame( REFTIME *pAvgTimePerFrame )
 {

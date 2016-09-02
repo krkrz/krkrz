@@ -263,7 +263,7 @@ public:
 
 	void GetClientRect( struct tTVPRect& rt );
 
-	// メッセージハンドラ
+	// 繝｡繝�繧ｻ繝ｼ繧ｸ繝上Φ繝峨Λ
 	virtual void OnActive( HWND preactive ) {}
 	virtual void OnDeactive( HWND postactive ) {}
 	virtual void OnClose( CloseAction& action ){}

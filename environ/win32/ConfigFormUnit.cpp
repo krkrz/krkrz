@@ -21,20 +21,20 @@
 #include "ApplicationSpecialPath.h"
 #include "BinaryStream.h"
 /*
-IDC_DESCRIPTION_EDIT : à–¾ƒeƒLƒXƒg
-IDC_DEFAULT_BUTTON : ƒfƒtƒHƒ‹ƒgƒ{ƒ^ƒ“
+IDC_DESCRIPTION_EDIT : èª¬æ˜ãƒ†ã‚­ã‚¹ãƒˆ
+IDC_DEFAULT_BUTTON : ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆãƒœã‚¿ãƒ³
 IDC_OPTION_COMBO
 IDC_OPTIONS_TREE
 */
 struct TreeItem {
 	HTREEITEM    ItemHandle;
-	std::wstring Text; // €–Ú–¼
-	std::wstring Caption; // ƒpƒ‰ƒ[ƒ^‚Ì–¼‘O + İ’è’l
-	std::wstring Parameter; // ƒpƒ‰ƒ[ƒ^‚Ì–¼‘O
-	tjs_int Value; // ƒpƒ‰ƒ[ƒ^‚Ìİ’è’lƒCƒ“ƒfƒbƒNƒX
-	tjs_int Defalut; // ƒpƒ‰ƒ[ƒ^‚ÌƒfƒtƒHƒ‹ƒg’lƒCƒ“ƒfƒbƒNƒX
-	std::wstring Description; // €–Ú‚Ìà–¾
-	std::vector<std::pair<std::wstring, std::wstring> > Select; // İ’è‰Â”\‚È’l‚ÌƒŠƒXƒg
+	std::wstring Text; // é …ç›®å
+	std::wstring Caption; // ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®åå‰ + è¨­å®šå€¤
+	std::wstring Parameter; // ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®åå‰
+	tjs_int Value; // ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®è¨­å®šå€¤ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
+	tjs_int Defalut; // ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
+	std::wstring Description; // é …ç›®ã®èª¬æ˜
+	std::vector<std::pair<std::wstring, std::wstring> > Select; // è¨­å®šå¯èƒ½ãªå€¤ã®ãƒªã‚¹ãƒˆ
 };
 
 class ConfigFormUnit {
@@ -50,7 +50,7 @@ class ConfigFormUnit {
 	std::vector<TreeItem> TreeItems;
 
 private:
-	// TreeControl ‚ÉƒAƒCƒeƒ€’Ç‰Á
+	// TreeControl ã«ã‚¢ã‚¤ãƒ†ãƒ è¿½åŠ 
 	HTREEITEM InsertTreeItem( HTREEITEM hParent, const std::wstring& text ) {
 		TV_INSERTSTRUCT tvinsert;
 		ZeroMemory( &tvinsert, sizeof(tvinsert) );
@@ -68,16 +68,16 @@ private:
 		tvitem.hItem = hItem;
 		TreeView_SetItem( TreeControl, &tvitem );
 	}
-	// €–Ú‚ğ‘I‘ğ‚·‚é
+	// é …ç›®ã‚’é¸æŠã™ã‚‹
 	void SelectItem( const TreeItem& item ) {
-		// à–¾XV
+		// èª¬æ˜æ›´æ–°
 		::SetDlgItemText( WindowHandle, IDC_DESCRIPTION_EDIT, item.Description.c_str() );
 
-		// ‘I‘ğˆXV
+		// é¸æŠè‚¢æ›´æ–°
 		::EnableWindow( OptionList, TRUE );
 		UpdateItemList( item );
 		
-		// ƒfƒtƒHƒ‹ƒgƒ{ƒ^ƒ“XV
+		// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆãƒœã‚¿ãƒ³æ›´æ–°
 		SetDefaultButtonEnable( item.Defalut != item.Value );
 	}
 	void ClearOptionList() {
@@ -123,7 +123,7 @@ private:
 			}
 		}
 	}
-	// w’èƒtƒHƒ‹ƒ_‚É‚ ‚éw’èŠg’£q‚Ìƒvƒ‰ƒOƒCƒ“‚©‚çİ’èî•ñ‚ğ“Ç‚İ‚Ş
+	// æŒ‡å®šãƒ•ã‚©ãƒ«ãƒ€ã«ã‚ã‚‹æŒ‡å®šæ‹¡å¼µå­ã®ãƒ—ãƒ©ã‚°ã‚¤ãƒ³ã‹ã‚‰è¨­å®šæƒ…å ±ã‚’èª­ã¿è¾¼ã‚€
 	void LoadPluginOptionDesc( tTVPCommandOptionList* coreopt, const std::wstring& path, const std::wstring& ext ) {
 		std::wstring exename = ExePath();
 		exename = IncludeTrailingBackslash(ExtractFileDir(exename));
@@ -170,7 +170,7 @@ public:
 		::SetDlgItemText( WindowHandle, IDC_DESCRIPTION_EDIT, text.c_str() );
 	}
 	void LoadOptionTree();
-	// Œ»İ‚ÌƒAƒCƒeƒ€‚ğİ’è‚µA‚»‚ê‚É]‚¢•\¦‚ğXV‚·‚é
+	// ç¾åœ¨ã®ã‚¢ã‚¤ãƒ†ãƒ ã‚’è¨­å®šã—ã€ãã‚Œã«å¾“ã„è¡¨ç¤ºã‚’æ›´æ–°ã™ã‚‹
 	void SetCurrentItem( HTREEITEM hItem ) {
 		if( CurrentItem != NULL && CurrentItem->ItemHandle == hItem ) return;
 
@@ -216,7 +216,7 @@ public:
 		}
 		return ret;
 	}
-	// İ’è‚³‚ê‚½“à—e‚ğ•Û‘¶‚·‚é
+	// è¨­å®šã•ã‚ŒãŸå†…å®¹ã‚’ä¿å­˜ã™ã‚‹
 	void SaveSetting() {
 		tTJSVariant val;
 		std::wstring path;
@@ -301,7 +301,7 @@ public:
 };
 static ConfigFormUnit* DialogForm = NULL;
 
-// –{‘Ì‚Æƒvƒ‰ƒOƒCƒ“‚Ìİ’èî•ñ‚ğ“Ç‚İAƒcƒŠ[‚É”½‰f‚·‚é
+// æœ¬ä½“ã¨ãƒ—ãƒ©ã‚°ã‚¤ãƒ³ã®è¨­å®šæƒ…å ±ã‚’èª­è¾¼ã¿ã€ãƒ„ãƒªãƒ¼ã«åæ˜ ã™ã‚‹
 void ConfigFormUnit::LoadOptionTree() {
 	tTVPCommandOptionList* options = TVPGetEngineCommandDesc();
 	if( options ) {
@@ -317,7 +317,7 @@ void ConfigFormUnit::LoadOptionTree() {
 
 		tTJSVariant val;
 		HTREEITEM hFirst = NULL;
-		// —LŒø‚ÈƒAƒCƒeƒ€”‚ğƒJƒEƒ“ƒg
+		// æœ‰åŠ¹ãªã‚¢ã‚¤ãƒ†ãƒ æ•°ã‚’ã‚«ã‚¦ãƒ³ãƒˆ
 		tjs_uint itemcount = 0;
 		tjs_uint count = (tjs_uint)options->Categories.size();
 		for( tjs_uint i = 0; i < count; i++ ) {
@@ -333,7 +333,7 @@ void ConfigFormUnit::LoadOptionTree() {
 		for( tjs_uint i = 0; i < count; i++ ) {
 			const tTVPCommandOptionCategory& category = options->Categories[i];
 			tjs_uint optcount = (tjs_uint)category.Options.size();
-			// ‚Ü‚¸‚ÍƒJƒeƒSƒŠ‚É—LŒø‚ÈƒAƒCƒeƒ€‚ª‚ ‚é‚©ƒ`ƒFƒbƒN‚·‚é
+			// ã¾ãšã¯ã‚«ãƒ†ã‚´ãƒªã«æœ‰åŠ¹ãªã‚¢ã‚¤ãƒ†ãƒ ãŒã‚ã‚‹ã‹ãƒã‚§ãƒƒã‚¯ã™ã‚‹
 			bool hasitem = false;
 			for( tjs_uint j = 0; j < optcount; j++ ) {
 				if( category.Options[j].User ) {
@@ -418,7 +418,7 @@ LRESULT ConfigFormUnit::Dispatch( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 		return TRUE;
 	 case WM_NOTIFY:
 		if( wParam == IDC_OPTIONS_TREE ) {
-			// ƒcƒŠ[ƒRƒ“ƒgƒ[ƒ‹‚Ì’Ê’m‚ÅŒ»İ‘I‘ğ‚³‚ê‚Ä‚¢‚éƒAƒCƒeƒ€‚ğ”F¯
+			// ãƒ„ãƒªãƒ¼ã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã®é€šçŸ¥ã§ç¾åœ¨é¸æŠã•ã‚Œã¦ã„ã‚‹ã‚¢ã‚¤ãƒ†ãƒ ã‚’èªè­˜
 			NMHDR* hdr = (LPNMHDR)lParam;
 			UINT code = hdr->code;
 			if( code == NM_SETCURSOR || code == NM_CLICK || code == NM_SETFOCUS) {
@@ -451,7 +451,7 @@ void TVPShowUserConfig()
 		if( result == IDOK ) {
 			if( DialogForm ) {
 				DialogForm->SaveSetting();
-				::MessageBox( NULL, L"İ’è‚ğ•Û‘¶‚µ‚Ü‚µ‚½", L"Save Option", MB_OK );
+				::MessageBox( NULL, L"è¨­å®šã‚’ä¿å­˜ã—ã¾ã—ãŸ", L"Save Option", MB_OK );
 			}
 		}
 	} catch(...) {

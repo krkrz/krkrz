@@ -20,7 +20,7 @@ extern unsigned char TVPOpacityOnOpacityTable[256*256];
 extern unsigned char TVPNegativeMulTable[256*256];
 }
 
-// ‚Ù‚Úopacityg‚Á‚½ƒAƒ‹ƒtƒ@ƒuƒŒƒ“ƒh‚Æ“¯‚¶‚¾‚¯‚ÇAopa‚Ì—^‚¦‚ç‚ê•û‚ªˆá‚¤
+// ã»ã¼opacityä½¿ã£ãŸã‚¢ãƒ«ãƒ•ã‚¡ãƒ–ãƒ¬ãƒ³ãƒ‰ã¨åŒã˜ã ã‘ã©ã€opaã®ä¸ãˆã‚‰ã‚Œæ–¹ãŒé•ã†
 struct sse2_univ_trans_blend_func {
 	const __m128i zero_;
 	const tjs_uint32 *table_;
@@ -66,7 +66,7 @@ struct sse2_univ_trans_blend_func {
 		return _mm_packus_epi16( ms11, ms12 );
 	}
 #if 0
-	// 2ƒsƒNƒZƒ‹‚¸‚Âˆ—‚·‚é
+	// 2ãƒ”ã‚¯ã‚»ãƒ«ãšã¤å‡¦ç†ã™ã‚‹
 	inline void operator()( tjs_uint32 *d, const tjs_uint32 *s1, const tjs_uint32 *s2, const tjs_uint8 *rule ) const {
 		__m128i ms1 = _mm_loadl_epi64( (const __m128i*)s1 );
 		__m128i ms2 = _mm_loadl_epi64( (const __m128i*)s2 );
@@ -136,7 +136,7 @@ struct sse2_univ_trans_d_blend_func {
 		mask = _mm_srli_epi32( mask, 8 );	// 0x00ff
 		mopa = _mm_xor_si128( mopa, mask );	// 255-opa
 		a1 = _mm_mullo_epi16( a1, mopa );	// a1 * opa
-		// 255-opa ‚¾‚ÆŒë·‚ª‘å‚«‚ß‚¾‚¯‚ÇA‘¬‚¢
+		// 255-opa ã ã¨èª¤å·®ãŒå¤§ãã‚ã ã‘ã©ã€é€Ÿã„
 #else
 		__m128i invopa = _mm_set1_epi32( 256 );
 		invopa = _mm_sub_epi16( invopa, mopa );
@@ -194,14 +194,14 @@ struct sse2_univ_trans_d_blend_func {
 		a1 = _mm_xor_si128( a1, mask );	// (a = 255-a, b = 255-b) : ^=xor
 		__m128i mtmp = a1;
 
-		a1 = _mm_slli_epi32( a1, 8 );		// 00ff|ff00	ãˆÊ << 8
-		mtmp = _mm_slli_epi16( mtmp, 8 );	// 0000|ff00	‰ºˆÊ << 8
+		a1 = _mm_slli_epi32( a1, 8 );		// 00ff|ff00	ä¸Šä½ << 8
+		mtmp = _mm_slli_epi16( mtmp, 8 );	// 0000|ff00	ä¸‹ä½ << 8
 		mtmp = _mm_slli_epi32( mtmp, 8 );	// 00ff|0000
-		a1 = _mm_mullo_epi16( a1, mtmp );	// ãˆÊ‚Å‰‰ZA‰ºˆÊ•”•ª‚Í‚²‚İ
-		a1 = _mm_srli_epi32( a1, 16 );		// addr >> 16 | ‰ºˆÊ‚ğÌ‚Ä‚é
+		a1 = _mm_mullo_epi16( a1, mtmp );	// ä¸Šä½ã§æ¼”ç®—ã€ä¸‹ä½éƒ¨åˆ†ã¯ã”ã¿
+		a1 = _mm_srli_epi32( a1, 16 );		// addr >> 16 | ä¸‹ä½ã‚’æ¨ã¦ã‚‹
 		a1 = _mm_andnot_si128( a1, mask );	// ~addr&0x0000ffff
 		a1 = _mm_srli_epi16( a1, 8 );		// addr>>8
-		a1 = _mm_slli_epi32( a1, 24 );		// ƒAƒ‹ƒtƒ@ˆÊ’u‚Ö
+		a1 = _mm_slli_epi32( a1, 24 );		// ã‚¢ãƒ«ãƒ•ã‚¡ä½ç½®ã¸
 
 		const __m128i colormask = _mm_set1_epi32(0x00ffffff);
 		ms11 = _mm_and_si128( ms11, colormask );
@@ -210,7 +210,7 @@ struct sse2_univ_trans_d_blend_func {
 };
 
 
-// ‚ ‚ç‚©‚¶‚ß 16bit * 2 ‚ÅƒpƒbƒN‚µ‚Ä‚¨‚­
+// ã‚ã‚‰ã‹ã˜ã‚ 16bit * 2 ã§ãƒ‘ãƒƒã‚¯ã—ã¦ãŠã
 void TVPInitUnivTransBlendTable_sse2_c(tjs_uint32 *table, tjs_int phase, tjs_int vague)
 {
 	tjs_int i = 0;
@@ -325,7 +325,7 @@ static inline void sse2_univ_trans_switch(tjs_uint32 *dest, const tjs_uint32 *sr
 		md = _mm_andnot_si128( md, ms11 );	// opa >= src1lv : src1
 		if( _mm_movemask_epi8(opa1) != 0 ) {	// opa < src1lv
 			__m128i ms21 = _mm_loadu_si128( (__m128i const*)src2 );	// src2
-			opa1 = _mm_xor_si128( opa1, not );	// ”½“] opa >= src1lv : src1
+			opa1 = _mm_xor_si128( opa1, not );	// åè»¢ opa >= src1lv : src1
 			__m128i opa2 = mr;
 			opa2 = _mm_cmplt_epi32( mr, msrc2lv );	// opa < src2lv ? 0xff : 0
 			opa1 = _mm_or_si128( opa1, opa2 );	// (opa >= src1lv) || (opa < src2lv)

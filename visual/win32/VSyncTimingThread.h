@@ -6,15 +6,15 @@
 #include "NativeEventQueue.h"
 
 //---------------------------------------------------------------------------
-// VSync�p�̃^�C�~���O�𔭐������邽�߂̃X���b�h
+// VSync用のタイミングを発生させるためのスレッド
 //---------------------------------------------------------------------------
 class tTVPVSyncTimingThread : public tTVPThread
 {
 	DWORD SleepTime;
 	tTVPThreadEvent Event;
 	tTJSCriticalSection CS;
-	DWORD VSyncInterval; //!< VSync �̊Ԋu(�Q�l�l)
-	DWORD LastVBlankTick; //!< �Ō�� vblank �̎���
+	DWORD VSyncInterval; //!< VSync の間隔(参考値)
+	DWORD LastVBlankTick; //!< 最後の vblank の時間
 
 	bool Enabled;
 
@@ -30,7 +30,7 @@ protected:
 	void Proc( NativeEvent& ev );
 
 public:
-	void MeasureVSyncInterval(); // VSyncInterval ���v������
+	void MeasureVSyncInterval(); // VSyncInterval を計測する
 };
 //---------------------------------------------------------------------------
 

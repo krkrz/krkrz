@@ -25,7 +25,7 @@ void TVPFillARGB_sse2_c( tjs_uint32 *dest, tjs_int len, tjs_uint32 value ) {
 	}
 	tjs_uint32 rem = (len>>4)<<4;
 	tjs_uint32* limit = dest + rem;
-	{	// 16pixel‚²‚Æ
+	{	// 16pixelã”ã¨
 		const __m128i mvalue = _mm_set1_epi32( value );
 		while( dest < limit ) {
 			_mm_store_si128( (__m128i*)(dest+ 0), mvalue );
@@ -57,7 +57,7 @@ void TVPFillARGB_NC_sse2_c( tjs_uint32 *dest, tjs_int len, tjs_uint32 value ) {
 	}
 	tjs_uint32 rem = (len>>4)<<4;
 	tjs_uint32* limit = dest + rem;
-	{	// 16pixel‚²‚Æ
+	{	// 16pixelã”ã¨
 		const __m128i mvalue = _mm_set1_epi32( value );
 		while( dest < limit ) {
 			_mm_stream_si128( (__m128i*)(dest+ 0), mvalue );
@@ -118,7 +118,7 @@ inline void sse2_const_color_copy_unroll( tjs_uint32 *dest, tjs_int len, const f
 	}
 	tjs_uint32 rem = (len>>4)<<4;
 	tjs_uint32* limit = dest + rem;
-	{	// 16pixel‚²‚Æ
+	{	// 16pixelã”ã¨
 		while( dest < limit ) {
 			__m128i md0 = _mm_load_si128( (__m128i const*)(dest + 0) );
 			__m128i md1 = _mm_load_si128( (__m128i const*)(dest + 4) );
@@ -263,17 +263,17 @@ struct sse2_const_alpha_fill_blend_d_functor {
 
 		__m128i mask = colormask_;
 		mask = _mm_srli_epi32( mask, 8 );	// 0x00ffffff >> 8 = 0x0000ffff
-		dopa = _mm_xor_si128( dopa, mask );	// (a = 255-a, b = 255-b) : ^=xor : •’Ê‚É8bit’PˆÊ‚Åˆø‚¢‚Ä‚àˆê‚©cc
+		dopa = _mm_xor_si128( dopa, mask );	// (a = 255-a, b = 255-b) : ^=xor : æ™®é€šã«8bitå˜ä½ã§å¼•ã„ã¦ã‚‚ä¸€ç·’ã‹â€¦â€¦
 		__m128i mtmp = dopa;
 
-		dopa = _mm_slli_epi32( dopa, 8 );		// 00ff|ff00	ãˆÊ << 8
-		mtmp = _mm_slli_epi16( mtmp, 8 );		// 0000|ff00	‰ºˆÊ << 8
+		dopa = _mm_slli_epi32( dopa, 8 );		// 00ff|ff00	ä¸Šä½ << 8
+		mtmp = _mm_slli_epi16( mtmp, 8 );		// 0000|ff00	ä¸‹ä½ << 8
 		mtmp = _mm_slli_epi32( mtmp, 8 );		// 00ff|0000
-		dopa = _mm_mullo_epi16( dopa, mtmp );	// ãˆÊ‚Å‰‰ZA‰ºˆÊ•”•ª‚Í‚²‚İ
-		dopa = _mm_srli_epi32( dopa, 16 );		// addr >> 16 | ‰ºˆÊ‚ğÌ‚Ä‚é
+		dopa = _mm_mullo_epi16( dopa, mtmp );	// ä¸Šä½ã§æ¼”ç®—ã€ä¸‹ä½éƒ¨åˆ†ã¯ã”ã¿
+		dopa = _mm_srli_epi32( dopa, 16 );		// addr >> 16 | ä¸‹ä½ã‚’æ¨ã¦ã‚‹
 		dopa = _mm_andnot_si128( dopa, mask );	// ~addr&0x0000ffff
 		dopa = _mm_srli_epi16( dopa, 8 );		// addr>>8
-		dopa = _mm_slli_epi32( dopa, 24 );		// ƒAƒ‹ƒtƒ@ˆÊ’u‚Ö
+		dopa = _mm_slli_epi32( dopa, 24 );		// ã‚¢ãƒ«ãƒ•ã‚¡ä½ç½®ã¸
 
 		mc1 = _mm_and_si128( mc1, colormask_ );
 		return _mm_or_si128( mc1, dopa );
@@ -331,7 +331,7 @@ struct sse2_const_alpha_fill_blend_a_functor {
 		return _mm_packus_epi16( md1, md2 );
 	}
 };
-// TVPFillColor_sse2_c ‚àˆÈ‰º‚ÌƒoƒŠƒG[ƒVƒ‡ƒ“‚Æ‚µ‚ÄÀ‘•‰Â”\‚¾‚¯‚ÇAª‚ÌƒAƒ“ƒ[ƒ‹”Åg‚¤‚±‚Æ‚É‚·‚é
+// TVPFillColor_sse2_c ã‚‚ä»¥ä¸‹ã®ãƒãƒªã‚¨ãƒ¼ã‚·ãƒ§ãƒ³ã¨ã—ã¦å®Ÿè£…å¯èƒ½ã ã‘ã©ã€â†‘ã®ã‚¢ãƒ³ãƒ­ãƒ¼ãƒ«ç‰ˆä½¿ã†ã“ã¨ã«ã™ã‚‹
 template<typename functor>
 inline void sse2_const_color_alpha_blend( tjs_uint32 *dest, tjs_int len, const functor& func ) {
 	if( len <= 0 ) return;
@@ -348,7 +348,7 @@ inline void sse2_const_color_alpha_blend( tjs_uint32 *dest, tjs_int len, const f
 	}
 	tjs_uint32 rem = (len>>2)<<2;
 	tjs_uint32* limit = dest + rem;
-	{	// 4pixel‚²‚Æ
+	{	// 4pixelã”ã¨
 		while( dest < limit ) {
 			__m128i md = _mm_load_si128( (__m128i const*)dest );
 			_mm_store_si128( (__m128i*)dest, func( md ) );
@@ -386,7 +386,7 @@ struct sse2_alpha_color_mat_functor {
 		__m128i ms = _mm_cvtsi32_si128( s );
 		__m128i ma = ms;
 		ma = _mm_srli_epi32( ma, 24 );
-		ma = _mm_shufflelo_epi16( ma, _MM_SHUFFLE( 0, 0, 0, 0 )  );	// ‰ºˆÊ‚Ì‚İ
+		ma = _mm_shufflelo_epi16( ma, _MM_SHUFFLE( 0, 0, 0, 0 )  );	// ä¸‹ä½ã®ã¿
 		
 		ms = _mm_unpacklo_epi8( ms, zero_ );
 		ms = _mm_sub_epi16( ms, md );		// ms -= md

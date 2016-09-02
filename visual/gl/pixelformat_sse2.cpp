@@ -123,7 +123,7 @@ void TVPConvert24BitTo32Bit_ssse3_c(tjs_uint32 *dest, const tjs_uint8 *buf, tjs_
 	mask.m128i_u8[14] = 0x0B;
 	mask.m128i_u8[15] = 0x80;
 
-	// 16’PˆÊ
+	// 16å˜ä½
 	tjs_uint32 rem = (len>>4)<<4;
 	tjs_uint32* limit = dest + rem;
 	while( dest < limit ) {

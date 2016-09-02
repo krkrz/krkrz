@@ -889,11 +889,11 @@ bool tTVPBaseBitmap::Copy9Patch( const tTVPBaseBitmap *ref, tTVPRect& margin )
 
 	tjs_int w = ref->GetWidth();
 	tjs_int h = ref->GetHeight();
-	// 9 + ã‰º‚Ì11ƒsƒNƒZƒ‹‚Í•K—v
+	// 9 + ä¸Šä¸‹ã®11ãƒ”ã‚¯ã‚»ãƒ«ã¯å¿…è¦
 	if( w < 11 || h < 11 ) return false;
 	tjs_int dw = GetWidth();
 	tjs_int dh = GetHeight();
-	// ƒRƒs[æ‚ªŒ³‰æ‘œ‚æ‚è‚à¬‚³‚¢‚ÍƒRƒs[•s‰Â
+	// ã‚³ãƒ”ãƒ¼å…ˆãŒå…ƒç”»åƒã‚ˆã‚Šã‚‚å°ã•ã„æ™‚ã¯ã‚³ãƒ”ãƒ¼ä¸å¯
 	if( dw < (w-2) || dh < (h-2) ) return false;
 
 	const tjs_uint32 *src = (const tjs_uint32*)ref->GetScanLine(0);
@@ -949,7 +949,7 @@ bool tTVPBaseBitmap::Copy9Patch( const tTVPBaseBitmap *ref, tTVPRect& margin )
 
 		if( scale.bottom != -1 && margin.bottom != -1 ) break;
 	}
-	// ƒXƒP[ƒ‹—p‚Ì—Ìˆæ‚ªŒ©•t‚©‚ç‚È‚¢‚ÍƒRƒs[‚Å‚«‚È‚¢
+	// ã‚¹ã‚±ãƒ¼ãƒ«ç”¨ã®é ˜åŸŸãŒè¦‹ä»˜ã‹ã‚‰ãªã„æ™‚ã¯ã‚³ãƒ”ãƒ¼ã§ããªã„
 	if( scale.left == -1 || scale.right == -1 || scale.top == -1 || scale.bottom == -1 )
 		return false;
 	
@@ -969,7 +969,7 @@ bool tTVPBaseBitmap::Copy9Patch( const tTVPBaseBitmap *ref, tTVPRect& margin )
 	const tjs_uint32 *s2 = src + pitch + scale.right;
 	tjs_uint32 *d1 = dst;
 	tjs_uint32 *d2 = dst + src_left_width + dst_center_width;
-	// ã‘¤¶‰E’[‚ÌƒRƒs[
+	// ä¸Šå´å·¦å³ç«¯ã®ã‚³ãƒ”ãƒ¼
 	for( tjs_int y = 0; y < src_top_height; y++ )
 	{
 		memcpy( d1, s1, src_left_width*sizeof(tjs_uint32));
@@ -977,11 +977,11 @@ bool tTVPBaseBitmap::Copy9Patch( const tTVPBaseBitmap *ref, tTVPRect& margin )
 		d1 += dpitch; s1 += pitch;
 		d2 += dpitch; s2 += pitch;
 	}
-	// ã‘¤’†ŠÔ
+	// ä¸Šå´ä¸­é–“
 	const tjs_uint32 *s3 = src + pitch + scale.left;
 	tjs_uint32 *d3 = dst + src_left_width;
 	if( src_center_width == 1 )
-	{   // ƒRƒs[Œ³‚Ì•‚ª1‚Ì‚Í‚»‚ÌF‚Å“h‚è‚Â‚Ô‚·
+	{   // ã‚³ãƒ”ãƒ¼å…ƒã®å¹…ãŒ1ã®æ™‚ã¯ãã®è‰²ã§å¡—ã‚Šã¤ã¶ã™
 		for( tjs_int y = 0; y < src_top_height; y++ )
 		{
 			TVPFillARGB( d3, dst_center_width, *s3 );
@@ -992,23 +992,23 @@ bool tTVPBaseBitmap::Copy9Patch( const tTVPBaseBitmap *ref, tTVPRect& margin )
 	else
 	{   // scale
 		for( tjs_int y = 0; y < src_top_height; y++ )
-		{   // c•ûŒü‚ÍƒuƒŒƒ“ƒh‚µ‚È‚¢‚Ì‚Å‚‘¬‰»o—ˆ‚é‚ªcc
+		{   // ç¸¦æ–¹å‘ã¯ãƒ–ãƒ¬ãƒ³ãƒ‰ã—ãªã„ã®ã§é«˜é€ŸåŒ–å‡ºæ¥ã‚‹ãŒâ€¦â€¦
 			TVPInterpStretchCopy( d3, dst_center_width, s3, s3, 0, 0, src_center_step );
 			d3 += dpitch; s3 += pitch;
 		}
 	}
-	// ’†ŠÔˆÊ’u
-	// s1 s2 s3 d1 d2 d3 ‚ÍA’†ŠÔˆÊ’u‚ğw‚µ‚Ä‚¢‚é‚Í‚¸
+	// ä¸­é–“ä½ç½®
+	// s1 s2 s3 d1 d2 d3 ã¯ã€ä¸­é–“ä½ç½®ã‚’æŒ‡ã—ã¦ã„ã‚‹ã¯ãš
 	if( src_center_height == 1 )
 	{
-		// ’†ŠÔˆÊ’u‚Ì—¼’[
+		// ä¸­é–“ä½ç½®ã®ä¸¡ç«¯
 		for( tjs_int y = 0; y < dst_center_height; y ++ )
 		{
 			memcpy( d1, s1, src_left_width*sizeof(tjs_uint32));
 			memcpy( d2, s2, src_right_width*sizeof(tjs_uint32));
 			d1 += dpitch; d2 += dpitch;
 		}
-		// ’†ŠÔˆÊ’u‚Ì^‚ñ’†
+		// ä¸­é–“ä½ç½®ã®çœŸã‚“ä¸­
 		if( src_center_width == 1 )
 		{
 			for( tjs_int y = 0; y < dst_center_height; y ++ )
@@ -1029,24 +1029,24 @@ bool tTVPBaseBitmap::Copy9Patch( const tTVPBaseBitmap *ref, tTVPRect& margin )
 	else
 	{
 		tTVPRect cliprect(0,0,dw,dh);
-		{		// ¶‘¤
+		{		// å·¦å´
 			tTVPRect srcrect( 1,        scale.top,     scale.left, scale.bottom );
 			tTVPRect dstrect( 0,   src_top_height, src_left_width,   (src_top_height+dst_center_height) );
 			TVPResampleImage( cliprect, this, dstrect, ref, srcrect, stSemiFastLinear, 0.0f, bmCopy, 255, false );
 		}
-		{		// ’†ŠÔ
+		{		// ä¸­é–“
 			tTVPRect srcrect(     scale.left,      scale.top,                     scale.right, scale.bottom );
 			tTVPRect dstrect( src_left_width, src_top_height, src_left_width+dst_center_width, src_top_height+dst_center_height );
 			TVPResampleImage( cliprect, this, dstrect, ref, srcrect, stSemiFastLinear, 0.0f, bmCopy, 255, false );   
 		}
-		{		// ‰E‘¤
+		{		// å³å´
 			tTVPRect srcrect(          scale.right,        scale.top, w-1, scale.bottom );
 			tTVPRect dstrect( dw - src_right_width,   src_top_height,  dw,   src_top_height+dst_center_height );
 			TVPResampleImage( cliprect, this, dstrect, ref, srcrect, stSemiFastLinear, 0.0f, bmCopy, 255, false );
 		}
 	}
 	
-	// ‰º‘¤¶‰E’[‚ÌƒRƒs[
+	// ä¸‹å´å·¦å³ç«¯ã®ã‚³ãƒ”ãƒ¼
 	s1 = src + pitch * scale.bottom + 1;
 	s2 = src + pitch * scale.bottom + scale.right;
 	d1 = dst + dpitch * (dh-src_bottom_height);
@@ -1058,11 +1058,11 @@ bool tTVPBaseBitmap::Copy9Patch( const tTVPBaseBitmap *ref, tTVPRect& margin )
 		d1 += dpitch; s1 += pitch;
 		d2 += dpitch; s2 += pitch;
 	}
-	// ‰º‘¤’†ŠÔ
+	// ä¸‹å´ä¸­é–“
 	s3 = src + pitch * scale.bottom + scale.left;
 	d3 = dst + dpitch * (dh-src_bottom_height) + src_left_width;
 	if( src_center_width == 1 )
-	{   // ƒRƒs[Œ³‚Ì•‚ª1‚Ì‚Í‚»‚ÌF‚Å“h‚è‚Â‚Ô‚·
+	{   // ã‚³ãƒ”ãƒ¼å…ƒã®å¹…ãŒ1ã®æ™‚ã¯ãã®è‰²ã§å¡—ã‚Šã¤ã¶ã™
 		for( tjs_int y = 0; y < src_bottom_height; y++ )
 		{
 			TVPFillARGB( d3, dst_center_width, *s3 );

@@ -1147,11 +1147,11 @@ void TVPShowScriptException(eTJSScriptError &e)
 				tjs_int lineno = 1+e.GetBlockNoAddRef()->SrcPosToLine(e.GetPosition() )- e.GetBlockNoAddRef()->GetLineOffset();
 
 #if defined(WIN32) && defined(_DEBUG) && !defined(ENABLE_DEBUGGER)
-// ƒfƒoƒbƒKÀs‚³‚ê‚Ä‚¢‚éAVisual Studio ‚ÅsƒWƒƒƒ“ƒv‚·‚é‚Ìw’è‚ğƒfƒoƒbƒOo—Í‚Éo‚µ‚ÄAbreak ‚Å’â~‚·‚é
+// ãƒ‡ãƒãƒƒã‚¬å®Ÿè¡Œã•ã‚Œã¦ã„ã‚‹æ™‚ã€Visual Studio ã§è¡Œã‚¸ãƒ£ãƒ³ãƒ—ã™ã‚‹æ™‚ã®æŒ‡å®šã‚’ãƒ‡ãƒãƒƒã‚°å‡ºåŠ›ã«å‡ºã—ã¦ã€break ã§åœæ­¢ã™ã‚‹
 				if( ::IsDebuggerPresent() ) {
 					std::wstring debuglile( std::wstring(L"2>")+path.AsStdString()+L"("+std::to_wstring(lineno)+L"): error :" + errstr.AsStdString() );
 					::OutputDebugString( debuglile.c_str() );
-					// ‚±‚±‚Å break‚Å’â~‚µ‚½A’¼‘O‚Ìo—Ís‚ğƒ_ƒuƒ‹ƒNƒŠƒbƒN‚·‚ê‚ÎA—áŠO‰ÓŠ‚ÌƒXƒNƒŠƒvƒg‚ğVisual Studio‚ÅŠJ‚¯‚é
+					// ã“ã“ã§ breakã§åœæ­¢ã—ãŸæ™‚ã€ç›´å‰ã®å‡ºåŠ›è¡Œã‚’ãƒ€ãƒ–ãƒ«ã‚¯ãƒªãƒƒã‚¯ã™ã‚Œã°ã€ä¾‹å¤–ç®‡æ‰€ã®ã‚¹ã‚¯ãƒªãƒ—ãƒˆã‚’Visual Studioã§é–‹ã‘ã‚‹
 					::DebugBreak();
 				}
 #endif

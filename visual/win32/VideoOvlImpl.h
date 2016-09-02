@@ -43,21 +43,21 @@ class tTJSNI_VideoOverlay : public tTJSNI_BaseVideoOverlay
 	tTVPLocalTempStorageHolder *LocalTempStorageHolder;
 	class tTJSNI_BaseLayer	*Layer1;
 	class tTJSNI_BaseLayer	*Layer2;
-	tTVPVideoOverlayMode	Mode;	//!< Mode‚Ì“®“I‚È•ÏX‚Ío—ˆ‚È‚¢Bopen‘O‚ÉƒZƒbƒg‚µ‚Ä‚¨‚­‚±‚Æ
+	tTVPVideoOverlayMode	Mode;	//!< Modeã®å‹•çš„ãªå¤‰æ›´ã¯å‡ºæ¥ãªã„ã€‚openå‰ã«ã‚»ãƒƒãƒˆã—ã¦ãŠãã“ã¨
 	bool	Loop;
 
-	class tTVPBaseBitmap	*Bitmap[2];	//!< Layer•`‰æ—pƒoƒbƒtƒ@—pBitmap
+	class tTVPBaseBitmap	*Bitmap[2];	//!< Layeræç”»ç”¨ãƒãƒƒãƒ•ã‚¡ç”¨Bitmap
 	BYTE			*BmpBits[2];
 
-	bool	IsPrepare;			//!< €”õƒ‚[ƒh‚©‚Ç‚¤‚©
+	bool	IsPrepare;			//!< æº–å‚™ãƒ¢ãƒ¼ãƒ‰ã‹ã©ã†ã‹
 
-	int		SegLoopStartFrame;	//!< ƒZƒOƒƒ“ƒgƒ‹[ƒvŠJŽnƒtƒŒ[ƒ€
-	int		SegLoopEndFrame;	//!< ƒZƒOƒƒ“ƒgƒ‹[ƒvI—¹ƒtƒŒ[ƒ€
+	int		SegLoopStartFrame;	//!< ã‚»ã‚°ãƒ¡ãƒ³ãƒˆãƒ«ãƒ¼ãƒ—é–‹å§‹ãƒ•ãƒ¬ãƒ¼ãƒ 
+	int		SegLoopEndFrame;	//!< ã‚»ã‚°ãƒ¡ãƒ³ãƒˆãƒ«ãƒ¼ãƒ—çµ‚äº†ãƒ•ãƒ¬ãƒ¼ãƒ 
 
-	//! ƒCƒxƒ“ƒg‚ªÝ’è‚³‚ê‚½ŽžAŒ»ÝƒtƒŒ[ƒ€‚Ì•û‚ªi‚ñ‚Å‚¢‚½‚©‚Ç‚¤‚©B
-	//! ƒCƒxƒ“ƒg‚ªÝ’è‚³‚ê‚Ä‚¢‚éƒtƒŒ[ƒ€‚æ‚è‘O‚ÉŒ»ÝƒtƒŒ[ƒ€‚ªˆÚ“®‚µ‚½ŽžA‚±‚Ìƒtƒ‰ƒO‚Í‰ðœ‚³‚ê‚éB
+	//! ã‚¤ãƒ™ãƒ³ãƒˆãŒè¨­å®šã•ã‚ŒãŸæ™‚ã€ç¾åœ¨ãƒ•ãƒ¬ãƒ¼ãƒ ã®æ–¹ãŒé€²ã‚“ã§ã„ãŸã‹ã©ã†ã‹ã€‚
+	//! ã‚¤ãƒ™ãƒ³ãƒˆãŒè¨­å®šã•ã‚Œã¦ã„ã‚‹ãƒ•ãƒ¬ãƒ¼ãƒ ã‚ˆã‚Šå‰ã«ç¾åœ¨ãƒ•ãƒ¬ãƒ¼ãƒ ãŒç§»å‹•ã—ãŸæ™‚ã€ã“ã®ãƒ•ãƒ©ã‚°ã¯è§£é™¤ã•ã‚Œã‚‹ã€‚
 	bool	IsEventPast;
-	int		EventFrame;		//!< ƒCƒxƒ“ƒg‚ð”­¶‚³‚¹‚éƒtƒŒ[ƒ€
+	int		EventFrame;		//!< ã‚¤ãƒ™ãƒ³ãƒˆã‚’ç™ºç”Ÿã•ã›ã‚‹ãƒ•ãƒ¬ãƒ¼ãƒ 
 
 public:
 	tTJSNI_VideoOverlay();

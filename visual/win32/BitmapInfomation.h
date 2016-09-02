@@ -22,7 +22,7 @@ public:
 		return *this;
 	}
 
-	// 以下、Win32 のみのメソッド
+	// 莉･荳九仝in32 縺ｮ縺ｿ縺ｮ繝｡繧ｽ繝�繝�
 	BITMAPINFO* GetBITMAPINFO() { return BitmapInfo; }
 	const BITMAPINFO* GetBITMAPINFO() const { return BitmapInfo; }
 };

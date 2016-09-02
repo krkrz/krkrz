@@ -41,7 +41,7 @@ public:
 
 	void SetSize(tjs_uint width, tjs_uint height, bool keepimage = true);
 	// for async load
-	// @param bits : tTVPBitmapBitsAlloc::Alloc‚ÅŠm•Û‚µ‚½‚à‚Ì‚ğg—p‚·‚é‚±‚Æ
+	// @param bits : tTVPBitmapBitsAlloc::Allocã§ç¢ºä¿ã—ãŸã‚‚ã®ã‚’ä½¿ç”¨ã™ã‚‹ã“ã¨
 	void SetSizeAndImageBuffer( tjs_uint width, tjs_uint height, void* bits );
 
 	void SetWidth(tjs_uint width);

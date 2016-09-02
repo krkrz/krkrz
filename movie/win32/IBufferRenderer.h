@@ -3,7 +3,7 @@
 #ifndef __IBUFFER_RENDERER_H__
 #define __IBUFFER_RENDERER_H__
 
-#define EC_UPDATE		(EC_USER+1)	// ‚±‚ê‚Í•ª—£‚µ‚½•û‚ª—Ç‚¢‚©‚à
+#define EC_UPDATE		(EC_USER+1)	// ã“ã‚Œã¯åˆ†é›¢ã—ãŸæ–¹ãŒè‰¯ã„ã‹ã‚‚
 
 EXTERN_C const IID CLSID_BufferRenderer;
 

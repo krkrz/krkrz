@@ -28,7 +28,7 @@ struct tTVPAtClassInstallInfo {
 	}
 	const tjs_char* Name;
 	iTJSDispatch2* (*Handler)(iTJSDispatch2*);
-	std::vector<std::wstring> Dependences;	// ˆË‘¶ƒNƒ‰ƒXƒŠƒXƒg
+	std::vector<std::wstring> Dependences;	// ä¾å­˜ã‚¯ãƒ©ã‚¹ãƒªã‚¹ãƒˆ
 };
 static std::vector<tTVPAtClassInstallInfo> *TVPAtClassInstallInfos = NULL;
 static bool TVPAtInstallClass = false;

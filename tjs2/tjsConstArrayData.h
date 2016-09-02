@@ -20,7 +20,7 @@
 namespace TJS
 {
 /**
- * TJS2 ƒoƒCƒgƒR[ƒh‘‚«o‚µ‚Å Variant Œ^‚ğ•ª—£‚µAŒÅ—LŒ^‚Å•Û‚·‚é‚½‚ß‚ÌƒNƒ‰ƒX
+ * TJS2 ãƒã‚¤ãƒˆã‚³ãƒ¼ãƒ‰æ›¸ãå‡ºã—ã§ Variant å‹ã‚’åˆ†é›¢ã—ã€å›ºæœ‰å‹ã§ä¿æŒã™ã‚‹ãŸã‚ã®ã‚¯ãƒ©ã‚¹
  */
 class tjsConstArrayData {
 private:
@@ -32,14 +32,14 @@ private:
 	std::vector<std::wstring> String;
 	std::vector<std::vector<tjs_uint8>* > ByteBuffer;
 
-	// •Û‚µ‚½‚©‚Ç‚¤‚©”»’è‚·‚é‚½‚ß‚ÌƒnƒbƒVƒ…
+	// ä¿æŒã—ãŸã‹ã©ã†ã‹åˆ¤å®šã™ã‚‹ãŸã‚ã®ãƒãƒƒã‚·ãƒ¥
 	std::map<tjs_int8,int> ByteHash;
 	std::map<tjs_int16,int> ShortHash;
 	std::map<tjs_int32,int> IntegerHash;
 	std::map<tjs_int64,int> LongHash;
 	std::map<double,int> DoubleHash;
 	std::map<std::wstring,int> StringHash;
-	// ƒIƒNƒeƒbƒgŒ^‚Ì‚ÍƒnƒbƒVƒ…‚ğg‚Á‚Ä‚¢‚È‚¢
+	// ã‚ªã‚¯ãƒ†ãƒƒãƒˆå‹ã®æ™‚ã¯ãƒãƒƒã‚·ãƒ¥ã‚’ä½¿ã£ã¦ã„ãªã„
 
 	static const tjs_uint8 TYPE_VOID = 0;
 	static const tjs_uint8 TYPE_OBJECT = 1;
@@ -54,32 +54,32 @@ private:
 	static const tjs_uint8 TYPE_UNKNOWN = -1;
 
 	/**
-	 * ƒIƒNƒeƒbƒgŒ^‚Ì’l‚ğŠi”[‚·‚é
+	 * ã‚ªã‚¯ãƒ†ãƒƒãƒˆå‹ã®å€¤ã‚’æ ¼ç´ã™ã‚‹
 	 */
 	int PutByteBuffer( tTJSVariantOctet* val );
 
 	/**
-	 * 1ƒoƒCƒg‚Ì’l‚ğŠi”[‚·‚é
+	 * 1ãƒã‚¤ãƒˆã®å€¤ã‚’æ ¼ç´ã™ã‚‹
 	 */
 	int PutByte( tjs_int8 b );
 	
 	/**
-	 * 2ƒoƒCƒg‚Ì’l‚ğŠi”[‚·‚é
+	 * 2ãƒã‚¤ãƒˆã®å€¤ã‚’æ ¼ç´ã™ã‚‹
 	 */
 	int PutShort( tjs_int16 b );
 	
 	/**
-	 * 4ƒoƒCƒg‚Ì’l‚ğŠi”[‚·‚é
+	 * 4ãƒã‚¤ãƒˆã®å€¤ã‚’æ ¼ç´ã™ã‚‹
 	 */
 	int PutInteger( tjs_int32 b );
 	
 	/**
-	 * 8ƒoƒCƒg‚Ì’l‚ğŠi”[‚·‚é
+	 * 8ãƒã‚¤ãƒˆã®å€¤ã‚’æ ¼ç´ã™ã‚‹
 	 */
 	int PutLong( tjs_int64 b );
 	
 	/**
-	 * •‚“®¬”“_’l‚ğŠi”[‚·‚é
+	 * æµ®å‹•å°æ•°ç‚¹å€¤ã‚’æ ¼ç´ã™ã‚‹
 	 */
 	int PutDouble( double b );
 
@@ -108,22 +108,22 @@ public:
 	~tjsConstArrayData();
 
 	/**
-	 * •¶š—ñ‚ğŠi”[‚·‚é
+	 * æ–‡å­—åˆ—ã‚’æ ¼ç´ã™ã‚‹
 	 */
 	int PutString( const tjs_char* val );
 
 	/**
-	 * ƒoƒCƒAƒ“ƒgŒ^‚ªŠi”[‚µ‚Ä‚¢‚éŒ^‚ğ“¾‚é
+	 * ãƒã‚¤ã‚¢ãƒ³ãƒˆå‹ãŒæ ¼ç´ã—ã¦ã„ã‚‹å‹ã‚’å¾—ã‚‹
 	 */
 	int GetType( tTJSVariant& v, tTJSScriptBlock* block );
 
 	/**
-	 * ƒoƒCƒAƒ“ƒg’l‚ğŠi”[‚·‚é
+	 * ãƒã‚¤ã‚¢ãƒ³ãƒˆå€¤ã‚’æ ¼ç´ã™ã‚‹
 	 */
 	int PutVariant( tTJSVariant& v, tTJSScriptBlock* block );
 
 	/**
-	 * •Û‚³‚ê‚Ä‚¢‚é’l‚ğƒoƒCƒg—ñ‚É‚µ‚Äæ‚èo‚·
+	 * ä¿æŒã•ã‚Œã¦ã„ã‚‹å€¤ã‚’ãƒã‚¤ãƒˆåˆ—ã«ã—ã¦å–ã‚Šå‡ºã™
 	 */
 	std::vector<tjs_uint8>* ExportBuffer();
 };

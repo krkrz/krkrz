@@ -32,7 +32,7 @@ void TVPMakeAlphaFromKey_sse2_c(tjs_uint32 *dest, tjs_int len, tjs_uint32 key) {
 
 	key &= 0x00ffffff;
 	tjs_int count = (tjs_int)((unsigned)dest & 0xF);
-	if( count ) {	// ‚±‚±‚Å len > 3 ‚Æ‚µ‚Ä‚µ‚Ü‚Á‚½•û‚ª‚¢‚¢‚©‚È
+	if( count ) {	// ã“ã“ã§ len > 3 ã¨ã—ã¦ã—ã¾ã£ãŸæ–¹ãŒã„ã„ã‹ãª
 		count = (16 - count)>>2;
 		count = count > len ? len : count;
 		tjs_uint32* limit = dest + count;
@@ -53,7 +53,7 @@ void TVPMakeAlphaFromKey_sse2_c(tjs_uint32 *dest, tjs_int len, tjs_uint32 key) {
 		const __m128i alpha = _mm_set1_epi32( 0xff000000 );
 		do {
 			__m128i md = _mm_load_si128( (__m128i const*)dest );
-			md = _mm_and_si128( md, mmask );	// d &= mask ƒAƒ‹ƒtƒ@‚ğƒNƒŠƒA(“§–¾‚É)
+			md = _mm_and_si128( md, mmask );	// d &= mask ã‚¢ãƒ«ãƒ•ã‚¡ã‚’ã‚¯ãƒªã‚¢(é€æ˜ã«)
 			__m128i mk = mmkey;
 			mk = _mm_cmpeq_epi32( mk, md );		// d == key ? 1111 : 0000
 			mk = _mm_andnot_si128( mk, alpha );	// maskalpha = (^cmpmask) & alpha
@@ -120,8 +120,8 @@ void TVPReverse32_sse2_c(tjs_uint32 *pixels, tjs_int len) {
 	while( pixels < limit ) {
 		__m128i ms = _mm_loadu_si128( (__m128i const*)pixels );
 		__m128i md = _mm_loadu_si128( (__m128i const*)&dest[-3] );
-		ms = _mm_shuffle_epi32( ms, _MM_SHUFFLE( 0, 1, 2, 3 ) );	// ‹t“]
-		md = _mm_shuffle_epi32( md, _MM_SHUFFLE( 0, 1, 2, 3 ) );	// ‹t“]
+		ms = _mm_shuffle_epi32( ms, _MM_SHUFFLE( 0, 1, 2, 3 ) );	// é€†è»¢
+		md = _mm_shuffle_epi32( md, _MM_SHUFFLE( 0, 1, 2, 3 ) );	// é€†è»¢
 		_mm_storeu_si128( (__m128i*)&dest[-3], ms );
 		_mm_storeu_si128( (__m128i*)pixels, md );
 		pixels += 4; dest -= 4;
@@ -144,19 +144,19 @@ void TVPReverse8_sse2_c(tjs_uint8 *pixels, tjs_int len){
 		while( pixels < limit ) {
 			__m128i ms1 = _mm_loadu_si128( (__m128i const*)pixels );
 			__m128i md1 = _mm_loadu_si128( (__m128i const*)&dest[-15] );
-			ms1 = _mm_shuffle_epi32( ms1, _MM_SHUFFLE( 0, 1, 2, 3 ) );		// ‹t“] 32bit
-			ms1 = _mm_shufflelo_epi16( ms1, _MM_SHUFFLE( 2, 3, 0, 1 )  );	// ‹t“] 16bit
+			ms1 = _mm_shuffle_epi32( ms1, _MM_SHUFFLE( 0, 1, 2, 3 ) );		// é€†è»¢ 32bit
+			ms1 = _mm_shufflelo_epi16( ms1, _MM_SHUFFLE( 2, 3, 0, 1 )  );	// é€†è»¢ 16bit
 			ms1 = _mm_shufflehi_epi16( ms1, _MM_SHUFFLE( 2, 3, 0, 1 )  );
-			__m128i msr = ms1;	// ‹t“] 8bit
+			__m128i msr = ms1;	// é€†è»¢ 8bit
 			ms1 = _mm_slli_epi16( ms1, 8 );	// << 8
 			msr = _mm_srli_epi16( msr, 8 );	// >> 8
 			ms1 = _mm_or_si128( ms1, msr );
 			_mm_storeu_si128( (__m128i*)&dest[-15], ms1 );
 
-			md1 = _mm_shuffle_epi32( md1, _MM_SHUFFLE( 0, 1, 2, 3 ) );		// ‹t“] 32bit
-			md1 = _mm_shufflelo_epi16( md1, _MM_SHUFFLE( 2, 3, 0, 1 )  );	// ‹t“] 16bit
+			md1 = _mm_shuffle_epi32( md1, _MM_SHUFFLE( 0, 1, 2, 3 ) );		// é€†è»¢ 32bit
+			md1 = _mm_shufflelo_epi16( md1, _MM_SHUFFLE( 2, 3, 0, 1 )  );	// é€†è»¢ 16bit
 			md1 = _mm_shufflehi_epi16( md1, _MM_SHUFFLE( 2, 3, 0, 1 )  );
-			__m128i mdr = md1;	// ‹t“] 8bit
+			__m128i mdr = md1;	// é€†è»¢ 8bit
 			md1 = _mm_slli_epi16( md1, 8 );	// << 8
 			mdr = _mm_srli_epi16( mdr, 8 );	// >> 8
 			md1 = _mm_or_si128( md1, mdr );
@@ -183,8 +183,8 @@ void TVPReverse8_ssse3_c(tjs_uint8 *pixels, tjs_int len){
 		while( pixels < limit ) {
 			__m128i ms = _mm_loadu_si128( (__m128i const*)pixels );
 			__m128i md = _mm_loadu_si128( (__m128i const*)&dest[-15] );
-			ms = _mm_shuffle_epi8( ms, mask );	// ‹t“]
-			md = _mm_shuffle_epi8( md, mask );	// ‹t“]
+			ms = _mm_shuffle_epi8( ms, mask );	// é€†è»¢
+			md = _mm_shuffle_epi8( md, mask );	// é€†è»¢
 			_mm_storeu_si128( (__m128i*)&dest[-15], ms );
 			_mm_storeu_si128( (__m128i*)pixels, md );
 			pixels += 16; dest -= 16;
@@ -212,7 +212,7 @@ struct sse2_make_alpha_from_key_functor {
 		return d;
 	}
 	inline __m128i operator()( __m128i md ) const {
-		md = _mm_and_si128( md, mmask );	// d &= mask ƒAƒ‹ƒtƒ@‚ğƒNƒŠƒA(“§–¾‚É)
+		md = _mm_and_si128( md, mmask );	// d &= mask ã‚¢ãƒ«ãƒ•ã‚¡ã‚’ã‚¯ãƒªã‚¢(é€æ˜ã«)
 		__m128i mk = mmkey;
 		mk = _mm_cmpeq_epi32( mk, md );		// d == key ? 1111 : 0000
 		mk = _mm_andnot_si128( mk, alpha );	// maskalpha = (^cmpmask) & alpha
@@ -226,7 +226,7 @@ struct sse2_do_gray_scale {
 	__m128i lum_;
 	inline sse2_do_gray_scale() : zero_( _mm_setzero_si128() ), alphamask_(_mm_set1_epi32(0xff000000)), lum_(_mm_set1_epi32(0x0036B713)) {
 		lum_ = _mm_unpacklo_epi8( lum_, zero_ );
-		// lum_ ‚ÌƒAƒ‹ƒtƒ@¬•ª‚ğff‚É‚·‚ê‚ÎŒë·‚ª­‚µo‚é‚ªƒAƒ‹ƒtƒ@‚Ìƒ}ƒXƒN“™‚ª•K—v‚È‚­‚È‚Á‚Ä­‚µ‚¾‚¯‘¬‚­‚È‚é
+		// lum_ ã®ã‚¢ãƒ«ãƒ•ã‚¡æˆåˆ†ã‚’ffã«ã™ã‚Œã°èª¤å·®ãŒå°‘ã—å‡ºã‚‹ãŒã‚¢ãƒ«ãƒ•ã‚¡ã®ãƒã‚¹ã‚¯ç­‰ãŒå¿…è¦ãªããªã£ã¦å°‘ã—ã ã‘é€Ÿããªã‚‹
 	}
 	inline tjs_uint32 operator()( tjs_uint32 s ) const {
 		tjs_uint32 d = (s&0xff)*19;
@@ -310,13 +310,13 @@ struct ssse3_do_gray_scale {
 		ms1 = _mm_mullo_epi16( ms1, lum_ );
 		ms2 = _mm_mullo_epi16( ms2, lum_ );
 		ms1 = _mm_hadd_epi16( ms1, ms2 );	// A+R G+B | A+R G+B ... (A=0)
-		ms1 = _mm_hadd_epi16( ms1, ms1 );	// A+R+G+B | A+R+G+B | A+R+G+B | A+R+G+B (01230123) : 8pixel‚Ü‚Æ‚ß‚Äˆ—‚·‚ê‚Î‚à‚Á‚Æ‘¬‚»‚¤
+		ms1 = _mm_hadd_epi16( ms1, ms1 );	// A+R+G+B | A+R+G+B | A+R+G+B | A+R+G+B (01230123) : 8pixelã¾ã¨ã‚ã¦å‡¦ç†ã™ã‚Œã°ã‚‚ã£ã¨é€Ÿãã†
 		ms1 = _mm_shuffle_epi8( ms1, mask );
 		ms1 = _mm_or_si128( ms1, ma );
 		return ms1;
 	}
 };
-// ’Êí‚ÌƒAƒ‹ƒtƒ@‚©‚çæZÏ‚İƒAƒ‹ƒtƒ@‚Ö
+// é€šå¸¸ã®ã‚¢ãƒ«ãƒ•ã‚¡ã‹ã‚‰ä¹—ç®—æ¸ˆã¿ã‚¢ãƒ«ãƒ•ã‚¡ã¸
 struct sse2_alpha_to_premulalpha {
 	const __m128i zero_;
 	const __m128i colormask_;
@@ -354,7 +354,7 @@ struct sse2_alpha_to_premulalpha {
 		return _mm_or_si128( ms1, ma );
 	}
 };
-// æZÏ‚İƒAƒ‹ƒtƒ@‚©‚ç’ÊíƒAƒ‹ƒtƒ@‚Ö
+// ä¹—ç®—æ¸ˆã¿ã‚¢ãƒ«ãƒ•ã‚¡ã‹ã‚‰é€šå¸¸ã‚¢ãƒ«ãƒ•ã‚¡ã¸
 // alpha = alpha
 // color = color*255 / alpha
 struct sse2_premulalpha_to_alpha {
@@ -377,7 +377,7 @@ struct sse2_premulalpha_to_alpha {
 #if 1
 		rcp = _mm_rcp_ps(rcp);
 #else
-		rcp = m128_rcp_22bit_ps(rcp);	// ­‚µ¸“x‚ª—Ç‚¢‚ªÅ‘åŒë·‚ª2‚È‚Ì‚Í•Ï‚í‚ç‚¸, 20%‚­‚ç‚¢’x‚­‚È‚é
+		rcp = m128_rcp_22bit_ps(rcp);	// å°‘ã—ç²¾åº¦ãŒè‰¯ã„ãŒæœ€å¤§èª¤å·®ãŒ2ãªã®ã¯å¤‰ã‚ã‚‰ãš, 20%ãã‚‰ã„é…ããªã‚‹
 #endif
 		rcp = _mm_mul_ps(rcp, f65535_);
 		ma1 = _mm_cvtps_epi32(rcp);
@@ -387,7 +387,7 @@ struct sse2_premulalpha_to_alpha {
 		ma1 = _mm_unpacklo_epi16( ma1, ma1 );	// 0 0 0 0 1 1 1 1
 		ma2 = _mm_unpackhi_epi16( ma2, ma2 );	// 2 2 2 2 3 3 3 3
 		__m128i ms1 = _mm_setzero_si128();
-		ms1 = _mm_unpacklo_epi8( ms1, ms );		// s 0 s 0 s 0 s 0 : ãˆÊ8ƒrƒbƒg‚Ö
+		ms1 = _mm_unpacklo_epi8( ms1, ms );		// s 0 s 0 s 0 s 0 : ä¸Šä½8ãƒ“ãƒƒãƒˆã¸
 		ms1 = _mm_mulhi_epu16( ms1, ma1 );		// s / a
 		__m128i ms2 = _mm_setzero_si128();
 		ms2 = _mm_unpackhi_epi8( ms2, ms );
@@ -400,7 +400,7 @@ struct sse2_premulalpha_to_alpha {
 		ss1 = _mm_packus_epi16( ss1, ss2 );
 
 		ms1 = _mm_packus_epi16( ms1, ms2 );
-		ms1 = _mm_sub_epi8( ms1, ss1 );		// •„†‚È‚µ16bit–O˜apack‚Ì‚½‚ß‚Ìˆ—
+		ms1 = _mm_sub_epi8( ms1, ss1 );		// ç¬¦å·ãªã—16bité£½å’Œpackã®ãŸã‚ã®å‡¦ç†
 		ms1 = _mm_and_si128( ms1, colormask_ );
 		return _mm_or_si128( ms1, ma );
 	}
@@ -525,22 +525,22 @@ static inline void blend_func_sse2( tjs_uint8 * __restrict dest, const tjs_uint8
 		dest++; src++;
 	}
 }
-// src ‚Æ dest ‚ªd•¡‚µ‚Ä‚¢‚é‰Â”\«‚Ì‚ ‚é‚à‚Ì
+// src ã¨ dest ãŒé‡è¤‡ã—ã¦ã„ã‚‹å¯èƒ½æ€§ã®ã‚ã‚‹ã‚‚ã®
 template<typename functor>
 static inline void overlap_blend_func_sse2( tjs_uint32 * dest, const tjs_uint32 * src, tjs_int len, const functor& func ) {
 	if( len <= 0 ) return;
 	
 	const tjs_uint32 *src_end = src + len;
 	if( dest > src && dest < src_end ) {
-		// backward ƒI[ƒo[ƒ‰ƒbƒv‚·‚é‚Ì‚ÅŒã‚ë‚©‚çƒRƒs[
-		tjs_int remain = (len>>2)<<2;	// 4–¢–‚Ì’[”ƒJƒbƒg
+		// backward ã‚ªãƒ¼ãƒãƒ¼ãƒ©ãƒƒãƒ—ã™ã‚‹ã®ã§å¾Œã‚ã‹ã‚‰ã‚³ãƒ”ãƒ¼
+		tjs_int remain = (len>>2)<<2;	// 4æœªæº€ã®ç«¯æ•°ã‚«ãƒƒãƒˆ
 		len--;
 		while( len >= remain ) {
 			dest[len] = func( dest[len], src[len] );
 			len--;
 		}
 		while( len >= 0 ) {
-			// 4ƒsƒNƒZƒ‹‚¸‚ÂƒRƒs[, ƒI[ƒo[ƒ‰ƒbƒv‚ÌƒP[ƒX‚Í­‚È‚¢‚Ì‚ÆCore i3/5/7ˆÈ~‚È‚çƒAƒ‰ƒCƒƒ“ƒgŠÖŒW‚È‚­‘¬‚¢‚Ì‚ÅAƒAƒ‰ƒCƒƒ“ƒg‹C‚É‚¹‚¸ƒRƒs[
+			// 4ãƒ”ã‚¯ã‚»ãƒ«ãšã¤ã‚³ãƒ”ãƒ¼, ã‚ªãƒ¼ãƒãƒ¼ãƒ©ãƒƒãƒ—ã®ã‚±ãƒ¼ã‚¹ã¯å°‘ãªã„ã®ã¨Core i3/5/7ä»¥é™ãªã‚‰ã‚¢ãƒ©ã‚¤ãƒ¡ãƒ³ãƒˆé–¢ä¿‚ãªãé€Ÿã„ã®ã§ã€ã‚¢ãƒ©ã‚¤ãƒ¡ãƒ³ãƒˆæ°—ã«ã›ãšã‚³ãƒ”ãƒ¼
 			__m128i md = _mm_loadu_si128( (__m128i const*)&(dest[len-3]) );
 			__m128i ms = _mm_loadu_si128( (__m128i const*)&(src[len-3]) );
 			md = func( md, ms );
@@ -557,7 +557,7 @@ static void overlap_copy_func_sse2( tjs_uint32 * dest, const tjs_uint32 * src, t
 	functor func;
 	overlap_blend_func_sse2<functor>( dest, src, len, func );
 }
-// dest = src1 * src2 ‚Æ‚È‚Á‚Ä‚¢‚é‚à‚Ì
+// dest = src1 * src2 ã¨ãªã£ã¦ã„ã‚‹ã‚‚ã®
 template<typename functor>
 static inline void sd_blend_func_sse2( tjs_uint32 *dest, const tjs_uint32 *src1, const tjs_uint32 *src2, tjs_int len, const functor& func ) {
 	if( len <= 0 ) return;
@@ -598,7 +598,7 @@ static inline void sd_blend_func_sse2( tjs_uint32 *dest, const tjs_uint32 *src1,
 }
 
 
-// Š®‘S“§–¾‚Å‚ÍƒRƒs[‚¹‚¸AŠ®‘S•s“§–¾‚Í‚»‚Ì‚Ü‚ÜƒRƒs[‚·‚é
+// å®Œå…¨é€æ˜ã§ã¯ã‚³ãƒ”ãƒ¼ã›ãšã€å®Œå…¨ä¸é€æ˜ã¯ãã®ã¾ã¾ã‚³ãƒ”ãƒ¼ã™ã‚‹
 template<typename functor>
 static void blend_src_branch_func_sse2( tjs_uint32 * __restrict dest, const tjs_uint32 * __restrict src, tjs_int len, const functor& func ) {
 	if( len <= 0 ) return;
@@ -669,23 +669,23 @@ static void copy_src_branch_func_sse2( tjs_uint32 * __restrict dest, const tjs_u
 	functor func;
 	blend_src_branch_func_sse2<functor>( dest, src, len, func );
 }
-// •âŠÔƒRƒs[—p 16bitŒÅ’è¬”“_
-// func_t : ƒuƒŒƒ“ƒhŠÖ”
-// interp_t : •âŠÔŠÖ”
+// è£œé–“ã‚³ãƒ”ãƒ¼ç”¨ 16bitå›ºå®šå°æ•°ç‚¹
+// func_t : ãƒ–ãƒ¬ãƒ³ãƒ‰é–¢æ•°
+// interp_t : è£œé–“é–¢æ•°
 template<typename func_t,typename interp_t>
 void sse2_interpolation_line_transform_copy(tjs_uint32 *dest, tjs_int len, const tjs_uint32 *src, tjs_int sx, tjs_int sy, tjs_int stepx, tjs_int stepy, tjs_int srcpitch, const func_t& func, const interp_t& inter) {
 	if( len <= 0 ) return;
 
 	const tjs_uint8* s = (tjs_uint8*)src;
 
-	__m128i mxy1 = _mm_cvtsi32_si128( sy );			// _mm_mul_epu32 ‚Ì‚½‚ß‚É‰º‚ğsy‚Æ‚·‚é
+	__m128i mxy1 = _mm_cvtsi32_si128( sy );			// _mm_mul_epu32 ã®ãŸã‚ã«ä¸‹ã‚’syã¨ã™ã‚‹
 	__m128i mx = _mm_cvtsi32_si128( sx );
 	mxy1 = _mm_unpacklo_epi32( mxy1, mx );			// 0 | 0 | sx | sy
 	__m128i mstep = _mm_cvtsi32_si128( stepy );
 	__m128i mstepx = _mm_cvtsi32_si128( stepx );
 	mstep = _mm_unpacklo_epi32( mstep, mstepx );	// 0 | 0 | stepx | stepy
 	__m128i mxy = mxy1;
-	mxy1 = _mm_add_epi32( mxy1, mstep );			// 1i‚ß‚é
+	mxy1 = _mm_add_epi32( mxy1, mstep );			// 1é€²ã‚ã‚‹
 	mxy = _mm_unpacklo_epi64( mxy, mxy1 );			// ++sx | ++sy | sx | sy
 	mstep = _mm_unpacklo_epi64( mstep, mstep );		// stepx | stepy | stepx | stepy
 	__m128i mstep1 = mstep;
@@ -724,7 +724,7 @@ void sse2_interpolation_line_transform_copy(tjs_uint32 *dest, tjs_int len, const
 		_mm_store_si128( (__m128i*)dest, func( md, ms1 ) );
 		dest += 4;
 	}
-	// ’[”
+	// ç«¯æ•°
 	limit += (len-rem);
 	while( dest < limit ) {
 		__m128i mxyi = mxy;
@@ -738,8 +738,8 @@ void sse2_interpolation_line_transform_copy(tjs_uint32 *dest, tjs_int len, const
 }
 
 //--------------------------------------------------------------------
-// ƒuƒŒƒ“ƒh‚È‚Ç‰½‚às‚í‚È‚¢ê‡‚ÍACƒo[ƒWƒ‡ƒ“‚Ì•û‚ª­‚µ‚¾‚¯‘¬‚¢
-// FX‚Æ‚µ‚Ä‚İ‚½‚ªˆÈ‰º‚ÌÀ‘•‚ª‚»‚Ì’†‚Å‚Íˆê”Ô‘¬‚©‚Á‚½
+// ãƒ–ãƒ¬ãƒ³ãƒ‰ãªã©ä½•ã‚‚è¡Œã‚ãªã„å ´åˆã¯ã€Cãƒãƒ¼ã‚¸ãƒ§ãƒ³ã®æ–¹ãŒå°‘ã—ã ã‘é€Ÿã„
+// è‰²ã€…ã¨è©¦ã—ã¦ã¿ãŸãŒä»¥ä¸‹ã®å®Ÿè£…ãŒãã®ä¸­ã§ã¯ä¸€ç•ªé€Ÿã‹ã£ãŸ
 template<typename functor>
 static inline void stretch_blend_func_sse2(tjs_uint32 *dest, tjs_int len, const tjs_uint32 *src, tjs_int srcstart, tjs_int srcstep, const functor &func ) {
 	if( len <= 0 ) return;
@@ -890,7 +890,7 @@ static void TVP##NAME##_HDA_sse2_c( tjs_uint32 *dest, const tjs_uint32 *src, tjs
 }
 
 //DEFINE_BLEND_FUNCTION_MIN_VARIATION( AlphaBlend, alpha_blend )
-// AlphaBlend‚Íƒ\[ƒX‚ªŠ®‘S“§–¾/•s“§–¾‚Å•ªŠò‚·‚é“Áê”Å‚ğg‚¤‚Ì‚ÅAŒÂ•Ê‚É‘‚­
+// AlphaBlendã¯ã‚½ãƒ¼ã‚¹ãŒå®Œå…¨é€æ˜/ä¸é€æ˜ã§åˆ†å²ã™ã‚‹ç‰¹æ®Šç‰ˆã‚’ä½¿ã†ã®ã§ã€å€‹åˆ¥ã«æ›¸ã
 static void TVPAlphaBlend_sse2_c( tjs_uint32 *dest, const tjs_uint32 *src, tjs_int len ) {
 	copy_src_branch_func_sse2<sse2_alpha_blend_functor>( dest, src, len );
 }
@@ -980,7 +980,7 @@ DEFINE_BLEND_FUNCTION_MIN_VARIATION( PsDiff5Blend, ps_diff5_blend )
 DEFINE_BLEND_FUNCTION_MIN_VARIATION( PsExclusionBlend, ps_exclusion_blend )
 
 
-/// ƒAƒtƒBƒ“•ÏŠ·
+/// ã‚¢ãƒ•ã‚£ãƒ³å¤‰æ›
 #define DEF_NEAREST( blend_func )	\
 sse2_nearest_functor inter;	\
 blend_func func;					\
@@ -1038,15 +1038,15 @@ void TVPLinTransColorCopy_sse2_c(tjs_uint32 *dest, tjs_int len, const tjs_uint32
 void TVPLinTransConstAlphaBlend_sse2_c(tjs_uint32 *dest, tjs_int len, const tjs_uint32 *src,  tjs_int sx, tjs_int sy, tjs_int stepx, tjs_int stepy, tjs_int srcpitch, tjs_int opa) {
 	DEF_NEAREST_OPA( sse2_const_alpha_blend_functor );
 }
-// HDA”Å
+// HDAç‰ˆ
 void TVPLinTransConstAlphaBlend_HDA_sse2_c( tjs_uint32 *dest, tjs_int len, const tjs_uint32 *src, tjs_int sx, tjs_int sy, tjs_int stepx, tjs_int stepy, tjs_int srcpitch, tjs_int opa ) {
 	DEF_NEAREST_OPA( sse2_const_alpha_blend_hda_functor );
 }
-// dest alpha ‚ğg‚¤”Å
+// dest alpha ã‚’ä½¿ã†ç‰ˆ
 void TVPLinTransConstAlphaBlend_d_sse2_c(tjs_uint32 *dest, tjs_int len, const tjs_uint32 *src, tjs_int sx, tjs_int sy, tjs_int stepx, tjs_int stepy, tjs_int srcpitch, tjs_int opa) {
 	DEF_NEAREST_OPA( sse2_const_alpha_blend_d_functor );
 }
-// dest ‚ª premul alpha ”Å
+// dest ãŒ premul alpha ç‰ˆ
 void TVPLinTransConstAlphaBlend_a_sse2_c(tjs_uint32 *dest, tjs_int len, const tjs_uint32 *src, tjs_int sx, tjs_int sy, tjs_int stepx, tjs_int stepy, tjs_int srcpitch, tjs_int opa) {
 	DEF_NEAREST_OPA( sse2_const_alpha_blend_a_functor );
 }
@@ -1079,8 +1079,8 @@ void TVPInterpLinTransCopy_sse2_c(tjs_uint32 *dest, tjs_int len, const tjs_uint3
 void TVPInterpLinTransConstAlphaBlend_sse2_c(tjs_uint32 *dest, tjs_int len, const tjs_uint32 *src,  tjs_int sx, tjs_int sy, tjs_int stepx, tjs_int stepy, tjs_int srcpitch, tjs_int opa) {
 	DEF_BILINEAR_OPA( sse2_const_alpha_blend_functor )
 }
-// Šg‘åk¬
-// ƒjƒAƒŒƒXƒg
+// æ‹¡å¤§ç¸®å°
+// ãƒ‹ã‚¢ãƒ¬ã‚¹ãƒˆ
 void TVPStretchCopy_sse2_c(tjs_uint32 *dest, tjs_int len, const tjs_uint32 *src, tjs_int srcstart, tjs_int srcstep) {
 	stretch_copy_func_sse2<sse2_const_copy_functor>( dest, len, src, srcstart, srcstep );
 }
@@ -1143,7 +1143,7 @@ void TVPStretchConstAlphaBlend_a_sse2_c(tjs_uint32 *dest, tjs_int len, const tjs
 void TVPStretchColorCopy_sse2_c(tjs_uint32 *dest, tjs_int destlen, const tjs_uint32 *src, tjs_int srcstart, tjs_int srcstep) {
 	stretch_copy_func_sse2<sse2_color_copy_functor>( dest, destlen, src, srcstart, srcstep );
 }
-// ƒoƒCƒŠƒjƒA
+// ãƒã‚¤ãƒªãƒ‹ã‚¢
 void TVPInterpStretchCopy_sse2_c(tjs_uint32 *dest, tjs_int destlen, const tjs_uint32 *src1, const tjs_uint32 *src2, tjs_int blend_y, tjs_int srcstart, tjs_int srcstep) {
 	stretch_copy_func_sse2<sse2_const_copy_functor>( dest, destlen, src1, src2, blend_y, srcstart, srcstep );
 }
@@ -1341,23 +1341,23 @@ void TVPGL_SSE2_Init() {
 
 		TVPDarkenBlend =  TVPDarkenBlend_sse2_c;
 		TVPDarkenBlend_HDA =  TVPDarkenBlend_HDA_sse2_c;
-		// TVPDarkenBlend_o		// MMX”Å‚ª‚È‚¢Ag—p•p“x‚©‚ç‚àSSE2–¢‘Î‰‚É
-		// TVPDarkenBlend_HDA_o	// MMX”Å‚ª‚È‚¢Ag—p•p“x‚©‚ç‚àSSE2–¢‘Î‰‚É
+		// TVPDarkenBlend_o		// MMXç‰ˆãŒãªã„ã€ä½¿ç”¨é »åº¦ã‹ã‚‰ã‚‚SSE2æœªå¯¾å¿œã«
+		// TVPDarkenBlend_HDA_o	// MMXç‰ˆãŒãªã„ã€ä½¿ç”¨é »åº¦ã‹ã‚‰ã‚‚SSE2æœªå¯¾å¿œã«
 
 		TVPLightenBlend =  TVPLightenBlend_sse2_c;
 		TVPLightenBlend_HDA =  TVPLightenBlend_HDA_sse2_c;
-		// TVPLightenBlend_o		// MMX”Å‚ª‚È‚¢Ag—p•p“x‚©‚ç‚àSSE2–¢‘Î‰‚É
-		// TVPLightenBlend_HDA_o	// MMX”Å‚ª‚È‚¢Ag—p•p“x‚©‚ç‚àSSE2–¢‘Î‰‚É
+		// TVPLightenBlend_o		// MMXç‰ˆãŒãªã„ã€ä½¿ç”¨é »åº¦ã‹ã‚‰ã‚‚SSE2æœªå¯¾å¿œã«
+		// TVPLightenBlend_HDA_o	// MMXç‰ˆãŒãªã„ã€ä½¿ç”¨é »åº¦ã‹ã‚‰ã‚‚SSE2æœªå¯¾å¿œã«
 
 		TVPMulBlend =  TVPMulBlend_sse2_c;
 		TVPMulBlend_HDA =  TVPMulBlend_HDA_sse2_c;
 		TVPMulBlend_o =  TVPMulBlend_o_sse2_c;
 		TVPMulBlend_HDA_o =  TVPMulBlend_HDA_o_sse2_c;
 
-		// TVPColorDodgeBlend		// MMX”Å‚ª‚È‚¢Ag—p•p“x‚©‚ç‚àSSE2–¢‘Î‰‚É
-		// TVPColorDodgeBlend_HDA	// MMX”Å‚ª‚È‚¢Ag—p•p“x‚©‚ç‚àSSE2–¢‘Î‰‚É
-		// TVPColorDodgeBlend_o		// MMX”Å‚ª‚È‚¢Ag—p•p“x‚©‚ç‚àSSE2–¢‘Î‰‚É
-		// TVPColorDodgeBlend_HDA_o	// MMX”Å‚ª‚È‚¢Ag—p•p“x‚©‚ç‚àSSE2–¢‘Î‰‚É
+		// TVPColorDodgeBlend		// MMXç‰ˆãŒãªã„ã€ä½¿ç”¨é »åº¦ã‹ã‚‰ã‚‚SSE2æœªå¯¾å¿œã«
+		// TVPColorDodgeBlend_HDA	// MMXç‰ˆãŒãªã„ã€ä½¿ç”¨é »åº¦ã‹ã‚‰ã‚‚SSE2æœªå¯¾å¿œã«
+		// TVPColorDodgeBlend_o		// MMXç‰ˆãŒãªã„ã€ä½¿ç”¨é »åº¦ã‹ã‚‰ã‚‚SSE2æœªå¯¾å¿œã«
+		// TVPColorDodgeBlend_HDA_o	// MMXç‰ˆãŒãªã„ã€ä½¿ç”¨é »åº¦ã‹ã‚‰ã‚‚SSE2æœªå¯¾å¿œã«
 
 		TVPScreenBlend =  TVPScreenBlend_sse2_c;
 		TVPScreenBlend_HDA =  TVPScreenBlend_HDA_sse2_c;
@@ -1469,7 +1469,7 @@ void TVPGL_SSE2_Init() {
 		TVPInitUnivTransBlendTable = TVPInitUnivTransBlendTable_sse2_c;
 		TVPInitUnivTransBlendTable_d = TVPInitUnivTransBlendTable_d_sse2_c;
 		TVPInitUnivTransBlendTable_a = TVPInitUnivTransBlendTable_sse2_c;
-		// SSE2”Å‚ÍƒAƒ‹ƒtƒ@‚àƒuƒŒƒ“ƒh‚µ‚Ä‚¢‚é‚Ì‚ÅA‚Ç‚¿‚ç‚Å‚às‚¯‚é
+		// SSE2ç‰ˆã¯ã‚¢ãƒ«ãƒ•ã‚¡ã‚‚ãƒ–ãƒ¬ãƒ³ãƒ‰ã—ã¦ã„ã‚‹ã®ã§ã€ã©ã¡ã‚‰ã§ã‚‚è¡Œã‘ã‚‹
 		TVPUnivTransBlend = TVPUnivTransBlend_sse2_c;
 		TVPUnivTransBlend_a = TVPUnivTransBlend_sse2_c;
 		TVPUnivTransBlend_d = TVPUnivTransBlend_d_sse2_c;
@@ -1479,13 +1479,13 @@ void TVPGL_SSE2_Init() {
 
 		if( TVPCPUType & TVP_CPU_HAS_SSE ) {
 			TVPInitGammaAdjustTempData = TVPInitGammaAdjustTempData_sse2_c;
-			// TVPUninitGammaAdjustTempData // ‰½‚à‚µ‚È‚¢‚Ì‚Å–¢À‘•
+			// TVPUninitGammaAdjustTempData // ä½•ã‚‚ã—ãªã„ã®ã§æœªå®Ÿè£…
 		}
-		TVPAdjustGamma_a = TVPAdjustGamma_a_sse2_c;	// ‹t”ƒe[ƒuƒ‹‚ğg—p‚µ‚È‚¢•û–@‚É‚·‚é‚ÆSSE‚àg‚¤
-		//TVPAdjustGamma // C”Å‚Æ”äŠr‚µ‚Ä‘å·‚È‚¢‚Ì‚ÅSSE2”Å–¢g—p
+		TVPAdjustGamma_a = TVPAdjustGamma_a_sse2_c;	// é€†æ•°ãƒ†ãƒ¼ãƒ–ãƒ«ã‚’ä½¿ç”¨ã—ãªã„æ–¹æ³•ã«ã™ã‚‹ã¨SSEã‚‚ä½¿ã†
+		//TVPAdjustGamma // Cç‰ˆã¨æ¯”è¼ƒã—ã¦å¤§å·®ãªã„ã®ã§SSE2ç‰ˆæœªä½¿ç”¨
 
-		// Šg‘åk¬
-		// TVPStretchCopy = TVPStretchCopy_sse2_c; // SSE2g‚í‚È‚¢•û‚ª­‚µ‘¬‚¢
+		// æ‹¡å¤§ç¸®å°
+		// TVPStretchCopy = TVPStretchCopy_sse2_c; // SSE2ä½¿ã‚ãªã„æ–¹ãŒå°‘ã—é€Ÿã„
 		TVPStretchAlphaBlend = TVPStretchAlphaBlend_sse2_c;
 		TVPStretchAlphaBlend_HDA = TVPStretchAlphaBlend_HDA_sse2_c;
 		TVPStretchAlphaBlend_o = TVPStretchAlphaBlend_o_sse2_c;
@@ -1509,11 +1509,11 @@ void TVPGL_SSE2_Init() {
 		TVPInterpStretchAdditiveAlphaBlend = TVPInterpStretchAdditiveAlphaBlend_sse2_c;
 		TVPInterpStretchAdditiveAlphaBlend_o = TVPInterpStretchAdditiveAlphaBlend_o_sse2_c;
 		TVPInterpStretchConstAlphaBlend = TVPInterpStretchConstAlphaBlend_sse2_c;
-		// TVPFastLinearInterpH2F	// g‚í‚ê‚È‚­‚È‚Á‚Ä‚¢‚é‚Ì‚Å–¢À‘•
-		// TVPFastLinearInterpH2B	// g‚í‚ê‚È‚­‚È‚Á‚Ä‚¢‚é‚Ì‚Å–¢À‘•
-		// TVPFastLinearInterpV2	// g‚í‚ê‚È‚­‚È‚Á‚Ä‚¢‚é‚Ì‚Å–¢À‘•
+		// TVPFastLinearInterpH2F	// ä½¿ã‚ã‚Œãªããªã£ã¦ã„ã‚‹ã®ã§æœªå®Ÿè£…
+		// TVPFastLinearInterpH2B	// ä½¿ã‚ã‚Œãªããªã£ã¦ã„ã‚‹ã®ã§æœªå®Ÿè£…
+		// TVPFastLinearInterpV2	// ä½¿ã‚ã‚Œãªããªã£ã¦ã„ã‚‹ã®ã§æœªå®Ÿè£…
 
-		// ƒAƒtƒBƒ“•ÏŠ·—p
+		// ã‚¢ãƒ•ã‚£ãƒ³å¤‰æ›ç”¨
 		TVPLinTransAlphaBlend = TVPLinTransAlphaBlend_sse2_c;
 		TVPLinTransAlphaBlend_HDA = TVPLinTransAlphaBlend_HDA_sse2_c;
 		TVPLinTransAlphaBlend_o = TVPLinTransAlphaBlend_o_sse2_c;
@@ -1536,7 +1536,7 @@ void TVPGL_SSE2_Init() {
 		TVPInterpLinTransCopy = TVPInterpLinTransCopy_sse2_c;
 		TVPInterpLinTransConstAlphaBlend = TVPInterpLinTransConstAlphaBlend_sse2_c;
 
-		// Box Blur ( TODO ÀŠÂ‹«‚Å—vƒeƒXƒg)
+		// Box Blur ( TODO å®Ÿç’°å¢ƒã§è¦ãƒ†ã‚¹ãƒˆ)
 		TVPAddSubVertSum16 = TVPAddSubVertSum16_sse2_c;
 		TVPAddSubVertSum16_d = TVPAddSubVertSum16_d_sse2_c;
 		TVPAddSubVertSum32 = TVPAddSubVertSum32_sse2_c;
@@ -1556,26 +1556,26 @@ void TVPGL_SSE2_Init() {
 			TVPConvert24BitTo32Bit = TVPConvert24BitTo32Bit_sse2_c;
 			TVPBLConvert24BitTo32Bit = TVPConvert24BitTo32Bit_sse2_c;
 		}
-		//F•ÏŠ·‚Íg—p•p“x­‚È‚¢ ˆÈ‰º‚ÍMMX”Å‚à‚È‚¢‚Ì‚ÅSSE2”Å‚à‚È‚­‚Ä‚¢‚¢‚©‚à
-		//TVPBLExpand1BitTo8BitPal	// BMP“Ç‚İ‚İA1bit•¶š‚Ì•ÏŠ·‚Åg‚í‚ê‚é
-		//TVPBLExpand1BitTo8Bit		// BMP“Ç‚İ‚İ‚Åg‚í‚ê‚é‚Ì‚İ
-		//TVPBLExpand1BitTo32BitPal	// BMP“Ç‚İ‚İ‚Åg‚í‚ê‚é‚Ì‚İ
-		//TVPBLExpand4BitTo8BitPal	// BMP“Ç‚İ‚İ‚Åg‚í‚ê‚é‚Ì‚İ
-		//TVPBLExpand4BitTo8Bit		// BMP“Ç‚İ‚İ‚Åg‚í‚ê‚é‚Ì‚İ
-		//TVPBLExpand4BitTo32BitPal	// BMP“Ç‚İ‚İ‚Åg‚í‚ê‚é‚Ì‚İ
-		//TVPBLExpand8BitTo8BitPal	// BMP“Ç‚İ‚İ‚Åg‚í‚ê‚é‚Ì‚İ
-		//TVPBLExpand8BitTo32BitPal	// BMP“Ç‚İ‚İ‚Åg‚í‚ê‚é‚Ì‚İ
-		//TVPExpand8BitTo32BitGray	// JPEG“Ç‚İ‚İ‚Åg‚í‚ê‚é‚Ì‚İ
-		//TVPBLConvert15BitTo8Bit	// BMP“Ç‚İ‚İ‚Åg‚í‚ê‚é‚Ì‚İ
-		//TVPBLConvert15BitTo32Bit	// BMP“Ç‚İ‚İ‚Åg‚í‚ê‚é‚Ì‚İ
-		//TVPBLConvert24BitTo8Bit	// BMP/PNG“Ç‚İ‚İ‚Åg‚í‚ê‚é‚Ì‚İ
-		//TVPBLConvert32BitTo8Bit	// BMP“Ç‚İ‚İ‚Åg‚í‚ê‚é‚Ì‚İ
-		//TVPBLConvert32BitTo32Bit_NoneAlpha	// BMP“Ç‚İ‚İ‚Åg‚í‚ê‚é‚Ì‚İ
-		//TVPBLConvert32BitTo32Bit_MulAddAlpha	// BMP“Ç‚İ‚İ‚Åg‚í‚ê‚é‚Ì‚İ
-		//TVPBLConvert32BitTo32Bit_AddAlpha		// BMP“Ç‚İ‚İ‚Åg‚í‚ê‚é‚Ì‚İ
-		//TVPDither32BitTo16Bit565 // g‚í‚ê‚Ä‚¢‚È‚¢
-		//TVPDither32BitTo16Bit555 // g‚í‚ê‚Ä‚¢‚È‚¢
-		//TVPDither32BitTo8Bit		// BMP“Ç‚İ‚İ‚Åg‚í‚ê‚é‚Ì‚İ
+		//è‰²å¤‰æ›ã¯ä½¿ç”¨é »åº¦å°‘ãªã„ ä»¥ä¸‹ã¯MMXç‰ˆã‚‚ãªã„ã®ã§SSE2ç‰ˆã‚‚ãªãã¦ã„ã„ã‹ã‚‚
+		//TVPBLExpand1BitTo8BitPal	// BMPèª­ã¿è¾¼ã¿ã€1bitæ–‡å­—ã®å¤‰æ›ã§ä½¿ã‚ã‚Œã‚‹
+		//TVPBLExpand1BitTo8Bit		// BMPèª­ã¿è¾¼ã¿ã§ä½¿ã‚ã‚Œã‚‹ã®ã¿
+		//TVPBLExpand1BitTo32BitPal	// BMPèª­ã¿è¾¼ã¿ã§ä½¿ã‚ã‚Œã‚‹ã®ã¿
+		//TVPBLExpand4BitTo8BitPal	// BMPèª­ã¿è¾¼ã¿ã§ä½¿ã‚ã‚Œã‚‹ã®ã¿
+		//TVPBLExpand4BitTo8Bit		// BMPèª­ã¿è¾¼ã¿ã§ä½¿ã‚ã‚Œã‚‹ã®ã¿
+		//TVPBLExpand4BitTo32BitPal	// BMPèª­ã¿è¾¼ã¿ã§ä½¿ã‚ã‚Œã‚‹ã®ã¿
+		//TVPBLExpand8BitTo8BitPal	// BMPèª­ã¿è¾¼ã¿ã§ä½¿ã‚ã‚Œã‚‹ã®ã¿
+		//TVPBLExpand8BitTo32BitPal	// BMPèª­ã¿è¾¼ã¿ã§ä½¿ã‚ã‚Œã‚‹ã®ã¿
+		//TVPExpand8BitTo32BitGray	// JPEGèª­ã¿è¾¼ã¿ã§ä½¿ã‚ã‚Œã‚‹ã®ã¿
+		//TVPBLConvert15BitTo8Bit	// BMPèª­ã¿è¾¼ã¿ã§ä½¿ã‚ã‚Œã‚‹ã®ã¿
+		//TVPBLConvert15BitTo32Bit	// BMPèª­ã¿è¾¼ã¿ã§ä½¿ã‚ã‚Œã‚‹ã®ã¿
+		//TVPBLConvert24BitTo8Bit	// BMP/PNGèª­ã¿è¾¼ã¿ã§ä½¿ã‚ã‚Œã‚‹ã®ã¿
+		//TVPBLConvert32BitTo8Bit	// BMPèª­ã¿è¾¼ã¿ã§ä½¿ã‚ã‚Œã‚‹ã®ã¿
+		//TVPBLConvert32BitTo32Bit_NoneAlpha	// BMPèª­ã¿è¾¼ã¿ã§ä½¿ã‚ã‚Œã‚‹ã®ã¿
+		//TVPBLConvert32BitTo32Bit_MulAddAlpha	// BMPèª­ã¿è¾¼ã¿ã§ä½¿ã‚ã‚Œã‚‹ã®ã¿
+		//TVPBLConvert32BitTo32Bit_AddAlpha		// BMPèª­ã¿è¾¼ã¿ã§ä½¿ã‚ã‚Œã‚‹ã®ã¿
+		//TVPDither32BitTo16Bit565 // ä½¿ã‚ã‚Œã¦ã„ãªã„
+		//TVPDither32BitTo16Bit555 // ä½¿ã‚ã‚Œã¦ã„ãªã„
+		//TVPDither32BitTo8Bit		// BMPèª­ã¿è¾¼ã¿ã§ä½¿ã‚ã‚Œã‚‹ã®ã¿
 
 		// load TLG
 //		TVPTLG5DecompressSlide = TVPTLG5DecompressSlide_test;		// for Test
@@ -1584,10 +1584,10 @@ void TVPGL_SSE2_Init() {
 		TVPTLG5DecompressSlide = TVPTLG5DecompressSlide_sse2_c;
 		TVPTLG5ComposeColors3To4 = TVPTLG5ComposeColors3To4_sse2_c;
 		TVPTLG5ComposeColors4To4 = TVPTLG5ComposeColors4To4_sse2_c;
-		//TVPTLG6DecodeGolombValuesForFirst	// MMX‚ğÏ‹É“I‚Ég‚Á‚½‚à‚Ì‚Í‚È‚­ASIMD‰»‚µ‚Ã‚ç‚»‚¤‚È‚½‚ßSSE2”Å–¢À‘•
-		//TVPTLG6DecodeGolombValues			// MMX‚ğÏ‹É“I‚Ég‚Á‚½‚à‚Ì‚Í‚È‚­ASIMD‰»‚µ‚Ã‚ç‚»‚¤‚È‚½‚ßSSE2”Å–¢À‘•
+		//TVPTLG6DecodeGolombValuesForFirst	// MMXã‚’ç©æ¥µçš„ã«ä½¿ã£ãŸã‚‚ã®ã¯ãªãã€SIMDåŒ–ã—ã¥ã‚‰ãã†ãªãŸã‚SSE2ç‰ˆæœªå®Ÿè£…
+		//TVPTLG6DecodeGolombValues			// MMXã‚’ç©æ¥µçš„ã«ä½¿ã£ãŸã‚‚ã®ã¯ãªãã€SIMDåŒ–ã—ã¥ã‚‰ãã†ãªãŸã‚SSE2ç‰ˆæœªå®Ÿè£…
 #ifdef TJS_64BIT_OS
-		// MMX”Å‚Ì•û‚ª‘¬‚¢‚Ì‚ÅA64bit‚Å‚Ì‚İ—LŒø‚É
+		// MMXç‰ˆã®æ–¹ãŒé€Ÿã„ã®ã§ã€64bitã§ã®ã¿æœ‰åŠ¹ã«
 		TVPTLG6DecodeLineGeneric = TVPTLG6DecodeLineGeneric_sse2_c;
 		TVPTLG6DecodeLine = TVPTLG6DecodeLine_sse2_c;
 #endif
@@ -1728,7 +1728,7 @@ static void start_test( bool ischeckalpha, void* blend_a, void* blend_b, int che
 			const int range = 3;
 			if( /*(a1!=0)&&(a2!=0)&&*/(rdiff | gdiff | bdiff) ) {
 				// src[j], dst[j] is faild.
-				if( rdiff < range && gdiff < range && bdiff < range ) {	// warn. 1‚µ‚©·‚ª‚È‚¢‚Ì‚ÅŒë·ƒŒƒxƒ‹
+				if( rdiff < range && gdiff < range && bdiff < range ) {	// warn. 1ã—ã‹å·®ãŒãªã„ã®ã§èª¤å·®ãƒ¬ãƒ™ãƒ«
 				} else {
 					printf("invalid color src : 0x%08x, dst : 0x%08x\n", src[j], dst[j] );
 					printf( "  c 0x%08x\n", dst1[j] );
@@ -1748,7 +1748,7 @@ static void start_test( bool ischeckalpha, void* blend_a, void* blend_b, int che
 			}
 			if( ischeckalpha && adiff ) {
 				// src[j], dst[j] is faild.
-				if( adiff < range) {	// warn. Œë·ƒŒƒxƒ‹
+				if( adiff < range) {	// warn. èª¤å·®ãƒ¬ãƒ™ãƒ«
 				} else {
 					printf("invalid alpha src : 0x%08x, dst : 0x%08x\n", src[j], dst[j] );
 					printf( "  c 0x%08x\n", dst1[j] );
@@ -1864,7 +1864,7 @@ void BlendTest_sse2_c() {
 	//TEST_FUNC_O2( TVPConstAlphaBlend );	// pass
 	//TEST_FUNC_O2_C( TVPConstAlphaBlend_HDA );	// pass
 	//TEST_FUNC_O2_C( TVPConstAlphaBlend_d );	// pass
-	//TEST_FUNC_O2_C( TVPConstAlphaBlend_a );	// C”Å‚Æ”äŠr‚·‚é‚Æ 2 ’ö“x·‚ªo‚éƒP[ƒX‚ª‚ ‚é
+	//TEST_FUNC_O2_C( TVPConstAlphaBlend_a );	// Cç‰ˆã¨æ¯”è¼ƒã™ã‚‹ã¨ 2 ç¨‹åº¦å·®ãŒå‡ºã‚‹ã‚±ãƒ¼ã‚¹ãŒã‚ã‚‹
 
 	
 	//TEST_FUNC( TVPAlphaBlend_d );
@@ -1909,7 +1909,7 @@ void BlendTest_sse2_c() {
 	//TEST_FUNC_O( TVPSubBlend )
 	//TEST_FUNC_O2( TVPConstAlphaBlend )
 
-	// PSŒn pass ƒe[ƒuƒ‹Œn‚ÌƒuƒŒƒ“ƒh’x‚¢‚©‚ç“WŠJ‚µ‚½‚¢‚Æ‚±‚ë
+	// PSç³» pass ãƒ†ãƒ¼ãƒ–ãƒ«ç³»ã®ãƒ–ãƒ¬ãƒ³ãƒ‰é…ã„ã‹ã‚‰å±•é–‹ã—ãŸã„ã¨ã“ã‚
 	/*
 	TEST_FUNC( TVPPsAlphaBlend );
 	TEST_FUNC( TVPPsAlphaBlend_HDA );

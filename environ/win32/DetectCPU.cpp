@@ -57,7 +57,7 @@ static void TVPGetCPUTypeForOne()
 	}
 #endif
 
-	// check OSFXSR WinXP�ȍ~�Ȃ�T�|�[�g���Ă���̂ŁA�������̃`�F�b�N�͖��Ӗ�����
+	// check OSFXSR WinXP以降ならサポートしているので、もうこのチェックは無意味かな
 #ifndef TJS_64BIT_OS
 	if(TVPCPUFeatures & TVP_CPU_HAS_SSE)
 	{

@@ -21,7 +21,7 @@ void GDIFontRasterizer::InitChAntialiasMethod() {
 	tTJSVariant val;
 	if( TVPGetCommandLine(TJS_W("-aamethod"), &val) ) {
 		ttstr str(val);
-#if 0 // ‚Ü‚Á‚½‚­ˆÓ–¡‚Ì‚È‚¢ƒR[ƒhH
+#if 0 // ã¾ã£ãŸãæ„å‘³ã®ãªã„ã‚³ãƒ¼ãƒ‰ï¼Ÿ
 		if(str == TJS_W("auto"))
 			; // nothing to do
 #endif

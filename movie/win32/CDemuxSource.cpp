@@ -2,7 +2,7 @@
 /*! @file
 @brief Demux source filter
 
-ƒfƒ}ƒ‹ƒ`ƒvƒŒƒNƒTƒ\[ƒXƒtƒBƒ‹ƒ^‚ğÀ‘•‚·‚é
+ãƒ‡ãƒãƒ«ãƒãƒ—ãƒ¬ã‚¯ã‚µã‚½ãƒ¼ã‚¹ãƒ•ã‚£ãƒ«ã‚¿ã‚’å®Ÿè£…ã™ã‚‹
 -----------------------------------------------------------------------------
 	Copyright (C) 2005 T.Imoto <http://www.kaede-software.com>
 -----------------------------------------------------------------------------
@@ -23,10 +23,10 @@ static const GUID CLSID_DemuxSource = { 0x68d40d07, 0x25db, 0x4c49, { 0xaa, 0xaa
 
 //----------------------------------------------------------------------------
 //! @brief	  	CDemuxSource constructor
-//! @param		lpunk : W¬‚³‚ê‚½Š—LÒƒIƒuƒWƒFƒNƒg‚Ö‚Ìƒ|ƒCƒ“ƒ^B
-//! @param		phr : HRESULT ’l‚Ö‚Ìƒ|ƒCƒ“ƒ^B
-//! @param		reader : ‚±‚ÌƒtƒBƒ‹ƒ^‚ÌƒŠ[ƒ_[
-//! @param		clsid : ‚±‚ÌƒtƒBƒ‹ƒ^‚ÌƒNƒ‰ƒXID
+//! @param		lpunk : é›†æˆã•ã‚ŒãŸæ‰€æœ‰è€…ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã¸ã®ãƒã‚¤ãƒ³ã‚¿ã€‚
+//! @param		phr : HRESULT å€¤ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã€‚
+//! @param		reader : ã“ã®ãƒ•ã‚£ãƒ«ã‚¿ã®ãƒªãƒ¼ãƒ€ãƒ¼
+//! @param		clsid : ã“ã®ãƒ•ã‚£ãƒ«ã‚¿ã®ã‚¯ãƒ©ã‚¹ID
 //----------------------------------------------------------------------------
 CDemuxSource::CDemuxSource( LPUNKNOWN lpunk, HRESULT *phr, IDemuxReader *reader, CLSID clsid )
 : CSource( NAME("Demux Source"), lpunk, clsid, phr ), m_DemuxReader(reader)//, m_cRef(0)
@@ -45,10 +45,10 @@ CDemuxSource::~CDemuxSource()
 	delete m_DemuxReader;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	—v‹‚³‚ê‚½ƒCƒ“ƒ^[ƒtƒFƒCƒX‚ğ•Ô‚·
-//! @param		riid : ƒCƒ“ƒ^[ƒtƒFƒCƒX‚ÌIID
-//! @param		ppv : ƒCƒ“ƒ^[ƒtƒFƒCƒX‚ğ•Ô‚·ƒ|ƒCƒ“ƒ^[‚Ö‚Ìƒ|ƒCƒ“ƒ^
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	è¦æ±‚ã•ã‚ŒãŸã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã‚’è¿”ã™
+//! @param		riid : ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã®IID
+//! @param		ppv : ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã‚’è¿”ã™ãƒã‚¤ãƒ³ã‚¿ãƒ¼ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 STDMETHODIMP CDemuxSource::NonDelegatingQueryInterface( REFIID riid, void ** ppv )
 {
@@ -61,9 +61,9 @@ STDMETHODIMP CDemuxSource::NonDelegatingQueryInterface( REFIID riid, void ** ppv
 	}
 }
 //----------------------------------------------------------------------------
-//! @brief	  	Ä¶‚µ‚½‚¢ƒXƒgƒŠ[ƒ€‚ğŠJ‚­
-//! @param		stream : ƒ€[ƒr[‚Ö‚ÌƒXƒgƒŠ[ƒ€
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	å†ç”Ÿã—ãŸã„ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‚’é–‹ã
+//! @param		stream : ãƒ ãƒ¼ãƒ“ãƒ¼ã¸ã®ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CDemuxSource::OpenStream( IStream *stream )
 {
@@ -83,20 +83,20 @@ HRESULT CDemuxSource::OpenStream( IStream *stream )
 		assert( outStream );
 		CDemuxOutputPin *pin = new CDemuxOutputPin( NAME("Demux Source"), this, &hr, L"Demux output pin", this, outStream, &m_crtFilterLock );
 //		pin->AddRef();
-		// AddPin‚Ínew‚µ‚½’iŠK‚ÅƒR[ƒ‹‚³‚ê‚é‚Ì‚ÅA–¾¦“I‚É’Ç‰Á‚·‚é•K—v‚Í‚È‚¢
+		// AddPinã¯newã—ãŸæ®µéšã§ã‚³ãƒ¼ãƒ«ã•ã‚Œã‚‹ã®ã§ã€æ˜ç¤ºçš„ã«è¿½åŠ ã™ã‚‹å¿…è¦ã¯ãªã„
 	}
 	return hr;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	Ä¶ƒŒ[ƒg‚ª•ÏX‚³‚ê‚½‚ÉƒR[ƒ‹‚³‚ê‚é
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	å†ç”Ÿãƒ¬ãƒ¼ãƒˆãŒå¤‰æ›´ã•ã‚ŒãŸæ™‚ã«ã‚³ãƒ¼ãƒ«ã•ã‚Œã‚‹
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CDemuxSource::ChangeRate(void)
 {
-	{	// ƒNƒŠƒeƒBƒJƒ‹ ƒZƒNƒVƒ‡ƒ“ ƒƒbƒN‚ÌƒXƒR[ƒvB
+	{	// ã‚¯ãƒªãƒ†ã‚£ã‚«ãƒ« ã‚»ã‚¯ã‚·ãƒ§ãƒ³ ãƒ­ãƒƒã‚¯ã®ã‚¹ã‚³ãƒ¼ãƒ—ã€‚
 		CAutoLock cAutoLock(&m_crtFilterLock);
 		if( m_dRateSeeking <= 0 ) {
-			m_dRateSeeking = 1.0;  // “KØ‚È’l‚ÉƒŠƒZƒbƒg‚·‚éB
+			m_dRateSeeking = 1.0;  // é©åˆ‡ãªå€¤ã«ãƒªã‚»ãƒƒãƒˆã™ã‚‹ã€‚
 			return E_FAIL;
 		}
 	}
@@ -104,20 +104,20 @@ HRESULT CDemuxSource::ChangeRate(void)
 	return Reader()->SetRate( m_dRateSeeking );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	Ä¶‚ªŠJn‚³‚ê‚½‚ÉƒR[ƒ‹‚³‚ê‚é
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	å†ç”ŸãŒé–‹å§‹ã•ã‚ŒãŸæ™‚ã«ã‚³ãƒ¼ãƒ«ã•ã‚Œã‚‹
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CDemuxSource::ChangeStart(void)
 {
 	UpdateFromSeek();
 	if( m_rtStart > m_rtDuration  )
-		m_rtStart = m_rtDuration;	// ŠÛ‚ß
+		m_rtStart = m_rtDuration;	// ä¸¸ã‚
 
 	return Reader()->SetStartTime( m_rtStart );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	Ä¶‚ª’â~‚³‚ê‚½‚ÉƒR[ƒ‹‚³‚ê‚é
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	å†ç”ŸãŒåœæ­¢ã•ã‚ŒãŸæ™‚ã«ã‚³ãƒ¼ãƒ«ã•ã‚Œã‚‹
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CDemuxSource::ChangeStop(void)
 {
@@ -125,8 +125,8 @@ HRESULT CDemuxSource::ChangeStop(void)
 	return Reader()->SetEndTime(m_rtStop);
 }
 //----------------------------------------------------------------------------
-//! @brief	  	•Û‚µ‚Ä‚¢‚éƒsƒ“‚ğ‚·‚×‚Äíœ‚·‚é
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ä¿æŒã—ã¦ã„ã‚‹ãƒ”ãƒ³ã‚’ã™ã¹ã¦å‰Šé™¤ã™ã‚‹
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 void CDemuxSource::ClearPins()
 {
@@ -134,8 +134,8 @@ void CDemuxSource::ClearPins()
 		delete GetPin(GetPinCount()-1);
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒtƒBƒ‹ƒ^‚ğƒ|[ƒY‚·‚é
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ãƒ•ã‚£ãƒ«ã‚¿ã‚’ãƒãƒ¼ã‚ºã™ã‚‹
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 STDMETHODIMP CDemuxSource::Pause()
 {
@@ -152,8 +152,8 @@ STDMETHODIMP CDemuxSource::Pause()
 	return CSource::Pause();
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒV[ƒN‚©‚ç‚Ì•ÏX‚ğ”½‰f‚·‚é
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ã‚·ãƒ¼ã‚¯ã‹ã‚‰ã®å¤‰æ›´ã‚’åæ˜ ã™ã‚‹
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 void CDemuxSource::UpdateFromSeek()
 {
@@ -162,19 +162,19 @@ void CDemuxSource::UpdateFromSeek()
 	DeliverEndFlush();
 }
 //----------------------------------------------------------------------------
-//! @brief	  	V‚½‚ÉÄ¶‚ªŠJn‚³‚ê‚½‚±‚Æ‚ğ’Ê’m‚·‚é
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	æ–°ãŸã«å†ç”ŸãŒé–‹å§‹ã•ã‚ŒãŸã“ã¨ã‚’é€šçŸ¥ã™ã‚‹
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CDemuxSource::NewSegment()
 {
 	return DeliverNewSegment(m_rtStart, m_rtStop, m_dRateSeeking);
 }
 //----------------------------------------------------------------------------
-//! @brief	  	V‚½‚ÉÄ¶‚ªŠJn‚³‚ê‚½‚±‚Æ‚ğƒ_ƒEƒ“ƒXƒgƒŠ[ƒ€‚Ö’Ê’m‚·‚é
-//! @param		tStart : ŠJnŠÔ
-//! @param		tStop : ’â~ŠÔ
-//! @param		dRate : Ä¶ƒŒ[ƒg
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	æ–°ãŸã«å†ç”ŸãŒé–‹å§‹ã•ã‚ŒãŸã“ã¨ã‚’ãƒ€ã‚¦ãƒ³ã‚¹ãƒˆãƒªãƒ¼ãƒ ã¸é€šçŸ¥ã™ã‚‹
+//! @param		tStart : é–‹å§‹æ™‚é–“
+//! @param		tStop : åœæ­¢æ™‚é–“
+//! @param		dRate : å†ç”Ÿãƒ¬ãƒ¼ãƒˆ
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CDemuxSource::DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate)
 {
@@ -192,8 +192,8 @@ HRESULT CDemuxSource::DeliverNewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tS
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒXƒgƒŠ[ƒ€‚ªI’[‚É’B‚µ‚½‚±‚Æ‚ğƒ_ƒEƒ“ƒXƒgƒŠ[ƒ€‚Ö’Ê’m‚·‚é
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ã‚¹ãƒˆãƒªãƒ¼ãƒ ãŒçµ‚ç«¯ã«é”ã—ãŸã“ã¨ã‚’ãƒ€ã‚¦ãƒ³ã‚¹ãƒˆãƒªãƒ¼ãƒ ã¸é€šçŸ¥ã™ã‚‹
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CDemuxSource::DeliverEndOfStream(void)
 {
@@ -211,8 +211,8 @@ HRESULT CDemuxSource::DeliverEndOfStream(void)
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒtƒ‰ƒbƒVƒ…ˆ—‚ÌI—¹‚ğƒ_ƒEƒ“ƒXƒgƒŠ[ƒ€‚Ö—v‹‚·‚é
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ãƒ•ãƒ©ãƒƒã‚·ãƒ¥å‡¦ç†ã®çµ‚äº†ã‚’ãƒ€ã‚¦ãƒ³ã‚¹ãƒˆãƒªãƒ¼ãƒ ã¸è¦æ±‚ã™ã‚‹
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CDemuxSource::DeliverEndFlush(void)
 {
@@ -230,8 +230,8 @@ HRESULT CDemuxSource::DeliverEndFlush(void)
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒtƒ‰ƒbƒVƒ…ˆ—‚ÌŠJn‚ğƒ_ƒEƒ“ƒXƒgƒŠ[ƒ€‚Ö—v‹‚·‚é
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ãƒ•ãƒ©ãƒƒã‚·ãƒ¥å‡¦ç†ã®é–‹å§‹ã‚’ãƒ€ã‚¦ãƒ³ã‚¹ãƒˆãƒªãƒ¼ãƒ ã¸è¦æ±‚ã™ã‚‹
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CDemuxSource::DeliverBeginFlush(void)
 {
@@ -249,16 +249,16 @@ HRESULT CDemuxSource::DeliverBeginFlush(void)
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒtƒBƒ‹ƒ^ƒ^ƒCƒv‚ğæ“¾‚·‚é
-//! @return		ƒtƒBƒ‹ƒ^ƒ^ƒCƒv
+//! @brief	  	ãƒ•ã‚£ãƒ«ã‚¿ã‚¿ã‚¤ãƒ—ã‚’å–å¾—ã™ã‚‹
+//! @return		ãƒ•ã‚£ãƒ«ã‚¿ã‚¿ã‚¤ãƒ—
 //----------------------------------------------------------------------------
 ULONG STDMETHODCALLTYPE CDemuxSource::GetMiscFlags(void)
 {
 	return AM_FILTER_MISC_FLAGS_IS_SOURCE;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	Œ»İÚ‘±‚³‚ê‚Ä‚¢‚éƒsƒ“‚Ì”‚ğæ“¾‚·‚é
-//! @return		Ú‘±”
+//! @brief	  	ç¾åœ¨æ¥ç¶šã•ã‚Œã¦ã„ã‚‹ãƒ”ãƒ³ã®æ•°ã‚’å–å¾—ã™ã‚‹
+//! @return		æ¥ç¶šæ•°
 //----------------------------------------------------------------------------
 ULONG CDemuxSource::GetNumberOfConnection()
 {
@@ -274,9 +274,9 @@ ULONG CDemuxSource::GetNumberOfConnection()
 	return result;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒ^ƒCƒ€ƒtƒH[ƒ}ƒbƒg‚ªƒTƒ|[ƒg‚³‚ê‚Ä‚¢‚é‚©‚Ç‚¤‚©Šm”F‚·‚é
-//! @param		pFormat : ƒ^ƒCƒ€ƒtƒH[ƒ}ƒbƒg
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ã‚¿ã‚¤ãƒ ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆãŒã‚µãƒãƒ¼ãƒˆã•ã‚Œã¦ã„ã‚‹ã‹ã©ã†ã‹ç¢ºèªã™ã‚‹
+//! @param		pFormat : ã‚¿ã‚¤ãƒ ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CDemuxSource::IsFormatSupported(const GUID * pFormat)
 {
@@ -285,9 +285,9 @@ HRESULT CDemuxSource::IsFormatSupported(const GUID * pFormat)
 	return *pFormat == TIME_FORMAT_MEDIA_TIME ? S_OK : S_FALSE;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒXƒgƒŠ[ƒ€‚Ì—Dæƒ^ƒCƒ€ ƒtƒH[ƒ}ƒbƒg‚ğæ“¾‚·‚é
-//! @param		pFormat : ƒ^ƒCƒ€ƒtƒH[ƒ}ƒbƒg
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ã‚¹ãƒˆãƒªãƒ¼ãƒ ã®å„ªå…ˆã‚¿ã‚¤ãƒ  ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã‚’å–å¾—ã™ã‚‹
+//! @param		pFormat : ã‚¿ã‚¤ãƒ ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CDemuxSource::QueryPreferredFormat(GUID *pFormat)
 {
@@ -296,9 +296,9 @@ HRESULT CDemuxSource::QueryPreferredFormat(GUID *pFormat)
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒ^ƒCƒ€ƒtƒH[ƒ}ƒbƒg‚ğİ’è‚·‚é
-//! @param		pFormat : ƒ^ƒCƒ€ƒtƒH[ƒ}ƒbƒg
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ã‚¿ã‚¤ãƒ ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã‚’è¨­å®šã™ã‚‹
+//! @param		pFormat : ã‚¿ã‚¤ãƒ ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CDemuxSource::SetTimeFormat(const GUID * pFormat)
 {
@@ -307,9 +307,9 @@ HRESULT CDemuxSource::SetTimeFormat(const GUID * pFormat)
 	return *pFormat == TIME_FORMAT_MEDIA_TIME ? S_OK : E_INVALIDARG;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	w’è‚µ‚½ƒ^ƒCƒ€ ƒtƒH[ƒ}ƒbƒg‚ªŒ»İg‚í‚ê‚Ä‚¢‚éƒtƒH[ƒ}ƒbƒg‚©‚Ç‚¤‚©‚ğŠm”F‚·‚é
-//! @param		pFormat : ƒ^ƒCƒ€ƒtƒH[ƒ}ƒbƒg
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	æŒ‡å®šã—ãŸã‚¿ã‚¤ãƒ  ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆãŒç¾åœ¨ä½¿ã‚ã‚Œã¦ã„ã‚‹ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã‹ã©ã†ã‹ã‚’ç¢ºèªã™ã‚‹
+//! @param		pFormat : ã‚¿ã‚¤ãƒ ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CDemuxSource::IsUsingTimeFormat(const GUID * pFormat)
 {
@@ -317,9 +317,9 @@ HRESULT CDemuxSource::IsUsingTimeFormat(const GUID * pFormat)
 	return *pFormat == TIME_FORMAT_MEDIA_TIME ? S_OK : S_FALSE;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	Œ»İ‚Ìƒ^ƒCƒ€ ƒtƒH[ƒ}ƒbƒg‚ğæ“¾‚·‚é
-//! @param		pFormat : ƒ^ƒCƒ€ƒtƒH[ƒ}ƒbƒg
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ç¾åœ¨ã®ã‚¿ã‚¤ãƒ  ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã‚’å–å¾—ã™ã‚‹
+//! @param		pFormat : ã‚¿ã‚¤ãƒ ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CDemuxSource::GetTimeFormat(GUID *pFormat)
 {
@@ -328,9 +328,9 @@ HRESULT CDemuxSource::GetTimeFormat(GUID *pFormat)
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒXƒgƒŠ[ƒ€‚ÌŠÔ•‚ğæ“¾‚·‚é
-//! @param		pDuration : ’·‚³
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ã‚¹ãƒˆãƒªãƒ¼ãƒ ã®æ™‚é–“å¹…ã‚’å–å¾—ã™ã‚‹
+//! @param		pDuration : é•·ã•
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CDemuxSource::GetDuration(LONGLONG *pDuration)
 {
@@ -340,9 +340,9 @@ HRESULT CDemuxSource::GetDuration(LONGLONG *pDuration)
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒXƒgƒŠ[ƒ€‚Ì’â~ŠÔ‚ğæ“¾‚·‚é
-//! @param		pStop : ’â~ŠÔ
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ã‚¹ãƒˆãƒªãƒ¼ãƒ ã®åœæ­¢æ™‚é–“ã‚’å–å¾—ã™ã‚‹
+//! @param		pStop : åœæ­¢æ™‚é–“
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CDemuxSource::GetStopPosition(LONGLONG *pStop)
 {
@@ -352,9 +352,9 @@ HRESULT CDemuxSource::GetStopPosition(LONGLONG *pStop)
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒXƒgƒŠ[ƒ€‚ÌŒ»İŠÔ‚ğæ“¾‚·‚é
-//! @param		pCurrent : Œ»İŠÔ
-//! @return		–¢ƒTƒ|[ƒg
+//! @brief	  	ã‚¹ãƒˆãƒªãƒ¼ãƒ ã®ç¾åœ¨æ™‚é–“ã‚’å–å¾—ã™ã‚‹
+//! @param		pCurrent : ç¾åœ¨æ™‚é–“
+//! @return		æœªã‚µãƒãƒ¼ãƒˆ
 //----------------------------------------------------------------------------
 HRESULT CDemuxSource::GetCurrentPosition(LONGLONG *pCurrent)
 {
@@ -363,9 +363,9 @@ HRESULT CDemuxSource::GetCurrentPosition(LONGLONG *pCurrent)
 	return E_NOTIMPL;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒV[ƒN”\—Í‚ğæ“¾‚·‚é
-//! @param		pCapabilities : ƒV[ƒN”\—Í
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ã‚·ãƒ¼ã‚¯èƒ½åŠ›ã‚’å–å¾—ã™ã‚‹
+//! @param		pCapabilities : ã‚·ãƒ¼ã‚¯èƒ½åŠ›
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CDemuxSource::GetCapabilities( DWORD * pCapabilities )
 {
@@ -374,9 +374,9 @@ HRESULT CDemuxSource::GetCapabilities( DWORD * pCapabilities )
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	w’è‚µ‚½ƒV[ƒN”\—Í‚ğƒXƒgƒŠ[ƒ€‚ª‚Á‚Ä‚¢‚é‚©‚Ç‚¤‚©‚ğ–â‚¢‡‚í‚¹‚é
-//! @param		pCapabilities : ƒV[ƒN”\—Í
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	æŒ‡å®šã—ãŸã‚·ãƒ¼ã‚¯èƒ½åŠ›ã‚’ã‚¹ãƒˆãƒªãƒ¼ãƒ ãŒæŒã£ã¦ã„ã‚‹ã‹ã©ã†ã‹ã‚’å•ã„åˆã‚ã›ã‚‹
+//! @param		pCapabilities : ã‚·ãƒ¼ã‚¯èƒ½åŠ›
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CDemuxSource::CheckCapabilities( DWORD * pCapabilities )
 {
@@ -385,13 +385,13 @@ HRESULT CDemuxSource::CheckCapabilities( DWORD * pCapabilities )
 	return (~m_dwSeekingCaps & *pCapabilities) ? S_FALSE : S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	1 ‚Â‚Ìƒ^ƒCƒ€ ƒtƒH[ƒ}ƒbƒg‚©‚ç•Ê‚Ìƒ^ƒCƒ€ ƒtƒH[ƒ}ƒbƒg‚É•ÏŠ·‚·‚é
-//! @param		pTarget : •ÏŠ·‚³‚ê‚½ƒ^ƒCƒ€‚ğó‚¯æ‚é•Ï”‚Ö‚Ìƒ|ƒCƒ“ƒ^
-//! @param		pTargetFormat : ƒ^[ƒQƒbƒg ƒtƒH[ƒ}ƒbƒg‚Ìƒ^ƒCƒ€ ƒtƒH[ƒ}ƒbƒg GUID ‚Ö‚Ìƒ|ƒCƒ“ƒ^BNULL ‚Ìê‡‚ÍAŒ»İ‚ÌƒtƒH[ƒ}ƒbƒg‚ªg‚í‚ê‚é
-//! @param		Source : •ÏŠ·‚·‚éƒ^ƒCƒ€’l
-//! @param		pSourceFormat : •ÏŠ·‚·‚éƒtƒH[ƒ}ƒbƒg‚Ìƒ^ƒCƒ€ ƒtƒH[ƒ}ƒbƒg GUID ‚Ö‚Ìƒ|ƒCƒ“ƒ^BNULL ‚Ìê‡‚ÍAŒ»İ‚ÌƒtƒH[ƒ}ƒbƒg‚ªg‚í‚ê‚é
-//! @return		ƒGƒ‰[ƒR[ƒh
-//! @note	TIME_FORMAT_MEDIA_TIMEˆÈŠO‚ÍƒTƒ|[ƒg‚µ‚Ä‚¢‚È‚¢
+//! @brief	  	1 ã¤ã®ã‚¿ã‚¤ãƒ  ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã‹ã‚‰åˆ¥ã®ã‚¿ã‚¤ãƒ  ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã«å¤‰æ›ã™ã‚‹
+//! @param		pTarget : å¤‰æ›ã•ã‚ŒãŸã‚¿ã‚¤ãƒ ã‚’å—ã‘å–ã‚‹å¤‰æ•°ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+//! @param		pTargetFormat : ã‚¿ãƒ¼ã‚²ãƒƒãƒˆ ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã®ã‚¿ã‚¤ãƒ  ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ GUID ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã€‚NULL ã®å ´åˆã¯ã€ç¾åœ¨ã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆãŒä½¿ã‚ã‚Œã‚‹
+//! @param		Source : å¤‰æ›ã™ã‚‹ã‚¿ã‚¤ãƒ å€¤
+//! @param		pSourceFormat : å¤‰æ›ã™ã‚‹ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã®ã‚¿ã‚¤ãƒ  ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆ GUID ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã€‚NULL ã®å ´åˆã¯ã€ç¾åœ¨ã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆãŒä½¿ã‚ã‚Œã‚‹
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
+//! @note	TIME_FORMAT_MEDIA_TIMEä»¥å¤–ã¯ã‚µãƒãƒ¼ãƒˆã—ã¦ã„ãªã„
 //----------------------------------------------------------------------------
 HRESULT CDemuxSource::ConvertTimeFormat( LONGLONG * pTarget, const GUID * pTargetFormat, LONGLONG Source, const GUID * pSourceFormat )
 {
@@ -411,12 +411,12 @@ HRESULT CDemuxSource::ConvertTimeFormat( LONGLONG * pTarget, const GUID * pTarge
 	return E_INVALIDARG;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	Œ»İˆÊ’u‚Æ’â~ˆÊ’u‚ğİ’è‚·‚é
-//! @param		pCurrent : Œ»İˆÊ’u‚ğw’è‚·‚é•Ï”‚Ö‚Ìƒ|ƒCƒ“ƒ^AŒ»İ‚Ìƒ^ƒCƒ€ ƒtƒH[ƒ}ƒbƒg‚Ì’PˆÊ
-//! @param		CurrentFlags : ˆÊ’u‚ğw’è‚·‚é‚½‚ß‚Ìƒtƒ‰ƒO‚Ìƒrƒbƒg‚²‚Æ‚Ì‘g‚İ‡‚í‚¹
-//! @param		pStop : I—¹ƒ^ƒCƒ€‚ğw’è‚·‚é•Ï”‚Ö‚Ìƒ|ƒCƒ“ƒ^AŒ»İ‚Ìƒ^ƒCƒ€ ƒtƒH[ƒ}ƒbƒg‚Ì’PˆÊ
-//! @param		StopFlags : ˆÊ’u‚ğw’è‚·‚é‚½‚ß‚Ìƒtƒ‰ƒO‚Ìƒrƒbƒg‚²‚Æ‚Ì‘g‚İ‡‚í‚¹
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ç¾åœ¨ä½ç½®ã¨åœæ­¢ä½ç½®ã‚’è¨­å®šã™ã‚‹
+//! @param		pCurrent : ç¾åœ¨ä½ç½®ã‚’æŒ‡å®šã™ã‚‹å¤‰æ•°ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã€ç¾åœ¨ã®ã‚¿ã‚¤ãƒ  ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã®å˜ä½
+//! @param		CurrentFlags : ä½ç½®ã‚’æŒ‡å®šã™ã‚‹ãŸã‚ã®ãƒ•ãƒ©ã‚°ã®ãƒ“ãƒƒãƒˆã”ã¨ã®çµ„ã¿åˆã‚ã›
+//! @param		pStop : çµ‚äº†ã‚¿ã‚¤ãƒ ã‚’æŒ‡å®šã™ã‚‹å¤‰æ•°ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã€ç¾åœ¨ã®ã‚¿ã‚¤ãƒ  ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã®å˜ä½
+//! @param		StopFlags : ä½ç½®ã‚’æŒ‡å®šã™ã‚‹ãŸã‚ã®ãƒ•ãƒ©ã‚°ã®ãƒ“ãƒƒãƒˆã”ã¨ã®çµ„ã¿åˆã‚ã›
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CDemuxSource::SetPositions( LONGLONG * pCurrent, DWORD CurrentFlags, LONGLONG * pStop,  DWORD StopFlags )
 {
@@ -469,10 +469,10 @@ HRESULT CDemuxSource::SetPositions( LONGLONG * pCurrent, DWORD CurrentFlags, LON
 	return hr;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	Œ»İ‚ÌˆÊ’u‚Æ’â~ˆÊ’u‚ğæ“¾‚·‚é
-//! @param		pCurrent : ŠJnˆÊ’u‚ğó‚¯æ‚é•Ï”‚Ö‚Ìƒ|ƒCƒ“ƒ^
-//! @param		pStop : ’â~ˆÊ’u‚ğó‚¯æ‚é•Ï”‚Ö‚Ìƒ|ƒCƒ“ƒ^
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ç¾åœ¨ã®ä½ç½®ã¨åœæ­¢ä½ç½®ã‚’å–å¾—ã™ã‚‹
+//! @param		pCurrent : é–‹å§‹ä½ç½®ã‚’å—ã‘å–ã‚‹å¤‰æ•°ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+//! @param		pStop : åœæ­¢ä½ç½®ã‚’å—ã‘å–ã‚‹å¤‰æ•°ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CDemuxSource::GetPositions( LONGLONG * pCurrent, LONGLONG * pStop )
 {
@@ -485,10 +485,10 @@ HRESULT CDemuxSource::GetPositions( LONGLONG * pCurrent, LONGLONG * pStop )
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒV[ƒN‚ª—LŒø‚Èƒ^ƒCƒ€‚Ì”ÍˆÍ‚ğæ“¾‚·‚é
-//! @param		pEarliest : ƒV[ƒN‚ª—LŒø‚ÈÅ‚à‘‚¢ƒ^ƒCƒ€‚ğó‚¯æ‚é•Ï”‚Ö‚Ìƒ|ƒCƒ“ƒ^
-//! @param		pLatest : ƒV[ƒN‚ª—LŒø‚ÈÅ‚à’x‚¢ƒ^ƒCƒ€‚ğó‚¯æ‚é•Ï”‚Ö‚Ìƒ|ƒCƒ“ƒ^
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ã‚·ãƒ¼ã‚¯ãŒæœ‰åŠ¹ãªã‚¿ã‚¤ãƒ ã®ç¯„å›²ã‚’å–å¾—ã™ã‚‹
+//! @param		pEarliest : ã‚·ãƒ¼ã‚¯ãŒæœ‰åŠ¹ãªæœ€ã‚‚æ—©ã„ã‚¿ã‚¤ãƒ ã‚’å—ã‘å–ã‚‹å¤‰æ•°ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+//! @param		pLatest : ã‚·ãƒ¼ã‚¯ãŒæœ‰åŠ¹ãªæœ€ã‚‚é…ã„ã‚¿ã‚¤ãƒ ã‚’å—ã‘å–ã‚‹å¤‰æ•°ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CDemuxSource::GetAvailable( LONGLONG * pEarliest, LONGLONG * pLatest )
 {
@@ -502,9 +502,9 @@ HRESULT CDemuxSource::GetAvailable( LONGLONG * pEarliest, LONGLONG * pLatest )
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	Ä¶ƒŒ[ƒg‚ğİ’è‚·‚é
-//! @param		dRate : Ä¶ƒŒ[ƒg
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	å†ç”Ÿãƒ¬ãƒ¼ãƒˆã‚’è¨­å®šã™ã‚‹
+//! @param		dRate : å†ç”Ÿãƒ¬ãƒ¼ãƒˆ
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CDemuxSource::SetRate( double dRate)
 {
@@ -515,9 +515,9 @@ HRESULT CDemuxSource::SetRate( double dRate)
 	return ChangeRate();
 }
 //----------------------------------------------------------------------------
-//! @brief	  	Ä¶ƒŒ[ƒg‚ğæ“¾‚·‚é
-//! @param		dRate : Ä¶ƒŒ[ƒg
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	å†ç”Ÿãƒ¬ãƒ¼ãƒˆã‚’å–å¾—ã™ã‚‹
+//! @param		dRate : å†ç”Ÿãƒ¬ãƒ¼ãƒˆ
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CDemuxSource::GetRate( double * pdRate)
 {
@@ -527,9 +527,9 @@ HRESULT CDemuxSource::GetRate( double * pdRate)
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ŠJnˆÊ’u‚Ì‘O‚ÉƒLƒ…[‚É“ü‚éƒf[ƒ^‚Ì—Ê‚ğæ“¾‚·‚é
-//! @param		pPreroll : ƒvƒŠƒ[ƒ‹ ƒ^ƒCƒ€‚ğó‚¯æ‚é•Ï”‚Ö‚Ìƒ|ƒCƒ“ƒ^
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	é–‹å§‹ä½ç½®ã®å‰ã«ã‚­ãƒ¥ãƒ¼ã«å…¥ã‚‹ãƒ‡ãƒ¼ã‚¿ã®é‡ã‚’å–å¾—ã™ã‚‹
+//! @param		pPreroll : ãƒ—ãƒªãƒ­ãƒ¼ãƒ« ã‚¿ã‚¤ãƒ ã‚’å—ã‘å–ã‚‹å¤‰æ•°ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CDemuxSource::GetPreroll(LONGLONG *pPreroll)
 {

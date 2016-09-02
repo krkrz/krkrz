@@ -6,7 +6,7 @@
 #include <d3d9.h>
 
 //---------------------------------------------------------------------------
-//! @brief		uBasicvƒfƒoƒCƒX(‚à‚Á‚Æ‚àŠî–{“I‚È•`‰æ‚ğs‚¤‚Ì‚İ‚ÌƒfƒoƒCƒX)
+//! @brief		ã€ŒBasicã€ãƒ‡ãƒã‚¤ã‚¹(ã‚‚ã£ã¨ã‚‚åŸºæœ¬çš„ãªæç”»ã‚’è¡Œã†ã®ã¿ã®ãƒ‡ãƒã‚¤ã‚¹)
 //---------------------------------------------------------------------------
 class tTVPBasicDrawDevice : public tTVPDrawDevice
 {
@@ -24,21 +24,21 @@ class tTVPBasicDrawDevice : public tTVPDrawDevice
 	D3DDISPLAYMODE			DispMode;
 
 	UINT	CurrentMonitor;
-	void*	TextureBuffer; //!< ƒeƒNƒXƒ`ƒƒ‚ÌƒT[ƒtƒF[ƒX‚Ö‚Ìƒƒ‚ƒŠƒ|ƒCƒ“ƒ^
-	long	TexturePitch; //!< ƒeƒNƒXƒ`ƒƒ‚Ìƒsƒbƒ`
+	void*	TextureBuffer; //!< ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ã‚µãƒ¼ãƒ•ã‚§ãƒ¼ã‚¹ã¸ã®ãƒ¡ãƒ¢ãƒªãƒã‚¤ãƒ³ã‚¿
+	long	TexturePitch; //!< ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ãƒ”ãƒƒãƒ
 
-	tjs_uint TextureWidth; //!< ƒeƒNƒXƒ`ƒƒ‚Ì‰¡•
-	tjs_uint TextureHeight; //!< ƒeƒNƒXƒ`ƒƒ‚Ìc•
+	tjs_uint TextureWidth; //!< ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®æ¨ªå¹…
+	tjs_uint TextureHeight; //!< ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ç¸¦å¹…
 
-	bool ShouldShow; //!< show ‚ÅÀÛ‚É‰æ–Ê‚É‰æ‘œ‚ğ“]‘—‚·‚×‚«‚©
+	bool ShouldShow; //!< show ã§å®Ÿéš›ã«ç”»é¢ã«ç”»åƒã‚’è»¢é€ã™ã¹ãã‹
 
 	tjs_uint VsyncInterval;
 
 public:
-	tTVPBasicDrawDevice(); //!< ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	tTVPBasicDrawDevice(); //!< ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 
 private:
-	~tTVPBasicDrawDevice(); //!< ƒfƒXƒgƒ‰ƒNƒ^
+	~tTVPBasicDrawDevice(); //!< ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 
 	void InvalidateAll();
 
@@ -66,29 +66,29 @@ public:
 public:
 	void EnsureDevice();
 
-//---- LayerManager ‚ÌŠÇ—ŠÖ˜A
+//---- LayerManager ã®ç®¡ç†é–¢é€£
 	virtual void TJS_INTF_METHOD AddLayerManager(iTVPLayerManager * manager);
 
-//---- •`‰æˆÊ’uEƒTƒCƒYŠÖ˜A
+//---- æç”»ä½ç½®ãƒ»ã‚µã‚¤ã‚ºé–¢é€£
 	virtual void TJS_INTF_METHOD SetTargetWindow(HWND wnd, bool is_main);
 	virtual void TJS_INTF_METHOD SetDestRectangle(const tTVPRect & rect);
 	virtual void TJS_INTF_METHOD NotifyLayerResize(iTVPLayerManager * manager);
 
-//---- Ä•`‰æŠÖ˜A
+//---- å†æç”»é–¢é€£
 	virtual void TJS_INTF_METHOD Show();
 	virtual bool TJS_INTF_METHOD WaitForVBlank( tjs_int* in_vblank, tjs_int* delayed );
 
-//---- LayerManager ‚©‚ç‚Ì‰æ‘œó‚¯“n‚µŠÖ˜A
+//---- LayerManager ã‹ã‚‰ã®ç”»åƒå—ã‘æ¸¡ã—é–¢é€£
 	virtual void TJS_INTF_METHOD StartBitmapCompletion(iTVPLayerManager * manager);
 	virtual void TJS_INTF_METHOD NotifyBitmapCompleted(iTVPLayerManager * manager,
 		tjs_int x, tjs_int y, const void * bits, const BITMAPINFO * bitmapinfo,
 		const tTVPRect &cliprect, tTVPLayerType type, tjs_int opacity);
 	virtual void TJS_INTF_METHOD EndBitmapCompletion(iTVPLayerManager * manager);
 
-//---- ƒfƒoƒbƒOx‰‡
+//---- ãƒ‡ãƒãƒƒã‚°æ”¯æ´
 	virtual void TJS_INTF_METHOD SetShowUpdateRect(bool b);
 
-//---- ƒtƒ‹ƒXƒNƒŠ[ƒ“
+//---- ãƒ•ãƒ«ã‚¹ã‚¯ãƒªãƒ¼ãƒ³
 	virtual bool TJS_INTF_METHOD SwitchToFullScreen( HWND window, tjs_uint w, tjs_uint h, tjs_uint bpp, tjs_uint color, bool changeresolution );
 	virtual void TJS_INTF_METHOD RevertFromFullScreen( HWND window, tjs_uint w, tjs_uint h, tjs_uint bpp, tjs_uint color );
 

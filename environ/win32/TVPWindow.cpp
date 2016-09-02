@@ -39,7 +39,7 @@ LRESULT WINAPI tTVPWindow::WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM l
 }
 
 LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam ) {
-	// ƒ}ƒEƒXƒƒbƒZ[ƒW‚ª‚«‚½AMouse Enter ‚Ì”»’è‚ğs‚¤
+	// ãƒã‚¦ã‚¹ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒããŸæ™‚ã€Mouse Enter ã®åˆ¤å®šã‚’è¡Œã†
 	if( (msg >= WM_MOUSEFIRST && msg <= WM_MOUSELAST) && msg != WM_MOUSELEAVE ) {
 		if( in_window_ == false ) {
 			OnMouseEnter();
@@ -49,7 +49,7 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
             tme.dwFlags = TME_LEAVE;
             tme.hwndTrack = hWnd;
 			tme.dwHoverTime = HOVER_DEFAULT;
-            ::TrackMouseEvent( &tme ); // ‚±‚±‚ÅƒGƒ‰[‚ğƒnƒ“ƒhƒŠƒ“ƒO‚µ‚Ä‚à‚ ‚Ü‚èˆÓ–¡–³‚¢‚Ì‚Å–³‹
+            ::TrackMouseEvent( &tme ); // ã“ã“ã§ã‚¨ãƒ©ãƒ¼ã‚’ãƒãƒ³ãƒ‰ãƒªãƒ³ã‚°ã—ã¦ã‚‚ã‚ã¾ã‚Šæ„å‘³ç„¡ã„ã®ã§ç„¡è¦–
 		}
 	}
 
@@ -112,7 +112,7 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 	case WM_RBUTTONUP:
 		OnMouseUp( mbRight, GetShiftState(wParam), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
 		return 0;
-	case WM_RBUTTONDBLCLK: // ‰Eƒ_ƒuƒ‹ƒNƒŠƒbƒN‚Í–³‹
+	case WM_RBUTTONDBLCLK: // å³ãƒ€ãƒ–ãƒ«ã‚¯ãƒªãƒƒã‚¯ã¯ç„¡è¦–
 		return ::DefWindowProc(hWnd,msg,wParam,lParam);
 
 	case WM_MBUTTONDOWN:
@@ -121,33 +121,33 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 	case WM_MBUTTONUP:
 		OnMouseUp( mbMiddle, GetShiftState(wParam), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
 		return 0;
-	case WM_MBUTTONDBLCLK: // ’†ƒ_ƒuƒ‹ƒNƒŠƒbƒN‚Í–³‹
+	case WM_MBUTTONDBLCLK: // ä¸­ãƒ€ãƒ–ãƒ«ã‚¯ãƒªãƒƒã‚¯ã¯ç„¡è¦–
 		return ::DefWindowProc(hWnd,msg,wParam,lParam);
 
-	case WM_XBUTTONDBLCLK: // Xƒ_ƒuƒ‹ƒNƒŠƒbƒN‚Í–³‹
+	case WM_XBUTTONDBLCLK: // Xãƒ€ãƒ–ãƒ«ã‚¯ãƒªãƒƒã‚¯ã¯ç„¡è¦–
 		return ::DefWindowProc(hWnd,msg,wParam,lParam);
 	case WM_XBUTTONUP:
 	    switch(GET_XBUTTON_WPARAM(wParam)){
-        case XBUTTON1: // ƒTƒCƒhƒL[‚ª‘æ1Xƒ{ƒ^ƒ“
+        case XBUTTON1: // ã‚µã‚¤ãƒ‰ã‚­ãƒ¼ãŒç¬¬1Xãƒœã‚¿ãƒ³
             OnMouseUp( mbX1, GetShiftState(wParam), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
 			return 0;
-        case XBUTTON2: // ƒTƒCƒhƒL[‚ª‘æ2Xƒ{ƒ^ƒ“
+        case XBUTTON2: // ã‚µã‚¤ãƒ‰ã‚­ãƒ¼ãŒç¬¬2Xãƒœã‚¿ãƒ³
             OnMouseUp( mbX2, GetShiftState(wParam), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
 			return 0;
 		}
 		return ::DefWindowProc(hWnd,msg,wParam,lParam);
-	case WM_XBUTTONDOWN: // –ß‚é‚âi‚Ş‚ªŠ„‚è“–‚Ä‚ç‚ê‚é
+	case WM_XBUTTONDOWN: // æˆ»ã‚‹ã‚„é€²ã‚€ãŒå‰²ã‚Šå½“ã¦ã‚‰ã‚Œã‚‹
 	    switch(GET_XBUTTON_WPARAM(wParam)){
-        case XBUTTON1: // ƒTƒCƒhƒL[‚ª‘æ1Xƒ{ƒ^ƒ“
+        case XBUTTON1: // ã‚µã‚¤ãƒ‰ã‚­ãƒ¼ãŒç¬¬1Xãƒœã‚¿ãƒ³
             OnMouseDown( mbX1, GetShiftState(wParam), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
 			return 0;
-        case XBUTTON2: // ƒTƒCƒhƒL[‚ª‘æ2Xƒ{ƒ^ƒ“
+        case XBUTTON2: // ã‚µã‚¤ãƒ‰ã‚­ãƒ¼ãŒç¬¬2Xãƒœã‚¿ãƒ³
             OnMouseDown( mbX2, GetShiftState(wParam), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
 			return 0;
 		}
 		return ::DefWindowProc(hWnd,msg,wParam,lParam);
 	case WM_TOUCH: {
-		// user32.dll ‚©‚ç GetTouchInputInfo ‚È‚Ç“Ç‚İ‚Ş
+		// user32.dll ã‹ã‚‰ GetTouchInputInfo ãªã©èª­ã¿è¾¼ã‚€
 		if( procGetTouchInputInfo && procCloseTouchInputHandle ) {
 			UINT cInputs = LOWORD(wParam);
 			PTOUCHINPUT pInputs = new TOUCHINPUT[cInputs];
@@ -273,9 +273,9 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 	case WM_GETMINMAXINFO:
 		{
 			MINMAXINFO* lpmmi = (LPMINMAXINFO)lParam;
-			// lpmmi->ptMaxPosition Å‘å‰»‚ÌˆÊ’u
-			// lpmmi->ptMaxSize Å‘å‰»‚ÌƒTƒCƒY
-			// Å¬ƒTƒCƒY
+			// lpmmi->ptMaxPosition æœ€å¤§åŒ–æ™‚ã®ä½ç½®
+			// lpmmi->ptMaxSize æœ€å¤§åŒ–æ™‚ã®ã‚µã‚¤ã‚º
+			// æœ€å°ã‚µã‚¤ã‚º
 			if( min_size_.cx > 0 ) {
 				lpmmi->ptMinTrackSize.x = min_size_.cx;
 			}
@@ -283,14 +283,14 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 				lpmmi->ptMinTrackSize.y = min_size_.cy;
 			}
 			if( max_size_.cx > 0 ) {
-				lpmmi->ptMaxTrackSize.x = max_size_.cx; // ƒTƒCƒY•ÏX‚ÌÅ‘åƒTƒCƒY
+				lpmmi->ptMaxTrackSize.x = max_size_.cx; // ã‚µã‚¤ã‚ºå¤‰æ›´æ™‚ã®æœ€å¤§ã‚µã‚¤ã‚º
 			} else {
-				lpmmi->ptMaxTrackSize.x = INT_MAX; // ƒTƒCƒY•ÏX‚ÌÅ‘åƒTƒCƒY
+				lpmmi->ptMaxTrackSize.x = INT_MAX; // ã‚µã‚¤ã‚ºå¤‰æ›´æ™‚ã®æœ€å¤§ã‚µã‚¤ã‚º
 			}
 			if( max_size_.cy > 0 ) {
-				lpmmi->ptMaxTrackSize.y = max_size_.cy; // ƒTƒCƒY•ÏX‚ÌÅ‘åƒTƒCƒY
+				lpmmi->ptMaxTrackSize.y = max_size_.cy; // ã‚µã‚¤ã‚ºå¤‰æ›´æ™‚ã®æœ€å¤§ã‚µã‚¤ã‚º
 			} else {
-				lpmmi->ptMaxTrackSize.y = INT_MAX; // ƒTƒCƒY•ÏX‚ÌÅ‘åƒTƒCƒY
+				lpmmi->ptMaxTrackSize.y = INT_MAX; // ã‚µã‚¤ã‚ºå¤‰æ›´æ™‚ã®æœ€å¤§ã‚µã‚¤ã‚º
 			}
 			return 0;
 		}
@@ -308,7 +308,7 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 			if( in_mode_ ) modal_result_ = mrCancel;
 		} else if( wParam == SC_KEYMENU ) {
 			if( HasMenu( hWnd ) == false ) {
-				return 0; // ƒƒjƒ…[‚ª‚È‚¢‚ÍAƒRƒ}ƒ“ƒh‚ğÁ”ï‚µ‚ÄAƒ}ƒEƒXƒJ[ƒ\ƒ‹“ü—Í‚ÌƒƒXƒg‚ğ–h‚®
+				return 0; // ãƒ¡ãƒ‹ãƒ¥ãƒ¼ãŒãªã„æ™‚ã¯ã€ã‚³ãƒãƒ³ãƒ‰ã‚’æ¶ˆè²»ã—ã¦ã€ãƒã‚¦ã‚¹ã‚«ãƒ¼ã‚½ãƒ«å…¥åŠ›ã®ãƒ­ã‚¹ãƒˆã‚’é˜²ã
 			}
 		}
 		return ::DefWindowProc(hWnd,msg,wParam,lParam);
@@ -440,16 +440,16 @@ HRESULT tTVPWindow::CreateWnd( const std::wstring& classname, const std::wstring
 		ttstr str = touch;
 		if(str == TJS_W("true")) ignore_touch = true;
 	}
-	// ƒn[ƒh‚ªƒ}ƒ‹ƒ`ƒ^ƒbƒ`‚ğƒTƒ|[ƒg‚µ‚Ä‚¢‚é‚©‚Ç‚¤‚©
+	// ãƒãƒ¼ãƒ‰ãŒãƒãƒ«ãƒã‚¿ãƒƒãƒã‚’ã‚µãƒãƒ¼ãƒˆã—ã¦ã„ã‚‹ã‹ã©ã†ã‹
 	if( procRegisterTouchWindow && ignore_touch == false ) {
 		int value= ::GetSystemMetrics( SM_DIGITIZER );
 		if( (value & (NID_MULTI_INPUT|NID_READY)) == (NID_MULTI_INPUT|NID_READY) ) {
-			// ƒ}ƒ‹ƒ`ƒ^ƒbƒ`ƒTƒ|[ƒg & €”õ‚Å‚«‚Ä‚¢‚é
+			// ãƒãƒ«ãƒã‚¿ãƒƒãƒã‚µãƒãƒ¼ãƒˆ & æº–å‚™ã§ãã¦ã„ã‚‹
 #ifndef TVP_TOUCH_DISABLE
 			procRegisterTouchWindow( window_handle_, REGISTER_TOUCH_FLAG );
 			ignore_touch_mouse_ = true;
 #endif
-			// MICROSOFT_TABLETPENSERVICE_PROPERTY ƒvƒƒpƒeƒB‚ğ•ÏX‚·‚é
+			// MICROSOFT_TABLETPENSERVICE_PROPERTY ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ã‚’å¤‰æ›´ã™ã‚‹
 			ATOM atom = ::GlobalAddAtom( MICROSOFT_TABLETPENSERVICE_PROPERTY );
 			::SetProp( window_handle_, MICROSOFT_TABLETPENSERVICE_PROPERTY, reinterpret_cast<HANDLE>( DEFAULT_TABLETPENSERVICE_PROPERTY ) );
 			::GlobalDeleteAtom( atom );
@@ -521,7 +521,7 @@ void tTVPWindow::SetClientSize( HWND hWnd, SIZE& size ) {
 }
 
 
-// •\¦ó‘Ô
+// è¡¨ç¤ºçŠ¶æ…‹
 bool tTVPWindow::GetVisible() const {
 	return ::IsWindowVisible( GetHandle() ) ? true : false;
 }
@@ -867,7 +867,7 @@ int tTVPWindow::ShowModal() {
 		throw Exception( (const tjs_char*)TVPCannotShowModalAreadyShowed );
 	}
 	if( Application->GetWindowCount() == 1 ) {
-		// 1ŒÂ‚µ‚© Window‚ª‚È‚¢‚ÍModal‰»‚·‚éˆÓ–¡‚ª‚È‚¢‚Ì‚ÆA•s‹ï‡‚ÌŒ³‚È‚Ì‚Å—áŠO”­¶
+		// 1å€‹ã—ã‹ WindowãŒãªã„æ™‚ã¯ModalåŒ–ã™ã‚‹æ„å‘³ãŒãªã„ã®ã¨ã€ä¸å…·åˆã®å…ƒãªã®ã§ä¾‹å¤–ç™ºç”Ÿ
 		throw Exception( (const tjs_char*)TVPCannotShowModalSingleWindow );
 	}
 	if( in_mode_ == false ) in_mode_ = true;

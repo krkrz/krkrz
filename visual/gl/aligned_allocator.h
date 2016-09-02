@@ -16,8 +16,8 @@ struct aligned_allocator : public std::allocator<T>
 	template <class U> struct rebind    { typedef aligned_allocator<U,TAlign> other; };
 	aligned_allocator() throw() {}
 	aligned_allocator(const aligned_allocator&) throw () {}
-	template <class U> aligned_allocator(const aligned_allocator<U>&) throw() {}
-	template <class U> aligned_allocator& operator=(const aligned_allocator<U>&) throw()  {}
+	template <class U> aligned_allocator(const aligned_allocator<U, TAlign>&) throw() {}
+	template <class U> aligned_allocator& operator=(const aligned_allocator<U, TAlign>&) throw()  {}
 	// allocate
 	pointer allocate(size_type c, const void* hint = 0) {
 		return static_cast<pointer>( _mm_malloc( sizeof(T)*c, TAlign ) );

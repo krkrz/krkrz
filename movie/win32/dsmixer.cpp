@@ -1,15 +1,15 @@
 /****************************************************************************/
 /*! @file
-@brief VMR9‚ğg‚¤ƒI[ƒo[ƒŒƒCƒNƒ‰ƒX
+@brief VMR9ã‚’ä½¿ã†ã‚ªãƒ¼ãƒãƒ¼ãƒ¬ã‚¤ã‚¯ãƒ©ã‚¹
 
-Às‚É‚ÍDirectX9ˆÈ~‚ª•K—v
+å®Ÿè¡Œã«ã¯DirectX9ä»¥é™ãŒå¿…è¦
 -----------------------------------------------------------------------------
 	Copyright (C) 2005 T.Imoto
 -----------------------------------------------------------------------------
 @author		T.Imoto
 @date		2005/09/25
 @note
-			2005/09/25	T.Imoto		ì¬
+			2005/09/25	T.Imoto		ä½œæˆ
 *****************************************************************************/
 
 
@@ -32,7 +32,7 @@
 #include "TVPVideoOverlay.h"
 
 //----------------------------------------------------------------------------
-//! @brief	  	‰Šú‰»
+//! @brief	  	åˆæœŸåŒ–
 //----------------------------------------------------------------------------
 tTVPDSMixerVideoOverlay::tTVPDSMixerVideoOverlay()
 {
@@ -44,7 +44,7 @@ tTVPDSMixerVideoOverlay::tTVPDSMixerVideoOverlay()
 	m_hMessageDrainWnd = NULL;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒCƒ“ƒ^[ƒtƒFƒCƒX‚ğ‰ğ•ú‚·‚é
+//! @brief	  	ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã‚’è§£æ”¾ã™ã‚‹
 //----------------------------------------------------------------------------
 tTVPDSMixerVideoOverlay::~tTVPDSMixerVideoOverlay()
 {
@@ -53,7 +53,7 @@ tTVPDSMixerVideoOverlay::~tTVPDSMixerVideoOverlay()
 	m_hMessageDrainWnd = NULL;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒCƒ“ƒ^[ƒtƒFƒCƒX‚ğ‰ğ•ú‚·‚é
+//! @brief	  	ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã‚’è§£æ”¾ã™ã‚‹
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::ReleaseAll()
 {
@@ -84,12 +84,12 @@ void __stdcall tTVPDSMixerVideoOverlay::ReleaseAll()
 	tTVPDSMovie::ReleaseAll();
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒtƒBƒ‹ƒ^ƒOƒ‰ƒt‚Ì\’z
-//! @param 		callbackwin : ƒƒbƒZ[ƒW‚ğ‘—M‚·‚éƒEƒBƒ“ƒhƒE
-//! @param 		stream : “Ç‚İ‚İŒ³ƒXƒgƒŠ[ƒ€
-//! @param 		streamname : ƒXƒgƒŠ[ƒ€‚Ì–¼‘O
-//! @param 		type : ƒƒfƒBƒAƒ^ƒCƒv(Šg’£q)
-//! @param 		size : ƒƒfƒBƒAƒTƒCƒY
+//! @brief	  	ãƒ•ã‚£ãƒ«ã‚¿ã‚°ãƒ©ãƒ•ã®æ§‹ç¯‰
+//! @param 		callbackwin : ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’é€ä¿¡ã™ã‚‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦
+//! @param 		stream : èª­ã¿è¾¼ã¿å…ƒã‚¹ãƒˆãƒªãƒ¼ãƒ 
+//! @param 		streamname : ã‚¹ãƒˆãƒªãƒ¼ãƒ ã®åå‰
+//! @param 		type : ãƒ¡ãƒ‡ã‚£ã‚¢ã‚¿ã‚¤ãƒ—(æ‹¡å¼µå­)
+//! @param 		size : ãƒ¡ãƒ‡ã‚£ã‚¢ã‚µã‚¤ã‚º
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::BuildGraph( HWND callbackwin, IStream *stream, const wchar_t * streamname, const wchar_t *type, unsigned __int64 size )
 {
@@ -149,7 +149,7 @@ void __stdcall tTVPDSMixerVideoOverlay::BuildGraph( HWND callbackwin, IStream *s
 			if( FAILED(hr = GraphBuilder()->AddFilter( m_Reader, L"Stream Reader")) )
 				ThrowDShowException(L"Failed to call IFilterGraph::AddFilter.", hr);
 	
-			// AddFilter‚µ‚½‚Ì‚ÅRelease
+			// AddFilterã—ãŸã®ã§Release
 			m_Reader->Release();
 
 			if( mt.subtype == MEDIASUBTYPE_Avi || mt.subtype == MEDIASUBTYPE_QTMovie )
@@ -236,7 +236,7 @@ void __stdcall tTVPDSMixerVideoOverlay::BuildGraph( HWND callbackwin, IStream *s
 			}
 		}
 #if 1
-		{	// •½‹ÏƒtƒŒ[ƒ€•\¦ŠÔ‚ğæ“¾‚·‚é
+		{	// å¹³å‡ãƒ•ãƒ¬ãƒ¼ãƒ è¡¨ç¤ºæ™‚é–“ã‚’å–å¾—ã™ã‚‹
 			CComPtr<IBaseFilter>	pRender;
 			if( FAILED(hr = FindVideoRenderer( &pRender ) ) )
 				ThrowDShowException(L"Failed to call FindVideoRenderer( &pRender ).", hr);
@@ -303,8 +303,8 @@ void __stdcall tTVPDSMixerVideoOverlay::BuildGraph( HWND callbackwin, IStream *s
 	CoUninitialize();
 }
 //----------------------------------------------------------------------------
-//! @brief	  	VMR9ƒtƒBƒ‹ƒ^‚ğƒtƒBƒ‹ƒ^ƒOƒ‰ƒt‚Ö’Ç‰Á‚·‚é
-//! @param 		pVMR9 : VMR9ƒtƒBƒ‹ƒ^
+//! @brief	  	VMR9ãƒ•ã‚£ãƒ«ã‚¿ã‚’ãƒ•ã‚£ãƒ«ã‚¿ã‚°ãƒ©ãƒ•ã¸è¿½åŠ ã™ã‚‹
+//! @param 		pVMR9 : VMR9ãƒ•ã‚£ãƒ«ã‚¿
 //----------------------------------------------------------------------------
 void tTVPDSMixerVideoOverlay::AddVMR9Filer( CComPtr<IBaseFilter> &pVMR9 )
 {
@@ -343,10 +343,10 @@ void tTVPDSMixerVideoOverlay::AddVMR9Filer( CComPtr<IBaseFilter> &pVMR9 )
 	}
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒ~ƒLƒVƒ“ƒO‚·‚éƒrƒbƒgƒ}ƒbƒv‚ğİ’è‚·‚é
-//! @param 		hdc : İ’è‚µ‚Ä‚¢‚éƒrƒbƒgƒ}ƒbƒv‚ğ•Û‚µ‚Ä‚¢‚éƒfƒoƒCƒXƒRƒ“ƒeƒLƒXƒg
-//! @param 		dest : “]‘—æˆÊ’u
-//! @param 		alpha : ƒAƒ‹ƒtƒ@’l (0.0 - 1.0‚Åw’è)
+//! @brief	  	ãƒŸã‚­ã‚·ãƒ³ã‚°ã™ã‚‹ãƒ“ãƒƒãƒˆãƒãƒƒãƒ—ã‚’è¨­å®šã™ã‚‹
+//! @param 		hdc : è¨­å®šã—ã¦ã„ã‚‹ãƒ“ãƒƒãƒˆãƒãƒƒãƒ—ã‚’ä¿æŒã—ã¦ã„ã‚‹ãƒ‡ãƒã‚¤ã‚¹ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆ
+//! @param 		dest : è»¢é€å…ˆä½ç½®
+//! @param 		alpha : ã‚¢ãƒ«ãƒ•ã‚¡å€¤ (0.0 - 1.0ã§æŒ‡å®š)
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::SetMixingBitmap( HDC hdc, RECT *dest, float alpha )
 {
@@ -364,10 +364,10 @@ void __stdcall tTVPDSMixerVideoOverlay::SetMixingBitmap( HDC hdc, RECT *dest, fl
 	long width;
 	long height;
 //	GetVideoSize( &width, &height );
-	// ƒrƒfƒIƒTƒCƒY‚Å‚Í‚È‚­AÅIo—Í‰æ‘œ‚ÌƒTƒCƒY‚ÅˆÊ’u‚ğŒvZ‚·‚é
+	// ãƒ“ãƒ‡ã‚ªã‚µã‚¤ã‚ºã§ã¯ãªãã€æœ€çµ‚å‡ºåŠ›ç”»åƒã®ã‚µã‚¤ã‚ºã§ä½ç½®ã‚’è¨ˆç®—ã™ã‚‹
 	width = Rect.right - Rect.left;
 	height = Rect.bottom - Rect.top;
-	// 0Š„‚è‰ñ”ğ
+	// 0å‰²ã‚Šå›é¿
 	if( width <= 0 ) width = 1;
 	if( height <= 0 ) height = 1;
 	if( dest )
@@ -378,7 +378,7 @@ void __stdcall tTVPDSMixerVideoOverlay::SetMixingBitmap( HDC hdc, RECT *dest, fl
 		bmpInfo.rDest.bottom = (static_cast<float>(dest->bottom)+0.5f)/static_cast<float>(height);
 	}
 	else
-	{	// NULL‚Ì‚ÍA‘S‘Ì‚ÉƒuƒŒƒ“ƒh‚·‚é‚æ‚¤‚É‚·‚é
+	{	// NULLã®æ™‚ã¯ã€å…¨ä½“ã«ãƒ–ãƒ¬ãƒ³ãƒ‰ã™ã‚‹ã‚ˆã†ã«ã™ã‚‹
 		bmpInfo.rDest.left = 0.0f;
 		bmpInfo.rDest.top = 0.0f;
 		bmpInfo.rDest.right = 1.0f;
@@ -391,7 +391,7 @@ void __stdcall tTVPDSMixerVideoOverlay::SetMixingBitmap( HDC hdc, RECT *dest, fl
 		ThrowDShowException(L"Failed to set IVMRMixerBitmap9::SetAlphaBitmap.", hr);
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒ~ƒLƒVƒ“ƒO‚µ‚Ä‚¢‚éƒrƒbƒgƒ}ƒbƒv‚Ìİ’è‚ğ‰ğœ‚·‚é
+//! @brief	  	ãƒŸã‚­ã‚·ãƒ³ã‚°ã—ã¦ã„ã‚‹ãƒ“ãƒƒãƒˆãƒãƒƒãƒ—ã®è¨­å®šã‚’è§£é™¤ã™ã‚‹
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::ResetMixingBitmap()
 {
@@ -400,18 +400,18 @@ void __stdcall tTVPDSMixerVideoOverlay::ResetMixingBitmap()
 	if(FAILED(hr = m_VMR9MixerBmp->GetAlphaBitmapParameters(&bmpInfo)) )
 		ThrowDShowException(L"Failed to set IVMRMixerBitmap9::GetAlphaBitmapParameters.", hr);
 
-	if( bmpInfo.hdc == NULL )	// İ’è‚³‚ê‚Ä‚¢‚È‚¢‚Ì‚ÅƒŠƒ^[ƒ“
+	if( bmpInfo.hdc == NULL )	// è¨­å®šã•ã‚Œã¦ã„ãªã„ã®ã§ãƒªã‚¿ãƒ¼ãƒ³
 		return;
 
 	ZeroMemory(&bmpInfo, sizeof(bmpInfo));
 
-	// İ’è‚¹‚¸‚É‚±‚Ìƒƒ\ƒbƒh‚ğƒR[ƒ‹‚·‚é‚ÆAƒrƒbƒgƒ}ƒbƒv‚ğ‰ğœ‚·‚é‚Æ‚¢‚¤d—l‚ç‚µ‚¢B
+	// è¨­å®šã›ãšã«ã“ã®ãƒ¡ã‚½ãƒƒãƒ‰ã‚’ã‚³ãƒ¼ãƒ«ã™ã‚‹ã¨ã€ãƒ“ãƒƒãƒˆãƒãƒƒãƒ—ã‚’è§£é™¤ã™ã‚‹ã¨ã„ã†ä»•æ§˜ã‚‰ã—ã„ã€‚
 	if(FAILED(hr = MixerBmp()->UpdateAlphaBitmapParameters( &bmpInfo )) )
 		ThrowDShowException(L"Failed to set IVMRMixerBitmap9::UpdateAlphaBitmapParameters.", hr);
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒ~ƒLƒVƒ“ƒO‚·‚éƒrƒfƒIƒXƒgƒŠ[ƒ€‚ÌƒAƒ‹ƒtƒ@’l‚ğİ’è‚·‚é
-//! @param		a : İ’è‚·‚éƒAƒ‹ƒtƒ@’l
+//! @brief	  	ãƒŸã‚­ã‚·ãƒ³ã‚°ã™ã‚‹ãƒ“ãƒ‡ã‚ªã‚¹ãƒˆãƒªãƒ¼ãƒ ã®ã‚¢ãƒ«ãƒ•ã‚¡å€¤ã‚’è¨­å®šã™ã‚‹
+//! @param		a : è¨­å®šã™ã‚‹ã‚¢ãƒ«ãƒ•ã‚¡å€¤
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::SetMixingMovieAlpha( float a )
 {
@@ -420,8 +420,8 @@ void __stdcall tTVPDSMixerVideoOverlay::SetMixingMovieAlpha( float a )
 		ThrowDShowException(L"Failed to set IVMRMixerControl9::SetAlpha.", hr);
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒ~ƒLƒVƒ“ƒO‚·‚éƒrƒfƒIƒXƒgƒŠ[ƒ€‚ÌƒAƒ‹ƒtƒ@’l‚ğæ“¾‚·‚é
-//! @param		a : ƒAƒ‹ƒtƒ@’l‚ğó‚¯æ‚éƒ|ƒCƒ“ƒ^
+//! @brief	  	ãƒŸã‚­ã‚·ãƒ³ã‚°ã™ã‚‹ãƒ“ãƒ‡ã‚ªã‚¹ãƒˆãƒªãƒ¼ãƒ ã®ã‚¢ãƒ«ãƒ•ã‚¡å€¤ã‚’å–å¾—ã™ã‚‹
+//! @param		a : ã‚¢ãƒ«ãƒ•ã‚¡å€¤ã‚’å—ã‘å–ã‚‹ãƒã‚¤ãƒ³ã‚¿
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::GetMixingMovieAlpha( float *a )
 {
@@ -430,8 +430,8 @@ void __stdcall tTVPDSMixerVideoOverlay::GetMixingMovieAlpha( float *a )
 		ThrowDShowException(L"Failed to set IVMRMixerControl9::GetAlpha.", hr);
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒ~ƒLƒVƒ“ƒO‚·‚éƒrƒfƒIƒXƒgƒŠ[ƒ€‚Ì”wŒiF‚ğİ’è‚·‚é
-//! @param		col : İ’è‚·‚é”wŒiF
+//! @brief	  	ãƒŸã‚­ã‚·ãƒ³ã‚°ã™ã‚‹ãƒ“ãƒ‡ã‚ªã‚¹ãƒˆãƒªãƒ¼ãƒ ã®èƒŒæ™¯è‰²ã‚’è¨­å®šã™ã‚‹
+//! @param		col : è¨­å®šã™ã‚‹èƒŒæ™¯è‰²
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::SetMixingMovieBGColor( unsigned long col )
 {
@@ -441,8 +441,8 @@ void __stdcall tTVPDSMixerVideoOverlay::SetMixingMovieBGColor( unsigned long col
 		ThrowDShowException(L"Failed to set IVMRMixerControl9::SetBackgroundClr.", hr);
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒ~ƒLƒVƒ“ƒO‚·‚éƒrƒfƒIƒXƒgƒŠ[ƒ€‚Ì”wŒiF‚ğæ“¾‚·‚é
-//! @param		col : ”wŒiF‚ğó‚¯æ‚éƒ|ƒCƒ“ƒ^
+//! @brief	  	ãƒŸã‚­ã‚·ãƒ³ã‚°ã™ã‚‹ãƒ“ãƒ‡ã‚ªã‚¹ãƒˆãƒªãƒ¼ãƒ ã®èƒŒæ™¯è‰²ã‚’å–å¾—ã™ã‚‹
+//! @param		col : èƒŒæ™¯è‰²ã‚’å—ã‘å–ã‚‹ãƒã‚¤ãƒ³ã‚¿
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::GetMixingMovieBGColor( unsigned long *col )
 {
@@ -454,8 +454,8 @@ void __stdcall tTVPDSMixerVideoOverlay::GetMixingMovieBGColor( unsigned long *co
 	*col >>= 8;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒEƒBƒ“ƒhƒEƒnƒ“ƒhƒ‹‚ğİ’è‚·‚é
-//! @param 		window : ƒEƒBƒ“ƒhƒEƒnƒ“ƒhƒ‹
+//! @brief	  	ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒãƒ³ãƒ‰ãƒ«ã‚’è¨­å®šã™ã‚‹
+//! @param 		window : ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒãƒ³ãƒ‰ãƒ«
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::SetWindow(HWND window)
 {
@@ -469,8 +469,8 @@ void __stdcall tTVPDSMixerVideoOverlay::SetWindow(HWND window)
 	}
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒrƒfƒI‚Ì•\¦‹éŒ`‚ğİ’è‚·‚é
-//! @param 		rect : •\¦‹éŒ`
+//! @brief	  	ãƒ“ãƒ‡ã‚ªã®è¡¨ç¤ºçŸ©å½¢ã‚’è¨­å®šã™ã‚‹
+//! @param 		rect : è¡¨ç¤ºçŸ©å½¢
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::SetRect(RECT *rect)
 {
@@ -479,17 +479,17 @@ void __stdcall tTVPDSMixerVideoOverlay::SetRect(RECT *rect)
 	AllocatorPresenter()->SetRect(rect);
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒrƒfƒI‚Ì•\¦/”ñ•\¦‚ğİ’è‚·‚é
-//! @param 		b : •\¦/”ñ•\¦
+//! @brief	  	ãƒ“ãƒ‡ã‚ªã®è¡¨ç¤º/éè¡¨ç¤ºã‚’è¨­å®šã™ã‚‹
+//! @param 		b : è¡¨ç¤º/éè¡¨ç¤º
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::SetVisible(bool b)
 {
 	AllocatorPresenter()->SetVisible(b);
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒrƒfƒI‚ÌƒTƒCƒY‚ğæ“¾‚·‚é
-//! @param 		width : •
-//! @param 		height : ‚‚³
+//! @brief	  	ãƒ“ãƒ‡ã‚ªã®ã‚µã‚¤ã‚ºã‚’å–å¾—ã™ã‚‹
+//! @param 		width : å¹…
+//! @param 		height : é«˜ã•
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::GetVideoSize( long *width, long *height )
 {
@@ -500,9 +500,9 @@ void __stdcall tTVPDSMixerVideoOverlay::GetVideoSize( long *width, long *height 
 	*height = m_Height;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ŠeƒtƒŒ[ƒ€‚Ì•½‹Ï•\¦ŠÔ‚ğæ“¾‚·‚é
-//! @param 		pAvgTimePerFrame : ŠeƒtƒŒ[ƒ€‚Ì•½‹Ï•\¦ŠÔ
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	å„ãƒ•ãƒ¬ãƒ¼ãƒ ã®å¹³å‡è¡¨ç¤ºæ™‚é–“ã‚’å–å¾—ã™ã‚‹
+//! @param 		pAvgTimePerFrame : å„ãƒ•ãƒ¬ãƒ¼ãƒ ã®å¹³å‡è¡¨ç¤ºæ™‚é–“
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT __stdcall tTVPDSMixerVideoOverlay::GetAvgTimePerFrame( REFTIME *pAvgTimePerFrame )
 {
@@ -510,21 +510,21 @@ HRESULT __stdcall tTVPDSMixerVideoOverlay::GetAvgTimePerFrame( REFTIME *pAvgTime
 	return S_OK;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒrƒfƒI‰æ‘œ‚ğ‰æ–Ê‚Ö”½‰f‚·‚é
+//! @brief	  	ãƒ“ãƒ‡ã‚ªç”»åƒã‚’ç”»é¢ã¸åæ˜ ã™ã‚‹
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::PresentVideoImage()
 {
 	AllocatorPresenter()->PresentVideoImage();
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒƒbƒZ[ƒW‚ğ‘—‚éƒEƒBƒ“ƒhƒE‚ğİ’è‚·‚é
+//! @brief	  	ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’é€ã‚‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’è¨­å®šã™ã‚‹
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::SetMessageDrainWindow(HWND window)
 {
 	m_hMessageDrainWnd = window;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	Å¬’l‚ğ“¾‚é
+//! @brief	  	æœ€å°å€¤ã‚’å¾—ã‚‹
 //----------------------------------------------------------------------------
 void tTVPDSMixerVideoOverlay::GetAmpControlRangeMin( float *v, int flag )
 {
@@ -540,7 +540,7 @@ void tTVPDSMixerVideoOverlay::GetAmpControlRangeMin( float *v, int flag )
 	*v = proc.MinValue;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	Å‘å’l‚ğ“¾‚é
+//! @brief	  	æœ€å¤§å€¤ã‚’å¾—ã‚‹
 //----------------------------------------------------------------------------
 void tTVPDSMixerVideoOverlay::GetAmpControlRangeMax( float *v, int flag )
 {
@@ -556,7 +556,7 @@ void tTVPDSMixerVideoOverlay::GetAmpControlRangeMax( float *v, int flag )
 	*v = proc.MaxValue;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒfƒtƒHƒ‹ƒg’l‚ğ“¾‚é
+//! @brief	  	ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤ã‚’å¾—ã‚‹
 //----------------------------------------------------------------------------
 void tTVPDSMixerVideoOverlay::GetAmpControlDefaultValue( float *v, int flag )
 {
@@ -572,7 +572,7 @@ void tTVPDSMixerVideoOverlay::GetAmpControlDefaultValue( float *v, int flag )
 	*v = proc.DefaultValue;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒXƒeƒbƒvƒTƒCƒY‚ğ“¾‚é
+//! @brief	  	ã‚¹ãƒ†ãƒƒãƒ—ã‚µã‚¤ã‚ºã‚’å¾—ã‚‹
 //----------------------------------------------------------------------------
 void tTVPDSMixerVideoOverlay::GetAmpControlStepSize( float *v, int flag )
 {
@@ -588,7 +588,7 @@ void tTVPDSMixerVideoOverlay::GetAmpControlStepSize( float *v, int flag )
 	*v = proc.StepSize;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	’l‚ğ“¾‚é
+//! @brief	  	å€¤ã‚’å¾—ã‚‹
 //----------------------------------------------------------------------------
 void tTVPDSMixerVideoOverlay::GetAmpControl( float *v, int flag )
 {
@@ -617,7 +617,7 @@ void tTVPDSMixerVideoOverlay::GetAmpControl( float *v, int flag )
 	}
 }
 //----------------------------------------------------------------------------
-//! @brief	  	’l‚ğİ’è‚·‚é
+//! @brief	  	å€¤ã‚’è¨­å®šã™ã‚‹
 //----------------------------------------------------------------------------
 void tTVPDSMixerVideoOverlay::SetAmpControl( float v, int flag )
 {
@@ -653,168 +653,168 @@ void tTVPDSMixerVideoOverlay::SetAmpControl( float v, int flag )
 }
 
 //----------------------------------------------------------------------------
-//! @brief	  	ƒRƒ“ƒgƒ‰ƒXƒg‚Ì•‚ÌÅ¬’l‚ğ“¾‚é
+//! @brief	  	ã‚³ãƒ³ãƒˆãƒ©ã‚¹ãƒˆã®å¹…ã®æœ€å°å€¤ã‚’å¾—ã‚‹
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::GetContrastRangeMin( float *v )
 {
 	GetAmpControlRangeMin( v, ProcAmpControl9_Contrast );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒRƒ“ƒgƒ‰ƒXƒg‚Ì•‚ÌÅ‘å’l‚ğ“¾‚é
+//! @brief	  	ã‚³ãƒ³ãƒˆãƒ©ã‚¹ãƒˆã®å¹…ã®æœ€å¤§å€¤ã‚’å¾—ã‚‹
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::GetContrastRangeMax( float *v )
 {
 	GetAmpControlRangeMax( v, ProcAmpControl9_Contrast );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒRƒ“ƒgƒ‰ƒXƒg‚ÌƒfƒtƒHƒ‹ƒg’l‚ğ“¾‚é
+//! @brief	  	ã‚³ãƒ³ãƒˆãƒ©ã‚¹ãƒˆã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤ã‚’å¾—ã‚‹
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::GetContrastDefaultValue( float *v )
 {
 	GetAmpControlDefaultValue( v, ProcAmpControl9_Contrast );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒRƒ“ƒgƒ‰ƒXƒg‚ÌƒXƒeƒbƒvƒTƒCƒY‚ğ“¾‚é
+//! @brief	  	ã‚³ãƒ³ãƒˆãƒ©ã‚¹ãƒˆã®ã‚¹ãƒ†ãƒƒãƒ—ã‚µã‚¤ã‚ºã‚’å¾—ã‚‹
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::GetContrastStepSize( float *v )
 {
 	GetAmpControlStepSize( v, ProcAmpControl9_Contrast );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒRƒ“ƒgƒ‰ƒXƒg‚ğ“¾‚é
+//! @brief	  	ã‚³ãƒ³ãƒˆãƒ©ã‚¹ãƒˆã‚’å¾—ã‚‹
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::GetContrast( float *v )
 {
 	GetAmpControl( v, ProcAmpControl9_Contrast );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒRƒ“ƒgƒ‰ƒXƒg‚ğİ’è‚·‚é
+//! @brief	  	ã‚³ãƒ³ãƒˆãƒ©ã‚¹ãƒˆã‚’è¨­å®šã™ã‚‹
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::SetContrast( float v )
 {
 	SetAmpControl( v, ProcAmpControl9_Contrast );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	‹P“x‚Ì•‚ÌÅ¬’l‚ğ“¾‚é
+//! @brief	  	è¼åº¦ã®å¹…ã®æœ€å°å€¤ã‚’å¾—ã‚‹
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::GetBrightnessRangeMin( float *v )
 {
 	GetAmpControlRangeMin( v, ProcAmpControl9_Brightness );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	‹P“x‚Ì•‚ÌÅ‘å’l‚ğ“¾‚é
+//! @brief	  	è¼åº¦ã®å¹…ã®æœ€å¤§å€¤ã‚’å¾—ã‚‹
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::GetBrightnessRangeMax( float *v )
 {
 	GetAmpControlRangeMax( v, ProcAmpControl9_Brightness );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	‹P“x‚ÌƒfƒtƒHƒ‹ƒg’l‚ğ“¾‚é
+//! @brief	  	è¼åº¦ã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤ã‚’å¾—ã‚‹
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::GetBrightnessDefaultValue( float *v )
 {
 	GetAmpControlDefaultValue( v, ProcAmpControl9_Brightness );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	‹P“x‚ÌƒXƒeƒbƒvƒTƒCƒY‚ğ“¾‚é
+//! @brief	  	è¼åº¦ã®ã‚¹ãƒ†ãƒƒãƒ—ã‚µã‚¤ã‚ºã‚’å¾—ã‚‹
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::GetBrightnessStepSize( float *v )
 {
 	GetAmpControlStepSize( v, ProcAmpControl9_Brightness );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	‹P“x‚ğ“¾‚é
+//! @brief	  	è¼åº¦ã‚’å¾—ã‚‹
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::GetBrightness( float *v )
 {
 	GetAmpControl( v, ProcAmpControl9_Brightness );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	‹P“x‚ğİ’è‚·‚é
+//! @brief	  	è¼åº¦ã‚’è¨­å®šã™ã‚‹
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::SetBrightness( float v )
 {
 	SetAmpControl( v, ProcAmpControl9_Brightness );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	F‘Š‚Ì•‚ÌÅ¬’l‚ğ“¾‚é
+//! @brief	  	è‰²ç›¸ã®å¹…ã®æœ€å°å€¤ã‚’å¾—ã‚‹
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::GetHueRangeMin( float *v )
 {
 	GetAmpControlRangeMin( v, ProcAmpControl9_Hue );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	F‘Š‚Ì•‚ÌÅ‘å’l‚ğ“¾‚é
+//! @brief	  	è‰²ç›¸ã®å¹…ã®æœ€å¤§å€¤ã‚’å¾—ã‚‹
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::GetHueRangeMax( float *v )
 {
 	GetAmpControlRangeMax( v, ProcAmpControl9_Hue );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	F‘Š‚ÌƒfƒtƒHƒ‹ƒg’l‚ğ“¾‚é
+//! @brief	  	è‰²ç›¸ã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤ã‚’å¾—ã‚‹
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::GetHueDefaultValue( float *v )
 {
 	GetAmpControlDefaultValue( v, ProcAmpControl9_Hue );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	F‘Š‚ÌƒXƒeƒbƒvƒTƒCƒY‚ğ“¾‚é
+//! @brief	  	è‰²ç›¸ã®ã‚¹ãƒ†ãƒƒãƒ—ã‚µã‚¤ã‚ºã‚’å¾—ã‚‹
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::GetHueStepSize( float *v )
 {
 	GetAmpControlStepSize( v, ProcAmpControl9_Hue );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	F‘Š‚ğ“¾‚é
+//! @brief	  	è‰²ç›¸ã‚’å¾—ã‚‹
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::GetHue( float *v )
 {
 	GetAmpControl( v, ProcAmpControl9_Hue );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	F‘Š‚ğİ’è‚·‚é
+//! @brief	  	è‰²ç›¸ã‚’è¨­å®šã™ã‚‹
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::SetHue( float v )
 {
 	SetAmpControl( v, ProcAmpControl9_Hue );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	Ê“x‚Ì•‚ÌÅ¬’l‚ğ“¾‚é
+//! @brief	  	å½©åº¦ã®å¹…ã®æœ€å°å€¤ã‚’å¾—ã‚‹
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::GetSaturationRangeMin( float *v )
 {
 	GetAmpControlRangeMin( v, ProcAmpControl9_Saturation );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	Ê“x‚Ì•‚ÌÅ‘å’l‚ğ“¾‚é
+//! @brief	  	å½©åº¦ã®å¹…ã®æœ€å¤§å€¤ã‚’å¾—ã‚‹
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::GetSaturationRangeMax( float *v )
 {
 	GetAmpControlRangeMax( v, ProcAmpControl9_Saturation );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	Ê“x‚ÌƒfƒtƒHƒ‹ƒg’l‚ğ“¾‚é
+//! @brief	  	å½©åº¦ã®ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆå€¤ã‚’å¾—ã‚‹
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::GetSaturationDefaultValue( float *v )
 {
 	GetAmpControlDefaultValue( v, ProcAmpControl9_Saturation );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	Ê“x‚ÌƒXƒeƒbƒvƒTƒCƒY‚ğ“¾‚é
+//! @brief	  	å½©åº¦ã®ã‚¹ãƒ†ãƒƒãƒ—ã‚µã‚¤ã‚ºã‚’å¾—ã‚‹
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::GetSaturationStepSize( float *v )
 {
 	GetAmpControlStepSize( v, ProcAmpControl9_Saturation );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	Ê“x‚ğ“¾‚é
+//! @brief	  	å½©åº¦ã‚’å¾—ã‚‹
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::GetSaturation( float *v )
 {
 	GetAmpControl( v, ProcAmpControl9_Saturation );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	Ê“x‚ğİ’è‚·‚é
+//! @brief	  	å½©åº¦ã‚’è¨­å®šã™ã‚‹
 //----------------------------------------------------------------------------
 void __stdcall tTVPDSMixerVideoOverlay::SetSaturation( float v )
 {

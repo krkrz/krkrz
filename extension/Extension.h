@@ -14,15 +14,15 @@ struct tTVPAtInstallClass {
 
 /*
 
-�ȉ��̂悤�ȏ����ŁAcpp �ɓ���Ă����ƁAVM��������A�N���X��ǉ�����i�K�Œǉ����Ă���܂��B
-�ÓI�����N����ƃN���X�ǉ������plugin�̗l�ȋ@�\�ł��B
-plugin�͎��s���ɃN���X���ǉ����܂����Aextension�̓r���h���鎞�ɁA�����N���X��I������`�ł��B
+以下のような書式で、cpp に入れておくと、VM初期化後、クラスを追加する段階で追加してくれます。
+静的リンクするとクラス追加されるpluginの様な機能です。
+pluginは実行時にクラス等追加しますが、extensionはビルドする時に、入れるクラスを選択する形です。
 static tTVPAtInstallClass TVPInstallClassFoo
 	(TJS_W("ClassFoo"), TVPCreateNativeClass_ClassFoo,TJS_W("Window,Layer"));
-�Ăяo�����֐��ɂ�global���n�����̂ŁA�K�v�ł���΂������烁���o�Ȃǎ擾���܂��B
-�o�^�͌Ăяo�������Ԃ�l��iTJSDispatch2��global�ɓo�^����̂ŁA�Ăяo���ꂽ�֐����œo�^����K�v
-�͂���܂���B
-�o�^���ˑ��N���X��3�ԖڂɎw��\�ł����A���݂̂Ƃ��떳������Ă��܂��B
+呼び出される関数にはglobalが渡されるので、必要であればそこからメンバなど取得します。
+登録は呼び出し側が返り値のiTJSDispatch2をglobalに登録するので、呼び出された関数内で登録する必要
+はありません。
+登録時依存クラスを3番目に指定可能ですが、現在のところ無視されています。
 */
 extern void TVPCauseAtInstallExtensionClass( iTJSDispatch2 *global );
 

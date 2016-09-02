@@ -23,7 +23,7 @@ bool tTJSBinarySerializer::IsBinary( const tjs_uint8 header[tTJSBinarySerializer
 	return memcmp( HEADER, header, tTJSBinarySerializer::HEADER_LENGTH) == 0;
 }
 /**
- * ƒoƒCƒAƒ“ƒg’l‚ğŠi”[‚·‚é
+ * ãƒã‚¤ã‚¢ãƒ³ãƒˆå€¤ã‚’æ ¼ç´ã™ã‚‹
  */
 void tTJSBinarySerializer::PutVariant( tTJSBinaryStream* stream, tTJSVariant& v )
 {
@@ -86,7 +86,7 @@ tTJSDictionaryObject* tTJSBinarySerializer::CreateDictionary( tjs_uint count ) {
 		return ret;
 	}
 	if( RootArray ) {
-		TJSThrowFrom_tjs_error(TJS_E_INVALIDPARAM);	// Œ^‚ªˆá‚¤
+		TJSThrowFrom_tjs_error(TJS_E_INVALIDPARAM);	// å‹ãŒé•ã†
 	}
 	if( DicClass == NULL ) {
 		iTJSDispatch2* dsp = TJSCreateDictionaryObject(&DicClass);
@@ -106,7 +106,7 @@ tTJSArrayObject* tTJSBinarySerializer::CreateArray( tjs_uint count ) {
 		return ret;
 	}
 	if( RootDictionary ) {
-		TJSThrowFrom_tjs_error(TJS_E_INVALIDPARAM);	// Œ^‚ªˆá‚¤
+		TJSThrowFrom_tjs_error(TJS_E_INVALIDPARAM);	// å‹ãŒé•ã†
 	}
 	tTJSArrayObject* array = (tTJSArrayObject*)TJSCreateArrayObject();
 	return array;
@@ -285,7 +285,7 @@ tTJSVariant* tTJSBinarySerializer::ReadDictionary( const tjs_uint8* buff, const 
 	for( tjs_uint i = 0; i < count; i++ ) {
 		tjs_uint8 type = buff[index];
 		index++;
-		// Å‰‚É•¶š‚ğ“Ç‚Ş
+		// æœ€åˆã«æ–‡å­—ã‚’èª­ã‚€
 		tTJSVariantString* name = NULL;
 		switch( type ) {
 		case TYPE_STRING8: {
@@ -314,12 +314,12 @@ tTJSVariant* tTJSBinarySerializer::ReadDictionary( const tjs_uint8* buff, const 
 				tjs_int len = type - TYPE_FIX_STRING_MIN;
 				if( (len*sizeof(tjs_char)+index) > size ) TJS_eTJSError( TJSReadError );
 				name = ReadString( buff, len, index );
-			} else { // DictionaryŒ`®‚Ìê‡AÅ‰‚É•¶š—ñ‚ª‚±‚È‚¢‚Æ‚¢‚¯‚È‚¢
+			} else { // Dictionaryå½¢å¼ã®å ´åˆã€æœ€åˆã«æ–‡å­—åˆ—ãŒã“ãªã„ã¨ã„ã‘ãªã„
 				 TJS_eTJSError( TJSReadError );
 			}
 			break;
 		}
-		// Ÿ‚É—v‘f‚ğ“Ç‚Ş
+		// æ¬¡ã«è¦ç´ ã‚’èª­ã‚€
 		tTJSVariant* value = ReadBasicType( buff, size, index );
 		AddDictionary( dic, name, value );
 		delete value;

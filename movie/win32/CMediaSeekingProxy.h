@@ -2,8 +2,8 @@
 /*! @file
 @brief IMediaSeeking Proxy
 
-IMediaSeeking‚ÌŒÄ‚Ño‚µ‚ğ‘ã—‚·‚éB
-ƒsƒ“‚ªƒ\[ƒXƒtƒBƒ‹ƒ^‚ÌIMediaSeeking‚ğg—p‚µ‚½‚¢ê‡‚È‚Ç‚Ég‚¤
+IMediaSeekingã®å‘¼ã³å‡ºã—ã‚’ä»£ç†ã™ã‚‹ã€‚
+ãƒ”ãƒ³ãŒã‚½ãƒ¼ã‚¹ãƒ•ã‚£ãƒ«ã‚¿ã®IMediaSeekingã‚’ä½¿ç”¨ã—ãŸã„å ´åˆãªã©ã«ä½¿ã†
 -----------------------------------------------------------------------------
 	Copyright (C) 2005 T.Imoto <http://www.kaede-software.com>
 -----------------------------------------------------------------------------
@@ -20,18 +20,18 @@ IMediaSeeking‚ÌŒÄ‚Ño‚µ‚ğ‘ã—‚·‚éB
 #include <assert.h>
 #include <atlcomcli.h>
 
-//! IMediaSeeking‚Ö‚Ì‘€ì‚ğ’P‚ÉƒAƒbƒvƒXƒgƒŠ[ƒ€‚Ö“n‚µ‚Äˆ—‚·‚éê‡‚ÍACPosPassThru‚ğg—p‚·‚é‚ªA
-//! ƒ\[ƒXƒtƒBƒ‹ƒ^‚Ìƒsƒ“‚ÅIMediaSeeking‚ğÀ‘•‚·‚é•K—v‚ª‚ ‚éê‡Aƒ\[ƒXƒtƒBƒ‹ƒ^‚ÌIMediaSeeking
-//! ƒCƒ“ƒ^[ƒtƒFƒCƒX‚ğŒÄ‚Ño‚·–‚É‚È‚é‚±‚Æ‚ª‘½‚¢‚Æv‚í‚ê‚éB
-//! CMediaSeekingProxy‚Í‚±‚Ì‚æ‚¤‚È—p“r‚Ég‚¤‚½‚ß‚ÌƒNƒ‰ƒXB
+//! IMediaSeekingã¸ã®æ“ä½œã‚’å˜ã«ã‚¢ãƒƒãƒ—ã‚¹ãƒˆãƒªãƒ¼ãƒ ã¸æ¸¡ã—ã¦å‡¦ç†ã™ã‚‹å ´åˆã¯ã€CPosPassThruã‚’ä½¿ç”¨ã™ã‚‹ãŒã€
+//! ã‚½ãƒ¼ã‚¹ãƒ•ã‚£ãƒ«ã‚¿ã®ãƒ”ãƒ³ã§IMediaSeekingã‚’å®Ÿè£…ã™ã‚‹å¿…è¦ãŒã‚ã‚‹å ´åˆã€ã‚½ãƒ¼ã‚¹ãƒ•ã‚£ãƒ«ã‚¿ã®IMediaSeeking
+//! ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã‚’å‘¼ã³å‡ºã™äº‹ã«ãªã‚‹ã“ã¨ãŒå¤šã„ã¨æ€ã‚ã‚Œã‚‹ã€‚
+//! CMediaSeekingProxyã¯ã“ã®ã‚ˆã†ãªç”¨é€”ã«ä½¿ã†ãŸã‚ã®ã‚¯ãƒ©ã‚¹ã€‚
 class CMediaSeekingProxy : public IMediaSeeking
 {
 private:
 //	CComPtr<IMediaSeeking>	m_Delegate;
-	IMediaSeeking*			m_Delegate;	// CComPtr ‚Å‚Â‚Æ©g‚ğ‚Â‚±‚Æ‚É‚È‚Á‚ÄŠJ•ú‚Å‚«‚È‚­‚È‚é‚±‚Æ‚ª‚ ‚é
+	IMediaSeeking*			m_Delegate;	// CComPtr ã§æŒã¤ã¨è‡ªèº«ã‚’æŒã¤ã“ã¨ã«ãªã£ã¦é–‹æ”¾ã§ããªããªã‚‹ã“ã¨ãŒã‚ã‚‹
 	//----------------------------------------------------------------------------
-	//! @brief	  	IMediaSeeking‚ğæ“¾‚·‚é
-	//! @return		IMediaSeekingƒCƒ“ƒ^[ƒtƒFƒCƒX
+	//! @brief	  	IMediaSeekingã‚’å–å¾—ã™ã‚‹
+	//! @return		IMediaSeekingã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹
 	//----------------------------------------------------------------------------
 	IMediaSeeking *MediaSeeking()
 	{
@@ -39,7 +39,7 @@ private:
 		return m_Delegate;
 	}
 
-	// delegate‚ğİ’è‚µ‚È‚¢¶¬‚âƒRƒs[‚ğ‹Ö~‚·‚é
+	// delegateã‚’è¨­å®šã—ãªã„ç”Ÿæˆã‚„ã‚³ãƒ”ãƒ¼ã‚’ç¦æ­¢ã™ã‚‹
 	CMediaSeekingProxy();
 	CMediaSeekingProxy(const CMediaSeekingProxy& copy);
 	void operator =(const CMediaSeekingProxy& lhs);

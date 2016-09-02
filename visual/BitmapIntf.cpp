@@ -15,8 +15,8 @@ tTJSNI_Bitmap::~tTJSNI_Bitmap() {
 	TVPTempBitmapHolderRelease();
 }
 //----------------------------------------------------------------------
-// string, [uint] ƒtƒ@ƒCƒ‹–¼AƒJƒ‰[ƒL[‚Ì‡‚ÅŽw’è
-// uint, uint, [bpp] •A‚‚³Abpp‚Ì‡‚ÅŽw’è
+// string, [uint] ãƒ•ã‚¡ã‚¤ãƒ«åã€ã‚«ãƒ©ãƒ¼ã‚­ãƒ¼ã®é †ã§æŒ‡å®š
+// uint, uint, [bpp] å¹…ã€é«˜ã•ã€bppã®é †ã§æŒ‡å®š
 tjs_error TJS_INTF_METHOD tTJSNI_Bitmap::Construct(tjs_int numparams, tTJSVariant **param, iTJSDispatch2 *tjs_obj) {
 	Owner = tjs_obj;
 	if( numparams > 0 ) {

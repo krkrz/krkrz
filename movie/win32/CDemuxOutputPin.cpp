@@ -2,7 +2,7 @@
 /*! @file
 @brief Demux output pin
 
-ƒfƒ}ƒ‹ƒ`ƒvƒŒƒNƒT‚Ìo—Íƒsƒ“‚ğÀ‘•‚·‚é
+ãƒ‡ãƒãƒ«ãƒãƒ—ãƒ¬ã‚¯ã‚µã®å‡ºåŠ›ãƒ”ãƒ³ã‚’å®Ÿè£…ã™ã‚‹
 -----------------------------------------------------------------------------
 	Copyright (C) 2005 T.Imoto <http://www.kaede-software.com>
 -----------------------------------------------------------------------------
@@ -16,13 +16,13 @@
 #include "CDemuxSource.h"
 //----------------------------------------------------------------------------
 //! @brief	  	CDemuxOutputPin constructor
-//! @param		szName : ƒfƒoƒbƒO‚Ì‚½‚ß‚Ég—p‚³‚ê‚é‹Lq‚Ö‚Ìƒ|ƒCƒ“ƒ^B
-//! @param		pFilter : ‚±‚Ìƒsƒ“‚ğì¬‚µ‚½ƒtƒBƒ‹ƒ^
-//! @param		pHr : HRESULT ’l‚Ö‚Ìƒ|ƒCƒ“ƒ^B
-//! @param		pszName : ‚±‚Ìƒsƒ“‚Ì–¼‘O
-//! @param		pSeek : ƒ\[ƒXƒtƒBƒ‹ƒ^‚ÌIMediaSeeking
-//! @param		outstream : ‚±‚Ìƒsƒ“‚Ìo—ÍƒXƒgƒŠ[ƒ€
-//! @param		lock : ƒƒbƒNƒIƒuƒWƒFƒNƒg
+//! @param		szName : ãƒ‡ãƒãƒƒã‚°ã®ãŸã‚ã«ä½¿ç”¨ã•ã‚Œã‚‹è¨˜è¿°ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã€‚
+//! @param		pFilter : ã“ã®ãƒ”ãƒ³ã‚’ä½œæˆã—ãŸãƒ•ã‚£ãƒ«ã‚¿
+//! @param		pHr : HRESULT å€¤ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã€‚
+//! @param		pszName : ã“ã®ãƒ”ãƒ³ã®åå‰
+//! @param		pSeek : ã‚½ãƒ¼ã‚¹ãƒ•ã‚£ãƒ«ã‚¿ã®IMediaSeeking
+//! @param		outstream : ã“ã®ãƒ”ãƒ³ã®å‡ºåŠ›ã‚¹ãƒˆãƒªãƒ¼ãƒ 
+//! @param		lock : ãƒ­ãƒƒã‚¯ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
 //----------------------------------------------------------------------------
 CDemuxOutputPin::CDemuxOutputPin( TCHAR *szName, CSource *pFilter, HRESULT *pHr, LPCWSTR pszName, IMediaSeeking *pSeek, IOutputStream *outstream, CCritSec *lock )
  : CSourceStream( szName, pHr, pFilter, pszName ), m_SeekProxy(pSeek), m_Stream(outstream), m_Lock(lock)
@@ -33,10 +33,10 @@ CDemuxOutputPin::CDemuxOutputPin( TCHAR *szName, CSource *pFilter, HRESULT *pHr,
 CDemuxOutputPin::~CDemuxOutputPin()
 {}
 //----------------------------------------------------------------------------
-//! @brief	  	—v‹‚³‚ê‚½ƒCƒ“ƒ^[ƒtƒFƒCƒX‚ğ•Ô‚·
-//! @param		riid : ƒCƒ“ƒ^[ƒtƒFƒCƒX‚ÌIID
-//! @param		ppv : ƒCƒ“ƒ^[ƒtƒFƒCƒX‚ğ•Ô‚·ƒ|ƒCƒ“ƒ^[‚Ö‚Ìƒ|ƒCƒ“ƒ^
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	è¦æ±‚ã•ã‚ŒãŸã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã‚’è¿”ã™
+//! @param		riid : ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã®IID
+//! @param		ppv : ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹ã‚’è¿”ã™ãƒã‚¤ãƒ³ã‚¿ãƒ¼ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 STDMETHODIMP CDemuxOutputPin::NonDelegatingQueryInterface( REFIID riid, void ** ppv )
 {
@@ -47,10 +47,10 @@ STDMETHODIMP CDemuxOutputPin::NonDelegatingQueryInterface( REFIID riid, void ** 
 	}
 }
 //----------------------------------------------------------------------------
-//! @brief	  	o—Í‰Â”\‚ÈƒƒfƒBƒAƒ^ƒCƒv‚ğ•Ô‚·
-//! @param		iPosition : ƒƒfƒBƒAƒ^ƒCƒv‚Ì˜”
-//! @param		pmt : ƒƒfƒBƒAƒ^ƒCƒv‚ğŠi”[‚·‚é•Ï”
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	å‡ºåŠ›å¯èƒ½ãªãƒ¡ãƒ‡ã‚£ã‚¢ã‚¿ã‚¤ãƒ—ã‚’è¿”ã™
+//! @param		iPosition : ãƒ¡ãƒ‡ã‚£ã‚¢ã‚¿ã‚¤ãƒ—ã®åºæ•°
+//! @param		pmt : ãƒ¡ãƒ‡ã‚£ã‚¢ã‚¿ã‚¤ãƒ—ã‚’æ ¼ç´ã™ã‚‹å¤‰æ•°
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CDemuxOutputPin::GetMediaType( int iPosition, CMediaType *pmt )
 {
@@ -58,10 +58,10 @@ HRESULT CDemuxOutputPin::GetMediaType( int iPosition, CMediaType *pmt )
 	return m_Stream->GetMediaType( iPosition, pmt );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	w’è‚³‚ê‚½ƒƒfƒBƒAƒ^ƒCƒv‚ª—˜—p‚Å‚«‚é‚©‚Ç‚¤‚©Šm”F‚·‚é
-//! @param		pmt : o—Ío—ˆ‚é‚©‚Ç‚¤‚©Šm”F‚ğ‚·‚éƒƒfƒBƒAƒ^ƒCƒv
-//! @return		ƒGƒ‰[ƒR[ƒh
-//! @note		Œ»İADirectX VA‚ğí‚É‚Í‚¶‚­‚æ‚¤‚É‚µ‚Ä‚¢‚é
+//! @brief	  	æŒ‡å®šã•ã‚ŒãŸãƒ¡ãƒ‡ã‚£ã‚¢ã‚¿ã‚¤ãƒ—ãŒåˆ©ç”¨ã§ãã‚‹ã‹ã©ã†ã‹ç¢ºèªã™ã‚‹
+//! @param		pmt : å‡ºåŠ›å‡ºæ¥ã‚‹ã‹ã©ã†ã‹ç¢ºèªã‚’ã™ã‚‹ãƒ¡ãƒ‡ã‚£ã‚¢ã‚¿ã‚¤ãƒ—
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
+//! @note		ç¾åœ¨ã€DirectX VAã‚’å¸¸ã«ã¯ã˜ãã‚ˆã†ã«ã—ã¦ã„ã‚‹
 //----------------------------------------------------------------------------
 HRESULT CDemuxOutputPin::CheckMediaType( const CMediaType *pmt )
 {
@@ -80,10 +80,10 @@ HRESULT CDemuxOutputPin::CheckMediaType( const CMediaType *pmt )
 	return VFW_E_TYPE_NOT_ACCEPTED;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	w’è‚³‚ê‚½ƒƒfƒBƒAƒ^ƒCƒv‚ª—˜—p‚Å‚«‚é‚©‚Ç‚¤‚©Šm”F‚·‚é
-//! @param		pmt : o—Ío—ˆ‚é‚©‚Ç‚¤‚©Šm”F‚ğ‚·‚éƒƒfƒBƒAƒ^ƒCƒv
-//! @return		ƒGƒ‰[ƒR[ƒh
-//! @note		Œ»İADirectX VA‚ğí‚É‚Í‚¶‚­‚æ‚¤‚É‚µ‚Ä‚¢‚é
+//! @brief	  	æŒ‡å®šã•ã‚ŒãŸãƒ¡ãƒ‡ã‚£ã‚¢ã‚¿ã‚¤ãƒ—ãŒåˆ©ç”¨ã§ãã‚‹ã‹ã©ã†ã‹ç¢ºèªã™ã‚‹
+//! @param		pmt : å‡ºåŠ›å‡ºæ¥ã‚‹ã‹ã©ã†ã‹ç¢ºèªã‚’ã™ã‚‹ãƒ¡ãƒ‡ã‚£ã‚¢ã‚¿ã‚¤ãƒ—
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
+//! @note		ç¾åœ¨ã€DirectX VAã‚’å¸¸ã«ã¯ã˜ãã‚ˆã†ã«ã—ã¦ã„ã‚‹
 //----------------------------------------------------------------------------
 HRESULT CDemuxOutputPin::SetMediaType( const CMediaType *pmt )
 {
@@ -95,10 +95,10 @@ HRESULT CDemuxOutputPin::SetMediaType( const CMediaType *pmt )
 	return hr;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒoƒbƒtƒ@‚ÌƒTƒCƒY‚ğŒˆ’è‚·‚é
-//! @param		pIMemAllocator : ƒAƒƒP[ƒ^[‚Ö‚Ìƒ|ƒCƒ“ƒ^
-//! @param		pProp : —v‹ƒTƒCƒY
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ãƒãƒƒãƒ•ã‚¡ã®ã‚µã‚¤ã‚ºã‚’æ±ºå®šã™ã‚‹
+//! @param		pIMemAllocator : ã‚¢ãƒ­ã‚±ãƒ¼ã‚¿ãƒ¼ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+//! @param		pProp : è¦æ±‚ã‚µã‚¤ã‚º
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CDemuxOutputPin::DecideBufferSize( IMemAllocator *pIMemAllocator, ALLOCATOR_PROPERTIES *pProp )
 {
@@ -158,7 +158,7 @@ HRESULT CDemuxOutputPin::DecideBufferSize( IMemAllocator *pIMemAllocator, ALLOCA
 				break;
 		}
 	}
-	// ¬Œ÷‚µ‚½ê‡‚àAÀÛ‚ÌŒ‹‰Ê‚ğŠm”F‚·‚éB
+	// æˆåŠŸã—ãŸå ´åˆã‚‚ã€å®Ÿéš›ã®çµæœã‚’ç¢ºèªã™ã‚‹ã€‚
 	if( pProp->cbBuffer > actualAlloc.cbBuffer )
 	{
 		return E_FAIL;
@@ -168,7 +168,7 @@ HRESULT CDemuxOutputPin::DecideBufferSize( IMemAllocator *pIMemAllocator, ALLOCA
 		return hr;
 
 //	hr = pIMemAllocator->Commit();
-// o—Íƒsƒ“‚ªƒAƒNƒeƒBƒu‚É‚È‚é‚Ü‚ÅCommit‚Í’x‚ç‚¹‚é
+// å‡ºåŠ›ãƒ”ãƒ³ãŒã‚¢ã‚¯ãƒ†ã‚£ãƒ–ã«ãªã‚‹ã¾ã§Commitã¯é…ã‚‰ã›ã‚‹
 
 #ifdef _DEBUG
 	switch( hr ) {
@@ -196,8 +196,8 @@ HRESULT CDemuxOutputPin::DecideBufferSize( IMemAllocator *pIMemAllocator, ALLOCA
 	return hr;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒTƒ“ƒvƒ‹‚ğƒ_ƒEƒ“ƒXƒgƒŠ[ƒ€‚Ö‘—‚è‘±‚¯‚éˆ—
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ã‚µãƒ³ãƒ—ãƒ«ã‚’ãƒ€ã‚¦ãƒ³ã‚¹ãƒˆãƒªãƒ¼ãƒ ã¸é€ã‚Šç¶šã‘ã‚‹å‡¦ç†
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CDemuxOutputPin::DoBufferProcessingLoop(void)
 {
@@ -240,9 +240,9 @@ HRESULT CDemuxOutputPin::DoBufferProcessingLoop(void)
 	return S_FALSE;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒTƒ“ƒvƒ‹‚ğƒXƒgƒŠ[ƒ€‚©‚çæ“¾‚·‚é
-//! @param		pSample : ƒTƒ“ƒvƒ‹‚Ö‚Ìƒ|ƒCƒ“ƒ^‚Ìƒ|ƒCƒ“ƒ^
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ã‚µãƒ³ãƒ—ãƒ«ã‚’ã‚¹ãƒˆãƒªãƒ¼ãƒ ã‹ã‚‰å–å¾—ã™ã‚‹
+//! @param		pSample : ã‚µãƒ³ãƒ—ãƒ«ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã®ãƒã‚¤ãƒ³ã‚¿
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CDemuxOutputPin::RetrieveBuffer( IMediaSample **pSample )
 {
@@ -251,19 +251,19 @@ HRESULT CDemuxOutputPin::RetrieveBuffer( IMediaSample **pSample )
 	return hr;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	Ú‘±ˆ—
-//! @param		pReceivePin : Ú‘±‚ğ—v‹‚³‚ê‚Ä‚¢‚éƒsƒ“
-//! @param		pmt : Ú‘±‚Åg—p‚·‚é‚±‚Æ‚ğ—v‹‚³‚ê‚Ä‚¢‚éƒƒfƒBƒAƒ^ƒCƒv
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	æ¥ç¶šå‡¦ç†
+//! @param		pReceivePin : æ¥ç¶šã‚’è¦æ±‚ã•ã‚Œã¦ã„ã‚‹ãƒ”ãƒ³
+//! @param		pmt : æ¥ç¶šã§ä½¿ç”¨ã™ã‚‹ã“ã¨ã‚’è¦æ±‚ã•ã‚Œã¦ã„ã‚‹ãƒ¡ãƒ‡ã‚£ã‚¢ã‚¿ã‚¤ãƒ—
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 STDMETHODIMP CDemuxOutputPin::Connect( IPin *pReceivePin, const AM_MEDIA_TYPE *pmt )
 {
 	return CSourceStream::Connect( pReceivePin, pmt );
 }
 //----------------------------------------------------------------------------
-//! @brief	  	Ú‘±Š®—¹ˆ—
-//! @param		pReceivePin : Ú‘±‚Ég‚í‚ê‚½ƒsƒ“
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	æ¥ç¶šå®Œäº†å‡¦ç†
+//! @param		pReceivePin : æ¥ç¶šã«ä½¿ã‚ã‚ŒãŸãƒ”ãƒ³
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CDemuxOutputPin::CompleteConnect( IPin *pReceivePin )
 {
@@ -271,10 +271,10 @@ HRESULT CDemuxOutputPin::CompleteConnect( IPin *pReceivePin )
 	return hr;
 }
 //----------------------------------------------------------------------------
-//! @brief	  	ƒAƒƒP[ƒ^[‚ğŒˆ’è‚·‚éˆ—
-//! @param		pPin : “ü—Íƒsƒ“
-//! @param		pAlloc : ƒAƒƒP[ƒ^[
-//! @return		ƒGƒ‰[ƒR[ƒh
+//! @brief	  	ã‚¢ãƒ­ã‚±ãƒ¼ã‚¿ãƒ¼ã‚’æ±ºå®šã™ã‚‹å‡¦ç†
+//! @param		pPin : å…¥åŠ›ãƒ”ãƒ³
+//! @param		pAlloc : ã‚¢ãƒ­ã‚±ãƒ¼ã‚¿ãƒ¼
+//! @return		ã‚¨ãƒ©ãƒ¼ã‚³ãƒ¼ãƒ‰
 //----------------------------------------------------------------------------
 HRESULT CDemuxOutputPin::DecideAllocator( IMemInputPin *pPin, IMemAllocator **pAlloc )
 {

@@ -11,14 +11,14 @@ extern FontSystem* TVPFontSystem;
 
 static bool IsInitDefalutFontName = false;
 /**
- * ƒXƒgƒbƒNƒtƒHƒ“ƒgŽw’è‚Ìê‡AƒVƒXƒeƒ€‚©‚çƒtƒHƒ‹ƒg–¼‚ðŽæ“¾‚µ‚ÄA‚»‚ÌƒIƒuƒWƒFƒNƒg‚ðƒfƒtƒHƒ‹ƒg‚Æ‚·‚é
+ * ã‚¹ãƒˆãƒƒã‚¯ãƒ•ã‚©ãƒ³ãƒˆæŒ‡å®šã®å ´åˆã€ã‚·ã‚¹ãƒ†ãƒ ã‹ã‚‰ãƒ•ã‚©ãƒ«ãƒˆåã‚’å–å¾—ã—ã¦ã€ãã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¨ã™ã‚‹
  */
 const tjs_char *TVPGetDefaultFontName() {
 	if( IsInitDefalutFontName ) {
 		return TVPDefaultFontName;
 	}
 
-	// ƒRƒ}ƒ“ƒhƒ‰ƒCƒ“‚ÅŽw’è‚ª‚ ‚éê‡A‚»‚ÌƒtƒHƒ“ƒg‚ðŽg—p‚·‚é
+	// ã‚³ãƒžãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³ã§æŒ‡å®šãŒã‚ã‚‹å ´åˆã€ãã®ãƒ•ã‚©ãƒ³ãƒˆã‚’ä½¿ç”¨ã™ã‚‹
 	tTJSVariant opt;
 	if(TVPGetCommandLine(TJS_W("-deffont"), &opt)) {
 		ttstr str(opt);
@@ -26,7 +26,7 @@ const tjs_char *TVPGetDefaultFontName() {
 	}
 	IsInitDefalutFontName =  true;
 
-	// ƒVƒXƒeƒ€’è‹`‚ÌƒtƒHƒ“ƒg‚©‚Ç‚¤‚©ƒ`ƒFƒbƒN‚·‚é
+	// ã‚·ã‚¹ãƒ†ãƒ å®šç¾©ã®ãƒ•ã‚©ãƒ³ãƒˆã‹ã©ã†ã‹ãƒã‚§ãƒƒã‚¯ã™ã‚‹
 	ttstr name = ttstr(TVPDefaultFontName);
 	HGDIOBJ obj = NULL;
 	if( name == ttstr(TJS_W("ANSI_FIXED_FONT")) ) {
@@ -218,7 +218,7 @@ static int CALLBACK TVPFSFEnumFontsProc( ENUMLOGFONTEX *lpelfe, NEWTEXTMETRICEX 
 
 	return 1;
 }
-// ƒtƒHƒ“ƒg–¼‚©‚çƒLƒƒƒ‰ƒZƒbƒg‚ð“¾‚é
+// ãƒ•ã‚©ãƒ³ãƒˆåã‹ã‚‰ã‚­ãƒ£ãƒ©ã‚»ãƒƒãƒˆã‚’å¾—ã‚‹
 static int CALLBACK TVPFSFEnumCurFaceFontsProc( ENUMLOGFONTEX *lpelfe, NEWTEXTMETRICEX *lpntme, int FontType, LPARAM userdata ) {
 	BYTE* data = reinterpret_cast<BYTE*>(userdata);
 	*data = lpelfe->elfLogFont.lfCharSet;

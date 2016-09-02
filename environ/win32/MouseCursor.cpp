@@ -54,12 +54,12 @@ bool MouseCursor::CURSOR_INITIALIZED = false;
 void MouseCursor::Initialize() {
 	if( CURSOR_INITIALIZED ) return;
 
-	// ƒfƒtƒHƒ‹ƒgƒJ[ƒ\ƒ‹‚ğ“Ç‚İ‚Ş
+	// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã‚«ãƒ¼ã‚½ãƒ«ã‚’èª­ã¿è¾¼ã‚€
 	for( int i = 0; i < CURSOR_EOT; i++ ) {
 		CURSOR_HANDLES[i] = ::LoadCursor( NULL, CURSORS[i] );
 	}
 
-	// ŒöŠJƒJ[ƒ\ƒ‹ID‚Æˆê’v‚·‚é‚æ‚¤‚Éƒnƒ“ƒhƒ‹‚ğŠi”[‚·‚é
+	// å…¬é–‹ã‚«ãƒ¼ã‚½ãƒ«IDã¨ä¸€è‡´ã™ã‚‹ã‚ˆã†ã«ãƒãƒ³ãƒ‰ãƒ«ã‚’æ ¼ç´ã™ã‚‹
 	CURSOR_HANDLES_FOR_INDEXES.clear();
 	CURSOR_HANDLES_FOR_INDEXES.reserve( CURSOR_INDEXES_NUM );
 	for( int i = 0; i < CURSOR_INDEXES_NUM; i++ ) {
@@ -73,7 +73,7 @@ void MouseCursor::Initialize() {
 	CURSOR_INITIALIZED = true;
 }
 void MouseCursor::Finalize() {
-	// “Ç‚İ‚Ü‚ê‚½ƒJ[ƒ\ƒ‹‚ğíœ
+	// èª­ã¿è¾¼ã¾ã‚ŒãŸã‚«ãƒ¼ã‚½ãƒ«ã‚’å‰Šé™¤
 	if( CURSOR_HANDLES_FOR_INDEXES.size() > CURSOR_INDEXES_NUM ) {
 		int numCursor = (int)CURSOR_HANDLES_FOR_INDEXES.size();
 		for( int i = CURSOR_INDEXES_NUM; i < numCursor; i++ ) {
@@ -84,33 +84,33 @@ void MouseCursor::Finalize() {
 }
 int MouseCursor::GetCurrentCursor() {
 	HCURSOR hCursor = ::GetCursor();
-	// Á‹
+	// æ¶ˆå»æ™‚
 	if( hCursor == NULL ) return crNone;
 
 	int size = (int)CURSOR_HANDLES_FOR_INDEXES.size();
 	int handleIndex = cursor_index_ + CURSOR_OFFSET;
 
 	if( handleIndex >= 0 && handleIndex < size && CURSOR_HANDLES_FOR_INDEXES[handleIndex] == hCursor ) {
-		// ‚Ü‚¸‚Ícursor_index_ƒJ[ƒ\ƒ‹‚Æ”äŠr
+		// ã¾ãšã¯cursor_index_ã‚«ãƒ¼ã‚½ãƒ«ã¨æ¯”è¼ƒ
 		return cursor_index_;
 	} else if( CURSOR_HANDLES[CURSOR_ARROW] == hCursor ) {
-		// Ÿ‚ÉƒfƒtƒHƒ‹ƒg‚Æ”äŠr
+		// æ¬¡ã«ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¨æ¯”è¼ƒ
 		return crDefault;
 	} else {
-		// ‚»‚êˆÈŠO‚ÍA‘S‚Ä‚Æ”äŠr‚·‚é
+		// ãã‚Œä»¥å¤–ã¯ã€å…¨ã¦ã¨æ¯”è¼ƒã™ã‚‹
 		for( int i = 0; i < size; i++ ) {
 			if( CURSOR_HANDLES_FOR_INDEXES[i] == hCursor ) {
 				return i - CURSOR_OFFSET;
 			}
 		}
 	}
-	// ‘S‚Ä‚Éƒ}ƒbƒ`‚µ‚È‚©‚Á‚½ê‡
+	// å…¨ã¦ã«ãƒãƒƒãƒã—ãªã‹ã£ãŸå ´åˆ
 	return INVALID_CURSOR_INDEX;
 }
 void MouseCursor::SetMouseCursor( int index ) {
 	HCURSOR hCursor = NULL;
 	if( index != crNone ) {
-		int id = index + CURSOR_OFFSET; // crSizeAll = -22, ‚È‚Ì‚ÅA‚»‚Ì•ª‰ÁZ
+		int id = index + CURSOR_OFFSET; // crSizeAll = -22, ãªã®ã§ã€ãã®åˆ†åŠ ç®—
 		if( id >= 0 && id < (int)CURSOR_HANDLES_FOR_INDEXES.size() ) {
 			hCursor = CURSOR_HANDLES_FOR_INDEXES[id];
 		} else {

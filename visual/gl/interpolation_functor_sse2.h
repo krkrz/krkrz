@@ -4,7 +4,7 @@
 
 struct sse2_nearest_functor {
 	inline __m128i operator()( const tjs_uint8* s, __m128i mxyi, __m128i mpitch, tjs_int srcpitch ) const {
-		mxyi = _mm_srai_epi32( mxyi, 16 );	// ŒÅ’è¬”“_‚©‚ç®”‚Ö
+		mxyi = _mm_srai_epi32( mxyi, 16 );	// å›ºå®šå°æ•°ç‚¹ã‹ã‚‰æ•´æ•°ã¸
 		__m128i my = mxyi;
 		my = _mm_mul_epu32( my, mpitch );	// sy * srcpitch
 		int sy1 = _mm_cvtsi128_si32( my );
@@ -31,8 +31,8 @@ struct sse2_bilinear_functor {
 	inline sse2_bilinear_functor() : zero_(_mm_setzero_si128()) {}
 	inline __m128i operator()( const tjs_uint8* s, __m128i mxyi, __m128i mpitch, tjs_int srcpitch ) const {
 		__m128i mratio = mxyi;
-		// À•WŒvZ
-		mxyi = _mm_srai_epi32( mxyi, 16 );	// ŒÅ’è¬”“_‚©‚ç®”‚Ö
+		// åº§æ¨™è¨ˆç®—
+		mxyi = _mm_srai_epi32( mxyi, 16 );	// å›ºå®šå°æ•°ç‚¹ã‹ã‚‰æ•´æ•°ã¸
 		__m128i my = mxyi;
 		my = _mm_mul_epu32( my, mpitch );	// sy * srcpitch
 		int sy1 = _mm_cvtsi128_si32( my );
@@ -47,7 +47,7 @@ struct sse2_bilinear_functor {
 		const tjs_uint8* px1 = s + sy1 + sx1;
 		const tjs_uint8* px2 = s + sy2 + sx2;
 
-		// “Ç‚İ‚İ
+		// èª­ã¿è¾¼ã¿
 		__m128i mp1 = _mm_cvtsi32_si128( *((const tjs_uint32*)px1) );
 		__m128i mp = _mm_cvtsi32_si128( *((const tjs_uint32*)px2) );
 		mp1 = _mm_unpacklo_epi32( mp1, mp );
@@ -66,8 +66,8 @@ struct sse2_bilinear_functor {
 		mp4 = _mm_unpacklo_epi8( mp4, zero_ );
 
 		// mratio sx sy sx sy
-		// 16bit shuffle ‚ÅãˆÊ 16bit ‚ğÁ‚·
-		mratio = _mm_shufflelo_epi16( mratio, _MM_SHUFFLE( 2, 2, 0, 0 )  );	// sx sy | sx1 sx1 sy1 sy1 = & 0x0000ffff‚É‹ß‚¢Œø‰Ê
+		// 16bit shuffle ã§ä¸Šä½ 16bit ã‚’æ¶ˆã™
+		mratio = _mm_shufflelo_epi16( mratio, _MM_SHUFFLE( 2, 2, 0, 0 )  );	// sx sy | sx1 sx1 sy1 sy1 = & 0x0000ffffã«è¿‘ã„åŠ¹æœ
 		mratio = _mm_shufflehi_epi16( mratio, _MM_SHUFFLE( 2, 2, 0, 0 )  );	// sx2 sx2 sy2 sy2 sx1 sx1 sy1 sy1
 		mratio = _mm_srli_epi16( mratio, 8 );	// ratio >> 8
 		__m128i sx_ratio = mratio;
@@ -77,18 +77,18 @@ struct sse2_bilinear_functor {
 		sx_ratio = _mm_shuffle_epi32(sx_ratio, _MM_SHUFFLE( 3, 3, 1, 1 )  );	// sx2 sx2 sx2 sx2 sx1 sx1 sx1 sx1
 		sy_ratio = _mm_shuffle_epi32(sy_ratio, _MM_SHUFFLE( 2, 2, 0, 0 )  );	// sy2 sy2 sy2 sy2 sy1 sy1 sy1 sy1
 
-		// ã’i‚ğsx_ratio‚ÅƒuƒŒƒ“ƒh
+		// ä¸Šæ®µã‚’sx_ratioã§ãƒ–ãƒ¬ãƒ³ãƒ‰
 		mp2 = _mm_sub_epi16( mp2, mp1 );	// s0: mm2 = s0p1 - s0p0
 		mp2 = _mm_mullo_epi16( mp2, sx_ratio );	// s0:
 		mp2 = _mm_srli_epi16( mp2, 8 );		// s0: mm2 = (s0p1 - s0p0) * bx
 		mp1 = _mm_add_epi8( mp1, mp2 );		// s0: mm1 = s0p0 + (s0p1 - s0p0) * bx = S0
-		// ‰º’i‚ğsx_ratio‚ÅƒuƒŒƒ“ƒh
+		// ä¸‹æ®µã‚’sx_ratioã§ãƒ–ãƒ¬ãƒ³ãƒ‰
 		mp4 = _mm_sub_epi16( mp4, mp3 );	// s1: mm4 = s1p1 - s1p0
 		mp4 = _mm_mullo_epi16( mp4, sx_ratio );	// s1:
 		mp4 = _mm_srli_epi16( mp4, 8 );		// s1: mm4 = (s1p1 - s1p0) * bx
 		mp3 = _mm_add_epi8( mp3, mp4 );		// s1: mm3 = s1p0 + (s1p1 - s1p0) * bx = S1
 
-		// ã‰º‚ğsy_ratio‚ÅƒuƒŒƒ“ƒh
+		// ä¸Šä¸‹ã‚’sy_ratioã§ãƒ–ãƒ¬ãƒ³ãƒ‰
 		mp3 = _mm_sub_epi16( mp3, mp1 );	// s0/s1: mm3 = S1 - S0
 		mp3 = _mm_mullo_epi16( mp3, sy_ratio );	// s0/s1:
 		mp3 = _mm_srli_epi16( mp3, 8 );		// s0/s1: mm3 = (S1 - S0) * by
@@ -96,12 +96,12 @@ struct sse2_bilinear_functor {
 		
 		//mp1 = _mm_packus_epi16( mp1, zero_ );
 		//_mm_storel_epi64((__m128i *)d, mp1);
-		return mp1;	// pack‚¹‚¸‚É16bitó‘Ô‚Ì‚Ü‚Ü•Ô‚µ‚½•û‚ªŒãˆ—‚µ‚â‚·‚¢‚©H ‚Å‚àAŒ»s‚ÌƒuƒŒƒ“ƒhˆ—‚Ípackó‘Ô‘z’è‚µ‚Ä‚¢‚é‚Ì‚Å‚»‚Ì•Ó‚è‚à‘Î‰•K—v
+		return mp1;	// packã›ãšã«16bitçŠ¶æ…‹ã®ã¾ã¾è¿”ã—ãŸæ–¹ãŒå¾Œå‡¦ç†ã—ã‚„ã™ã„ã‹ï¼Ÿ ã§ã‚‚ã€ç¾è¡Œã®ãƒ–ãƒ¬ãƒ³ãƒ‰å‡¦ç†ã¯packçŠ¶æ…‹æƒ³å®šã—ã¦ã„ã‚‹ã®ã§ãã®è¾ºã‚Šã‚‚å¯¾å¿œå¿…è¦
 	}
 	inline tjs_uint32 operator()( const tjs_uint8* s, tjs_int sy, tjs_int sx, tjs_int srcpitch ) const {
 		const tjs_uint8* px = s + (sy>>16)*srcpitch + (sx>>16)*4;
 
-		// 2pixel “¯‚É“Ç‚Ş‚ÆƒŒƒWƒXƒ^ß–ñ‚Å‚«‚é‚È
+		// 2pixel åŒæ™‚ã«èª­ã‚€ã¨ãƒ¬ã‚¸ã‚¹ã‚¿ç¯€ç´„ã§ãã‚‹ãª
 		__m128i mp1 = _mm_loadl_epi64( (__m128i const*)px );	// p1 | p2 : s0p0 s0p1
 		__m128i mp2 = _mm_loadl_epi64( (__m128i const*)(px+srcpitch) );	// p3 | p4 : s1p0 s1p1
 		mp1 = _mm_unpacklo_epi32( mp1, mp2 );	// 1 3 2 4
@@ -122,9 +122,9 @@ struct sse2_bilinear_functor {
 		msxr = _mm_adds_epu8( msxr, mtmp );	// sx + (sx>>7), sy + (sy>>7)
 		__m128i msyr = msxr;
 		msxr = _mm_shuffle_epi32(msxr, _MM_SHUFFLE( 2, 2, 2, 2 )  );
-		// msyr = sx sx sx sx sy sy sy sy, sy ‚Í ‰ºˆÊ 64bit ‚Å‚Ì‰‰Z‚È‚Ì‚Å•À‚×‘Ö‚¦•K—v‚È‚¢
+		// msyr = sx sx sx sx sy sy sy sy, sy ã¯ ä¸‹ä½ 64bit ã§ã®æ¼”ç®—ãªã®ã§ä¸¦ã¹æ›¿ãˆå¿…è¦ãªã„
 
-		// ã‰º’i‚ğ“¯‚Ésx_ratio‚ÅƒuƒŒƒ“ƒh
+		// ä¸Šä¸‹æ®µã‚’åŒæ™‚ã«sx_ratioã§ãƒ–ãƒ¬ãƒ³ãƒ‰
 		mp2 = _mm_sub_epi16( mp2, mp1 );	// s0: mm2 = s0p1 - s0p0
 		mp2 = _mm_mullo_epi16( mp2, msxr );	// s0:
 		mp2 = _mm_srli_epi16( mp2, 8 );		// s0: mm2 = (s0p1 - s0p0) * bx
@@ -132,7 +132,7 @@ struct sse2_bilinear_functor {
 		__m128i mp3 = mp1;
 		mp3 = _mm_srli_si128( mp3, 8 );
 
-		// ã‰º‚ğsy_ratio‚ÅƒuƒŒƒ“ƒh
+		// ä¸Šä¸‹ã‚’sy_ratioã§ãƒ–ãƒ¬ãƒ³ãƒ‰
 		mp3 = _mm_sub_epi16( mp3, mp1 );	// s0/s1: mm3 = S1 - S0
 		mp3 = _mm_mullo_epi16( mp3, msyr );	// s0/s1:
 		mp3 = _mm_srli_epi16( mp3, 8 );		// s0/s1: mm3 = (S1 - S0) * by
@@ -173,7 +173,7 @@ struct sse2_bilinear_fixy_functor {
 		tjs_int blend_x = (srcstart & 0xffff) >> 8;
 		__m128i mbx = _mm_set1_epi16( (short)blend_x );
 
-		// 2pixel “¯‚É“Ç‚Ş‚ÆƒŒƒWƒXƒ^ß–ñ‚Å‚«‚é
+		// 2pixel åŒæ™‚ã«èª­ã‚€ã¨ãƒ¬ã‚¸ã‚¹ã‚¿ç¯€ç´„ã§ãã‚‹
 		tjs_int sp = srcstart >> 16;
 		__m128i mp1 = _mm_loadl_epi64( (__m128i const*)(src1+sp) );	// p1 | p2 : s0p0 s0p1
 		__m128i mp2 = _mm_loadl_epi64( (__m128i const*)(src2+sp) );	// p3 | p4 : s1p0 s1p1
@@ -184,7 +184,7 @@ struct sse2_bilinear_fixy_functor {
 		mp1 = _mm_unpacklo_epi8( mp1, zero_ );
 		mp2 = _mm_unpacklo_epi8( mp2, zero_ );
 
-		// ã‰º’i‚ğ“¯‚Émbx‚ÅƒuƒŒƒ“ƒh
+		// ä¸Šä¸‹æ®µã‚’åŒæ™‚ã«mbxã§ãƒ–ãƒ¬ãƒ³ãƒ‰
 		mp2 = _mm_sub_epi16( mp2, mp1 );	// s0: mm2 = s0p1 - s0p0
 		mp2 = _mm_mullo_epi16( mp2, mbx );	// s0:
 		mp2 = _mm_srli_epi16( mp2, 8 );		// s0: mm2 = (s0p1 - s0p0) * bx
@@ -192,7 +192,7 @@ struct sse2_bilinear_fixy_functor {
 		__m128i mp3 = mp1;
 		mp3 = _mm_srli_si128( mp3, 8 );
 
-		// ã‰º‚ğmby‚ÅƒuƒŒƒ“ƒh
+		// ä¸Šä¸‹ã‚’mbyã§ãƒ–ãƒ¬ãƒ³ãƒ‰
 		mp3 = _mm_sub_epi16( mp3, mp1 );	// s0/s1: mm3 = S1 - S0
 		mp3 = _mm_mullo_epi16( mp3, mby_ );	// s0/s1:
 		mp3 = _mm_srli_epi16( mp3, 8 );		// s0/s1: mm3 = (S1 - S0) * by
@@ -211,7 +211,7 @@ struct sse2_bilinear_fixy_functor {
 		tjs_int o3 = offset.m128i_i32[3];
 
 		__m128i mbx = mstart;
-		mbx = _mm_shufflelo_epi16( mbx, _MM_SHUFFLE( 2, 2, 0, 0 )  );	// sx4 sx3 | sx2 sx2 sx1 sx1 = & 0x0000ffff‚É‹ß‚¢Œø‰Ê
+		mbx = _mm_shufflelo_epi16( mbx, _MM_SHUFFLE( 2, 2, 0, 0 )  );	// sx4 sx3 | sx2 sx2 sx1 sx1 = & 0x0000ffffã«è¿‘ã„åŠ¹æœ
 		mbx = _mm_shufflehi_epi16( mbx, _MM_SHUFFLE( 2, 2, 0, 0 )  );	// sx4 sx4 sx3 sx3 sx2 sx2 sx1 sx1
 		mbx = _mm_srli_epi16( mbx, 8 );
 		__m128i mbx2 = mbx;
@@ -223,7 +223,7 @@ struct sse2_bilinear_fixy_functor {
 	}
 
 	inline __m128i two( const tjs_uint32* src1, const tjs_uint32* src2, tjs_int o0, tjs_int o1, __m128i mbx ) const {
-		// “Ç‚İ‚İ
+		// èª­ã¿è¾¼ã¿
 		__m128i mp1 = _mm_cvtsi32_si128( *(src1+o0) );
 		__m128i mp = _mm_cvtsi32_si128( *(src1+o1) );
 		mp1 = _mm_unpacklo_epi32( mp1, mp );
@@ -241,17 +241,17 @@ struct sse2_bilinear_fixy_functor {
 		mp4 = _mm_unpacklo_epi32( mp4, mp );
 		mp4 = _mm_unpacklo_epi8( mp4, zero_ );
 
-		// ã’i‚ğsx_ratio‚ÅƒuƒŒƒ“ƒh
+		// ä¸Šæ®µã‚’sx_ratioã§ãƒ–ãƒ¬ãƒ³ãƒ‰
 		mp2 = _mm_sub_epi16( mp2, mp1 );	// s0: mm2 = s0p1 - s0p0
 		mp2 = _mm_mullo_epi16( mp2, mbx );	// s0:
 		mp2 = _mm_srli_epi16( mp2, 8 );		// s0: mm2 = (s0p1 - s0p0) * bx
 		mp1 = _mm_add_epi8( mp1, mp2 );		// s0: mm1 = s0p0 + (s0p1 - s0p0) * bx = S0
-		// ‰º’i‚ğsx_ratio‚ÅƒuƒŒƒ“ƒh
+		// ä¸‹æ®µã‚’sx_ratioã§ãƒ–ãƒ¬ãƒ³ãƒ‰
 		mp4 = _mm_sub_epi16( mp4, mp3 );	// s1: mm4 = s1p1 - s1p0
 		mp4 = _mm_mullo_epi16( mp4, mbx );	// s1:
 		mp4 = _mm_srli_epi16( mp4, 8 );		// s1: mm4 = (s1p1 - s1p0) * bx
 		mp3 = _mm_add_epi8( mp3, mp4 );		// s1: mm3 = s1p0 + (s1p1 - s1p0) * bx = S1
-		// ã‰º‚ğsy_ratio‚ÅƒuƒŒƒ“ƒh
+		// ä¸Šä¸‹ã‚’sy_ratioã§ãƒ–ãƒ¬ãƒ³ãƒ‰
 		mp3 = _mm_sub_epi16( mp3, mp1 );	// s0/s1: mm3 = S1 - S0
 		mp3 = _mm_mullo_epi16( mp3, mby_ );	// s0/s1:
 		mp3 = _mm_srli_epi16( mp3, 8 );		// s0/s1: mm3 = (S1 - S0) * by

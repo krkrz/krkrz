@@ -6,7 +6,7 @@
 
 namespace TJS
 {
-// ‘½dŒp³‚ÍƒTƒ|[ƒg‚µ‚È‚¢
+// å¤šé‡ç¶™æ‰¿ã¯ã‚µãƒãƒ¼ãƒˆã—ãªã„
 class tTJSExtendableObject : public tTJSCustomObject {
 	typedef tTJSCustomObject inherited;
 
@@ -14,8 +14,8 @@ protected:
 	iTJSDispatch2*	SuperClass;
 
 	/**
-	 * @param global : Šù’èƒNƒ‰ƒX‚ğŒŸõ‚·‚éƒIƒuƒWƒFƒNƒg(•’Ê‚ÍƒOƒ[ƒoƒ‹)
-	 * @param classname : Šù’èƒNƒ‰ƒX–¼
+	 * @param global : æ—¢å®šã‚¯ãƒ©ã‚¹ã‚’æ¤œç´¢ã™ã‚‹ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ(æ™®é€šã¯ã‚°ãƒ­ãƒ¼ãƒãƒ«)
+	 * @param classname : æ—¢å®šã‚¯ãƒ©ã‚¹å
 	 */
 	void ExtendsClass( iTJSDispatch2* global, const ttstr& classname );
 public:
@@ -64,7 +64,7 @@ public:
 	NativeInstanceSupport(tjs_uint32 flag, tjs_int32 classid,
 		iTJSNativeInstance **pointer);
 
-	// ƒX[ƒp[ƒNƒ‰ƒX‚Ì“o˜^‚Ææ“¾‚ğƒTƒ|[ƒg
+	// ã‚¹ãƒ¼ãƒ‘ãƒ¼ã‚¯ãƒ©ã‚¹ã®ç™»éŒ²ã¨å–å¾—ã‚’ã‚µãƒãƒ¼ãƒˆ
 	tjs_error TJS_INTF_METHOD 
 	ClassInstanceInfo(tjs_uint32 flag, tjs_uint num, tTJSVariant *value);
 
