@@ -19,25 +19,22 @@
 #include "DebugIntf.h"
 #include "WindowIntf.h"
 #include "LayerIntf.h"
-//#include "CDDAIntf.h"
-//#include "MIDIIntf.h"
 #include "WaveIntf.h"
 #include "TimerIntf.h"
 #include "EventIntf.h"
 #include "SystemIntf.h"
 #include "PluginIntf.h"
-//#include "MenuItemIntf.h"
 #include "ClipboardIntf.h"
 #include "MsgIntf.h"
-//#include "KAGParser.h"
 #include "VideoOvlIntf.h"
-//#include "PadIntf.h"
 #include "TextStream.h"
 #include "Random.h"
 #include "tjsRandomGenerator.h"
 #include "SysInitIntf.h"
 #include "PhaseVocoderFilter.h"
+#ifndef ANDROID
 #include "BasicDrawDevice.h"
+#endif
 #include "BinaryStream.h"
 #include "SysInitImpl.h"
 #include "SystemControl.h"
@@ -454,14 +451,7 @@ void TVPInitScriptEngine()
 		{
 			TJSEnableDebugMode = true;
 			TVPAddImportantLog((const tjs_char *)TVPWarnDebugOptionEnabled);
-//			if(TVPGetCommandLine(TJS_W("-warnrundelobj"), &val) )
-//			{
-//				str = val;
-//				if(str == TJS_W("yes"))
-//				{
-					TJSWarnOnExecutionOnDeletingObject = true;
-//				}
-//			}
+			TJSWarnOnExecutionOnDeletingObject = true;
 		}
 	}
 	// Set Read text encoding
@@ -545,6 +535,7 @@ void TVPInitScriptEngine()
 	waveclass->PropSet(TJS_MEMBERENSURE|TJS_IGNOREPROP|TJS_STATICMEMBER,
 		TJS_W("PhaseVocoder"), NULL, &val, waveclass);
 
+#ifndef ANDROID	// TODO 仮
 	/* Window and its drawdevices */
 	iTJSDispatch2 * windowclass = NULL;
 	REGISTER_OBJECT(Window, (windowclass = TVPCreateNativeClass_Window()));
@@ -553,6 +544,7 @@ void TVPInitScriptEngine()
 	dsp->Release();
 	windowclass->PropSet(TJS_MEMBERENSURE|TJS_IGNOREPROP|TJS_STATICMEMBER,
 		TJS_W("BasicDrawDevice"), NULL, &val, windowclass);
+#endif
 
 	// Add Extension Classes
 	TVPCauseAtInstallExtensionClass( global );
