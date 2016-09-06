@@ -23,6 +23,8 @@
 #include "tjsDebug.h"
 
 #include "Application.h"
+#include "CharacterSet.h"
+#include "resource.h"
 //---------------------------------------------------------------------------
 
 /*
@@ -232,9 +234,40 @@ bool TVPCheckProcessLog()
 	return false;
 }
 //---------------------------------------------------------------------------
+ttstr TVPGetSystemInitializeScript()
+{
+	HMODULE hModule = ::GetModuleHandle(nullptr);
+	const char *buf = nullptr;
+	unsigned int size = 0;
+	HRSRC hRsrc = ::FindResource(nullptr, MAKEINTRESOURCE(IDR_SYS_INIT_SCRIPT), TEXT("TEXT"));
+	if( hRsrc != nullptr ) {
+		size = ::SizeofResource( hModule, hRsrc );
+		HGLOBAL hGlobal = ::LoadResource( hModule, hRsrc );
+		if( hGlobal != nullptr ) {
+			buf = reinterpret_cast<const char*>(::LockResource(hGlobal));
+		}
+	}
+	if( buf == nullptr ) ttstr(L"Resource Read Error.");
 
-
-
+	// UTF-8 to UTF-16
+	size_t len = TVPUtf8ToWideCharString( buf, size, NULL );
+	if( len < 0 ) return ttstr(L"Resource Read Error.");
+	tjs_char* tmp = new tjs_char[len+1];
+	ttstr ret;
+	if( tmp ) {
+		try {
+			len = TVPUtf8ToWideCharString( buf, size, tmp );
+		} catch(...) {
+			delete[] tmp;
+			throw;
+		}
+		tmp[len] = 0;
+		ret = ttstr( &(tmp[0]) );
+		delete[] tmp;
+	}
+	return ret;
+}
+//---------------------------------------------------------------------------
 
 
 

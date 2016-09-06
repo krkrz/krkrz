@@ -83,7 +83,7 @@ extern bool TVPProcessUnhandledException(eTJS &e);
 //---------------------------------------------------------------------------
 extern void TVPInitializeStartupScript();
 extern bool TVPCheckProcessLog();
-
+extern ttstr TVPGetSystemInitializeScript();
 //---------------------------------------------------------------------------
 
 
