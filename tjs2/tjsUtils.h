@@ -14,16 +14,33 @@
 #include "tjsVariant.h"
 #include "tjsString.h"
 
+#if 1
+#include <mutex>
+#else
 #ifdef __WIN32__
 #include <windows.h>
 #else
 #include <semaphore.h>
+#endif
 #endif
 namespace TJS
 {
 //---------------------------------------------------------------------------
 // tTJSCriticalSection ( implement on each platform for multi-threading support )
 //---------------------------------------------------------------------------
+#if 1
+class tTJSCriticalSection
+{
+	std::recursive_mutex Mutex;
+
+public:
+	tTJSCriticalSection() {}
+	~tTJSCriticalSection() {}
+
+	void Enter() { Mutex.lock(); }
+	void Leave() { Mutex.unlock(); }
+};
+#else
 #ifdef __WIN32__
 class tTJSCriticalSection
 {
@@ -48,26 +65,12 @@ public:
 	void Leave() { sem_post( &Handle ); }
 };
 #endif
+#endif
 //---------------------------------------------------------------------------
 // interlocked operation ( implement on each platform for multi-threading support )
 //---------------------------------------------------------------------------
-/*
-#ifdef __WIN32__
-#include <Windows.h>
+// refer C++11 atomic
 
-// we assume that sizeof(tjs_uint) is 4 on TJS2/win32.
-
-inline tjs_uint TJSInterlockedIncrement(tjs_uint & value)
-{
-	return InterlockedIncrement((long*)&value);
-}
-
-#else
-
-inline
-
-#endif
-*/
 //---------------------------------------------------------------------------
 // tTJSCriticalSectionHolder
 //---------------------------------------------------------------------------
