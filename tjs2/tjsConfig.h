@@ -50,13 +50,13 @@ TJS_EXP_FUNC_DEF(tjs_int, TJS_stricmp, (const tjs_char *s1, const tjs_char *s2))
 TJS_EXP_FUNC_DEF(void, TJS_strcpy_maxlen, (tjs_char *d, const tjs_char *s, size_t len));
 TJS_EXP_FUNC_DEF(void, TJS_strcpy, (tjs_char *d, const tjs_char *s));
 TJS_EXP_FUNC_DEF(size_t, TJS_strlen, (const tjs_char *d));
+TJS_EXP_FUNC_DEF(tjs_char *, TJS_strstr, (const tjs_char *big, const tjs_char *little));
+TJS_EXP_FUNC_DEF(tjs_int, TJS_strcmp, (const tjs_char *s1, const tjs_char *s2));
+TJS_EXP_FUNC_DEF(tjs_int, TJS_strncmp, (const tjs_char *s1, const tjs_char *s2, size_t n));
+TJS_EXP_FUNC_DEF(tjs_char *, TJS_strncpy, (tjs_char * __restrict dst, const tjs_char * __restrict src, size_t n));
+TJS_EXP_FUNC_DEF(tjs_char *, TJS_strcat, (tjs_char * __restrict s1, const tjs_char * __restrict s2));
+TJS_EXP_FUNC_DEF(tjs_char *, TJS_strchr, (const tjs_char *s, tjs_char c));
 
-#define TJS_strcmp			wcscmp
-#define TJS_strncmp			wcsncmp
-#define TJS_strncpy			wcsncpy
-#define TJS_strcat			wcscat
-#define TJS_strstr			wcsstr
-#define TJS_strchr			wcschr
 #define TJS_malloc			malloc
 #define TJS_free			free
 #define TJS_realloc			realloc

@@ -310,6 +310,102 @@ int TJS_wctomb(tjs_nchar *s, tjs_char wc)
 	return size;
 }
 //---------------------------------------------------------------------------
+// 以下 bionic からコピーして tjs_char へ書き換え
+tjs_char * TJS_strstr(const tjs_char *big, const tjs_char *little)
+{
+	const tjs_char *p;
+	const tjs_char *q;
+	const tjs_char *r;
+
+	if (!*little) {
+		/* LINTED interface specification */
+		return (tjs_char *)big;
+	}
+	if (TJS_strlen(big) < TJS_strlen(little))
+		return nullptr;
+
+	p = big;
+	q = little;
+	while (*p) {
+		q = little;
+		r = p;
+		while (*q) {
+			if (*r != *q)
+				break;
+			q++;
+			r++;
+		}
+		if (!*q) {
+			/* LINTED interface specification */
+			return (tjs_char *)p;
+		}
+		p++;
+	}
+	return nullptr;
+}
+//---------------------------------------------------------------------------
+tjs_int TJS_strcmp(const tjs_char *s1, const tjs_char *s2)
+{
+	while (*s1 == *s2++)
+		if (*s1++ == '\0')
+			return (0);
+	return (*s1 - *(--s2));
+}
+//---------------------------------------------------------------------------
+tjs_int TJS_strncmp(const tjs_char *s1, const tjs_char *s2, size_t n)
+{
+	if (n == 0)
+		return (0);
+	do {
+		if (*s1 != *s2++) {
+			return (*s1 - *(--s2));
+		}
+		if (*s1++ == 0)
+			break;
+	} while (--n != 0);
+	return (0);
+}
+//---------------------------------------------------------------------------
+tjs_char * TJS_strncpy(tjs_char * __restrict dst, const tjs_char * __restrict src, size_t n)
+{
+	if (n != 0) {
+		tjs_char *d = dst;
+		const tjs_char *s = src;
+
+		do {
+			if ((*d++ = *s++) == TJS_W('\0')) {
+				/* NUL pad the remaining n-1 bytes */
+				while (--n != 0)
+					*d++ = TJS_W('\0');
+				break;
+			}
+		} while (--n != 0);
+	}
+	return (dst);
+}
+//---------------------------------------------------------------------------
+tjs_char * TJS_strcat(tjs_char * __restrict s1, const tjs_char * __restrict s2)
+{
+	tjs_char *cp;
+
+	cp = s1;
+	while (*cp != TJS_W('\0'))
+		cp++;
+	while ((*cp++ = *s2++) != TJS_W('\0'))
+		;
+
+	return (s1);
+}
+//---------------------------------------------------------------------------
+tjs_char * TJS_strchr(const tjs_char *s, tjs_char c)
+{
+	while (*s != c && *s != TJS_W('\0'))
+		s++;
+	if (*s == c)
+		return ((tjs_char *)s);
+	return (nullptr);
+}
+//---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
 
