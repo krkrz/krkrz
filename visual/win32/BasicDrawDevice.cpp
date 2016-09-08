@@ -10,7 +10,7 @@
 #include "DebugIntf.h"
 #include "ThreadIntf.h"
 #include "ComplexRect.h"
-#include "EventImpl.h"
+#include "EventIntf.h"
 #include "WindowImpl.h"
 
 #include <d3d9.h>
@@ -639,9 +639,11 @@ void TJS_INTF_METHOD tTVPBasicDrawDevice::StartBitmapCompletion(iTVPLayerManager
 }
 //---------------------------------------------------------------------------
 void TJS_INTF_METHOD tTVPBasicDrawDevice::NotifyBitmapCompleted(iTVPLayerManager * manager,
-	tjs_int x, tjs_int y, const void * bits, const BITMAPINFO * bitmapinfo,
+	tjs_int x, tjs_int y, const void * bits, const class BitmapInfomation * bmpinfo,
 	const tTVPRect &cliprect, tTVPLayerType type, tjs_int opacity)
 {
+	const BITMAPINFO *bitmapinfo = bmpinfo->GetBITMAPINFO();
+
 	// bits, bitmapinfo で表されるビットマップの cliprect の領域を、x, y に描画
 	// する。
 	// opacity と type は無視するしかないので無視する

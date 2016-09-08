@@ -1211,6 +1211,7 @@ void tTVPComplexRect::RectangleSub(tTVPRegionRect *r, const tTVPRect *rr)
 //---------------------------------------------------------------------------
 void tTVPComplexRect::DumpChain()
 {
+#ifdef _WIN32
 	std::wstring str;
 	tIterator it = GetIterator();
 	while(it.Step()) {
@@ -1219,6 +1220,7 @@ void tTVPComplexRect::DumpChain()
 		str += tmp;
 	}
 	OutputDebugString(str.c_str());
+#endif
 }
 //---------------------------------------------------------------------------
 

@@ -3,7 +3,10 @@
 #include "CharacterSet.h"
 #ifdef _WIN32
 #include <mmsystem.h>
+#elif defined(ANDROID)
+#include <time.h>
 #endif
+
 
 //---------------------------------------------------------------------------
 // TVPGetRoughTickCount

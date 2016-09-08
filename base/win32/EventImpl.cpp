@@ -10,7 +10,7 @@
 //---------------------------------------------------------------------------
 #include "tjsCommHead.h"
 
-#include "EventImpl.h"
+#include "EventIntf.h"
 #include "SystemControl.h"
 #include "ThreadIntf.h"
 #include "TickCount.h"

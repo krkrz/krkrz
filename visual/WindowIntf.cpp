@@ -21,9 +21,8 @@
 #include "LayerIntf.h"
 #include "SysInitIntf.h"
 #include "LayerManager.h"
-//#include "EventImpl.h"
-#ifdef _WIN32
 #include "VideoOvlIntf.h"
+#ifdef _WIN32
 #include "BasicDrawDevice.h"
 #endif
 
@@ -812,20 +811,28 @@ TJS_END_NATIVE_METHOD_DECL(/*func. name*/showModal)
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/setMaskRegion)
 {
+#ifdef ANDROID
+	return TJS_E_NOTIMPL;
+#else
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
 	tjs_int threshold = 1;
 	if(numparams >= 1 && param[0]->Type() != tvtVoid)
 		threshold = (tjs_int)*param[0];
 	_this->SetMaskRegion(threshold);
 	return TJS_S_OK;
+#endif
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/setMaskRegion)
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/removeMaskRegion)
 {
+#ifdef ANDROID
+	return TJS_E_NOTIMPL;
+#else
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
 	_this->RemoveMaskRegion();
 	return TJS_S_OK;
+#endif
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/removeMaskRegion)
 //----------------------------------------------------------------------
@@ -1740,17 +1747,25 @@ TJS_BEGIN_NATIVE_PROP_DECL(imeMode) // not defaultImeMode
 {
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
+#ifdef ANDROID
+		return TJS_E_NOTIMPL;
+#else
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
 		*result = (tjs_int)_this->GetDefaultImeMode();
 		return TJS_S_OK;
+#endif
 	}
 	TJS_END_NATIVE_PROP_GETTER
 
 	TJS_BEGIN_NATIVE_PROP_SETTER
 	{
+#ifdef ANDROID
+		return TJS_E_NOTIMPL;
+#else
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
 		_this->SetDefaultImeMode((tTVPImeMode)(tjs_int)*param);
 		return TJS_S_OK;
+#endif
 	}
 	TJS_END_NATIVE_PROP_SETTER
 }
@@ -1760,17 +1775,25 @@ TJS_BEGIN_NATIVE_PROP_DECL(mouseCursorState)
 {
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
+#ifdef ANDROID
+		return TJS_E_NOTIMPL;
+#else
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
 		*result = (tjs_int)_this->GetMouseCursorState();
 		return TJS_S_OK;
+#endif
 	}
 	TJS_END_NATIVE_PROP_GETTER
 
 	TJS_BEGIN_NATIVE_PROP_SETTER
 	{
+#ifdef ANDROID
+		return TJS_E_NOTIMPL;
+#else
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
 		_this->SetMouseCursorState((tTVPMouseCursorState)(tjs_int)*param);
 		return TJS_S_OK;
+#endif
 	}
 	TJS_END_NATIVE_PROP_SETTER
 }

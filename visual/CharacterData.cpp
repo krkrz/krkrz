@@ -2,6 +2,7 @@
 #include "CharacterData.h"
 #include "tvpgl.h"
 #include "MsgIntf.h"
+#include <cstdlib>
 
 //---------------------------------------------------------------------------
 tTVPCharacterData::tTVPCharacterData( const tjs_uint8 * indata,

@@ -134,7 +134,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);__WIN32__;NO_STRICT;TJS_TEXT_OUT_CRLF;TJS_JP_LOCALIZED;TJS_DEBUG_DUMP_STRING;_CRT_SECURE_NO_WARNING;TVP_LOG_TO_COMMANDLINE_CONSOLE;TVP_REPORT_HW_EXCEPTION;TVP_ENABLE_EXECUTE_AT_EXCEPTION;</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>../external/baseclasses;../movie/win32;../visual/gl;../extension;../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../platform/win32;../external;../external/zlib;../external/lpng;../external/libjpeg-turbo;../external/libjpeg-turbo/vcproj;../external/onig/src;../external/freetype/include;../external/jxrlib/jxrgluelib;../external/jxrlib/image/sys;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../environ;../external/baseclasses;../movie/win32;../visual/gl;../extension;../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../platform/win32;../external;../external/zlib;../external/lpng;../external/libjpeg-turbo;../external/libjpeg-turbo/vcproj;../external/onig/src;../external/freetype/include;../external/jxrlib/jxrgluelib;../external/jxrlib/image/sys;</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -159,7 +159,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);__WIN32__;NO_STRICT;TJS_TEXT_OUT_CRLF;TJS_JP_LOCALIZED;TJS_DEBUG_DUMP_STRING;_CRT_SECURE_NO_WARNING;TVP_LOG_TO_COMMANDLINE_CONSOLE;TVP_REPORT_HW_EXCEPTION;TVP_ENABLE_EXECUTE_AT_EXCEPTION;</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>../external/baseclasses;../movie/win32;../visual/gl;../extension;../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../platform/win32;../external;../external/zlib;../external/lpng;../external/libjpeg-turbo;../external/libjpeg-turbo/vcproj;../external/onig/src;../external/freetype/include;../external/jxrlib/jxrgluelib;../external/jxrlib/image/sys;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../environ;../external/baseclasses;../movie/win32;../visual/gl;../extension;../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../platform/win32;../external;../external/zlib;../external/lpng;../external/libjpeg-turbo;../external/libjpeg-turbo/vcproj;../external/onig/src;../external/freetype/include;../external/jxrlib/jxrgluelib;../external/jxrlib/image/sys;</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -186,7 +186,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);__WIN32__;NO_STRICT;TJS_TEXT_OUT_CRLF;TJS_JP_LOCALIZED;TJS_DEBUG_DUMP_STRING;TVP_LOG_TO_COMMANDLINE_CONSOLE;DISABLE_EMBEDDED_GAME_PAD;TVP_REPORT_HW_EXCEPTION;TVP_ENABLE_EXECUTE_AT_EXCEPTION;</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>../external/baseclasses;../movie/win32;../visual/gl;../extension;../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../platform/win32;../external;../external/zlib;../external/lpng;../external/libjpeg-turbo;../external/libjpeg-turbo/vcproj;../external/onig/src;../external/freetype/include;../external/jxrlib/jxrgluelib;../external/jxrlib/image/sys;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../environ;../external/baseclasses;../movie/win32;../visual/gl;../extension;../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../platform/win32;../external;../external/zlib;../external/lpng;../external/libjpeg-turbo;../external/libjpeg-turbo/vcproj;../external/onig/src;../external/freetype/include;../external/jxrlib/jxrgluelib;../external/jxrlib/image/sys;</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -227,7 +227,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);__WIN32__;NO_STRICT;TJS_TEXT_OUT_CRLF;TJS_JP_LOCALIZED;TJS_DEBUG_DUMP_STRING;TVP_LOG_TO_COMMANDLINE_CONSOLE;DISABLE_EMBEDDED_GAME_PAD;TVP_REPORT_HW_EXCEPTION;TVP_ENABLE_EXECUTE_AT_EXCEPTION;</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>../external/baseclasses;../movie/win32;../visual/gl;../extension;../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../platform/win32;../external;../external/zlib;../external/lpng;../external/libjpeg-turbo;../external/libjpeg-turbo/vcproj;../external/onig/src;../external/freetype/include;../external/jxrlib/jxrgluelib;../external/jxrlib/image/sys;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../environ;../external/baseclasses;../movie/win32;../visual/gl;../extension;../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../platform/win32;../external;../external/zlib;../external/lpng;../external/libjpeg-turbo;../external/libjpeg-turbo/vcproj;../external/onig/src;../external/freetype/include;../external/jxrlib/jxrgluelib;../external/jxrlib/image/sys;</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -267,7 +267,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);__WIN32__;NO_STRICT;TJS_TEXT_OUT_CRLF;TJS_JP_LOCALIZED;TJS_DEBUG_DUMP_STRING;TVP_LOG_TO_COMMANDLINE_CONSOLE;DISABLE_EMBEDDED_GAME_PAD;TVP_REPORT_HW_EXCEPTION;ENABLE_DEBUGGER;</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>../external/baseclasses;../movie/win32;../visual/gl;../extension;../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../platform/win32;../external;../external/zlib;../external/lpng;../external/libjpeg-turbo;../external/libjpeg-turbo/vcproj;../external/onig/src;../external/freetype/include;../external/jxrlib/jxrgluelib;../external/jxrlib/image/sys;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../environ;../external/baseclasses;../movie/win32;../visual/gl;../extension;../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../platform/win32;../external;../external/zlib;../external/lpng;../external/libjpeg-turbo;../external/libjpeg-turbo/vcproj;../external/onig/src;../external/freetype/include;../external/jxrlib/jxrgluelib;../external/jxrlib/image/sys;</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -308,7 +308,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);__WIN32__;NO_STRICT;TJS_TEXT_OUT_CRLF;TJS_JP_LOCALIZED;TJS_DEBUG_DUMP_STRING;TVP_LOG_TO_COMMANDLINE_CONSOLE;DISABLE_EMBEDDED_GAME_PAD;TVP_REPORT_HW_EXCEPTION;ENABLE_DEBUGGER;</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>../external/baseclasses;../movie/win32;../visual/gl;../extension;../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../platform/win32;../external;../external/zlib;../external/lpng;../external/libjpeg-turbo;../external/libjpeg-turbo/vcproj;../external/onig/src;../external/freetype/include;../external/jxrlib/jxrgluelib;../external/jxrlib/image/sys;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../environ;../external/baseclasses;../movie/win32;../visual/gl;../extension;../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../platform/win32;../external;../external/zlib;../external/lpng;../external/libjpeg-turbo;../external/libjpeg-turbo/vcproj;../external/onig/src;../external/freetype/include;../external/jxrlib/jxrgluelib;../external/jxrlib/image/sys;</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -354,7 +354,6 @@
     <ClInclude Include="..\base\SystemIntf.h" />
     <ClInclude Include="..\base\TextStream.h" />
     <ClInclude Include="..\base\UtilStreams.h" />
-    <ClInclude Include="..\base\win32\EventImpl.h" />
     <ClInclude Include="..\base\win32\FileSelector.h" />
     <ClInclude Include="..\base\win32\FuncStubs.h" />
     <ClInclude Include="..\base\win32\NativeEventQueue.h" />
@@ -364,6 +363,7 @@
     <ClInclude Include="..\base\win32\SysInitImpl.h" />
     <ClInclude Include="..\base\win32\SystemImpl.h" />
     <ClInclude Include="..\base\XP3Archive.h" />
+    <ClInclude Include="..\environ\TouchPoint.h" />
     <ClInclude Include="..\environ\win32\Application.h" />
     <ClInclude Include="..\environ\win32\ApplicationSpecialPath.h" />
     <ClInclude Include="..\environ\win32\CompatibleNativeFuncs.h" />
@@ -372,7 +372,6 @@
     <ClInclude Include="..\environ\win32\EmergencyExit.h" />
     <ClInclude Include="..\environ\win32\MouseCursor.h" />
     <ClInclude Include="..\environ\win32\SystemControl.h" />
-    <ClInclude Include="..\environ\win32\TouchPoint.h" />
     <ClInclude Include="..\environ\win32\TVPWindow.h" />
     <ClInclude Include="..\environ\win32\VersionFormUnit.h" />
     <ClInclude Include="..\environ\win32\WindowFormUnit.h" />
@@ -570,6 +569,7 @@
     <ClCompile Include="..\base\win32\SysInitImpl.cpp" />
     <ClCompile Include="..\base\win32\SystemImpl.cpp" />
     <ClCompile Include="..\base\XP3Archive.cpp" />
+    <ClCompile Include="..\environ\TouchPoint.cpp" />
     <ClCompile Include="..\environ\win32\Application.cpp" />
     <ClCompile Include="..\environ\win32\CompatibleNativeFuncs.cpp" />
     <ClCompile Include="..\environ\win32\ConfigFormUnit.cpp" />
@@ -577,7 +577,6 @@
     <ClCompile Include="..\environ\win32\EmergencyExit.cpp" />
     <ClCompile Include="..\environ\win32\MouseCursor.cpp" />
     <ClCompile Include="..\environ\win32\SystemControl.cpp" />
-    <ClCompile Include="..\environ\win32\TouchPoint.cpp" />
     <ClCompile Include="..\environ\win32\TVPWindow.cpp" />
     <ClCompile Include="..\environ\win32\VersionFormUnit.cpp" />
     <ClCompile Include="..\environ\win32\WindowFormUnit.cpp" />

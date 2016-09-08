@@ -12,13 +12,9 @@
 #define PluginImplH
 //---------------------------------------------------------------------------
 #include <memory.h>
-#include <objidl.h> // for IStream
 
 #include "PluginIntf.h"
 
-#ifdef TVP_SUPPORT_KPI
-	#include "kmp_pi.h"
-#endif
 
 
 //---------------------------------------------------------------------------
@@ -46,24 +42,18 @@ struct IWaveUnpacker;
 struct ITSSStorageProvider;
 extern "C"
 {
-	iTVPFunctionExporter * __stdcall TVPGetFunctionExporter();
+	iTVPFunctionExporter * TVPGetFunctionExporter();
 
 	// V2 plug-in
-	typedef HRESULT (_stdcall * tTVPV2LinkProc)(iTVPFunctionExporter *);
-	typedef HRESULT (_stdcall * tTVPV2UnlinkProc)();
+	typedef tjs_error (* tTVPV2LinkProc)(iTVPFunctionExporter *);
+	typedef tjs_error (* tTVPV2UnlinkProc)();
 
+#if 0
 	// TSS
-	typedef HRESULT (_stdcall * tTVPGetModuleInstanceProc)(ITSSModule **out,
-		ITSSStorageProvider *provider, IStream * config, HWND mainwin);
-	typedef ULONG (_stdcall * tTVPGetModuleThreadModelProc)(void);
-	typedef HRESULT (_stdcall * tTVPShowConfigWindowProc)(HWND parentwin,
-		IStream * storage );
-	typedef ULONG (_stdcall * tTVPCanUnloadNowProc)(void);
-
-#ifdef TVP_SUPPORT_OLD_WAVEUNPACKER
-	// WaveUnpacker
-	typedef HRESULT (_stdcall * tTVPCreateWaveUnpackerProc)(IStream *storage,long size,
-		char *name,IWaveUnpacker **out); // old WaveUnpacker stuff
+	typedef tjs_error (_stdcall * tTVPGetModuleInstanceProc)(ITSSModule **out, ITSSStorageProvider *provider, IStream * config, HWND mainwin);
+	typedef tjs_uint32 (_stdcall * tTVPGetModuleThreadModelProc)(void);
+	typedef tjs_error (_stdcall * tTVPShowConfigWindowProc)(HWND parentwin, IStream * storage );
+	typedef tjs_uint32 (_stdcall * tTVPCanUnloadNowProc)(void);
 #endif
 }
 //---------------------------------------------------------------------------
@@ -71,14 +61,7 @@ extern "C"
 //---------------------------------------------------------------------------
 struct ITSSWaveDecoder;
 extern ITSSWaveDecoder * TVPSearchAvailTSSWaveDecoder(const ttstr & storage, const ttstr & extension);
-#ifdef TVP_SUPPORT_OLD_WAVEUNPACKER
-class IWaveUnpacker;
-extern IWaveUnpacker * TVPSearchAvailWaveUnpacker(const ttstr & storage, IStream **stream);
-#endif
-#ifdef TVP_SUPPORT_KPI
-extern void * TVPSearchAvailKMPWaveDecoder(const ttstr & storage, KMPMODULE ** module,
-	SOUNDINFO * info);
-#endif
+
 extern void TVPAddExportFunction(const tjs_char *name, void *ptr);
 extern void TVPAddExportFunction(const char *name, void *ptr);
 TJS_EXP_FUNC_DEF(void, TVPThrowPluginUnboundFunctionError, (const char *funcname));
@@ -113,7 +96,6 @@ TJS_EXP_FUNC_DEF(void, TVP_md5_init, (TVP_md5_state_t *pms));
 TJS_EXP_FUNC_DEF(void, TVP_md5_append, (TVP_md5_state_t *pms, const tjs_uint8 *data, int nbytes));
 TJS_EXP_FUNC_DEF(void, TVP_md5_finish, (TVP_md5_state_t *pms, tjs_uint8 *digest));
 
-TJS_EXP_FUNC_DEF(HWND, TVPGetApplicationWindowHandle, ());
 TJS_EXP_FUNC_DEF(void, TVPProcessApplicationMessages, ());
 TJS_EXP_FUNC_DEF(void, TVPHandleApplicationMessage, ());
 

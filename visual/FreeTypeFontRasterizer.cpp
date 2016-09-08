@@ -6,6 +6,7 @@
 #include <math.h>
 #include "MsgIntf.h"
 #include "FontSystem.h"
+#include <cmath>
 
 extern void TVPUninitializeFreeFont();
 extern FontSystem* TVPFontSystem;

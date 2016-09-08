@@ -1,37 +1,59 @@
-// Form = new TTVPWindowForm
 
-// 仮想ウィンドウとして実装してしまうのがいいか
-// シングルウィンドウ環境では、1画面1ウィンドウのみとして、1つのウィンドウしかアクティブにならない。
-// ウィンドウの切り替え方法が提供されていない場合は、進行不能になってしまうが諦めてもらう？
-// DrawDevice はテクスチャに描画して、それを返すだけの実装がいいかな？ そのテクスチャが実質Windowとして。
-// 理屈上はマルチウィンドウも可能になるように
+#ifndef __WINDOW_FORM_H__
+#define __WINDOW_FORM_H__
+
+#include "TouchPoint.h"
+#include "VelocityTracker.h"
+
+enum {
+	orientUnknown,
+	orientPortrait,
+	orientLandscape,
+};
+
+typedef unsigned long TShiftState;
+tjs_uint32 TVP_TShiftState_To_uint32(TShiftState state);
+TShiftState TVP_TShiftState_From_uint32(tjs_uint32 state);
+
 /*
- * シングルウィンドウ系システムのために、マルチウィンドウは使えない方がやっぱりいいかな。
- * Window がほぼそのままディスプレイと紐づいているような
+ * tTJSNI_Window が持つ Form クラスに要求されるメソッドを列挙したもの。
+ * Form = new TTVPWindowForm(Application, this) のように実体化される。
+ * このファイル自体は使われず、各環境で各メソッドを実装するためのベースとして使用する
+ *
+ * イベント配信周りは書かれていないので、別途実装の必要あり
  */
-class tTVPWindowForm {
+class TTVPWindowForm : public TouchHandler {
+
+	TouchPointList touch_points_;
+	VelocityTrackers TouchVelocityTracker;
+	VelocityTracker MouseVelocityTracker;
+
+public:
+	TTVPWindowForm( class tTVPApplication* app, tTJSNI_Window* ni );
+	virtual ~TTVPWindowForm();
+
 	// Windowが有効かどうか、無効だとイベントが配信されない
 	bool GetFormEnabled();
 
 	// 閉じる
 	void InvalidateClose();
-	void SendCloseMessage()
+	void SendCloseMessage();
 	void Close();
 	void OnCloseQueryCalled(bool b);
 
 	// 定期的に呼び出されるので、定期処理があれば実行する
-	void TickBeat()
+	void TickBeat();
 
 	// アクティブ/デアクティブ化された時に、Windowがアクティブかどうかチェックされる
-	bool GetWindowActive()
+	bool GetWindowActive();
 
 	// DrawDevice
-	void ResetDrawDevice()
+	void ResetDrawDevice();
 
 	// キー入力
-	void InternalKeyDown(WORD key, tjs_uint32 shift);
-	void OnKeyUp( WORD vk, int shift );
-	void OnKeyPress( WORD vk, int repeat, bool prevkeystate, bool convertkey );
+	void InternalKeyDown(tjs_uint16 key, tjs_uint32 shift);
+	void OnKeyUp( tjs_uint16 vk, int shift );
+	void OnKeyPress( tjs_uint16 vk, int repeat, bool prevkeystate, bool convertkey );
 
 	// プライマリーレイヤーのサイズに合うように呼び出される。w/hはLayerWidth/LayerHeightに当たり、ズームを考慮して表示サイズを設定する
 	void SetPaintBoxSize(tjs_int w, tjs_int h);
@@ -41,8 +63,8 @@ class tTVPWindowForm {
 	void SetMouseCursor(tjs_int handle);
 	void HideMouseCursor();
 	void SetMouseCursorState(tTVPMouseCursorState mcs);
-	tTVPMouseCursorState GetMouseCursorState() const
-	// void ReleaseCapture();
+	tTVPMouseCursorState GetMouseCursorState() const;
+
 	// マウスカーソル座標はLayer.cursorX/cursorYで得られるようになっているが、タッチスクリーンだと無意味なので使えなくなる
 	void GetCursorPos(tjs_int &x, tjs_int &y);
 	void SetCursorPos(tjs_int x, tjs_int y);
@@ -62,11 +84,11 @@ class tTVPWindowForm {
 
 	// Windowハンドル系メソッドはすべて不要
 	// VideoOverlay で SetMessageDrainWindow に渡す Window ハンドル
-	HWND GetSurfaceWindowHandle();
+	void* GetSurfaceWindowHandle() { return nullptr; }
 	// VideoOverlay の OwnerWindow として設定される Window ハンドル
-	HWND GetWindowHandle();
+	void* GetWindowHandle() { return nullptr; }
 	// Window::HWND プロパティ値として使用される。非Windows環境ではプラグインに渡すこと出来ないから不要か。ダミーでNULL返せばいい
-	HWND GetWindowHandleForPlugin();
+	void* GetWindowHandleForPlugin() { return nullptr; }
 
 	// VideoOverlayで表示サイズを決めるためにズーム値を用いて引数値を拡大縮小する
 	void ZoomRectangle( tjs_int & left, tjs_int & top, tjs_int & right, tjs_int & bottom);
@@ -74,7 +96,7 @@ class tTVPWindowForm {
 	void GetVideoOffset(tjs_int &ofsx, tjs_int &ofsy);
 
 	// プラグインでメッセージレシーバを登録するに使われる、Androidでは無効
-	void RegisterWindowMessageReceiver(tTVPWMRRegMode mode, void * proc, const void *userdata);
+	//void RegisterWindowMessageReceiver(tTVPWMRRegMode mode, void * proc, const void *userdata);
 
 
 	// 内容更新
@@ -104,16 +126,16 @@ class tTVPWindowForm {
 	int GetHeight() const;
 	void SetSize( int w, int h );
 	// 最小、最大サイズ関係、Androidなどリサイズがないとしたら無効か
-	void SetMinWidth( int v )
-	int GetMinWidth() const
-	void SetMinHeight( int v )
-	int GetMinHeight()
-	void SetMinSize( int w, int h )
-	void SetMaxWidth( int v )
-	int GetMaxWidth()
-	void SetMaxHeight( int v )
-	int GetMaxHeight()
-	void SetMaxSize( int w, int h )
+	void SetMinWidth( int v );
+	int GetMinWidth() const;
+	void SetMinHeight( int v );
+	int GetMinHeight();
+	void SetMinSize( int w, int h );
+	void SetMaxWidth( int v );
+	int GetMaxWidth();
+	void SetMaxHeight( int v );
+	int GetMaxHeight();
+	void SetMaxSize( int w, int h );
 
 	// 内部のサイズ、実質的にこれが表示領域サイズ
 	void SetInnerWidth( int w );
@@ -145,7 +167,8 @@ class tTVPWindowForm {
 	bool GetTrapKey() const;
 
 	// ウィンドウマスクリージョンは無効
-	void SetMaskRegion(HRGN threshold);
+	//void SetMaskRegion(HRGN threshold);
+	void SetMaskRegion(void* threshold);
 	void RemoveMaskRegion();
 
 	// フォースは常に真
@@ -159,29 +182,47 @@ class tTVPWindowForm {
 	void SetZoomDenom(tjs_int d);
 	tjs_int GetZoomDenom() const;
 
-	// タッチ入力関係
-	void SetTouchScaleThreshold( double threshold )
-	double GetTouchScaleThreshold() const
-	void SetTouchRotateThreshold( double threshold )
-	double GetTouchRotateThreshold() const
-	tjs_real GetTouchPointStartX( tjs_int index ) const;
-	tjs_real GetTouchPointStartY( tjs_int index ) const;
-	tjs_real GetTouchPointX( tjs_int index ) const;
-	tjs_real GetTouchPointY( tjs_int index ) const;
-	tjs_int GetTouchPointID( tjs_int index ) const;
-	tjs_int GetTouchPointCount() const;
+	// タッチ入力関係 ( TouchPointList によって管理されている )
+	void SetTouchScaleThreshold( double threshold ) { touch_points_.SetScaleThreshold( threshold ); }
+	double GetTouchScaleThreshold() const { return touch_points_.GetScaleThreshold(); }
+	void SetTouchRotateThreshold( double threshold ) { touch_points_.SetRotateThreshold( threshold ); }
+	double GetTouchRotateThreshold() const { return touch_points_.GetRotateThreshold(); }
+	tjs_real GetTouchPointStartX( tjs_int index ) const { return touch_points_.GetStartX(index); }
+	tjs_real GetTouchPointStartY( tjs_int index ) const { return touch_points_.GetStartY(index); }
+	tjs_real GetTouchPointX( tjs_int index ) const { return touch_points_.GetX(index); }
+	tjs_real GetTouchPointY( tjs_int index ) const { return touch_points_.GetY(index); }
+	tjs_int GetTouchPointID( tjs_int index ) const { return touch_points_.GetID(index); }
+	tjs_int GetTouchPointCount() const { return touch_points_.CountUsePoint(); }
+	void ResetTouchVelocity( tjs_int id ) {
+		TouchVelocityTracker.end( id );
+	}
 
 	// タッチ入力のマウスエミュレートON/OFF
 	void SetEnableTouch( bool b );
 	bool GetEnableTouch() const;
 
 	// タッチ、マウス加速度
-	bool GetTouchVelocity( tjs_int id, float& x, float& y, float& speed ) const
-	bool GetMouseVelocity( float& x, float& y, float& speed ) const
-	void ResetMouseVelocity()
+	bool GetTouchVelocity( tjs_int id, float& x, float& y, float& speed ) const {
+		return TouchVelocityTracker.getVelocity( id, x, y, speed );
+	}
+	bool GetMouseVelocity( float& x, float& y, float& speed ) const {
+		if( MouseVelocityTracker.getVelocity( x, y ) ) {
+			speed = hypotf(x, y);
+			return true;
+		}
+		return false;
+	}
+	void ResetMouseVelocity() {
+		MouseVelocityTracker.clear();
+	}
 
 	// 画面表示向き取得
 	int GetDisplayOrientation();
 	int GetDisplayRotate();
+
+	virtual void OnTouchScaling( double startdist, double currentdist, double cx, double cy, int flag );
+	virtual void OnTouchRotate( double startangle, double currentangle, double distance, double cx, double cy, int flag );
+	virtual void OnMultiTouch();
 };
 
+#endif

@@ -78,7 +78,9 @@ tjs_uint8 TVP_GUID_KSDATAFORMAT_SUBTYPE_IEEE_FLOAT[16] =
 
 
 #include "DetectCPU.h"
+#if defined(_M_IX86) || defined(_M_X64) || defined(__i386__) || defined(__x86_64__)
 #include "tvpgl_ia32_intf.h"
+#endif
 
 //---------------------------------------------------------------------------
 // CPU specific optimized routine prototypes
@@ -1105,7 +1107,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/setPos) // not setPosition
 	y = (*param[1]);
 	z = (*param[2]);
 
-	_this->SetPos( static_cast<D3DVALUE>(x), static_cast<D3DVALUE>(y), static_cast<D3DVALUE>(z) );
+	_this->SetPos( static_cast<float>(x), static_cast<float>(y), static_cast<float>(z) );
 
 	return TJS_S_OK;
 }
@@ -1377,7 +1379,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(posX)
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_WaveSoundBuffer);
 
-		_this->SetPosX( static_cast<D3DVALUE>( (tTVReal)*param ));
+		_this->SetPosX( static_cast<float>( (tTVReal)*param ));
 
 		return TJS_S_OK;
 	}
@@ -1401,7 +1403,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(posY)
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_WaveSoundBuffer);
 
-		_this->SetPosY( static_cast<D3DVALUE>( (tTVReal)*param ) );
+		_this->SetPosY( static_cast<float>( (tTVReal)*param ) );
 
 		return TJS_S_OK;
 	}
@@ -1425,7 +1427,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(posZ)
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_WaveSoundBuffer);
 
-		_this->SetPosZ( static_cast<D3DVALUE>((tTVReal)*param) );
+		_this->SetPosZ( static_cast<float>((tTVReal)*param) );
 
 		return TJS_S_OK;
 	}

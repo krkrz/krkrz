@@ -374,7 +374,7 @@ public:
 	//!				示される矩形を x, y 位置に転送すればよいが、描画矩形の大きさに合わせた
 	//!				拡大や縮小などは描画デバイス側で面倒を見る必要がある。
 	virtual void TJS_INTF_METHOD NotifyBitmapCompleted(iTVPLayerManager * manager,
-		tjs_int x, tjs_int y, const void * bits, const BITMAPINFO * bitmapinfo,
+		tjs_int x, tjs_int y, const void * bits, const class BitmapInfomation * bitmapinfo,
 		const tTVPRect &cliprect, tTVPLayerType type, tjs_int opacity) = 0;
 
 	//! @brief		(LayerManager->DrawDevice) ビットマップの描画を終了する

@@ -182,9 +182,6 @@
     <ClInclude Include="..\tjs2\tjsVariantString.h">
       <Filter>tjs2</Filter>
     </ClInclude>
-    <ClInclude Include="..\base\win32\EventImpl.h">
-      <Filter>base\win32</Filter>
-    </ClInclude>
     <ClInclude Include="..\base\win32\FileSelector.h">
       <Filter>base\win32</Filter>
     </ClInclude>
@@ -399,9 +396,6 @@
       <Filter>sound</Filter>
     </ClInclude>
     <ClInclude Include="..\environ\win32\CompatibleNativeFuncs.h">
-      <Filter>environ\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="..\environ\win32\TouchPoint.h">
       <Filter>environ\win32</Filter>
     </ClInclude>
     <ClInclude Include="..\utils\TickCount.h">
@@ -682,6 +676,9 @@
     </ClInclude>
     <ClInclude Include="..\sound\SoundBufferBaseImpl.h">
       <Filter>sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\environ\TouchPoint.h">
+      <Filter>environ</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -973,9 +970,6 @@
     <ClCompile Include="..\environ\win32\CompatibleNativeFuncs.cpp">
       <Filter>environ\win32</Filter>
     </ClCompile>
-    <ClCompile Include="..\environ\win32\TouchPoint.cpp">
-      <Filter>environ\win32</Filter>
-    </ClCompile>
     <ClCompile Include="..\utils\TickCount.cpp">
       <Filter>utils</Filter>
     </ClCompile>
@@ -1254,6 +1248,9 @@
     </ClCompile>
     <ClCompile Include="..\sound\SoundBufferBaseImpl.cpp">
       <Filter>sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\environ\TouchPoint.cpp">
+      <Filter>environ</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

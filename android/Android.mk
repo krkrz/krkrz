@@ -34,12 +34,14 @@ LOCAL_CFLAGS += \
 LOCAL_CPPFLAGS += -std=c++11
 LOCAL_CPP_FEATURES += exceptions
 LOCAL_C_INCLUDES += \
+$(LOCAL_PATH)/environ/ \
 $(LOCAL_PATH)/environ/android \
 $(LOCAL_PATH)/tjs2 \
 $(LOCAL_PATH)/external/onig/src \
 $(LOCAL_PATH)/external/lpng \
 $(LOCAL_PATH)/external/freetype/include \
 $(LOCAL_PATH)/external/libjpeg-turbo \
+$(LOCAL_PATH)/external/libjpeg-turbo/android \
 $(LOCAL_PATH)/base \
 $(LOCAL_PATH)/base/android \
 $(LOCAL_PATH)/extension \
@@ -52,6 +54,7 @@ $(LOCAL_PATH)/utils \
 $(LOCAL_PATH)/utils/android \
 $(LOCAL_PATH)/visual \
 $(LOCAL_PATH)/visual/android \
+$(LOCAL_PATH)/visual/gl \
 $(NDK)/source/cpufeatures
 
 LOCAL_SRC_FILES := \
@@ -154,7 +157,6 @@ $(LOCAL_PATH)/visual/LayerIntf.cpp \
 $(LOCAL_PATH)/visual/LayerManager.cpp \
 $(LOCAL_PATH)/visual/LayerTreeOwnerImpl.cpp \
 $(LOCAL_PATH)/visual/LoadJPEG.cpp \
-$(LOCAL_PATH)/visual/LoadJXR.cpp \
 $(LOCAL_PATH)/visual/LoadPNG.cpp \
 $(LOCAL_PATH)/visual/LoadTLG.cpp \
 $(LOCAL_PATH)/visual/PrerenderedFont.cpp \

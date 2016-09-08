@@ -12,6 +12,8 @@
 #include "tjsCommHead.h"
 
 #include <math.h>
+#include <cstdlib>
+#include <cmath>
 
 #include "tjsArray.h"
 #include "LayerIntf.h"
@@ -29,7 +31,9 @@
 #include "BitmapIntf.h"
 
 #include "TVPColor.h"
+#ifdef _WIN32
 #include "TVPSysFont.h"
+#endif
 #include "FontRasterizer.h"
 #include "RectItf.h"
 #include "FontSystem.h"

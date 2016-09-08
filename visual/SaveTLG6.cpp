@@ -1386,7 +1386,8 @@ void TVPSaveAsTLG(void* formatdata, tTJSBinaryStream* dst, const tTVPBaseBitmap*
 				return TJS_S_OK;
 			}
 		} callback(tags);
-		meta->EnumMembers(TJS_IGNOREPROP, &tTJSVariantClosure(&callback, NULL), meta);
+		tTJSVariantClosure clo(&callback, NULL);
+		meta->EnumMembers(TJS_IGNOREPROP, &clo, meta);
 	}
 
 	bool istls6 = false;

@@ -81,7 +81,7 @@ public:
 //---- LayerManager からの画像受け渡し関連
 	virtual void TJS_INTF_METHOD StartBitmapCompletion(iTVPLayerManager * manager);
 	virtual void TJS_INTF_METHOD NotifyBitmapCompleted(iTVPLayerManager * manager,
-		tjs_int x, tjs_int y, const void * bits, const BITMAPINFO * bitmapinfo,
+		tjs_int x, tjs_int y, const void * bits, const class BitmapInfomation * bitmapinfo,
 		const tTVPRect &cliprect, tTVPLayerType type, tjs_int opacity);
 	virtual void TJS_INTF_METHOD EndBitmapCompletion(iTVPLayerManager * manager);
 

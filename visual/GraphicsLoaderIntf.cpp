@@ -27,6 +27,8 @@
 #include "UtilStreams.h"
 #include "tjsDictionary.h"
 #include "ScriptMgnIntf.h"
+#include <cstdlib>
+#include <cmath>
 
 //---------------------------------------------------------------------------
 

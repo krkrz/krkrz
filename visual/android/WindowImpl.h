@@ -18,13 +18,13 @@
 //---------------------------------------------------------------------------
 // tTJSNI_Window : Window Native Instance
 //---------------------------------------------------------------------------
-//class TTVPWindowForm;
+class TTVPWindowForm;
 class iTVPDrawDevice;
 class tTJSNI_BaseLayer;
 class tTJSNI_Window : public tTJSNI_BaseWindow
 {
-#if 0
 	TTVPWindowForm *Form;
+#if 0
 	class tTVPVSyncTimingThread *VSyncTimingThread;
 #endif
 
@@ -34,9 +34,6 @@ public:
 		iTJSDispatch2 *tjs_obj);
 	void TJS_INTF_METHOD Invalidate();
 
-#if 0
-	bool CloseFlag;
-
 public:
 	bool CanDeliverEvents() const; // tTJSNI_BaseWindow::CanDeliverEvents override
 
@@ -45,9 +42,9 @@ public:
 	void NotifyWindowClose();
 
 	void SendCloseMessage();
-#endif
-	void TickBeat() {}
-#if 0
+
+	void TickBeat();
+
 private:
 	bool GetWindowActive();
 	void UpdateVSyncThread();
@@ -72,8 +69,8 @@ public:
 		tjs_int l, tjs_int t);
 	void TJS_INTF_METHOD DisableAttentionPoint();
 	void TJS_INTF_METHOD SetImeMode(tTVPImeMode mode);
-	void SetDefaultImeMode(tTVPImeMode mode);
-	tTVPImeMode GetDefaultImeMode() const;
+	void SetDefaultImeMode(tTVPImeMode mode) {}
+	tTVPImeMode GetDefaultImeMode() const { return imDisable; }
 	void TJS_INTF_METHOD ResetImeMode();
 
 //-- update managment
@@ -82,8 +79,8 @@ public:
 
 //-- interface to VideoOverlay object
 public:
-	HWND GetSurfaceWindowHandle();
-	HWND GetWindowHandle();
+	//HWND GetSurfaceWindowHandle();
+	//HWND GetWindowHandle();
 	void GetVideoOffset(tjs_int &ofsx, tjs_int &ofsy);
 
 	void ReadjustVideoRect();
@@ -94,9 +91,8 @@ public:
 	void ZoomRectangle(
 		tjs_int & left, tjs_int & top,
 		tjs_int & right, tjs_int & bottom);
-	HWND GetWindowHandleForPlugin();
-	void RegisterWindowMessageReceiver(tTVPWMRRegMode mode,
-		void * proc, const void *userdata);
+	//HWND GetWindowHandleForPlugin();
+	//void RegisterWindowMessageReceiver(tTVPWMRRegMode mode, void * proc, const void *userdata);
 
 //-- methods
 	void Close();
@@ -162,8 +158,8 @@ public:
 	void SetTrapKey(bool b);
 	bool GetTrapKey() const;
 
-	void SetMaskRegion(tjs_int threshold);
-	void RemoveMaskRegion();
+	//void SetMaskRegion(tjs_int threshold);
+	//void RemoveMaskRegion();
 
 	void SetMouseCursorState(tTVPMouseCursorState mcs);
     tTVPMouseCursorState GetMouseCursorState() const;
@@ -188,6 +184,9 @@ public:
 	tjs_real GetTouchPointY( tjs_int index );
 	tjs_real GetTouchPointID( tjs_int index );
 	tjs_int GetTouchPointCount();
+	bool GetTouchVelocity( tjs_int id, float& x, float& y, float& speed ) const;
+	bool GetMouseVelocity( float& x, float& y, float& speed ) const;
+	void ResetMouseVelocity();
 	
 	void SetHintDelay( tjs_int delay );
 	tjs_int GetHintDelay() const;
@@ -200,14 +199,8 @@ public:
 	
 	bool WaitForVBlank( tjs_int* in_vblank, tjs_int* delayed );
 
+	void OnTouchUp( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id );
 public: // for iTVPLayerTreeOwner
-	// LayerManager -> LTO
-	/*
-	implements on tTJSNI_BaseWindow
-	virtual void TJS_INTF_METHOD RegisterLayerManager( class iTVPLayerManager* manager );
-	virtual void TJS_INTF_METHOD UnregisterLayerManager( class iTVPLayerManager* manager );
-	*/
-
 	virtual void TJS_INTF_METHOD StartBitmapCompletion(iTVPLayerManager * manager);
 	virtual void TJS_INTF_METHOD NotifyBitmapCompleted(class iTVPLayerManager * manager,
 		tjs_int x, tjs_int y, const void * bits, const class BitmapInfomation * bitmapinfo,
@@ -231,7 +224,7 @@ public: // for iTVPLayerTreeOwner
 	virtual void TJS_INTF_METHOD ResetImeMode( class iTVPLayerManager* manager );
 
 protected:
-#endif
+
 };
 //---------------------------------------------------------------------------
 

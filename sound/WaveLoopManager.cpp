@@ -128,7 +128,7 @@ static void TVPCrossFadeIntegerBlend(void *dest, void *src1, void *src2,
 			tjs_int si2 = (tjs_int)*s2;
 			tjs_int o = (tjs_int) (
 						(((tjs_int64)si2 * (tjs_uint64)ratio) >> 32) +
-						(((tjs_int64)si1 * (0x100000000ui64 - (tjs_uint64)ratio) ) >> 32) );
+						(((tjs_int64)si1 * (0x100000000ull - (tjs_uint64)ratio) ) >> 32) );
 			*out = o;
 			s1 ++;
 			s2 ++;

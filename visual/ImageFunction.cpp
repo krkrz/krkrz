@@ -3,6 +3,7 @@
 #include "ImageFunction.h"
 #include "BitmapIntf.h"
 #include "RectItf.h"
+#include <cmath>
 
 tTJSNI_ImageFunction::tTJSNI_ImageFunction() {}
 
