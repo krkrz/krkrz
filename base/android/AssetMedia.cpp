@@ -1,6 +1,8 @@
+#include "tjsCommHead.h"
 
 #include <android/asset_manager.h>
 #include "Application.h"
+#include "StorageIntf.h"
 
 //---------------------------------------------------------------------------
 // tTVPAssetFileStream
@@ -41,7 +43,7 @@ public:
 	}
 
 	tjs_uint TJS_INTF_METHOD Read(void *buffer, tjs_uint read_size) {
-		return AAsset_read( assets_, buffer, read_size );
+		return AAsset_read( asset_, buffer, read_size );
 	}
 	tjs_uint TJS_INTF_METHOD Write(const void *buffer, tjs_uint write_size) {
 		// cannot write to asset
@@ -104,7 +106,7 @@ public:
 		if(name.IsEmpty()) return false;
 		ttstr _name(name);
 		GetLocalName(_name);
-		AAsset* asset = AAssetManager_open( Application->getAssetManager(), localname.AsNarrowStdString().c_str(), AASSET_MODE_UNKNOWN);
+		AAsset* asset = AAssetManager_open( Application->getAssetManager(), _name.AsNarrowStdString().c_str(), AASSET_MODE_UNKNOWN);
 		bool result = asset != NULL;
 		if( result ) {
 			AAsset_close( asset );
@@ -129,8 +131,9 @@ public:
 
 		AAssetDir* dir = AAssetManager_openDir( Application->getAssetManager(), name.AsNarrowStdString().c_str() );
 		if( dir ) {
+			const char* filename = nullptr;
 			do {
-				const char* filename = AAssetDir_getNextFileName( dir );
+				filename = AAssetDir_getNextFileName( dir );
 				if( filename ) {
 					ttstr file( filename );
 					tjs_char *p = file.Independ();
@@ -198,7 +201,7 @@ class AssetCache {
 			files_.insert( std::map<std::string,AssetDirectory*>::value_type( name, dir ) );
 		}
 		AssetDirectory* getFile( const std::string& name ) {
-			std::map<std::string,AssetDirectory*>::iterator i = files_.find( const KEY_TYPE &key );
+			std::map<std::string,AssetDirectory*>::iterator i = files_.find( name );
 			if( i != files_.end() ) {
 				return (*i).second;
 			} else {
@@ -218,8 +221,9 @@ public:
 		}
 	}
 	void searchDir( AAssetManager* mgr, AAssetDir* dir, AssetDirectory& current, const std::string& base ) {
+		const char* filename = nullptr;
 		do {
-			const char* filename = AAssetDir_getNextFileName( dir );
+			filename = AAssetDir_getNextFileName( dir );
 			if( filename ) {
 				std::string curfile(filename);
 				std::string path( base + curfile );

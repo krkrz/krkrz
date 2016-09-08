@@ -15,7 +15,6 @@
 #include "ScriptMgnIntf.h"
 #include "PluginImpl.h"
 #include "StorageImpl.h"
-#include "GraphicsLoaderImpl.h"
 
 #include "MsgImpl.h"
 #include "SysInitIntf.h"

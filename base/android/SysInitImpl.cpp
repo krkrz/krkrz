@@ -28,17 +28,11 @@
 #include "XP3Archive.h"
 #include "ScriptMgnIntf.h"
 #include "XP3Archive.h"
-#include "VersionFormUnit.h"
-#include "EmergencyExit.h"
-
-//#include "tvpgl_ia32_intf.h"
-
 #include "BinaryStream.h"
 #include "Application.h"
 #include "Exception.h"
 #include "ApplicationSpecialPath.h"
-#include "resource.h"
-#include "ConfigFormUnit.h"
+
 
 
 //---------------------------------------------------------------------------

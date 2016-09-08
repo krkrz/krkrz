@@ -107,9 +107,16 @@ $(LOCAL_PATH)/base/SystemIntf.cpp \
 $(LOCAL_PATH)/base/TextStream.cpp \
 $(LOCAL_PATH)/base/UtilStreams.cpp \
 $(LOCAL_PATH)/base/XP3Archive.cpp \
+$(LOCAL_PATH)/base/android/AssetMedia.cpp \
+$(LOCAL_PATH)/base/android/EventImpl.cpp \
 $(LOCAL_PATH)/base/android/SystemImpl.cpp \
 $(LOCAL_PATH)/base/android/NativeEventQueue.cpp \
+$(LOCAL_PATH)/base/android/PluginImpl.cpp \
+$(LOCAL_PATH)/base/android/StorageImpl.cpp \
+$(LOCAL_PATH)/base/android/SysInitImpl.cpp \
+$(LOCAL_PATH)/base/android/SystemImple.cpp \
 $(LOCAL_PATH)/environ/android/Application.cpp \
+$(LOCAL_PATH)/environ/android/DetectCPU.cpp \
 $(LOCAL_PATH)/environ/android/TVPScreen.cpp \
 $(LOCAL_PATH)/environ/android/SystemControl.cpp \
 $(LOCAL_PATH)/extension/Extension.cpp \
@@ -170,6 +177,8 @@ $(LOCAL_PATH)/visual/WindowIntf.cpp \
 $(LOCAL_PATH)/visual/android/BitmapBitsAlloc.cpp \
 $(LOCAL_PATH)/visual/android/BitmapInfomation.cpp \
 $(LOCAL_PATH)/visual/android/LayerImpl.cpp \
+$(LOCAL_PATH)/visual/android/VideoOvlImpl.cpp \
+$(LOCAL_PATH)/visual/android/WindowForm.cpp \
 $(LOCAL_PATH)/visual/android/WindowImpl.cpp
 
 ifneq ($(filter $(TARGET_ARCH_ABI), x86_64 x86),)

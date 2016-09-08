@@ -4,6 +4,23 @@
 
 #include "TouchPoint.h"
 #include "VelocityTracker.h"
+#include "tvpinputdefs.h"
+#include "WindowIntf.h"
+
+#ifndef MK_ALT 
+#define MK_ALT (0x20)
+#endif
+
+enum {
+	 ssShift = TVP_SS_SHIFT,
+	 ssAlt = TVP_SS_ALT,
+	 ssCtrl = TVP_SS_CTRL,
+	 ssLeft = TVP_SS_LEFT,
+	 ssRight = TVP_SS_RIGHT,
+	 ssMiddle = TVP_SS_MIDDLE,
+	 ssDouble = TVP_SS_DOUBLE,
+	 ssRepeat = TVP_SS_REPEAT,
+};
 
 enum {
 	orientUnknown,
@@ -29,7 +46,7 @@ class TTVPWindowForm : public TouchHandler {
 	VelocityTracker MouseVelocityTracker;
 
 public:
-	TTVPWindowForm( class tTVPApplication* app, tTJSNI_Window* ni );
+	TTVPWindowForm( class tTVPApplication* app, class tTJSNI_Window* ni );
 	virtual ~TTVPWindowForm();
 
 	// Windowが有効かどうか、無効だとイベントが配信されない
@@ -59,28 +76,28 @@ public:
 	void SetPaintBoxSize(tjs_int w, tjs_int h);
 
 	// マウスカーソル
-	void SetDefaultMouseCursor();
-	void SetMouseCursor(tjs_int handle);
-	void HideMouseCursor();
-	void SetMouseCursorState(tTVPMouseCursorState mcs);
-	tTVPMouseCursorState GetMouseCursorState() const;
+	void SetDefaultMouseCursor() {}
+	void SetMouseCursor(tjs_int handle) {}
+	void HideMouseCursor() {}
+	void SetMouseCursorState(tTVPMouseCursorState mcs) {}
+	tTVPMouseCursorState GetMouseCursorState() const { return mcsHidden; }
 
-	// マウスカーソル座標はLayer.cursorX/cursorYで得られるようになっているが、タッチスクリーンだと無意味なので使えなくなる
-	void GetCursorPos(tjs_int &x, tjs_int &y);
-	void SetCursorPos(tjs_int x, tjs_int y);
+	// マウスカーソル座標はLayer.cursorX/cursorYで得られるようになっているが、タッチスクリーンだと無意味なので使えなくなる(最後のタッチ座標を記憶して置いた方がよいか？)
+	void GetCursorPos(tjs_int &x, tjs_int &y) { x = 0; y = 0;}
+	void SetCursorPos(tjs_int x, tjs_int y) {}
 
-	// ヒント表示(Androidでは無効か)
-	void SetHintText(iTJSDispatch2* sender, const ttstr &text);
-	void SetHintDelay( tjs_int delay );
-	tjs_int GetHintDelay() const;
+	// ヒント表示(マウスオーバー出来ないのでAndroidでは無効)
+	void SetHintText(iTJSDispatch2* sender, const ttstr &text) {}
+	void SetHintDelay( tjs_int delay ) {}
+	tjs_int GetHintDelay() const { return 0; }
 
 	// IME 入力関係、EditViewを最前面に貼り付けて、そこで入力させるのが現実的かな、好きな位置に表示は画面狭いとあまり現実的じゃないかも
 	// 入力タイトルを指定して、入力受付、確定文字が返ってくるスタイルの方がいいか、モーダルにはならないから、確定後イベント通知かな
-	void SetAttentionPoint(tjs_int left, tjs_int top, const struct tTVPFont * font );
-	void DisableAttentionPoint();
-	void SetImeMode(tTVPImeMode mode);
-	tTVPImeMode GetDefaultImeMode() const;
-	void ResetImeMode();
+	void SetAttentionPoint(tjs_int left, tjs_int top, const struct tTVPFont * font ) {}
+	void DisableAttentionPoint() {}
+	void SetImeMode(tTVPImeMode mode) {}
+	tTVPImeMode GetDefaultImeMode() const { return imDisable; }
+	void ResetImeMode() {}
 
 	// Windowハンドル系メソッドはすべて不要
 	// VideoOverlay で SetMessageDrainWindow に渡す Window ハンドル
@@ -103,7 +120,7 @@ public:
 	void UpdateWindow(tTVPUpdateType type = utNormal);
 
 	// 表示/非表示
-	bool GetVisible() const;
+	bool GetVisible() const { return true; }
 	void SetVisibleFromScript(bool b);
 	void ShowWindowAsModal();
 
@@ -126,16 +143,16 @@ public:
 	int GetHeight() const;
 	void SetSize( int w, int h );
 	// 最小、最大サイズ関係、Androidなどリサイズがないとしたら無効か
-	void SetMinWidth( int v );
-	int GetMinWidth() const;
-	void SetMinHeight( int v );
-	int GetMinHeight();
-	void SetMinSize( int w, int h );
-	void SetMaxWidth( int v );
-	int GetMaxWidth();
-	void SetMaxHeight( int v );
-	int GetMaxHeight();
-	void SetMaxSize( int w, int h );
+	void SetMinWidth( int v ) {}
+	int GetMinWidth() const { return 0; }
+	void SetMinHeight( int v ) {}
+	int GetMinHeight() { return 0; }
+	void SetMinSize( int w, int h ) {}
+	void SetMaxWidth( int v ) {}
+	int GetMaxWidth() { return 0; }
+	void SetMaxHeight( int v ) {}
+	int GetMaxHeight() { return 0; }
+	void SetMaxSize( int w, int h ) {}
 
 	// 内部のサイズ、実質的にこれが表示領域サイズ
 	void SetInnerWidth( int w );
@@ -145,35 +162,35 @@ public:
 	void SetInnerSize( int w, int h );
 
 	// 境界サイズ、無効
-	void SetBorderStyle( enum tTVPBorderStyle st);
-	enum tTVPBorderStyle GetBorderStyle() const;
+	void SetBorderStyle( enum tTVPBorderStyle st) {}
+	enum tTVPBorderStyle GetBorderStyle() const { return bsNone; }
 
 	// 常に最前面表示、無効
-	void SetStayOnTop( bool b );
-	bool GetStayOnTop() const;
+	void SetStayOnTop( bool b ) {}
+	bool GetStayOnTop() const { return true; }
 	// 最前面へ移動
-	void BringToFront();
+	void BringToFront() {}
 
 	// フルスクリーン、無効と言うか常に真
-	void SetFullScreenMode(bool b);
-	bool GetFullScreenMode() const;
+	void SetFullScreenMode(bool b) {}
+	bool GetFullScreenMode() const { return true; }
 
 	//マウスキー(キーボードでのマウスカーソル操作)は無効
-	void SetUseMouseKey(bool b);
-	bool GetUseMouseKey() const;
+	void SetUseMouseKey(bool b) {}
+	bool GetUseMouseKey() const { return false; }
 
 	// 他ウィンドウのキー入力をトラップするか、無効
-	void SetTrapKey(bool b);
-	bool GetTrapKey() const;
+	void SetTrapKey(bool b) {}
+	bool GetTrapKey() const { return false; }
 
 	// ウィンドウマスクリージョンは無効
 	//void SetMaskRegion(HRGN threshold);
-	void SetMaskRegion(void* threshold);
-	void RemoveMaskRegion();
+	void SetMaskRegion(void* threshold) {}
+	void RemoveMaskRegion() {}
 
 	// フォースは常に真
-	void SetFocusable(bool b);
-	bool GetFocusable() const;
+	void SetFocusable(bool b) {}
+	bool GetFocusable() const { return true; }
 
 	// 表示ズーム関係
 	void SetZoom(tjs_int numer, tjs_int denom, bool set_logical = true);
@@ -198,8 +215,8 @@ public:
 	}
 
 	// タッチ入力のマウスエミュレートON/OFF
-	void SetEnableTouch( bool b );
-	bool GetEnableTouch() const;
+	void SetEnableTouch( bool b ) {}
+	bool GetEnableTouch() const { return false; }
 
 	// タッチ、マウス加速度
 	bool GetTouchVelocity( tjs_int id, float& x, float& y, float& speed ) const {

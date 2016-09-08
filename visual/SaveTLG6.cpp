@@ -64,7 +64,7 @@ bool TVPAcceptSaveAsTLG(void* formatdata, const ttstr & type, class iTJSDispatch
 
 // golomb bit length table is compressed, so we need to
 // decompress it.
-char TVPTLG6GolombBitLengthTable[TVP_TLG6_GOLOMB_N_COUNT*2*128][TVP_TLG6_GOLOMB_N_COUNT];
+static char TVPTLG6GolombBitLengthTable[TVP_TLG6_GOLOMB_N_COUNT*2*128][TVP_TLG6_GOLOMB_N_COUNT];
 static bool TVPTLG6GolombTableInit = false;
 static short int TVPTLG6GolombCompressed[TVP_TLG6_GOLOMB_N_COUNT][9] = {
 		{3,7,15,27,63,108,223,448,130,},

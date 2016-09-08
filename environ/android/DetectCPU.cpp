@@ -28,6 +28,7 @@
 extern "C"
 {
 	tjs_uint32 TVPCPUType = 0; // CPU type
+	tjs_uint32 TVPCPUFeatures = 0;
 }
 
 static bool TVPCPUChecked = false;
@@ -43,7 +44,7 @@ static bool TVPCPUChecked = false;
 static void TVPGetCPUTypeForOne()
 {
 	AndroidCpuFamily family = android_getCpuFamily();
-	uint64_t features = android_getCpuFeatures;
+	uint64_t features = android_getCpuFeatures();
 	TVPCPUFeatures = static_cast<tjs_uint32>((features << 8) & 0xffffff00) | static_cast<tjs_uint32>(family);
 	if( family == TVP_CPU_FAMILY_X86 || family == TVP_CPU_FAMILY_X86_64 ) {
 		TVPCPUFeatures |= TVP_CPU_HAS_CMOV | TVP_CPU_HAS_MMX | TVP_CPU_HAS_SSE | TVP_CPU_HAS_SSE2;
@@ -222,7 +223,7 @@ void TVPDetectCPU()
 	bool succeeded = thread->GetSucceeded();
 	delete thread;
 	if(!succeeded) throw Exception(L"CPU check failure");
-	cpuinfo += TVPDumpCPUInfo(cpu) + TJS_W("\r\n");
+	cpuinfo += TVPDumpCPUInfo(0) + TJS_W("\r\n");
 	features =  (TVPCPUFeatures & TVP_CPU_FEATURE_MASK);
 	TVPCPUType = TVPCPUFeatures;
 
