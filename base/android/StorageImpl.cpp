@@ -23,10 +23,12 @@
 #include "Application.h"
 #include "StringUtil.h"
 #include "FilePathUtil.h"
+#include "TickCount.h"
 
 #ifndef _WIN32
 #include <sys/types.h>
 #include <dirent.h>
+#include <unistd.h>
 #endif
 
 //---------------------------------------------------------------------------
@@ -284,13 +286,13 @@ ttstr TVPGetTemporaryName()
 
 		if(!TVPTempPathInit)
 		{
-			wchar_t tmp[MAX_PATH+1];
-			::GetTempPath(MAX_PATH, tmp);
+			tjs_char tmp[MAX_PATH+1];
+			TVPUtf8ToWideCharString( Application->GetCachePath()->c_str(), static_cast<tjs_char*>(tmp) );
 			TVPTempPath = tmp;
 
 			if(TVPTempPath.GetLastChar() != TJS_W('\\')) TVPTempPath += TJS_W("\\");
-			TVPProcessID = (tjs_int) GetCurrentProcessId();
-			TVPTempUniqueNum = (tjs_int) GetTickCount();
+			TVPProcessID = static_cast<tjs_int>( getpid() );
+			TVPTempUniqueNum = static_cast<tjs_int>( TVPGetRoughTickCount32() );
 			TVPTempPathInit = true;
 		}
 		num = TVPTempUniqueNum ++;
@@ -318,7 +320,13 @@ ttstr TVPGetTemporaryName()
 //---------------------------------------------------------------------------
 bool TVPRemoveFile(const ttstr &name)
 {
-	return 0!=::DeleteFile(name.c_str());
+	std::string filename;
+	if( TVPUtf16ToUtf8( filename, name.AsStdString() ) ) {
+		return 0 == remove(filename.c_str());
+	} else {
+		return false;
+	}
+
 }
 //---------------------------------------------------------------------------
 
@@ -329,7 +337,12 @@ bool TVPRemoveFile(const ttstr &name)
 //---------------------------------------------------------------------------
 bool TVPRemoveFolder(const ttstr &name)
 {
-	return 0!=RemoveDirectory(name.c_str());
+	std::string filename;
+	if( TVPUtf16ToUtf8( filename, name.AsStdString() ) ) {
+		return 0==rmdir(filename.c_str());
+	} else {
+		return false;
+	}
 }
 //---------------------------------------------------------------------------
 
@@ -341,7 +354,7 @@ bool TVPRemoveFolder(const ttstr &name)
 //---------------------------------------------------------------------------
 ttstr TVPGetAppPath()
 {
-	static ttstr exepath(Application->getInternalDataPath(););
+	static ttstr exepath( Application->getInternalDataPath() );
 	return exepath;
 }
 //---------------------------------------------------------------------------
@@ -373,11 +386,15 @@ tTJSBinaryStream * TVPOpenStream(const ttstr & _name, tjs_uint32 flags)
 //---------------------------------------------------------------------------
 bool TVPCheckExistentLocalFile(const ttstr &name)
 {
-	tjs_uint32 attrib = ::GetFileAttributes(name.c_str());
-	if(attrib == 0xffffffff || (attrib & FILE_ATTRIBUTE_DIRECTORY))
-		return false; // not a file
-	else
-		return true; // a file
+	std::string filename;
+	if( TVPUtf16ToUtf8( filename, name.AsStdString() ) ) {
+		struct stat st;
+		if( stat( filename.c_str(), &st) == 0) {
+			if( S_ISREG(st.st_mode) )
+			return true;
+		}
+	}
+	return false;
 }
 //---------------------------------------------------------------------------
 
@@ -389,11 +406,15 @@ bool TVPCheckExistentLocalFile(const ttstr &name)
 //---------------------------------------------------------------------------
 bool TVPCheckExistentLocalFolder(const ttstr &name)
 {
-	tjs_uint32 attrib = GetFileAttributes(name.c_str());
-	if(attrib != 0xffffffff && (attrib & FILE_ATTRIBUTE_DIRECTORY))
-		return true; // a folder
-	else
-		return false; // not a folder
+	std::string filename;
+	if( TVPUtf16ToUtf8( filename, name.AsStdString() ) ) {
+		struct stat st;
+		if( stat( filename.c_str(), &st) == 0) {
+			if( S_ISDIR(st.st_mode) )
+			return true;
+		}
+	}
+	return false;
 }
 //---------------------------------------------------------------------------
 
@@ -465,8 +486,12 @@ static bool _TVPCreateFolders(const ttstr &folder)
 
 	if(!_TVPCreateFolders(parent)) return false;
 
-	BOOL res = ::CreateDirectory(folder.c_str(), NULL);
-	return 0!=res;
+	std::string filename;
+	int res = -1;
+	if( TVPUtf16ToUtf8( filename, folder.AsStdString() ) ) {
+		res = mkdir( filename.c_str(), 0777 );
+	}
+	return 0 == res;
 }
 
 bool TVPCreateFolders(const ttstr &folder)
@@ -500,20 +525,22 @@ tTVPLocalFileStream::tTVPLocalFileStream(const ttstr &origname,
 	switch(access)
 	{
 	case TJS_BS_READ:
-		rw = GENERIC_READ;					mode = "rb";		break;
+		mode = "rb";		break;
 	case TJS_BS_WRITE:
-		rw = GENERIC_WRITE;					mode = "wb";		break;
+		mode = "wb";		break;
 	case TJS_BS_APPEND:
-		rw = GENERIC_WRITE;					mode = "ab";			break;
+		mode = "ab";		break;
 	case TJS_BS_UPDATE:
-		rw = GENERIC_WRITE|GENERIC_READ;	mode = "rb+";		break;
+		mode = "rb+";		break;
 	}
 
 	tjs_int trycount = 0;
+	std::string filename;
+	TVPUtf16ToUtf8( filename, localname.AsStdString() );
 
 retry:
-	Handle = fopen( localname.c_str(), mode );
-	if(Handle == NULL)
+	Handle = fopen( filename.c_str(), mode );
+	if(Handle == nullptr)
 	{
 		if(trycount == 0 && access == TJS_BS_WRITE)
 		{
@@ -527,7 +554,7 @@ retry:
 	}
 
 	if(access == TJS_BS_APPEND) // move the file pointer to last
-		fseek(Handle, 0, NULL, FILE_END);
+		fseek(Handle, 0, nullptr, SEEK_END);
 
 	// push current tick as an environment noise
 	tjs_uint32 tick = TVPGetRoughTickCount32();
@@ -536,7 +563,7 @@ retry:
 //---------------------------------------------------------------------------
 tTVPLocalFileStream::~tTVPLocalFileStream()
 {
-	if(Handle!=NULL) fclose(Handle);
+	if(Handle!=nullptr) fclose(Handle);
 
 	// push current tick as an environment noise
 	// (timing information from file accesses may be good noises)
@@ -584,7 +611,7 @@ tjs_uint64 TJS_INTF_METHOD tTVPLocalFileStream::GetSize()
 {
 	tjs_uint64 ret;
 	struct stat stbuf;
-	if( fstat(Handle, &stbuf) ) {
+	if( stat(Handle, &stbuf) != 0 ) {
 		TVPThrowExceptionMessage(TVPSeekError);
 	}
 	ret = stbuf.st_size;
@@ -599,41 +626,14 @@ tjs_uint64 TJS_INTF_METHOD tTVPLocalFileStream::GetSize()
 // tTVPPluginHolder
 //---------------------------------------------------------------------------
 tTVPPluginHolder::tTVPPluginHolder(const ttstr &aname)
+: LocalTempStorageHolder(nullptr)
 {
-	LocalTempStorageHolder = NULL;
-
-	// search in TVP storage system
-	ttstr place(TVPGetPlacedPath(aname));
-	if(!place.IsEmpty())
-	{
-		LocalTempStorageHolder = new tTVPLocalTempStorageHolder(place);
-	}
-	else
-	{
-		// not found in TVP storage system; search exepath, exepath\system, exepath\plugin
-		ttstr exepath =
-			IncludeTrailingBackslash(ExtractFileDir(ExePath()));
-		ttstr pname = exepath + aname;
-		if(TVPCheckExistentLocalFile(pname))
-		{
-			LocalName = pname;
-			return;
-		}
-
-		pname = exepath + TJS_W("system\\") + aname;
-		if(TVPCheckExistentLocalFile(pname))
-		{
-			LocalName = pname;
-			return;
-		}
-
-		pname = exepath + TJS_W("plugin\\") + aname;
-		if(TVPCheckExistentLocalFile(pname))
-		{
-			LocalName = pname;
-			return;
-		}
-	}
+	// /data/data/(パッケージ名)/lib/
+	std::string filename;
+	TVPUtf16ToUtf8( filename, aname.AsStdString() );
+	std::string sopath = std::string("/data/data/") + Application->GetPackageName() + std::string("/lib/") + filename;
+	ttstr place( sopath.c_str() );
+	LocalTempStorageHolder = new tTVPLocalTempStorageHolder(place);
 }
 //---------------------------------------------------------------------------
 tTVPPluginHolder::~tTVPPluginHolder()
@@ -647,7 +647,7 @@ tTVPPluginHolder::~tTVPPluginHolder()
 const ttstr & tTVPPluginHolder::GetLocalName() const
 {
 	if(LocalTempStorageHolder) return LocalTempStorageHolder->GetLocalName();
-	return LocalName;
+	return ttstr();
 }
 //---------------------------------------------------------------------------
 

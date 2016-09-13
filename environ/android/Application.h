@@ -274,6 +274,8 @@ public:
 
 	const std::wstring& GetInternalDataPath() const { return internal_data_path_; }
 	const std::wstring& GetExternalDataPath() const { return external_data_path_; }
+	const std::string* GetCachePath() const { return nullptr; } // TODO キャッシュディレクトリを返すように実装する
+	const std::string GetPackageName() const { return std::string(); }
 
 	// for iTVPApplication
 	virtual void startApplication( struct android_app* state );
@@ -335,6 +337,7 @@ public:
 	 * メッセージポンプを回す
 	 */
 	void ProcessMessages() {}
+	void HandleMessage() {}
 };
 std::vector<std::string>* LoadLinesFromFile( const std::wstring& path );
 

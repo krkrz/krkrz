@@ -47,21 +47,10 @@ extern "C"
 	// V2 plug-in
 	typedef tjs_error (* tTVPV2LinkProc)(iTVPFunctionExporter *);
 	typedef tjs_error (* tTVPV2UnlinkProc)();
-
-#if 0
-	// TSS
-	typedef tjs_error (_stdcall * tTVPGetModuleInstanceProc)(ITSSModule **out, ITSSStorageProvider *provider, IStream * config, HWND mainwin);
-	typedef tjs_uint32 (_stdcall * tTVPGetModuleThreadModelProc)(void);
-	typedef tjs_error (_stdcall * tTVPShowConfigWindowProc)(HWND parentwin, IStream * storage );
-	typedef tjs_uint32 (_stdcall * tTVPCanUnloadNowProc)(void);
-#endif
 }
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-struct ITSSWaveDecoder;
-extern ITSSWaveDecoder * TVPSearchAvailTSSWaveDecoder(const ttstr & storage, const ttstr & extension);
-
 extern void TVPAddExportFunction(const tjs_char *name, void *ptr);
 extern void TVPAddExportFunction(const char *name, void *ptr);
 TJS_EXP_FUNC_DEF(void, TVPThrowPluginUnboundFunctionError, (const char *funcname));
@@ -133,8 +122,6 @@ typedef void (TJS_USERENTRY *tTVPFinallyBlockFunction)(void *data);
 
 TJS_EXP_FUNC_DEF(void, TVPDoTryBlock, (tTVPTryBlockFunction tryblock, tTVPCatchBlockFunction catchblock, tTVPFinallyBlockFunction finallyblock, void *data));
 
-
-TJS_EXP_FUNC_DEF(bool, TVPGetFileVersionOf, (const wchar_t* module_filename, tjs_int &major, tjs_int &minor, tjs_int &release, tjs_int &build));
 
 
 //---------------------------------------------------------------------------

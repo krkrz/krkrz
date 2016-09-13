@@ -28,21 +28,10 @@
 #include "FuncStubs.h"
 #include "tjs.h"
 
-#ifdef TVP_SUPPORT_OLD_WAVEUNPACKER
-	#include "oldwaveunpacker.h"
-#endif
-
-#pragma pack(push, 8)
-	///  tvpsnd.h needs packing size of 8
-	#include "tvpsnd.h"
-#pragma pack(pop)
-
-#ifdef TVP_SUPPORT_KPI
-	#include "kmp_pi.h"
-#endif
 
 #include "FilePathUtil.h"
 #include "Application.h"
+#include "CharacterSet.h"
 
 #include <dlfcn.h>
 //---------------------------------------------------------------------------
@@ -114,7 +103,7 @@ bool TJS_INTF_METHOD tTVPFunctionExporter::QueryFunctionsByNarrowString(
 	return ret;
 }
 //---------------------------------------------------------------------------
-extern "C" iTVPFunctionExporter * __stdcall TVPGetFunctionExporter()
+extern "C" iTVPFunctionExporter * TVPGetFunctionExporter()
 {
 	// for external applications
 	TVPInitExportFuncs();
@@ -136,147 +125,34 @@ void TVPThrowPluginUnboundFunctionError(const tjs_char *funcname)
 //---------------------------------------------------------------------------
 
 
-
-
-//---------------------------------------------------------------------------
-// implementation of IStorageProvider
-//---------------------------------------------------------------------------
-class tTVPStorageProvider : public ITSSStorageProvider
-{
-	HRESULT STDMETHODCALLTYPE QueryInterface(REFIID iid, void **ppvObjOut)
-	{
-		if(!ppvObjOut) return E_INVALIDARG;
-
-		*ppvObjOut = NULL;
-		if(!memcmp(&iid, &IID_IUnknown, 16))
-			*ppvObjOut = (IUnknown*)this;
-		else if(!memcmp(&iid, &IID_ITSSStorageProvider, 16))
-			*ppvObjOut = (ITSSStorageProvider*)this;
-
-		if(*ppvObjOut)
-		{
-			AddRef();
-			return S_OK;
-		}
-		return E_NOINTERFACE;
-	}
-
-	ULONG STDMETHODCALLTYPE AddRef(void) { return 1; }
-	ULONG STDMETHODCALLTYPE Release(void) { return 1; }
-
-	HRESULT __stdcall GetStreamForRead(
-		LPWSTR url,
-		IUnknown * *stream);
-
-	HRESULT __stdcall GetStreamForWrite(
-		LPWSTR url,
-		IUnknown * *stream) { return E_NOTIMPL; }
-
-	HRESULT __stdcall GetStreamForUpdate(
-		LPWSTR url,
-		IUnknown * *stream) { return E_NOTIMPL; }
-};
-//---------------------------------------------------------------------------
-HRESULT __stdcall tTVPStorageProvider::GetStreamForRead(
-		LPWSTR url,
-		IUnknown * *stream)
-{
-	tTJSBinaryStream *stream0;
-	try
-	{
-		stream0 = TVPCreateStream(url);
-	}
-	catch(...)
-	{
-		return E_FAIL;
-	}
-
-	IUnknown *istream = (IUnknown*)(IStream*)new tTVPIStreamAdapter(stream0);
-	*stream = istream;
-
-	return S_OK;
-}
-//---------------------------------------------------------------------------
-
-
-
 //---------------------------------------------------------------------------
 // Plug-ins management
 //---------------------------------------------------------------------------
 struct tTVPPlugin
 {
 	ttstr Name;
-	void *Instance;
+	void *Instance = nullptr;
 
-	tTVPPluginHolder *Holder;
+	tTVPPluginHolder *Holder = nullptr;
 
-	bool IsSusiePicturePlugin; // Susie picture plugins are managed in GraphicsLoaderImpl.cpp
-	bool IsSusieArchivePlugin; // Susie archive plugins are managed in SusieArchive.cpp
+	tTVPV2LinkProc V2Link = nullptr;
+	tTVPV2UnlinkProc V2Unlink = nullptr;
 
-	ITSSModule *TSSModule;
-
-#ifdef TVP_SUPPORT_KPI
-	KMPMODULE *KMPModule;
-#endif
-
-	tTVPV2LinkProc V2Link;
-	tTVPV2UnlinkProc V2Unlink;
-
-
-	tTVPGetModuleInstanceProc GetModuleInstance;
-	tTVPGetModuleThreadModelProc GetModuleThreadModel;
-	tTVPShowConfigWindowProc ShowConfigWindow;
-	tTVPCanUnloadNowProc CanUnloadNow;
-#ifdef TVP_SUPPORT_OLD_WAVEUNPACKER
-	tTVPCreateWaveUnpackerProc CreateWaveUnpacker;
-#endif
-
-#ifdef TVP_SUPPORT_KPI
-	pfnGetKMPModule GetKMPModule;
-#endif
-
-	std::vector<ttstr> SupportedExts;
-
-	tTVPPlugin(const ttstr & name, ITSSStorageProvider *storageprovider);
+	tTVPPlugin(const ttstr & name);
 	~tTVPPlugin();
 
 	bool Uninit();
 };
 //---------------------------------------------------------------------------
-tTVPPlugin::tTVPPlugin(const ttstr & name, ITSSStorageProvider *storageprovider)
+tTVPPlugin::tTVPPlugin(const ttstr & name) : Name(name)
 {
-	Name = name;
-
-	Instance = NULL;
-	Holder = NULL;
-	IsSusiePicturePlugin = false;
-	IsSusieArchivePlugin = false;
-	TSSModule = NULL;
-
-#ifdef TVP_SUPPORT_KPI
-	KMPModule = NULL;
-#endif
-
-	V2Link = NULL;
-	V2Unlink = NULL;
-
-	GetModuleInstance = NULL;
-	GetModuleThreadModel = NULL;
-	ShowConfigWindow = NULL;
-	CanUnloadNow = NULL;
-
-#ifdef TVP_SUPPORT_OLD_WAVEUNPACKER
-	CreateWaveUnpacker = NULL;
-#endif
-
-#ifdef TVP_SUPPORT_KPI
-	GetKMPModule = NULL;
-#endif
-
-	// load DLL
+	// load shared library
 	Holder = new tTVPPluginHolder(name);
-	Instance = LoadLibrary(Holder->GetLocalName().AsStdString().c_str());
-	Instance = dlopen( Holder->GetLocalName().AsStdString().c_str(), RTLD_NOW|RTLD_LOCAL );
+	std::string filename;
+	if( TVPUtf16ToUtf8( filename, Holder->GetLocalName().AsStdString() ) )
+	{
+		Instance = dlopen( filename.c_str(), RTLD_NOW|RTLD_LOCAL );
+	}
 	if(!Instance)
 	{
 		delete Holder;
@@ -287,88 +163,16 @@ tTVPPlugin::tTVPPlugin(const ttstr & name, ITSSStorageProvider *storageprovider)
 	{
 		// retrieve each functions
 		V2Link = (tTVPV2LinkProc)dlsym(Instance, "V2Link");
-		char *errmes = dlerror();
+		//const char *errmes = dlerror();
 
 		V2Unlink = (tTVPV2UnlinkProc)dlsym(Instance, "V2Unlink");
-		*errmes = dlerror();
-
-		GetModuleInstance = (tTVPGetModuleInstanceProc)dlsym(Instance, "GetModuleInstance");
-		*errmes = dlerror();
-		GetModuleThreadModel = (tTVPGetModuleThreadModelProc)dlsym(Instance, "GetModuleThreadModel");
-		*errmes = dlerror();
-		ShowConfigWindow = (tTVPShowConfigWindowProc)dlsym(Instance, "ShowConfigWindow");
-		*errmes = dlerror();
-		CanUnloadNow = (tTVPCanUnloadNowProc)dlsym(Instance, "CanUnloadNow");
-		*errmes = dlerror();
-#ifdef TVP_SUPPORT_OLD_WAVEUNPACKER
-		CreateWaveUnpacker = (tTVPCreateWaveUnpackerProc)dlsym(Instance, "CreateWaveUnpacker");
-		*errmes = dlerror();
-#endif
-
-#ifdef TVP_SUPPORT_KPI
-		GetKMPModule = (pfnGetKMPModule)dlsym(Instance, SZ_KMP_GETMODULE);
-		*errmes = dlerror();
-#endif
+		//*errmes = dlerror();
 
 		// link
 		if(V2Link)
 		{
 			V2Link(TVPGetFunctionExporter());
 		}
-#if 0
-		// retrieve ModuleInstance
-		// Susie Plug-in check
-		if(GetProcAddress(Instance, "GetPicture"))
-		{
-			IsSusiePicturePlugin = true;
-			TVPLoadPictureSPI(Instance);
-			return;
-		}
-		if(GetProcAddress(Instance, "GetFile"))
-		{
-			IsSusieArchivePlugin = true;
-			TVPLoadArchiveSPI(Instance);
-			return;
-		}
-#endif
-		if(GetModuleInstance)
-		{
-			HRESULT hr = GetModuleInstance(&TSSModule, storageprovider, NULL, Application->GetHandle());
-			if(FAILED(hr) || TSSModule == NULL)
-				TVPThrowExceptionMessage(TVPCannotLoadPlugin, name);
-
-			// get supported extensions
-			unsigned long index = 0;
-			while(true)
-			{
-				wchar_t mediashortname[33];
-				wchar_t buf[256];
-				HRESULT hr = TSSModule->GetSupportExts(index,
-					mediashortname, buf, 255);
-				if(hr == S_OK)
-					SupportedExts.push_back(ttstr(buf).AsLowerCase());
-				else
-					break;
-				index ++;
-			}
-		}
-
-
-#ifdef TVP_SUPPORT_KPI
-		// retrieve KbMediaPlayer Plug-in module instance
-		if(GetKMPModule)
-		{
-			KMPModule = GetKMPModule();
-			if(KMPModule->dwVersion != 100)
-				TVPThrowExceptionMessage(TVPCannotLoadPlugin, name +
-					TJS_W(" (invalid version)"));
-			if(!KMPModule->dwReentrant)
-				TVPThrowExceptionMessage(TVPCannotLoadPlugin, name +
-					TJS_W(" (is not re-entrant)"));
-
-			if(KMPModule->Init) KMPModule->Init();
-		}
-#endif
 	}
 	catch(...)
 	{
@@ -389,14 +193,9 @@ bool tTVPPlugin::Uninit()
 
 	if(V2Unlink)
 	{
- 		if(FAILED(V2Unlink())) return false;
+ 		if(TJS_FAILED(V2Unlink())) return false;
 	}
-#ifdef TVP_SUPPORT_KPI
-	if(KMPModule) if(KMPModule->Deinit) KMPModule->Deinit();
-#endif
-	if(TSSModule) TSSModule->Release();
-	if(IsSusiePicturePlugin) TVPUnloadPictureSPI(Instance);
-	if(IsSusieArchivePlugin) TVPUnloadArchiveSPI(Instance);
+
 	dlclose(Instance);
 	delete Holder;
 	return true;
@@ -411,7 +210,6 @@ typedef std::vector<tTVPPlugin*> tTVPPluginVectorType;
 struct tTVPPluginVectorStruc
 {
 	tTVPPluginVectorType Vector;
-	tTVPStorageProvider StorageProvider;
 } static TVPPluginVector;
 static void TVPDestroyPluginVector(void)
 {
@@ -459,7 +257,7 @@ void TVPLoadPlugin(const ttstr & name)
 	try
 	{
 		TVPPluginLoading = true;
-		p = new tTVPPlugin(name, &TVPPluginVector.StorageProvider);
+		p = new tTVPPlugin(name);
 		TVPPluginLoading = false;
 	}
 	catch(...)
@@ -491,257 +289,6 @@ bool TVPUnloadPlugin(const ttstr & name)
 	return false;
 }
 //---------------------------------------------------------------------------
-
-
-
-
-#if 0
-//---------------------------------------------------------------------------
-// plug-in autoload support
-//---------------------------------------------------------------------------
-struct tTVPFoundPlugin
-{
-	std::wstring Path;
-	std::wstring Name;
-	bool operator < (const tTVPFoundPlugin &rhs) const { return Name < rhs.Name; }
-};
-static tjs_int TVPAutoLoadPluginCount = 0;
-static void TVPSearchPluginsAt(std::vector<tTVPFoundPlugin> &list, std::wstring folder)
-{
-	WIN32_FIND_DATA ffd;
-	HANDLE handle = ::FindFirstFile((folder + L"*.tpm").c_str(), &ffd);
-	if(handle != INVALID_HANDLE_VALUE)
-	{
-		BOOL cont;
-		do
-		{
-			if(!(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
-			{
-				tTVPFoundPlugin fp;
-				fp.Path = folder;
-				fp.Name = ffd.cFileName;
-				list.push_back(fp);
-			}
-			cont = FindNextFile(handle, &ffd);
-		} while(cont);
-		FindClose(handle);
-	}
-}
-
-void TVPLoadPluigins(void)
-{
-	// This function searches plugins which have an extension of ".tpm"
-	// in the default path: 
-	//    1. a folder which holds kirikiri executable
-	//    2. "plugin" folder of it
-	// Plugin load order is to be decided using its name;
-	// aaa.tpm is to be loaded before aab.tpm (sorted by ASCII order)
-
-	// search plugins from path: (exepath), (exepath)\system, (exepath)\plugin
-	std::vector<tTVPFoundPlugin> list;
-
-	std::wstring exepath = IncludeTrailingBackslash(ExtractFileDir(ExePath()));
-
-	TVPSearchPluginsAt(list, exepath);
-	TVPSearchPluginsAt(list, exepath + L"system\\");
-	TVPSearchPluginsAt(list, exepath + L"plugin\\");
-
-	// sort by filename
-	std::sort(list.begin(), list.end());
-
-	// load each plugin
-	TVPAutoLoadPluginCount = (tjs_int)list.size();
-	for(std::vector<tTVPFoundPlugin>::iterator i = list.begin();
-		i != list.end();
-		i++)
-	{
-		TVPAddImportantLog(ttstr(TJS_W("(info) Loading ")) + ttstr(i->Name));
-		TVPLoadPlugin(i->Path + i->Name);
-	}
-}
-//---------------------------------------------------------------------------
-tjs_int TVPGetAutoLoadPluginCount() { return TVPAutoLoadPluginCount; }
-//---------------------------------------------------------------------------
-#endif
-
-
-
-
-
-//---------------------------------------------------------------------------
-// interface to Wave decode plugins
-//---------------------------------------------------------------------------
-ITSSWaveDecoder * TVPSearchAvailTSSWaveDecoder(const ttstr & storage, const ttstr & extension)
-{
-	tTVPPluginVectorType::iterator i;
-	for(i = TVPPluginVector.Vector.begin();
-		i != TVPPluginVector.Vector.end(); i++)
-	{
-		if((*i)->TSSModule)
-		{
-			// check whether the plugin supports extension
-			bool supported = false;
-			std::vector<ttstr>::iterator ei;
-			for(ei = (*i)->SupportedExts.begin(); ei != (*i)->SupportedExts.end(); ei++)
-			{
-				if(ei->GetLen() == 0) { supported = true; break; }
-				if(extension == *ei) { supported = true; break; }
-			}
-
-			if(!supported) continue;
-
-			// retrieve instance from (*i)->TSSModule
-			IUnknown *intf = NULL;
-			HRESULT hr = (*i)->TSSModule->GetMediaInstance(
-				(wchar_t*)storage.c_str(), &intf);
-			if(SUCCEEDED(hr))
-			{
-				try
-				{
-					// check  whether the instance has IID_ITSSWaveDecoder
-					// interface.
-					ITSSWaveDecoder * decoder;
-					if(SUCCEEDED(intf->QueryInterface(IID_ITSSWaveDecoder,
-						(void**) &decoder)))
-					{
-						intf->Release();
-						return decoder; // OK
-					}
-				}
-				catch(...)
-				{
-					intf->Release();
-					throw;
-				}
-				intf->Release();
-			}
-
-		}
-	}
-	return NULL; // not found
-}
-//---------------------------------------------------------------------------
-//---------------------------------------------------------------------------
-#ifdef TVP_SUPPORT_OLD_WAVEUNPACKER
-IWaveUnpacker * TVPSearchAvailWaveUnpacker(const ttstr & storage, IStream **stream)
-{
-	tTVPPluginVectorType::iterator i;
-	for(i = TVPPluginVector.Vector.begin();
-		i != TVPPluginVector.Vector.end(); i++)
-	{
-		if((*i)->CreateWaveUnpacker) break;
-	}
-	if(i == TVPPluginVector.Vector.end()) return NULL; // KPI not found
-
-	// retrieve IStream interface
-	AnsiString ansiname = storage.AsAnsiString();
-
-	tTJSBinaryStream *stream0 = NULL;
-	long size;
-	try
-	{
-		stream0 = TVPCreateStream(storage);
-		size = (long)stream0->GetSize();
-	}
-	catch(...)
-	{
-		if(stream0) delete stream0;
-		return NULL;
-	}
-
-	IStream *istream = new tTVPIStreamAdapter(stream0);
-
-	try
-	{
-
-		for(i = TVPPluginVector.Vector.begin();
-			i != TVPPluginVector.Vector.end(); i++)
-		{
-			if((*i)->CreateWaveUnpacker)
-			{
-				// call CreateWaveUnpacker to retrieve decoder instance
-				IWaveUnpacker *out;
-				HRESULT hr = (*i)->CreateWaveUnpacker(istream, size,
-					ansiname.c_str(), &out);
-				if(SUCCEEDED(hr))
-				{
-					*stream = istream;
-					return out;
-				}
-			}
-		}
-	}
-	catch(...)
-	{
-		istream->Release();
-		return NULL;
-	}
-	istream->Release();
-	return NULL; // not found
-}
-#endif
-//---------------------------------------------------------------------------
-//---------------------------------------------------------------------------
-#ifdef TVP_SUPPORT_KPI
-void * TVPSearchAvailKMPWaveDecoder(const ttstr & storage, KMPMODULE ** module,
-	SOUNDINFO * info)
-{
-	tTVPPluginVectorType::iterator i;
-	for(i = TVPPluginVector.Vector.begin();
-		i != TVPPluginVector.Vector.end(); i++)
-	{
-		if((*i)->KMPModule) break;
-	}
-	if(i == TVPPluginVector.Vector.end()) return NULL; // KPI not found
-
-	AnsiString localname;
-
-	if(TJS_strchr(storage.c_str(), TVPArchiveDelimiter)) return NULL;
-		// in-archive storage is not supported
-
-	try
-	{
-		ttstr ln(TVPSearchPlacedPath(storage));
-		TVPGetLocalName(ln);
-		localname  = ln.AsAnsiString();
-	}
-	catch(...)
-	{
-		return NULL;
-	}
-
-	AnsiString ext = TVPExtractStorageExt(storage).AsAnsiString();
-
-	for(i = TVPPluginVector.Vector.begin();
-		i != TVPPluginVector.Vector.end(); i++)
-	{
-		if((*i)->KMPModule)
-		{
-			// search over available extensions
-			const char **module_ext = (*i)->KMPModule->ppszSupportExts;
-			while(*module_ext)
-			{
-				if(!strcmpi(ext.c_str(), *module_ext)) break;
-				module_ext ++;
-			}
-			if(!*module_ext) continue; // not found in this plug-in
-
-			*module = (*i)->KMPModule;
-			HKMP hkmp = (*i)->KMPModule->Open(localname.c_str(), info);
-			if(hkmp)
-				(*i)->KMPModule->SetPosition(hkmp, 0);
-					// rewind; some plug-ins crash when the initial rewind is
-					// not processed...
-			return hkmp;
-		}
-	}
-	return NULL; // not found
-}
-#endif
-//---------------------------------------------------------------------------
-
-
-
 
 
 //---------------------------------------------------------------------------
@@ -789,11 +336,6 @@ void TVP_md5_append(TVP_md5_state_t *pms, const tjs_uint8 *data, int nbytes)
 void TVP_md5_finish(TVP_md5_state_t *pms, tjs_uint8 *digest)
 {
 	md5_finish((md5_state_t*)pms, digest);
-}
-//---------------------------------------------------------------------------
-HWND TVPGetApplicationWindowHandle()
-{
-	return Application->GetHandle();
 }
 //---------------------------------------------------------------------------
 void TVPProcessApplicationMessages()
@@ -874,68 +416,6 @@ void TVPDoTryBlock(
 	if(finallyblock) finallyblock(data);
 }
 //---------------------------------------------------------------------------
-
-
-
-//---------------------------------------------------------------------------
-// TVPGetFileVersionOf
-//---------------------------------------------------------------------------
-bool TVPGetFileVersionOf(const wchar_t* module_filename, tjs_int &major, tjs_int &minor, tjs_int &release, tjs_int &build)
-{
-	// retrieve file version
-	major = minor = release = build = 0;
-
-	VS_FIXEDFILEINFO *FixedFileInfo;
-	BYTE *VersionInfo;
-	bool got = false;
-
-	UINT dum;
-	DWORD dum2;
-
-	wchar_t* filename = new wchar_t[TJS_strlen(module_filename) + 1];
-	try
-	{
-		TJS_strcpy(filename, module_filename);
-
-		DWORD size = ::GetFileVersionInfoSize (filename, &dum2);
-		if(size)
-		{
-			VersionInfo = new BYTE[size + 2];
-			try
-			{
-				if(::GetFileVersionInfo(filename, 0, size, (void*)VersionInfo))
-				{
-					if(::VerQueryValue((void*)VersionInfo, L"\\", (void**)(&FixedFileInfo),
-						&dum))
-					{
-						major   = FixedFileInfo->dwFileVersionMS >> 16;
-						minor   = FixedFileInfo->dwFileVersionMS & 0xffff;
-						release = FixedFileInfo->dwFileVersionLS >> 16;
-						build   = FixedFileInfo->dwFileVersionLS & 0xffff;
-						got = true;
-					}
-				}
-			}
-			catch(...)
-			{
-				delete [] VersionInfo;
-				throw;
-			}
-			delete [] VersionInfo;
-		}
-	}
-	catch(...)
-	{
-		delete [] filename;
-		throw;
-	}
-
-	delete [] filename;
-
-	return got;
-}
-//---------------------------------------------------------------------------
-
 
 
 //---------------------------------------------------------------------------

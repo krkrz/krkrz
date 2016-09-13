@@ -13,6 +13,7 @@
 //---------------------------------------------------------------------------
 #include "StorageIntf.h"
 #include "UtilStreams.h"
+#include <stdio.h>
 
 //---------------------------------------------------------------------------
 // tTVPLocalFileStream
@@ -20,7 +21,7 @@
 class tTVPLocalFileStream : public tTJSBinaryStream
 {
 private:
-	HANDLE Handle;
+	FILE* Handle;
 
 public:
 	tTVPLocalFileStream(const ttstr &origname, const ttstr & localname,
@@ -36,7 +37,7 @@ public:
 
 	tjs_uint64 TJS_INTF_METHOD GetSize();
 
-	HANDLE GetHandle() const { return Handle; }
+	FILE* GetHandle() const { return Handle; }
 };
 //---------------------------------------------------------------------------
 
@@ -64,7 +65,6 @@ TJS_EXP_FUNC_DEF(bool, TVPCreateFolders, (const ttstr &folder));
 class tTVPPluginHolder
 {
 private:
-	ttstr LocalName;
 	tTVPLocalTempStorageHolder * LocalTempStorageHolder;
 
 public:

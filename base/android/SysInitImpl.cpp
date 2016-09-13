@@ -13,6 +13,8 @@
 
 #include "FilePathUtil.h"
 #include <sys/sysinfo.h>
+#include <chrono>
+#include <thread>
 
 #include "SysInitImpl.h"
 #include "StorageIntf.h"
@@ -942,7 +944,7 @@ bool TVPCheckAbout(void)
 {
 	if(TVPGetCommandLine(TJS_W("-about")))
 	{
-		Sleep(600);
+		std::this_thread::sleep_for(std::chrono::microseconds(1));
 		tjs_char msg[80];
 		TJS_snprintf(msg, sizeof(msg)/sizeof(tjs_char), TVPInfoCpuClockRoughly, (int)TVPCPUClock);
 		TVPAddImportantLog(msg);
