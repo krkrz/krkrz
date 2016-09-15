@@ -34,7 +34,7 @@ public:
 	{
 		const char *p = (const char*)&val;
 		const char *plim = (const char*)&val + sizeof(T);
-		register tjs_uint32 ret = 0;
+		tjs_uint32 ret = 0;
 		while(p<plim)
 		{
 			ret += *p;
