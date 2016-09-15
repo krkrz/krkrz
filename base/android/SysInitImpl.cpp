@@ -34,6 +34,7 @@
 #include "Application.h"
 #include "Exception.h"
 #include "ApplicationSpecialPath.h"
+#include "TickCount.h"
 
 
 
@@ -43,6 +44,7 @@
 std::wstring TVPNativeProjectDir;
 std::wstring TVPNativeDataPath;
 bool TVPProjectDirSelected = false;
+extern tjs_real TVPCPUClock;
 //---------------------------------------------------------------------------
 
 
@@ -88,8 +90,8 @@ void TVPDumpHWException()
 static void TVPInitRandomGenerator()
 {
 	// initialize random generator
-	tjs_uint tick = GetTickCount();
-	TVPPushEnvironNoise(&tick, sizeof(DWORD));
+	tjs_uint32 tick = TVPGetRoughTickCount32();
+	TVPPushEnvironNoise(&tick, sizeof(tjs_uint32));
 	pid_t id = gettid(); // pthread
 	TVPPushEnvironNoise(&id, sizeof(id));
 }
@@ -110,7 +112,11 @@ void TVPInitializeBaseSystems()
 
 	// set default current directory
 	{
-		TVPSetCurrentDirectory( IncludeTrailingBackslash(ExtractFileDir(ExePath())) );
+		std::string filename;
+		std::wstring path( IncludeTrailingBackslash(ExtractFileDir(Application->GetExternalDataPath())) );
+		if( TVPUtf16ToUtf8( filename, path ) ) {
+			chdir( filename.c_str() );
+		}
 	}
 
 	// load message map file
@@ -182,9 +188,12 @@ void TVPBeforeSystemInit()
 		}
 	}
 
-	// ディレクトリチェック
-	// Assets からの読込み
-
+	// ディレクトリチェック - Android 版は以下の優先順位
+	// 1. Intent で指定されている場合は、そこから読み込む(Debugのみ)
+	// 2. assets/config.cf を読み、そこで指定されたフォルダから読み込む
+	// 3. assets/data.xp3 から読み込む
+	// 4. assets/startup.tjs から開始
+#if 0
 	wchar_t buf[MAX_PATH];
 	bool bufset = false;
 	bool nosel = false;
@@ -347,21 +356,19 @@ void TVPBeforeSystemInit()
 	{
 		TVPAddImportantLog( TVPFormatMessage(TVPInfoSelectedProjectDirectory, TVPProjectDir) );
 	}
+#endif
 }
 //---------------------------------------------------------------------------
 static void TVPDumpOptions();
 //---------------------------------------------------------------------------
 extern bool TVPEnableGlobalHeapCompaction;
 static bool TVPHighTimerPeriod = false;
-static UINT TVPTimeBeginPeriodRes = 0;
+static tjs_uint TVPTimeBeginPeriodRes = 0;
 //---------------------------------------------------------------------------
 void TVPAfterSystemInit()
 {
 	// ensure datapath directory
 	TVPEnsureDataPathDirectory();
-
-	// check CPU type
-	// TVPDetectCPU();
 
 	TVPAllocGraphicCacheOnHeap = false; // always false since beta 20
 
@@ -412,8 +419,6 @@ void TVPAfterSystemInit()
 	if(TVPTotalPhysMemory <= 64*1024*1024)
 		TVPSetFontCacheForLowMem();
 
-//	TVPGraphicCacheSystemLimit = 1*1024*1024; // DEBUG 
-
 
 	// check TVPGraphicSplitOperation option
 	if(TVPGetCommandLine(TJS_W("-gsplit"), &opt))
@@ -457,12 +462,12 @@ void TVPAfterSystemInit()
 	TVPDumpOptions();
 
 	// initilaize x86 graphic routines
-#ifndef WIN32	// CPUごとに準備した方が良い
+#ifdef _WIN32	// CPUごとに準備した方が良い
 	TVPGL_IA32_Init();
 #endif
 
 	// timer precision
-	UINT prectick = 1;
+	tjs_uint prectick = 1;
 	if(TVPGetCommandLine(TJS_W("-timerprec"), &opt))
 	{
 		ttstr str(opt);
@@ -724,6 +729,7 @@ void TVPEnsureDataPathDirectory()
 	}
 }
 //---------------------------------------------------------------------------
+#if 0	// Android 版ではコマンドラインは読まない
 static void PushAllCommandlineArguments()
 {
 	// store arguments given by commandline to "TVPProgramArguments"
@@ -761,6 +767,7 @@ static void PushAllCommandlineArguments()
 		}
 	}
 }
+#endif
 //---------------------------------------------------------------------------
 static void PushConfigFileOptions(const std::vector<std::string> * options)
 {
@@ -788,32 +795,36 @@ static void TVPInitProgramArgumentsAndDataPath(bool stop_after_datapath_got)
 		{
 			// read embedded options and default configuration file
 			options[0] = TVPGetEmbeddedOptions();
-			options[1] = TVPGetConfigFileOptions(ApplicationSpecialPath::GetConfigFileName(ExePath()));
+			options[1] = TVPGetConfigFileOptions( TJS_W("asset://config.cf") );
 
 			// at this point, we need to push all exsting known options
 			// to be able to see datapath
-			PushAllCommandlineArguments();
+			//PushAllCommandlineArguments();
 			PushConfigFileOptions(options[1]); // has more priority
 			PushConfigFileOptions(options[0]); // has lesser priority
 
 			// read datapath
+#if 0
 			tTJSVariant val;
 			std::wstring config_datapath;
 			if(TVPGetCommandLine(TJS_W("-datapath"), &val))
 				config_datapath = ((ttstr)val).AsStdString();
 			TVPNativeDataPath = ApplicationSpecialPath::GetDataPathDirectory(config_datapath, ExePath());
+#endif
+			TVPNativeDataPath = TJS_W("asset://");
 
 			if(stop_after_datapath_got) return;
 
 			// read per-user configuration file
-			options[2] = TVPGetConfigFileOptions(ApplicationSpecialPath::GetUserConfigFileName(config_datapath, ExePath()));
+			// TODO : ユーザー設定は SharedPreference から読み込むようにするのが望ましい
+			//options[2] = TVPGetConfigFileOptions(ApplicationSpecialPath::GetUserConfigFileName(config_datapath, ExePath()));
 
 			// push each options into option stock
 			// we need to clear TVPProgramArguments first because of the
 			// option priority order.
 			TVPProgramArguments.clear();
-			PushAllCommandlineArguments();
-			PushConfigFileOptions(options[2]); // has more priority
+			//PushAllCommandlineArguments();
+			//PushConfigFileOptions(options[2]); // has more priority
 			PushConfigFileOptions(options[1]); // has more priority
 			PushConfigFileOptions(options[0]); // has lesser priority
 		} catch(...) {
@@ -917,6 +928,7 @@ void TVPSetCommandLine(const tjs_char * name, const ttstr & value)
 //---------------------------------------------------------------------------
 // TVPCheckPrintDataPath
 //---------------------------------------------------------------------------
+#if 0 // Android 版では行わない
 bool TVPCheckPrintDataPath()
 {
 	// print current datapath to stdout, then exit
@@ -933,6 +945,7 @@ bool TVPCheckPrintDataPath()
 
 	return false;
 }
+#endif
 //---------------------------------------------------------------------------
 
 
@@ -940,6 +953,7 @@ bool TVPCheckPrintDataPath()
 //---------------------------------------------------------------------------
 // TVPCheckAbout
 //---------------------------------------------------------------------------
+#if 0
 bool TVPCheckAbout(void)
 {
 	if(TVPGetCommandLine(TJS_W("-about")))
@@ -955,6 +969,7 @@ bool TVPCheckAbout(void)
 
 	return false;
 }
+#endif
 //---------------------------------------------------------------------------
 
 
