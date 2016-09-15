@@ -66,6 +66,7 @@ class tTVPPluginHolder
 {
 private:
 	tTVPLocalTempStorageHolder * LocalTempStorageHolder;
+	ttstr LocalPath;
 
 public:
 	tTVPPluginHolder(const ttstr &aname);

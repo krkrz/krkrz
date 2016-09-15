@@ -1021,9 +1021,9 @@ static void TVPExecuteAsync( const std::wstring& progname)
 //---------------------------------------------------------------------------
 // TVPWaitWritePermit
 //---------------------------------------------------------------------------
+#if 0	// 使われていない？ Windows版でも使われていない
 static bool TVPWaitWritePermit(const std::wstring& fn)
 {
-#if 0
 	tjs_int timeout = 10; // 10/1 = 5 seconds
 	while(true)
 	{
@@ -1039,8 +1039,9 @@ static bool TVPWaitWritePermit(const std::wstring& fn)
 		timeout--;
 		if(timeout == 0) return false;
 	}
-#endif
+	return false;
 }
+#endif
 //---------------------------------------------------------------------------
 
 

@@ -240,8 +240,8 @@ void TVPPreNormalizeStorageName(ttstr &name)
 
 	if(namelen >= 2)
 	{
-		if((name[0] >= TJS_W('a') && name[0]<=TJS_W('z') ||
-			name[0] >= TJS_W('A') && name[0]<=TJS_W('Z') ) &&
+		if(((name[0] >= TJS_W('a') && name[0]<=TJS_W('z')) ||
+			(name[0] >= TJS_W('A') && name[0]<=TJS_W('Z'))) &&
 			name[1] == TJS_W(':'))
 		{
 			// Windows drive:path expression
@@ -255,8 +255,8 @@ void TVPPreNormalizeStorageName(ttstr &name)
 
 	if(namelen>=3)
 	{
-		if(name[0] == TJS_W('\\') && name[1] == TJS_W('\\') ||
-			name[0] == TJS_W('/') && name[1] == TJS_W('/'))
+		if( (name[0] == TJS_W('\\') && name[1] == TJS_W('\\')) ||
+			(name[0] == TJS_W('/') && name[1] == TJS_W('/')) )
 		{
 			// unc expression
 			name = ttstr(TJS_W("file:")) + name;
@@ -354,7 +354,7 @@ bool TVPRemoveFolder(const ttstr &name)
 //---------------------------------------------------------------------------
 ttstr TVPGetAppPath()
 {
-	static ttstr exepath( Application->getInternalDataPath() );
+	static ttstr exepath( Application->GetInternalDataPath() );
 	return exepath;
 }
 //---------------------------------------------------------------------------
@@ -554,7 +554,7 @@ retry:
 	}
 
 	if(access == TJS_BS_APPEND) // move the file pointer to last
-		fseek(Handle, 0, nullptr, SEEK_END);
+		fseek(Handle, 0, SEEK_END);
 
 	// push current tick as an environment noise
 	tjs_uint32 tick = TVPGetRoughTickCount32();
@@ -578,7 +578,7 @@ tjs_uint64 TJS_INTF_METHOD tTVPLocalFileStream::Seek(tjs_int64 offset, tjs_int w
 	{
 	case TJS_BS_SEEK_SET:	dwmm = SEEK_SET;	break;
 	case TJS_BS_SEEK_CUR:	dwmm = SEEK_CUR;	break;
-	case TJS_BS_SEEK_END:	dwmm = FILE_END;	break;
+	case TJS_BS_SEEK_END:	dwmm = SEEK_END;	break;
 	default:				dwmm = SEEK_SET;	break; // may be enough
 	}
 
@@ -611,7 +611,7 @@ tjs_uint64 TJS_INTF_METHOD tTVPLocalFileStream::GetSize()
 {
 	tjs_uint64 ret;
 	struct stat stbuf;
-	if( stat(Handle, &stbuf) != 0 ) {
+	if( fstat( fileno(Handle), &stbuf) != 0 ) {
 		TVPThrowExceptionMessage(TVPSeekError);
 	}
 	ret = stbuf.st_size;
@@ -647,7 +647,7 @@ tTVPPluginHolder::~tTVPPluginHolder()
 const ttstr & tTVPPluginHolder::GetLocalName() const
 {
 	if(LocalTempStorageHolder) return LocalTempStorageHolder->GetLocalName();
-	return ttstr();
+	return LocalPath;
 }
 //---------------------------------------------------------------------------
 
