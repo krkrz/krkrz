@@ -24,4 +24,4 @@ static inline tjs_uint fast_int_hypot(tjs_int lx, tjs_int ly) {
 	return length;
 }
 
-#endif __TVP_MATH_UTIL_H__
+#endif // __TVP_MATH_UTIL_H__
