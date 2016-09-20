@@ -20,6 +20,7 @@
 #include "TickCount.h"
 #include "ComplexRect.h"
 //#include "WindowImpl.h"
+#include "EventIntf.h"
 #include "SystemControl.h"
 //#include "DInputMgn.h"
 
@@ -32,7 +33,6 @@
 
 #define ANDROID_BUILDING_DISABLE
 
-#ifndef ANDROID_BUILDING_DISABLE
 //---------------------------------------------------------------------------
 static ttstr TVPAppTitle;
 static bool TVPAppTitleInit = false;
@@ -46,16 +46,14 @@ static bool TVPAppTitleInit = false;
 //---------------------------------------------------------------------------
 static void TVPShowSimpleMessageBox(const ttstr & text, const ttstr & caption)
 {
-	HWND hWnd = TVPGetModalWindowOwnerHandle();
-	if( hWnd == INVALID_HANDLE_VALUE ) {
-		hWnd = NULL;
-	}
-	::MessageBox( hWnd, text.AsStdString().c_str(), caption.AsStdString().c_str(), MB_OK|MB_ICONINFORMATION );
+	// ignore caption
+	Application->ShowToast( text.AsStdString().c_str() );
 }
 //---------------------------------------------------------------------------
 
 
 
+#ifndef ANDROID_BUILDING_DISABLE
 //---------------------------------------------------------------------------
 // TVPGetAsyncKeyState
 //---------------------------------------------------------------------------
@@ -100,7 +98,6 @@ bool TVPGetAsyncKeyState(tjs_uint keycode, bool getcurrent)
 //---------------------------------------------------------------------------
 ttstr TVPGetPlatformName()
 {
-	//static ttstr platform(TJS_W("Win32"));
 	static ttstr platform(TJS_W("Android"));
 	return platform;
 }
@@ -183,7 +180,7 @@ ttstr TVPGetPersonalPath()
 	return TVPGetAppPath();
 }
 //---------------------------------------------------------------------------
-
+#endif // ANDROID_BUILDING_DISABLE
 
 
 
@@ -192,22 +189,9 @@ ttstr TVPGetPersonalPath()
 //---------------------------------------------------------------------------
 ttstr TVPGetAppDataPath()
 {
-	// Retrieve application data directory;
-	// If this is not exist, returns application exe path.
-
-	ttstr path = TVPGetSpecialFolderPath(CSIDL_APPDATA);
-	
-	if(!path.IsEmpty())
-	{
-		path = TVPNormalizeStorageName(path);
-		if(path.GetLastChar() != TJS_W('/')) path += TJS_W('/');
-		return path;
-	}
-
-	return TVPGetAppPath();
+	return ttstr( Application->GetInternalDataPath().c_str() );
 }
 //---------------------------------------------------------------------------
-#endif // ANDROID_BUILDING_DISABLE
 
 
 
@@ -221,7 +205,7 @@ bool TVPCreateAppLock(const ttstr &lockname)
 }
 //---------------------------------------------------------------------------
 
-#ifndef ANDROID_BUILDING_DISABLE
+
 //---------------------------------------------------------------------------
 enum tTVPTouchDevice {
 	tdNone				= 0,
@@ -239,29 +223,11 @@ enum tTVPTouchDevice {
  **/
 static int TVPGetSupportTouchDevice()
 {
-	int result = 0;
-	tjs_int value = Application->getTouchscreen();
-	switch( value ) {
-	case ACONFIGURATION_TOUCHSCREEN_ANY:
-		result |= tdIntegratedTouch;
-		result |= tdMultiInput;
-		result |= tdDigitizerReady;
-		break;
-	case ACONFIGURATION_TOUCHSCREEN_NOTOUCH:
-		break;
-	case ACONFIGURATION_TOUCHSCREEN_STYLUS:
-		result |= tdIntegratedPen;
-		result |= tdDigitizerReady;
-		break;
-	case ACONFIGURATION_TOUCHSCREEN_FINGER:
-		result |= tdIntegratedTouch;
-		result |= tdMultiInput;
-		result |= tdDigitizerReady;
-		break;
-	}
-	return result;
+	// 常に組み込みタッチパネルを返す
+	return tdIntegratedTouch | tdMultiInput;
 }
 //---------------------------------------------------------------------------
+
 
 //---------------------------------------------------------------------------
 // System.onActivate and System.onDeactivate related
@@ -373,6 +339,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/getKeyState)
 }
 TJS_END_NATIVE_STATIC_METHOD_DECL_OUTER(/*object to register*/cls,
 	/*func. name*/getKeyState)
+#if 0
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/shellExecute)
 {
@@ -421,6 +388,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/readRegValue)
 }
 TJS_END_NATIVE_STATIC_METHOD_DECL_OUTER(/*object to register*/cls,
 	/*func. name*/readRegValue)
+#endif
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/getArgument)
 {
@@ -452,6 +420,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/setArgument)
 TJS_END_NATIVE_STATIC_METHOD_DECL_OUTER(/*object to register*/cls,
 	/*func. name*/setArgument)
 //----------------------------------------------------------------------
+#if 0
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/createAppLock)
 {
 	if(numparams < 1) return TJS_E_BADPARAMCOUNT;
@@ -475,11 +444,16 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/dumpHeap)
 }
 TJS_END_NATIVE_STATIC_METHOD_DECL_OUTER(/*object to register*/cls,
 	/*func. name*/dumpHeap)
+#endif
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/nullpo)
 {
 	// force make a null-po
+#ifdef __GNUC__
+	__builtin_trap();
+#else
 	*(int *)0  = 0;
+#endif
 
 	return TJS_S_OK;
 }
@@ -492,6 +466,7 @@ TJS_END_NATIVE_STATIC_METHOD_DECL_OUTER(/*object to register*/cls,
 //-- properties
 
 //----------------------------------------------------------------------
+#if 0
 TJS_BEGIN_NATIVE_PROP_DECL(exePath)
 {
 	TJS_BEGIN_NATIVE_PROP_GETTER
@@ -517,6 +492,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(personalPath)
 	TJS_DENY_NATIVE_PROP_SETTER
 }
 TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, personalPath)
+#endif
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_PROP_DECL(appDataPath)
 {
@@ -544,6 +520,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(dataPath)
 }
 TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, dataPath)
 //----------------------------------------------------------------------
+#if 0
 TJS_BEGIN_NATIVE_PROP_DECL(exeName)
 {
 	TJS_BEGIN_NATIVE_PROP_GETTER
@@ -557,6 +534,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(exeName)
 	TJS_DENY_NATIVE_PROP_SETTER
 }
 TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, exeName)
+#endif
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_PROP_DECL(title)
 {
@@ -681,4 +659,3 @@ TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, touchDevice)
 //---------------------------------------------------------------------------
 
 
-#endif // ANDROID_BUILDING_DISABLE

@@ -90,6 +90,14 @@ public:
 	void OnMultiTouch();
 
 	void OnDisplayRotate( tjs_int orientation, tjs_int rotate, tjs_int bpp, tjs_int hresolution, tjs_int vresolution );
+
+
+	static int GetWidth();
+	static int GetHeight();
+	static int GetDesktopLeft();
+	static int GetDesktopTop();
+	static int GetDesktopWidth();
+	static int GetDesktopHeight();
 };
 
 #endif // __TVP_SCREEN_H__

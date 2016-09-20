@@ -112,9 +112,9 @@ $(LOCAL_PATH)/base/android/EventImpl.cpp \
 $(LOCAL_PATH)/base/android/SystemImpl.cpp \
 $(LOCAL_PATH)/base/android/NativeEventQueue.cpp \
 $(LOCAL_PATH)/base/android/PluginImpl.cpp \
+$(LOCAL_PATH)/base/android/ScriptMgnImpl.cpp \
 $(LOCAL_PATH)/base/android/StorageImpl.cpp \
 $(LOCAL_PATH)/base/android/SysInitImpl.cpp \
-$(LOCAL_PATH)/base/android/SystemImpl.cpp \
 $(LOCAL_PATH)/environ/android/Application.cpp \
 $(LOCAL_PATH)/environ/android/DetectCPU.cpp \
 $(LOCAL_PATH)/environ/android/TVPScreen.cpp \

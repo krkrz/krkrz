@@ -48,6 +48,7 @@ public:
 	tjs_uint TJS_INTF_METHOD Write(const void *buffer, tjs_uint write_size) {
 		// cannot write to asset
 		TVPThrowExceptionMessage(TVPWriteError);
+		return 0;
 	}
 
 	void TJS_INTF_METHOD SetEndOfStorage() {
@@ -205,6 +206,7 @@ class AssetCache {
 			if( i != files_.end() ) {
 				return (*i).second;
 			} else {
+				return nullptr;
 			}
 		}
 		const std::string& getName() const { return name_; }

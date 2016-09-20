@@ -277,6 +277,9 @@ public:
 	const std::string* GetCachePath() const { return nullptr; } // TODO キャッシュディレクトリを返すように実装する
 	const std::string GetPackageName() const { return std::string(); }
 
+	bool GetActivating() const { return true; }	// TODO
+	void ShowToast( const tjs_char* text ) {}	// TODO
+
 	// for iTVPApplication
 	virtual void startApplication( struct android_app* state );
 
