@@ -279,6 +279,7 @@ public:
 
 	bool GetActivating() const { return true; }	// TODO
 	void ShowToast( const tjs_char* text ) {}	// TODO
+	const tTVPScreen& GetScreen() const { return screen_; }
 
 	// for iTVPApplication
 	virtual void startApplication( struct android_app* state );

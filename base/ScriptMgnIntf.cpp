@@ -851,7 +851,9 @@ void TVPShowScriptException(eTJSScriptError &e)
 							//_wsystem( exepath.c_str() );
 							arg = ttstr(str);
 							TVPAddLog( ttstr(TJS_W("(execute) "))+exepath+ttstr(TJS_W(" "))+arg);
+#if defined(WIN32)
 							TVPShellExecute( exepath, arg );
+#endif	// Android では Intent で他のアプリに送れるようにする方がよい
 						}
 					}
 				}

@@ -146,6 +146,7 @@ $(LOCAL_PATH)/utils/TimerImpl.cpp \
 $(LOCAL_PATH)/utils/TimerIntf.cpp \
 $(LOCAL_PATH)/utils/uni_cp932.cpp \
 $(LOCAL_PATH)/utils/VelocityTracker.cpp \
+$(LOCAL_PATH)/utils/android/ClipboardImpl.cpp \
 $(LOCAL_PATH)/utils/android/ThreadImpl.cpp \
 $(LOCAL_PATH)/visual/BitmapIntf.cpp \
 $(LOCAL_PATH)/visual/BitmapLayerTreeOwner.cpp \
