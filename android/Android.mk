@@ -181,7 +181,9 @@ $(LOCAL_PATH)/visual/android/LayerImpl.cpp \
 $(LOCAL_PATH)/visual/android/VideoOvlImpl.cpp \
 $(LOCAL_PATH)/visual/android/WindowForm.cpp \
 $(LOCAL_PATH)/visual/android/WindowImpl.cpp \
-$(LOCAL_PATH)/visual/gl/blend_function.cpp
+$(LOCAL_PATH)/visual/gl/blend_function.cpp \
+$(LOCAL_PATH)/visual/gl/ResampleImage.cpp \
+$(LOCAL_PATH)/visual/gl/WeightFunctor.cpp
 
 ifneq ($(filter $(TARGET_ARCH_ABI), x86_64 x86),)
 LOCAL_SRC_FILES += \

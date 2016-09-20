@@ -35,6 +35,7 @@ extern "C"
 #define TVP_CPU_HAS_MMX      0x00002000		// always support for android
 #define TVP_CPU_HAS_SSE      0x00004000		// always support for android
 #define TVP_CPU_HAS_SSE2     0x00008000		// always support for android
+#define TVP_CPU_HAS_AVX2     0x00010000		// not used on android
 
 #define TVP_CPU_HAS_ARM_ARMv7        (ANDROID_CPU_ARM_FEATURE_ARMv7 << 8)
 #define TVP_CPU_HAS_ARM_VFPv3        (ANDROID_CPU_ARM_FEATURE_VFPv3 << 8)

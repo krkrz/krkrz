@@ -17,7 +17,11 @@
 #include <cmath>
 #include <vector>
 
+#ifdef _WIN32
 #include "tvpgl_ia32_intf.h"
+#else
+#include "DetectCPU.h"
+#endif
 #include "DetectCPU.h"
 #include "LayerBitmapIntf.h"
 #include "LayerBitmapImpl.h"
@@ -297,7 +301,7 @@ static void AxisParamCalculateAxis( TParam& param, int srcstart, int srcend, int
 #else
 		param.weight_.reserve( length );
 #endif
-		TParam::weight_t* output = &param.weight_[0];
+		typename TParam::weight_t* output = &param.weight_[0];
 		for( int x = 0; x < dstlength; x++ ) {
 			float cx = (x+0.5f)*(float)srclength/(float)dstlength + srcstart;
 			int left = (int)std::floor(cx-rangex);
@@ -335,7 +339,7 @@ static void AxisParamCalculateAxis( TParam& param, int srcstart, int srcend, int
 #else
 		param.weight_.reserve( length );
 #endif
-		TParam::weight_t* output = &param.weight_[0];
+		typename TParam::weight_t* output = &param.weight_[0];
 		const float delta = (float)dstlength/(float)srclength; // 転送先座標での位置増分
 		for( int x = 0; x < dstlength; x++ ) {
 			float cx = (x+0.5f)*(float)srclength/(float)dstlength + srcstart;
