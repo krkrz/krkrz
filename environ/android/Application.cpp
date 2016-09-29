@@ -11,6 +11,7 @@
 #include <string>
 #include <unistd.h>
 #include <fcntl.h>
+#include <stdio.h>
 #include <android/sensor.h>
 #include <android/log.h>
 #include <android_native_app_glue.h>
@@ -22,6 +23,7 @@
 #include "DebugIntf.h"
 #include "TickCount.h"
 #include "NativeEventQueue.h"
+#include "CharacterSet.h"
 
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "krkrz", __VA_ARGS__))
 #define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "krkrz", __VA_ARGS__))
@@ -473,6 +475,23 @@ void tTVPApplication::OnTouchUp( float x, float y, float cx, float cy, int32_t i
 }
 
 
+std::vector<std::string>* LoadLinesFromFile( const std::wstring& path ) {
+	std::string npath;
+	if( TVPUtf16ToUtf8( npath, path ) == false ) {
+		return nullptr;
+	}
+	FILE *fp = fopen( npath.c_str(), "r");
+    if( fp == nullptr ) {
+		return nullptr;
+    }
+	char buff[1024];
+	std::vector<std::string>* ret = new std::vector<std::string>();
+    while( fgets(buff, 1024, fp) != nullptr ) {
+		ret->push_back( std::string(buff) );
+    }
+    fclose(fp);
+	return ret;
+}
 
 extern "C" {
 iTVPApplication* CreateApplication() {
@@ -484,4 +503,21 @@ void DestroyApplication( iTVPApplication* app ) {
 	Application = NULL;
 }
 };
+
+// /system/fonts/ フォントが置かれているフォルダ
+// 以下のXMLファイルを参照して、lang=ja のデフォルトフォントファイル名を取得する
+// /system/etc/fallback_fonts-ja.xml
+// /system/etc/fallback_fonts.xml
+// /system/etc/fonts.xml
+// /etc/fallback_fonts-ja.xml
+// /etc/fallback_fonts.xml
+// /etc/fonts.xml
+// TODO 上記から得たフォントファイルを開いて、フォント名を取得して返す、Androidではファイル名にしてしまった方がいいかもしれない
+const tjs_char *TVPGetDefaultFontName() {
+	return TJS_W("Noto Sans CJK");
+}
+// /system/fonts/ フォントが置かれているフォルダから取得するが、読み込んでリスト作るの少し時間かかりそう
+void TVPGetAllFontList( std::vector<std::wstring>& list ) {
+	list.clear();
+}
 

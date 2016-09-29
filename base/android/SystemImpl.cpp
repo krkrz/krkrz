@@ -128,6 +128,27 @@ ttstr TVPGetOSName()
 }
 //---------------------------------------------------------------------------
 
+//---------------------------------------------------------------------------
+// TVPGetOSBits
+//---------------------------------------------------------------------------
+tjs_int TVPGetOSBits()
+{
+	// TODO arm の定義で調べているが、OSから取得するAPIで得るのが好ましい。すぐには見つからなかったが方法を調べること
+#if defined(__ANDROID__) 
+#	if __ARM_ARCH >= 7
+#		if __ARM_32BIT_STATE
+			return 32;
+#		else
+			return 64;
+#		endif
+#	else
+		return 32;
+#	endif
+#else
+	return 32;
+#endif
+}
+//---------------------------------------------------------------------------
 
 #ifndef ANDROID_BUILDING_DISABLE
 //---------------------------------------------------------------------------
@@ -326,15 +347,8 @@ TJS_END_NATIVE_STATIC_METHOD_DECL_OUTER(/*object to register*/cls,
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/getKeyState)
 {
 	if(numparams < 1) return TJS_E_BADPARAMCOUNT;
-
-	tjs_uint code = (tjs_int)*param[0];
-
-	bool getcurrent = true;
-	if(numparams >= 2) getcurrent = 0!=(tjs_int)*param[1];
-
-	bool res = TVPGetAsyncKeyState(code, getcurrent);
-
-	if(result) *result = (tjs_int)res;
+	// always 0.
+	if(result) *result = (tjs_int)0;
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_STATIC_METHOD_DECL_OUTER(/*object to register*/cls,

@@ -29,9 +29,94 @@
 #include "ScriptMgnIntf.h"
 #include <cstdlib>
 #include <cmath>
+#include "StorageImpl.h"
 
 //---------------------------------------------------------------------------
 
+void tTVPGraphicHandlerType::Load( void* formatdata, void *callbackdata, tTVPGraphicSizeCallback sizecallback, tTVPGraphicScanLineCallback scanlinecallback,
+	tTVPMetaInfoPushCallback metainfopushcallback, tTJSBinaryStream *src, tjs_int32 keyidx, tTVPGraphicLoadMode mode)
+{
+	if( LoadHandler == NULL ) TVPThrowExceptionMessage(TVPUnknownGraphicFormat, TJS_W("unknown"));
+
+#ifdef _WIN32
+	if( IsPlugin )
+	{
+		tTVPIStreamAdapter *istream = new tTVPIStreamAdapter(src);
+		try {
+			LoadHandlerPlugin( formatdata, callbackdata, sizecallback, scanlinecallback, metainfopushcallback,
+				istream, keyidx, mode);
+		} catch(...) {
+			istream->ClearStream();
+			istream->Release();
+			throw;
+		}
+		istream->ClearStream();
+		istream->Release();
+	}
+	else
+#endif
+	{
+		LoadHandler( formatdata, callbackdata, sizecallback, scanlinecallback, metainfopushcallback,
+			src, keyidx, mode);
+	}
+}
+void tTVPGraphicHandlerType::Save( const ttstr & storagename, const ttstr & mode, const tTVPBaseBitmap* image, iTJSDispatch2* meta )
+{
+	if( SaveHandler == NULL ) TVPThrowExceptionMessage(TVPUnknownGraphicFormat, mode );
+
+	tTJSBinaryStream *stream = TVPCreateStream(TVPNormalizeStorageName(storagename), TJS_BS_WRITE);
+#ifdef _WIN32
+	if( IsPlugin )
+	{
+		tTVPIStreamAdapter *istream = new tTVPIStreamAdapter(stream);
+		try {
+			tjs_uint h = image->GetHeight();
+			tjs_uint w = image->GetWidth();
+			SaveHandlerPlugin( FormatData, (void*)image, istream, mode, w, h, tTVPBitmapScanLineCallbackForSave, meta );
+		} catch(...) {
+			istream->Release();
+			throw;
+		}
+		istream->Release();
+	}
+	else
+#endif
+	{
+		try {
+			SaveHandler( FormatData, stream, image, mode, meta );
+		} catch(...) {
+			delete stream;
+			throw;
+		}
+		delete stream;
+	}
+}
+void tTVPGraphicHandlerType::Header( tTJSBinaryStream *src, iTJSDispatch2** dic )
+{
+	if( HeaderHandler == NULL ) TVPThrowExceptionMessage(TVPUnknownGraphicFormat, TJS_W("unknown") );
+
+#ifdef _WIN32
+	if( IsPlugin )
+	{
+		tTVPIStreamAdapter *istream = new tTVPIStreamAdapter(src);
+		try {
+			HeaderHandlerPlugin( FormatData, istream, dic );
+		} catch(...) {
+			istream->ClearStream();
+			istream->Release();
+			throw;
+		}
+		istream->ClearStream();
+		istream->Release();
+	}
+	else
+#endif
+	{
+		HeaderHandler( FormatData, src, dic );
+	}
+}
+
+//---------------------------------------------------------------------------
 
 bool TVPAcceptSaveAsBMP( void* formatdata, const ttstr & type, class iTJSDispatch2** dic )
 {
@@ -86,8 +171,10 @@ public:
 			TJS_W(".tlg5"), TVPLoadTLG, TVPLoadHeaderTLG, TVPSaveAsTLG, TVPAcceptSaveAsTLG, NULL));
 		Handlers.push_back(tTVPGraphicHandlerType(
 			TJS_W(".tlg6"), TVPLoadTLG, TVPLoadHeaderTLG, TVPSaveAsTLG, TVPAcceptSaveAsTLG, NULL));
+#ifdef _WIN32
 		Handlers.push_back(tTVPGraphicHandlerType(
 			TJS_W(".jxr"), TVPLoadJXR, TVPLoadHeaderJXR, TVPSaveAsJXR, TVPAcceptSaveAsJXR, NULL));
+#endif
 		ReCreateHash();
 		Avail = true;
 	}

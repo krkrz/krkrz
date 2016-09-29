@@ -11,7 +11,6 @@
 #ifndef SystemImplH
 #define SystemImplH
 //---------------------------------------------------------------------------
-TJS_EXP_FUNC_DEF(bool, TVPGetAsyncKeyState, (tjs_uint keycode, bool getcurrent = true));
 //---------------------------------------------------------------------------
 extern void TVPPostApplicationActivateEvent();
 extern void TVPPostApplicationDeactivateEvent();

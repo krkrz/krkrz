@@ -10,8 +10,11 @@
 //---------------------------------------------------------------------------
 #include "tjsCommHead.h"
 
+#include <android/asset_manager.h>
 #include "MsgIntf.h"
 #include "MsgImpl.h"
+#include "Application.h"
+#include "CharacterSet.h"
 
 
 //---------------------------------------------------------------------------
@@ -33,29 +36,35 @@ void TVPGetVersion(void)
 		// TVPGetFileVersionOf(ExePath().c_str(), TVPVersionMajor, TVPVersionMinor, TVPVersionRelease, TVPVersionBuild);
 	}
 }
-#if 0
 //---------------------------------------------------------------------------
 // about string retrieving
 //---------------------------------------------------------------------------
 extern const tjs_char* TVPCompileDate;
 extern const tjs_char* TVPCompileTime;
 ttstr TVPReadAboutStringFromResource() {
-	HMODULE hModule = ::GetModuleHandle(NULL);
-	const char *buf = NULL;
-	unsigned int size = 0;
-	HRSRC hRsrc = ::FindResource(NULL, MAKEINTRESOURCE(IDR_LICENSE_TEXT), TEXT("TEXT"));
-	if( hRsrc != NULL ) {
-		size = ::SizeofResource( hModule, hRsrc );
-		HGLOBAL hGlobal = ::LoadResource( hModule, hRsrc );
-		if( hGlobal != NULL ) {
-			buf = reinterpret_cast<const char*>(::LockResource(hGlobal));
-		}
+	AAsset* asset = AAssetManager_open( Application->getAssetManager(), "license.txt", AASSET_MODE_RANDOM );
+	char *buf = nullptr;
+	if( asset == nullptr ) return ttstr(L"Resource Read Error.");
+
+	tjs_uint64 flen = AAsset_getLength64( asset );
+	buf = new char[flen];
+	if( buf == nullptr ) {
+		AAsset_close( asset );
+		return ttstr(L"Resource Read Error.");
 	}
-	if( buf == NULL ) ttstr(L"Resource Read Error.");
+	tjs_uint rsize = AAsset_read( asset, buf, flen );
+	AAsset_close( asset );
+	if( flen != rsize ) {
+		delete[] buf;
+		return ttstr(L"Resource Read Error.");
+	}
 
 	// UTF-8 to UTF-16
 	size_t len = TVPUtf8ToWideCharString( buf, NULL );
-	if( len < 0 ) return ttstr(L"Resource Read Error.");
+	if( len <= 0 ) {
+		delete[] buf;
+		return ttstr(L"Resource Read Error.");
+	}
 	wchar_t* tmp = new wchar_t[len+1];
 	ttstr ret;
 	if( tmp ) {
@@ -63,6 +72,7 @@ ttstr TVPReadAboutStringFromResource() {
 			len = TVPUtf8ToWideCharString( buf, tmp );
 		} catch(...) {
 			delete[] tmp;
+			delete[] buf;
 			throw;
 		}
 		tmp[len] = 0;
@@ -95,7 +105,8 @@ ttstr TVPReadAboutStringFromResource() {
 		ret = ttstr( &(tmp2[0]) );
 		delete[] tmp;
 	}
+	delete[] buf;
 	return ret;
 }
 
-#endif
+

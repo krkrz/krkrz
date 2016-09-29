@@ -26,6 +26,17 @@
 #include "UserEvent.h"
 #include "NativeEventQueue.h"
 
+static bool TVPDeferedSettingAvailable = false;
+//---------------------------------------------------------------------------
+void TVPWaveSoundBufferCommitSettings()
+{
+	// commit all defered sound buffer settings
+	if(TVPDeferedSettingAvailable)
+	{
+		TVPDeferedSettingAvailable = false;
+	}
+}
+//---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 // tTJSNI_WaveSoundBuffer
 //---------------------------------------------------------------------------

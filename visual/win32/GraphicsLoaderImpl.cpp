@@ -23,6 +23,8 @@
 #include "LayerBitmapIntf.h"
 #include "MsgIntf.h"
 
+#if 0
+// move to intf
 void tTVPGraphicHandlerType::Load( void* formatdata, void *callbackdata, tTVPGraphicSizeCallback sizecallback, tTVPGraphicScanLineCallback scanlinecallback,
 	tTVPMetaInfoPushCallback metainfopushcallback, tTJSBinaryStream *src, tjs_int32 keyidx, tTVPGraphicLoadMode mode)
 {
@@ -99,6 +101,7 @@ void tTVPGraphicHandlerType::Header( tTJSBinaryStream *src, iTJSDispatch2** dic 
 		HeaderHandler( FormatData, src, dic );
 	}
 }
+#endif
 /*
 	support of SPI for archive files is in StorageImpl.cpp
 */
