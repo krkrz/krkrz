@@ -1,27 +1,27 @@
 
-Šî–{“I‚É Android Studio ‚ðŽg—p‚µ‚½ Android ŠJ”­•û–@‚É]‚¤B
+åŸºæœ¬çš„ã« Android Studio ã‚’ä½¿ç”¨ã—ãŸ Android é–‹ç™ºæ–¹æ³•ã«å¾“ã†ã€‚
 https://developer.android.com/studio/index.html?hl=ja
 
-‰º‹L‚ÉƒZƒbƒgƒAƒbƒv•û–@‚ð‹L‚·‚ªAƒo[ƒWƒ‡ƒ“‚É‚æ‚Á‚ÄƒZƒbƒgƒAƒbƒv•û–@‚ÍˆÙ‚È‚é‚±‚Æ‚à‚ ‚é‚Ì‚ÅAÅVƒo[ƒWƒ‡ƒ“‚ÌƒZƒbƒgƒAƒbƒv•û–@‚ð’²‚×‚½•û‚ª‘‚¢‚©‚à‚µ‚ê‚È‚¢B
+ä¸‹è¨˜ã«ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—æ–¹æ³•ã‚’è¨˜ã™ãŒã€ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã«ã‚ˆã£ã¦ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—æ–¹æ³•ã¯ç•°ãªã‚‹ã“ã¨ã‚‚ã‚ã‚‹ã®ã§ã€æœ€æ–°ãƒãƒ¼ã‚¸ãƒ§ãƒ³ã®ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—æ–¹æ³•ã‚’èª¿ã¹ãŸæ–¹ãŒæ—©ã„ã‹ã‚‚ã—ã‚Œãªã„ã€‚
 
 
-yŠÂ‹«ƒZƒbƒgƒAƒbƒvz
-JDK 64bit ‚ÌÅV”Å‚ðƒ_ƒEƒ“ƒ[ƒh‚·‚éB
-ŠÂ‹«•Ï”‚É JAVA_HOME = C:\Program Files\Java\jdkx.x.x_xxx ‚È‚Ç‚ÆÝ’è‚·‚éB
-Android Studio ‚ðƒ_ƒEƒ“ƒ[ƒh‚µ‚ÄA‚»‚±‚©‚çŠeŽí SDKANDKAcmake “™‚Ìƒ_ƒEƒ“ƒ[ƒh‚ðs‚¤B
-Android Studio ‚ð‹N“®‚·‚ê‚ÎAŽ©“®“I‚ÉŠeŽíƒ_ƒEƒ“ƒ[ƒh‰æ–Ê‚ª•\Ž¦‚³‚ê‚éB
-ˆê•”AAndroid Studio ‚ðI—¹‚µ‚Ä SDK “à‚Ì SDK Manager.exe ‚ðŽg—p‚µ‚½ƒ_ƒEƒ“ƒ[ƒh‚ª•K—v‚È‚à‚Ì‚ª•\Ž¦‚³‚ê‚é‚±‚Æ‚à‚ ‚é‚Ì‚ÅA‚»‚ê‚É]‚¤B
-ŠÂ‹«•Ï” PATH ‚É sdk/ndk-bundle, sdk/platform-tools, sdk/tools ‚ðÝ’èB
+ã€ç’°å¢ƒã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—ã€‘
+JDK 64bit ã®æœ€æ–°ç‰ˆã‚’ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã™ã‚‹ã€‚
+ç’°å¢ƒå¤‰æ•°ã« JAVA_HOME = C:\Program Files\Java\jdkx.x.x_xxx ãªã©ã¨è¨­å®šã™ã‚‹ã€‚
+Android Studio ã‚’ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã—ã¦ã€ãã“ã‹ã‚‰å„ç¨® SDKã€NDKã€cmake ç­‰ã®ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã‚’è¡Œã†ã€‚
+Android Studio ã‚’èµ·å‹•ã™ã‚Œã°ã€è‡ªå‹•çš„ã«å„ç¨®ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ç”»é¢ãŒè¡¨ç¤ºã•ã‚Œã‚‹ã€‚
+ä¸€éƒ¨ã€Android Studio ã‚’çµ‚äº†ã—ã¦ SDK å†…ã® SDK Manager.exe ã‚’ä½¿ç”¨ã—ãŸãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ãŒå¿…è¦ãªã‚‚ã®ãŒè¡¨ç¤ºã•ã‚Œã‚‹ã“ã¨ã‚‚ã‚ã‚‹ã®ã§ã€ãã‚Œã«å¾“ã†ã€‚
+ç’°å¢ƒå¤‰æ•° PATH ã« sdk/ndk-bundle, sdk/platform-tools, sdk/tools ã‚’è¨­å®šã€‚
 
 
-yƒrƒ‹ƒhz
-Android Studio ‚ð‹N“®‚µ‚ÄAFile > Open ‚©‚ç krkrz/androidƒtƒHƒ‹ƒ_‚ð“Ç‚Ýž‚Ü‚¹‚éB
-“Ç‚Ýž‚ß‚ÎŽ©“®ƒrƒ‹ƒh‚ª‘–‚é‚ªAƒƒjƒ…[‚Ì Build > Make Project ‚Å make ‚à‰Â”\B
-ƒtƒHƒ‹ƒ_ˆÚ“®“™‚Å C++ ‚Ìƒrƒ‹ƒh(cmake)‚ªŽ¸”s‚·‚éê‡‚ÍAˆÈ‰º‚ÌƒLƒƒƒbƒVƒ…íœ‚ðs‚¤B
+ã€ãƒ“ãƒ«ãƒ‰ã€‘
+Android Studio ã‚’èµ·å‹•ã—ã¦ã€File > Open ã‹ã‚‰ krkrz/androidãƒ•ã‚©ãƒ«ãƒ€ã‚’èª­ã¿è¾¼ã¾ã›ã‚‹ã€‚
+èª­ã¿è¾¼ã‚ã°è‡ªå‹•ãƒ“ãƒ«ãƒ‰ãŒèµ°ã‚‹ãŒã€ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã® Build > Make Project ã§ make ã‚‚å¯èƒ½ã€‚
+ãƒ•ã‚©ãƒ«ãƒ€ç§»å‹•ç­‰ã§ C++ ã®ãƒ“ãƒ«ãƒ‰(cmake)ãŒå¤±æ•—ã™ã‚‹å ´åˆã¯ã€ä»¥ä¸‹ã®ã‚­ãƒ£ãƒƒã‚·ãƒ¥å‰Šé™¤ã‚’è¡Œã†ã€‚
 
 
-ycmakeƒLƒƒƒbƒVƒ…íœz
-cmake ‚ÌƒLƒƒƒbƒVƒ…‚Í android/app/.externalNativeBuild/cmake ˆÈ‰º‚Ì debug/release ‚ðíœ‚µ‚Ä‚µ‚Ü‚¦‚Îƒrƒ‹ƒhŽžŽ©“®¶¬‚³‚ê‚éB
-ƒtƒHƒ‹ƒ_ˆÚ“®‚È‚Ç‚µ‚½ê‡ƒLƒƒƒbƒVƒ…‚ðÁ‚·•K—v‚ª‚ ‚éB
+ã€cmakeã‚­ãƒ£ãƒƒã‚·ãƒ¥å‰Šé™¤ã€‘
+cmake ã®ã‚­ãƒ£ãƒƒã‚·ãƒ¥ã¯ android/app/.externalNativeBuild/cmake ä»¥ä¸‹ã® debug/release ã‚’å‰Šé™¤ã—ã¦ã—ã¾ãˆã°ãƒ“ãƒ«ãƒ‰æ™‚è‡ªå‹•ç”Ÿæˆã•ã‚Œã‚‹ã€‚
+ãƒ•ã‚©ãƒ«ãƒ€ç§»å‹•ãªã©ã—ãŸå ´åˆã‚­ãƒ£ãƒƒã‚·ãƒ¥ã‚’æ¶ˆã™å¿…è¦ãŒã‚ã‚‹ã€‚
 
 
