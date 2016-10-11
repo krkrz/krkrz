@@ -10,6 +10,7 @@
 //---------------------------------------------------------------------------
 
 #include "tjsCommHead.h"
+#include <string>
 
 #include "tjs.h"
 #include "tjsDebug.h"

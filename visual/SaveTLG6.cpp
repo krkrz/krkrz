@@ -86,7 +86,11 @@ void TVPTLG6InitGolombTable()
 				TVPTLG6GolombBitLengthTable[a++][n] = (char)i;
 		}
 		if(a != TVP_TLG6_GOLOMB_N_COUNT*2*128)
+#ifdef __GNUC__
+			__builtin_trap();
+#else
 			*(char*)0 = 0;   // THIS MUST NOT BE EXECUETED!
+#endif
 				// (this is for compressed table data check)
 	}
 	TVPTLG6GolombTableInit = true;

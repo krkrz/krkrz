@@ -42,6 +42,7 @@ TTVPWindowForm::~TTVPWindowForm() {
 
 	// Windowが有効かどうか、無効だとイベントが配信されない
 bool TTVPWindowForm::GetFormEnabled() {
+	return true;
 }
 
 // 閉じる
@@ -60,6 +61,7 @@ void TTVPWindowForm::TickBeat() {
 
 // アクティブ/デアクティブ化された時に、Windowがアクティブかどうかチェックされる
 bool TTVPWindowForm::GetWindowActive() {
+	return true;
 }
 
 // DrawDevice
@@ -108,22 +110,22 @@ void TTVPWindowForm::SetCaption( const std::wstring& v ) {
 // サイズや位置など
 // 位置はAndroidでは無効か、常に0を返し、設定もスルーなど
 void TTVPWindowForm::SetLeft( int l ) {}
-int TTVPWindowForm::GetLeft() const {}
+int TTVPWindowForm::GetLeft() const { return 0; };
 void TTVPWindowForm::SetTop( int t ) {}
-int TTVPWindowForm::GetTop() const {}
+int TTVPWindowForm::GetTop() const { return 0; }
 void TTVPWindowForm::SetPosition( int l, int t ) {}
 // サイズ
 void TTVPWindowForm::SetWidth( int w ) {}
-int TTVPWindowForm::GetWidth() const {}
+int TTVPWindowForm::GetWidth() const { return 0; }
 void TTVPWindowForm::SetHeight( int h ) {}
-int TTVPWindowForm::GetHeight() const {}
+int TTVPWindowForm::GetHeight() const { return 0; }
 void TTVPWindowForm::SetSize( int w, int h ) {}
 
 // 内部のサイズ、実質的にこれが表示領域サイズ
 void TTVPWindowForm::SetInnerWidth( int w ) {}
-int TTVPWindowForm::GetInnerWidth() const {}
+int TTVPWindowForm::GetInnerWidth() const { return 0; }
 void TTVPWindowForm::SetInnerHeight( int h ) {}
-int TTVPWindowForm::GetInnerHeight() const {}
+int TTVPWindowForm::GetInnerHeight() const { return 0; }
 void TTVPWindowForm::SetInnerSize( int w, int h ) {}
 
 // 表示ズーム関係
@@ -134,8 +136,8 @@ void TTVPWindowForm::SetZoomDenom(tjs_int d) {}
 tjs_int TTVPWindowForm::GetZoomDenom() const { return 1; }
 
 // 画面表示向き取得
-int TTVPWindowForm::GetDisplayOrientation() {}
-int TTVPWindowForm::GetDisplayRotate() {}
+int TTVPWindowForm::GetDisplayOrientation() { return orientUnknown; }
+int TTVPWindowForm::GetDisplayRotate() { return 0; }
 
 void TTVPWindowForm::OnTouchScaling( double startdist, double currentdist, double cx, double cy, int flag ) {}
 void TTVPWindowForm::OnTouchRotate( double startangle, double currentangle, double distance, double cx, double cy, int flag ) {}

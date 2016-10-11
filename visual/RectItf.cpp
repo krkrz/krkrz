@@ -331,7 +331,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(nativeArray)
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Rect);
-		*result = (tTVInteger)(tjs_uint)_this->Get().array;
+		*result = (tTVInteger)(tjs_intptr_t)_this->Get().array;
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_GETTER

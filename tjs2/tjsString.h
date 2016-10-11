@@ -18,6 +18,25 @@
 #endif
 #include "tjsVariantString.h"
 
+#ifdef ANDROID
+namespace std {
+	template<typename T>
+	wstring to_format_str( T value, const wchar_t* format ) {
+		wchar_t buff[128];
+		swprintf( buff, 128, format, value);
+		return wstring(buff);
+	}
+	inline wstring to_wstring( int value ) { return to_format_str( value, L"%d" ); }
+	inline wstring to_wstring( long value ) { return to_format_str( value, L"%ld" ); }
+	inline wstring to_wstring( long long value ) { return to_format_str( value, L"%lld" ); }
+	inline wstring to_wstring( unsigned value ) { return to_format_str( value, L"%u" ); }
+	inline wstring to_wstring( unsigned long value ) { return to_format_str( value, L"%lu" ); }
+	inline wstring to_wstring( unsigned long long value ) { return to_format_str( value, L"%llu" ); }
+	inline wstring to_wstring( float value ) { return to_format_str( value, L"%f" ); }
+	inline wstring to_wstring( double value ) { return to_format_str( value, L"%lf" ); }
+};
+#endif
+
 namespace TJS
 {
 /*[*/

@@ -10,7 +10,7 @@
 //---------------------------------------------------------------------------
 #include "tjsCommHead.h"
 
-
+#include <string>
 #include "FilePathUtil.h"
 #include <sys/sysinfo.h>
 #include <chrono>
