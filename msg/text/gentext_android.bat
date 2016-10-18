@@ -1,9 +1,9 @@
 perl gentext_android.pl
-copy tjsErrorInc.h ..\..\tjs2\tjsErrorInc.h
-copy MsgImpl.h ..\android\MsgImpl.h
-copy MsgIntfInc.h ..\MsgIntfInc.h
-copy MsgLoad.cpp ..\android\MsgLoad.cpp
-REM copy string_table_en.cpp ..\android\string_table_en.cpp
-copy string_table_jp.cpp ..\android\string_table_jp.cpp
-REM copy string_table_resource.h ..\android\string_table_resource.h
+REM copy tjsErrorInc.h ..\..\tjs2\tjsErrorInc.h
+REM copy MsgImpl.h ..\android\MsgImpl.h
+REM copy MsgIntfInc.h ..\MsgIntfInc.h
+REM copy MsgLoad.cpp ..\android\MsgLoad.cpp
+copy arrays-ja.xml ..\..\android\app\src\main\res\values-ja\arrays.xml
+copy arrays-en.xml ..\..\android\app\src\main\res\values\arrays.xml
 pause
+

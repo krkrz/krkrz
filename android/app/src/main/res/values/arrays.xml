@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="system_message_resource">
+        <item>"Internal error"</item>
+        <item>"Warning: "</item>
+        <item>"Non-global post-! operator is used (note that the post-! operator behavior is changed on TJS2 version 2.4.1)"</item>
+        <item>"Cannot convert given narrow string to wide string"</item>
+        <item>"Cannot convert the variable type (%1 to %2)"</item>
+        <item>"Cannot convert the variable type (%1 to Object)"</item>
+        <item>"Specify an ID"</item>
+        <item>"Substitution in boolean context (use form of &amp;apos;(A=B)!=0&amp;apos; to compare to zero)"</item>
+        <item>"This expression cannot be used as a lvalue"</item>
+        <item>"Insufficient memory"</item>
+        <item>"Cannot get the value of this expression"</item>
+        <item>"Accessing to null object"</item>
+        <item>"Member &amp;quot;&amp;quot;%1&amp;quot;&amp;quot; does not exist"</item>
+        <item>"Member does not exist"</item>
+        <item>"Called method is not implemented"</item>
+        <item>"Invalid argument"</item>
+        <item>"Invalid argument count"</item>
+        <item>"Not a function or invalid method/property type"</item>
+        <item>"Specify a Dictionary object or an Array object"</item>
+        <item>"Specify an Array object"</item>
+        <item>"Cannot free the string memory block"</item>
+        <item>"Cannot allocate the string memory block"</item>
+        <item>"Cannot place &amp;quot;&amp;quot;break&amp;quot;&amp;quot; or &amp;quot;&amp;quot;continue&amp;quot;&amp;quot; here"</item>
+        <item>"Cannot place &amp;quot;&amp;quot;case&amp;quot;&amp;quot; here"</item>
+        <item>"Cannot place &amp;quot;&amp;quot;return&amp;quot;&amp;quot; here"</item>
+        <item>"Un-terminated string/regexp/octet literal"</item>
+        <item>"Cannot be parsed as a number"</item>
+        <item>"Un-terminated comment"</item>
+        <item>"Invalid character &amp;apos;%1&amp;apos;"</item>
+        <item>"Expected %1"</item>
+        <item>"Syntax error (%1)"</item>
+        <item>"Error in conditional compiling expression"</item>
+        <item>"Super class does not exist or cannot specify the super class"</item>
+        <item>"Invalid VM code"</item>
+        <item>"The value is out of the range"</item>
+        <item>"Invalid operation for Read-only or Write-only property"</item>
+        <item>"Invalid object context"</item>
+        <item>"The object is already invalidated"</item>
+        <item>"&amp;quot;&amp;quot;...&amp;quot;&amp;quot; is used out of functions"</item>
+        <item>"Invalid date format"</item>
+        <item>"Invalid value for date/time"</item>
+        <item>"Cannot convert exception because &amp;quot;&amp;quot;Exception&amp;quot;&amp;quot; does not exist"</item>
+        <item>"Invalid format string"</item>
+        <item>"Division by zero"</item>
+        <item>"Cannot reconstruct random seeds"</item>
+        <item>"ID"</item>
+        <item>"[out of TJS2 script]"</item>
+        <item>"Total %1 Object(s) was not freed"</item>
+        <item>" &amp;lt;-- "</item>
+        <item>" &amp;lt;-- "</item>
+        <item>"Object %1 [%2] wes not freed / The object was created at : %2"</item>
+        <item>"Object %1 [%2] wes not freed / The object was created at : %2"</item>
+        <item>"Group by object type and location where the object was created"</item>
+        <item>"Group by object type"</item>
+        <item>"%1 time(s) : [%2] %3"</item>
+        <item>"%1 time(s) : [%2] %3"</item>
+        <item>"%1 time(s) : [%2]"</item>
+        <item>"%4: Running code on deleting-in-progress object %1[%2] / The object was created at : %3"</item>
+        <item>"%4: Running code on deleting-in-progress object %1[%2] / The object was created at : %3"</item>
+        <item>"Write error"</item>
+        <item>"Read error"</item>
+        <item>"Seek error"</item>
+        <item>"Bytecode read error. File is broken or it&amp;apos;s not bytecode file."</item>
+        <item>"Object Hash Map log version mismatch"</item>
+        <item>"Currupted Object Hash Map log"</item>
+        <item>"Unknown failure : %08X"</item>
+        <item>"Unknown pack/unpack TEMPLATE charcter"</item>
+        <item>"Unknown bit string charcter"</item>
+        <item>"Unknown Hex string charcter"</item>
+        <item>"Not supported uuencode"</item>
+        <item>"Not supported BER"</item>
+        <item>"Not supported unpack &amp;apos;p&amp;apos;"</item>
+        <item>"Not supported unpack &amp;apos;P&amp;apos;"</item>
+        <item>"Kirikiri Z Executable core /%1 (Compiled on %DATE% %TIME%) TJS2/%2 Copyright (C) 1997-2013 W.Dee and contributors All rights reserved."</item>
+        <item>"The details of version information can be perused if -about is attached and started. "</item>
+        <item>"http://krkrz.github.io/"</item>
+        <item>"Internal Error: at %1 line %2"</item>
+        <item>"Invalid Parameter"</item>
+        <item>"Debug option enabled"</item>
+        <item>"Command line parameter %1 = %2 is invalid. It&amp;apos;s used default."</item>
+        <item>"Command line parameter %1 = %2 is invalid."</item>
+        <item>"Not implemented"</item>
+        <item>"Cannot open storage %1"</item>
+        <item>"Cannot find storage %1"</item>
+        <item>"Cannot open storage %1 for writing"</item>
+        <item>"Cannot find storage %1 in archive %2"</item>
+        <item>"Invalid path name %1"</item>
+        <item>"Not supported media type &amp;quot;&amp;quot;%1&amp;quot;&amp;quot;"</item>
+        <item>"Cannot unbind XP3 exe %1"</item>
+        <item>"%1 is not XP3 archive or unsupported"</item>
+        <item>"Use path delimiter &amp;apos;&amp;gt;&amp;apos; or &amp;apos;/&amp;apos;"</item>
+        <item>"(Attention) Filename &amp;quot;&amp;quot;%1&amp;quot;&amp;quot; contains &amp;apos;#&amp;apos;"</item>
+        <item>"Cannot get local name from %1"</item>
+        <item>"Read error"</item>
+        <item>"Write error"</item>
+        <item>"Seek error"</item>
+        <item>"Truncate error"</item>
+        <item>"Cannot allocate memory"</item>
+        <item>"Unpompression failed"</item>
+        <item>"Compression failed"</item>
+        <item>"Cannot write to archive"</item>
+        <item>"%1 is unsupported cipger mode"</item>
+        <item>"%1 is unsupported encoding"</item>
+        <item>"%1 is unsupported mode string"</item>
+        <item>"Unknown graphic format %1"</item>
+        <item>"Cannot suggest graphics extension for %1"</item>
+        <item>"Mask size mismath"</item>
+        <item>"Province image %1 size mismatch"</item>
+        <item>"Image Load Error /%1"</item>
+        <item>"JPEG Read Error /%1"</item>
+        <item>"PNG Read Error /%1"</item>
+        <item>"ERI Read Error /%1"</item>
+        <item>"TLG Read Error /%1"</item>
+        <item>"Invalid image save type (%1)"</item>
+        <item>"Invalid operation for 8bpp"</item>
+        <item>"Invalid operation for 32bpp"</item>
+        <item>"Specify Window class object"</item>
+        <item>"Specify Layer class object"</item>
+        <item>"Specify Layer or Bitmap class object"</item>
+        <item>"Cannot accept omAuto mode"</item>
+        <item>"Cannot create empty layer image"</item>
+        <item>"Cannot set primary layer invisible"</item>
+        <item>"Cannot move primary layer"</item>
+        <item>"Cannot set parent self"</item>
+        <item>"Cannot move next to self or not siblings"</item>
+        <item>"Cannot move primary or siblingless"</item>
+        <item>"Cannot move to under Other primary layer"</item>
+        <item>"Invalid Image position"</item>
+        <item>"Cannot set Mode to disabled or modal"</item>
+        <item>"Not drawable layer type"</item>
+        <item>"Source layer has no image"</item>
+        <item>"Unsupported layer type %1"</item>
+        <item>"Not drawble face type %1"</item>
+        <item>"Cannot convert layer type using given direction"</item>
+        <item>"Negative opacity not supported on this face"</item>
+        <item>"Source rectangle out of bitmap"</item>
+        <item>"Box blur area must contain center pixel"</item>
+        <item>"Box blur area must be smaller than 16 million"</item>
+        <item>"Cannot change focus in processing focus"</item>
+        <item>"Window has no layer"</item>
+        <item>"Window has already primary layer"</item>
+        <item>"Specified event %1 needs parameter"</item>
+        <item>"Specified event %1 needs parameter %2"</item>
+        <item>"Specified event name %1 is unknown"</item>
+        <item>"Out of Rectangle"</item>
+        <item>"Invalid method in updating"</item>
+        <item>"Cannot create instance"</item>
+        <item>"Unknown wave format %1"</item>
+        <item>"Current transition must be stopping"</item>
+        <item>"Transition handler error %1"</item>
+        <item>"Transition %1 already registerd"</item>
+        <item>"Cannot find transition handler %1"</item>
+        <item>"Specify transition source"</item>
+        <item>"This layer cannot have image"</item>
+        <item>"Transition source and destination must have image"</item>
+        <item>"Cannot load rule graphics %1"</item>
+        <item>"Specify option %1"</item>
+        <item>"Transition layer size mismatch %1 and %2"</item>
+        <item>"Transition mutual source"</item>
+        <item>"Warring : Method %1 %2th parameter had is ignore. Hold destination alpha parameter is now deprecated."</item>
+        <item>"Cannot connect multiple wave sound buffer at once"</item>
+        <item>"Invalid window size must be in 64 to 32768"</item>
+        <item>"Invalid overlap count must be in 2 to 32"</item>
+        <item>"Currently async load bitmap"</item>
+        <item>"copying to clipboard failed."</item>
+        <item>"Invalid UTF-16 to UTF-8"</item>
+        <item>"(info) Loading startup script : "</item>
+        <item>"(info) Startup script ended."</item>
+        <item>"sizeof(tjs_char) must be 2 or 4."</item>
+        <item>"Media name &amp;quot;&amp;quot;%1&amp;quot;&amp;quot; had already been registered"</item>
+        <item>"Media name &amp;quot;&amp;quot;%1&amp;quot;&amp;quot; is not registered"</item>
+        <item>"(info) Rebuilding Auto Path Table ..."</item>
+        <item>"(info) Total %1 file(s) found, %2 file(s) activated. (%3ms)"</item>
+        <item>"Error in retrieving System.onActivate/onDeactivate : %1"</item>
+        <item>"The host is not a 16-bit unicode system."</item>
+        <item>"(info) Trying to read XP3 virtual file system information from : %1"</item>
+        <item>"Specified storage had been protected!"</item>
+        <item>"(info) Failed."</item>
+        <item>"(info) Done. (contains %1 file(s), %2 segment(s))"</item>
+        <item>"\r\n\r\n\r\n==============================================================================\r\n==============================================================================\r\n"</item>
+        <item>"\n\n\n==============================================================================\n==============================================================================\n"</item>
+        <item>"DEFAULT_GUI_FONT"</item>
+        <item>"Can&amp;apos;t open font file &amp;apos;%1$s&amp;apos;"</item>
+        <item>"Font &amp;apos;%1$s&amp;apos; cannot be used"</item>
+        <item>"Font Rasterize error."</item>
+        <item>"BITFIELDS not supported."</item>
+        <item>"Compressed BMP not supported."</item>
+        <item>"Unsupported color mode for palettized image."</item>
+        <item>"This is not a Windows BMP file or an OS/2 BMP file."</item>
+        <item>"Non-supported header version."</item>
+        <item>"(info) Touching "</item>
+        <item>" ... aborted [timed out]"</item>
+        <item>" ... aborted [limit bytes exceeded]"</item>
+        <item>"Faild glyph for DrawGlyph."</item>
+        <item>"Panic! Layer object is not properly constructed. The constructor was not called??"</item>
+        <item>"Unknown update type"</item>
+        <item>"Unknown transition type"</item>
+        <item>"Update type of tutGiveUpdate is not yet supported"</item>
+        <item>"error code : "</item>
+        <item>"JPEG does not support palettized image"</item>
+        <item>"libpng error."</item>
+        <item>"Unsupported color type for palattized image"</item>
+        <item>"Unsupported color type"</item>
+        <item>"Too large image"</item>
+        <item>"PNG save error."</item>
+        <item>"TLG cannot be used as universal transition rule, province(_p) or mask(_m) images."</item>
+        <item>"Unsupported color count : "</item>
+        <item>"Data flag must be 0 (any flags are not yet supported)"</item>
+        <item>"Unsupported color type : "</item>
+        <item>"External golomb bit length table is not yet supported."</item>
+        <item>"Unsupported entropy coding method"</item>
+        <item>"Invalid TLG header or unsupported TLG version."</item>
+        <item>"Malformed TLG SDS tag structure, missing colon after name length"</item>
+        <item>"Malformed TLG SDS tag structure, missing equals after name"</item>
+        <item>"Malformed TLG SDS tag structure, missing colon after value length"</item>
+        <item>"Malformed TLG SDS tag structure, missing comma after a tag"</item>
+        <item>"File size is zero."</item>
+        <item>"Memory allocation error."</item>
+        <item>"File read error."</item>
+        <item>"Signature not found or invalid pre-rendered font file."</item>
+        <item>"Not a 16-bit UNICODE font file."</item>
+        <item>"Invalid header version."</item>
+        <item>"SaveTLG6: Insufficient memory"</item>
+        <item>"SaveTLG6: Too large bit length (given image may be too large)"</item>
+        <item>"Could not retrive interface from given draw device"</item>
+        <item>"Illegal character conversion. UTF-16 to UTF-8."</item>
+        <item>"require layerTreeOwnerInterface interface"</item>
+        <item>"Script exception raised"</item>
+        <item>"Hardware exception raised"</item>
+        <item>"Script Editor (Main)"</item>
+        <item>"Script Editor (Exception)"</item>
+        <item>"Not found krdevui.dll"</item>
+        <item>"Invalid krdevui.dll"</item>
+        <item>"Invalid bpp"</item>
+        <item>"Cannot load Plugin %1"</item>
+        <item>"Not valid plugin %1"</item>
+        <item>"Faild to release plugin"</item>
+        <item>"Cannot link plugin while plugin linking"</item>
+        <item>"Not Susie Plugin"</item>
+        <item>"Susie Plugin error : %1"</item>
+        <item>"Cannot release plugin"</item>
+        <item>"Not loaded plugin %1"</item>
+        <item>"Cannot allocate memory for Bitmap : %1 (size=%2)"</item>
+        <item>"Scan line %1 is range over (0 to %2)"</item>
+        <item>"Plugin Error : %1"</item>
+        <item>"Invalid CD-DA Drive"</item>
+        <item>"CD-DA Drive not found"</item>
+        <item>"MCI Error : %1"</item>
+        <item>"Invalid SMF : %1"</item>
+        <item>"Malformed MIDI Message"</item>
+        <item>"DirectSound Initialize file : %1"</item>
+        <item>"Cannot create DirectSound secondary buffer : %1/%2"</item>
+        <item>"Invalid loop information %1"</item>
+        <item>"Not child menu Item"</item>
+        <item>"Cannot initialize Direct3D : %1"</item>
+        <item>"Cannot find display mode : %1"</item>
+        <item>"Cannot switch to fullscreen : %1"</item>
+        <item>"Invalid property in fullscreen : %1"</item>
+        <item>"Invalid method in fullscreen : %1"</item>
+        <item>"Cannot load mouse cursor : %1"</item>
+        <item>"Cannot load krmovie.dll"</item>
+        <item>"Invalid krmovie.dll"</item>
+        <item>"Error in krmovie.dll : %1"</item>
+        <item>"Window already missing"</item>
+        <item>"Prerendered font mapping failed : %1"</item>
+        <item>"Cannot write %1."</item>
+        <item>"Did not exit %1. Cannot delete file."</item>
+        <item>"Cannot execute %1."</item>
+        <item>"Plugin require %1 funcion. Bat not found function in this file."</item>
+        <item>" = (Exception)"</item>
+        <item>"Console : "</item>
+        <item>"(info) Listing files in %1 Åc"</item>
+        <item>"(info) Total physical memory : %1"</item>
+        <item>"(info) Selected project directory : %1"</item>
+        <item>"too small executable size."</item>
+        <item>"(info) Loading executable embedded options failed (ignoring) : %1"</item>
+        <item>"(info) Loading executable embedded options succeeded."</item>
+        <item>"file not found."</item>
+        <item>"(info) Loading configuration file &amp;quot;&amp;quot;%1&amp;quot;&amp;quot; failed (ignoring) : %2"</item>
+        <item>"(info) Loading configuration file &amp;quot;&amp;quot;%1&amp;quot;&amp;quot; succeeded."</item>
+        <item>"(info) Data path does not exist, trying to make it ... %1"</item>
+        <item>"ok."</item>
+        <item>"failed."</item>
+        <item>"(info) Data path : %1"</item>
+        <item>"(info) Specified option(s) (earlier item has more priority) :"</item>
+        <item>" (none)"</item>
+        <item>"(info) CPU clock (roughly) : %dMHz"</item>
+        <item>"Program started on %1 (%2)"</item>
+        <item>"Kirikiri"</item>
+        <item>"Unknown error!"</item>
+        <item>"Exit code: %d\n"</item>
+        <item>"Fatal Error"</item>
+        <item>"Enable Digitizer"</item>
+        <item>"The device has an integrated touch digitizer. "</item>
+        <item>"The device has an external touch digitizer. "</item>
+        <item>"The device has an integrated pen digitizer."</item>
+        <item>"The device has an external pen digitizer."</item>
+        <item>"The device supports multiple sources of digitizer input. "</item>
+        <item>"The device is ready to receive digitizer input."</item>
+        <item>"CPU check failure."</item>
+        <item>"CPU check failure: CPU family 4 or lesser is not supported\r\n%1"</item>
+        <item>"(info) CPU #%1 : "</item>
+        <item>"CPU check failure: Not supported CPU\r\n%1"</item>
+        <item>"(info) finally detected CPU features : %1"</item>
+        <item>"CPU check failure: Not supported CPU\r\n%1"</item>
+        <item>"(info) CPU clock : %.1fMHz"</item>
+        <item>"Layer bitmap: Buffer underrun detected. Check your drawing code!"</item>
+        <item>"Layer bitmap: Buffer overrun detected. Check your drawing code!"</item>
+        <item>"Faild to create Direct3D9."</item>
+        <item>"Faild to decide backbuffer format."</item>
+        <item>"Faild to create Direct3D9 Device."</item>
+        <item>"Faild to set viewport."</item>
+        <item>"Faild to set render state."</item>
+        <item>"warning : Image size too large. May be cannot create texture."</item>
+        <item>"Use power of two surface."</item>
+        <item>"Cannot allocate D3D off-screen surface/HR=%1"</item>
+        <item>"BasicDrawDevice: Failed to create Direct3D devices: %1"</item>
+        <item>"BasicDrawDevice: Failed to create Direct3D devices: unknown reason"</item>
+        <item>"BasicDrawDevice: Texture has already been locked (StartBitmapCompletion() has been called twice without EndBitmapCompletion()), unlocking the texture."</item>
+        <item>"Internal error/HR=%1"</item>
+        <item>"BasicDrawDevice: (inf) Polygon drawing failed/HR=%1"</item>
+        <item>"BasicDrawDevice: (inf) IDirect3DDevice::Present failed/HR=%1"</item>
+        <item>"ChangeDisplaySettings failed: DISP_CHANGE_RESTART"</item>
+        <item>"ChangeDisplaySettings failed: DISP_CHANGE_BADFLAGS"</item>
+        <item>"ChangeDisplaySettings failed: DISP_CHANGE_BADPARAM"</item>
+        <item>"ChangeDisplaySettings failed: DISP_CHANGE_FAILED"</item>
+        <item>"ChangeDisplaySettings failed: DISP_CHANGE_BADMODE"</item>
+        <item>"ChangeDisplaySettings failed: DISP_CHANGE_NOTUPDATED"</item>
+        <item>"ChangeDisplaySettings failed: unknown reason (%1)"</item>
+        <item>"Failed to create screen DC"</item>
+        <item>"Failed to create offscreen bitmap"</item>
+        <item>"Failed to create offscreen DC"</item>
+        <item>"(info) Susie plugin info : %1"</item>
+        <item>"Non-supported bitmap header was given from susie plug-in."</item>
+        <item>"BasicDrawDevice: Failed to create Direct3D Device: %1"</item>
+        <item>"BasicDrawDevice: Failed to create Direct3D Device: unknown reason"</item>
+        <item>"Fatal: Could not create any drawer objects."</item>
+        <item>"&amp;quot;&amp;quot;basic draw&amp;quot;&amp;quot; device does not support layer manager more than 1"</item>
+        <item>"Invalid video size"</item>
+        <item>"Rough VSync interval read from API : %1"</item>
+        <item>"Rough VSync interval still seems wrong, assuming default value (16)"</item>
+        <item>"(info) IDirect3D9 or higher detected. Retrieving current Direct3D driver information..."</item>
+        <item>"(info) Failed."</item>
+        <item>"(info) Loading Direct3D ..."</item>
+        <item>"Cannot load d3d9.dll"</item>
+        <item>"Missing Direct3DCreate9 in d3d9.dll"</item>
+        <item>"(info) environment: using %1"</item>
+        <item>"(info) Searching best fullscreen resolution ..."</item>
+        <item>"(info) condition: preferred screen mode: %1"</item>
+        <item>"(info) condition: mode: %1"</item>
+        <item>"(info) condition: zoom mode: %1"</item>
+        <item>"(info) environment: default screen mode: %1"</item>
+        <item>"(info) environment: default screen aspect ratio: %1 : %2"</item>
+        <item>"(info) environment: available display modes:"</item>
+        <item>"(info) Panic! There is no reasonable candidate screen mode provided from the driver ... trying to use the default screen size and color depth ..."</item>
+        <item>"(info) result: candidates:"</item>
+        <item>"(info) Trying screen mode: %1"</item>
+        <item>"All screen mode has been tested, but no modes available at all."</item>
+        <item>"(info) Changing screen mode succeeded"</item>
+        <item>"Select XP3 file or folder"</item>
+        <item>"D3D : The device has been lost but cannot be reset at this time."</item>
+        <item>"D3D : Internal driver error. Applications should destroy and recreate the device when receiving this error. "</item>
+        <item>"D3D : The method call is invalid. For example, a method&amp;apos;s parameter may not be a valid pointer."</item>
+        <item>"D3D : Direct3D does not have enough display memory to perform the operation. "</item>
+        <item>"D3D : Direct3D could not allocate sufficient memory to complete the call."</item>
+        <item>"D3D : The pixel format of the texture surface is not valid."</item>
+        <item>"D3D : The device does not support a specified texture-blending operation for color values."</item>
+        <item>"D3D : The device does not support a specified texture-blending argument for color values."</item>
+        <item>"D3D : The device does not support a specified texture-blending operation for the alpha channel."</item>
+        <item>"D3D : The device does not support a specified texture-blending argument for the alpha channel."</item>
+        <item>"D3D : The application is requesting more texture-filtering operations than the device supports."</item>
+        <item>"D3D : The current texture filters cannot be used together."</item>
+        <item>"D3D : The device does not support the specified texture factor value. Not used; provided only to support older drivers."</item>
+        <item>"D3D : The currently set render states cannot be used together."</item>
+        <item>"D3D : The device does not support the specified texture filter."</item>
+        <item>"D3D : The current textures cannot be used simultaneously."</item>
+        <item>"D3D : The requested item was not found."</item>
+        <item>"D3D : There is more data available than the specified buffer size can hold."</item>
+        <item>"D3D : The device has been lost but can be reset at this time."</item>
+        <item>"D3D : This device does not support the queried technique."</item>
+        <item>"D3D : The requested device type is not valid."</item>
+        <item>"D3D : Not used."</item>
+        <item>"D3D : The previous blit operation that is transferring information to or from this surface is incomplete."</item>
+        <item>"D3D : The device that returned this code caused the hardware adapter to be reset by the OS."</item>
+        <item>"D3D : The device does not support overlay for the specified size or display mode. "</item>
+        <item>"D3D : The device does not support overlay for the specified surface format. "</item>
+        <item>"D3D : The specified content cannot be protected."</item>
+        <item>"D3D : The specified cryptographic algorithm is not supported."</item>
+        <item>"D3D : The present statistics have no orderly sequence."</item>
+        <item>"D3D : The hardware adapter has been removed."</item>
+        <item>"D3D : This is a success code. However, the autogeneration of mipmaps is not supported for this format."</item>
+        <item>"D3D : An undetermined error occurred inside the Direct3D subsystem."</item>
+        <item>"D3D : An invalid parameter was passed to the returning function."</item>
+        <item>"D3D : Unknown error."</item>
+        <item>"Access Violation: The thread attempts to read from or write to a virtual address for which it does not have access."</item>
+        <item>"Break Point: A breakpoint is encountered."</item>
+        <item>"Data Type Misalignment: The thread attempts to read or write data that is misaligned on hardware that does not provide alignment. For example, 16-bit values must be aligned on 2-byte boundaries, 32-bit values on 4-byte boundaries, and so on."</item>
+        <item>"Single Step: A trace trap or other single instruction mechanism signals that one instruction is executed."</item>
+        <item>"Array Bounds Exceede: The thread attempts to access an array element that is out of bounds, and the underlying hardware supports bounds checking."</item>
+        <item>"Denormal Operand: One of the operands in a floating point operation is denormal. A denormal value is one that is too small to represent as a standard floating point value."</item>
+        <item>"Divide By Zero: The thread attempts to divide a floating point value by a floating point divisor of 0 (zero)."</item>
+        <item>"Inexact Result: The result of a floating point operation cannot be represented exactly as a decimal fraction."</item>
+        <item>"Invalid Operation: A floating point exception that is not included in this list."</item>
+        <item>"Overflow: The exponent of a floating point operation is greater than the magnitude allowed by the corresponding type."</item>
+        <item>"Stack Check: The stack has overflowed or underflowed, because of a floating point operation."</item>
+        <item>"Underflow: The exponent of a floating point operation is less than the magnitude allowed by the corresponding type."</item>
+        <item>"Divide By Zero: The thread attempts to divide an integer value by an integer divisor of 0 (zero)."</item>
+        <item>"Overflow: The result of an integer operation creates a value that is too large to be held by the destination register. In some cases, this will result in a carry out of the most significant bit of the result. Some operations do not set the carry flag."</item>
+        <item>"Priv Instruction: The thread attempts to execute an instruction with an operation that is not allowed in the current computer mode."</item>
+        <item>"Noncontinuable Exception: The thread attempts to continue execution after a non-continuable exception occurs."</item>
+        <item>"Guard Page: The thread accessed memory allocated with the PAGE_GUARD modifier."</item>
+        <item>"Illegal Instruction: The thread tries to execute an invalid instruction."</item>
+        <item>"In Page Error: The thread tries to access a page that is not present, and the system is unable to load the page. For example, this exception might occur if a network connection is lost while running a program over a network."</item>
+        <item>"Invalid Disposition: An exception handler returns an invalid disposition to the exception dispatcher. Programmers using a high-level language such as C should never encounter this exception."</item>
+        <item>"Invalid Handle: The thread used a handle to a kernel object that was invalid (probably because it had been closed.)"</item>
+        <item>"Stack Overflow: The thread uses up its stack."</item>
+        <item>"Unwind Consolidate: A frame consolidation has been executed."</item>
+        <item>"Cannot Show Modal."</item>
+        <item>"Cannot Show Modal. When it is single window."</item>
+    </string-array>
+</resources>

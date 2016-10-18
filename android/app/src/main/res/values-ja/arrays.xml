@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="system_message_resource">
+        <item>"内部エラーが発生しました"</item>
+        <item>"警告: "</item>
+        <item>"グローバルでない場所で後置 ! 演算子が使われています(この演算子の挙動はTJS2 version 2.4.1 で変わりましたのでご注意ください)"</item>
+        <item>"文字列を UNICODE 文字列に変換できません。解釈できない文字が含まれてます。正しいデータが指定されているかを確認してください。データが破損している可能性もあります"</item>
+        <item>"%1 から %2 へ型を変換できません"</item>
+        <item>"%1 から Object へ型を変換できません。Object 型が要求される文脈で Object 型以外の値が渡されるとこのエラーが発生します"</item>
+        <item>"識別子を指定してください"</item>
+        <item>"論理値が求められている場所で = 演算子が使用されています(== 演算子の間違いですか？代入した上でゼロと値を比較したい場合は、(A=B) != 0 の形式を使うことをお勧めします)"</item>
+        <item>"不正な代入か不正な式の操作です"</item>
+        <item>"メモリが足りません"</item>
+        <item>"この式からは値を得ることができません"</item>
+        <item>"null オブジェクトにアクセスしようとしました"</item>
+        <item>"メンバ &amp;quot;&amp;quot;%1&amp;quot;&amp;quot; が見つかりません"</item>
+        <item>"メンバが見つかりません"</item>
+        <item>"呼び出そうとした機能は未実装です"</item>
+        <item>"不正な引数です"</item>
+        <item>"引数の数が不正です"</item>
+        <item>"関数ではないかプロパティの種類が違います"</item>
+        <item>"Dictionary または Array クラスのオブジェクトを指定してください"</item>
+        <item>"Array クラスのオブジェクトを指定してください"</item>
+        <item>"文字列メモリブロックを解放できません"</item>
+        <item>"文字列メモリブロックを確保できません"</item>
+        <item>"&amp;quot;&amp;quot;break&amp;quot;&amp;quot; または &amp;quot;&amp;quot;continue&amp;quot;&amp;quot; はここに書くことはできません"</item>
+        <item>"&amp;quot;&amp;quot;case&amp;quot;&amp;quot; はここに書くことはできません"</item>
+        <item>"&amp;quot;&amp;quot;return&amp;quot;&amp;quot; はここに書くことはできません"</item>
+        <item>"文字列定数/正規表現/オクテット即値が終わらないままスクリプトの終端に達しました"</item>
+        <item>"数値として解釈できません"</item>
+        <item>"コメントが終わらないままスクリプトの終端に達しました"</item>
+        <item>"不正な文字です : &amp;apos;%1&amp;apos;"</item>
+        <item>"%1 がありません"</item>
+        <item>"文法エラーです(%1)"</item>
+        <item>"条件コンパイル式にエラーがあります"</item>
+        <item>"スーパークラスが存在しないかスーパークラスを特定できません"</item>
+        <item>"不正な VM コードです"</item>
+        <item>"値が範囲外です"</item>
+        <item>"読み込み専用あるいは書き込み専用プロパティに対して行えない操作をしようとしました"</item>
+        <item>"実行コンテキストが違います"</item>
+        <item>"オブジェクトはすでに無効化されています"</item>
+        <item>"&amp;quot;&amp;quot;...&amp;quot;&amp;quot; は関数外では使えません"</item>
+        <item>"不正な日付文字列の形式です"</item>
+        <item>"不正な日付・時刻です"</item>
+        <item>"&amp;quot;&amp;quot;Exception&amp;quot;&amp;quot; が存在しないため例外オブジェクトを作成できません"</item>
+        <item>"不正な書式文字列です"</item>
+        <item>"0 で除算をしようとしました"</item>
+        <item>"乱数系列を初期化できません(おそらく不正なデータが渡されました)"</item>
+        <item>"識別子"</item>
+        <item>"[TJSスクリプト管理外]"</item>
+        <item>"合計 %1 個のオブジェクトが解放されていません"</item>
+        <item>"\r\n                     "</item>
+        <item>"\n                     "</item>
+        <item>"オブジェクト %1 [%2] が解放されていません。オブジェクト作成時の呼び出し履歴は以下の通りです:\r\n                     %3"</item>
+        <item>"オブジェクト %1 [%2] が解放されていません。オブジェクト作成時の呼び出し履歴は以下の通りです:\n                     %3"</item>
+        <item>"オブジェクトのタイプとオブジェクト作成時の履歴による分類"</item>
+        <item>"オブジェクトのタイプによる分類"</item>
+        <item>"%1 個 : [%2]\r\n                     %3"</item>
+        <item>"%1 個 : [%2]\n                     %3"</item>
+        <item>"%1 個 : [%2]"</item>
+        <item>"%4: 削除中のオブジェクト %1[%2] 上でコードが実行されています。このオブジェクトの作成時の呼び出し履歴は以下の通りです:\r\n                     %3"</item>
+        <item>"%4: 削除中のオブジェクト %1[%2] 上でコードが実行されています。このオブジェクトの作成時の呼び出し履歴は以下の通りです:\n                     %3"</item>
+        <item>"書き込みエラーが発生しました"</item>
+        <item>"読み込みエラーが発生しました。ファイルが破損している可能性や、デバイスからの読み込みに失敗した可能性があります"</item>
+        <item>"シークエラーが発生しました。ファイルが破損している可能性や、デバイスからの読み込みに失敗した可能性があります"</item>
+        <item>"バイトコードファイル読み込みエラー。ファイルが壊れているかバイトコードとは異なるファイルです"</item>
+        <item>"Object Hash Map ログのバージョンが一致しません"</item>
+        <item>"不正な Object Hash Map ログ"</item>
+        <item>"未知のエラー %08X"</item>
+        <item>"不明な pack/unpack TEMPLATE 文字です"</item>
+        <item>"不明な bit string 文字です"</item>
+        <item>"不明な16進数文字です"</item>
+        <item>"uuencode はサポートしていません"</item>
+        <item>"BER圧縮はサポートしていません"</item>
+        <item>"&amp;apos;p&amp;apos; unpack はサポートしていません"</item>
+        <item>"&amp;apos;P&amp;apos; unpack はサポートしていません"</item>
+        <item>"吉里吉里[きりきり] Z 実行コア/%1 (Compiled on %DATE% %TIME%) TJS2/%2 Copyright (C) 1997-2013 W.Dee and contributors All rights reserved."</item>
+        <item>"バージョン情報の詳細は -about を付けて起動すると閲覧できます"</item>
+        <item>"http://krkrz.github.io/"</item>
+        <item>"内部エラーが発生しました: at %1 line %2"</item>
+        <item>"不正なパラメータです"</item>
+        <item>"-debug オプションが指定されているため,現在 吉里吉里はデバッグモードで動作しています。デバッグモードでは十分な実行速度が出ない場合があるので注意してください"</item>
+        <item>"コマンドラインパラメータ %1 に指定された値 %2 は無効のためデフォルトの設定を用います"</item>
+        <item>"コマンドラインパラメータ %1 に指定された値 %2 は無効です"</item>
+        <item>"未実装の機能を呼び出そうとしました"</item>
+        <item>"ストレージ %1 を開くことができません"</item>
+        <item>"ストレージ %1 が見つかりません"</item>
+        <item>"ストレージ %1 を書き込み用に開くことができません。ファイルが書き込み禁止になっていないか、あるいはファイルに書き込み権限があるかどうか、あるいはそもそもそれが書き込み可能なメディアやファイルなのかを確認してください"</item>
+        <item>"ストレージ %1 がアーカイブ %2 の中に見つかりません"</item>
+        <item>"パス名 %1 は無効な形式です。形式が正しいかどうかを確認してください"</item>
+        <item>"&amp;quot;&amp;quot;%1&amp;quot;&amp;quot; は対応していないメディアタイプです"</item>
+        <item>"%1 は実行可能ファイルに見えますが、これに結合されたアーカイブを発見できませんでした"</item>
+        <item>"%1 は XP3 アーカイブではないか、対応できない形式です。アーカイブファイルを指定すべき場面で通常のファイルを指定した場合、あるいは対応できないアーカイブファイルを指定した場合などにこのエラーが発生しますので、確認してください"</item>
+        <item>"パス名の最後には &amp;apos;&amp;gt;&amp;apos; または &amp;apos;/&amp;apos; を指定してください (吉里吉里２ 2.19 beta 14 よりアーカイブの区切り記号が &amp;apos;#&amp;apos; から &amp;apos;&amp;gt;&amp;apos; に変わりました)"</item>
+        <item>"(注意) &amp;apos;#&amp;apos; がファイル名 &amp;quot;&amp;quot;%1&amp;quot;&amp;quot; に含まれています。アーカイブの区切り文字は吉里吉里２ 2.19 beta 14 より&amp;apos;#&amp;apos; から &amp;apos;&amp;gt;&amp;apos; に変わりました。もしアーカイブの区切り文字のつもりで &amp;apos;#&amp;apos; を使用した場合は、お手数ですが &amp;apos;&amp;gt;&amp;apos; に変えてください"</item>
+        <item>"ストレージ名 %1 をローカルファイル名に変換できません。アーカイブファイル内のファイルや、ローカルファイルでないファイルはローカルファイル名に変換できません。"</item>
+        <item>"読み込みエラーです。ファイルが破損している可能性や、デバイスからの読み込みに失敗した可能性があります"</item>
+        <item>"書き込みエラーです"</item>
+        <item>"シークに失敗しました。ファイルが破損している可能性や、デバイスからの読み込みに失敗した可能性があります"</item>
+        <item>"ファイルの長さを切り詰めるのに失敗しました"</item>
+        <item>"メモリ確保に失敗しました。"</item>
+        <item>"ファイルの展開に失敗しました。未対応の圧縮形式が指定されたか、あるいはファイルが破損している可能性があります"</item>
+        <item>"ファイルの圧縮に失敗しました"</item>
+        <item>"アーカイブにデータを書き込むことはできません"</item>
+        <item>"%1 は未対応の暗号化形式か、データが破損しています"</item>
+        <item>"%1 は未対応のエンコード方式です。"</item>
+        <item>"認識できないモード文字列の指定です(%1)"</item>
+        <item>"%1 は未知の画像形式です"</item>
+        <item>"%1 について適切な拡張子を持ったファイルを見つけられませんでした"</item>
+        <item>"マスク画像のサイズがメイン画像のサイズと違います"</item>
+        <item>"領域画像 %1 はメイン画像とサイズが違います"</item>
+        <item>"画像読み込み中にエラーが発生しました/%1"</item>
+        <item>"JPEG 読み込み中にエラーが発生しました/%1"</item>
+        <item>"PNG 読み込み中にエラーが発生しました/%1"</item>
+        <item>"ERI 読み込み中にエラーが発生しました/%1"</item>
+        <item>"TLG 読み込み中にエラーが発生しました/%1"</item>
+        <item>"無効な保存画像形式です(%1)"</item>
+        <item>"8bpp 画像に対しては行えない操作を行おうとしました"</item>
+        <item>"32bpp 画像に対しては行えない操作を行おうとしました"</item>
+        <item>"Window クラスのオブジェクトを指定してください"</item>
+        <item>"Layer クラスのオブジェクトを指定してください"</item>
+        <item>"Layer クラスか Bitmap クラスのオブジェクトを指定してください"</item>
+        <item>"この操作で mode に omAuto を指定することは出来ません"</item>
+        <item>"画像サイズの横幅あるいは縦幅を 0 以下の数に設定することはできません"</item>
+        <item>"プライマリレイヤは不可視にできません"</item>
+        <item>"プライマリレイヤは移動できません"</item>
+        <item>"自分自身を親とすることはできません"</item>
+        <item>"自分自身の前後や親の異なるレイヤの前後に移動することはできません"</item>
+        <item>"プライマリレイヤや兄弟の無いレイヤは前後に移動することはできません"</item>
+        <item>"別のプライマリレイヤ下にレイヤを移動することはできません"</item>
+        <item>"レイヤ領域に画像の無い領域が発生しました"</item>
+        <item>"すでにモーダルなレイヤの親レイヤ、あるいは不可視/無効なレイヤをモーダルにすることはできません"</item>
+        <item>"この type のレイヤでは描画や画像読み込みや画像サイズ/位置の変更/取得はできません"</item>
+        <item>"転送元レイヤは画像を持っていません"</item>
+        <item>"%1 はこの type のレイヤでは使用できません"</item>
+        <item>"%1 ではこの face に描画できません"</item>
+        <item>"指定されたレイヤタイプ変換はできません"</item>
+        <item>"負の不透明度はこの face では指定できません"</item>
+        <item>"転送元がビットマップ外の領域を含んでいます。正しい範囲に収まるように転送元を指定してください"</item>
+        <item>"矩形ブラーの範囲は必ず(0,0)をその中に含む必要があります。leftとrightが両方とも正の数値、あるいは両方とも負の数値という指定はできません(topとbottomに対しても同様)"</item>
+        <item>"矩形ブラーの範囲が大きすぎます。矩形ブラーの範囲は1677万以下である必要があります"</item>
+        <item>"フォーカス変更処理中はフォーカスを新たに変更することはできません"</item>
+        <item>"ウィンドウにレイヤがありません"</item>
+        <item>"ウィンドウにはすでにプライマリレイヤがあります"</item>
+        <item>"イベント %1 にはパラメータが必要です"</item>
+        <item>"イベント %1 にはパラメータ %2 が必要です"</item>
+        <item>"イベント名 %1 は未知のイベント名です"</item>
+        <item>"矩形外を指定されました"</item>
+        <item>"画面更新中はこの機能を実行できません"</item>
+        <item>"このクラスはインスタンスを作成できません"</item>
+        <item>"%1 は対応できない Wave 形式です"</item>
+        <item>"現在のトランジションを停止させてから新しいトランジションを開始してください。同じレイヤに対して複数のトランジションを同時に実行しようとするとこのエラーが発生します"</item>
+        <item>"トランジションハンドラでエラーが発生しました : %1"</item>
+        <item>"トランジション %1 は既に登録されています"</item>
+        <item>"トランジションハンドラ %1 が見つかりません"</item>
+        <item>"トランジション元を指定してください"</item>
+        <item>"このレイヤは画像を持つことはできません"</item>
+        <item>"トランジション元とトランジション先はともに画像を持っている必要があります"</item>
+        <item>"ルール画像 %1 を読み込むことができません"</item>
+        <item>"オプション %1 を指定してください"</item>
+        <item>"トランジション元(%1)とトランジション先(%2)のレイヤのサイズが一致しません"</item>
+        <item>"トランジション元のトランジション元が自分自身です"</item>
+        <item>"警告 : メソッド %1 の %2 番目に渡された hda パラメータは、吉里吉里２ 2.23 beta 2 より無視されるようになりました。代わりに Layer.holdAlpha プロパティを用いてください。"</item>
+        <item>"複数の WaveSoundBuffer を一つのフィルタで同時に使用することはできません"</item>
+        <item>"window は 64～32768 の範囲の 2 の累乗で無ければなりません"</item>
+        <item>"overlap は 2～32 の範囲の 2 の累乗で無ければなりません"</item>
+        <item>"Bitmap を非同期読込み中のため、このメソッドは呼び出せません"</item>
+        <item>"クリップボードへのコピーに失敗しました"</item>
+        <item>"UTF-16では発生し得ないUTF-8への変換です"</item>
+        <item>"(info) 起動スクリプト読込み中 : "</item>
+        <item>"(info) 起動スクリプト実行終了。"</item>
+        <item>"sizeof(tjs_char) は 2 か 4 でなければなりません。"</item>
+        <item>"メディア名 &amp;quot;&amp;quot;%1&amp;quot;&amp;quot; は既に登録されています"</item>
+        <item>"メディア名 &amp;quot;&amp;quot;%1&amp;quot;&amp;quot; は登録されていません"</item>
+        <item>"(info) 自動検索パステーブルを再構築しています ..."</item>
+        <item>"(info) Total %1 file(s) found, %2 file(s) activated. (%3ms)"</item>
+        <item>"Error in retrieving System.onActivate/onDeactivate : %1"</item>
+        <item>"The host is not a 16-bit unicode system."</item>
+        <item>"(info) Trying to read XP3 virtual file system information from : %1"</item>
+        <item>"Specified storage had been protected!"</item>
+        <item>"(info) 失敗。"</item>
+        <item>"(info) Done. (contains %1 file(s), %2 segment(s))"</item>
+        <item>"\r\n\r\n\r\n==============================================================================\r\n==============================================================================\r\n"</item>
+        <item>"\n\n\n==============================================================================\n==============================================================================\n"</item>
+        <item>"ＭＳ Ｐゴシック"</item>
+        <item>"Can&amp;apos;t open font file &amp;apos;%1$s&amp;apos;"</item>
+        <item>"フォント &amp;apos;%1$s&amp;apos; は使用できません"</item>
+        <item>"フォント ラスタライズ エラー."</item>
+        <item>"BITFIELDS not supported."</item>
+        <item>"Compressed BMP not supported."</item>
+        <item>"Unsupported color mode for palettized image."</item>
+        <item>"This is not a Windows BMP file or an OS/2 BMP file."</item>
+        <item>"Non-supported header version."</item>
+        <item>"(info) Touching "</item>
+        <item>" ... 中断 [タイムアウト]"</item>
+        <item>" ... 中断 [バイトサイズ上限値超過]"</item>
+        <item>"Faild glyph for DrawGlyph."</item>
+        <item>"Panic! Layer object is not properly constructed. The constructor was not called??"</item>
+        <item>"不明な update タイプ"</item>
+        <item>"不明な transition タイプ"</item>
+        <item>"Update タイプの tutGiveUpdate はサポートしていません"</item>
+        <item>"エラーコード : "</item>
+        <item>"JPEG はパレット画像をサポートしていません"</item>
+        <item>"libpng エラー."</item>
+        <item>"Unsupported color type for palattized image"</item>
+        <item>"サポートしていないカラータイプ"</item>
+        <item>"Too large image"</item>
+        <item>"PNG save error."</item>
+        <item>"TLG cannot be used as universal transition rule, province(_p) or mask(_m) images."</item>
+        <item>"Unsupported color count : "</item>
+        <item>"Data flag must be 0 (any flags are not yet supported)"</item>
+        <item>"サポートしていないカラータイプです : "</item>
+        <item>"外部 golomb ビット長テーブルはサポートしていません"</item>
+        <item>"サポートしていないエントロピーコードメソッドです"</item>
+        <item>"不正な TLG ヘッダーか、サポートしていない TLG バージョンです"</item>
+        <item>"Malformed TLG SDS tag structure, missing colon after name length"</item>
+        <item>"Malformed TLG SDS tag structure, missing equals after name"</item>
+        <item>"Malformed TLG SDS tag structure, missing colon after value length"</item>
+        <item>"Malformed TLG SDS tag structure, missing comma after a tag"</item>
+        <item>"ファイルサイズがゼロです"</item>
+        <item>"メモリ確保に失敗しました"</item>
+        <item>"ファイル読込みエラー"</item>
+        <item>"シグネチャが見つからないか、プリレンダーフォントファイルではありません"</item>
+        <item>"16 ビット UNICODE フォントファイルではありません"</item>
+        <item>"不正なバージョンのヘッダーです"</item>
+        <item>"SaveTLG6: メモリ不足です"</item>
+        <item>"SaveTLG6: ビット長が長すぎます (渡された画像が大きすぎる可能性があります)"</item>
+        <item>"渡された Draw Device からインターフェイスを取得できません"</item>
+        <item>"UTF-16では発生し得ないUTF-8への変換"</item>
+        <item>"layerTreeOwnerInterfaceを持つオブジェクトを指定してください"</item>
+        <item>"スクリプトで例外が発生しました"</item>
+        <item>"ハードウェア例外が発生しました"</item>
+        <item>"スクリプトエディタ (メイン)"</item>
+        <item>"スクリプトエディタ (例外通知)"</item>
+        <item>"フォルダ/アーカイブの選択画面を表示しようとしましたが krdevui.dll が見つからないので表示できません.\n実行するフォルダ/アーカイブはコマンドラインの引数として指定してください"</item>
+        <item>"krdevui.dll が異常か、バージョンが一致しません"</item>
+        <item>"無効な色深度です"</item>
+        <item>"プラグイン %1 を読み込めません"</item>
+        <item>"%1 は有効なプラグインではありません"</item>
+        <item>"プラグインの解放に失敗しました"</item>
+        <item>"プラグインの接続中に他のプラグインを接続することはできまません"</item>
+        <item>"異常な Susie プラグインです"</item>
+        <item>"Susie プラグインでエラーが発生しました/エラーコード %1"</item>
+        <item>"指定されたプラグインは使用中のため解放できません"</item>
+        <item>"%1 は読み込まれていません"</item>
+        <item>"ビットマップ用メモリを確保できません/%1(size=%2)"</item>
+        <item>"スキャンライン %1 は範囲(0～%2)を超えています"</item>
+        <item>"プラグインでエラーが発生しました/%1"</item>
+        <item>"指定されたドライブでは CD-DA を再生できません"</item>
+        <item>"CD-DA を再生できるドライブが見つかりません"</item>
+        <item>"MCI でエラーが発生しました : %1"</item>
+        <item>"有効な SMF ファイルではありません : %1"</item>
+        <item>"指定されたメッセージは MIDI メッセージとして有効な形式ではありません"</item>
+        <item>"DirectSound を初期化できません : %1"</item>
+        <item>"DirectSound セカンダリバッファを作成できません : %1/%2"</item>
+        <item>"ループ情報 %1 は異常です"</item>
+        <item>"指定されたメニュー項目はこのメニュー項目の子ではありません"</item>
+        <item>"Direct3D を初期化できません : %1"</item>
+        <item>"適合する画面モードが見つかりません : %1"</item>
+        <item>"フルスクリーンに切り替えられません : %1"</item>
+        <item>"フルスクリーン中では操作できないプロパティを設定しようとしました"</item>
+        <item>"フルスクリーン中では操作できないメソッドを呼び出そうとしました"</item>
+        <item>"マウスカーソル %1 の読み込みに失敗しました"</item>
+        <item>"ビデオ/Shockwave Flash を再生するためには krmovie.dll / krflash.dll が必要ですが 読み込むことができません"</item>
+        <item>"krmovie.dll/krflash.dll が異常か 対応できないバージョンです"</item>
+        <item>"krmovie.dll/krflash.dll 内でエラーが発生しました/%1"</item>
+        <item>"ウィンドウはすでに存在していません"</item>
+        <item>"レンダリング済みフォントのマッピングに失敗しました : %1"</item>
+        <item>"%1 に書き込みできません。ソフトウェアが実行中のままになっていないか、あるいは書き込み権限があるかどうかを確認してください"</item>
+        <item>"%1 の終了を確認できないため、これを削除できませんでした(このファイルは削除して結構です)"</item>
+        <item>"%1 を実行できません"</item>
+        <item>"プラグインから関数 %1 を要求されましたが、その関数は本体内に存在しません。プラグインと本体のバージョンが正しく対応しているか確認してください"</item>
+        <item>" = (例外発生)"</item>
+        <item>"コンソール : "</item>
+        <item>"(info) Listing files in %1 …"</item>
+        <item>"(info) Total physical memory : %1"</item>
+        <item>"(info) Selected project directory : %1"</item>
+        <item>"too small executable size."</item>
+        <item>"(info) Loading executable embedded options failed (ignoring) : %1"</item>
+        <item>"(info) Loading executable embedded options succeeded."</item>
+        <item>"file not found."</item>
+        <item>"(info) Loading configuration file &amp;quot;&amp;quot;%1&amp;quot;&amp;quot; failed (ignoring) : %2"</item>
+        <item>"(info) Loading configuration file &amp;quot;&amp;quot;%1&amp;quot;&amp;quot; succeeded."</item>
+        <item>"(info) Data path does not exist, trying to make it ... %1"</item>
+        <item>"成功。"</item>
+        <item>"失敗。"</item>
+        <item>"(info) Data path : %1"</item>
+        <item>"(info) Specified option(s) (earlier item has more priority) :"</item>
+        <item>" (none)"</item>
+        <item>"(info) CPU clock (roughly) : %dMHz"</item>
+        <item>"%1 (%2) 上で実行が開始されました"</item>
+        <item>"吉里吉里"</item>
+        <item>"不明なエラーが発生しました。"</item>
+        <item>"終了コード: %d\n"</item>
+        <item>"致命的なエラーが発生しました"</item>
+        <item>"有効なデジタイザー"</item>
+        <item>"統合型のタッチ デジタイザーが入力に使用されています。"</item>
+        <item>"外付けのタッチ デジタイザーが入力に使用されています。"</item>
+        <item>"統合型のペン デジタイザーが入力に使用されています。"</item>
+        <item>"外付けのペン デジタイザーが入力に使用されています。"</item>
+        <item>"複数入力がサポートされた入力デジタイザーが入力に使用されています。"</item>
+        <item>"入力デジタイザーで入力の準備ができています。"</item>
+        <item>"CPUのチェック失敗"</item>
+        <item>"CPU check failure: CPU family 4 or lesser is not supported\r\n%1"</item>
+        <item>"(info) CPU #%1 : "</item>
+        <item>"CPUチェック失敗: サポートしていないCPU\r\n%1"</item>
+        <item>"(info) finally detected CPU features : %1"</item>
+        <item>"CPU check failure: Not supported CPU\r\n%1"</item>
+        <item>"(info) CPU clock : %.1fMHz"</item>
+        <item>"Layer bitmap: Buffer underrun detected. Check your drawing code!"</item>
+        <item>"Layer bitmap: Buffer overrun detected. Check your drawing code!"</item>
+        <item>"Direct3D9 生成失敗"</item>
+        <item>"Faild to decide backbuffer format."</item>
+        <item>"Faild to create Direct3D9 Device."</item>
+        <item>"Faild to set viewport."</item>
+        <item>"Faild to set render state."</item>
+        <item>"warning : Image size too large. May be cannot create texture."</item>
+        <item>"2の累乗サイズのサーフェイスを使用します。"</item>
+        <item>"Cannot allocate D3D off-screen surface/HR=%1"</item>
+        <item>"BasicDrawDevice: Failed to create Direct3D devices: %1"</item>
+        <item>"BasicDrawDevice: Failed to create Direct3D devices: unknown reason"</item>
+        <item>"BasicDrawDevice: テクスチャーは既にロックされています (EndBitmapCompletion() を呼ばずに StartBitmapCompletion() を2回呼び出しています), アンロックしてください."</item>
+        <item>"Internal error/HR=%1"</item>
+        <item>"BasicDrawDevice: (inf) ポリゴン描画に失敗しました/HR=%1"</item>
+        <item>"BasicDrawDevice: (inf) IDirect3DDevice::Present failed/HR=%1"</item>
+        <item>"ChangeDisplaySettings failed: DISP_CHANGE_RESTART"</item>
+        <item>"ChangeDisplaySettings failed: DISP_CHANGE_BADFLAGS"</item>
+        <item>"ChangeDisplaySettings failed: DISP_CHANGE_BADPARAM"</item>
+        <item>"ChangeDisplaySettings failed: DISP_CHANGE_FAILED"</item>
+        <item>"ChangeDisplaySettings failed: DISP_CHANGE_BADMODE"</item>
+        <item>"ChangeDisplaySettings failed: DISP_CHANGE_NOTUPDATED"</item>
+        <item>"ChangeDisplaySettings 失敗: 不明な理由 (%1)"</item>
+        <item>"スクリーンデバイスコンテキストの取得に失敗しました"</item>
+        <item>"オフスクリーンビットマップの生成に失敗しました"</item>
+        <item>"オフスクリーンデバイスコンテキストの生成に失敗しました"</item>
+        <item>"(info) Susie プラグイン情報 : %1"</item>
+        <item>"サポートしていない Bitmap ヘッダーが Susie プラグインから渡されました"</item>
+        <item>"BasicDrawDevice: Direct3D Device の生成に失敗しました : %1"</item>
+        <item>"BasicDrawDevice: Direct3D Device の生成に失敗しました : 不明な理由"</item>
+        <item>"Fatal: どの drawer オブジェクトも生成できませんでした"</item>
+        <item>"&amp;quot;&amp;quot;Basic Draw&amp;quot;&amp;quot; デバイスでは２つ以上のLayer Managerを登録できない"</item>
+        <item>"無効なビデオサイズ"</item>
+        <item>"API から取得したリフレッシュレート : "</item>
+        <item>"リフレッシュレートはまだ間違っているようなので、デフォルト値(16)と仮定します"</item>
+        <item>"(info) IDirect3D9 以上のインターフェイスが見つかりました。現在の Direct3D ドライバ情報を取得します..."</item>
+        <item>"(info) 失敗"</item>
+        <item>"(info) Direct3D 読込み..."</item>
+        <item>"d3d9.dll をロードできません"</item>
+        <item>"Direct3DCreate9 が d3d9.dll に見つかりません"</item>
+        <item>"(info) environment: %1 を使用"</item>
+        <item>"(info) 最適なフルスクリーン解像度を検索 ..."</item>
+        <item>"(info) condition: 推奨スクリーンモード: %1"</item>
+        <item>"(info) condition: モード: %1"</item>
+        <item>"(info) condition: ズームモード: %1"</item>
+        <item>"(info) environment: デフォルトスクリーンモード: %1"</item>
+        <item>"(info) environment: デフォルトスクリーンアスペクトレート: %1 : %2"</item>
+        <item>"(info) environment: 有効なディスプレイモード:"</item>
+        <item>"(info) Panic! ドライバーから提供されたスクリーンモードに適切なものはありません。デフォルト画面サイズ、色数を試します"</item>
+        <item>"(info) result: candidates:"</item>
+        <item>"(info) スクリーンモードの %1 を試みる"</item>
+        <item>"全スクリーンモードを試しましたが、使用可能なモードはありませんでした"</item>
+        <item>"(info) スクリーンモード変更に成功しました"</item>
+        <item>"XP3ファイルかフォルダを選択してください"</item>
+        <item>"D3D : デバイスは消失しています。現在リセットできません。"</item>
+        <item>"D3D : ドライバ内部でエラーが発生しました。アプリケーションをシャットダウンする必要があります。"</item>
+        <item>"D3D : メソッドの呼び出しが無効です。メソッドのパラメータが有効なポインタではない等の可能性があります。"</item>
+        <item>"D3D : Direct3D が処理を行うのに十分なディスプレイ メモリがありません"</item>
+        <item>"D3D : Direct3D が呼び出しを完了するための十分なメモリを割り当てることができませんでした"</item>
+        <item>"D3D : テクスチャ サーフェイスのピクセル フォーマットが無効です"</item>
+        <item>"D3D : 色値に対して指定されているテクスチャ ブレンディング処理を、デバイスがサポートしていません"</item>
+        <item>"D3D : 色値に対して指定されているテクスチャ ブレンディング引数を、デバイスがサポートしていません"</item>
+        <item>"D3D : アルファ チャンネルに対して指定されているテクスチャ ブレンディング処理を、デバイスがサポートしていません"</item>
+        <item>"D3D : アルファ チャンネルに対して指定されているテクスチャ ブレンディング引数を、デバイスがサポートしていません"</item>
+        <item>"D3D : デバイスがサポートしている数より多くのテクスチャ フィルタリング処理を、アプリケーションが要求しています"</item>
+        <item>"D3D : 現在のテクスチャ フィルタは同時には使えません"</item>
+        <item>"D3D : デバイスが指定されたテクスチャ係数値をサポートしていません"</item>
+        <item>"D3D : 現在設定されているレンダリング ステートは同時には使えません"</item>
+        <item>"D3D : デバイスが指定されたテクスチャ フィルタをサポートしていません"</item>
+        <item>"D3D : 現在のテクスチャは同時には使えません"</item>
+        <item>"D3D : 要求された項目が見つかりませんでした"</item>
+        <item>"D3D : 指定されたバッファ サイズに保持できる以上のデータが存在します"</item>
+        <item>"D3D : デバイスは、消失していますが、現在リセットできます"</item>
+        <item>"D3D : このデバイスは、照会されたテクニックをサポートしていません"</item>
+        <item>"D3D : 要求されたデバイスの種類が無効です"</item>
+        <item>"D3D : 使用されません"</item>
+        <item>"D3D : このサーフェスとの間で情報を転送している以前のビット演算が不完全です"</item>
+        <item>"D3D : このコードを返したデバイスが原因で、ハードウェア アダプターが OS によってリセットされました"</item>
+        <item>"D3D : 指定されたサイズまたはディスプレイ モードのオーバーレイをデバイスがサポートしていません。"</item>
+        <item>"D3D : 指定されたサーフェス フォーマットのオーバーレイをデバイスがサポートしていません。"</item>
+        <item>"D3D : D3DERR_CANNOTPROTECTCONTENT"</item>
+        <item>"D3D : 指定された暗号化アルゴリズムをサポートしていません。"</item>
+        <item>"D3D : D3DERR_PRESENT_STATISTICS_DISJOINT"</item>
+        <item>"D3D : ハードウェア アダプターが削除されています"</item>
+        <item>"D3D : 成功しましたが、このフォーマットに対するミップマップの自動生成はサポートされていません"</item>
+        <item>"D3D : Direct3D サブシステム内で原因不明のエラーが発生しました"</item>
+        <item>"D3D : 無効なパラメータが関数に渡されました"</item>
+        <item>"D3D : 不明なエラーが発生しました"</item>
+        <item>"Access Violation: スレッドが適切なアクセス権を持たない仮想アドレスに対して、読み取りまたは書き込みを試みました。"</item>
+        <item>"Break Point: ブレークポイントに到達しました。"</item>
+        <item>"Data Type Misalignment: 境界整列をサポートしないハードウェア上で、スレッドが境界に整列していないデータの読み取りまたは書き込みを試みました。たとえば、16 ビットの値は 2 バイトの境界線上に、32 ビットの値は 4 バイトの境界線上に整列していなければなりません。"</item>
+        <item>"Single Step: トレーストラップなどの単一命令メカニズムから 1 つの命令の実行が通知されました。"</item>
+        <item>"Array Bounds Exceede: スレッドが範囲外の配列要素にアクセスしようとしました。使用中のハードウェアは境界チェックをサポートしています。"</item>
+        <item>"Denormal Operand: 浮動小数点演算のオペランドの 1 つが不正規化値です。不正規化値とは、小さすぎて標準の浮動小数点値として表現できない値です。"</item>
+        <item>"Divide By Zero: スレッドが浮動小数点値を 0 の浮動小数点除数で除算しようとしました。"</item>
+        <item>"Inexact Result: 浮動小数点演算の結果を 10 進小数で正確に表現できません。"</item>
+        <item>"Invalid Operation: このリストに含まれていない例外が発生しました。"</item>
+        <item>"Overflow: 浮動小数点演算の指数が大きく、対応する型によって表現できません。"</item>
+        <item>"Stack Check: 浮動小数点演算の結果、スタックのオーバーフローまたはアンダーフローが発生しました。"</item>
+        <item>"Underflow: 浮動小数点演算の指数が小さく、対応する型によって表現できません。"</item>
+        <item>"Divide By Zero: スレッドが整数値を 0 の整数除数で除算しようとしました。"</item>
+        <item>"Overflow: 整数演算結果の最上位ビットが繰り上がりました。"</item>
+        <item>"Priv Instruction: 現在のマシンモードで許可されていない演算を行う命令をスレッドが実行しようとしました。"</item>
+        <item>"Noncontinuable Exception: 継続不可能な例外が発生した後、スレッドが実行を継続しようとしました。"</item>
+        <item>"Guard Page: PAGE_GUARD で保護されたメモリにアクセスしました。"</item>
+        <item>"Illegal Instruction: 無効な命令を実行しようとしました。"</item>
+        <item>"In Page Error: 存在しないページへアクセスしようとしました、またシステムはページをロードできません。 "</item>
+        <item>"Invalid Disposition: 例外ハンドラは無効な配置をディスパッチャに返しました。C言語のような高水準言語では発生しません。"</item>
+        <item>"Invalid Handle: 無効な(おそらく既に閉じられている)カーネルオブジェクトのハンドルを使用しました。"</item>
+        <item>"Stack Overflow: スタックを使い果たしました。"</item>
+        <item>"Unwind Consolidate: フレーム結合が実行されました。"</item>
+        <item>"既に表示、もしくは無効になっているウィンドウをモーダル表示することは出来ません。"</item>
+        <item>"ウィンドウが1個の時モーダル表示することは出来ません。"</item>
+    </string-array>
+</resources>

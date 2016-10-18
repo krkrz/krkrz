@@ -11,8 +11,8 @@ use warnings;
 use strict;
 
 {
-	my $jp_res_filename = 'string_table_jp.cpp';
-	my $en_res_filename = 'string_table_en.cpp';
+	my $jp_res_filename = 'arrays-ja.xml';
+	my $en_res_filename = 'arrays-en.xml';
 	#my $res_header_filename = 'string_table_resource.h';
 	my $tjs_error_header = 'tjsErrorInc.h';
 	my $tvp_mes_header = 'MsgIntfInc.h';
@@ -97,10 +97,14 @@ use strict;
 	open FHMWH, ">$tvp_mes_win32_header" or die;
 	open FHCPP, ">$tvp_mes_load" or die;
 
-	print FHJP "#include \"tjsCommHead.h\"\n";
-	print FHJP "const tjs_char* MESSAGE_RESOURCE[] = {\n";
-	print FHEN "#include \"tjsCommHead.h\"\n";
-	print FHEN "const tjs_char* MESSAGE_RESOURCE[] = {\n";
+	print FHJP "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+	print FHJP "<resources>\n";
+	print FHJP "    <string-array name=\"system_message_resource\">\n";
+
+	print FHEN "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+	print FHEN "<resources>\n";
+	print FHEN "    <string-array name=\"system_message_resource\">\n";
+
 
 #	print FHH  <<'HEADER';
 #// generated from gentext.pl Messages.xlsx
@@ -153,8 +157,18 @@ CPPSRC
 	for( my $i = 0; $i < $length; $i++ ) {
 		my $len = length $res_id[$i];
 		if( ($len+1) > $maxlen ) { $maxlen = ($len+1); }
+		$mes_jp[$i] =~ s/\"/&quot;/g;
+		$mes_jp[$i] =~ s/\'/&apos;/g;
+		$mes_jp[$i] =~ s/</&lt;/g;
+		$mes_jp[$i] =~ s/>/&gt;/g;
+		$mes_jp[$i] =~ s/&/&amp;/g;
 		$len = length $mes_jp[$i];
 		if( ($len+1) > $mesmaxlen ) { $mesmaxlen = ($len+1); }
+		$mes_en[$i] =~ s/\"/&quot;/g;
+		$mes_en[$i] =~ s/\'/&apos;/g;
+		$mes_en[$i] =~ s/</&lt;/g;
+		$mes_en[$i] =~ s/>/&gt;/g;
+		$mes_en[$i] =~ s/&/&amp;/g;
 		$len = length $mes_en[$i];
 		if( ($len+1) > $mesmaxlen ) { $mesmaxlen = ($len+1); }
 	}
@@ -163,15 +177,12 @@ CPPSRC
 
 	for( my $i = 0; $i < $length; $i++ ) {
 		my $len = length $res_id[$i];
-		#my $line = "    ".$res_id[$i];
-		my $line = "\t";
 		my $header_res = "#define ".$res_id[$i];
 		for( my $j = $len; $j < $maxlen; $j++ ) {
-			# $line .= " ";
 			$header_res .= " ";
 		}
-		my $jpline = $line . "TJS_W(\"".$mes_jp[$i]."\"),\n";
-		my $enline = $line . "TJS_W(\"".$mes_en[$i]."\"),\n";
+		my $jpline = "        <item>\"".$mes_jp[$i]."\"</item>\n";
+		my $enline = "        <item>\"".$mes_en[$i]."\"</item>\n";
 		print FHJP $jpline;
 		print FHEN $enline;
 		#my $id = $i + 10000; # 10000以降の番号に割り当てておく
@@ -241,10 +252,12 @@ CPPSRC
 
 	close FHCPP;
 
-	print FHJP "};\n";
+	print FHJP "    </string-array>\n";
+	print FHJP "</resources>\n";
 	close FHJP;
 
-	print FHEN "};\n";
+	print FHEN "    </string-array>\n";
+	print FHEN "</resources>\n";
 	close FHEN;
 
 	#print FHH "#endif\n";
