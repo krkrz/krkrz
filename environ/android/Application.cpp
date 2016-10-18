@@ -16,6 +16,8 @@
 #include <android/log.h>
 #include <android_native_app_glue.h>
 #include <android/looper.h>
+#include <android/native_window.h>
+#include <android/native_window_jni.h>
 #include "Application.h"
 
 #include "ScriptMgnIntf.h"
@@ -33,7 +35,7 @@ tTVPApplication* Application;
 
 
 tTVPApplication::tTVPApplication()
-: app_state_(NULL)
+: app_state_(NULL), jvm_(NULL)
 {
 }
 tTVPApplication::~tTVPApplication() {
@@ -492,6 +494,42 @@ std::vector<std::string>* LoadLinesFromFile( const std::wstring& path ) {
     fclose(fp);
 	return ret;
 }
+void tTVPApplication::nativeOnStart(JNIEnv *jenv, jobject obj) {
+	Application->onStart();
+}
+void tTVPApplication::nativeOnResume(JNIEnv *jenv, jobject obj) {
+	Application->onResume();
+}
+void tTVPApplication::nativeOnPause(JNIEnv *jenv, jobject obj) {
+	Application->onPause();
+}
+void tTVPApplication::nativeOnStop(JNIEnv *jenv, jobject obj) {
+	Application->onStop();
+}
+void tTVPApplication::writeBitmapToNative( const void * src ) {
+	int32_t format = ANativeWindow_getFormat( window_ );
+	ARect dirty;
+	dirty.left = 0;
+	dirty.top = 0;
+	dirty.right = ANativeWindow_getWidth( window_ );
+	dirty.bottom = ANativeWindow_getHeight( window_ );
+	ANativeWindow_Buffer buffer;
+	ANativeWindow_lock( window_ , &buffer, &dirty );
+	unsigned char* bits = (unsigned char*)buffer.bits;
+	for( int32_t y = 0; y < buffer.height; y++ ) {
+		unsigned char* lines = bits;
+		for( int32_t x = 0; x < buffer.width; x++ ) {
+			// src を書き込む
+			lines[0] = 0xff;
+			lines[1] = 0xff;
+			lines[2] = 0;
+			lines[3] = 0xff;
+			lines += 4;
+		}
+		bits += buffer.stride*sizeof(int32_t);
+	}
+	ANativeWindow_unlockAndPost( window_  );
+}
 
 extern "C" {
 iTVPApplication* CreateApplication() {
@@ -521,3 +559,57 @@ void TVPGetAllFontList( std::vector<std::wstring>& list ) {
 	list.clear();
 }
 
+void tTVPApplication::nativeSetSurface(JNIEnv *jenv, jobject obj, jobject surface) {
+	if( surface != 0 ) {
+		ANativeWindow* window = ANativeWindow_fromSurface(jenv, surface);
+		LOGI("Got window %p", window);
+		Application->setWindow(window);
+	} else {
+		LOGI("Releasing window");
+		ANativeWindow_release(Application->getWindow());
+		Application->setWindow(nullptr);
+	}
+	return;
+}
+
+static JNINativeMethod methods[] = {
+		// Java側関数名, (引数の型)返り値の型, native側の関数名の順に並べます
+		{ "nativeOnStart", "()V", (void *)tTVPApplication::nativeOnStart },
+		{ "nativeOnResume", "()V", (void *)tTVPApplication::nativeOnResume },
+		{ "nativeOnPause", "()V", (void *)tTVPApplication::nativeOnPause },
+		{ "nativeOnStop", "()V", (void *)tTVPApplication::nativeOnStop },
+		{ "nativeSetSurface", "(LAndroid/view/Surface)V", (void *)tTVPApplication::nativeSetSurface },
+};
+
+jint registerNativeMethods( JNIEnv* env, const char *class_name, JNINativeMethod *methods, int num_methods ) {
+	int result = 0;
+	jclass clazz = env->FindClass(class_name);
+	if (clazz) {
+		int result = env->RegisterNatives(clazz, methods, num_methods);
+		if (result < 0) {
+			LOGE("registerNativeMethods failed(class=%s)", class_name);
+		}
+	} else {
+		LOGE("registerNativeMethods: class'%s' not found", class_name);
+	}
+	return result;
+}
+#define	NUM_ARRAY_ELEMENTS(p) ((int) sizeof(p) / sizeof(p[0]))
+int registerJavaMethod( JNIEnv *env)  {
+	if( registerNativeMethods(env, "jp/kirikiri/krkrz/MainActivity", methods, NUM_ARRAY_ELEMENTS(methods)) < 0) {
+		return -1;
+	}
+	return 0;
+}
+extern "C" jint JNI_OnLoad( JavaVM *vm, void *reserved ) {
+	JNIEnv *env;
+	if (vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6) != JNI_OK) {
+		return JNI_ERR;
+	}
+	Application = new tTVPApplication();
+	Application->setJavaVM( vm );
+
+	// register native methods
+	int res = registerJavaMethod(env);
+	return JNI_VERSION_1_6;
+}

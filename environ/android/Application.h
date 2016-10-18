@@ -39,6 +39,9 @@ enum {
 class NativeEventQueueIntarface;
 
 class tTVPApplication : public iTVPApplication {
+	JavaVM* jvm_;
+	ANativeWindow* window_;
+
 	struct android_app* app_state_;
 	tTVPScreen screen_;
 	std::wstring title_;
@@ -342,6 +345,20 @@ public:
 	 */
 	void ProcessMessages() {}
 	void HandleMessage() {}
+
+	void setJavaVM( JavaVM* jvm ) {
+		jvm_ = jvm;
+	}
+	void setWindow( ANativeWindow* window ) {
+		window_ = window;
+	}
+	ANativeWindow* getWindow() { return window_; }
+	static void nativeOnStart(JNIEnv *jenv, jobject obj);
+	static void nativeOnResume(JNIEnv *jenv, jobject obj);
+	static void nativeOnPause(JNIEnv *jenv, jobject obj);
+	static void nativeOnStop(JNIEnv *jenv, jobject obj);
+	static void nativeSetSurface(JNIEnv *jenv, jobject obj, jobject surface);
+	void writeBitmapToNative( const void * bits );
 };
 std::vector<std::string>* LoadLinesFromFile( const std::wstring& path );
 
