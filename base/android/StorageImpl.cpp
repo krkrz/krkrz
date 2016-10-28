@@ -286,9 +286,9 @@ ttstr TVPGetTemporaryName()
 
 		if(!TVPTempPathInit)
 		{
-			tjs_char tmp[MAX_PATH+1];
-			TVPUtf8ToWideCharString( Application->GetCachePath()->c_str(), static_cast<tjs_char*>(tmp) );
-			TVPTempPath = tmp;
+			//tjs_char tmp[MAX_PATH+1];
+			//TVPUtf8ToWideCharString( Application->GetCachePath()->c_str(), static_cast<tjs_char*>(tmp) );
+			TVPTempPath = ttstr( Application->GetCachePath()->c_str() );
 
 			if(TVPTempPath.GetLastChar() != TJS_W('\\')) TVPTempPath += TJS_W("\\");
 			TVPProcessID = static_cast<tjs_int>( getpid() );

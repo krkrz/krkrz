@@ -67,7 +67,7 @@ public:
 //		Succeeded = true;
 //		SetThreadAffinityMask(GetHandle(), tam);
 
-		Resume();
+		StartTread();
 	}
 
 	~tTVPCPUCheckThread()

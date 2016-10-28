@@ -13,24 +13,30 @@
 #include "tjsNative.h"
 #include "ThreadIntf.h"
 
-#include <pthread.h>
-#include <semaphore.h>
-
 //---------------------------------------------------------------------------
 // tTVPThread
 //---------------------------------------------------------------------------
+#include <thread>
+#include <condition_variable>
+#include <mutex>
+#include <atomic>
+
 class tTVPThread
 {
+protected:
+	std::thread* Thread;
+private:
 	bool Terminated;
-	pthread_t Handle;
-	//uint32_t threadId;
-	bool Suspended;
-	sem_t SuspendSemaphore;
 
-	static void* StartProc(void * arg);
+	std::mutex Mtx;
+	std::condition_variable Cond;
+	bool ThreadStarting;
+
+	void StartProc();
 
 public:
-	tTVPThread(bool suspended);
+	tTVPThread() {}
+	tTVPThread( bool suspended );
 	virtual ~tTVPThread();
 
 	bool GetTerminated() const { return Terminated; }
@@ -38,25 +44,19 @@ public:
 	void Terminate() { Terminated = true; }
 
 protected:
-	virtual void Execute() = 0;
+	virtual void Execute() {}
 
 public:
-	void WaitFor();
+	void StartTread();
+	void WaitFor() { if (Thread && Thread->joinable()) { Thread->join(); } }
 
 	tTVPThreadPriority GetPriority();
 	void SetPriority(tTVPThreadPriority pri);
 
-	//void Suspend();
-	void Resume();
-	// Suspend はサポートしないので、Event(semaphore)を使って待ち合わせする
-
-#ifdef WIN32
-	HANDLE GetHandle() const { return Handle; } 	/* win32 specific */
-	DWORD GetThreadId() const { return ThreadId; }  /* win32 specific */
-#endif
+	std::thread::native_handle_type GetHandle() { if(Thread) return Thread->native_handle(); else return reinterpret_cast<std::thread::native_handle_type>(nullptr); }
+	std::thread::id GetThreadId() { if(Thread) return Thread->get_id(); else return std::thread::id(); }
 };
 //---------------------------------------------------------------------------
-
 
 
 //---------------------------------------------------------------------------
@@ -64,19 +64,41 @@ public:
 //---------------------------------------------------------------------------
 class tTVPThreadEvent
 {
-#ifdef WIN32
-	HANDLE Handle;
-#else	// pthread
-	sem_t Handle;
-#endif
+	std::mutex Mtx;
+	std::condition_variable Cond;
+	bool IsReady;
 
 public:
-	tTVPThreadEvent(bool manualreset = false);
-	virtual ~tTVPThreadEvent();
+	tTVPThreadEvent() : IsReady(false) {}
+	virtual ~tTVPThreadEvent() {}
 
-	void Set();
-	void Reset();
-	bool WaitFor(tjs_uint timeout);
+	void Set() {
+		{
+			std::lock_guard<std::mutex> lock(Mtx);
+			IsReady = true;
+		}
+		Cond.notify_all();
+	}
+	/*
+	void Reset() {
+		std::lock_guard<std::mutex> lock(Mtx);
+		IsReady = false;
+	}
+	*/
+	bool WaitFor( tjs_uint timeout ) {
+		std::unique_lock<std::mutex> lk( Mtx );
+		if( timeout == 0 ) {
+			Cond.wait( lk, [this]{ return IsReady;} );
+			IsReady = false;
+			return true;
+		} else {
+			//std::cv_status result = Cond.wait_for( lk, std::chrono::milliseconds( timeout ) );
+			//return result == std::cv_status::no_timeout;
+			bool result = Cond.wait_for( lk, std::chrono::milliseconds( timeout ), [this]{ return IsReady;} );
+			IsReady = false;
+			return result;
+		}
+	}
 };
 //---------------------------------------------------------------------------
 

@@ -147,13 +147,14 @@ HEADER
 #include "tjsError.h"
 #include "MsgIntf.h"
 #include "SysInitIntf.h"
+#include <jni.h>
 
 static bool IS_LOAD_MESSAGE = false;
 CPPSRC
 
 	my $length = @mes_id;
 	my $maxlen = 24;
-	my $mesmaxlen = 1024;
+	my $mesmaxlen = 10;
 	for( my $i = 0; $i < $length; $i++ ) {
 		my $len = length $res_id[$i];
 		if( ($len+1) > $maxlen ) { $maxlen = ($len+1); }
@@ -162,6 +163,7 @@ CPPSRC
 		$mes_jp[$i] =~ s/</&lt;/g;
 		$mes_jp[$i] =~ s/>/&gt;/g;
 		$mes_jp[$i] =~ s/&/&amp;/g;
+		$mes_jp[$i] =~ s/%/%%/g;
 		$len = length $mes_jp[$i];
 		if( ($len+1) > $mesmaxlen ) { $mesmaxlen = ($len+1); }
 		$mes_en[$i] =~ s/\"/&quot;/g;
@@ -169,10 +171,11 @@ CPPSRC
 		$mes_en[$i] =~ s/</&lt;/g;
 		$mes_en[$i] =~ s/>/&gt;/g;
 		$mes_en[$i] =~ s/&/&amp;/g;
+		$mes_en[$i] =~ s/%/%%/g;
 		$len = length $mes_en[$i];
 		if( ($len+1) > $mesmaxlen ) { $mesmaxlen = ($len+1); }
 	}
-	#print FHCPP "static const int MAX_MESSAGE_LENGTH = $mesmaxlen;\n";
+	print FHCPP "static const int MAX_MESSAGE_LENGTH = $mesmaxlen;\n";
 	print FHCPP "enum {\n";
 
 	for( my $i = 0; $i < $length; $i++ ) {
@@ -209,10 +212,17 @@ CPPSRC
 	#	print FHCPP "\t".$res_id[$i].",\n";
 	#}
 	print FHCPP <<'CPPSRC';
-extern const tjs_char* MESSAGE_RESOURCE[];
-void TVPLoadMessage() {
+static tjs_char MESSAGE_WORK[MAX_MESSAGE_LENGTH];
+void TVPLoadMessage( JNIEnv *jenv, jobject obj, jobjectArray mesarray ) {
 	if( IS_LOAD_MESSAGE ) return;
 	IS_LOAD_MESSAGE = true;
+
+	int stringCount = jenv->GetArrayLength(mesarray);
+	assert( NUM_MESSAGE_MAX == stringCount );
+
+	jstring string;
+	int jstrlen;
+	const jchar* chars;
 CPPSRC
 	my $is_opt = 0;
 	for( my $i = 0; $i < $length; $i++ ) {
@@ -222,31 +232,30 @@ CPPSRC
 		if( defined $mes_opt[$i] ) {
 			if( $mes_opt[$i] eq "CRLF" ) {
 				print FHCPP "#ifdef TJS_TEXT_OUT_CRLF\n";
-				print FHCPP "\t".$mes_id[$i].".AssignMessage( MESSAGE_RESOURCE[".$enumid."] );\n";
+				print FHCPP "\t"."string = (jstring) jenv->GetObjectArrayElement( mesarray, ".$enumid." );\n";
 				print FHCPP "#else\n";
 				$is_opt = 1;
 			} elsif( $mes_opt[$i] eq "ANSI" ) {
 				print FHCPP "#ifdef TVP_TEXT_READ_ANSI_MBCS\n";
-				print FHCPP "\t".$mes_id[$i].".AssignMessage( MESSAGE_RESOURCE[".$enumid."] );\n";
+				print FHCPP "\t"."string = (jstring) jenv->GetObjectArrayElement( mesarray, ".$enumid." );\n";
 				print FHCPP "#else\n";
 				$is_opt = 1;
 			}
 		} else {
-			print FHCPP "\t".$mes_id[$i].".AssignMessage( MESSAGE_RESOURCE[".$enumid."] );\n";
+			print FHCPP "\t"."string = (jstring) jenv->GetObjectArrayElement( mesarray, ".$enumid." );\n";
 			if( $is_opt == 1 ) {
 				print FHCPP "#endif\n";
 				$is_opt = 0;
 			}
+			print FHCPP "\t"."jstrlen = jenv->GetStringLength( string );\n";
+			print FHCPP "\t"."chars = jenv->GetStringChars( string, nullptr );\n";
+			print FHCPP "\t"."TJS_strcpy_maxlen( MESSAGE_WORK, static_cast<const tjs_char*>(chars), jstrlen );\n";
+			print FHCPP "\t"."MESSAGE_WORK[jstrlen] = TJS_W('\\0');\n";
+			print FHCPP "\t"."jenv->ReleaseStringChars( string, chars );\n";
+			print FHCPP "\t".$mes_id[$i].".AssignMessage( MESSAGE_WORK );\n\n";
 		}
 	}
 	print FHCPP <<'CPPSRC';
-}
-const tjs_char* TVPGetMessage( tjs_int id ) {
-	if( id >= 0 && id < NUM_MESSAGE_MAX ) {
-		return MESSAGE_RESOURCE[id];
-	} else {
-		return NULL;
-	}
 }
 CPPSRC
 

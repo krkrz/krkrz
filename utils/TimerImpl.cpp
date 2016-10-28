@@ -90,13 +90,19 @@ tTVPTimerThread::tTVPTimerThread() : tTVPThread(true), EventQueue(this,&tTVPTime
 	PendingEventsAvailable = false;
 	SetPriority(TVPLimitTimerCapacity ? ttpNormal : ttpHighest);
 	EventQueue.Allocate();
+#ifdef ANDROID
+	StartTread();
+#else
 	Resume();
+#endif
 }
 //---------------------------------------------------------------------------
 tTVPTimerThread::~tTVPTimerThread()
 {
 	Terminate();
+#ifdef _WIN32
 	Resume();
+#endif
 	Event.Set();
 	WaitFor();
 	EventQueue.Deallocate();

@@ -2,7 +2,7 @@
 #include "tjsCommHead.h"
 
 #include "WindowForm.h"
-
+#include "ActivityEvents.h"
 
 tjs_uint32 TVP_TShiftState_To_uint32(TShiftState state) {
 	tjs_uint32 result = 0;
@@ -35,11 +35,39 @@ TShiftState TVP_TShiftState_From_uint32(tjs_uint32 state){
 	return result;
 }
 
-TTVPWindowForm::TTVPWindowForm( class tTVPApplication* app, class tTJSNI_Window* ni ) : touch_points_(this) {
+TTVPWindowForm::TTVPWindowForm( class tTVPApplication* app, class tTJSNI_Window* ni )
+ : touch_points_(this), EventQueue(this,&TTVPWindowForm::WndProc) {
+	EventQueue.Allocate();
 }
 TTVPWindowForm::~TTVPWindowForm() {
+	EventQueue.Deallocate();
 }
+void TTVPWindowForm::WndProc(NativeEvent& ev) {
+	switch( ev.Message ) {
+	case AM_START:
+		break;
+	case AM_RESTART:
+		break;
+	case AM_RESUME:
+		break;
+	case AM_PAUSE:
+		break;
+	case AM_STOP:
+		break;
+	case AM_DESTROY:
+		break;
+	case AM_SURFACE_CHANGED:
+		break;
+	case AM_SURFACE_CREATED:
+		break;
+	case AM_SURFACE_DESTORYED:
+		break;
 
+	default:
+		EventQueue.HandlerDefault( ev );
+		break;
+	}
+}
 	// Windowが有効かどうか、無効だとイベントが配信されない
 bool TTVPWindowForm::GetFormEnabled() {
 	return true;

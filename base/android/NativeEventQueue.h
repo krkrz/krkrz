@@ -5,13 +5,14 @@
 // 呼び出されるハンドラがシングルスレッドで動作するイベントキュー
 
 struct NativeEvent {
-	int Result;
+	// int Result;
 	tjs_uint Message;
-	tjs_uint WParam;
+	tjs_uint64 WParam;
 	tjs_uint64 LParam;
 
 	NativeEvent(){}
-	NativeEvent( int mes ) : Result(0), Message(mes), WParam(0), LParam(0) {}
+	NativeEvent( int mes ) : Message(mes), WParam(0), LParam(0) {}
+	NativeEvent( int mes, tjs_int64 wparam, tjs_int64 lparam ) : Message(mes), WParam(wparam), LParam(lparam) {}
 };
 
 class NativeEventQueueIntarface {

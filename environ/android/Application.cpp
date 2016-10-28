@@ -18,6 +18,7 @@
 #include <android/looper.h>
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
+#include <android/asset_manager_jni.h>
 #include "Application.h"
 
 #include "ScriptMgnIntf.h"
@@ -26,130 +27,107 @@
 #include "TickCount.h"
 #include "NativeEventQueue.h"
 #include "CharacterSet.h"
+#include "WindowForm.h"
 
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "krkrz", __VA_ARGS__))
 #define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "krkrz", __VA_ARGS__))
 #define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR, "krkrz", __VA_ARGS__))
 
+static const tjs_int TVP_VERSION_MAJOR = 1;
+static const tjs_int TVP_VERSION_MINOR = 0;
+static const tjs_int TVP_VERSION_RELEASE = 0;
+static const tjs_int TVP_VERSION_BUILD = 1;
+
 tTVPApplication* Application;
 
+/**
+ * Android 版のバージョン番号はソースコードに埋め込む
+ * パッケージのバージョン番号はアプリのバージョンであって、エンジンのバージョンではないため
+ * apk からバージョン番号を取得するのは好ましくない。
+ */
+void TVPGetFileVersionOf( tjs_int& major, tjs_int& minor, tjs_int& release, tjs_int& build ) {
+	major = TVP_VERSION_MAJOR;
+	minor = TVP_VERSION_MINOR;
+	release = TVP_VERSION_RELEASE;
+	build = TVP_VERSION_BUILD;
+}
+
+/**
+ * WM_... のように AM_... でメッセージを作ると理解早いかな
+ *
+ * 初期化は複数段階で行う必要がある
+ * native 初期化 > Java 側初期化 > Java側からnativeへ諸設定 > nativeスレッド本格始動
+ */
 
 tTVPApplication::tTVPApplication()
-: app_state_(NULL), jvm_(NULL)
+: jvm_(nullptr), window_(nullptr), asset_manager_(nullptr), config_(nullptr), is_terminate_(false), main_window_(nullptr)
 {
 }
 tTVPApplication::~tTVPApplication() {
 }
-//-------------------------------------------------------------------
-#if 0
-class AssetCache {
-	class AssetDirectory {
-		bool is_file_;
-		std::string name_;
-		std::map<std::string,AssetDirectory*> files_;
-	public:
-		AssetDirectory() : is_file_(false) {}
-		AssetDirectory( bool isfile, const char* name ) : is_file_(isfile), name_(name) {}
-		AssetDirectory( bool isfile, const std::string& name ) : is_file_(isfile), name_(name) {}
-		~AssetDirectory() {
-			std::map<std::string,AssetDirectory*>::iterator i = files_.begin();
-			for( ; i != files_.end(); ++i ) {
-				delete (*i).second;
-			}
-			files_.clear();
-		}
-		void pushFile( const std::string& name, AssetDirectory* dir ) {
-			files_.insert( std::map<std::string,AssetDirectory*>::value_type( name, dir ) );
-		}
-		AssetDirectory* getFile( const std::string& name ) {
-			std::map<std::string,AssetDirectory*>::iterator i = files_.find( name );
-			if( i != files_.end() ) {
-				return (*i).second;
-			} else {
-			}
-		}
-		const std::string& getName() const { return name_; }
-		bool isFile() const { return is_file_; }
-	};
-	AssetDirectory root_;
 
-private:
-	void searchDir( AAssetManager* mgr, AAssetDir* dir, AssetDirectory& current, const std::string& base ) {
-		LOGI( "find path %s\n", base.c_str() );
-		const char* filename = NULL;
-		do {
-			filename = AAssetDir_getNextFileName( dir );
-			if( filename ) {
-				std::string curfile(filename);
-				std::string path( base + curfile );
-				//AAssetDir* newdir = AAssetManager_openDir( mgr, path.c_str() );
-				// ファイルとディレクトリの識別方法はない？
-				// そもそもファイルしか得られない様子
-				// Asset に頼った実装は無理ぽ、Assetからローカルにファイルコピーして動かした方が良さげ
-				// スクリプト書いて、実行パス指定した方がいいな
-				AAssetDir* newdir = NULL;
-				if( newdir ) {
-					LOGI( "find dir %s\n", path.c_str() );
-					AssetDirectory* finddir = new AssetDirectory( false, curfile );
-					current.pushFile( curfile, finddir );
-					// 再帰
-					searchDir( mgr, newdir, *finddir, path + std::string("/") );
-					AAssetDir_close( newdir );
+NativeEvent* tTVPApplication::createNativeEvent() {
+	std::lock_guard<std::mutex> lock( main_thread_mutex_ );
+	if( command_cache_.empty() ) {
+		return new NativeEvent();
+	} else {
+		NativeEvent* ret = command_cache_.back();
+		command_cache_.pop_back();
+		return ret;
+	}
+}
+void tTVPApplication::releaseNativeEvent( NativeEvent* ev ) {
+	std::lock_guard<std::mutex> lock( main_thread_mutex_ );
+	command_cache_.push_back( ev );
+}
+// コマンドをメインのメッセージループに投げる
+void tTVPApplication::postEvent( const NativeEvent* ev, NativeEventQueueIntarface* handler ) {
+	std::lock_guard<std::mutex> lock( main_thread_mutex_ );
+	NativeEvent* e = createNativeEvent();
+	e->Message = ev->Message;
+	e->WParam = ev->WParam;
+	e->LParam = ev->LParam;
+	command_que_.push( EventCommand( handler, e ) );
+
+	// メインスレッドを起こす
+	wakeupMainThread();
+}
+void tTVPApplication::wakeupMainThread() {
+	main_thread_cv_.notify_one();
+}
+void tTVPApplication::mainLoop() {
+	while( is_terminate_ ) {
+		{	// イベントキューからすべてのイベントをディスパッチ
+			std::lock_guard<std::mutex> lock( main_thread_mutex_ );
+			while( !command_que_.empty() ) {
+				NativeEventQueueIntarface* handler = command_que_.front().target;
+				NativeEvent* event = command_que_.front().command;
+				command_que_.pop();
+
+				if( handler != nullptr ) {
+					// ハンドラ指定付きの場合はハンドラから探して見つからったらディスパッチ
+					auto result = std::find_if(event_handlers_.begin(), event_handlers_.end(), [handler](NativeEventQueueIntarface* x) { return x == handler; });
+					if( result != event_handlers_.end() ) {
+						(*result)->Dispatch( *event );
+					}
 				} else {
-					LOGI( "find file %s\n", path.c_str() );
-					// ファイルだった
-					current.pushFile( curfile, new AssetDirectory( true, curfile ) );
+					// ハンドラ指定のない場合はすべてのハンドラでディスパッチ
+					for( std::vector<NativeEventQueueIntarface*>::iterator it = event_handlers_.begin(); it != event_handlers_.end(); it++ ) {
+						if( (*it) != nullptr ) {
+							(*it)->Dispatch( *event );
+						}
+					}
 				}
-			}
-		} while( filename );
-	}
-public:
-	AssetCache() {}
-	void initialize() {
-		AAssetManager* mgr = Application->getAssetManager();
-		AAssetDir* dir = AAssetManager_openDir( mgr, "" );
-		if( dir ) {
-			searchDir( mgr, dir, root_, std::string("") );
-			AAssetDir_close( dir );
-		}
-		
-		AAsset* root = AAssetManager_open( mgr, "", AASSET_MODE_STREAMING );
-		if( root ) {
-			off_t start, length;
-			int fd = AAsset_openFileDescriptor( root, start, length );
-			if( fd >= 0 ) {
-				
+				releaseNativeEvent( event );
 			}
 		}
-	}
-};
-//-------------------------------------------------------------------
-#endif
-extern void print_font_files();
-bool tTVPApplication::initCommandPipe() {
-	int msgpipe[2];
-	//if( pipe(msgpipe) ) {
-	if( pipe2(msgpipe, O_NONBLOCK | O_CLOEXEC) == -1 ) {
-		LOGE("could not create pipe: %s", strerror(errno));
-		return false;
-	}
-	user_msg_read_ = msgpipe[0];
-	user_msg_write_ = msgpipe[1];
-	ALooper_addFd( app_state_->looper, user_msg_read_, LOOPER_ID_USER, ALOOPER_EVENT_INPUT, tTVPApplication::messagePipeCallBack, this );
-
-	return true;
-}
-void tTVPApplication::finalCommandPipe() {
-	ALooper_removeFd( app_state_->looper, user_msg_read_ );
-	close( user_msg_read_ );
-	close( user_msg_write_ );
-}
-	// コマンドをメインのメッセージループに投げる
-void tTVPApplication::postEvent( const NativeEvent* ev ) {
-	if( write( user_msg_write_, ev, sizeof(NativeEvent)) != sizeof(NativeEvent) ) {
-		LOGE("Failure writing pipe event: %s\n", strerror(errno));
+		{	// コマンドキューに何か入れられるまで待つ
+			std::unique_lock<std::mutex> uniq_lk(main_thread_mutex_);
+			main_thread_cv_.wait(uniq_lk, [this]{ return !command_que_.empty();});
+		}
 	}
 }
+/*
 int8_t tTVPApplication::readCommand() {
 	int8_t cmd;
 	if( read(user_msg_read_, &cmd, sizeof(cmd)) == sizeof(cmd) ) {
@@ -169,6 +147,7 @@ int tTVPApplication::messagePipeCallBack(int fd, int events, void* user) {
 	}
 	return 1;
 }
+ */
 void tTVPApplication::HandleMessage( NativeEvent& ev ) {
 	for( std::vector<NativeEventQueueIntarface*>::iterator it = event_handlers_.begin(); it != event_handlers_.end(); it++ ) {
 		if( (*it) != NULL ) (*it)->Dispatch( ev );
@@ -176,6 +155,7 @@ void tTVPApplication::HandleMessage( NativeEvent& ev ) {
 }
 // for iTVPApplication
 void tTVPApplication::startApplication( struct android_app* state ) {
+	/*
 	assert( state );
 	app_state_ = state;
 
@@ -188,6 +168,7 @@ void tTVPApplication::startApplication( struct android_app* state ) {
 		// We are starting with a previous saved state; restore from it.
 		loadSaveState( state->savedState );
 	}
+	*/
 
 	//print_font_files();
 	// ここから初期化
@@ -427,18 +408,18 @@ void tTVPApplication::loadSaveState( void* state ) {
 void tTVPApplication::handleSensorEvent() {
 }
 void tTVPApplication::tarminateProcess() {
-	screen_.tarminate();
+	//screen_.tarminate();
 }
 void tTVPApplication::handleIdle() {
 }
 void tTVPApplication::saveState() {
-	clearSaveState();
+	//clearSaveState();
 }
 void tTVPApplication::initializeWindow() {
-	screen_.initialize(this);
+	//screen_.initialize(this);
 }
 void tTVPApplication::tarminateWindow() {
-	screen_.tarminate();
+	//screen_.tarminate();
 }
 void tTVPApplication::gainedFocus() {
 }
@@ -467,15 +448,15 @@ void tTVPApplication::onStop() {
 void tTVPApplication::onDestroy() {
 }
 void tTVPApplication::OnTouchDown( float x, float y, float cx, float cy, int32_t id, float pressure, int32_t meta ) {
-	screen_.OnTouchDown( x, y, cx, cy, id );
+	//screen_.OnTouchDown( x, y, cx, cy, id );
 }
 void tTVPApplication::OnTouchMove( float x, float y, float cx, float cy, int32_t id, float pressure,int32_t meta ) {
-	screen_.OnTouchMove( x, y, cx, cy, id );
+	//screen_.OnTouchMove( x, y, cx, cy, id );
 }
 void tTVPApplication::OnTouchUp( float x, float y, float cx, float cy, int32_t id, float pressure,int32_t meta ) {
-	screen_.OnTouchUp( x, y, cx, cy, id );
+	//screen_.OnTouchUp( x, y, cx, cy, id );
 }
-
+//-----------------------------
 
 std::vector<std::string>* LoadLinesFromFile( const std::wstring& path ) {
 	std::string npath;
@@ -493,18 +474,6 @@ std::vector<std::string>* LoadLinesFromFile( const std::wstring& path ) {
     }
     fclose(fp);
 	return ret;
-}
-void tTVPApplication::nativeOnStart(JNIEnv *jenv, jobject obj) {
-	Application->onStart();
-}
-void tTVPApplication::nativeOnResume(JNIEnv *jenv, jobject obj) {
-	Application->onResume();
-}
-void tTVPApplication::nativeOnPause(JNIEnv *jenv, jobject obj) {
-	Application->onPause();
-}
-void tTVPApplication::nativeOnStop(JNIEnv *jenv, jobject obj) {
-	Application->onStop();
 }
 void tTVPApplication::writeBitmapToNative( const void * src ) {
 	int32_t format = ANativeWindow_getFormat( window_ );
@@ -559,6 +528,54 @@ void TVPGetAllFontList( std::vector<std::wstring>& list ) {
 	list.clear();
 }
 
+const std::wstring& tTVPApplication::GetInternalDataPath() const {
+	if( internal_data_path_.empty() ) {
+		getStringFromJava( static_cast<const char*>("getInternalDataPath"), const_cast<std::wstring&>(internal_data_path_) );
+	}
+	return internal_data_path_;
+}
+const std::wstring& tTVPApplication::GetExternalDataPath() const {
+	if( external_data_path_.empty() ) {
+		getStringFromJava( static_cast<const char*>("getExternalDataPath"), const_cast<std::wstring&>(external_data_path_) );
+	}
+	return external_data_path_;
+}
+const std::wstring* tTVPApplication::GetCachePath() const {
+	if( cache_path_.empty() ) {
+		getStringFromJava( static_cast<const char*>("getCachePath"), const_cast<std::wstring&>(cache_path_) );
+	}
+	return &cache_path_;
+}
+void tTVPApplication::getStringFromJava( const char* methodName, std::wstring& dest ) const {
+	JNIEnv *env;
+	if (jvm_->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6) == JNI_OK) {
+		jvm_->AttachCurrentThread( &env, nullptr );
+		jobject thiz = activity_;
+		jclass clazz = env->GetObjectClass(thiz);
+		jmethodID mid = env->GetMethodID(clazz, methodName, "()Ljava/lang/String;");
+		jstring ret = (jstring) env->CallObjectMethod(thiz, mid, nullptr);
+		int jstrlen = env->GetStringLength(ret);
+		const jchar* chars = env->GetStringChars( ret, nullptr );
+		dest = std::wstring( chars, &chars[jstrlen] );
+		env->ReleaseStringChars( ret, chars );
+		env->DeleteLocalRef( ret );
+		jvm_->DetachCurrentThread();
+	}
+}
+/**
+ * Java から送られてきた各種イベントをここで処理する
+ * イベントの種類に応じてアプリケーションとして処理するか、Windowに処理させるか判断
+ */
+void tTVPApplication::SendMessageFromJava( tjs_int message, tjs_int64 wparam, tjs_int64 lparam ) {
+	// Main Windowが存在する場合はそのWindowへ送る
+	NativeEvent ev(message,lparam,wparam);
+	TTVPWindowForm* win = GetMainWindow();
+	if( win ) {
+		postEvent( &ev, win->GetEventHandler() );
+	} else {
+		postEvent( &ev, nullptr );
+	}
+}
 void tTVPApplication::nativeSetSurface(JNIEnv *jenv, jobject obj, jobject surface) {
 	if( surface != 0 ) {
 		ANativeWindow* window = ANativeWindow_fromSurface(jenv, surface);
@@ -571,14 +588,48 @@ void tTVPApplication::nativeSetSurface(JNIEnv *jenv, jobject obj, jobject surfac
 	}
 	return;
 }
+void jstrcpy_maxlen(tjs_char *d, const jchar *s, size_t len)
+{
+	tjs_char ch;
+	len++;
+	while((ch=*s)!=0 && --len) *(d++) = ch, s++;
+	*d = 0;
+}
+void tTVPApplication::nativeSetMessageResource(JNIEnv *jenv, jobject obj, jobjectArray mesarray) {
+	int stringCount = jenv->GetArrayLength(mesarray);
+	for( int i = 0; i < stringCount; i++ ) {
+		jstring string = (jstring) jenv->GetObjectArrayElement( mesarray, i);
+		int jstrlen = jenv->GetStringLength( string );
+		const jchar* chars = jenv->GetStringChars( string, nullptr );
+		// copy message. 解放しない
+		tjs_char* mesres = new tjs_char[jstrlen+1];
+		jstrcpy_maxlen( mesres, chars, jstrlen );
+		mesres[jstrlen] = TJS_W('\0');
+		jenv->ReleaseStringChars( string, chars );
+		jenv->DeleteLocalRef( string );
+	}
+}
 
+void tTVPApplication::nativeSetAssetManager(JNIEnv *jenv, jobject obj, jobject assetManager ) {
+	AAssetManager* am = AAssetManager_fromJava( jenv, assetManager );
+	Application->setAssetManager( am );
+}
+/**
+ * Java からの通知はここに来る
+ */
+void tTVPApplication::nativeToMessage(JNIEnv *jenv, jobject obj, jint mes, jlong wparam, jlong lparam ) {
+	Application->SendMessageFromJava( mes, lparam, wparam );
+}
+void tTVPApplication::nativeSetActivity(JNIEnv *jenv, jobject obj, jobject activity) {
+	Application->activity_ = activity;
+}
 static JNINativeMethod methods[] = {
 		// Java側関数名, (引数の型)返り値の型, native側の関数名の順に並べます
-		{ "nativeOnStart", "()V", (void *)tTVPApplication::nativeOnStart },
-		{ "nativeOnResume", "()V", (void *)tTVPApplication::nativeOnResume },
-		{ "nativeOnPause", "()V", (void *)tTVPApplication::nativeOnPause },
-		{ "nativeOnStop", "()V", (void *)tTVPApplication::nativeOnStop },
-		{ "nativeSetSurface", "(LAndroid/view/Surface)V", (void *)tTVPApplication::nativeSetSurface },
+		{ "nativeSetSurface", "(LAndroid/view/Surface;)V", (void *)tTVPApplication::nativeSetSurface },
+//		{ "nativeSetMessageResource", "([Ljava/lang/String;)V", (void *)tTVPApplication::nativeSetMessageResource },
+		{ "nativeSetAssetManager", "([Landroid/content/res/AssetManager;)V", (void *)tTVPApplication::nativeSetAssetManager },
+		{ "nativeToMessage", "(IJJ)V", (void*)tTVPApplication::nativeToMessage },
+		{ "nativeSetActivity", "([Landroid/app/Activity;)V", (void *)tTVPApplication::nativeSetActivity },
 };
 
 jint registerNativeMethods( JNIEnv* env, const char *class_name, JNINativeMethod *methods, int num_methods ) {

@@ -11,12 +11,14 @@
 #include "tjsCommHead.h"
 
 #include <android/asset_manager.h>
+#include <string>
+#include <iostream>
 #include "MsgIntf.h"
 #include "MsgImpl.h"
 #include "Application.h"
 #include "CharacterSet.h"
 
-
+extern void TVPGetFileVersionOf( tjs_int& major, tjs_int& minor, tjs_int& release, tjs_int& build );
 //---------------------------------------------------------------------------
 // version retrieving
 //---------------------------------------------------------------------------
@@ -32,8 +34,7 @@ void TVPGetVersion(void)
 		TVPVersionRelease = 0;
 		TVPVersionBuild = 0;
 
-		// TODO: バージョン番号は Java を経由して PackageManager から取得しないと無理かな？
-		// TVPGetFileVersionOf(ExePath().c_str(), TVPVersionMajor, TVPVersionMinor, TVPVersionRelease, TVPVersionBuild);
+		TVPGetFileVersionOf( TVPVersionMajor, TVPVersionMinor, TVPVersionRelease, TVPVersionBuild);
 	}
 }
 //---------------------------------------------------------------------------

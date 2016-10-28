@@ -11,75 +11,84 @@
 #define NOMINMAX
 #include "tjsCommHead.h"
 
-//#include <process.h>
-//#include <algorithm>
-//#include <unistd.h>
-#include <errno.h>
-#include <cpu-features.h>
+#ifdef _WIN32
+#include <process.h>
+#endif
+#include <algorithm>
+#include <assert.h>
 
 #include "ThreadIntf.h"
 #include "ThreadImpl.h"
 #include "MsgIntf.h"
 
-
-
-// pause/resume
-// http://stackoverflow.com/questions/1606400/how-to-sleep-or-pause-a-pthread-in-c-on-linux
+#ifdef ANDROID
+#include <pthread.h>
+#include <semaphore.h>
+#endif
 
 //---------------------------------------------------------------------------
 // tTVPThread : a wrapper class for thread
 //---------------------------------------------------------------------------
-tTVPThread::tTVPThread(bool suspended)
+tTVPThread::tTVPThread( bool suspended )
+ : Thread(nullptr), Terminated(false), ThreadStarting(false)
 {
-	Terminated = false;
-	//Handle = NULL;
-	//ThreadId = 0;
-	Suspended = suspended;
-
-	if( suspended ) {
-		int err = sem_init( &SuspendSemaphore, 0, 0 );
-		if( err != 0 ) TVPThrowInternalError;
-	}
-
-	pthread_attr_t threadAttr;
-	pthread_attr_init(&threadAttr);
-	threadAttr.sched_policy = SCHED_RR;
-	int maxpri = sched_get_priority_max( SCHED_RR );
-	int minpri = sched_get_priority_min( SCHED_RR );
-	threadAttr.sched_priority = minpri + (maxpri - minpri) / 2;	// 真ん中にしておく
-
-	int err = pthread_create( &Handle, &threadAttr, tTVPThread::StartProc, (void*)this );
-	if( err != 0 ) TVPThrowInternalError;
+	assert( suspended );
 }
 //---------------------------------------------------------------------------
 tTVPThread::~tTVPThread()
 {
-	if( Suspended ) {
-		sem_destroy( &SuspendSemaphore );
+	if( Thread != nullptr ) {
+		Thread->detach();
+		delete Thread;
 	}
-	pthread_detach(Handle);
 }
 //---------------------------------------------------------------------------
-void* tTVPThread::StartProc(void * arg)
+void tTVPThread::StartProc()
 {
-	tTVPThread* thread = ((tTVPThread*)arg);
-	if( thread->Suspended ) {
-		sem_wait( &(thread->SuspendSemaphore) );
+	{	// スレッドが開始されたのでフラグON
+		std::lock_guard<std::mutex> lock( Mtx );
+		ThreadStarting = true;
 	}
-	thread->Execute();
-	return 0;
+	Cond.notify_all();
+	Execute();
+	// return 0;
 }
 //---------------------------------------------------------------------------
-void tTVPThread::WaitFor()
-{	// 終了待ち
-	pthread_join( Handle, NULL );
+void tTVPThread::StartTread()
+{
+	if( Thread == nullptr ) {
+		try {
+			Thread = new std::thread( &tTVPThread::StartProc, this );
+
+			// スレッドが開始されるのを待つ
+			std::unique_lock<std::mutex> lock( Mtx );
+			Cond.wait( lock, [this] { return ThreadStarting; } );
+		} catch( std::system_error &e ) {
+			TVPThrowInternalError;
+		}
+	}
 }
 //---------------------------------------------------------------------------
 tTVPThreadPriority tTVPThread::GetPriority()
 {
+#ifdef _WIN32
+	int n = ::GetThreadPriority( GetHandle());
+	switch(n)
+	{
+	case THREAD_PRIORITY_IDLE:			return ttpIdle;
+	case THREAD_PRIORITY_LOWEST:		return ttpLowest;
+	case THREAD_PRIORITY_BELOW_NORMAL:	return ttpLower;
+	case THREAD_PRIORITY_NORMAL:		return ttpNormal;
+	case THREAD_PRIORITY_ABOVE_NORMAL:	return ttpHigher;
+	case THREAD_PRIORITY_HIGHEST:		return ttpHighest;
+	case THREAD_PRIORITY_TIME_CRITICAL:	return ttpTimeCritical;
+	}
+
+	return ttpNormal;
+#else
 	int policy;
 	struct sched_param param;
-	int err = pthread_getschedparam( Handle, &policy, &param );
+	int err = pthread_getschedparam( GetHandle(), &policy, &param );
 	int maxpri = sched_get_priority_max( policy );
 	int minpri = sched_get_priority_min( policy );
 	int range = (maxpri - minpri);
@@ -110,13 +119,29 @@ tTVPThreadPriority tTVPThread::GetPriority()
 		}
 	}
 	return ttpNormal;
+#endif
 }
 //---------------------------------------------------------------------------
 void tTVPThread::SetPriority(tTVPThreadPriority pri)
 {
+#ifdef _WIN32
+	int npri = THREAD_PRIORITY_NORMAL;
+	switch(pri)
+	{
+	case ttpIdle:			npri = THREAD_PRIORITY_IDLE;			break;
+	case ttpLowest:			npri = THREAD_PRIORITY_LOWEST;			break;
+	case ttpLower:			npri = THREAD_PRIORITY_BELOW_NORMAL;	break;
+	case ttpNormal:			npri = THREAD_PRIORITY_NORMAL;			break;
+	case ttpHigher:			npri = THREAD_PRIORITY_ABOVE_NORMAL;	break;
+	case ttpHighest:		npri = THREAD_PRIORITY_HIGHEST;			break;
+	case ttpTimeCritical:	npri = THREAD_PRIORITY_TIME_CRITICAL;	break;
+	}
+
+	::SetThreadPriority( GetHandle(), npri);
+#else
 	int policy;
 	struct sched_param param;
-	int err = pthread_getschedparam( Handle, &policy, &param );
+	int err = pthread_getschedparam( GetHandle(), &policy, &param );
 	int maxpri = sched_get_priority_max( policy );
 	int minpri = sched_get_priority_min( policy );
 	int range = (maxpri - minpri);
@@ -133,280 +158,268 @@ void tTVPThread::SetPriority(tTVPThreadPriority pri)
 	case ttpHighest:		param.sched_priority = minpri + half+ (half*2)/3;	break;
 	case ttpTimeCritical:	param.sched_priority = maxpri;						break;
 	}
-	err = pthread_setschedparam( Handle, policy, &param );
-}
-//---------------------------------------------------------------------------
-	/*
-void tTVPThread::Suspend()
-{
-	SuspendThread(Handle);
-}
-	*/
-//---------------------------------------------------------------------------
-void tTVPThread::Resume()
-{
-	if( Suspended ) {
-		sem_post( &SuspendSemaphore );
-	}
-}
-//---------------------------------------------------------------------------
-/*
-// krkrz のコア、各種機能はここからすべてたどれるようにする
-tTVPEngine {
-}
-// エンジンを動作させるためのドライバ、ポーリングや各種
-tTVPEngineDriver {
-}
-*/
-//
-#if 0
-// Mutex は cond とともに使う様子
-    pthread_cond_t cond;
-class PThreadMutex {
-	pthread_mutex_t Mutex;
-
-public:
-	PThreadMutex() {
-		// pthread_mutexattr_t Attr; アトリビュートは汎用的ではないよう
-		pthread_mutex_init( &Mutex, NULL );
-	}
-	~PThreadMutex() {
-		pthread_mutex_destroy( &Mutex );
-	}
-	void Lock() {
-		pthread_mutex_lock( &Mutex );
-	}
-	void Unlock() {
-		pthread_mutex_unlock( &Mutex );
-	}
-};
-
-// Win32 のようにはちょっと使いづらい?
-// シグナルを使うので、スレッドで実装されたTJS2用タイマーを共用した方が良さそう。
-// タイマーとイベント(メッセージ)は独自実装のものを使った方がよさそうだな
-// http://umezawa.dyndns.info/wordpress/?p=3174
-class PThreadTimer {
-	timer_t TimerId;
-	struct timer_t   TimerSpec;
-	struct sigaction    SignalAction;
-
-	static void SignalHander( int signo ) {
-		/*
-		if( event_ ) {
-			event_->Handle();
-		}
-		*/
-	}
-public:
-	PThreadTimer() {
-		// シグナル初期化
-		SignalAction.sa_handler = SignalHander;
-		SignalAction.sa_flags = 0;
-		sigemptyset( &SignalAction.sa_mask );
-		int err = sigaction( SIGALRM, &SignalAction, NULL );
-		if( err != 0 ) TVPThrowInternalError;
-
-		// タイマー生成
-		err = timer_create( CLOCK_REALTIME, NULL, &TimerId );
-		if( err != 0 ) TVPThrowInternalError;
-	}
-	~PThreadTimer() {
-		timer_delete( TimerId );
-	}
-	// msec ミリ秒
-	int SetInterval( tjs_uint32 msec ) {
-		struct itimerspec spec;
-		tjs_uint32 sec = msec / 1000;
-		msec -= sec*1000;
-		spec.it_interval.tv_sec = sec;
-		spec.it_interval.tv_nsec = msec*1000*1000;
-		spec.it_value.tv_sec = sec;
-		spec.it_value.tv_nsec = msec*1000*1000;
-		return timer_settime( TimerSpec, 0, &spec, NULL );
-	}
-	int Oneshot( tjs_uint32 msec ) {
-		struct itimerspec spec;
-		tjs_uint32 sec = msec / 1000;
-		msec -= sec*1000;
-		spec.it_interval.tv_sec = sec;
-		spec.it_interval.tv_nsec = msec*1000*1000;
-		spec.it_value.tv_sec = 0;
-		spec.it_value.tv_nsec = 0;
-		return timer_settime( TimerSpec, 0, &spec, NULL );
-	}
-	void Pause() {
-		// pause(0); // シグナル待ち？
-	}
-};
-#endif
-// http://www.tsoftware.jp/nptl/
-// pthread では、イベントはセマフォを使う様子
-
-
-
-
-
-
-
-
-//---------------------------------------------------------------------------
-// tTVPThreadEvent
-//---------------------------------------------------------------------------
-tTVPThreadEvent::tTVPThreadEvent(bool manualreset)
-{
-#ifdef WIN32
-	Handle = ::CreateEvent(NULL, manualreset?TRUE:FALSE, FALSE, NULL);
-	if(!Handle) TVPThrowInternalError;
-#else
-	if( manualreset ) TVPThrowInternalError; // マニュアルリセットは非サポート
-	int err = sem_init( &Handle, 0, 0 );
-	if( err != 0 ) TVPThrowInternalError;
-#endif
-}
-//---------------------------------------------------------------------------
-tTVPThreadEvent::~tTVPThreadEvent()
-{
-#ifdef WIN32
-	::CloseHandle(Handle);
-#else
-	sem_destroy( &Handle );
-#endif
-}
-//---------------------------------------------------------------------------
-void tTVPThreadEvent::Set()
-{
-#ifdef WIN32
-	SetEvent(Handle);
-#else
-	int err = sem_post( &Handle );
-	if( err != 0 ) TVPThrowInternalError;
-#endif
-}
-//---------------------------------------------------------------------------
-void tTVPThreadEvent::Reset()
-{
-#ifdef WIN32
-	ResetEvent(Handle);
-#else
-	int val = 0;
-	int err = sem_getvalue( &Handle, &val );
-	if( err == 0 && val > 0 ) {
-		for( int i = 0; i < val; i++ ) {
-			err = sem_trywait( &Handle );
-			if( err != 0 ) break;
-		}
-	}
-#endif
-}
-//---------------------------------------------------------------------------
-bool tTVPThreadEvent::WaitFor(tjs_uint timeout)
-{
-#ifdef WIN32
-	// wait for event;
-	// returns true if the event is set, otherwise (when timed out) returns false.
-	DWORD state = WaitForSingleObject(Handle, timeout == 0 ? INFINITE : timeout);
-	if(state == WAIT_OBJECT_0) return true;
-	return false;
-#else
-	if( timeout == 0 ) {
-		sem_wait( &Handle );
-	} else {
-		struct timespec spec;
-		memset(&spec, 0x00, sizeof(spec));
-		clock_gettime(CLOCK_REALTIME, &spec); // コンパイルに-lrt必要
-		tjs_uint sec = timeout / 1000;
-		spec.tv_sec += sec;
-		spec.tv_nsec += (timeout - (sec*1000)) * 1000 * 1000;	// nanoseconds
-		int err = sem_timedwait( &Handle, &spec );
-		return (err != ETIMEDOUT );
-	}
-	return true;
+	err = pthread_setschedparam( GetHandle(), policy, &param );
 #endif
 }
 //---------------------------------------------------------------------------
 
-// シングルスレッドで動作させる
-#if 1
+
+
+
+//---------------------------------------------------------------------------
+#ifndef _WIN32
 tjs_int TVPDrawThreadNum = 1;
-tjs_int TVPGetProcessorNum() { return 1; }
-tjs_int TVPGetThreadNum() { return 1; }
-void TVPBeginThreadTask(tjs_int taskNum) {}
-void TVPExecThreadTask(TVP_THREAD_TASK_FUNC func, TVP_THREAD_PARAM param) {
-	func( param );
+//---------------------------------------------------------------------------
+tjs_int TVPGetProcessorNum( void )
+{
+	return std::thread::hardware_concurrency();
 }
-void TVPEndThreadTask() {}
-#else
-// Android NDKで使えないシステムコール・ライブラリ関数一覧 
-// http://dsas.blog.klab.org/archives/52155870.html
-// sched_setaffinity(2) は使えない
+//---------------------------------------------------------------------------
+tjs_int TVPGetThreadNum( void )
+{
+	tjs_int threadNum = TVPDrawThreadNum ? TVPDrawThreadNum : std::thread::hardware_concurrency();
+	threadNum = std::min( threadNum, TVPMaxThreadNum );
+	return threadNum;
+}
+//---------------------------------------------------------------------------
+static void TJS_USERENTRY DummyThreadTask(void *) {}
+//---------------------------------------------------------------------------
+class DrawThreadPool;
+class DrawThread : public tTVPThread {
+	std::mutex mtx;
+	std::condition_variable cv;
+	TVP_THREAD_TASK_FUNC  lpStartAddress;
+	TVP_THREAD_PARAM lpParameter;
+	DrawThreadPool* parent;
+protected:
+	virtual void Execute();
+
+public:
+	DrawThread( DrawThreadPool* p ) : parent(p), lpStartAddress(nullptr), lpParameter(nullptr)  {}
+	void SetTask( TVP_THREAD_TASK_FUNC func, TVP_THREAD_PARAM param ) {
+		std::lock_guard<std::mutex> lock(mtx);
+		lpStartAddress = func;
+		lpParameter = param;
+		cv.notify_one();
+	}
+};
+//---------------------------------------------------------------------------
+class DrawThreadPool {
+	std::vector<DrawThread*> workers;
+	std::atomic<int> running_thread_count;
+	tjs_int task_num;
+	tjs_int task_count;
+private:
+	void PoolThread( tjs_int taskNum );
+
+public:
+	DrawThreadPool() : running_thread_count(0), task_num(0), task_count(0) {}
+	inline void DecCount() { running_thread_count--; }
+	void BeginTask( tjs_int taskNum ) {
+		task_num = taskNum;
+		task_count = 0;
+		PoolThread( taskNum );
+	}
+	void ExecTask(TVP_THREAD_TASK_FUNC func, TVP_THREAD_PARAM param) {
+		if( task_count >= task_num - 1 ) {
+			func( param );
+			return;
+		}
+		running_thread_count++;
+		workers[task_count]->SetTask( func, param );
+		std::this_thread::yield();
+	}
+	void WaitForTask() {
+		int expected = 0;
+		while( false == std::atomic_compare_exchange_weak( &running_thread_count, &expected, 0 ) ) {
+			expected = 0;
+			std::this_thread::yield();	// スレッド切り替え(再スケジューリング)
+		}
+	}
+};
+//---------------------------------------------------------------------------
+void DrawThread::Execute() {
+	while(!GetTerminated()) {
+		{
+			std::unique_lock<std::mutex> uniq_lk(mtx);
+			cv.wait(uniq_lk, [this]{ return lpStartAddress != nullptr;});
+		}
+		if( lpStartAddress != nullptr ) (lpStartAddress)( lpParameter );
+		lpStartAddress = nullptr;
+		parent->DecCount();
+	}
+}
+//---------------------------------------------------------------------------
+void DrawThreadPool::PoolThread( tjs_int taskNum ) {
+	tjs_int extraThreadNum = TVPGetThreadNum() - 1;
+
+/*
+	// for pthread(!android)
+	cpu_set_t cpuset;
+	CPU_ZERO( &cpuset );
+	CPU_SET( i, &cpuset );
+	int rc = pthread_setaffinity_np( workers[i].native_handle(), sizeof( cpu_set_t ), &cpuset );
+*/
+	// スレッド数がextraThreadNumに達していないので(suspend状態で)生成する
+	while( workers.size() < extraThreadNum ) {
+		DrawThread* th = new DrawThread(this);
+		th->StartTread();
+		workers.push_back( th );
+	}
+	// スレッド数が多い場合終了させる
+	while( workers.size() > extraThreadNum ) {
+		DrawThread *th = workers.back();
+		th->Terminate();
+		th->SetTask( DummyThreadTask, nullptr );
+		th->WaitFor();
+		workers.pop_back();
+	}
+}
+//---------------------------------------------------------------------------
+static DrawThreadPool TVPTheadPool;
+//---------------------------------------------------------------------------
+void TVPBeginThreadTask(tjs_int taskNum) {
+	TVPTheadPool.BeginTask( taskNum );
+}
+//---------------------------------------------------------------------------
+void TVPExecThreadTask(TVP_THREAD_TASK_FUNC func, TVP_THREAD_PARAM param) {
+	TVPTheadPool.ExecTask( func, param );
+}
+//---------------------------------------------------------------------------
+void TVPEndThreadTask(void) {
+	TVPTheadPool.WaitForTask();
+}
+//---------------------------------------------------------------------------
+
+#if 0
 tjs_int TVPDrawThreadNum = 1;
 struct ThreadInfo {
 	bool readyToExit;
-	pthread_t thread;
-	pthread_cond_t cond;
-	pthread_mutex_t mtx;
+	std::thread* thread;
 	TVP_THREAD_TASK_FUNC  lpStartAddress;
 	TVP_THREAD_PARAM lpParameter;
 };
-tjs_int TVPGetProcessorNum() { return android_getCpuCount(); }
-tjs_int TVPGetThreadNum() {
-	tjs_int threadNum = TVPDrawThreadNum ? TVPDrawThreadNum : GetProcesserNum();
-	threadNum = std::min(threadNum, TVPMaxThreadNum);
+static std::vector<ThreadInfo*> TVPThreadList;
+static std::vector<tjs_int> TVPProcesserIdList;
+//static tjs_int TVPRunningThreadCount = 0;
+static std::atomic_long TVPRunningThreadCount{0};
+static tjs_int TVPThreadTaskNum, TVPThreadTaskCount;
+//---------------------------------------------------------------------------
+tjs_int TVPGetProcessorNum( void )
+{
+	return std::thread::hardware_concurrency();
+}
+//---------------------------------------------------------------------------
+tjs_int TVPGetThreadNum( void )
+{
+	tjs_int threadNum = TVPDrawThreadNum ? TVPDrawThreadNum : std::thread::hardware_concurrency();
+	threadNum = std::min( threadNum, TVPMaxThreadNum );
 	return threadNum;
 }
-static bool ThreadLoop(void *p) {
+//---------------------------------------------------------------------------
+static void ThreadLoop( void* p )
+{
 	ThreadInfo *threadInfo = (ThreadInfo*)p;
-
-	// http://linuxgcc.sytes.net/sys019.php
-	// http://www.principia-m.com/ts/0037/index-jp.html
-	pthread_mutex_lock(&p->mtx);
-	pthread_cond_wait( &p->cond, &p->mtx );
-	pthread_mutex_unlock(&p->mtx);
-
-	for(;;) {
-		if( threadInfo->readyToExit ) break;
-		(threadInfo->lpStartAddress)(threadInfo->lpParameter);
-		InterlockedDecrement(&TVPRunningThreadCount);
-		SuspendThread(GetCurrentThread());
+	for( ;;) {
+		if( threadInfo->readyToExit )
+			break;
+		( threadInfo->lpStartAddress )( threadInfo->lpParameter );
+		TVPRunningThreadCount--;
+		SuspendThread( GetCurrentThread() );
 	}
 	delete threadInfo;
-	ExitThread(0);
-	return true;
+	ExitThread( 0 );
 }
-void TVPBeginThreadTask(tjs_int taskNum) {
+//---------------------------------------------------------------------------
+void TVPBeginThreadTask( tjs_int taskNum )
+{
 	TVPThreadTaskNum = taskNum;
 	TVPThreadTaskCount = 0;
 	tjs_int extraThreadNum = TVPGetThreadNum() - 1;
 	if( TVPProcesserIdList.empty() ) {
+#ifdef _WIN32
+		// for windows thread
+#ifndef TJS_64BIT_OS
+		DWORD processAffinityMask, systemAffinityMask;
+		GetProcessAffinityMask( GetCurrentProcess(),
+			&processAffinityMask,
+			&systemAffinityMask );
 		for( tjs_int i = 0; i < MAXIMUM_PROCESSORS; i++ ) {
-			TVPProcesserIdList.push_back(i);
-    	}
+			if( processAffinityMask & ( 1 << i ) )
+				TVPProcesserIdList.push_back( i );
+		}
+#else
+		ULONGLONG processAffinityMask, systemAffinityMask;
+		GetProcessAffinityMask( GetCurrentProcess(),
+			(PDWORD_PTR)&processAffinityMask,
+			(PDWORD_PTR)&systemAffinityMask );
+		for( tjs_int i = 0; i < MAXIMUM_PROCESSORS; i++ ) {
+			if( processAffinityMask & ( 1ULL << i ) )
+				TVPProcesserIdList.push_back( i );
+		}
+#endif
+#else defined(!ANDROID)
+		// for pthread(!android)
+		cpu_set_t cpuset;
+		CPU_ZERO( &cpuset );
+		CPU_SET( i, &cpuset );
+		int rc = pthread_setaffinity_np( threads[i].native_handle(),
+			sizeof( cpu_set_t ), &cpuset );
+#endif
+		if( TVPProcesserIdList.empty() )
+			TVPProcesserIdList.push_back( MAXIMUM_PROCESSORS );
 	}
-	while( static_cast<tjs_int>(TVPThreadList.size()) < extraThreadNum) {
+	// スレッド数がextraThreadNumに達していないので(suspend状態で)生成する
+	while( static_cast<tjs_int>( TVPThreadList.size() ) < extraThreadNum ) {
 		ThreadInfo *threadInfo = new ThreadInfo();
 		threadInfo->readyToExit = false;
-		if( pthread_mutex_init( &threadInfo->mtx, NULL ) != 0 ) TVPThrowInternalError;
-		if( pthread_cond_init( &threadInfo->cond, NULL ) != 0 ) TVPThrowInternalError;
-		if( pthread_create( &threadInfo->thread, NULL, ThreadLoop, threadInfo ) != 0 ) TVPThrowInternalError;
-		TVPThreadList.push_back(threadInfo);
+		threadInfo->thread = CreateThread( NULL, 0, ThreadLoop, threadInfo, CREATE_SUSPENDED, NULL );
+		SetThreadIdealProcessor( threadInfo->thread, TVPProcesserIdList[TVPThreadList.size() % TVPProcesserIdList.size()] );
+		TVPThreadList.push_back( threadInfo );
 	}
-  while ( static_cast<tjs_int>(TVPThreadList.size()) > extraThreadNum) {
-    ThreadInfo *threadInfo = TVPThreadList.back();
-    threadInfo->readyToExit = true;
-    while (ResumeThread(threadInfo->thread) == 0)
-      Sleep(0);
-    TVPThreadList.pop_back();
-  }
+	// extraThreadNum よりスレッド数が多い場合終了させる
+	while( static_cast<tjs_int>( TVPThreadList.size() ) > extraThreadNum ) {
+		ThreadInfo *threadInfo = TVPThreadList.back();
+		threadInfo->readyToExit = true;
+		while( ResumeThread( threadInfo->thread ) == 0 )
+			Sleep( 0 );
+		TVPThreadList.pop_back();
+	}
 }
 
-#endif
-#if 0
 //---------------------------------------------------------------------------
+void TVPExecThreadTask( TVP_THREAD_TASK_FUNC func, TVP_THREAD_PARAM param )
+{
+	if( TVPThreadTaskCount >= TVPThreadTaskNum - 1 ) {
+		func( param );
+		return;
+	}
+	ThreadInfo *threadInfo;
+	threadInfo = TVPThreadList[TVPThreadTaskCount++];
+	threadInfo->lpStartAddress = func;
+	threadInfo->lpParameter = param;
+	TVPRunningThreadCount++;
+	while( ResumeThread( threadInfo->thread ) == 0 )
+		Sleep( 0 );
+}
+//---------------------------------------------------------------------------
+void TVPEndThreadTask( void )
+{
+	long expected = 0;
+	while( false == std::atomic_compare_exchange_weak( &TVPRunningThreadCount, &expected, 0 ) ) {
+		expected = 0;
+		std::this_thread::yield();	// スレッド切り替え(再スケジューリング)
+	}
+}
+
+//---------------------------------------------------------------------------
+#endif
+#else
 tjs_int TVPDrawThreadNum = 1;
 
 struct ThreadInfo {
   bool readyToExit;
-   thread;
+  HANDLE thread;
   TVP_THREAD_TASK_FUNC  lpStartAddress;
   TVP_THREAD_PARAM lpParameter;
 };
@@ -463,6 +476,7 @@ void TVPBeginThreadTask(tjs_int taskNum)
   TVPThreadTaskCount = 0;
   tjs_int extraThreadNum = TVPGetThreadNum() - 1;
   if (TVPProcesserIdList.empty()) {
+#ifndef TJS_64BIT_OS
     DWORD processAffinityMask, systemAffinityMask;
     GetProcessAffinityMask(GetCurrentProcess(),
                            &processAffinityMask,
@@ -471,6 +485,16 @@ void TVPBeginThreadTask(tjs_int taskNum)
       if (processAffinityMask & (1 << i))
         TVPProcesserIdList.push_back(i);
     }
+#else
+    ULONGLONG processAffinityMask, systemAffinityMask;
+    GetProcessAffinityMask(GetCurrentProcess(),
+                           (PDWORD_PTR)&processAffinityMask,
+                           (PDWORD_PTR)&systemAffinityMask);
+    for (tjs_int i = 0; i < MAXIMUM_PROCESSORS; i++) {
+      if (processAffinityMask & (1ULL << i))
+        TVPProcesserIdList.push_back(i);
+    }
+#endif
     if (TVPProcesserIdList.empty())
       TVPProcesserIdList.push_back(MAXIMUM_PROCESSORS);
   }
@@ -514,4 +538,3 @@ void TVPEndThreadTask(void)
 
 //---------------------------------------------------------------------------
 #endif
-	

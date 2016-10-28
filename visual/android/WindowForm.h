@@ -6,6 +6,7 @@
 #include "VelocityTracker.h"
 #include "tvpinputdefs.h"
 #include "WindowIntf.h"
+#include "NativeEventQueue.h"
 
 #ifndef MK_ALT 
 #define MK_ALT (0x20)
@@ -44,6 +45,11 @@ class TTVPWindowForm : public TouchHandler {
 	TouchPointList touch_points_;
 	VelocityTrackers TouchVelocityTracker;
 	VelocityTracker MouseVelocityTracker;
+
+	NativeEventQueue<TTVPWindowForm> EventQueue;
+
+protected:
+	void WndProc(NativeEvent& ev);
 
 public:
 	TTVPWindowForm( class tTVPApplication* app, class tTJSNI_Window* ni );
@@ -240,6 +246,8 @@ public:
 	virtual void OnTouchScaling( double startdist, double currentdist, double cx, double cy, int flag );
 	virtual void OnTouchRotate( double startangle, double currentangle, double distance, double cx, double cy, int flag );
 	virtual void OnMultiTouch();
+
+	NativeEventQueueIntarface* GetEventHandler() { return &EventQueue; }
 };
 
 #endif

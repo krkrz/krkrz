@@ -309,10 +309,10 @@ void tTVPScreen::OnDisplayRotate( tjs_int orientation, tjs_int rotate, tjs_int b
 
 
 int tTVPScreen::GetWidth() {
-	return Application->GetScreen().getWidth();
+	return ANativeWindow_getWidth( Application->getWindow()) ;
 }
 int tTVPScreen::GetHeight() {
-	return Application->GetScreen().getHeight();
+	return ANativeWindow_getHeight( Application->getWindow() );
 }
 // 上部のシステムバーなどを考慮して返す方がよいかもしれない
 int tTVPScreen::GetDesktopLeft() {
@@ -322,9 +322,9 @@ int tTVPScreen::GetDesktopTop() {
 	return 0;
 }
 int tTVPScreen::GetDesktopWidth() {
-	return Application->GetScreen().getWidth();
+	return ANativeWindow_getWidth( Application->getWindow()) ;
 }
 int tTVPScreen::GetDesktopHeight() {
-	return Application->GetScreen().getHeight();
+	return ANativeWindow_getHeight( Application->getWindow() );
 }
 

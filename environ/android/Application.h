@@ -6,7 +6,12 @@
 #include <map>
 #include <stack>
 #include <algorithm>
+#include <queue>
 #include <assert.h>
+
+#include <mutex>
+#include <condition_variable>
+#include <thread>
 
 #include <android/sensor.h>
 #include <android/configuration.h>
@@ -17,6 +22,7 @@
 
 #include "iTVPApplication.h"
 #include "TVPScreen.h"
+#include "tjsUtils.h"
 
 enum {
 	mrOk,
@@ -37,37 +43,62 @@ enum {
 	mbOK = 1,
 };
 class NativeEventQueueIntarface;
+struct NativeEvent;
+class TTVPWindowForm;
 
+struct EventCommand {
+	NativeEventQueueIntarface*	target;
+	NativeEvent*				command;
+	EventCommand( NativeEventQueueIntarface* t, NativeEvent* c ) : target(t), command(c) {}
+	EventCommand() : target(nullptr), command(nullptr) {}
+};
 class tTVPApplication : public iTVPApplication {
-	JavaVM* jvm_;
-	ANativeWindow* window_;
+	JavaVM*			jvm_;
+	ANativeWindow*	window_;
+	AAssetManager*	asset_manager_;	// set from java
+	AConfiguration*	config_;
+	jobject			activity_;
 
-	struct android_app* app_state_;
-	tTVPScreen screen_;
 	std::wstring title_;
 
-	int user_msg_read_;
-	int user_msg_write_;
-	//ALooper user_looper_;
-	// コマンドごとにキューを設けないと意図した動作にならないか
-	//std::queue<NativeEvent> event_queue_;
-	std::vector<NativeEventQueueIntarface*> event_handlers_;
+	std::vector<NativeEventQueueIntarface*>	event_handlers_;
+	std::vector<NativeEvent*>				command_cache_;
+	std::queue<EventCommand>				command_que_;
 
-	/*
-	// センサー系はまとめた方が良さそう
-	// Screen クラスでイベントとして処理してしまった方がいいかな
-	ASensorManager* sensor_manager_;
-	const ASensor* accelerometer_sensor_;
-	ASensorEventQueue* sensor_event_queue_;
-	*/
+	std::string language_;
+	std::string country_;
+	
+	bool is_terminate_;
 
+	// std::u16string
 	std::wstring internal_data_path_;
 	std::wstring external_data_path_;
+	std::wstring cache_path_;
+
+	class TTVPWindowForm* main_window_;
+
+	std::mutex main_thread_mutex_;
+	std::condition_variable main_thread_cv_;
+
+private:
+	NativeEvent* createNativeEvent();
+	void releaseNativeEvent( NativeEvent* ev );
+	void wakeupMainThread();
+	void getStringFromJava( const char* methodName, std::wstring& dest ) const;
 
 public:
+	void setAssetManager( AAssetManager* am ) {
+		asset_manager_ = am;
+		if( config_ == nullptr ) {
+			config_ = AConfiguration_new();
+		}
+		AConfiguration_fromAssetManager( config_, asset_manager_ );
+	}
+	static void nativeSetAssetManager(JNIEnv *jenv, jobject obj, jobject assetManager );
+
 	// platform's SDK version
 	tjs_int getSdkVersion() const {
-		return getActivity()->sdkVersion;
+		return AConfiguration_getSdkVersion( const_cast<AConfiguration*>(getConfiguration()) );
 	}
 	std::string getLanguage() const {
 		char lang[2];
@@ -182,10 +213,7 @@ public:
 	tjs_int getUIModeNight() const {
 		return AConfiguration_getUiModeNight( const_cast<AConfiguration*>(getConfiguration()) );
 	}
-	// for tTVPScreen
-	ANativeWindow* getNativeWindow() const {
-		return getAppState()->window;
-	}
+	/*
 	void setSaveState( const void* data, size_t size ) {
 		assert( app_state_ );
 		if( app_state_->savedStateSize != size ) {
@@ -208,55 +236,15 @@ public:
 		app_state_->savedState = NULL;
 		app_state_->savedStateSize = 0;
 	}
-	inline AAssetManager* getAssetManager() {
-		ANativeActivity* activity = getActivity();
-		assert( activity->assetManager );
-		return activity->assetManager;
-	}
+	*/
+	inline const AAssetManager* getAssetManager() const { return asset_manager_; }
+	inline AAssetManager* getAssetManager() { return asset_manager_; }
+
 private:
-	inline const android_app* getAppState() const {
-		assert( app_state_ );
-		return app_state_;
-	}
-	inline android_app* getAppState() {
-		assert( app_state_ );
-		return app_state_;
-	}
-	inline const ANativeActivity* getActivity() const {
-		const android_app* state = getAppState();
-		assert( state->activity );
-		return state->activity;
-	}
-	inline ANativeActivity* getActivity() {
-		const android_app* state = getAppState();
-		assert( state->activity );
-		return state->activity;
-	}
-	inline const AAssetManager* getAssetManager() const {
-		const ANativeActivity* activity = getActivity();
-		assert( activity->assetManager );
-		return activity->assetManager;
-	}
-	inline const char* getInternalDataPath() const {
-		const char* path = getActivity()->internalDataPath;
-		assert( path );
-		return path;
-	}
-	inline const char* getExternalDataPath() const {
-		const char* path = getActivity()->externalDataPath;
-		assert( path );
-		return path;
-	}
-	inline const AConfiguration* getConfiguration() const {
-		const android_app* state = getAppState();
-		assert( state->config );
-		return state->config;
-	}
-	inline AConfiguration* getConfiguration() {
-		const android_app* state = getAppState();
-		assert( state->config );
-		return state->config;
-	}
+	inline jobject getActivity() { return activity_; }
+
+	inline const AConfiguration* getConfiguration() const { assert( config_ ); return config_; }
+	inline AConfiguration* getConfiguration() { assert( config_ ); return config_; }
 
 	static void handleCommand( struct android_app* state, int32_t cmd );
 	void onCommand( struct android_app* state, int32_t cmd );
@@ -264,25 +252,28 @@ private:
 	static int32_t handleInput( struct android_app* state, AInputEvent* event );
 	int32_t onInput( struct android_app* state, AInputEvent* event );
 
-	bool initCommandPipe();
-	void finalCommandPipe();
-	int8_t readCommand();
+	//bool initCommandPipe();
+	//void finalCommandPipe();
+	//int8_t readCommand();
 	void HandleMessage( struct NativeEvent &ev );
 
-	static int messagePipeCallBack(int fd, int events, void* user);
+	//static int messagePipeCallBack(int fd, int events, void* user);
 
+	// メインループ
+	void mainLoop();
 public:
 	tTVPApplication();
 	~tTVPApplication();
 
-	const std::wstring& GetInternalDataPath() const { return internal_data_path_; }
-	const std::wstring& GetExternalDataPath() const { return external_data_path_; }
-	const std::string* GetCachePath() const { return nullptr; } // TODO キャッシュディレクトリを返すように実装する
+	// TODO Java から取得するようにする
+	const std::wstring& GetInternalDataPath() const;
+	const std::wstring& GetExternalDataPath() const;
+	const std::wstring* GetCachePath() const;
 	const std::string GetPackageName() const { return std::string(); }
 
 	bool GetActivating() const { return true; }	// TODO
 	void ShowToast( const tjs_char* text ) {}	// TODO
-	const tTVPScreen& GetScreen() const { return screen_; }
+	//const tTVPScreen& GetScreen() const { return screen_; }
 
 	// for iTVPApplication
 	virtual void startApplication( struct android_app* state );
@@ -316,15 +307,17 @@ public:
 	static int MessageDlg( const std::wstring& string, const std::wstring& caption, int type, int button ) {
 		return 0;
 	}
-	void postEvent( const struct NativeEvent* ev );
+	void postEvent( const struct NativeEvent* ev, NativeEventQueueIntarface* handler = nullptr );
 
 	void addEventHandler( NativeEventQueueIntarface* handler ) {
+		std::lock_guard<std::mutex> lock( main_thread_mutex_ );
 		std::vector<NativeEventQueueIntarface*>::iterator it = std::find(event_handlers_.begin(), event_handlers_.end(), handler);
 		if( it == event_handlers_.end() ) {
 			event_handlers_.push_back( handler );
 		}
 	}
 	void removeEventHandler( NativeEventQueueIntarface* handler ) {
+		std::lock_guard<std::mutex> lock( main_thread_mutex_ );
 		std::vector<NativeEventQueueIntarface*>::iterator it = std::remove(event_handlers_.begin(), event_handlers_.end(), handler);
 		event_handlers_.erase( it, event_handlers_.end() );
 	}
@@ -352,13 +345,17 @@ public:
 	void setWindow( ANativeWindow* window ) {
 		window_ = window;
 	}
+	void SendMessageFromJava( tjs_int message, tjs_int64 wparam, tjs_int64 lparam );
 	ANativeWindow* getWindow() { return window_; }
-	static void nativeOnStart(JNIEnv *jenv, jobject obj);
-	static void nativeOnResume(JNIEnv *jenv, jobject obj);
-	static void nativeOnPause(JNIEnv *jenv, jobject obj);
-	static void nativeOnStop(JNIEnv *jenv, jobject obj);
+	// for tTVPScreen
+	ANativeWindow* getNativeWindow() const { return window_; }
 	static void nativeSetSurface(JNIEnv *jenv, jobject obj, jobject surface);
+	static void nativeSetMessageResource(JNIEnv *jenv, jobject obj, jobjectArray mesarray);
+	static void nativeToMessage(JNIEnv *jenv, jobject obj, jint mes, jlong wparam, jlong lparam );
+	static void nativeSetActivity(JNIEnv *jenv, jobject obj, jobject activity);
 	void writeBitmapToNative( const void * bits );
+
+	TTVPWindowForm* GetMainWindow() { return main_window_; }
 };
 std::vector<std::string>* LoadLinesFromFile( const std::wstring& path );
 
