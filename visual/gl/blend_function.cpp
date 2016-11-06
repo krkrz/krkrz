@@ -18,10 +18,9 @@
 #include <math.h>
 #include <string.h>
 
-#include "tjsTypes.h"
+#include "tjsCommHead.h"
 #include "tvpgl.h"
 
-#include "tjsTypes.h"
 #include "tvpgl.h"
 #ifdef _WIN32
 #include "tvpgl_ia32_intf.h"

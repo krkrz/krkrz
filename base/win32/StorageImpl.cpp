@@ -131,7 +131,7 @@ void TJS_INTF_METHOD tTVPFileMedia::GetListAt(const ttstr &_name, iTVPStorageLis
 		{
 			if(!(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 			{
-				ttstr file(ffd.cFileName);
+				ttstr file( reinterpret_cast<tjs_char*>(ffd.cFileName) );
 				tjs_char *p = file.Independ();
 				while(*p)
 				{
@@ -276,7 +276,7 @@ ttstr TVPGetTemporaryName()
 
 		if(!TVPTempPathInit)
 		{
-			wchar_t tmp[MAX_PATH+1];
+			tjs_char tmp[MAX_PATH+1];
 			::GetTempPath(MAX_PATH, tmp);
 			TVPTempPath = tmp;
 
@@ -829,7 +829,7 @@ HRESULT STDMETHODCALLTYPE tTVPIStreamAdapter::Stat(STATSTG *pstatstg, DWORD grfS
 			// anyway returns an empty string
 			LPWSTR str = (LPWSTR)CoTaskMemAlloc(sizeof(*str));
 			if(str == NULL) return E_OUTOFMEMORY;
-			*str = L'\0';
+			*str = TJS_W('\0');
 			pstatstg->pwcsName = str;
 		}
 
@@ -1092,18 +1092,18 @@ ttstr TVPSearchCD(const ttstr & name)
 	// search CD which has specified volume label name.
 	// return drive letter ( such as 'A' or 'B' )
 	// return empty string if not found.
-	std::wstring narrow_name = name.AsStdString();
+	tjs_string narrow_name = name.AsStdString();
 
-	wchar_t dr[4];
-	for(dr[0]=L'A',dr[1]=L':',dr[2]=L'\\',dr[3]=0;dr[0]<=L'Z';dr[0]++)
+	tjs_char dr[4];
+	for(dr[0]=TJS_W('A'),dr[1]=TJS_W(':'),dr[2]=TJS_W('\\'),dr[3]=0;dr[0]<=TJS_W('Z');dr[0]++)
 	{
 		if(::GetDriveType(dr) == DRIVE_CDROM)
 		{
-			wchar_t vlabel[256];
-			wchar_t fs[256];
+			tjs_char vlabel[256];
+			tjs_char fs[256];
 			DWORD mcl = 0,sfs = 0;
 			GetVolumeInformation(dr, vlabel, 255, NULL, &mcl, &sfs, fs, 255);
-			if( icomp(std::wstring(vlabel),narrow_name) )
+			if( icomp(tjs_string(vlabel),narrow_name) )
 			//if(std::string(vlabel).AnsiCompareIC(narrow_name)==0)
 				return ttstr((tjs_char)dr[0]);
 		}

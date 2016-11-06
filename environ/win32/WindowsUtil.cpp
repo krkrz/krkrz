@@ -30,9 +30,9 @@ void TVPOutputWindowsErrorToConsole( const char* file, int line ) {
 		NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, NULL );
 	if( len > 0 ) {
 #ifdef _DEBUG
-		ttstr str(ttstr(L"(error) Windows Error : ") + ttstr(L"file : ") + ttstr(file) + ttstr(L", line : ") + ttstr(line) + ttstr(L", message : ") + ttstr((LPCWSTR)lpMsgBuf));
+		ttstr str(ttstr(TJS_W("(error) Windows Error : ")) + ttstr(TJS_W("file : ")) + ttstr(file) + ttstr(TJS_W(", line : ")) + ttstr(line) + ttstr(TJS_W(", message : ")) + ttstr((LPCWSTR)lpMsgBuf));
 #else
-		ttstr str(ttstr(L"(error) Windows Error : ") + ttstr((LPCWSTR)lpMsgBuf));
+		ttstr str(ttstr(TJS_W("(error) Windows Error : ")) + ttstr((LPCWSTR)lpMsgBuf));
 #endif
 		TVPAddImportantLog( str );
 	}

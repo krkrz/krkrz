@@ -35,7 +35,7 @@ static iTVPApplication* InitializeApplication( const char* internalDataPath ) {
 	FinalizeApplication();
 	// so を読み込んで初期化
 	std::string path(internalDataPath);
-	std::string::size_type pos = path.find_last_of( L'/' );
+	std::string::size_type pos = path.find_last_of( TJS_W('/') );
 	if( pos != std::string::npos ) {
 		std::string dllpath = path.substr( 0, pos+1 ) + std::string("lib/libkrkrz.so");
 		LoadApplication = dlopen( dllpath.c_str(), RTLD_LAZY );

@@ -1011,10 +1011,10 @@ bool tTVPWaveLoopManager::GetString(char *s, tTVPLabelStringType &v)
 		us[size] = TJS_W('\0');
 
 #ifdef TVP_IN_LOOP_TUNER
-		// convert us (an array of wchar_t) to AnsiString
+		// convert us (an array of tjs_char) to AnsiString
 		v = AnsiString(us);
 #else
-		// convert us (an array of wchar_t) to ttstr
+		// convert us (an array of tjs_char) to ttstr
 		v = ttstr(us);
 #endif
 

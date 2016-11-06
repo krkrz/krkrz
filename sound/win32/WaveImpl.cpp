@@ -677,7 +677,7 @@ static ttstr TVPGetSoundBufferFormatString(const WAVEFORMATEXTENSIBLE &wfx)
 			debuglog += TJS_W("sub type = KSDATAFORMAT_SUBTYPE_PCM");
 		else
 		{
-			wchar_t buf[101];
+			tjs_char buf[101];
 			StringFromGUID2((const _GUID &)wfx.SubFormat,
 				buf, 100);
 			debuglog += TJS_W("unknown sub type ") + ttstr(buf);
@@ -696,12 +696,12 @@ static BOOL CALLBACK DSoundEnumCallback( GUID* pGUID, const wchar_t * strDesc,
 	{
 		log += TJS_W(" [");
 
-		wchar_t driverpath[1024];
-		wchar_t* driverpath_filename = NULL;
+		tjs_char driverpath[1024];
+		tjs_char* driverpath_filename = NULL;
 		bool success = 0!=SearchPath(NULL, strDrvName, NULL, 1023, driverpath, &driverpath_filename);
 		if(!success)
 		{
-			wchar_t syspath[1024];
+			tjs_char syspath[1024];
 			GetSystemDirectory(syspath, 1023);
 			TJS_strcat(syspath, TJS_W("\\drivers")); // SystemDir\drivers
 			success = 0!=SearchPath(syspath, strDrvName, NULL, 1023, driverpath, &driverpath_filename);
@@ -709,7 +709,7 @@ static BOOL CALLBACK DSoundEnumCallback( GUID* pGUID, const wchar_t * strDesc,
 
 		if(!success)
 		{
-			wchar_t syspath[1024];
+			tjs_char syspath[1024];
 			GetWindowsDirectory(syspath, 1023);
 			TJS_strcat(syspath, TJS_W("\\system32")); // WinDir\system32
 			success = 0!=SearchPath(syspath, strDrvName, NULL, 1023, driverpath, &driverpath_filename);
@@ -717,7 +717,7 @@ static BOOL CALLBACK DSoundEnumCallback( GUID* pGUID, const wchar_t * strDesc,
 
 		if(!success)
 		{
-			wchar_t syspath[1024];
+			tjs_char syspath[1024];
 			GetWindowsDirectory(syspath, 1023);
 			TJS_strcat(syspath, TJS_W("\\system32\\drivers")); // WinDir\system32\drivers
 			success = 0!=SearchPath(syspath, strDrvName, NULL, 1023, driverpath, &driverpath_filename);
@@ -729,7 +729,7 @@ static BOOL CALLBACK DSoundEnumCallback( GUID* pGUID, const wchar_t * strDesc,
 			tjs_int major, minor, release, build;
 			if(TVPGetFileVersionOf(driverpath, major, minor, release, build))
 			{
-				wchar_t tmp[256];
+				tjs_char tmp[256];
 				TJS_snprintf(tmp, 256, TJS_W(" version %d.%d.%d.%d"), (int)major, (int)minor, (int)release, (int)build);
 				log += tmp;
 			}

@@ -9,7 +9,7 @@
 class tTVPPlayerCallback : public IMFAsyncCallback, public CUnknown {
 	class tTVPMFPlayer* owner_;
 public:
-	tTVPPlayerCallback( class tTVPMFPlayer* owner ) : CUnknown(L"PlayerCallback",NULL), owner_(owner) {}
+	tTVPPlayerCallback( class tTVPMFPlayer* owner ) : CUnknown(TJS_W("PlayerCallback"),NULL), owner_(owner) {}
 
 	// IUnknown
 	DECLARE_IUNKNOWN;
@@ -55,7 +55,7 @@ protected:
 
 	MFTIME				HnsDuration;
 
-	std::wstring		StreamName;
+	tjs_string		StreamName;
 	//IStream*			Stream;
 	//bool				StartPositionSpecify;
 	//__int64				StartPosition;
@@ -143,7 +143,7 @@ public:
 	virtual ~tTVPMFPlayer();
 
 	virtual void __stdcall BuildGraph( HWND callbackwin, IStream *stream,
-		const wchar_t * streamname, const wchar_t *type, unsigned __int64 size );
+		const tjs_char * streamname, const tjs_char *type, unsigned __int64 size );
 
 	virtual void __stdcall AddRef();
 	virtual void __stdcall Release();

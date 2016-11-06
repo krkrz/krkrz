@@ -131,9 +131,9 @@ public:
 	void ShowWindowAsModal();
 
 	// タイトル、Activityのタイトルに設定できるが、無意味かな
-	std::wstring GetCaption();
-	void GetCaption( std::wstring& v ) const;
-	void SetCaption( const std::wstring& v );
+	tjs_string GetCaption();
+	void GetCaption( tjs_string& v ) const;
+	void SetCaption( const tjs_string& v );
 
 	// サイズや位置など
 	// 位置はAndroidでは無効か、常に0を返し、設定もスルーなど

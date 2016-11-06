@@ -34,7 +34,7 @@
 class tNativeFreeTypeFace : public tBaseFreeTypeFace
 {
 protected:
-	std::wstring FaceName;	//!< Face名 = フォント名
+	tjs_string FaceName;	//!< Face名 = フォント名
 	FT_Face Face;	//!< FreeType face オブジェクト
 
 private:
@@ -45,11 +45,11 @@ private:
 	TEXTMETRIC TextMetric;
 
 public:
-	tNativeFreeTypeFace(const std::wstring &fontname, tjs_uint32 options);
+	tNativeFreeTypeFace(const tjs_string &fontname, tjs_uint32 options);
 	virtual ~tNativeFreeTypeFace();
 
 	virtual FT_Face GetFTFace() const;
-	virtual void GetFaceNameList(std::vector<std::wstring> & dest) const; 
+	virtual void GetFaceNameList(std::vector<tjs_string> & dest) const; 
 
 	bool GetIsTTC() const { return IsTTC; }
 	tjs_char GetDefaultChar() const;

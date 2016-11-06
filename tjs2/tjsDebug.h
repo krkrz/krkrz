@@ -123,13 +123,13 @@ extern void TJSDebuggerLog( const ttstr &line, bool impotant );
 extern void TJSDebuggerGetScopeKey( struct ScopeKey& scope,  const tjs_char* classname, const tjs_char* funcname, const tjs_char* filename, int codeoffset );
 extern void TJSDebuggerAddLocalVariable( const struct ScopeKey& key, const tjs_char* varname, int regaddr );
 extern void TJSDebuggerAddLocalVariable( const tjs_char* filename, const tjs_char* classname, const tjs_char* funcname, int codeoffset, const tjs_char* varname, int regaddr );
-extern void TJSDebuggerGetLocalVariableString( const struct ScopeKey& key, tTJSVariant* ra, std::list<std::wstring>& values );
-extern void TJSDebuggerGetLocalVariableString( const tjs_char* filename, const tjs_char* classname, const tjs_char* funcname, int codeoffset, tTJSVariant* ra, std::list<std::wstring>& values );
+extern void TJSDebuggerGetLocalVariableString( const struct ScopeKey& key, tTJSVariant* ra, std::list<tjs_string>& values );
+extern void TJSDebuggerGetLocalVariableString( const tjs_char* filename, const tjs_char* classname, const tjs_char* funcname, int codeoffset, tTJSVariant* ra, std::list<tjs_string>& values );
 extern void TJSDebuggerClearLocalVariable( const ScopeKey& key );
 extern void TJSDebuggerClearLocalVariable( const tjs_char* classname, const tjs_char* funcname, const tjs_char* filename, int codeoffset );
 
 extern void TJSDebuggerAddClassVariable( const tjs_char* classname, const tjs_char* varname, int regaddr );
-extern void TJSDebuggerGetClassVariableString( const tjs_char* classname, tTJSVariant* ra, tTJSVariant* da, std::list<std::wstring>& values );
+extern void TJSDebuggerGetClassVariableString( const tjs_char* classname, tTJSVariant* ra, tTJSVariant* da, std::list<tjs_string>& values );
 extern void TJSDebuggerClearLocalVariable( const tjs_char* classname );
 #endif	// ENABLE_DEBUGGER
 

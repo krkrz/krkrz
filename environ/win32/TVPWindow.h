@@ -46,8 +46,8 @@ protected:
 
 	HWND				window_handle_;
 
-	std::wstring	window_class_name_;
-	std::wstring	window_title_;
+	tjs_string	window_class_name_;
+	tjs_string	window_title_;
 	SIZE		window_client_size_;
 	SIZE		min_size_;
 	SIZE		max_size_;
@@ -94,7 +94,7 @@ protected:
 
 	virtual LRESULT WINAPI Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
 
-	HRESULT CreateWnd( const std::wstring& classname, const std::wstring& title, int width, int height, HWND hParent=NULL );
+	HRESULT CreateWnd( const tjs_string& classname, const tjs_string& title, int width, int height, HWND hParent=NULL );
 
 	virtual void OnDestroy();
 	virtual void OnPaint();
@@ -156,7 +156,7 @@ public:
 
 	virtual bool Initialize();
 
-	void SetWidnowTitle( const std::wstring& title );
+	void SetWidnowTitle( const tjs_string& title );
 	void SetScreenSize( int width, int height );
 
 	HWND GetHandle() { return window_handle_; }
@@ -176,8 +176,8 @@ public:
 	bool GetEnable() const;
 	void SetEnable( bool s );
 
-	void GetCaption( std::wstring& v ) const;
-	void SetCaption( const std::wstring& v );
+	void GetCaption( tjs_string& v ) const;
+	void SetCaption( const tjs_string& v );
 	
 	void SetBorderStyle( enum tTVPBorderStyle st);
 	enum tTVPBorderStyle GetBorderStyle() const;

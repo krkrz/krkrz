@@ -1516,7 +1516,7 @@ tjs_int tTJSInterCodeContext::ExecuteCode(tTJSVariant *ra_org, tjs_int startip,
 		DisplayExceptionGeneratedCode((tjs_int)(codesave - CodeArea), ra_org);
 		TJS_eTJSScriptError(e.what(), this, (tjs_int)(codesave-CodeArea));
 	}
-	catch(const wchar_t *text)
+	catch(const tjs_char *text)
 	{
 		DEBUGGER_EXCEPTION_HOOK;
 		DisplayExceptionGeneratedCode((tjs_int)(codesave - CodeArea), ra_org);
@@ -2874,7 +2874,7 @@ void tTJSInterCodeContext::ProcessOctetFunction(const tjs_char *member, const tT
 {
 	if(!member) TJSThrowFrom_tjs_error(TJS_E_MEMBERNOTFOUND, TJS_W(""));
 	switch( member[0] ) {
-	case L'u':
+	case TJS_W('u'):
 		if( !TJS_strcmp( TJS_W("unpack"), member) ) {
 			tjs_error err = TJSOctetUnpack( target, args, numargs, result );
 			if( err != TJS_S_OK ) {
@@ -2884,7 +2884,7 @@ void tTJSInterCodeContext::ProcessOctetFunction(const tjs_char *member, const tT
 		}
 		break;
 #if 0
-	case L'p':
+	case TJS_W('p'):
 		if( !TJS_strcmp( TJS_W("pack"), member) ) {
 			if(numargs < 2) TJSThrowFrom_tjs_error(TJS_E_BADPARAMCOUNT);
 			ttstr templ = *args[0];

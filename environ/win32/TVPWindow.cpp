@@ -381,7 +381,7 @@ const DWORD tTVPWindow::DEFAULT_TABLETPENSERVICE_PROPERTY = (
 	TABLET_DISABLE_FLICKS // disables pen flicks (back, forward, drag down, drag up)
 	);
 
-HRESULT tTVPWindow::CreateWnd( const std::wstring& classname, const std::wstring& title, int width, int height, HWND hParent )
+HRESULT tTVPWindow::CreateWnd( const tjs_string& classname, const tjs_string& title, int width, int height, HWND hParent )
 {
 	window_class_name_ = classname;
 	window_title_ = title;
@@ -461,7 +461,7 @@ void tTVPWindow::UnregisterWindow() {
 	::UnregisterClass( window_class_name_.c_str(), wc_.hInstance );
 }
 
-void tTVPWindow::SetWidnowTitle( const std::wstring& title ) {
+void tTVPWindow::SetWidnowTitle( const tjs_string& title ) {
 	if( window_title_ != title ) {
 		window_title_ = title;
 		if( window_handle_ ) {
@@ -536,18 +536,18 @@ void tTVPWindow::SetEnable( bool s ) {
 	::EnableWindow( GetHandle(), s ? TRUE : FALSE );
 }
 
-void tTVPWindow::GetCaption( std::wstring& v ) const {
+void tTVPWindow::GetCaption( tjs_string& v ) const {
 	v.clear();
 	int len = ::GetWindowTextLength( GetHandle() );
 	if( len > 0 ) {
-		std::vector<wchar_t> caption(len+1,0);
+		std::vector<tjs_char> caption(len+1,0);
 		int readlen = ::GetWindowText( GetHandle(), &(caption[0]), len+1 );
 		if( readlen > 0 ) {
 			v.assign( &(caption[0]) );
 		}
 	}
 }
-void tTVPWindow::SetCaption( const std::wstring& v ) {
+void tTVPWindow::SetCaption( const tjs_string& v ) {
 	if( window_title_ != v ) {
 		window_title_ = v;
 		::SetWindowText( GetHandle(), window_title_.c_str() );

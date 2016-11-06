@@ -346,9 +346,6 @@ public:
 //---------------------------------------------------------------------------
 class tTVPTextWriteStream : public iTJSTextWriteStream
 {
-	// TODO: 32bit wchar_t support
-
-
         static const tjs_uint COMPRESSION_BUFFER_SIZE = 1024 * 1024;
 
 	tTJSBinaryStream * Stream;

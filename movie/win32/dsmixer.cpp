@@ -91,7 +91,7 @@ void __stdcall tTVPDSMixerVideoOverlay::ReleaseAll()
 //! @param 		type : メディアタイプ(拡張子)
 //! @param 		size : メディアサイズ
 //----------------------------------------------------------------------------
-void __stdcall tTVPDSMixerVideoOverlay::BuildGraph( HWND callbackwin, IStream *stream, const wchar_t * streamname, const wchar_t *type, unsigned __int64 size )
+void __stdcall tTVPDSMixerVideoOverlay::BuildGraph( HWND callbackwin, IStream *stream, const tjs_char * streamname, const tjs_char *type, unsigned __int64 size )
 {
 	HRESULT			hr;
 
@@ -100,11 +100,11 @@ void __stdcall tTVPDSMixerVideoOverlay::BuildGraph( HWND callbackwin, IStream *s
 	// detect CMediaType from stream's extension ('type')
 	try {
 		if( FAILED(hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED)) )
-			ThrowDShowException(L"Failed to call CoInitializeEx.", hr);
+			ThrowDShowException(TJS_W("Failed to call CoInitializeEx."), hr);
 
 		// create IFilterGraph instance
 		if( FAILED(hr = m_GraphBuilder.CoCreateInstance(CLSID_FilterGraph, NULL, CLSCTX_INPROC)) )
-			ThrowDShowException(L"Failed to create FilterGraph.", hr);
+			ThrowDShowException(TJS_W("Failed to create FilterGraph."), hr);
 
 		// Register to ROT
 		if(GetShouldRegisterToROT())
@@ -127,9 +127,9 @@ void __stdcall tTVPDSMixerVideoOverlay::BuildGraph( HWND callbackwin, IStream *s
 			BuildWMVGraph( pVMR9, stream );
 
 			if( FAILED(hr = pVMR9.QueryInterface( &m_VMR9MixerCtrl ) ) )
-				ThrowDShowException(L"Failed to query IVMRMixerControl9.", hr);
+				ThrowDShowException(TJS_W("Failed to query IVMRMixerControl9."), hr);
 			if( FAILED(hr = pVMR9.QueryInterface( &m_VMR9MixerBmp ) ) )
-				ThrowDShowException(L"Failed to query IVMRMixerBitmap9.", hr);
+				ThrowDShowException(TJS_W("Failed to query IVMRMixerBitmap9."), hr);
 		}
 		else
 		{
@@ -142,12 +142,12 @@ void __stdcall tTVPDSMixerVideoOverlay::BuildGraph( HWND callbackwin, IStream *s
 			hr = S_OK;
 			m_Reader = new CIStreamReader( m_Proxy, &mt, &hr );
 			if( FAILED(hr) || m_Reader == NULL )
-				ThrowDShowException(L"Failed to create proxy filter object.", hr);
+				ThrowDShowException(TJS_W("Failed to create proxy filter object."), hr);
 			m_Reader->AddRef();
 
 			// add fliter
-			if( FAILED(hr = GraphBuilder()->AddFilter( m_Reader, L"Stream Reader")) )
-				ThrowDShowException(L"Failed to call IFilterGraph::AddFilter.", hr);
+			if( FAILED(hr = GraphBuilder()->AddFilter( m_Reader, TJS_W("Stream Reader"))) )
+				ThrowDShowException(TJS_W("Failed to call IFilterGraph::AddFilter."), hr);
 	
 			// AddFilterしたのでRelease
 			m_Reader->Release();
@@ -156,11 +156,11 @@ void __stdcall tTVPDSMixerVideoOverlay::BuildGraph( HWND callbackwin, IStream *s
 			{
 				// render output pin
 				if( FAILED(hr = GraphBuilder()->Render(m_Reader->GetPin(0))) )
-					ThrowDShowException(L"Failed to call IGraphBuilder::Render.", hr);
+					ThrowDShowException(TJS_W("Failed to call IGraphBuilder::Render."), hr);
 	
 				CComPtr<IBaseFilter>	pRender;
 				if( FAILED(hr = FindVideoRenderer( &pRender ) ) )
-					ThrowDShowException(L"Failed to call FindVideoRenderer( &pRender ).", hr);
+					ThrowDShowException(TJS_W("Failed to call FindVideoRenderer( &pRender )."), hr);
 	
 				CComPtr<IPin>	pRenderPin;
 				pRenderPin = GetInPin(pRender, 0);
@@ -168,17 +168,17 @@ void __stdcall tTVPDSMixerVideoOverlay::BuildGraph( HWND callbackwin, IStream *s
 				// get decoder output pin
 				CComPtr<IPin>			pDecoderPinOut;
 				if( FAILED(hr = pRenderPin->ConnectedTo( &pDecoderPinOut )) )
-					ThrowDShowException(L"Failed to call pRenderPin->ConnectedTo( &pDecoderPinOut ).", hr);
+					ThrowDShowException(TJS_W("Failed to call pRenderPin->ConnectedTo( &pDecoderPinOut )."), hr);
 	
 				// dissconnect pins
 				if( FAILED(hr = pDecoderPinOut->Disconnect()) )
-					ThrowDShowException(L"Failed to call pDecoderPinOut->Disconnect().", hr);
+					ThrowDShowException(TJS_W("Failed to call pDecoderPinOut->Disconnect()."), hr);
 				if( FAILED(hr = pRenderPin->Disconnect()) )
-					ThrowDShowException(L"Failed to call pRenderPin->Disconnect().", hr);
+					ThrowDShowException(TJS_W("Failed to call pRenderPin->Disconnect()."), hr);
 	
 				// remove default render
 				if( FAILED(hr = GraphBuilder()->RemoveFilter( pRender ) ) )
-					ThrowDShowException(L"Failed to call GraphBuilder->RemoveFilter(pRenderPin).", hr);
+					ThrowDShowException(TJS_W("Failed to call GraphBuilder->RemoveFilter(pRenderPin)."), hr);
 
 				CComPtr<IBaseFilter>	pVMR9;
 				AddVMR9Filer( pVMR9 );
@@ -187,12 +187,12 @@ void __stdcall tTVPDSMixerVideoOverlay::BuildGraph( HWND callbackwin, IStream *s
 				pRdrPinIn = GetInPin(pVMR9, 0);
 	
 				if( FAILED(hr = GraphBuilder()->ConnectDirect( pDecoderPinOut, pRdrPinIn, NULL )) )
-					ThrowDShowException(L"Failed to call GraphBuilder()->ConnectDirect( pDecoderPinOut, pRdrPinIn, NULL ).", hr);
+					ThrowDShowException(TJS_W("Failed to call GraphBuilder()->ConnectDirect( pDecoderPinOut, pRdrPinIn, NULL )."), hr);
 	
 				if( FAILED(hr = pVMR9.QueryInterface( &m_VMR9MixerCtrl ) ) )
-					ThrowDShowException(L"Failed to query IVMRMixerControl9.", hr);
+					ThrowDShowException(TJS_W("Failed to query IVMRMixerControl9."), hr);
 				if( FAILED(hr = pVMR9.QueryInterface( &m_VMR9MixerBmp ) ) )
-					ThrowDShowException(L"Failed to query IVMRMixerBitmap9.", hr);
+					ThrowDShowException(TJS_W("Failed to query IVMRMixerBitmap9."), hr);
 			}
 #ifdef ENABLE_THEORA
 			else if( mt.subtype == MEDIASUBTYPE_Ogg )
@@ -202,9 +202,9 @@ void __stdcall tTVPDSMixerVideoOverlay::BuildGraph( HWND callbackwin, IStream *s
 				BuildTheoraGraph( pVMR9, m_Reader); // may throw an exception
 	
 				if( FAILED(hr = pVMR9.QueryInterface( &m_VMR9MixerCtrl ) ) )
-					ThrowDShowException(L"Failed to query IVMRMixerControl9.", hr);
+					ThrowDShowException(TJS_W("Failed to query IVMRMixerControl9."), hr);
 				if( FAILED(hr = pVMR9.QueryInterface( &m_VMR9MixerBmp ) ) )
-					ThrowDShowException(L"Failed to query IVMRMixerBitmap9.", hr);
+					ThrowDShowException(TJS_W("Failed to query IVMRMixerBitmap9."), hr);
 			}
 #endif
 			else
@@ -217,9 +217,9 @@ void __stdcall tTVPDSMixerVideoOverlay::BuildGraph( HWND callbackwin, IStream *s
 					BuildPluginGraph( handler, pVMR9, m_Reader );
 
 					if( FAILED(hr = pVMR9.QueryInterface( &m_VMR9MixerCtrl ) ) )
-						ThrowDShowException(L"Failed to query IVMRMixerControl9.", hr);
+						ThrowDShowException(TJS_W("Failed to query IVMRMixerControl9."), hr);
 					if( FAILED(hr = pVMR9.QueryInterface( &m_VMR9MixerBmp ) ) )
-						ThrowDShowException(L"Failed to query IVMRMixerBitmap9.", hr);
+						ThrowDShowException(TJS_W("Failed to query IVMRMixerBitmap9."), hr);
 
 				}
 				else
@@ -229,9 +229,9 @@ void __stdcall tTVPDSMixerVideoOverlay::BuildGraph( HWND callbackwin, IStream *s
 					BuildMPEGGraph( pVMR9, m_Reader); // may throw an exception
 		
 					if( FAILED(hr = pVMR9.QueryInterface( &m_VMR9MixerCtrl ) ) )
-						ThrowDShowException(L"Failed to query IVMRMixerControl9.", hr);
+						ThrowDShowException(TJS_W("Failed to query IVMRMixerControl9."), hr);
 					if( FAILED(hr = pVMR9.QueryInterface( &m_VMR9MixerBmp ) ) )
-						ThrowDShowException(L"Failed to query IVMRMixerBitmap9.", hr);
+						ThrowDShowException(TJS_W("Failed to query IVMRMixerBitmap9."), hr);
 				}
 			}
 		}
@@ -239,14 +239,14 @@ void __stdcall tTVPDSMixerVideoOverlay::BuildGraph( HWND callbackwin, IStream *s
 		{	// 平均フレーム表示時間を取得する
 			CComPtr<IBaseFilter>	pRender;
 			if( FAILED(hr = FindVideoRenderer( &pRender ) ) )
-				ThrowDShowException(L"Failed to call FindVideoRenderer( &pRender ).", hr);
+				ThrowDShowException(TJS_W("Failed to call FindVideoRenderer( &pRender )."), hr);
 
 			CComPtr<IPin>	pRenderPin;
 			pRenderPin = GetInPin(pRender, 0);
 
 			AM_MEDIA_TYPE mt;
 			if( FAILED(hr = pRenderPin->ConnectionMediaType(&mt)) )
-				ThrowDShowException(L"Failed to call IPin::ConnectionMediaType(pmt).", hr);
+				ThrowDShowException(TJS_W("Failed to call IPin::ConnectionMediaType(pmt)."), hr);
 			if( mt.formattype == FORMAT_VideoInfo && mt.cbFormat != 0 )
 			{
 				VIDEOINFOHEADER	*vih = reinterpret_cast<VIDEOINFOHEADER*>(mt.pbFormat);
@@ -266,25 +266,25 @@ void __stdcall tTVPDSMixerVideoOverlay::BuildGraph( HWND callbackwin, IStream *s
 #endif
 		// query each interfaces
 		if( FAILED(hr = m_GraphBuilder.QueryInterface( &m_MediaControl )) )
-			ThrowDShowException(L"Failed to query IMediaControl", hr);
+			ThrowDShowException(TJS_W("Failed to query IMediaControl"), hr);
 		if( FAILED(hr = m_GraphBuilder.QueryInterface( &m_MediaPosition )) )
-			ThrowDShowException(L"Failed to query IMediaPosition", hr);
+			ThrowDShowException(TJS_W("Failed to query IMediaPosition"), hr);
 		if( FAILED(hr = m_GraphBuilder.QueryInterface( &m_MediaSeeking )) )
-			ThrowDShowException(L"Failed to query IMediaSeeking", hr);
+			ThrowDShowException(TJS_W("Failed to query IMediaSeeking"), hr);
 		if( FAILED(hr = m_GraphBuilder.QueryInterface( &m_MediaEventEx )) )
-			ThrowDShowException(L"Failed to query IMediaEventEx", hr);
+			ThrowDShowException(TJS_W("Failed to query IMediaEventEx"), hr);
 
 		if( FAILED(hr = m_GraphBuilder.QueryInterface( &m_BasicAudio )) )
-			ThrowDShowException(L"Failed to query IBasicAudio", hr);
+			ThrowDShowException(TJS_W("Failed to query IBasicAudio"), hr);
 
 		// set notify event
 		if(callbackwin)
 		{
 			if(FAILED(hr = Event()->SetNotifyWindow((OAHWND)callbackwin, WM_GRAPHNOTIFY, (long)(this))))
-				ThrowDShowException(L"Failed to set IMediaEventEx::SetNotifyWindow.", hr);
+				ThrowDShowException(TJS_W("Failed to set IMediaEventEx::SetNotifyWindow."), hr);
 		}
 	}
-	catch(const wchar_t *msg)
+	catch(const tjs_char *msg)
 	{
 		MakeAPause(true);
 		ReleaseAll();
@@ -310,36 +310,36 @@ void tTVPDSMixerVideoOverlay::AddVMR9Filer( CComPtr<IBaseFilter> &pVMR9 )
 {
 	HRESULT			hr = S_OK;
 	if( FAILED(hr = pVMR9.CoCreateInstance(CLSID_VideoMixingRenderer9, NULL, CLSCTX_INPROC) ) )
-		ThrowDShowException(L"Failed to create VMR9 Filter. This component requires DirectX9.", hr);
+		ThrowDShowException(TJS_W("Failed to create VMR9 Filter. This component requires DirectX9."), hr);
 
-	if( FAILED(hr = GraphBuilder()->AddFilter( pVMR9, L"Video Mixing Render 9")) )
-		ThrowDShowException(L"Failed to call GraphBuilder()->AddFilter( pVMR9, L\"Video Mixing Render 9\").", hr);
+	if( FAILED(hr = GraphBuilder()->AddFilter( pVMR9, TJS_W("Video Mixing Render 9"))) )
+		ThrowDShowException(TJS_W("Failed to call GraphBuilder()->AddFilter( pVMR9, L\"Video Mixing Render 9\")."), hr);
 
 	{
 		CComPtr<IVMRFilterConfig9>	pConfig;
 		if( FAILED(hr = pVMR9.QueryInterface(&pConfig) ) )
-			ThrowDShowException(L"Failed to query IVMRFilterConfig9.", hr);
+			ThrowDShowException(TJS_W("Failed to query IVMRFilterConfig9."), hr);
 
 		if( FAILED(hr = pConfig->SetNumberOfStreams(1) ) )
-			ThrowDShowException(L"Failed to call IVMRFilterConfig9::SetNumberOfStreams(1).", hr);
+			ThrowDShowException(TJS_W("Failed to call IVMRFilterConfig9::SetNumberOfStreams(1)."), hr);
 		if( FAILED(hr = pConfig->SetRenderingMode(VMR9Mode_Renderless ) ) )
-			ThrowDShowException(L"Failed to call IVMRFilterConfig9::SetRenderingMode(VMR9Mode_Renderless).", hr);
+			ThrowDShowException(TJS_W("Failed to call IVMRFilterConfig9::SetRenderingMode(VMR9Mode_Renderless)."), hr);
 
 		// Negotiate Renderless mode
 		if( FAILED(hr = pVMR9.QueryInterface( &m_VMR9SurfAllocNotify ) ) )
-			ThrowDShowException(L"Failed to query IVMRSurfaceAllocatorNotify9.", hr);
+			ThrowDShowException(TJS_W("Failed to query IVMRSurfaceAllocatorNotify9."), hr);
 
 		CComPtr<IVMRSurfaceAllocator9>	alloc;
 		if( FAILED(hr = AllocatorPresenter()->QueryInterface( IID_IVMRSurfaceAllocator9, reinterpret_cast<void**>(&alloc.p) ) ) )
-			ThrowDShowException(L"Failed to query IVMRSurfaceAllocator9.", hr);
+			ThrowDShowException(TJS_W("Failed to query IVMRSurfaceAllocator9."), hr);
 		if( FAILED(hr = AllocatorNotify()->AdviseSurfaceAllocator( reinterpret_cast<DWORD_PTR>(this), alloc ) ) )
-			ThrowDShowException(L"Failed to call IVMRSurfaceAllocatorNotify9::AdviseSurfaceAllocator().", hr);
+			ThrowDShowException(TJS_W("Failed to call IVMRSurfaceAllocatorNotify9::AdviseSurfaceAllocator()."), hr);
 		if( FAILED(hr = Allocator()->AdviseNotify( AllocatorNotify() ) ) )
-			ThrowDShowException(L"Failed to call IVMRSurfaceAllocator9::AdviseNotify().", hr);
+			ThrowDShowException(TJS_W("Failed to call IVMRSurfaceAllocator9::AdviseNotify()."), hr);
 
 		// query monitor config
 //		if( FAILED(hr = pVMR9.QueryInterface(&m_VMR9MonitorConfig)) )
-//			ThrowDShowException(L"Failed to query IVMRMonitorConfig9.", hr);
+//			ThrowDShowException(TJS_W("Failed to query IVMRMonitorConfig9."), hr);
 	}
 }
 //----------------------------------------------------------------------------
@@ -388,7 +388,7 @@ void __stdcall tTVPDSMixerVideoOverlay::SetMixingBitmap( HDC hdc, RECT *dest, fl
 	bmpInfo.dwFilterMode = MixerPref_PointFiltering;
 
 	if(FAILED(hr = MixerBmp()->SetAlphaBitmap( &bmpInfo )) )
-		ThrowDShowException(L"Failed to set IVMRMixerBitmap9::SetAlphaBitmap.", hr);
+		ThrowDShowException(TJS_W("Failed to set IVMRMixerBitmap9::SetAlphaBitmap."), hr);
 }
 //----------------------------------------------------------------------------
 //! @brief	  	ミキシングしているビットマップの設定を解除する
@@ -398,7 +398,7 @@ void __stdcall tTVPDSMixerVideoOverlay::ResetMixingBitmap()
 	HRESULT			hr;
 	VMR9AlphaBitmap	bmpInfo;
 	if(FAILED(hr = m_VMR9MixerBmp->GetAlphaBitmapParameters(&bmpInfo)) )
-		ThrowDShowException(L"Failed to set IVMRMixerBitmap9::GetAlphaBitmapParameters.", hr);
+		ThrowDShowException(TJS_W("Failed to set IVMRMixerBitmap9::GetAlphaBitmapParameters."), hr);
 
 	if( bmpInfo.hdc == NULL )	// 設定されていないのでリターン
 		return;
@@ -407,7 +407,7 @@ void __stdcall tTVPDSMixerVideoOverlay::ResetMixingBitmap()
 
 	// 設定せずにこのメソッドをコールすると、ビットマップを解除するという仕様らしい。
 	if(FAILED(hr = MixerBmp()->UpdateAlphaBitmapParameters( &bmpInfo )) )
-		ThrowDShowException(L"Failed to set IVMRMixerBitmap9::UpdateAlphaBitmapParameters.", hr);
+		ThrowDShowException(TJS_W("Failed to set IVMRMixerBitmap9::UpdateAlphaBitmapParameters."), hr);
 }
 //----------------------------------------------------------------------------
 //! @brief	  	ミキシングするビデオストリームのアルファ値を設定する
@@ -417,7 +417,7 @@ void __stdcall tTVPDSMixerVideoOverlay::SetMixingMovieAlpha( float a )
 {
 	HRESULT			hr;
 	if(FAILED(hr = MixerControl()->SetAlpha( 0, a )) )
-		ThrowDShowException(L"Failed to set IVMRMixerControl9::SetAlpha.", hr);
+		ThrowDShowException(TJS_W("Failed to set IVMRMixerControl9::SetAlpha."), hr);
 }
 //----------------------------------------------------------------------------
 //! @brief	  	ミキシングするビデオストリームのアルファ値を取得する
@@ -427,7 +427,7 @@ void __stdcall tTVPDSMixerVideoOverlay::GetMixingMovieAlpha( float *a )
 {
 	HRESULT			hr;
 	if(FAILED(hr = MixerControl()->GetAlpha( 0, a )) )
-		ThrowDShowException(L"Failed to set IVMRMixerControl9::GetAlpha.", hr);
+		ThrowDShowException(TJS_W("Failed to set IVMRMixerControl9::GetAlpha."), hr);
 }
 //----------------------------------------------------------------------------
 //! @brief	  	ミキシングするビデオストリームの背景色を設定する
@@ -438,7 +438,7 @@ void __stdcall tTVPDSMixerVideoOverlay::SetMixingMovieBGColor( unsigned long col
 	HRESULT			hr;
 	COLORREF	cr = ChangeEndian32(col<<8);
 	if(FAILED(hr = MixerControl()->SetBackgroundClr( cr )) )
-		ThrowDShowException(L"Failed to set IVMRMixerControl9::SetBackgroundClr.", hr);
+		ThrowDShowException(TJS_W("Failed to set IVMRMixerControl9::SetBackgroundClr."), hr);
 }
 //----------------------------------------------------------------------------
 //! @brief	  	ミキシングするビデオストリームの背景色を取得する
@@ -449,7 +449,7 @@ void __stdcall tTVPDSMixerVideoOverlay::GetMixingMovieBGColor( unsigned long *co
 	HRESULT		hr;
 	COLORREF	cr;
 	if(FAILED(hr = MixerControl()->GetBackgroundClr( &cr )) )
-		ThrowDShowException(L"Failed to set IVMRMixerControl9::GetBackgroundClr.", hr);
+		ThrowDShowException(TJS_W("Failed to set IVMRMixerControl9::GetBackgroundClr."), hr);
 	*col = ChangeEndian32(cr);
 	*col >>= 8;
 }
@@ -494,7 +494,7 @@ void __stdcall tTVPDSMixerVideoOverlay::SetVisible(bool b)
 void __stdcall tTVPDSMixerVideoOverlay::GetVideoSize( long *width, long *height )
 {
 	if( width == NULL || height == NULL )
-		TVPThrowExceptionMessage(L"Pointer is NULL.(tTVPDSMixerVideoOverlay::GetVideoSize)");
+		TVPThrowExceptionMessage(TJS_W("Pointer is NULL.(tTVPDSMixerVideoOverlay::GetVideoSize)"));
 
 	*width = m_Width;
 	*height = m_Height;
@@ -535,7 +535,7 @@ void tTVPDSMixerVideoOverlay::GetAmpControlRangeMin( float *v, int flag )
 
 	HRESULT			hr;
 	if(FAILED(hr = MixerControl()->GetProcAmpControlRange( 0, &proc )) )
-		ThrowDShowException(L"Failed to set IVMRMixerControl9::GetProcAmpControlRange.", hr);
+		ThrowDShowException(TJS_W("Failed to set IVMRMixerControl9::GetProcAmpControlRange."), hr);
 
 	*v = proc.MinValue;
 }
@@ -551,7 +551,7 @@ void tTVPDSMixerVideoOverlay::GetAmpControlRangeMax( float *v, int flag )
 
 	HRESULT			hr;
 	if(FAILED(hr = MixerControl()->GetProcAmpControlRange( 0, &proc )) )
-		ThrowDShowException(L"Failed to set IVMRMixerControl9::GetProcAmpControlRange.", hr);
+		ThrowDShowException(TJS_W("Failed to set IVMRMixerControl9::GetProcAmpControlRange."), hr);
 
 	*v = proc.MaxValue;
 }
@@ -567,7 +567,7 @@ void tTVPDSMixerVideoOverlay::GetAmpControlDefaultValue( float *v, int flag )
 
 	HRESULT			hr;
 	if(FAILED(hr = MixerControl()->GetProcAmpControlRange( 0, &proc )) )
-		ThrowDShowException(L"Failed to set IVMRMixerControl9::GetProcAmpControlRange.", hr);
+		ThrowDShowException(TJS_W("Failed to set IVMRMixerControl9::GetProcAmpControlRange."), hr);
 
 	*v = proc.DefaultValue;
 }
@@ -583,7 +583,7 @@ void tTVPDSMixerVideoOverlay::GetAmpControlStepSize( float *v, int flag )
 
 	HRESULT			hr;
 	if(FAILED(hr = MixerControl()->GetProcAmpControlRange( 0, &proc )) )
-		ThrowDShowException(L"Failed to set IVMRMixerControl9::GetProcAmpControlRange.", hr);
+		ThrowDShowException(TJS_W("Failed to set IVMRMixerControl9::GetProcAmpControlRange."), hr);
 
 	*v = proc.StepSize;
 }
@@ -599,7 +599,7 @@ void tTVPDSMixerVideoOverlay::GetAmpControl( float *v, int flag )
 
 	HRESULT			hr;
 	if(FAILED(hr = MixerControl()->GetProcAmpControl( 0, &proc )) )
-		ThrowDShowException(L"Failed to set IVMRMixerControl9::GetProcAmpControl.", hr);
+		ThrowDShowException(TJS_W("Failed to set IVMRMixerControl9::GetProcAmpControl."), hr);
 
 	switch( flag ) {
 		case ProcAmpControl9_Contrast:
@@ -626,7 +626,7 @@ void tTVPDSMixerVideoOverlay::SetAmpControl( float v, int flag )
 	VMR9ProcAmpControl proc = { sizeof(VMR9ProcAmpControl) };
 	HRESULT			hr;
 	if(FAILED(hr = MixerControl()->GetProcAmpControl( 0, &proc )) )
-		ThrowDShowException(L"Failed to set IVMRMixerControl9::GetProcAmpControl.", hr);
+		ThrowDShowException(TJS_W("Failed to set IVMRMixerControl9::GetProcAmpControl."), hr);
 
 	if( proc.dwFlags & flag ) {
 		proc.dwFlags = flag;
@@ -646,9 +646,9 @@ void tTVPDSMixerVideoOverlay::SetAmpControl( float v, int flag )
 		}
 
 		if(FAILED(hr = MixerControl()->SetProcAmpControl( 0, &proc )) )
-			ThrowDShowException(L"Failed to set IVMRMixerControl9::SetProcAmpControl.", hr);
+			ThrowDShowException(TJS_W("Failed to set IVMRMixerControl9::SetProcAmpControl."), hr);
 	} else {
-		ThrowDShowException(L"Not supported parameter. IVMRMixerControl9::SetProcAmpControl.", hr);
+		ThrowDShowException(TJS_W("Not supported parameter. IVMRMixerControl9::SetProcAmpControl."), hr);
 	}
 }
 

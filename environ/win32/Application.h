@@ -6,7 +6,7 @@
 #include <map>
 #include <stack>
 
-std::wstring ExePath();
+tjs_string ExePath();
 
 // 見通しのよい方法に変更した方が良い
 extern int _argc;
@@ -62,10 +62,10 @@ public:
 };
 class tTVPApplication {
 	std::vector<class TTVPWindowForm*> windows_list_;
-	std::wstring title_;
+	tjs_string title_;
 
 	bool is_attach_console_;
-	std::wstring console_title_;
+	tjs_string console_title_;
 	AcceleratorKeyTable accel_key_;
 	bool tarminate_;
 	bool application_activating_;
@@ -79,7 +79,7 @@ private:
 	void CheckConsole();
 	void CloseConsole();
 	void CheckDigitizer();
-	void ShowException( const wchar_t* e );
+	void ShowException( const tjs_char* e );
 	void Initialize() {}
 	void Run();
 
@@ -88,7 +88,7 @@ public:
 	~tTVPApplication();
 	bool StartApplication( int argc, tjs_char* argv[] );
 
-	void PrintConsole( const wchar_t* mes, unsigned long len, bool iserror = false );
+	void PrintConsole( const tjs_char* mes, unsigned long len, bool iserror = false );
 	bool IsAttachConsole() { return is_attach_console_; }
 
 	bool IsTarminate() const { return tarminate_; }
@@ -120,11 +120,11 @@ public:
 	void HandleMessage();
 	void HandleIdle(MSG &msg);
 
-	std::wstring GetTitle() const { return title_; }
-	void SetTitle( const std::wstring& caption );
+	tjs_string GetTitle() const { return title_; }
+	void SetTitle( const tjs_string& caption );
 
-	static inline int MessageDlg( const std::wstring& string, const std::wstring& caption, int type, int button ) {
-		return ::MessageBox( NULL, string.c_str(), caption.c_str(), type|button  );
+	static inline int MessageDlg( const tjs_string& string, const tjs_string& caption, int type, int button ) {
+		return ::MessageBox( nullptr, string.c_str(), caption.c_str(), type|button  );
 	}
 	void Terminate() {
 		::PostQuitMessage(0);
@@ -167,7 +167,7 @@ public:
 	 */
 	void LoadImageRequest( class iTJSDispatch2 *owner, class tTJSNI_Bitmap* bmp, const ttstr &name );
 };
-std::vector<std::string>* LoadLinesFromFile( const std::wstring& path );
+std::vector<std::string>* LoadLinesFromFile( const tjs_string& path );
 
 inline HINSTANCE GetHInstance() { return ((HINSTANCE)GetModuleHandle(0)); }
 extern class tTVPApplication* Application;

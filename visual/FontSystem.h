@@ -9,9 +9,9 @@
 
 class tTVPWStringHash {
 public:
-	static tjs_uint32 Make(const std::wstring &val)
+	static tjs_uint32 Make(const tjs_string &val)
 	{
-		const wchar_t* ptr = val.c_str();
+		const tjs_char* ptr = val.c_str();
 		if(*ptr == 0) return 0;
 		tjs_uint32 v = 0;
 		while(*ptr)
@@ -31,22 +31,22 @@ public:
 
 class FontSystem {
 	bool FontNamesInit;
-	tTJSHashTable<std::wstring, tjs_int, tTVPWStringHash> TVPFontNames;
+	tTJSHashTable<tjs_string, tjs_int, tTVPWStringHash> TVPFontNames;
 
 	tTVPFont DefaultFont;
 	bool DefaultLOGFONTCreated;
 
 	void InitFontNames();
 	//---------------------------------------------------------------------------
-	void AddFont( const std::wstring& name );
+	void AddFont( const tjs_string& name );
 	//---------------------------------------------------------------------------
-	bool FontExists( const std::wstring &name );
+	bool FontExists( const tjs_string &name );
 
 	void ConstructDefaultFont();
 
 public:
 	FontSystem();
-	std::wstring GetBeingFont(std::wstring fonts);
+	tjs_string GetBeingFont(tjs_string fonts);
 	const tTVPFont& GetDefaultFont() const {
 		return DefaultFont;
 	}

@@ -106,7 +106,7 @@ class iTJSDispatch2
 	methods, that have "ByNum" at the end of the name, have
 	"num" parameter that enables the function to call a member with number directly.
 	following two have the same effect:
-	FuncCall(NULL, L"123", NULL, 0, NULL, NULL);
+	FuncCall(NULL, TJS_W("123"), NULL, 0, NULL, NULL);
 	FuncCallByNum(NULL, 123, NULL, 0, NULL, NULL);
 */
 

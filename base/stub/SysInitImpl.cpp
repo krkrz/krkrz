@@ -46,8 +46,8 @@
 //---------------------------------------------------------------------------
 // global data
 //---------------------------------------------------------------------------
-std::wstring TVPNativeProjectDir;
-std::wstring TVPNativeDataPath;
+tjs_string TVPNativeProjectDir;
+tjs_string TVPNativeDataPath;
 bool TVPProjectDirSelected = false;
 //---------------------------------------------------------------------------
 
@@ -207,7 +207,7 @@ struct tTVPHWExceptionData
 	int AccessFlag; // for EAccessViolation (0=read, 1=write, 8=execute)
 	void *AccessTarget; // for EAccessViolation
 	CONTEXT Context; // OS exception context
-	wchar_t Module[MAX_PATH]; // module name which caused the exception
+	tjs_char Module[MAX_PATH]; // module name which caused the exception
 
 	tjs_uint8 CodesAtEIP[TVP_HWE_MAX_CODES_AT_EIP];
 	tjs_int CodesAtEIPLen;
@@ -225,13 +225,13 @@ static tTVPHWExceptionData TVPLastHWExceptionData;
 
 HANDLE TVPHWExceptionLogHandle = NULL;
 //---------------------------------------------------------------------------
-static wchar_t TVPHWExceptionLogFilename[MAX_PATH];
+static tjs_char TVPHWExceptionLogFilename[MAX_PATH];
 
 static void TVPWriteHWELogFile()
 {
 	TVPEnsureDataPathDirectory();
 	TJS_strcpy(TVPHWExceptionLogFilename, TVPNativeDataPath.c_str());
-	TJS_strcat(TVPHWExceptionLogFilename, L"hwexcept.log");
+	TJS_strcat(TVPHWExceptionLogFilename, TJS_W("hwexcept.log"));
 	TVPHWExceptionLogHandle = CreateFile(TVPHWExceptionLogFilename, GENERIC_WRITE,
 		FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
@@ -241,16 +241,16 @@ static void TVPWriteHWELogFile()
 	SetFilePointer(TVPHWExceptionLogHandle, filesize, NULL, FILE_BEGIN);
 
 	// write header
-	const wchar_t headercomment[] =
-		L"THIS IS A HARDWARE EXCEPTION LOG FILE OF KIRIKIRI. "
-		L"PLEASE SEND THIS FILE TO THE AUTHOR WITH *.console.log FILE. ";
+	const tjs_char headercomment[] =
+		TJS_W("THIS IS A HARDWARE EXCEPTION LOG FILE OF KIRIKIRI. ")
+		TJS_W("PLEASE SEND THIS FILE TO THE AUTHOR WITH *.console.log FILE. ");
 	DWORD written = 0;
 	for(int i = 0; i < 4; i++)
-		WriteFile(TVPHWExceptionLogHandle, L"----", 4*sizeof(wchar_t), &written, NULL);
+		WriteFile(TVPHWExceptionLogHandle, TJS_W("----"), 4*sizeof(tjs_char), &written, NULL);
 	WriteFile(TVPHWExceptionLogHandle, headercomment, sizeof(headercomment)-1,
 		&written, NULL);
 	for(int i = 0; i < 4; i++)
-		WriteFile(TVPHWExceptionLogHandle, L"----", 4*sizeof(wchar_t), &written, NULL);
+		WriteFile(TVPHWExceptionLogHandle, TJS_W("----"), 4*sizeof(tjs_char), &written, NULL);
 		
 
 	// write version
@@ -378,7 +378,7 @@ void TVPHandleSEHException( int ErrorCode, EXCEPTION_RECORD *P, unsigned long os
 			VirtualQuery((void*)d->ESP[p], &mbi, sizeof(mbi));
 			if(mbi.State == MEM_COMMIT)
 			{
-				wchar_t module[MAX_PATH];
+				tjs_char module[MAX_PATH];
 				if(::GetModuleFileName((HMODULE)mbi.AllocationBase, module, MAX_PATH))
 				{
 					tjs_uint8 buf[16];
@@ -711,7 +711,7 @@ void TVPDumpHWException()
 		VirtualQuery((void*)d->CallTrace[s], &mbi, sizeof(mbi));
 		if(mbi.State == MEM_COMMIT)
 		{
-			wchar_t module[MAX_PATH];
+			tjs_char module[MAX_PATH];
 			if(::GetModuleFileName((HMODULE)mbi.AllocationBase, module, MAX_PATH))
 			{
 				line += ttstr(ExtractFileName(module).c_str());
@@ -813,7 +813,7 @@ void TVPInitializeBaseSystems()
 static int CALLBACK TVPBrowseCallbackProc(HWND hwnd,UINT uMsg,LPARAM lParam,LPARAM lpData)
 {
     if(uMsg==BFFM_INITIALIZED){
-		wchar_t exeDir[MAX_PATH];
+		tjs_char exeDir[MAX_PATH];
 		TJS_strcpy(exeDir, IncludeTrailingBackslash(ExtractFileDir(ExePath())).c_str());
         ::SendMessage(hwnd,BFFM_SETSELECTION,(WPARAM)TRUE,(LPARAM)exeDir);
     }
@@ -852,7 +852,7 @@ void TVPBeforeSystemInit()
 
 		TVPTotalPhysMemory = status.ullTotalPhys;
 
-		ttstr memstr( std::to_wstring(TVPTotalPhysMemory).c_str() );
+		ttstr memstr( to_tjs_string(TVPTotalPhysMemory).c_str() );
 		TVPAddImportantLog( TVPFormatMessage(TVPInfoTotalPhysicalMemory, memstr) );
 
 		tTJSVariant opt;
@@ -886,7 +886,7 @@ void TVPBeforeSystemInit()
 	}
 
 
-	wchar_t buf[MAX_PATH];
+	tjs_char buf[MAX_PATH];
 	bool bufset = false;
 	bool nosel = false;
 	bool forcesel = false;
@@ -902,7 +902,7 @@ void TVPBeforeSystemInit()
 		}
 		else
 		{
-			wchar_t exeDir[MAX_PATH];
+			tjs_char exeDir[MAX_PATH];
 			TJS_strcpy(exeDir, IncludeTrailingBackslash(ExtractFileDir(ExePath())).c_str());
 			for(tjs_int i = 1; i<_argc; i++)
 			{
@@ -932,8 +932,8 @@ void TVPBeforeSystemInit()
 		// sel option was set
 		if(bufset)
 		{
-			wchar_t path[MAX_PATH];
-			wchar_t *dum = 0;
+			tjs_char path[MAX_PATH];
+			tjs_char *dum = 0;
 			GetFullPathName(buf, MAX_PATH-1, path, &dum);
 			TJS_strcpy(buf, path);
 			TVPProjectDirSelected = false;
@@ -946,7 +946,7 @@ void TVPBeforeSystemInit()
 	// check "content-data" directory
 	if(!forcedataxp3 && !nosel)
 	{
-		wchar_t tmp[MAX_PATH];
+		tjs_char tmp[MAX_PATH];
 		TJS_strcpy(tmp, IncludeTrailingBackslash(ExtractFileDir(ExePath())).c_str());
 		TJS_strcat(tmp, TJS_W("content-data"));
 		if(DirectoryExists(tmp))
@@ -962,7 +962,7 @@ void TVPBeforeSystemInit()
 	// check "data.xp3" archive
  	if(!nosel)
 	{
-		wchar_t tmp[MAX_PATH];
+		tjs_char tmp[MAX_PATH];
 		TJS_strcpy(tmp, IncludeTrailingBackslash(ExtractFileDir(ExePath())).c_str());
 		TJS_strcat(tmp, TJS_W("data.xp3"));
 		if(FileExists(tmp))
@@ -977,7 +977,7 @@ void TVPBeforeSystemInit()
 	// check "data.exe" archive
  	if(!nosel)
 	{
-		wchar_t tmp[MAX_PATH];
+		tjs_char tmp[MAX_PATH];
 		TJS_strcpy(tmp, IncludeTrailingBackslash(ExtractFileDir(ExePath())).c_str());
 		TJS_strcat(tmp, TJS_W("data.exe"));
 		if(FileExists(tmp))
@@ -1005,7 +1005,7 @@ void TVPBeforeSystemInit()
 	// check "data" directory
 	if(!forcedataxp3 && !nosel)
 	{
-		wchar_t tmp[MAX_PATH];
+		tjs_char tmp[MAX_PATH];
 		TJS_strcpy(tmp, IncludeTrailingBackslash(ExtractFileDir(ExePath())).c_str());
 		TJS_strcat(tmp, TJS_W("data"));
 		if(DirectoryExists(tmp))
@@ -1031,7 +1031,7 @@ void TVPBeforeSystemInit()
 	if(!forcedataxp3 && (!nosel || forcesel))
 	{
 		BOOL			bRes;
-		wchar_t			chPutFolder[MAX_PATH];
+		tjs_char			chPutFolder[MAX_PATH];
 		LPITEMIDLIST	pidlRetFolder;
 		BROWSEINFO		stBInfo;
 		::ZeroMemory( &stBInfo, sizeof(stBInfo) );
@@ -1363,10 +1363,10 @@ static std::vector<std::string> * TVPGetEmbeddedOptions()
 	return ret;
 }
 //---------------------------------------------------------------------------
-static std::vector<std::string> * TVPGetConfigFileOptions(const std::wstring& filename)
+static std::vector<std::string> * TVPGetConfigFileOptions(const tjs_string& filename)
 {
 	// load .cf file
-	std::wstring errmsg;
+	tjs_string errmsg;
 	if(!FileExists(filename))
 		errmsg = (const tjs_char*)TVPFileNotFound;
 
@@ -1525,7 +1525,7 @@ static void TVPInitProgramArgumentsAndDataPath(bool stop_after_datapath_got)
 
 			// read datapath
 			tTJSVariant val;
-			std::wstring config_datapath;
+			tjs_string config_datapath;
 			if(TVPGetCommandLine(TJS_W("-datapath"), &val))
 				config_datapath = ((ttstr)val).AsStdString();
 			TVPNativeDataPath = ApplicationSpecialPath::GetDataPathDirectory(config_datapath, ExePath());
@@ -1690,7 +1690,7 @@ bool TVPCheckAbout(void)
 //---------------------------------------------------------------------------
 // TVPExecuteAsync
 //---------------------------------------------------------------------------
-static void TVPExecuteAsync( const std::wstring& progname)
+static void TVPExecuteAsync( const tjs_string& progname)
 {
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
@@ -1730,7 +1730,7 @@ static void TVPExecuteAsync( const std::wstring& progname)
 //---------------------------------------------------------------------------
 // TVPWaitWritePermit
 //---------------------------------------------------------------------------
-static bool TVPWaitWritePermit(const std::wstring& fn)
+static bool TVPWaitWritePermit(const tjs_string& fn)
 {
 	tjs_int timeout = 10; // 10/1 = 5 seconds
 	while(true)

@@ -1252,6 +1252,9 @@
     <ClCompile Include="..\environ\TouchPoint.cpp">
       <Filter>environ</Filter>
     </ClCompile>
+    <ClCompile Include="..\tjs2\tjsSnprintf.cpp">
+      <Filter>tjs2</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="tvpwin32.rc">

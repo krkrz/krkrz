@@ -10,7 +10,7 @@
  *****************************************************************************/
 
 
-#include "tjsTypes.h"
+#include "tjsCommHead.h"
 #include "tvpgl_ia32_intf.h"
 
 #ifdef _MSC_VER

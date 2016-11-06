@@ -660,6 +660,7 @@
     <ClCompile Include="..\tjs2\tjsRegExp.cpp" />
     <ClCompile Include="..\tjs2\tjsScriptBlock.cpp" />
     <ClCompile Include="..\tjs2\tjsScriptCache.cpp" />
+    <ClCompile Include="..\tjs2\tjsSnprintf.cpp" />
     <ClCompile Include="..\tjs2\tjsString.cpp" />
     <ClCompile Include="..\tjs2\tjsUtils.cpp" />
     <ClCompile Include="..\tjs2\tjsVariant.cpp" />

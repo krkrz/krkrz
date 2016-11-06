@@ -149,7 +149,7 @@ void __stdcall tTVPDSMovie::Play()
 	HRESULT	hr;
 	if( FAILED(hr = Controller()->Run()) )
 	{
-		ThrowDShowException(L"Failed to call IMediaControl::Run.", hr);
+		ThrowDShowException(TJS_W("Failed to call IMediaControl::Run."), hr);
 	}
 }
 //----------------------------------------------------------------------------
@@ -160,7 +160,7 @@ void __stdcall tTVPDSMovie::Stop()
 	HRESULT	hr;
 	if( FAILED(hr = Controller()->Stop()) )
 	{
-		ThrowDShowException(L"Failed to call IMediaControl::Stop.", hr);
+		ThrowDShowException(TJS_W("Failed to call IMediaControl::Stop."), hr);
 	}
 }
 //----------------------------------------------------------------------------
@@ -171,7 +171,7 @@ void __stdcall tTVPDSMovie::Pause()
 	HRESULT	hr;
 	if( FAILED(hr = Controller()->Pause()) )
 	{
-		ThrowDShowException(L"Failed to call IMediaControl::Pause.", hr);
+		ThrowDShowException(TJS_W("Failed to call IMediaControl::Pause."), hr);
 	}
 }
 //----------------------------------------------------------------------------
@@ -185,14 +185,14 @@ void __stdcall tTVPDSMovie::SetPosition( unsigned __int64 tick )
 	GUID	Format;
 	if( FAILED(hr = MediaSeeking()->GetTimeFormat( &Format ) ) )
 	{
-		ThrowDShowException(L"Failed to call IMediaSeeking::GetTimeFormat (in tTVPDSMovie::SetPosition).", hr);
+		ThrowDShowException(TJS_W("Failed to call IMediaSeeking::GetTimeFormat (in tTVPDSMovie::SetPosition)."), hr);
 	}
 	if( IsEqualGUID( TIME_FORMAT_MEDIA_TIME, Format ) )
 	{
 		LONGLONG	requestTime = (LONGLONG)(tick * 10000);
 		if( FAILED(hr = MediaSeeking()->SetPositions( &requestTime, AM_SEEKING_AbsolutePositioning | AM_SEEKING_SeekToKeyFrame, NULL, AM_SEEKING_NoPositioning )) )
 		{
-			ThrowDShowException(L"Failed to call IMediaSeeking::SetPositions (TIME_FORMAT_MEDIA_TIME, in tTVPDSMovie::SetPosition).", hr);
+			ThrowDShowException(TJS_W("Failed to call IMediaSeeking::SetPositions (TIME_FORMAT_MEDIA_TIME, in tTVPDSMovie::SetPosition)."), hr);
 		}
 	}
 	else if( IsEqualGUID( TIME_FORMAT_FRAME, Format ) )
@@ -200,17 +200,17 @@ void __stdcall tTVPDSMovie::SetPosition( unsigned __int64 tick )
 		REFTIME	AvgTimePerFrame;
 		if( FAILED(hr = GetAvgTimePerFrame( &AvgTimePerFrame )) )
 		{
-			ThrowDShowException(L"Failed to call IBasicVideo::get_AvgTimePerFrame (in tTVPDSMovie::SetPosition).", hr);
+			ThrowDShowException(TJS_W("Failed to call IBasicVideo::get_AvgTimePerFrame (in tTVPDSMovie::SetPosition)."), hr);
 		}
 		LONGLONG	requestFrame = (LONGLONG)(((tick / 1000.0) / AvgTimePerFrame) + 0.5);
 		if( FAILED(hr = MediaSeeking()->SetPositions( &requestFrame, AM_SEEKING_AbsolutePositioning | AM_SEEKING_SeekToKeyFrame, NULL, AM_SEEKING_NoPositioning )) )
 		{
-			ThrowDShowException(L"Failed to call IMediaSeeking::SetPositions (TIME_FORMAT_FRAME, in tTVPDSMovie::SetPosition).", hr);
+			ThrowDShowException(TJS_W("Failed to call IMediaSeeking::SetPositions (TIME_FORMAT_FRAME, in tTVPDSMovie::SetPosition)."), hr);
 		}
 	}
 	else
 	{
-		TVPThrowExceptionMessage(L"Not supported time format.");
+		TVPThrowExceptionMessage(TJS_W("Not supported time format."));
 	}
 }
 //----------------------------------------------------------------------------
@@ -225,12 +225,12 @@ void __stdcall tTVPDSMovie::GetPosition( unsigned __int64 *tick )
 	LONGLONG	Current;
 	if( FAILED(hr = MediaSeeking()->GetCurrentPosition( &Current ) ) )
 	{
-		ThrowDShowException(L"Failed to call IMediaSeeking::GetCurrentPosition (in tTVPDSMovie::GetPosition).", hr);
+		ThrowDShowException(TJS_W("Failed to call IMediaSeeking::GetCurrentPosition (in tTVPDSMovie::GetPosition)."), hr);
 	}
 	GUID	Format;
 	if( FAILED(hr = MediaSeeking()->GetTimeFormat( &Format ) ) )
 	{
-		ThrowDShowException(L"Failed to call IMediaSeeking::GetTimeFormat (in tTVPDSMovie::GetPosition).", hr);
+		ThrowDShowException(TJS_W("Failed to call IMediaSeeking::GetTimeFormat (in tTVPDSMovie::GetPosition)."), hr);
 	}
 	if( IsEqualGUID( TIME_FORMAT_MEDIA_TIME, Format ) )
 	{
@@ -242,14 +242,14 @@ void __stdcall tTVPDSMovie::GetPosition( unsigned __int64 *tick )
 		REFTIME	AvgTimePerFrame;
 		if( FAILED(hr = GetAvgTimePerFrame( &AvgTimePerFrame )) )
 		{
-			ThrowDShowException(L"Failed to call IBasicVideo::get_AvgTimePerFrame (in tTVPDSMovie::GetPosition).", hr);
+			ThrowDShowException(TJS_W("Failed to call IBasicVideo::get_AvgTimePerFrame (in tTVPDSMovie::GetPosition)."), hr);
 		}
 		LONGLONG	curTime = (LONGLONG)(Current * AvgTimePerFrame * 1000.0);
 		*tick = (unsigned __int64)( curTime < 0 ? 0 : curTime);
 	}
 	else
 	{
-		TVPThrowExceptionMessage(L"Not supported time format.");
+		TVPThrowExceptionMessage(TJS_W("Not supported time format."));
 	}
 }
 //----------------------------------------------------------------------------
@@ -288,7 +288,7 @@ void __stdcall tTVPDSMovie::GetEvent( long *evcode, LONG_PTR *param1, LONG_PTR *
 	{
 		if( *evcode == EC_ERRORABORT )
 		{
-			ThrowDShowException(L"Error Abort.", static_cast<HRESULT>(*param1) );
+			ThrowDShowException(TJS_W("Error Abort."), static_cast<HRESULT>(*param1) );
 		}
 		*got = true;
 	}
@@ -321,7 +321,7 @@ void __stdcall tTVPDSMovie::Rewind()
 	HRESULT	hr;
 	if( FAILED(hr = Position()->put_CurrentPosition(0)) )
 	{
-		ThrowDShowException(L"Failed to call IMediaPosition::put_CurrentPosition(0).", hr);
+		ThrowDShowException(TJS_W("Failed to call IMediaPosition::put_CurrentPosition(0)."), hr);
 	}
 	return;
 }
@@ -340,19 +340,19 @@ void __stdcall tTVPDSMovie::SetFrame( int f )
 	GUID	Format;
 	if( FAILED(hr = MediaSeeking()->GetTimeFormat( &Format ) ) )
 	{
-		ThrowDShowException(L"Failed to call IMediaSeeking::GetTimeFormat (in tTVPDSMovie::SetFrame).", hr);
+		ThrowDShowException(TJS_W("Failed to call IMediaSeeking::GetTimeFormat (in tTVPDSMovie::SetFrame)."), hr);
 	}
 	if( IsEqualGUID( TIME_FORMAT_MEDIA_TIME, Format ) )
 	{
 		REFTIME	AvgTimePerFrame;
 		if( FAILED(hr = GetAvgTimePerFrame( &AvgTimePerFrame )) )
 		{
-			ThrowDShowException(L"Failed to call IBasicVideo::get_AvgTimePerFrame (in tTVPDSMovie::SetFrame).", hr);
+			ThrowDShowException(TJS_W("Failed to call IBasicVideo::get_AvgTimePerFrame (in tTVPDSMovie::SetFrame)."), hr);
 		}
 		LONGLONG	requestTime = (LONGLONG)(AvgTimePerFrame * 10000000.0 * f);
 		if( FAILED(hr = MediaSeeking()->SetPositions( &requestTime, AM_SEEKING_AbsolutePositioning | AM_SEEKING_SeekToKeyFrame, NULL, AM_SEEKING_NoPositioning )) )
 		{
-			ThrowDShowException(L"Failed to call IMediaSeeking::SetPositions (TIME_FORMAT_MEDIA_TIME, in tTVPDSMovie::SetFrame).", hr);
+			ThrowDShowException(TJS_W("Failed to call IMediaSeeking::SetPositions (TIME_FORMAT_MEDIA_TIME, in tTVPDSMovie::SetFrame)."), hr);
 		}
 	}
 	else if( IsEqualGUID( TIME_FORMAT_FRAME, Format ) )
@@ -360,12 +360,12 @@ void __stdcall tTVPDSMovie::SetFrame( int f )
 		LONGLONG	requestFrame = f;
 		if( FAILED(hr = MediaSeeking()->SetPositions( &requestFrame, AM_SEEKING_AbsolutePositioning | AM_SEEKING_SeekToKeyFrame, NULL, AM_SEEKING_NoPositioning )) )
 		{
-			ThrowDShowException(L"Failed to call IMediaSeeking::SetPositions (TIME_FORMAT_FRAME, in tTVPDSMovie::SetFrame).", hr);
+			ThrowDShowException(TJS_W("Failed to call IMediaSeeking::SetPositions (TIME_FORMAT_FRAME, in tTVPDSMovie::SetFrame)."), hr);
 		}
 	}
 	else
 	{
-		TVPThrowExceptionMessage(L"Not supported time format.");
+		TVPThrowExceptionMessage(TJS_W("Not supported time format."));
 	}
 }
 //----------------------------------------------------------------------------
@@ -380,19 +380,19 @@ void __stdcall tTVPDSMovie::GetFrame( int *f )
 	LONGLONG	Current;
 	if( FAILED(hr = MediaSeeking()->GetCurrentPosition( &Current ) ) )
 	{
-		ThrowDShowException(L"Failed to call IMediaSeeking::GetCurrentPosition (in tTVPDSMovie::GetFrame).", hr);
+		ThrowDShowException(TJS_W("Failed to call IMediaSeeking::GetCurrentPosition (in tTVPDSMovie::GetFrame)."), hr);
 	}
 	GUID	Format;
 	if( FAILED(hr = MediaSeeking()->GetTimeFormat( &Format ) ) )
 	{
-		ThrowDShowException(L"Failed to call IMediaSeeking::GetTimeFormat (in tTVPDSMovie::GetFrame).", hr);
+		ThrowDShowException(TJS_W("Failed to call IMediaSeeking::GetTimeFormat (in tTVPDSMovie::GetFrame)."), hr);
 	}
 	if( IsEqualGUID( TIME_FORMAT_MEDIA_TIME, Format ) )
 	{
 		REFTIME	AvgTimePerFrame;
 		if( FAILED(hr = GetAvgTimePerFrame( &AvgTimePerFrame )) )
 		{
-			ThrowDShowException(L"Failed to call IBasicVideo::get_AvgTimePerFrame (in tTVPDSMovie::GetFrame).", hr);
+			ThrowDShowException(TJS_W("Failed to call IBasicVideo::get_AvgTimePerFrame (in tTVPDSMovie::GetFrame)."), hr);
 		}
 		double	currentTime = Current / 10000000.0;
 		*f = (int)(currentTime / AvgTimePerFrame + 0.5);
@@ -403,7 +403,7 @@ void __stdcall tTVPDSMovie::GetFrame( int *f )
 	}
 	else
 	{
-		TVPThrowExceptionMessage(L"Not supported time format.");
+		TVPThrowExceptionMessage(TJS_W("Not supported time format."));
 	}
 }
 
@@ -419,19 +419,19 @@ void __stdcall tTVPDSMovie::SetStopFrame( int f )
 	GUID	Format;
 	if( FAILED(hr = MediaSeeking()->GetTimeFormat( &Format ) ) )
 	{
-		ThrowDShowException(L"Failed to call IMediaSeeking::GetTimeFormat (in tTVPDSMovie::SetStopFrame).", hr);
+		ThrowDShowException(TJS_W("Failed to call IMediaSeeking::GetTimeFormat (in tTVPDSMovie::SetStopFrame)."), hr);
 	}
 	if( IsEqualGUID( TIME_FORMAT_MEDIA_TIME, Format ) )
 	{
 		REFTIME	AvgTimePerFrame;
 		if( FAILED(hr = GetAvgTimePerFrame( &AvgTimePerFrame )) )
 		{
-			ThrowDShowException(L"Failed to call IBasicVideo::get_AvgTimePerFrame (in tTVPDSMovie::SetStopFrame).", hr);
+			ThrowDShowException(TJS_W("Failed to call IBasicVideo::get_AvgTimePerFrame (in tTVPDSMovie::SetStopFrame)."), hr);
 		}
 		LONGLONG	requestTime = (LONGLONG)(AvgTimePerFrame * 10000000.0 * f);
 		if( FAILED(hr = MediaSeeking()->SetPositions( NULL, AM_SEEKING_NoPositioning, &requestTime, AM_SEEKING_AbsolutePositioning )) )
 		{
-			ThrowDShowException(L"Failed to call IMediaSeeking::SetPositions (TIME_FORMAT_MEDIA_TIME, in tTVPDSMovie::SetStopFrame).", hr);
+			ThrowDShowException(TJS_W("Failed to call IMediaSeeking::SetPositions (TIME_FORMAT_MEDIA_TIME, in tTVPDSMovie::SetStopFrame)."), hr);
 		}
 	}
 	else if( IsEqualGUID( TIME_FORMAT_FRAME, Format ) )
@@ -439,12 +439,12 @@ void __stdcall tTVPDSMovie::SetStopFrame( int f )
 		LONGLONG	requestFrame = f;
 		if( FAILED(hr = MediaSeeking()->SetPositions( NULL, AM_SEEKING_NoPositioning, &requestFrame, AM_SEEKING_AbsolutePositioning )) )
 		{
-			ThrowDShowException(L"Failed to call IMediaSeeking::SetPositions (TIME_FORMAT_FRAME, in tTVPDSMovie::SetStopFrame).", hr);
+			ThrowDShowException(TJS_W("Failed to call IMediaSeeking::SetPositions (TIME_FORMAT_FRAME, in tTVPDSMovie::SetStopFrame)."), hr);
 		}
 	}
 	else
 	{
-		TVPThrowExceptionMessage(L"Not supported time format.");
+		TVPThrowExceptionMessage(TJS_W("Not supported time format."));
 	}
 }
 //----------------------------------------------------------------------------
@@ -459,19 +459,19 @@ void __stdcall tTVPDSMovie::GetStopFrame( int *f )
 	LONGLONG	Stop;
 	if( FAILED(hr = MediaSeeking()->GetStopPosition( &Stop ) ) )
 	{
-		ThrowDShowException(L"Failed to call IMediaSeeking::GetStopPosition (in tTVPDSMovie::GetStopFrame).", hr);
+		ThrowDShowException(TJS_W("Failed to call IMediaSeeking::GetStopPosition (in tTVPDSMovie::GetStopFrame)."), hr);
 	}
 	GUID	Format;
 	if( FAILED(hr = MediaSeeking()->GetTimeFormat( &Format ) ) )
 	{
-		ThrowDShowException(L"Failed to call IMediaSeeking::GetTimeFormat (in tTVPDSMovie::GetStopFrame).", hr);
+		ThrowDShowException(TJS_W("Failed to call IMediaSeeking::GetTimeFormat (in tTVPDSMovie::GetStopFrame)."), hr);
 	}
 	if( IsEqualGUID( TIME_FORMAT_MEDIA_TIME, Format ) )
 	{
 		REFTIME	AvgTimePerFrame;
 		if( FAILED(hr = GetAvgTimePerFrame( &AvgTimePerFrame )) )
 		{
-			ThrowDShowException(L"Failed to call IBasicVideo::get_AvgTimePerFrame (in tTVPDSMovie::GetStopFrame).", hr);
+			ThrowDShowException(TJS_W("Failed to call IBasicVideo::get_AvgTimePerFrame (in tTVPDSMovie::GetStopFrame)."), hr);
 		}
 		double	stopTime = Stop / 10000000.0;
 		*f = (int)(stopTime / AvgTimePerFrame + 0.5);
@@ -482,7 +482,7 @@ void __stdcall tTVPDSMovie::GetStopFrame( int *f )
 	}
 	else
 	{
-		TVPThrowExceptionMessage(L"Not supported time format.");
+		TVPThrowExceptionMessage(TJS_W("Not supported time format."));
 	}
 }
 //----------------------------------------------------------------------------
@@ -498,33 +498,33 @@ void __stdcall tTVPDSMovie::SetDefaultStopFrame()
 	LONGLONG	totalTime;
 	if( FAILED(hr = MediaSeeking()->GetTimeFormat( &Format ) ) )
 	{
-		ThrowDShowException(L"Failed to call IMediaSeeking::GetTimeFormat (in tTVPDSMovie::SetDefaultStopFrame).", hr);
+		ThrowDShowException(TJS_W("Failed to call IMediaSeeking::GetTimeFormat (in tTVPDSMovie::SetDefaultStopFrame)."), hr);
 	}
 	if( IsEqualGUID( TIME_FORMAT_MEDIA_TIME, Format ) )
 	{
 		if( FAILED(hr = MediaSeeking()->GetDuration( &totalTime )) )
 		{
-			ThrowDShowException(L"Failed to call IMediaSeeking::GetDuration (in tTVPDSMovie::SetDefaultStopFrame).", hr);
+			ThrowDShowException(TJS_W("Failed to call IMediaSeeking::GetDuration (in tTVPDSMovie::SetDefaultStopFrame)."), hr);
 		}
 		if( FAILED(hr = MediaSeeking()->SetPositions( NULL, AM_SEEKING_NoPositioning, &totalTime, AM_SEEKING_AbsolutePositioning)) )
 		{
-			ThrowDShowException(L"Failed to call IMediaSeeking::SetPositions (TIME_FORMAT_MEDIA_TIME, in tTVPDSMovie::SetDefaultStopFrame).", hr);
+			ThrowDShowException(TJS_W("Failed to call IMediaSeeking::SetPositions (TIME_FORMAT_MEDIA_TIME, in tTVPDSMovie::SetDefaultStopFrame)."), hr);
 		}
 	}
 	else if( IsEqualGUID( TIME_FORMAT_FRAME, Format ) )
 	{
 		if( FAILED(hr = MediaSeeking()->GetDuration( &totalTime )) )
 		{
-			ThrowDShowException(L"Failed to call IMediaSeeking::GetDuration (in tTVPDSMovie::SetDefaultStopFrame).", hr);
+			ThrowDShowException(TJS_W("Failed to call IMediaSeeking::GetDuration (in tTVPDSMovie::SetDefaultStopFrame)."), hr);
 		}
 		if( FAILED(hr = MediaSeeking()->SetPositions( NULL, AM_SEEKING_NoPositioning, &totalTime, AM_SEEKING_AbsolutePositioning )) )
 		{
-			ThrowDShowException(L"Failed to call IMediaSeeking::SetPositions (TIME_FORMAT_FRAME, in tTVPDSMovie::SetDefaultStopFrame).", hr);
+			ThrowDShowException(TJS_W("Failed to call IMediaSeeking::SetPositions (TIME_FORMAT_FRAME, in tTVPDSMovie::SetDefaultStopFrame)."), hr);
 		}
 	}
 	else
 	{
-		TVPThrowExceptionMessage(L"Not supported time format.");
+		TVPThrowExceptionMessage(TJS_W("Not supported time format."));
 	}
 }
 //----------------------------------------------------------------------------
@@ -539,7 +539,7 @@ void __stdcall tTVPDSMovie::GetFPS( double *f )
 	REFTIME	AvgTimePerFrame;
 	if( FAILED(hr = GetAvgTimePerFrame( &AvgTimePerFrame )) )
 	{
-		ThrowDShowException(L"Failed to call IBasicVideo::get_AvgTimePerFrame (in tTVPDSMovie::GetFPS).", hr);
+		ThrowDShowException(TJS_W("Failed to call IBasicVideo::get_AvgTimePerFrame (in tTVPDSMovie::GetFPS)."), hr);
 	}
 	*f = 1.0 / AvgTimePerFrame;
 }
@@ -555,19 +555,19 @@ void __stdcall tTVPDSMovie::GetNumberOfFrame( int *f )
 	LONGLONG	totalTime;
 	if( FAILED(hr = MediaSeeking()->GetDuration( &totalTime )) )
 	{
-		ThrowDShowException(L"Failed to call IMediaSeeking::GetDuration (in tTVPDSMovie::GetNumberOfFrame).", hr);
+		ThrowDShowException(TJS_W("Failed to call IMediaSeeking::GetDuration (in tTVPDSMovie::GetNumberOfFrame)."), hr);
 	}
 	GUID	Format;
 	if( FAILED(hr = MediaSeeking()->GetTimeFormat( &Format ) ) )
 	{
-		ThrowDShowException(L"Failed to call IMediaSeeking::GetTimeFormat (in tTVPDSMovie::GetNumberOfFrame).", hr);
+		ThrowDShowException(TJS_W("Failed to call IMediaSeeking::GetTimeFormat (in tTVPDSMovie::GetNumberOfFrame)."), hr);
 	}
 	if( IsEqualGUID( TIME_FORMAT_MEDIA_TIME, Format ) )
 	{
 		REFTIME	AvgTimePerFrame;
 		if( FAILED(hr = GetAvgTimePerFrame( &AvgTimePerFrame )) )
 		{
-			ThrowDShowException(L"Failed to call IBasicVideo::get_AvgTimePerFrame (in tTVPDSMovie::GetNumberOfFrame).", hr);
+			ThrowDShowException(TJS_W("Failed to call IBasicVideo::get_AvgTimePerFrame (in tTVPDSMovie::GetNumberOfFrame)."), hr);
 		}
 		double	totalSec = totalTime / 10000000.0;
 		*f = (int)(totalSec / AvgTimePerFrame + 0.5);
@@ -578,7 +578,7 @@ void __stdcall tTVPDSMovie::GetNumberOfFrame( int *f )
 	}
 	else
 	{
-		TVPThrowExceptionMessage(L"Not supported time format.");
+		TVPThrowExceptionMessage(TJS_W("Not supported time format."));
 	}
 }
 //----------------------------------------------------------------------------
@@ -593,12 +593,12 @@ void __stdcall tTVPDSMovie::GetTotalTime( __int64 *t )
 	LONGLONG	totalTime;
 	if( FAILED(hr = MediaSeeking()->GetDuration( &totalTime )) )
 	{
-		ThrowDShowException(L"Failed to call IMediaSeeking::GetDuration (in tTVPDSMovie::GetTotalTime).", hr);
+		ThrowDShowException(TJS_W("Failed to call IMediaSeeking::GetDuration (in tTVPDSMovie::GetTotalTime)."), hr);
 	}
 	GUID	Format;
 	if( FAILED(hr = MediaSeeking()->GetTimeFormat( &Format ) ) )
 	{
-		ThrowDShowException(L"Failed to call IMediaSeeking::GetTimeFormat (in tTVPDSMovie::GetTotalTime).", hr);
+		ThrowDShowException(TJS_W("Failed to call IMediaSeeking::GetTimeFormat (in tTVPDSMovie::GetTotalTime)."), hr);
 	}
 	if( IsEqualGUID( TIME_FORMAT_MEDIA_TIME, Format ) )
 	{
@@ -609,14 +609,14 @@ void __stdcall tTVPDSMovie::GetTotalTime( __int64 *t )
 		REFTIME	AvgTimePerFrame;
 		if( FAILED(hr = GetAvgTimePerFrame( &AvgTimePerFrame )) )
 		{
-			ThrowDShowException(L"Failed to call IBasicVideo::get_AvgTimePerFrame (in tTVPDSMovie::GetTotalTime).", hr);
+			ThrowDShowException(TJS_W("Failed to call IBasicVideo::get_AvgTimePerFrame (in tTVPDSMovie::GetTotalTime)."), hr);
 		}
 		// フレームから秒へ、秒からmsecへ
 		*t = (__int64)((totalTime * AvgTimePerFrame) * 1000.0 );
 	}
 	else
 	{
-		TVPThrowExceptionMessage(L"Not supported time format.");
+		TVPThrowExceptionMessage(TJS_W("Not supported time format."));
 	}
 }
 //----------------------------------------------------------------------------
@@ -684,7 +684,7 @@ void __stdcall tTVPDSMovie::SetPlayRate( double rate )
 	if( rate > 0.0 )
 	{
 		if( FAILED(hr = MediaSeeking()->SetRate(rate)) )
-			ThrowDShowException(L"Failed to call IMediaSeeking::SetRate.", hr);
+			ThrowDShowException(TJS_W("Failed to call IMediaSeeking::SetRate."), hr);
 	}
 }
 //----------------------------------------------------------------------------
@@ -699,7 +699,7 @@ void __stdcall tTVPDSMovie::GetPlayRate( double *rate )
 	if( rate != NULL )
 	{
 		if( FAILED(hr = MediaSeeking()->GetRate(rate)) )
-			ThrowDShowException(L"Failed to call IMediaSeeking::GetRate.", hr);
+			ThrowDShowException(TJS_W("Failed to call IMediaSeeking::GetRate."), hr);
 	}
 }
 //----------------------------------------------------------------------------
@@ -720,7 +720,7 @@ void __stdcall tTVPDSMovie::SetAudioBalance( long balance )
 		if( balance >= -10000 && balance <= 10000 )
 		{
 			if( FAILED( hr = Audio()->put_Balance(balance) ) )
-				ThrowDShowException(L"Failed to call IBasicAudio::put_Balance.", hr);
+				ThrowDShowException(TJS_W("Failed to call IBasicAudio::put_Balance."), hr);
 		}
 	}
 }
@@ -740,7 +740,7 @@ void __stdcall tTVPDSMovie::GetAudioBalance( long *balance )
 	if( Audio() != NULL && balance != NULL )
 	{
 		if( FAILED( hr = Audio()->get_Balance(balance) ) )
-			ThrowDShowException(L"Failed to call IBasicAudio::get_Balance.", hr);
+			ThrowDShowException(TJS_W("Failed to call IBasicAudio::get_Balance."), hr);
 	}
 }
 //----------------------------------------------------------------------------
@@ -759,7 +759,7 @@ void __stdcall tTVPDSMovie::SetAudioVolume( long volume )
 		if( volume >= -10000 && volume <= 0 )
 		{
 			if( FAILED( hr = Audio()->put_Volume( volume ) ) )
-				ThrowDShowException(L"Failed to call IBasicAudio::put_Volume.", hr);
+				ThrowDShowException(TJS_W("Failed to call IBasicAudio::put_Volume."), hr);
 		}
 	}
 }
@@ -777,7 +777,7 @@ void __stdcall tTVPDSMovie::GetAudioVolume( long *volume )
 	if( Audio() != NULL && volume != NULL )
 	{
 		if( FAILED( hr = Audio()->get_Volume( volume ) ) )
-			ThrowDShowException(L"Failed to call IBasicAudio::gut_Volume.", hr);
+			ThrowDShowException(TJS_W("Failed to call IBasicAudio::gut_Volume."), hr);
 	}
 }
 //----------------------------------------------------------------------------
@@ -857,7 +857,7 @@ void __stdcall tTVPDSMovie::SelectStream( unsigned long num, std::vector<StreamI
 	if( StreamSelect() != NULL && num < si.size() )
 	{
 		if( FAILED(hr = StreamSelect()->Enable( si[num].index, AMSTREAMSELECTENABLE_ENABLE )) )
-			ThrowDShowException(L"Failed to call IAMStreamSelect::Enable.", hr);
+			ThrowDShowException(TJS_W("Failed to call IAMStreamSelect::Enable."), hr);
 	}
 }
 //----------------------------------------------------------------------------
@@ -878,7 +878,7 @@ void __stdcall tTVPDSMovie::GetEnableStreamNum( long *num, std::vector<StreamInf
 		{
 			DWORD	dwFlags;
 			if( FAILED(hr = StreamSelect()->Info( (*i).index, NULL, &dwFlags, NULL, NULL, NULL, NULL, NULL ) ) )
-				ThrowDShowException(L"Failed to call IAMStreamSelect::Info.", hr);
+				ThrowDShowException(TJS_W("Failed to call IAMStreamSelect::Info."), hr);
 
 			if( (dwFlags == AMSTREAMSELECTINFO_ENABLED) || (dwFlags == AMSTREAMSELECTINFO_EXCLUSIVE) )
 			{
@@ -901,12 +901,12 @@ void __stdcall tTVPDSMovie::DisableAudioStream( void )
 	if( StreamSelect() != NULL && m_AudioStreamInfo.size() > 0)
 	{
 		if( FAILED(hr = StreamSelect()->Enable( m_AudioStreamInfo[0].index, 0 )) )
-			ThrowDShowException(L"Failed to call IAMStreamSelect::Enable.", hr);
+			ThrowDShowException(TJS_W("Failed to call IAMStreamSelect::Enable."), hr);
 #if 0
 		for( std::vector<StreamInfo>::iterator i = m_AudioStreamInfo.begin(); i != m_AudioStreamInfo.end(); i++ )
 		{
 			if( FAILED(hr = StreamSelect()->Enable( (*i).index, 0 )) )
-				ThrowDShowException(L"Failed to call IAMStreamSelect::Enable.", hr);
+				ThrowDShowException(TJS_W("Failed to call IAMStreamSelect::Enable."), hr);
 		}
 #endif
 	}
@@ -1118,11 +1118,11 @@ HRESULT __stdcall tTVPDSMovie::AddToROT( DWORD ROTreg )
 	if( FAILED(GetRunningObjectTable(0, &pirot)) )
 		return E_FAIL;
 
-	WCHAR	wsz[256];
-//	wsprintfW(wsz, L"FilterGraph %08x  pid %08x", (DWORD_PTR) 0, GetCurrentProcessId());
-//	swprintf(wsz, L"FilterGraph %08x  pid %08x", (DWORD_PTR) 0, GetCurrentProcessId());
-	(void)StringCchPrintfW(wsz, NUMELMS(wsz), L"FilterGraph %08x  pid %08x", (DWORD_PTR) 0, GetCurrentProcessId());
-	HRESULT hr = CreateItemMoniker(L"!", wsz, &pmk);
+	tjs_char	wsz[256];
+//	wsprintfW(wsz, TJS_W("FilterGraph %08x  pid %08x"), (DWORD_PTR) 0, GetCurrentProcessId());
+//	swprintf(wsz, TJS_W("FilterGraph %08x  pid %08x"), (DWORD_PTR) 0, GetCurrentProcessId());
+	(void)StringCchPrintfW(wsz, NUMELMS(wsz), TJS_W("FilterGraph %08x  pid %08x"), (DWORD_PTR) 0, GetCurrentProcessId());
+	HRESULT hr = CreateItemMoniker(TJS_W("!"), wsz, &pmk);
 	if( SUCCEEDED(hr) )
 	{
 		hr = pirot->Register( 0, pUnkGraph, pmk, &ROTreg );
@@ -1163,31 +1163,31 @@ HRESULT __stdcall tTVPDSMovie::GetAvgTimePerFrame( REFTIME *pAvgTimePerFrame )
 //! @param		mt : メディアタイプを返す変数への参照
 //! @param		type : ムービーファイルの拡張子
 //----------------------------------------------------------------------------
-void tTVPDSMovie::ParseVideoType( CMediaType &mt, const wchar_t *type )
+void tTVPDSMovie::ParseVideoType( CMediaType &mt, const tjs_char *type )
 {
 	// note: audio-less mpeg stream must have an extension of
 	// ".mpv" .
-	if      (_wcsicmp(type, L".mpg") == 0)
+	if      (_wcsicmp(type, TJS_W(".mpg")) == 0)
 		mt.subtype = MEDIASUBTYPE_MPEG1System;
-	else if (_wcsicmp(type, L".mpeg") == 0)
+	else if (_wcsicmp(type, TJS_W(".mpeg")) == 0)
 		mt.subtype = MEDIASUBTYPE_MPEG1System;
-	else if (_wcsicmp(type, L".mpv") == 0) 
+	else if (_wcsicmp(type, TJS_W(".mpv")) == 0) 
 		mt.subtype = MEDIASUBTYPE_MPEG1Video;
 //		mt.subtype = MEDIASUBTYPE_MPEG1System;
-	else if (_wcsicmp(type, L".m1v") == 0) 
+	else if (_wcsicmp(type, TJS_W(".m1v")) == 0) 
 		mt.subtype = MEDIASUBTYPE_MPEG1Video;
-	else if (_wcsicmp(type, L".dat") == 0)
+	else if (_wcsicmp(type, TJS_W(".dat")) == 0)
 		mt.subtype = MEDIASUBTYPE_MPEG1VideoCD;
-	else if (_wcsicmp(type, L".avi") == 0)
+	else if (_wcsicmp(type, TJS_W(".avi")) == 0)
 		mt.subtype = MEDIASUBTYPE_Avi;
-	else if (_wcsicmp(type, L".mov") == 0)
+	else if (_wcsicmp(type, TJS_W(".mov")) == 0)
 		mt.subtype = MEDIASUBTYPE_QTMovie;
 	else {
 		tTVPDSFilterHandlerType* handler = TVPGetDSFilterHandler( ttstr(type) );
 		if( handler ) {
 			mt.subtype = *(handler->Guid);
 		} else {
-			TVPThrowExceptionMessage(L"Unknown video format extension."); // unknown format
+			TVPThrowExceptionMessage(TJS_W("Unknown video format extension.")); // unknown format
 		}
 	}
 }
@@ -1196,10 +1196,10 @@ void tTVPDSMovie::ParseVideoType( CMediaType &mt, const wchar_t *type )
 //! @param		type : ムービーファイルの拡張子
 //! @return		Windows Media Fileかどうか
 //----------------------------------------------------------------------------
-bool tTVPDSMovie::IsWindowsMediaFile( const wchar_t *type ) const
+bool tTVPDSMovie::IsWindowsMediaFile( const tjs_char *type ) const
 {
-	if( (_wcsicmp(type, L".asf") == 0) || (_wcsicmp(type, L".wma") == 0) ||
-		(_wcsicmp(type, L".wmv") == 0) )
+	if( (_wcsicmp(type, TJS_W(".asf")) == 0) || (_wcsicmp(type, TJS_W(".wma")) == 0) ||
+		(_wcsicmp(type, TJS_W(".wmv")) == 0) )
 	{
 		return true;
 	}
@@ -1515,59 +1515,59 @@ void tTVPDSMovie::BuildMPEGGraph( IBaseFilter *pRdr, IBaseFilter *pSrc )
 	CComPtr<IBaseFilter>	pMPEG1Splitter;	// for MPEG 1 splitter filter
 
 	if( FAILED(hr = pMPEG1Splitter.CoCreateInstance(CLSID_MPEG1Splitter, NULL, CLSCTX_INPROC_SERVER)) )
-		ThrowDShowException(L"Failed to create MPEG 1 splitter filter object.", hr);
-	if( FAILED(hr = GraphBuilder()->AddFilter(pMPEG1Splitter, L"MPEG-I Stream Splitter")) )
-		ThrowDShowException(L"Failed to call GraphBuilder()->AddFilter(pMPEG1Splitter, L\"MPEG-I Stream Splitter\").", hr);
+		ThrowDShowException(TJS_W("Failed to create MPEG 1 splitter filter object."), hr);
+	if( FAILED(hr = GraphBuilder()->AddFilter(pMPEG1Splitter, TJS_W("MPEG-I Stream Splitter"))) )
+		ThrowDShowException(TJS_W("Failed to call GraphBuilder()->AddFilter(pMPEG1Splitter, L\"MPEG-I Stream Splitter\")."), hr);
 	if( FAILED(hr = ConnectFilters( pSrc, pMPEG1Splitter )) )
-		ThrowDShowException(L"Failed to call ConnectFilters( pSrc, pMPEG1Splitter ).", hr);
+		ThrowDShowException(TJS_W("Failed to call ConnectFilters( pSrc, pMPEG1Splitter )."), hr);
 
 	// Connect to MPEG 1 video codec filter
 	CComPtr<IBaseFilter>	pMPEGVideoCodec;	// for MPEG 1 video codec filter
 	if( FAILED(hr = pMPEGVideoCodec.CoCreateInstance(CLSID_CMpegVideoCodec, NULL, CLSCTX_INPROC_SERVER)) )
-		ThrowDShowException(L"Failed to create MPEG 1 video codec filter object.", hr);
-	if( FAILED(hr = GraphBuilder()->AddFilter(pMPEGVideoCodec, L"MPEG Video Decoder")) )
-		ThrowDShowException(L"Failed to call GraphBuilder()->AddFilter(pMPEGVideoCodec, L\"MPEG Video Decoder\").", hr);
+		ThrowDShowException(TJS_W("Failed to create MPEG 1 video codec filter object."), hr);
+	if( FAILED(hr = GraphBuilder()->AddFilter(pMPEGVideoCodec, TJS_W("MPEG Video Decoder"))) )
+		ThrowDShowException(TJS_W("Failed to call GraphBuilder()->AddFilter(pMPEGVideoCodec, L\"MPEG Video Decoder\")."), hr);
 	if( FAILED(hr = ConnectFilters( pMPEG1Splitter, pMPEGVideoCodec )) )
-		ThrowDShowException(L"Failed to call ConnectFilters( pMPEG1Splitter, pMPEGVideoCodec ).", hr);
+		ThrowDShowException(TJS_W("Failed to call ConnectFilters( pMPEG1Splitter, pMPEGVideoCodec )."), hr);
 
 	// Connect to render filter
 	if( FAILED(hr = ConnectFilters( pMPEGVideoCodec, pRdr )) )
-		ThrowDShowException(L"Failed to call ConnectFilters( pMPEGVideoCodec, pRdr ).", hr);
+		ThrowDShowException(TJS_W("Failed to call ConnectFilters( pMPEGVideoCodec, pRdr )."), hr);
 
 	// Connect to MPEG audio codec filter
 	CComPtr<IBaseFilter>	pMPEGAudioCodec;	// for MPEG audio codec filter
 	if( FAILED(hr = pMPEGAudioCodec.CoCreateInstance(CLSID_CMpegAudioCodec, NULL, CLSCTX_INPROC_SERVER)) )
-		ThrowDShowException(L"Failed to create MPEG audio codec filter object.", hr);
-	if( FAILED(hr = GraphBuilder()->AddFilter(pMPEGAudioCodec, L"MPEG Audio Decoder")) )
-		ThrowDShowException(L"Failed to call GraphBuilder()->AddFilter(pMPEGAudioCodec, L\"MPEG Audio Decoder\").", hr);
+		ThrowDShowException(TJS_W("Failed to create MPEG audio codec filter object."), hr);
+	if( FAILED(hr = GraphBuilder()->AddFilter(pMPEGAudioCodec, TJS_W("MPEG Audio Decoder"))) )
+		ThrowDShowException(TJS_W("Failed to call GraphBuilder()->AddFilter(pMPEGAudioCodec, L\"MPEG Audio Decoder\")."), hr);
 	if( FAILED(hr = ConnectFilters( pMPEG1Splitter, pMPEGAudioCodec )) )
 	{	// not have Audio.
 		if( FAILED(hr = GraphBuilder()->RemoveFilter( pMPEGAudioCodec)) )
-			ThrowDShowException(L"Failed to call GraphBuilder()->RemoveFilter( pMPEGAudioCodec).", hr);
+			ThrowDShowException(TJS_W("Failed to call GraphBuilder()->RemoveFilter( pMPEGAudioCodec)."), hr);
 		return;
 	}
 
 	// Connect to DDS render filter
 	CComPtr<IBaseFilter>	pDDSRenderer;	// for sound renderer filter
 	if( FAILED(hr = pDDSRenderer.CoCreateInstance(CLSID_DSoundRender, NULL, CLSCTX_INPROC_SERVER)) )
-		ThrowDShowException(L"Failed to create sound render filter object.", hr);
-	if( FAILED(hr = GraphBuilder()->AddFilter(pDDSRenderer, L"Sound Renderer")) )
-		ThrowDShowException(L"Failed to call GraphBuilder()->AddFilter(pDDSRenderer, L\"Sound Renderer\").", hr);
+		ThrowDShowException(TJS_W("Failed to create sound render filter object."), hr);
+	if( FAILED(hr = GraphBuilder()->AddFilter(pDDSRenderer, TJS_W("Sound Renderer"))) )
+		ThrowDShowException(TJS_W("Failed to call GraphBuilder()->AddFilter(pDDSRenderer, L\"Sound Renderer\")."), hr);
 	if( FAILED(hr = ConnectFilters( pMPEGAudioCodec, pDDSRenderer ) ) )
 	{
 		if( FAILED(hr = GraphBuilder()->RemoveFilter( pMPEGAudioCodec)) )
-			ThrowDShowException(L"Failed to call GraphBuilder()->RemoveFilter( pMPEGAudioCodec).", hr);
+			ThrowDShowException(TJS_W("Failed to call GraphBuilder()->RemoveFilter( pMPEGAudioCodec)."), hr);
 		if( FAILED(hr = GraphBuilder()->RemoveFilter( pDDSRenderer)) )
-			ThrowDShowException(L"Failed to call GraphBuilder()->RemoveFilter( pDDSRenderer).", hr);
+			ThrowDShowException(TJS_W("Failed to call GraphBuilder()->RemoveFilter( pDDSRenderer)."), hr);
 	}
 	else
 	{	// This MPEG file have a audio stream.
 		if( FAILED(hr = pMPEG1Splitter.QueryInterface( &m_StreamSelect ) ) )
-			ThrowDShowException(L"Failed to query IAMStreamSelect.", hr);
+			ThrowDShowException(TJS_W("Failed to query IAMStreamSelect."), hr);
 
 		DWORD	numOfStream;
 		if( FAILED(hr = StreamSelect()->Count( &numOfStream )) )
-			ThrowDShowException(L"Failed to call StreamSelect()->Count(&numOfStream).", hr);
+			ThrowDShowException(TJS_W("Failed to call StreamSelect()->Count(&numOfStream)."), hr);
 
 		for( int i = 0; i < (int)numOfStream; i++ )
 		{
@@ -1608,66 +1608,66 @@ void tTVPDSMovie::BuildWMVGraph( IBaseFilter *pRdr, IStream *pStream )
 	CWMReader		*pReader = new CWMReader();
 	CDemuxSource	*pWMAS = new CDemuxSource(NULL, &hr, pReader, CLSID_WMReaderSource );
 	if( FAILED(hr) )
-		ThrowDShowException(L"Failed to create Windows Media stream source object.", hr);
+		ThrowDShowException(TJS_W("Failed to create Windows Media stream source object."), hr);
 
 	pWMSource = pWMAS;
 	if( FAILED(hr = pWMAS->OpenStream( pStream ) ) )
-		ThrowDShowException(L"Failed to call CDemuxSource::OpenStream( stream ).", hr);
+		ThrowDShowException(TJS_W("Failed to call CDemuxSource::OpenStream( stream )."), hr);
 
-	if( FAILED(hr = GraphBuilder()->AddFilter( pWMSource, L"Windows Media stream source")) )
-		ThrowDShowException(L"Failed to call GraphBuilder()->AddFilter( pWMSource, L\"Windows Media stream source\").", hr);
+	if( FAILED(hr = GraphBuilder()->AddFilter( pWMSource, TJS_W("Windows Media stream source"))) )
+		ThrowDShowException(TJS_W("Failed to call GraphBuilder()->AddFilter( pWMSource, L\"Windows Media stream source\")."), hr);
 
 	CComPtr<IBaseFilter>	pWMVDec;
 	if( FAILED(pWMVDec.CoCreateInstance(CLSID_DMOWrapperFilter, NULL, CLSCTX_INPROC_SERVER )) )
-		ThrowDShowException(L"Failed to create DMOWrapperFilter.", hr);
+		ThrowDShowException(TJS_W("Failed to create DMOWrapperFilter."), hr);
 
 	{	// Set WMV Decoder DMO
 		CComPtr<IDMOWrapperFilter>	pWmvDmoWrapper;
 		if( FAILED(hr = pWMVDec.QueryInterface( &pWmvDmoWrapper )) )
-			ThrowDShowException(L"Failed to query IDMOWrapperFilter.", hr);
+			ThrowDShowException(TJS_W("Failed to query IDMOWrapperFilter."), hr);
 		if( FAILED(hr = pWmvDmoWrapper->Init(CLSID_WMVDecoderDMO, DMOCATEGORY_VIDEO_DECODER)) )
-			ThrowDShowException(L"Failed to call IDMOWrapperFilter::Init.", hr);
+			ThrowDShowException(TJS_W("Failed to call IDMOWrapperFilter::Init."), hr);
 	}
-	if( FAILED(hr = GraphBuilder()->AddFilter( pWMVDec, L"Windows Media Video Decoder (DMO Wrapper)")) )
-		ThrowDShowException(L"Failed to call GraphBuilder()->AddFilter( pWMVDec, L\"Windows Media Video Decoder (DMO Wrapper)\").", hr);
+	if( FAILED(hr = GraphBuilder()->AddFilter( pWMVDec, TJS_W("Windows Media Video Decoder (DMO Wrapper)"))) )
+		ThrowDShowException(TJS_W("Failed to call GraphBuilder()->AddFilter( pWMVDec, L\"Windows Media Video Decoder (DMO Wrapper)\")."), hr);
 
 	// Connect to decoder filter
 	if( FAILED(hr = ConnectFilters( pWMSource, pWMVDec )) )
-		ThrowDShowException(L"Failed to call ConnectFilters( pWMSource, pWMVDec ).", hr);
+		ThrowDShowException(TJS_W("Failed to call ConnectFilters( pWMSource, pWMVDec )."), hr);
 
 	// Connect to render filter
 	if( FAILED(hr = ConnectFilters( pWMVDec, pRdr )) )
-		ThrowDShowException(L"Failed to call ConnectFilters( pWMVDec, pRdr ).", hr);
+		ThrowDShowException(TJS_W("Failed to call ConnectFilters( pWMVDec, pRdr )."), hr);
 
 	CComPtr<IBaseFilter>	pWMADec;
 	if( FAILED(pWMADec.CoCreateInstance(CLSID_DMOWrapperFilter, NULL, CLSCTX_INPROC_SERVER )) )
-		ThrowDShowException(L"Failed to create DMOWrapperFilter.", hr);
+		ThrowDShowException(TJS_W("Failed to create DMOWrapperFilter."), hr);
 
 	{	// Set WMA Decoder DMO
 		CComPtr<IDMOWrapperFilter>	pWmaDmoWrapper;
 		if( FAILED(hr = pWMADec.QueryInterface( &pWmaDmoWrapper )) )
-			ThrowDShowException(L"Failed to query IDMOWrapperFilter.", hr);
+			ThrowDShowException(TJS_W("Failed to query IDMOWrapperFilter."), hr);
 		if( FAILED(hr = pWmaDmoWrapper->Init(CLSID_WMADecoderDMO, DMOCATEGORY_AUDIO_DECODER)) )
-			ThrowDShowException(L"Failed to call IDMOWrapperFilter::Init.", hr);
+			ThrowDShowException(TJS_W("Failed to call IDMOWrapperFilter::Init."), hr);
 	}
-	if( FAILED(hr = GraphBuilder()->AddFilter( pWMADec, L"Windows Media Audio Decoder (DMO Wrapper)")) )
-		ThrowDShowException(L"Failed to call GraphBuilder()->AddFilter( pWMADec, L\"Windows Media Audio Decoder (DMO Wrapper)\").", hr);
+	if( FAILED(hr = GraphBuilder()->AddFilter( pWMADec, TJS_W("Windows Media Audio Decoder (DMO Wrapper)"))) )
+		ThrowDShowException(TJS_W("Failed to call GraphBuilder()->AddFilter( pWMADec, L\"Windows Media Audio Decoder (DMO Wrapper)\")."), hr);
 
 	// Connect to decoder filter
 	if( FAILED(hr = ConnectFilters( pWMSource, pWMADec )) )
 	{	// オーディオがない
 		if( FAILED(hr = GraphBuilder()->RemoveFilter( pWMADec)) )
-			ThrowDShowException(L"Failed to call GraphBuilder()->RemoveFilter( pDDSRenderer).", hr);
+			ThrowDShowException(TJS_W("Failed to call GraphBuilder()->RemoveFilter( pDDSRenderer)."), hr);
 		return;
 	}
 
 	CComPtr<IBaseFilter>	pDDSRenderer;	// for sound renderer filter
 	if( FAILED(hr = pDDSRenderer.CoCreateInstance(CLSID_DSoundRender, NULL, CLSCTX_INPROC_SERVER)) )
-		ThrowDShowException(L"Failed to create sound render filter object.", hr);
-	if( FAILED(hr = GraphBuilder()->AddFilter(pDDSRenderer, L"Sound Renderer")) )
-		ThrowDShowException(L"Failed to call GraphBuilder()->AddFilter(pDDSRenderer, L\"Sound Renderer\").", hr);
+		ThrowDShowException(TJS_W("Failed to create sound render filter object."), hr);
+	if( FAILED(hr = GraphBuilder()->AddFilter(pDDSRenderer, TJS_W("Sound Renderer"))) )
+		ThrowDShowException(TJS_W("Failed to call GraphBuilder()->AddFilter(pDDSRenderer, L\"Sound Renderer\")."), hr);
 	if( FAILED(hr = ConnectFilters( pWMADec, pDDSRenderer ) ) )
-		ThrowDShowException(L"Failed to call ConnectFilters( pWMADec, pDDSRenderer ).", hr);
+		ThrowDShowException(TJS_W("Failed to call ConnectFilters( pWMADec, pDDSRenderer )."), hr);
 
 }
 //----------------------------------------------------------------------------
@@ -1682,45 +1682,45 @@ void tTVPDSMovie::BuildPluginGraph( struct tTVPDSFilterHandlerType* handler, IBa
 	// Connect to splitter filter
 	CComPtr<IBaseFilter>	pSplitter( (IBaseFilter*)handler->SplitterHander(handler->FormatData) );	// for splitter filter
 
-	if( FAILED(hr = GraphBuilder()->AddFilter(pSplitter, L"Plugin Stream Splitter")) )
-		ThrowDShowException(L"Failed to call GraphBuilder()->AddFilter(pSplitter, L\"Stream Splitter\").", hr);
+	if( FAILED(hr = GraphBuilder()->AddFilter(pSplitter, TJS_W("Plugin Stream Splitter"))) )
+		ThrowDShowException(TJS_W("Failed to call GraphBuilder()->AddFilter(pSplitter, L\"Stream Splitter\")."), hr);
 	if( FAILED(hr = ConnectFilters( pSrc, pSplitter )) )
-		ThrowDShowException(L"Failed to call ConnectFilters( pSrc, pSplitter ).", hr);
+		ThrowDShowException(TJS_W("Failed to call ConnectFilters( pSrc, pSplitter )."), hr);
 
 	// Connect to video codec filter
 	CComPtr<IBaseFilter>	pVideoCodec( (IBaseFilter*)handler->VideoHander(handler->FormatData) );	// for video codec filter
-	if( FAILED(hr = GraphBuilder()->AddFilter(pVideoCodec, L"Plugin Video Decoder")) )
-		ThrowDShowException(L"Failed to call GraphBuilder()->AddFilter(pVideoCodec, L\"Video Decoder\").", hr);
+	if( FAILED(hr = GraphBuilder()->AddFilter(pVideoCodec, TJS_W("Plugin Video Decoder"))) )
+		ThrowDShowException(TJS_W("Failed to call GraphBuilder()->AddFilter(pVideoCodec, L\"Video Decoder\")."), hr);
 	if( FAILED(hr = ConnectFilters( pSplitter, pVideoCodec )) )
-		ThrowDShowException(L"Failed to call ConnectFilters( pSplitter, pVideoCodec ).", hr);
+		ThrowDShowException(TJS_W("Failed to call ConnectFilters( pSplitter, pVideoCodec )."), hr);
 
 	// Connect to render filter
 	if( FAILED(hr = ConnectFilters( pVideoCodec, pRdr )) )
-		ThrowDShowException(L"Failed to call ConnectFilters( pVideoCodec, pRdr ).", hr);
+		ThrowDShowException(TJS_W("Failed to call ConnectFilters( pVideoCodec, pRdr )."), hr);
 
 	// Connect to audio codec filter
 	CComPtr<IBaseFilter>	pAudioCodec( (IBaseFilter*)handler->AudioHander(handler->FormatData) );	// for audio codec filter
-	if( FAILED(hr = GraphBuilder()->AddFilter(pAudioCodec, L"Plugin Audio Decoder")) )
-		ThrowDShowException(L"Failed to call GraphBuilder()->AddFilter(pAudioCodec, L\"Audio Decoder\").", hr);
+	if( FAILED(hr = GraphBuilder()->AddFilter(pAudioCodec, TJS_W("Plugin Audio Decoder"))) )
+		ThrowDShowException(TJS_W("Failed to call GraphBuilder()->AddFilter(pAudioCodec, L\"Audio Decoder\")."), hr);
 	if( FAILED(hr = ConnectFilters( pSplitter, pAudioCodec )) )
 	{	// not have Audio.
 		if( FAILED(hr = GraphBuilder()->RemoveFilter( pAudioCodec)) )
-			ThrowDShowException(L"Failed to call GraphBuilder()->RemoveFilter( pAudioCodec).", hr);
+			ThrowDShowException(TJS_W("Failed to call GraphBuilder()->RemoveFilter( pAudioCodec)."), hr);
 		return;
 	}
 
 	// Connect to DDS render filter
 	CComPtr<IBaseFilter>	pDDSRenderer;	// for sound renderer filter
 	if( FAILED(hr = pDDSRenderer.CoCreateInstance(CLSID_DSoundRender, NULL, CLSCTX_INPROC_SERVER)) )
-		ThrowDShowException(L"Failed to create sound render filter object.", hr);
-	if( FAILED(hr = GraphBuilder()->AddFilter(pDDSRenderer, L"Sound Renderer")) )
-		ThrowDShowException(L"Failed to call GraphBuilder()->AddFilter(pDDSRenderer, L\"Sound Renderer\").", hr);
+		ThrowDShowException(TJS_W("Failed to create sound render filter object."), hr);
+	if( FAILED(hr = GraphBuilder()->AddFilter(pDDSRenderer, TJS_W("Sound Renderer"))) )
+		ThrowDShowException(TJS_W("Failed to call GraphBuilder()->AddFilter(pDDSRenderer, L\"Sound Renderer\")."), hr);
 	if( FAILED(hr = ConnectFilters( pAudioCodec, pDDSRenderer ) ) )
 	{
 		if( FAILED(hr = GraphBuilder()->RemoveFilter( pAudioCodec)) )
-			ThrowDShowException(L"Failed to call GraphBuilder()->RemoveFilter( pAudioCodec).", hr);
+			ThrowDShowException(TJS_W("Failed to call GraphBuilder()->RemoveFilter( pAudioCodec)."), hr);
 		if( FAILED(hr = GraphBuilder()->RemoveFilter( pDDSRenderer)) )
-			ThrowDShowException(L"Failed to call GraphBuilder()->RemoveFilter( pDDSRenderer).", hr);
+			ThrowDShowException(TJS_W("Failed to call GraphBuilder()->RemoveFilter( pDDSRenderer)."), hr);
 	}
 }
 #ifdef ENABLE_THEORA
@@ -1736,45 +1736,45 @@ void tTVPDSMovie::BuildTheoraGraph( IBaseFilter *pRdr, IBaseFilter *pSrc )
 	// Connect to Ogg splitter filter
 	CComPtr<IBaseFilter>	pOggSplitter( CreateOggSplitter() );	// for Ogg splitter filter
 
-	if( FAILED(hr = GraphBuilder()->AddFilter(pOggSplitter, L"Ogg Stream Splitter")) )
-		ThrowDShowException(L"Failed to call GraphBuilder()->AddFilter(pOggSplitter, L\"Ogg Stream Splitter\").", hr);
+	if( FAILED(hr = GraphBuilder()->AddFilter(pOggSplitter, TJS_W("Ogg Stream Splitter"))) )
+		ThrowDShowException(TJS_W("Failed to call GraphBuilder()->AddFilter(pOggSplitter, L\"Ogg Stream Splitter\")."), hr);
 	if( FAILED(hr = ConnectFilters( pSrc, pOggSplitter )) )
-		ThrowDShowException(L"Failed to call ConnectFilters( pSrc, pOggSplitter ).", hr);
+		ThrowDShowException(TJS_W("Failed to call ConnectFilters( pSrc, pOggSplitter )."), hr);
 
 	// Connect to Theora video codec filter
 	CComPtr<IBaseFilter>	pTheoraVideoCodec( CreateTheoraDecoder() );	// for Theora video codec filter
-	if( FAILED(hr = GraphBuilder()->AddFilter(pTheoraVideoCodec, L"Theora Video Decoder")) )
-		ThrowDShowException(L"Failed to call GraphBuilder()->AddFilter(pTheoraVideoCodec, L\"Theora Video Decoder\").", hr);
+	if( FAILED(hr = GraphBuilder()->AddFilter(pTheoraVideoCodec, TJS_W("Theora Video Decoder"))) )
+		ThrowDShowException(TJS_W("Failed to call GraphBuilder()->AddFilter(pTheoraVideoCodec, L\"Theora Video Decoder\")."), hr);
 	if( FAILED(hr = ConnectFilters( pOggSplitter, pTheoraVideoCodec )) )
-		ThrowDShowException(L"Failed to call ConnectFilters( pOggSplitter, pTheoraVideoCodec ).", hr);
+		ThrowDShowException(TJS_W("Failed to call ConnectFilters( pOggSplitter, pTheoraVideoCodec )."), hr);
 
 	// Connect to render filter
 	if( FAILED(hr = ConnectFilters( pTheoraVideoCodec, pRdr )) )
-		ThrowDShowException(L"Failed to call ConnectFilters( pTheoraVideoCodec, pRdr ).", hr);
+		ThrowDShowException(TJS_W("Failed to call ConnectFilters( pTheoraVideoCodec, pRdr )."), hr);
 
 	// Connect to Vorbis audio codec filter
 	CComPtr<IBaseFilter>	pVorbisAudioCodec( CreateVorbisDecoder() );	// for Vorbis audio codec filter
-	if( FAILED(hr = GraphBuilder()->AddFilter(pVorbisAudioCodec, L"Vorbis Audio Decoder")) )
-		ThrowDShowException(L"Failed to call GraphBuilder()->AddFilter(pVorbisAudioCodec, L\"Vorbis Audio Decoder\").", hr);
+	if( FAILED(hr = GraphBuilder()->AddFilter(pVorbisAudioCodec, TJS_W("Vorbis Audio Decoder"))) )
+		ThrowDShowException(TJS_W("Failed to call GraphBuilder()->AddFilter(pVorbisAudioCodec, L\"Vorbis Audio Decoder\")."), hr);
 	if( FAILED(hr = ConnectFilters( pOggSplitter, pVorbisAudioCodec )) )
 	{	// not have Audio.
 		if( FAILED(hr = GraphBuilder()->RemoveFilter( pVorbisAudioCodec)) )
-			ThrowDShowException(L"Failed to call GraphBuilder()->RemoveFilter( pVorbisAudioCodec).", hr);
+			ThrowDShowException(TJS_W("Failed to call GraphBuilder()->RemoveFilter( pVorbisAudioCodec)."), hr);
 		return;
 	}
 
 	// Connect to DDS render filter
 	CComPtr<IBaseFilter>	pDDSRenderer;	// for sound renderer filter
 	if( FAILED(hr = pDDSRenderer.CoCreateInstance(CLSID_DSoundRender, NULL, CLSCTX_INPROC_SERVER)) )
-		ThrowDShowException(L"Failed to create sound render filter object.", hr);
-	if( FAILED(hr = GraphBuilder()->AddFilter(pDDSRenderer, L"Sound Renderer")) )
-		ThrowDShowException(L"Failed to call GraphBuilder()->AddFilter(pDDSRenderer, L\"Sound Renderer\").", hr);
+		ThrowDShowException(TJS_W("Failed to create sound render filter object."), hr);
+	if( FAILED(hr = GraphBuilder()->AddFilter(pDDSRenderer, TJS_W("Sound Renderer"))) )
+		ThrowDShowException(TJS_W("Failed to call GraphBuilder()->AddFilter(pDDSRenderer, L\"Sound Renderer\")."), hr);
 	if( FAILED(hr = ConnectFilters( pVorbisAudioCodec, pDDSRenderer ) ) )
 	{
 		if( FAILED(hr = GraphBuilder()->RemoveFilter( pVorbisAudioCodec)) )
-			ThrowDShowException(L"Failed to call GraphBuilder()->RemoveFilter( pVorbisAudioCodec).", hr);
+			ThrowDShowException(TJS_W("Failed to call GraphBuilder()->RemoveFilter( pVorbisAudioCodec)."), hr);
 		if( FAILED(hr = GraphBuilder()->RemoveFilter( pDDSRenderer)) )
-			ThrowDShowException(L"Failed to call GraphBuilder()->RemoveFilter( pDDSRenderer).", hr);
+			ThrowDShowException(TJS_W("Failed to call GraphBuilder()->RemoveFilter( pDDSRenderer)."), hr);
 	}
 
 	return;
@@ -1803,13 +1803,13 @@ HRESULT tTVPDSMovie::ConnectFilters( IBaseFilter* pFilterUpstream, IBaseFilter* 
 	// grab upstream filter's enumerator
 	CComPtr<IEnumPins> pIEnumPinsUpstream;
 	if( FAILED(hr = pFilterUpstream->EnumPins(&pIEnumPinsUpstream)) )
-		ThrowDShowException(L"Failed to call pFilterUpstream->EnumPins(&pIEnumPinsUpstream).", hr);
+		ThrowDShowException(TJS_W("Failed to call pFilterUpstream->EnumPins(&pIEnumPinsUpstream)."), hr);
 
 	// iterate through upstream filter's pins
 	while( pIEnumPinsUpstream->Next (1, &pIPinUpstream, 0) == S_OK )
 	{
 		if( FAILED(hr = pIPinUpstream->QueryPinInfo(&PinInfoUpstream)) )
-			ThrowDShowException(L"Failed to call pIPinUpstream->QueryPinInfo(&PinInfoUpstream).", hr);
+			ThrowDShowException(TJS_W("Failed to call pIPinUpstream->QueryPinInfo(&PinInfoUpstream)."), hr);
 #if _DEBUG
 		sprintf(debug, "upstream: %ls\n", PinInfoUpstream.achName);
 		OutputDebugStringA(debug);

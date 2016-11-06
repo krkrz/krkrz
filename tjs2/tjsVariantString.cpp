@@ -272,7 +272,7 @@ void TJSCompactStringHeap()
 				if(h[i].HeapFlag & HEAP_FLAG_USING)
 				{
 					// using cell
-					const wchar_t * ptr = h[i].operator const tjs_char *();
+					const tjs_char * ptr = h[i].operator const tjs_char *();
 					if(ptr[0] == 0)
 					{
 						OutputDebugString("empty string cell found");
@@ -451,7 +451,7 @@ void TJSDeallocStringHeap(tTJSVariantString * vs)
 
 #ifdef TJS_DEBUG_CHECK_STRING_HEAP_INTEGRITY
 		{
-			const wchar_t * ptr = vs->operator const tjs_char *();
+			const tjs_char * ptr = vs->operator const tjs_char *();
 			if(ptr[0] == 0)
 			{
 				OutputDebugString("empty string cell found");
@@ -574,21 +574,21 @@ tTJSVariantString * TJSAllocVariantString(const tjs_char *ref1, const tjs_char *
 		}
 	}
 
-	tjs_intptr_t len1 = ref1?wcslen(ref1):0;
-	tjs_intptr_t len2 = ref2?wcslen(ref2):0;
+	tjs_intptr_t len1 = ref1? TJS_strlen(ref1):0;
+	tjs_intptr_t len2 = ref2? TJS_strlen(ref2):0;
 
 	tTJSVariantString *ret = TJSAllocStringHeap();
 
 	if(len1+len2>TJS_VS_SHORT_LEN)
 	{
 		ret->LongString = TJSVS_malloc((tjs_uint)(len1+len2+1));
-		if(ref1) wcscpy(ret->LongString , ref1);
-		if(ref2) wcscpy(ret->LongString + len1, ref2);
+		if(ref1) TJS_strcpy(ret->LongString , ref1);
+		if(ref2) TJS_strcpy(ret->LongString + len1, ref2);
 	}
 	else
 	{
-		if(ref1) wcscpy(ret->ShortString, ref1);
-		if(ref2) wcscpy(ret->ShortString + len1, ref2);
+		if(ref1) TJS_strcpy(ret->ShortString, ref1);
+		if(ref2) TJS_strcpy(ret->ShortString + len1, ref2);
 	}
 	ret->Length = (tjs_int)(len1+len2);
 	return ret;

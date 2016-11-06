@@ -113,13 +113,13 @@ int tjsConstArrayData::PutDouble( double b ) {
 
 
 int tjsConstArrayData::PutString( const tjs_char* val ) {
-	std::wstring b;
-	if( val ) b = std::wstring(val);
-	std::map<std::wstring,int>::const_iterator index = StringHash.find( b );
+	tjs_string b;
+	if( val ) b = tjs_string(val);
+	std::map<tjs_string,int>::const_iterator index = StringHash.find( b );
 	if( index == StringHash.end() ) {
 		int idx = (int)String.size();
 		String.push_back( b );
-		StringHash.insert( std::pair<std::wstring,int>(b,idx) );
+		StringHash.insert( std::pair<tjs_string,int>(b,idx) );
 		return idx;
 	} else {
 		return index->second;
@@ -293,7 +293,7 @@ std::vector<tjs_uint8>* tjsConstArrayData::ExportBuffer() {
 	count = (int)String.size();
 	Add4ByteToVector( buf, count );
 	for( int i = 0; i < count; i++ ) {
-		std::wstring& str = String[i];
+		tjs_string& str = String[i];
 		int len = (int)str.length();
 		Add4ByteToVector( buf, len );
 		for( int s = 0; s < len; s++ ) {

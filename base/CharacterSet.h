@@ -22,7 +22,7 @@ TJS_EXP_FUNC_DEF(tjs_int, TVPUtf8ToWideCharString, (const char * in, tjs_char *o
 
 extern tjs_int TVPUtf8ToWideCharString(const char * in, tjs_uint length, tjs_char *out);
 
-extern bool TVPUtf8ToUtf16( std::wstring& out, const std::string& in );
-extern bool TVPUtf16ToUtf8( std::string& out, const std::wstring& in );
+extern bool TVPUtf8ToUtf16( tjs_string& out, const std::string& in );
+extern bool TVPUtf16ToUtf8( std::string& out, const tjs_string& in );
 
 #endif

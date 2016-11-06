@@ -127,12 +127,12 @@ void TTVPWindowForm::ShowWindowAsModal() {
 }
 
 // タイトル、Activityのタイトルに設定できるが、無意味かな
-std::wstring TTVPWindowForm::GetCaption() {
-	return std::wstring(L"");
+tjs_string TTVPWindowForm::GetCaption() {
+	return tjs_string(TJS_W(""));
 }
-void TTVPWindowForm::GetCaption( std::wstring& v ) const {
+void TTVPWindowForm::GetCaption( tjs_string& v ) const {
 }
-void TTVPWindowForm::SetCaption( const std::wstring& v ) {
+void TTVPWindowForm::SetCaption( const tjs_string& v ) {
 }
 
 // サイズや位置など

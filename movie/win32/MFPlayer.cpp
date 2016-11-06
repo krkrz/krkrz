@@ -45,8 +45,8 @@
 //! @return		エラー文字列
 //----------------------------------------------------------------------------
 void __stdcall GetMFVideoOverlayObject(
-	HWND callbackwin, IStream *stream, const wchar_t * streamname,
-	const wchar_t *type, unsigned __int64 size, iTVPVideoOverlay **out)
+	HWND callbackwin, IStream *stream, const tjs_char * streamname,
+	const tjs_char *type, unsigned __int64 size, iTVPVideoOverlay **out)
 {
 	*out = new tTVPMFPlayer;
 
@@ -166,32 +166,32 @@ void tTVPMFPlayer::OnDestoryWindow() {
 /*
 void tTVPMFPlayer::InitializeMFDLL() {
 	if( MfDLL.IsLoaded() == false ) {
-		MfDLL.Load(L"mf.dll");
+		MfDLL.Load(TJS_W("mf.dll"));
 	}
 }
 */
 //----------------------------------------------------------------------------
 void __stdcall tTVPMFPlayer::BuildGraph( HWND callbackwin, IStream *stream,
-	const wchar_t * streamname, const wchar_t *type, unsigned __int64 size )
+	const tjs_char * streamname, const tjs_char *type, unsigned __int64 size )
 {
 	BuildWindow = callbackwin;
 	OwnerWindow = callbackwin;
 	PlayWindow::SetOwner( callbackwin );
 	CallbackWindow = callbackwin;
 	PlayWindow::SetMessageDrainWindow( callbackwin );
-	StreamName = std::wstring(streamname);
+	StreamName = tjs_string(streamname);
 	//Stream = stream;
 
 	HRESULT hr = S_OK;
 	// MFCreateMFByteStreamOnStream は、Windows 7 以降にのみある API なので、動的ロードして Vista での起動に支障がないようにする
-	if( MfplatDLL.IsLoaded() == false ) MfplatDLL.Load(L"mfplat.dll");
+	if( MfplatDLL.IsLoaded() == false ) MfplatDLL.Load(TJS_W("mfplat.dll"));
 	typedef HRESULT (WINAPI *FuncMFCreateMFByteStreamOnStream)(IStream *pStream,IMFByteStream **ppByteStream);
 	FuncMFCreateMFByteStreamOnStream pCreateMFByteStream = (FuncMFCreateMFByteStreamOnStream)MfplatDLL.GetProcAddress("MFCreateMFByteStreamOnStream");
 	if( pCreateMFByteStream == NULL ) {
-		TVPThrowExceptionMessage(L"Faild to retrieve MFCreateMFByteStreamOnStream from mfplat.dll.");
+		TVPThrowExceptionMessage(TJS_W("Faild to retrieve MFCreateMFByteStreamOnStream from mfplat.dll."));
 	}
 	if( FAILED(hr = pCreateMFByteStream( stream, &ByteStream )) ) {
-		TVPThrowExceptionMessage(L"Faild to create stream.");
+		TVPThrowExceptionMessage(TJS_W("Faild to create stream."));
 	}
 }
 /*
@@ -270,52 +270,52 @@ HRESULT tTVPMFPlayer::CreateVideoPlayer() {
 		return E_FAIL;
 
 	if( FAILED(hr = MFCreateMediaSession( NULL, &MediaSession )) ) {
-		TVPThrowExceptionMessage(L"Faild to create Media session.");
+		TVPThrowExceptionMessage(TJS_W("Faild to create Media session."));
 	}
 	if( FAILED(hr = MediaSession->BeginGetEvent( PlayerCallback, NULL )) ) {
-		TVPThrowExceptionMessage(L"Faild to begin get event.");
+		TVPThrowExceptionMessage(TJS_W("Faild to begin get event."));
 	}
 	CComPtr<IMFSourceResolver> pSourceResolver;
 	if( FAILED(hr = MFCreateSourceResolver(&pSourceResolver)) ) {
-		TVPThrowExceptionMessage(L"Faild to create source resolver.");
+		TVPThrowExceptionMessage(TJS_W("Faild to create source resolver."));
 	}
 	MF_OBJECT_TYPE ObjectType = MF_OBJECT_INVALID;
 	CComPtr<IUnknown> pSource;
 	if( FAILED(hr = pSourceResolver->CreateObjectFromByteStream( ByteStream, StreamName.c_str(), MF_RESOLUTION_MEDIASOURCE, NULL, &ObjectType, (IUnknown**)&pSource )) ) {
-	//if( FAILED(hr = pSourceResolver->CreateObjectFromURL( L"C:\\krkrz\\bin\\win32\\data\\test.mp4",
+	//if( FAILED(hr = pSourceResolver->CreateObjectFromURL( TJS_W("C:\\krkrz\\bin\\win32\\data\\test.mp4"),
 	//	MF_RESOLUTION_MEDIASOURCE, NULL, &ObjectType, (IUnknown**)&pSource)) ) {
-		TVPThrowExceptionMessage(L"Faild to open stream.");
+		TVPThrowExceptionMessage(TJS_W("Faild to open stream."));
 	}
 	if( ObjectType != MF_OBJECT_MEDIASOURCE ) {
-		TVPThrowExceptionMessage(L"Invalid media source.");
+		TVPThrowExceptionMessage(TJS_W("Invalid media source."));
 	}
 	//CComPtr<IMFMediaSource> pMediaSource;
 	if( FAILED(hr = pSource.QueryInterface(&MediaSource)) ) {
-		TVPThrowExceptionMessage(L"Faild to query Media source.");
+		TVPThrowExceptionMessage(TJS_W("Faild to query Media source."));
 	}
 	if( FAILED(hr = MFCreateTopology(&Topology)) ) {
-		TVPThrowExceptionMessage(L"Faild to create Topology.");
+		TVPThrowExceptionMessage(TJS_W("Faild to create Topology."));
 	}
 	CComPtr<IMFPresentationDescriptor> pPresentationDescriptor;
 	if( FAILED(hr = MediaSource->CreatePresentationDescriptor(&pPresentationDescriptor)) ) {
-		TVPThrowExceptionMessage(L"Faild to create Presentation Descriptor.");
+		TVPThrowExceptionMessage(TJS_W("Faild to create Presentation Descriptor."));
 	}
 	DWORD streamCount;
 	if( FAILED(hr = pPresentationDescriptor->GetStreamDescriptorCount(&streamCount)) ) {
-		TVPThrowExceptionMessage(L"Faild to get stream count.");
+		TVPThrowExceptionMessage(TJS_W("Faild to get stream count."));
 	}
 	if( streamCount < 1 ) {
-		TVPThrowExceptionMessage(L"Not found media stream.");
+		TVPThrowExceptionMessage(TJS_W("Not found media stream."));
 	}
 	for( DWORD i = 0; i < streamCount; i++ ) {
 		if( FAILED(hr = AddBranchToPartialTopology(Topology, MediaSource, pPresentationDescriptor, i, hWnd)) ) {
-			TVPThrowExceptionMessage(L"Faild to add nodes.");
+			TVPThrowExceptionMessage(TJS_W("Faild to add nodes."));
 		}
 	}
 	pPresentationDescriptor->GetUINT64(MF_PD_DURATION, (UINT64*)&HnsDuration);
 	
 	if( FAILED(hr = MediaSession->SetTopology( 0, Topology )) ) {
-		TVPThrowExceptionMessage(L"Faild to set topology.");
+		TVPThrowExceptionMessage(TJS_W("Faild to set topology."));
 	}
 	return hr;
 }
@@ -325,7 +325,7 @@ HRESULT tTVPMFPlayer::AddBranchToPartialTopology( IMFTopology *pTopology, IMFMed
 	HRESULT hr;
 	BOOL selected = FALSE;
     if( FAILED(hr = pPD->GetStreamDescriptorByIndex(iStream, &selected, &pSD)) ) {
-		TVPThrowExceptionMessage(L"Faild to get stream desc.");
+		TVPThrowExceptionMessage(TJS_W("Faild to get stream desc."));
 	}
 	if( selected ) {
 		// Create the media sink activation object.
@@ -336,16 +336,16 @@ HRESULT tTVPMFPlayer::AddBranchToPartialTopology( IMFTopology *pTopology, IMFMed
 		// Add a source node for this stream.
 		CComPtr<IMFTopologyNode> pSourceNode;
         if( FAILED(hr = AddSourceNode(pTopology, pSource, pPD, pSD, &pSourceNode) ) ) {
-			TVPThrowExceptionMessage(L"Faild to add source node.");
+			TVPThrowExceptionMessage(TJS_W("Faild to add source node."));
 		}
 		// Create the output node for the renderer.
 		CComPtr<IMFTopologyNode> pOutputNode;
         if( FAILED(hr = AddOutputNode(pTopology, pSinkActivate, 0, &pOutputNode)) ) {
-			TVPThrowExceptionMessage(L"Faild to add output node.");
+			TVPThrowExceptionMessage(TJS_W("Faild to add output node."));
 		}
 		// Connect the source node to the output node.
         if( FAILED(hr = pSourceNode->ConnectOutput(0, pOutputNode, 0)) ) {
-			TVPThrowExceptionMessage(L"Faild to connect node.");
+			TVPThrowExceptionMessage(TJS_W("Faild to connect node."));
 		}
 	}
 	return hr;
@@ -355,18 +355,18 @@ HRESULT tTVPMFPlayer::CreateMediaSinkActivate( IMFStreamDescriptor *pSourceSD, H
 	CComPtr<IMFMediaTypeHandler> pHandler;
 	// Get the media type handler for the stream.
     if( FAILED(hr = pSourceSD->GetMediaTypeHandler(&pHandler)) ) {
-		TVPThrowExceptionMessage(L"Faild to get media type handler.");
+		TVPThrowExceptionMessage(TJS_W("Faild to get media type handler."));
 	}
 	// Get the major media type.
     GUID guidMajorType;
     if( FAILED(hr = pHandler->GetMajorType(&guidMajorType)) ) {
-		TVPThrowExceptionMessage(L"Faild to get major type.");
+		TVPThrowExceptionMessage(TJS_W("Faild to get major type."));
 	}
     CComPtr<IMFActivate>		pActivate;
 	if( MFMediaType_Audio == guidMajorType ) {
 		// Create the audio renderer.
         if( FAILED(hr = MFCreateAudioRendererActivate(&pActivate) )) {
-			TVPThrowExceptionMessage(L"Faild to create audio render.");
+			TVPThrowExceptionMessage(TJS_W("Faild to create audio render."));
 		}
 	} else if( MFMediaType_Video == guidMajorType ) {
 		// Get FPS
@@ -377,7 +377,7 @@ HRESULT tTVPMFPlayer::CreateMediaSinkActivate( IMFStreamDescriptor *pSourceSD, H
 
         // Create the video renderer.
         if( FAILED(hr = MFCreateVideoRendererActivate(hVideoWindow, &pActivate) ) ) {
-			TVPThrowExceptionMessage(L"Faild to create video render.");
+			TVPThrowExceptionMessage(TJS_W("Faild to create video render."));
 		}
 		// ここでカスタムEVRをつなぐようにすると自前で色々描画できるようになる
 		// 現状は標準のものを使っている
@@ -388,7 +388,7 @@ HRESULT tTVPMFPlayer::CreateMediaSinkActivate( IMFStreamDescriptor *pSourceSD, H
 		my_activate_obj->QueryInterface( IID_IUnknown, (void**)&unk );
 		if( FAILED(hr = pActivate->SetUnknown(MF_ACTIVATE_CUSTOM_VIDEO_PRESENTER_ACTIVATE, unk)) ) {
 			my_activate_obj->Release();
-			TVPThrowExceptionMessage(L"Faild to add custom EVR presenter video render.");
+			TVPThrowExceptionMessage(TJS_W("Faild to add custom EVR presenter video render."));
 		}
 		my_activate_obj->Release();
 #endif
@@ -407,21 +407,21 @@ HRESULT tTVPMFPlayer::AddSourceNode( IMFTopology *pTopology, IMFMediaSource *pSo
 	// Create the node.
 	CComPtr<IMFTopologyNode> pNode;
     if( FAILED(hr = MFCreateTopologyNode(MF_TOPOLOGY_SOURCESTREAM_NODE, &pNode)) ) {
-		TVPThrowExceptionMessage(L"Faild to create source node.");
+		TVPThrowExceptionMessage(TJS_W("Faild to create source node."));
 	}
 	// Set the attributes.
     if( FAILED(hr = pNode->SetUnknown(MF_TOPONODE_SOURCE, pSource) ) ) {
-		TVPThrowExceptionMessage(L"Faild to set source node.");
+		TVPThrowExceptionMessage(TJS_W("Faild to set source node."));
 	}
 	if( FAILED(hr = pNode->SetUnknown(MF_TOPONODE_PRESENTATION_DESCRIPTOR, pPD) ) ) {
-		TVPThrowExceptionMessage(L"Faild to set presentation desc.");
+		TVPThrowExceptionMessage(TJS_W("Faild to set presentation desc."));
 	}
 	if( FAILED(hr = pNode->SetUnknown(MF_TOPONODE_STREAM_DESCRIPTOR, pSD)) ) {
-		TVPThrowExceptionMessage(L"Faild to set stream desc.");
+		TVPThrowExceptionMessage(TJS_W("Faild to set stream desc."));
 	}
 	// Add the node to the topology.
     if( FAILED(hr = pTopology->AddNode(pNode)) ) {
-		TVPThrowExceptionMessage(L"Faild to add source node to topology.");
+		TVPThrowExceptionMessage(TJS_W("Faild to add source node to topology."));
 	}
 	// Return the pointer to the caller.
     *ppNode = pNode;
@@ -434,22 +434,22 @@ HRESULT tTVPMFPlayer::AddOutputNode( IMFTopology *pTopology, IMFActivate *pActiv
     // Create the node.
     CComPtr<IMFTopologyNode> pNode;
     if( FAILED(hr = MFCreateTopologyNode(MF_TOPOLOGY_OUTPUT_NODE, &pNode)) ){
-		TVPThrowExceptionMessage(L"Faild to create output node.");
+		TVPThrowExceptionMessage(TJS_W("Faild to create output node."));
 	}
     // Set the object pointer.
     if( FAILED(hr = pNode->SetObject(pActivate)) ) {
-		TVPThrowExceptionMessage(L"Faild to set activate.");
+		TVPThrowExceptionMessage(TJS_W("Faild to set activate."));
 	}
     // Set the stream sink ID attribute.
     if( FAILED(hr = pNode->SetUINT32(MF_TOPONODE_STREAMID, dwId)) ) {
-		TVPThrowExceptionMessage(L"Faild to set stream id.");
+		TVPThrowExceptionMessage(TJS_W("Faild to set stream id."));
 	}
 	if( FAILED(hr = pNode->SetUINT32(MF_TOPONODE_NOSHUTDOWN_ON_REMOVE, FALSE)) ) {
-		TVPThrowExceptionMessage(L"Faild to set no shutdown on remove.");
+		TVPThrowExceptionMessage(TJS_W("Faild to set no shutdown on remove."));
 	}
     // Add the node to the topology.
     if( FAILED(hr = pTopology->AddNode(pNode)) ) {
-		TVPThrowExceptionMessage(L"Faild to add ouput node to topology.");
+		TVPThrowExceptionMessage(TJS_W("Faild to add ouput node to topology."));
 	}
     // Return the pointer to the caller.
     *ppNode = pNode;
@@ -463,18 +463,18 @@ HRESULT tTVPMFPlayer::AddOutputNode( IMFTopology *pTopology, IMFStreamSink *pStr
 	// Create the node.
 	CComPtr<IMFTopologyNode> pNode;
     if( FAILED(hr = MFCreateTopologyNode(MF_TOPOLOGY_OUTPUT_NODE, &pNode)) ) {
-		TVPThrowExceptionMessage(L"Faild to create output node.");
+		TVPThrowExceptionMessage(TJS_W("Faild to create output node."));
 	}
 	// Set the object pointer.
 	if( FAILED(hr = pNode->SetObject(pStreamSink)) ) {
-		TVPThrowExceptionMessage(L"Faild to set stream sink.");
+		TVPThrowExceptionMessage(TJS_W("Faild to set stream sink."));
 	}
 	// Add the node to the topology.
 	if( FAILED(hr = pTopology->AddNode(pNode))) {
-		TVPThrowExceptionMessage(L"Faild to add output node.");
+		TVPThrowExceptionMessage(TJS_W("Faild to add output node."));
 	}
 	if( FAILED(hr = pNode->SetUINT32(MF_TOPONODE_NOSHUTDOWN_ON_REMOVE, TRUE) ) ) {
-		TVPThrowExceptionMessage(L"Faild to set no shutdown on remove.");
+		TVPThrowExceptionMessage(TJS_W("Faild to set no shutdown on remove."));
 	}
 	*ppNode = pNode;
     (*ppNode)->AddRef();
@@ -533,7 +533,7 @@ void __stdcall tTVPMFPlayer::ReleaseAll()
 }
 //----------------------------------------------------------------------------
 void tTVPMFPlayer::NotifyError( HRESULT hr ) {
-	TVPThrowExceptionMessage(L"MF Operation Error.",hr);
+	TVPThrowExceptionMessage(TJS_W("MF Operation Error."),hr);
 }
 void tTVPMFPlayer::OnMediaItemCleared() {
 }
@@ -559,7 +559,7 @@ void __stdcall tTVPMFPlayer::SetWindow(HWND window) {
 	if( VideoDisplayControl.p ) {
 		hr = VideoDisplayControl->SetVideoWindow( window );
 		if( FAILED(hr) ) {
-			TVPThrowExceptionMessage(L"Faild to call SetVideoWindow.");
+			TVPThrowExceptionMessage(TJS_W("Faild to call SetVideoWindow."));
 		}
 	}
 	CreateVideoPlayer();
@@ -580,7 +580,7 @@ void __stdcall tTVPMFPlayer::SetRect(RECT *rect) {
 		// MF では、ソース矩形も指定可能になっている
 		HRESULT hr = VideoDisplayControl->SetVideoPosition( NULL, &vr );
 		if( FAILED(hr) ) {
-			TVPThrowExceptionMessage(L"Faild to set rect.");
+			TVPThrowExceptionMessage(TJS_W("Faild to set rect."));
 		}
 	}
 }
@@ -605,7 +605,7 @@ void __stdcall tTVPMFPlayer::Play() {
 		PropVariantClear(&varStart);
 	}
 	if( FAILED(hr) ) {
-		TVPThrowExceptionMessage(L"Faild to play.");
+		TVPThrowExceptionMessage(TJS_W("Faild to play."));
 	}
 }
 void __stdcall tTVPMFPlayer::Stop() {
@@ -616,7 +616,7 @@ void __stdcall tTVPMFPlayer::Stop() {
 		//StartPositionSpecify = false;
 	}
 	if( FAILED(hr) ) {
-		TVPThrowExceptionMessage(L"Faild to stop.");
+		TVPThrowExceptionMessage(TJS_W("Faild to stop."));
 	}
 }
 void __stdcall tTVPMFPlayer::Pause() {
@@ -626,7 +626,7 @@ void __stdcall tTVPMFPlayer::Pause() {
 		//StartPositionSpecify = false;
 	}
 	if( FAILED(hr) ) {
-		TVPThrowExceptionMessage(L"Faild to stop.");
+		TVPThrowExceptionMessage(TJS_W("Faild to stop."));
 	}
 }
 MFCLOCK_STATE tTVPMFPlayer::GetClockState() {
@@ -652,7 +652,7 @@ void __stdcall tTVPMFPlayer::SetPosition(unsigned __int64 tick) {
 		PropVariantClear(&var);
 	}
 	if( FAILED(hr) ) {
-		TVPThrowExceptionMessage(L"Faild to set position.");
+		TVPThrowExceptionMessage(TJS_W("Faild to set position."));
 	}
 }
 void __stdcall tTVPMFPlayer::GetPosition(unsigned __int64 *tick) {
@@ -670,8 +670,8 @@ void __stdcall tTVPMFPlayer::GetPosition(unsigned __int64 *tick) {
 		*tick = 0;
 	}
 	if( FAILED(hr) ) {
-		//TVPThrowExceptionMessage(L"Faild to get position.");
-		ThrowDShowException(L"Faild to get position.",hr);
+		//TVPThrowExceptionMessage(TJS_W("Faild to get position."));
+		ThrowDShowException(TJS_W("Faild to get position."),hr);
 	}
 }
 void __stdcall tTVPMFPlayer::GetStatus(tTVPVideoStatus *status) {
@@ -770,7 +770,7 @@ void __stdcall tTVPMFPlayer::GetVideoSize( long *width, long *height ){
 		*height = 240;
 	}
 	if( FAILED(hr) ) {
-		TVPThrowExceptionMessage(L"Faild to get video size.");
+		TVPThrowExceptionMessage(TJS_W("Faild to get video size."));
 	}
 }
 void __stdcall tTVPMFPlayer::GetFrontBuffer( BYTE **buff ){
@@ -801,7 +801,7 @@ void __stdcall tTVPMFPlayer::SetPlayRate( double rate ) {
 		}
 	}
 	if( FAILED(hr) ) {
-		TVPThrowExceptionMessage(L"Faild to set play rate.");
+		TVPThrowExceptionMessage(TJS_W("Faild to set play rate."));
 	}
 }
 void __stdcall tTVPMFPlayer::GetPlayRate( double *rate ) {
@@ -813,7 +813,7 @@ void __stdcall tTVPMFPlayer::GetPlayRate( double *rate ) {
 		}
 	}
 	if( FAILED(hr) ) {
-		TVPThrowExceptionMessage(L"Faild to get play rate.");
+		TVPThrowExceptionMessage(TJS_W("Faild to get play rate."));
 	}
 }
 HRESULT tTVPMFPlayer::SetVolumeToMF() {
@@ -847,7 +847,7 @@ void __stdcall tTVPMFPlayer::SetAudioBalance( long balance ) {
 
 		HRESULT hr = SetVolumeToMF();
 		if( FAILED(hr) ) {
-			TVPThrowExceptionMessage(L"Faild to set audio balance.");
+			TVPThrowExceptionMessage(TJS_W("Faild to set audio balance."));
 		} 
 	}
 }
@@ -875,7 +875,7 @@ void __stdcall tTVPMFPlayer::GetAudioBalance( long *balance ) {
 		}
 	}
 	if( FAILED(hr) ) {
-		TVPThrowExceptionMessage(L"Faild to get audio balance.");
+		TVPThrowExceptionMessage(TJS_W("Faild to get audio balance."));
 	}
 	*/
 }
@@ -887,7 +887,7 @@ void __stdcall tTVPMFPlayer::SetAudioVolume( long volume ) {
 		
 		HRESULT hr = SetVolumeToMF();
 		if( FAILED(hr) ) {
-			TVPThrowExceptionMessage(L"Faild to set audio volume.");
+			TVPThrowExceptionMessage(TJS_W("Faild to set audio volume."));
 		} 
 	}
 }
@@ -902,7 +902,7 @@ void __stdcall tTVPMFPlayer::GetAudioVolume( long *volume ) {
 		}
 	}
 	if( FAILED(hr) ) {
-		TVPThrowExceptionMessage(L"Faild to get audio volume.");
+		TVPThrowExceptionMessage(TJS_W("Faild to get audio volume."));
 	} else {
 		*volume = (long)((vol - 1.0f) * 10000);
 	}

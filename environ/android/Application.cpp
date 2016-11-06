@@ -458,7 +458,7 @@ void tTVPApplication::OnTouchUp( float x, float y, float cx, float cy, int32_t i
 }
 //-----------------------------
 
-std::vector<std::string>* LoadLinesFromFile( const std::wstring& path ) {
+std::vector<std::string>* LoadLinesFromFile( const tjs_string& path ) {
 	std::string npath;
 	if( TVPUtf16ToUtf8( npath, path ) == false ) {
 		return nullptr;
@@ -524,29 +524,29 @@ const tjs_char *TVPGetDefaultFontName() {
 	return TJS_W("Noto Sans CJK");
 }
 // /system/fonts/ フォントが置かれているフォルダから取得するが、読み込んでリスト作るの少し時間かかりそう
-void TVPGetAllFontList( std::vector<std::wstring>& list ) {
+void TVPGetAllFontList( std::vector<tjs_string>& list ) {
 	list.clear();
 }
 
-const std::wstring& tTVPApplication::GetInternalDataPath() const {
+const tjs_string& tTVPApplication::GetInternalDataPath() const {
 	if( internal_data_path_.empty() ) {
-		getStringFromJava( static_cast<const char*>("getInternalDataPath"), const_cast<std::wstring&>(internal_data_path_) );
+		getStringFromJava( static_cast<const char*>("getInternalDataPath"), const_cast<tjs_string&>(internal_data_path_) );
 	}
 	return internal_data_path_;
 }
-const std::wstring& tTVPApplication::GetExternalDataPath() const {
+const tjs_string& tTVPApplication::GetExternalDataPath() const {
 	if( external_data_path_.empty() ) {
-		getStringFromJava( static_cast<const char*>("getExternalDataPath"), const_cast<std::wstring&>(external_data_path_) );
+		getStringFromJava( static_cast<const char*>("getExternalDataPath"), const_cast<tjs_string&>(external_data_path_) );
 	}
 	return external_data_path_;
 }
-const std::wstring* tTVPApplication::GetCachePath() const {
+const tjs_string* tTVPApplication::GetCachePath() const {
 	if( cache_path_.empty() ) {
-		getStringFromJava( static_cast<const char*>("getCachePath"), const_cast<std::wstring&>(cache_path_) );
+		getStringFromJava( static_cast<const char*>("getCachePath"), const_cast<tjs_string&>(cache_path_) );
 	}
 	return &cache_path_;
 }
-void tTVPApplication::getStringFromJava( const char* methodName, std::wstring& dest ) const {
+void tTVPApplication::getStringFromJava( const char* methodName, tjs_string& dest ) const {
 	JNIEnv *env;
 	if (jvm_->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6) == JNI_OK) {
 		jvm_->AttachCurrentThread( &env, nullptr );
@@ -556,7 +556,7 @@ void tTVPApplication::getStringFromJava( const char* methodName, std::wstring& d
 		jstring ret = (jstring) env->CallObjectMethod(thiz, mid, nullptr);
 		int jstrlen = env->GetStringLength(ret);
 		const jchar* chars = env->GetStringChars( ret, nullptr );
-		dest = std::wstring( chars, &chars[jstrlen] );
+		dest = tjs_string( chars, &chars[jstrlen] );
 		env->ReleaseStringChars( ret, chars );
 		env->DeleteLocalRef( ret );
 		jvm_->DetachCurrentThread();

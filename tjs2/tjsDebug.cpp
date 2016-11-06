@@ -763,10 +763,10 @@ public:
 
 private:
 	HWND			DebuggerHwnd;	//!< デバッガウィンドウハンドル
-	std::wstring	LastScriptFileName;
+	tjs_string	LastScriptFileName;
 	tjs_int			LastLineNo;
 
-	std::wstring	BreakScriptFileName;
+	tjs_string	BreakScriptFileName;
 	int				BreakLineNo;
 
 	Breakpoints		BreakPoints;
@@ -820,7 +820,7 @@ public:
 		DummyWindow.Deallocate();
 	}
 	void Initialize() {
-		DebuggerHwnd = ::FindWindow(L"TScriptDebuggerForm",NULL);	//!< 名前決め打ち
+		DebuggerHwnd = ::FindWindow(TJS_W("TScriptDebuggerForm"),NULL);	//!< 名前決め打ち
 		if( DebuggerHwnd == 0 ) {
 			DebuggerHwnd = INVALID_HANDLE_VALUE;
 		}
@@ -843,7 +843,7 @@ public:
 
 		HandleBreakCommand();	// ブレーク要求が送られてきているか調べる
 
-		BreakScriptFileName = std::wstring(filename);
+		BreakScriptFileName = tjs_string(filename);
 		BreakLineNo = lineno;
 
 		bool is_change_line = false;
@@ -909,10 +909,10 @@ private:
 	void SendBreak() {
 		if( DebuggerHwnd != INVALID_HANDLE_VALUE ) {
 			HWND hwnd = DummyWindow.GetOwner();
-			size_t len = sizeof(int) + (BreakScriptFileName.size() + 1) * sizeof(wchar_t);
+			size_t len = sizeof(int) + (BreakScriptFileName.size() + 1) * sizeof(tjs_char);
 			std::vector<char>	buff(len);
 			(*(int*)&(buff[0])) = BreakLineNo;
-			memcpy( &(buff[sizeof(int)]), BreakScriptFileName.c_str(), (BreakScriptFileName.size()+1) * sizeof(wchar_t) );
+			memcpy( &(buff[sizeof(int)]), BreakScriptFileName.c_str(), (BreakScriptFileName.size()+1) * sizeof(tjs_char) );
 			DebuggerMessage	message( DBGEV_GEE_BREAK, &(buff[0]), len );
 			::SendMessage( DebuggerHwnd, WM_COPYDATA, (WPARAM)hwnd, (LPARAM)&message );
 		}
@@ -927,31 +927,31 @@ private:
 	}
 	void SendLocalValue( tTJSInterCodeContext* ctx ) {
 		if( ctx == NULL ) return;
-		std::list<std::wstring> values;
+		std::list<tjs_string> values;
 		TJSDebuggerGetLocalVariableString( ctx->GetDebuggerScopeKey(), ctx->GetDebuggerRegisterArea(), values );
 		SendValues( values, DBGEV_GEE_LOCAL_VALUE );
 	}
 	void SendClassValue( tTJSInterCodeContext* ctx ) {
 		if( ctx == NULL ) return;
-		std::list<std::wstring> values;
+		std::list<tjs_string> values;
 		TJSDebuggerGetClassVariableString( ctx->GetSelfClassName().c_str(), ctx->GetDebuggerRegisterArea(), ctx->GetDebuggerDataArea(), values );
 		SendValues( values, DBGEV_GEE_CLASS_VALUE );
 	}
 
-	void SendValues( const std::list<std::wstring>& values, int command ) {
+	void SendValues( const std::list<tjs_string>& values, int command ) {
 		if( values.size() > 0 ) {
 			size_t bufflen = 0;
 			bufflen += sizeof(int);	// counts
-			for( std::list<std::wstring>::const_iterator i = values.begin(); i != values.end(); ++i ) {
-				bufflen += ((*i).size() + 1) * sizeof(wchar_t);
+			for( std::list<tjs_string>::const_iterator i = values.begin(); i != values.end(); ++i ) {
+				bufflen += ((*i).size() + 1) * sizeof(tjs_char);
 			}
 			int count = values.size() / 2;
 			std::vector<char>	buff(bufflen);
 			(*(int*)&(buff[0])) = count;
-			wchar_t* strbuff = (wchar_t*)&buff[sizeof(int)];
-			for( std::list<std::wstring>::const_iterator i = values.begin(); i != values.end(); ++i ) {
+			tjs_char* strbuff = (tjs_char*)&buff[sizeof(int)];
+			for( std::list<tjs_string>::const_iterator i = values.begin(); i != values.end(); ++i ) {
 				int wstr_len = ((*i).size() + 1);
-				memcpy( strbuff, (*i).c_str(), wstr_len * sizeof(wchar_t) );
+				memcpy( strbuff, (*i).c_str(), wstr_len * sizeof(tjs_char) );
 				strbuff += wstr_len;
 			}
 			if( DebuggerHwnd != INVALID_HANDLE_VALUE ) {
@@ -1075,12 +1075,12 @@ private:
 				points++;
 			}
 			if( count > 0 && length > 1 ) {
-				wchar_t* filename = (wchar_t*)points;
-				std::vector<wchar_t> name(length );
+				tjs_char* filename = (tjs_char*)points;
+				std::vector<tjs_char> name(length );
 				memcpy( &(name[0]), filename, length );
-				length /= sizeof(wchar_t);
+				length /= sizeof(tjs_char);
 				name[length-1] = 0;
-				std::wstring wfilename( &(name[0]) );
+				tjs_string wfilename( &(name[0]) );
 				BreakPoints.SetBreakPoint( wfilename, breakpoints[0] );
 				BreakpointLine* lines = BreakPoints.GetBreakPointLines( wfilename );
 				if( lines ) {
@@ -1122,25 +1122,25 @@ private:
 class NameIndexCollection
 {
 protected:
-	std::map<std::wstring,int> NameWithID;	//!< 名前とIDのペア
-	std::vector<const std::wstring*> Names;	//!< 指定インデックスの名前
+	std::map<tjs_string,int> NameWithID;	//!< 名前とIDのペア
+	std::vector<const tjs_string*> Names;	//!< 指定インデックスの名前
 
 public:
-	int GetID( const std::wstring& name ) {
-		std::map<std::wstring,int>::const_iterator i = NameWithID.find( name );
+	int GetID( const tjs_string& name ) {
+		std::map<tjs_string,int>::const_iterator i = NameWithID.find( name );
 		if( i != NameWithID.end() ) {
 			return i->second;
 		}
 		// 見付からないので追加する
 		int index = Names.size();	// 配列の最後の要素番号を得る
-		typedef std::pair<std::map<std::wstring,int>::iterator, bool> name_result_t;
+		typedef std::pair<std::map<tjs_string,int>::iterator, bool> name_result_t;
 		name_result_t ret = NameWithID.insert( std::make_pair( name, index ) );	// 要素番号で挿入
 		assert( ret.second );
-		const std::wstring* name_ref = &((*(ret.first)).first);	// 挿入した名前のポイントを得る
+		const tjs_string* name_ref = &((*(ret.first)).first);	// 挿入した名前のポイントを得る
 		Names.push_back( name_ref );	// そのポインタを配列に保存する
 		return index;
 	}
-	const std::wstring* GetName( int id ) const {
+	const tjs_string* GetName( int id ) const {
 		if( id < static_cast<int>(Names.size()) ) {
 			return Names[id];
 		}
@@ -1148,8 +1148,8 @@ public:
 	}
 };
 static NameIndexCollection NameIndexCollectionData;
-int TJSGetIDFromName( const tjs_char* name ) { return NameIndexCollectionData.GetID( std::wstring(name) ); }
-const std::wstring* TJSGetNameFormID( int id ) { return NameIndexCollectionData.GetName( id ); }
+int TJSGetIDFromName( const tjs_char* name ) { return NameIndexCollectionData.GetID( tjs_string(name) ); }
+const tjs_string* TJSGetNameFormID( int id ) { return NameIndexCollectionData.GetName( id ); }
 
 void TJSDebuggerGetScopeKey( ScopeKey& scope, const tjs_char* classname, const tjs_char* funcname, const tjs_char* filename, int codeoffset ) {
 	int classindex = -1;
@@ -1223,7 +1223,7 @@ public:
 		ret.first->second.push_back( LocalVariableKey( varindex, regaddr ) );
 	}
 	// 変数名と値のリストを得る
-	void GetVars( const tjs_char* classname, tTJSVariant* ra, tTJSVariant* da, std::list<std::wstring>& values ) {
+	void GetVars( const tjs_char* classname, tTJSVariant* ra, tTJSVariant* da, std::list<tjs_string>& values ) {
 		values.clear();
 		if( ra == NULL || da == NULL ) return;
 
@@ -1232,16 +1232,16 @@ public:
 
 		iterator i = Variables.find( classindex );
 		if( i != Variables.end() ) {
-			std::wstring selfclass(L"this.");
-			if( classindex < 0 ) selfclass = std::wstring(L"global.");
+			tjs_string selfclass(TJS_W("this."));
+			if( classindex < 0 ) selfclass = tjs_string(TJS_W("global."));
 			const std::list<ClassVariableKey>& vars = i->second;
 			for( std::list<ClassVariableKey>::const_iterator j = vars.begin(); j != vars.end(); ++j ) {
-				const std::wstring* varname = TJSGetNameFormID( (*j).VarIndex );
-				std::wstring memname;
+				const tjs_string* varname = TJSGetNameFormID( (*j).VarIndex );
+				tjs_string memname;
 				if( varname ) {
 					memname = selfclass + *varname;
 				} else {
-					memname = selfclass + std::wstring(L"(unknown)");
+					memname = selfclass + tjs_string(TJS_W("(unknown)"));
 				}
 				tTJSVariant* ra_code1 = TJS_GET_VM_REG_ADDR( ra, TJS_TO_VM_REG_ADDR(-1) );
 				tjs_error hr = -1;
@@ -1255,11 +1255,11 @@ public:
 					}
 				}
 
-				std::wstring value;
+				tjs_string value;
 				if( TJS_FAILED(hr) ) {
-					value = std::wstring(L"error");
+					value = tjs_string(TJS_W("error"));
 				} else {
-					value = std::wstring( TJSVariantToReadableString( result ).c_str() );
+					value = tjs_string( TJSVariantToReadableString( result ).c_str() );
 				}
 
 				values.push_back( memname );
@@ -1310,21 +1310,21 @@ public:
 	}
 
 	// 変数名と値のリストを得る
-	void GetVars( const ScopeKey& scope, tTJSVariant* ra, std::list<std::wstring>& values ) {
+	void GetVars( const ScopeKey& scope, tTJSVariant* ra, std::list<tjs_string>& values ) {
 		values.clear();
 		if( ra == NULL ) return;
 		iterator i = Variables.find( scope );
 		if( i != Variables.end() ) {
 			const std::list<LocalVariableKey>& vars = i->second;
 			for( std::list<LocalVariableKey>::const_iterator j = vars.begin(); j != vars.end(); ++j ) {
-				const std::wstring* varname = TJSGetNameFormID( (*j).VarIndex );
-				std::wstring name;
+				const tjs_string* varname = TJSGetNameFormID( (*j).VarIndex );
+				tjs_string name;
 				if( varname ) {
 					name = *varname;
 				} else {
-					name = std::wstring(L"(unknown)");
+					name = tjs_string(TJS_W("(unknown)"));
 				}
-				std::wstring value( TJSVariantToReadableString( TJS_GET_VM_REG( ra, (*j).RegAddr ) ).c_str() );
+				tjs_string value( TJSVariantToReadableString( TJS_GET_VM_REG( ra, (*j).RegAddr ) ).c_str() );
 
 				values.push_back( name );
 				values.push_back( value );
@@ -1332,7 +1332,7 @@ public:
 		}
 	}
 	// 変数名と値のリストを得る
-	void GetVars( const tjs_char* classname, const tjs_char* funcname, const tjs_char* filename, int codeoffset, tTJSVariant* ra, std::list<std::wstring>& values ) {
+	void GetVars( const tjs_char* classname, const tjs_char* funcname, const tjs_char* filename, int codeoffset, tTJSVariant* ra, std::list<tjs_string>& values ) {
 		ScopeKey scope;
 		TJSDebuggerGetScopeKey( scope, classname, funcname, filename, codeoffset );
 		GetVars( scope, ra, values );
@@ -1345,14 +1345,14 @@ static ClassVariableCollection ClassVariableCollectionData;
 void TJSDebuggerAddLocalVariable( const tjs_char* classname, const tjs_char* funcname, const tjs_char* filename, int codeoffset, const tjs_char* varname, int regaddr ) {
 	LocalVariableCollectionData.SetVar( classname, funcname, filename, codeoffset, varname, regaddr );
 }
-void TJSDebuggerGetLocalVariableString( const tjs_char* classname, const tjs_char* funcname, const tjs_char* filename, int codeoffset, tTJSVariant* ra, std::list<std::wstring>& values ) {
+void TJSDebuggerGetLocalVariableString( const tjs_char* classname, const tjs_char* funcname, const tjs_char* filename, int codeoffset, tTJSVariant* ra, std::list<tjs_string>& values ) {
 	LocalVariableCollectionData.GetVars( classname, funcname, filename, codeoffset, ra, values );
 }
 
 void TJSDebuggerAddLocalVariable( const ScopeKey& key, const tjs_char* varname, int regaddr ) {
 	LocalVariableCollectionData.SetVar( key, varname, regaddr );
 }
-void TJSDebuggerGetLocalVariableString( const ScopeKey& key, tTJSVariant* ra, std::list<std::wstring>& values ) {
+void TJSDebuggerGetLocalVariableString( const ScopeKey& key, tTJSVariant* ra, std::list<tjs_string>& values ) {
 	LocalVariableCollectionData.GetVars( key, ra, values );
 }
 void TJSDebuggerClearLocalVariable( const ScopeKey& key ) {
@@ -1366,7 +1366,7 @@ void TJSDebuggerClearLocalVariable( const tjs_char* classname, const tjs_char* f
 void TJSDebuggerAddClassVariable( const tjs_char* classname, const tjs_char* varname, int regaddr ) {
 	ClassVariableCollectionData.SetVar( classname, varname, regaddr );
 }
-void TJSDebuggerGetClassVariableString( const tjs_char* classname, tTJSVariant* ra, tTJSVariant* da, std::list<std::wstring>& values ) {
+void TJSDebuggerGetClassVariableString( const tjs_char* classname, tTJSVariant* ra, tTJSVariant* da, std::list<tjs_string>& values ) {
 	ClassVariableCollectionData.GetVars( classname, ra, da, values );
 }
 void TJSDebuggerClearLocalVariable( const tjs_char* classname ) {

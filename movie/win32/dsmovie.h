@@ -180,8 +180,8 @@ protected:
 
 	HRESULT ConnectFilters( IBaseFilter* pFilterUpstream, IBaseFilter* pFilterDownstream );
 	void BuildMPEGGraph( IBaseFilter *pRdr, IBaseFilter *pSrc );
-	void ParseVideoType( CMediaType &mt, const wchar_t *type );
-	bool IsWindowsMediaFile( const wchar_t *type ) const;
+	void ParseVideoType( CMediaType &mt, const tjs_char *type );
+	bool IsWindowsMediaFile( const tjs_char *type ) const;
 	void BuildWMVGraph( IBaseFilter *pRdr, IStream *pStream );
 #ifdef ENABLE_THEORA
 	void BuildTheoraGraph( IBaseFilter *pRdr, IBaseFilter *pSrc );
@@ -208,7 +208,7 @@ public:
 	virtual ~tTVPDSMovie();
 
 	virtual void __stdcall BuildGraph( HWND callbackwin, IStream *stream,
-		const wchar_t * streamname, const wchar_t *type, unsigned __int64 size ) = 0;
+		const tjs_char * streamname, const tjs_char *type, unsigned __int64 size ) = 0;
 
 	virtual void __stdcall AddRef();
 	virtual void __stdcall Release();

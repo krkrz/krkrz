@@ -67,10 +67,10 @@ inline void DumpMemoryLeaks()
 #endif  // _DEBUG
 }
 
-std::wstring ExePath() {
-	wchar_t szFull[_MAX_PATH];
-	::GetModuleFileName(NULL, szFull, sizeof(szFull) / sizeof(wchar_t));
-	return std::wstring(szFull);
+tjs_string ExePath() {
+	tjs_char szFull[_MAX_PATH];
+	::GetModuleFileName(NULL, szFull, sizeof(szFull) / sizeof(tjs_char));
+	return tjs_string(szFull);
 }
 
 bool TVPCheckAbout();
@@ -243,17 +243,17 @@ struct SEHException {
 
 int TVPWriteHWEDumpFile( EXCEPTION_POINTERS* pExceptionPointers ) {
 	BOOL bMiniDumpSuccessful;
-	WCHAR szPath[MAX_PATH]; 
-	WCHAR szFileName[MAX_PATH]; 
-	const wchar_t* szAppName = TVPKirikiri;
-	const wchar_t* szVersion = TVPGetVersionString().c_str();
+	tjs_char szPath[MAX_PATH]; 
+	tjs_char szFileName[MAX_PATH]; 
+	const tjs_char* szAppName = TVPKirikiri;
+	const tjs_char* szVersion = TVPGetVersionString().c_str();
 
 	TVPEnsureDataPathDirectory();
 	TJS_strcpy(szPath, TVPNativeDataPath.c_str());
 
 	SYSTEMTIME stLocalTime;
 	::GetLocalTime( &stLocalTime );
-	StringCchPrintf( szFileName, MAX_PATH, L"%s%s%s-%04d%02d%02d-%02d%02d%02d-%ld-%ld.dmp",
+	StringCchPrintf( szFileName, MAX_PATH, TJS_W("%s%s%s-%04d%02d%02d-%02d%02d%02d-%ld-%ld.dmp"),
 				szPath, szAppName, szVersion,
 				stLocalTime.wYear, stLocalTime.wMonth, stLocalTime.wDay,
 				stLocalTime.wHour, stLocalTime.wMinute, stLocalTime.wSecond,
@@ -282,7 +282,7 @@ void se_translator_function(unsigned int code, struct _EXCEPTION_POINTERS* ep) {
 	}
 	throw SEHException(code,ep);
 }
-const wchar_t* SECodeToMessage( unsigned int code ) {
+const tjs_char* SECodeToMessage( unsigned int code ) {
 	switch(code){
 	case EXCEPTION_ACCESS_VIOLATION: return TVPExceptionAccessViolation;
 	case EXCEPTION_BREAKPOINT: return TVPExceptionBreakpoint;
@@ -308,7 +308,7 @@ const wchar_t* SECodeToMessage( unsigned int code ) {
 	case EXCEPTION_STACK_OVERFLOW: return TVPExceptionStackOverflow;
 	case STATUS_UNWIND_CONSOLIDATE: return TVPExceptionUnwindCconsolidate;
 	}
-	return L"Unknown";
+	return TJS_W("Unknown");
 }
 
 bool tTVPApplication::StartApplication( int argc, tjs_char* argv[] ) {
@@ -350,7 +350,7 @@ bool tTVPApplication::StartApplication( int argc, tjs_char* argv[] ) {
 
 		if(TVPCheckAbout()) return true; // version information dialog box;
 
-		SetTitle( std::wstring(TVPKirikiri) );
+		SetTitle( tjs_string(TVPKirikiri) );
 		TVPSystemControl = new tTVPSystemControl();
 #ifndef TVP_IGNORE_LOAD_TPM_PLUGIN
 		TVPLoadPluigins(); // load plugin module *.tpm
@@ -395,11 +395,11 @@ bool tTVPApplication::StartApplication( int argc, tjs_char* argv[] ) {
 		ShowException( ttstr(e.what()).c_str() );
 	} catch( const char* e ) {
 		ShowException( ttstr(e).c_str() );
-	} catch( const wchar_t* e ) {
+	} catch( const tjs_char* e ) {
 		ShowException( e );
 	} catch( const SEHException& e ) {
 		PEXCEPTION_RECORD rec = e.ExceptionPointers->ExceptionRecord;
-		std::wstring text(SECodeToMessage(e.Code));
+		tjs_string text(SECodeToMessage(e.Code));
 		ttstr result = TJSGetStackTraceString( 10 );
 		PrintConsole( result.c_str(), result.length(), true );
 
@@ -444,9 +444,9 @@ void tTVPApplication::CheckConsole() {
 	}
 
 	if( (hin==0||hout==0||herr==0) && attachedConsole ) {
-		wchar_t console[256];
+		tjs_char console[256];
 		::GetConsoleTitle( console, 256 );
-		console_title_ = std::wstring( console );
+		console_title_ = tjs_string( console );
 		// 元のハンドルを再割り当て
 		if (hin)  ::SetStdHandle(STD_INPUT_HANDLE, hin);
 		if (hout) ::SetStdHandle(STD_OUTPUT_HANDLE, hout);
@@ -457,7 +457,7 @@ void tTVPApplication::CheckConsole() {
 }
 
 void tTVPApplication::CloseConsole() {
-	wchar_t buf[100];
+	tjs_char buf[100];
 	DWORD len = TJS_snprintf(buf, 100, TVPExitCode, TVPTerminateCode);
 	PrintConsole(buf, len);
 	if( is_attach_console_ ) {
@@ -467,7 +467,7 @@ void tTVPApplication::CloseConsole() {
 	}
 }
 
-void tTVPApplication::PrintConsole( const wchar_t* mes, unsigned long len, bool iserror ) {
+void tTVPApplication::PrintConsole( const tjs_char* mes, unsigned long len, bool iserror ) {
 	HANDLE hStdOutput = ::GetStdHandle(iserror ? STD_ERROR_HANDLE : STD_OUTPUT_HANDLE);
 	if (hStdOutput > 0) {
 		DWORD mode;
@@ -475,7 +475,7 @@ void tTVPApplication::PrintConsole( const wchar_t* mes, unsigned long len, bool 
 			// 実コンソール
 			DWORD wlen;
 			::WriteConsoleW( hStdOutput, mes, len, &wlen, NULL );
-			::WriteConsoleW( hStdOutput, L"\n", 1, &wlen, NULL );
+			::WriteConsoleW( hStdOutput, TJS_W("\n"), 1, &wlen, NULL );
 		} else {
 			// その他のハンドル
 			ttstr str = mes;
@@ -497,7 +497,7 @@ void tTVPApplication::PrintConsole( const wchar_t* mes, unsigned long len, bool 
 	}
 #ifdef _DEBUG
 	::OutputDebugString( mes );
-	::OutputDebugString( L"\n" );
+	::OutputDebugString( TJS_W("\n") );
 #endif
 }
 HWND tTVPApplication::GetHandle() {
@@ -530,7 +530,7 @@ void tTVPApplication::BringToFront() {
 		windows_list_[i]->BringToFront();
 	}
 }
-void tTVPApplication::ShowException( const wchar_t* e ) {
+void tTVPApplication::ShowException( const tjs_char* e ) {
 	::MessageBox( NULL, e, TVPFatalError, MB_OK );
 }
 void tTVPApplication::Run() {
@@ -580,7 +580,7 @@ void tTVPApplication::HandleIdle(MSG &) {
 	}
 	if( done ) ::WaitMessage();
 }
-void tTVPApplication::SetTitle( const std::wstring& caption ) {
+void tTVPApplication::SetTitle( const tjs_string& caption ) {
 	title_ = caption;
 	if( windows_list_.size() > 0 ) {
 		windows_list_[0]->SetCaption( caption );
@@ -757,9 +757,9 @@ void tTVPApplication::LoadImageRequest( class iTJSDispatch2 *owner, class tTJSNI
 	}
 }
 
-std::vector<std::string>* LoadLinesFromFile( const std::wstring& path ) {
+std::vector<std::string>* LoadLinesFromFile( const tjs_string& path ) {
 	FILE *fp = NULL;
-	_wfopen_s( &fp, path.c_str(), L"r");
+	_wfopen_s( &fp, path.c_str(), TJS_W("r"));
     if( fp == NULL ) {
 		return NULL;
     }

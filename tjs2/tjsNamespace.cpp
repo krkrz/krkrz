@@ -59,8 +59,8 @@ void tTJSLocalSymbolList::Add(const tjs_char * name)
 	if(Find(name)==-1)
 	{
 		tTJSLocalSymbol *newsym=new tTJSLocalSymbol;
-		newsym->Name=new tjs_char[wcslen(name)+1];
-		wcscpy(newsym->Name,name);
+		newsym->Name=new tjs_char[TJS_strlen(name)+1];
+		TJS_strcpy(newsym->Name,name);
 		size_t i;
 		for(i=0;i<List.size();i++)
 		{

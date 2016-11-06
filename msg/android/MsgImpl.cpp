@@ -45,28 +45,28 @@ extern const tjs_char* TVPCompileTime;
 ttstr TVPReadAboutStringFromResource() {
 	AAsset* asset = AAssetManager_open( Application->getAssetManager(), "license.txt", AASSET_MODE_RANDOM );
 	char *buf = nullptr;
-	if( asset == nullptr ) return ttstr(L"Resource Read Error.");
+	if( asset == nullptr ) return ttstr(TJS_W("Resource Read Error."));
 
 	tjs_uint64 flen = AAsset_getLength64( asset );
 	buf = new char[flen];
 	if( buf == nullptr ) {
 		AAsset_close( asset );
-		return ttstr(L"Resource Read Error.");
+		return ttstr(TJS_W("Resource Read Error."));
 	}
 	tjs_uint rsize = AAsset_read( asset, buf, flen );
 	AAsset_close( asset );
 	if( flen != rsize ) {
 		delete[] buf;
-		return ttstr(L"Resource Read Error.");
+		return ttstr(TJS_W("Resource Read Error."));
 	}
 
 	// UTF-8 to UTF-16
 	size_t len = TVPUtf8ToWideCharString( buf, NULL );
 	if( len <= 0 ) {
 		delete[] buf;
-		return ttstr(L"Resource Read Error.");
+		return ttstr(TJS_W("Resource Read Error."));
 	}
-	wchar_t* tmp = new wchar_t[len+1];
+	tjs_char* tmp = new tjs_char[len+1];
 	ttstr ret;
 	if( tmp ) {
 		try {
@@ -82,7 +82,7 @@ ttstr TVPReadAboutStringFromResource() {
 		size_t timelen = TJS_strlen( TVPCompileTime );
 
 		// CR to CR-LF, %DATE% and %TIME% to compile data and time
-		std::vector<wchar_t> tmp2;
+		std::vector<tjs_char> tmp2;
 		tmp2.reserve( len * 2 + datelen + timelen );
 		for( size_t i = 0; i < len; i++ ) {
 			if( tmp[i] == '%' && (i+6) < len && tmp[i+1] == 'D' && tmp[i+2] == 'A' && tmp[i+3] == 'T' && tmp[i+4] == 'E' && tmp[i+5] == '%' ) {
@@ -95,11 +95,11 @@ ttstr TVPReadAboutStringFromResource() {
 					tmp2.push_back( TVPCompileTime[j] );
 				}
 				i += 5;
-			} else if( tmp[i] != L'\n' ) {
+			} else if( tmp[i] != TJS_W('\n') ) {
 				tmp2.push_back( tmp[i] );
 			} else {
-				tmp2.push_back( L'\r' );
-				tmp2.push_back( L'\n' );
+				tmp2.push_back( TJS_W('\r') );
+				tmp2.push_back( TJS_W('\n') );
 			}
 		}
 		tmp2.push_back( 0 );

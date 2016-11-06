@@ -43,7 +43,7 @@
  * @param fontname	フォント名
  * @param options	オプション
  */
-tNativeFreeTypeFace::tNativeFreeTypeFace(const std::wstring &fontname,
+tNativeFreeTypeFace::tNativeFreeTypeFace(const tjs_string &fontname,
 	tjs_uint32 options)
 {
 	// フィールドのクリア
@@ -253,7 +253,7 @@ tjs_char tNativeFreeTypeFace::GetDefaultChar() const
 	if( ret != 0 ) return TextMetric.tmDefaultChar;
 	ret = FT_Get_Char_Index( Face, TextMetric.tmBreakChar );
 	if( ret != 0 ) return TextMetric.tmBreakChar;
-	return L' ';
+	return TJS_W(' ');
 }
 //---------------------------------------------------------------------------
 
@@ -262,7 +262,7 @@ tjs_char tNativeFreeTypeFace::GetDefaultChar() const
  * このフォントファイルが持っているフォントを配列として返す
  * @param dest	格納先配列
  */
-void tNativeFreeTypeFace::GetFaceNameList(std::vector<std::wstring> & dest) const
+void tNativeFreeTypeFace::GetFaceNameList(std::vector<tjs_string> & dest) const
 {
 	// このFaceの場合、既にFaceは特定されているため、利用可能な
 	// Face 数は常に1で、フォント名はこのオブジェクトが構築された際に渡された

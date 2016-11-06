@@ -113,10 +113,10 @@ ttstr TVPGetOSName()
 	const tjs_char *osname = TJS_W("Android");
 
 	std::string lang = Application->getLanguage();
-	std::wstring wlang;
+	tjs_string wlang;
 	TVPUtf8ToUtf16( wlang, lang );
 	std::string country = Application->getCountry();
-	std::wstring wcountry;
+	tjs_string wcountry;
 	TVPUtf8ToUtf16( wcountry, country );
 	tjs_int ver = Application->getSdkVersion();
 
@@ -162,7 +162,7 @@ bool TVPShellExecute(const ttstr &target, const ttstr &param)
 	if(::ShellExecute(NULL, NULL,
 		target.c_str(),
 		param.IsEmpty() ? NULL : param.c_str(),
-		L"",
+		TJS_W(""),
 		SW_SHOWNORMAL)
 		<=(void *)32)
 	{

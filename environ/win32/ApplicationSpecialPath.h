@@ -7,59 +7,59 @@
 
 class ApplicationSpecialPath {
 public:
-	static std::wstring GetSpecialFolderPath(int csidl) {
-		wchar_t path[MAX_PATH+1];
+	static tjs_string GetSpecialFolderPath(int csidl) {
+		tjs_char path[MAX_PATH+1];
 		if(!SHGetSpecialFolderPath(NULL, path, csidl, false))
-			return std::wstring();
-		return std::wstring(path);
+			return tjs_string();
+		return tjs_string(path);
 	}
-	static inline std::wstring GetPersonalPath() {
-		std::wstring path = GetSpecialFolderPath(CSIDL_PERSONAL);
+	static inline tjs_string GetPersonalPath() {
+		tjs_string path = GetSpecialFolderPath(CSIDL_PERSONAL);
 		if( path.empty() ) path = GetSpecialFolderPath(CSIDL_APPDATA);
 
-		if(path != L"") {
+		if(path != TJS_W("")) {
 			return path;
 		}
-		return L"";
+		return TJS_W("");
 	}
-	static inline std::wstring GetAppDataPath() {
-		std::wstring path = GetSpecialFolderPath(CSIDL_APPDATA);
-		if(path != L"" ) {
+	static inline tjs_string GetAppDataPath() {
+		tjs_string path = GetSpecialFolderPath(CSIDL_APPDATA);
+		if(path != TJS_W("") ) {
 			return path;
 		}
-		return L"";
+		return TJS_W("");
 	}
-	static inline std::wstring GetSavedGamesPath() {
-		std::wstring result;
+	static inline tjs_string GetSavedGamesPath() {
+		tjs_string result;
 		PWSTR ppszPath = NULL;
 		HRESULT hr = ::SHGetKnownFolderPath(FOLDERID_SavedGames, 0, NULL, &ppszPath);
 		if( hr == S_OK ) {
-			result = std::wstring(ppszPath);
+			result = tjs_string( ppszPath );
 			::CoTaskMemFree( ppszPath );
 		}
 		return result;
 	}
-	static inline std::wstring ReplaceStringAll( std::wstring src, const std::wstring& target, const std::wstring& dest ) {
-		std::wstring::size_type nPos = 0;
-		while( (nPos = src.find(target, nPos)) != std::wstring::npos ) {
+	static inline tjs_string ReplaceStringAll( tjs_string src, const tjs_string& target, const tjs_string& dest ) {
+		tjs_string::size_type nPos = 0;
+		while( (nPos = src.find(target, nPos)) != tjs_string::npos ) {
 			src.replace( nPos, target.length(), dest );
 		}
 		return src;
 	}
 
-	static inline std::wstring GetConfigFileName( const std::wstring& exename ) {
-		return ChangeFileExt(exename, L".cf");
+	static inline tjs_string GetConfigFileName( const tjs_string& exename ) {
+		return ChangeFileExt(exename, TJS_W(".cf"));
 	}
-	static std::wstring GetDataPathDirectory( std::wstring datapath, const std::wstring& exename ) {
-		if(datapath == L"" ) datapath = std::wstring(L"$(exepath)\\savedata");
+	static tjs_string GetDataPathDirectory( tjs_string datapath, const tjs_string& exename ) {
+		if(datapath == TJS_W("") ) datapath = tjs_string(TJS_W("$(exepath)\\savedata"));
 
-		std::wstring exepath = ExcludeTrailingBackslash(ExtractFileDir(exename));
-		std::wstring personalpath = ExcludeTrailingBackslash(GetPersonalPath());
-		std::wstring appdatapath = ExcludeTrailingBackslash(GetAppDataPath());
-		std::wstring savedgamespath = ExcludeTrailingBackslash(GetSavedGamesPath());
-		if(personalpath == L"") personalpath = exepath;
-		if(appdatapath == L"") appdatapath = exepath;
-		if(savedgamespath == L"") savedgamespath = exepath;
+		tjs_string exepath = ExcludeTrailingBackslash(ExtractFileDir(exename));
+		tjs_string personalpath = ExcludeTrailingBackslash(GetPersonalPath());
+		tjs_string appdatapath = ExcludeTrailingBackslash(GetAppDataPath());
+		tjs_string savedgamespath = ExcludeTrailingBackslash(GetSavedGamesPath());
+		if(personalpath == TJS_W("")) personalpath = exepath;
+		if(appdatapath == TJS_W("")) appdatapath = exepath;
+		if(savedgamespath == TJS_W("")) savedgamespath = exepath;
 
 		OSVERSIONINFO osinfo;
 		osinfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
@@ -67,18 +67,18 @@ public:
 
 		bool vista_or_later = osinfo.dwPlatformId == VER_PLATFORM_WIN32_NT && osinfo.dwMajorVersion >= 6;
 
-		std::wstring vistapath = vista_or_later ? appdatapath : exepath;
+		tjs_string vistapath = vista_or_later ? appdatapath : exepath;
 
-		datapath = ReplaceStringAll(datapath, L"$(exepath)", exepath);
-		datapath = ReplaceStringAll(datapath, L"$(personalpath)", personalpath);
-		datapath = ReplaceStringAll(datapath, L"$(appdatapath)", appdatapath);
-		datapath = ReplaceStringAll(datapath, L"$(vistapath)", vistapath);
-		datapath = ReplaceStringAll(datapath, L"$(savedgamespath)", savedgamespath);
+		datapath = ReplaceStringAll(datapath, TJS_W("$(exepath)"), exepath);
+		datapath = ReplaceStringAll(datapath, TJS_W("$(personalpath)"), personalpath);
+		datapath = ReplaceStringAll(datapath, TJS_W("$(appdatapath)"), appdatapath);
+		datapath = ReplaceStringAll(datapath, TJS_W("$(vistapath)"), vistapath);
+		datapath = ReplaceStringAll(datapath, TJS_W("$(savedgamespath)"), savedgamespath);
 		return IncludeTrailingBackslash(ExpandUNCFileName(datapath));
 	}
-	static std::wstring GetUserConfigFileName( const std::wstring& datapath, const std::wstring& exename ) {
+	static tjs_string GetUserConfigFileName( const tjs_string& datapath, const tjs_string& exename ) {
 		// exepath, personalpath, appdatapath
-		return GetDataPathDirectory(datapath, exename) + ExtractFileName(ChangeFileExt(exename, L".cfu"));
+		return GetDataPathDirectory(datapath, exename) + ExtractFileName(ChangeFileExt(exename, TJS_W(".cfu")));
 	}
 };
 

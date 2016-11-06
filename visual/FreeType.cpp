@@ -38,7 +38,7 @@
 #pragma warning(pop)
 #endif
 
-extern bool TVPEncodeUTF8ToUTF16( std::wstring &output, const std::string &source );
+extern bool TVPEncodeUTF8ToUTF16( tjs_string &output, const std::string &source );
 
 //---------------------------------------------------------------------------
 
@@ -64,7 +64,7 @@ class tGenericFreeTypeFace : public tBaseFreeTypeFace
 protected:
 	FT_Face Face;	//!< FreeType face オブジェクト
 	tTJSBinaryStream* File;	 //!< tTJSBinaryStream オブジェクト
-	std::vector<std::wstring> FaceNames; //!< Face名を列挙した配列
+	std::vector<tjs_string> FaceNames; //!< Face名を列挙した配列
 
 private:
 	FT_StreamRec Stream;
@@ -74,8 +74,8 @@ public:
 	virtual ~tGenericFreeTypeFace();
 
 	virtual FT_Face GetFTFace() const;
-	virtual void GetFaceNameList(std::vector<std::wstring> & dest) const;
-	virtual tjs_char GetDefaultChar() const { return L' '; }
+	virtual void GetFaceNameList(std::vector<tjs_string> & dest) const;
+	virtual tjs_char GetDefaultChar() const { return TJS_W(' '); }
 
 private:
 	void Clear();
@@ -130,12 +130,12 @@ tGenericFreeTypeFace::tGenericFreeTypeFace(const ttstr &fontname, tjs_uint32 opt
 		{
 			if(!OpenFaceByIndex(i, face))
 			{
-				FaceNames.push_back(std::wstring());
+				FaceNames.push_back(tjs_string());
 			}
 			else
 			{
 				const char * name = face->family_name;
-				std::wstring wname;
+				tjs_string wname;
 				TVPEncodeUTF8ToUTF16( wname, std::string(name) );
 				FaceNames.push_back( wname );
 				face_num = face->num_faces;
@@ -190,7 +190,7 @@ FT_Face tGenericFreeTypeFace::GetFTFace() const
 /**
  * このフォントファイルが持っているフォントを配列として返す
  */
-void tGenericFreeTypeFace::GetFaceNameList(std::vector<std::wstring> & dest) const
+void tGenericFreeTypeFace::GetFaceNameList(std::vector<tjs_string> & dest) const
 {
 	dest = FaceNames;
 }
@@ -276,7 +276,7 @@ bool tGenericFreeTypeFace::OpenFaceByIndex(tjs_uint index, FT_Face & face)
  * @param fontname	フォント名
  * @param options	オプション
  */
-tFreeTypeFace::tFreeTypeFace(const std::wstring &fontname, tjs_uint32 options)
+tFreeTypeFace::tFreeTypeFace(const tjs_string &fontname, tjs_uint32 options)
 	: FontName(fontname)
 {
 	TVPInitializeFont();
@@ -420,7 +420,7 @@ tjs_char tFreeTypeFace::GetCharcodeFromGlyphIndex(tjs_uint index)
  * このフォントに含まれるFace名のリストを得る
  * @param dest	格納先配列
  */
-void tFreeTypeFace::GetFaceNameList(std::vector<std::wstring> &dest)
+void tFreeTypeFace::GetFaceNameList(std::vector<tjs_string> &dest)
 {
 	Face->GetFaceNameList(dest);
 }

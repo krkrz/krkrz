@@ -259,7 +259,7 @@ void TVPDetectCPU()
 			thread->WaitEnd();
 			bool succeeded = thread->GetSucceeded();
 			delete thread;
-			if(!succeeded) throw Exception(L"CPU check failure");
+			if(!succeeded) throw Exception(TJS_W("CPU check failure"));
 			cpuinfo += TVPDumpCPUInfo(cpu) + TJS_W("\r\n");
 
 			// mask features
@@ -298,7 +298,7 @@ void TVPDetectCPU()
 			thread->WaitEnd();
 			bool succeeded = thread->GetSucceeded();
 			delete thread;
-			if(!succeeded) throw Exception(L"CPU check failure");
+			if(!succeeded) throw Exception(TJS_W("CPU check failure"));
 			cpuinfo += TVPDumpCPUInfo(cpu) + TJS_W("\r\n");
 
 			// mask features

@@ -258,10 +258,10 @@ tjs_int TVPUtf8ToWideCharString(const char * in, tjs_uint length, tjs_char *out)
 	return count;
 }
 //---------------------------------------------------------------------------
-bool TVPUtf8ToUtf16( std::wstring& out, const std::string& in ) {
+bool TVPUtf8ToUtf16( tjs_string& out, const std::string& in ) {
 	tjs_int len = TVPUtf8ToWideCharString( in.c_str(), NULL );
 	if( len < 0 ) return false;
-	wchar_t* buf = new wchar_t[len];
+	tjs_char* buf = new tjs_char[len];
 	if( buf ) {
 		try {
 			len = TVPUtf8ToWideCharString( in.c_str(), buf );
@@ -275,7 +275,7 @@ bool TVPUtf8ToUtf16( std::wstring& out, const std::string& in ) {
 	return len > 0;
 }
 //---------------------------------------------------------------------------
-bool TVPUtf16ToUtf8( std::string& out, const std::wstring& in ) {
+bool TVPUtf16ToUtf8( std::string& out, const tjs_string& in ) {
 	tjs_int len = TVPWideCharToUtf8String( in.c_str(), NULL );
 	if( len < 0 ) return false;
 	char* buf = new char[len];

@@ -42,7 +42,7 @@ class OptionDescReader {
 		}
 		return 0;
 	}
-	static void RetriveString( std::wstring& out, const picojson::object& obj, const char* name ) {
+	static void RetriveString( tjs_string& out, const picojson::object& obj, const char* name ) {
 		std::map<std::string, picojson::value>::const_iterator v = obj.find(std::string(name));
 		if( v != obj.end() ) {
 			const picojson::value& val = v->second;
@@ -50,11 +50,11 @@ class OptionDescReader {
 				TVPUtf8ToUtf16( out,  val.get<std::string>() );
 			} else if( val.is<double>() ) {
 				int vi = (int)val.get<double>();
-				out = std::to_wstring(vi);
+				out = to_tjs_string(vi);
 			} else if( val.is<bool>() ) {
 				bool b = val.get<bool>();
-				if( b ) out = L"true";
-				else out = L"false";
+				if( b ) out = TJS_W("true");
+				else out = TJS_W("false");
 			}
 		}
 	}
@@ -86,12 +86,12 @@ void OptionDescReader::ParseOption( tTVPCommandOption& opt, const picojson::obje
 	RetriveString( opt.Caption, option, CAPTION );
 	RetriveString( opt.Description, option, DESCRIPTION );
 	RetriveString( opt.Name, option, NAME );
-	std::wstring type;
+	tjs_string type;
 	RetriveString( type, option, TYPE );
 	opt.Length = 0;
-	if( type == std::wstring(L"select") ) {
+	if( type == tjs_string(TJS_W("select")) ) {
 		opt.Type = tTVPCommandOption::VT_Select;
-	} else if( type == std::wstring(L"string") ) {
+	} else if( type == tjs_string(TJS_W("string")) ) {
 		opt.Type = tTVPCommandOption::VT_String;
 		opt.Length = GetInteger( LENGTH, option );
 		RetriveString( opt.Value, option, VALUE );
@@ -160,7 +160,7 @@ tTVPCommandOptionList* ParseCommandDesc( const char *buf, unsigned int size ) {
 	std::string errorstr;
 	picojson::parse( v, buf, buf+size, &errorstr );
 	if( errorstr.empty() != true ) {
-		std::wstring errmessage;
+		tjs_string errmessage;
 		if( TVPUtf8ToUtf16( errmessage, errorstr ) ) 	
 			TVPAddImportantLog( errmessage.c_str() );
 		return NULL;
@@ -183,7 +183,7 @@ static BOOL CALLBACK TVPEnumResNameProc( HMODULE hModule, LPCTSTR lpszType, LPTS
 	return TRUE;
 }
 };
-tTVPCommandOptionList* TVPGetPluginCommandDesc( const wchar_t* name ) {
+tTVPCommandOptionList* TVPGetPluginCommandDesc( const tjs_char* name ) {
 	HMODULE hModule = ::LoadLibraryEx( name, NULL, LOAD_LIBRARY_AS_DATAFILE );
 	if( hModule == NULL ) return NULL;
 	const char *buf = NULL;
@@ -191,9 +191,9 @@ tTVPCommandOptionList* TVPGetPluginCommandDesc( const wchar_t* name ) {
 	tTVPCommandOptionList* ret = NULL;
 	try {
 		//BOOL typeret = ::EnumResourceTypes( hModule, (ENUMRESTYPEPROC)EnumResTypeProc,  NULL );
-		//BOOL resret = ::EnumResourceNames( hModule, L"TEXT", (ENUMRESNAMEPROC)TVPEnumResNameProc, NULL );
+		//BOOL resret = ::EnumResourceNames( hModule, TJS_W("TEXT"), (ENUMRESNAMEPROC)TVPEnumResNameProc, NULL );
 
-		HRSRC hRsrc = ::FindResource(hModule, L"IDR_OPTION_DESC_JSON", L"TEXT" );
+		HRSRC hRsrc = ::FindResource(hModule, TJS_W("IDR_OPTION_DESC_JSON"), TJS_W("TEXT") );
 		if( hRsrc != NULL ) {
 			size = ::SizeofResource( hModule, hRsrc );
 			HGLOBAL hGlobal = ::LoadResource( hModule, hRsrc );

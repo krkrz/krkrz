@@ -21,15 +21,15 @@ public:
 		Close();
 	}
 
-	bool Open( const wchar_t* filename, const wchar_t* mode ) {
+	bool Open( const tjs_char* filename, const tjs_char* mode ) {
 		Close();
 #ifndef ANDROID
 		fp_ = _wfopen(filename, mode);
 		return fp_ != NULL;
 #else
 		fp_ = NULL;
-		std::wstring wname(filename);
-		std::wstring wmode(mode);
+		tjs_string wname(filename);
+		tjs_string wmode(mode);
 		std::string nname, nmode;
 		if( TVPUtf16ToUtf8(nname, wname) && TVPUtf16ToUtf8(nmode, wmode) ) {
 			fp_ = fopen( nname.c_str(), nmode.c_str() );

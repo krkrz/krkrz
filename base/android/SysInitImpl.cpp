@@ -41,8 +41,8 @@
 //---------------------------------------------------------------------------
 // global data
 //---------------------------------------------------------------------------
-std::wstring TVPNativeProjectDir;
-std::wstring TVPNativeDataPath;
+tjs_string TVPNativeProjectDir;
+tjs_string TVPNativeDataPath;
 bool TVPProjectDirSelected = false;
 extern tjs_real TVPCPUClock;
 //---------------------------------------------------------------------------
@@ -113,7 +113,7 @@ void TVPInitializeBaseSystems()
 	// set default current directory
 	{
 		std::string filename;
-		std::wstring path( IncludeTrailingBackslash(ExtractFileDir(Application->GetExternalDataPath())) );
+		tjs_string path( IncludeTrailingBackslash(ExtractFileDir(Application->GetExternalDataPath())) );
 		if( TVPUtf16ToUtf8( filename, path ) ) {
 			chdir( filename.c_str() );
 		}
@@ -155,7 +155,7 @@ void TVPBeforeSystemInit()
 
 		TVPTotalPhysMemory = info.totalram;
 
-		ttstr memstr( std::to_wstring(TVPTotalPhysMemory).c_str() );
+		ttstr memstr( to_tjs_string(TVPTotalPhysMemory).c_str() );
 		TVPAddImportantLog( TVPFormatMessage(TVPInfoTotalPhysicalMemory, memstr) );
 
 		tTJSVariant opt;
@@ -194,7 +194,7 @@ void TVPBeforeSystemInit()
 	// 3. assets/data.xp3 から読み込む
 	// 4. assets/startup.tjs から開始
 #if 0
-	wchar_t buf[MAX_PATH];
+	tjs_char buf[MAX_PATH];
 	bool bufset = false;
 	bool nosel = false;
 	bool forcesel = false;
@@ -210,7 +210,7 @@ void TVPBeforeSystemInit()
 		}
 		else
 		{
-			wchar_t exeDir[MAX_PATH];
+			tjs_char exeDir[MAX_PATH];
 			TJS_strcpy(exeDir, IncludeTrailingBackslash(ExtractFileDir(ExePath())).c_str());
 			for(tjs_int i = 1; i<_argc; i++)
 			{
@@ -239,8 +239,8 @@ void TVPBeforeSystemInit()
 		// sel option was set
 		if(bufset)
 		{
-			wchar_t path[MAX_PATH];
-			wchar_t *dum = 0;
+			tjs_char path[MAX_PATH];
+			tjs_char *dum = 0;
 			GetFullPathName(buf, MAX_PATH-1, path, &dum);
 			TJS_strcpy(buf, path);
 			TVPProjectDirSelected = false;
@@ -253,7 +253,7 @@ void TVPBeforeSystemInit()
 	// check "content-data" directory
 	if(!forcedataxp3 && !nosel)
 	{
-		wchar_t tmp[MAX_PATH];
+		tjs_char tmp[MAX_PATH];
 		TJS_strcpy(tmp, IncludeTrailingBackslash(ExtractFileDir(ExePath())).c_str());
 		TJS_strcat(tmp, TJS_W("content-data"));
 		if(DirectoryExists(tmp))
@@ -269,7 +269,7 @@ void TVPBeforeSystemInit()
 	// check "data.xp3" archive
  	if(!nosel)
 	{
-		wchar_t tmp[MAX_PATH];
+		tjs_char tmp[MAX_PATH];
 		TJS_strcpy(tmp, IncludeTrailingBackslash(ExtractFileDir(ExePath())).c_str());
 		TJS_strcat(tmp, TJS_W("data.xp3"));
 		if(FileExists(tmp))
@@ -284,7 +284,7 @@ void TVPBeforeSystemInit()
 	// check "data.exe" archive
  	if(!nosel)
 	{
-		wchar_t tmp[MAX_PATH];
+		tjs_char tmp[MAX_PATH];
 		TJS_strcpy(tmp, IncludeTrailingBackslash(ExtractFileDir(ExePath())).c_str());
 		TJS_strcat(tmp, TJS_W("data.exe"));
 		if(FileExists(tmp))
@@ -312,7 +312,7 @@ void TVPBeforeSystemInit()
 	// check "data" directory
 	if(!forcedataxp3 && !nosel)
 	{
-		wchar_t tmp[MAX_PATH];
+		tjs_char tmp[MAX_PATH];
 		TJS_strcpy(tmp, IncludeTrailingBackslash(ExtractFileDir(ExePath())).c_str());
 		TJS_strcat(tmp, TJS_W("data"));
 		if(DirectoryExists(tmp))
@@ -641,10 +641,10 @@ static std::vector<std::string> * TVPGetEmbeddedOptions()
 	return NULL;
 }
 //---------------------------------------------------------------------------
-static std::vector<std::string> * TVPGetConfigFileOptions(const std::wstring& filename)
+static std::vector<std::string> * TVPGetConfigFileOptions(const tjs_string& filename)
 {
 	// load .cf file
-	std::wstring errmsg;
+	tjs_string errmsg;
 	if(!FileExists(filename))
 		errmsg = (const tjs_char*)TVPFileNotFound;
 
@@ -806,7 +806,7 @@ static void TVPInitProgramArgumentsAndDataPath(bool stop_after_datapath_got)
 			// read datapath
 #if 0
 			tTJSVariant val;
-			std::wstring config_datapath;
+			tjs_string config_datapath;
 			if(TVPGetCommandLine(TJS_W("-datapath"), &val))
 				config_datapath = ((ttstr)val).AsStdString();
 			TVPNativeDataPath = ApplicationSpecialPath::GetDataPathDirectory(config_datapath, ExePath());
@@ -978,7 +978,7 @@ bool TVPCheckAbout(void)
 //---------------------------------------------------------------------------
 // TVPExecuteAsync
 //---------------------------------------------------------------------------
-static void TVPExecuteAsync( const std::wstring& progname)
+static void TVPExecuteAsync( const tjs_string& progname)
 {
 #if 0
 	STARTUPINFO si;
@@ -1022,7 +1022,7 @@ static void TVPExecuteAsync( const std::wstring& progname)
 // TVPWaitWritePermit
 //---------------------------------------------------------------------------
 #if 0	// 使われていない？ Windows版でも使われていない
-static bool TVPWaitWritePermit(const std::wstring& fn)
+static bool TVPWaitWritePermit(const tjs_string& fn)
 {
 	tjs_int timeout = 10; // 10/1 = 5 seconds
 	while(true)

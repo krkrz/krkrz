@@ -29,13 +29,13 @@ IDC_OPTIONS_TREE
 */
 struct TreeItem {
 	HTREEITEM    ItemHandle;
-	std::wstring Text; // 項目名
-	std::wstring Caption; // パラメータの名前 + 設定値
-	std::wstring Parameter; // パラメータの名前
+	tjs_string Text; // 項目名
+	tjs_string Caption; // パラメータの名前 + 設定値
+	tjs_string Parameter; // パラメータの名前
 	tjs_int Value; // パラメータの設定値インデックス
 	tjs_int Defalut; // パラメータのデフォルト値インデックス
-	std::wstring Description; // 項目の説明
-	std::vector<std::pair<std::wstring, std::wstring> > Select; // 設定可能な値のリスト
+	tjs_string Description; // 項目の説明
+	std::vector<std::pair<tjs_string, tjs_string> > Select; // 設定可能な値のリスト
 };
 
 class ConfigFormUnit {
@@ -52,27 +52,27 @@ class ConfigFormUnit {
 
 private:
 	// TreeControl にアイテム追加
-	HTREEITEM InsertTreeItem( HTREEITEM hParent, const std::wstring& text ) {
+	HTREEITEM InsertTreeItem( HTREEITEM hParent, const tjs_string& text ) {
 		TV_INSERTSTRUCT tvinsert;
 		ZeroMemory( &tvinsert, sizeof(tvinsert) );
 		tvinsert.hInsertAfter = TVI_LAST;
 		tvinsert.item.mask = TVIF_TEXT;
 		tvinsert.hParent = hParent;
-		tvinsert.item.pszText = (wchar_t*)text.c_str();
+		tvinsert.item.pszText = const_cast<LPWSTR>(reinterpret_cast<LPCWSTR>(text.c_str()));
 		return TreeView_InsertItem( TreeControl, &tvinsert );
 	}
-	void SetTreeItem( HTREEITEM hItem, const std::wstring& text ) {
+	void SetTreeItem( HTREEITEM hItem, const tjs_string& text ) {
 		TVITEM tvitem;
 		ZeroMemory( &tvitem, sizeof(tvitem) );
 		tvitem.mask = TVIF_TEXT;
-		tvitem.pszText = (wchar_t*)text.c_str();
+		tvitem.pszText = const_cast<LPWSTR>( reinterpret_cast<LPCWSTR>( text.c_str()));
 		tvitem.hItem = hItem;
 		TreeView_SetItem( TreeControl, &tvitem );
 	}
 	// 項目を選択する
 	void SelectItem( const TreeItem& item ) {
 		// 説明更新
-		::SetDlgItemText( WindowHandle, IDC_DESCRIPTION_EDIT, item.Description.c_str() );
+		::SetDlgItemText( WindowHandle, IDC_DESCRIPTION_EDIT, reinterpret_cast<LPCWSTR>(item.Description.c_str()) );
 
 		// 選択肢更新
 		::EnableWindow( OptionList, TRUE );
@@ -88,7 +88,7 @@ private:
 		ClearOptionList();
 		tjs_uint count = (tjs_uint)item.Select.size();
 		for( tjs_uint i = 0; i < count; i++ ) {
-			std::wstring itemstr = item.Select[i].second + std::wstring(L" / ") + item.Select[i].first;
+			tjs_string itemstr = item.Select[i].second + tjs_string(TJS_W(" / ")) + item.Select[i].first;
 			ComboBox_InsertString( OptionList, -1, itemstr.c_str() );
 		}
 		ComboBox_SetCurSel( OptionList, item.Value );
@@ -99,7 +99,7 @@ private:
 		::SetWindowPos( OptionList, 0, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER|SWP_NOACTIVATE|SWP_SHOWWINDOW);
 	}
 	void SelectNull() {
-		::SetDlgItemText( WindowHandle, IDC_DESCRIPTION_EDIT, L"" );
+		::SetDlgItemText( WindowHandle, IDC_DESCRIPTION_EDIT, reinterpret_cast<LPCWSTR>(TJS_W("")) );
 		ClearOptionList();
 		::EnableWindow( OptionList, FALSE );
 		SetDefaultButtonEnable( false );
@@ -114,9 +114,9 @@ private:
 			}
 			if( ischange ) {
 				if( CurrentItem->Defalut != CurrentItem->Value ) {
-					CurrentItem->Caption = std::wstring(L"* ") + CurrentItem->Text + std::wstring(L" : ") + CurrentItem->Select[CurrentItem->Value].second;
+					CurrentItem->Caption = tjs_string(TJS_W("* ")) + CurrentItem->Text + tjs_string(TJS_W(" : ")) + CurrentItem->Select[CurrentItem->Value].second;
 				} else {
-					CurrentItem->Caption = CurrentItem->Text + std::wstring(L" : ") + CurrentItem->Select[CurrentItem->Value].second;
+					CurrentItem->Caption = CurrentItem->Text + tjs_string(TJS_W(" : ")) + CurrentItem->Select[CurrentItem->Value].second;
 				}
 				if( CurrentItem->ItemHandle ) {
 					SetTreeItem( CurrentItem->ItemHandle, CurrentItem->Caption );
@@ -125,17 +125,17 @@ private:
 		}
 	}
 	// 指定フォルダにある指定拡張子のプラグインから設定情報を読み込む
-	void LoadPluginOptionDesc( tTVPCommandOptionList* coreopt, const std::wstring& path, const std::wstring& ext ) {
-		std::wstring exename = ExePath();
+	void LoadPluginOptionDesc( tTVPCommandOptionList* coreopt, const tjs_string& path, const tjs_string& ext ) {
+		tjs_string exename = ExePath();
 		exename = IncludeTrailingBackslash(ExtractFileDir(exename));
-		std::wstring filepath = exename + path;
-		std::wstring mask = filepath + L"*." + ext;
+		tjs_string filepath = exename + path;
+		tjs_string mask = filepath + TJS_W("*.") + ext;
 
 		WIN32_FIND_DATA fd;
-		HANDLE hSearch = ::FindFirstFile( mask.c_str(), &fd );
+		HANDLE hSearch = ::FindFirstFile( reinterpret_cast<LPCWSTR>(mask.c_str()), &fd );
 		if( hSearch != INVALID_HANDLE_VALUE ) {
 			do {
-				tTVPCommandOptionList* options = TVPGetPluginCommandDesc( (filepath + std::wstring(fd.cFileName) ).c_str() );
+				tTVPCommandOptionList* options = TVPGetPluginCommandDesc( (filepath + tjs_string( reinterpret_cast<tjs_char*>(fd.cFileName)) ).c_str() );
 				if( options ) {
 					TVPMargeCommandDesc( *coreopt, *options );
 					delete options;
@@ -167,8 +167,8 @@ public:
 		::EnableWindow( DefaultButton, enable ? TRUE : FALSE );
 	}
 
-	void SetDescriptionText( const std::wstring& text ) {
-		::SetDlgItemText( WindowHandle, IDC_DESCRIPTION_EDIT, text.c_str() );
+	void SetDescriptionText( const tjs_string& text ) {
+		::SetDlgItemText( WindowHandle, IDC_DESCRIPTION_EDIT, reinterpret_cast<LPCWSTR>(text.c_str()) );
 	}
 	void LoadOptionTree();
 	// 現在のアイテムを設定し、それに従い表示を更新する
@@ -188,16 +188,16 @@ public:
 			SelectNull();
 		}
 	}
-	void ConvertReturnCode( std::wstring& text ) {
-		std::vector<wchar_t> buf;
+	void ConvertReturnCode( tjs_string& text ) {
+		std::vector<tjs_char> buf;
 		size_t len = text.length();
 		buf.reserve( len * 2 );
 		for( size_t i = 0; i < len; i++ ) {
-			if( text[i] != L'\n' ) {
+			if( text[i] != TJS_W('\n') ) {
 				buf.push_back( text[i] );
 			} else {
-				buf.push_back( L'\r' );
-				buf.push_back( L'\n' );
+				buf.push_back( TJS_W('\r') );
+				buf.push_back( TJS_W('\n') );
 			}
 		}
 		text.assign( &(buf[0]), buf.size() );
@@ -220,13 +220,13 @@ public:
 	// 設定された内容を保存する
 	void SaveSetting() {
 		tTJSVariant val;
-		std::wstring path;
-		if( TVPGetCommandLine( L"-datapath", &val) ) {
+		tjs_string path;
+		if( TVPGetCommandLine( TJS_W("-datapath"), &val) ) {
 			ttstr str(val);
 			path.assign( str.c_str(), str.length() );
 		}
-		std::wstring exename = ExePath();
-		std::wstring filename = ChangeFileExt( ExtractFileName( exename ), L".cfu" );
+		tjs_string exename = ExePath();
+		tjs_string filename = ChangeFileExt( ExtractFileName( exename ), TJS_W(".cfu") );
 		filename = ApplicationSpecialPath::GetDataPathDirectory( path, exename ) + filename;
 		const char * warnings =
 "; ============================================================================\r\n"
@@ -241,7 +241,7 @@ public:
 ";  be like opt=\"\\x61\\x62\\x63\".\r\n"
 "; ============================================================================\r\n"
 "";
-		tTJSBinaryStream *stream = TVPCreateBinaryStreamForWrite( ttstr(filename), L"" );
+		tTJSBinaryStream *stream = TVPCreateBinaryStreamForWrite( ttstr(filename), TJS_W("") );
 		if( stream ) {
 			try {
 				stream->Write( warnings, (tjs_uint)strlen(warnings) );
@@ -255,16 +255,16 @@ public:
 		}
 
 	}
-	static int HexNum(wchar_t ch) {
+	static int HexNum(tjs_char ch) {
 		if(ch>='a' && ch<='f')return ch-'a'+10;
 		if(ch>='A' && ch<='F')return ch-'A'+10;
 		if(ch>='0' && ch<='9')return ch-'0';
 		return -1;
 	} 
-	static std::string DecodeString( const std::wstring& str ) {
+	static std::string DecodeString( const tjs_string& str ) {
 		if( str.empty() ) return "";
 		ttstr ret;
-		const wchar_t *p = str.c_str();
+		const tjs_char *p = str.c_str();
 		if(p[0] != '\"') return ttstr(str).AsNarrowStdString();
 
 		p++;
@@ -273,7 +273,7 @@ public:
 			p++;
 			if(*p != 'x') break;
 			p++;
-			wchar_t ch = 0;
+			tjs_char ch = 0;
 			while( true ) {
 				int n = HexNum(*p);
 				if(n == -1) break;
@@ -285,15 +285,15 @@ public:
 		}
 		return ret.AsNarrowStdString();
 	}
-	static std::string EncodeString( const std::wstring& str ) {
+	static std::string EncodeString( const tjs_string& str ) {
 		if( str.empty() ) return "\"\"";
 		ttstr ws(str.c_str());
-		const wchar_t *p = ws.c_str();
+		const tjs_char *p = ws.c_str();
 
 		std::string ret = "\"";
 		while( *p ) {
 			char tmp[10];
-			sprintf(tmp, "\\x%X", *p);
+			TJS_nsprintf(tmp, "\\x%X", *p);
 			ret += tmp;
 			p++;
 		}
@@ -306,14 +306,14 @@ static ConfigFormUnit* DialogForm = NULL;
 void ConfigFormUnit::LoadOptionTree() {
 	tTVPCommandOptionList* options = TVPGetEngineCommandDesc();
 	if( options ) {
-		LoadPluginOptionDesc( options, L"\\", L"dll" );
-		LoadPluginOptionDesc( options, L"\\", L"tpm" );
+		LoadPluginOptionDesc( options, TJS_W("\\"), TJS_W("dll") );
+		LoadPluginOptionDesc( options, TJS_W("\\"), TJS_W("tpm") );
 #ifdef TJS_64BIT_OS
-		LoadPluginOptionDesc( options, L"plugin64\\", L"dll" );
-		LoadPluginOptionDesc( options, L"plugin64\\", L"tpm" );
+		LoadPluginOptionDesc( options, TJS_W("plugin64\\"), TJS_W("dll") );
+		LoadPluginOptionDesc( options, TJS_W("plugin64\\"), TJS_W("tpm") );
 #else
-		LoadPluginOptionDesc( options, L"plugin\\", L"dll" );
-		LoadPluginOptionDesc( options, L"plugin\\", L"tpm" );
+		LoadPluginOptionDesc( options, TJS_W("plugin\\"), TJS_W("dll") );
+		LoadPluginOptionDesc( options, TJS_W("plugin\\"), TJS_W("tpm") );
 #endif
 
 		tTJSVariant val;
@@ -351,20 +351,20 @@ void ConfigFormUnit::LoadOptionTree() {
 					TreeItem& curitem = TreeItems[itemidx];
 					curitem.Text = option.Caption;
 					curitem.Parameter = option.Name;
-					curitem.Description = std::wstring(L"-")+option.Name+std::wstring(L"\n")+option.Description;
+					curitem.Description = tjs_string(TJS_W("-"))+option.Name+tjs_string(TJS_W("\n"))+option.Description;
 					ConvertReturnCode( curitem.Description );
 					tjs_uint valcount = (tjs_uint)option.Values.size();
 					curitem.Select.resize( valcount );
 					curitem.Defalut = -1;
-					std::wstring argname( std::wstring(L"-") + option.Name );
-					std::wstring selectvalue;
+					tjs_string argname( tjs_string(TJS_W("-")) + option.Name );
+					tjs_string selectvalue;
 					if( TVPGetCommandLine( argname.c_str(), &val) ) {
 						ttstr str(val);
 						selectvalue.assign( str.c_str(), str.length() );
 					}
 					tjs_int selectindex = -1;
 					for( tjs_uint k = 0; k < valcount; k++ ) {
-						std::pair<std::wstring, std::wstring>& sel = curitem.Select[k];
+						std::pair<tjs_string, tjs_string>& sel = curitem.Select[k];
 						const tTVPCommandOptionsValue& val = option.Values[k];
 						sel.first = val.Value;
 						sel.second = val.Description;
@@ -384,9 +384,9 @@ void ConfigFormUnit::LoadOptionTree() {
 					}
 
 					if( curitem.Defalut != curitem.Value ) {
-						curitem.Caption = std::wstring(L"* ") + curitem.Text + std::wstring(L" : ") + curitem.Select[curitem.Value].second;
+						curitem.Caption = tjs_string(TJS_W("* ")) + curitem.Text + tjs_string(TJS_W(" : ")) + curitem.Select[curitem.Value].second;
 					} else {
-						curitem.Caption = curitem.Text + std::wstring(L" : ") + curitem.Select[curitem.Value].second;
+						curitem.Caption = curitem.Text + tjs_string(TJS_W(" : ")) + curitem.Select[curitem.Value].second;
 					}
 					curitem.ItemHandle = InsertTreeItem( hItem, curitem.Caption );
 					itemidx++;
@@ -452,7 +452,7 @@ void TVPShowUserConfig()
 		if( result == IDOK ) {
 			if( DialogForm ) {
 				DialogForm->SaveSetting();
-				::MessageBox( NULL, L"設定を保存しました", L"Save Option", MB_OK );
+				::MessageBox( NULL, TJS_W("設定を保存しました"), TJS_W("Save Option"), MB_OK );
 			}
 		}
 	} catch(...) {

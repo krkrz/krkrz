@@ -37,28 +37,6 @@ int dpparse (void *YYPARSE_PARAM);
 
 
 //---------------------------------------------------------------------------
-// Character component classifications
-//---------------------------------------------------------------------------
-static bool inline TJS_iswspace(tjs_char ch)
-{
-	if(ch&0xff00) return false; else return 0!=::isspace(ch);
-}
-//---------------------------------------------------------------------------
-static bool inline TJS_iswdigit(tjs_char ch)
-{
-	if(ch&0xff00) return false; else return 0!=::isdigit(ch);
-}
-//---------------------------------------------------------------------------
-static bool inline TJS_iswalpha(tjs_char ch)
-{
-	if(ch&0xff00) return true; else return 0!=::isalpha(ch);
-}
-//---------------------------------------------------------------------------
-
-
-
-
-//---------------------------------------------------------------------------
 // tTJSDateParser : A date/time parser class
 //---------------------------------------------------------------------------
 tTJSDateParser::tTJSDateParser(const tjs_char *in)

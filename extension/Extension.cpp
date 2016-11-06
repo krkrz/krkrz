@@ -9,26 +9,26 @@ struct tTVPAtClassInstallInfo {
 	tTVPAtClassInstallInfo(const tjs_char* name, iTJSDispatch2* (*handler)(iTJSDispatch2*), const tjs_char* dependences ) {
 		Name = name, Handler = handler;
 		if( dependences ) {
-			std::wstring dep(dependences);
+			tjs_string dep(dependences);
 			const tjs_char* start = dependences;
 			const tjs_char* cur = dependences;
 			while( *cur ) {
 				if( (*cur) == TJS_W(',') ) {
 					if( start != cur ) {
-						Dependences.push_back( std::wstring(start,cur) );
+						Dependences.push_back( tjs_string(start,cur) );
 					}
 					start = cur+1;
 				}
 				cur++;
 			}
 			if( start != cur ) {
-				Dependences.push_back( std::wstring(start,cur) );
+				Dependences.push_back( tjs_string(start,cur) );
 			}
 		}
 	}
 	const tjs_char* Name;
 	iTJSDispatch2* (*Handler)(iTJSDispatch2*);
-	std::vector<std::wstring> Dependences;	// 依存クラスリスト
+	std::vector<tjs_string> Dependences;	// 依存クラスリスト
 };
 static std::vector<tTVPAtClassInstallInfo> *TVPAtClassInstallInfos = NULL;
 static bool TVPAtInstallClass = false;

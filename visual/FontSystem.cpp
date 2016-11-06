@@ -7,14 +7,14 @@
 #include "MsgIntf.h"
 #include <vector>
 
-extern void TVPGetAllFontList( std::vector<std::wstring>& list );
+extern void TVPGetAllFontList( std::vector<tjs_string>& list );
 extern const tjs_char *TVPGetDefaultFontName();
 
 void FontSystem::InitFontNames() {
 	// enumlate all fonts
 	if(FontNamesInit) return;
 
-	std::vector<std::wstring> list;
+	std::vector<tjs_string> list;
 	TVPGetAllFontList( list );
 	size_t count = list.size();
 	for( size_t i = 0; i < count; i++ ) {
@@ -24,11 +24,11 @@ void FontSystem::InitFontNames() {
 	FontNamesInit = true;
 }
 //---------------------------------------------------------------------------
-void FontSystem::AddFont( const std::wstring& name ) {
+void FontSystem::AddFont( const tjs_string& name ) {
 	TVPFontNames.Add( name, 1 );
 }
 //---------------------------------------------------------------------------
-bool FontSystem::FontExists( const std::wstring &name ) {
+bool FontSystem::FontExists( const tjs_string &name ) {
 	// check existence of font
 	InitFontNames();
 
@@ -50,7 +50,7 @@ void FontSystem::ConstructDefaultFont() {
 	}
 }
 
-std::wstring FontSystem::GetBeingFont(std::wstring fonts) {
+tjs_string FontSystem::GetBeingFont(tjs_string fonts) {
 	// retrieve being font in the system.
 	// font candidates are given by "fonts", separated by comma.
 
@@ -65,8 +65,8 @@ std::wstring FontSystem::GetBeingFont(std::wstring fonts) {
 
 	bool prev_empty_name = false;
 	while(fonts!=TJS_W("")) {
-		std::wstring fontname;
-		std::wstring::size_type pos = fonts.find_first_of(TJS_W(","));
+		tjs_string fontname;
+		tjs_string::size_type pos = fonts.find_first_of(TJS_W(","));
 		if( pos != std::string::npos ) {
 			fontname = Trim( fonts.substr( 0, pos) );
 			fonts = fonts.c_str()+pos+1;
@@ -90,8 +90,8 @@ std::wstring FontSystem::GetBeingFont(std::wstring fonts) {
 	}
 
 	if(vfont) {
-		return std::wstring(TJS_W("@")) + std::wstring(TVPGetDefaultFontName());
+		return tjs_string(TJS_W("@")) + tjs_string(TVPGetDefaultFontName());
 	} else {
-		return std::wstring(TVPGetDefaultFontName());
+		return tjs_string(TVPGetDefaultFontName());
 	}
 }

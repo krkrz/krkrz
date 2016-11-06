@@ -24,7 +24,7 @@ public:
 	HDC GetDC() { return hMemDC_; }
 };
 
-extern void TVPGetAllFontList( std::vector<std::wstring>& list );
-extern void TVPGetFontList(std::vector<std::wstring> & list, tjs_uint32 flags, const tTVPFont & font );
+extern void TVPGetAllFontList( std::vector<tjs_string>& list );
+extern void TVPGetFontList(std::vector<tjs_string> & list, tjs_uint32 flags, const tTVPFont & font );
 extern tjs_uint8 TVPGetCharSetFromFaceName( const tjs_char* face );
 #endif // __TVP_SYS_FONT_H__

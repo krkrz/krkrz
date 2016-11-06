@@ -59,7 +59,7 @@ class tTVPApplication : public iTVPApplication {
 	AConfiguration*	config_;
 	jobject			activity_;
 
-	std::wstring title_;
+	tjs_string title_;
 
 	std::vector<NativeEventQueueIntarface*>	event_handlers_;
 	std::vector<NativeEvent*>				command_cache_;
@@ -70,10 +70,10 @@ class tTVPApplication : public iTVPApplication {
 	
 	bool is_terminate_;
 
-	// std::u16string
-	std::wstring internal_data_path_;
-	std::wstring external_data_path_;
-	std::wstring cache_path_;
+	// tjs_string
+	tjs_string internal_data_path_;
+	tjs_string external_data_path_;
+	tjs_string cache_path_;
 
 	class TTVPWindowForm* main_window_;
 
@@ -84,7 +84,7 @@ private:
 	NativeEvent* createNativeEvent();
 	void releaseNativeEvent( NativeEvent* ev );
 	void wakeupMainThread();
-	void getStringFromJava( const char* methodName, std::wstring& dest ) const;
+	void getStringFromJava( const char* methodName, tjs_string& dest ) const;
 
 public:
 	void setAssetManager( AAssetManager* am ) {
@@ -266,9 +266,9 @@ public:
 	~tTVPApplication();
 
 	// TODO Java から取得するようにする
-	const std::wstring& GetInternalDataPath() const;
-	const std::wstring& GetExternalDataPath() const;
-	const std::wstring* GetCachePath() const;
+	const tjs_string& GetInternalDataPath() const;
+	const tjs_string& GetExternalDataPath() const;
+	const tjs_string* GetCachePath() const;
 	const std::string GetPackageName() const { return std::string(); }
 
 	bool GetActivating() const { return true; }	// TODO
@@ -304,7 +304,7 @@ public:
 	void OnTouchUp( float x, float y, float cx, float cy, int32_t id, float pressure,int32_t meta );
 
 	// for exception showing
-	static int MessageDlg( const std::wstring& string, const std::wstring& caption, int type, int button ) {
+	static int MessageDlg( const tjs_string& string, const tjs_string& caption, int type, int button ) {
 		return 0;
 	}
 	void postEvent( const struct NativeEvent* ev, NativeEventQueueIntarface* handler = nullptr );
@@ -322,8 +322,8 @@ public:
 		event_handlers_.erase( it, event_handlers_.end() );
 	}
 
-	std::wstring GetTitle() const { return title_; }
-	void SetTitle( const std::wstring& caption ) { 
+	tjs_string GetTitle() const { return title_; }
+	void SetTitle( const tjs_string& caption ) { 
 		title_ = caption;
 	}
 	void Terminate() {
@@ -357,7 +357,7 @@ public:
 
 	TTVPWindowForm* GetMainWindow() { return main_window_; }
 };
-std::vector<std::string>* LoadLinesFromFile( const std::wstring& path );
+std::vector<std::string>* LoadLinesFromFile( const tjs_string& path );
 
 extern class tTVPApplication* Application;
 

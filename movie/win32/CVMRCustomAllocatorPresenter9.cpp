@@ -69,10 +69,10 @@ void CVMRCustomAllocatorPresenter9::Initialize()
 	CAutoLock	autoLock(m_Lock);
 	HRESULT	hr;
 	if( FAILED(hr = CreateChildWindow()) )
-		ThrowDShowException(L"Failed to create window.", hr );
+		ThrowDShowException(TJS_W("Failed to create window."), hr );
 
 	if( FAILED(hr = CreateD3D() ) )
-		ThrowDShowException(L"Failed to create device.", hr );
+		ThrowDShowException(TJS_W("Failed to create device."), hr );
 }
 //----------------------------------------------------------------------------
 //! @brief	  	要求されたインターフェイスを返す
@@ -931,14 +931,14 @@ void CVMRCustomAllocatorPresenter9::SetRect( RECT *rect )
 			Reset();
 		} else {
 			if( MoveWindow( m_ChildWnd, clientRect.left, clientRect.top, clientRect.right - clientRect.left, clientRect.bottom - clientRect.top, TRUE ) == 0 )
-				ThrowDShowException(L"Failed to call MoveWindow.", HRESULT_FROM_WIN32(GetLastError()));
+				ThrowDShowException(TJS_W("Failed to call MoveWindow."), HRESULT_FROM_WIN32(GetLastError()));
 
 			m_SrcRect.left = m_SrcRect.top = 0;
 			m_SrcRect.right = width;
 			m_SrcRect.bottom = height;
 			HRESULT	hr;
 			if( FAILED(hr = UpdateVertex()) )
-				ThrowDShowException(L"Failed to Update Vertex.", hr );
+				ThrowDShowException(TJS_W("Failed to Update Vertex."), hr );
 		}
 	}
 }
@@ -957,13 +957,13 @@ void CVMRCustomAllocatorPresenter9::SetVisible( bool b )
 		{
 			ShowWindow( m_ChildWnd, SW_SHOW );
 			if( UpdateWindow( m_ChildWnd ) == 0 )
-				ThrowDShowException(L"Failed to call ShowWindow.", HRESULT_FROM_WIN32(GetLastError()));
+				ThrowDShowException(TJS_W("Failed to call ShowWindow."), HRESULT_FROM_WIN32(GetLastError()));
 		}
 
 		RECT clientRect;
 		CalcChildWindowSize( clientRect );
 		if( MoveWindow( m_ChildWnd, clientRect.left, clientRect.top, clientRect.right - clientRect.left, clientRect.bottom - clientRect.top, TRUE ) == 0 )
-			ThrowDShowException(L"Failed to call MoveWindow.", HRESULT_FROM_WIN32(GetLastError()));
+			ThrowDShowException(TJS_W("Failed to call MoveWindow."), HRESULT_FROM_WIN32(GetLastError()));
 	}
 }
 //----------------------------------------------------------------------------
@@ -978,12 +978,12 @@ void CVMRCustomAllocatorPresenter9::Reset()
 //		ReleaseSurfaces();
 		DestroyChildWindow();
 		if( FAILED(hr = CreateChildWindow() ) )
-			ThrowDShowException(L"Failed to create window.", hr );
+			ThrowDShowException(TJS_W("Failed to create window."), hr );
 
 		if( FAILED(hr = ResizeBackbuffer()) )
 		{
 			if( FAILED(hr = RebuildD3DDevice()) )
-				ThrowDShowException(L"Failed to rebuild Device.", hr );
+				ThrowDShowException(TJS_W("Failed to rebuild Device."), hr );
 		}
 		m_RebuildingWindow = false;
 	} else {

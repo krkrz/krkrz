@@ -127,7 +127,7 @@ ttstr TVPGetOSName()
 	ovi.dwOSVersionInfoSize = sizeof(ovi);
 
 	bool isGetVersion = false;
-	HMODULE hModule = ::LoadLibrary( L"ntdll.dll" );
+	HMODULE hModule = ::LoadLibrary( TJS_W("ntdll.dll") );
 	if( hModule ) {
 		RtlGetVersionFunc func;
 		func = (RtlGetVersionFunc)::GetProcAddress( hModule, "RtlGetVersion" );
@@ -214,7 +214,7 @@ ttstr TVPGetOSName()
 		ovi.dwMinorVersion, ovi.dwBuildNumber&0xfff);
 
 	ttstr str(buf);
-	str += ttstr(ovi.szCSDVersion);
+	str += ttstr( ovi.szCSDVersion );
 
 	return str;
 }
@@ -251,7 +251,7 @@ bool TVPShellExecute(const ttstr &target, const ttstr &param)
 	if(::ShellExecute(NULL, NULL,
 		target.c_str(),
 		param.IsEmpty() ? NULL : param.c_str(),
-		L"",
+		TJS_W(""),
 		SW_SHOWNORMAL)
 		<=(void *)32)
 	{
@@ -440,7 +440,7 @@ static void TVPReadRegValue(tTJSVariant &result, const ttstr & key)
 //---------------------------------------------------------------------------
 static ttstr TVPGetSpecialFolderPath(int csidl)
 {
-	WCHAR path[MAX_PATH+1];
+	tjs_char path[MAX_PATH+1];
 	if(!SHGetSpecialFolderPath(NULL, path, csidl, false))
 		return ttstr();
 	return ttstr(path);
@@ -510,7 +510,7 @@ ttstr TVPGetSavedGamesPath()
 	PWSTR ppszPath = NULL;
 	HRESULT hr = ::SHGetKnownFolderPath(FOLDERID_SavedGames, 0, NULL, &ppszPath);
 	if( hr == S_OK ) {
-		path = ppszPath;
+		path = ttstr( ppszPath );
 		::CoTaskMemFree( ppszPath );
 	}
 	return path;
@@ -630,7 +630,7 @@ void TVPHeapDump()
 	tjs_char buff[128];
 	HANDLE heaps[100];
 	DWORD c = ::GetProcessHeaps (100, heaps);
-	TJS_sprintf( buff, 128, TJS_W("The process has %d heaps."), c );
+	TJS_snprintf( buff, 128, TJS_W("The process has %d heaps."), c );
 	TVPAddLog( buff );
 
 	const HANDLE default_heap = ::GetProcessHeap();
@@ -691,11 +691,11 @@ void TVPHeapDump()
 			if( isdefault ) mes += TJS_W(" [default]");
 			if( isCRT ) mes += TJS_W(" [CRT]");
 			TVPAddLog( mes );
-			TJS_sprintf( buff, 128, L"  Allocated: %d, size: %lld, overhead: %lld", use.count, use.total, use.overhead );
+			TJS_snprintf( buff, 128, TJS_W("  Allocated: %d, size: %lld, overhead: %lld"), use.count, use.total, use.overhead );
 			TVPAddLog( buff );
-			TJS_sprintf( buff, 128, L"  Uncommitted: %d, size: %lld, overhead: %lld", uncommit.count, uncommit.total, uncommit.overhead );
+			TJS_snprintf( buff, 128, TJS_W("  Uncommitted: %d, size: %lld, overhead: %lld"), uncommit.count, uncommit.total, uncommit.overhead );
 			TVPAddLog( buff );
-			TJS_sprintf( buff, 128, L"  Unused: %d, size: %lld, overhead: %lld", unused.count, unused.total, unused.overhead );
+			TJS_snprintf( buff, 128, TJS_W("  Unused: %d, size: %lld, overhead: %lld"), unused.count, unused.total, unused.overhead );
 			TVPAddLog( buff );
 		}
 	}

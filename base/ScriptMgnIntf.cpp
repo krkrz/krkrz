@@ -793,7 +793,7 @@ void TVPShowScriptException(eTJS &e)
 	{
 		ttstr errstr = (ttstr(TVPScriptExceptionRaised) + TJS_W("\n") + e.GetMessage());
 		TVPAddLog(ttstr(TVPScriptExceptionRaised) + TJS_W("\n") + e.GetMessage());
-		Application->MessageDlg( errstr.AsStdString(), std::wstring(), mtError, mbOK );
+		Application->MessageDlg( errstr.AsStdString(), tjs_string(), mtError, mbOK );
 		TVPTerminateSync(1);
 	}
 }
@@ -823,19 +823,19 @@ void TVPShowScriptException(eTJSScriptError &e)
 					path = newpath;
 				}
 				TVPGetLocalName( path );
-				std::wstring scriptPath( path.AsStdString() );
+				tjs_string scriptPath( path.AsStdString() );
 				tjs_int lineno = 1+e.GetBlockNoAddRef()->SrcPosToLine(e.GetPosition() )- e.GetBlockNoAddRef()->GetLineOffset();
 
 #if defined(WIN32) && defined(_DEBUG) && !defined(ENABLE_DEBUGGER)
 // デバッガ実行されている時、Visual Studio で行ジャンプする時の指定をデバッグ出力に出して、break で停止する
 				if( ::IsDebuggerPresent() ) {
-					std::wstring debuglile( std::wstring(L"2>")+path.AsStdString()+L"("+std::to_wstring(lineno)+L"): error :" + errstr.AsStdString() );
+					tjs_string debuglile( tjs_string(TJS_W("2>"))+path.AsStdString()+TJS_W("(")+to_tjs_string(lineno)+TJS_W("): error :") + errstr.AsStdString() );
 					::OutputDebugString( debuglile.c_str() );
 					// ここで breakで停止した時、直前の出力行をダブルクリックすれば、例外箇所のスクリプトをVisual Studioで開ける
 					::DebugBreak();
 				}
 #endif
-				scriptPath = std::wstring(L"\"") + scriptPath + std::wstring(L"\"");
+				scriptPath = tjs_string(TJS_W("\"")) + scriptPath + tjs_string(TJS_W("\""));
 				tTJSVariant val;
 				if( TVPGetCommandLine(TJS_W("-exceptionexe"), &val) )
 				{
@@ -845,9 +845,9 @@ void TVPShowScriptException(eTJSScriptError &e)
 					{
 						ttstr arg(val);
 						if( !exepath.IsEmpty() && !arg.IsEmpty() ) {
-							std::wstring str( arg.AsStdString() );
-							str = ApplicationSpecialPath::ReplaceStringAll( str, std::wstring(L"%filepath%"), scriptPath );
-							str = ApplicationSpecialPath::ReplaceStringAll( str, std::wstring(L"%line%"), std::to_wstring(lineno) );
+							tjs_string str( arg.AsStdString() );
+							str = ApplicationSpecialPath::ReplaceStringAll( str, tjs_string(TJS_W("%filepath%")), scriptPath );
+							str = ApplicationSpecialPath::ReplaceStringAll( str, tjs_string(TJS_W("%line%")), to_tjs_string(lineno) );
 							//exepath = exepath + ttstr(str);
 							//_wsystem( exepath.c_str() );
 							arg = ttstr(str);

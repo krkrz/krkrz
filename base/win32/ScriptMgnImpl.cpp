@@ -145,13 +145,13 @@ void TVPStartObjectHashMapLog(void)
 		si.dwFlags = STARTF_USESHOWWINDOW;
 		si.wShowWindow = SW_SHOWNORMAL;
 
-		wchar_t szFull[_MAX_PATH];
-		::GetModuleFileName(NULL, szFull, sizeof(szFull) / sizeof(wchar_t));
-		std::wstring exepath(szFull);
+		tjs_char szFull[_MAX_PATH];
+		::GetModuleFileName(NULL, szFull, sizeof(szFull) / sizeof(tjs_char));
+		tjs_string exepath(szFull);
 		BOOL ret =
 			::CreateProcess(
 				NULL,
-				const_cast<LPTSTR>((exepath + L" -@processohmlog").c_str()),
+				reinterpret_cast<LPTSTR>(const_cast<tjs_char*>( (exepath + TJS_W(" -@processohmlog")).c_str() )),
 				NULL,
 				NULL,
 				TRUE,
@@ -247,11 +247,11 @@ ttstr TVPGetSystemInitializeScript()
 			buf = reinterpret_cast<const char*>(::LockResource(hGlobal));
 		}
 	}
-	if( buf == nullptr ) ttstr(L"Resource Read Error.");
+	if( buf == nullptr ) ttstr(TJS_W("Resource Read Error."));
 
 	// UTF-8 to UTF-16
 	size_t len = TVPUtf8ToWideCharString( buf, size, NULL );
-	if( len < 0 ) return ttstr(L"Resource Read Error.");
+	if( len < 0 ) return ttstr(TJS_W("Resource Read Error."));
 	tjs_char* tmp = new tjs_char[len+1];
 	ttstr ret;
 	if( tmp ) {

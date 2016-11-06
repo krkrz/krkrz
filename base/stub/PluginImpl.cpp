@@ -266,8 +266,8 @@ tTVPPlugin::tTVPPlugin(const ttstr & name, ITSSStorageProvider *storageprovider)
 			unsigned long index = 0;
 			while(true)
 			{
-				wchar_t mediashortname[33];
-				wchar_t buf[256];
+				tjs_char mediashortname[33];
+				tjs_char buf[256];
 				HRESULT hr = TSSModule->GetSupportExts(index,
 					mediashortname, buf, 255);
 				if(hr == S_OK)
@@ -558,7 +558,7 @@ void TVPDoTryBlock(
 // 実行ファイル等のバージョン情報を取得する
 // 本体のバージョン取得にも使われていて、ここで得たバージョンナンバーを表示する
 //---------------------------------------------------------------------------
-bool TVPGetFileVersionOf(const wchar_t* module_filename, tjs_int &major, tjs_int &minor, tjs_int &release, tjs_int &build)
+bool TVPGetFileVersionOf(const tjs_char* module_filename, tjs_int &major, tjs_int &minor, tjs_int &release, tjs_int &build)
 {
 	major = 1;
 	minor = release = 0;

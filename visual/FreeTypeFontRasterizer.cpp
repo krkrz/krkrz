@@ -43,7 +43,7 @@ void FreeTypeFontRasterizer::ApplyFont( class tTVPNativeBaseBitmap *bmp, bool fo
 //---------------------------------------------------------------------------
 void FreeTypeFontRasterizer::ApplyFont( const tTVPFont& font ) {
 	CurrentFont = font;
-	std::wstring stdname = TVPFontSystem->GetBeingFont(font.Face.AsStdString());
+	tjs_string stdname = TVPFontSystem->GetBeingFont(font.Face.AsStdString());
 	// TVP_FACE_OPTIONS_NO_ANTIALIASING
 	// TVP_FACE_OPTIONS_NO_HINTING
 	// TVP_FACE_OPTIONS_FORCE_AUTO_HINTING

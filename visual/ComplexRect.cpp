@@ -1212,10 +1212,10 @@ void tTVPComplexRect::RectangleSub(tTVPRegionRect *r, const tTVPRect *rr)
 void tTVPComplexRect::DumpChain()
 {
 #ifdef _WIN32
-	std::wstring str;
+	tjs_string str;
 	tIterator it = GetIterator();
 	while(it.Step()) {
-		wchar_t tmp[200];
+		tjs_char tmp[200];
 		TJS_snprintf(tmp, 200, TJS_W("%p (%p) %p : "), it.Get().Prev, &(it.Get()), it.Get().Next);
 		str += tmp;
 	}

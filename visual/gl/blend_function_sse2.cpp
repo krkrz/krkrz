@@ -1,7 +1,7 @@
 
 
 
-#include "tjsTypes.h"
+#include "tjsCommHead.h"
 #include "tvpgl.h"
 #include "tvpgl_ia32_intf.h"
 #include "simd_def_x86x64.h"

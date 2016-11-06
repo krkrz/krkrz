@@ -286,7 +286,7 @@ ttstr TVPGetTemporaryName()
 
 		if(!TVPTempPathInit)
 		{
-			wchar_t tmp[MAX_PATH+1];
+			tjs_char tmp[MAX_PATH+1];
 			::GetTempPath(MAX_PATH, tmp);
 			TVPTempPath = tmp;
 

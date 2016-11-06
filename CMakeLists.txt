@@ -83,6 +83,7 @@ tjs2/tjsRandomGenerator.cpp
 tjs2/tjsRegExp.cpp
 tjs2/tjsScriptBlock.cpp
 tjs2/tjsScriptCache.cpp
+tjs2/tjsSnprintf.cpp
 tjs2/tjsString.cpp
 tjs2/tjsUtils.cpp
 tjs2/tjsVariant.cpp

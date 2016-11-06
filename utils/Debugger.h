@@ -72,13 +72,13 @@ struct BreakpointLine {
 };
 
 struct Breakpoints {
-	typedef std::map<std::wstring,BreakpointLine>	breakpoints;
+	typedef std::map<tjs_string,BreakpointLine>	breakpoints;
 	typedef breakpoints::iterator					iterator;
 	typedef breakpoints::const_iterator				const_iterator;
 
 	breakpoints BreakPoint;
 
-	void SetBreakPoint( const std::wstring& filename, int lineno ) {
+	void SetBreakPoint( const tjs_string& filename, int lineno ) {
 		iterator i = BreakPoint.find( filename );
 		if( i == BreakPoint.end() ) {
 			std::pair<iterator, bool> ret = BreakPoint.insert( breakpoints::value_type( filename, BreakpointLine() ) );
@@ -87,35 +87,35 @@ struct Breakpoints {
 		}
 		i->second.SetBreakPoint(lineno);
 	}
-	void ClearBreakPoint( const std::wstring& filename, int lineno ) {
+	void ClearBreakPoint( const tjs_string& filename, int lineno ) {
 		iterator i = BreakPoint.find( filename );
 		if( i == BreakPoint.end() ) {
 			return;
 		}
 		i->second.ClearBreakPoint( lineno );
 	}
-	bool IsBreakPoint( const std::wstring& filename, int lineno ) const {
+	bool IsBreakPoint( const tjs_string& filename, int lineno ) const {
 		const_iterator i = BreakPoint.find( filename );
 		if( i != BreakPoint.end() ) {
 			return i->second.IsBreakPoint(lineno);
 		}
 		return false;
 	}
-	const BreakpointLine* GetBreakPointLines( const std::wstring& filename ) const {
+	const BreakpointLine* GetBreakPointLines( const tjs_string& filename ) const {
 		const_iterator i = BreakPoint.find( filename );
 		if( i != BreakPoint.end() ) {
 			return &(i->second);
 		}
 		return NULL;
 	}
-	BreakpointLine* GetBreakPointLines( const std::wstring& filename ) {
+	BreakpointLine* GetBreakPointLines( const tjs_string& filename ) {
 		iterator i = BreakPoint.find( filename );
 		if( i != BreakPoint.end() ) {
 			return &(i->second);
 		}
 		return NULL;
 	}
-	bool HasBreakPoint( const std::wstring& filename ) {
+	bool HasBreakPoint( const tjs_string& filename ) {
 		iterator i = BreakPoint.find( filename );
 		if( i != BreakPoint.end() ) {
 			return( i->second.Lines.size() > 0 );

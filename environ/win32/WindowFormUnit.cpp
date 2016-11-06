@@ -188,7 +188,7 @@ TTVPWindowForm::TTVPWindowForm( tTVPApplication* app, tTJSNI_Window* ni, tTJSNI_
 	FullScreenDestRect(0,0,0,0) {
 	HWND hParent = NULL;
 	if( parent ) hParent = parent->GetSurfaceWindowHandle();
-	CreateWnd( L"TVPMainWindow", Application->GetTitle(), 10, 10, hParent );
+	CreateWnd( TJS_W("TVPMainWindow"), Application->GetTitle(), 10, 10, hParent );
 	TVPInitWindowOptions();
 	
 	// initialize members
@@ -1787,7 +1787,7 @@ void TTVPWindowForm::OnResize( UINT_PTR state, int w, int h ) {
 	}
 }
 void TTVPWindowForm::OnDropFile( HDROP hDrop ) {
-	wchar_t filename[MAX_PATH];
+	tjs_char filename[MAX_PATH];
 	tjs_int filecount= ::DragQueryFile(hDrop, 0xFFFFFFFF, NULL, MAX_PATH);
 	iTJSDispatch2 * array = TJSCreateArrayObject();
 	try {

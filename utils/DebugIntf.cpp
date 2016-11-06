@@ -47,7 +47,7 @@ bool TVPLoggingToFile = false;
 static tjs_uint TVPLogToFileRollBack = 100;
 static ttstr *TVPImportantLogs = NULL;
 static ttstr TVPLogLocation;
-wchar_t TVPNativeLogLocation[MAX_PATH];
+tjs_char TVPNativeLogLocation[MAX_PATH];
 //---------------------------------------------------------------------------
 
 
@@ -245,7 +245,7 @@ public:
 	~tTVPLogStreamHolder() { Stream.Close(); Alive = false; }
 
 private:
-	void Open(const wchar_t *mode);
+	void Open(const tjs_char *mode);
 
 public:
 	void Clear(); // clear log stream
@@ -255,13 +255,13 @@ public:
 
 } static TVPLogStreamHolder;
 //---------------------------------------------------------------------------
-void tTVPLogStreamHolder::Open(const wchar_t *mode)
+void tTVPLogStreamHolder::Open(const tjs_char *mode)
 {
 	if(OpenFailed) return; // no more try
 
 	try
 	{
-		wchar_t filename[MAX_PATH];
+		tjs_char filename[MAX_PATH];
 		if(TVPLogLocation.GetLen() == 0)
 		{
 			Stream.Close();
@@ -426,7 +426,7 @@ void TVPAddLog(const ttstr &line, bool appendtoimportant)
 #ifdef ENABLE_DEBUGGER
 	if( TJSEnableDebugMode ) TJSDebuggerLog(buf,appendtoimportant);
 	//OutputDebugStringW( buf.c_str() );
-	//OutputDebugStringW( L"\n" );
+	//OutputDebugStringW( TJS_W("\n") );
 #endif	// ENABLE_DEBUGGER
 
 #ifdef TVP_LOG_TO_COMMANDLINE_CONSOLE
@@ -872,7 +872,7 @@ class tTVPTJS2DumpOutputGateway : public iTJSConsoleOutput
 //---------------------------------------------------------------------------
 void TVPTJS2StartDump()
 {
-	wchar_t filename[MAX_PATH];
+	tjs_char filename[MAX_PATH];
 #ifndef ANDROID
 	TJS_strcpy(filename, ExePath().c_str());
 #else

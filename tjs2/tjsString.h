@@ -18,24 +18,29 @@
 #endif
 #include "tjsVariantString.h"
 
-#ifdef ANDROID
-namespace std {
-	template<typename T>
-	wstring to_format_str( T value, const wchar_t* format ) {
-		wchar_t buff[128];
-		swprintf( buff, 128, format, value);
-		return wstring(buff);
-	}
-	inline wstring to_wstring( int value ) { return to_format_str( value, L"%d" ); }
-	inline wstring to_wstring( long value ) { return to_format_str( value, L"%ld" ); }
-	inline wstring to_wstring( long long value ) { return to_format_str( value, L"%lld" ); }
-	inline wstring to_wstring( unsigned value ) { return to_format_str( value, L"%u" ); }
-	inline wstring to_wstring( unsigned long value ) { return to_format_str( value, L"%lu" ); }
-	inline wstring to_wstring( unsigned long long value ) { return to_format_str( value, L"%llu" ); }
-	inline wstring to_wstring( float value ) { return to_format_str( value, L"%f" ); }
-	inline wstring to_wstring( double value ) { return to_format_str( value, L"%lf" ); }
-};
+
+#include <sstream>
+template<typename T>
+tjs_string to_format_str( T value, const tjs_char* format ) {
+#if 0
+	tjs_char buff[128];
+	TJS_snprintf( buff, 128, format, value);
+	return tjs_string(buff);
+#else
+	std::basic_ostringstream<tjs_char> sout;
+	sout << value;
+	return sout.str();
 #endif
+}
+inline tjs_string to_tjs_string( int value ) { return to_format_str( value, TJS_W("%d") ); }
+inline tjs_string to_tjs_string( long value ) { return to_format_str( value, TJS_W("%ld") ); }
+inline tjs_string to_tjs_string( long long value ) { return to_format_str( value, TJS_W("%lld") ); }
+inline tjs_string to_tjs_string( unsigned value ) { return to_format_str( value, TJS_W("%u") ); }
+inline tjs_string to_tjs_string( unsigned long value ) { return to_format_str( value, TJS_W("%lu") ); }
+inline tjs_string to_tjs_string( unsigned long long value ) { return to_format_str( value, TJS_W("%llu") ); }
+inline tjs_string to_tjs_string( float value ) { return to_format_str( value, TJS_W("%f") ); }
+inline tjs_string to_tjs_string( double value ) { return to_format_str( value, TJS_W("%lf") ); }
+
 
 namespace TJS
 {
@@ -109,7 +114,7 @@ public:
 	tTJSString(const AnsiString &str) { Ptr = TJSAllocVariantString(str.c_str()); }
 	tTJSString(const WideString &str) { Ptr = TJSAllocVariantString(str.c_bstr()); }
 #endif
-	tTJSString(const std::wstring &str) { Ptr = TJSAllocVariantString(str.c_str()); }
+	tTJSString(const tjs_string &str) { Ptr = TJSAllocVariantString(str.c_str()); }
 
 	//--------------------------------------------------------- destructor --
 	TJS_METHOD_DEF(TJS_METHOD_RET_EMPTY, ~tTJSString, ()) { if(Ptr) Ptr->Release(); }
@@ -127,16 +132,16 @@ public:
 	}
 	const WideString AsWideString() const
 	{
-		if(!Ptr) return L"";
+		if(!Ptr) return TJS_W("");
 		return WideString(Ptr->operator const tjs_char *());
 	}
 #endif
 
-	const std::wstring AsStdString() const
+	const tjs_string AsStdString() const
 	{
-		if(!Ptr) return std::wstring(TJS_W(""));
+		if(!Ptr) return tjs_string(TJS_W(""));
 #ifdef UNICODE
-		return std::wstring(c_str());
+		return tjs_string(c_str());
 #else
 			// this constant string value must match std::string in type
 		tTJSNarrowStringHolder holder(Ptr->operator const tjs_char*());

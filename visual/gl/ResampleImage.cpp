@@ -771,7 +771,7 @@ void TVPResampleImage( const tTVPRect &cliprect, tTVPBaseBitmap *dest, const tTV
 				TVPWeightResample<BlackmanSincWeight>(clip, func, dest, destrect, src, srcrect );
 				break;
 			default:
-				throw L"Not supported yet.";
+				throw TJS_W("Not supported yet.");
 				break;
 			}
 		}

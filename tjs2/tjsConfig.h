@@ -54,8 +54,14 @@ TJS_EXP_FUNC_DEF(tjs_char *, TJS_strstr, (const tjs_char *big, const tjs_char *l
 TJS_EXP_FUNC_DEF(tjs_int, TJS_strcmp, (const tjs_char *s1, const tjs_char *s2));
 TJS_EXP_FUNC_DEF(tjs_int, TJS_strncmp, (const tjs_char *s1, const tjs_char *s2, size_t n));
 TJS_EXP_FUNC_DEF(tjs_char *, TJS_strncpy, (tjs_char * __restrict dst, const tjs_char * __restrict src, size_t n));
+TJS_EXP_FUNC_DEF(tjs_char *, TJS_strncpy_s, (tjs_char * __restrict dst, size_t dstCount, const tjs_char * __restrict src, size_t n));
 TJS_EXP_FUNC_DEF(tjs_char *, TJS_strcat, (tjs_char * __restrict s1, const tjs_char * __restrict s2));
 TJS_EXP_FUNC_DEF(tjs_char *, TJS_strchr, (const tjs_char *s, tjs_char c));
+TJS_EXP_FUNC_DEF(tjs_size, TJS_strspn, (const tjs_char *s, const tjs_char *set) );
+TJS_EXP_FUNC_DEF(tjs_int, TJS_sprintf, (tjs_char *s, const tjs_char *format, ...));
+TJS_EXP_FUNC_DEF(tjs_int, TJS_snprintf, ( tjs_char* buffer, size_t cnt, const tjs_char * format, ...  ));
+TJS_EXP_FUNC_DEF(tjs_int, TJS_vsnprintf, (tjs_char* buffer, size_t nsize, const tjs_char* format, va_list param));
+TJS_EXP_FUNC_DEF(tjs_real, TJS_strtod, (const tjs_char *nptr, tjs_char **endptr) );
 
 #define TJS_malloc			malloc
 #define TJS_free			free
@@ -66,43 +72,46 @@ TJS_EXP_FUNC_DEF(tjs_char *, TJS_strchr, (const tjs_char *s, tjs_char c));
 #define TJS_nstrlen			strlen
 #define TJS_nstrstr			strstr
 #define TJS_strftime		wcsftime
-#define TJS_vfprintf		vfwprintf
 #define TJS_octetcpy		memcpy
 #define TJS_octetcmp		memcmp
-#define TJS_strtod			wcstod
+//#define TJS_strtod			wcstod
 
 extern size_t TJS_mbstowcs(tjs_char *pwcs, const tjs_nchar *s, size_t n);
 extern size_t TJS_wcstombs(tjs_nchar *s, const tjs_char *pwcs, size_t n);
 extern int TJS_mbtowc(tjs_char *pwc, const tjs_nchar *s, size_t n);
 extern int TJS_wctomb(tjs_nchar *s, tjs_char wc);
 
-#define TJS_strncpy_s		wcsncpy_s
+#ifdef __cplusplus
+inline bool TJS_iswspace(tjs_char ch) {
+	// the standard iswspace misses when non-zero page code
+	if(ch&0xff00) return false; else return 0!=::isspace(ch);
+}
+inline bool TJS_iswdigit(tjs_char ch) {
+	// the standard iswdigit misses when non-zero page code
+	if(ch&0xff00) return false; else return 0!=::isdigit(ch);
+}
+inline bool TJS_iswalpha(tjs_char ch) {
+	// the standard iswalpha misses when non-zero page code
+	if(ch&0xff00) return true; else return 0!=::isalpha(ch);
+}
+#endif
+
 
 #if defined(__GNUC__)
 	#define TJS_cdecl
-	#define TJS_vsnprintf		vswprintf
-	extern tjs_int TJS_sprintf(tjs_char *s, const tjs_char *format, ...);
 	#define TJS_timezone timezone
-//	#define TJS_snprintf wsnprintf
-	extern "C" int TJS_snprintf( wchar_t* buffer, size_t cnt, const wchar_t * format, ...  );
 #elif __WIN32__
 	#define TJS_cdecl __cdecl
-#ifdef _MSC_VER
-	#define TJS_vsnprintf		_vsnwprintf
-#else
-	#define TJS_vsnprintf		vsnwprintf
-#endif
-	#define TJS_snprintf		swprintf_s
-	#define TJS_sprintf			swprintf
 	#define TJS_timezone _timezone
 #endif
 
 #define TJS_narrowtowidelen(X) TJS_mbstowcs(NULL, (X),0) // narrow->wide (if) converted length
 #define TJS_narrowtowide TJS_mbstowcs
 
-void TJS_debug_out(const tjs_char *format, ...);
 
 #ifdef TJS_DEBUG_TRACE
+void TJS_debug_out( const tjs_char *format, ... );
+#define TJS_vfprintf		vfwprintf
 #define TJS_D(x)	TJS_debug_out x;
 #define TJS_F_TRACE(x) tTJSFuncTrace ___trace(TJS_W(x));
 #else
@@ -156,6 +165,7 @@ public:
 //---------------------------------------------------------------------------
 // function tracer
 //---------------------------------------------------------------------------
+#ifdef TJS_DEBUG_TRACE
 class tTJSFuncTrace
 {
 	tjs_char *funcname;
@@ -170,6 +180,7 @@ public:
 		TJS_debug_out(TJS_W("exit: %ls\n"), funcname);
 	}
 };
+#endif
 //---------------------------------------------------------------------------
 
 
@@ -181,7 +192,7 @@ struct tTJSNarrowStringHolder
 	bool Allocated;
 	tjs_nchar *Buf;
 public:
-	tTJSNarrowStringHolder(const wchar_t *wide);
+	tTJSNarrowStringHolder(const tjs_char *wide);
 
 	~tTJSNarrowStringHolder(void);
 

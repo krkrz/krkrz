@@ -22,33 +22,33 @@
 #endif
 
 
-inline std::wstring IncludeTrailingBackslash( const std::wstring& path ) {
-	if( path[path.length()-1] != L'\\' ) {
-		return std::wstring(path+L"\\");
+inline tjs_string IncludeTrailingBackslash( const tjs_string& path ) {
+	if( path[path.length()-1] != TJS_W('\\') ) {
+		return tjs_string(path+TJS_W("\\"));
 	}
-	return std::wstring(path);
+	return tjs_string(path);
 }
-inline std::wstring ExcludeTrailingBackslash( const std::wstring& path ) {
-	if( path[path.length()-1] == L'\\' ) {
-		return std::wstring(path.c_str(),path.length()-1);
+inline tjs_string ExcludeTrailingBackslash( const tjs_string& path ) {
+	if( path[path.length()-1] == TJS_W('\\') ) {
+		return tjs_string(path.c_str(),path.length()-1);
 	}
-	return std::wstring(path);
+	return tjs_string(path);
 }
 // 末尾の /\ は含まない
-inline std::wstring ExtractFileDir( const std::wstring& path ) {
-	wchar_t drive[_MAX_DRIVE];
-	wchar_t dir[_MAX_DIR];
+inline tjs_string ExtractFileDir( const tjs_string& path ) {
+	tjs_char drive[_MAX_DRIVE];
+	tjs_char dir[_MAX_DIR];
 #ifdef _WIN32
 	_wsplitpath_s(path.c_str(), drive, _MAX_DRIVE, dir,_MAX_DIR, NULL, 0, NULL, 0 );
-	std::wstring dirstr = std::wstring( dir );
-	if( dirstr[dirstr.length()-1] != L'\\' ) {
-		return std::wstring( drive ) + dirstr;
+	tjs_string dirstr = tjs_string( dir );
+	if( dirstr[dirstr.length()-1] != TJS_W('\\') ) {
+		return tjs_string( drive ) + dirstr;
 	} else {
-		return std::wstring( drive ) + dirstr.substr(0,dirstr.length()-1);
+		return tjs_string( drive ) + dirstr.substr(0,dirstr.length()-1);
 	}
 #else
-	std::wstring::size_type pos = path.find_last_of( L"\\/" );
-	if( pos != std::wstring::npos ) {
+	tjs_string::size_type pos = path.find_last_of( TJS_W("\\/") );
+	if( pos != tjs_string::npos ) {
 		return path.substr( 0, pos );
 	} else {
 		return path;
@@ -56,15 +56,15 @@ inline std::wstring ExtractFileDir( const std::wstring& path ) {
 #endif
 }
 // 末尾の /\ を含む
-inline std::wstring ExtractFilePath( const std::wstring& path ) {
-	wchar_t drive[_MAX_DRIVE];
-	wchar_t dir[_MAX_DIR];
+inline tjs_string ExtractFilePath( const tjs_string& path ) {
+	tjs_char drive[_MAX_DRIVE];
+	tjs_char dir[_MAX_DIR];
 #ifdef _WIN32
 	_wsplitpath_s(path.c_str(), drive, _MAX_DRIVE, dir,_MAX_DIR, NULL, 0, NULL, 0 );
-	return std::wstring( drive ) + std::wstring( dir );
+	return tjs_string( drive ) + tjs_string( dir );
 #else
-	std::wstring::size_type pos = path.find_last_of( L"\\/" );
-	if( pos != std::wstring::npos ) {
+	tjs_string::size_type pos = path.find_last_of( TJS_W("\\/") );
+	if( pos != tjs_string::npos ) {
 		return path.substr( 0, pos+1 );
 	} else {
 		return path;
@@ -72,7 +72,7 @@ inline std::wstring ExtractFilePath( const std::wstring& path ) {
 #endif
 }
 
-inline bool DirectoryExists( const std::wstring& path ) {
+inline bool DirectoryExists( const tjs_string& path ) {
 #ifdef _WIN32
 	return (0!=::PathIsDirectory(path.c_str()));
 #else
@@ -86,7 +86,7 @@ inline bool DirectoryExists( const std::wstring& path ) {
 	return false;
 #endif
 }
-inline bool FileExists( const std::wstring& path ) {
+inline bool FileExists( const tjs_string& path ) {
 #ifdef _WIN32
 	return ( (0!=::PathFileExists(path.c_str())) && (0==::PathIsDirectory(path.c_str())) );
 #else
@@ -97,51 +97,51 @@ inline bool FileExists( const std::wstring& path ) {
 	return false;
 #endif
 }
-inline std::wstring ChangeFileExt( const std::wstring& path, const std::wstring& ext ) {
-	wchar_t drive[_MAX_DRIVE];
-	wchar_t dir[_MAX_DIR];
-	wchar_t fname[_MAX_FNAME];
+inline tjs_string ChangeFileExt( const tjs_string& path, const tjs_string& ext ) {
+	tjs_char drive[_MAX_DRIVE];
+	tjs_char dir[_MAX_DIR];
+	tjs_char fname[_MAX_FNAME];
 #ifdef _WIN32
 	_wsplitpath_s( path.c_str(), drive, _MAX_DRIVE, dir, _MAX_DIR, fname, _MAX_FNAME, NULL, 0 );
-	return std::wstring( drive ) + std::wstring( dir ) + std::wstring( fname ) + ext;
+	return tjs_string( drive ) + tjs_string( dir ) + tjs_string( fname ) + ext;
 #else
-	std::wstring::size_type pos = path.find_last_of( L'.' );
-	if( pos != std::wstring::npos ) {
+	tjs_string::size_type pos = path.find_last_of( TJS_W('.') );
+	if( pos != tjs_string::npos ) {
 		return path.substr( 0, pos+1 ) + ext;
 	} else {
 		return path + ext;
 	}
 #endif
 }
-inline std::wstring ExtractFileName( const std::wstring& path ) {
-	wchar_t fname[_MAX_FNAME];
-	wchar_t ext[_MAX_EXT];
+inline tjs_string ExtractFileName( const tjs_string& path ) {
+	tjs_char fname[_MAX_FNAME];
+	tjs_char ext[_MAX_EXT];
 #ifdef _WIN32
 	_wsplitpath_s( path.c_str(), NULL, 0, NULL, 0, fname, _MAX_FNAME, ext, _MAX_EXT );
-	return std::wstring( fname ) + std::wstring( ext );
+	return tjs_string( fname ) + tjs_string( ext );
 #else
-	std::wstring::size_type pos = path.find_last_of( L"\\/" );
-	if( pos != std::wstring::npos ) {
+	tjs_string::size_type pos = path.find_last_of( TJS_W("\\/") );
+	if( pos != tjs_string::npos ) {
 		return path.substr( pos+1 );
 	} else {
 		return path;
 	}
 #endif
 }
-inline std::wstring ExpandUNCFileName( const std::wstring& path ) {
+inline tjs_string ExpandUNCFileName( const tjs_string& path ) {
 #ifdef _WIN32
-	std::wstring result;
+	tjs_string result;
 	DWORD InfoSize = 0;
 	if( ERROR_MORE_DATA == WNetGetUniversalName( path.c_str(), UNIVERSAL_NAME_INFO_LEVEL, NULL, &InfoSize) ) {
 		UNIVERSAL_NAME_INFO* pInfo = reinterpret_cast<UNIVERSAL_NAME_INFO*>( ::GlobalAlloc(GMEM_FIXED, InfoSize) );
 		DWORD ret = ::WNetGetUniversalName( path.c_str(), UNIVERSAL_NAME_INFO_LEVEL, pInfo, &InfoSize);
 		if( NO_ERROR == ret ) {
-			result = std::wstring(pInfo->lpUniversalName);
+			result = tjs_string(pInfo->lpUniversalName);
 		}
 		::GlobalFree(pInfo);
 	} else {
-		wchar_t fullpath[_MAX_PATH];
-		result = std::wstring( _wfullpath( fullpath, path.c_str(), _MAX_PATH ) );
+		tjs_char fullpath[_MAX_PATH];
+		result = tjs_string( _wfullpath( fullpath, path.c_str(), _MAX_PATH ) );
 	}
 	return result;
 #else

@@ -188,8 +188,8 @@ ttstr TVPGetVersionInformation(void)
 		TJSVersionMajor, TJSVersionMinor, TJSVersionRelease);
 
 	ttstr version = TVPFormatMessage(TVPVersionInformation, verstr, tjsverstr);
-	std::wstring str = ApplicationSpecialPath::ReplaceStringAll( version.AsStdString(), std::wstring(L"%DATE%"), std::wstring(TVPCompileDate) );
-	str = ApplicationSpecialPath::ReplaceStringAll( str, std::wstring(L"%TIME%"), std::wstring(TVPCompileTime) );
+	tjs_string str = ApplicationSpecialPath::ReplaceStringAll( version.AsStdString(), tjs_string(TJS_W("%DATE%")), tjs_string(TVPCompileDate) );
+	str = ApplicationSpecialPath::ReplaceStringAll( str, tjs_string(TJS_W("%TIME%")), tjs_string(TVPCompileTime) );
 	return ttstr(str);
 }
 //---------------------------------------------------------------------------

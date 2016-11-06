@@ -11,7 +11,9 @@
 
 
 #include "tjsCommHead.h"
-
+#include <string>
+#include <locale>
+#include <codecvt>
 
 #ifdef __WIN32__
 #include <float.h>
@@ -35,18 +37,6 @@ extern tjs_size UnicodeToSJISString(const tjs_char *in, tjs_nchar* out, tjs_size
 
 namespace TJS
 {
-
-#if defined(__GNUC__)
-int TJS_snprintf( wchar_t* buffer, size_t cnt, const wchar_t * format, ...  )
-{
-	va_list arg;
-	va_start(arg, format);
-	int ret = vswprintf( buffer, cnt, format, arg );
-	va_end(arg);
-	return ret;
-}
-#endif
-	
 //---------------------------------------------------------------------------
 // debug support
 //---------------------------------------------------------------------------
@@ -60,7 +50,7 @@ tjs_uint TJSGetTickCount()
 
 
 //---------------------------------------------------------------------------
-// some wchar_t support functions
+// some tjs_char support functions
 //---------------------------------------------------------------------------
 tjs_int TJS_atoi(const tjs_char *s)
 {
@@ -144,10 +134,13 @@ tjs_int TJS_strnicmp(const tjs_char *s1, const tjs_char *s2,
 {
 	while(maxlen--)
 	{
-		if(*s1 == TJS_W('\0')) return (*s2 == TJS_W('\0')) ? 0 : -1;
-		if(*s2 == TJS_W('\0')) return (*s1 == TJS_W('\0')) ? 0 : 1;
-		if(*s1 < *s2) return -1;
-		if(*s1 > *s2) return 1;
+		tjs_char c1 = *s1, c2 = *s2;
+		if(c1 >= TJS_W('a') && c1 <= TJS_W('z')) c1 += TJS_W('Z')-TJS_W('z');
+		if(c2 >= TJS_W('a') && c2 <= TJS_W('z')) c2 += TJS_W('Z')-TJS_W('z');
+		if(c1 == TJS_W('\0')) return (c2 == TJS_W('\0')) ? 0 : -1;
+		if(c2 == TJS_W('\0')) return (c1 == TJS_W('\0')) ? 0 : 1;
+		if(c1 < c2) return -1;
+		if(c1 > c2) return 1;
 		s1++;
 		s2++;
 	}
@@ -196,19 +189,7 @@ size_t TJS_strlen(const tjs_char *d)
 	return d-p;
 }
 //---------------------------------------------------------------------------
-#if  defined(__GNUC__)
-tjs_int TJS_sprintf(tjs_char *s, const tjs_char *format, ...)
-{
-	tjs_int r;
-	va_list param;
-	va_start(param, format);
-	r = TJS_vsnprintf(s, INT_MAX, format, param);
-	va_end(param);
-	return r;
-}
-#endif
-//---------------------------------------------------------------------------
-
+#ifdef TJS_DEBUG_TRACE
 void TJS_cdecl TJS_debug_out(const tjs_char *format, ...)
 {
 	va_list param;
@@ -217,7 +198,7 @@ void TJS_cdecl TJS_debug_out(const tjs_char *format, ...)
 	va_end(param);
 }
 //---------------------------------------------------------------------------
-
+#endif
 
 //---------------------------------------------------------------------------
 #define TJS_MB_MAX_CHARLEN 2
@@ -384,6 +365,31 @@ tjs_char * TJS_strncpy(tjs_char * __restrict dst, const tjs_char * __restrict sr
 	return (dst);
 }
 //---------------------------------------------------------------------------
+tjs_char * TJS_strncpy_s(tjs_char * __restrict dst, size_t dstCount, const tjs_char * __restrict src, size_t n)
+{
+	if (n != 0 && dstCount != 0) {
+		tjs_char *d = dst;
+		size_t dn = dstCount;
+		const tjs_char *s = src;
+
+		do {
+			*d = *s; d++; s++;
+			if( (*s) == TJS_W('\0') ) {
+				/* NUL pad the remaining n-1 bytes */
+				n--; dn--;
+				while( n != 0 && dn != 0 ) {
+					*d++ = TJS_W('\0');
+					n--; dn--;
+				}
+				break;
+			}
+			n--; dn--;
+		} while( n != 0 && dn != 0 );
+		dst[dstCount-1] = TJS_W('\0');
+	}
+	return (dst);
+}
+//---------------------------------------------------------------------------
 tjs_char * TJS_strcat(tjs_char * __restrict s1, const tjs_char * __restrict s2)
 {
 	tjs_char *cp;
@@ -406,6 +412,125 @@ tjs_char * TJS_strchr(const tjs_char *s, tjs_char c)
 	return (nullptr);
 }
 //---------------------------------------------------------------------------
+tjs_size TJS_strspn(const tjs_char *s, const tjs_char *set)
+{
+	const tjs_char *p;
+	const tjs_char *q;
+
+	p = s;
+	while (*p) {
+		q = set;
+		while (*q) {
+			if (*p == *q)
+				break;
+			q++;
+		}
+		if (!*q)
+			goto done;
+		p++;
+	}
+
+done:
+	return (p - s);
+}
+//---------------------------------------------------------------------------
+tjs_real TJS_strtod(const tjs_char *nptr, tjs_char **endptr)
+{
+//#ifdef _WIN32
+#if 0
+	return static_cast<tjs_real>(wcstod( reinterpret_cast<const wchar_t*>(nptr), reinterpret_cast<wchar_t**>(endptr) ));
+#else
+	const tjs_char *src;
+	tjs_size size;
+	const tjs_char *start;
+	const tjs_char *aftersign;
+
+	/*
+	 * check length of string and call strtod
+	 */
+	src = nptr;
+
+	/* skip space first */
+	while (TJS_iswspace(*src)) {
+		src++;
+	}
+
+	/* get length of string */
+	start = src;
+	if (*src && TJS_strchr(TJS_W("+-"), *src))
+		src++;
+	aftersign = src;
+	if (TJS_strnicmp(src, TJS_W("inf"), 3) == 0) {
+		src += 3;
+		if (TJS_strnicmp(src, TJS_W("inity"), 5) == 0)
+			src += 5;
+		goto match;
+	}
+	if (TJS_strnicmp(src, TJS_W("nan"), 3) == 0) {
+		src += 3;
+		if (*src == TJS_W('(')) {
+			size = 1;
+			while (src[size] != TJS_W('\0') && src[size] != TJS_W(')'))
+				size++;
+			if (src[size] == TJS_W(')'))
+				src += size + 1;
+		}
+		goto match;
+	}
+	size = TJS_strspn(src, TJS_W("0123456789"));
+	src += size;
+	if (*src == TJS_W('.')) {/* XXX use localeconv */
+		src++;
+		size = TJS_strspn(src, TJS_W("0123456789"));
+		src += size;
+	}
+	if (*src && TJS_strchr(TJS_W("Ee"), *src)) {
+		src++;
+		if (*src && TJS_strchr(TJS_W("+-"), *src))
+			src++;
+		size = TJS_strspn(src, TJS_W("0123456789"));
+		src += size;
+	}
+match:
+	size = src - start;
+
+	/*
+	 * convert to a char-string and pass it to strtod.
+	 */
+	if (src > aftersign) {
+		// rewrite c++11 TODO Test
+		std::wstring_convert<std::codecvt_utf8_utf16<tjs_char>, tjs_char> converter;
+		tjs_string u16str( start, size );
+		std::string u8str = converter.to_bytes(u16str);
+		double result = 0.0;
+		size_t idx = 0;
+		try{
+			result = std::stod( u8str, &idx );
+			if (endptr) {
+				if( idx != u8str.size() ) {
+					std::string u8end( u8str.c_str(), idx );
+					tjs_string u16end = converter.from_bytes(u8end);
+					*endptr = (tjs_char*)start + u16end.size();
+				} else {
+					*endptr = const_cast<tjs_char*>(src);
+				}
+			}
+		} catch(...) {
+			errno = EILSEQ;
+			goto fail;
+		}
+		return result;
+	}
+
+fail:
+	if (endptr)
+		/* LINTED bad interface */
+		*endptr = (tjs_char*)nptr;
+
+	return 0;
+#endif
+}
+//---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
 
@@ -413,7 +538,7 @@ tjs_char * TJS_strchr(const tjs_char *s, tjs_char c)
 //---------------------------------------------------------------------------
 // tTJSNarrowStringHolder
 //---------------------------------------------------------------------------
-tTJSNarrowStringHolder::tTJSNarrowStringHolder(const wchar_t * wide)
+tTJSNarrowStringHolder::tTJSNarrowStringHolder(const tjs_char * wide)
 {
 	int n;
 	if(!wide)

@@ -85,7 +85,7 @@ public:
 	virtual ~tTVPDSMixerVideoOverlay();
 
 	virtual void __stdcall BuildGraph( HWND callbackwin, IStream *stream,
-		const wchar_t * streamname, const wchar_t *type, unsigned __int64 size );
+		const tjs_char * streamname, const tjs_char *type, unsigned __int64 size );
 
 	virtual void __stdcall SetWindow(HWND window);
 	virtual void __stdcall SetRect(RECT *rect);

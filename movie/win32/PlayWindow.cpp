@@ -142,7 +142,7 @@ void PlayWindow::SetRect( RECT *rect ) {
 		int		height = clientRect.bottom - clientRect.top;
 
 		if( ::MoveWindow( m_ChildWnd, clientRect.left, clientRect.top, clientRect.right - clientRect.left, clientRect.bottom - clientRect.top, TRUE ) == 0 )
-			ThrowDShowException(L"Failed to call MoveWindow.", HRESULT_FROM_WIN32(GetLastError()));
+			ThrowDShowException(TJS_W("Failed to call MoveWindow."), HRESULT_FROM_WIN32(GetLastError()));
 	}
 }
 //----------------------------------------------------------------------------
@@ -157,13 +157,13 @@ void PlayWindow::SetVisible( bool b ) {
 		else {
 			::ShowWindow( m_ChildWnd, SW_SHOW );
 			if( ::UpdateWindow( m_ChildWnd ) == 0 )
-				ThrowDShowException(L"Failed to call ShowWindow.", HRESULT_FROM_WIN32(GetLastError()));
+				ThrowDShowException(TJS_W("Failed to call ShowWindow."), HRESULT_FROM_WIN32(GetLastError()));
 		}
 
 		RECT clientRect;
 		CalcChildWindowSize( clientRect );
 		if( ::MoveWindow( m_ChildWnd, clientRect.left, clientRect.top, clientRect.right - clientRect.left, clientRect.bottom - clientRect.top, TRUE ) == 0 )
-			ThrowDShowException(L"Failed to call MoveWindow.", HRESULT_FROM_WIN32(GetLastError()));
+			ThrowDShowException(TJS_W("Failed to call MoveWindow."), HRESULT_FROM_WIN32(GetLastError()));
 	}
 }
 

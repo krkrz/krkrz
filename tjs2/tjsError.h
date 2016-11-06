@@ -65,7 +65,7 @@ extern ttstr TJSNonamedException;
 	{ \
 		TJS_eTJSError(e.what()); \
 	} \
-	catch(const wchar_t *text) \
+	catch(const tjs_char *text) \
 	{ \
 		TJS_eTJSError(text); \
 	} \

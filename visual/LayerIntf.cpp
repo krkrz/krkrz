@@ -9874,9 +9874,9 @@ void tTJSNI_Font::GetFontList(tjs_uint32 flags, std::vector<ttstr> & list)
 	else
 	{
 #ifdef _WIN32
-		std::vector<std::wstring> ansilist;
+		std::vector<tjs_string> ansilist;
 		TVPGetFontList(ansilist, flags, Font );
-		for(std::vector<std::wstring>::iterator i = ansilist.begin(); i != ansilist.end(); i++)
+		for(std::vector<tjs_string>::iterator i = ansilist.begin(); i != ansilist.end(); i++)
 			list.push_back(i->c_str());
 #else
 		list.clear();

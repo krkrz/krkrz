@@ -29,7 +29,7 @@ private:
 	std::vector<tjs_int32> Integer;
 	std::vector<tjs_int64> Long;
 	std::vector<double> Double;
-	std::vector<std::wstring> String;
+	std::vector<tjs_string> String;
 	std::vector<std::vector<tjs_uint8>* > ByteBuffer;
 
 	// 保持したかどうか判定するためのハッシュ
@@ -38,7 +38,7 @@ private:
 	std::map<tjs_int32,int> IntegerHash;
 	std::map<tjs_int64,int> LongHash;
 	std::map<double,int> DoubleHash;
-	std::map<std::wstring,int> StringHash;
+	std::map<tjs_string,int> StringHash;
 	// オクテット型の時はハッシュを使っていない
 
 	static const tjs_uint8 TYPE_VOID = 0;

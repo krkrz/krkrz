@@ -3,20 +3,20 @@
 #define __TVP_VIDEO_OVERLAY_H__
 
 extern void __stdcall GetVideoOverlayObject(
-	HWND callbackwin, struct IStream *stream, const wchar_t * streamname,
-	const wchar_t *type, unsigned __int64 size, class iTVPVideoOverlay **out);
+	HWND callbackwin, struct IStream *stream, const tjs_char * streamname,
+	const tjs_char *type, unsigned __int64 size, class iTVPVideoOverlay **out);
 
 extern void __stdcall GetVideoLayerObject(
-	HWND callbackwin, struct IStream *stream, const wchar_t * streamname,
-	const wchar_t *type, unsigned __int64 size, class iTVPVideoOverlay **out);
+	HWND callbackwin, struct IStream *stream, const tjs_char * streamname,
+	const tjs_char *type, unsigned __int64 size, class iTVPVideoOverlay **out);
 
 extern void __stdcall GetMixingVideoOverlayObject(
-	HWND callbackwin, struct IStream *stream, const wchar_t * streamname,
-	const wchar_t *type, unsigned __int64 size, class iTVPVideoOverlay **out);
+	HWND callbackwin, struct IStream *stream, const tjs_char * streamname,
+	const tjs_char *type, unsigned __int64 size, class iTVPVideoOverlay **out);
 
 extern void __stdcall GetMFVideoOverlayObject(
-	HWND callbackwin, struct IStream *stream, const wchar_t * streamname,
-	const wchar_t *type, unsigned __int64 size, class iTVPVideoOverlay **out);
+	HWND callbackwin, struct IStream *stream, const tjs_char * streamname,
+	const tjs_char *type, unsigned __int64 size, class iTVPVideoOverlay **out);
 
 
 /*[*/

@@ -1203,7 +1203,7 @@ void TVPResampleImageSSE2( const tTVPResampleClipping &clip, const tTVPImageCopy
 		TVPWeightResampleSSE2Fix<BlackmanSincWeightSSE>(clip, blendfunc, dest, destrect, src, srcrect );
 		break;
 	default:
-		throw L"Not supported yet.";
+		throw TJS_W("Not supported yet.");
 		break;
 	}
 }

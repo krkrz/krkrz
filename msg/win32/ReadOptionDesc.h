@@ -3,8 +3,8 @@
 #define __READ_OPTION_DESC_H__
 
 struct tTVPCommandOptionsValue {
-	std::wstring Value;
-	std::wstring Description;
+	tjs_string Value;
+	tjs_string Description;
 	bool IsDefault;
 };
 struct tTVPCommandOption {
@@ -13,24 +13,24 @@ struct tTVPCommandOption {
 		VT_String,
 		VT_Unknown
 	};
-	std::wstring Caption;
-	std::wstring Description;
-	std::wstring Name;
+	tjs_string Caption;
+	tjs_string Description;
+	tjs_string Name;
 	ValueType Type;
 	tjs_int Length;
-	std::wstring Value;
+	tjs_string Value;
 	std::vector<tTVPCommandOptionsValue> Values;
 	bool User;
 };
 struct tTVPCommandOptionCategory {
-	std::wstring Name;
+	tjs_string Name;
 	std::vector<tTVPCommandOption> Options;
 };
 struct tTVPCommandOptionList {
 	std::vector<tTVPCommandOptionCategory> Categories;
 };
 
-extern tTVPCommandOptionList* TVPGetPluginCommandDesc( const wchar_t* name );
+extern tTVPCommandOptionList* TVPGetPluginCommandDesc( const tjs_char* name );
 extern tTVPCommandOptionList* TVPGetEngineCommandDesc();
 void TVPMargeCommandDesc( tTVPCommandOptionList& dest, const tTVPCommandOptionList& src );
 

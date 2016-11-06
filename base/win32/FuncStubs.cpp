@@ -1396,7 +1396,7 @@ static void __stdcall TVP_Stub_5a4fcbe1e398e3d9690d571acbbbae9f(tTVPTryBlockFunc
 {
 	return TVPDoTryBlock(tryblock, catchblock, finallyblock, data);
 }
-static bool __stdcall TVP_Stub_5b62f504fe6d22428d7518d6c52d775d(const wchar_t * module_filename , tjs_int & major , tjs_int & minor , tjs_int & release , tjs_int & build)
+static bool __stdcall TVP_Stub_5b62f504fe6d22428d7518d6c52d775d(const tjs_char * module_filename , tjs_int & major , tjs_int & minor , tjs_int & release , tjs_int & build)
 {
 	return TVPGetFileVersionOf(module_filename, major, minor, release, build);
 }

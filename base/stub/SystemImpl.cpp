@@ -200,7 +200,7 @@ bool TVPShellExecute(const ttstr &target, const ttstr &param)
 	if(::ShellExecute(NULL, NULL,
 		target.c_str(),
 		param.IsEmpty() ? NULL : param.c_str(),
-		L"",
+		TJS_W(""),
 		SW_SHOWNORMAL)
 		<=(void *)32)
 	{
@@ -389,7 +389,7 @@ static void TVPReadRegValue(tTJSVariant &result, const ttstr & key)
 //---------------------------------------------------------------------------
 static ttstr TVPGetSpecialFolderPath(int csidl)
 {
-	WCHAR path[MAX_PATH+1];
+	tjs_char path[MAX_PATH+1];
 	if(!SHGetSpecialFolderPath(NULL, path, csidl, false))
 		return ttstr();
 	return ttstr(path);
@@ -622,11 +622,11 @@ static void TVPHeapDump()
 			if( isdefault ) mes += TJS_W(" [default]");
 			if( isCRT ) mes += TJS_W(" [CRT]");
 			TVPAddLog( mes );
-			TJS_sprintf( buff, 128, L"  Allocated: %d, size: %lld, overhead: %lld", use.count, use.total, use.overhead );
+			TJS_sprintf( buff, 128, TJS_W("  Allocated: %d, size: %lld, overhead: %lld"), use.count, use.total, use.overhead );
 			TVPAddLog( buff );
-			TJS_sprintf( buff, 128, L"  Uncommitted: %d, size: %lld, overhead: %lld", uncommit.count, uncommit.total, uncommit.overhead );
+			TJS_sprintf( buff, 128, TJS_W("  Uncommitted: %d, size: %lld, overhead: %lld"), uncommit.count, uncommit.total, uncommit.overhead );
 			TVPAddLog( buff );
-			TJS_sprintf( buff, 128, L"  Unused: %d, size: %lld, overhead: %lld", unused.count, unused.total, unused.overhead );
+			TJS_sprintf( buff, 128, TJS_W("  Unused: %d, size: %lld, overhead: %lld"), unused.count, unused.total, unused.overhead );
 			TVPAddLog( buff );
 		}
 	}

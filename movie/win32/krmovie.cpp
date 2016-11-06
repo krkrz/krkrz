@@ -31,8 +31,8 @@
 // GetVideoOverlayObject
 //---------------------------------------------------------------------------
 void __stdcall GetVideoOverlayObject(
-	HWND callbackwin, IStream *stream, const wchar_t * streamname,
-	const wchar_t *type, unsigned __int64 size, iTVPVideoOverlay **out)
+	HWND callbackwin, IStream *stream, const tjs_char * streamname,
+	const tjs_char *type, unsigned __int64 size, iTVPVideoOverlay **out)
 {
 	*out = new tTVPDSVideoOverlay;
 

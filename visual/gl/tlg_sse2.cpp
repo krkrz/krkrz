@@ -1,5 +1,5 @@
 
-#include "tjsTypes.h"
+#include "tjsCommHead.h"
 #include "tvpgl.h"
 #include "tvpgl_ia32_intf.h"
 #include "simd_def_x86x64.h"
@@ -1159,15 +1159,15 @@ void TVPTLG6DecodeLine_test(tjs_uint32 *prevline, tjs_uint32 *curline, tjs_int w
 	{
 		unsigned __int64 func_b_total = end0-start;
 		unsigned __int64 func_a_total = end1-end0;
-		wchar_t buff[128];
-		wsprintf( buff, L"TLG6 SSE2 %I64d, ASM %I64d, rate %I64d\n", func_b_total, func_a_total, (func_b_total)*100/(func_a_total) );
+		tjs_char buff[128];
+		TJS_sprintf( buff, TJS_W("TLG6 SSE2 %I64d, ASM %I64d, rate %I64d\n"), func_b_total, func_a_total, (func_b_total)*100/(func_a_total) );
 		OutputDebugString( buff );
 	}
 #ifdef _DEBUG
 	for( int i = 0; i < block_count*TVP_TLG6_W_BLOCK_SIZE; i++ ) {
 		if( curline0[i] != curline1[i] ) {
-			wchar_t buff[128];
-			wsprintf( buff, L"LZSS text type : %d, index : %d, 0x%08x, 0x%08x\n", filtertypes[i/TVP_TLG6_W_BLOCK_SIZE], i, curline0[i], curline1[i] );
+			tjs_char buff[128];
+			TJS_sprintf( buff, TJS_W("LZSS text type : %d, index : %d, 0x%08x, 0x%08x\n"), filtertypes[i/TVP_TLG6_W_BLOCK_SIZE], i, curline0[i], curline1[i] );
 			OutputDebugString( buff );
 		}
 	}
@@ -1198,27 +1198,27 @@ tjs_int TVPTLG5DecompressSlide_test( tjs_uint8 *out, const tjs_uint8 *in, tjs_in
 	{
 		unsigned __int64 func_b_total = end0-start;
 		unsigned __int64 func_a_total = end1-end0;
-		wchar_t buff[128];
-		wsprintf( buff, L"LZSS SSE2 %I64d, ASM %I64d, rate %I64d\n", func_b_total, func_a_total, (func_b_total)*100/(func_a_total) );
+		tjs_char buff[128];
+		TJS_sprintf( buff, TJS_W("LZSS SSE2 %I64d, ASM %I64d, rate %I64d\n"), func_b_total, func_a_total, (func_b_total)*100/(func_a_total) );
 		OutputDebugString( buff );
 	}
 
 	if( r0 != r1 ) {
-		wchar_t buff[128];
-		wsprintf( buff, L"LZSS ret, %d, %d\n", r0, r1 );
+		tjs_char buff[128];
+		TJS_sprintf( buff, TJS_W("LZSS ret, %d, %d\n"), r0, r1 );
 		OutputDebugString( buff );
 	}
 	for( int i = 0; i < 4096; i++ ) {
 		if( text0[i] != text1[i] ) {
-			wchar_t buff[128];
-			wsprintf( buff, L"LZSS text index : %d, %02x, %02x\n", i, text0[i], text1[i] );
+			tjs_char buff[128];
+			TJS_sprintf( buff, TJS_W("LZSS text index : %d, %02x, %02x\n"), i, text0[i], text1[i] );
 			OutputDebugString( buff );
 		}
 	}
 	for( int i = 0; i < 1920*4; i++ ) {
 		if( out0[i] != out1[i] ) {
-			wchar_t buff[128];
-			wsprintf( buff, L"LZSS output index : %d, %02x, %02x\n", i, out0[i], out1[i] );
+			tjs_char buff[128];
+			TJS_sprintf( buff, TJS_W("LZSS output index : %d, %02x, %02x\n"), i, out0[i], out1[i] );
 			OutputDebugString( buff );
 		}
 	}
@@ -1260,8 +1260,8 @@ void TVPTLG5ComposeColors3To4_test(tjs_uint8 *outp, const tjs_uint8 *upper, tjs_
 	{
 		unsigned __int64 func_b_total = end0-start;
 		unsigned __int64 func_a_total = end1-end0;
-		wchar_t buff[128];
-		wsprintf( buff, L"ComposeColors3To4 SSE2 %I64d, ASM %I64d, rate %I64d\n", func_b_total, func_a_total, (func_b_total)*100/(func_a_total) );
+		tjs_char buff[128];
+		TJS_sprintf( buff, TJS_W("ComposeColors3To4 SSE2 %I64d, ASM %I64d, rate %I64d\n"), func_b_total, func_a_total, (func_b_total)*100/(func_a_total) );
 		OutputDebugString( buff );
 	}
 	for( int i = 0; i < width; i++ ) {
@@ -1269,8 +1269,8 @@ void TVPTLG5ComposeColors3To4_test(tjs_uint8 *outp, const tjs_uint8 *upper, tjs_
 			outp0[i*4+1] != outp1[i*4+1] ||
 			outp0[i*4+2] != outp1[i*4+2] ||
 			outp0[i*4+3] != outp1[i*4+3]) {
-			wchar_t buff[128];
-			wsprintf( buff, L"LZSS color index : %d, 0x%02x%02x%02x%02x, 0x%02x%02x%02x%02x\n", i,
+			tjs_char buff[128];
+			TJS_sprintf( buff, TJS_W("LZSS color index : %d, 0x%02x%02x%02x%02x, 0x%02x%02x%02x%02x\n"), i,
 				outp0[i*4+3], outp0[i*4+2], outp0[i*4+1], outp0[i*4+0],
 				outp1[i*4+3], outp1[i*4+2], outp1[i*4+1], outp1[i*4+0] );
 			OutputDebugString( buff );
@@ -1312,8 +1312,8 @@ void TVPTLG5ComposeColors4To4_test(tjs_uint8 *outp, const tjs_uint8 *upper, tjs_
 	{
 		unsigned __int64 func_b_total = end0-start;
 		unsigned __int64 func_a_total = end1-end0;
-		wchar_t buff[128];
-		wsprintf( buff, L"ComposeColors4To4 SSE2 %I64d, ASM %I64d, rate %I64d\n", func_b_total, func_a_total, (func_b_total)*100/(func_a_total) );
+		tjs_char buff[128];
+		TJS_sprintf( buff, TJS_W("ComposeColors4To4 SSE2 %I64d, ASM %I64d, rate %I64d\n"), func_b_total, func_a_total, (func_b_total)*100/(func_a_total) );
 		OutputDebugString( buff );
 	}
 	for( int i = 0; i < width; i++ ) {
@@ -1321,8 +1321,8 @@ void TVPTLG5ComposeColors4To4_test(tjs_uint8 *outp, const tjs_uint8 *upper, tjs_
 			outp0[i*4+1] != outp1[i*4+1] ||
 			outp0[i*4+2] != outp1[i*4+2] ||
 			outp0[i*4+3] != outp1[i*4+3]) {
-			wchar_t buff[128];
-			wsprintf( buff, L"LZSS color index : %d, 0x%02x%02x%02x%02x, 0x%02x%02x%02x%02x\n", i,
+			tjs_char buff[128];
+			TJS_sprintf( buff, TJS_W("LZSS color index : %d, 0x%02x%02x%02x%02x, 0x%02x%02x%02x%02x\n"), i,
 				outp0[i*4+3], outp0[i*4+2], outp0[i*4+1], outp0[i*4+0],
 				outp1[i*4+3], outp1[i*4+2], outp1[i*4+1], outp1[i*4+0] );
 			OutputDebugString( buff );

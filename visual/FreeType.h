@@ -42,7 +42,7 @@
  */
 class tFreeTypeFace
 {
-	std::wstring FontName;		//!< フォント名
+	tjs_string FontName;		//!< フォント名
 	tBaseFreeTypeFace * Face; //!< Face オブジェクト
 	FT_Face FTFace; //!< FreeType Face オブジェクト
 	tjs_uint32 Options; //!< フラグ
@@ -56,15 +56,15 @@ class tFreeTypeFace
 
 	static inline tjs_int FT_PosToInt( tjs_int x ) { return (((x) + (1 << 5)) >> 6); }
 public:
-	tFreeTypeFace(const std::wstring &fontname, tjs_uint32 options);
+	tFreeTypeFace(const tjs_string &fontname, tjs_uint32 options);
 	~tFreeTypeFace();
 
 	tjs_uint GetGlyphCount();
 	tjs_char GetCharcodeFromGlyphIndex(tjs_uint index);
 
-	void GetFaceNameList(std::vector<std::wstring> &dest);
+	void GetFaceNameList(std::vector<tjs_string> &dest);
 
-	const std::wstring& GetFontName() const { return FontName; }
+	const tjs_string& GetFontName() const { return FontName; }
 
 	tjs_int GetHeight() { return Height; }
 	void SetHeight(int height);

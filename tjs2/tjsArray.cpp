@@ -38,18 +38,6 @@ namespace TJS
 //---------------------------------------------------------------------------
 static tjs_int32 ClassID_Array;
 //---------------------------------------------------------------------------
-static bool inline TJS_iswspace(tjs_char ch)
-{
-	// the standard iswspace misses when non-zero page code
-	if(ch&0xff00) return false; else return 0!=::isspace(ch);
-}
-//---------------------------------------------------------------------------
-static bool inline TJS_iswdigit(tjs_char ch)
-{
-	// the standard iswdigit misses when non-zero page code
-	if(ch&0xff00) return false; else return 0!=::isdigit(ch);
-}
-//---------------------------------------------------------------------------
 // Utility Function(s)
 //---------------------------------------------------------------------------
 static bool IsNumber(const tjs_char *str, tjs_int &result)

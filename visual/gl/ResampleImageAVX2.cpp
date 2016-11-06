@@ -1229,7 +1229,7 @@ void TVPResampleImageAVX2( const tTVPResampleClipping &clip, const tTVPImageCopy
 		TVPWeightResampleAVX2Fix<BlackmanSincWeightAVX>(clip, blendfunc, dest, destrect, src, srcrect );
 		break;
 	default:
-		throw L"Not supported yet.";
+		throw TJS_W("Not supported yet.");
 		break;
 	}
 }
