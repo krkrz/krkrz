@@ -71,10 +71,9 @@ TJS_EXP_FUNC_DEF(tjs_real, TJS_strtod, (const tjs_char *nptr, tjs_char **endptr)
 #define TJS_nstrcat			strcat
 #define TJS_nstrlen			strlen
 #define TJS_nstrstr			strstr
-#define TJS_strftime		wcsftime
 #define TJS_octetcpy		memcpy
 #define TJS_octetcmp		memcmp
-//#define TJS_strtod			wcstod
+
 
 extern size_t TJS_mbstowcs(tjs_char *pwcs, const tjs_nchar *s, size_t n);
 extern size_t TJS_wcstombs(tjs_nchar *s, const tjs_char *pwcs, size_t n);

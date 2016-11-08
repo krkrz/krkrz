@@ -13,7 +13,8 @@
 #include "tjsCommHead.h"
 #include <string>
 #include <locale>
-#include <codecvt>
+#include <errno.h>
+//#include <codecvt>
 
 #ifdef __WIN32__
 #include <float.h>
@@ -23,6 +24,7 @@
 /*
  * core/utils/cp932_uni.cpp
  * core/utils/uni_cp932.cpp
+ * base/CharacterSet.cpp
  * を一緒にリンクしてください。
  * CP932(ShiftJIS) と Unicode 変換に使用しています。
  * Win32 APIの同等の関数は互換性等の問題があることやマルチプラットフォームの足かせとなる
@@ -34,6 +36,8 @@ extern bool IsSJISLeadByte( tjs_nchar b );
 extern tjs_uint UnicodeToSJIS(tjs_char in);
 extern tjs_size UnicodeToSJISString(const tjs_char *in, tjs_nchar* out );
 extern tjs_size UnicodeToSJISString(const tjs_char *in, tjs_nchar* out, tjs_size limit );
+extern bool TVPUtf8ToUtf16( tjs_string& out, const std::string& in );
+extern bool TVPUtf16ToUtf8( std::string& out, const tjs_string& in );
 
 namespace TJS
 {
@@ -499,23 +503,27 @@ match:
 	 */
 	if (src > aftersign) {
 		// rewrite c++11 TODO Test
-		std::wstring_convert<std::codecvt_utf8_utf16<tjs_char>, tjs_char> converter;
-		tjs_string u16str( start, size );
-		std::string u8str = converter.to_bytes(u16str);
+		tjs_string u16str(start, size);
+		std::string u8str;
+		TVPUtf16ToUtf8(u8str, u16str);
 		double result = 0.0;
 		size_t idx = 0;
-		try{
-			result = std::stod( u8str, &idx );
+		try {
+			char *end;
+			const char *u8start = u8str.c_str();
+			result = strtod(u8start, &end);
 			if (endptr) {
-				if( idx != u8str.size() ) {
-					std::string u8end( u8str.c_str(), idx );
-					tjs_string u16end = converter.from_bytes(u8end);
-					*endptr = (tjs_char*)start + u16end.size();
+				idx = static_cast<size_t>(end - u8start );
+				if (idx != u8str.size()) {
+					std::string u8end(u8str.c_str(), idx);
+					tjs_string u16end;
+					TVPUtf8ToUtf16(u16end, u8end);
+					*endptr = (tjs_char *) start + u16end.size();
 				} else {
-					*endptr = const_cast<tjs_char*>(src);
+					*endptr = const_cast<tjs_char *>(src);
 				}
 			}
-		} catch(...) {
+		} catch (...) {
 			errno = EILSEQ;
 			goto fail;
 		}
@@ -525,7 +533,7 @@ match:
 fail:
 	if (endptr)
 		/* LINTED bad interface */
-		*endptr = (tjs_char*)nptr;
+		*endptr = (tjs_char *) nptr;
 
 	return 0;
 #endif

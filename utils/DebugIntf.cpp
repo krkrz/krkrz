@@ -255,6 +255,17 @@ public:
 
 } static TVPLogStreamHolder;
 //---------------------------------------------------------------------------
+static const tjs_char *WDAY[] = {
+		TJS_W("Sunday"), TJS_W("Monday"), TJS_W("Tuesday"), TJS_W("Wednesday"),
+		TJS_W("Thursday"), TJS_W("Friday"), TJS_W("Saturday")
+};
+//---------------------------------------------------------------------------
+static const tjs_char *MDAY[] = {
+		TJS_W("January"), TJS_W("February"), TJS_W("March"), TJS_W("April"), TJS_W("May"), TJS_W("June"),
+		TJS_W("July"), TJS_W("August"), TJS_W("September"), TJS_W("October"), TJS_W("November"),
+		TJS_W("December")
+};
+//---------------------------------------------------------------------------
 void tTVPLogStreamHolder::Open(const tjs_char *mode)
 {
 	if(OpenFailed) return; // no more try
@@ -283,7 +294,6 @@ void tTVPLogStreamHolder::Open(const tjs_char *mode)
 			if(Stream.Tell() == 0)
 			{
 				// write BOM
-				// TODO: 32-bit unicode support
 				Stream.Write( TJS_N("\xff\xfe"), 2 ); // indicate unicode text
 			}
 
@@ -296,13 +306,12 @@ void tTVPLogStreamHolder::Open(const tjs_char *mode)
 
 
 			static tjs_char timebuf[80];
-
-			tm *struct_tm;
-			time_t timer;
-			timer = time(&timer);
-
-			struct_tm = localtime(&timer);
-			TJS_strftime(timebuf, 79, TJS_W("%#c"), struct_tm);
+			{
+				time_t timer;
+				timer = time(&timer);
+				tm* t = localtime(&timer);
+				TJS_snprintf( timebuf, 79, TJS_W("%s, %s %02d, %04d %02d:%02d:%02d"), WDAY[t->tm_wday], MDAY[t->tm_mon], t->tm_mday, t->tm_year+1900, t->tm_hour, t->tm_min, t->tm_sec );
+			}
 
 			Log(ttstr(TJS_W("Logging to ")) + ttstr(filename) + TJS_W(" started on ") + timebuf);
 
@@ -393,7 +402,7 @@ void TVPAddLog(const ttstr &line, bool appendtoimportant)
 	if(prevlogtime != timer)
 	{
 		struct_tm = localtime(&timer);
-		TJS_strftime(timebuf, 39, TJS_W("%H:%M:%S"), struct_tm);
+		TJS_snprintf( timebuf, 39, TJS_W("%02d:%02d:%02d"), struct_tm->tm_hour, struct_tm->tm_min, struct_tm->tm_sec );
 		prevlogtime = timer;
 		prevtimebuf = timebuf;
 	}
