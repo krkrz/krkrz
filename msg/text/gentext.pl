@@ -1,8 +1,8 @@
-
+﻿
 # メッセージ類のヘッダーファイルなどを生成します。
 use utf8;
 use Win32::OLE qw(in with);
-use Win32::OLE::Const 'Microsoft Excel';
+use Win32::OLE::Const 'Microsoft Office .* Object Library';
 $Win32::OLE::Warn = 3;
 use Cwd;
 use Encode qw/encode decode/;
@@ -13,6 +13,7 @@ use strict;
 {
 	my $jp_res_filename = 'string_table_jp.rc';
 	my $en_res_filename = 'string_table_en.rc';
+	my $chs_res_filename = 'string_table_chs.rc';
 	my $res_header_filename = 'string_table_resource.h';
 	my $tjs_error_header = 'tjsErrorInc.h';
 	my $tvp_mes_header = 'MsgIntfInc.h';
@@ -24,6 +25,7 @@ use strict;
 	my @res_id;
 	my @mes_jp;
 	my @mes_en;
+	my @mes_chs;
 	my @mes_opt;
 	my @tarminate;
 
@@ -54,6 +56,7 @@ use strict;
 			my $MesJp = $worksheet->Cells($row, 2)->{Value};
 			my $MesEn = $worksheet->Cells($row, 3)->{Value};
 			my $MesOpt = $worksheet->Cells($row, 4)->{Value};
+			my $MesChs = $worksheet->Cells($row, 5)->{Value};
 			# リソースファイル用にエスケープする
 			if( defined $MesJp ) {
 				#$MesJp = decode( 'cp932', $MesJp );
@@ -64,6 +67,10 @@ use strict;
 			if( defined $MesEn ) {
 				$MesEn =~ s/(\\")/""/g;
 				$MesEn =~ s/(\\')/'/g;
+			}
+			if (defined $MesChs) {
+				$MesChs =~ s/(\\")/""/g;
+				$MesChs =~ s/(\\')/'/g;
 			}
 			if( defined $MesId ) {
 				my $ResId = $MesId;
@@ -80,6 +87,7 @@ use strict;
 				push @mes_jp, $MesJp;
 				push @mes_en, $MesEn;
 				push @mes_opt, $MesOpt;
+				push @mes_chs, $MesChs;
 			}
 			$row++;
 		} while( defined $MesId );
@@ -90,6 +98,7 @@ use strict;
 	# String Table のリソースを出力
 	open FHJP, ">$jp_res_filename" or die;
 	open FHEN, ">$en_res_filename" or die;
+	open FHCHS, ">$chs_res_filename" or die;
 	open FHH, ">$res_header_filename" or die;
 
 	open FHEH, ">$tjs_error_header" or die;
@@ -101,6 +110,8 @@ use strict;
 	print FHJP "BEGIN\n";
 	print FHEN "STRINGTABLE\n";
 	print FHEN "BEGIN\n";
+	print FHCHS "STRINGTABLE\n";
+	print FHCHS "BEGIN\n";
 
 	print FHH  <<'HEADER';
 // generated from gentext.pl Messages.xlsx
@@ -158,6 +169,8 @@ CPPSRC
 		if( ($len+1) > $mesmaxlen ) { $mesmaxlen = ($len+1); }
 		$len = length $mes_en[$i];
 		if( ($len+1) > $mesmaxlen ) { $mesmaxlen = ($len+1); }
+		$len = length $mes_chs[$i];
+		if( ($len+1) > $mesmaxlen ) { $mesmaxlen = ($len+1); }
 	}
 	print FHCPP "static const int MAX_MESSAGE_LENGTH = $mesmaxlen;\n";
 	print FHCPP "enum {\n";
@@ -172,8 +185,10 @@ CPPSRC
 		}
 		my $jpline = $line . "\"".$mes_jp[$i]."\"\n";
 		my $enline = $line . "\"".$mes_en[$i]."\"\n";
+		my $chsline = $line . "\"".$mes_chs[$i]."\"\n";
 		print FHJP $jpline;
 		print FHEN $enline;
+		print FHCHS $chsline;
 		my $id = $i + 10000; # 10000以降の番号に割り当てておく
 		print FHH $header_res.$id."\n";
 		if( !defined $mes_opt[$i] ) {
@@ -265,6 +280,9 @@ CPPSRC
 	print FHEN "END\n";
 	close FHEN;
 
+	print FHCHS "END\n";
+	close FHCHS;
+	
 	print FHH "#endif\n";
 	close FHH;
 
