@@ -77,6 +77,7 @@ class tTVPApplication : public iTVPApplication {
 
 	class TTVPWindowForm* main_window_;
 
+    pthread_t thread_id_;
 	std::mutex main_thread_mutex_;
 	std::condition_variable main_thread_cv_;
 
@@ -259,6 +260,7 @@ private:
 
 	//static int messagePipeCallBack(int fd, int events, void* user);
 
+	static void* startMainLoopCallback( void* myself );
 	// メインループ
 	void mainLoop();
 public:
@@ -277,6 +279,9 @@ public:
 
 	// for iTVPApplication
 	virtual void startApplication( struct android_app* state );
+	void initializeApplication();
+	void startMainLoop();
+	void stopMainLoop();
 
 	void loadSaveState( void* state );
 	void handleSensorEvent();
@@ -342,9 +347,7 @@ public:
 	void setJavaVM( JavaVM* jvm ) {
 		jvm_ = jvm;
 	}
-	void setWindow( ANativeWindow* window ) {
-		window_ = window;
-	}
+	void setWindow( ANativeWindow* window );
 	void SendMessageFromJava( tjs_int message, tjs_int64 wparam, tjs_int64 lparam );
 	ANativeWindow* getWindow() { return window_; }
 	// for tTVPScreen
@@ -353,6 +356,7 @@ public:
 	static void nativeSetMessageResource(JNIEnv *jenv, jobject obj, jobjectArray mesarray);
 	static void nativeToMessage(JNIEnv *jenv, jobject obj, jint mes, jlong wparam, jlong lparam );
 	static void nativeSetActivity(JNIEnv *jenv, jobject obj, jobject activity);
+	static void nativeInitialize(JNIEnv *jenv, jobject obj);
 	void writeBitmapToNative( const void * bits );
 
 	TTVPWindowForm* GetMainWindow() { return main_window_; }

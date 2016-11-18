@@ -40,6 +40,7 @@ static const tjs_int TVP_VERSION_BUILD = 1;
 
 tTVPApplication* Application;
 
+extern void TVPRegisterAssetMedia();
 /**
  * Android 版のバージョン番号はソースコードに埋め込む
  * パッケージのバージョン番号はアプリのバージョンであって、エンジンのバージョンではないため
@@ -60,7 +61,7 @@ void TVPGetFileVersionOf( tjs_int& major, tjs_int& minor, tjs_int& release, tjs_
  */
 
 tTVPApplication::tTVPApplication()
-: jvm_(nullptr), window_(nullptr), asset_manager_(nullptr), config_(nullptr), is_terminate_(false), main_window_(nullptr)
+: jvm_(nullptr), window_(nullptr), asset_manager_(nullptr), config_(nullptr), is_terminate_(true), main_window_(nullptr)
 {
 }
 tTVPApplication::~tTVPApplication() {
@@ -120,6 +121,8 @@ void tTVPApplication::mainLoop() {
 				}
 				releaseNativeEvent( event );
 			}
+			// アイドル処理
+			handleIdle();
 		}
 		{	// コマンドキューに何か入れられるまで待つ
 			std::unique_lock<std::mutex> uniq_lk(main_thread_mutex_);
@@ -228,7 +231,51 @@ void tTVPApplication::startApplication( struct android_app* state ) {
 	} catch(...) {
 	}
 }
+void tTVPApplication::initializeApplication() {
+	TVPTerminateCode = 0;
 
+	// TODO Init console(LogCat)
+	try {
+		TVPRegisterAssetMedia();
+
+		TVPInitScriptEngine();
+
+		// banner
+		TVPAddImportantLog( TVPFormatMessage(TVPProgramStartedOn, TVPGetOSName(), TVPGetPlatformName()) );
+
+		TVPInitializeBaseSystems();
+
+		Initialize();
+
+		if(TVPCheckPrintDataPath()) return;
+		if(TVPExecuteUserConfig()) return;
+
+		// image_load_thread_ = new tTVPAsyncImageLoader();
+
+		TVPSystemInit();
+
+		if(TVPCheckAbout()) return; // version information dialog box;
+
+		SetTitle( tjs_string(TVPKirikiri) );
+
+		TVPSystemControl = new tTVPSystemControl();
+
+#ifndef TVP_IGNORE_LOAD_TPM_PLUGIN
+//		TVPLoadPluigins(); // load plugin module *.tpm
+#endif
+
+		// Check digitizer
+		CheckDigitizer();
+
+		// start image load thread
+		// image_load_thread_->Resume();
+
+		if(TVPProjectDirSelected) TVPInitializeStartupScript();
+
+		// run main loop from activity resume.
+	} catch(...) {
+	}
+}
 void tTVPApplication::handleCommand( struct android_app* state, int32_t cmd ) {
 	tTVPApplication* app = (tTVPApplication*)(state->userData);
 	app->onCommand( state, cmd );
@@ -236,6 +283,23 @@ void tTVPApplication::handleCommand( struct android_app* state, int32_t cmd ) {
 int32_t tTVPApplication::handleInput( struct android_app* state, AInputEvent* event ) {
 	tTVPApplication* app = (tTVPApplication*)(state->userData);
 	return app->onInput( state, event );
+}
+void* tTVPApplication::startMainLoopCallback( void* myself ) {
+	tTVPApplication* app = reinterpret_cast<tTVPApplication*>(myself);
+	app->mainLoop();
+	pthread_exit(0);
+	return nullptr;
+}
+void tTVPApplication::startMainLoop() {
+	if( is_terminate_ ) {
+		is_terminate_ = false;
+		pthread_create( &thread_id_, 0, startMainLoopCallback, this );
+	}
+}
+void tTVPApplication::stopMainLoop() {
+	is_terminate_ = true;
+	wakeupMainThread();
+	pthread_join( thread_id_, 0 );
 }
 void tTVPApplication::onCommand( struct android_app* state, int32_t cmd ) {
 	switch( cmd ) {
@@ -569,6 +633,25 @@ void tTVPApplication::getStringFromJava( const char* methodName, tjs_string& des
 void tTVPApplication::SendMessageFromJava( tjs_int message, tjs_int64 wparam, tjs_int64 lparam ) {
 	// Main Windowが存在する場合はそのWindowへ送る
 	NativeEvent ev(message,lparam,wparam);
+	switch( message ) {
+	case AM_START:
+	case AM_RESTART:
+		return;
+	case AM_RESUME:
+		startMainLoop();
+		break;
+	case AM_PAUSE:
+		break;
+	case AM_STOP:
+		break;
+	case AM_DESTROY:
+		stopMainLoop();
+		return;
+	case AM_SURFACE_CHANGED:
+	case AM_SURFACE_CREATED:
+	case AM_SURFACE_DESTORYED:
+		break;
+	}
 	TTVPWindowForm* win = GetMainWindow();
 	if( win ) {
 		postEvent( &ev, win->GetEventHandler() );
@@ -576,15 +659,22 @@ void tTVPApplication::SendMessageFromJava( tjs_int message, tjs_int64 wparam, tj
 		postEvent( &ev, nullptr );
 	}
 }
+
+void tTVPApplication::setWindow( ANativeWindow* window ) {
+	std::lock_guard<std::mutex> lock( main_thread_mutex_ );
+	window_ = window;
+}
 void tTVPApplication::nativeSetSurface(JNIEnv *jenv, jobject obj, jobject surface) {
 	if( surface != 0 ) {
 		ANativeWindow* window = ANativeWindow_fromSurface(jenv, surface);
 		LOGI("Got window %p", window);
 		Application->setWindow(window);
+		SendMessageFromJava( AM_SURFACE_CHANGED, 0, 0 );
 	} else {
 		LOGI("Releasing window");
 		ANativeWindow_release(Application->getWindow());
 		Application->setWindow(nullptr);
+		SendMessageFromJava( AM_SURFACE_DESTORYED, 0, 0 );
 	}
 	return;
 }
@@ -623,6 +713,9 @@ void tTVPApplication::nativeToMessage(JNIEnv *jenv, jobject obj, jint mes, jlong
 void tTVPApplication::nativeSetActivity(JNIEnv *jenv, jobject obj, jobject activity) {
 	Application->activity_ = activity;
 }
+void tTVPApplication::nativeInitialize(JNIEnv *jenv, jobject obj) {
+	Application->initializeApplication();
+}
 static JNINativeMethod methods[] = {
 		// Java側関数名, (引数の型)返り値の型, native側の関数名の順に並べます
 		{ "nativeSetSurface", "(LAndroid/view/Surface;)V", (void *)tTVPApplication::nativeSetSurface },
@@ -630,6 +723,7 @@ static JNINativeMethod methods[] = {
 		{ "nativeSetAssetManager", "([Landroid/content/res/AssetManager;)V", (void *)tTVPApplication::nativeSetAssetManager },
 		{ "nativeToMessage", "(IJJ)V", (void*)tTVPApplication::nativeToMessage },
 		{ "nativeSetActivity", "([Landroid/app/Activity;)V", (void *)tTVPApplication::nativeSetActivity },
+		{ "nativeInitialize", "()V", (void *)tTVPApplication::nativeInitialize},
 };
 
 jint registerNativeMethods( JNIEnv* env, const char *class_name, JNINativeMethod *methods, int num_methods ) {

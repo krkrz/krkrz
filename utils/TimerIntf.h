@@ -13,6 +13,7 @@
 
 #include "tjsNative.h"
 #include "EventIntf.h"
+#include "TimerThread.h"
 
 
 // the timer has sub-milliseconds precision by fixed-point real.
@@ -30,7 +31,7 @@ extern bool TVPLimitTimerCapacity;
 //---------------------------------------------------------------------------
 // tTJSNI_BaseTimer
 //---------------------------------------------------------------------------
-class tTJSNI_BaseTimer : public tTJSNativeInstance
+class tTJSNI_Timer : public tTJSNativeInstance, public tTVPTimerBase
 {
 	typedef tTJSNativeInstance inherited;
 
@@ -43,15 +44,15 @@ protected:
 	tTVPAsyncTriggerMode Mode; // trigger mode
 
 public:
-	tTJSNI_BaseTimer();
+	tTJSNI_Timer();
 	tjs_error TJS_INTF_METHOD
 		Construct(tjs_int numparams, tTJSVariant **param,
 			iTJSDispatch2 *tjs_obj);
 	void TJS_INTF_METHOD Invalidate();
 
 protected:
-	void Fire(tjs_uint n);
-	void CancelEvents();
+	virtual void Fire(tjs_uint n);
+	virtual void CancelEvents();
 	bool AreEventsInQueue();
 
 public:
@@ -66,7 +67,6 @@ public:
 };
 //---------------------------------------------------------------------------
 
-#include "TimerImpl.h" // must define tTJSNI_Timer class
 
 //---------------------------------------------------------------------------
 // tTJSNC_Timer : TJS Timer class

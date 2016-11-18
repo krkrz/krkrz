@@ -36,7 +36,7 @@ TShiftState TVP_TShiftState_From_uint32(tjs_uint32 state){
 }
 
 TTVPWindowForm::TTVPWindowForm( class tTVPApplication* app, class tTJSNI_Window* ni )
- : touch_points_(this), EventQueue(this,&TTVPWindowForm::WndProc) {
+ : app_(app), touch_points_(this), EventQueue(this,&TTVPWindowForm::WndProc) {
 	EventQueue.Allocate();
 }
 TTVPWindowForm::~TTVPWindowForm() {

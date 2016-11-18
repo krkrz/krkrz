@@ -151,26 +151,19 @@ public:
 		}
 	}
 	void TJS_INTF_METHOD GetLocallyAccessibleName(ttstr &name) {
-		#if 0
-			public String getLocallyAccessibleName( final String name ) {
-		StringBuilder newname = new StringBuilder(256);
-		int start = 0;
-		final int count = name.length();
-		if( count > 0 && name.charAt(0) == '.' ) start++; // 最初に . がある場合はスキップ
-		while( count > start && (name.charAt(start) == '/' || name.charAt(start) == '\\') ) start++; // 最初に / \ がある場合はスキップ
-
-		while( start < count ) {
-			char c = name.charAt(start);
-			if( c != '\\' ) {
-				newname.append(c);
-			} else {
-				newname.append('/'); // \ は / に置換する
-			}
-			start++;
+		ttstr newname;
+		const tjs_char *ptr = name.c_str();
+		if( *ptr == TJS_W('.') ) ptr++;
+		while( *ptr == TJS_W('/') || *ptr == TJS_W('\\') ) ptr++;
+		newname = ttstr(ptr);
+		// change path delimiter to '/'
+		tjs_char *pp = newname.Independ();
+		while(*pp)
+		{
+			if(*pp == TJS_W('\\')) *pp = TJS_W('/');
+			pp++;
 		}
-		return newname.toString();
-	}
-		#endif
+		name = newname;
 	}
 
 	void TJS_INTF_METHOD GetLocalName(ttstr &name) {
@@ -180,6 +173,14 @@ public:
 		name = tmp;
 	}
 };
+//---------------------------------------------------------------------------
+void TVPRegisterAssetMedia()
+{
+	iTVPStorageMedia *assetmedia = new tTVPAssetMedia();
+	TVPRegisterStorageMedia( assetmedia );
+	assetmedia->Release();
+}
+//---------------------------------------------------------------------------
 
 
 class AssetCache {

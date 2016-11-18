@@ -28,9 +28,9 @@ bool TVPLimitTimerCapacity = false;
 
 
 //---------------------------------------------------------------------------
-// tTJSNI_BaseTimer
+// tTJSNI_Timer
 //---------------------------------------------------------------------------
-tTJSNI_BaseTimer::tTJSNI_BaseTimer()
+tTJSNI_Timer::tTJSNI_Timer()
 {
 	Owner = NULL;
 	Counter = 0;
@@ -41,7 +41,7 @@ tTJSNI_BaseTimer::tTJSNI_BaseTimer()
 }
 //---------------------------------------------------------------------------
 tjs_error TJS_INTF_METHOD
-		tTJSNI_BaseTimer::Construct(tjs_int numparams, tTJSVariant **param,
+		tTJSNI_Timer::Construct(tjs_int numparams, tTJSVariant **param,
 			iTJSDispatch2 *tjs_obj)
 {
 	if(numparams < 1) return TJS_E_BADPARAMCOUNT;
@@ -55,11 +55,17 @@ tjs_error TJS_INTF_METHOD
 	ActionOwner = param[0]->AsObjectClosure();
 	Owner = tjs_obj;
 
+	tTVPTimerThread::Add(this);
+
 	return TJS_S_OK;
 }
 //---------------------------------------------------------------------------
-void TJS_INTF_METHOD tTJSNI_BaseTimer::Invalidate()
+void TJS_INTF_METHOD tTJSNI_Timer::Invalidate()
 {
+	tTVPTimerThread::Remove(this);
+	ZeroPendingCount();
+	CancelEvents();
+
 	TVPCancelSourceEvents(Owner);
 	Owner = NULL;
 
@@ -69,7 +75,7 @@ void TJS_INTF_METHOD tTJSNI_BaseTimer::Invalidate()
 	inherited::Invalidate();
 }
 //---------------------------------------------------------------------------
-void tTJSNI_BaseTimer::Fire(tjs_uint n)
+void tTJSNI_Timer::Fire(tjs_uint n)
 {
 	if(!Owner) return;
 	static ttstr eventname(TJS_W("onTimer"));
@@ -105,7 +111,7 @@ void tTJSNI_BaseTimer::Fire(tjs_uint n)
 	}
 }
 //---------------------------------------------------------------------------
-void tTJSNI_BaseTimer::CancelEvents()
+void tTJSNI_Timer::CancelEvents()
 {
 	// cancel all events
 	if(Owner)
@@ -115,7 +121,7 @@ void tTJSNI_BaseTimer::CancelEvents()
 	}
 }
 //---------------------------------------------------------------------------
-bool tTJSNI_BaseTimer::AreEventsInQueue()
+bool tTJSNI_Timer::AreEventsInQueue()
 {
 	// are events in event queue ?
 
@@ -283,5 +289,26 @@ TJS_END_NATIVE_PROP_DECL(mode)
 }
 //---------------------------------------------------------------------------
 
+
+
+//---------------------------------------------------------------------------
+// tTJSNC_Timer
+//---------------------------------------------------------------------------
+tTJSNativeInstance *tTJSNC_Timer::CreateNativeInstance()
+{
+	return new tTJSNI_Timer();
+}
+//---------------------------------------------------------------------------
+
+
+
+//---------------------------------------------------------------------------
+// TVPCreateNativeClass_Timer
+//---------------------------------------------------------------------------
+tTJSNativeClass * TVPCreateNativeClass_Timer()
+{
+	return new tTJSNC_Timer();
+}
+//---------------------------------------------------------------------------
 
 

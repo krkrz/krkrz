@@ -428,9 +428,6 @@
     <ClInclude Include="..\visual\FontSystem.h">
       <Filter>visual</Filter>
     </ClInclude>
-    <ClInclude Include="..\utils\TimerImpl.h">
-      <Filter>utils</Filter>
-    </ClInclude>
     <ClInclude Include="..\visual\LayerBitmapImpl.h">
       <Filter>visual</Filter>
     </ClInclude>
@@ -469,9 +466,6 @@
     </ClInclude>
     <ClInclude Include="..\visual\win32\VSyncTimingThread.h">
       <Filter>visual\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="..\utils\win32\TVPTimer.h">
-      <Filter>utils\win32</Filter>
     </ClInclude>
     <ClInclude Include="..\base\win32\NativeEventQueue.h">
       <Filter>base\win32</Filter>
@@ -679,6 +673,12 @@
     </ClInclude>
     <ClInclude Include="..\environ\TouchPoint.h">
       <Filter>environ</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utils\TimerThread.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utils\TVPTimer.h">
+      <Filter>utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -994,9 +994,6 @@
     <ClCompile Include="..\visual\FontSystem.cpp">
       <Filter>visual</Filter>
     </ClCompile>
-    <ClCompile Include="..\utils\TimerImpl.cpp">
-      <Filter>utils</Filter>
-    </ClCompile>
     <ClCompile Include="..\visual\LayerBitmapImpl.cpp">
       <Filter>visual</Filter>
     </ClCompile>
@@ -1038,9 +1035,6 @@
     </ClCompile>
     <ClCompile Include="..\visual\win32\VSyncTimingThread.cpp">
       <Filter>visual\win32</Filter>
-    </ClCompile>
-    <ClCompile Include="..\utils\win32\TVPTimer.cpp">
-      <Filter>utils\win32</Filter>
     </ClCompile>
     <ClCompile Include="..\base\win32\NativeEventQueue.cpp">
       <Filter>base\win32</Filter>
@@ -1254,6 +1248,12 @@
     </ClCompile>
     <ClCompile Include="..\tjs2\tjsSnprintf.cpp">
       <Filter>tjs2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utils\TimerThread.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utils\TVPTimer.cpp">
+      <Filter>utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

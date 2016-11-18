@@ -34,6 +34,9 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
         System.loadLibrary("krkrz");
         nativeSetActivity( this );
         nativeSetAssetManager( getResources().getAssets() );
+
+		// Execute startup.tjs
+		nativeInitialize();
 	}
 	@Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -123,4 +126,5 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
     public static native void nativeSetSurface(Surface surface);
 	public static native void nativeSetAssetManager(AssetManager am);
     public static native void nativeSetActivity( Activity activity );
+	public static native void nativeInitialize();
 }

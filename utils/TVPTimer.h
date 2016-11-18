@@ -2,6 +2,8 @@
 #ifndef __TVP_TIMER_H__
 #define __TVP_TIMER_H__
 
+#include "TimerThread.h"
+
 class TVPTimerEventIntarface {
 public:
 	virtual void Handle() = 0;
@@ -17,53 +19,29 @@ public:
 	void Handle() { (owner_->*handler_)(); }
 };
 
-class TVPTimer {
-	HWND		window_handle_;
-	WNDCLASSEX	wc_;
-
+class TVPTimer : public tTVPTimerBase {
 	TVPTimerEventIntarface* event_;
-	int		interval_;
-	bool	enabled_;
 
-	int CreateUtilWindow();
-	void Destroy();
-	static LRESULT WINAPI TVPTimer::WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
-	void UpdateTimer();
-
-	void FireEvent() {
+protected:
+	// タイマー処理実態。メインスレッドで呼ばれる。
+	virtual void Fire(tjs_uint n) {
 		if( event_ ) {
 			event_->Handle();
 		}
 	}
 
+	// イベントをキャンセルする。SetEnabled/SetIntervalをコールした時内部で呼ばれる。
+	virtual void CancelEvents() {}
+
 public:
 	TVPTimer();
-	~TVPTimer();
+	virtual ~TVPTimer();
 
 	template<typename T>
 	void SetOnTimerHandler( T* owner, void (T::*Handler)() ) {
 		if( event_ ) delete event_;
 		event_ = new TVPTimerEvent<T>( owner, Handler );
-		UpdateTimer();
 	}
-
-	void SetInterval( int i ) {
-		if( interval_ != i ) {
-			interval_ = i;
-			UpdateTimer();
-		}
-	}
-	int GetInterval() const {
-		return interval_;
-	}
-	void SetEnabled( bool b ) {
-		if( enabled_ != b ) {
-			enabled_ = b;
-			UpdateTimer();
-		}
-	}
-	bool GetEnable() const { return enabled_; }
-
 };
 
 

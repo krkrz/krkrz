@@ -137,13 +137,13 @@ utils/MiscUtility.cpp
 utils/Random.cpp
 utils/ThreadIntf.cpp
 utils/TickCount.cpp
-utils/TimerImpl.cpp
+utils/TimerThread.cpp
 utils/TimerIntf.cpp
+utils/TVPTimer.cpp
 utils/uni_cp932.cpp
 utils/VelocityTracker.cpp
 utils/android/ClipboardImpl.cpp
 utils/android/ThreadImpl.cpp
-utils/android/TVPTimer.cpp
 visual/BitmapIntf.cpp
 visual/BitmapLayerTreeOwner.cpp
 visual/CharacterData.cpp

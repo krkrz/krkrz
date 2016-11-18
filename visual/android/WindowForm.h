@@ -41,6 +41,7 @@ TShiftState TVP_TShiftState_From_uint32(tjs_uint32 state);
  * イベント配信周りは書かれていないので、別途実装の必要あり
  */
 class TTVPWindowForm : public TouchHandler {
+	tTVPApplication* app_;
 
 	TouchPointList touch_points_;
 	VelocityTrackers TouchVelocityTracker;

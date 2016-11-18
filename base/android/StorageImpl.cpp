@@ -27,6 +27,7 @@
 
 #ifndef _WIN32
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <dirent.h>
 #include <unistd.h>
 #endif
@@ -80,7 +81,6 @@ void TJS_INTF_METHOD tTVPFileMedia::NormalizeDomainName(ttstr &name)
 void TJS_INTF_METHOD tTVPFileMedia::NormalizePathName(ttstr &name)
 {
 	// 非Windows環境では大文字小文字区別する実装の方が良いか？
-	/*
 	// normalize path name
 	// make all characters small
 	tjs_char *p = name.Independ();
@@ -90,7 +90,6 @@ void TJS_INTF_METHOD tTVPFileMedia::NormalizePathName(ttstr &name)
 			*p += TJS_W('a') - TJS_W('A');
 		p++;
 	}
-	*/
 }
 //---------------------------------------------------------------------------
 bool TJS_INTF_METHOD tTVPFileMedia::CheckExistentStorage(const ttstr &name)
@@ -119,91 +118,52 @@ tTJSBinaryStream * TJS_INTF_METHOD tTVPFileMedia::Open(const ttstr & name, tjs_u
 //---------------------------------------------------------------------------
 void TJS_INTF_METHOD tTVPFileMedia::GetListAt(const ttstr &_name, iTVPStorageLister *lister)
 {
-#if 0
-#ifndef _WIN32
-	// http://fa11enprince.hatenablog.com/entry/2013/08/29/021607
-#else
 	ttstr name(_name);
 	GetLocalName(name);
-	name += TJS_W("*.*");
-
-	// perform UNICODE operation
-	WIN32_FIND_DATAW ffd;
-	HANDLE handle = ::FindFirstFile(name.c_str(), &ffd);
-	if(handle != INVALID_HANDLE_VALUE)
-	{
-		BOOL cont;
-		do
-		{
-			if(!(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
-			{
-				ttstr file(ffd.cFileName);
-				tjs_char *p = file.Independ();
-				while(*p)
-				{
-					// make all characters small
-					if(*p >= TJS_W('A') && *p <= TJS_W('Z'))
-						*p += TJS_W('a') - TJS_W('A');
-					p++;
+	tjs_string wname(name.AsStdString());
+	std::string nname;
+	if( TVPUtf16ToUtf8(nname, wname) ) {
+		DIR* dr;
+		if( ( dr = opendir(filepath) ) != nullptr ) {
+			struct dirent* entry;
+			while( ( entry = readdir( dr ) ) != nullptr ) {
+				if( entry->d_type == DT_REG ) {
+					tjs_char fname[256];
+					tjs_int count = TVPUtf8ToWideCharString( entry->d_name, fname );
+					fname[count] = TJS_W('\0');
+					ttstr file(fname);
+					tjs_char *p = file.Independ();
+					while(*p) {
+						// make all characters small
+						if(*p >= TJS_W('A') && *p <= TJS_W('Z'))
+							*p += TJS_W('a') - TJS_W('A');
+						p++;
+					}
+					lister->Add(file);
 				}
-				lister->Add(file);
+				// entry->d_type == DT_UNKNOWN
 			}
-
-			cont = ::FindNextFile(handle, &ffd);
-		} while(cont);
-		FindClose(handle);
+			closedir( dr );
+		}
 	}
-#endif
-#endif
 }
 //---------------------------------------------------------------------------
 void TJS_INTF_METHOD tTVPFileMedia::GetLocallyAccessibleName(ttstr &name)
 {
-#if 0
 	ttstr newname;
 
 	const tjs_char *ptr = name.c_str();
-
-	if(TJS_strncmp(ptr, TJS_W("./"), 2))
-	{
-		// differs from "./",
-		// this may be a UNC file name.
-		// UNC first two chars must be "\\\\" ?
-		// AFAIK 32-bit version of Windows assumes that '/' can be used as a path
-		// delimiter. Can UNC "\\\\" be replaced by "//" though ?
-
-		newname = ttstr(TJS_W("\\\\")) + ptr;
-	}
-	else
-	{
-		ptr += 2;  // skip "./"
-		if(!*ptr) {
-			newname = TJS_W("");
-		} else {
-			tjs_char dch = *ptr;
-			if(*ptr < TJS_W('a') || *ptr > TJS_W('z')) {
-				newname = TJS_W("");
-			} else {
-				ptr++;
-				if(*ptr != TJS_W('/')) {
-					newname = TJS_W("");
-				} else {
-					newname = ttstr(dch) + TJS_W(":") + ptr;
-				}
-			}
-		}
-	}
-
-	// change path delimiter to '\\'
+	if( *ptr == TJS_W('.') ) ptr++;
+	while( *ptr == TJS_W('/') || *ptr == TJS_W('\\') ) ptr++;
+	newname = ttstr(ptr);
+	// change path delimiter to '/'
 	tjs_char *pp = newname.Independ();
 	while(*pp)
 	{
-		if(*pp == TJS_W('/')) *pp = TJS_W('\\');
+		if(*pp == TJS_W('\\')) *pp = TJS_W('/');
 		pp++;
 	}
-
 	name = newname;
-#endif
 }
 //---------------------------------------------------------------------------
 void TJS_INTF_METHOD tTVPFileMedia::GetLocalName(ttstr &name)
@@ -238,22 +198,7 @@ void TVPPreNormalizeStorageName(ttstr &name)
 	tjs_int namelen = name.GetLen();
 	if(namelen == 0) return;
 
-	if(namelen >= 2)
-	{
-		if(((name[0] >= TJS_W('a') && name[0]<=TJS_W('z')) ||
-			(name[0] >= TJS_W('A') && name[0]<=TJS_W('Z'))) &&
-			name[1] == TJS_W(':'))
-		{
-			// Windows drive:path expression
-			ttstr newname(TJS_W("file://./"));
-			newname += name[0];
-			newname += (name.c_str()+2);
-            name = newname;
-			return;
-		}
-	}
-
-	if(namelen>=3)
+	if(namelen>=2)
 	{
 		if( (name[0] == TJS_W('\\') && name[1] == TJS_W('\\')) ||
 			(name[0] == TJS_W('/') && name[1] == TJS_W('/')) )
