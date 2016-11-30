@@ -242,9 +242,6 @@
     <ClInclude Include="..\msg\MsgIntf.h">
       <Filter>msg</Filter>
     </ClInclude>
-    <ClInclude Include="..\msg\svn_revision.h">
-      <Filter>msg</Filter>
-    </ClInclude>
     <ClInclude Include="..\environ\win32\WindowFormUnit.h">
       <Filter>environ\win32</Filter>
     </ClInclude>
@@ -306,9 +303,6 @@
       <Filter>visual</Filter>
     </ClInclude>
     <ClInclude Include="..\visual\LayerManager.h">
-      <Filter>visual</Filter>
-    </ClInclude>
-    <ClInclude Include="..\visual\LoadTLG.h">
       <Filter>visual</Filter>
     </ClInclude>
     <ClInclude Include="..\visual\transhandler.h">
@@ -1262,9 +1256,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="small.ico">
-      <Filter>リソース ファイル</Filter>
-    </Image>
     <Image Include="tvpwin32.ico">
       <Filter>リソース ファイル</Filter>
     </Image>

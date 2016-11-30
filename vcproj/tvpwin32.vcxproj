@@ -403,7 +403,6 @@
     <ClInclude Include="..\movie\win32\PlayWindow.h" />
     <ClInclude Include="..\movie\win32\TVPVideoOverlay.h" />
     <ClInclude Include="..\msg\MsgIntf.h" />
-    <ClInclude Include="..\msg\svn_revision.h" />
     <ClInclude Include="..\msg\win32\MsgImpl.h" />
     <ClInclude Include="..\msg\win32\ReadOptionDesc.h" />
     <ClInclude Include="..\sound\MathAlgorithms.h" />
@@ -518,7 +517,6 @@
     <ClInclude Include="..\visual\LayerIntf.h" />
     <ClInclude Include="..\visual\LayerManager.h" />
     <ClInclude Include="..\visual\LayerTreeOwnerImpl.h" />
-    <ClInclude Include="..\visual\LoadTLG.h" />
     <ClInclude Include="..\visual\PrerenderedFont.h" />
     <ClInclude Include="..\visual\RectItf.h" />
     <ClInclude Include="..\visual\SaveTLG.h" />
@@ -766,7 +764,6 @@
     <ResourceCompile Include="tvpwin32.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="small.ico" />
     <Image Include="tvpwin32.ico" />
   </ItemGroup>
   <ItemGroup>
