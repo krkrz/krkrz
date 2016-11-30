@@ -9,6 +9,7 @@ TVPTimer::TVPTimer() : event_(nullptr) {
 TVPTimer::~TVPTimer() {
 	tTVPTimerThread::Remove(this);
 	ZeroPendingCount();
+	if( event_ ) delete event_;
 }
 
 
