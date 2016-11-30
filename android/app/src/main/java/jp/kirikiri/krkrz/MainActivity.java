@@ -6,6 +6,8 @@ import android.content.res.Configuration;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -91,6 +93,172 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
     	super.onDestroy();
         nativeToMessage(EventCode.AM_DESTROY,0,0);
     }
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        return super.onKeyDown(keyCode, event);
+    }
+    @Override
+    public boolean onKeyMultiple(int keyCode, int repeatCount, KeyEvent event) {
+        return super.onKeyMultiple(keyCode, repeatCount, event);
+    }
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        return super.onKeyUp(keyCode, event);
+    }
+
+    @Override
+    public boolean onGenericMotionEvent( MotionEvent event ) {
+        // ジョイスティック、ゲームパッド、マウス、トラックボール イベント
+        // 現在のところ実装していない
+        int action = event.getActionMasked();
+        int meta = getModifiersToInt( event.getMetaState(), event.getDownTime() > 0 );
+        switch( action ) {
+            case MotionEvent.ACTION_HOVER_MOVE: // 非押下移動も判定出来るようにする
+                meta = getModifiersToInt( event.getMetaState(), false );
+                break;
+            case MotionEvent.ACTION_OUTSIDE:
+                meta = getModifiersToInt( event.getMetaState(), false );
+                break;
+        }
+        int type = getMouseToolType( event.getToolType(0) );
+        switch( type ) {
+            case MotionEvent.TOOL_TYPE_MOUSE: //	マウス
+            case MotionEvent.TOOL_TYPE_STYLUS: //	スタイラス
+                int btn = getMouseButtonNumber( event.getButtonState() );
+                break;
+            case MotionEvent.TOOL_TYPE_FINGER: //	指
+            case MotionEvent.TOOL_TYPE_ERASER: //	消しゴム
+            case MotionEvent.TOOL_TYPE_UNKNOWN: //	その他
+            default:
+                break;
+        }
+        return super.onGenericMotionEvent(event);
+    }
+    public static final int TOUCH_DOWN = 0;
+    public static final int TOUCH_MOVE = 1;
+    public static final int TOUCH_UP = 2;
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        //int action = event.getAction();
+        //int index = (action & MotionEvent.ACTION_POINTER_INDEX_MASK) >> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
+        int index = event.getActionIndex();
+        int eventID = event.getPointerId(index);
+
+        int action = event.getActionMasked();
+        //int meta = getModifiersToInt( event.getMetaState(), event.getDownTime() > 0 );
+        float x = event.getX();
+        float y = event.getY();
+        long tick = event.getEventTime();
+        float c = event.getSize();
+        int count = 0;
+        switch( action ) {
+            case MotionEvent.ACTION_DOWN:
+                // meta = getModifiersToInt( event.getMetaState(), true );
+                nativeOnTouch( TOUCH_DOWN, x, y, c, eventID, tick );
+                break;
+            case MotionEvent.ACTION_POINTER_DOWN: // マルチタッチ
+                count = event.getPointerCount();
+                for(int i = 0; i < count; i++ ) {
+                    int pid = event.getPointerId(i);
+                    x = event.getX(i);
+                    y = event.getY(i);
+                    c = event.getSize(i);
+                    nativeOnTouch( TOUCH_DOWN, x, y, c, pid, tick );
+                }
+                break;
+            case MotionEvent.ACTION_POINTER_UP: // マルチタッチ
+                count = event.getPointerCount();
+                for(int i = 0; i < count; i++ ) {
+                    int pid = event.getPointerId(i);
+                    x = event.getX(i);
+                    y = event.getY(i);
+                    c = event.getSize(i);
+                    nativeOnTouch( TOUCH_UP, x, y, c, pid, tick );
+                }
+                break;
+            case MotionEvent.ACTION_UP:
+                nativeOnTouch( TOUCH_UP, x, y, c, eventID, tick );
+                //meta = getModifiersToInt( event.getMetaState(), false );
+                break;
+            case MotionEvent.ACTION_MOVE: {
+                //meta = getModifiersToInt(event.getMetaState(), true);
+                count = event.getPointerCount();
+                for(int i = 0; i < count; i++ ) {
+                    int pid = event.getPointerId(i);
+                    x = event.getX(i);
+                    y = event.getY(i);
+                    c = event.getSize(i);
+                    nativeOnTouch( TOUCH_MOVE, x, y, c, pid, tick );
+                    int hsize = event.getHistorySize();
+                    for( int j = 0; j < hsize; j++ ) {
+                        x = event.getHistoricalX(i, j);
+                        y = event.getHistoricalY(i, j);
+                        c = event.getHistoricalSize(i, j);
+                        tick = event.getHistoricalEventTime(j);
+                        nativeOnTouch( TOUCH_MOVE, x, y, c, pid, tick );
+                    }
+                }
+                break;
+            }
+            case MotionEvent.ACTION_CANCEL:
+                // 押されたが即座に離された場合は無視扱いしておく
+                // meta = getModifiersToInt( event.getMetaState(), false );
+                break;
+        }
+        return true;
+    }
+    public static final int SS_SHIFT   = 0x01;
+    public static final int SS_ALT     = 0x02;
+    public static final int SS_CTRL    = 0x04;
+    public static final int SS_LEFT    = 0x08;
+    public static final int SS_RIGHT   = 0x10;
+    public static final int SS_MIDDLE  = 0x20;
+    public static final int SS_DOUBLE  = 0x40;
+    public static final int SS_REPEAT  = 0x80;
+    public static final int SS_ALTGRAPH= 0x100; // AltGraph キー
+    public static final int SS_META    = 0x200; // Meta キー
+    private static final int META_ALT_MASK = KeyEvent.META_ALT_ON|KeyEvent.META_ALT_LEFT_ON|KeyEvent.META_ALT_RIGHT_ON; // API 11
+    private static final int META_SHIFT_MASK = KeyEvent.META_SHIFT_ON|KeyEvent.META_SHIFT_LEFT_ON|KeyEvent.META_SHIFT_RIGHT_ON; // API 11
+    private static final int META_CTRL_MASK = 0x00007000; // API 11
+    private static final int META_META_MASK = 0x00070000; // API 11
+    private static int getModifiersToInt( int meta, boolean ispressing ) {
+        int f = 0;
+        if( (meta & META_ALT_MASK) != 0 ) { f += SS_ALT; }
+        if( (meta & META_SHIFT_MASK) != 0 ) { f += SS_SHIFT; }
+        if( (meta & META_CTRL_MASK) != 0 ) { f += SS_CTRL; }
+        if( (meta & META_META_MASK) != 0 ) { f += SS_META; }
+        if( ispressing ) { f += SS_LEFT; }
+        return f;
+    }
+    public static final int mbLeft   = 0;
+    public static final int mbRight  = 1;
+    public static final int mbMiddle = 2;
+    public static final int mbX1      = 3;
+    public static final int mbX2      = 4;
+    public static final int mbForward   = 5;
+    public static final int mbBack      = 6;
+    public static final int mbStylusPrimary     = 7;
+    public static final int mbStylusSecondary   = 8;
+    private static int getMouseButtonNumber( int state ) {
+        if( (state & MotionEvent.BUTTON_PRIMARY) != 0 ) { return mbLeft; /* 左クリック */ }
+        if( (state & MotionEvent.BUTTON_SECONDARY) != 0 ) { return mbRight; /* 右クリック */ }
+        if( (state & MotionEvent.BUTTON_TERTIARY) != 0 ) { return mbMiddle; /* 真ん中クリック */ }
+        if( (state & MotionEvent.BUTTON_FORWARD) != 0 ) { return mbForward; /* マウスのホイールボタンを前に進める */ }
+        if( (state & MotionEvent.BUTTON_BACK) != 0 ) { return mbBack; /* マウスのホイールボタンを後ろに進める */ }
+        if( (state & MotionEvent.BUTTON_STYLUS_PRIMARY) != 0 ) { return mbStylusPrimary; /* スタイラス主 */ }
+        if( (state & MotionEvent.BUTTON_STYLUS_SECONDARY) != 0 ) { return mbStylusSecondary; /* スタイラス副 */ }
+        return -1;
+    }
+    private static int getMouseToolType( int type ) {
+        switch( type ) {
+            case MotionEvent.TOOL_TYPE_FINGER: //	指
+            case MotionEvent.TOOL_TYPE_MOUSE: //	マウス
+            case MotionEvent.TOOL_TYPE_STYLUS: //	スタイラス
+            case MotionEvent.TOOL_TYPE_ERASER: //	消しゴム
+            case MotionEvent.TOOL_TYPE_UNKNOWN: //	その他
+        }
+        return 0;
+    }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
         nativeSetSurface(holder.getSurface());
@@ -101,14 +269,14 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
     public void surfaceDestroyed(SurfaceHolder holder) {
         nativeSetSurface(null);
     }
-	// *** native から呼び出すよう関数
+	// *** native から呼び出す用関数
     public String getMessageRes( int id ) {
         String[] mes  = getResources().getStringArray(R.array.system_message_resource);
         return mes[id];
     }
 	public String getLanguage() {
-		Locale locale = Locale.getDefault();
-		return locale.getLanguage();
+        Locale locale = Locale.getDefault();
+        return locale.getLanguage();
 	}
     public String getCachePath() {
         // getCacheDir() の場合は内部、どちらでも取得できるほうがいいか？
@@ -127,4 +295,6 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
 	public static native void nativeSetAssetManager(AssetManager am);
     public static native void nativeSetActivity( Activity activity );
 	public static native void nativeInitialize();
+
+    public static native void nativeOnTouch( int type, float x, float y, float c, int id, long tick );
 }

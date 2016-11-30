@@ -520,10 +520,8 @@ tTVPNativeBaseBitmap::tTVPNativeBaseBitmap(tjs_uint w, tjs_uint h, tjs_uint bpp)
 	TVPInializeFontRasterizers();
 	// TVPFontRasterizer->AddRef(); TODO
 
-	// TVPConstructDefaultFont();
 	Font = TVPFontSystem->GetDefaultFont();
 	PrerenderedFont = NULL;
-	//LogFont = TVPDefaultLOGFONT;
 	FontChanged = true;
 	GlobalFontState = -1;
 	TextWidth = TextHeight = 0;
@@ -540,7 +538,6 @@ tTVPNativeBaseBitmap::tTVPNativeBaseBitmap(const tTVPNativeBaseBitmap & r)
 
 	Font = r.Font;
 	PrerenderedFont = NULL;
-	//LogFont = TVPDefaultLOGFONT;
 	FontChanged = true;
 	TextWidth = TextHeight = 0;
 }
@@ -764,14 +761,7 @@ void tTVPNativeBaseBitmap::SetFont(const tTVPFont &font)
 void tTVPNativeBaseBitmap::GetFontList(tjs_uint32 flags, std::vector<ttstr> &list)
 {
 	ApplyFont();
-#ifdef _WIN32
-	std::vector<tjs_string> ansilist;
-	TVPGetFontList(ansilist, flags, GetFont() );
-	for(std::vector<tjs_string>::iterator i = ansilist.begin(); i != ansilist.end(); i++)
-		list.push_back(i->c_str());
-#else
-	list.clear();
-#endif
+	TVPFontSystem->GetFontList( list, flags, GetFont() );
 }
 //---------------------------------------------------------------------------
 void tTVPNativeBaseBitmap::MapPrerenderedFont(const ttstr & storage)

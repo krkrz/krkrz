@@ -52,6 +52,7 @@ struct EventCommand {
 	EventCommand( NativeEventQueueIntarface* t, NativeEvent* c ) : target(t), command(c) {}
 	EventCommand() : target(nullptr), command(nullptr) {}
 };
+
 class tTVPApplication : public iTVPApplication {
 	JavaVM*			jvm_;
 	ANativeWindow*	window_;
@@ -80,6 +81,9 @@ class tTVPApplication : public iTVPApplication {
     pthread_t thread_id_;
 	std::mutex main_thread_mutex_;
 	std::condition_variable main_thread_cv_;
+
+	bool font_list_searched_;
+	std::vector<FontInfo*>	font_list_;
 
 private:
 	NativeEvent* createNativeEvent();
@@ -349,6 +353,7 @@ public:
 	}
 	void setWindow( ANativeWindow* window );
 	void SendMessageFromJava( tjs_int message, tjs_int64 wparam, tjs_int64 lparam );
+	void SendTouchMessageFromJava( tjs_int type, float x, float y, float c, int id, tjs_int64 tick );
 	ANativeWindow* getWindow() { return window_; }
 	// for tTVPScreen
 	ANativeWindow* getNativeWindow() const { return window_; }
@@ -357,6 +362,7 @@ public:
 	static void nativeToMessage(JNIEnv *jenv, jobject obj, jint mes, jlong wparam, jlong lparam );
 	static void nativeSetActivity(JNIEnv *jenv, jobject obj, jobject activity);
 	static void nativeInitialize(JNIEnv *jenv, jobject obj);
+	static void nativeOnTouch( JNIEnv *jenv, jint type, jfloat x, jfloat y, jfloat c, jint id, jlong tick );
 	void writeBitmapToNative( const void * bits );
 
 	TTVPWindowForm* GetMainWindow() { return main_window_; }

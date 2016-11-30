@@ -58,11 +58,9 @@ tTVPSystemControl::tTVPSystemControl() : EventEnable(true) {
 
 	TVPSystemControlAlive = true;
 
-	/*
-	SystemWatchTimer.SetInterval(50);
 	SystemWatchTimer.SetOnTimerHandler( this, &tTVPSystemControl::SystemWatchTimerTimer );
+	SystemWatchTimer.SetInterval(50);
 	SystemWatchTimer.SetEnabled( true );
-	*/
 }
 void tTVPSystemControl::InvokeEvents() {
 	CallDeliverAllEventsOnIdle();

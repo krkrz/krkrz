@@ -3,6 +3,7 @@
 
 #include "WindowForm.h"
 #include "ActivityEvents.h"
+#include "Application.h"
 
 tjs_uint32 TVP_TShiftState_To_uint32(TShiftState state) {
 	tjs_uint32 result = 0;

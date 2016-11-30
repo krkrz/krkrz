@@ -1497,12 +1497,12 @@ void TTVPWindowForm::SetAttentionPoint(tjs_int left, tjs_int top, const tTVPFont
 	AttentionPoint.x = left;
 	AttentionPoint.y = top;
 	AttentionPointEnabled = true;
+	bool assignedfont = false;
 	if( font ) {
-		AttentionFont->Assign(*font);
-	} else {
-		tTVPSysFont * default_font = new tTVPSysFont();
-		AttentionFont->Assign(default_font);
-		delete default_font;
+		assignedfont = AttentionFont->Assign(*font);
+	}
+	if( assignedfont == false ) {
+		AttentionFont->AssignDefaultUIFont();
 	}
 	AcquireImeControl();
 }

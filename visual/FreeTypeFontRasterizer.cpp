@@ -7,6 +7,9 @@
 #include "MsgIntf.h"
 #include "FontSystem.h"
 #include <cmath>
+#ifdef _WIN32
+#include "TVPSysFont.h"
+#endif
 
 extern void TVPUninitializeFreeFont();
 extern FontSystem* TVPFontSystem;
@@ -182,4 +185,18 @@ void FreeTypeFontRasterizer::GetGlyphDrawRect( const ttstr & text, tTVPRect& are
 		offsety = 0;
 	}
 }
+//---------------------------------------------------------------------------
+extern bool TVPAddFontToFreeType( const ttstr& storage, std::vector<tjs_string>* faces );
+bool FreeTypeFontRasterizer::AddFont( const ttstr& storage, std::vector<tjs_string>* faces ) {
+	return TVPAddFontToFreeType( storage, faces );
+}
+//---------------------------------------------------------------------------
+extern void TVPGetFontListFromFreeType(std::vector<ttstr> & list, tjs_uint32 flags, const tTVPFont & font );
+void FreeTypeFontRasterizer::GetFontList(std::vector<ttstr> & list, tjs_uint32 flags, const struct tTVPFont & font ) {
+#ifdef _WIN32
+	TVPGetFontList( list, flags, font );
+#endif
+	TVPGetFontListFromFreeType( list, flags, font );
+}
+//---------------------------------------------------------------------------
 

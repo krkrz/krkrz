@@ -124,7 +124,7 @@ void TJS_INTF_METHOD tTVPFileMedia::GetListAt(const ttstr &_name, iTVPStorageLis
 	std::string nname;
 	if( TVPUtf16ToUtf8(nname, wname) ) {
 		DIR* dr;
-		if( ( dr = opendir(filepath) ) != nullptr ) {
+		if( ( dr = opendir(nname.c_str()) ) != nullptr ) {
 			struct dirent* entry;
 			while( ( entry = readdir( dr ) ) != nullptr ) {
 				if( entry->d_type == DT_REG ) {

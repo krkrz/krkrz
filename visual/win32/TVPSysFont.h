@@ -17,14 +17,15 @@ public:
 	~tTVPSysFont();
 
 	int GetAscentHeight();
-	void Assign( const tTVPSysFont* font );
-	void Assign( const tTVPFont &font );
-	void ApplyFont( const LOGFONT* info );
+	bool Assign( const tTVPSysFont* font );
+	bool Assign( const tTVPFont &font );
+	bool ApplyFont( const LOGFONT* info );
+	bool AssignDefaultUIFont();
 	void GetFont( LOGFONT* font ) const;
 	HDC GetDC() { return hMemDC_; }
 };
 
 extern void TVPGetAllFontList( std::vector<tjs_string>& list );
-extern void TVPGetFontList(std::vector<tjs_string> & list, tjs_uint32 flags, const tTVPFont & font );
+extern void TVPGetFontList(std::vector<ttstr> & list, tjs_uint32 flags, const tTVPFont & font );
 extern tjs_uint8 TVPGetCharSetFromFaceName( const tjs_char* face );
 #endif // __TVP_SYS_FONT_H__

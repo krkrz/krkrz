@@ -6,9 +6,12 @@
 #include "StringUtil.h"
 #include "MsgIntf.h"
 #include <vector>
+#include "FontRasterizer.h"
+
 
 extern void TVPGetAllFontList( std::vector<tjs_string>& list );
 extern const tjs_char *TVPGetDefaultFontName();
+extern void TVPSetDefaultFontName( const tjs_char * name );
 
 void FontSystem::InitFontNames() {
 	// enumlate all fonts
@@ -95,3 +98,31 @@ tjs_string FontSystem::GetBeingFont(tjs_string fonts) {
 		return tjs_string(TVPGetDefaultFontName());
 	}
 }
+//---------------------------------------------------------------------------
+void FontSystem::AddExtraFont( const tjs_string& storage, std::vector<ttstr>* faces ) {
+	std::vector<tjs_string> loadface;
+	if( GetCurrentRasterizer()->AddFont( storage, &loadface ) ) {
+		for( auto i = loadface.begin(); i != loadface.end(); ++i ) {
+			AddFont( *i );
+		}
+	}
+	if( faces ) {
+		for( auto i = loadface.begin(); i != loadface.end(); ++i ) {
+			faces->push_back( ttstr( *i ) );
+		}
+	}
+}
+//---------------------------------------------------------------------------
+const tjs_char* FontSystem::GetDefaultFontName() const {
+	return TVPGetDefaultFontName();
+}
+//---------------------------------------------------------------------------
+void FontSystem::SetDefaultFontName( const tjs_char* name ) {
+	TVPSetDefaultFontName( name );
+	DefaultFont.Face = ttstr(TVPGetDefaultFontName());
+}
+//---------------------------------------------------------------------------
+void FontSystem::GetFontList(std::vector<ttstr> & list, tjs_uint32 flags, const struct tTVPFont & font ) {
+	GetCurrentRasterizer()->GetFontList( list, flags, font );
+}
+//---------------------------------------------------------------------------

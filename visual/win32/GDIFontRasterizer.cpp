@@ -8,6 +8,8 @@
 #include "FontSystem.h"
 #include "TVPSysFont.h"
 #include "SysInitImpl.h"
+#include "BinaryStream.h"
+#include "MsgIntf.h"
 
 extern FontSystem* TVPFontSystem;
 
@@ -66,6 +68,9 @@ void GDIFontRasterizer::Release() {
 		FontDC = NULL;
 		delete NonBoldFontDC;
 		NonBoldFontDC = NULL;
+		for( auto i = MemFontList.begin(); i != MemFontList.end(); i++ ) {
+			::RemoveFontMemResourceEx(*i);
+		}
 
 		delete this;
 	}
@@ -387,5 +392,37 @@ void GDIFontRasterizer::GetGlyphDrawRect( const ttstr & text, tTVPRect& area )
 		offsety = 0;
 	}
 }
-
+//---------------------------------------------------------------------------
+bool GDIFontRasterizer::AddFont( const ttstr& storage, std::vector<tjs_string>* faces ) {
+	tTJSBinaryStream* stream = TVPCreateBinaryStreamForRead(storage,TJS_W("") );
+	if( stream == nullptr ) {
+		TVPThrowExceptionMessage( TVPCannotOpenFontFile, storage );
+	}
+	if( faces ) faces->clear();
+	bool result = false;
+	tjs_uint size = static_cast<tjs_uint>(stream->GetSize());
+	char *data = nullptr;
+	try {
+		data = new char[size];
+		tjs_uint rsize = 0;
+		if( (rsize = stream->Read(data, size)) == size ) {
+			DWORD ret = 0;
+			HANDLE handle = AddFontMemResourceEx((void*)data, size, nullptr, &ret);
+			MemFontList.push_back(handle);
+			if( ret ) result = true;
+		}
+	} catch(...) {
+		delete stream;
+		delete data;
+		throw;
+	}
+	delete stream;
+	delete data;
+	return result;
+}
+//---------------------------------------------------------------------------
+void GDIFontRasterizer::GetFontList(std::vector<ttstr> & list, tjs_uint32 flags, const struct tTVPFont & font ) {
+	TVPGetFontList( list, flags, font );
+}
+//---------------------------------------------------------------------------
 

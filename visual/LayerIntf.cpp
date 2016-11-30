@@ -45,7 +45,6 @@
 
 extern void TVPSetFontRasterizer( tjs_int index );
 extern tjs_int TVPGetFontRasterizer();
-extern FontRasterizer* GetCurrentRasterizer();
 extern void TVPMapPrerenderedFont(const tTVPFont & font, const ttstr & storage);
 extern void TVPUnmapPrerenderedFont(const tTVPFont & font);
 extern tjs_int TVPGetCursor(const ttstr & name);
@@ -9873,14 +9872,7 @@ void tTJSNI_Font::GetFontList(tjs_uint32 flags, std::vector<ttstr> & list)
 	if( Layer ) Layer->GetFontList(flags,list);
 	else
 	{
-#ifdef _WIN32
-		std::vector<tjs_string> ansilist;
-		TVPGetFontList(ansilist, flags, Font );
-		for(std::vector<tjs_string>::iterator i = ansilist.begin(); i != ansilist.end(); i++)
-			list.push_back(i->c_str());
-#else
-		list.clear();
-#endif
+		TVPFontSystem->GetFontList( list, flags, Font );
 	}
 }
 //---------------------------------------------------------------------------
@@ -10059,6 +10051,37 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/unmapPrerenderedFont)
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/unmapPrerenderedFont)
 //----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/addFont)
+{
+	if(numparams < 1) return TJS_E_BADPARAMCOUNT;
+
+	if(result)
+	{
+		std::vector<ttstr> faces;
+		ttstr fontname = *param[0];
+		TVPFontSystem->AddExtraFont( fontname.AsStdString(), &faces );
+
+		iTJSDispatch2 *dsp;
+		dsp = TJSCreateArrayObject();
+		tTJSVariant tmp(dsp, dsp);
+		*result = tmp;
+		dsp->Release();
+		for(tjs_uint i = 0; i < faces.size(); i++)
+		{
+			tmp = ttstr(faces[i]);
+			dsp->PropSetByNum(TJS_MEMBERENSURE, i, &tmp, dsp);
+		}
+	}
+	else
+	{
+		ttstr fontname = *param[0];
+		TVPFontSystem->AddExtraFont( fontname.AsStdString(), nullptr );
+	}
+
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_STATIC_METHOD_DECL(/*func. name*/addFont)
+//----------------------------------------------------------------------
 
 //-- properties
 
@@ -10205,7 +10228,7 @@ TJS_END_NATIVE_PROP_DECL(angle)
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_PROP_DECL(faceIsFileName)
 {
-	// Face名をファイル名として開く、FreeTypeでのみ有効。ただし、そのレイヤーでIMEを有効した場合動作は不定
+	// Face名をファイル名として開く、FreeTypeでのみ有効。ただし、そのレイヤーでIMEを有効した場合動作は DEFAULT_GUI_FONT が使われる
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Font);
@@ -10242,6 +10265,25 @@ TJS_BEGIN_NATIVE_PROP_DECL(rasterizer)
 }
 TJS_END_NATIVE_STATIC_PROP_DECL(rasterizer)
 //----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(defaultFaceName)
+{
+	TJS_BEGIN_NATIVE_PROP_GETTER
+	{
+		*result = ttstr(TVPFontSystem->GetDefaultFontName());
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_GETTER
+
+	TJS_BEGIN_NATIVE_PROP_SETTER
+	{
+		ttstr name( *param );
+		TVPFontSystem->SetDefaultFontName( name.c_str() );
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_STATIC_PROP_DECL(defaultFaceName)
+//----------------------------------------------------------------------
 
 	TJS_END_NATIVE_MEMBERS
 }
@@ -10263,8 +10305,10 @@ struct tFontClassHolder {
 	~tFontClassHolder() { if( Obj ) Obj->Release(), Obj = NULL; }
 } static fontclassholder;
 //---------------------------------------------------------------------------
+extern void TVPInializeFontRasterizers();
 tTJSNativeClass * TVPCreateNativeClass_Font()
 {
+	TVPInializeFontRasterizers();
 	if( fontclassholder.Obj ) {
 		tTJSNativeClass* fontclass = fontclassholder.Obj;
 		fontclass->AddRef();

@@ -39,8 +39,6 @@ class FontSystem {
 	void InitFontNames();
 	//---------------------------------------------------------------------------
 	void AddFont( const tjs_string& name );
-	//---------------------------------------------------------------------------
-	bool FontExists( const tjs_string &name );
 
 	void ConstructDefaultFont();
 
@@ -50,6 +48,15 @@ public:
 	const tTVPFont& GetDefaultFont() const {
 		return DefaultFont;
 	}
+	bool FontExists( const tjs_string &name );
+	// Font.addFont でストレージ内のフォントを追加する
+	// faces が期待通り動作するのは FreeType のみ、GDI では読み込まれたフェイス名は現在正しく取得出来ない
+	void AddExtraFont( const tjs_string& storage, std::vector<ttstr>* faces );
+
+	const tjs_char* GetDefaultFontName() const;
+	void SetDefaultFontName( const tjs_char* name );
+
+	void GetFontList(std::vector<ttstr> & list, tjs_uint32 flags, const struct tTVPFont & font );
 };
 
 #endif // __FONT_SYSTEM_H__

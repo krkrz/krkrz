@@ -12,7 +12,7 @@
 #define SystemControlH
 //---------------------------------------------------------------------------
 #include <string>
-//#include "TVPTimer.h"
+#include "TVPTimer.h"
 //---------------------------------------------------------------------------
 class tTVPSystemControl
 {
@@ -29,7 +29,7 @@ private:	// ユーザー宣言
 
 	tjs_uint MixedIdleTick;
 
-	//TVPTimer SystemWatchTimer;
+	TVPTimer SystemWatchTimer;
 public:
 	tTVPSystemControl();
 

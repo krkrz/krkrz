@@ -14,6 +14,10 @@ public:
 	virtual tjs_int GetAscentHeight() = 0;
 	virtual class tTVPCharacterData* GetBitmap( const struct tTVPFontAndCharacterData & font, tjs_int aofsx, tjs_int aofsy ) = 0;
 	virtual void GetGlyphDrawRect( const ttstr & text, struct tTVPRect& area ) = 0;
+	virtual bool AddFont( const ttstr& storage, std::vector<tjs_string>* faces ) = 0;
+	virtual void GetFontList(std::vector<ttstr> & list, tjs_uint32 flags, const struct tTVPFont & font ) = 0;
 };
+
+extern FontRasterizer* GetCurrentRasterizer();
 
 #endif // __FREE_TYPE_FONT_RASTERIZER_H__

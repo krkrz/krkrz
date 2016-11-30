@@ -23,6 +23,8 @@ public:
 	tjs_int GetAscentHeight();
 	tTVPCharacterData* GetBitmap( const tTVPFontAndCharacterData & font, tjs_int aofsx, tjs_int aofsy );
 	void GetGlyphDrawRect( const ttstr & text, struct tTVPRect& area );
+	bool AddFont( const ttstr& storage, std::vector<tjs_string>* faces );
+	void GetFontList(std::vector<ttstr> & list, tjs_uint32 flags, const struct tTVPFont & font );
 };
 
 #endif // __FREE_TYPE_FONT_RASTERIZER_H__

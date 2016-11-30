@@ -28,6 +28,16 @@
 #include "NativeEventQueue.h"
 #include "CharacterSet.h"
 #include "WindowForm.h"
+#include "SysInitImpl.h"
+#include "SystemControl.h"
+#include "ActivityEvents.h"
+
+#include <ft2build.h>
+#include FT_TRUETYPE_UNPATENTED_H
+#include FT_SYNTHESIS_H
+#include FT_BITMAP_H
+extern FT_Library FreeTypeLibrary;
+extern void TVPInitializeFont();
 
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "krkrz", __VA_ARGS__))
 #define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "krkrz", __VA_ARGS__))
@@ -245,16 +255,11 @@ void tTVPApplication::initializeApplication() {
 
 		TVPInitializeBaseSystems();
 
-		Initialize();
-
-		if(TVPCheckPrintDataPath()) return;
 		if(TVPExecuteUserConfig()) return;
 
 		// image_load_thread_ = new tTVPAsyncImageLoader();
 
 		TVPSystemInit();
-
-		if(TVPCheckAbout()) return; // version information dialog box;
 
 		SetTitle( tjs_string(TVPKirikiri) );
 
@@ -263,9 +268,6 @@ void tTVPApplication::initializeApplication() {
 #ifndef TVP_IGNORE_LOAD_TPM_PLUGIN
 //		TVPLoadPluigins(); // load plugin module *.tpm
 #endif
-
-		// Check digitizer
-		CheckDigitizer();
 
 		// start image load thread
 		// image_load_thread_->Resume();
@@ -575,21 +577,124 @@ void DestroyApplication( iTVPApplication* app ) {
 }
 };
 
-// /system/fonts/ フォントが置かれているフォルダ
-// 以下のXMLファイルを参照して、lang=ja のデフォルトフォントファイル名を取得する
-// /system/etc/fallback_fonts-ja.xml
-// /system/etc/fallback_fonts.xml
-// /system/etc/fonts.xml
-// /etc/fallback_fonts-ja.xml
-// /etc/fallback_fonts.xml
-// /etc/fonts.xml
-// TODO 上記から得たフォントファイルを開いて、フォント名を取得して返す、Androidではファイル名にしてしまった方がいいかもしれない
-const tjs_char *TVPGetDefaultFontName() {
-	return TJS_W("Noto Sans CJK");
+extern FontSystem* TVPFontSystem;
+static bool SelectFont( const std::vector<tjs_string>& faces, tjs_string& face ) {
+	for( auto i = faces.begin(); i != faces.end(); ++i ) {
+		if( TVPFontSystem->FontExists( *i ) ) {
+			face = *i;
+			return true;
+		}
+	}
+	return false;
 }
-// /system/fonts/ フォントが置かれているフォルダから取得するが、読み込んでリスト作るの少し時間かかりそう
+static bool IsInitDefalutFontName = false;
+const tjs_char *TVPGetDefaultFontName() {
+	if( IsInitDefalutFontName ) {
+		return TVPDefaultFontName;
+	}
+	TVPDefaultFontName.AssignMessage(TJS_W("Droid Sans Mono"));
+	IsInitDefalutFontName =  true;
+
+	// コマンドラインで指定がある場合、そのフォントを使用する
+	tTJSVariant opt;
+	if(TVPGetCommandLine(TJS_W("-deffont"), &opt)) {
+		ttstr str(opt);
+		TVPDefaultFontName.AssignMessage( str.c_str() );
+	} else {
+		assert( TVPFontSystem );
+		std::string lang( Application->getLanguage() );
+		tjs_string face;
+		if( lang == std::string("ja" ) {
+			std::vector<tjs_string> facenames{tjs_string(TJS_W("Noto Sans JP")),tjs_string(TJS_W("MotoyaLMaru")),
+				tjs_string(TJS_W("MotoyaLCedar")),tjs_string(TJS_W("Droid Sans Japanese")),tjs_string(TJS_W("Droid Sans Mono"))};
+			if( SelectFont( facenames, face ) ) {
+				TVPDefaultFontName.AssignMessage( face.c_str() );
+			}
+		} else if( lang == std::string("zh" ) {
+			std::vector<tjs_string> facenames{tjs_string(TJS_W("Noto Sans SC")),tjs_string(TJS_W("Droid Sans Mono"))};
+			if( SelectFont( facenames, face ) ) {
+				TVPDefaultFontName.AssignMessage( face.c_str() );
+			}
+		} else if( lang == std::string("ko" ) {
+			std::vector<tjs_string> facenames{tjs_string(TJS_W("Noto Sans KR")),tjs_string(TJS_W("Droid Sans Mono"))};
+			if( SelectFont( facenames, face ) ) {
+				TVPDefaultFontName.AssignMessage( face.c_str() );
+			}
+		} else {
+			std::vector<tjs_string> facenames{tjs_string(TJS_W("Droid Sans Mono"))};
+			if( SelectFont( facenames, face ) ) {
+				TVPDefaultFontName.AssignMessage( face.c_str() );
+			}
+		}
+	}
+	return TVPDefaultFontName;
+}
+void TVPSetDefaultFontName( const tjs_char * name ) {
+	TVPDefaultFontName.AssignMessage( name );
+}
+// /system/fonts/ フォントが置かれているフォルダから取得する(Nexus5で約50msかかる)
+// フォントが最初に使われる時にFontSystem::InitFontNames経由で呼ばれる
+void TVPAddSystemFontToFreeType( const std::string& storage, std::vector<tjs_string>* faces )
 void TVPGetAllFontList( std::vector<tjs_string>& list ) {
-	list.clear();
+	TVPInitializeFont();
+
+	DIR* dr;
+	if( ( dr = opendir("/system/fonts/") ) != nullptr ) {
+		struct dirent* entry;
+		while( ( entry = readdir( dr ) ) != nullptr ) {
+			if( entry->d_type == DT_REG ) {
+				std::string path(entry->d_name);
+				std::string::size_type extp = path.find_last_of(".");
+				if( extp != std::string::npos ) {
+					std::string ext = path.substr(extp);
+					if( ext == std::string(".ttf") || ext == std::string(".ttc") || ext == std::string(".otf") ) {
+						// .ttf | .ttc | .otf
+						std::string fullpath( std::string("/system/fonts/") + path );
+						TVPAddSystemFontToFreeType( fullpath, &list );
+					}
+				}
+			}
+		}
+		closedir( dr );
+	}
+#if 0
+	for( std::list<std::string>::const_iterator i = fontfiles.begin(); i != fontfiles.end(); ++i ) {
+		FT_Face face = nullptr;
+		std::string fullpath( std::string("/system/fonts/") + *i );
+		FT_Open_Args args;
+		memset(&args, 0, sizeof(args));
+		args.flags = FT_OPEN_PATHNAME;
+		args.pathname = fullpath.c_str();
+		tjs_uint face_num = 1;
+		std::list<std::string> facenames;
+		for( tjs_uint f = 0; f < face_num; f++ ) {
+			FT_Error err = FT_Open_Face( FreeTypeLibrary, &args, 0, &face);
+			if( err == 0 ) {
+				facenames.push_back( std::string(face->family_name) );
+				std::string(face->style_name);	// スタイル名
+				if( face->face_flags & FT_FACE_FLAG_SCALABLE ) {
+					// 可変サイズフォントのみ採用
+					if( face->num_glyphs > 2965 ) {
+						// JIS第一水準漢字以上のグリフ数
+						if( face->style_flags & FT_STYLE_FLAG_ITALIC ) {}
+						if( face->style_flags & FT_STYLE_FLAG_BOLD ) {}
+						face_num = face->num_faces;
+						int numcharmap = face->num_charmaps;
+						for( int c = 0; c < numcharmap; c++ ) {
+							FT_Encoding enc = face->charmaps[c]->encoding;
+							if( enc == FT_ENCODING_SJIS ) {
+								// mybe japanese
+							}
+							if( enc == FT_ENCODING_UNICODE ) {
+							}
+						}
+					}
+				}
+			}
+			if(face) FT_Done_Face(face), face = nullptr;
+		}
+	}
+#endif
 }
 
 const tjs_string& tTVPApplication::GetInternalDataPath() const {
@@ -659,7 +764,36 @@ void tTVPApplication::SendMessageFromJava( tjs_int message, tjs_int64 wparam, tj
 		postEvent( &ev, nullptr );
 	}
 }
-
+static const int TOUCH_DOWN = 0;
+static const int TOUCH_MOVE = 1;
+static const int TOUCH_UP = 2;
+void tTVPApplication::SendTouchMessageFromJava( tjs_int type, float x, float y, float c, int id, tjs_int64 tick ) {
+	NativeEvent ev;
+	switch( type ) {
+	case TOUCH_DOWN:
+		ev.Message = AM_TOUCH_DOWN;
+		break;
+	case TOUCH_MOVE:
+		ev.Message = AM_TOUCH_MOVE;
+		break;
+	case TOUCH_UP:
+		ev.Message = AM_TOUCH_UP;
+		break;
+	default:
+		return;
+	}
+	ev.WParamf0 = x;
+	ev.WParamf1 = y;
+	ev.LParamf0 = c;
+	ev.LParam1 = id;
+	ev.Result = tick;
+	TTVPWindowForm* win = GetMainWindow();
+	if( win ) {
+		postEvent( &ev, win->GetEventHandler() );
+	} else {
+		postEvent( &ev, nullptr );
+	}
+}
 void tTVPApplication::setWindow( ANativeWindow* window ) {
 	std::lock_guard<std::mutex> lock( main_thread_mutex_ );
 	window_ = window;
@@ -669,12 +803,12 @@ void tTVPApplication::nativeSetSurface(JNIEnv *jenv, jobject obj, jobject surfac
 		ANativeWindow* window = ANativeWindow_fromSurface(jenv, surface);
 		LOGI("Got window %p", window);
 		Application->setWindow(window);
-		SendMessageFromJava( AM_SURFACE_CHANGED, 0, 0 );
+		Application->SendMessageFromJava( AM_SURFACE_CHANGED, 0, 0 );
 	} else {
 		LOGI("Releasing window");
 		ANativeWindow_release(Application->getWindow());
 		Application->setWindow(nullptr);
-		SendMessageFromJava( AM_SURFACE_DESTORYED, 0, 0 );
+		Application->SendMessageFromJava( AM_SURFACE_DESTORYED, 0, 0 );
 	}
 	return;
 }
@@ -716,6 +850,9 @@ void tTVPApplication::nativeSetActivity(JNIEnv *jenv, jobject obj, jobject activ
 void tTVPApplication::nativeInitialize(JNIEnv *jenv, jobject obj) {
 	Application->initializeApplication();
 }
+void tTVPApplication::nativeOnTouch( JNIEnv *jenv, jint type, jfloat x, jfloat y, jfloat c, jint id, jlong tick ) {
+	Application->SendTouchMessageFromJava( type, x, y, c, id, tick );
+}
 static JNINativeMethod methods[] = {
 		// Java側関数名, (引数の型)返り値の型, native側の関数名の順に並べます
 		{ "nativeSetSurface", "(LAndroid/view/Surface;)V", (void *)tTVPApplication::nativeSetSurface },
@@ -724,6 +861,7 @@ static JNINativeMethod methods[] = {
 		{ "nativeToMessage", "(IJJ)V", (void*)tTVPApplication::nativeToMessage },
 		{ "nativeSetActivity", "([Landroid/app/Activity;)V", (void *)tTVPApplication::nativeSetActivity },
 		{ "nativeInitialize", "()V", (void *)tTVPApplication::nativeInitialize},
+		{ "nativeOnTouch", "(IFFFIJ)V", (void *)tTVPApplication::nativeInitialize},
 };
 
 jint registerNativeMethods( JNIEnv* env, const char *class_name, JNINativeMethod *methods, int num_methods ) {
