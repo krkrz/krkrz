@@ -7,6 +7,7 @@
 #include <stack>
 #include <algorithm>
 #include <queue>
+#include <string>
 #include <assert.h>
 
 #include <mutex>
@@ -19,6 +20,7 @@
 #include <android/native_window.h>
 #include <android/log.h>
 #include <android_native_app_glue.h>
+#include <android/input.h>
 
 #include "iTVPApplication.h"
 #include "TVPScreen.h"
@@ -75,21 +77,30 @@ class tTVPApplication : public iTVPApplication {
 	tjs_string internal_data_path_;
 	tjs_string external_data_path_;
 	tjs_string cache_path_;
+	tjs_string package_code_path_;
+	tjs_string package_path_;
+	tjs_string system_release_version_;
 
+	class tTVPAsyncImageLoader* image_load_thread_;
 	class TTVPWindowForm* main_window_;
 
     pthread_t thread_id_;
-	std::mutex main_thread_mutex_;
+	std::mutex event_handlers_mutex_;
+	std::mutex command_cache_mutex_;
+	std::mutex command_que_mutex_;
 	std::condition_variable main_thread_cv_;
 
-	bool font_list_searched_;
-	std::vector<FontInfo*>	font_list_;
+	//bool font_list_searched_;
+	//std::vector<FontInfo*>	font_list_;
+	std::vector<char>		console_cache_;
 
+	tjs_string				startup_path_;
 private:
 	NativeEvent* createNativeEvent();
 	void releaseNativeEvent( NativeEvent* ev );
 	void wakeupMainThread();
 	void getStringFromJava( const char* methodName, tjs_string& dest ) const;
+	void callActivityMethod( const char* methodName ) const;
 
 public:
 	void setAssetManager( AAssetManager* am ) {
@@ -101,10 +112,13 @@ public:
 	}
 	static void nativeSetAssetManager(JNIEnv *jenv, jobject obj, jobject assetManager );
 
+	void finishActivity();
+
 	// platform's SDK version
 	tjs_int getSdkVersion() const {
 		return AConfiguration_getSdkVersion( const_cast<AConfiguration*>(getConfiguration()) );
 	}
+	const tjs_string& getSystemVersion() const;
 	std::string getLanguage() const {
 		char lang[2];
 		AConfiguration_getLanguage( const_cast<AConfiguration*>(getConfiguration()), lang );
@@ -267,15 +281,17 @@ private:
 	static void* startMainLoopCallback( void* myself );
 	// メインループ
 	void mainLoop();
+
+	bool appDispatch(NativeEvent& ev);
 public:
 	tTVPApplication();
 	~tTVPApplication();
 
-	// TODO Java から取得するようにする
 	const tjs_string& GetInternalDataPath() const;
 	const tjs_string& GetExternalDataPath() const;
 	const tjs_string* GetCachePath() const;
-	const std::string GetPackageName() const { return std::string(); }
+	const tjs_char* GetPackageName() const;
+	const tjs_char* GetPackageCodePath() const;
 
 	bool GetActivating() const { return true; }	// TODO
 	void ShowToast( const tjs_char* text ) {}	// TODO
@@ -319,14 +335,14 @@ public:
 	void postEvent( const struct NativeEvent* ev, NativeEventQueueIntarface* handler = nullptr );
 
 	void addEventHandler( NativeEventQueueIntarface* handler ) {
-		std::lock_guard<std::mutex> lock( main_thread_mutex_ );
+		std::lock_guard<std::mutex> lock( event_handlers_mutex_ );
 		std::vector<NativeEventQueueIntarface*>::iterator it = std::find(event_handlers_.begin(), event_handlers_.end(), handler);
 		if( it == event_handlers_.end() ) {
 			event_handlers_.push_back( handler );
 		}
 	}
 	void removeEventHandler( NativeEventQueueIntarface* handler ) {
-		std::lock_guard<std::mutex> lock( main_thread_mutex_ );
+		std::lock_guard<std::mutex> lock( event_handlers_mutex_ );
 		std::vector<NativeEventQueueIntarface*>::iterator it = std::remove(event_handlers_.begin(), event_handlers_.end(), handler);
 		event_handlers_.erase( it, event_handlers_.end() );
 	}
@@ -336,7 +352,7 @@ public:
 		title_ = caption;
 	}
 	void Terminate() {
-		exit(0);
+		finishActivity();
 	}
 	/**
 	 * 画像の非同期読込み要求
@@ -351,21 +367,34 @@ public:
 	void setJavaVM( JavaVM* jvm ) {
 		jvm_ = jvm;
 	}
+	JNIEnv* getJavaEnv( bool& attached ) const;
+	void detachJavaEnv() const;
+
 	void setWindow( ANativeWindow* window );
 	void SendMessageFromJava( tjs_int message, tjs_int64 wparam, tjs_int64 lparam );
 	void SendTouchMessageFromJava( tjs_int type, float x, float y, float c, int id, tjs_int64 tick );
 	ANativeWindow* getWindow() { return window_; }
 	// for tTVPScreen
 	ANativeWindow* getNativeWindow() const { return window_; }
+	
+	//void setStartupPath( const tjs_string& path ) { startup_path_ = path; }
+	//const tjs_string& getStartupPath() const { return startup_path_; }
+
 	static void nativeSetSurface(JNIEnv *jenv, jobject obj, jobject surface);
 	static void nativeSetMessageResource(JNIEnv *jenv, jobject obj, jobjectArray mesarray);
 	static void nativeToMessage(JNIEnv *jenv, jobject obj, jint mes, jlong wparam, jlong lparam );
 	static void nativeSetActivity(JNIEnv *jenv, jobject obj, jobject activity);
 	static void nativeInitialize(JNIEnv *jenv, jobject obj);
-	static void nativeOnTouch( JNIEnv *jenv, jint type, jfloat x, jfloat y, jfloat c, jint id, jlong tick );
+	static void nativeOnTouch( JNIEnv *jenv, jobject obj, jint type, jfloat x, jfloat y, jfloat c, jint id, jlong tick );
+	static void nativeSetStartupPath( JNIEnv *jenv, jobject obj, jstring path );
+
 	void writeBitmapToNative( const void * bits );
 
 	TTVPWindowForm* GetMainWindow() { return main_window_; }
+	void AddWindow( TTVPWindowForm* window );
+
+	void PrintConsole( const tjs_char* mes, unsigned long len, bool iserror = false );
+
 };
 std::vector<std::string>* LoadLinesFromFile( const tjs_string& path );
 

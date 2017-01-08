@@ -31,6 +31,9 @@
 #include "SysInitImpl.h"
 #include "SystemControl.h"
 #include "ActivityEvents.h"
+#include "MsgIntf.h"
+#include "FontSystem.h"
+#include "GraphicsLoadThread.h"
 
 #include <ft2build.h>
 #include FT_TRUETYPE_UNPATENTED_H
@@ -51,6 +54,7 @@ static const tjs_int TVP_VERSION_BUILD = 1;
 tTVPApplication* Application;
 
 extern void TVPRegisterAssetMedia();
+extern void TVPRegisterContentMedia();
 /**
  * Android 版のバージョン番号はソースコードに埋め込む
  * パッケージのバージョン番号はアプリのバージョンであって、エンジンのバージョンではないため
@@ -71,14 +75,15 @@ void TVPGetFileVersionOf( tjs_int& major, tjs_int& minor, tjs_int& release, tjs_
  */
 
 tTVPApplication::tTVPApplication()
-: jvm_(nullptr), window_(nullptr), asset_manager_(nullptr), config_(nullptr), is_terminate_(true), main_window_(nullptr)
+: jvm_(nullptr), window_(nullptr), asset_manager_(nullptr), config_(nullptr), is_terminate_(true), main_window_(nullptr),
+ console_cache_(1024), image_load_thread_(nullptr), thread_id_(-1)
 {
 }
 tTVPApplication::~tTVPApplication() {
 }
 
 NativeEvent* tTVPApplication::createNativeEvent() {
-	std::lock_guard<std::mutex> lock( main_thread_mutex_ );
+	std::lock_guard<std::mutex> lock( command_cache_mutex_ );
 	if( command_cache_.empty() ) {
 		return new NativeEvent();
 	} else {
@@ -88,17 +93,19 @@ NativeEvent* tTVPApplication::createNativeEvent() {
 	}
 }
 void tTVPApplication::releaseNativeEvent( NativeEvent* ev ) {
-	std::lock_guard<std::mutex> lock( main_thread_mutex_ );
+	std::lock_guard<std::mutex> lock( command_cache_mutex_ );
 	command_cache_.push_back( ev );
 }
 // コマンドをメインのメッセージループに投げる
 void tTVPApplication::postEvent( const NativeEvent* ev, NativeEventQueueIntarface* handler ) {
-	std::lock_guard<std::mutex> lock( main_thread_mutex_ );
 	NativeEvent* e = createNativeEvent();
 	e->Message = ev->Message;
 	e->WParam = ev->WParam;
 	e->LParam = ev->LParam;
-	command_que_.push( EventCommand( handler, e ) );
+	{
+		std::lock_guard<std::mutex> lock( command_que_mutex_ );
+		command_que_.push( EventCommand( handler, e ) );
+	}
 
 	// メインスレッドを起こす
 	wakeupMainThread();
@@ -107,9 +114,11 @@ void tTVPApplication::wakeupMainThread() {
 	main_thread_cv_.notify_one();
 }
 void tTVPApplication::mainLoop() {
-	while( is_terminate_ ) {
+	bool attached;
+	JNIEnv *env = getJavaEnv(attached);	// attach thread to java
+	while( is_terminate_ == false ) {
 		{	// イベントキューからすべてのイベントをディスパッチ
-			std::lock_guard<std::mutex> lock( main_thread_mutex_ );
+			std::lock_guard<std::mutex> lock( command_que_mutex_ );
 			while( !command_que_.empty() ) {
 				NativeEventQueueIntarface* handler = command_que_.front().target;
 				NativeEvent* event = command_que_.front().command;
@@ -117,15 +126,20 @@ void tTVPApplication::mainLoop() {
 
 				if( handler != nullptr ) {
 					// ハンドラ指定付きの場合はハンドラから探して見つからったらディスパッチ
+					std::lock_guard<std::mutex> lock( event_handlers_mutex_ );
 					auto result = std::find_if(event_handlers_.begin(), event_handlers_.end(), [handler](NativeEventQueueIntarface* x) { return x == handler; });
 					if( result != event_handlers_.end() ) {
 						(*result)->Dispatch( *event );
 					}
 				} else {
-					// ハンドラ指定のない場合はすべてのハンドラでディスパッチ
-					for( std::vector<NativeEventQueueIntarface*>::iterator it = event_handlers_.begin(); it != event_handlers_.end(); it++ ) {
-						if( (*it) != nullptr ) {
-							(*it)->Dispatch( *event );
+					if( appDispatch(*event) == false ) {
+						// ハンドラ指定のない場合でアプリでディスパッチしないものは、すべてのハンドラでディスパッチ
+						std::lock_guard<std::mutex> lock( event_handlers_mutex_ );
+						for (std::vector<NativeEventQueueIntarface *>::iterator it = event_handlers_.begin();
+							 it != event_handlers_.end(); it++) {
+							if ((*it) != nullptr) {
+								(*it)->Dispatch(*event);
+							}
 						}
 					}
 				}
@@ -135,10 +149,19 @@ void tTVPApplication::mainLoop() {
 			handleIdle();
 		}
 		{	// コマンドキューに何か入れられるまで待つ
-			std::unique_lock<std::mutex> uniq_lk(main_thread_mutex_);
+			std::unique_lock<std::mutex> uniq_lk(command_que_mutex_);
 			main_thread_cv_.wait(uniq_lk, [this]{ return !command_que_.empty();});
 		}
 	}
+	if( attached ) detachJavaEnv();
+}
+bool tTVPApplication::appDispatch(NativeEvent& ev) {
+	switch( ev.Message ) {
+		case AM_STARTUP_SCRIPT:
+			TVPInitializeStartupScript();
+			return true;
+	}
+	return false;
 }
 /*
 int8_t tTVPApplication::readCommand() {
@@ -162,6 +185,7 @@ int tTVPApplication::messagePipeCallBack(int fd, int events, void* user) {
 }
  */
 void tTVPApplication::HandleMessage( NativeEvent& ev ) {
+	std::lock_guard<std::mutex> lock( event_handlers_mutex_ );
 	for( std::vector<NativeEventQueueIntarface*>::iterator it = event_handlers_.begin(); it != event_handlers_.end(); it++ ) {
 		if( (*it) != NULL ) (*it)->Dispatch( ev );
 	}
@@ -244,20 +268,27 @@ void tTVPApplication::startApplication( struct android_app* state ) {
 void tTVPApplication::initializeApplication() {
 	TVPTerminateCode = 0;
 
-	// TODO Init console(LogCat)
 	try {
+		// asset:// を登録
 		TVPRegisterAssetMedia();
 
+		// content:// を登録
+		TVPRegisterContentMedia();
+
+		// スクリプトエンジンを初期化し各種クラスを登録
 		TVPInitScriptEngine();
 
-		// banner
+		// ログへOS名等出力
 		TVPAddImportantLog( TVPFormatMessage(TVPProgramStartedOn, TVPGetOSName(), TVPGetPlatformName()) );
 
+		// アーカイブデリミタ、カレントディレクトリ、msgmap.tjsの実行 と言った初期化処理
 		TVPInitializeBaseSystems();
 
-		if(TVPExecuteUserConfig()) return;
+		// -userconf 付きで起動されたかどうかチェックする。Android だと Activity 分けた方が賢明
+		// if(TVPExecuteUserConfig()) return;
 
-		// image_load_thread_ = new tTVPAsyncImageLoader();
+		// TODO 非同期画像読み込みは後で実装する
+		image_load_thread_ = new tTVPAsyncImageLoader();
 
 		TVPSystemInit();
 
@@ -270,7 +301,7 @@ void tTVPApplication::initializeApplication() {
 #endif
 
 		// start image load thread
-		// image_load_thread_->Resume();
+		image_load_thread_->StartTread();
 
 		if(TVPProjectDirSelected) TVPInitializeStartupScript();
 
@@ -295,13 +326,22 @@ void* tTVPApplication::startMainLoopCallback( void* myself ) {
 void tTVPApplication::startMainLoop() {
 	if( is_terminate_ ) {
 		is_terminate_ = false;
-		pthread_create( &thread_id_, 0, startMainLoopCallback, this );
+		pthread_attr_t attr;
+		if( pthread_attr_init( &attr ) == 0 ) {
+			pthread_attr_setstacksize( &attr, 64*1024 );
+			pthread_create( &thread_id_, &attr, startMainLoopCallback, this );
+			pthread_attr_destroy( &attr );
+		} else {
+			pthread_create( &thread_id_, 0, startMainLoopCallback, this );
+		}
 	}
 }
 void tTVPApplication::stopMainLoop() {
-	is_terminate_ = true;
-	wakeupMainThread();
-	pthread_join( thread_id_, 0 );
+	if( is_terminate_ == false ) {
+		is_terminate_ = true;
+		wakeupMainThread();
+		pthread_join( thread_id_, 0 );
+	}
 }
 void tTVPApplication::onCommand( struct android_app* state, int32_t cmd ) {
 	switch( cmd ) {
@@ -565,7 +605,24 @@ void tTVPApplication::writeBitmapToNative( const void * src ) {
 	}
 	ANativeWindow_unlockAndPost( window_  );
 }
-
+void tTVPApplication::AddWindow( TTVPWindowForm* window ) {
+	if( main_window_ ) {
+		TVPThrowExceptionMessage(TJS_W("Cannot add window."));	// TODO move to resource
+	}
+	main_window_ = window;
+}
+void tTVPApplication::PrintConsole( const tjs_char* mes, unsigned long len, bool iserror ) {
+	if( console_cache_.size() < (len*3+1) ) {
+		console_cache_.resize(len*3+1);
+	}
+	tjs_int u8len = TVPWideCharToUtf8String( mes, &(console_cache_[0]) );
+	console_cache_[u8len] = '\0';
+	if( iserror ) {
+		__android_log_print(ANDROID_LOG_ERROR, "krkrz", "%s", &(console_cache_[0]) );
+	} else {
+		__android_log_print(ANDROID_LOG_INFO, "krkrz", "%s", &(console_cache_[0]) );
+	}
+}
 extern "C" {
 iTVPApplication* CreateApplication() {
 	Application = new tTVPApplication();
@@ -577,64 +634,9 @@ void DestroyApplication( iTVPApplication* app ) {
 }
 };
 
-extern FontSystem* TVPFontSystem;
-static bool SelectFont( const std::vector<tjs_string>& faces, tjs_string& face ) {
-	for( auto i = faces.begin(); i != faces.end(); ++i ) {
-		if( TVPFontSystem->FontExists( *i ) ) {
-			face = *i;
-			return true;
-		}
-	}
-	return false;
-}
-static bool IsInitDefalutFontName = false;
-const tjs_char *TVPGetDefaultFontName() {
-	if( IsInitDefalutFontName ) {
-		return TVPDefaultFontName;
-	}
-	TVPDefaultFontName.AssignMessage(TJS_W("Droid Sans Mono"));
-	IsInitDefalutFontName =  true;
-
-	// コマンドラインで指定がある場合、そのフォントを使用する
-	tTJSVariant opt;
-	if(TVPGetCommandLine(TJS_W("-deffont"), &opt)) {
-		ttstr str(opt);
-		TVPDefaultFontName.AssignMessage( str.c_str() );
-	} else {
-		assert( TVPFontSystem );
-		std::string lang( Application->getLanguage() );
-		tjs_string face;
-		if( lang == std::string("ja" ) {
-			std::vector<tjs_string> facenames{tjs_string(TJS_W("Noto Sans JP")),tjs_string(TJS_W("MotoyaLMaru")),
-				tjs_string(TJS_W("MotoyaLCedar")),tjs_string(TJS_W("Droid Sans Japanese")),tjs_string(TJS_W("Droid Sans Mono"))};
-			if( SelectFont( facenames, face ) ) {
-				TVPDefaultFontName.AssignMessage( face.c_str() );
-			}
-		} else if( lang == std::string("zh" ) {
-			std::vector<tjs_string> facenames{tjs_string(TJS_W("Noto Sans SC")),tjs_string(TJS_W("Droid Sans Mono"))};
-			if( SelectFont( facenames, face ) ) {
-				TVPDefaultFontName.AssignMessage( face.c_str() );
-			}
-		} else if( lang == std::string("ko" ) {
-			std::vector<tjs_string> facenames{tjs_string(TJS_W("Noto Sans KR")),tjs_string(TJS_W("Droid Sans Mono"))};
-			if( SelectFont( facenames, face ) ) {
-				TVPDefaultFontName.AssignMessage( face.c_str() );
-			}
-		} else {
-			std::vector<tjs_string> facenames{tjs_string(TJS_W("Droid Sans Mono"))};
-			if( SelectFont( facenames, face ) ) {
-				TVPDefaultFontName.AssignMessage( face.c_str() );
-			}
-		}
-	}
-	return TVPDefaultFontName;
-}
-void TVPSetDefaultFontName( const tjs_char * name ) {
-	TVPDefaultFontName.AssignMessage( name );
-}
 // /system/fonts/ フォントが置かれているフォルダから取得する(Nexus5で約50msかかる)
 // フォントが最初に使われる時にFontSystem::InitFontNames経由で呼ばれる
-void TVPAddSystemFontToFreeType( const std::string& storage, std::vector<tjs_string>* faces )
+extern void TVPAddSystemFontToFreeType( const std::string& storage, std::vector<tjs_string>* faces );
 void TVPGetAllFontList( std::vector<tjs_string>& list ) {
 	TVPInitializeFont();
 
@@ -696,7 +698,94 @@ void TVPGetAllFontList( std::vector<tjs_string>& list ) {
 	}
 #endif
 }
+static bool IsInitDefalutFontName = false;
+//extern FontSystem* TVPFontSystem;
+static bool SelectFont( const std::vector<tjs_string>& faces, tjs_string& face ) {
+	std::vector<tjs_string> fonts;
+	TVPGetAllFontList( fonts );
+	for( auto i = faces.begin(); i != faces.end(); ++i ) {
+		auto found = std::find( fonts.begin(), fonts.end(), *i );
+		//if( TVPFontSystem->FontExists( *i ) ) {
+		if( found != fonts.end() ) {
+			face = *i;
+			return true;
+		}
+	}
+	return false;
+}
+const tjs_char *TVPGetDefaultFontName() {
+	if( IsInitDefalutFontName ) {
+		return TVPDefaultFontName;
+	}
+	TVPDefaultFontName.AssignMessage(TJS_W("Droid Sans Mono"));
+	IsInitDefalutFontName =  true;
 
+	// コマンドラインで指定がある場合、そのフォントを使用する
+	tTJSVariant opt;
+	if(TVPGetCommandLine(TJS_W("-deffont"), &opt)) {
+		ttstr str(opt);
+		TVPDefaultFontName.AssignMessage( str.c_str() );
+	} else {
+		std::string lang( Application->getLanguage() );
+		tjs_string face;
+		if( lang == std::string("ja" ) ) {
+			std::vector<tjs_string> facenames{tjs_string(TJS_W("Noto Sans JP")),tjs_string(TJS_W("MotoyaLMaru")),
+				tjs_string(TJS_W("MotoyaLCedar")),tjs_string(TJS_W("Droid Sans Japanese")),tjs_string(TJS_W("Droid Sans Mono"))};
+			if( SelectFont( facenames, face ) ) {
+				TVPDefaultFontName.AssignMessage( face.c_str() );
+			}
+		} else if( lang == std::string("zh" ) ) {
+			std::vector<tjs_string> facenames{tjs_string(TJS_W("Noto Sans SC")),tjs_string(TJS_W("Droid Sans Mono"))};
+			if( SelectFont( facenames, face ) ) {
+				TVPDefaultFontName.AssignMessage( face.c_str() );
+			}
+		} else if( lang == std::string("ko" ) ) {
+			std::vector<tjs_string> facenames{tjs_string(TJS_W("Noto Sans KR")),tjs_string(TJS_W("Droid Sans Mono"))};
+			if( SelectFont( facenames, face ) ) {
+				TVPDefaultFontName.AssignMessage( face.c_str() );
+			}
+		} else {
+			std::vector<tjs_string> facenames{tjs_string(TJS_W("Droid Sans Mono"))};
+			if( SelectFont( facenames, face ) ) {
+				TVPDefaultFontName.AssignMessage( face.c_str() );
+			}
+		}
+	}
+	return TVPDefaultFontName;
+}
+void TVPSetDefaultFontName( const tjs_char * name ) {
+	TVPDefaultFontName.AssignMessage( name );
+}
+
+void tTVPApplication::getStringFromJava( const char* methodName, tjs_string& dest ) const {
+	bool attached;
+	JNIEnv *env = getJavaEnv(attached);
+	if ( env != nullptr ) {
+		jobject thiz = activity_;
+		jclass clazz = env->GetObjectClass(thiz);
+		jmethodID mid = env->GetMethodID(clazz, methodName, "()Ljava/lang/String;");
+		jstring ret = (jstring) env->CallObjectMethod(thiz, mid, nullptr);
+		int jstrlen = env->GetStringLength(ret);
+		const jchar* chars = env->GetStringChars( ret, nullptr );
+		dest = tjs_string( chars, &chars[jstrlen] );
+		env->ReleaseStringChars( ret, chars );
+		env->DeleteLocalRef( ret );
+		env->DeleteLocalRef(clazz);
+		if( attached ) detachJavaEnv();
+	}
+}
+void tTVPApplication::callActivityMethod( const char* methodName ) const {
+	bool attached;
+	JNIEnv *env = getJavaEnv(attached);
+	if ( env != nullptr ) {
+		jobject thiz = activity_;
+		jclass clazz = env->GetObjectClass(thiz);
+		jmethodID mid = env->GetMethodID(clazz, methodName, "()V");
+		env->CallVoidMethod(thiz, mid, nullptr);
+		env->DeleteLocalRef(clazz);
+		if( attached ) detachJavaEnv();
+	}
+}
 const tjs_string& tTVPApplication::GetInternalDataPath() const {
 	if( internal_data_path_.empty() ) {
 		getStringFromJava( static_cast<const char*>("getInternalDataPath"), const_cast<tjs_string&>(internal_data_path_) );
@@ -715,21 +804,41 @@ const tjs_string* tTVPApplication::GetCachePath() const {
 	}
 	return &cache_path_;
 }
-void tTVPApplication::getStringFromJava( const char* methodName, tjs_string& dest ) const {
-	JNIEnv *env;
-	if (jvm_->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6) == JNI_OK) {
-		jvm_->AttachCurrentThread( &env, nullptr );
-		jobject thiz = activity_;
-		jclass clazz = env->GetObjectClass(thiz);
-		jmethodID mid = env->GetMethodID(clazz, methodName, "()Ljava/lang/String;");
-		jstring ret = (jstring) env->CallObjectMethod(thiz, mid, nullptr);
-		int jstrlen = env->GetStringLength(ret);
-		const jchar* chars = env->GetStringChars( ret, nullptr );
-		dest = tjs_string( chars, &chars[jstrlen] );
-		env->ReleaseStringChars( ret, chars );
-		env->DeleteLocalRef( ret );
-		jvm_->DetachCurrentThread();
+const tjs_char* tTVPApplication::GetPackageName() const {
+	if( package_path_.empty() ) {
+		getStringFromJava( static_cast<const char*>("getPackageName"), const_cast<tjs_string&>(package_path_) );
 	}
+	return package_path_.c_str();
+}
+const tjs_char* tTVPApplication::GetPackageCodePath() const {
+	if( package_code_path_.empty() ) {
+		getStringFromJava( static_cast<const char*>("getPackageCodePath"), const_cast<tjs_string&>(package_code_path_) );
+	}
+	return package_code_path_.c_str();
+}
+void tTVPApplication::finishActivity() {
+	callActivityMethod( "postFinish" );
+	stopMainLoop();
+}
+const tjs_string& tTVPApplication::getSystemVersion() const {
+	if( system_release_version_.empty() ) {
+		bool attached;
+		JNIEnv *env = getJavaEnv(attached);
+		if ( env != nullptr ) {
+			jclass versionClass = env->FindClass("android/os/Build$VERSION" );
+			jfieldID releaseFieldID = env->GetStaticFieldID(versionClass, "RELEASE", "Ljava/lang/String;" );
+			jstring ret = (jstring)env->GetStaticObjectField(versionClass, releaseFieldID );
+			int jstrlen = env->GetStringLength(ret);
+			const jchar* chars = env->GetStringChars( ret, nullptr );
+			tjs_string& dest = const_cast<tjs_string&>(system_release_version_);
+			dest = tjs_string( chars, &chars[jstrlen] );
+			env->ReleaseStringChars( ret, chars );
+			env->DeleteLocalRef( ret );
+			env->DeleteLocalRef(versionClass);
+			if( attached ) detachJavaEnv();
+		}
+	}
+	return system_release_version_;
 }
 /**
  * Java から送られてきた各種イベントをここで処理する
@@ -737,13 +846,19 @@ void tTVPApplication::getStringFromJava( const char* methodName, tjs_string& des
  */
 void tTVPApplication::SendMessageFromJava( tjs_int message, tjs_int64 wparam, tjs_int64 lparam ) {
 	// Main Windowが存在する場合はそのWindowへ送る
+	// TODO startup.tjsがまだ呼ばれていない(ストレージ選択されていない)時に、イベントをキューに溜めるのはよろしくない。メインスレッド起動時にキューを空にするのが良いか？
 	NativeEvent ev(message,lparam,wparam);
 	switch( message ) {
+	case AM_STARTUP_SCRIPT:
+		postEvent( &ev, nullptr );
+		return;
 	case AM_START:
 	case AM_RESTART:
 		return;
 	case AM_RESUME:
-		startMainLoop();
+		if( TVPProjectDirSelected ) {
+			startMainLoop();
+		}
 		break;
 	case AM_PAUSE:
 		break;
@@ -795,7 +910,7 @@ void tTVPApplication::SendTouchMessageFromJava( tjs_int type, float x, float y, 
 	}
 }
 void tTVPApplication::setWindow( ANativeWindow* window ) {
-	std::lock_guard<std::mutex> lock( main_thread_mutex_ );
+	// std::lock_guard<std::mutex> lock( main_thread_mutex_ );
 	window_ = window;
 }
 void tTVPApplication::nativeSetSurface(JNIEnv *jenv, jobject obj, jobject surface) {
@@ -844,24 +959,67 @@ void tTVPApplication::nativeSetAssetManager(JNIEnv *jenv, jobject obj, jobject a
 void tTVPApplication::nativeToMessage(JNIEnv *jenv, jobject obj, jint mes, jlong wparam, jlong lparam ) {
 	Application->SendMessageFromJava( mes, lparam, wparam );
 }
-void tTVPApplication::nativeSetActivity(JNIEnv *jenv, jobject obj, jobject activity) {
-	Application->activity_ = activity;
+void tTVPApplication::nativeSetActivity(JNIEnv *env, jobject obj, jobject activity) {
+	if( activity != nullptr ) {
+		jobject globalactivity = env->NewGlobalRef(activity);
+		Application->activity_ = globalactivity;
+	} else {
+		if( Application->activity_ != nullptr ) {
+			env->DeleteGlobalRef( Application->activity_ );
+			Application->activity_ = nullptr;
+		}
+	}
 }
 void tTVPApplication::nativeInitialize(JNIEnv *jenv, jobject obj) {
 	Application->initializeApplication();
 }
-void tTVPApplication::nativeOnTouch( JNIEnv *jenv, jint type, jfloat x, jfloat y, jfloat c, jint id, jlong tick ) {
+void tTVPApplication::nativeOnTouch( JNIEnv *jenv, jobject obj, jint type, jfloat x, jfloat y, jfloat c, jint id, jlong tick ) {
 	Application->SendTouchMessageFromJava( type, x, y, c, id, tick );
+}
+// 起動パスを渡された時呼び出される
+extern void TVPSetProjectPath( const ttstr& path );
+void tTVPApplication::nativeSetStartupPath( JNIEnv *jenv, jobject obj, jstring jpath ) {
+	int jstrlen = jenv->GetStringLength( jpath );
+	const jchar* chars = jenv->GetStringChars( jpath, nullptr );
+	ttstr path(reinterpret_cast<const tjs_char*>(chars),jstrlen);
+	//Application->setStartupPath( path );
+	jenv->ReleaseStringChars( jpath, chars );
+
+	TVPSetProjectPath( path );
+	Application->SendMessageFromJava( AM_STARTUP_SCRIPT, 0, 0 );
+	Application->startMainLoop();
+}
+
+JNIEnv* tTVPApplication::getJavaEnv( bool& attached ) const {
+	attached = false;
+	JNIEnv *env = nullptr;
+	jint status = jvm_->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6);
+	if( status == JNI_EDETACHED ) {
+		jint astatus = jvm_->AttachCurrentThread( &env, nullptr );
+		if( astatus != JNI_OK ) {
+			// throw error
+			TVPThrowExceptionMessage(TJS_W("Cannot attach java thread."));
+			return nullptr;
+		}
+		attached = true;
+	} else if( status != JNI_OK ) {
+		TVPThrowExceptionMessage(TJS_W("Cannot retrieve java Env."));
+	}
+	return env;
+}
+void tTVPApplication::detachJavaEnv() const {
+	jvm_->DetachCurrentThread();
 }
 static JNINativeMethod methods[] = {
 		// Java側関数名, (引数の型)返り値の型, native側の関数名の順に並べます
-		{ "nativeSetSurface", "(LAndroid/view/Surface;)V", (void *)tTVPApplication::nativeSetSurface },
+		{ "nativeSetSurface", "(Landroid/view/Surface;)V", (void *)tTVPApplication::nativeSetSurface },
 //		{ "nativeSetMessageResource", "([Ljava/lang/String;)V", (void *)tTVPApplication::nativeSetMessageResource },
-		{ "nativeSetAssetManager", "([Landroid/content/res/AssetManager;)V", (void *)tTVPApplication::nativeSetAssetManager },
+		{ "nativeSetAssetManager", "(Landroid/content/res/AssetManager;)V", (void *)tTVPApplication::nativeSetAssetManager },
 		{ "nativeToMessage", "(IJJ)V", (void*)tTVPApplication::nativeToMessage },
-		{ "nativeSetActivity", "([Landroid/app/Activity;)V", (void *)tTVPApplication::nativeSetActivity },
+		{ "nativeSetActivity", "(Landroid/app/Activity;)V", (void *)tTVPApplication::nativeSetActivity },
 		{ "nativeInitialize", "()V", (void *)tTVPApplication::nativeInitialize},
-		{ "nativeOnTouch", "(IFFFIJ)V", (void *)tTVPApplication::nativeInitialize},
+		{ "nativeOnTouch", "(IFFFIJ)V", (void *)tTVPApplication::nativeOnTouch},
+		{ "nativeSetStartupPath", "(Ljava/lang/String;)V", (void *)tTVPApplication::nativeSetStartupPath},
 };
 
 jint registerNativeMethods( JNIEnv* env, const char *class_name, JNINativeMethod *methods, int num_methods ) {
@@ -884,6 +1042,7 @@ int registerJavaMethod( JNIEnv *env)  {
 	}
 	return 0;
 }
+extern void TVPLoadMessage();
 extern "C" jint JNI_OnLoad( JavaVM *vm, void *reserved ) {
 	JNIEnv *env;
 	if (vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6) != JNI_OK) {
@@ -894,5 +1053,8 @@ extern "C" jint JNI_OnLoad( JavaVM *vm, void *reserved ) {
 
 	// register native methods
 	int res = registerJavaMethod(env);
+
+	// メッセージリソースを読み込む、strings.xmlに移動したらもう少し後で読み込んだ方がいいかもしれない
+	TVPLoadMessage();
 	return JNI_VERSION_1_6;
 }

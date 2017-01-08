@@ -49,6 +49,12 @@ class TTVPWindowForm : public TouchHandler {
 
 	NativeEventQueue<TTVPWindowForm> EventQueue;
 
+	//-- TJS object related
+	tTJSNI_Window * TJSNativeInstance;
+	int LastMouseDownX, LastMouseDownY; // in Layer coodinates
+
+	tTVPRect FullScreenDestRect;
+
 protected:
 	void WndProc(NativeEvent& ev);
 
@@ -239,14 +245,18 @@ public:
 	void ResetMouseVelocity() {
 		MouseVelocityTracker.clear();
 	}
+	void TranslateWindowToDrawArea(float&x, float &y);
 
 	// 画面表示向き取得
 	int GetDisplayOrientation();
 	int GetDisplayRotate();
 
-	virtual void OnTouchScaling( double startdist, double currentdist, double cx, double cy, int flag );
-	virtual void OnTouchRotate( double startangle, double currentangle, double distance, double cx, double cy, int flag );
-	virtual void OnMultiTouch();
+	void OnTouchDown( float x, float y, float cx, float cy, tjs_int id, tjs_int64 tick );
+	void OnTouchMove( float x, float y, float cx, float cy, tjs_int id, tjs_int64 tick );
+	void OnTouchUp( float x, float y, float cx, float cy, tjs_int id, tjs_int64 tick );
+	void OnTouchScaling( double startdist, double currentdist, double cx, double cy, int flag );
+	void OnTouchRotate( double startangle, double currentangle, double distance, double cx, double cy, int flag );
+	void OnMultiTouch();
 
 	NativeEventQueueIntarface* GetEventHandler() { return &EventQueue; }
 };

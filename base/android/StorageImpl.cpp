@@ -198,6 +198,17 @@ void TVPPreNormalizeStorageName(ttstr &name)
 	tjs_int namelen = name.GetLen();
 	if(namelen == 0) return;
 
+	if(namelen >= 2)
+	{
+		if( (name[0] == TJS_W('\\') || name[0] == TJS_W('/')) &&
+			(name[1] != TJS_W('\\') && name[1] != TJS_W('/'))) {
+			ttstr newname(TJS_W("file:/"));
+			newname += name;
+			name = newname;
+			return;
+		}
+	}
+
 	if(namelen>=2)
 	{
 		if( (name[0] == TJS_W('\\') && name[1] == TJS_W('\\')) ||
@@ -299,7 +310,7 @@ bool TVPRemoveFolder(const ttstr &name)
 //---------------------------------------------------------------------------
 ttstr TVPGetAppPath()
 {
-	static ttstr exepath( Application->GetInternalDataPath() );
+	static ttstr exepath(TVPExtractStoragePath(TVPNormalizeStorageName(Application->GetPackageCodePath())));
 	return exepath;
 }
 //---------------------------------------------------------------------------
@@ -574,9 +585,7 @@ tTVPPluginHolder::tTVPPluginHolder(const ttstr &aname)
 : LocalTempStorageHolder(nullptr)
 {
 	// /data/data/(パッケージ名)/lib/
-	std::string filename;
-	TVPUtf16ToUtf8( filename, aname.AsStdString() );
-	std::string sopath = std::string("/data/data/") + Application->GetPackageName() + std::string("/lib/") + filename;
+	tjs_string sopath = tjs_string(TJS_W("/data/data/")) + tjs_string(Application->GetPackageName()) + tjs_string(TJS_W("/lib/")) + aname.AsStdString();
 	ttstr place( sopath.c_str() );
 	LocalTempStorageHolder = new tTVPLocalTempStorageHolder(place);
 }

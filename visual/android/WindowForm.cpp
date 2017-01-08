@@ -37,8 +37,10 @@ TShiftState TVP_TShiftState_From_uint32(tjs_uint32 state){
 }
 
 TTVPWindowForm::TTVPWindowForm( class tTVPApplication* app, class tTJSNI_Window* ni )
- : app_(app), touch_points_(this), EventQueue(this,&TTVPWindowForm::WndProc) {
+ : app_(app), touch_points_(this), EventQueue(this,&TTVPWindowForm::WndProc), TJSNativeInstance(ni), FullScreenDestRect(0,0,0,0) {
 	EventQueue.Allocate();
+ 
+	app->AddWindow(this);
 }
 TTVPWindowForm::~TTVPWindowForm() {
 	EventQueue.Deallocate();
@@ -63,7 +65,15 @@ void TTVPWindowForm::WndProc(NativeEvent& ev) {
 		break;
 	case AM_SURFACE_DESTORYED:
 		break;
-
+	case AM_TOUCH_DOWN:
+		OnTouchDown( ev.WParamf0, ev.WParamf1, ev.LParamf0, ev.LParamf0, ev.LParam1, ev.Result );
+		break;
+	case AM_TOUCH_MOVE:
+		OnTouchMove( ev.WParamf0, ev.WParamf1, ev.LParamf0, ev.LParamf0, ev.LParam1, ev.Result );
+		break;
+	case AM_TOUCH_UP:
+		OnTouchUp( ev.WParamf0, ev.WParamf1, ev.LParamf0, ev.LParamf0, ev.LParam1, ev.Result );
+		break;
 	default:
 		EventQueue.HandlerDefault( ev );
 		break;
@@ -168,7 +178,57 @@ tjs_int TTVPWindowForm::GetZoomDenom() const { return 1; }
 int TTVPWindowForm::GetDisplayOrientation() { return orientUnknown; }
 int TTVPWindowForm::GetDisplayRotate() { return 0; }
 
-void TTVPWindowForm::OnTouchScaling( double startdist, double currentdist, double cx, double cy, int flag ) {}
-void TTVPWindowForm::OnTouchRotate( double startangle, double currentangle, double distance, double cx, double cy, int flag ) {}
-void TTVPWindowForm::OnMultiTouch() {}
+void TTVPWindowForm::TranslateWindowToDrawArea(float&x, float &y) {
+	if( GetFullScreenMode() ) {
+		x -= FullScreenDestRect.left;
+		y -= FullScreenDestRect.top;
+	}
+}
+void TTVPWindowForm::OnTouchDown( float x, float y, float cx, float cy, tjs_int id, tjs_int64 tick ) {
+	TranslateWindowToDrawArea(x, y);
+
+	TouchVelocityTracker.start( id );
+	TouchVelocityTracker.update( id, tick, (float)x, (float)y );
+
+	if(TJSNativeInstance) {
+		TVPPostInputEvent( new tTVPOnTouchDownInputEvent(TJSNativeInstance, x, y, cx, cy, id));
+	}
+	touch_points_.TouchDown( x, y ,cx, cy, id, static_cast<tjs_uint>(tick&0xffffffff) );
+}
+void TTVPWindowForm::OnTouchMove( float x, float y, float cx, float cy, tjs_int id, tjs_int64 tick ) {
+	TranslateWindowToDrawArea( x, y);
+
+	TouchVelocityTracker.update( id, tick, (float)x, (float)y );
+
+	if(TJSNativeInstance) {
+		TVPPostInputEvent( new tTVPOnTouchMoveInputEvent(TJSNativeInstance, x, y, cx, cy, id));
+	}
+	touch_points_.TouchMove( x, y, cx, cy, id, static_cast<tjs_uint>(tick&0xffffffff) );
+}
+void TTVPWindowForm::OnTouchUp( float x, float y, float cx, float cy, tjs_int id, tjs_int64 tick ) {
+	TranslateWindowToDrawArea( x, y);
+
+	TouchVelocityTracker.update( id, tick, (float)x, (float)y );
+
+	if(TJSNativeInstance) {
+		TVPPostInputEvent( new tTVPOnTouchUpInputEvent(TJSNativeInstance, x, y, cx, cy, id));
+	}
+	touch_points_.TouchUp( x, y, cx, cy, id, static_cast<tjs_uint>(tick&0xffffffff) );
+}
+
+void TTVPWindowForm::OnTouchScaling( double startdist, double currentdist, double cx, double cy, int flag ) {
+	if(TJSNativeInstance) {
+		TVPPostInputEvent( new tTVPOnTouchScalingInputEvent(TJSNativeInstance, startdist, currentdist, cx, cy, flag ));
+	}
+}
+void TTVPWindowForm::OnTouchRotate( double startangle, double currentangle, double distance, double cx, double cy, int flag ) {
+	if(TJSNativeInstance) {
+		TVPPostInputEvent( new tTVPOnTouchRotateInputEvent(TJSNativeInstance, startangle, currentangle, distance, cx, cy, flag));
+	}
+}
+void TTVPWindowForm::OnMultiTouch() {
+	if( TJSNativeInstance ) {
+		TVPPostInputEvent( new tTVPOnMultiTouchInputEvent(TJSNativeInstance) );
+	}
+}
 

@@ -72,7 +72,7 @@ struct tTJSVariantString_S
 /*]*/
 #ifdef __GNUC__
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wundefined-bool-conversion"
+//#pragma GCC diagnostic ignored "-Wundefined-bool-conversion"
 #endif
 /*start-of-tTJSVariantString*/
 class tTJSVariantString : public tTJSVariantString_S

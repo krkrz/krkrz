@@ -1,10 +1,16 @@
 package jp.kirikiri.krkrz;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.graphics.PixelFormat;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.ParcelFileDescriptor;
+import android.support.v4.provider.DocumentFile;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -13,17 +19,45 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.io.FileNotFoundException;
 import java.util.Locale;
 
 public class MainActivity extends Activity  implements SurfaceHolder.Callback {
     private static String TAG = "KrkrZActivity";
 
+    static final int READ_DOCUMENT_REQUEST_CODE = 1;
+    static final int SELECT_TREE_REQUEST_CODE = 2;
+    static final int CREATE_DOCUMENT_REQUEST_CODE = 3;
+
+    private Handler mHandler;
+
+    private boolean mSelectedStartFolder;
+    private boolean mOpenStartFolder;
+
+    class FinishEvent implements Runnable {
+        @Override
+        public void run() {
+            finish();
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mSelectedStartFolder = false;
+        mOpenStartFolder = false;
+        mHandler = new Handler();
 
         initializeNative();
+
+        Intent intent = getIntent();
+        Bundle bundle = intent.getExtras();
+        if(bundle != null) {
+            String path = bundle.getString("startup_path");
+            nativeSetStartupPath(path);
+        }
 
         setContentView(R.layout.activity_main);
         SurfaceView surfaceView = (SurfaceView)findViewById(R.id.surfaceview);
@@ -73,6 +107,11 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
         super.onResume();
         Log.i(TAG, "onResume()");
         nativeToMessage(EventCode.AM_RESUME,0,0);
+        if( mSelectedStartFolder == false ) {
+            mSelectedStartFolder = true;
+            mOpenStartFolder = true;
+            selectFolder();
+        }
     }
 
     @Override
@@ -92,6 +131,7 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
     protected void onDestroy() {
     	super.onDestroy();
         nativeToMessage(EventCode.AM_DESTROY,0,0);
+        nativeSetActivity( null );
     }
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -259,6 +299,59 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
         }
         return 0;
     }
+    public void selectFolder() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        startActivityForResult(intent, SELECT_TREE_REQUEST_CODE);
+    }
+    // IntentでProviderを実装している呼びます。
+    public void performFileSearch() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("*/*");
+        startActivityForResult(intent, READ_DOCUMENT_REQUEST_CODE);
+    }
+    public void createFile( String filename ) {
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.setType("*/*");
+        intent.putExtra(Intent.EXTRA_TITLE, filename );
+        startActivityForResult(intent, CREATE_DOCUMENT_REQUEST_CODE );
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
+        if (requestCode == READ_DOCUMENT_REQUEST_CODE ) {
+            if( resultCode == Activity.RESULT_OK ) {
+                Uri uri = null;
+                if (resultData != null) {
+                    uri = resultData.getData();
+                    DocumentFile doc = DocumentFile.fromSingleUri(this, uri);
+                    String disp = doc.getName();
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                        final int takeFlags = resultData.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                        getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION );
+                        try {
+                            ParcelFileDescriptor desc = getContentResolver().openFileDescriptor(uri, "r");
+                            // String r = disp + ":" + nativeReadFile(desc);
+                        } catch( FileNotFoundException e ) {
+                        }
+                    }
+                }
+            } else {
+                // cancel
+            }
+        } else if( requestCode == SELECT_TREE_REQUEST_CODE ) {
+            if( resultCode == Activity.RESULT_OK ) {
+                Uri treeUri = resultData.getData();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    getContentResolver().takePersistableUriPermission(treeUri, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                }
+                if( mOpenStartFolder ) {
+                    // nativeSelectPath( treeUri.toString() + "/", this );
+                    nativeSetStartupPath( treeUri.toString() + "/" );
+                }
+            }
+            mOpenStartFolder = false;
+        }
+    }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
         nativeSetSurface(holder.getSurface());
@@ -288,6 +381,11 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
     public String getExternalDataPath() {
         return getExternalFilesDir(null).toString();
     }
+    //public String retrievePackageName() { return getPackageName(); }
+    //public String retrievePackageCodePath() { return getPackageCodePath(); }
+    public void postFinish() {
+        mHandler.post( new FinishEvent() );
+    }
 
 	// *** native 関数列挙
 	public static native void nativeToMessage(int mes, long wparam, long lparam );
@@ -295,6 +393,7 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
 	public static native void nativeSetAssetManager(AssetManager am);
     public static native void nativeSetActivity( Activity activity );
 	public static native void nativeInitialize();
+	public static native void nativeSetStartupPath( String path );
 
     public static native void nativeOnTouch( int type, float x, float y, float c, int id, long tick );
 }

@@ -45,6 +45,7 @@ tjs_string TVPNativeProjectDir;
 tjs_string TVPNativeDataPath;
 bool TVPProjectDirSelected = false;
 extern tjs_real TVPCPUClock;
+extern ttstr TVPGetPersonalPath();
 //---------------------------------------------------------------------------
 
 
@@ -112,11 +113,7 @@ void TVPInitializeBaseSystems()
 
 	// set default current directory
 	{
-		std::string filename;
-		tjs_string path( IncludeTrailingBackslash(ExtractFileDir(Application->GetExternalDataPath())) );
-		if( TVPUtf16ToUtf8( filename, path ) ) {
-			chdir( filename.c_str() );
-		}
+		TVPSetCurrentDirectory( IncludeTrailingBackslash(ExtractFileDir(Application->GetExternalDataPath())) );
 	}
 
 	// load message map file
@@ -189,10 +186,41 @@ void TVPBeforeSystemInit()
 	}
 
 	// ディレクトリチェック - Android 版は以下の優先順位
-	// 1. Intent で指定されている場合は、そこから読み込む(Debugのみ)
-	// 2. assets/config.cf を読み、そこで指定されたフォルダから読み込む
-	// 3. assets/data.xp3 から読み込む
-	// 4. assets/startup.tjs から開始
+	// 1. assets/config.cf を読み、そこで指定されたフォルダから読み込む(未実装)
+	// 2. assets/data.xp3 から読み込む
+	// 3. assets/startup.tjs から開始
+	tjs_char buf[MAX_PATH];
+	bool selected = false;
+	AAsset* asset = AAssetManager_open( Application->getAssetManager(), "data.xp3", AASSET_MODE_UNKNOWN);
+	bool result = asset != nullptr;
+	if( result ) {
+		AAsset_close( asset );
+		asset = nullptr;
+		TJS_strcpy(buf, TJS_W("assts://data.xp3"));
+		tjs_int buflen = TJS_strlen(buf);
+		buf[buflen] = TVPArchiveDelimiter, buf[buflen+1] = 0;
+		selected = true;
+		TVPProjectDirSelected = true;
+	}
+	if( !selected ) {
+		asset = AAssetManager_open( Application->getAssetManager(), "startup.tjs", AASSET_MODE_UNKNOWN);
+		result = asset != nullptr;
+		if( result ) {
+			AAsset_close( asset );
+			asset = nullptr;
+			TJS_strcpy(buf, TJS_W("assts://startup.tjs"));
+			selected = true;
+			TVPProjectDirSelected = true;
+		}
+	}
+	if( selected ) {
+		TVPProjectDir = TVPNormalizeStorageName(buf);
+		TVPSetCurrentDirectory(TVPProjectDir);
+		TVPNativeProjectDir = buf;
+	}
+	if(TVPProjectDirSelected) {
+		TVPAddImportantLog( TVPFormatMessage(TVPInfoSelectedProjectDirectory, TVPProjectDir) );
+	}
 #if 0
 	tjs_char buf[MAX_PATH];
 	bool bufset = false;
@@ -357,6 +385,16 @@ void TVPBeforeSystemInit()
 		TVPAddImportantLog( TVPFormatMessage(TVPInfoSelectedProjectDirectory, TVPProjectDir) );
 	}
 #endif
+}
+//---------------------------------------------------------------------------
+void TVPSetProjectPath( const ttstr& path ) {
+	if( TVPProjectDirSelected == false ) {
+		TVPProjectDirSelected = true;
+		TVPProjectDir = TVPNormalizeStorageName(path);
+		TVPSetCurrentDirectory(TVPProjectDir);
+		TVPNativeProjectDir = path.AsStdString();
+		TVPAddImportantLog( TVPFormatMessage(TVPInfoSelectedProjectDirectory, TVPProjectDir) );
+	}
 }
 //---------------------------------------------------------------------------
 static void TVPDumpOptions();
@@ -572,7 +610,8 @@ void TVPTerminateSync(int code)
 {
 	// do synchronous temination of application (never return)
 	TVPSystemUninit();
-	exit(code);
+
+	Application->Terminate();
 }
 //---------------------------------------------------------------------------
 void TVPMainWindowClosed()
@@ -811,7 +850,8 @@ static void TVPInitProgramArgumentsAndDataPath(bool stop_after_datapath_got)
 				config_datapath = ((ttstr)val).AsStdString();
 			TVPNativeDataPath = ApplicationSpecialPath::GetDataPathDirectory(config_datapath, ExePath());
 #endif
-			TVPNativeDataPath = TJS_W("asset://");
+			//TVPNativeDataPath = TJS_W("asset://");
+			TVPNativeDataPath = Application->GetExternalDataPath();
 
 			if(stop_after_datapath_got) return;
 
@@ -1011,83 +1051,6 @@ static void TVPExecuteAsync( const tjs_string& progname)
 	throw Exception(ttstr(TVPExecutionFail).AsStdString());
 #endif
 	// TODO インテントを投げる実装にした方が良い
-}
-//---------------------------------------------------------------------------
-
-
-
-
-
-//---------------------------------------------------------------------------
-// TVPWaitWritePermit
-//---------------------------------------------------------------------------
-#if 0	// 使われていない？ Windows版でも使われていない
-static bool TVPWaitWritePermit(const tjs_string& fn)
-{
-	tjs_int timeout = 10; // 10/1 = 5 seconds
-	while(true)
-	{
-		HANDLE h = CreateFile(fn.c_str(), GENERIC_WRITE, FILE_SHARE_READ, NULL,
-			OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-		if(h != INVALID_HANDLE_VALUE)
-		{
-			CloseHandle(h);
-			return true;
-		}
-
-		Sleep(500);
-		timeout--;
-		if(timeout == 0) return false;
-	}
-	return false;
-}
-#endif
-//---------------------------------------------------------------------------
-
-
-#if 0
-//---------------------------------------------------------------------------
-// TVPShowUserConfig
-//---------------------------------------------------------------------------
-static void TVPShowUserConfig(std::string orgexe)
-{
-	TVPEnsureDataPathDirectory();
-
-	Application->SetTitle( ChangeFileExt(ExtractFileName(orgexe), "") );
-	TConfSettingsForm *form = new TConfSettingsForm(Application, true);
-	form->InitializeConfig(orgexe);
-	form->ShowModal();
-	delete form;
-}
-//---------------------------------------------------------------------------
-#endif
-
-//---------------------------------------------------------------------------
-// TVPExecuteUserConfig
-//---------------------------------------------------------------------------
-bool TVPExecuteUserConfig()
-{
-#if 0
-	// check command line argument
-
-	tjs_int i;
-	bool process = false;
-	for(i=1; i<_argc; i++)
-	{
-		if(!strcmp(_argv[i], "-userconf")) // this does not refer TVPGetCommandLine
-			process = true;
-	}
-
-	if(!process) return false;
-
-	// execute user config mode
-	//TVPShowUserConfig(ExePath());
-	TVPShowUserConfig();
-
-	// exit
-	return true;
-#endif
-	return false; // userconf はない
 }
 //---------------------------------------------------------------------------
 

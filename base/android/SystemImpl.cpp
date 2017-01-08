@@ -119,10 +119,11 @@ ttstr TVPGetOSName()
 	tjs_string wcountry;
 	TVPUtf8ToUtf16( wcountry, country );
 	tjs_int ver = Application->getSdkVersion();
+	const tjs_char *sysVer = Application->getSystemVersion().c_str();
 
 	tjs_char buf[256];
-	TJS_snprintf(buf, sizeof(buf)/sizeof(tjs_char), TJS_W("%ls API Level %d Country %ls : Language %ls"),
-		osname, ver, wcountry.c_str(), wlang.c_str() );
+	TJS_snprintf(buf, sizeof(buf)/sizeof(tjs_char), TJS_W("%ls %ls(API Level %d) Country %ls : Language %ls"),
+		osname, sysVer, ver, wcountry.c_str(), wlang.c_str() );
 
 	return ttstr(buf);
 }
@@ -175,6 +176,7 @@ bool TVPShellExecute(const ttstr &target, const ttstr &param)
 	*/
 }
 //---------------------------------------------------------------------------
+#endif // ANDROID_BUILDING_DISABLE
 
 
 //---------------------------------------------------------------------------
@@ -182,26 +184,16 @@ bool TVPShellExecute(const ttstr &target, const ttstr &param)
 //---------------------------------------------------------------------------
 ttstr TVPGetPersonalPath()
 {
-	// Retrieve personal directory;
-	// This usually refers "My Documents".
-	// If this is not exist, returns application data path, then exe path.
-	// for windows vista, this refers application data path.
-	ttstr path;
-	path = TVPGetSpecialFolderPath(CSIDL_PERSONAL);
-	if(path.IsEmpty())
-		path = TVPGetSpecialFolderPath(CSIDL_APPDATA);
-	
+	ttstr path( Application->GetExternalDataPath().c_str() );
 	if(!path.IsEmpty())
 	{
 		path = TVPNormalizeStorageName(path);
 		if(path.GetLastChar() != TJS_W('/')) path += TJS_W('/');
 		return path;
 	}
-
 	return TVPGetAppPath();
 }
 //---------------------------------------------------------------------------
-#endif // ANDROID_BUILDING_DISABLE
 
 
 
@@ -353,56 +345,6 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/getKeyState)
 }
 TJS_END_NATIVE_STATIC_METHOD_DECL_OUTER(/*object to register*/cls,
 	/*func. name*/getKeyState)
-#if 0
-//----------------------------------------------------------------------
-TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/shellExecute)
-{
-	if(numparams < 1) return TJS_E_BADPARAMCOUNT;
-
-	ttstr target = *param[0];
-	ttstr execparam;
-
-	if(numparams >= 2) execparam = *param[1];
-
-	bool res = TVPShellExecute(target, execparam);
-
-	if(result) *result = (tjs_int)res;
-	return TJS_S_OK;
-}
-TJS_END_NATIVE_STATIC_METHOD_DECL_OUTER(/*object to register*/cls,
-	/*func. name*/shellExecute)
-//----------------------------------------------------------------------
-TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/system)
-{
-	if(numparams < 1) return TJS_E_BADPARAMCOUNT;
-
-	ttstr target = *param[0];
-
-	int ret = _wsystem(target.c_str());
-
-	TVPDeliverCompactEvent(TVP_COMPACT_LEVEL_MAX); // this should clear all caches
-
-	if(result) *result = (tjs_int)ret;
-	return TJS_S_OK;
-}
-TJS_END_NATIVE_STATIC_METHOD_DECL_OUTER(/*object to register*/cls,
-	/*func. name*/system)
-//----------------------------------------------------------------------
-TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/readRegValue)
-{
-	if(numparams < 1) return TJS_E_BADPARAMCOUNT;
-	if(!result) return TJS_S_OK;
-
-	ttstr key = *param[0];
-
-
-	TVPReadRegValue(*result, key);
-
-	return TJS_S_OK;
-}
-TJS_END_NATIVE_STATIC_METHOD_DECL_OUTER(/*object to register*/cls,
-	/*func. name*/readRegValue)
-#endif
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/getArgument)
 {
@@ -434,32 +376,6 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/setArgument)
 TJS_END_NATIVE_STATIC_METHOD_DECL_OUTER(/*object to register*/cls,
 	/*func. name*/setArgument)
 //----------------------------------------------------------------------
-#if 0
-TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/createAppLock)
-{
-	if(numparams < 1) return TJS_E_BADPARAMCOUNT;
-	if(!result) return TJS_S_OK;
-
-	ttstr lockname = *param[0];
-
-	bool res = TVPCreateAppLock(lockname);
-
-	if(result) *result = (tjs_int)res;
-
-	return TJS_S_OK;
-}
-TJS_END_NATIVE_STATIC_METHOD_DECL_OUTER(/*object to register*/cls,
-	/*func. name*/createAppLock)
-//----------------------------------------------------------------------
-TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/dumpHeap)
-{
-	TVPHeapDump();
-	return TJS_S_OK;
-}
-TJS_END_NATIVE_STATIC_METHOD_DECL_OUTER(/*object to register*/cls,
-	/*func. name*/dumpHeap)
-#endif
-//----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/nullpo)
 {
 	// force make a null-po
@@ -480,7 +396,6 @@ TJS_END_NATIVE_STATIC_METHOD_DECL_OUTER(/*object to register*/cls,
 //-- properties
 
 //----------------------------------------------------------------------
-#if 0
 TJS_BEGIN_NATIVE_PROP_DECL(exePath)
 {
 	TJS_BEGIN_NATIVE_PROP_GETTER
@@ -506,7 +421,6 @@ TJS_BEGIN_NATIVE_PROP_DECL(personalPath)
 	TJS_DENY_NATIVE_PROP_SETTER
 }
 TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, personalPath)
-#endif
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_PROP_DECL(appDataPath)
 {
@@ -534,12 +448,11 @@ TJS_BEGIN_NATIVE_PROP_DECL(dataPath)
 }
 TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, dataPath)
 //----------------------------------------------------------------------
-#if 0
 TJS_BEGIN_NATIVE_PROP_DECL(exeName)
 {
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
-		static ttstr exename(TVPNormalizeStorageName(ExePath()));
+		static ttstr exename(TVPNormalizeStorageName(Application->GetPackageCodePath()));
 		*result = exename;
 		return TJS_S_OK;
 	}
@@ -548,7 +461,6 @@ TJS_BEGIN_NATIVE_PROP_DECL(exeName)
 	TJS_DENY_NATIVE_PROP_SETTER
 }
 TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, exeName)
-#endif
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_PROP_DECL(title)
 {
