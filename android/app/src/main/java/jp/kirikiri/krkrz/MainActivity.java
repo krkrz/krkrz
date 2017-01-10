@@ -42,6 +42,32 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
             finish();
         }
     }
+    class SurfaceSizeChangeEvent implements Runnable {
+        private int mWidth;
+        private int mHeight;
+        public SurfaceSizeChangeEvent( int w, int h ) { mWidth = w; mHeight = h; }
+        @Override
+        public void run() {
+            SurfaceView surfaceView = (SurfaceView)findViewById(R.id.surfaceview);
+            surfaceView.getHolder().setFixedSize(mWidth, mHeight);
+        }
+    }
+    class ActivityTitleChangeEvent implements Runnable {
+        private String mTitle;
+        public ActivityTitleChangeEvent( String title ) { mTitle = title; }
+        @Override
+        public void run() {
+            setTitle( mTitle );
+        }
+    }
+    class ShowToastEvent implements Runnable {
+        private String mMessage;
+        public ShowToastEvent( String title ) { mMessage = title; }
+        @Override
+        public void run() {
+            Toast.makeText(MainActivity.this,mMessage,Toast.LENGTH_LONG).show();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -356,7 +382,6 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
     public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
         nativeSetSurface(holder.getSurface());
     }
-
     public void surfaceCreated(SurfaceHolder holder) {
     }
     public void surfaceDestroyed(SurfaceHolder holder) {
@@ -386,6 +411,10 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
     public void postFinish() {
         mHandler.post( new FinishEvent() );
     }
+    public void postChangeSurfaceSize( int w, int h ) { mHandler.post( new SurfaceSizeChangeEvent( w, h ) ); }
+    public void postChangeCaption( String t ) { mHandler.post( new ActivityTitleChangeEvent(t) ); }
+    public String getCaption() { return getTitle().toString(); }
+    public void postShowToastMessage( String m ) { mHandler.post( new ShowToastEvent(m) ); }
 
 	// *** native 関数列挙
 	public static native void nativeToMessage(int mes, long wparam, long lparam );

@@ -409,7 +409,7 @@ tGenericFreeTypeFace::tGenericFreeTypeFace(const std::string& path, const ttstr 
 		args.num_params = 1;
 		args.params = parameters;
 		FT_Error err = FT_Open_Face( FreeTypeLibrary, &args, index, &Face);
-		if( err == 0 ) {
+		if( err != 0 ) {
 			TVPThrowExceptionMessage(TVPFontCannotBeUsed, fontname );
 		}
 		FaceNames.push_back( fontname.AsStdString() );

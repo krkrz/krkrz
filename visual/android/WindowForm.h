@@ -43,6 +43,10 @@ TShiftState TVP_TShiftState_From_uint32(tjs_uint32 state);
 class TTVPWindowForm : public TouchHandler {
 	class tTVPApplication* app_;
 
+	//-- drawdevice related
+	bool NextSetWindowHandleToDrawDevice;
+	tTVPRect LastSentDrawDeviceDestRect;
+
 	TouchPointList touch_points_;
 	VelocityTrackers TouchVelocityTracker;
 	VelocityTracker MouseVelocityTracker;
@@ -53,7 +57,25 @@ class TTVPWindowForm : public TouchHandler {
 	tTJSNI_Window * TJSNativeInstance;
 	int LastMouseDownX, LastMouseDownY; // in Layer coodinates
 
+	//-- layer position / size
+	tjs_int LayerLeft;
+	tjs_int LayerTop;
+	tjs_int LayerWidth;
+	tjs_int LayerHeight;
+	tjs_int ZoomDenom; // Zooming factor denominator (setting)
+	tjs_int ZoomNumer; // Zooming factor numerator (setting)
+	tjs_int ActualZoomDenom; // Zooming factor denominator (actual)
+	tjs_int ActualZoomNumer; // Zooming factor numerator (actual)
+
 	tTVPRect FullScreenDestRect;
+
+private:
+	void InternalSetPaintBoxSize();
+	void SetDrawDeviceDestRect();
+
+	static int MulDiv( int nNumber, int nNumerator, int nDenominator ) {
+		return (int)(((int64_t)nNumber * (int64_t)nNumerator) / nDenominator);
+	}
 
 protected:
 	void WndProc(NativeEvent& ev);

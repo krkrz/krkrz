@@ -37,10 +37,14 @@ TShiftState TVP_TShiftState_From_uint32(tjs_uint32 state){
 }
 
 TTVPWindowForm::TTVPWindowForm( class tTVPApplication* app, class tTJSNI_Window* ni )
- : app_(app), touch_points_(this), EventQueue(this,&TTVPWindowForm::WndProc), TJSNativeInstance(ni), FullScreenDestRect(0,0,0,0) {
+ : app_(app), touch_points_(this), EventQueue(this,&TTVPWindowForm::WndProc), TJSNativeInstance(ni), FullScreenDestRect(0,0,0,0),
+	LayerLeft(0), LayerTop(0), LayerWidth(32), LayerHeight(32), ZoomDenom(1), ActualZoomDenom(1), ZoomNumer(1), ActualZoomNumer(1) {
 	EventQueue.Allocate();
- 
+
 	app->AddWindow(this);
+
+	NextSetWindowHandleToDrawDevice = true;
+	LastSentDrawDeviceDestRect.clear();
 }
 TTVPWindowForm::~TTVPWindowForm() {
 	EventQueue.Deallocate();
@@ -60,6 +64,7 @@ void TTVPWindowForm::WndProc(NativeEvent& ev) {
 	case AM_DESTROY:
 		break;
 	case AM_SURFACE_CHANGED:
+		// Surfaceが切り替わったので、DrawDevice 準備
 		break;
 	case AM_SURFACE_CREATED:
 		break;
@@ -115,8 +120,38 @@ void TTVPWindowForm::OnKeyUp( tjs_uint16 vk, int shift ) {
 void TTVPWindowForm::OnKeyPress( tjs_uint16 vk, int repeat, bool prevkeystate, bool convertkey ) {
 }
 
+void TTVPWindowForm::SetDrawDeviceDestRect()
+{
+	tTVPRect destrect;
+	tjs_int w = MulDiv(LayerWidth,  ActualZoomNumer, ActualZoomDenom);
+	tjs_int h = MulDiv(LayerHeight, ActualZoomNumer, ActualZoomDenom);
+	if( w < 1 ) w = 1;
+	if( h < 1 ) h = 1;
+
+	destrect.left = destrect.top = 0;
+	destrect.right = w;
+	destrect.bottom = h;
+
+	if( LastSentDrawDeviceDestRect != destrect ) {
+		if( TJSNativeInstance ) {
+			if( GetFullScreenMode() ) {
+				TJSNativeInstance->GetDrawDevice()->SetClipRectangle(FullScreenDestRect);
+			} else {
+				TJSNativeInstance->GetDrawDevice()->SetClipRectangle(destrect);
+			}
+			TJSNativeInstance->GetDrawDevice()->SetDestRectangle(destrect);
+		}
+		LastSentDrawDeviceDestRect = destrect;
+	}
+}
+void TTVPWindowForm::InternalSetPaintBoxSize() {
+	SetDrawDeviceDestRect();
+}
 // プライマリーレイヤーのサイズに合うように呼び出される。w/hはLayerWidth/LayerHeightに当たり、ズームを考慮して表示サイズを設定する
 void TTVPWindowForm::SetPaintBoxSize(tjs_int w, tjs_int h) {
+	LayerWidth  = w;
+	LayerHeight = h;
+	InternalSetPaintBoxSize();
 }
 
 // VideoOverlayで表示サイズを決めるためにズーム値を用いて引数値を拡大縮小する
@@ -128,6 +163,15 @@ void TTVPWindowForm::GetVideoOffset(tjs_int &ofsx, tjs_int &ofsy) {
 
 // 内容更新
 void TTVPWindowForm::UpdateWindow(tTVPUpdateType type) {
+	if( TJSNativeInstance ) {
+		tTVPRect r;
+		r.left = 0;
+		r.top = 0;
+		r.right = LayerWidth;
+		r.bottom = LayerHeight;
+		TJSNativeInstance->NotifyWindowExposureToLayer(r);
+		TVPDeliverWindowUpdateEvents();
+	}
 }
 
 // 表示/非表示
@@ -139,11 +183,13 @@ void TTVPWindowForm::ShowWindowAsModal() {
 
 // タイトル、Activityのタイトルに設定できるが、無意味かな
 tjs_string TTVPWindowForm::GetCaption() {
-	return tjs_string(TJS_W(""));
+	return Application->GetActivityCaption();
 }
 void TTVPWindowForm::GetCaption( tjs_string& v ) const {
+	v = Application->GetActivityCaption();
 }
 void TTVPWindowForm::SetCaption( const tjs_string& v ) {
+	Application->SetActivityCaption( v );
 }
 
 // サイズや位置など

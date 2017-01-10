@@ -172,6 +172,7 @@ visual/TransIntf.cpp
 visual/tvpgl.c
 visual/VideoOvlIntf.cpp
 visual/WindowIntf.cpp
+visual/android/BasicDrawDevice.cpp
 visual/android/BitmapBitsAlloc.cpp
 visual/android/BitmapInfomation.cpp
 visual/android/LayerImpl.cpp

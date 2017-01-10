@@ -18,16 +18,11 @@
 #include "LayerManager.h"
 #include "WindowIntf.h"
 #include "DebugIntf.h"
-#ifdef _WIN32
 #include "BasicDrawDevice.h"
-#endif
+
 
 tTJSNativeClass* TVPCreateDefaultDrawDevice() {
-#ifdef _WIN32
 	return new tTJSNC_BasicDrawDevice();
-#else
-	return NULL;
-#endif
 }
 
 //---------------------------------------------------------------------------

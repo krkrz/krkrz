@@ -21,6 +21,7 @@
 #include <android/log.h>
 #include <android_native_app_glue.h>
 #include <android/input.h>
+#include <android/asset_manager.h>
 
 #include "iTVPApplication.h"
 #include "TVPScreen.h"
@@ -100,6 +101,7 @@ private:
 	void releaseNativeEvent( NativeEvent* ev );
 	void wakeupMainThread();
 	void getStringFromJava( const char* methodName, tjs_string& dest ) const;
+	void setStringToJava( const char* methodName, const tjs_string& src );
 	void callActivityMethod( const char* methodName ) const;
 
 public:
@@ -113,6 +115,7 @@ public:
 	static void nativeSetAssetManager(JNIEnv *jenv, jobject obj, jobject assetManager );
 
 	void finishActivity();
+	void changeSurfaceSize( int w, int h );
 
 	// platform's SDK version
 	tjs_int getSdkVersion() const {
@@ -294,7 +297,7 @@ public:
 	const tjs_char* GetPackageCodePath() const;
 
 	bool GetActivating() const { return true; }	// TODO
-	void ShowToast( const tjs_char* text ) {}	// TODO
+	void ShowToast( const tjs_char* text );
 	//const tTVPScreen& GetScreen() const { return screen_; }
 
 	// for iTVPApplication
@@ -329,9 +332,8 @@ public:
 	void OnTouchUp( float x, float y, float cx, float cy, int32_t id, float pressure,int32_t meta );
 
 	// for exception showing
-	static int MessageDlg( const tjs_string& string, const tjs_string& caption, int type, int button ) {
-		return 0;
-	}
+	static int MessageDlg( const tjs_string& string, const tjs_string& caption, int type, int button );
+
 	void postEvent( const struct NativeEvent* ev, NativeEventQueueIntarface* handler = nullptr );
 
 	void addEventHandler( NativeEventQueueIntarface* handler ) {
@@ -351,6 +353,9 @@ public:
 	void SetTitle( const tjs_string& caption ) { 
 		title_ = caption;
 	}
+	tjs_string GetActivityCaption();
+	void SetActivityCaption( const tjs_string& caption );
+
 	void Terminate() {
 		finishActivity();
 	}

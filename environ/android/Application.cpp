@@ -1,4 +1,12 @@
-
+/**
+ * メモ
+ *
+ * JNIとのやり取りに関して、各種寿命など以下のリンク文書が参考になる
+ * Android開発者のためのJNI入門
+ * http://techbooster.jpn.org/andriod/application/7264/
+ * Javaを呼出して動かす（jobject、jstring、jclass）
+ * http://simple-asta.blogspot.jp/p/javajobjectjstringjclass.html
+ */
 #include "tjsCommHead.h"
 
 #include "tjsError.h"
@@ -116,6 +124,7 @@ void tTVPApplication::wakeupMainThread() {
 void tTVPApplication::mainLoop() {
 	bool attached;
 	JNIEnv *env = getJavaEnv(attached);	// attach thread to java
+	// ここの env は、TJS VM のメインスレッド内共通なので、スレッドIDと共に保持して、各種呼び出し時に使いまわす方が効率的か
 	while( is_terminate_ == false ) {
 		{	// イベントキューからすべてのイベントをディスパッチ
 			std::lock_guard<std::mutex> lock( command_que_mutex_ );
@@ -774,6 +783,20 @@ void tTVPApplication::getStringFromJava( const char* methodName, tjs_string& des
 		if( attached ) detachJavaEnv();
 	}
 }
+void tTVPApplication::setStringToJava( const char* methodName, const tjs_string& src ) {
+	bool attached;
+	JNIEnv *env = getJavaEnv(attached);
+	if ( env != nullptr ) {
+		jobject thiz = activity_;
+		jclass clazz = env->GetObjectClass(thiz);
+		jmethodID mid = env->GetMethodID(clazz, methodName, "(Ljava/lang/String;)V");
+		jstring arg = env->NewString( reinterpret_cast<const jchar *>(src.c_str()), src.length() );
+		env->CallVoidMethod(thiz, mid, arg);
+		env->DeleteLocalRef( arg );
+		env->DeleteLocalRef(clazz);
+		if( attached ) detachJavaEnv();
+	}
+}
 void tTVPApplication::callActivityMethod( const char* methodName ) const {
 	bool attached;
 	JNIEnv *env = getJavaEnv(attached);
@@ -820,6 +843,18 @@ void tTVPApplication::finishActivity() {
 	callActivityMethod( "postFinish" );
 	stopMainLoop();
 }
+void tTVPApplication::changeSurfaceSize( int w, int h ) {
+	bool attached;
+	JNIEnv *env = getJavaEnv(attached);
+	if ( env != nullptr ) {
+		jobject thiz = activity_;
+		jclass clazz = env->GetObjectClass(thiz);
+		jmethodID mid = env->GetMethodID(clazz, "postChangeSurfaceSize", "(II)V");
+		env->CallVoidMethod(thiz, mid, w, h );
+		env->DeleteLocalRef(clazz);
+		if( attached ) detachJavaEnv();
+	}
+}
 const tjs_string& tTVPApplication::getSystemVersion() const {
 	if( system_release_version_.empty() ) {
 		bool attached;
@@ -840,6 +875,22 @@ const tjs_string& tTVPApplication::getSystemVersion() const {
 	}
 	return system_release_version_;
 }
+tjs_string tTVPApplication::GetActivityCaption() {
+	tjs_string caption;
+	getStringFromJava( "getCaption", caption );
+	return caption;
+}
+void tTVPApplication::SetActivityCaption( const tjs_string& caption ) {
+	setStringToJava( "postChangeCaption", caption );
+}
+void tTVPApplication::ShowToast( const tjs_char* text ) {
+	setStringToJava( "postShowToastMessage", tjs_string(text) );
+}
+int tTVPApplication::MessageDlg( const tjs_string& string, const tjs_string& caption, int type, int button ) {
+	Application->ShowToast( string.c_str() );
+	return 0;
+}
+
 /**
  * Java から送られてきた各種イベントをここで処理する
  * イベントの種類に応じてアプリケーションとして処理するか、Windowに処理させるか判断
@@ -911,7 +962,17 @@ void tTVPApplication::SendTouchMessageFromJava( tjs_int type, float x, float y, 
 }
 void tTVPApplication::setWindow( ANativeWindow* window ) {
 	// std::lock_guard<std::mutex> lock( main_thread_mutex_ );
+	if( window_ ) {
+		// release previous window reference
+		ANativeWindow_release( window_ );
+	}
+
 	window_ = window;
+
+	if( window ) {
+		// acquire window reference
+		ANativeWindow_acquire( window );
+	}
 }
 void tTVPApplication::nativeSetSurface(JNIEnv *jenv, jobject obj, jobject surface) {
 	if( surface != 0 ) {
@@ -921,7 +982,6 @@ void tTVPApplication::nativeSetSurface(JNIEnv *jenv, jobject obj, jobject surfac
 		Application->SendMessageFromJava( AM_SURFACE_CHANGED, 0, 0 );
 	} else {
 		LOGI("Releasing window");
-		ANativeWindow_release(Application->getWindow());
 		Application->setWindow(nullptr);
 		Application->SendMessageFromJava( AM_SURFACE_DESTORYED, 0, 0 );
 	}
@@ -963,6 +1023,8 @@ void tTVPApplication::nativeSetActivity(JNIEnv *env, jobject obj, jobject activi
 	if( activity != nullptr ) {
 		jobject globalactivity = env->NewGlobalRef(activity);
 		Application->activity_ = globalactivity;
+		// Activity の jclass や 必要となるメソッドIDはここで一気に取得してしまっていた方がいいかもしれない
+		// jclass は頻繁に必要になるのでここで、メソッドIDは必要になった初回に取得が妥当か
 	} else {
 		if( Application->activity_ != nullptr ) {
 			env->DeleteGlobalRef( Application->activity_ );

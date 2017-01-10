@@ -33,9 +33,7 @@
 #include "tjsRandomGenerator.h"
 #include "SysInitIntf.h"
 #include "PhaseVocoderFilter.h"
-#ifndef ANDROID
 #include "BasicDrawDevice.h"
-#endif
 #include "BinaryStream.h"
 #include "SysInitImpl.h"
 #include "SystemControl.h"
@@ -206,7 +204,6 @@ void TVPInitScriptEngine()
 	waveclass->PropSet(TJS_MEMBERENSURE|TJS_IGNOREPROP|TJS_STATICMEMBER,
 		TJS_W("PhaseVocoder"), NULL, &val, waveclass);
 
-#ifndef ANDROID	// TODO 仮
 	/* Window and its drawdevices */
 	iTJSDispatch2 * windowclass = NULL;
 	REGISTER_OBJECT(Window, (windowclass = TVPCreateNativeClass_Window()));
@@ -215,7 +212,6 @@ void TVPInitScriptEngine()
 	dsp->Release();
 	windowclass->PropSet(TJS_MEMBERENSURE|TJS_IGNOREPROP|TJS_STATICMEMBER,
 		TJS_W("BasicDrawDevice"), NULL, &val, windowclass);
-#endif
 
 	// Add Extension Classes
 	TVPCauseAtInstallExtensionClass( global );
