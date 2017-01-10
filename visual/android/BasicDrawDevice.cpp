@@ -203,12 +203,14 @@ void TJS_INTF_METHOD tTVPBasicDrawDevice::NotifyBitmapCompleted(iTVPLayerManager
 		if(bmpinfo->GetHeight() < 0)
 		{
 			// bottom-down
-			src_pitch = bmpinfo->GetPitchBytes();
+			//src_pitch = bmpinfo->GetPitchBytes();
+			src_pitch = bmpinfo->GetWidth() * 4;
 		}
 		else
 		{
 			// bottom-up
-			src_pitch = bmpinfo->GetPitchBytes();
+			//src_pitch = bmpinfo->GetPitchBytes();
+			src_pitch = -bmpinfo->GetWidth() * 4;
 			src_p += bmpinfo->GetWidth() * 4 * (bmpinfo->GetHeight() - 1);
 		}
 
