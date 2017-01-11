@@ -160,11 +160,20 @@ void TJS_INTF_METHOD tTVPBasicDrawDevice::StartBitmapCompletion(iTVPLayerManager
 	if( IsLockBuffer == false ) {
 		ANativeWindow* win = Application->getWindow();
 		if( win != nullptr ) {
+			int w = ANativeWindow_getWidth( win );
+			int h = ANativeWindow_getHeight( win );
+			if( DestRect.get_width() != 0 && DestRect.get_height() != 0 ) {
+				if( DestRect.get_width() != w || DestRect.get_height() != h ) {
+					int32_t result = ANativeWindow_setBuffersGeometry( win, DestRect.get_width(), DestRect.get_height(), WINDOW_FORMAT_RGBX_8888 );
+					w = ANativeWindow_getWidth( win );
+					h = ANativeWindow_getHeight( win );
+				}
+			}
 			ARect dirty;
 			dirty.left = 0;
 			dirty.top = 0;
-			dirty.right = ANativeWindow_getWidth( win );
-			dirty.bottom = ANativeWindow_getHeight( win );
+			dirty.right = w;
+			dirty.bottom = h;
 			ANativeWindow_lock( win, &BackBuffer, &dirty );
 			IsLockBuffer = true;
 		}
@@ -218,7 +227,21 @@ void TJS_INTF_METHOD tTVPBasicDrawDevice::NotifyBitmapCompleted(iTVPLayerManager
 		{
 			const void *srcp = src_p + src_pitch * src_y + src_x * 4;
 			void *destp = (tjs_uint8*)BackBuffer.bits + BackBuffer.stride*sizeof(int32_t) * dest_y + dest_x * 4;
+#if 0
 			memcpy(destp, srcp, width_bytes);
+#else
+            // TODO 暫定処理、Pixel Shader で入れ替える方が良い
+			const tjs_uint8* s = reinterpret_cast<const tjs_uint8*>(srcp);
+			 tjs_uint8* d = reinterpret_cast<tjs_uint8*>(destp);
+			for( int i = 0; i < width_bytes; i+=4 ) {
+				d[0] = s[2];
+				d[1] = s[1];
+				d[2] = s[0];
+				d[3] = s[3];
+				d  += 4;
+				s  += 4;
+			}
+#endif
 		}
 	}
 }
