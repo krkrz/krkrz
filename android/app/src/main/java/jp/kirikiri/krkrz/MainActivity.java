@@ -82,7 +82,9 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
         Bundle bundle = intent.getExtras();
         if(bundle != null) {
             String path = bundle.getString("startup_path");
-            nativeSetStartupPath(path);
+            if( path != null && !path.isEmpty()) {
+                nativeSetStartupPath(path);
+            }
         }
 
         setContentView(R.layout.activity_main);
