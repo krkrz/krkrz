@@ -189,7 +189,9 @@ public:
 	bool TJS_INTF_METHOD CheckExistentStorage(const ttstr &name) {
 		if(name.IsEmpty()) return false;
 		ttstr _name(name);
-		GetLocalName(_name);
+		//GetLocalName(_name);
+		GetLocallyAccessibleName(_name);
+		if( _name.IsEmpty() ) return false;	// 存在しないファイルへの変換はできない
 
 		bool attached;
 		JNIEnv *env = Application->getJavaEnv(attached);
