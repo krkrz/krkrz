@@ -118,7 +118,6 @@ extension/Extension.cpp
 msg/MsgIntf.cpp
 msg/android/MsgImpl.cpp
 msg/android/MsgLoad.cpp
-msg/android/string_table_jp.cpp
 sound/MathAlgorithms.cpp
 sound/PhaseVocoderDSP.cpp
 sound/PhaseVocoderFilter.cpp
