@@ -42,6 +42,7 @@
 #include "MsgIntf.h"
 #include "FontSystem.h"
 #include "GraphicsLoadThread.h"
+#include "MsgLoad.h"
 
 #include <ft2build.h>
 #include FT_TRUETYPE_UNPATENTED_H
@@ -987,6 +988,7 @@ void tTVPApplication::nativeSetSurface(JNIEnv *jenv, jobject obj, jobject surfac
 	}
 	return;
 }
+
 void jstrcpy_maxlen(tjs_char *d, const jchar *s, size_t len)
 {
 	tjs_char ch;
@@ -994,7 +996,37 @@ void jstrcpy_maxlen(tjs_char *d, const jchar *s, size_t len)
 	while((ch=*s)!=0 && --len) *(d++) = ch, s++;
 	*d = 0;
 }
+class tTVPMessageResourceProvider : public iTVPMessageResourceProvider {
+	JNIEnv* env_;
+	jobjectArray array_;
+	jstring work_;
+	tjs_int count_;
+	tjs_int last_index_;
+public:
+	tTVPMessageResourceProvider( JNIEnv *env, jobjectArray a ) : env_(env), array_(a), last_index_(-1) {
+		count_ = env->GetArrayLength(a);
+	}
+	virtual const tjs_char* GetMessage( tjs_int index, tjs_uint& length ) {
+		if( index >= count_ ) {
+			length = 0;
+			return nullptr;
+		}
+		work_ = (jstring)env_->GetObjectArrayElement( array_, index );
+		length = env_->GetStringLength( work_ );
+		last_index_ = index;
+		return reinterpret_cast<const tjs_char*>(env_->GetStringChars( work_, nullptr ));
+	}
+	virtual void ReleaseMessage( const tjs_char* mes, tjs_int index ) {
+		assert( last_index_ == index );
+		env_->ReleaseStringChars( work_, reinterpret_cast<const jchar*>(mes) );
+		env_->DeleteLocalRef( work_ );
+		work_ = nullptr;
+	}
+};
 void tTVPApplication::nativeSetMessageResource(JNIEnv *jenv, jobject obj, jobjectArray mesarray) {
+	tTVPMessageResourceProvider provider( jenv, mesarray );
+	TVPLoadMessage( &provider );
+	/*
 	int stringCount = jenv->GetArrayLength(mesarray);
 	for( int i = 0; i < stringCount; i++ ) {
 		jstring string = (jstring) jenv->GetObjectArrayElement( mesarray, i);
@@ -1007,6 +1039,7 @@ void tTVPApplication::nativeSetMessageResource(JNIEnv *jenv, jobject obj, jobjec
 		jenv->ReleaseStringChars( string, chars );
 		jenv->DeleteLocalRef( string );
 	}
+	 */
 }
 
 void tTVPApplication::nativeSetAssetManager(JNIEnv *jenv, jobject obj, jobject assetManager ) {
@@ -1075,7 +1108,7 @@ void tTVPApplication::detachJavaEnv() const {
 static JNINativeMethod methods[] = {
 		// Java側関数名, (引数の型)返り値の型, native側の関数名の順に並べます
 		{ "nativeSetSurface", "(Landroid/view/Surface;)V", (void *)tTVPApplication::nativeSetSurface },
-//		{ "nativeSetMessageResource", "([Ljava/lang/String;)V", (void *)tTVPApplication::nativeSetMessageResource },
+		{ "nativeSetMessageResource", "([Ljava/lang/String;)V", (void *)tTVPApplication::nativeSetMessageResource },
 		{ "nativeSetAssetManager", "(Landroid/content/res/AssetManager;)V", (void *)tTVPApplication::nativeSetAssetManager },
 		{ "nativeToMessage", "(IJJ)V", (void*)tTVPApplication::nativeToMessage },
 		{ "nativeSetActivity", "(Landroid/app/Activity;)V", (void *)tTVPApplication::nativeSetActivity },
@@ -1104,7 +1137,7 @@ int registerJavaMethod( JNIEnv *env)  {
 	}
 	return 0;
 }
-extern void TVPLoadMessage();
+
 extern "C" jint JNI_OnLoad( JavaVM *vm, void *reserved ) {
 	JNIEnv *env;
 	if (vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6) != JNI_OK) {
@@ -1117,6 +1150,6 @@ extern "C" jint JNI_OnLoad( JavaVM *vm, void *reserved ) {
 	int res = registerJavaMethod(env);
 
 	// メッセージリソースを読み込む、strings.xmlに移動したらもう少し後で読み込んだ方がいいかもしれない
-	TVPLoadMessage();
+	// TVPLoadMessage();
 	return JNI_VERSION_1_6;
 }

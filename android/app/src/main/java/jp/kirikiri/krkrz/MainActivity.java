@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.PixelFormat;
 import android.net.Uri;
 import android.os.Build;
@@ -97,7 +98,10 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
 	private void initializeNative() {
         System.loadLibrary("krkrz");
         nativeSetActivity( this );
-        nativeSetAssetManager( getResources().getAssets() );
+        Resources res = getResources();
+        nativeSetAssetManager( res.getAssets() );
+        String[] mes = res.getStringArray(R.array.system_message_resource);
+        nativeSetMessageResource( mes );
 
 		// Execute startup.tjs
 		nativeInitialize();
@@ -425,6 +429,7 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
     public static native void nativeSetActivity( Activity activity );
 	public static native void nativeInitialize();
 	public static native void nativeSetStartupPath( String path );
+    public static native void nativeSetMessageResource(String[] mes);
 
     public static native void nativeOnTouch( int type, float x, float y, float c, int id, long tick );
 }

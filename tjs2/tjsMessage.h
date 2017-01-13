@@ -69,6 +69,14 @@ public:
 		TJS_strcpy(AssignedMessage, msg);
 	}
 
+	void AssignMessage(const tjs_char *msg, tjs_uint len)
+	{
+		if(AssignedMessage) delete [] AssignedMessage, AssignedMessage = NULL;
+		AssignedMessage = new tjs_char[len + 1];
+		TJS_strncpy(AssignedMessage, msg, len);
+		AssignedMessage[len] = TJS_W('\0');
+	}
+
 	operator const tjs_char * ()
 		{ return AssignedMessage?AssignedMessage:DefaultMessage; }
 		/* this function may called after destruction */

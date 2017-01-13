@@ -49,6 +49,17 @@ public:
 		return false;
 	}
 
+	bool AssignMessage(const tjs_char *name, const tjs_char *newmsg, tjs_uint len)
+	{
+		tTJSMessageHolder **holder = Hash.Find(ttstr(name));
+		if(holder)
+		{
+			(*holder)->AssignMessage(newmsg,len);
+			return true;
+		}
+		return false;
+	}
+
 	bool Get(const tjs_char *name, ttstr &str)
 	{
 		tTJSMessageHolder **holder = Hash.Find(ttstr(name));
