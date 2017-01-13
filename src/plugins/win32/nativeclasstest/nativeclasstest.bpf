@@ -1,6 +1,0 @@
-USEUNIT("Main.cpp");
-USEUNIT("..\tp_stub.cpp");
-//---------------------------------------------------------------------------
-This file is used by the project manager only and should be treated like the project file
-
-DllEntryPoint

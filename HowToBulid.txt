@@ -107,3 +107,4 @@ OptionsDesc.cpp : option_desc_ja.txt
 src/core/base/win32/makestub.bat で以下のファイルが生成されます。
 FuncStubs.cpp/FuncStubs.h : makestub.pl内で指定されたヘッダーファイル内のTJS_EXP_FUNC_DEF/TVP_GL_FUNC_PTR_EXTERN_DECLマクロで記述された関数
 tp_stub.cpp/tp_stub.h : 同上
+
