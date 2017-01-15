@@ -6,6 +6,7 @@ import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.PixelFormat;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -76,6 +77,9 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
         mSelectedStartFolder = false;
         mOpenStartFolder = false;
         mHandler = new Handler();
+
+        // ハードウェアボタンでミュージック音量を変更可能に
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         initializeNative();
 
