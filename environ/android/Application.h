@@ -392,6 +392,7 @@ public:
 	static void nativeInitialize(JNIEnv *jenv, jobject obj);
 	static void nativeOnTouch( JNIEnv *jenv, jobject obj, jint type, jfloat x, jfloat y, jfloat c, jint id, jlong tick );
 	static void nativeSetStartupPath( JNIEnv *jenv, jobject obj, jstring path );
+	static void nativeSetSoundNativeParameter( JNIEnv *jenv, jobject obj, jint rate, jint size );
 
 	void writeBitmapToNative( const void * bits );
 

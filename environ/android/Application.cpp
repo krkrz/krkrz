@@ -64,6 +64,7 @@ tTVPApplication* Application;
 
 extern void TVPRegisterAssetMedia();
 extern void TVPRegisterContentMedia();
+extern void TVPSetSoundNativeParameter( int rate, int buffSize );
 /**
  * Android 版のバージョン番号はソースコードに埋め込む
  * パッケージのバージョン番号はアプリのバージョンであって、エンジンのバージョンではないため
@@ -1071,6 +1072,11 @@ void tTVPApplication::nativeInitialize(JNIEnv *jenv, jobject obj) {
 void tTVPApplication::nativeOnTouch( JNIEnv *jenv, jobject obj, jint type, jfloat x, jfloat y, jfloat c, jint id, jlong tick ) {
 	Application->SendTouchMessageFromJava( type, x, y, c, id, tick );
 }
+// サウンドHW/ドライバが最終出力するサンプリングレートとバッファサイズをJavaがで取得し、それをここで設定する
+void tTVPApplication::nativeSetSoundNativeParameter( JNIEnv *jenv, jobject obj, jint rate, jint size )
+{
+	TVPSetSoundNativeParameter( rate, size );
+}
 // 起動パスを渡された時呼び出される
 extern void TVPSetProjectPath( const ttstr& path );
 void tTVPApplication::nativeSetStartupPath( JNIEnv *jenv, jobject obj, jstring jpath ) {
@@ -1115,6 +1121,7 @@ static JNINativeMethod methods[] = {
 		{ "nativeInitialize", "()V", (void *)tTVPApplication::nativeInitialize},
 		{ "nativeOnTouch", "(IFFFIJ)V", (void *)tTVPApplication::nativeOnTouch},
 		{ "nativeSetStartupPath", "(Ljava/lang/String;)V", (void *)tTVPApplication::nativeSetStartupPath},
+		{ "nativeSetSoundNativeParameter", "(II)V", (void*)tTVPApplication::nativeSetSoundNativeParameter},
 };
 
 jint registerNativeMethods( JNIEnv* env, const char *class_name, JNINativeMethod *methods, int num_methods ) {

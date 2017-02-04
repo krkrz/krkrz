@@ -32,6 +32,8 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
     static final int READ_DOCUMENT_REQUEST_CODE = 1;
     static final int SELECT_TREE_REQUEST_CODE = 2;
     static final int CREATE_DOCUMENT_REQUEST_CODE = 3;
+    static int AudioOptimalSampleRate = 44100;
+    static int AudioOptimalBufferSize = 256;
 
     private Handler mHandler;
 
@@ -81,6 +83,21 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
         // ハードウェアボタンでミュージック音量を変更可能に
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
+        // 4.2以降 最適なサンプリングレートを取得する
+        // Audio Output latency
+        // https://googlesamples.github.io/android-audio-high-performance/guides/audio-output-latency.html
+        int frameRateInt = 44100;
+        int framesPerBufferInt = 256;
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+            String frameRate = am.getProperty(AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE);
+            frameRateInt = Integer.parseInt(frameRate);
+            if(frameRateInt == 0) frameRateInt = 44100; // Use a default value if property not found
+            String framesPerBuffer = am.getProperty(AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER);
+            framesPerBufferInt = Integer.parseInt(framesPerBuffer);
+            if(framesPerBufferInt == 0) framesPerBufferInt = 256; // Use default
+        }
+        nativeSetSoundNativeParameter( frameRateInt, framesPerBufferInt );
         initializeNative();
 
         Intent intent = getIntent();
@@ -436,4 +453,5 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
     public static native void nativeSetMessageResource(String[] mes);
 
     public static native void nativeOnTouch( int type, float x, float y, float c, int id, long tick );
+	private static native void nativeSetSoundNativeParameter( int rate, int size );
 }
