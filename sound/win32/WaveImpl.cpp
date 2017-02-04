@@ -43,6 +43,27 @@
 #include "UserEvent.h"
 #include "NativeEventQueue.h"
 
+
+//---------------------------------------------------------------------------
+// static function for TJS WaveSoundBuffer class
+//---------------------------------------------------------------------------
+void TVPSoundSetGlobalVolume(tjs_int v)
+{
+	tTJSNI_WaveSoundBuffer::SetGlobalVolume(v);
+}
+tjs_int TVPSoundGetGlobalVolume()
+{
+	return tTJSNI_WaveSoundBuffer::GetGlobalVolume();
+}
+void TVPSoundSetGlobalFocusMode(tTVPSoundGlobalFocusMode b)
+{
+	tTJSNI_WaveSoundBuffer::SetGlobalFocusMode(b);
+}
+tTVPSoundGlobalFocusMode TVPSoundGetGlobalFocusMode()
+{
+	return tTJSNI_WaveSoundBuffer::GetGlobalFocusMode();
+}
+
 //---------------------------------------------------------------------------
 // Options management
 //---------------------------------------------------------------------------

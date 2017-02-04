@@ -186,11 +186,40 @@ public:
 	iTJSDispatch2 * GetWaveLabelsObjectNoAddRef();
 	tTVPWaveLoopManager * GetWaveLoopManager() const { return LoopManager; }
 	iTJSDispatch2 * GetFiltersNoAddRef() { return Filters; }
+
+	// method
+	virtual void Open(const ttstr & storagename) = 0;
+	virtual void Play() = 0;
+	virtual void Stop() = 0;
+	virtual void SetPos(float x, float y, float z) = 0;
+
+	// properties
+    virtual tjs_uint64 GetPosition() = 0;
+	virtual void SetPosition(tjs_uint64 pos) = 0;
+    virtual tjs_uint64 GetSamplePosition() = 0;
+	virtual void SetSamplePosition(tjs_uint64 pos) = 0;
+	virtual bool GetPaused() const = 0;
+	virtual void SetPaused(bool b) = 0;
+	virtual tjs_uint64 GetTotalTime() = 0;
+	virtual void SetLooping(bool b) = 0;
+	virtual bool GetLooping() const = 0;
+	virtual void SetVolume(tjs_int v) = 0;
+	virtual tjs_int GetVolume() const = 0;
+	virtual void SetVolume2(tjs_int v) = 0;
+	virtual tjs_int GetVolume2() const = 0;
+	virtual void SetPan(tjs_int v) = 0;
+	virtual tjs_int GetPan() const = 0;
+	virtual void SetPosX(float v) = 0;
+	virtual float GetPosX() const = 0;
+	virtual void SetPosY(float v) = 0;
+	virtual float GetPosY() const = 0;
+	virtual void SetPosZ(float v) = 0;
+	virtual float GetPosZ() const = 0;
+	virtual tjs_int GetFrequency() const = 0;
+	virtual void SetFrequency(tjs_int freq) = 0;
+	virtual tjs_int GetBitsPerSample() const = 0;
+	virtual tjs_int GetChannels() const = 0;
 };
-//---------------------------------------------------------------------------
-
-#include "WaveImpl.h" // must define tTJSNI_WaveSoundBuffer class
-
 //---------------------------------------------------------------------------
 
 
@@ -221,12 +250,11 @@ extern tTJSNativeClass * TVPCreateNativeClass_WaveSoundBuffer();
 //---------------------------------------------------------------------------
 // tTJSNI_WaveFlags : Wave Flags object
 //---------------------------------------------------------------------------
-class tTJSNI_WaveSoundBuffer;
 class tTJSNI_WaveFlags : public tTJSNativeInstance
 {
 	typedef tTJSNativeInstance inherited;
 
-	tTJSNI_WaveSoundBuffer * Buffer;
+	tTJSNI_BaseWaveSoundBuffer * Buffer;
 
 public:
 	tTJSNI_WaveFlags();
@@ -235,7 +263,7 @@ public:
 		iTJSDispatch2 *tjs_obj);
 	void TJS_INTF_METHOD Invalidate();
 
-	tTJSNI_WaveSoundBuffer * GetBuffer() const { return Buffer; }
+	tTJSNI_BaseWaveSoundBuffer * GetBuffer() const { return Buffer; }
 };
 //---------------------------------------------------------------------------
 
