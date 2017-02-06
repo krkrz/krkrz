@@ -12,7 +12,6 @@
 #include "tjsCommHead.h"
 
 #include "ThreadIntf.h"
-#include "ThreadImpl.h"
 #include "MsgIntf.h"
 
 #ifdef _WIN32
@@ -291,7 +290,7 @@ void DrawThreadPool::PoolThread( tjs_int taskNum ) {
 		th->StartTread();
 #ifdef _WIN32
 		::SetThreadIdealProcessor( th->GetHandle(), processor_ids[workers.size() % processor_ids.size()] );
-#else !defined( ANDROID )
+#elif !defined( ANDROID )
 		// for pthread(!android)
 		cpu_set_t cpuset;
 		CPU_ZERO( &cpuset );

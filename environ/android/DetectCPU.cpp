@@ -62,7 +62,7 @@ class tTVPCPUCheckThread : public tTVPThread
 {
 	bool Succeeded;
 public:
-	tTVPCPUCheckThread(tjs_uint32 tam) : tTVPThread(true)
+	tTVPCPUCheckThread(tjs_uint32 tam)
 	{
 //		Succeeded = true;
 //		SetThreadAffinityMask(GetHandle(), tam);
