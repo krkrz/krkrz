@@ -26,6 +26,37 @@
 #include "UserEvent.h"
 #include "NativeEventQueue.h"
 
+// サウンドHW/ドライバが最終出力するサンプリングレートとバッファサイズ
+// この値に基づき最適なパラメータを設定する
+static int TVPSoundNativeFrameRate = 44100;
+static int TVPSoundNativeFramesPerBuffer = 256;
+void TVPSetSoundNativeParameter( int rate, int buffSize )
+{
+	TVPSoundNativeFrameRate = rate;
+	TVPSoundNativeFramesPerBuffer = buffSize;
+}
+//---------------------------------------------------------------------------
+// static function for TJS WaveSoundBuffer class
+//---------------------------------------------------------------------------
+void TVPSoundSetGlobalVolume(tjs_int v)
+{
+	tTJSNI_WaveSoundBuffer::SetGlobalVolume(v);
+}
+tjs_int TVPSoundGetGlobalVolume()
+{
+	return tTJSNI_WaveSoundBuffer::GetGlobalVolume();
+}
+void TVPSoundSetGlobalFocusMode(tTVPSoundGlobalFocusMode b)
+{
+	tTJSNI_WaveSoundBuffer::SetGlobalFocusMode(b);
+}
+tTVPSoundGlobalFocusMode TVPSoundGetGlobalFocusMode()
+{
+	return tTJSNI_WaveSoundBuffer::GetGlobalFocusMode();
+}
+//---------------------------------------------------------------------------
+
+
 static bool TVPDeferedSettingAvailable = false;
 //---------------------------------------------------------------------------
 void TVPWaveSoundBufferCommitSettings()
