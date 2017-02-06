@@ -479,7 +479,6 @@
     <ClInclude Include="..\utils\TVPTimer.h" />
     <ClInclude Include="..\utils\uni_cp932.h" />
     <ClInclude Include="..\utils\VelocityTracker.h" />
-    <ClInclude Include="..\utils\win32\ThreadImpl.h" />
     <ClInclude Include="..\visual\argb.h" />
     <ClInclude Include="..\visual\BitmapIntf.h" />
     <ClInclude Include="..\visual\BitmapLayerTreeOwner.h" />
@@ -677,7 +676,6 @@
     <ClCompile Include="..\utils\uni_cp932.cpp" />
     <ClCompile Include="..\utils\VelocityTracker.cpp" />
     <ClCompile Include="..\utils\win32\ClipboardImpl.cpp" />
-    <ClCompile Include="..\utils\win32\ThreadImpl.cpp" />
     <ClCompile Include="..\visual\BitmapIntf.cpp" />
     <ClCompile Include="..\visual\BitmapLayerTreeOwner.cpp" />
     <ClCompile Include="..\visual\CharacterData.cpp" />

@@ -158,13 +158,13 @@ public:
 
 //---------------------------------------------------------------------------
 tTVPContinuousHandlerCallLimitThread::tTVPContinuousHandlerCallLimitThread()
-	 : tTVPThread(true), EventQueue(this,&tTVPContinuousHandlerCallLimitThread::WndProc)
+	 : EventQueue(this,&tTVPContinuousHandlerCallLimitThread::WndProc)
 {
 	NextEventTick = 0;
 	Interval = (1<<TVP_SUBMILLI_FRAC_BITS)*1000/60; // default 60Hz
 	Enabled = false;
 	EventQueue.Allocate();
-	Resume();
+	StartTread();
 }
 //---------------------------------------------------------------------------
 
@@ -173,7 +173,6 @@ tTVPContinuousHandlerCallLimitThread::tTVPContinuousHandlerCallLimitThread()
 tTVPContinuousHandlerCallLimitThread::~tTVPContinuousHandlerCallLimitThread()
 {
 	Terminate();
-	Resume();
 	Event.Set();
 	WaitFor();
 	EventQueue.Deallocate();

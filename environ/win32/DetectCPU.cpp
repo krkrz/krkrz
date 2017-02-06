@@ -89,14 +89,14 @@ class tTVPCPUCheckThread : public tTVPThread
 {
 	bool Succeeded;
 public:
-	tTVPCPUCheckThread(DWORD tam) : tTVPThread(true)
+	tTVPCPUCheckThread(DWORD tam)
 	{
 		// set thread affinity mask
 		Succeeded = true;
 
 		SetThreadAffinityMask(GetHandle(), tam);
 
-		Resume();
+		StartTread();
 	}
 
 	~tTVPCPUCheckThread()

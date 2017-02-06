@@ -41,7 +41,7 @@ class tTVPEmergencyExitThread : public tTVPThread
 	tTVPThreadEvent Event;
 
 public:
-	tTVPEmergencyExitThread() : tTVPThread(true)
+	tTVPEmergencyExitThread()
 	{
 #ifdef TJS_64BIT_OS
 		// get pam
@@ -94,7 +94,7 @@ public:
 			SetThreadAffinityMask(GetHandle(), tam);
 		}
 #endif
-		Resume();
+		StartTread();
 	}
 
 	~tTVPEmergencyExitThread()

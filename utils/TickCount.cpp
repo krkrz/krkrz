@@ -105,23 +105,16 @@ protected:
 
 } static * TVPWatchThread = NULL;
 //---------------------------------------------------------------------------
-tTVPWatchThread::tTVPWatchThread() : tTVPThread(true)
+tTVPWatchThread::tTVPWatchThread()
 {
 	TVPWatchLastTick = TVPGetRoughTickCount32();
 	SetPriority(ttpNormal);
-#ifdef ANDROID
 	StartTread();
-#else
-	Resume();
-#endif
 }
 //---------------------------------------------------------------------------
 tTVPWatchThread::~tTVPWatchThread()
 {
 	Terminate();
-#ifdef _WIN32
-	Resume();
-#endif
 	Event.Set();
 	WaitFor();
 }

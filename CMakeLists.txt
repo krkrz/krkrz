@@ -143,7 +143,6 @@ utils/TVPTimer.cpp
 utils/uni_cp932.cpp
 utils/VelocityTracker.cpp
 utils/android/ClipboardImpl.cpp
-utils/android/ThreadImpl.cpp
 visual/BitmapIntf.cpp
 visual/BitmapLayerTreeOwner.cpp
 visual/CharacterData.cpp

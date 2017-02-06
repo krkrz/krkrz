@@ -12,7 +12,7 @@
 
 //---------------------------------------------------------------------------
 tTVPVSyncTimingThread::tTVPVSyncTimingThread(tTJSNI_Window* owner)
-	 : tTVPThread(true), EventQueue(this,&tTVPVSyncTimingThread::Proc), OwnerWindow(owner)
+	 : EventQueue(this,&tTVPVSyncTimingThread::Proc), OwnerWindow(owner)
 {
 	SleepTime = 1;
 	LastVBlankTick = 0;
@@ -20,7 +20,7 @@ tTVPVSyncTimingThread::tTVPVSyncTimingThread(tTJSNI_Window* owner)
 	Enabled = false;
 	EventQueue.Allocate();
 	MeasureVSyncInterval();
-	Resume();
+	StartTread();
 }
 //---------------------------------------------------------------------------
 
@@ -29,7 +29,6 @@ tTVPVSyncTimingThread::tTVPVSyncTimingThread(tTJSNI_Window* owner)
 tTVPVSyncTimingThread::~tTVPVSyncTimingThread()
 {
 	Terminate();
-	Resume();
 	Event.Set();
 	WaitFor();
 	EventQueue.Deallocate();

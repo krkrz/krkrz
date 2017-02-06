@@ -359,7 +359,7 @@ bool tTVPApplication::StartApplication( int argc, tjs_char* argv[] ) {
 		CheckDigitizer();
 
 		// start image load thread
-		image_load_thread_->Resume();
+		image_load_thread_->StartTread();
 
 		if(TVPProjectDirSelected) TVPInitializeStartupScript();
 
