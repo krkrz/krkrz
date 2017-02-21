@@ -235,11 +235,14 @@ public:
 	tTJSNC_WaveSoundBuffer();
 	static tjs_uint32 ClassID;
 
+	typedef tTJSNativeInstance *(*FuncCreateNativeInstance)();
+	FuncCreateNativeInstance Factory;
 protected:
-	tTJSNativeInstance *CreateNativeInstance();
+	tTJSNativeInstance *CreateNativeInstance() { return Factory(); }
 };
 //---------------------------------------------------------------------------
 extern tTJSNativeClass * TVPCreateNativeClass_WaveSoundBuffer();
+extern tTJSNativeClass * TVPCreateNativeClass_QueueSoundBuffer();
 //---------------------------------------------------------------------------
 
 

@@ -1012,11 +1012,19 @@ iTJSDispatch2 * tTJSNI_BaseWaveSoundBuffer::GetWaveLabelsObjectNoAddRef()
 
 
 //---------------------------------------------------------------------------
+static tTJSNativeInstance *TVP_SoundCreateNativeInstance()
+{
+	TJS_eTJSError( TJSNotImplemented );
+	return nullptr;
+}
+//---------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------
 // tTJSNC_WaveSoundBuffer : TJS WaveSoundBuffer class
 //---------------------------------------------------------------------------
 tjs_uint32 tTJSNC_WaveSoundBuffer::ClassID = -1;
 tTJSNC_WaveSoundBuffer::tTJSNC_WaveSoundBuffer()  :
-	tTJSNativeClass(TJS_W("WaveSoundBuffer"))
+	tTJSNativeClass(TJS_W("WaveSoundBuffer")), Factory( TVP_SoundCreateNativeInstance )
 {
 	// registration of native members
 

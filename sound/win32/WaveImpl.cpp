@@ -3374,7 +3374,8 @@ tjs_int tTJSNI_WaveSoundBuffer::GetVisBuffer(tjs_int16 *dest, tjs_int numsamples
 //---------------------------------------------------------------------------
 // tTJSNC_WaveSoundBuffer
 //---------------------------------------------------------------------------
-tTJSNativeInstance *tTJSNC_WaveSoundBuffer::CreateNativeInstance()
+//tTJSNativeInstance *tTJSNC_WaveSoundBuffer::CreateNativeInstance()
+static tTJSNativeInstance *CreateNativeInstance()
 {
 	return new tTJSNI_WaveSoundBuffer();
 }
@@ -3388,6 +3389,7 @@ tTJSNativeInstance *tTJSNC_WaveSoundBuffer::CreateNativeInstance()
 tTJSNativeClass * TVPCreateNativeClass_WaveSoundBuffer()
 {
 	tTJSNativeClass *cls = new tTJSNC_WaveSoundBuffer();
+	((tTJSNC_WaveSoundBuffer*)cls)->Factory = CreateNativeInstance;
 	static tjs_uint32 TJS_NCM_CLASSID;
 	TJS_NCM_CLASSID = tTJSNC_WaveSoundBuffer::ClassID;
 
