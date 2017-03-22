@@ -671,6 +671,24 @@
     <ClInclude Include="..\utils\TVPTimer.h">
       <Filter>utils</Filter>
     </ClInclude>
+    <ClInclude Include="..\sound\AudioDevice.h">
+      <Filter>sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sound\QueueSoundBufferImpl.h">
+      <Filter>sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sound\SoundDecodeThread.h">
+      <Filter>sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sound\SoundEventThread.h">
+      <Filter>sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sound\SoundPlayer.h">
+      <Filter>sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sound\SoundSamples.h">
+      <Filter>sound</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\tjs2\tjs.cpp">
@@ -1242,6 +1260,21 @@
     </ClCompile>
     <ClCompile Include="..\utils\TVPTimer.cpp">
       <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sound\QueueSoundBufferImpl.cpp">
+      <Filter>sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sound\SoundDecodeThread.cpp">
+      <Filter>sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sound\SoundEventThread.cpp">
+      <Filter>sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sound\win32\XAudio2Device.cpp">
+      <Filter>sound\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sound\SoundPlayer.cpp">
+      <Filter>sound</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
