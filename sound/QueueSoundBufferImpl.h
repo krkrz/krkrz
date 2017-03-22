@@ -15,6 +15,7 @@
 #include "WaveIntf.h"
 #include "WaveLoopManager.h"
 #include "AudioDevice.h"
+#include "SoundPlayer.h"
 
 //---------------------------------------------------------------------------
 // Constants
@@ -64,12 +65,14 @@ class tTJSNI_QueueSoundBuffer : public tTJSNI_BaseWaveSoundBuffer
 	tTVPWaveDecoder * Decoder;
 	class tTVPSoundDecodeThread * Thread;
 
-	iTVPAudioStream *Stream;
+	//iTVPAudioStream *Stream;
 
-	tTVPWaveFormat C_InputFormat;	// 現在のDSoundのフォーマット。再生成を回避する
+	// tTVPWaveFormat C_InputFormat;	// 現在のDSoundのフォーマット。再生成を回避する
 	tTVPWaveFormat InputFormat;
 
 	bool Looping;
+
+	tTVPSoundPlayer Player;
 
 	std::vector<tTVPWaveLabel> LabelEventQueue;
 
@@ -79,24 +82,25 @@ class tTJSNI_QueueSoundBuffer : public tTJSNI_BaseWaveSoundBuffer
 	bool UseVisBuffer;
 	tjs_uint8* VisBuffer;
 
-	tjs_int64 PlayStopPos; // 停止位置
+	//tjs_int64 PlayStopPos; // 停止位置
 
 	// double buffering
 	static const tjs_uint BufferCount = 2;
-	tjs_uint8* Buffer[BufferCount];
+	class tTVPSoundSamplesBuffer* Buffer[BufferCount];
+	//tjs_uint8* Buffer[BufferCount];
 	tjs_uint BufferDecodedSamplesInUnit[BufferCount];
 	tjs_uint WriteBufferIndex;
 	tjs_uint ReadBufferIndex;
 	tjs_uint AccessUnitSamples;
 	tjs_uint AccessUnitBytes;
 	tjs_uint BufferSize;
-	tjs_uint64 QueuedSize;
-	bool BufferEnded;
+	//tjs_uint64 QueuedSize;
+	//bool BufferEnded;
 
 	tTVPWaveSegmentQueue BufferSegmentQueues[BufferCount];
 	tjs_int64 DecodeSamplePos[BufferCount];
 
-	tjs_int64 DecodePos; // decoded samples from directsound buffer play
+	//tjs_int64 DecodePos; // decoded samples from directsound buffer play
 	tjs_int64 LastCheckedDecodePos; // last sured position (-1 for not checked) and 
 	tjs_uint64 LastCheckedTick; // last sured tick time
 
@@ -114,7 +118,7 @@ class tTJSNI_QueueSoundBuffer : public tTJSNI_BaseWaveSoundBuffer
 	void StopPlay();
 
 	void CreateSoundBuffer();
-	static void MakeSilentWave( void *dest, tjs_int bytes, tjs_int bitsPerSample );
+	//static void MakeSilentWave( void *dest, tjs_int bytes, tjs_int bitsPerSample );
 	void ResetLastCheckedDecodePos();
 public:
 	bool ThreadCallbackEnabled;
@@ -124,28 +128,25 @@ public:
 		iTJSDispatch2 *tjs_obj);
 	void TJS_INTF_METHOD Invalidate();
 
-	static void StreamCallback( class iTVPAudioStream*, void* user );
-
-	bool EnqueueBuffer( class iTVPAudioStream* );
+	//bool EnqueueBuffer( class iTVPAudioStream* );
 
 	void DestroySoundBuffer();
 	void ReleaseSoundBuffer( bool disableevent = true );
 
 	tTJSCriticalSection & GetBufferCS() { return BufferCS; }
 
-
-	//bool FillL2Buffer(bool firstwrite, bool fromdecodethread);
-	//bool FillBuffer(bool firstwrite = false, bool allowpause = true);
-	void TryCreateSoundBuffer();
+	void PushPlayStream( class tTVPSoundSamplesBuffer* buffer );
+	void ReleasePlayedSamples( class tTVPSoundSamplesBuffer* buffer, bool continued );
 
 	tjs_int FireLabelEventsAndGetNearestLabelEventStep(tjs_int64 tick);
 	tjs_int GetNearestEventStep();
 	void FlushAllLabelEvents();
 
-	bool DoDecode(); // for tTVPSoundDecodeThread
+//	bool DoDecode(); // for tTVPSoundDecodeThread
 	void Update();	// for tTVPSoundEventThread(FillBuffer)
 
 	tjs_uint Decode( void *buffer, tjs_uint bufsamplelen, tTVPWaveSegmentQueue & segments );
+//	void PushPlayStream( tTVPSoundSamplesBuffer* buf ); ////
 
 	virtual void Open(const ttstr & storagename) override;
 	virtual void Play() override;
@@ -188,8 +189,8 @@ public:
 	virtual void SetFrequency(tjs_int freq) override;
 
 
-	void SetVolumeToSoundBuffer();
-	void SetFrequencyToBuffer();
+	void SetVolumeToStream();
+	void SetFrequencyToStream();
 
 	static void SetGlobalVolume(tjs_int v);
 	static tjs_int GetGlobalVolume() { return GlobalVolume; }

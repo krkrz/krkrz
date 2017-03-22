@@ -235,7 +235,7 @@ void tTVPSoundBuffers::ResetVolumeToAllSoundBuffer() {
 	// call each SoundBuffer's SetVolumeToSoundBuffer
 	tTJSCriticalSectionHolder holder(BufferCS);
 	for( auto i = Buffers.begin(); i != Buffers.end(); i++) {
-		(*i)->SetVolumeToSoundBuffer();
+		(*i)->SetVolumeToStream();
 	}
 }
 //---------------------------------------------------------------------------

@@ -29,6 +29,7 @@
 #include "SoundEventThread.h"
 #include "SoundDecodeThread.h"
 #include <algorithm>
+#include "SoundSamples.h"
 
 //---------------------------------------------------------------------------
 // Options management
@@ -105,58 +106,38 @@ extern void TVPRegisterTSSWaveDecoderCreator();
 tjs_int tTJSNI_QueueSoundBuffer::GlobalVolume = 100000;
 tTVPSoundGlobalFocusMode tTJSNI_QueueSoundBuffer::GlobalFocusMode = sgfmNeverMute;
 //---------------------------------------------------------------------------
-tTJSNI_QueueSoundBuffer::tTJSNI_QueueSoundBuffer()
+tTJSNI_QueueSoundBuffer::tTJSNI_QueueSoundBuffer() : Player(this)
 {
 	TVPInitSoundOptions();
 	// TVPRegisterTSSWaveDecoderCreator();
 	Decoder = nullptr;
-	Stream = nullptr;
+	//Stream = nullptr;
 	LoopManager = nullptr;
 	Thread = nullptr;
 	UseVisBuffer = false;
 	VisBuffer = nullptr;
 	ThreadCallbackEnabled = false;
-	//Level2Buffer = NULL;
-	//Level2BufferSize = 0;
 	Volume = 100000;
 	Volume2 = 100000;
 	//BufferCanControlPan = false;
 	Pan = 0;
-	/*PosX = PosY = PosZ = ( D3DVALUE )0.0;
-	SoundBuffer = NULL;
-	Sound3DBuffer = NULL;
-	L2BufferDecodedSamplesInUnit = NULL;*/
-
 	for( tjs_uint i = 0; i < BufferCount; i++ ) {
 		Buffer[i] = nullptr;
 	}
-	//L1BufferSegmentQueues = nullptr;
-	//L2BufferSegmentQueues = NULL;
-	//L1BufferDecodeSamplePos = nullptr;
-	DecodePos = 0;
-	//L1BufferUnits = 0;
-	//L2BufferUnits = 0;
+	//DecodePos = 0;
 	TVPSoundBuffers.AddBuffer( this );
 	Thread = new tTVPSoundDecodeThread( this );
-	ZeroMemory( &C_InputFormat, sizeof( C_InputFormat ) );
+	//ZeroMemory( &C_InputFormat, sizeof( C_InputFormat ) );
 	ZeroMemory( &InputFormat, sizeof( InputFormat ) );
 	//ZeroMemory( &Format, sizeof( Format ) );
 	Looping = false;
-	StreamPlaying = false;
 	BufferPlaying = false;
-	Paused = false;
 	//BufferBytes = 0;
 	AccessUnitBytes = 0;
 	AccessUnitSamples = 0;
-	//L2AccessUnitBytes = 0;
 	//SoundBufferPrevReadPos = 0;
 	//SoundBufferWritePos = 0;
-	PlayStopPos = 0;
-	//L2BufferReadPos = 0;
-	//L2BufferWritePos = 0;
-	//L2BufferRemain = 0;
-	//L2BufferEnded = false;
-	BufferEnded = false;
+//	BufferEnded = false;
 	LastCheckedDecodePos = -1;
 	LastCheckedTick = 0;
 }
@@ -184,11 +165,7 @@ void TJS_INTF_METHOD tTJSNI_QueueSoundBuffer::Invalidate()
 	TVPSoundBuffers.RemoveBuffer( this );
 }
 //---------------------------------------------------------------------------
-void tTJSNI_QueueSoundBuffer::StreamCallback( iTVPAudioStream* stream, void* user ) {
-	tTJSNI_QueueSoundBuffer* sb = reinterpret_cast<tTJSNI_QueueSoundBuffer*>(user);
-	sb->EnqueueBuffer( stream );
-}
-//---------------------------------------------------------------------------
+#if 0
 void tTJSNI_QueueSoundBuffer::MakeSilentWave( void *dest, tjs_int bytes, tjs_int bitsPerSample ) {
 	if( bitsPerSample == 8 ) {
 		// 0x80
@@ -198,11 +175,13 @@ void tTJSNI_QueueSoundBuffer::MakeSilentWave( void *dest, tjs_int bytes, tjs_int
 		memset( dest, 0x00, bytes );
 	}
 }
+#endif
 //---------------------------------------------------------------------------
+#if 0
 bool tTJSNI_QueueSoundBuffer::EnqueueBuffer( iTVPAudioStream* stream ) {
 	tTJSCriticalSectionHolder holder(BufferCS);
 
-	if(!Stream) return false;
+	if(!Player.HasStream()) return false;
 	if(!Decoder) return false;
 	if(!BufferPlaying) return false;
 
@@ -269,6 +248,7 @@ bool tTJSNI_QueueSoundBuffer::EnqueueBuffer( iTVPAudioStream* stream ) {
 	}
 	return result;
 }
+#endif
 //---------------------------------------------------------------------------
 void tTJSNI_QueueSoundBuffer::ReleaseSoundBuffer( bool disableevent ) {
 	// called at exit ( system uninitialization )
@@ -281,20 +261,19 @@ void tTJSNI_QueueSoundBuffer::ReleaseSoundBuffer( bool disableevent ) {
 }
 //---------------------------------------------------------------------------
 void tTJSNI_QueueSoundBuffer::DestroySoundBuffer() {
-	if( Stream ) delete Stream, Stream = nullptr;
+	Player.Destroy();
 
-	StreamPlaying = false;
 	BufferPlaying = false;
 
 	LabelEventQueue.clear();
 
 	for( tjs_uint i = 0; i < BufferCount; i++ ) {
-		if( Buffer[i] ) delete[] Buffer[i];
+		if( Buffer[i] ) delete Buffer[i];
 		Buffer[i] = nullptr;
 	}
 
-	ZeroMemory( &C_InputFormat, sizeof( C_InputFormat ) );
-	
+	// ZeroMemory( &C_InputFormat, sizeof( C_InputFormat ) );
+
 	DeallocateVisBuffer();
 }
 //---------------------------------------------------------------------------
@@ -304,8 +283,8 @@ void tTJSNI_QueueSoundBuffer::ResetSamplePositions() {
 		DecodeSamplePos[i] = -1;
 	}
 	LabelEventQueue.clear();
-	WriteBufferIndex = ReadBufferIndex = 0;
-	DecodePos = 0;
+	//WriteBufferIndex = ReadBufferIndex = 0;
+	//DecodePos = 0;
 }
 //---------------------------------------------------------------------------
 void tTJSNI_QueueSoundBuffer::Clear()
@@ -315,12 +294,11 @@ void tTJSNI_QueueSoundBuffer::Clear()
 	ThreadCallbackEnabled = false;
 	TVPSoundBuffers.CheckAllSleep();
 	Thread->Interrupt();
-	if(LoopManager) delete LoopManager, LoopManager = NULL;
+	if(LoopManager) delete LoopManager, LoopManager = nullptr;
 	ClearFilterChain();
-	if(Decoder) delete Decoder, Decoder = NULL;
+	if(Decoder) delete Decoder, Decoder = nullptr;
 	BufferPlaying = false;
-	StreamPlaying = false;
-	Paused = false;
+	Player.Clear();
 
 	ResetSamplePositions();
 
@@ -340,6 +318,7 @@ tjs_uint tTJSNI_QueueSoundBuffer::Decode( void *buffer, tjs_uint bufsamplelen, t
 	return w;
 }
 //---------------------------------------------------------------------------
+#if 0
 bool tTJSNI_QueueSoundBuffer::DoDecode() {
 	if( Stream ) {
 		tTJSCriticalSectionHolder holder(BufferCS);
@@ -364,198 +343,79 @@ bool tTJSNI_QueueSoundBuffer::DoDecode() {
 	}
 	return false;
 }
+#endif
+//---------------------------------------------------------------------------
+void tTJSNI_QueueSoundBuffer::PushPlayStream( tTVPSoundSamplesBuffer* buffer ) {
+
+	ResetLastCheckedDecodePos();
+
+	// push play stream
+	Player.PushSamplesBuffer( buffer );
+
+	tjs_int64 decodePos = buffer->GetDecodePosition();
+	const std::deque<tTVPWaveLabel> & labels = buffer->GetSegmentQueue().GetLabels();
+	if(labels.size() != 0) {
+		// add DecodePos offset to each item->Offset
+		// and insert into LabelEventQueue
+		for( std::deque<tTVPWaveLabel>::const_iterator i = labels.begin(); i != labels.end(); i++) {
+			LabelEventQueue.push_back( tTVPWaveLabel(i->Position, i->Name, static_cast<tjs_int>(i->Offset + decodePos)));
+		}
+
+		// sort
+		std::sort(LabelEventQueue.begin(), LabelEventQueue.end(), tTVPWaveLabel::tSortByOffsetFuncObj());
+
+		// re-schedule label events
+		TVPSoundBuffers.ReschedulePendingLabelEvent(GetNearestEventStep());
+	}
+}
 //---------------------------------------------------------------------------
 void tTJSNI_QueueSoundBuffer::Update() {
 	tTJSCriticalSectionHolder holder(BufferCS);
-	if(!SoundBuffer) return;
+	//if(!SoundBuffer) return;
 	if(!Decoder) return;
 	if(!BufferPlaying) return;
 
-	if( Paused ) {
-		if( StreamPlaying ) {
-			Stream->StopStream();
-			StreamPlaying = false;
-		}
-		return;
-	} else {
-		if( !StreamPlaying ) {
-			Stream->StartStream();
-			StreamPlaying = true;
-		}
+	bool continued = Player.Update();
+	if( continued == false ) {
+		FlushAllLabelEvents();
+		ResetSamplePositions();
+		BufferPlaying = false;
+		if( LoopManager ) LoopManager->SetPosition( 0 );
 	}
-	EnqueueBuffer( Stream );
+	// EnqueueBuffer( Stream );
 }
-//---------------------------------------------------------------------------
-#if 0
-bool tTJSNI_QueueSoundBuffer::FillL2Buffer(bool firstwrite, bool fromdecodethread) {
-	if(!fromdecodethread && Thread->GetRunning())
-		Thread->SetPriority(ttpHighest);
-			// make decoder thread priority high, before entering critical section
-
-	tTJSCriticalSectionHolder holder(L2BufferCS);
-
-	if(firstwrite)
-	{
-		// only main thread runs here
-		L2BufferReadPos = L2BufferWritePos = L2BufferRemain = 0;
-		L2BufferEnded = false;
-		for(tjs_int i = 0; i<L2BufferUnits; i++)
-			L2BufferDecodedSamplesInUnit[i] = 0;
-	}
-
-	{
-		tTVPThreadPriority ttpbefore = TVPDecodeThreadHighPriority;
-		bool retflag = false;
-		if(Thread->GetRunning())
-		{
-			ttpbefore = Thread->GetPriority();
-			Thread->SetPriority(TVPDecodeThreadHighPriority);
-		}
-		{
-			tTJSCriticalSectionHolder holder(L2BufferRemainCS);
-			if(L2BufferRemain == L2BufferUnits) retflag = true;
-		}
-		if(!retflag) UpdateFilterChain(); // if the buffer is not full, update filter internal state
-		if(Thread->GetRunning()) Thread->SetPriority(ttpbefore);
-		if(retflag) return false; // buffer is full
-	}
-
-	if(L2BufferEnded)
-	{
-		L2BufferSegmentQueues[L2BufferWritePos].Clear();
-		L2BufferDecodedSamplesInUnit[L2BufferWritePos] = 0;
-	}
-	else
-	{
-		L2BufferSegmentQueues[L2BufferWritePos].Clear();
-		tjs_uint decoded = Decode(
-			L2BufferWritePos * L2AccessUnitBytes + Level2Buffer,
-			AccessUnitSamples,
-			L2BufferSegmentQueues[L2BufferWritePos]);
-
-		if(decoded < (tjs_uint) AccessUnitSamples) L2BufferEnded = true;
-
-		L2BufferDecodedSamplesInUnit[L2BufferWritePos] = decoded;
-	}
-
-	L2BufferWritePos++;
-	if(L2BufferWritePos >= L2BufferUnits) L2BufferWritePos = 0;
-
-	{
-		tTVPThreadPriority ttpbefore = TVPDecodeThreadHighPriority;
-		if(Thread->GetRunning())
-		{
-			ttpbefore = Thread->GetPriority();
-			Thread->SetPriority(TVPDecodeThreadHighPriority);
-		}
-		{
-			tTJSCriticalSectionHolder holder(L2BufferRemainCS);
-			L2BufferRemain++;
-		}
-		if(Thread->GetRunning()) Thread->SetPriority(ttpbefore);
-	}
-	return true;
-}
-#endif
 //---------------------------------------------------------------------------
 void tTJSNI_QueueSoundBuffer::CreateSoundBuffer() {
-	TVPInitAudioDevice(); // ensure Audio Device object
-
-	//bool format_is_not_identical = TVPAlwaysRecreateSoundBuffer ||
-	bool format_is_not_identical = 
-		C_InputFormat.SamplesPerSec		!= InputFormat.SamplesPerSec ||
-		C_InputFormat.Channels			!= InputFormat.Channels ||
-		C_InputFormat.BitsPerSample		!= InputFormat.BitsPerSample ||
-		C_InputFormat.BytesPerSample	!= InputFormat.BytesPerSample ||
-		C_InputFormat.SpeakerConfig		!= InputFormat.SpeakerConfig ||
-		C_InputFormat.IsFloat			!= InputFormat.IsFloat;
-
-	if( format_is_not_identical ) {
-		TryCreateSoundBuffer();
-	}
-
-	// reset volume, sound position and frequency
-	SetVolumeToSoundBuffer();
-	SetFrequencyToBuffer();
-
-	C_InputFormat = InputFormat;
-}
-//---------------------------------------------------------------------------
-void tTJSNI_QueueSoundBuffer::TryCreateSoundBuffer()
-{
-	// compute buffer bytes
-	AccessUnitSamples = InputFormat.SamplesPerSec;	// 1sec
-#ifdef ANDROID
-	if( InputFormat.SamplesPerSec == TVPSoundNativeFrameRate ) {
-		// サンプリングレートがHW出力レートと一致する時、バッファサイズの調整を行いレイテンシを低減させる
-		tjs_uint unit = AccessUnitSamples / TVPSoundNativeFramesPerBuffer;
-		if( AccessUnitSamples != (TVPSoundNativeFramesPerBuffer*unit) ) {
-			AccessUnitSamples = TVPSoundNativeFramesPerBuffer*(unit+1);
-		}
-	}
-#endif
-	AccessUnitBytes = AccessUnitSamples * InputFormat.BytesPerSample * InputFormat.Channels;
-	BufferSize = AccessUnitBytes;
-	if(BufferSize <= 0)
-		TVPThrowExceptionMessage(TJS_W("Invalid format."));
-
-	for( tjs_uint i = 0; i < BufferCount; i++ ) {
-		if( Buffer[i] ) {
-			delete[] Buffer[i];
-		}
-		Buffer[i] = new tjs_uint8[BufferSize];
-	}
-
+	// ensure Audio Device object
+	TVPInitAudioDevice();
 	if( TVPAudioDevice == nullptr ) {
 		TVPThrowExceptionMessage(TJS_W("Uninitialize audio device."));
 	}
-	if( Stream ) {
-		delete Stream;
-	}
-	tTVPAudioStreamParam param;
-	param.Channels = InputFormat.Channels;		// チャンネル数
-	param.SampleRate = InputFormat.SamplesPerSec;		// サンプリングレート
-	param.BitsPerSample = InputFormat.BitsPerSample;	// サンプル当たりのビット数
-	param.SampleType = astUInt8;
-	if( InputFormat.IsFloat ) {
-		param.SampleType = astFloat32;	// サンプルの形式
-	} else if( param.BitsPerSample == 8 ) {
-		param.SampleType = astUInt8;
-	} else if( param.BitsPerSample == 16 ) {
-		param.SampleType = astInt16;
-	} else {
-		TVPThrowExceptionMessage(TJS_W("Invalid format(BitsPerSample)."));
-	}
-	param.FramesPerBuffer = InputFormat.SamplesPerSec;		// 1回のキューイングで入れるサンプル数
-	Stream = TVPAudioDevice->CreateAudioStream( param );
-	if( Stream == nullptr ) {
-		TVPThrowExceptionMessage(TJS_W("Faild to create audio stream."));
+
+	if( !Player.IsSameFormat( InputFormat ) ) {
+		for( tjs_uint i = 0; i < BufferCount; i++ ) {
+			if( Buffer[i] == nullptr ) {
+				Buffer[i] = new tTVPSoundSamplesBuffer( this, i );
+			}
+			Buffer[i]->Create( &InputFormat, UseVisBuffer );
+		}
+		Player.CreateStream( TVPAudioDevice, InputFormat, Buffer[0]->GetSamplesCount() );
 	}
 
-	// allocate visualization buffer
-	if(UseVisBuffer) ResetVisBuffer();
-
+	// reset volume, sound position and frequency
+	SetVolumeToStream();
+	SetFrequencyToStream();
 }
 //---------------------------------------------------------------------------
 void tTJSNI_QueueSoundBuffer::ResetLastCheckedDecodePos() {
-	if( !Stream ) return;
+	if( !Player.HasStream() ) return;
 
 	// set LastCheckedDecodePos and  LastCheckedTick
 	// we shoud reset these values because the clock sources are usually
 	// not identical.
 	tTJSCriticalSectionHolder holder(BufferCS);
-
-	tjs_uint32 count = Stream->GetQueuedCount();
-	tjs_uint32 index = (ReadBufferIndex + count) % BufferCount;
-
-	tjs_uint64 pos = Stream->GetSamplesPlayed();
-	tjs_int offset = (tjs_int)( pos % AccessUnitSamples );
-
-	if(DecodeSamplePos[index] != -1)
-	{
-		LastCheckedDecodePos = DecodeSamplePos[index] + offset;
-		LastCheckedTick = TVPGetTickCount();
-	}
+	LastCheckedDecodePos = Player.GetCurrentPlayingPosition();
+	LastCheckedTick = TVPGetTickCount();
 }
 //---------------------------------------------------------------------------
 tjs_int tTJSNI_QueueSoundBuffer::FireLabelEventsAndGetNearestLabelEventStep( tjs_int64 tick ) {
@@ -566,7 +426,7 @@ tjs_int tTJSNI_QueueSoundBuffer::FireLabelEventsAndGetNearestLabelEventStep( tjs
 	tTJSCriticalSectionHolder holder(BufferCS);
 
 	if(!BufferPlaying) return TVP_TIMEOFS_INVALID_VALUE; // buffer is not currently playing
-	if(!StreamPlaying) return TVP_TIMEOFS_INVALID_VALUE; // direct sound buffer is not currently playing
+	if(!Player.IsPlaying()) return TVP_TIMEOFS_INVALID_VALUE; // direct sound buffer is not currently playing
 
 	if(LabelEventQueue.size() == 0) return TVP_TIMEOFS_INVALID_VALUE; // no more events
 
@@ -578,7 +438,7 @@ tjs_int tTJSNI_QueueSoundBuffer::FireLabelEventsAndGetNearestLabelEventStep( tjs
 	while(true)
 	{
 		if(LabelEventQueue.size() == 0) break;
-		std::vector<tTVPWaveLabel>::iterator i = LabelEventQueue.begin();
+		auto i = LabelEventQueue.begin();
 		int diff = (tjs_int32)i->Offset - (tjs_int32)decodepos;
 		if(diff <= 0)
 			InvokeLabelEvent(i->Name);
@@ -602,9 +462,7 @@ tjs_int tTJSNI_QueueSoundBuffer::GetNearestEventStep() {
 	// calculate current playing decodepos
 	// at this point, LastCheckedDecodePos must not be -1
 	if(LastCheckedDecodePos == -1) ResetLastCheckedDecodePos();
-	tjs_int64 decodepos = (TVPGetTickCount() - LastCheckedTick) * Frequency / 1000 +
-		LastCheckedDecodePos;
-
+	tjs_int64 decodepos = (TVPGetTickCount() - LastCheckedTick) * Frequency / 1000 + LastCheckedDecodePos;
 	return (tjs_int)((LabelEventQueue[0].Offset - (tjs_int32)decodepos) * 1000 / Frequency);
 }
 //---------------------------------------------------------------------------
@@ -630,9 +488,8 @@ void tTJSNI_QueueSoundBuffer::StartPlay()
 	TVPSoundBuffers.EnsureBufferWorking();
 
 	// play from first
-
+	tjs_int64 predecodedSamples = 0;
 	{	// thread protected block
-		if(Thread->GetRunning()) { Thread->SetPriority(TVPDecodeThreadHighPriority); }
 		tTJSCriticalSectionHolder holder(BufferCS);
 
 		CreateSoundBuffer();
@@ -642,42 +499,40 @@ void tTJSNI_QueueSoundBuffer::StartPlay()
 
 		// fill sound buffer with some first samples
 		BufferPlaying = true;
-		PlayStopPos = -1;
-		QueuedSize = 0;
-		BufferEnded = false;
-		DoDecode();
-		EnqueueBuffer( Stream );
-		DoDecode();
-		EnqueueBuffer( Stream );
+		//PlayStopPos = -1;
+		//QueuedSize = 0;
+		//BufferEnded = false;
+		Player.Reset();
+		for( tjs_int i = 0; i < BufferCount; i++ ) {
+			Buffer[i]->Reset();
+			Buffer[i]->Decode();
+			Buffer[i]->SetDecodePosition( predecodedSamples );
+			predecodedSamples += Buffer[i]->GetInSamples();
+			Player.PushSamplesBuffer( Buffer[i] );
+		}
 
 		// start playing
-		if(!Paused)
-		{
-			Stream->StartStream();
-			StreamPlaying = true;
-		}
+		Player.Start();
 
 		// re-schedule label events
 		ResetLastCheckedDecodePos();
-		//TVPReschedulePendingLabelEvent(GetNearestEventStep());
+		TVPSoundBuffers.ReschedulePendingLabelEvent(GetNearestEventStep());
 	}	// end of thread protected block
 
 	// ensure thread
 	TVPSoundBuffers.EnsureBufferWorking(); // wake the playing thread up again
 	ThreadCallbackEnabled = true;
-	Thread->Continue();
-
+	Thread->StartDecoding( predecodedSamples );
 }
 //---------------------------------------------------------------------------
 void tTJSNI_QueueSoundBuffer::StopPlay()
 {
 	if(!Decoder) return;
 
-	if(Thread->GetRunning()) { Thread->SetPriority(TVPDecodeThreadHighPriority);}
 	tTJSCriticalSectionHolder holder(BufferCS);
 
-	if( Stream ) Stream->StopStream();
-	StreamPlaying = false;
+	Player.Stop();
+
 	BufferPlaying = false;
 }
 //---------------------------------------------------------------------------
@@ -688,9 +543,6 @@ void tTJSNI_QueueSoundBuffer::Play() {
 
 	StopPlay();
 
-	//TVPEnsurePrimaryBufferPlay(); // let primary buffer to start running
-
-	if(Thread->GetRunning()) { Thread->SetPriority(TVPDecodeThreadHighPriority);}
 	tTJSCriticalSectionHolder holder(BufferCS);
 
 	StartPlay();
@@ -714,11 +566,8 @@ void tTJSNI_QueueSoundBuffer::Stop() {
 }
 //---------------------------------------------------------------------------
 void tTJSNI_QueueSoundBuffer::SetPaused(bool b) {
-	if( Thread->GetRunning() ) {
-		Thread->SetPriority(TVPDecodeThreadHighPriority);
-	}
 	tTJSCriticalSectionHolder holder(BufferCS);
-	Paused = b;
+	Player.SetPsused( b );
 }
 //---------------------------------------------------------------------------
 void tTJSNI_QueueSoundBuffer::Open(const ttstr & storagename) {
@@ -779,6 +628,13 @@ void tTJSNI_QueueSoundBuffer::Open(const ttstr & storagename) {
 	SetStatus(ssStop);
 }
 //---------------------------------------------------------------------------
+void tTJSNI_QueueSoundBuffer::ReleasePlayedSamples( tTVPSoundSamplesBuffer* buffer, bool continued ) {
+	// 再生が終了したバッファ。まだ再生するのなら Decoder へ入れる
+	if( continued ) {
+		if( Thread ) Thread->PushSamplesBuffer( buffer );
+	}
+}
+//---------------------------------------------------------------------------
 void tTJSNI_QueueSoundBuffer::SetLooping(bool b) {
 	Looping = b;
 	if( LoopManager ) LoopManager->SetLooping( Looping );
@@ -786,19 +642,9 @@ void tTJSNI_QueueSoundBuffer::SetLooping(bool b) {
 //---------------------------------------------------------------------------
 tjs_uint64 tTJSNI_QueueSoundBuffer::GetSamplePosition() {
 	if(!Decoder) return 0L;
-	if(!Stream) return 0L;
 
 	tTJSCriticalSectionHolder holder(BufferCS);
-
-	// 現在再生している側のバッファを求める
-	tjs_uint32 count = Stream->GetQueuedCount();
-	tjs_uint32 index = (ReadBufferIndex + count) % BufferCount;
-	tTVPWaveSegmentQueue & segs = BufferSegmentQueues[index];
-
-	// 全再生サンプル数をバッファサイズで剰余してオフセットを求める
-	tjs_uint64 pos = Stream->GetSamplesPlayed();
-	tjs_int offset = (tjs_int)( pos % AccessUnitSamples );
-	return segs.FilteredPositionToDecodePosition(offset);
+	return Player.GetSamplePosition();
 }
 //---------------------------------------------------------------------------
 void tTJSNI_QueueSoundBuffer::SetSamplePosition(tjs_uint64 pos) {
@@ -806,7 +652,7 @@ void tTJSNI_QueueSoundBuffer::SetSamplePosition(tjs_uint64 pos) {
 
 	if(InputFormat.TotalSamples && InputFormat.TotalSamples <= possamples) return;
 
-	if(BufferPlaying && StreamPlaying) {
+	if(BufferPlaying && Player.IsPlaying() ) {
 		StopPlay();
 		LoopManager->SetPosition(possamples);
 		StartPlay();
@@ -817,7 +663,7 @@ void tTJSNI_QueueSoundBuffer::SetSamplePosition(tjs_uint64 pos) {
 //---------------------------------------------------------------------------
 tjs_uint64 tTJSNI_QueueSoundBuffer::GetPosition() {
 	if(!Decoder) return 0L;
-	if(!Stream) return 0L;
+	if(!Player.HasStream()) return 0L;
 	return GetSamplePosition() * 1000 / InputFormat.SamplesPerSec;
 }
 //---------------------------------------------------------------------------
@@ -829,9 +675,9 @@ tjs_uint64 tTJSNI_QueueSoundBuffer::GetTotalTime() {
 	return InputFormat.TotalSamples * 1000ULL / InputFormat.SamplesPerSec;
 }
 //---------------------------------------------------------------------------
-void tTJSNI_QueueSoundBuffer::SetVolumeToSoundBuffer() {
+void tTJSNI_QueueSoundBuffer::SetVolumeToStream() {
 	// set current volume/pan to Stream
-	if( Stream ) {
+	if( Player.HasStream() ) {
 		tjs_int v;
 		tjs_int mutevol = 100000;
 		if(TVPSoundGlobalFocusModeByOption >= sgfmMuteOnDeactivate &&
@@ -869,10 +715,10 @@ void tTJSNI_QueueSoundBuffer::SetVolumeToSoundBuffer() {
 		v = (Volume / 10) * (Volume2 / 10) / 1000;
 		v = (v / 10) * (GlobalVolume / 10) / 1000;
 		v = (v / 10) * (mutevol / 10) / 1000;
-		Stream->SetVolume( v );
+		Player.SetVolume( v );
 
 		// set pan
-		Stream->SetPan( Pan );
+		Player.SetPan( Pan );
 	}
 }
 //---------------------------------------------------------------------------
@@ -882,7 +728,7 @@ void tTJSNI_QueueSoundBuffer::SetVolume(tjs_int v) {
 
 	if( Volume != v ) {
 		Volume = v;
-		SetVolumeToSoundBuffer();
+		SetVolumeToStream();
 	}
 }
 //---------------------------------------------------------------------------
@@ -892,7 +738,7 @@ void tTJSNI_QueueSoundBuffer::SetVolume2(tjs_int v) {
 
 	if( Volume2 != v ) {
 		Volume2 = v;
-		SetVolumeToSoundBuffer();
+		SetVolumeToStream();
 	}
 }
 //---------------------------------------------------------------------------
@@ -900,7 +746,7 @@ void tTJSNI_QueueSoundBuffer::SetPan(tjs_int v) {
 	if(v < -100000) v = -100000;
 	if(v > 100000) v = 100000;
 	if( Pan != v ) {
-		SetVolumeToSoundBuffer();
+		SetVolumeToStream();
 	}
 }
 //---------------------------------------------------------------------------
@@ -921,20 +767,20 @@ void tTJSNI_QueueSoundBuffer::SetGlobalFocusMode(tTVPSoundGlobalFocusMode b) {
 	}
 }
 //---------------------------------------------------------------------------
-void tTJSNI_QueueSoundBuffer::SetFrequencyToBuffer() {
-	if(Stream) Stream->SetFrequency(Frequency);
+void tTJSNI_QueueSoundBuffer::SetFrequencyToStream() {
+	Player.SetFrequency(Frequency);
 }
 //---------------------------------------------------------------------------
 void tTJSNI_QueueSoundBuffer::SetFrequency(tjs_int freq) {
 	Frequency = freq;
-	SetFrequencyToBuffer();
+	SetFrequencyToStream();
 }
 //---------------------------------------------------------------------------
 void tTJSNI_QueueSoundBuffer::SetUseVisBuffer(bool b) {
 	tTJSCriticalSectionHolder holder(BufferCS);
 	if(b) {
 		UseVisBuffer = true;
-		if(Stream) ResetVisBuffer();
+		if(Player.HasStream()) ResetVisBuffer();
 	} else {
 		DeallocateVisBuffer();
 		UseVisBuffer = false;
@@ -991,17 +837,20 @@ tjs_int tTJSNI_QueueSoundBuffer::GetVisBuffer(tjs_int16 *dest, tjs_int numsample
 	if(!UseVisBuffer) return 0;
 	if(!VisBuffer) return 0;
 	if(!Decoder) return 0;
-	if(!Stream) return 0;
-	if(!StreamPlaying || !BufferPlaying) return 0;
+	if(!Player.HasStream()) return 0;
+	if(!Player.IsPlaying() || !BufferPlaying) return 0;
 
 	if(channels != InputFormat.Channels && channels != 1) return 0;
 	tjs_uint64 samples = 0;
 	{
+		/*
+		TODO 実装すること
 		tTJSCriticalSectionHolder holder(BufferCS);
 		samples = Stream->GetSamplesPlayed() + aheadsamples;
 		samples %= AccessUnitSamples;
 		if(BufferSegmentQueues[pp/AccessUnitBytes].GetFilteredLength() == 0)
 			return 0;
+		*/
 	}
 	return 0; 
 }
