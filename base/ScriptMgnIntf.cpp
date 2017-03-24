@@ -197,7 +197,7 @@ void TVPInitScriptEngine()
 
 	/* WaveSoundBuffer and its filters */
 	iTJSDispatch2 * waveclass = NULL;
-	REGISTER_OBJECT(WaveSoundBuffer, (waveclass = TVPCreateNativeClass_WaveSoundBuffer()));
+	REGISTER_OBJECT( WaveSoundBuffer, ( waveclass = TVPCreateNativeClass_SoundBuffer() ) );
 	dsp = new tTJSNC_PhaseVocoder();
 	val = tTJSVariant(dsp);
 	dsp->Release();
