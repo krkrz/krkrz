@@ -24,10 +24,6 @@ class tTVPSoundDecodeThread : public tTVPThread
 	std::vector<tTVPSoundSamplesBuffer*> Samples;
 	tjs_int64 DecodedSamples;
 
-private:
-	// サンプルバッファキューを空にする
-	void ClearQueue();
-
 public:
 	tTVPSoundDecodeThread(tTJSNI_QueueSoundBuffer * owner);
 	~tTVPSoundDecodeThread();
@@ -40,6 +36,8 @@ public:
 	void StartDecoding( tjs_int64 predecoded );
 	// サンプルバッファを追加する
 	void PushSamplesBuffer( tTVPSoundSamplesBuffer* buf );
+	// サンプルバッファキューを空にする
+	void ClearQueue();
 };
 
 

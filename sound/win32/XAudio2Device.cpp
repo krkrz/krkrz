@@ -149,7 +149,10 @@ public:
 		if( SourceVoice ) SourceVoice->Start();
 	}
 	virtual void StopStream() override {
-		if( SourceVoice ) SourceVoice->Stop();
+		if( SourceVoice ) {
+			SourceVoice->Stop();
+			SourceVoice->FlushSourceBuffers();
+		}
 	}
 	virtual void AbortStream() override {
 		if( SourceVoice ) SourceVoice->Stop();

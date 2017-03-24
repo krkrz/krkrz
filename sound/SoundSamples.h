@@ -76,6 +76,9 @@ public:
 	tjs_uint GetSamplesCount() const { return SampleSize; }
 
 	void Decode() {
+		tTJSCriticalSectionHolder holder(Owner->GetBufferCS());
+
+		Segment.Clear();
 		if( InSamples < SampleSize ) {
 			InSamples = 0;
 		} else {
@@ -84,6 +87,9 @@ public:
 		if( InSamples < SampleSize ) {
 			tjs_uint blockAlign = Format->BytesPerSample * Format->Channels;
 			MakeSilentWave( Buffer + InSamples*blockAlign, (SampleSize - InSamples)*blockAlign, Format->BitsPerSample );
+		}
+		if( UseVisBuffer ) {
+			memcpy( VisBuffer, Buffer, ByteSize );
 		}
 	}
 	void Enqueue( iTVPAudioStream* stream ) {
@@ -104,6 +110,7 @@ public:
 		if( VisBuffer ) delete[] VisBuffer, VisBuffer = nullptr;
 		UseVisBuffer = false;
 	}
+	const tjs_uint8* GetVisBuffer() const { return VisBuffer; }
 	const tTVPWaveSegmentQueue& GetSegmentQueue() const { return Segment; }
 };
 

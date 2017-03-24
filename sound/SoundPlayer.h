@@ -20,13 +20,14 @@ class tTVPSoundPlayer {
 	tTJSNI_QueueSoundBuffer* Owner;
 	std::vector<tTVPSoundSamplesBuffer*> Samples;
 	iTVPAudioStream *Stream;
-	tTVPWaveFormat StreamFormat;
-	tTJSCriticalSection BufferCS;
+	tTVPWaveFormat StreamFormat;	// 現在のStreamのSoundフォーマット。再生成を回避する
 
 	bool Paused;
 	bool Playing;
 	bool BufferEnded;
 	tjs_int64 PlayStopPos;
+
+	void CopyVisBuffer(tjs_int16 *dest, const tjs_uint8 *src, tjs_int numsamples, tjs_int channels);
 public:
 	tTVPSoundPlayer( tTJSNI_QueueSoundBuffer* owner );
 	~tTVPSoundPlayer();
@@ -41,15 +42,9 @@ public:
 	void CreateStream( class iTVPAudioDevice* device, tTVPWaveFormat& format, tjs_uint samplesCount );
 	void Start();
 	void Stop();
-	void Reset() {
-		BufferEnded = false;
-		PlayStopPos = -1;
-	}
-	void Clear() {
-		Paused = false;
-		Playing = false;
-		PlayStopPos = -1;
-	}
+	void Reset();
+	void Clear();
+	void ClearSampleQueue();
 	void Destroy();
 	bool IsSameFormat( tTVPWaveFormat& format ) const {
 		return( StreamFormat.SamplesPerSec	== format.SamplesPerSec &&
@@ -64,11 +59,12 @@ public:
 	void SetFrequency(tjs_int freq);
 	bool HasStream() const { return Stream != nullptr; }
 	bool IsPaused() const { return Paused; }
-	void SetPsused( bool paused ) { Playing = Paused; }
+	void SetPsused( bool paused );
 	bool IsPlaying() const { return Playing; }
 	bool Update();
 	tjs_int64 GetCurrentPlayingPosition();
 	tjs_uint64 GetSamplePosition();
+	tjs_int GetVisBuffer(tjs_int16 *dest, tjs_int numsamples, tjs_int channels, tjs_int aheadsamples );
 	bool IsBufferEnded() const { return BufferEnded; }
 };
 

@@ -24,7 +24,7 @@ tTVPSoundPlayer::~tTVPSoundPlayer() {
 }
 //---------------------------------------------------------------------------
 void tTVPSoundPlayer::PushSamplesBuffer( tTVPSoundSamplesBuffer* buf ) {
-	tTJSCriticalSectionHolder holder(BufferCS);
+	tTJSCriticalSectionHolder holder(Owner->GetBufferCS());
 	Samples.push_back( buf );
 	if( !BufferEnded ) {
 		BufferEnded = buf->IsEnded();
@@ -38,7 +38,7 @@ void tTVPSoundPlayer::PushSamplesBuffer( tTVPSoundSamplesBuffer* buf ) {
 void tTVPSoundPlayer::Callback( class iTVPAudioStream* stream ) {
 	tTVPSoundSamplesBuffer* sample = nullptr;
 	{
-		tTJSCriticalSectionHolder holder(BufferCS);
+		tTJSCriticalSectionHolder holder(Owner->GetBufferCS());
 		if( Samples.size() > 0 ) {
 			auto itr = Samples.begin();
 			sample = *itr;
@@ -77,6 +77,7 @@ void tTVPSoundPlayer::CreateStream( iTVPAudioDevice* device, tTVPWaveFormat& for
 tjs_int64 tTVPSoundPlayer::GetCurrentPlayingPosition() {
 	tjs_int64 result = -1;
 	if( Stream ) {
+		tTJSCriticalSectionHolder holder(Owner->GetBufferCS());
 		tjs_uint64 pos = Stream->GetSamplesPlayed();
 		if( Samples.size() > 0 ) {
 			auto itr = Samples.begin();
@@ -92,6 +93,7 @@ tjs_int64 tTVPSoundPlayer::GetCurrentPlayingPosition() {
 tjs_uint64 tTVPSoundPlayer::GetSamplePosition() {
 	tjs_uint64 result = 0;
 	if( Stream ) {
+		tTJSCriticalSectionHolder holder(Owner->GetBufferCS());
 		tjs_uint64 pos = Stream->GetSamplesPlayed();
 		if( Samples.size() > 0 ) {
 			auto itr = Samples.begin();
@@ -104,6 +106,52 @@ tjs_uint64 tTVPSoundPlayer::GetSamplePosition() {
 	return result;
 }
 //---------------------------------------------------------------------------
+void tTVPSoundPlayer::CopyVisBuffer(tjs_int16 *dest, const tjs_uint8 *src,
+	tjs_int numsamples, tjs_int channels)
+{
+	if(channels == 1) {
+		TVPConvertPCMTo16bits(dest, (const void*)src, StreamFormat.Channels,
+			StreamFormat.BytesPerSample, StreamFormat.BitsPerSample,
+			StreamFormat.IsFloat, numsamples, true);
+	} else if(channels == StreamFormat.Channels) {
+		TVPConvertPCMTo16bits(dest, (const void*)src, StreamFormat.Channels,
+			StreamFormat.BytesPerSample, StreamFormat.BitsPerSample,
+			StreamFormat.IsFloat, numsamples, false);
+	}
+}
+//---------------------------------------------------------------------------
+tjs_int tTVPSoundPlayer::GetVisBuffer(tjs_int16 *dest, tjs_int numsamples, tjs_int channels, tjs_int aheadsamples ) {
+	tjs_int writtensamples = 0;
+	tjs_uint blockAlign = StreamFormat.BytesPerSample * StreamFormat.Channels;
+	if( Stream ) {
+		tTJSCriticalSectionHolder holder(Owner->GetBufferCS());
+		tjs_uint64 pos = Stream->GetSamplesPlayed();
+		if( Samples.size() > 0 ) {
+			auto itr = Samples.begin();
+			if( (*itr)->GetSegmentQueue().GetFilteredLength() == 0 ) return 0;
+			tTVPSoundSamplesBuffer* sample = *itr;
+			tjs_int count = static_cast<tjs_int>(sample->GetSamplesCount());
+			tjs_int offset = (tjs_int)( pos % count ) + aheadsamples;
+			for( auto i = Samples.begin(); i != Samples.end(); i++ ) {
+				if( offset >= count ) {
+					offset -= count;
+					continue;
+				}
+				tjs_int bufrest = count - offset;
+				tjs_int copysamples = (bufrest > numsamples ? numsamples : bufrest);
+				CopyVisBuffer(dest, (*i)->GetVisBuffer() + offset * blockAlign, copysamples, channels);
+				numsamples -= copysamples;
+				writtensamples += copysamples;
+				if(numsamples <= 0) break;
+
+				dest += channels * copysamples;
+				offset = 0;
+			}
+		}
+	}
+	return writtensamples;
+}
+//---------------------------------------------------------------------------
 void tTVPSoundPlayer::Start() {
 	if(!Paused) {
 		Stream->StartStream();
@@ -114,6 +162,25 @@ void tTVPSoundPlayer::Start() {
 void tTVPSoundPlayer::Stop() {
 	if( Stream ) Stream->StopStream();
 	Playing = false;
+}
+//---------------------------------------------------------------------------
+void tTVPSoundPlayer::Reset() {
+	BufferEnded = false;
+	PlayStopPos = -1;
+}
+//---------------------------------------------------------------------------
+void tTVPSoundPlayer::Clear() {
+	tTJSCriticalSectionHolder holder(Owner->GetBufferCS());
+	Paused = false;
+	Playing = false;
+	PlayStopPos = -1;
+	Samples.clear();
+}
+//---------------------------------------------------------------------------
+void tTVPSoundPlayer::ClearSampleQueue() {
+	tTJSCriticalSectionHolder holder(Owner->GetBufferCS());
+	if( Stream ) Stream->ClearQueue();
+	Samples.clear();
 }
 //---------------------------------------------------------------------------
 void tTVPSoundPlayer::Destroy() {
@@ -133,6 +200,11 @@ void tTVPSoundPlayer::SetPan(tjs_int v) {
 //---------------------------------------------------------------------------
 void tTVPSoundPlayer::SetFrequency(tjs_int freq) {
 	if(Stream) Stream->SetFrequency( freq );
+}
+//---------------------------------------------------------------------------
+void tTVPSoundPlayer::SetPsused( bool paused ) {
+	tTJSCriticalSectionHolder holder(Owner->GetBufferCS());
+	Playing = Paused;
 }
 //---------------------------------------------------------------------------
 bool tTVPSoundPlayer::Update() {
