@@ -15,10 +15,14 @@
 #define _WIN32_WINNT _WIN32_WINNT_WIN8
 #include <Xaudio2.h>
 
-#pragma comment(lib,"XAudio2.lib")
+//#pragma comment(lib,"XAudio2.lib")
 
 class XAudio2Stream;
 class XAudio2Device : public iTVPAudioDevice {
+	typedef HRESULT ( __stdcall *FuncXAudio2Create)( IXAudio2 **ppXAudio2, UINT32 Flags, XAUDIO2_PROCESSOR XAudio2Processor);
+
+	HMODULE XAudio2DLL;
+	FuncXAudio2Create procXAudio2Create;
 	IXAudio2* XAudio2;
 	IXAudio2MasteringVoice* MasteringVoice;
 	tjs_int Volume;
@@ -32,8 +36,8 @@ class XAudio2Device : public iTVPAudioDevice {
 		return level;
 	}
 public:
-	XAudio2Device() : XAudio2(nullptr), MasteringVoice(nullptr), Volume(100000) {}
-	virtual ~XAudio2Device() override {}
+	XAudio2Device() : XAudio2DLL(nullptr), procXAudio2Create(nullptr), XAudio2(nullptr), MasteringVoice(nullptr), Volume(100000) {}
+	virtual ~XAudio2Device() override;
 
 	virtual void Initialize( tTVPAudioInitParam& param ) override;
 	virtual void Uninitialize() override;
@@ -222,12 +226,32 @@ public:
 	virtual void STDMETHODCALLTYPE OnLoopEnd(void * pBufferContext) override {}
 	virtual void STDMETHODCALLTYPE OnVoiceError(void * pBufferContext, HRESULT Error) override {}
 };
-
+XAudio2Device::~XAudio2Device() {
+	if( XAudio2DLL ) {
+		::FreeLibrary(XAudio2DLL);
+		XAudio2DLL = nullptr;
+	}
+	procXAudio2Create = nullptr;
+}
 void XAudio2Device::Initialize( tTVPAudioInitParam& param ) {
 	if( param.SampleRate < XAUDIO2_MIN_SAMPLE_RATE || param.SampleRate > XAUDIO2_MAX_SAMPLE_RATE ) {
 		TVPThrowExceptionMessage(TJS_W("Invalid parameter."));
 	}
 	TVPAddLog( TJS_W("XAudio2 initializing...") );
+
+	if( XAudio2DLL == nullptr ) {
+		XAudio2DLL = ::LoadLibrary( TJS_W("XAudio2_9.dll") );
+		if( XAudio2DLL == nullptr ) {
+			XAudio2DLL = ::LoadLibrary( TJS_W("XAudio2_8.dll") );
+		}
+	}
+	if( XAudio2DLL == nullptr ) {
+		TVPThrowExceptionMessage(TJS_W("Cannot load XAudio2 dll."));
+	}
+	procXAudio2Create = (HRESULT ( __stdcall *)(IXAudio2 **,UINT32,XAUDIO2_PROCESSOR))GetProcAddress(XAudio2DLL, "XAudio2Create");
+	if( !procXAudio2Create ) {
+		TVPThrowExceptionMessage(TJS_W("Missing XAudio2Create in XAudio2 dll."));
+	}
 
 	HRESULT hr;
 	if( FAILED( hr = ::CoInitializeEx( nullptr, COINIT_MULTITHREADED ) ) ) {
@@ -235,10 +259,8 @@ void XAudio2Device::Initialize( tTVPAudioInitParam& param ) {
 	}
 
 	UINT32 flags = 0;
-#if defined( _DEBUG )
-//	flags |= XAUDIO2_DEBUG_ENGINE;
-#endif
-	if( FAILED( hr = ::XAudio2Create( &XAudio2, flags ) ) ) {
+	//if( FAILED( hr = ::XAudio2Create( &XAudio2, flags ) ) ) {
+	if( FAILED( hr = procXAudio2Create( &XAudio2, flags, XAUDIO2_DEFAULT_PROCESSOR ) ) ) {
 		::CoUninitialize();
 		TVPThrowExceptionMessage(TJS_W("Faild to call XAudio2Create."));
 	}
