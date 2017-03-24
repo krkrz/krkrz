@@ -16,7 +16,18 @@
 #include <Xaudio2.h>
 
 //#pragma comment(lib,"XAudio2.lib")
-
+bool TVPHasXAudio2DLL() {
+	HMODULE hModule = nullptr;
+	hModule = ::LoadLibrary( TJS_W("XAudio2_9.dll") );
+	if( hModule == nullptr ) {
+		hModule = ::LoadLibrary( TJS_W("XAudio2_8.dll") );
+	}
+	bool result = hModule != nullptr;
+	if( hModule ) {
+		::FreeLibrary(hModule);
+	}
+	return result;
+}
 class XAudio2Stream;
 class XAudio2Device : public iTVPAudioDevice {
 	typedef HRESULT ( __stdcall *FuncXAudio2Create)( IXAudio2 **ppXAudio2, UINT32 Flags, XAUDIO2_PROCESSOR XAudio2Processor);

@@ -243,6 +243,7 @@ protected:
 //---------------------------------------------------------------------------
 extern tTJSNativeClass * TVPCreateNativeClass_WaveSoundBuffer();
 extern tTJSNativeClass * TVPCreateNativeClass_QueueSoundBuffer();
+extern tTJSNativeClass * TVPCreateNativeClass_SoundBuffer();
 //---------------------------------------------------------------------------
 
 

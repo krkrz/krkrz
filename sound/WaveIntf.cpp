@@ -1782,5 +1782,22 @@ iTJSDispatch2 * TVPCreateWaveFlagsObject(iTJSDispatch2 * buffer)
 	return out;
 }
 //---------------------------------------------------------------------------
+extern tTJSNativeClass * TVPCreateNativeClass_QueueSoundBuffer();
+#ifdef _WIN32
+extern tTJSNativeClass * TVPCreateNativeClass_WaveSoundBuffer();
+extern bool TVPHasXAudio2DLL();
+#endif
+tTJSNativeClass * TVPCreateNativeClass_SoundBuffer()
+{
+#ifdef _WIN32
+	if( TVPHasXAudio2DLL() ) {
+		return TVPCreateNativeClass_QueueSoundBuffer();
+	} else {
+		return TVPCreateNativeClass_WaveSoundBuffer();
+	}
+#else
+	return TVPCreateNativeClass_QueueSoundBuffer();
+#endif
+}
 
-
+//---------------------------------------------------------------------------
