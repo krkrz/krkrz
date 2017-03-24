@@ -1,6 +1,7 @@
 
 #include "tjsCommHead.h"
 
+#include <algorithm>
 #include "SoundEventThread.h"
 #include "QueueSoundBufferImpl.h"
 #include "TickCount.h"

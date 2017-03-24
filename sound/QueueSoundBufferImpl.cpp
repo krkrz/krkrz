@@ -128,7 +128,7 @@ tTJSNI_QueueSoundBuffer::tTJSNI_QueueSoundBuffer() : Player(this)
 
 	TVPSoundBuffers.AddBuffer( this );
 	Thread = new tTVPSoundDecodeThread( this );
-	ZeroMemory( &InputFormat, sizeof( InputFormat ) );
+	memset( &InputFormat, 0, sizeof( InputFormat ) );
 	Looping = false;
 	BufferPlaying = false;
 	LastCheckedDecodePos = -1;

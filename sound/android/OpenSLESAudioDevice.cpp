@@ -1,10 +1,69 @@
 #ifdef ANDROID
 
+#include "tjsCommHead.h"
+
 #include <assert.h>
 #include <SLES/OpenSLES.h>
 #include <SLES/OpenSLES_Android.h>
+#include <algorithm>
+#include "AudioDevice.h"
+#include "MsgIntf.h"
+#include "DebugIntf.h"
 
+#include "QueueSoundBufferImpl.h"
 
+// サウンドHW/ドライバが最終出力するサンプリングレートとバッファサイズ
+// この値に基づき最適なパラメータを設定する
+static int TVPSoundNativeFrameRate = 48000;
+static int TVPSoundNativeFramesPerBuffer = 256;
+void TVPSetSoundNativeParameter( int rate, int buffSize )
+{
+    TVPSoundNativeFrameRate = rate;
+    TVPSoundNativeFramesPerBuffer = buffSize;
+}
+//---------------------------------------------------------------------------
+// static function for TJS WaveSoundBuffer class
+//---------------------------------------------------------------------------
+void TVPSoundSetGlobalVolume(tjs_int v) {
+    tTJSNI_QueueSoundBuffer::SetGlobalVolume(v);
+}
+tjs_int TVPSoundGetGlobalVolume() {
+    return tTJSNI_QueueSoundBuffer::GetGlobalVolume();
+}
+void TVPSoundSetGlobalFocusMode(tTVPSoundGlobalFocusMode b) {
+    tTJSNI_QueueSoundBuffer::SetGlobalFocusMode(b);
+}
+tTVPSoundGlobalFocusMode TVPSoundGetGlobalFocusMode() {
+    return tTJSNI_QueueSoundBuffer::GetGlobalFocusMode();
+}
+void TVPWaveSoundBufferCommitSettings() {
+}
+//---------------------------------------------------------------------------
+
+static const tjs_char* TVPGetOpenSLESErrorMessage( SLresult result ) {
+    switch( result ) {
+        case SL_RESULT_SUCCESS: return TJS_W("Success");
+        case SL_RESULT_PRECONDITIONS_VIOLATED: return TJS_W("Preconditions Violated");
+        case SL_RESULT_PARAMETER_INVALID: return TJS_W("Parameter Invalid");
+        case SL_RESULT_MEMORY_FAILURE: return TJS_W("Memory Failure");
+        case SL_RESULT_RESOURCE_ERROR: return TJS_W("Resource Error");
+        case SL_RESULT_RESOURCE_LOST: return TJS_W("Resource Lost");
+        case SL_RESULT_IO_ERROR: return TJS_W("IO Error");
+        case SL_RESULT_BUFFER_INSUFFICIENT: return TJS_W("Buffer Insufficient");
+        case SL_RESULT_CONTENT_CORRUPTED: return TJS_W("Content Corrupted");
+        case SL_RESULT_CONTENT_UNSUPPORTED: return TJS_W("Content Unsupported");
+        case SL_RESULT_CONTENT_NOT_FOUND: return TJS_W("Content Not Found");
+        case SL_RESULT_PERMISSION_DENIED: return TJS_W("Permission Denied");
+        case SL_RESULT_FEATURE_UNSUPPORTED: return TJS_W("Feature Unsupported");
+        case SL_RESULT_INTERNAL_ERROR: return TJS_W("Internal Error");
+        case SL_RESULT_UNKNOWN_ERROR: return TJS_W("Unknown Error");
+        case SL_RESULT_OPERATION_ABORTED: return TJS_W("Operation Aborted");
+        case SL_RESULT_CONTROL_LOST: return TJS_W("Control Lost");
+        default: return TJS_W("Unknown Erorr");
+    }
+}
+
+class OpenSLESAudioStream;
 class OpenSLESAudioDevice : public iTVPAudioDevice {
 	SLObjectItf EngineObject;
 	SLEngineItf EngineEngine;
@@ -55,7 +114,7 @@ public:
 
 	static void PlayerCallback(SLAndroidSimpleBufferQueueItf, void* context) {
 		OpenSLESAudioStream* stream = reinterpret_cast<OpenSLESAudioStream*>(context);
-		strem->Callback();
+        stream->Callback();
 	}
 	void Callback() {
 		CallbackFunc( this, UserData );
@@ -73,7 +132,7 @@ public:
 
 	virtual tjs_uint32 GetQueuedCount() const {
 		SLAndroidSimpleBufferQueueState state;
-		SLresult result = (*BufferQueue)->GetState( BufferQueue );
+		SLresult result = (*BufferQueue)->GetState( BufferQueue, &state );
 		if( SL_RESULT_SUCCESS == result ) {
 			return state.count;
 		} else {
@@ -105,13 +164,13 @@ public:
 			SLmillibel maxVol;
 			SLresult result = (*Volume)->GetMaxVolumeLevel( Volume, &maxVol );
 			if( SL_RESULT_SUCCESS != result ) {
-				TVPThrowExceptionMessage( TJS_W("SLVolumeItf::GetMaxVolumeLevel Error : ") + TVPGetOpenSLESErrorMessage(result) );
+				TVPThrowExceptionMessage( (TJS_W("SLVolumeItf::GetMaxVolumeLevel Error : ") + ttstr(TVPGetOpenSLESErrorMessage(result))).c_str() );
 			}
 
 			SLmillibel vol = static_cast<SLmillibel>( (static_cast<tjs_int>(maxVol)*100000) / vol );
 			(*Volume)->SetVolumeLevel( Volume, vol );
 			if( SL_RESULT_SUCCESS != result ) {
-				TVPThrowExceptionMessage( TJS_W("SLVolumeItf::SetVolumeLevel Error : ") + TVPGetOpenSLESErrorMessage(result) );
+				TVPThrowExceptionMessage( (TJS_W("SLVolumeItf::SetVolumeLevel Error : ") + ttstr(TVPGetOpenSLESErrorMessage(result))).c_str() );
 			}
 			AudioVolumeValue = vol;
 		}
@@ -122,29 +181,29 @@ public:
 			if( pan == 0 ) {
 				SLresult result = (*Volume)->SetStereoPosition( Volume, 0 );
 				if( SL_RESULT_SUCCESS != result ) {
-					TVPThrowExceptionMessage( TJS_W("SLVolumeItf::SetStereoPosition Error : ") + TVPGetOpenSLESErrorMessage(result) );
+					TVPThrowExceptionMessage( (TJS_W("SLVolumeItf::SetStereoPosition Error : ") + ttstr(TVPGetOpenSLESErrorMessage(result))).c_str() );
 				}
 
 				result = (*Volume)->EnableStereoPosition( Volume, SL_BOOLEAN_FALSE );
 				if( SL_RESULT_SUCCESS != result ) {
-					TVPThrowExceptionMessage( TJS_W("SLVolumeItf::EnableStereoPosition Error : ") + TVPGetOpenSLESErrorMessage(result) );
+					TVPThrowExceptionMessage( (TJS_W("SLVolumeItf::EnableStereoPosition Error : ") + ttstr(TVPGetOpenSLESErrorMessage(result))).c_str() );
 				}
 			} else {
 				SLboolean panning;
 				SLresult result = (*Volume)->IsEnabledStereoPosition( Volume, &panning );
 				if( SL_RESULT_SUCCESS != result ) {
-					TVPThrowExceptionMessage( TJS_W("SLVolumeItf::IsEnabledStereoPosition Error : ") + TVPGetOpenSLESErrorMessage(result) );
+					TVPThrowExceptionMessage( (TJS_W("SLVolumeItf::IsEnabledStereoPosition Error : ") + ttstr(TVPGetOpenSLESErrorMessage(result))).c_str() );
 				}
 				if( panning != SL_BOOLEAN_TRUE ) {
 					result = (*Volume)->EnableStereoPosition( Volume, SL_BOOLEAN_TRUE );
 					if( SL_RESULT_SUCCESS != result ) {
-						TVPThrowExceptionMessage( TJS_W("SLVolumeItf::EnableStereoPosition Error : ") + TVPGetOpenSLESErrorMessage(result) );
+						TVPThrowExceptionMessage( (TJS_W("SLVolumeItf::EnableStereoPosition Error : ") + ttstr(TVPGetOpenSLESErrorMessage(result))).c_str() );
 					}
 				}
 				SLpermille pos = static_cast<SLpermille>( pan / 100 );
 				result = (*Volume)->SetStereoPosition( Volume, pos );	// -1000 - 0 - 1000
 				if( SL_RESULT_SUCCESS != result ) {
-					TVPThrowExceptionMessage( TJS_W("SLVolumeItf::SetStereoPosition Error : ") + TVPGetOpenSLESErrorMessage(result) );
+					TVPThrowExceptionMessage( (TJS_W("SLVolumeItf::SetStereoPosition Error : ") + ttstr(TVPGetOpenSLESErrorMessage(result))).c_str() );
 				}
 			}
 			AudioBalanceValue = pan;
@@ -219,7 +278,7 @@ OpenSLESAudioStream::OpenSLESAudioStream( OpenSLESAudioDevice* parent, const tTV
 	const SLboolean		req[3] = {SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE};
 
 	// プレイヤーオブジェクト作成
-	SLresult result = (*engine)->CreateAudioPlayer(engine, &PlayerObject, &audioSrc, &audioSnk, 3, ids, req);
+	result = (*engine)->CreateAudioPlayer(engine, &PlayerObject, &audioSrc, &audioSnk, 3, ids, req);
 	if( SL_RESULT_SUCCESS != result ) {
 		PlayerObject = nullptr;
 		throw;

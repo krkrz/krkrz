@@ -296,7 +296,10 @@ public:
 	const tjs_char* GetPackageName() const;
 	const tjs_char* GetPackageCodePath() const;
 
+	// アクティブかどうか
 	bool GetActivating() const { return true; }	// TODO
+	// Android では非アクティブの時は最初化とみなす
+	bool GetNotMinimizing() const { return !GetActivating(); }
 	void ShowToast( const tjs_char* text );
 	//const tTVPScreen& GetScreen() const { return screen_; }
 

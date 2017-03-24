@@ -1799,5 +1799,10 @@ tTJSNativeClass * TVPCreateNativeClass_SoundBuffer()
 	return TVPCreateNativeClass_QueueSoundBuffer();
 #endif
 }
-
+// TODO Windows で以下のメソッドがQueueタイプで実装されていない
+// TVPSoundSetGlobalVolume
+// TVPSoundGetGlobalVolume
+// TVPSoundSetGlobalFocusMode
+// TVPSoundGetGlobalFocusMode
+// TVPWaveSoundBufferCommitSettings
 //---------------------------------------------------------------------------

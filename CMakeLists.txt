@@ -121,14 +121,18 @@ msg/android/MsgLoad.cpp
 sound/MathAlgorithms.cpp
 sound/PhaseVocoderDSP.cpp
 sound/PhaseVocoderFilter.cpp
+sound/QueueSoundBufferImpl.cpp
 sound/RealFFT.cpp
 sound/SoundBufferBaseIntf.cpp
 sound/SoundBufferBaseImpl.cpp
+sound/SoundDecodeThread.cpp
+sound/SoundEventThread.cpp
+sound/SoundPlayer.cpp
 sound/WaveFormatConverter.cpp
 sound/WaveIntf.cpp
 sound/WaveLoopManager.cpp
 sound/WaveSegmentQueue.cpp
-sound/android/WaveImpl.cpp
+sound/android/OpenSLESAudioDevice.cpp
 utils/ClipboardIntf.cpp
 utils/cp932_uni.cpp
 utils/DebugIntf.cpp
@@ -218,6 +222,7 @@ find_library( EGL-lib EGL )
 find_library( GLESv1_CM-lib GLESv1_CM )
 find_library( GLESv2-lib GLESv2 )
 find_library( z-lib z )
+find_library( opensles OpenSLES )
 
 
 target_link_libraries( krkrz
@@ -230,6 +235,7 @@ target_link_libraries( krkrz
                        ${GLESv1_CM-lib}
                        ${GLESv2-lib}
                        ${z-lib}
+                       ${opensles}
                        atomic
                        
                        # Links my library
