@@ -618,7 +618,7 @@ void tTVPApplication::writeBitmapToNative( const void * src ) {
 }
 void tTVPApplication::AddWindow( TTVPWindowForm* window ) {
 	if( main_window_ ) {
-		TVPThrowExceptionMessage(TJS_W("Cannot add window."));	// TODO move to resource
+		TVPThrowExceptionMessage(TJS_W("Cannot add window. Window has already been added."));	// TODO move to resource
 	}
 	main_window_ = window;
 }
@@ -811,6 +811,19 @@ void tTVPApplication::callActivityMethod( const char* methodName ) const {
 		if( attached ) detachJavaEnv();
 	}
 }
+void tTVPApplication::getIntegerFromJava( const char* methodName, tjs_int& dest ) const {
+	bool attached;
+	JNIEnv *env = getJavaEnv(attached);
+	if ( env != nullptr ) {
+		jobject thiz = activity_;
+		jclass clazz = env->GetObjectClass(thiz);
+		jmethodID mid = env->GetMethodID(clazz, methodName, "()I");
+		int ret = (int)env->CallIntMethod(thiz, mid, nullptr);
+		dest = ret;
+		env->DeleteLocalRef(clazz);
+		if( attached ) detachJavaEnv();
+	}
+}
 const tjs_string& tTVPApplication::GetInternalDataPath() const {
 	if( internal_data_path_.empty() ) {
 		getStringFromJava( static_cast<const char*>("getInternalDataPath"), const_cast<tjs_string&>(internal_data_path_) );
@@ -840,6 +853,11 @@ const tjs_char* tTVPApplication::GetPackageCodePath() const {
 		getStringFromJava( static_cast<const char*>("getPackageCodePath"), const_cast<tjs_string&>(package_code_path_) );
 	}
 	return package_code_path_.c_str();
+}
+tjs_int tTVPApplication::getDisplayRotate() const {
+	tjs_int rot = -1;
+	getIntegerFromJava( static_cast<const char*>("getDisplayRotate"), rot );
+	return rot;
 }
 void tTVPApplication::finishActivity() {
 	callActivityMethod( "postFinish" );

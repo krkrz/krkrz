@@ -179,6 +179,7 @@ void TTVPWindowForm::SetVisibleFromScript(bool b) {
 }
 void TTVPWindowForm::ShowWindowAsModal() {
 	// modal は対応しないので、例外出す
+	TVPThrowExceptionMessage(TJS_W("Modal window is not supported."));
 }
 
 // タイトル、Activityのタイトルに設定できるが、無意味かな
@@ -221,8 +222,23 @@ void TTVPWindowForm::SetZoomDenom(tjs_int d) {}
 tjs_int TTVPWindowForm::GetZoomDenom() const { return 1; }
 
 // 画面表示向き取得
-int TTVPWindowForm::GetDisplayOrientation() { return orientUnknown; }
-int TTVPWindowForm::GetDisplayRotate() { return 0; }
+int TTVPWindowForm::GetDisplayOrientation() {
+	tjs_int orient = Application->getOrientation();
+	switch( orient ) {
+	case tTVPApplication::orientUnknown:
+		return orientUnknown;
+	case tTVPApplication::orientPortrait:
+		return orientPortrait;
+	case tTVPApplication::orientLandscape:
+		return orientLandscape;
+	case tTVPApplication::orientSquare:	// not used
+	default:
+		return  orientUnknown;
+	}
+}
+int TTVPWindowForm::GetDisplayRotate() {
+	return Application->getDisplayRotate();
+}
 
 void TTVPWindowForm::TranslateWindowToDrawArea(float&x, float &y) {
 	if( GetFullScreenMode() ) {

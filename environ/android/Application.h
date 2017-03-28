@@ -103,12 +103,15 @@ private:
 	void getStringFromJava( const char* methodName, tjs_string& dest ) const;
 	void setStringToJava( const char* methodName, const tjs_string& src );
 	void callActivityMethod( const char* methodName ) const;
+	void getIntegerFromJava( const char* methodName, tjs_int& dest ) const;
 
 public:
 	void setAssetManager( AAssetManager* am ) {
 		asset_manager_ = am;
 		if( config_ == nullptr ) {
 			config_ = AConfiguration_new();
+		} else {
+			// update configuration
 		}
 		AConfiguration_fromAssetManager( config_, asset_manager_ );
 	}
@@ -295,6 +298,7 @@ public:
 	const tjs_string* GetCachePath() const;
 	const tjs_char* GetPackageName() const;
 	const tjs_char* GetPackageCodePath() const;
+	tjs_int getDisplayRotate() const;
 
 	// アクティブかどうか
 	bool GetActivating() const { return true; }	// TODO

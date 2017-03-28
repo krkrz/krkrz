@@ -142,6 +142,10 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
         Log.i(TAG, "onConfigurationChanged()");
+		
+		// update configuration
+        Resources res = getResources();
+        nativeSetAssetManager( res.getAssets() );
 	}
     @Override
     protected void onStart() {
@@ -434,6 +438,26 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
     public String getExternalDataPath() {
         return getExternalFilesDir(null).toString();
     }
+	public int getDisplayRotate() {
+		int val = -1;
+		Display d = getWindowManager().getDefaultDisplay();
+		int rotation = d.getRotation();
+		switch(rotation) {
+		case Surface.ROTATION_0:
+			val = 0;
+			break;
+		case Surface.ROTATION_90:
+			val = 90;
+			break;
+		case Surface.ROTATION_180:
+			val = 180;
+			break;
+		case Surface.ROTATION_270:
+			val = 270;
+			break;
+		}
+		return val;
+	}
     //public String retrievePackageName() { return getPackageName(); }
     //public String retrievePackageCodePath() { return getPackageCodePath(); }
     public void postFinish() {
