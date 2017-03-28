@@ -22,9 +22,13 @@
 
 #include "MsgImpl.h"
 
+#ifdef _WIN32
 #define WIDEN2(x) L ## x
 #define WIDEN(x) WIDEN2(x)
-
+#else
+#define WIDEN2(x) u ## x
+#define WIDEN(x) WIDEN2(x)
+#endif
 
 //---------------------------------------------------------------------------
 // Message Strings

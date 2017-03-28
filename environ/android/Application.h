@@ -56,7 +56,7 @@ struct EventCommand {
 	EventCommand() : target(nullptr), command(nullptr) {}
 };
 
-class tTVPApplication : public iTVPApplication {
+class tTVPApplication {
 	JavaVM*			jvm_;
 	ANativeWindow*	window_;
 	AAssetManager*	asset_manager_;	// set from java
@@ -238,30 +238,7 @@ public:
 	tjs_int getUIModeNight() const {
 		return AConfiguration_getUiModeNight( const_cast<AConfiguration*>(getConfiguration()) );
 	}
-	/*
-	void setSaveState( const void* data, size_t size ) {
-		assert( app_state_ );
-		if( app_state_->savedStateSize != size ) {
-			if( app_state_->savedState != NULL ) {
-				free( app_state_->savedState );
-			}
-			app_state_->savedState = NULL;
-		}
-		if( app_state_->savedState == NULL ) {
-			app_state_->savedState = malloc(size);
-		}
-		memcpy( app_state_->savedState, data, size );
-		app_state_->savedStateSize = size;
-	}
-	void clearSaveState() {
-		assert( app_state_ );
-		if( app_state_->savedState != NULL ) {
-			free( app_state_->savedState );
-		}
-		app_state_->savedState = NULL;
-		app_state_->savedStateSize = 0;
-	}
-	*/
+
 	inline const AAssetManager* getAssetManager() const { return asset_manager_; }
 	inline AAssetManager* getAssetManager() { return asset_manager_; }
 
@@ -271,24 +248,15 @@ private:
 	inline const AConfiguration* getConfiguration() const { assert( config_ ); return config_; }
 	inline AConfiguration* getConfiguration() { assert( config_ ); return config_; }
 
-	static void handleCommand( struct android_app* state, int32_t cmd );
-	void onCommand( struct android_app* state, int32_t cmd );
-
-	static int32_t handleInput( struct android_app* state, AInputEvent* event );
-	int32_t onInput( struct android_app* state, AInputEvent* event );
-
-	//bool initCommandPipe();
-	//void finalCommandPipe();
-	//int8_t readCommand();
 	void HandleMessage( struct NativeEvent &ev );
-
-	//static int messagePipeCallBack(int fd, int events, void* user);
 
 	static void* startMainLoopCallback( void* myself );
 	// メインループ
 	void mainLoop();
 
 	bool appDispatch(NativeEvent& ev);
+
+	void handleIdle();
 public:
 	tTVPApplication();
 	~tTVPApplication();
@@ -305,38 +273,12 @@ public:
 	// Android では非アクティブの時は最初化とみなす
 	bool GetNotMinimizing() const { return !GetActivating(); }
 	void ShowToast( const tjs_char* text );
-	//const tTVPScreen& GetScreen() const { return screen_; }
 
-	// for iTVPApplication
-	virtual void startApplication( struct android_app* state );
+
 	void initializeApplication();
 	void startMainLoop();
 	void stopMainLoop();
 
-	void loadSaveState( void* state );
-	void handleSensorEvent();
-	void tarminateProcess();
-	void handleIdle();
-	void saveState();
-	void initializeWindow();
-	void tarminateWindow();
-	void gainedFocus();
-	void lostFocus();
-	void inputChanged();
-	void windowResized();
-	void windowRedrawNeeded();
-	void contentRectChanged();
-	void configChanged();
-	void lowMemory();
-	void onStart();
-	void onResume();
-	void onPause();
-	void onStop();
-	void onDestroy();
-
-	void OnTouchDown( float x, float y, float cx, float cy, int32_t id, float pressure, int32_t meta );
-	void OnTouchMove( float x, float y, float cx, float cy, int32_t id, float pressure,int32_t meta );
-	void OnTouchUp( float x, float y, float cx, float cy, int32_t id, float pressure,int32_t meta );
 
 	// for exception showing
 	static int MessageDlg( const tjs_string& string, const tjs_string& caption, int type, int button );

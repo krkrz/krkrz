@@ -123,6 +123,8 @@ void tTVPApplication::postEvent( const NativeEvent* ev, NativeEventQueueIntarfac
 void tTVPApplication::wakeupMainThread() {
 	main_thread_cv_.notify_one();
 }
+void tTVPApplication::handleIdle() {
+}
 void tTVPApplication::mainLoop() {
 	bool attached;
 	JNIEnv *env = getJavaEnv(attached);	// attach thread to java
@@ -174,108 +176,13 @@ bool tTVPApplication::appDispatch(NativeEvent& ev) {
 	}
 	return false;
 }
-/*
-int8_t tTVPApplication::readCommand() {
-	int8_t cmd;
-	if( read(user_msg_read_, &cmd, sizeof(cmd)) == sizeof(cmd) ) {
-		return cmd;
-	} else {
-		LOGE("No data on command pipe!");
-	}
-	return -1;
-}
-int tTVPApplication::messagePipeCallBack(int fd, int events, void* user) {
-	if( user != NULL ) {
-		tTVPApplication* app = (tTVPApplication*)user;
-		NativeEvent msg;
-		while( read(fd, &msg, sizeof(NativeEvent)) == sizeof(NativeEvent) ) {
-			app->HandleMessage(msg);
-		}
-	}
-	return 1;
-}
- */
 void tTVPApplication::HandleMessage( NativeEvent& ev ) {
 	std::lock_guard<std::mutex> lock( event_handlers_mutex_ );
 	for( std::vector<NativeEventQueueIntarface*>::iterator it = event_handlers_.begin(); it != event_handlers_.end(); it++ ) {
 		if( (*it) != NULL ) (*it)->Dispatch( ev );
 	}
 }
-// for iTVPApplication
-void tTVPApplication::startApplication( struct android_app* state ) {
-	/*
-	assert( state );
-	app_state_ = state;
 
-	state->userData = this;
-	state->onAppCmd = tTVPApplication::handleCommand;
-	state->onInputEvent = tTVPApplication::handleInput;
-	initCommandPipe();
-
-	if( state->savedState != NULL ) {
-		// We are starting with a previous saved state; restore from it.
-		loadSaveState( state->savedState );
-	}
-	*/
-
-	//print_font_files();
-	// ここから初期化
-	
-	// try starting the program!
-	bool engine_init = false;
-	try {
-		// TJS2 スクリプトエンジンを初期化してstartup.tjsを呼ぶ。
-		TVPInitScriptEngine();
-		engine_init = true;
-
-		// banner
-		TVPAddImportantLog( TVPFormatMessage(TVPProgramStartedOn, TVPGetOSName(), TVPGetPlatformName()) );
-		
-		// main loop
-		tjs_uint32 tick = TVPGetRoughTickCount32();
-		while( 1 ) { // Read all pending events.
-			int ident;
-			int events;
-			//struct android_poll_source* source;
-			void* source;
-			int timeout = 16;	//16msec周期で動作するようにする
-			while( (ident = ALooper_pollAll( timeout/* msec */, NULL, &events, (void**)&source)) != ALOOPER_POLL_TIMEOUT ) {
-				// Process this event.
-				if( source != NULL ) {
-					if( (tTVPApplication*)source == this ) {
-						// user_msg_write_ へ投げられたコマンド
-					} else {
-						struct android_poll_source* ps = (struct android_poll_source*)source;
-						ps->process(state, ps);
-					}
-				}
-
-				// If a sensor has data, process it now.
-				/*
-				if( ident == LOOPER_ID_USER ) {
-					handleSensorEvent();
-				}
-				*/
-
-				// Check if we are exiting.
-				if( state->destroyRequested != 0 ) {
-					tarminateProcess();
-					return;
-				}
-				tjs_uint32 curtick = TVPGetRoughTickCount32();
-				if( tick > curtick ) {	// 1周回ってしまった場合
-					curtick += 0xffffffffUL - tick;
-					tick = 0;
-				}
-				timeout = 16 - (curtick - tick);
-				if( timeout < 0 ) timeout = 0;
-			}
-			handleIdle();
-			tick = TVPGetRoughTickCount32();
-		}
-	} catch(...) {
-	}
-}
 void tTVPApplication::initializeApplication() {
 	TVPTerminateCode = 0;
 
@@ -320,14 +227,7 @@ void tTVPApplication::initializeApplication() {
 	} catch(...) {
 	}
 }
-void tTVPApplication::handleCommand( struct android_app* state, int32_t cmd ) {
-	tTVPApplication* app = (tTVPApplication*)(state->userData);
-	app->onCommand( state, cmd );
-}
-int32_t tTVPApplication::handleInput( struct android_app* state, AInputEvent* event ) {
-	tTVPApplication* app = (tTVPApplication*)(state->userData);
-	return app->onInput( state, event );
-}
+
 void* tTVPApplication::startMainLoopCallback( void* myself ) {
 	tTVPApplication* app = reinterpret_cast<tTVPApplication*>(myself);
 	app->mainLoop();
@@ -353,225 +253,6 @@ void tTVPApplication::stopMainLoop() {
 		wakeupMainThread();
 		pthread_join( thread_id_, 0 );
 	}
-}
-void tTVPApplication::onCommand( struct android_app* state, int32_t cmd ) {
-	switch( cmd ) {
-		case APP_CMD_SAVE_STATE:
-			saveState();
-			break;
-		case APP_CMD_INIT_WINDOW:
-			initializeWindow();
-			break;
-		case APP_CMD_TERM_WINDOW:
-			tarminateWindow();
-			break;
-        case APP_CMD_GAINED_FOCUS:
-			gainedFocus();
-			break;
-		case APP_CMD_LOST_FOCUS:
-			lostFocus();
-			break;
-		case APP_CMD_INPUT_CHANGED:
-			inputChanged();
-			break;
-		case APP_CMD_WINDOW_RESIZED:
-			windowResized();
-			break;
-		case APP_CMD_WINDOW_REDRAW_NEEDED:
-			windowRedrawNeeded();
-			break;
-		case APP_CMD_CONTENT_RECT_CHANGED:
-			contentRectChanged();
-			break;
-		case APP_CMD_CONFIG_CHANGED:
-			configChanged();
-			break;
-		case APP_CMD_LOW_MEMORY:
-			lowMemory();
-			break;
-		case APP_CMD_START:
-			onStart();
-			break;
-		case APP_CMD_RESUME:
-			onResume();
-			break;
-		case APP_CMD_PAUSE:
-			onPause();
-			break;
-		case APP_CMD_STOP:
-			onStop();
-			break;
-		case APP_CMD_DESTROY:
-			onDestroy();
-			break;
-	}
-}
-int32_t tTVPApplication::onInput( struct android_app* state, AInputEvent* event ) {
-	int32_t type = AInputEvent_getType(event);
-	if( type == AINPUT_EVENT_TYPE_MOTION ) {
-		int32_t src = AInputEvent_getSource(event);	// 入力デバイスの種類
-		// src == AINPUT_SOURCE_TOUCHSCREEN タッチスクリーン
-		// src == AINPUT_SOURCE_MOUSE AINPUT_SOURCE_TRACKBALL AINPUT_SOURCE_TOUCHPAD
-		int32_t action = AMotionEvent_getAction(event);
-		int32_t meta = AMotionEvent_getMetaState(event);
-		// AMotionEvent_getEventTime(event); // イベント発生時間
-		// AMotionEvent_getDownTime(event); // 押されていた時間
-		// AMotionEvent_getEdgeFlags(event); // スクリーン端判定
-		float x = AMotionEvent_getX(event, 0);
-		float y = AMotionEvent_getY(event, 0);
-		float cy = AMotionEvent_getTouchMajor(event,0);	// 触れられている長辺 指の形状から縦側にしておく
-		float cx = AMotionEvent_getTouchMinor(event,0);	// 触れられている短辺 指の形状から横側にしておく
-		float pressure = AMotionEvent_getPressure(event, 0);	// 圧力
-		/*
-		float size = AMotionEvent_getSize(event, 0);	// 範囲(推定値) デバイス固有値から0-1の範囲に正規化したもの
-		float toolmajor = AMotionEvent_getToolMajor(event,0);
-		float toolminor = AMotionEvent_getToolMinor(event,0);
-		LOGI( "press : %f, size: %f, major : %f, minor : %f\n", pressure, size, toolmajor, toolminor );
-		*/
-		int32_t id = AMotionEvent_getPointerId(event, 0);
-		action &= AMOTION_EVENT_ACTION_MASK;
-		switch( action ) {
-		case AMOTION_EVENT_ACTION_DOWN:
-			OnTouchDown( x, y, cx, cy, id, pressure, meta );
-			break;
-		case AMOTION_EVENT_ACTION_UP:
-			OnTouchUp( x, y, cx, cy, id, pressure, meta );
-			break;
-		case AMOTION_EVENT_ACTION_CANCEL:	// Down/Up同時発生。ありえるの？
-			break;
-		case AMOTION_EVENT_ACTION_MOVE:
-			OnTouchMove( x, y, cx, cy, id, pressure, meta );
-			break;
-		case AMOTION_EVENT_ACTION_POINTER_DOWN: {	// multi-touch
-			size_t downidx = (action&AMOTION_EVENT_ACTION_POINTER_INDEX_MASK) >> AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT;
-			size_t count = AMotionEvent_getPointerCount(event);
-			if( downidx == 0 ) {
-				OnTouchDown( x, y, cx, cy, id, pressure, meta );
-			} else {
-				OnTouchMove( x, y, cx, cy, id, pressure, meta );
-			}
-			for( size_t i = 1; i < count; i++ ) {
-				x = AMotionEvent_getX(event, i);
-				y = AMotionEvent_getY(event, i);
-				cy = AMotionEvent_getTouchMajor(event,i);
-				cx = AMotionEvent_getTouchMinor(event,i);
-				pressure = AMotionEvent_getPressure(event, i);
-				id = AMotionEvent_getPointerId(event, i);
-				if( i == downidx ) {
-					OnTouchDown( x, y, cx, cy, id, pressure, meta );
-				} else {
-					OnTouchMove( x, y, cx, cy, id, pressure, meta );
-				}
-			}
-			break;
-		}
-		case AMOTION_EVENT_ACTION_POINTER_UP: {	// multi-touch
-			size_t upidx = (action&AMOTION_EVENT_ACTION_POINTER_INDEX_MASK) >> AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT;
-			size_t count = AMotionEvent_getPointerCount(event);
-			if( upidx == 0 ) {
-				OnTouchUp( x, y, cx, cy, id, pressure, meta );
-			} else {
-				OnTouchMove( x, y, cx, cy, id, pressure, meta );
-			}
-			for( size_t i = 1; i < count; i++ ) {
-				x = AMotionEvent_getX(event, i);
-				y = AMotionEvent_getY(event, i);
-				cy = AMotionEvent_getTouchMajor(event,i);
-				cx = AMotionEvent_getTouchMinor(event,i);
-				pressure = AMotionEvent_getPressure(event, i);
-				id = AMotionEvent_getPointerId(event, i);
-				if( i == upidx ) {
-					OnTouchUp( x, y, cx, cy, id, pressure, meta );
-				} else {
-					OnTouchMove( x, y, cx, cy, id, pressure, meta );
-				}
-			}
-			break;
-		}
-		case AMOTION_EVENT_ACTION_OUTSIDE:
-			break;
-		}
-		return 1;
-	} else if( type == AINPUT_EVENT_TYPE_KEY ) { // key events
-		int32_t src = AInputEvent_getSource(event);	// 入力デバイスの種類
-		// src == AINPUT_SOURCE_KEYBOARD AINPUT_SOURCE_DPAD
-		return 1;
-	}
-	return 0;
-}
-
-#if 0
-void tTVPApplication::setApplicationState( struct android_app* state ) {
-	assert( state );
-	app_state_ = state;
-	// ここでいろいろと初期化してしまった方がよさげ
-
-	std::string internalDataPath( getInternalDataPath() );
-	TVPUtf8ToUtf16( internal_data_path_, internalDataPath );
-
-	std::string externalDataPath( getExternalDataPath() );
-	TVPUtf8ToUtf16( external_data_path_, externalDataPath );
-
-	/*
-	// Prepare to monitor accelerometer
-	sensor_manager_ = ASensorManager_getInstance();
-	accelerometer_sensor_ = ASensorManager_getDefaultSensor( sensorManager, ASENSOR_TYPE_ACCELEROMETER );
-	sensor_event_queue_ = ASensorManager_createEventQueue( sensorManager, state->looper, LOOPER_ID_USER, NULL, NULL );
-	*/
-}
-#endif
-void tTVPApplication::loadSaveState( void* state ) {
-}
-void tTVPApplication::handleSensorEvent() {
-}
-void tTVPApplication::tarminateProcess() {
-	//screen_.tarminate();
-}
-void tTVPApplication::handleIdle() {
-}
-void tTVPApplication::saveState() {
-	//clearSaveState();
-}
-void tTVPApplication::initializeWindow() {
-	//screen_.initialize(this);
-}
-void tTVPApplication::tarminateWindow() {
-	//screen_.tarminate();
-}
-void tTVPApplication::gainedFocus() {
-}
-void tTVPApplication::lostFocus() {
-}
-void tTVPApplication::inputChanged() {
-}
-void tTVPApplication::windowResized() {
-}
-void tTVPApplication::windowRedrawNeeded() {
-}
-void tTVPApplication::contentRectChanged() {
-}
-void tTVPApplication::configChanged() {
-}
-void tTVPApplication::lowMemory() {
-}
-void tTVPApplication::onStart() {
-}
-void tTVPApplication::onResume() {
-}
-void tTVPApplication::onPause() {
-}
-void tTVPApplication::onStop() {
-}
-void tTVPApplication::onDestroy() {
-}
-void tTVPApplication::OnTouchDown( float x, float y, float cx, float cy, int32_t id, float pressure, int32_t meta ) {
-	//screen_.OnTouchDown( x, y, cx, cy, id );
-}
-void tTVPApplication::OnTouchMove( float x, float y, float cx, float cy, int32_t id, float pressure,int32_t meta ) {
-	//screen_.OnTouchMove( x, y, cx, cy, id );
-}
-void tTVPApplication::OnTouchUp( float x, float y, float cx, float cy, int32_t id, float pressure,int32_t meta ) {
-	//screen_.OnTouchUp( x, y, cx, cy, id );
 }
 //-----------------------------
 
@@ -634,16 +315,6 @@ void tTVPApplication::PrintConsole( const tjs_char* mes, unsigned long len, bool
 		__android_log_print(ANDROID_LOG_INFO, "krkrz", "%s", &(console_cache_[0]) );
 	}
 }
-extern "C" {
-iTVPApplication* CreateApplication() {
-	Application = new tTVPApplication();
-	return Application;
-}
-void DestroyApplication( iTVPApplication* app ) {
-	delete app;
-	Application = NULL;
-}
-};
 
 // /system/fonts/ フォントが置かれているフォルダから取得する(Nexus5で約50msかかる)
 // フォントが最初に使われる時にFontSystem::InitFontNames経由で呼ばれる

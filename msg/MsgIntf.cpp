@@ -150,6 +150,7 @@ tjs_int TVPVersionMinor;
 tjs_int TVPVersionRelease;
 tjs_int TVPVersionBuild;
 //---------------------------------------------------------------------------
+/*
 #ifdef _WIN32
 #define WIDEN2(x) L ## x
 #define WIDEN(x) WIDEN2(x)
@@ -157,6 +158,7 @@ tjs_int TVPVersionBuild;
 #define WIDEN2(x) u ## x
 #define WIDEN(x) WIDEN2(x)
 #endif
+*/
 const tjs_char* TVPCompileDate = WIDEN(__DATE__);
 const tjs_char* TVPCompileTime = WIDEN(__TIME__);
 
