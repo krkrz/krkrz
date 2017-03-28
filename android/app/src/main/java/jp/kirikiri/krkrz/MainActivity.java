@@ -88,18 +88,15 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
         // 4.2以降 最適なサンプリングレートを取得する
         // Audio Output latency
         // https://googlesamples.github.io/android-audio-high-performance/guides/audio-output-latency.html
-        int frameRateInt = 44100;
-        int framesPerBufferInt = 256;
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
             String frameRate = am.getProperty(AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE);
-            frameRateInt = Integer.parseInt(frameRate);
-            if(frameRateInt == 0) frameRateInt = 44100; // Use a default value if property not found
+            AudioOptimalSampleRate = Integer.parseInt(frameRate);
+            if(AudioOptimalSampleRate == 0) AudioOptimalSampleRate = 44100; // Use a default value if property not found
             String framesPerBuffer = am.getProperty(AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER);
-            framesPerBufferInt = Integer.parseInt(framesPerBuffer);
-            if(framesPerBufferInt == 0) framesPerBufferInt = 256; // Use default
+            AudioOptimalBufferSize = Integer.parseInt(framesPerBuffer);
+            if(AudioOptimalBufferSize == 0) AudioOptimalBufferSize = 256; // Use default
         }
-        nativeSetSoundNativeParameter( frameRateInt, framesPerBufferInt );
         initializeNative();
 
         Intent intent = getIntent();
@@ -120,6 +117,7 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
 
 	private void initializeNative() {
         System.loadLibrary("krkrz");
+        nativeSetSoundNativeParameter( AudioOptimalSampleRate, AudioOptimalBufferSize );
         nativeSetActivity( this );
         Resources res = getResources();
         nativeSetAssetManager( res.getAssets() );
@@ -479,5 +477,5 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
     public static native void nativeSetMessageResource(String[] mes);
 
     public static native void nativeOnTouch( int type, float x, float y, float c, int id, long tick );
-	private static native void nativeSetSoundNativeParameter( int rate, int size );
+    public static native void nativeSetSoundNativeParameter( int rate, int size );
 }
