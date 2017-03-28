@@ -266,12 +266,20 @@ public:
 	const tjs_string* GetCachePath() const;
 	const tjs_char* GetPackageName() const;
 	const tjs_char* GetPackageCodePath() const;
-	tjs_int getDisplayRotate() const;
+	// ディスプレイの回転角度を取得する
+	tjs_int GetDisplayRotate() const;
+	// Main View の幅を取得する
+	tjs_int GetMainViewWidth() const;
+	// Main View の高さを取得する
+	tjs_int GetMainViewHeight() const;
+	tjs_int GetActivityWidth() const;
+	tjs_int GetActivityHeight() const;
 
 	// アクティブかどうか
 	bool GetActivating() const { return true; }	// TODO
 	// Android では非アクティブの時は最初化とみなす
 	bool GetNotMinimizing() const { return !GetActivating(); }
+	// Toastを使って文字列を表示する
 	void ShowToast( const tjs_char* text );
 
 
@@ -328,8 +336,22 @@ public:
 	void SendMessageFromJava( tjs_int message, tjs_int64 wparam, tjs_int64 lparam );
 	void SendTouchMessageFromJava( tjs_int type, float x, float y, float c, int id, tjs_int64 tick );
 	ANativeWindow* getWindow() { return window_; }
+
+	tjs_int GetSurfaceWidth() const {
+		if( window_ ) {
+			return ANativeWindow_getWidth( window_ );
+		}
+		return 0;
+	}
+	tjs_int GetSurfaceHeight() const {
+		if( window_ ) {
+			return ANativeWindow_getHeight ( window_ );
+		}
+		return 0;
+	}
+	
 	// for tTVPScreen
-	ANativeWindow* getNativeWindow() const { return window_; }
+	//ANativeWindow* getNativeWindow() const { return window_; }
 	
 	//void setStartupPath( const tjs_string& path ) { startup_path_ = path; }
 	//const tjs_string& getStartupPath() const { return startup_path_; }

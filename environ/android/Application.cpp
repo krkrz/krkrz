@@ -525,10 +525,30 @@ const tjs_char* tTVPApplication::GetPackageCodePath() const {
 	}
 	return package_code_path_.c_str();
 }
-tjs_int tTVPApplication::getDisplayRotate() const {
+tjs_int tTVPApplication::GetDisplayRotate() const {
 	tjs_int rot = -1;
 	getIntegerFromJava( static_cast<const char*>("getDisplayRotate"), rot );
 	return rot;
+}
+tjs_int tTVPApplication::GetMainViewWidth() const {
+	tjs_int w = 0;
+	getIntegerFromJava( static_cast<const char*>("getMainViewWidth"), w );
+	return w;
+}
+tjs_int tTVPApplication::GetMainViewHeight() const {
+	tjs_int h = 0;
+	getIntegerFromJava( static_cast<const char*>("getMainViewHeight"), h );
+	return h;
+}
+tjs_int tTVPApplication::GetActivityWidth() const {
+	tjs_int w = 0;
+	getIntegerFromJava( static_cast<const char*>("getActivityWidth"), w );
+	return w;
+}
+tjs_int tTVPApplication::GetActivityHeight() const {
+	tjs_int h = 0;
+	getIntegerFromJava( static_cast<const char*>("getActivityHeight"), h );
+	return h;
 }
 void tTVPApplication::finishActivity() {
 	callActivityMethod( "postFinish" );

@@ -146,6 +146,10 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
         Resources res = getResources();
         nativeSetAssetManager( res.getAssets() );
 	}
+	@Override
+	public void onWindowFocusChanged(boolean hasFocus) {
+		super.onWindowFocusChanged(hasFocus);
+	}
     @Override
     protected void onStart() {
         super.onStart();
@@ -456,6 +460,26 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
 			break;
 		}
 		return val;
+	}
+	public int getMainViewWidth() {
+		View view = (View)findViewById(R.id.activity_main);
+		return view.getWidth();
+	}
+	public int getMainViewHeight() {
+		View view = (View)findViewById(R.id.activity_main);
+		return view.getHeight();
+	}
+	public int getActivityWidth() {
+		Display display = getWindowManager().getDefaultDisplay();
+		Point point = new Point();
+		display.getSize(point);
+		return point.x;
+	}
+	public int getActivityHeight() {
+		Display display = getWindowManager().getDefaultDisplay();
+		Point point = new Point();
+		display.getSize(point);
+		return point.y;
 	}
     //public String retrievePackageName() { return getPackageName(); }
     //public String retrievePackageCodePath() { return getPackageCodePath(); }

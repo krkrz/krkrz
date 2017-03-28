@@ -201,18 +201,26 @@ void TTVPWindowForm::SetTop( int t ) {}
 int TTVPWindowForm::GetTop() const { return 0; }
 void TTVPWindowForm::SetPosition( int l, int t ) {}
 // サイズ
-void TTVPWindowForm::SetWidth( int w ) {}
-int TTVPWindowForm::GetWidth() const { return 0; }
-void TTVPWindowForm::SetHeight( int h ) {}
-int TTVPWindowForm::GetHeight() const { return 0; }
-void TTVPWindowForm::SetSize( int w, int h ) {}
+void TTVPWindowForm::SetWidth( int w ) { /* Activityのサイズを変更することはできない */ }
+int TTVPWindowForm::GetWidth() const {
+	return Appliction->GetActivityWidth();
+}
+void TTVPWindowForm::SetHeight( int h ) { /* Activityのサイズを変更することはできない */ }
+int TTVPWindowForm::GetHeight() const {
+	return Appliction->GetActivityHeight();
+}
+void TTVPWindowForm::SetSize( int w, int h ) { /* Activityのサイズを変更することはできない */ }
 
 // 内部のサイズ、実質的にこれが表示領域サイズ
-void TTVPWindowForm::SetInnerWidth( int w ) {}
-int TTVPWindowForm::GetInnerWidth() const { return 0; }
-void TTVPWindowForm::SetInnerHeight( int h ) {}
-int TTVPWindowForm::GetInnerHeight() const { return 0; }
-void TTVPWindowForm::SetInnerSize( int w, int h ) {}
+void TTVPWindowForm::SetInnerWidth( int w ) { /* 表示領域のサイズを変更することはできない */ }
+int TTVPWindowForm::GetInnerWidth() const {
+	return Appliction->GetMainViewWidth();
+}
+void TTVPWindowForm::SetInnerHeight( int h ) { /* 表示領域のサイズを変更することはできない */ }
+int TTVPWindowForm::GetInnerHeight() const {
+	return Appliction->GetMainViewHeight();
+}
+void TTVPWindowForm::SetInnerSize( int w, int h ) { /* 表示領域のサイズを変更することはできない */ }
 
 // 表示ズーム関係
 void TTVPWindowForm::SetZoom(tjs_int numer, tjs_int denom, bool set_logical ) {}
@@ -237,7 +245,7 @@ int TTVPWindowForm::GetDisplayOrientation() {
 	}
 }
 int TTVPWindowForm::GetDisplayRotate() {
-	return Application->getDisplayRotate();
+	return Application->GetDisplayRotate();
 }
 
 void TTVPWindowForm::TranslateWindowToDrawArea(float&x, float &y) {
