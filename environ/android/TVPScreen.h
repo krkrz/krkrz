@@ -9,8 +9,9 @@
 
 #include "MsgIntf.h"
 
-class iTVPSurface;
+//class iTVPSurface;
 class tTVPScreen {
+#if 0
 	EGLDisplay display_;
 	EGLContext context_;
 	EGLSurface surface_;
@@ -90,8 +91,8 @@ public:
 	void OnMultiTouch();
 
 	void OnDisplayRotate( tjs_int orientation, tjs_int rotate, tjs_int bpp, tjs_int hresolution, tjs_int vresolution );
-
-
+#endif
+public:
 	static int GetWidth();
 	static int GetHeight();
 	static int GetDesktopLeft();

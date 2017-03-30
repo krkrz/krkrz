@@ -7,6 +7,7 @@ import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.PixelFormat;
+import android.graphics.Point;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
@@ -481,6 +482,18 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
 		display.getSize(point);
 		return point.y;
 	}
+	public int getScreenWidth() {
+        Display display = getWindowManager().getDefaultDisplay();
+        Point point = new Point();
+        display.getRealSize(point);
+        return point.x;
+    }
+    public int getScreenHeight() {
+        Display display = getWindowManager().getDefaultDisplay();
+        Point point = new Point();
+        display.getRealSize(point);
+        return point.y;
+    }
     //public String retrievePackageName() { return getPackageName(); }
     //public String retrievePackageCodePath() { return getPackageCodePath(); }
     public void postFinish() {

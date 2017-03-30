@@ -203,22 +203,22 @@ void TTVPWindowForm::SetPosition( int l, int t ) {}
 // サイズ
 void TTVPWindowForm::SetWidth( int w ) { /* Activityのサイズを変更することはできない */ }
 int TTVPWindowForm::GetWidth() const {
-	return Appliction->GetActivityWidth();
+	return Application->GetActivityWidth();
 }
 void TTVPWindowForm::SetHeight( int h ) { /* Activityのサイズを変更することはできない */ }
 int TTVPWindowForm::GetHeight() const {
-	return Appliction->GetActivityHeight();
+	return Application->GetActivityHeight();
 }
 void TTVPWindowForm::SetSize( int w, int h ) { /* Activityのサイズを変更することはできない */ }
 
 // 内部のサイズ、実質的にこれが表示領域サイズ
 void TTVPWindowForm::SetInnerWidth( int w ) { /* 表示領域のサイズを変更することはできない */ }
 int TTVPWindowForm::GetInnerWidth() const {
-	return Appliction->GetMainViewWidth();
+	return Application->GetMainViewWidth();
 }
 void TTVPWindowForm::SetInnerHeight( int h ) { /* 表示領域のサイズを変更することはできない */ }
 int TTVPWindowForm::GetInnerHeight() const {
-	return Appliction->GetMainViewHeight();
+	return Application->GetMainViewHeight();
 }
 void TTVPWindowForm::SetInnerSize( int w, int h ) { /* 表示領域のサイズを変更することはできない */ }
 

@@ -550,6 +550,16 @@ tjs_int tTVPApplication::GetActivityHeight() const {
 	getIntegerFromJava( static_cast<const char*>("getActivityHeight"), h );
 	return h;
 }
+tjs_int tTVPApplication::GetScreenWidth() const {
+    tjs_int w = 0;
+    getIntegerFromJava( static_cast<const char*>("getScreenWidth"), w );
+    return w;
+}
+tjs_int tTVPApplication::GetScreenHeight() const {
+    tjs_int h = 0;
+    getIntegerFromJava( static_cast<const char*>("getScreenHeight"), h );
+    return h;
+}
 void tTVPApplication::finishActivity() {
 	callActivityMethod( "postFinish" );
 	stopMainLoop();

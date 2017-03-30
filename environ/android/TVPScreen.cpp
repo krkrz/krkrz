@@ -7,7 +7,7 @@
 
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "krkrz", __VA_ARGS__))
 #define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "krkrz", __VA_ARGS__))
-
+#if 0
 //頂点シェーダのコード
 const char tTVPScreen::VERTEX_CODE[] =
 	"attribute vec4 a_Position;\n"
@@ -24,7 +24,7 @@ const char tTVPScreen::FRAGMENT_CODE[] =
 	"varying vec2 v_UV;\n"
 	"uniform sampler2D u_Tex;\n"
 	"void main(){\n"
-		"gl_FragColor=texture2D(u_Tex,v_UV);\n"
+		"gl_FragColor=texture2D(u_Tex,v_UV).brga;\n"
 	"}\n";
 
 
@@ -306,13 +306,13 @@ void tTVPScreen::OnMultiTouch() {
 
 void tTVPScreen::OnDisplayRotate( tjs_int orientation, tjs_int rotate, tjs_int bpp, tjs_int hresolution, tjs_int vresolution ) {
 }
-
+#endif
 
 int tTVPScreen::GetWidth() {
-	return ANativeWindow_getWidth( Application->getWindow()) ;
+	return Application->GetScreenWidth();
 }
 int tTVPScreen::GetHeight() {
-	return ANativeWindow_getHeight( Application->getWindow() );
+	return Application->GetScreenHeight();
 }
 // 上部のシステムバーなどを考慮して返す方がよいかもしれない
 int tTVPScreen::GetDesktopLeft() {
@@ -322,9 +322,9 @@ int tTVPScreen::GetDesktopTop() {
 	return 0;
 }
 int tTVPScreen::GetDesktopWidth() {
-	return ANativeWindow_getWidth( Application->getWindow()) ;
+	return Application->GetScreenWidth();
 }
 int tTVPScreen::GetDesktopHeight() {
-	return ANativeWindow_getHeight( Application->getWindow() );
+	return Application->GetScreenHeight();
 }
 

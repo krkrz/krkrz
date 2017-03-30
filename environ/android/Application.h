@@ -274,6 +274,8 @@ public:
 	tjs_int GetMainViewHeight() const;
 	tjs_int GetActivityWidth() const;
 	tjs_int GetActivityHeight() const;
+	tjs_int GetScreenWidth() const;
+	tjs_int GetScreenHeight() const;
 
 	// アクティブかどうか
 	bool GetActivating() const { return true; }	// TODO
