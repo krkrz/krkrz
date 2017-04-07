@@ -321,7 +321,7 @@ public:
 	/**
 	 * 画像の非同期読込み要求
 	 */
-	void LoadImageRequest( class iTJSDispatch2 *owner, class tTJSNI_Bitmap* bmp, const ttstr &name ) {}
+	void LoadImageRequest( class iTJSDispatch2 *owner, class tTJSNI_Bitmap* bmp, const ttstr &name );
 	/**
 	 * メッセージポンプを回す
 	 */

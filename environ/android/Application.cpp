@@ -166,6 +166,15 @@ void tTVPApplication::mainLoop() {
 			main_thread_cv_.wait(uniq_lk, [this]{ return !command_que_.empty();});
 		}
 	}
+
+	try {
+		// image_load_thread_->ExitRequest();
+		delete image_load_thread_;
+		image_load_thread_ = nullptr;
+	} catch(...) {
+		// ignore errors
+	}
+
 	if( attached ) detachJavaEnv();
 }
 bool tTVPApplication::appDispatch(NativeEvent& ev) {
@@ -610,6 +619,11 @@ void tTVPApplication::ShowToast( const tjs_char* text ) {
 int tTVPApplication::MessageDlg( const tjs_string& string, const tjs_string& caption, int type, int button ) {
 	Application->ShowToast( string.c_str() );
 	return 0;
+}
+void tTVPApplication::LoadImageRequest( class iTJSDispatch2 *owner, class tTJSNI_Bitmap* bmp, const ttstr &name ) {
+	if( image_load_thread_ ) {
+		image_load_thread_->LoadRequest( owner, bmp, name );
+	}
 }
 
 /**
