@@ -497,9 +497,6 @@ process_exp_stub("../../utils/ThreadIntf.h");
 print OFH "#include \"DebugIntf.h\"\n";
 process_exp_stub("../../utils/DebugIntf.h");
 
-#print OFH "#include \"KAGParser.h\"\n";
-#process_exp_stub("../../utils/KAGParser.h");
-
 print OFH "#include \"Random.h\"\n";
 process_exp_stub("../../utils/Random.h");
 
@@ -517,9 +514,6 @@ process_exp_stub("../../sound/WaveIntf.h");
 
 print OFH "#include \"WaveImpl.h\"\n";
 process_exp_stub("../../sound/win32/WaveImpl.h");
-
-#print OFH "#include \"MIDIImpl.h\"\n";
-#process_exp_stub("../../sound/win32/MIDIImpl.h");
 
 print OFH "#include \"GraphicsLoaderIntf.h\"\n";
 process_exp_stub("../../visual/GraphicsLoaderIntf.h");
@@ -702,6 +696,9 @@ print OHFH <<EOF;
 #ifndef __cplusplus
 	#error Sorry, currently tp_stub.h can only be used in C++ mode.
 #endif
+
+#include <string>
+#include <stdarg.h>
 
 #ifndef _WIN32
 	#error Sorry, currently tp_stub.h can only be used in Win32 VC++ or Borland compilers.
