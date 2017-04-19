@@ -324,7 +324,7 @@ sub process_exp_stub
 		$defs .= $1."\n";
 	}
 
-	while($content =~ /\/\*\[C\*\/(.*?)\/\*\C]\*\//gs)
+	while($content =~ /\/\*\[C\*\/(.*?)\/\*C]\*\//gs)
 	{
 		$impls .= $1."\n";
 	}
@@ -552,7 +552,7 @@ print OFH "#include \"WindowImpl.h\"\n";
 process_exp_stub("../../visual/win32/WindowImpl.h");
 
 print OFH "#include \"DrawDevice.h\"\n";
-process_exp_stub("../../visual/win32/DrawDevice.h");
+process_exp_stub("../../visual/DrawDevice.h");
 
 print OFH "#include \"voMode.h\"\n";
 process_exp_stub("../../visual/voMode.h");
