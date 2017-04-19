@@ -534,6 +534,12 @@ const tjs_char* tTVPApplication::GetPackageCodePath() const {
 	}
 	return package_code_path_.c_str();
 }
+const tjs_char* tTVPApplication::GetSoPath() const {
+	if( so_path_.empty() ) {
+		getStringFromJava( static_cast<const char*>("getSoPath"), const_cast<tjs_string&>(so_path_) );
+	}
+	return so_path_.c_str();
+}
 tjs_int tTVPApplication::GetDisplayRotate() const {
 	tjs_int rot = -1;
 	getIntegerFromJava( static_cast<const char*>("getDisplayRotate"), rot );

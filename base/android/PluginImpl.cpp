@@ -34,6 +34,7 @@
 #include "CharacterSet.h"
 
 #include <dlfcn.h>
+#include <dirent.h>
 //---------------------------------------------------------------------------
 // export table
 //---------------------------------------------------------------------------
@@ -147,11 +148,27 @@ struct tTVPPlugin
 tTVPPlugin::tTVPPlugin(const ttstr & name) : Name(name)
 {
 	// load shared library
-	Holder = new tTVPPluginHolder(name);
+    // check libXXX...
+    ttstr soname = name.AsLowerCase();
+    if( soname.GetLen() <= 3 ||
+        soname[0] != TJS_W('l') ||
+        soname[1] != TJS_W('i') ||
+        soname[2] != TJS_W('b') ) {
+        soname = TJS_W("lib") + soname;
+    }
+    // check libXXX.so or dll
+    tjs_int len = soname.GetLen();
+    if( soname[len-1] == TJS_W('l') && soname[len-2] == TJS_W('l') && soname[len-3] == TJS_W('d') ) {
+        tjs_string extso = ChangeFileExt( soname.AsStdString(), TJS_W("so") );
+        soname = ttstr( extso );
+    }
+	Holder = new tTVPPluginHolder(soname);
 	std::string filename;
 	if( TVPUtf16ToUtf8( filename, Holder->GetLocalName().AsStdString() ) )
 	{
-		Instance = dlopen( filename.c_str(), RTLD_NOW|RTLD_LOCAL );
+		if( TVPCheckExistentLocalFile(Holder->GetLocalName()) ) {
+			Instance = dlopen( filename.c_str(), RTLD_NOW|RTLD_LOCAL );
+		}
 	}
 	if(!Instance)
 	{
@@ -201,7 +218,8 @@ bool tTVPPlugin::Uninit()
 	return true;
 }
 //---------------------------------------------------------------------------
-
+tjs_int TVPGetAutoLoadPluginCount() { return 0; }
+//---------------------------------------------------------------------------
 
 
 //---------------------------------------------------------------------------

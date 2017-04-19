@@ -22,3 +22,6 @@
 [submodule "external/portaudio"]
 	path = external/portaudio
 	url = https://github.com/krkrz/portaudio.git
+[submodule "external/angle"]
+	path = external/angle
+	url = https://github.com/krkrz/angle.git

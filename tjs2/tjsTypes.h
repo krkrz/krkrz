@@ -42,12 +42,11 @@
 #define TJS_METHOD_RET(type)
 
 
-
+/*[*/
 #if defined(_WIN32)  && !defined(__GNUC__)
 
 /* VC++/BCC */
 
-/*[*/
 typedef __int8 tjs_int8;
 typedef unsigned __int8 tjs_uint8;
 typedef __int16 tjs_int16;
@@ -93,7 +92,6 @@ typedef uintptr_t tjs_uintptr_t;
 
 #define TJS_W(X) L##X
 
-/*]*/
 
 #else
 
@@ -164,6 +162,7 @@ typedef uintptr_t tjs_uintptr_t;
 #define TJS_W(X) u##X
 
 #endif /* end of defined(_WIN32) && !defined(__GNUC__) */
+/*]*/
 
 /*[*/
 #define TJS_N(X) X

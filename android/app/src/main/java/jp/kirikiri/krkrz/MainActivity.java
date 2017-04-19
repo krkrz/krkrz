@@ -3,6 +3,8 @@ package jp.kirikiri.krkrz;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -27,6 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.FileNotFoundException;
+import java.net.URL;
 import java.util.Locale;
 
 public class MainActivity extends Activity  implements SurfaceHolder.Callback {
@@ -441,6 +444,16 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
     }
     public String getExternalDataPath() {
         return getExternalFilesDir(null).toString();
+    }
+    public String getSoPath() {
+        ApplicationInfo appliInfo = null;
+        try {
+            appliInfo = getPackageManager().getApplicationInfo(getPackageName(), PackageManager.GET_META_DATA);
+        } catch (PackageManager.NameNotFoundException e) {}
+        if( appliInfo != null ) {
+            return appliInfo.nativeLibraryDir + "/";
+        }
+        return "/data/data/" + getPackageName() + "/lib/" ;
     }
 	public int getDisplayRotate() {
 		int val = -1;

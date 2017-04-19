@@ -58,9 +58,9 @@ TJS_EXP_FUNC_DEF(tjs_char *, TJS_strncpy_s, (tjs_char * __restrict dst, size_t d
 TJS_EXP_FUNC_DEF(tjs_char *, TJS_strcat, (tjs_char * __restrict s1, const tjs_char * __restrict s2));
 TJS_EXP_FUNC_DEF(tjs_char *, TJS_strchr, (const tjs_char *s, tjs_char c));
 TJS_EXP_FUNC_DEF(tjs_size, TJS_strspn, (const tjs_char *s, const tjs_char *set) );
-TJS_EXP_FUNC_DEF(tjs_int, TJS_sprintf, (tjs_char *s, const tjs_char *format, ...));
-TJS_EXP_FUNC_DEF(tjs_int, TJS_snprintf, ( tjs_char* buffer, size_t cnt, const tjs_char * format, ...  ));
-TJS_EXP_FUNC_DEF(tjs_int, TJS_vsnprintf, (tjs_char* buffer, size_t nsize, const tjs_char* format, va_list param));
+extern tjs_int TJS_sprintf( tjs_char *s, const tjs_char *format, ... );
+extern tjs_int TJS_snprintf( tjs_char* buffer, size_t cnt, const tjs_char * format, ... );
+extern tjs_int TJS_vsnprintf( tjs_char* buffer, size_t nsize, const tjs_char* format, va_list param );
 TJS_EXP_FUNC_DEF(tjs_real, TJS_strtod, (const tjs_char *nptr, tjs_char **endptr) );
 
 #define TJS_malloc			malloc

@@ -81,6 +81,7 @@ class tTVPApplication {
 	tjs_string package_code_path_;
 	tjs_string package_path_;
 	tjs_string system_release_version_;
+	tjs_string so_path_;
 
 	class tTVPAsyncImageLoader* image_load_thread_;
 	class TTVPWindowForm* main_window_;
@@ -266,6 +267,7 @@ public:
 	const tjs_string* GetCachePath() const;
 	const tjs_char* GetPackageName() const;
 	const tjs_char* GetPackageCodePath() const;
+	const tjs_char* GetSoPath() const;
 	// ディスプレイの回転角度を取得する
 	tjs_int GetDisplayRotate() const;
 	// Main View の幅を取得する

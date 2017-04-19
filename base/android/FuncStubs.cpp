@@ -10,10 +10,3653 @@
 
 
 #include "tjsCommHead.h"
-// 自動生成されるので空でよい
-// 生成されるのは公開関数名とその関数ポインタ。
-// プラグインで利用される。
-void TVPExportFunctions()
+
+#include "tjsVariant.h"
+#include "tjsString.h"
+#include "PluginImpl.h"
+
+#define STDCALL
+
+static void STDCALL TVP_Stub_3d4b725f0b4234d79524822e7c34486b(tTJSVariant * _this, iTJSDispatch2 * objthis)
 {
+	return _this->ChangeClosureObjThis(objthis);
+}
+static void STDCALL TVP_Stub_3fc0c32ee41ea0c515f8fbb681e37982(tTJSVariant * _this)
+{
+	::new (_this) tTJSVariant();
+}
+static void STDCALL TVP_Stub_e8dbd4fe012262d9da831e0735aa33b3(tTJSVariant * _this, const tTJSVariant & ref)
+{
+	::new (_this) tTJSVariant(ref);
+}
+static void STDCALL TVP_Stub_ace6cce1353865d7376caca1f2124216(tTJSVariant * _this, iTJSDispatch2 * ref)
+{
+	::new (_this) tTJSVariant(ref);
+}
+static void STDCALL TVP_Stub_5055344aa8055bc238b79e5f88fc3300(tTJSVariant * _this, iTJSDispatch2 * obj , iTJSDispatch2 * objthis)
+{
+	::new (_this) tTJSVariant(obj, objthis);
+}
+static void STDCALL TVP_Stub_8238c542b814acf1a83c00cced57ba26(tTJSVariant * _this, const tjs_char * ref)
+{
+	::new (_this) tTJSVariant(ref);
+}
+static void STDCALL TVP_Stub_bd2a14ca8c345fd7f151b08d1792fb60(tTJSVariant * _this, const tTJSString & ref)
+{
+	::new (_this) tTJSVariant(ref);
+}
+static void STDCALL TVP_Stub_16d432f9f86738a7688cbfc9b12441ec(tTJSVariant * _this, const tjs_nchar * ref)
+{
+	::new (_this) tTJSVariant(ref);
+}
+static void STDCALL TVP_Stub_6dac00582b8ba529e548ef058c4e869e(tTJSVariant * _this, const tjs_uint8 * ref , tjs_uint len)
+{
+	::new (_this) tTJSVariant(ref, len);
+}
+static void STDCALL TVP_Stub_9193ae470b5efdfe617b5e94cd8f5da6(tTJSVariant * _this, bool ref)
+{
+	::new (_this) tTJSVariant(ref);
+}
+static void STDCALL TVP_Stub_ec455b6ef0f5da178063db3875973260(tTJSVariant * _this, tjs_int32 ref)
+{
+	::new (_this) tTJSVariant(ref);
+}
+static void STDCALL TVP_Stub_a56aaf685bd171b63b0ef3c894d80ecf(tTJSVariant * _this, tjs_int64 ref)
+{
+	::new (_this) tTJSVariant(ref);
+}
+static void STDCALL TVP_Stub_9a5fe199cebb9841f94ac0bb7a4a3b6a(tTJSVariant * _this, tjs_real ref)
+{
+	::new (_this) tTJSVariant(ref);
+}
+static void STDCALL TVP_Stub_2acb76a1f86e34afc5fe934d406c6c4c(tTJSVariant * _this, const tjs_uint8 * * src)
+{
+	::new (_this) tTJSVariant(src);
+}
+static void STDCALL TVP_Stub_3a4d914ca7d24989c236ad223c002d49(tTJSVariant * _this)
+{
+	_this->~tTJSVariant();
+}
+static tTJSVariantType STDCALL TVP_Stub_8fca7d3a123df1eacf228ba89f6a02ff(tTJSVariant * _this)
+{
+	return _this->Type();
+}
+static void STDCALL TVP_Stub_58be195f96a36c158d638e3b0c79308b(tTJSVariant * _this)
+{
+	return _this->Clear();
+}
+static tTJSVariantClosure & STDCALL TVP_Stub_eaa4d5b1d186a807a63311ab6d5e16e4(tTJSVariant * _this)
+{
+	return _this->AsObjectClosure();
+}
+static void STDCALL TVP_Stub_246f30d208c1d3a4e2b558090f403734(tTJSVariant * _this)
+{
+	return _this->ToObject();
+}
+static iTJSDispatch2 * STDCALL TVP_Stub_3206ef9b7a8013d6572decdea49e7e2e(tTJSVariant * _this)
+{
+	return _this->operator iTJSDispatch2 *();
+}
+static void STDCALL TVP_Stub_c5a30d297c3a121879b1392bc6c604ef(tTJSVariant * _this)
+{
+	return _this->ToString();
+}
+static tjs_uint32 * STDCALL TVP_Stub_e398f5aef0ab92bc1323f3b094722fb1(tTJSVariant * _this)
+{
+	return _this->GetHint();
+}
+static void STDCALL TVP_Stub_0733b0ac80880897d327dc6f3b04ea9e(tTJSVariant * _this)
+{
+	return _this->ToOctet();
+}
+static void STDCALL TVP_Stub_4cb055ed9d8ef71d1af10898965c940c(tTJSVariant * _this)
+{
+	return _this->ToInteger();
+}
+static void STDCALL TVP_Stub_ef8d198596b7d3143d02ed4450ccefa1(tTJSVariant * _this)
+{
+	return _this->ToReal();
+}
+static tTJSVariant & STDCALL TVP_Stub_d48ea419e040ffe8c20c1e86d80c9a5f(tTJSVariant * _this, const tTJSVariant & ref)
+{
+	return _this->operator =(ref);
+}
+static void STDCALL TVP_Stub_679b215ff76a269871d5f325b981e561(tTJSVariant * _this, const tTJSVariant & ref)
+{
+	return _this->CopyRef(ref);
+}
+static tTJSVariant & STDCALL TVP_Stub_1039eff4a4443f9238438485a35a93a7(tTJSVariant * _this, iTJSDispatch2 * ref)
+{
+	return _this->operator =(ref);
+}
+static tTJSVariant & STDCALL TVP_Stub_2f873b0ee1c6591ba28bc4b9c0e4c954(tTJSVariant * _this, iTJSDispatch2 * ref)
+{
+	return _this->SetObject(ref);
+}
+static tTJSVariant & STDCALL TVP_Stub_a583ffb56cdb2ede691e15053a8a165a(tTJSVariant * _this, iTJSDispatch2 * object , iTJSDispatch2 * objthis)
+{
+	return _this->SetObject(object, objthis);
+}
+static tTJSVariant & STDCALL TVP_Stub_e09ed277802c1b117e1908421448886d(tTJSVariant * _this, tTJSVariantClosure ref)
+{
+	return _this->operator =(ref);
+}
+static tTJSVariant & STDCALL TVP_Stub_e76dfb9e00f4a9d491117d815f30db7f(tTJSVariant * _this, tTJSVariantString * ref)
+{
+	return _this->operator =(ref);
+}
+static tTJSVariant & STDCALL TVP_Stub_b000dd8934508d8ec6d6ef976a6ff49b(tTJSVariant * _this, tTJSVariantOctet * ref)
+{
+	return _this->operator =(ref);
+}
+static tTJSVariant & STDCALL TVP_Stub_d98ab5c968ebfde4e924901d09190774(tTJSVariant * _this, const tTJSString & ref)
+{
+	return _this->operator =(ref);
+}
+static tTJSVariant & STDCALL TVP_Stub_661e8c10d5d477e6823a840244937cd8(tTJSVariant * _this, const tjs_char * ref)
+{
+	return _this->operator =(ref);
+}
+static tTJSVariant & STDCALL TVP_Stub_6b39e70ea89c4f883689f51289029b69(tTJSVariant * _this, const tjs_nchar * ref)
+{
+	return _this->operator =(ref);
+}
+static tTJSVariant & STDCALL TVP_Stub_4a18b1c0afe37b84e2b35a7fc07c4e0f(tTJSVariant * _this, bool ref)
+{
+	return _this->operator =(ref);
+}
+static tTJSVariant & STDCALL TVP_Stub_48b85c8774d91ca40b2992f0e452f19e(tTJSVariant * _this, tjs_int32 ref)
+{
+	return _this->operator =(ref);
+}
+static tTJSVariant & STDCALL TVP_Stub_5ea8db9a9193fe6bab53baf2bee06b6b(tTJSVariant * _this, const tTVInteger ref)
+{
+	return _this->operator =(ref);
+}
+static tTJSVariant & STDCALL TVP_Stub_46b92626ff6894e993c4f193a129540b(tTJSVariant * _this, tjs_real ref)
+{
+	return _this->operator =(ref);
+}
+static void STDCALL TVP_Stub_6efc1d1f66f0e01a81faf767d7576816(tTJSVariant * _this, const tTJSVariant & rhs)
+{
+	return _this->logicalorequal(rhs);
+}
+static void STDCALL TVP_Stub_4ededf58eae77c320b4a6f5f701acafb(tTJSVariant * _this, const tTJSVariant & rhs)
+{
+	return _this->logicalandequal(rhs);
+}
+static void STDCALL TVP_Stub_028d5fda2f4568f6ab14b49d89650a4d(tTJSVariant * _this, const tTJSVariant & rhs)
+{
+	return _this->operator |=(rhs);
+}
+static void STDCALL TVP_Stub_11912984b8c094d2df26bf3c3677d096(tTJSVariant * _this)
+{
+	return _this->increment();
+}
+static void STDCALL TVP_Stub_6c0df790c33142e286aea9af6993d931(tTJSVariant * _this)
+{
+	return _this->decrement();
+}
+static void STDCALL TVP_Stub_c27d85b695cd6e144210785bdfd446ce(tTJSVariant * _this, const tTJSVariant & rhs)
+{
+	return _this->operator ^=(rhs);
+}
+static void STDCALL TVP_Stub_8422ef7f42009be0ad58a09d64149051(tTJSVariant * _this, const tTJSVariant & rhs)
+{
+	return _this->operator &=(rhs);
+}
+static void STDCALL TVP_Stub_ee07e6522577952453206ede39cdf54c(tTJSVariant * _this, const tTJSVariant & rhs)
+{
+	return _this->operator >>=(rhs);
+}
+static void STDCALL TVP_Stub_786a65424247e711f6ca31f0a10603d7(tTJSVariant * _this, const tTJSVariant & rhs)
+{
+	return _this->rbitshiftequal(rhs);
+}
+static void STDCALL TVP_Stub_995a222f2038dd2007f2c1f6429bd19e(tTJSVariant * _this, const tTJSVariant & rhs)
+{
+	return _this->operator <<=(rhs);
+}
+static void STDCALL TVP_Stub_da8c6e750d6a9c0557a56ef7f7fd8e88(tTJSVariant * _this, const tTJSVariant & rhs)
+{
+	return _this->operator %=(rhs);
+}
+static void STDCALL TVP_Stub_9cf7b0f119bcf3fa4564837ae25429b3(tTJSVariant * _this, const tTJSVariant & rhs)
+{
+	return _this->operator /=(rhs);
+}
+static void STDCALL TVP_Stub_17cbcacad2ed350215d7d700c676ea40(tTJSVariant * _this, const tTJSVariant & rhs)
+{
+	return _this->idivequal(rhs);
+}
+static void STDCALL TVP_Stub_2bd375c0598e9148d88579a51b2f07a8(tTJSVariant * _this, const tTJSVariant & rhs)
+{
+	return _this->operator *=(rhs);
+}
+static void STDCALL TVP_Stub_4d2c157f8b0b49e57c3e9b5abc9deb0f(tTJSVariant * _this)
+{
+	return _this->logicalnot();
+}
+static void STDCALL TVP_Stub_4b7eaccf64af0f3a4c4fe64f4e2dd3fd(tTJSVariant * _this)
+{
+	return _this->bitnot();
+}
+static void STDCALL TVP_Stub_3a4d2602c392a8d1f4c38d537a8c95e0(tTJSVariant * _this)
+{
+	return _this->tonumber();
+}
+static void STDCALL TVP_Stub_8d915d35ef8e857f245c5d46798618e4(tTJSVariant * _this)
+{
+	return _this->changesign();
+}
+static void STDCALL TVP_Stub_1e463482afa8ca30f5fa7bea4fa5741d(tTJSVariant * _this, const tTJSVariant & rhs)
+{
+	return _this->operator -=(rhs);
+}
+static void STDCALL TVP_Stub_fdf270e4080c986abd1649fa9fffdeab(tTJSVariant * _this, const tTJSVariant & rhs)
+{
+	return _this->operator +=(rhs);
+}
+static tTJSVariantType STDCALL TVP_Stub_972e0f9a6ec4648a9fb82bcf5d9095ff(tTJSVariant * _this)
+{
+	return _this->Type();
+}
+static bool STDCALL TVP_Stub_9d76731c37c4664d654db026644c64b4(tTJSVariant * _this, const tTJSVariant & val2)
+{
+	return _this->NormalCompare(val2);
+}
+static bool STDCALL TVP_Stub_4f1620cb699874b9c8cedf6e321c606e(tTJSVariant * _this, const tTJSVariant & val2)
+{
+	return _this->DiscernCompare(val2);
+}
+static bool STDCALL TVP_Stub_ef1c6b2b601d1b0ff70272a4d447aa3c(tTJSVariant * _this, const tTJSVariant & val2)
+{
+	return _this->DiscernCompareStrictReal(val2);
+}
+static bool STDCALL TVP_Stub_9b7872860c95cfdafb056ab30318e99c(tTJSVariant * _this, const tTJSVariant & val2)
+{
+	return _this->GreaterThan(val2);
+}
+static bool STDCALL TVP_Stub_53360f194a04fc142ddae2b9a3ab4c92(tTJSVariant * _this, const tTJSVariant & val2)
+{
+	return _this->LittlerThan(val2);
+}
+static bool STDCALL TVP_Stub_ce1dcb05e5e7c4cafbc4ed37f63b256e(tTJSVariant * _this, const tjs_char * classname)
+{
+	return _this->IsInstanceOf(classname);
+}
+static iTJSDispatch2 * STDCALL TVP_Stub_841ce4492b37321eea0c1b500de9b352(tTJSVariant * _this)
+{
+	return _this->AsObject();
+}
+static iTJSDispatch2 * STDCALL TVP_Stub_61785de870894968cd9d95e17e88eafc(tTJSVariant * _this)
+{
+	return _this->AsObjectNoAddRef();
+}
+static iTJSDispatch2 * STDCALL TVP_Stub_ad3236e727398311c3b8e1ddd5f4b293(tTJSVariant * _this)
+{
+	return _this->AsObjectThis();
+}
+static iTJSDispatch2 * STDCALL TVP_Stub_80e0b7be488545ff9b8bc52c9ab5fba5(tTJSVariant * _this)
+{
+	return _this->AsObjectThisNoAddRef();
+}
+static tTJSVariantClosure & STDCALL TVP_Stub_4eaa3e4efb319707db6ef81db1c6f147(tTJSVariant * _this)
+{
+	return _this->AsObjectClosureNoAddRef();
+}
+static tTJSVariantString * STDCALL TVP_Stub_693a0152f098caee7fc77f545dd3e954(tTJSVariant * _this)
+{
+	return _this->AsString();
+}
+static tTJSVariantString * STDCALL TVP_Stub_42840710f5fba9bb32b95290b1796a55(tTJSVariant * _this)
+{
+	return _this->AsStringNoAddRef();
+}
+static const tjs_char * STDCALL TVP_Stub_adec3f9ef429aa9a284081f0fc6a1b5b(tTJSVariant * _this)
+{
+	return _this->GetString();
+}
+static tTJSVariantOctet * STDCALL TVP_Stub_674a7948152a1d7a49050b9d98796403(tTJSVariant * _this)
+{
+	return _this->AsOctet();
+}
+static tTJSVariantOctet * STDCALL TVP_Stub_aa6f132b2031c83062f6149c90f2df5f(tTJSVariant * _this)
+{
+	return _this->AsOctetNoAddRef();
+}
+static tTVInteger STDCALL TVP_Stub_b52f446e22bb92d495f7e65ac71c9bf9(tTJSVariant * _this)
+{
+	return _this->AsInteger();
+}
+static void STDCALL TVP_Stub_d4899fd4a8beb06f192dcb1d300e3319(tTJSVariant * _this, tTJSVariant & targ)
+{
+	return _this->AsNumber(targ);
+}
+static tTVInteger STDCALL TVP_Stub_d3f5ec78464d29ee6988a1f90c2e3e1b(tTJSVariant * _this)
+{
+	return _this->operator tTVInteger();
+}
+static bool STDCALL TVP_Stub_a463ad6a757c3f04e09a72e288737d06(tTJSVariant * _this)
+{
+	return _this->operator bool();
+}
+static tjs_int STDCALL TVP_Stub_27857bb89d35113183b682c3917d6c7a(tTJSVariant * _this)
+{
+	return _this->operator tjs_int();
+}
+static tTVReal STDCALL TVP_Stub_a5f80951cfb882ac6a3e06c0b9a95807(tTJSVariant * _this)
+{
+	return _this->AsReal();
+}
+static tTVReal STDCALL TVP_Stub_35aadb63079c8bd84ebc0389bae306e0(tTJSVariant * _this)
+{
+	return _this->operator tTVReal();
+}
+static tTJSVariant STDCALL TVP_Stub_fb6573df5887c2020ae58136f8342ed4(tTJSVariant * _this, const tTJSVariant & rhs)
+{
+	return _this->operator ||(rhs);
+}
+static tTJSVariant STDCALL TVP_Stub_86c67d2197c46824ab10f59e568ad13a(tTJSVariant * _this, const tTJSVariant & rhs)
+{
+	return _this->operator &&(rhs);
+}
+static tTJSVariant STDCALL TVP_Stub_263a0c5b335b2c4d5bc1f55b51b8315e(tTJSVariant * _this, const tTJSVariant & rhs)
+{
+	return _this->operator |(rhs);
+}
+static tTJSVariant STDCALL TVP_Stub_975c1099e57ab67122ddef0f44fd7dd5(tTJSVariant * _this, const tTJSVariant & rhs)
+{
+	return _this->operator ^(rhs);
+}
+static tTJSVariant STDCALL TVP_Stub_04493e5237a7ca97afd391cb7e831ba0(tTJSVariant * _this, const tTJSVariant & rhs)
+{
+	return _this->operator &(rhs);
+}
+static tTJSVariant STDCALL TVP_Stub_9996100acc7705cb2b0c904d6bad4401(tTJSVariant * _this, const tTJSVariant & rhs)
+{
+	return _this->operator !=(rhs);
+}
+static tTJSVariant STDCALL TVP_Stub_5d91cff3b2a26ff7c0543e0f6d737117(tTJSVariant * _this, const tTJSVariant & rhs)
+{
+	return _this->operator ==(rhs);
+}
+static tTJSVariant STDCALL TVP_Stub_ef1dedc2cb58dc4e1afc14238b6fc518(tTJSVariant * _this, const tTJSVariant & rhs)
+{
+	return _this->operator <(rhs);
+}
+static tTJSVariant STDCALL TVP_Stub_f18397fe81c043ba2346e31b359f6a73(tTJSVariant * _this, const tTJSVariant & rhs)
+{
+	return _this->operator >(rhs);
+}
+static tTJSVariant STDCALL TVP_Stub_2ee45ad60b0c06a8d0feebc3a6aad9e7(tTJSVariant * _this, const tTJSVariant & rhs)
+{
+	return _this->operator <=(rhs);
+}
+static tTJSVariant STDCALL TVP_Stub_44500491c57e17032951fe6ed268ff1d(tTJSVariant * _this, const tTJSVariant & rhs)
+{
+	return _this->operator >=(rhs);
+}
+static tTJSVariant STDCALL TVP_Stub_056f5d278c75750df792bf8b081fbf7d(tTJSVariant * _this, const tTJSVariant & rhs)
+{
+	return _this->operator >>(rhs);
+}
+static tTJSVariant STDCALL TVP_Stub_04233bc4f7d4df92c260d23110320afe(tTJSVariant * _this, tjs_int count)
+{
+	return _this->rbitshift(count);
+}
+static tTJSVariant STDCALL TVP_Stub_cdc475c4419e77c22508e337428c4074(tTJSVariant * _this, const tTJSVariant & rhs)
+{
+	return _this->operator <<(rhs);
+}
+static tTJSVariant STDCALL TVP_Stub_06bacb2910308a47bbe27ff7efa1226d(tTJSVariant * _this, const tTJSVariant & rhs)
+{
+	return _this->operator %(rhs);
+}
+static tTJSVariant STDCALL TVP_Stub_521e053199a4aeb4e0f24d9f4a6cc682(tTJSVariant * _this, const tTJSVariant & rhs)
+{
+	return _this->operator /(rhs);
+}
+static tTJSVariant STDCALL TVP_Stub_02164e6fb4c925843ac774ec1e4c6e5d(tTJSVariant * _this, const tTJSVariant & rhs)
+{
+	return _this->idiv(rhs);
+}
+static tTJSVariant STDCALL TVP_Stub_5110cbbcddbd9688281ee5418e3f9023(tTJSVariant * _this, const tTJSVariant & rhs)
+{
+	return _this->operator *(rhs);
+}
+static tTJSVariant STDCALL TVP_Stub_1db54b61f00bf931452218c4a39e79ef(tTJSVariant * _this)
+{
+	return _this->operator !();
+}
+static tTJSVariant STDCALL TVP_Stub_9d0edd8f51f155767301017bd3d256da(tTJSVariant * _this)
+{
+	return _this->operator ~();
+}
+static tTJSVariant STDCALL TVP_Stub_8f744c5aa8df5471939b960bc759f12b(tTJSVariant * _this, const tTJSVariant & rhs)
+{
+	return _this->operator -(rhs);
+}
+static tTJSVariant STDCALL TVP_Stub_ba7ff7b0b4192bd2cc7f49c7b688ad57(tTJSVariant * _this)
+{
+	return _this->operator +();
+}
+static tTJSVariant STDCALL TVP_Stub_7773ac921bb82c85de3be69ef86265fd(tTJSVariant * _this)
+{
+	return _this->operator -();
+}
+static tTJSVariant STDCALL TVP_Stub_114a781ed71edace31abb352a2671f41(tTJSVariant * _this, const tTJSVariant & rhs)
+{
+	return _this->operator +(rhs);
+}
+static void * STDCALL TVP_Stub_2bc5f4a97decfa82c625430479ec512b(size_t size)
+{
+	return tTJSVariant::operator new(size);
+}
+static void STDCALL TVP_Stub_066fb79f94523d95d12480f23c58cc8e(void * p)
+{
+	return tTJSVariant::operator delete(p);
+}
+static void * STDCALL TVP_Stub_803906b8de16ff825d4e69e1952d872f(size_t size)
+{
+	return tTJSVariant::operator new [](size);
+}
+static void STDCALL TVP_Stub_34cc96a5118ee1e12b0750ea64d40b1f(void * p)
+{
+	return tTJSVariant::operator delete [](p);
+}
+static void * STDCALL TVP_Stub_dbe821fb8b651d42a9c8e730517c408c(size_t size , void * buf)
+{
+	return tTJSVariant::operator new(size, buf);
+}
+static void STDCALL TVP_Stub_8970ba46068ac74746c3e84299937d8f(tTJSVariantOctet * _this, const tjs_uint8 * data , tjs_uint length)
+{
+	::new (_this) tTJSVariantOctet(data, length);
+}
+static void STDCALL TVP_Stub_438e27dcbb077284213eb4d7dcd43f8f(tTJSVariantOctet * _this, const tjs_uint8 * data1 , tjs_uint len1 , const tjs_uint8 * data2 , tjs_uint len2)
+{
+	::new (_this) tTJSVariantOctet(data1, len1, data2, len2);
+}
+static void STDCALL TVP_Stub_a98d712ca19a49afe07d0a7c5d064cef(tTJSVariantOctet * _this, const tTJSVariantOctet * o1 , const tTJSVariantOctet * o2)
+{
+	::new (_this) tTJSVariantOctet(o1, o2);
+}
+static void STDCALL TVP_Stub_08aef69683bcfe2a5c63d4c7866de8e9(tTJSVariantOctet * _this)
+{
+	_this->~tTJSVariantOctet();
+}
+static void STDCALL TVP_Stub_dbc9bc2e27068c8426b1c6a7f89424e0(tTJSVariantOctet * _this)
+{
+	return _this->AddRef();
+}
+static void STDCALL TVP_Stub_5eeb98ca016123f57966457533bb639e(tTJSVariantOctet * _this)
+{
+	return _this->Release();
+}
+static tjs_uint STDCALL TVP_Stub_98fdc846d0b4a83412f3521f65bb98b4(tTJSVariantOctet * _this)
+{
+	return _this->GetLength();
+}
+static const tjs_uint8 * STDCALL TVP_Stub_3309591d3c7f6f688e81588f169dba21(tTJSVariantOctet * _this)
+{
+	return _this->GetData();
+}
+static void STDCALL TVP_Stub_d83a866389246d824efcc83303a04484(tTJSString * _this)
+{
+	::new (_this) tTJSString();
+}
+static void STDCALL TVP_Stub_6cf6f332a6a14a15e8dce62301f5c840(tTJSString * _this, const tTJSString & rhs)
+{
+	::new (_this) tTJSString(rhs);
+}
+static void STDCALL TVP_Stub_566eeea3c5f009b0fc6fa123ba30f496(tTJSString * _this, tTJSVariantString * vstr)
+{
+	::new (_this) tTJSString(vstr);
+}
+static void STDCALL TVP_Stub_88806e38e35c73b36acadd4061a4fe0b(tTJSString * _this, const tjs_char * str)
+{
+	::new (_this) tTJSString(str);
+}
+static void STDCALL TVP_Stub_3bb69d3886159aaecc333b6ff17287bf(tTJSString * _this, const tjs_nchar * str)
+{
+	::new (_this) tTJSString(str);
+}
+static void STDCALL TVP_Stub_3e36278551a9c8b29cb2e8017db6af0d(tTJSString * _this, const tTJSStringBufferLength len)
+{
+	::new (_this) tTJSString(len);
+}
+static void STDCALL TVP_Stub_5de99d84f3dc902cb0812fb85a7d5c88(tTJSString * _this, tjs_char rch)
+{
+	::new (_this) tTJSString(rch);
+}
+static void STDCALL TVP_Stub_31e85cbc73f8fbd4cea895a751480059(tTJSString * _this, const tTJSVariant & val)
+{
+	::new (_this) tTJSString(val);
+}
+static void STDCALL TVP_Stub_6ae29e405ede762f1a89a9dd526cb36e(tTJSString * _this, const tTJSString & str , int n)
+{
+	::new (_this) tTJSString(str, n);
+}
+static void STDCALL TVP_Stub_c95bd66d95c153cdac41b5243e555f5f(tTJSString * _this, const tjs_char * str , int n)
+{
+	::new (_this) tTJSString(str, n);
+}
+static void STDCALL TVP_Stub_72a67e9c52fd27dbb66eded47efeea74(tTJSString * _this, tjs_int n)
+{
+	::new (_this) tTJSString(n);
+}
+static void STDCALL TVP_Stub_fb13e41bda53e4e59403e3e14effccd6(tTJSString * _this)
+{
+	_this->~tTJSString();
+}
+static tTJSString & STDCALL TVP_Stub_9a5c710e620e47f105752453ad5d6ab1(tTJSString * _this, const tTJSString & rhs)
+{
+	return _this->operator =(rhs);
+}
+static tTJSString & STDCALL TVP_Stub_18f1ad16c11429707cbf8ea4d1d4a21e(tTJSString * _this, const tjs_char * rhs)
+{
+	return _this->operator =(rhs);
+}
+static tTJSString & STDCALL TVP_Stub_550f317b573a1256af00586890ae82f1(tTJSString * _this, const tjs_nchar * rhs)
+{
+	return _this->operator =(rhs);
+}
+static void STDCALL TVP_Stub_cd50da721dfb63f36c1ebb1226830428(tTJSString * _this, const tTJSString & ref)
+{
+	return _this->operator +=(ref);
+}
+static void STDCALL TVP_Stub_fbba3dd6a087599d1277ae58f6cec18e(tTJSString * _this, const tTJSVariantString * ref)
+{
+	return _this->operator +=(ref);
+}
+static void STDCALL TVP_Stub_43cc5b5a61a6090af83333d115b5b868(tTJSString * _this, const tjs_char * ref)
+{
+	return _this->operator +=(ref);
+}
+static void STDCALL TVP_Stub_616fb5060d81eb5bab58647596582df4(tTJSString * _this, tjs_char rch)
+{
+	return _this->operator +=(rch);
+}
+static void STDCALL TVP_Stub_168cf4c1b9ef70b98f2e0ab3695a4f3b(tTJSString * _this)
+{
+	return _this->Clear();
+}
+static tjs_char * STDCALL TVP_Stub_314573cca30a7c2aecc9166fbf5400c9(tTJSString * _this, tjs_uint len)
+{
+	return _this->AllocBuffer(len);
+}
+static tjs_char * STDCALL TVP_Stub_03da356426c038fad663c836c3e330ef(tTJSString * _this, tjs_uint len)
+{
+	return _this->AppendBuffer(len);
+}
+static void STDCALL TVP_Stub_31dbebdedc08d75e34a2cd564ce60586(tTJSString * _this)
+{
+	return _this->FixLen();
+}
+static void STDCALL TVP_Stub_d9224ad7a0de743a7eea15fdb2c5f934(tTJSString * _this, const tTJSString & from , const tTJSString & to , bool forall = true)
+{
+	return _this->Replace(from, to, forall);
+}
+static void STDCALL TVP_Stub_c01b0720b49ce4f792446d8965d2c31f(tTJSString * _this)
+{
+	return _this->ToLowerCase();
+}
+static void STDCALL TVP_Stub_4af47e46a11e1357cb994f405289d13e(tTJSString * _this)
+{
+	return _this->ToUppserCase();
+}
+static tjs_uint32 * STDCALL TVP_Stub_25b6dafa19bfa5bde1a8b519da248f82(tTJSString * _this)
+{
+	return _this->GetHint();
+}
+static tjs_char * STDCALL TVP_Stub_72425405819c900aec719491cbd90c6d(tTJSString * _this)
+{
+	return _this->Independ();
+}
+static const tjs_char * STDCALL TVP_Stub_a79942af73f33bff6e432c9fd808e469(tTJSString * _this)
+{
+	return _this->c_str();
+}
+static tTJSVariantString * STDCALL TVP_Stub_df106470a4141ebc7eda22160859ffdc(tTJSString * _this)
+{
+	return _this->AsVariantStringNoAddRef();
+}
+static tjs_int64 STDCALL TVP_Stub_469bc225b0ecd9561aae5a46b85ded42(tTJSString * _this)
+{
+	return _this->AsInteger();
+}
+static bool STDCALL TVP_Stub_a6663c078b3aa79b39ee2d09f3875765(tTJSString * _this, const tTJSString & ref)
+{
+	return _this->operator ==(ref);
+}
+static bool STDCALL TVP_Stub_efbe634ce4f13633e220cae167cf63fb(tTJSString * _this, const tTJSString & ref)
+{
+	return _this->operator !=(ref);
+}
+static tjs_int STDCALL TVP_Stub_57f4147bcc09e4e4442ffc9b0895727e(tTJSString * _this, const tTJSString & ref)
+{
+	return _this->CompareIC(ref);
+}
+static bool STDCALL TVP_Stub_1fb2d2e44cf83aebef7b26fd6b20bc2b(tTJSString * _this, const tjs_char * ref)
+{
+	return _this->operator ==(ref);
+}
+static bool STDCALL TVP_Stub_bd6aa777bac947f5cffd891e9c724794(tTJSString * _this, const tjs_char * ref)
+{
+	return _this->operator !=(ref);
+}
+static tjs_int STDCALL TVP_Stub_83c662330b75d616cdc8a4e11d7ababa(tTJSString * _this, const tjs_char * ref)
+{
+	return _this->CompareIC(ref);
+}
+static bool STDCALL TVP_Stub_bbde02fe30c8a6cadb7073174ea3a874(tTJSString * _this, const tTJSString & ref)
+{
+	return _this->operator <(ref);
+}
+static bool STDCALL TVP_Stub_cc1c14f63867f90bc883de03e9212cbc(tTJSString * _this, const tTJSString & ref)
+{
+	return _this->operator >(ref);
+}
+static tTJSString STDCALL TVP_Stub_236e007b32bc2631b5f6dc1eda6be0a9(tTJSString * _this, const tTJSString & ref)
+{
+	return _this->operator +(ref);
+}
+static tTJSString STDCALL TVP_Stub_cfbb9809e0e6d954b2652856e935ced9(tTJSString * _this, const tjs_char * ref)
+{
+	return _this->operator +(ref);
+}
+static tTJSString STDCALL TVP_Stub_60ee96ae4a7704340bef20fb35ba6ade(tTJSString * _this, tjs_char rch)
+{
+	return _this->operator +(rch);
+}
+static tjs_char STDCALL TVP_Stub_564b37278b50f4e5597dff6540868d49(tTJSString * _this, tjs_uint i)
+{
+	return _this->operator [](i);
+}
+static void STDCALL TVP_Stub_890b3a4831b824653e919b4a5197358d(tTJSString * _this, tTJSString & dest)
+{
+	return _this->AsLowerCase(dest);
+}
+static void STDCALL TVP_Stub_2dfa6c77c5051d160b8a06f540e0d68b(tTJSString * _this, tTJSString & dest)
+{
+	return _this->AsUpperCase(dest);
+}
+static void STDCALL TVP_Stub_05f88567d510fd84659ccbf493f647ed(tTJSString * _this, tTJSString & dest)
+{
+	return _this->EscapeC(dest);
+}
+static void STDCALL TVP_Stub_7166b8f7bb9688c980e4fa172f06f30c(tTJSString * _this, tTJSString & dest)
+{
+	return _this->UnescapeC(dest);
+}
+static bool STDCALL TVP_Stub_b9456ecba8b7898d80d2e5caa64035c9(tTJSString * _this, const tjs_char * string)
+{
+	return _this->StartsWith(string);
+}
+static bool STDCALL TVP_Stub_dd44464bd8430a5be5fef0cffcd97117(tTJSString * _this, const tTJSString & string)
+{
+	return _this->StartsWith(string);
+}
+static tjs_int STDCALL TVP_Stub_a57696ca0c157cd7d3cd4e58c1df957c(tTJSString * _this)
+{
+	return _this->GetNarrowStrLen();
+}
+static void STDCALL TVP_Stub_1aea9f8a38bbb875b6d052f330da9178(tTJSString * _this, tjs_nchar * dest , tjs_int destmaxlen)
+{
+	return _this->ToNarrowStr(dest, destmaxlen);
+}
+static bool STDCALL TVP_Stub_2d3b3d6e22ee139cda9eee47dc031945(tTJSString * _this)
+{
+	return _this->IsEmpty();
+}
+static tjs_int STDCALL TVP_Stub_8ff49e56c3c4c566561dcdd5c9ecc4db(tTJSString * _this)
+{
+	return _this->GetLen();
+}
+static tjs_int STDCALL TVP_Stub_490b547e93e40082d0b83312467104f9(tTJSString * _this)
+{
+	return _this->length();
+}
+static tjs_char STDCALL TVP_Stub_2c1ef06748df47df52b586ac0fbc6a34(tTJSString * _this)
+{
+	return _this->GetLastChar();
+}
+static void * STDCALL TVP_Stub_b6b2a03160b88239eccd18d89b1537d3(size_t size)
+{
+	return tTJSString::operator new(size);
+}
+static void STDCALL TVP_Stub_8becefbd52c76c7ecb0ea7b7f50b7915(void * p)
+{
+	return tTJSString::operator delete(p);
+}
+static void * STDCALL TVP_Stub_74b9687a3bfd3b2c7abe226efc4225c1(size_t size)
+{
+	return tTJSString::operator new [](size);
+}
+static void STDCALL TVP_Stub_7cafc2bf5965b594e60830e3057bbd58(void * p)
+{
+	return tTJSString::operator delete [](p);
+}
+static void * STDCALL TVP_Stub_80f111939c5694cbf43d07cf0ad1726c(size_t size , void * buf)
+{
+	return tTJSString::operator new(size, buf);
+}
+static void STDCALL TVP_Stub_8dc9cef84191f79b38403a2070952fd4(tTJSVariantString * _this)
+{
+	return _this->AddRef();
+}
+static void STDCALL TVP_Stub_1d42bd1e659b36886c20567497b7ee96(tTJSVariantString * _this)
+{
+	return _this->Release();
+}
+static void STDCALL TVP_Stub_0848fbdc7eeddb12c80bcd9c31383a64(tTJSVariantString * _this, const tjs_char * ref , tjs_int maxlen = - 1)
+{
+	return _this->SetString(ref, maxlen);
+}
+static void STDCALL TVP_Stub_1f1123c906c28ab6d16b6bef3f7ae978(tTJSVariantString * _this, const tjs_nchar * ref)
+{
+	return _this->SetString(ref);
+}
+static void STDCALL TVP_Stub_b84394e20cc73a90349cf5be4e783111(tTJSVariantString * _this, tjs_uint len)
+{
+	return _this->AllocBuffer(len);
+}
+static void STDCALL TVP_Stub_76e0db3797851fe8ff90cf84780c50ad(tTJSVariantString * _this, const tjs_char * ref)
+{
+	return _this->ResetString(ref);
+}
+static void STDCALL TVP_Stub_6616241156c22bced42cd9f2f647677e(tTJSVariantString * _this, tjs_uint applen)
+{
+	return _this->AppendBuffer(applen);
+}
+static void STDCALL TVP_Stub_1ace346a3dd546c66ad115a33d8cf693(tTJSVariantString * _this, const tjs_char * str)
+{
+	return _this->Append(str);
+}
+static void STDCALL TVP_Stub_96fb9bbe33531d4268573355c658e165(tTJSVariantString * _this, const tjs_char * str , tjs_int applen)
+{
+	return _this->Append(str, applen);
+}
+static tTJSVariantString * STDCALL TVP_Stub_c90b5737134c76f9ed0bb5da7cfaad8c(tTJSVariantString * _this)
+{
+	return _this->FixLength();
+}
+static tjs_uint32 * STDCALL TVP_Stub_070ed05259a265cabdd82bfedabdd638(tTJSVariantString * _this)
+{
+	return _this->GetHint();
+}
+static const tjs_char * STDCALL TVP_Stub_008b7e3a4c5bb23ee991f684a5064737(tTJSVariantString * _this)
+{
+	return _this->operator const tjs_char *();
+}
+static tjs_int STDCALL TVP_Stub_b64741dc4544ed43c44ddb6d0eb838ea(tTJSVariantString * _this)
+{
+	return _this->GetLength();
+}
+static tTVInteger STDCALL TVP_Stub_5b83e28b2d9ab0f75d7c7f6f61b5ded6(tTJSVariantString * _this)
+{
+	return _this->ToInteger();
+}
+static tTVReal STDCALL TVP_Stub_b948c9f43837efa489b0b91f3f675710(tTJSVariantString * _this)
+{
+	return _this->ToReal();
+}
+static void STDCALL TVP_Stub_eb83216f6f718245468ef48b97ab4c2d(tTJSVariantString * _this, tTJSVariant & dest)
+{
+	return _this->ToNumber(dest);
+}
+static tjs_int STDCALL TVP_Stub_c66ab4868b743de9c0ba8b26c67b23da(tTJSVariantString * _this)
+{
+	return _this->GetRefCount();
+}
+#include "tjsTypes.h"
+#include "tjsConfig.h"
+static tjs_int STDCALL TVP_Stub_586e16d502a6ad98b08161bdb090f8b6(const tjs_char * s)
+{
+	return TJS_atoi(s);
+}
+static tjs_char * STDCALL TVP_Stub_d8bc9c71c80b200c39b29167d795cad0(tjs_int value , tjs_char * string)
+{
+	return TJS_int_to_str(value, string);
+}
+static tjs_char * STDCALL TVP_Stub_85df4beb87f6503891e116ce046353c3(tjs_int64 value , tjs_char * string)
+{
+	return TJS_tTVInt_to_str(value, string);
+}
+static tjs_int STDCALL TVP_Stub_35b6a7e1c73f257aae91e05fa9826e84(const tjs_char * s1 , const tjs_char * s2 , size_t maxlen)
+{
+	return TJS_strnicmp(s1, s2, maxlen);
+}
+static tjs_int STDCALL TVP_Stub_a25b46701e25030af1ed847e0df229eb(const tjs_char * s1 , const tjs_char * s2)
+{
+	return TJS_stricmp(s1, s2);
+}
+static void STDCALL TVP_Stub_c8906bf1efa5e86f9fddfab55a01c8f6(tjs_char * d , const tjs_char * s , size_t len)
+{
+	return TJS_strcpy_maxlen(d, s, len);
+}
+static void STDCALL TVP_Stub_8141059f613820f694608af28e20cbad(tjs_char * d , const tjs_char * s)
+{
+	return TJS_strcpy(d, s);
+}
+static size_t STDCALL TVP_Stub_cf2690e47099ac6378ed50df4a8a8e90(const tjs_char * d)
+{
+	return TJS_strlen(d);
+}
+static tjs_char * STDCALL TVP_Stub_1dfa540e3e66d5681d06cd96a02092f4(const tjs_char * big , const tjs_char * little)
+{
+	return TJS_strstr(big, little);
+}
+static tjs_int STDCALL TVP_Stub_4e9a5f2e6b2f0d415a119eb9a950c501(const tjs_char * s1 , const tjs_char * s2)
+{
+	return TJS_strcmp(s1, s2);
+}
+static tjs_int STDCALL TVP_Stub_7e504da873d48bc2372cfda3f3f9a76a(const tjs_char * s1 , const tjs_char * s2 , size_t n)
+{
+	return TJS_strncmp(s1, s2, n);
+}
+static tjs_char * STDCALL TVP_Stub_afed4efc8c31cda039a58ba63e34773e(tjs_char * __restrict dst , const tjs_char * __restrict src , size_t n)
+{
+	return TJS_strncpy(dst, src, n);
+}
+static tjs_char * STDCALL TVP_Stub_c56eafd762bf88c9a49215b35f3ca1f1(tjs_char * __restrict dst , size_t dstCount , const tjs_char * __restrict src , size_t n)
+{
+	return TJS_strncpy_s(dst, dstCount, src, n);
+}
+static tjs_char * STDCALL TVP_Stub_9c1640d6849276e55e2f2f9f6dede800(tjs_char * __restrict s1 , const tjs_char * __restrict s2)
+{
+	return TJS_strcat(s1, s2);
+}
+static tjs_char * STDCALL TVP_Stub_f7ff7394cce517831679d890d05e7b35(const tjs_char * s , tjs_char c)
+{
+	return TJS_strchr(s, c);
+}
+static tjs_size STDCALL TVP_Stub_5cb1f14a12578d0e6a1fe83b0400da44(const tjs_char * s , const tjs_char * set)
+{
+	return TJS_strspn(s, set);
+}
+static tjs_real STDCALL TVP_Stub_c7aadac7045a57fddb29e2ab2134d3a7(const tjs_char * nptr , tjs_char * * endptr)
+{
+	return TJS_strtod(nptr, endptr);
+}
+#include "tjsVariantString.h"
+static tjs_char * STDCALL TVP_Stub_810c7054e44f535cf250f00707105417(tjs_uint len)
+{
+	return TJSVS_malloc(len);
+}
+static tjs_char * STDCALL TVP_Stub_52a9af7905ddc71d8b4e0ef7366eebdd(tjs_char * buf , tjs_uint len)
+{
+	return TJSVS_realloc(buf, len);
+}
+static void STDCALL TVP_Stub_1635dbae2d91b338ddfd0430f8aa7f10(tjs_char * buf)
+{
+	return TJSVS_free(buf);
+}
+static tTJSVariantString * STDCALL TVP_Stub_30df0c29ad8f672f7fe0742b4b11cd7f(const tjs_char * ref1 , const tjs_char * ref2)
+{
+	return TJSAllocVariantString(ref1, ref2);
+}
+static tTJSVariantString * STDCALL TVP_Stub_61c82dec644c58290a25f34a69478870(const tjs_char * ref , tjs_int n)
+{
+	return TJSAllocVariantString(ref, n);
+}
+static tTJSVariantString * STDCALL TVP_Stub_f08e347d2d47dc5fc9a3cb59355b4fbb(const tjs_char * ref)
+{
+	return TJSAllocVariantString(ref);
+}
+static tTJSVariantString * STDCALL TVP_Stub_5c62e59c2062f658d4c79d5257a9a586(const tjs_nchar * ref)
+{
+	return TJSAllocVariantString(ref);
+}
+static tTJSVariantString * STDCALL TVP_Stub_259c72d8bfed1210ca71c54f24cacc7a(const tjs_uint8 * * src)
+{
+	return TJSAllocVariantString(src);
+}
+static tTJSVariantString * STDCALL TVP_Stub_801a92ace08eb7ed001406869a39a75f(tjs_uint len)
+{
+	return TJSAllocVariantStringBuffer(len);
+}
+static tTJSVariantString * STDCALL TVP_Stub_e22e647af4ded8e51b1e76c845b4c8e2(tTJSVariantString * str , const tjs_char * app)
+{
+	return TJSAppendVariantString(str, app);
+}
+static tTJSVariantString * STDCALL TVP_Stub_12902221314df9bcf7f7cb74a5242fe0(tTJSVariantString * str , const tTJSVariantString * app)
+{
+	return TJSAppendVariantString(str, app);
+}
+static tTJSVariantString * STDCALL TVP_Stub_b10feea1619ba8ac11237c12002cdb3e(const tjs_char * format , tjs_uint numparams , tTJSVariant * * params)
+{
+	return TJSFormatString(format, numparams, params);
+}
+#include "tjsUtils.h"
+static const tjs_char * STDCALL TVP_Stub_19755b50d241edcb477bdcac22663778(tTJSVariantType type)
+{
+	return TJSVariantTypeToTypeString(type);
+}
+static tTJSString STDCALL TVP_Stub_040a0ecf46963e094ee8ec32ab3f1962(const tTJSVariant & val , tjs_int maxlen = 512)
+{
+	return TJSVariantToReadableString(val, maxlen);
+}
+static tTJSString STDCALL TVP_Stub_525c529dc687b5d86424d775d00bdfce(const tTJSVariant & val)
+{
+	return TJSVariantToExpressionString(val);
+}
+static void * STDCALL TVP_Stub_c96107b91e2a215f560a2612c6e85931(tjs_uint bytes , tjs_uint align_bits)
+{
+	return TJSAlignedAlloc(bytes, align_bits);
+}
+static void STDCALL TVP_Stub_b8788eaa2ca495263c6ea2df264af5f5(void * ptr)
+{
+	return TJSAlignedDealloc(ptr);
+}
+static tjs_uint32 STDCALL TVP_Stub_4c6494008c520d896d699f82aca30b25(tjs_real r)
+{
+	return TJSGetFPClass(r);
+}
+#include "tjsString.h"
+static tTJSString STDCALL TVP_Stub_7d8f8d5e0832ecf248b19a89801ead0e(const tjs_char * lhs , const tTJSString & rhs)
+{
+	return operator +(lhs, rhs);
+}
+static tTJSString STDCALL TVP_Stub_70849965060a6402f41b0b11ec2bb3a7(tjs_uint32 num , int zeropad = 8)
+{
+	return TJSInt32ToHex(num, zeropad);
+}
+#include "tjsInterface.h"
+#include "tjsErrorDefs.h"
+#include "tjsNative.h"
+static tjs_int32 STDCALL TVP_Stub_c72efa6b4efaa6664ae637a03e98e866(const tjs_char * name)
+{
+	return TJSRegisterNativeClass(name);
+}
+static tjs_int32 STDCALL TVP_Stub_a250e46575d0df1166e1542613218a5c(const tjs_char * name)
+{
+	return TJSFindNativeClassID(name);
+}
+static const tjs_char * STDCALL TVP_Stub_a7bcff67b8d380c225b9d0d83921b3ae(tjs_int32 id)
+{
+	return TJSFindNativeClassName(id);
+}
+static tTJSNativeClassMethod * STDCALL TVP_Stub_fb68a3aa16bd2eb7d7550283170321bf(tTJSNativeClassMethodCallback callback)
+{
+	return TJSCreateNativeClassMethod(callback);
+}
+static tTJSNativeClassMethod * STDCALL TVP_Stub_35b4299ede11f511b331b713ba9f38a8(tTJSNativeClassMethodCallback callback)
+{
+	return TJSCreateNativeClassConstructor(callback);
+}
+static tTJSNativeClassProperty * STDCALL TVP_Stub_efe52691cff20b2dfaa16e8e16caac0a(tTJSNativeClassPropertyGetCallback get , tTJSNativeClassPropertySetCallback set)
+{
+	return TJSCreateNativeClassProperty(get, set);
+}
+static void STDCALL TVP_Stub_38eed43ef69251c34dc45695b8cf35c0(tTJSNativeClass * cls , const tjs_char * name , iTJSDispatch2 * dsp , const tjs_char * classname , tTJSNativeInstanceType type , tjs_uint32 flags = 0)
+{
+	return TJSNativeClassRegisterNCM(cls, name, dsp, classname, type, flags);
+}
+static void STDCALL TVP_Stub_2058b65abdfb7598910f0d584d40a19d(tTJSNativeClass * cls , tjs_int32 classid)
+{
+	return TJSNativeClassSetClassID(cls, classid);
+}
+static tTJSNativeClassForPlugin * STDCALL TVP_Stub_1ebecaefe2ffdc811fccbac42e67e544(const ttstr & name , tTJSCreateNativeInstance createinstance)
+{
+	return TJSCreateNativeClassForPlugin(name, createinstance);
+}
+#include "tjsVariant.h"
+static void STDCALL TVP_Stub_09e0f0912f8d758d3736ece9478c2686()
+{
+	return TJSThrowNullAccess();
+}
+static void STDCALL TVP_Stub_23d61eda3959b087b618e348471e2c36()
+{
+	return TJSThrowDivideByZero();
+}
+static tTJSVariantOctet * STDCALL TVP_Stub_e99b22c79b5bf04f3382f959c7bb69ca(const tjs_uint8 * data , tjs_uint length)
+{
+	return TJSAllocVariantOctet(data, length);
+}
+static tTJSVariantOctet * STDCALL TVP_Stub_9c4bb9ebee4db0fcebeae11c34950f97(const tjs_uint8 * data1 , tjs_uint len1 , const tjs_uint8 * data2 , tjs_uint len2)
+{
+	return TJSAllocVariantOctet(data1, len1, data2, len2);
+}
+static tTJSVariantOctet * STDCALL TVP_Stub_505a9563aeb1b0255cfcc8197bee7d9e(const tTJSVariantOctet * o1 , const tTJSVariantOctet * o2)
+{
+	return TJSAllocVariantOctet(o1, o2);
+}
+static tTJSVariantOctet * STDCALL TVP_Stub_f5ab80fc67ee04570330b9035144e760(const tjs_uint8 * * src)
+{
+	return TJSAllocVariantOctet(src);
+}
+static void STDCALL TVP_Stub_af50188bbaa019ee88b19ecd931f7cce(tTJSVariantOctet * o)
+{
+	return TJSDeallocVariantOctet(o);
+}
+static tTJSVariantString * STDCALL TVP_Stub_268c452e85a6ac75301a6132f4f5e38b(const tTJSVariantOctet * oct)
+{
+	return TJSOctetToListString(oct);
+}
+static tTJSVariantString * STDCALL TVP_Stub_646770a19b1768b372c9991ef0d3de85(const tTJSVariantClosure & dsp)
+{
+	return TJSObjectToString(dsp);
+}
+static tTJSVariantString * STDCALL TVP_Stub_5ec88e04fcb8e1877752281e172173ed(tjs_int64 i)
+{
+	return TJSIntegerToString(i);
+}
+static tTJSVariantString * STDCALL TVP_Stub_923f8161f2d2ba0e883bc4edc2901960(tjs_real r)
+{
+	return TJSRealToString(r);
+}
+static tTJSVariantString * STDCALL TVP_Stub_6f70cdb7586cbe571204f286f43c9780(tjs_real r)
+{
+	return TJSRealToHexString(r);
+}
+static tTVInteger STDCALL TVP_Stub_9a4eaa6a627038799015c093609bdde7(const tjs_char * str)
+{
+	return TJSStringToInteger(str);
+}
+static tTVReal STDCALL TVP_Stub_c8bb6590f4a7adc906d7b3e42d907267(const tjs_char * str)
+{
+	return TJSStringToReal(str);
+}
+#include "tjsArray.h"
+static iTJSDispatch2 * STDCALL TVP_Stub_8323d57f26876d87271dbfa257b7f7e2(iTJSDispatch2 * * classout = NULL)
+{
+	return TJSCreateArrayObject(classout);
+}
+static tjs_int STDCALL TVP_Stub_4d6f148e8997e1ae0cc0006ec1bd9618(iTJSDispatch2 * dsp)
+{
+	return TJSGetArrayElementCount(dsp);
+}
+static tjs_int STDCALL TVP_Stub_7f03a4ddb254d0518642d15513eaea85(iTJSDispatch2 * dsp , tTJSVariant * dest , tjs_uint start , tjs_int count)
+{
+	return TJSCopyArrayElementTo(dsp, dest, start, count);
+}
+#include "tjsDictionary.h"
+static iTJSDispatch2 * STDCALL TVP_Stub_4add3926c72ba9df9259be58b680de0d(iTJSDispatch2 * * classout = NULL)
+{
+	return TJSCreateDictionaryObject(classout);
+}
+#include "tjs.h"
+#include "tjsMessage.h"
+static ttstr STDCALL TVP_Stub_075d42cff8dc0c1fbd99c7459a63e526(const tjs_char * name)
+{
+	return TJSGetMessageMapMessage(name);
+}
+#include "tjsGlobalStringMap.h"
+static ttstr STDCALL TVP_Stub_b6bc45b28e194c7ac98bfdea88edee36(const ttstr & string)
+{
+	return TJSMapGlobalStringMap(string);
+}
+#include "tjsObject.h"
+static void STDCALL TVP_Stub_6dff6abb075da1a304520e60c011ef7b(tjs_int op , tTJSVariant & target , const tTJSVariant * param)
+{
+	return TJSDoVariantOperation(op, target, param);
+}
+static void STDCALL TVP_Stub_892ffbdb8375851fc557e4abe9589b77()
+{
+	return TJSDoRehash();
+}
+static iTJSDispatch2 * STDCALL TVP_Stub_b2f3538284fc2adda2a43272ee654a96()
+{
+	return TJSCreateCustomObject();
+}
+#include "StorageIntf.h"
+static ttstr STDCALL TVP_Stub_e0ff899ea4a9cc49a0e3b38deaf93b45()
+{
+	return TVPGetTemporaryName();
+}
+static ttstr STDCALL TVP_Stub_4b9c9ac2aafad07af4b16f34e9d4bba2()
+{
+	return TVPGetAppPath();
+}
+static void STDCALL TVP_Stub_c2e423356d9ca3f26f9c1d294ee9b742(iTVPStorageMedia * media)
+{
+	return TVPRegisterStorageMedia(media);
+}
+static void STDCALL TVP_Stub_c07314686fdf5815ce9b058020da942b(iTVPStorageMedia * media)
+{
+	return TVPUnregisterStorageMedia(media);
+}
+static bool STDCALL TVP_Stub_4a197be1985d45ee86d5672d24134560(const ttstr & name)
+{
+	return TVPIsExistentStorageNoSearch(name);
+}
+static bool STDCALL TVP_Stub_dec720a9c3cd2b378f195cf71a9ff8b0(const ttstr & name)
+{
+	return TVPIsExistentStorageNoSearchNoNormalize(name);
+}
+static ttstr STDCALL TVP_Stub_5726a5c7af641ebaa504dc9ec8380938(const ttstr & name)
+{
+	return TVPNormalizeStorageName(name);
+}
+static void STDCALL TVP_Stub_1c53bc96ac9dfd483c2227bc5fa44825(const ttstr & name)
+{
+	return TVPSetCurrentDirectory(name);
+}
+static void STDCALL TVP_Stub_1940c8fa03145aa029d0b7718ce0c809(ttstr & name)
+{
+	return TVPGetLocalName(name);
+}
+static ttstr STDCALL TVP_Stub_b37f047c0f9bd143b34a2fc87ce5f16e(const ttstr & name)
+{
+	return TVPExtractStorageExt(name);
+}
+static ttstr STDCALL TVP_Stub_dec35fbd2a24fc32e5c220174d864cf4(const ttstr & name)
+{
+	return TVPExtractStorageName(name);
+}
+static ttstr STDCALL TVP_Stub_86fd45a126296891aee413388597203e(const ttstr & name)
+{
+	return TVPExtractStoragePath(name);
+}
+static ttstr STDCALL TVP_Stub_603243e54f3508c37d993e8359b735dc(const ttstr & name)
+{
+	return TVPChopStorageExt(name);
+}
+static void STDCALL TVP_Stub_c3eadbd75b32dabe6faecebf492eb486(const ttstr & name)
+{
+	return TVPAddAutoPath(name);
+}
+static void STDCALL TVP_Stub_725e49de1d970ef04b179776666f2c34(const ttstr & name)
+{
+	return TVPRemoveAutoPath(name);
+}
+static ttstr STDCALL TVP_Stub_55a9b73f877bfd4c6d8157e7b1c458df(const ttstr & name)
+{
+	return TVPGetPlacedPath(name);
+}
+static bool STDCALL TVP_Stub_d070209f152dd22087e6e996e02c85cf(const ttstr & name)
+{
+	return TVPIsExistentStorage(name);
+}
+static void STDCALL TVP_Stub_308f905626bc51c7ef9b65b2c0ca34b2()
+{
+	return TVPClearStorageCaches();
+}
+#include "TextStream.h"
+static iTJSTextReadStream * STDCALL TVP_Stub_95aab2a1ac9491e8026f4977e0918760(const ttstr & name , const ttstr & modestr)
+{
+	return TVPCreateTextStreamForRead(name, modestr);
+}
+static iTJSTextReadStream * STDCALL TVP_Stub_e0ac94325eb783ca2fe7856a54444c90(const ttstr & name , const ttstr & modestr , const ttstr & encoding)
+{
+	return TVPCreateTextStreamForReadByEncoding(name, modestr, encoding);
+}
+static iTJSTextWriteStream * STDCALL TVP_Stub_0c99a79e866f08b4df3914e83fc203dc(const ttstr & name , const ttstr & modestr)
+{
+	return TVPCreateTextStreamForWrite(name, modestr);
+}
+static void STDCALL TVP_Stub_f2de531a016173057ff3540e47fed4e6(const ttstr & encoding)
+{
+	return TVPSetDefaultReadEncoding(encoding);
+}
+static const tjs_char * STDCALL TVP_Stub_4224a9066d8d13d6d7e12f1ace6a5beb()
+{
+	return TVPGetDefaultReadEncoding();
+}
+#include "CharacterSet.h"
+static tjs_int STDCALL TVP_Stub_900476efbc2031e643c042ca8e63a3d7(const tjs_char * in , char * out)
+{
+	return TVPWideCharToUtf8String(in, out);
+}
+static tjs_int STDCALL TVP_Stub_07dfce61d490cf671a2d5359d713d64a(const char * in , tjs_char * out)
+{
+	return TVPUtf8ToWideCharString(in, out);
+}
+#include "XP3Archive.h"
+static void STDCALL TVP_Stub_52d30ac8479ef7e870b5aff076482799(tTVPXP3ArchiveExtractionFilter filter)
+{
+	return TVPSetXP3ArchiveExtractionFilter(filter);
+}
+#include "EventIntf.h"
+static void STDCALL TVP_Stub_8e4d0392ed46e87f94e5fcf675a124a1()
+{
+	return TVPBreathe();
+}
+static bool STDCALL TVP_Stub_73f46e08d17e707725f433b454f05a89()
+{
+	return TVPGetBreathing();
+}
+static void STDCALL TVP_Stub_80d60e682fa72973071e335db272a2a2(bool en)
+{
+	return TVPSetSystemEventDisabledState(en);
+}
+static bool STDCALL TVP_Stub_6bd6262185fa0b9cf1750f6a525d893a()
+{
+	return TVPGetSystemEventDisabledState();
+}
+static void STDCALL TVP_Stub_cf29f737d4eb450b26789d421d0ec69a(iTJSDispatch2 * source , iTJSDispatch2 * target , ttstr & eventname , tjs_uint32 tag , tjs_uint32 flag , tjs_uint numargs , tTJSVariant * args)
+{
+	return TVPPostEvent(source, target, eventname, tag, flag, numargs, args);
+}
+static tjs_int STDCALL TVP_Stub_13c0e371c08fd1b9da2f0c103d01c59a(iTJSDispatch2 * source , iTJSDispatch2 * target , const ttstr & eventname , tjs_uint32 tag = 0)
+{
+	return TVPCancelEvents(source, target, eventname, tag);
+}
+static bool STDCALL TVP_Stub_82693e38df8f033ea98f9b7969d66d7b(iTJSDispatch2 * source , iTJSDispatch2 * target , const ttstr & eventname , tjs_uint32 tag)
+{
+	return TVPAreEventsInQueue(source, target, eventname, tag);
+}
+static tjs_int STDCALL TVP_Stub_6e3f8a3b18f55dae6153a889f00a3e87(iTJSDispatch2 * source , iTJSDispatch2 * target , const ttstr & eventname , tjs_uint32 tag)
+{
+	return TVPCountEventsInQueue(source, target, eventname, tag);
+}
+static void STDCALL TVP_Stub_efe14a197131b4813656d6669cc3475b(iTJSDispatch2 * source , iTJSDispatch2 * target , tjs_uint32 tag = 0)
+{
+	return TVPCancelEventsByTag(source, target, tag);
+}
+static void STDCALL TVP_Stub_ba4ecf60f872f757b69c84f457b3e941(iTJSDispatch2 * source)
+{
+	return TVPCancelSourceEvents(source);
+}
+static iTJSDispatch2 * STDCALL TVP_Stub_dffedabe32ce886e3b7e695b44ad3547(const tjs_char * type , iTJSDispatch2 * targthis , iTJSDispatch2 * targ)
+{
+	return TVPCreateEventObject(type, targthis, targ);
+}
+static void STDCALL TVP_Stub_f518c60b165658d19a0fadd8f69586aa(tTVPContinuousEventCallbackIntf * cb)
+{
+	return TVPAddContinuousEventHook(cb);
+}
+static void STDCALL TVP_Stub_6fefcb1c2ca01a876c301ab41dbdab9f(tTVPContinuousEventCallbackIntf * cb)
+{
+	return TVPRemoveContinuousEventHook(cb);
+}
+static void STDCALL TVP_Stub_df55083347df0483b4ca6ba1e4f0b9a0(tTVPCompactEventCallbackIntf * cb)
+{
+	return TVPAddCompactEventHook(cb);
+}
+static void STDCALL TVP_Stub_d8d28310f702714733c4c5dc850058df(tTVPCompactEventCallbackIntf * cb)
+{
+	return TVPRemoveCompactEventHook(cb);
+}
+#include "SystemIntf.h"
+static ttstr STDCALL TVP_Stub_52d24c38b05be174bc5c4fdcf02e9b9f()
+{
+	return TVPGetPlatformName();
+}
+static ttstr STDCALL TVP_Stub_f27f455c8f30cbaf1706faac3c7b8e02()
+{
+	return TVPGetOSName();
+}
+#include "SystemImpl.h"
+#include "ScriptMgnIntf.h"
+static iTJSDispatch2 * STDCALL TVP_Stub_0936d0f6fc53339d255893e58bcc6699()
+{
+	return TVPGetScriptDispatch();
+}
+static void STDCALL TVP_Stub_f4f7181b7fd679784c50b0cc7ba4c60e(const ttstr & content , tTJSVariant * result = NULL)
+{
+	return TVPExecuteScript(content, result);
+}
+static void STDCALL TVP_Stub_79816d7e5741c2416fefe2c2a8baef00(const ttstr & content , iTJSDispatch2 * context , tTJSVariant * result = NULL)
+{
+	return TVPExecuteScript(content, context, result);
+}
+static void STDCALL TVP_Stub_42a3d248fab928f16555abcceca62834(const ttstr & content , tTJSVariant * result = NULL)
+{
+	return TVPExecuteExpression(content, result);
+}
+static void STDCALL TVP_Stub_926d6212b8b1b238e7bef9b17a3ee643(const ttstr & content , iTJSDispatch2 * context , tTJSVariant * result = NULL)
+{
+	return TVPExecuteExpression(content, context, result);
+}
+static void STDCALL TVP_Stub_236e3d626784d80ca2cc5b2fe14cd9c6(const ttstr & content , const ttstr & name , tjs_int lineofs , tTJSVariant * result = NULL)
+{
+	return TVPExecuteScript(content, name, lineofs, result);
+}
+static void STDCALL TVP_Stub_1bfac11a5f95c842f97a8bb57d4019de(const ttstr & content , const ttstr & name , tjs_int lineofs , iTJSDispatch2 * context , tTJSVariant * result = NULL)
+{
+	return TVPExecuteScript(content, name, lineofs, context, result);
+}
+static void STDCALL TVP_Stub_198ce21c54b0cea4c1bf5eeba35349ab(const ttstr & content , const ttstr & name , tjs_int lineofs , tTJSVariant * result = NULL)
+{
+	return TVPExecuteExpression(content, name, lineofs, result);
+}
+static void STDCALL TVP_Stub_590a1ec7f64904eaa32b5c771bb5f8cd(const ttstr & content , const ttstr & name , tjs_int lineofs , iTJSDispatch2 * context , tTJSVariant * result = NULL)
+{
+	return TVPExecuteExpression(content, name, lineofs, context, result);
+}
+static void STDCALL TVP_Stub_dd13d4bc2b48540a92f047bf015b829b(const ttstr & name , tTJSVariant * result = NULL , bool isexpression = false , const tjs_char * modestr = NULL)
+{
+	return TVPExecuteStorage(name, result, isexpression, modestr);
+}
+static void STDCALL TVP_Stub_0ff502d492598d2211405180bfb4d1e1(const ttstr & name , iTJSDispatch2 * context , tTJSVariant * result = NULL , bool isexpression = false , const tjs_char * modestr = NULL)
+{
+	return TVPExecuteStorage(name, context, result, isexpression, modestr);
+}
+static void STDCALL TVP_Stub_cf5401746759bfe38918087aaab6c57b()
+{
+	return TVPDumpScriptEngine();
+}
+static void STDCALL TVP_Stub_04e84aa7d8cf0477d55c700164544b38(const tjs_uint8 * content , size_t len , iTJSDispatch2 * context , tTJSVariant * result = NULL , const tjs_char * name = NULL)
+{
+	return TVPExecuteBytecode(content, len, context, result, name);
+}
+static void STDCALL TVP_Stub_449039d3afbfbd52a63130a3b227a490(const ttstr & filename)
+{
+	return TVPCreateMessageMapFile(filename);
+}
+#include "StorageImpl.h"
+static bool STDCALL TVP_Stub_347a4fa85af84e223c4b61d33ead694a(const ttstr & name)
+{
+	return TVPCheckExistentLocalFolder(name);
+}
+static bool STDCALL TVP_Stub_4ad1dd24b3b4769ee10149eea006af7a(const ttstr & name)
+{
+	return TVPCheckExistentLocalFile(name);
+}
+static bool STDCALL TVP_Stub_b246b17b62d273bdc04e9d9e827f5c74(const ttstr & folder)
+{
+	return TVPCreateFolders(folder);
+}
+#include "PluginImpl.h"
+static void STDCALL TVP_Stub_c23ece207f6ec2dd7c76ef873047aee3(const char * funcname)
+{
+	return TVPThrowPluginUnboundFunctionError(funcname);
+}
+static void STDCALL TVP_Stub_81507020bc646be2f53ab95b9430ba27(const tjs_char * funcname)
+{
+	return TVPThrowPluginUnboundFunctionError(funcname);
+}
+static void * STDCALL TVP_Stub_acc0d3861d1b971abcbdda1c075dd681(size_t size)
+{
+	return TVP_malloc(size);
+}
+static void * STDCALL TVP_Stub_ff2dccead1b31e3f34e8be3e2ba5bbf1(void * pp , size_t size)
+{
+	return TVP_realloc(pp, size);
+}
+static void STDCALL TVP_Stub_e17db0d4f69625c61aba7fffe540dded(void * pp)
+{
+	return TVP_free(pp);
+}
+static tjs_int STDCALL TVP_Stub_5bbc872e7bba5b761c509d31116e4460()
+{
+	return TVPGetAutoLoadPluginCount();
+}
+static int STDCALL TVP_Stub_4adf361303eae78829250c7b732a5722(unsigned char * dest , unsigned long * destlen , const unsigned char * source , unsigned long sourcelen)
+{
+	return ZLIB_uncompress(dest, destlen, source, sourcelen);
+}
+static int STDCALL TVP_Stub_bf172364c57c1aa561b145fd5cacda0c(unsigned char * dest , unsigned long * destlen , const unsigned char * source , unsigned long sourcelen)
+{
+	return ZLIB_compress(dest, destlen, source, sourcelen);
+}
+static int STDCALL TVP_Stub_d7687aa80dac10f88deac7aa7e70538a(unsigned char * dest , unsigned long * destlen , const unsigned char * source , unsigned long sourcelen , int level)
+{
+	return ZLIB_compress2(dest, destlen, source, sourcelen, level);
+}
+static void STDCALL TVP_Stub_b18b7259f98029f745c75291d6855ab1(TVP_md5_state_t * pms)
+{
+	return TVP_md5_init(pms);
+}
+static void STDCALL TVP_Stub_b79e5d877116025576ca1f76af124009(TVP_md5_state_t * pms , const tjs_uint8 * data , int nbytes)
+{
+	return TVP_md5_append(pms, data, nbytes);
+}
+static void STDCALL TVP_Stub_8aea098dfe8a36c705cc2a9e1a189b84(TVP_md5_state_t * pms , tjs_uint8 * digest)
+{
+	return TVP_md5_finish(pms, digest);
+}
+static void STDCALL TVP_Stub_3d70bb72a7d7765c7e8ea580079ab7e9()
+{
+	return TVPProcessApplicationMessages();
+}
+static void STDCALL TVP_Stub_eba9b272d78a4b0cd7f9212e29a58607()
+{
+	return TVPHandleApplicationMessage();
+}
+static bool STDCALL TVP_Stub_cfbe8ee9d43aa64ae4190eac91f7c55f(const tjs_char * name , iTJSDispatch2 * dsp)
+{
+	return TVPRegisterGlobalObject(name, dsp);
+}
+static bool STDCALL TVP_Stub_a4308a386968ef5d23025ab8a9e8c6db(const tjs_char * name)
+{
+	return TVPRemoveGlobalObject(name);
+}
+static void STDCALL TVP_Stub_5a4fcbe1e398e3d9690d571acbbbae9f(tTVPTryBlockFunction tryblock , tTVPCatchBlockFunction catchblock , tTVPFinallyBlockFunction finallyblock , void * data)
+{
+	return TVPDoTryBlock(tryblock, catchblock, finallyblock, data);
+}
+#include "SysInitIntf.h"
+static bool STDCALL TVP_Stub_fb3b405f8747b54f26c332b9e6af81cd(const tjs_char * name , tTJSVariant * value = NULL)
+{
+	return TVPGetCommandLine(name, value);
+}
+static tjs_int STDCALL TVP_Stub_b7ccd11d130f186883c109d2ba17b598()
+{
+	return TVPGetCommandLineArgumentGeneration();
+}
+static void STDCALL TVP_Stub_cf8ab6c24f25993ccc7663e572ac2991(const tjs_char * name , const ttstr & value)
+{
+	return TVPSetCommandLine(name, value);
+}
+#include "SysInitImpl.h"
+#include "DetectCPU.h"
+static tjs_uint32 STDCALL TVP_Stub_ba40ffbca76695b54a02aa8c1f1e047b()
+{
+	return TVPGetCPUType();
+}
+#include "ThreadIntf.h"
+static tjs_int STDCALL TVP_Stub_c97720e639e95ba5130ce9dd78d30403()
+{
+	return TVPGetProcessorNum();
+}
+static tjs_int STDCALL TVP_Stub_c5557ac5391b1b831a22e64b65d1746c()
+{
+	return TVPGetThreadNum();
+}
+static void STDCALL TVP_Stub_3243a4c32d4f674f1bbc8d3895257568(tjs_int num)
+{
+	return TVPBeginThreadTask(num);
+}
+static void STDCALL TVP_Stub_78390a3d08879903ee9558e9df68db4d(TVP_THREAD_TASK_FUNC func , TVP_THREAD_PARAM param)
+{
+	return TVPExecThreadTask(func, param);
+}
+static void STDCALL TVP_Stub_58e9454d7096a52808f9a83b9ce25ff0()
+{
+	return TVPEndThreadTask();
+}
+#include "DebugIntf.h"
+static void STDCALL TVP_Stub_cdefadd0c3bf15b4639b2f0338a40585(const ttstr & line)
+{
+	return TVPAddLog(line);
+}
+static void STDCALL TVP_Stub_4bf80e9bac16b9e3f9bf385b2fbce657(const ttstr & line)
+{
+	return TVPAddImportantLog(line);
+}
+#include "Random.h"
+static void STDCALL TVP_Stub_51aeacf2b6ef9deb01c3b3db201d6bf9(const void * buf , tjs_int bufsize)
+{
+	return TVPPushEnvironNoise(buf, bufsize);
+}
+static void STDCALL TVP_Stub_9ed5432d73448da47991df9577ee97bc(void * dest)
+{
+	return TVPGetRandomBits128(dest);
+}
+#include "ClipboardIntf.h"
+static bool STDCALL TVP_Stub_cf1d02d1cc1aff0aae6c038c95dac80f(tTVPClipboardFormat format)
+{
+	return TVPClipboardHasFormat(format);
+}
+static void STDCALL TVP_Stub_ddb0e05c72c0692e78af885ac7ec82dc(const ttstr & text)
+{
+	return TVPClipboardSetText(text);
+}
+static bool STDCALL TVP_Stub_a3029db6292616cd16c228b91dc4af13(ttstr & text)
+{
+	return TVPClipboardGetText(text);
+}
+#include "TickCount.h"
+static tjs_uint64 STDCALL TVP_Stub_2d90871c6bc15a9e8d97d24c29e78e3b()
+{
+	return TVPGetTickCount();
+}
+#include "MsgIntf.h"
+static ttstr STDCALL TVP_Stub_0af6744e35e38276d6a98c1f382b1519(const tjs_char * msg , const ttstr & p1)
+{
+	return TVPFormatMessage(msg, p1);
+}
+static ttstr STDCALL TVP_Stub_ad40567a051208757642e5e087f3e741(const tjs_char * msg , const ttstr & p1 , const ttstr & p2)
+{
+	return TVPFormatMessage(msg, p1, p2);
+}
+static void STDCALL TVP_Stub_6a15185daab9b274963fe5ef46305775(const tjs_char * msg)
+{
+	return TVPThrowExceptionMessage(msg);
+}
+static void STDCALL TVP_Stub_073a2332a8ab3ed31ab81daea3d3f2c4(const tjs_char * msg , const ttstr & p1 , tjs_int num)
+{
+	return TVPThrowExceptionMessage(msg, p1, num);
+}
+static void STDCALL TVP_Stub_01216e91225e06c7422bef0c2febc0cc(const tjs_char * msg , const ttstr & p1)
+{
+	return TVPThrowExceptionMessage(msg, p1);
+}
+static void STDCALL TVP_Stub_16ce22ad500a5bdfd5d5743c847a28b6(const tjs_char * msg , const ttstr & p1 , const ttstr & p2)
+{
+	return TVPThrowExceptionMessage(msg, p1, p2);
+}
+static ttstr STDCALL TVP_Stub_59251c4104f736fa2690c5f77fb0a908()
+{
+	return TVPGetAboutString();
+}
+static ttstr STDCALL TVP_Stub_f923750e0fdb51a6fc6c304832cb3dd3()
+{
+	return TVPGetVersionInformation();
+}
+static ttstr STDCALL TVP_Stub_bc77a1e312ff7827d90387fb92f0f5b0()
+{
+	return TVPGetVersionString();
+}
+static void STDCALL TVP_Stub_2090afd7ae8bcb021ec4d04947d0d845(tjs_int & major , tjs_int & minor , tjs_int & release , tjs_int & build)
+{
+	return TVPGetSystemVersion(major, minor, release, build);
+}
+static void STDCALL TVP_Stub_3a0f858bdf86199dc2d00b583a3b915f(tjs_int & major , tjs_int & minor , tjs_int & release)
+{
+	return TVPGetTJSVersion(major, minor, release);
+}
+#include "WaveIntf.h"
+static void STDCALL TVP_Stub_0d316a141f7a502ff8d9ffe2d38d25a8(tjs_int16 * output , const void * input , const tTVPWaveFormat & format , tjs_int count , bool downmix)
+{
+	return TVPConvertPCMTo16bits(output, input, format, count, downmix);
+}
+static void STDCALL TVP_Stub_b31ff64ae2d8f93dbf28161d5080b295(tjs_int16 * output , const void * input , tjs_int channels , tjs_int bytespersample , tjs_int bitspersample , bool isfloat , tjs_int count , bool downmix)
+{
+	return TVPConvertPCMTo16bits(output, input, channels, bytespersample, bitspersample, isfloat, count, downmix);
+}
+static void STDCALL TVP_Stub_d9b1c73516daea6a9c6564e2b731615a(float * output , const void * input , tjs_int channels , tjs_int bytespersample , tjs_int bitspersample , bool isfloat , tjs_int count)
+{
+	return TVPConvertPCMToFloat(output, input, channels, bytespersample, bitspersample, isfloat, count);
+}
+static void STDCALL TVP_Stub_003f9d3de568fcd71dd532f33d38839c(float * output , const void * input , const tTVPWaveFormat & format , tjs_int count)
+{
+	return TVPConvertPCMToFloat(output, input, format, count);
+}
+#include "GraphicsLoaderIntf.h"
+static void STDCALL TVP_Stub_b94ead6de9316bc65758c5aefb564078(const ttstr & name , tTVPGraphicLoadingHandlerForPlugin loading , tTVPGraphicHeaderLoadingHandlerForPlugin header , tTVPGraphicSaveHandlerForPlugin save , tTVPGraphicAcceptSaveHandler accept , void * formatdata)
+{
+	return TVPRegisterGraphicLoadingHandler(name, loading, header, save, accept, formatdata);
+}
+static void STDCALL TVP_Stub_8a35be936d2aca049e398a081e511c97(const ttstr & name , tTVPGraphicLoadingHandlerForPlugin loading , tTVPGraphicHeaderLoadingHandlerForPlugin header , tTVPGraphicSaveHandlerForPlugin save , tTVPGraphicAcceptSaveHandler accept , void * formatdata)
+{
+	return TVPUnregisterGraphicLoadingHandler(name, loading, header, save, accept, formatdata);
+}
+static void STDCALL TVP_Stub_5b1fa785e397e643dd09cb43c2f2f4db()
+{
+	return TVPClearGraphicCache();
+}
+#include "tvpfontstruc.h"
+#include "tvpinputdefs.h"
+#include "LayerBitmapIntf.h"
+#include "drawable.h"
+#include "ComplexRect.h"
+#include "LayerIntf.h"
+static tjs_uint32 STDCALL TVP_Stub_29af78765c764c566e6adc77e0ea7041(tjs_uint32 col)
+{
+	return TVPToActualColor(col);
+}
+static tjs_uint32 STDCALL TVP_Stub_9e0df54e4c24ee28d5517c1743faa3a3(tjs_uint32 col)
+{
+	return TVPFromActualColor(col);
+}
+static iTJSDispatch2 * STDCALL TVP_Stub_d3aaa55d66777d7308ffa7a348c84841(tTJSNI_BaseLayer * layer)
+{
+	return TVPGetObjectFrom_NI_BaseLayer(layer);
+}
+#include "LayerManager.h"
+#include "WindowIntf.h"
+#include "WindowImpl.h"
+#include "voMode.h"
+#include "VideoOvlIntf.h"
+#include "TransIntf.h"
+static iTVPScanLineProvider * STDCALL TVP_Stub_9982ebedc12d343cb098e2a7b25bdef1(const ttstr & name , tjs_int bpp , tjs_uint32 key , tjs_uint w , tjs_uint h)
+{
+	return TVPSLPLoadImage(name, bpp, key, w, h);
+}
+static void STDCALL TVP_Stub_81eeacbed5ee6129bef4b370e28b5d10(iTVPTransHandlerProvider * pro)
+{
+	return TVPAddTransHandlerProvider(pro);
+}
+static void STDCALL TVP_Stub_6ed1088905d99012d2fb5827ea19527e(iTVPTransHandlerProvider * pro)
+{
+	return TVPRemoveTransHandlerProvider(pro);
+}
+#include "transhandler.h"
+#include "tvpgl.h"
+static void STDCALL TVP_Stub_b4d6c64cc0004ffaba804f0e8f02ab9b(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPAlphaBlend(dest, src, len);
+}
+static void STDCALL TVP_Stub_2c3e08b8df93ec50451edd916c707030(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPAlphaBlend_HDA(dest, src, len);
+}
+static void STDCALL TVP_Stub_eba070d1583ca5f5d02630ba33a5504b(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPAlphaBlend_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_ee474537852ce5eb165cb1761950faba(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPAlphaBlend_HDA_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_eed221c603243522667e2f1c6ace3ba4(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPAlphaBlend_d(dest, src, len);
+}
+static void STDCALL TVP_Stub_1f973c5e3cfaf00fa752b7e22d7ba481(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPAlphaBlend_a(dest, src, len);
+}
+static void STDCALL TVP_Stub_b9d5260bba9edd7503f1adf882218979(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPAlphaBlend_do(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_aedbd2eda61145de808e295331884245(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPAlphaBlend_ao(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_ce0f184e84752eb279e4f900d8b53c18(tjs_uint32 * dest , const tjs_uint32 color , tjs_int len)
+{
+	return TVPAlphaColorMat(dest, color, len);
+}
+static void STDCALL TVP_Stub_0217d49393163b80897d044c1d93092f(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPAdditiveAlphaBlend(dest, src, len);
+}
+static void STDCALL TVP_Stub_5bbd9d5b364840e9615af35a62f69d7d(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPAdditiveAlphaBlend_HDA(dest, src, len);
+}
+static void STDCALL TVP_Stub_2b2837e81fcaeec35f61a2a3ecf2fb2d(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPAdditiveAlphaBlend_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_bb0706a78e9066944bfbffd1406be2d4(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPAdditiveAlphaBlend_HDA_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_770e67c91215292980b88cc6efb9f2a5(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPAdditiveAlphaBlend_a(dest, src, len);
+}
+static void STDCALL TVP_Stub_068ab11f05731f2c2e9ea8c5fdb16a9f(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPAdditiveAlphaBlend_ao(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_b9873a0ad2653952cb2948b817e786e4(tjs_uint32 * buf , tjs_int len)
+{
+	return TVPConvertAdditiveAlphaToAlpha(buf, len);
+}
+static void STDCALL TVP_Stub_11d9804ae4db32d731af69c397769cbf(tjs_uint32 * buf , tjs_int len)
+{
+	return TVPConvertAlphaToAdditiveAlpha(buf, len);
+}
+static void STDCALL TVP_Stub_421f5aa6dbaaaf946f74942c77aac9bc(tjs_uint32 * dest , tjs_int len , const tjs_uint32 * src , tjs_int srcstart , tjs_int srcstep)
+{
+	return TVPStretchAlphaBlend(dest, len, src, srcstart, srcstep);
+}
+static void STDCALL TVP_Stub_563ee9dcb14a2914fc246e64679f42b5(tjs_uint32 * dest , tjs_int len , const tjs_uint32 * src , tjs_int srcstart , tjs_int srcstep)
+{
+	return TVPStretchAlphaBlend_HDA(dest, len, src, srcstart, srcstep);
+}
+static void STDCALL TVP_Stub_e23a54b6b80bd03111a40f669524724f(tjs_uint32 * dest , tjs_int len , const tjs_uint32 * src , tjs_int srcstart , tjs_int srcstep , tjs_int opa)
+{
+	return TVPStretchAlphaBlend_o(dest, len, src, srcstart, srcstep, opa);
+}
+static void STDCALL TVP_Stub_c90c8bbd18a7190636ae4269c36ad005(tjs_uint32 * dest , tjs_int len , const tjs_uint32 * src , tjs_int srcstart , tjs_int srcstep , tjs_int opa)
+{
+	return TVPStretchAlphaBlend_HDA_o(dest, len, src, srcstart, srcstep, opa);
+}
+static void STDCALL TVP_Stub_03c54a8e8c86e171f868a624e490691f(tjs_uint32 * dest , tjs_int len , const tjs_uint32 * src , tjs_int srcstart , tjs_int srcstep)
+{
+	return TVPStretchAlphaBlend_d(dest, len, src, srcstart, srcstep);
+}
+static void STDCALL TVP_Stub_30b63f3cc59b39f1a71829bbbdf6e45d(tjs_uint32 * dest , tjs_int len , const tjs_uint32 * src , tjs_int srcstart , tjs_int srcstep)
+{
+	return TVPStretchAlphaBlend_a(dest, len, src, srcstart, srcstep);
+}
+static void STDCALL TVP_Stub_705bcc30a0561ec679c2267e1a573b23(tjs_uint32 * dest , tjs_int len , const tjs_uint32 * src , tjs_int srcstart , tjs_int srcstep , tjs_int opa)
+{
+	return TVPStretchAlphaBlend_do(dest, len, src, srcstart, srcstep, opa);
+}
+static void STDCALL TVP_Stub_5c627d080007e455b0393a9b4457cd4d(tjs_uint32 * dest , tjs_int len , const tjs_uint32 * src , tjs_int srcstart , tjs_int srcstep , tjs_int opa)
+{
+	return TVPStretchAlphaBlend_ao(dest, len, src, srcstart, srcstep, opa);
+}
+static void STDCALL TVP_Stub_72a64cecd44d80f95fc93faf0d239e32(tjs_uint32 * dest , tjs_int len , const tjs_uint32 * src , tjs_int srcstart , tjs_int srcstep)
+{
+	return TVPStretchAdditiveAlphaBlend(dest, len, src, srcstart, srcstep);
+}
+static void STDCALL TVP_Stub_ef838904712bfdc614dbc689fbe7fb18(tjs_uint32 * dest , tjs_int destlen , const tjs_uint32 * src1 , const tjs_uint32 * src2 , tjs_int blend_y , tjs_int srcstart , tjs_int srcstep)
+{
+	return TVPInterpStretchAdditiveAlphaBlend(dest, destlen, src1, src2, blend_y, srcstart, srcstep);
+}
+static void STDCALL TVP_Stub_acc97936adc40656e824cfdf7a34e20c(tjs_uint32 * dest , tjs_int len , const tjs_uint32 * src , tjs_int srcstart , tjs_int srcstep)
+{
+	return TVPStretchAdditiveAlphaBlend_HDA(dest, len, src, srcstart, srcstep);
+}
+static void STDCALL TVP_Stub_5ea1ba3602f9d9fee344de6c3406d7a3(tjs_uint32 * dest , tjs_int len , const tjs_uint32 * src , tjs_int srcstart , tjs_int srcstep , tjs_int opa)
+{
+	return TVPStretchAdditiveAlphaBlend_o(dest, len, src, srcstart, srcstep, opa);
+}
+static void STDCALL TVP_Stub_d25f0771b8fc7715d69f01d950463a49(tjs_uint32 * dest , tjs_int destlen , const tjs_uint32 * src1 , const tjs_uint32 * src2 , tjs_int blend_y , tjs_int srcstart , tjs_int srcstep , tjs_int opa)
+{
+	return TVPInterpStretchAdditiveAlphaBlend_o(dest, destlen, src1, src2, blend_y, srcstart, srcstep, opa);
+}
+static void STDCALL TVP_Stub_f8ab11c930782ce058e517d0440ec87f(tjs_uint32 * dest , tjs_int len , const tjs_uint32 * src , tjs_int srcstart , tjs_int srcstep , tjs_int opa)
+{
+	return TVPStretchAdditiveAlphaBlend_HDA_o(dest, len, src, srcstart, srcstep, opa);
+}
+static void STDCALL TVP_Stub_b8157e369d53c2d944b76494980ced7b(tjs_uint32 * dest , tjs_int len , const tjs_uint32 * src , tjs_int srcstart , tjs_int srcstep)
+{
+	return TVPStretchAdditiveAlphaBlend_a(dest, len, src, srcstart, srcstep);
+}
+static void STDCALL TVP_Stub_aba94f656b4c1de827d11c72b36a5e9c(tjs_uint32 * dest , tjs_int len , const tjs_uint32 * src , tjs_int srcstart , tjs_int srcstep , tjs_int opa)
+{
+	return TVPStretchAdditiveAlphaBlend_ao(dest, len, src, srcstart, srcstep, opa);
+}
+static void STDCALL TVP_Stub_0656942f5a95783a4de73ca6e654d3b5(tjs_uint32 * dest , tjs_int len , const tjs_uint32 * src , tjs_int sx , tjs_int sy , tjs_int stepx , tjs_int stepy , tjs_int srcpitch)
+{
+	return TVPLinTransAlphaBlend(dest, len, src, sx, sy, stepx, stepy, srcpitch);
+}
+static void STDCALL TVP_Stub_5c2b7d12713dd5a94ef8e6eff1f79752(tjs_uint32 * dest , tjs_int len , const tjs_uint32 * src , tjs_int sx , tjs_int sy , tjs_int stepx , tjs_int stepy , tjs_int srcpitch)
+{
+	return TVPLinTransAlphaBlend_HDA(dest, len, src, sx, sy, stepx, stepy, srcpitch);
+}
+static void STDCALL TVP_Stub_6f1d30ac7e812cc5a059459c47638cd0(tjs_uint32 * dest , tjs_int len , const tjs_uint32 * src , tjs_int sx , tjs_int sy , tjs_int stepx , tjs_int stepy , tjs_int srcpitch , tjs_int opa)
+{
+	return TVPLinTransAlphaBlend_o(dest, len, src, sx, sy, stepx, stepy, srcpitch, opa);
+}
+static void STDCALL TVP_Stub_1d51684322635e7848ef53f7f6be8a1e(tjs_uint32 * dest , tjs_int len , const tjs_uint32 * src , tjs_int sx , tjs_int sy , tjs_int stepx , tjs_int stepy , tjs_int srcpitch , tjs_int opa)
+{
+	return TVPLinTransAlphaBlend_HDA_o(dest, len, src, sx, sy, stepx, stepy, srcpitch, opa);
+}
+static void STDCALL TVP_Stub_a1f2d56d138a4038fe1678328910a81d(tjs_uint32 * dest , tjs_int len , const tjs_uint32 * src , tjs_int sx , tjs_int sy , tjs_int stepx , tjs_int stepy , tjs_int srcpitch)
+{
+	return TVPLinTransAlphaBlend_d(dest, len, src, sx, sy, stepx, stepy, srcpitch);
+}
+static void STDCALL TVP_Stub_c135ef491b533febfd49696d22a1dd3d(tjs_uint32 * dest , tjs_int len , const tjs_uint32 * src , tjs_int sx , tjs_int sy , tjs_int stepx , tjs_int stepy , tjs_int srcpitch)
+{
+	return TVPLinTransAlphaBlend_a(dest, len, src, sx, sy, stepx, stepy, srcpitch);
+}
+static void STDCALL TVP_Stub_579117a873b466d78bf93e49c4a078da(tjs_uint32 * dest , tjs_int len , const tjs_uint32 * src , tjs_int sx , tjs_int sy , tjs_int stepx , tjs_int stepy , tjs_int srcpitch , tjs_int opa)
+{
+	return TVPLinTransAlphaBlend_do(dest, len, src, sx, sy, stepx, stepy, srcpitch, opa);
+}
+static void STDCALL TVP_Stub_ec8fa08705639eb7ae5d44ab63dea5e8(tjs_uint32 * dest , tjs_int len , const tjs_uint32 * src , tjs_int sx , tjs_int sy , tjs_int stepx , tjs_int stepy , tjs_int srcpitch , tjs_int opa)
+{
+	return TVPLinTransAlphaBlend_ao(dest, len, src, sx, sy, stepx, stepy, srcpitch, opa);
+}
+static void STDCALL TVP_Stub_b49dc1cda6109256815dae7b4293725d(tjs_uint32 * dest , tjs_int len , const tjs_uint32 * src , tjs_int sx , tjs_int sy , tjs_int stepx , tjs_int stepy , tjs_int srcpitch)
+{
+	return TVPLinTransAdditiveAlphaBlend(dest, len, src, sx, sy, stepx, stepy, srcpitch);
+}
+static void STDCALL TVP_Stub_912a670f56707ac70f2fee13660c2af8(tjs_uint32 * dest , tjs_int destlen , const tjs_uint32 * src , tjs_int sx , tjs_int sy , tjs_int stepx , tjs_int stepy , tjs_int srcpitch)
+{
+	return TVPInterpLinTransAdditiveAlphaBlend(dest, destlen, src, sx, sy, stepx, stepy, srcpitch);
+}
+static void STDCALL TVP_Stub_d0159986645df76b8c66fdb662efffde(tjs_uint32 * dest , tjs_int len , const tjs_uint32 * src , tjs_int sx , tjs_int sy , tjs_int stepx , tjs_int stepy , tjs_int srcpitch)
+{
+	return TVPLinTransAdditiveAlphaBlend_HDA(dest, len, src, sx, sy, stepx, stepy, srcpitch);
+}
+static void STDCALL TVP_Stub_cd7a2e6f91bf8d2daa3e28139d7d9f5c(tjs_uint32 * dest , tjs_int len , const tjs_uint32 * src , tjs_int sx , tjs_int sy , tjs_int stepx , tjs_int stepy , tjs_int srcpitch , tjs_int opa)
+{
+	return TVPLinTransAdditiveAlphaBlend_o(dest, len, src, sx, sy, stepx, stepy, srcpitch, opa);
+}
+static void STDCALL TVP_Stub_676004ca892b2bfee6859d0bb132fdd7(tjs_uint32 * dest , tjs_int destlen , const tjs_uint32 * src , tjs_int sx , tjs_int sy , tjs_int stepx , tjs_int stepy , tjs_int srcpitch , tjs_int opa)
+{
+	return TVPInterpLinTransAdditiveAlphaBlend_o(dest, destlen, src, sx, sy, stepx, stepy, srcpitch, opa);
+}
+static void STDCALL TVP_Stub_d4b161d8a745baa5e2113669773a758f(tjs_uint32 * dest , tjs_int len , const tjs_uint32 * src , tjs_int sx , tjs_int sy , tjs_int stepx , tjs_int stepy , tjs_int srcpitch , tjs_int opa)
+{
+	return TVPLinTransAdditiveAlphaBlend_HDA_o(dest, len, src, sx, sy, stepx, stepy, srcpitch, opa);
+}
+static void STDCALL TVP_Stub_ef7537293f6e3b6127480f6c5fd018a1(tjs_uint32 * dest , tjs_int len , const tjs_uint32 * src , tjs_int sx , tjs_int sy , tjs_int stepx , tjs_int stepy , tjs_int srcpitch)
+{
+	return TVPLinTransAdditiveAlphaBlend_a(dest, len, src, sx, sy, stepx, stepy, srcpitch);
+}
+static void STDCALL TVP_Stub_6f6f73b75cffe40a28566d1832ae1224(tjs_uint32 * dest , tjs_int len , const tjs_uint32 * src , tjs_int sx , tjs_int sy , tjs_int stepx , tjs_int stepy , tjs_int srcpitch , tjs_int opa)
+{
+	return TVPLinTransAdditiveAlphaBlend_ao(dest, len, src, sx, sy, stepx, stepy, srcpitch, opa);
+}
+static void STDCALL TVP_Stub_7adc5aad39e459e01543d07c239efe57(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPCopyOpaqueImage(dest, src, len);
+}
+static void STDCALL TVP_Stub_3ff6b480097eec3f5fdb7bfad685fd2a(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPConstAlphaBlend(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_b2c50c3a1dfea7e9d05fed69818bafc3(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPConstAlphaBlend_HDA(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_8024df9077e2c85b5b718ad2c87e57e7(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPConstAlphaBlend_d(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_989769d4eb8e42e9c9bbe721b296406c(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPConstAlphaBlend_a(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_cc1ac928b5c31570dfba7ed8f565be4b(tjs_uint32 * dest , tjs_int destlen , const tjs_uint32 * src , tjs_int srcstart , tjs_int srcstep)
+{
+	return TVPStretchCopyOpaqueImage(dest, destlen, src, srcstart, srcstep);
+}
+static void STDCALL TVP_Stub_62931efed5729a332e60bd1f7c7cecdf(tjs_uint32 * dest , tjs_int len , const tjs_uint32 * src , tjs_int srcstart , tjs_int srcstep , tjs_int opa)
+{
+	return TVPStretchConstAlphaBlend(dest, len, src, srcstart, srcstep, opa);
+}
+static void STDCALL TVP_Stub_53c18160b157088f72a9afd79737b48b(tjs_uint32 * dest , tjs_int destlen , const tjs_uint32 * src1 , const tjs_uint32 * src2 , tjs_int blend_y , tjs_int srcstart , tjs_int srcstep , tjs_int opa)
+{
+	return TVPInterpStretchConstAlphaBlend(dest, destlen, src1, src2, blend_y, srcstart, srcstep, opa);
+}
+static void STDCALL TVP_Stub_48135697fd7f4df87402a7dd4d761555(tjs_uint32 * dest , tjs_int len , const tjs_uint32 * src , tjs_int srcstart , tjs_int srcstep , tjs_int opa)
+{
+	return TVPStretchConstAlphaBlend_HDA(dest, len, src, srcstart, srcstep, opa);
+}
+static void STDCALL TVP_Stub_e2c71cf04e876069eb7315c800a96898(tjs_uint32 * dest , tjs_int len , const tjs_uint32 * src , tjs_int srcstart , tjs_int srcstep , tjs_int opa)
+{
+	return TVPStretchConstAlphaBlend_d(dest, len, src, srcstart, srcstep, opa);
+}
+static void STDCALL TVP_Stub_1f63c018cf805ca1168af192cf8a4b41(tjs_uint32 * dest , tjs_int len , const tjs_uint32 * src , tjs_int srcstart , tjs_int srcstep , tjs_int opa)
+{
+	return TVPStretchConstAlphaBlend_a(dest, len, src, srcstart, srcstep, opa);
+}
+static void STDCALL TVP_Stub_704a9574dafd3669e10d546549948e03(tjs_uint32 * dest , tjs_int destlen , const tjs_uint32 * src , tjs_int sx , tjs_int sy , tjs_int stepx , tjs_int stepy , tjs_int srcpitch)
+{
+	return TVPLinTransCopyOpaqueImage(dest, destlen, src, sx, sy, stepx, stepy, srcpitch);
+}
+static void STDCALL TVP_Stub_97905c510b9502c20c9322c9f5fb4188(tjs_uint32 * dest , tjs_int len , const tjs_uint32 * src , tjs_int sx , tjs_int sy , tjs_int stepx , tjs_int stepy , tjs_int srcpitch , tjs_int opa)
+{
+	return TVPLinTransConstAlphaBlend(dest, len, src, sx, sy, stepx, stepy, srcpitch, opa);
+}
+static void STDCALL TVP_Stub_b23e84230c4736667279c7a71f4ca53e(tjs_uint32 * dest , tjs_int destlen , const tjs_uint32 * src , tjs_int sx , tjs_int sy , tjs_int stepx , tjs_int stepy , tjs_int srcpitch , tjs_int opa)
+{
+	return TVPInterpLinTransConstAlphaBlend(dest, destlen, src, sx, sy, stepx, stepy, srcpitch, opa);
+}
+static void STDCALL TVP_Stub_eb41fc900b0a6e3aba9d531f266137f1(tjs_uint32 * dest , tjs_int len , const tjs_uint32 * src , tjs_int sx , tjs_int sy , tjs_int stepx , tjs_int stepy , tjs_int srcpitch , tjs_int opa)
+{
+	return TVPLinTransConstAlphaBlend_HDA(dest, len, src, sx, sy, stepx, stepy, srcpitch, opa);
+}
+static void STDCALL TVP_Stub_5bd02c627b74bbb22d5a525b8bcbbd27(tjs_uint32 * dest , tjs_int len , const tjs_uint32 * src , tjs_int sx , tjs_int sy , tjs_int stepx , tjs_int stepy , tjs_int srcpitch , tjs_int opa)
+{
+	return TVPLinTransConstAlphaBlend_d(dest, len, src, sx, sy, stepx, stepy, srcpitch, opa);
+}
+static void STDCALL TVP_Stub_cc82e6a6b31ea743b9ebbdeed1ddedc3(tjs_uint32 * dest , tjs_int len , const tjs_uint32 * src , tjs_int sx , tjs_int sy , tjs_int stepx , tjs_int stepy , tjs_int srcpitch , tjs_int opa)
+{
+	return TVPLinTransConstAlphaBlend_a(dest, len, src, sx, sy, stepx, stepy, srcpitch, opa);
+}
+static void STDCALL TVP_Stub_247b25d497e48bc0191fdb2ac530f4ca(tjs_uint32 * dest , const tjs_uint32 * src1 , const tjs_uint32 * src2 , tjs_int len , tjs_int opa)
+{
+	return TVPConstAlphaBlend_SD(dest, src1, src2, len, opa);
+}
+static void STDCALL TVP_Stub_6bbea3af36c35631641cc8356ff65475(tjs_uint32 * dest , const tjs_uint32 * src1 , const tjs_uint32 * src2 , tjs_int len , tjs_int opa)
+{
+	return TVPConstAlphaBlend_SD_a(dest, src1, src2, len, opa);
+}
+static void STDCALL TVP_Stub_cac02dfd62ba94abf6a346bef0bf3ab9(tjs_uint32 * dest , const tjs_uint32 * src1 , const tjs_uint32 * src2 , tjs_int len , tjs_int opa)
+{
+	return TVPConstAlphaBlend_SD_d(dest, src1, src2, len, opa);
+}
+static void STDCALL TVP_Stub_68eeb36d76d88ff00014f04b23454254(tjs_uint32 * table , tjs_int phase , tjs_int vague)
+{
+	return TVPInitUnivTransBlendTable(table, phase, vague);
+}
+static void STDCALL TVP_Stub_65e03b1c849b6e9cb5c478024aa9a5b7(tjs_uint32 * table , tjs_int phase , tjs_int vague)
+{
+	return TVPInitUnivTransBlendTable_d(table, phase, vague);
+}
+static void STDCALL TVP_Stub_7670c0c5630625ee6a73b7b9ee093650(tjs_uint32 * table , tjs_int phase , tjs_int vague)
+{
+	return TVPInitUnivTransBlendTable_a(table, phase, vague);
+}
+static void STDCALL TVP_Stub_68a0abce6eefa08e74353ec48c4c87a8(tjs_uint32 * dest , const tjs_uint32 * src1 , const tjs_uint32 * src2 , const tjs_uint8 * rule , const tjs_uint32 * table , tjs_int len)
+{
+	return TVPUnivTransBlend(dest, src1, src2, rule, table, len);
+}
+static void STDCALL TVP_Stub_ccb6e098b9a0791a0f20e9f1af55e341(tjs_uint32 * dest , const tjs_uint32 * src1 , const tjs_uint32 * src2 , const tjs_uint8 * rule , const tjs_uint32 * table , tjs_int len , tjs_int src1lv , tjs_int src2lv)
+{
+	return TVPUnivTransBlend_switch(dest, src1, src2, rule, table, len, src1lv, src2lv);
+}
+static void STDCALL TVP_Stub_0f817efe47b451fd719c05a104c2b803(tjs_uint32 * dest , const tjs_uint32 * src1 , const tjs_uint32 * src2 , const tjs_uint8 * rule , const tjs_uint32 * table , tjs_int len)
+{
+	return TVPUnivTransBlend_d(dest, src1, src2, rule, table, len);
+}
+static void STDCALL TVP_Stub_efad1a3d774747bd2b5adb221ede2678(tjs_uint32 * dest , const tjs_uint32 * src1 , const tjs_uint32 * src2 , const tjs_uint8 * rule , const tjs_uint32 * table , tjs_int len , tjs_int src1lv , tjs_int src2lv)
+{
+	return TVPUnivTransBlend_switch_d(dest, src1, src2, rule, table, len, src1lv, src2lv);
+}
+static void STDCALL TVP_Stub_563285ed004ddd2945f91db7b5347d3c(tjs_uint32 * dest , const tjs_uint32 * src1 , const tjs_uint32 * src2 , const tjs_uint8 * rule , const tjs_uint32 * table , tjs_int len)
+{
+	return TVPUnivTransBlend_a(dest, src1, src2, rule, table, len);
+}
+static void STDCALL TVP_Stub_4c032260ef83d44bfe05fdc16843a8f9(tjs_uint32 * dest , const tjs_uint32 * src1 , const tjs_uint32 * src2 , const tjs_uint8 * rule , const tjs_uint32 * table , tjs_int len , tjs_int src1lv , tjs_int src2lv)
+{
+	return TVPUnivTransBlend_switch_a(dest, src1, src2, rule, table, len, src1lv, src2lv);
+}
+static void STDCALL TVP_Stub_96fd614457f06499a430b0c6e0e8a941(tjs_uint32 * dest , const tjs_uint8 * src , tjs_int len , tjs_uint32 color)
+{
+	return TVPApplyColorMap(dest, src, len, color);
+}
+static void STDCALL TVP_Stub_d6e36d304ff7253088ab4bc1aaf13a98(tjs_uint32 * dest , const tjs_uint8 * src , tjs_int len , tjs_uint32 color , tjs_int opa)
+{
+	return TVPApplyColorMap_o(dest, src, len, color, opa);
+}
+static void STDCALL TVP_Stub_eddacf49735189e23d9d49831851ffdb(tjs_uint32 * dest , const tjs_uint8 * src , tjs_int len , tjs_uint32 color)
+{
+	return TVPApplyColorMap65(dest, src, len, color);
+}
+static void STDCALL TVP_Stub_20275a5de4aef464b85d3f6db2800063(tjs_uint32 * dest , const tjs_uint8 * src , tjs_int len , tjs_uint32 color , tjs_int opa)
+{
+	return TVPApplyColorMap65_o(dest, src, len, color, opa);
+}
+static void STDCALL TVP_Stub_872d1c626e6d4e3d5e86a257f0b14536(tjs_uint32 * dest , const tjs_uint8 * src , tjs_int len , tjs_uint32 color)
+{
+	return TVPApplyColorMap_HDA(dest, src, len, color);
+}
+static void STDCALL TVP_Stub_a7ebb70cdec339f26c2ea7fd9a471b88(tjs_uint32 * dest , const tjs_uint8 * src , tjs_int len , tjs_uint32 color , tjs_int opa)
+{
+	return TVPApplyColorMap_HDA_o(dest, src, len, color, opa);
+}
+static void STDCALL TVP_Stub_d748ffef5cde2a6a3333e75b7fa3fb49(tjs_uint32 * dest , const tjs_uint8 * src , tjs_int len , tjs_uint32 color)
+{
+	return TVPApplyColorMap65_HDA(dest, src, len, color);
+}
+static void STDCALL TVP_Stub_15e1fe0e6230e7b60e216e266f927f7b(tjs_uint32 * dest , const tjs_uint8 * src , tjs_int len , tjs_uint32 color , tjs_int opa)
+{
+	return TVPApplyColorMap65_HDA_o(dest, src, len, color, opa);
+}
+static void STDCALL TVP_Stub_f8179eafd0cbe8116874310519207dc0(tjs_uint32 * dest , const tjs_uint8 * src , tjs_int len , tjs_uint32 color)
+{
+	return TVPApplyColorMap_d(dest, src, len, color);
+}
+static void STDCALL TVP_Stub_accbc3bed3223d552de2723366cfc2b6(tjs_uint32 * dest , const tjs_uint8 * src , tjs_int len , tjs_uint32 color)
+{
+	return TVPApplyColorMap65_d(dest, src, len, color);
+}
+static void STDCALL TVP_Stub_e2c3e74d2a20a601c1f393348f58aeb2(tjs_uint32 * dest , const tjs_uint8 * src , tjs_int len , tjs_uint32 color)
+{
+	return TVPApplyColorMap_a(dest, src, len, color);
+}
+static void STDCALL TVP_Stub_e0163a6ca3397c2e71715132cccefa1d(tjs_uint32 * dest , const tjs_uint8 * src , tjs_int len , tjs_uint32 color)
+{
+	return TVPApplyColorMap65_a(dest, src, len, color);
+}
+static void STDCALL TVP_Stub_2c3ea1ea88799dfde81025bf1959333a(tjs_uint32 * dest , const tjs_uint8 * src , tjs_int len , tjs_uint32 color , tjs_int opa)
+{
+	return TVPApplyColorMap_do(dest, src, len, color, opa);
+}
+static void STDCALL TVP_Stub_a6bb56b3f4b7a89fe78d63956a0f444c(tjs_uint32 * dest , const tjs_uint8 * src , tjs_int len , tjs_uint32 color , tjs_int opa)
+{
+	return TVPApplyColorMap65_do(dest, src, len, color, opa);
+}
+static void STDCALL TVP_Stub_09a81ac18a121d8fbb67285a081bf9c6(tjs_uint32 * dest , const tjs_uint8 * src , tjs_int len , tjs_uint32 color , tjs_int opa)
+{
+	return TVPApplyColorMap_ao(dest, src, len, color, opa);
+}
+static void STDCALL TVP_Stub_46fdfe0f5369bf234c3ed60a43947d9d(tjs_uint32 * dest , const tjs_uint8 * src , tjs_int len , tjs_uint32 color , tjs_int opa)
+{
+	return TVPApplyColorMap65_ao(dest, src, len, color, opa);
+}
+static void STDCALL TVP_Stub_d866cb6c8a47444bbac60eeffbfc6d96(tjs_uint32 * dest , tjs_int len , tjs_uint32 color , tjs_int opa)
+{
+	return TVPConstColorAlphaBlend(dest, len, color, opa);
+}
+static void STDCALL TVP_Stub_7b5718fc67458089c685dbb900126890(tjs_uint32 * dest , tjs_int len , tjs_uint32 color , tjs_int opa)
+{
+	return TVPConstColorAlphaBlend_d(dest, len, color, opa);
+}
+static void STDCALL TVP_Stub_5713dfe9525662357d3819229e0204c2(tjs_uint32 * dest , tjs_int len , tjs_uint32 color , tjs_int opa)
+{
+	return TVPConstColorAlphaBlend_a(dest, len, color, opa);
+}
+static void STDCALL TVP_Stub_8954a6b4a7f8b378c2af16a00d5059b0(tjs_uint32 * dest , tjs_int len , tjs_int strength)
+{
+	return TVPRemoveConstOpacity(dest, len, strength);
+}
+static void STDCALL TVP_Stub_2ed4faa38db6f3dee0dea18ebe973d35(tjs_uint32 * dest , const tjs_uint8 * src , tjs_int len)
+{
+	return TVPRemoveOpacity(dest, src, len);
+}
+static void STDCALL TVP_Stub_d0338dedb0af532d22f2075a85373548(tjs_uint32 * dest , const tjs_uint8 * src , tjs_int len , tjs_int strength)
+{
+	return TVPRemoveOpacity_o(dest, src, len, strength);
+}
+static void STDCALL TVP_Stub_583d57c3bb9491f8f9904c266d3f52e8(tjs_uint32 * dest , const tjs_uint8 * src , tjs_int len)
+{
+	return TVPRemoveOpacity65(dest, src, len);
+}
+static void STDCALL TVP_Stub_8ac206da43e322eb8e34fce2b0959656(tjs_uint32 * dest , const tjs_uint8 * src , tjs_int len , tjs_int strength)
+{
+	return TVPRemoveOpacity65_o(dest, src, len, strength);
+}
+static void STDCALL TVP_Stub_14f5f97d90bd8da89b68d035367f4ba4(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPAddBlend(dest, src, len);
+}
+static void STDCALL TVP_Stub_ac3b21181ef4c1be73cf5e0edb4e1a8f(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPAddBlend_HDA(dest, src, len);
+}
+static void STDCALL TVP_Stub_1d7d97509292a4ca9269f2539dcc70fd(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPAddBlend_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_c4033f54a99517783b8d6ad23c90aeed(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPAddBlend_HDA_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_f19e38d48755c971fc35408ac65562fa(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPSubBlend(dest, src, len);
+}
+static void STDCALL TVP_Stub_e01204e226d8aa9520b3620b68da6196(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPSubBlend_HDA(dest, src, len);
+}
+static void STDCALL TVP_Stub_b50000da98f1257cf789fc63fb1fda02(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPSubBlend_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_c55f38b1a7623646aa5cc45d4f4f479b(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPSubBlend_HDA_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_983d270549ec0e83e2a863b43e1e6f70(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPMulBlend(dest, src, len);
+}
+static void STDCALL TVP_Stub_b48d779dc6a881c67c5f8fa12655aa28(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPMulBlend_HDA(dest, src, len);
+}
+static void STDCALL TVP_Stub_d3967c6e24d0c4ad107a03c1cadd57b1(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPMulBlend_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_6b6f416b5725a7cafb4774ffc3a00f10(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPMulBlend_HDA_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_bc7fc5dfa228152a09d2230823c2fe71(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPColorDodgeBlend(dest, src, len);
+}
+static void STDCALL TVP_Stub_a1cb941317b947beb88e29fa8d46a2be(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPColorDodgeBlend_HDA(dest, src, len);
+}
+static void STDCALL TVP_Stub_8e185e82bb27a7fb40f0b08f560a57e9(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPColorDodgeBlend_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_4b7b264b61ee0eea68213934217f5865(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPColorDodgeBlend_HDA_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_e872f12593d6853ebdffebbb5d003c10(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPDarkenBlend(dest, src, len);
+}
+static void STDCALL TVP_Stub_e86fcf60fa658129d937de3728d3c432(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPDarkenBlend_HDA(dest, src, len);
+}
+static void STDCALL TVP_Stub_350741a7398a187628866f5b397c7a99(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPDarkenBlend_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_3b5a3e187077b0b5eac9a040c99dd9e7(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPDarkenBlend_HDA_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_2d9b2bb2cd57220048fe170f1e960cb7(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPLightenBlend(dest, src, len);
+}
+static void STDCALL TVP_Stub_260624e275a20115e8861eb7b0383971(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPLightenBlend_HDA(dest, src, len);
+}
+static void STDCALL TVP_Stub_15b31724287dbbecb775b2e46dc35fb9(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPLightenBlend_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_ff652293eef07b5a7ec4f372e5504e2c(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPLightenBlend_HDA_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_99b773033e9a2c631b483d4d0e3881f8(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPScreenBlend(dest, src, len);
+}
+static void STDCALL TVP_Stub_3787960fc29b8545629d894ff46d4641(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPScreenBlend_HDA(dest, src, len);
+}
+static void STDCALL TVP_Stub_3fc76257bb1639de4bfa0c0fcedf9c4a(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPScreenBlend_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_292ee2eeb8131e34368ba9ee144b737a(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPScreenBlend_HDA_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_ec144655bc61bfa2c6e9505cc1a0a298(tjs_uint32 * dest , tjs_int destlen , const tjs_uint32 * src , tjs_int srcstart , tjs_int srcstep)
+{
+	return TVPStretchCopy(dest, destlen, src, srcstart, srcstep);
+}
+static void STDCALL TVP_Stub_230218bdabfc34178a8306a54276a3c8(tjs_uint32 * dest , tjs_int destlen , const tjs_uint32 * src1 , const tjs_uint32 * src2 , tjs_int blend_y , tjs_int srcstart , tjs_int srcstep)
+{
+	return TVPInterpStretchCopy(dest, destlen, src1, src2, blend_y, srcstart, srcstep);
+}
+static void STDCALL TVP_Stub_617dfb046aaf40078ee76715fa4756af(tjs_uint32 * dest , tjs_int destlen , const tjs_uint32 * src)
+{
+	return TVPFastLinearInterpH2F(dest, destlen, src);
+}
+static void STDCALL TVP_Stub_8116bb2b26dcafd9fefca76e9f1d9b24(tjs_uint32 * dest , tjs_int destlen , const tjs_uint32 * src)
+{
+	return TVPFastLinearInterpH2B(dest, destlen, src);
+}
+static void STDCALL TVP_Stub_12962f857563cd39b3cb1f9894775cc7(tjs_uint32 * dest , tjs_int destlen , const tjs_uint32 * src0 , const tjs_uint32 * src1)
+{
+	return TVPFastLinearInterpV2(dest, destlen, src0, src1);
+}
+static void STDCALL TVP_Stub_50c0d25cd9af311a5fb0aca78f691c3b(tjs_uint32 * dest , tjs_int destlen , const tjs_uint32 * src , tjs_int srcstart , tjs_int srcstep)
+{
+	return TVPStretchColorCopy(dest, destlen, src, srcstart, srcstep);
+}
+static void STDCALL TVP_Stub_6c37a1ccda816c4fbab4f0117ca75e8a(tjs_uint32 * dest , tjs_int destlen , const tjs_uint32 * src , tjs_int sx , tjs_int sy , tjs_int stepx , tjs_int stepy , tjs_int srcpitch)
+{
+	return TVPLinTransCopy(dest, destlen, src, sx, sy, stepx, stepy, srcpitch);
+}
+static void STDCALL TVP_Stub_e21c21762dd0e36d6f7d2cedaac97383(tjs_uint32 * dest , tjs_int destlen , const tjs_uint32 * src , tjs_int sx , tjs_int sy , tjs_int stepx , tjs_int stepy , tjs_int srcpitch)
+{
+	return TVPInterpLinTransCopy(dest, destlen, src, sx, sy, stepx, stepy, srcpitch);
+}
+static void STDCALL TVP_Stub_487ee86557f94113db9a981e08d29caa(tjs_uint32 * dest , tjs_int destlen , const tjs_uint32 * src , tjs_int sx , tjs_int sy , tjs_int stepx , tjs_int stepy , tjs_int srcpitch)
+{
+	return TVPLinTransColorCopy(dest, destlen, src, sx, sy, stepx, stepy, srcpitch);
+}
+static void STDCALL TVP_Stub_dfdfe0e494845bf484612cc97145f85c(tjs_uint32 * dest , tjs_int len , tjs_uint32 key)
+{
+	return TVPMakeAlphaFromKey(dest, len, key);
+}
+static void STDCALL TVP_Stub_e74dc11dbd56fb450eed1388a65d3102(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPCopyMask(dest, src, len);
+}
+static void STDCALL TVP_Stub_6981c02247de5799ea7dfbd79fdc208d(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPCopyColor(dest, src, len);
+}
+static void STDCALL TVP_Stub_7c559043315f6ecd7a86ec7d8d820f6d(tjs_uint32 * main , const tjs_uint8 * mask , tjs_int len)
+{
+	return TVPBindMaskToMain(main, mask, len);
+}
+static void STDCALL TVP_Stub_3a8b6aca73c83d6fc9ce813661ec734d(tjs_uint32 * dest , tjs_int len , tjs_uint32 value)
+{
+	return TVPFillARGB(dest, len, value);
+}
+static void STDCALL TVP_Stub_20d7ce65e240b745b10616bb5da1f897(tjs_uint32 * dest , tjs_int len , tjs_uint32 value)
+{
+	return TVPFillARGB_NC(dest, len, value);
+}
+static void STDCALL TVP_Stub_f4d1217249674ac9274d358c381afc0b(tjs_uint32 * dest , tjs_int len , tjs_uint32 color)
+{
+	return TVPFillColor(dest, len, color);
+}
+static void STDCALL TVP_Stub_ca77323bbe361f88f68536018fa94c50(tjs_uint32 * dest , tjs_int len , tjs_uint32 mask)
+{
+	return TVPFillMask(dest, len, mask);
+}
+static void STDCALL TVP_Stub_17983ecc7e7fe370bce664281a84c948(tjs_uint16 * dest , const tjs_uint32 * addline , const tjs_uint32 * subline , tjs_int len)
+{
+	return TVPAddSubVertSum16(dest, addline, subline, len);
+}
+static void STDCALL TVP_Stub_61a2f61030362903d00ba21a3cebecdd(tjs_uint16 * dest , const tjs_uint32 * addline , const tjs_uint32 * subline , tjs_int len)
+{
+	return TVPAddSubVertSum16_d(dest, addline, subline, len);
+}
+static void STDCALL TVP_Stub_e9f985403dbd18540d8230a2af6ed76b(tjs_uint32 * dest , const tjs_uint32 * addline , const tjs_uint32 * subline , tjs_int len)
+{
+	return TVPAddSubVertSum32(dest, addline, subline, len);
+}
+static void STDCALL TVP_Stub_be0523c9a72ba26cb4bfa3cb188cacf6(tjs_uint32 * dest , const tjs_uint32 * addline , const tjs_uint32 * subline , tjs_int len)
+{
+	return TVPAddSubVertSum32_d(dest, addline, subline, len);
+}
+static void STDCALL TVP_Stub_8ac7cf651223c8ba53df90cf4f3d3bbc(tjs_uint32 * dest , tjs_uint16 * sum , const tjs_uint16 * add , const tjs_uint16 * sub , tjs_int n , tjs_int len)
+{
+	return TVPDoBoxBlurAvg16(dest, sum, add, sub, n, len);
+}
+static void STDCALL TVP_Stub_873e73aa35096ad4c684d394a10135a6(tjs_uint32 * dest , tjs_uint16 * sum , const tjs_uint16 * add , const tjs_uint16 * sub , tjs_int n , tjs_int len)
+{
+	return TVPDoBoxBlurAvg16_d(dest, sum, add, sub, n, len);
+}
+static void STDCALL TVP_Stub_3342548f105147c86019ae31ece01d4e(tjs_uint32 * dest , tjs_uint32 * sum , const tjs_uint32 * add , const tjs_uint32 * sub , tjs_int n , tjs_int len)
+{
+	return TVPDoBoxBlurAvg32(dest, sum, add, sub, n, len);
+}
+static void STDCALL TVP_Stub_607ee0956cbb16b2afb7cb2227aa6267(tjs_uint32 * dest , tjs_uint32 * sum , const tjs_uint32 * add , const tjs_uint32 * sub , tjs_int n , tjs_int len)
+{
+	return TVPDoBoxBlurAvg32_d(dest, sum, add, sub, n, len);
+}
+static void STDCALL TVP_Stub_816d84c86e86d5e7c0018d551e741e4f(tjs_uint8 * line1 , tjs_uint8 * line2 , tjs_int len)
+{
+	return TVPSwapLine8(line1, line2, len);
+}
+static void STDCALL TVP_Stub_985fcda0141eb3b4c6bd8342e947f130(tjs_uint32 * line1 , tjs_uint32 * line2 , tjs_int len)
+{
+	return TVPSwapLine32(line1, line2, len);
+}
+static void STDCALL TVP_Stub_d00e4f9e493334d2f65ea379ff03d717(tjs_uint8 * pixels , tjs_int len)
+{
+	return TVPReverse8(pixels, len);
+}
+static void STDCALL TVP_Stub_0c246e6c7c8798e4c10d2bbfc66326c9(tjs_uint32 * pixels , tjs_int len)
+{
+	return TVPReverse32(pixels, len);
+}
+static void STDCALL TVP_Stub_501015843a83368b3ff1c7c9ef5f3bcb(tjs_uint32 * dest , tjs_int len)
+{
+	return TVPDoGrayScale(dest, len);
+}
+static void STDCALL TVP_Stub_61d5fc5a060f346752a3a8b6886d17bc(tTVPGLGammaAdjustTempData * temp , const tTVPGLGammaAdjustData * data)
+{
+	return TVPInitGammaAdjustTempData(temp, data);
+}
+static void STDCALL TVP_Stub_0debe3e1caf0f57572a59917851676d3(tTVPGLGammaAdjustTempData * temp)
+{
+	return TVPUninitGammaAdjustTempData(temp);
+}
+static void STDCALL TVP_Stub_ee3a36682f48639166ba04a19fe1b332(tjs_uint32 * dest , tjs_int len , tTVPGLGammaAdjustTempData * temp)
+{
+	return TVPAdjustGamma(dest, len, temp);
+}
+static void STDCALL TVP_Stub_4d99b9e38121251b40a90cd2bd5fea63(tjs_uint32 * dest , tjs_int len , tTVPGLGammaAdjustTempData * temp)
+{
+	return TVPAdjustGamma_a(dest, len, temp);
+}
+static void STDCALL TVP_Stub_f1509827696ebf5627bee1a45d675fb8(tjs_uint8 * dest , const tjs_uint8 * src , tjs_int len , tjs_int level)
+{
+	return TVPChBlurMulCopy65(dest, src, len, level);
+}
+static void STDCALL TVP_Stub_bbb625e23229350453161810c41419dd(tjs_uint8 * dest , const tjs_uint8 * src , tjs_int len , tjs_int level)
+{
+	return TVPChBlurAddMulCopy65(dest, src, len, level);
+}
+static void STDCALL TVP_Stub_489a6aae30de0feff5d3c5fbd42ae325(tjs_uint8 * dest , tjs_int destpitch , tjs_int destwidth , tjs_int destheight , const tjs_uint8 * src , tjs_int srcpitch , tjs_int srcwidth , tjs_int srcheight , tjs_int blurwidth , tjs_int blurlevel)
+{
+	return TVPChBlurCopy65(dest, destpitch, destwidth, destheight, src, srcpitch, srcwidth, srcheight, blurwidth, blurlevel);
+}
+static void STDCALL TVP_Stub_6b9a349305f8c689dcfdbcea2566769c(tjs_uint8 * dest , const tjs_uint8 * src , tjs_int len , tjs_int level)
+{
+	return TVPChBlurMulCopy(dest, src, len, level);
+}
+static void STDCALL TVP_Stub_6320d208ce1a570aca52c3cdf7421f7c(tjs_uint8 * dest , const tjs_uint8 * src , tjs_int len , tjs_int level)
+{
+	return TVPChBlurAddMulCopy(dest, src, len, level);
+}
+static void STDCALL TVP_Stub_0f83f0459badd1cd352041b9243d712f(tjs_uint8 * dest , tjs_int destpitch , tjs_int destwidth , tjs_int destheight , const tjs_uint8 * src , tjs_int srcpitch , tjs_int srcwidth , tjs_int srcheight , tjs_int blurwidth , tjs_int blurlevel)
+{
+	return TVPChBlurCopy(dest, destpitch, destwidth, destheight, src, srcpitch, srcwidth, srcheight, blurwidth, blurlevel);
+}
+static void STDCALL TVP_Stub_186a94b2fed609ed2d2a7ac1a2bed87f(tjs_uint8 * dest , const tjs_uint8 * buf , tjs_int len , const tjs_uint32 * pal)
+{
+	return TVPBLExpand1BitTo8BitPal(dest, buf, len, pal);
+}
+static void STDCALL TVP_Stub_bde8efb9971664f2b52fe912745e2791(tjs_uint8 * dest , const tjs_uint8 * buf , tjs_int len)
+{
+	return TVPBLExpand1BitTo8Bit(dest, buf, len);
+}
+static void STDCALL TVP_Stub_386d6fa5cb73e3519b62d20470e5414b(tjs_uint32 * dest , const tjs_uint8 * buf , tjs_int len , const tjs_uint32 * pal)
+{
+	return TVPBLExpand1BitTo32BitPal(dest, buf, len, pal);
+}
+static void STDCALL TVP_Stub_c61f97ec3d99bdbb23afe93870001bbf(tjs_uint8 * dest , const tjs_uint8 * buf , tjs_int len , const tjs_uint32 * pal)
+{
+	return TVPBLExpand4BitTo8BitPal(dest, buf, len, pal);
+}
+static void STDCALL TVP_Stub_f92821f2b23662c6f1256511a626cd3f(tjs_uint8 * dest , const tjs_uint8 * buf , tjs_int len)
+{
+	return TVPBLExpand4BitTo8Bit(dest, buf, len);
+}
+static void STDCALL TVP_Stub_76b0732e3e2886897d5f26b4b0545dee(tjs_uint32 * dest , const tjs_uint8 * buf , tjs_int len , const tjs_uint32 * pal)
+{
+	return TVPBLExpand4BitTo32BitPal(dest, buf, len, pal);
+}
+static void STDCALL TVP_Stub_903ed11ef3863850e837bd4b3b1d61a1(tjs_uint8 * dest , const tjs_uint8 * buf , tjs_int len , const tjs_uint32 * pal)
+{
+	return TVPBLExpand8BitTo8BitPal(dest, buf, len, pal);
+}
+static void STDCALL TVP_Stub_2661124b39595ffafe2fb0bfb7bd2efc(tjs_uint32 * dest , const tjs_uint8 * buf , tjs_int len , const tjs_uint32 * pal)
+{
+	return TVPBLExpand8BitTo32BitPal(dest, buf, len, pal);
+}
+static void STDCALL TVP_Stub_d0b7170e54398c2f9d27dcc513c4cf46(tjs_uint32 * dest , const tjs_uint8 * buf , tjs_int len)
+{
+	return TVPExpand8BitTo32BitGray(dest, buf, len);
+}
+static void STDCALL TVP_Stub_31bdd2a1eed3785c1422fab5ea6b3ce7(tjs_uint8 * dest , const tjs_uint16 * buf , tjs_int len)
+{
+	return TVPBLConvert15BitTo8Bit(dest, buf, len);
+}
+static void STDCALL TVP_Stub_dbc300d1dadc1a60cb0dcadfb92f1aee(tjs_uint32 * dest , const tjs_uint16 * buf , tjs_int len)
+{
+	return TVPBLConvert15BitTo32Bit(dest, buf, len);
+}
+static void STDCALL TVP_Stub_1d4d9f8bdf55bd4c78abd90656af0364(tjs_uint8 * dest , const tjs_uint8 * buf , tjs_int len)
+{
+	return TVPBLConvert24BitTo8Bit(dest, buf, len);
+}
+static void STDCALL TVP_Stub_5c7049e712e84b40ac05942421202de5(tjs_uint32 * dest , const tjs_uint8 * buf , tjs_int len)
+{
+	return TVPBLConvert24BitTo32Bit(dest, buf, len);
+}
+static void STDCALL TVP_Stub_5dca8992bb340d70ba65ddab65c28371(tjs_uint32 * dest , const tjs_uint8 * buf , tjs_int len)
+{
+	return TVPConvert24BitTo32Bit(dest, buf, len);
+}
+static void STDCALL TVP_Stub_85f1f38f783ebfcf638f3c443bc9b204(tjs_uint8 * dest , const tjs_uint32 * buf , tjs_int len)
+{
+	return TVPBLConvert32BitTo8Bit(dest, buf, len);
+}
+static void STDCALL TVP_Stub_7d61d143884bfa4b6c50dae11c2b659f(tjs_uint32 * dest , const tjs_uint32 * buf , tjs_int len)
+{
+	return TVPBLConvert32BitTo32Bit_NoneAlpha(dest, buf, len);
+}
+static void STDCALL TVP_Stub_793a2ad7ad3411be3670576a8e6ddcf8(tjs_uint32 * dest , const tjs_uint32 * buf , tjs_int len)
+{
+	return TVPBLConvert32BitTo32Bit_MulAddAlpha(dest, buf, len);
+}
+static void STDCALL TVP_Stub_68d8eec33254f1684e53bbc0aa8b2466(tjs_uint32 * dest , const tjs_uint32 * buf , tjs_int len)
+{
+	return TVPBLConvert32BitTo32Bit_AddAlpha(dest, buf, len);
+}
+static void STDCALL TVP_Stub_b09652d2197b29f7d38aff0298c69f17(tjs_uint16 * dest , const tjs_uint32 * src , tjs_int len , tjs_int xofs , tjs_int yofs)
+{
+	return TVPDither32BitTo16Bit565(dest, src, len, xofs, yofs);
+}
+static void STDCALL TVP_Stub_be7db03ddcf1886cb7233e58f19c8c77(tjs_uint16 * dest , const tjs_uint32 * src , tjs_int len , tjs_int xofs , tjs_int yofs)
+{
+	return TVPDither32BitTo16Bit555(dest, src, len, xofs, yofs);
+}
+static void STDCALL TVP_Stub_b4c8fedc1ffbe30d9703cb2b8d3c0e7b(tjs_uint8 * dest , const tjs_uint32 * src , tjs_int len , tjs_int xofs , tjs_int yofs)
+{
+	return TVPDither32BitTo8Bit(dest, src, len, xofs, yofs);
+}
+static void STDCALL TVP_Stub_77efef3b4ffc0cb577b76304e06e39f3(tjs_uint8 * outp , const tjs_uint8 * upper , tjs_uint8 * const * buf , tjs_int width)
+{
+	return TVPTLG5ComposeColors3To4(outp, upper, buf, width);
+}
+static void STDCALL TVP_Stub_0e55187bde599d6585eaabd2c4ac3f02(tjs_uint8 * outp , const tjs_uint8 * upper , tjs_uint8 * const * buf , tjs_int width)
+{
+	return TVPTLG5ComposeColors4To4(outp, upper, buf, width);
+}
+static tjs_int STDCALL TVP_Stub_f72e3fc3b97a9141b6f516f5e53bf9b8(tjs_uint8 * out , const tjs_uint8 * in , tjs_int insize , tjs_uint8 * text , tjs_int initialr)
+{
+	return TVPTLG5DecompressSlide(out, in, insize, text, initialr);
+}
+static void STDCALL TVP_Stub_e7a1ac237f00bb6320d0e0ac7e6d51c6(tjs_int8 * pixelbuf , tjs_int pixel_count , tjs_uint8 * bit_pool)
+{
+	return TVPTLG6DecodeGolombValuesForFirst(pixelbuf, pixel_count, bit_pool);
+}
+static void STDCALL TVP_Stub_d87682f6d691350878077bd101b7f0fc(tjs_int8 * pixelbuf , tjs_int pixel_count , tjs_uint8 * bit_pool)
+{
+	return TVPTLG6DecodeGolombValues(pixelbuf, pixel_count, bit_pool);
+}
+static void STDCALL TVP_Stub_d7ae155eaabd8e65d6b4d356fe4af496(tjs_uint32 * prevline , tjs_uint32 * curline , tjs_int width , tjs_int start_block , tjs_int block_limit , tjs_uint8 * filtertypes , tjs_int skipblockbytes , tjs_uint32 * in , tjs_uint32 initialp , tjs_int oddskip , tjs_int dir)
+{
+	return TVPTLG6DecodeLineGeneric(prevline, curline, width, start_block, block_limit, filtertypes, skipblockbytes, in, initialp, oddskip, dir);
+}
+static void STDCALL TVP_Stub_be3a1844ea6af533bd4e7b0a76c826a1(tjs_uint32 * prevline , tjs_uint32 * curline , tjs_int width , tjs_int block_count , tjs_uint8 * filtertypes , tjs_int skipblockbytes , tjs_uint32 * in , tjs_uint32 initialp , tjs_int oddskip , tjs_int dir)
+{
+	return TVPTLG6DecodeLine(prevline, curline, width, block_count, filtertypes, skipblockbytes, in, initialp, oddskip, dir);
+}
+static void STDCALL TVP_Stub_aa531d2c3c87f456e48a14722faa1c1f(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPPsAlphaBlend(dest, src, len);
+}
+static void STDCALL TVP_Stub_6889cd886e1c2e7faf541528636c16c3(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPPsAlphaBlend_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_5d9266e6a8a154fe4ba80b0995e109ab(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPPsAlphaBlend_HDA(dest, src, len);
+}
+static void STDCALL TVP_Stub_a7dc19b023737979ad1ae1ae01d560d2(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPPsAlphaBlend_HDA_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_d20444b7a6243d668a0d3956d95af510(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPPsAddBlend(dest, src, len);
+}
+static void STDCALL TVP_Stub_1458dec9eee36816c8002d4049840355(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPPsAddBlend_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_21137ff5351245b1611852301b7f5796(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPPsAddBlend_HDA(dest, src, len);
+}
+static void STDCALL TVP_Stub_c07fc4e45fc2dc44d839c5e012d0be60(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPPsAddBlend_HDA_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_6815b962a3122ae967284239932cc656(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPPsSubBlend(dest, src, len);
+}
+static void STDCALL TVP_Stub_e96cccbe1f16b0fb74673f2ec3343ff8(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPPsSubBlend_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_e8cd7494f919b18a992cb8c2722b2bf0(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPPsSubBlend_HDA(dest, src, len);
+}
+static void STDCALL TVP_Stub_990fdefcafc0de5e8e1f502c1b341e44(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPPsSubBlend_HDA_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_de5d83ba307e822825062377fb76c2ba(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPPsMulBlend(dest, src, len);
+}
+static void STDCALL TVP_Stub_5e28bcc0f5ad6a038eb5a6535b56386c(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPPsMulBlend_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_e33419e8ede4bb501ab1787cf17c7ca5(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPPsMulBlend_HDA(dest, src, len);
+}
+static void STDCALL TVP_Stub_1cd7cb9580c0cf723dea402b85a720b1(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPPsMulBlend_HDA_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_d18ca17fad389ff60ce3caa769083798(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPPsScreenBlend(dest, src, len);
+}
+static void STDCALL TVP_Stub_0a959a5ff02530a8eb122e7e1f8ceed3(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPPsScreenBlend_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_a4774ea559e64b4667b3845f8540d207(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPPsScreenBlend_HDA(dest, src, len);
+}
+static void STDCALL TVP_Stub_52eae3e8106494bfa604c15492ecb9f4(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPPsScreenBlend_HDA_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_882f458df5e05bb9ab2222e79f6c81cf(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPPsOverlayBlend(dest, src, len);
+}
+static void STDCALL TVP_Stub_6069a18bf7d3f394c230cdcf2f574ef4(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPPsOverlayBlend_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_75b60565caf44027cc52b2b5cf6b0ea3(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPPsOverlayBlend_HDA(dest, src, len);
+}
+static void STDCALL TVP_Stub_9d735149c3ad586363895f76645abf2e(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPPsOverlayBlend_HDA_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_ea5168fae254acdd8c8db6f1f3d2da03(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPPsHardLightBlend(dest, src, len);
+}
+static void STDCALL TVP_Stub_f5a42bd5239e1a0be29f92eb838d2c8c(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPPsHardLightBlend_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_7cc8cd9f415b183b42c546635aeade7f(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPPsHardLightBlend_HDA(dest, src, len);
+}
+static void STDCALL TVP_Stub_ad2fefa53e05528f9c1fe29d27db0f37(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPPsHardLightBlend_HDA_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_f3e06fed4c82a9bd1b53252abaf50847(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPPsSoftLightBlend(dest, src, len);
+}
+static void STDCALL TVP_Stub_960db7ea36202bf7ec3bf6b767cc045e(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPPsSoftLightBlend_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_7bf5d357eb52dd206a269b54c8136e0e(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPPsSoftLightBlend_HDA(dest, src, len);
+}
+static void STDCALL TVP_Stub_ba1c9b771c5cdb725128de684af3c9ca(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPPsSoftLightBlend_HDA_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_69cc6311196adc134fd153c4c5346bc5(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPPsColorDodgeBlend(dest, src, len);
+}
+static void STDCALL TVP_Stub_8ed68f8e79efe1c767f92e7d92eb8b54(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPPsColorDodgeBlend_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_60da1e9ec15b251ff18ddcdf8a3e93e0(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPPsColorDodgeBlend_HDA(dest, src, len);
+}
+static void STDCALL TVP_Stub_ef47304bad87a036e38f0319b48c1f6e(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPPsColorDodgeBlend_HDA_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_182d19020e4e2d5cd1462d7c8ef24d1f(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPPsColorDodge5Blend(dest, src, len);
+}
+static void STDCALL TVP_Stub_9e1fa429a92a5c99d397a06c20fd6705(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPPsColorDodge5Blend_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_74ac7c291299eb928aa4c2899df5567e(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPPsColorDodge5Blend_HDA(dest, src, len);
+}
+static void STDCALL TVP_Stub_fb645d9ec0ef3fd2aba2b762ef6b9a15(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPPsColorDodge5Blend_HDA_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_f988626275257574050ac789f9060a3b(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPPsColorBurnBlend(dest, src, len);
+}
+static void STDCALL TVP_Stub_1831064ed23493cef407648763ba4d69(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPPsColorBurnBlend_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_305390c94750daa7124db3ff6e77931c(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPPsColorBurnBlend_HDA(dest, src, len);
+}
+static void STDCALL TVP_Stub_4fb384a391bfcf6a3a2932661d3051aa(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPPsColorBurnBlend_HDA_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_305537c4820e23cf217a15efb56dba1c(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPPsLightenBlend(dest, src, len);
+}
+static void STDCALL TVP_Stub_aacf83677ca7df75117f7bafa7a53791(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPPsLightenBlend_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_d14b922fefc6c07aa536b94762579fe5(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPPsLightenBlend_HDA(dest, src, len);
+}
+static void STDCALL TVP_Stub_00fd650a79c603bdeb2f8e36f667a782(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPPsLightenBlend_HDA_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_a36ee133c07c30185b0bbc6375954e88(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPPsDarkenBlend(dest, src, len);
+}
+static void STDCALL TVP_Stub_dc657ecacf8e578870314427216864d9(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPPsDarkenBlend_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_e79d02b58a8bfdee439bc0694d7edd6d(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPPsDarkenBlend_HDA(dest, src, len);
+}
+static void STDCALL TVP_Stub_6b7537b66b71d27384bea45bc2bf24b4(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPPsDarkenBlend_HDA_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_b3456dbad652b52f5bce1889b6f4d0ef(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPPsDiffBlend(dest, src, len);
+}
+static void STDCALL TVP_Stub_9a50803a03e1ccb60120dff8b92ecdcd(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPPsDiffBlend_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_0f6b3940dc72e3e56cd15216b53b9126(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPPsDiffBlend_HDA(dest, src, len);
+}
+static void STDCALL TVP_Stub_23b647f1c825e214a7465de3ebe9968d(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPPsDiffBlend_HDA_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_8ec96bc7b777180f23e1a2e43bf9a413(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPPsDiff5Blend(dest, src, len);
+}
+static void STDCALL TVP_Stub_cffd45014652659638d59abe11daf3be(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPPsDiff5Blend_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_a784285a35b1bc76bb367305b5099e35(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPPsDiff5Blend_HDA(dest, src, len);
+}
+static void STDCALL TVP_Stub_03773751329896facf2003ab79bbc475(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPPsDiff5Blend_HDA_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_923884216edf134d07d8e70f8f57e827(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPPsExclusionBlend(dest, src, len);
+}
+static void STDCALL TVP_Stub_e48798dc69498f80b6633bb405eda6eb(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPPsExclusionBlend_o(dest, src, len, opa);
+}
+static void STDCALL TVP_Stub_998a5e1aa5cd85689795348fc540a655(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len)
+{
+	return TVPPsExclusionBlend_HDA(dest, src, len);
+}
+static void STDCALL TVP_Stub_5f6d263c0d48d03f6eb0dc44c9dd0be2(tjs_uint32 * dest , const tjs_uint32 * src , tjs_int len , tjs_int opa)
+{
+	return TVPPsExclusionBlend_HDA_o(dest, src, len, opa);
 }
 
+#include <zlib.h>
+/* function table is pretty large; is compressed via zlib */
+static tjs_uint8 compressed_functable[] = {
+0x78, 0x9c, 0xd5, 0x5d, 0xeb, 0x6f, 0x1b, 0xb9, 0x11, 0xbf, 0x3f, 0xc5, 0xfd, 0xd0, 0x40, 0x97, 
+0x53, 0x51, 0xc4, 0x89, 0x0d, 0xa3, 0xb8, 0x3b, 0x40, 0x0f, 0xbf, 0x5a, 0xdb, 0x51, 0x2d, 0xc5, 
+0x57, 0xb4, 0x68, 0x05, 0x7a, 0x97, 0xb6, 0xf6, 0xb2, 0x5a, 0xaa, 0xfb, 0x70, 0xac, 0xa2, 0xb8, 
+0xbf, 0xbd, 0x24, 0xf7, 0x45, 0x2e, 0x1f, 0x4b, 0x2e, 0xa9, 0x04, 0xfd, 0x12, 0x4b, 0xcb, 0x99, 
+0xdf, 0x0c, 0x87, 0xc3, 0xe1, 0x70, 0xc8, 0x55, 0x5e, 0x50, 0x14, 0x1e, 0xe5, 0xab, 0x3f, 0x2f, 
+0x1f, 0x40, 0x1a, 0x81, 0x24, 0xff, 0xd3, 0x9f, 0x66, 0x1b, 0x90, 0x3c, 0xc3, 0x59, 0x8c, 0xb2, 
+0x22, 0x85, 0x1f, 0x1f, 0x7f, 0x5d, 0x6d, 0xa2, 0x6c, 0x14, 0x61, 0x8a, 0x79, 0x94, 0xed, 0x40, 
+0x1e, 0x6c, 0x8e, 0x8f, 0xde, 0x7e, 0xff, 0x1d, 0xc7, 0xc2, 0x7c, 0x19, 0x69, 0x9a, 0x02, 0x94, 
+0x64, 0x39, 0x2b, 0xec, 0xe8, 0x8d, 0x86, 0xda, 0x5c, 0x64, 0x87, 0x72, 0x6c, 0xce, 0x59, 0x69, 
+0xf4, 0x6b, 0xb6, 0x0e, 0x36, 0x20, 0x35, 0x21, 0xc5, 0x4f, 0x96, 0x79, 0x1a, 0x25, 0xcf, 0x5a, 
+0xdd, 0x5b, 0xdc, 0xc4, 0x14, 0x18, 0xd3, 0x16, 0x51, 0x92, 0x9f, 0x61, 0xfd, 0xeb, 0xcf, 0x1a, 
+0xa6, 0x47, 0x84, 0x62, 0x4d, 0x33, 0x41, 0xc0, 0x00, 0xef, 0x8f, 0xfb, 0x69, 0x4e, 0x3f, 0xf4, 
+0xd0, 0xa4, 0x10, 0xe8, 0x44, 0x09, 0xea, 0x0b, 0x9d, 0xfd, 0xed, 0x48, 0xe9, 0x1f, 0xab, 0xfd, 
+0x0e, 0xf2, 0xde, 0x47, 0x9e, 0x60, 0x9a, 0x17, 0xd1, 0x2d, 0x63, 0x08, 0x52, 0x9e, 0xbb, 0xf2, 
+0xd1, 0xa3, 0x37, 0x3c, 0xe5, 0x24, 0xc3, 0x5e, 0x0b, 0x83, 0xba, 0x59, 0x8a, 0xb6, 0x42, 0x25, 
+0x4d, 0xd7, 0x5d, 0xd1, 0x0e, 0xa6, 0x20, 0x47, 0xe9, 0x51, 0xc7, 0x87, 0x14, 0x20, 0xa5, 0x2b, 
+0x10, 0x90, 0xaa, 0xff, 0xef, 0x31, 0x2d, 0x4f, 0x74, 0x09, 0xf3, 0xab, 0x88, 0xf6, 0x5b, 0xaa, 
+0x45, 0x90, 0x43, 0x55, 0xdb, 0x75, 0x92, 0xc3, 0x67, 0x98, 0x2a, 0x5a, 0xef, 0xf1, 0xb0, 0xf0, 
+0xda, 0x77, 0xed, 0xd0, 0xf4, 0xe5, 0x27, 0xf9, 0xcc, 0x93, 0xd8, 0x18, 0xed, 0xf6, 0xf7, 0xf0, 
+0xa9, 0x77, 0xa2, 0x6a, 0x24, 0xe9, 0xe6, 0x5e, 0x97, 0x6d, 0x09, 0xf3, 0x6a, 0x14, 0xbc, 0x70, 
+0x69, 0xe7, 0xbd, 0x46, 0x65, 0xd1, 0xa3, 0x06, 0x70, 0x56, 0x41, 0x61, 0x88, 0x50, 0xea, 0x03, 
+0xe6, 0x9c, 0x3d, 0x81, 0xa8, 0x9f, 0x53, 0x1e, 0xed, 0x8c, 0xf8, 0x64, 0xd1, 0x4c, 0xc3, 0x28, 
+0x44, 0x29, 0x9d, 0x41, 0xa4, 0x21, 0xcb, 0xc0, 0x0e, 0x0f, 0xd5, 0x3c, 0xb1, 0x11, 0x54, 0xc6, 
+0x34, 0x71, 0x02, 0xc4, 0xe8, 0x39, 0x0a, 0x40, 0x8c, 0x52, 0xf8, 0xef, 0x02, 0x4f, 0x2f, 0xc3, 
+0x69, 0x53, 0x71, 0x81, 0x24, 0xb4, 0x62, 0x6b, 0x74, 0xfa, 0xaf, 0xf1, 0x04, 0x8d, 0x92, 0x20, 
+0x85, 0x5b, 0xa8, 0x08, 0x27, 0x21, 0xd4, 0xb5, 0x36, 0xe2, 0xfe, 0x65, 0x2c, 0xae, 0x61, 0x79, 
+0x63, 0xcf, 0xf2, 0xf3, 0xcf, 0xc6, 0x3c, 0xe9, 0x63, 0x94, 0x67, 0x9b, 0xe8, 0x29, 0x1f, 0x66, 
+0xbe, 0x1f, 0x7f, 0xb4, 0xd7, 0xee, 0xf7, 0xf6, 0x2c, 0x7f, 0x34, 0x1f, 0xa5, 0x30, 0x7a, 0x19, 
+0xd6, 0x95, 0xb7, 0xc6, 0x32, 0x2a, 0x9f, 0x4b, 0x90, 0x7c, 0xb0, 0xb1, 0x45, 0x55, 0x4d, 0x39, 
+0x4a, 0x8a, 0xed, 0xa3, 0x62, 0x5d, 0x09, 0x68, 0xf2, 0x97, 0x45, 0xcf, 0x89, 0xde, 0x87, 0xfe, 
+0x60, 0x6f, 0xbf, 0x1f, 0x14, 0x2c, 0x06, 0xe9, 0xc0, 0x11, 0x65, 0xfc, 0x8e, 0x84, 0x13, 0xbe, 
+0xf9, 0x0e, 0xa5, 0x5b, 0x10, 0xcf, 0xd0, 0x76, 0x07, 0xf0, 0x42, 0x2f, 0x83, 0x57, 0xb2, 0xe2, 
+0x85, 0x22, 0x80, 0x69, 0xe2, 0x81, 0x97, 0x84, 0xe1, 0x20, 0xa7, 0xeb, 0xb1, 0x15, 0xca, 0x25, 
+0x8e, 0x42, 0x39, 0x4c, 0x57, 0xd8, 0xe4, 0x76, 0x8c, 0x37, 0x51, 0x9e, 0xc7, 0x43, 0x18, 0xaf, 
+0xb3, 0x6b, 0xdc, 0x00, 0x92, 0x00, 0x7e, 0x7c, 0x12, 0x57, 0x83, 0x8a, 0xad, 0xb3, 0x8a, 0xca, 
+0x73, 0xab, 0x91, 0x15, 0xf5, 0x1d, 0x9a, 0x84, 0x21, 0x49, 0x2c, 0xac, 0xb8, 0xe8, 0xc6, 0xc3, 
+0x9a, 0x43, 0x90, 0x65, 0x9d, 0x30, 0xea, 0x10, 0xea, 0x65, 0xbe, 0x0b, 0x50, 0x27, 0x82, 0xb6, 
+0x1c, 0x82, 0xac, 0xee, 0xa8, 0x08, 0xc9, 0xa4, 0x5a, 0x52, 0x95, 0x47, 0x08, 0x7d, 0x2b, 0x53, 
+0x4c, 0x3b, 0x7a, 0x89, 0x0d, 0xea, 0x75, 0xb6, 0x4b, 0xdf, 0xa4, 0xa9, 0x15, 0xa5, 0x18, 0x02, 
+0x26, 0xd9, 0x5d, 0x19, 0x71, 0xa4, 0x6e, 0x2a, 0x8f, 0x16, 0xad, 0x3c, 0x99, 0xea, 0x0c, 0x21, 
+0xf1, 0xf2, 0x1e, 0x92, 0x2a, 0xb5, 0x60, 0xfb, 0x42, 0x66, 0x6b, 0x57, 0xc9, 0x32, 0xa3, 0xee, 
+0xd3, 0x4a, 0x45, 0xa5, 0x5a, 0xdb, 0xff, 0xab, 0x9b, 0xa2, 0xfd, 0xfc, 0x6f, 0xde, 0xb8, 0xf1, 
+0x3b, 0x8a, 0xff, 0x97, 0xa3, 0xf6, 0x6e, 0xec, 0xbf, 0x93, 0x2f, 0x19, 0xc6, 0xfc, 0x3f, 0x39, 
+0xf2, 0xff, 0xe8, 0xc6, 0xfe, 0xb3, 0xa3, 0x74, 0x47, 0xed, 0x15, 0x09, 0x98, 0x39, 0xff, 0x30, 
+0xfd, 0x9b, 0x6c, 0xae, 0x4e, 0xe9, 0x2d, 0x7a, 0xec, 0x68, 0xf0, 0xdf, 0xbb, 0xb1, 0xff, 0x71, 
+0x10, 0x3b, 0xc9, 0xf6, 0xdc, 0xe4, 0xbe, 0x75, 0x9c, 0x25, 0x16, 0xe1, 0xe8, 0x37, 0x0b, 0xda, 
+0x3f, 0xb8, 0xa9, 0xf5, 0x83, 0x95, 0x28, 0x1b, 0x5c, 0x8d, 0x5a, 0x74, 0xf1, 0x79, 0xab, 0xe0, 
+0x4c, 0xe0, 0x97, 0x51, 0x16, 0xfd, 0x07, 0xae, 0x73, 0x6d, 0xa2, 0x1a, 0xc2, 0x18, 0xe6, 0x70, 
+0x54, 0x42, 0x7d, 0xdf, 0x0b, 0x79, 0xf4, 0x8f, 0x7f, 0x9a, 0xa3, 0x12, 0x62, 0x53, 0xe0, 0x0a, 
+0x75, 0x5c, 0xd3, 0x77, 0x97, 0x6e, 0xae, 0x0e, 0x57, 0xae, 0xf2, 0x86, 0xb5, 0x44, 0x7b, 0xf6, 
+0xb1, 0x1f, 0x64, 0x21, 0xf9, 0x18, 0xab, 0x1a, 0x64, 0xa8, 0xbf, 0x09, 0x74, 0x92, 0x4d, 0x4a, 
+0x45, 0x5b, 0xa7, 0x2f, 0xaa, 0xf6, 0x7b, 0x3c, 0x1c, 0x20, 0x83, 0x4c, 0xe9, 0x4e, 0x42, 0x84, 
+0xd3, 0xad, 0x1b, 0x98, 0x3c, 0xe7, 0x1b, 0x49, 0x7a, 0x56, 0x57, 0x3b, 0xa5, 0x5c, 0x73, 0x90, 
+0x03, 0xce, 0xa5, 0xcb, 0xac, 0xad, 0x34, 0x4c, 0x5b, 0x34, 0x94, 0x37, 0xa8, 0x0a, 0x3c, 0x12, 
+0x52, 0x49, 0x9e, 0xd9, 0x07, 0xdb, 0xa9, 0xfe, 0x68, 0x09, 0x13, 0x33, 0xca, 0xe6, 0xc1, 0xb4, 
+0x78, 0x7a, 0x82, 0x69, 0x69, 0x32, 0xb5, 0xce, 0x95, 0x06, 0x06, 0xa8, 0x9d, 0x5d, 0xa2, 0x91, 
+0xad, 0xc6, 0x8d, 0x4b, 0x1a, 0xd8, 0x40, 0x4b, 0x5c, 0x2f, 0x5f, 0x5c, 0xfb, 0x6f, 0x47, 0x8a, 
+0x21, 0xac, 0x36, 0x15, 0x35, 0x9d, 0x41, 0xc1, 0xce, 0x90, 0x4f, 0x3a, 0x60, 0x26, 0x5c, 0xcd, 
+0xe8, 0x35, 0x53, 0x40, 0x20, 0xff, 0x41, 0xae, 0x9d, 0x21, 0x83, 0xe0, 0x79, 0x26, 0x7c, 0x4c, 
+0x77, 0xb4, 0xe4, 0xad, 0x9b, 0x08, 0x64, 0xcd, 0x51, 0x00, 0xbf, 0x4b, 0xaa, 0x9b, 0x27, 0x71, 
+0x8c, 0x82, 0xd2, 0x15, 0x47, 0x4c, 0x90, 0x52, 0x10, 0xef, 0x76, 0x30, 0x09, 0x05, 0x6a, 0x41, 
+0xe6, 0x45, 0xf4, 0x8a, 0xfd, 0x7a, 0x24, 0x69, 0xb9, 0x87, 0xbb, 0x18, 0x04, 0x50, 0xe6, 0x8a, 
+0x92, 0x47, 0x65, 0x49, 0x54, 0x00, 0x59, 0xa1, 0x1b, 0xf4, 0x05, 0xa6, 0xb3, 0x32, 0x24, 0x49, 
+0x9a, 0x3f, 0xed, 0x76, 0x59, 0xd3, 0x2e, 0x9c, 0x36, 0xd4, 0x74, 0xed, 0x61, 0x83, 0xa2, 0xbb, 
+0xd7, 0x49, 0x08, 0x49, 0x87, 0x31, 0x85, 0x74, 0xa7, 0x59, 0xd3, 0x05, 0xeb, 0x2c, 0x97, 0xee, 
+0xbc, 0xb8, 0xed, 0x6c, 0x63, 0xc4, 0x8c, 0x6b, 0x15, 0x37, 0x8f, 0xf5, 0x51, 0x53, 0x87, 0xab, 
+0xbb, 0xc3, 0x6b, 0x2a, 0x16, 0xa2, 0x5f, 0x4b, 0x1d, 0xb5, 0x97, 0xed, 0x77, 0x3a, 0xb6, 0x4a, 
+0x2b, 0xde, 0xb5, 0xca, 0x92, 0xce, 0xf5, 0x6c, 0x90, 0xb8, 0x9f, 0x24, 0x5e, 0x6e, 0xa1, 0xa3, 
+0xc0, 0x64, 0xa4, 0xa1, 0x85, 0xa8, 0x1f, 0x07, 0xf5, 0xea, 0x67, 0x9d, 0x0d, 0xdb, 0x67, 0xf2, 
+0x89, 0xec, 0x83, 0x57, 0xb4, 0x4b, 0x2f, 0x67, 0x13, 0x3d, 0x18, 0x4b, 0x52, 0x0c, 0x29, 0x3d, 
+0x4e, 0xca, 0x9a, 0xa9, 0xdf, 0xad, 0x62, 0xb4, 0xde, 0xda, 0xce, 0x50, 0x59, 0x6f, 0x24, 0x0c, 
+0x78, 0xce, 0xda, 0x30, 0x9c, 0x67, 0x01, 0xd8, 0xc1, 0x99, 0x19, 0xf1, 0xa7, 0x04, 0x6a, 0xc8, 
+0x85, 0xc1, 0x5c, 0xe6, 0x20, 0xcd, 0xb3, 0x5f, 0x22, 0x9c, 0xca, 0x18, 0xbb, 0x8d, 0xc8, 0x63, 
+0x38, 0x89, 0x70, 0x14, 0xba, 0x03, 0x69, 0x8a, 0xbe, 0xe0, 0x07, 0x34, 0x68, 0xaa, 0x3a, 0xb1, 
+0x42, 0x0d, 0xdd, 0x88, 0x59, 0xb1, 0xc6, 0x9d, 0x8d, 0xa3, 0xa0, 0xd9, 0x75, 0x76, 0xbe, 0xdd, 
+0xe5, 0xfb, 0x6e, 0x7c, 0xe9, 0x2a, 0xc1, 0xca, 0x96, 0x91, 0xc4, 0x7c, 0x6e, 0x27, 0xf5, 0x11, 
+0x02, 0x03, 0xb2, 0x7c, 0xb6, 0x01, 0x9d, 0x0a, 0xd7, 0x5b, 0xb9, 0x2b, 0x49, 0xf7, 0x18, 0x02, 
+0x95, 0x7a, 0x8b, 0x21, 0x03, 0x94, 0xee, 0x30, 0x14, 0x98, 0x8a, 0x0d, 0x86, 0x46, 0xcf, 0x31, 
+0x47, 0x2e, 0x84, 0x7a, 0x4d, 0x2a, 0xdd, 0xae, 0x80, 0x75, 0x2e, 0xad, 0xa2, 0x58, 0x36, 0x75, 
+0x4b, 0x21, 0x03, 0x6b, 0xb2, 0x2c, 0x1b, 0x5e, 0x31, 0xb5, 0xe9, 0xea, 0x2c, 0xcd, 0x01, 0xd4, 
+0x1d, 0xc8, 0x94, 0x0a, 0x6a, 0x64, 0xf4, 0xa4, 0x0e, 0x52, 0x72, 0x6b, 0x7c, 0x8d, 0xc5, 0x54, 
+0xcb, 0x72, 0x07, 0xa7, 0x4c, 0x5d, 0xa8, 0xa7, 0x2b, 0xef, 0x29, 0x48, 0x12, 0x08, 0xb1, 0xb1, 
+0x71, 0x9e, 0xae, 0x4a, 0xd2, 0x59, 0x26, 0x22, 0x77, 0xf6, 0x52, 0xf2, 0x92, 0x72, 0x1b, 0x1b, 
+0xc4, 0xfa, 0xaf, 0x50, 0xb6, 0x6d, 0x89, 0xb9, 0xb2, 0xac, 0xca, 0xa2, 0x38, 0xde, 0xe8, 0x0a, 
+0xd1, 0x5a, 0xe5, 0xf1, 0x14, 0x98, 0xa1, 0x82, 0xad, 0x22, 0x57, 0xe4, 0x18, 0xf6, 0xcf, 0xcb, 
+0x35, 0xb6, 0x4b, 0x24, 0xcb, 0xd8, 0xdb, 0xf4, 0xaa, 0xa4, 0xc3, 0x1c, 0xeb, 0x1c, 0xd1, 0xec, 
+0xaa, 0x02, 0x18, 0x6b, 0xe9, 0x4b, 0x23, 0x75, 0x58, 0x4e, 0x3f, 0x08, 0x4c, 0xad, 0x26, 0x98, 
+0x2e, 0x89, 0x82, 0xed, 0x4e, 0x74, 0x1c, 0xe1, 0x41, 0x1d, 0x54, 0x04, 0x00, 0x33, 0xfe, 0xca, 
+0x75, 0x1b, 0xae, 0x60, 0xb7, 0x5f, 0x6f, 0xc1, 0x2b, 0x0e, 0xab, 0x23, 0x13, 0xa9, 0x02, 0xb3, 
+0x8e, 0xeb, 0xfb, 0xef, 0x4a, 0xb6, 0x96, 0x81, 0x88, 0x31, 0x30, 0x38, 0xa6, 0x24, 0x96, 0x33, 
+0xe8, 0x8c, 0x60, 0x05, 0x43, 0x23, 0x88, 0xe6, 0xb7, 0xb7, 0x7e, 0x57, 0xe5, 0x84, 0x37, 0xc7, 
+0xd1, 0x7a, 0x9d, 0x42, 0x3a, 0x2e, 0xb9, 0x80, 0xc3, 0xb6, 0xf5, 0x41, 0xae, 0x33, 0x05, 0x68, 
+0xb5, 0x14, 0x0c, 0xc5, 0x0e, 0x40, 0x6e, 0xaf, 0xad, 0x02, 0x6a, 0x23, 0x19, 0x2c, 0xa6, 0x66, 
+0x80, 0x3f, 0x11, 0x4d, 0x98, 0xd1, 0xdd, 0x89, 0x7e, 0xa0, 0x18, 0x25, 0x72, 0xed, 0xa3, 0x65, 
+0xcc, 0x91, 0x22, 0xb8, 0x56, 0x2a, 0x49, 0xbc, 0xe9, 0x61, 0x89, 0x1d, 0x9c, 0x2c, 0x2d, 0xf2, 
+0x8d, 0x65, 0x4d, 0x43, 0xe4, 0xd4, 0x44, 0x0c, 0x2e, 0xb3, 0x3e, 0xd4, 0x94, 0x4f, 0x29, 0x84, 
+0x23, 0x4e, 0x4d, 0x49, 0x4c, 0xa7, 0xc4, 0x74, 0x45, 0xe3, 0x5a, 0x8c, 0x7a, 0xed, 0x02, 0xa7, 
+0x5d, 0x68, 0x4c, 0x51, 0x86, 0x72, 0xcb, 0xae, 0x1a, 0x59, 0xb0, 0xcb, 0x2f, 0x23, 0xf6, 0x01, 
+0x88, 0x55, 0x03, 0x25, 0x2f, 0x5d, 0x9c, 0x79, 0xe9, 0x12, 0x62, 0xab, 0x21, 0xb1, 0x83, 0x94, 
+0x15, 0x60, 0x94, 0xd8, 0x17, 0xe4, 0xa2, 0x84, 0x76, 0xa0, 0x69, 0x95, 0x97, 0x5d, 0x17, 0xa9, 
+0xed, 0x84, 0xe9, 0x5b, 0x3a, 0x6e, 0x49, 0x42, 0x2e, 0x67, 0xac, 0x10, 0xf9, 0x57, 0xd4, 0x96, 
+0x3c, 0xe5, 0x0a, 0x56, 0x1c, 0x23, 0x59, 0xae, 0x43, 0xf0, 0x18, 0x43, 0x5e, 0x23, 0x76, 0x55, 
+0xe6, 0xbd, 0x4f, 0x0a, 0x72, 0xfe, 0xba, 0xc3, 0xb1, 0x24, 0x8b, 0x50, 0xa2, 0x86, 0x69, 0xb2, 
+0xe0, 0x6a, 0xc4, 0xa3, 0xe7, 0x04, 0x86, 0x13, 0x6e, 0x0a, 0x4b, 0xe7, 0x66, 0x45, 0x39, 0xaf, 
+0x66, 0x72, 0x53, 0x83, 0x6f, 0xf3, 0x27, 0x4a, 0x86, 0x13, 0x83, 0x8b, 0xc5, 0x2c, 0x06, 0x59, 
+0xd6, 0xb9, 0x2b, 0xdb, 0x28, 0xac, 0xd9, 0xce, 0x4a, 0xea, 0x43, 0x62, 0x6f, 0xaf, 0x89, 0xb0, 
+0x15, 0xba, 0x82, 0xaf, 0xa3, 0x56, 0xf8, 0xb8, 0x89, 0x3c, 0x8c, 0x2e, 0xf7, 0xf0, 0x39, 0xca, 
+0x72, 0x98, 0xde, 0x81, 0x3c, 0x7a, 0x81, 0xa5, 0x52, 0xca, 0xd5, 0xaa, 0x66, 0xba, 0x88, 0x92, 
+0x90, 0x61, 0xb8, 0x9e, 0x4b, 0x58, 0xe4, 0x4e, 0xd0, 0xe1, 0xbc, 0x03, 0x5b, 0xd8, 0xbd, 0xc4, 
+0xc7, 0x34, 0xdf, 0xc2, 0x7c, 0x83, 0x9a, 0x71, 0x98, 0xd1, 0xab, 0x2f, 0x42, 0xf3, 0x48, 0xca, 
+0x34, 0xc3, 0x43, 0xf0, 0x08, 0x82, 0xcf, 0xb6, 0x98, 0x33, 0xa2, 0x76, 0x5a, 0x04, 0xd8, 0xf8, 
+0x96, 0xc0, 0x8b, 0x94, 0x8c, 0x5a, 0xbe, 0x57, 0x42, 0xd7, 0x04, 0x5d, 0xdc, 0xfa, 0x39, 0x76, 
+0x8b, 0x1a, 0x7c, 0xac, 0x20, 0x59, 0xb6, 0x24, 0xac, 0xdf, 0x31, 0x94, 0xcd, 0x78, 0xce, 0x6e, 
+0xbb, 0x72, 0x64, 0xe9, 0x44, 0xf7, 0x36, 0xac, 0x38, 0xcb, 0x1b, 0x8c, 0xfa, 0x16, 0x10, 0x99, 
+0xa4, 0xe3, 0xd6, 0xab, 0x14, 0x7a, 0x10, 0x4d, 0x2b, 0xdf, 0x10, 0xd5, 0x50, 0x8f, 0x38, 0x0e, 
+0x39, 0x8b, 0xb8, 0x78, 0x8e, 0x12, 0xa5, 0x15, 0x1b, 0x8a, 0xda, 0xe7, 0x72, 0x3c, 0x5e, 0x64, 
+0xe6, 0x77, 0x88, 0x6b, 0x75, 0x59, 0xfd, 0x56, 0x9b, 0x14, 0x7d, 0xb9, 0x2b, 0xe2, 0x78, 0x12, 
+0x04, 0x38, 0x06, 0x8c, 0x84, 0xb6, 0x79, 0xf4, 0x12, 0x85, 0x70, 0xba, 0xff, 0x3b, 0x4c, 0x11, 
+0xbf, 0x9d, 0xa9, 0xef, 0xbd, 0x08, 0x6b, 0x80, 0xfd, 0x19, 0xda, 0x10, 0x14, 0xab, 0xa3, 0xb4, 
+0x5e, 0x01, 0x02, 0xbd, 0xc5, 0x89, 0x9a, 0x85, 0xf6, 0x7c, 0xb2, 0x5f, 0x45, 0x45, 0x8e, 0xa5, 
+0x47, 0x20, 0xbf, 0x1c, 0x51, 0x8a, 0x15, 0xba, 0xc1, 0xfe, 0xad, 0x0a, 0xdd, 0x06, 0x20, 0xe5, 
+0x9d, 0x2f, 0xa4, 0x42, 0x68, 0x6e, 0x7b, 0x69, 0x30, 0xaa, 0x3d, 0x66, 0x03, 0xd2, 0x6c, 0xb0, 
+0x34, 0x3c, 0x64, 0xab, 0xc9, 0x31, 0x08, 0x6f, 0x48, 0xc8, 0xe8, 0x71, 0x00, 0x97, 0xb0, 0x34, 
+0x3b, 0x60, 0x4a, 0x59, 0x12, 0xb4, 0x3b, 0x5f, 0x59, 0xf2, 0x50, 0xee, 0x81, 0x39, 0x72, 0xf6, 
+0xea, 0x21, 0x43, 0xdb, 0xbd, 0x32, 0xc7, 0x4c, 0xc2, 0x49, 0x9a, 0x82, 0xbd, 0xfc, 0x16, 0xbd, 
+0xb0, 0xa3, 0xc1, 0xb1, 0x8c, 0x92, 0x9f, 0xc7, 0xf4, 0x6e, 0x71, 0xb9, 0x09, 0x16, 0xaf, 0xda, 
+0xb3, 0x2c, 0xe4, 0x3d, 0x02, 0x96, 0x67, 0x85, 0x84, 0xbb, 0xfa, 0x5c, 0xa6, 0x31, 0xe6, 0x96, 
+0x62, 0x3a, 0x11, 0x34, 0xca, 0xcf, 0xf1, 0xde, 0x01, 0xaf, 0xf9, 0x20, 0xd5, 0xf5, 0x80, 0x86, 
+0x92, 0x5a, 0xff, 0x5b, 0x1c, 0x21, 0xc0, 0x33, 0xbc, 0x05, 0xbb, 0xea, 0x93, 0xcc, 0xb2, 0x2d, 
+0x07, 0xa6, 0xbb, 0x8c, 0xd1, 0x23, 0x88, 0x4b, 0x03, 0xe3, 0xaf, 0x7c, 0x80, 0xe2, 0xa6, 0x02, 
+0xaa, 0xfd, 0x95, 0xae, 0xf3, 0x58, 0xaf, 0x76, 0x5f, 0xcf, 0xa5, 0x33, 0x62, 0x6e, 0xc2, 0x4f, 
+0x29, 0x3c, 0x8a, 0x1b, 0x90, 0x91, 0x1a, 0x8d, 0xa6, 0xeb, 0xb3, 0x22, 0xcb, 0xd1, 0xb6, 0x7d, 
+0x75, 0xa5, 0xd6, 0xf9, 0x61, 0x81, 0x7b, 0xb9, 0x82, 0xdb, 0x1d, 0x4a, 0xb1, 0x59, 0xe8, 0x52, 
+0xdc, 0x6d, 0xc5, 0xd9, 0xe5, 0x02, 0xd0, 0x1a, 0x50, 0x2d, 0xf4, 0x61, 0x51, 0xaf, 0x30, 0x4b, 
+0xbc, 0x44, 0x12, 0xfb, 0xc0, 0x30, 0x02, 0xd8, 0x9a, 0x0f, 0x0b, 0xf6, 0x01, 0xab, 0xe7, 0xc3, 
+0xe2, 0x53, 0x92, 0x9a, 0x32, 0xd1, 0xb2, 0x2d, 0x65, 0xba, 0xce, 0xce, 0x5f, 0x09, 0x0f, 0x99, 
+0x19, 0x94, 0xe6, 0x0e, 0x2d, 0x21, 0xc0, 0x5b, 0xbd, 0xae, 0x5d, 0x0d, 0x58, 0xee, 0x50, 0x79, 
+0xe9, 0x17, 0xef, 0x01, 0xbb, 0xdc, 0x4c, 0x87, 0x1b, 0x9a, 0x9a, 0x9b, 0x98, 0x44, 0x31, 0x88, 
+0x58, 0x73, 0xbc, 0xc2, 0x15, 0x69, 0x8a, 0x85, 0xcd, 0xa3, 0x14, 0x92, 0x84, 0x61, 0xaf, 0x26, 
+0x26, 0x85, 0x2c, 0x14, 0x80, 0xb8, 0x4c, 0x78, 0x24, 0xb2, 0xcf, 0x5f, 0xf3, 0x14, 0x04, 0xb5, 
+0xde, 0xf8, 0x9b, 0x46, 0x4f, 0x9e, 0x56, 0xa6, 0xa5, 0x92, 0x98, 0x8e, 0xa6, 0x9a, 0x78, 0xb6, 
+0x41, 0x3b, 0xb5, 0x0a, 0x6d, 0x77, 0x26, 0x61, 0x38, 0x29, 0x72, 0x24, 0x43, 0x63, 0x1d, 0x65, 
+0x8b, 0x5e, 0xa0, 0x8a, 0x8e, 0x77, 0xb4, 0x05, 0x39, 0x0d, 0x0d, 0x65, 0x74, 0x9a, 0xd1, 0x55, 
+0x8b, 0xa6, 0x87, 0xbd, 0x15, 0xd5, 0x0c, 0x04, 0x1b, 0x98, 0x55, 0x53, 0x64, 0x05, 0x5f, 0xc9, 
+0xa5, 0xeb, 0x10, 0x4f, 0x52, 0x08, 0xb6, 0xe5, 0x3c, 0xc1, 0xe4, 0x74, 0x9e, 0x90, 0xb6, 0xf2, 
+0x39, 0xce, 0x31, 0x08, 0x51, 0x27, 0xc3, 0xe8, 0x48, 0xb3, 0x86, 0x9b, 0xee, 0xcf, 0x93, 0x00, 
+0x85, 0xcc, 0xb2, 0x23, 0x03, 0x56, 0x89, 0xf9, 0x25, 0x8d, 0x72, 0xd8, 0x2b, 0x87, 0x52, 0xe9, 
+0xf5, 0xe6, 0x3c, 0x78, 0x0e, 0x9f, 0x40, 0x11, 0xd3, 0x3e, 0xc8, 0x95, 0x93, 0x27, 0xf2, 0x74, 
+0xcc, 0x64, 0xbc, 0x5c, 0x4c, 0x7f, 0x58, 0xfc, 0x82, 0xb3, 0x29, 0x72, 0x0a, 0xb2, 0x42, 0x9f, 
+0xf2, 0xa7, 0x33, 0x65, 0x05, 0x42, 0xac, 0x89, 0xe1, 0x98, 0x81, 0x19, 0x56, 0xa8, 0x06, 0xe0, 
+0x58, 0x85, 0xaa, 0x4b, 0xa7, 0x53, 0x7f, 0x5b, 0xbc, 0x9f, 0xe0, 0x49, 0x8f, 0x93, 0xc0, 0xca, 
+0xf9, 0x71, 0x80, 0xbd, 0x88, 0xe2, 0x9c, 0xd6, 0x70, 0x1f, 0x16, 0xea, 0x66, 0x16, 0x67, 0x4a, 
+0x8c, 0xbb, 0x21, 0x21, 0xb1, 0xf5, 0x40, 0xdc, 0xe9, 0xf2, 0x71, 0xd9, 0x55, 0x4e, 0xe8, 0x72, 
+0x8f, 0x5d, 0x73, 0x7b, 0xfe, 0x42, 0xe3, 0x41, 0x46, 0xb6, 0xa9, 0xd8, 0x2b, 0xf0, 0xf0, 0x54, 
+0xef, 0x33, 0x71, 0x20, 0x4a, 0x5a, 0x16, 0x73, 0x81, 0xb2, 0x9c, 0x92, 0xf4, 0xbd, 0xb2, 0x36, 
+0x6e, 0x52, 0xe0, 0x76, 0xab, 0x27, 0xf9, 0x38, 0xee, 0x2c, 0x23, 0x9c, 0xb5, 0x67, 0x24, 0x55, 
+0x8e, 0xa9, 0x38, 0xe1, 0xbd, 0x5d, 0xd5, 0x26, 0x41, 0x90, 0xca, 0xf6, 0x72, 0x92, 0xc2, 0x12, 
+0xed, 0x3a, 0xf9, 0x6b, 0x01, 0x0b, 0xe8, 0x00, 0xca, 0x2b, 0x4a, 0x32, 0x09, 0x5f, 0xc8, 0x4c, 
+0xc0, 0x60, 0xfa, 0x3f, 0xdd, 0xaf, 0xc0, 0x73, 0xbf, 0xd1, 0x35, 0x38, 0x4b, 0x54, 0xa4, 0x01, 
+0x94, 0x5b, 0x53, 0xba, 0x54, 0xd7, 0x73, 0x99, 0xb2, 0x54, 0x2b, 0x75, 0xef, 0x5e, 0x4d, 0x00, 
+0xe6, 0xe2, 0x33, 0xde, 0xc8, 0xe6, 0x51, 0x52, 0xa0, 0x22, 0xa3, 0xa0, 0x57, 0x08, 0x7d, 0xa6, 
+0xde, 0xdf, 0x79, 0x5e, 0x6f, 0x27, 0x71, 0xf6, 0xf8, 0xc4, 0x63, 0x94, 0xe1, 0xdb, 0x19, 0x86, 
+0xaa, 0xb2, 0xdd, 0xe1, 0x69, 0xd6, 0x05, 0x68, 0x1f, 0xf6, 0x2b, 0x61, 0x09, 0x20, 0x2c, 0x2e, 
+0xf9, 0x13, 0x5e, 0xdb, 0xa5, 0x29, 0xce, 0xc7, 0x65, 0xf5, 0x58, 0x3a, 0x2c, 0x64, 0xb2, 0x06, 
+0x69, 0xb4, 0xcb, 0xeb, 0x16, 0x6e, 0x8a, 0x9e, 0xbf, 0xc2, 0xa0, 0xc0, 0x51, 0x99, 0x52, 0x48, 
+0xf6, 0xa3, 0x92, 0xa4, 0x4d, 0xcf, 0xa4, 0x4d, 0x78, 0x25, 0x20, 0x6d, 0x31, 0xcb, 0x52, 0xba, 
+0x92, 0xd1, 0x56, 0x03, 0x69, 0x37, 0xc4, 0x19, 0x27, 0x89, 0x3f, 0x2e, 0x50, 0xde, 0xec, 0x34, 
+0x4c, 0x53, 0x4b, 0x38, 0x6b, 0x9b, 0xca, 0xd2, 0x9b, 0xce, 0xe6, 0x87, 0x44, 0x5a, 0xcd, 0xd9, 
+0x5a, 0x0f, 0x96, 0x7e, 0x63, 0xd5, 0x8b, 0x3d, 0x2f, 0xb6, 0xbb, 0x72, 0xb4, 0xce, 0x93, 0xe7, 
+0x28, 0x81, 0xb2, 0x49, 0x31, 0xdd, 0xe7, 0x10, 0x27, 0x05, 0xec, 0xae, 0xa9, 0xae, 0x5c, 0x54, 
+0xe7, 0x46, 0x7a, 0x25, 0x74, 0xf2, 0xcb, 0x60, 0xd9, 0x6e, 0xd0, 0xf0, 0xea, 0x2d, 0x24, 0x83, 
+0xed, 0x52, 0x34, 0xdb, 0xc0, 0xe0, 0x73, 0x9d, 0x3a, 0xd2, 0x2c, 0xfc, 0x02, 0xc5, 0x61, 0xbb, 
+0x53, 0x36, 0xe2, 0xd0, 0x4b, 0xa0, 0xfa, 0x94, 0xa8, 0x99, 0x3a, 0x2b, 0xa5, 0x25, 0xa6, 0xb2, 
+0x78, 0xf5, 0x29, 0x79, 0xc4, 0x0b, 0x59, 0x78, 0x51, 0x24, 0x34, 0xfd, 0x38, 0x4f, 0x53, 0x94, 
+0x72, 0xd9, 0x8d, 0x3d, 0x9f, 0x60, 0xaa, 0x2a, 0x84, 0xd5, 0x87, 0x4f, 0xdc, 0x09, 0x6a, 0xdd, 
+0x96, 0x72, 0xa5, 0x6a, 0xe1, 0x94, 0x15, 0x53, 0xd0, 0xc3, 0x26, 0xb6, 0x92, 0xdd, 0x2c, 0xc5, 
+0x64, 0x7f, 0x88, 0x93, 0xfb, 0x1b, 0x04, 0xc2, 0x52, 0xb9, 0xea, 0xa8, 0xfb, 0xbb, 0x92, 0xe2, 
+0xef, 0x37, 0xd7, 0xd3, 0x35, 0xd6, 0x13, 0x87, 0x69, 0x32, 0x59, 0x46, 0x45, 0x92, 0xd1, 0xea, 
+0x78, 0x9d, 0xbe, 0x35, 0xdf, 0x63, 0xc4, 0x9c, 0x50, 0x68, 0xa9, 0x38, 0xe8, 0x83, 0x03, 0x1f, 
+0xfb, 0x40, 0x1e, 0x73, 0x47, 0x04, 0x64, 0x34, 0xc2, 0x13, 0x6c, 0xc2, 0x28, 0x1f, 0xd5, 0x5f, 
+0x32, 0x92, 0xf9, 0xad, 0x3b, 0x91, 0x80, 0xb6, 0x80, 0xf2, 0x2e, 0x87, 0x40, 0x28, 0x29, 0x06, 
+0xca, 0xa4, 0x3c, 0x61, 0x31, 0xd9, 0x46, 0xc2, 0xce, 0x30, 0x72, 0x09, 0x67, 0x8a, 0x48, 0x55, 
+0x14, 0xef, 0xf9, 0xe3, 0x28, 0xa0, 0x55, 0x89, 0x6a, 0x86, 0x65, 0xdc, 0xfc, 0xbe, 0x02, 0x49, 
+0x18, 0x43, 0x91, 0x8a, 0xcb, 0x94, 0xeb, 0x22, 0x41, 0x59, 0x12, 0x31, 0xcc, 0x68, 0x78, 0x00, 
+0xb2, 0xf0, 0x6b, 0xd9, 0xb9, 0x88, 0x84, 0x56, 0xe9, 0x7e, 0x8a, 0x3d, 0xb9, 0xcc, 0x0d, 0xea, 
+0x2f, 0xf5, 0x3c, 0x19, 0xd3, 0x84, 0x81, 0x88, 0x11, 0x1f, 0x5f, 0x44, 0x09, 0x9e, 0x03, 0x1d, 
+0xfa, 0xda, 0xe1, 0xb9, 0xb4, 0x1d, 0x67, 0x1c, 0x5b, 0xdc, 0xf9, 0x1b, 0x12, 0xf1, 0xa4, 0x85, 
+0x72, 0x55, 0x76, 0xcd, 0xf3, 0x4e, 0xd2, 0xe7, 0x82, 0x14, 0xb8, 0x2e, 0x61, 0x52, 0x57, 0x7f, 
+0xba, 0x75, 0x05, 0x9d, 0xa0, 0xee, 0x3e, 0x9a, 0x3b, 0x5c, 0x2a, 0x65, 0x2d, 0x3e, 0x55, 0xbf, 
+0x88, 0xd2, 0xd5, 0xa2, 0x1a, 0x62, 0x94, 0xde, 0x15, 0x5b, 0x49, 0x33, 0x0e, 0x34, 0x78, 0x33, 
+0x57, 0xb6, 0x31, 0x3b, 0x21, 0x3c, 0x96, 0x49, 0xd9, 0xb4, 0x02, 0xd9, 0xe7, 0xf6, 0x8a, 0x3b, 
+0x1f, 0xf3, 0x19, 0x0a, 0xe2, 0x72, 0xab, 0xab, 0xfb, 0xf3, 0xc9, 0x7c, 0xbd, 0x9a, 0x2c, 0xff, 
+0xb2, 0xbe, 0xf8, 0x74, 0x37, 0x1b, 0x33, 0x0f, 0x17, 0x93, 0xfb, 0xc9, 0x2d, 0xc7, 0x9f, 0x84, 
+0x0c, 0x7b, 0x27, 0x7d, 0xbc, 0x41, 0xc2, 0x9e, 0x94, 0x6b, 0xbf, 0x26, 0x15, 0xac, 0x1c, 0x90, 
+0x48, 0xad, 0x21, 0x5c, 0x14, 0xd9, 0xe6, 0x3c, 0x79, 0x89, 0x52, 0x94, 0xdc, 0xa1, 0x28, 0xab, 
+0x0d, 0x5b, 0x05, 0x3e, 0x49, 0x9f, 0xc8, 0xf5, 0x1d, 0x3c, 0x08, 0x68, 0x3b, 0x8d, 0xf2, 0xec, 
+0xdd, 0xf1, 0xd9, 0x48, 0xf4, 0x89, 0x59, 0x1c, 0xed, 0x1e, 0x11, 0x48, 0xc3, 0x2b, 0x90, 0x95, 
+0x87, 0xa5, 0x65, 0x66, 0x5a, 0x3f, 0x2e, 0x9f, 0xf1, 0x85, 0x89, 0xaa, 0x69, 0x49, 0x4a, 0x6f, 
+0x62, 0x89, 0x45, 0x82, 0x7d, 0x59, 0x51, 0x0a, 0x23, 0x7e, 0xfa, 0xa1, 0x1d, 0xb8, 0x28, 0xf8, 
+0x5c, 0x47, 0x5f, 0x26, 0xbd, 0x2d, 0xe5, 0xab, 0xca, 0x97, 0x82, 0x27, 0x0d, 0x63, 0x54, 0xd7, 
+0x17, 0xe8, 0xba, 0x75, 0xfe, 0x1a, 0xc0, 0x1d, 0x1b, 0x26, 0x74, 0xd3, 0xd8, 0x8c, 0x43, 0x9e, 
+0x66, 0xb9, 0xe2, 0x38, 0xeb, 0xa1, 0x2d, 0x70, 0x4d, 0xf0, 0xba, 0xdd, 0xbc, 0x86, 0xdd, 0x69, 
+0x7b, 0xc0, 0x59, 0x03, 0x16, 0x73, 0x9d, 0x3c, 0x51, 0xb3, 0x97, 0x01, 0x41, 0x4a, 0xd2, 0x00, 
+0x70, 0x6e, 0x5a, 0x96, 0x13, 0x2a, 0x92, 0x7a, 0x7a, 0xb6, 0x86, 0x91, 0x7f, 0xea, 0x60, 0x90, 
+0xe8, 0x65, 0x02, 0xc0, 0x39, 0x33, 0x4a, 0x5e, 0x60, 0x9a, 0x2f, 0x66, 0xb7, 0x2b, 0xf4, 0xee, 
+0x94, 0xbc, 0xc1, 0x59, 0xf3, 0xbe, 0x3b, 0x6d, 0xac, 0x53, 0x4d, 0xb0, 0xba, 0x92, 0xfd, 0xb0, 
+0xf8, 0x05, 0xbc, 0xc0, 0xd2, 0xbf, 0x98, 0x14, 0x99, 0x79, 0xc3, 0xc1, 0x1a, 0xba, 0xc9, 0xda, 
+0x3b, 0x7f, 0x69, 0x1a, 0x6b, 0x22, 0xe0, 0x22, 0x46, 0x78, 0xe6, 0x3e, 0x91, 0x7f, 0x87, 0x60, 
+0x0f, 0x80, 0xd5, 0x5b, 0x43, 0x56, 0x6d, 0xbf, 0x4c, 0xc1, 0x6e, 0x13, 0x05, 0x24, 0xd9, 0xc2, 
+0x1e, 0x50, 0xae, 0xc1, 0xa9, 0xb0, 0x43, 0xc0, 0x43, 0x29, 0xa3, 0x6b, 0xce, 0x4c, 0x59, 0x92, 
+0x2b, 0x1c, 0x6e, 0x61, 0x6a, 0x40, 0xb8, 0xc4, 0x2a, 0xea, 0xda, 0xc9, 0x61, 0xea, 0x2e, 0x67, 
+0xa8, 0xf8, 0xcb, 0xc1, 0x9d, 0x13, 0x80, 0xff, 0xf3, 0x8e, 0xd0, 0xca, 0x72, 0x45, 0x4f, 0x2b, 
+0xcb, 0x23, 0x71, 0x09, 0x5e, 0xa1, 0x49, 0x90, 0x17, 0xe4, 0x27, 0x46, 0x62, 0x94, 0x32, 0x17, 
+0x30, 0x44, 0xca, 0x8b, 0x14, 0x6d, 0x55, 0xb4, 0xaa, 0x7a, 0x44, 0x99, 0x0d, 0x11, 0xce, 0xf5, 
+0xdd, 0xf5, 0x7a, 0x0a, 0x32, 0x78, 0x03, 0xf6, 0xd5, 0xf5, 0x54, 0xf6, 0x41, 0x59, 0x6a, 0xc2, 
+0xf9, 0x44, 0x00, 0x12, 0x92, 0x49, 0xe0, 0xb5, 0x9f, 0x1c, 0x6e, 0x37, 0x15, 0xdc, 0xe5, 0xcd, 
+0x82, 0xd8, 0xec, 0x7a, 0x2b, 0xd9, 0x6a, 0x32, 0xde, 0x2e, 0x54, 0x11, 0x85, 0x7b, 0x2f, 0x74, 
+0x11, 0x5e, 0xa5, 0x20, 0xc9, 0x2a, 0xb3, 0xd5, 0x92, 0xe8, 0x01, 0x8f, 0xac, 0x41, 0x56, 0xe3, 
+0x71, 0x00, 0x98, 0xc4, 0xbb, 0x0d, 0x98, 0xc6, 0x24, 0x57, 0x66, 0x0c, 0xdc, 0x4d, 0x93, 0xdf, 
+0x1f, 0xcb, 0xd7, 0xf9, 0x96, 0x7b, 0x7d, 0x35, 0x9f, 0x38, 0x22, 0x20, 0x53, 0xfe, 0x7e, 0x4d, 
+0xbc, 0x61, 0xb9, 0x5a, 0x05, 0x38, 0xf2, 0x87, 0xbe, 0x3a, 0x02, 0xdc, 0x81, 0xe8, 0x34, 0xbb, 
+0xad, 0x2e, 0x9e, 0x2a, 0x81, 0xa4, 0xec, 0x61, 0x18, 0x91, 0x7b, 0x25, 0x8e, 0xce, 0x26, 0xa0, 
+0x0c, 0x76, 0x3a, 0x11, 0xc9, 0xcd, 0x3c, 0x52, 0xcd, 0xbc, 0x63, 0x0e, 0x73, 0x26, 0x09, 0x8e, 
+0x93, 0x62, 0xd5, 0x32, 0xcd, 0xe1, 0xe2, 0xa8, 0x4d, 0xfe, 0x8c, 0xfa, 0x94, 0xa9, 0x79, 0x2b, 
+0x1e, 0x16, 0xa2, 0x97, 0x97, 0x9c, 0xd3, 0xe1, 0x70, 0xae, 0xf2, 0xa1, 0x5a, 0x63, 0xbb, 0xce, 
+0x08, 0xa0, 0xa2, 0x4b, 0xf9, 0x02, 0x46, 0x43, 0x61, 0x8d, 0xf5, 0x3e, 0xb4, 0x88, 0x03, 0x59, 
+0x5c, 0x3e, 0xf4, 0xce, 0xb0, 0xdd, 0xd0, 0xe9, 0xdb, 0x1a, 0xdd, 0x59, 0xe4, 0x07, 0xbf, 0x27, 
+0x52, 0x0e, 0x33, 0xce, 0x75, 0x82, 0x93, 0xc7, 0x9d, 0xbb, 0x08, 0xcf, 0x5d, 0xf3, 0x3d, 0xd7, 
+0x7a, 0xa3, 0xba, 0xdb, 0x10, 0xf5, 0x58, 0xd1, 0x42, 0x98, 0xb9, 0x7c, 0x6b, 0x7b, 0x1e, 0x26, 
+0x06, 0xf4, 0xae, 0x45, 0xbe, 0x07, 0xce, 0xef, 0xe4, 0xc2, 0x29, 0x3c, 0xcd, 0x84, 0xdd, 0x67, 
+0xd5, 0x30, 0x69, 0x2e, 0x8e, 0x3e, 0x50, 0xa2, 0xb3, 0xfd, 0x86, 0xf7, 0xf4, 0x9b, 0xc9, 0xfe, 
+0xda, 0xa3, 0x3a, 0x78, 0x0e, 0x0c, 0xed, 0xdf, 0xb7, 0x32, 0xac, 0xfb, 0x6c, 0xb4, 0x12, 0xec, 
+0x6d, 0x0d, 0x34, 0x8f, 0xea, 0xdf, 0x46, 0xb6, 0x5a, 0xea, 0x57, 0x8b, 0x18, 0x07, 0x58, 0x33, 
+0x7d, 0x58, 0xfd, 0x2b, 0xc7, 0x90, 0x03, 0x2d, 0xa5, 0x8e, 0x3a, 0x7c, 0x9d, 0xf8, 0x72, 0x88, 
+0xc5, 0xd7, 0x44, 0x01, 0x72, 0x67, 0xfd, 0xe3, 0x0e, 0xfc, 0xbb, 0x80, 0x65, 0x19, 0x8d, 0xc3, 
+0x35, 0xdb, 0xdb, 0xce, 0x08, 0x95, 0x7d, 0x51, 0xc1, 0x00, 0xca, 0xa6, 0xb2, 0x60, 0x02, 0xe7, 
+0x55, 0x37, 0xe3, 0x3a, 0x80, 0x26, 0xe7, 0xd2, 0x5a, 0xdf, 0x7c, 0xc0, 0xa5, 0xc8, 0x9a, 0x41, 
+0xb1, 0x77, 0x25, 0x65, 0x06, 0x3e, 0x54, 0x8e, 0x97, 0xe4, 0xbb, 0xd7, 0x5d, 0xdc, 0x3a, 0xaa, 
+0x90, 0xe2, 0xd5, 0x98, 0x0a, 0x19, 0xce, 0x41, 0x47, 0x16, 0x64, 0x3c, 0x79, 0x9b, 0x9d, 0x48, 
+0xaf, 0x6e, 0x68, 0xbf, 0xa8, 0x7d, 0x03, 0x05, 0x14, 0xa2, 0x0f, 0x91, 0x4c, 0xd8, 0x88, 0xff, 
+0xa6, 0x7d, 0xf7, 0xbe, 0x88, 0x9a, 0x44, 0xe8, 0xe5, 0xbc, 0x37, 0x44, 0xbb, 0x2d, 0x01, 0xcb, 
+0xb9, 0xc1, 0x2a, 0xe0, 0x2c, 0xa2, 0x7f, 0xd5, 0xb2, 0xad, 0x43, 0x45, 0xf9, 0xa7, 0x24, 0x7a, 
+0xa1, 0x03, 0x45, 0xa5, 0xac, 0xc8, 0x05, 0x7e, 0xf9, 0x08, 0x99, 0xf3, 0xab, 0x1c, 0xcc, 0x02, 
+0x41, 0xe1, 0x25, 0x12, 0x04, 0x9e, 0x7b, 0x88, 0x81, 0xf8, 0x47, 0x67, 0xc6, 0xd9, 0x0e, 0x2f, 
+0x79, 0x9d, 0x7d, 0x89, 0xc8, 0x9d, 0xea, 0x03, 0x2b, 0x60, 0x6e, 0x8a, 0x61, 0xde, 0xe2, 0xd5, 
+0x18, 0x87, 0x57, 0xc1, 0xc2, 0x1c, 0x83, 0xe6, 0xa7, 0x5f, 0x73, 0x1c, 0x5c, 0x05, 0x9d, 0x39, 
+0xc8, 0x2d, 0xc7, 0x7d, 0x75, 0x66, 0xb8, 0xd3, 0x29, 0x72, 0xd6, 0xc1, 0x2b, 0xc9, 0x94, 0x50, 
+0xfa, 0x63, 0x35, 0x39, 0x58, 0xaf, 0x7e, 0xa7, 0x27, 0x1e, 0x35, 0x3c, 0x3d, 0x39, 0x88, 0x8e, 
+0x7d, 0x7b, 0x12, 0x5b, 0x3b, 0xf6, 0x1e, 0x51, 0x0e, 0xb6, 0xa5, 0x67, 0x4d, 0x4b, 0xc0, 0xc3, 
+0xd8, 0x54, 0x1b, 0x31, 0xec, 0xf5, 0xf4, 0x09, 0xa7, 0x9f, 0xbe, 0xf6, 0xba, 0xf9, 0x84, 0xeb, 
+0xb9, 0x98, 0x30, 0xdc, 0x73, 0x0e, 0x82, 0xdb, 0x73, 0xe2, 0x3d, 0x5c, 0x5b, 0x5f, 0xb8, 0x34, 
+0xf7, 0xa2, 0xb8, 0x7d, 0x1b, 0x06, 0x7b, 0x1c, 0x5d, 0x76, 0x64, 0x89, 0xa4, 0xc9, 0x92, 0xd4, 
+0x48, 0xcd, 0xbb, 0x70, 0x59, 0x8e, 0xb7, 0x80, 0x41, 0x94, 0xef, 0x8d, 0x73, 0xad, 0x92, 0x55, 
+0xca, 0xa5, 0xb4, 0xb4, 0x92, 0xdf, 0x2e, 0x7e, 0xe8, 0x90, 0x8c, 0x17, 0x0b, 0x0d, 0x82, 0x93, 
+0x36, 0x93, 0x30, 0x74, 0xb9, 0x45, 0xe3, 0x7a, 0x77, 0xc6, 0xcf, 0x8d, 0x19, 0x4f, 0xf7, 0x64, 
+0x96, 0xc5, 0xe3, 0x60, 0x5b, 0xd4, 0xbc, 0x43, 0x6d, 0xd1, 0xf0, 0x7b, 0xe9, 0x81, 0xbb, 0x2d, 
+0x6e, 0x8b, 0x78, 0xb0, 0x2d, 0x6a, 0xde, 0xa1, 0xb6, 0x68, 0xf8, 0xbd, 0xf4, 0xc0, 0xdd, 0x16, 
+0x34, 0x76, 0xcd, 0x51, 0xf8, 0x0c, 0x07, 0x9b, 0xa4, 0x03, 0x31, 0xd4, 0x32, 0x5d, 0x18, 0x9f, 
+0xdd, 0x72, 0xb7, 0xd3, 0x1c, 0xa4, 0x9f, 0x61, 0x32, 0xd8, 0x46, 0x0c, 0xfb, 0x50, 0xfb, 0xb0, 
+0x10, 0xbe, 0xba, 0xe2, 0x6e, 0x97, 0x9b, 0xe8, 0x79, 0x93, 0x3b, 0x18, 0x86, 0xe5, 0x1f, 0x6a, 
+0x19, 0x0e, 0xc3, 0x5b, 0x6f, 0x3c, 0xc4, 0xdc, 0x20, 0x85, 0x0e, 0xa6, 0x61, 0xd8, 0x07, 0x47, 
+0x5e, 0x06, 0xc2, 0x57, 0x57, 0x3c, 0xd8, 0xa5, 0x3d, 0x5b, 0xf1, 0x7e, 0x6d, 0xcb, 0x0a, 0x74, 
+0xd8, 0x8e, 0xfd, 0x02, 0x64, 0x39, 0xb9, 0xed, 0x0e, 0xd2, 0x52, 0xf2, 0xd5, 0xf1, 0x85, 0xa9, 
+0x44, 0x3d, 0xcc, 0xd4, 0x07, 0xcc, 0xc3, 0xb1, 0x43, 0xf7, 0xa5, 0xa3, 0x84, 0x23, 0xa9, 0xaf, 
+0xa1, 0x62, 0x0f, 0x3a, 0xbe, 0xde, 0x6d, 0x85, 0x43, 0x4b, 0x6b, 0xe5, 0x38, 0x9a, 0xca, 0x44, 
+0xd8, 0x2d, 0xf8, 0x5c, 0x1e, 0x42, 0x93, 0xd7, 0x33, 0xfe, 0x02, 0x35, 0xbb, 0x04, 0x71, 0x6f, 
+0x4a, 0x74, 0xbb, 0xad, 0xdf, 0xaf, 0xb4, 0x5e, 0x9e, 0x77, 0xfb, 0xee, 0x1b, 0x24, 0xc6, 0xcc, 
+0xd3, 0x28, 0x09, 0x89, 0xe0, 0x15, 0xba, 0x05, 0x51, 0x32, 0x60, 0x5b, 0x70, 0x11, 0xc5, 0xf1, 
+0xe4, 0xfe, 0x52, 0x31, 0x43, 0xe4, 0xbd, 0xad, 0x79, 0xd6, 0x77, 0x33, 0x5b, 0x36, 0x49, 0x47, 
+0xfb, 0x99, 0x44, 0xcb, 0xea, 0x79, 0x70, 0x72, 0x8f, 0x73, 0xda, 0x07, 0x98, 0xe6, 0xcb, 0x62, 
+0xfb, 0xee, 0xb4, 0x61, 0x65, 0x5e, 0x3f, 0x1b, 0x60, 0xea, 0x0e, 0x2a, 0xb3, 0xad, 0xf5, 0x88, 
+0xfb, 0xfe, 0xb8, 0xd7, 0x0b, 0x06, 0xa1, 0x3a, 0x1d, 0xa5, 0x70, 0x39, 0x0e, 0x9a, 0xa2, 0xd7, 
+0x69, 0x5c, 0xa4, 0x93, 0x97, 0x67, 0xc6, 0xb4, 0x0d, 0xb9, 0xc2, 0x1e, 0xaa, 0x47, 0x9a, 0xf9, 
+0xc8, 0x4b, 0x92, 0x55, 0x11, 0x0e, 0x23, 0xab, 0x3b, 0x04, 0xc3, 0xed, 0xd6, 0x2f, 0x49, 0xd5, 
+0x2b, 0x3f, 0xb2, 0x96, 0x5f, 0x00, 0x09, 0xd5, 0xf0, 0xac, 0x11, 0xc2, 0xfe, 0xf6, 0xa8, 0x22, 
+0x20, 0xd4, 0x4c, 0x5a, 0x33, 0x48, 0xf8, 0xee, 0xe1, 0x0b, 0x4c, 0x33, 0x89, 0x2c, 0x39, 0x9d, 
+0x0c, 0x5e, 0x30, 0xd5, 0x65, 0x0a, 0xf6, 0xcb, 0x00, 0x28, 0x4e, 0xe8, 0xba, 0xe7, 0x6a, 0x97, 
+0x60, 0xbb, 0x05, 0x93, 0xf0, 0xd7, 0x22, 0xa3, 0xbf, 0x8c, 0x48, 0xff, 0x4b, 0x3e, 0xfa, 0x86, 
+0xe0, 0x8d, 0xa4, 0xa5, 0x35, 0x66, 0x97, 0xa2, 0x6c, 0xed, 0x1c, 0x6e, 0xd8, 0xc3, 0xf3, 0x93, 
+0x91, 0xb4, 0x51, 0x32, 0x45, 0x1c, 0xb3, 0xc6, 0x51, 0xd6, 0xc2, 0xcc, 0x90, 0x66, 0x1b, 0xe2, 
+0x83, 0x78, 0xb7, 0x4b, 0x56, 0x1f, 0xa6, 0x9e, 0x24, 0x1e, 0xb7, 0xf4, 0x94, 0x82, 0x4a, 0x20, 
+0x1c, 0x6d, 0xbc, 0x61, 0x49, 0x50, 0x54, 0xab, 0x78, 0x2f, 0xba, 0xc9, 0xba, 0xcf, 0x99, 0xc2, 
+0x9f, 0x21, 0x7c, 0x98, 0xe1, 0xeb, 0x19, 0x61, 0x7a, 0x73, 0xfe, 0xba, 0x03, 0x49, 0xf8, 0x6e, 
+0x1a, 0xe5, 0x2b, 0x74, 0x86, 0xff, 0x5d, 0x80, 0xd8, 0xb0, 0x0b, 0xfa, 0x6c, 0x57, 0x44, 0x36, 
+0x83, 0x55, 0x63, 0xbc, 0x3f, 0xee, 0xa8, 0xd7, 0x53, 0xc0, 0x34, 0xd3, 0xef, 0xc3, 0xc1, 0x7a, 
+0xfe, 0xc1, 0x43, 0xcf, 0x3f, 0x1c, 0xb0, 0xe7, 0x67, 0x07, 0xeb, 0xf9, 0xd9, 0x01, 0xb4, 0x16, 
+0x90, 0xc9, 0x22, 0x31, 0x20, 0xf1, 0x9d, 0xde, 0xcc, 0xca, 0x97, 0x01, 0xdf, 0x9d, 0x98, 0x8c, 
+0x0f, 0x9b, 0x41, 0xe8, 0x60, 0xa8, 0x4a, 0x3a, 0x75, 0x7a, 0x81, 0x8e, 0xdd, 0xfc, 0x85, 0x47, 
+0xe9, 0x55, 0x47, 0x81, 0xe3, 0x07, 0xa5, 0xd1, 0x86, 0x02, 0xf4, 0xf6, 0x49, 0xb9, 0xc9, 0xe9, 
+0xc0, 0xd0, 0x3f, 0xeb, 0x3b, 0x94, 0xc8, 0xde, 0xdc, 0x74, 0x81, 0xc4, 0xa1, 0x9b, 0xfc, 0x3a, 
+0xae, 0x5f, 0x50, 0x17, 0xc4, 0x79, 0x94, 0x6f, 0x60, 0x5a, 0xc1, 0xbd, 0x3b, 0xc5, 0x7f, 0x4e, 
+0x98, 0xa5, 0x51, 0xb5, 0xef, 0x30, 0x88, 0xf7, 0x12, 0xe0, 0x13, 0xff, 0xc0, 0x16, 0xe3, 0xad, 
+0xc3, 0x5c, 0xdd, 0x5c, 0x9e, 0x90, 0x5f, 0x8c, 0x44, 0x19, 0xa4, 0xfb, 0xc7, 0xec, 0xfd, 0x0a, 
+0x7d, 0x30, 0x98, 0x1b, 0xd5, 0xe7, 0xea, 0x7f, 0x2f, 0x93, 0x1a, 0x58, 0x80, 0xfe, 0xe0, 0x08, 
+0x5d, 0x7d, 0x68, 0xd1, 0xe7, 0xb0, 0xfe, 0x4d, 0xb2, 0x65, 0x1c, 0x85, 0xd0, 0x22, 0x2d, 0xd0, 
+0x4c, 0x2c, 0x0c, 0x7c, 0x3a, 0xa7, 0x3f, 0xd1, 0x77, 0x89, 0xb5, 0xde, 0x3e, 0x3e, 0x80, 0xb8, 
+0x80, 0xe4, 0x67, 0x8c, 0x2e, 0xa2, 0x34, 0x2b, 0x4d, 0xae, 0x06, 0xec, 0x07, 0x1a, 0x04, 0x40, 
+0x36, 0x0d, 0xf4, 0x67, 0xb1, 0xa2, 0x60, 0x24, 0x8c, 0xb0, 0x51, 0x61, 0x46, 0x65, 0x84, 0x0e, 
+0x4a, 0x8f, 0xab, 0x30, 0xea, 0x58, 0xea, 0xe1, 0x41, 0xfe, 0x42, 0xf9, 0x8e, 0x9f, 0xd9, 0x84, 
+0x5f, 0x68, 0xde, 0xa1, 0xb3, 0xdb, 0xfc, 0x2d, 0xb4, 0xef, 0xff, 0x0d, 0xd0, 0xc6, 0xb9, 0x3a, 
+0xbd, 0xc8, 0x5c, 0xce, 0x8d, 0x5b, 0x6e, 0x5f, 0x5a, 0x38, 0x58, 0xc5, 0xdb, 0xe9, 0xf1, 0x22, 
+0x73, 0x39, 0x3f, 0x6e, 0xb9, 0x7d, 0x69, 0x31, 0xdc, 0x26, 0xfe, 0x4e, 0x91, 0x17, 0x99, 0xcb, 
+0x39, 0x72, 0xcb, 0xed, 0x4b, 0x8b, 0xe1, 0x36, 0xf1, 0x77, 0x9a, 0x8c, 0xed, 0xeb, 0x76, 0xe6, 
+0xc5, 0x01, 0x78, 0xd4, 0xc5, 0xc1, 0x61, 0x7c, 0x9e, 0x7c, 0x2d, 0xb2, 0x8f, 0x38, 0xf1, 0x8a, 
+0xc1, 0xde, 0xc1, 0x40, 0x2c, 0x82, 0x4f, 0x6d, 0x86, 0x9b, 0xa8, 0x8b, 0xe2, 0xaa, 0xd5, 0x15, 
+0x48, 0x43, 0x7a, 0x12, 0xeb, 0x60, 0x25, 0x1e, 0xc3, 0xaf, 0x46, 0xc3, 0x2d, 0x25, 0xe2, 0x38, 
+0xfb, 0x38, 0x7a, 0xca, 0x5d, 0x6d, 0xc5, 0x63, 0xf8, 0xd5, 0xc8, 0x61, 0xe2, 0x09, 0x38, 0xae, 
+0x9a, 0x79, 0xb8, 0xeb, 0x22, 0x80, 0x78, 0xd6, 0x69, 0xb8, 0xb9, 0xbc, 0xdf, 0x78, 0x61, 0x21, 
+0x4f, 0xbc, 0x18, 0xec, 0xc4, 0xb3, 0xc5, 0x4e, 0xbc, 0x99, 0xec, 0xc4, 0xaf, 0xcd, 0xa6, 0x45, 
+0xea, 0xb2, 0x04, 0xf2, 0x18, 0x7e, 0x35, 0x72, 0xb4, 0x16, 0x87, 0xe3, 0xaa, 0x99, 0xeb, 0xdd, 
+0x21, 0x1e, 0xc1, 0xa7, 0x36, 0xc3, 0xad, 0xe4, 0xf7, 0x06, 0xd1, 0x22, 0x73, 0xbc, 0x77, 0xc6, 
+0x01, 0x78, 0xd4, 0x65, 0xb8, 0x81, 0xbc, 0xde, 0x3e, 0xc3, 0x70, 0xd1, 0xd3, 0x93, 0x8b, 0x75, 
+0x6a, 0x76, 0x6f, 0x7a, 0x38, 0x58, 0x86, 0x85, 0xf0, 0xa1, 0x8f, 0x4b, 0xd4, 0x6e, 0xf9, 0xfd, 
+0x69, 0xe2, 0x66, 0x1a, 0x7f, 0x31, 0xfa, 0xfc, 0x35, 0x88, 0x0b, 0xf2, 0x3b, 0xc4, 0x0e, 0xf6, 
+0xe1, 0x31, 0xfc, 0x6a, 0x34, 0xdc, 0x4e, 0x22, 0xce, 0x10, 0xcd, 0xfe, 0x07, 0x71, 0xc3, 0x3e, 
+0x7a, 
+
+};
+static void * func_ptrs[] = {
+	(void*)TVP_Stub_3d4b725f0b4234d79524822e7c34486b,
+	(void*)TVP_Stub_3fc0c32ee41ea0c515f8fbb681e37982,
+	(void*)TVP_Stub_e8dbd4fe012262d9da831e0735aa33b3,
+	(void*)TVP_Stub_ace6cce1353865d7376caca1f2124216,
+	(void*)TVP_Stub_5055344aa8055bc238b79e5f88fc3300,
+	(void*)TVP_Stub_8238c542b814acf1a83c00cced57ba26,
+	(void*)TVP_Stub_bd2a14ca8c345fd7f151b08d1792fb60,
+	(void*)TVP_Stub_16d432f9f86738a7688cbfc9b12441ec,
+	(void*)TVP_Stub_6dac00582b8ba529e548ef058c4e869e,
+	(void*)TVP_Stub_9193ae470b5efdfe617b5e94cd8f5da6,
+	(void*)TVP_Stub_ec455b6ef0f5da178063db3875973260,
+	(void*)TVP_Stub_a56aaf685bd171b63b0ef3c894d80ecf,
+	(void*)TVP_Stub_9a5fe199cebb9841f94ac0bb7a4a3b6a,
+	(void*)TVP_Stub_2acb76a1f86e34afc5fe934d406c6c4c,
+	(void*)TVP_Stub_3a4d914ca7d24989c236ad223c002d49,
+	(void*)TVP_Stub_8fca7d3a123df1eacf228ba89f6a02ff,
+	(void*)TVP_Stub_58be195f96a36c158d638e3b0c79308b,
+	(void*)TVP_Stub_eaa4d5b1d186a807a63311ab6d5e16e4,
+	(void*)TVP_Stub_246f30d208c1d3a4e2b558090f403734,
+	(void*)TVP_Stub_3206ef9b7a8013d6572decdea49e7e2e,
+	(void*)TVP_Stub_c5a30d297c3a121879b1392bc6c604ef,
+	(void*)TVP_Stub_e398f5aef0ab92bc1323f3b094722fb1,
+	(void*)TVP_Stub_0733b0ac80880897d327dc6f3b04ea9e,
+	(void*)TVP_Stub_4cb055ed9d8ef71d1af10898965c940c,
+	(void*)TVP_Stub_ef8d198596b7d3143d02ed4450ccefa1,
+	(void*)TVP_Stub_d48ea419e040ffe8c20c1e86d80c9a5f,
+	(void*)TVP_Stub_679b215ff76a269871d5f325b981e561,
+	(void*)TVP_Stub_1039eff4a4443f9238438485a35a93a7,
+	(void*)TVP_Stub_2f873b0ee1c6591ba28bc4b9c0e4c954,
+	(void*)TVP_Stub_a583ffb56cdb2ede691e15053a8a165a,
+	(void*)TVP_Stub_e09ed277802c1b117e1908421448886d,
+	(void*)TVP_Stub_e76dfb9e00f4a9d491117d815f30db7f,
+	(void*)TVP_Stub_b000dd8934508d8ec6d6ef976a6ff49b,
+	(void*)TVP_Stub_d98ab5c968ebfde4e924901d09190774,
+	(void*)TVP_Stub_661e8c10d5d477e6823a840244937cd8,
+	(void*)TVP_Stub_6b39e70ea89c4f883689f51289029b69,
+	(void*)TVP_Stub_4a18b1c0afe37b84e2b35a7fc07c4e0f,
+	(void*)TVP_Stub_48b85c8774d91ca40b2992f0e452f19e,
+	(void*)TVP_Stub_5ea8db9a9193fe6bab53baf2bee06b6b,
+	(void*)TVP_Stub_46b92626ff6894e993c4f193a129540b,
+	(void*)TVP_Stub_6efc1d1f66f0e01a81faf767d7576816,
+	(void*)TVP_Stub_4ededf58eae77c320b4a6f5f701acafb,
+	(void*)TVP_Stub_028d5fda2f4568f6ab14b49d89650a4d,
+	(void*)TVP_Stub_11912984b8c094d2df26bf3c3677d096,
+	(void*)TVP_Stub_6c0df790c33142e286aea9af6993d931,
+	(void*)TVP_Stub_c27d85b695cd6e144210785bdfd446ce,
+	(void*)TVP_Stub_8422ef7f42009be0ad58a09d64149051,
+	(void*)TVP_Stub_ee07e6522577952453206ede39cdf54c,
+	(void*)TVP_Stub_786a65424247e711f6ca31f0a10603d7,
+	(void*)TVP_Stub_995a222f2038dd2007f2c1f6429bd19e,
+	(void*)TVP_Stub_da8c6e750d6a9c0557a56ef7f7fd8e88,
+	(void*)TVP_Stub_9cf7b0f119bcf3fa4564837ae25429b3,
+	(void*)TVP_Stub_17cbcacad2ed350215d7d700c676ea40,
+	(void*)TVP_Stub_2bd375c0598e9148d88579a51b2f07a8,
+	(void*)TVP_Stub_4d2c157f8b0b49e57c3e9b5abc9deb0f,
+	(void*)TVP_Stub_4b7eaccf64af0f3a4c4fe64f4e2dd3fd,
+	(void*)TVP_Stub_3a4d2602c392a8d1f4c38d537a8c95e0,
+	(void*)TVP_Stub_8d915d35ef8e857f245c5d46798618e4,
+	(void*)TVP_Stub_1e463482afa8ca30f5fa7bea4fa5741d,
+	(void*)TVP_Stub_fdf270e4080c986abd1649fa9fffdeab,
+	(void*)TVP_Stub_972e0f9a6ec4648a9fb82bcf5d9095ff,
+	(void*)TVP_Stub_9d76731c37c4664d654db026644c64b4,
+	(void*)TVP_Stub_4f1620cb699874b9c8cedf6e321c606e,
+	(void*)TVP_Stub_ef1c6b2b601d1b0ff70272a4d447aa3c,
+	(void*)TVP_Stub_9b7872860c95cfdafb056ab30318e99c,
+	(void*)TVP_Stub_53360f194a04fc142ddae2b9a3ab4c92,
+	(void*)TVP_Stub_ce1dcb05e5e7c4cafbc4ed37f63b256e,
+	(void*)TVP_Stub_841ce4492b37321eea0c1b500de9b352,
+	(void*)TVP_Stub_61785de870894968cd9d95e17e88eafc,
+	(void*)TVP_Stub_ad3236e727398311c3b8e1ddd5f4b293,
+	(void*)TVP_Stub_80e0b7be488545ff9b8bc52c9ab5fba5,
+	(void*)TVP_Stub_4eaa3e4efb319707db6ef81db1c6f147,
+	(void*)TVP_Stub_693a0152f098caee7fc77f545dd3e954,
+	(void*)TVP_Stub_42840710f5fba9bb32b95290b1796a55,
+	(void*)TVP_Stub_adec3f9ef429aa9a284081f0fc6a1b5b,
+	(void*)TVP_Stub_674a7948152a1d7a49050b9d98796403,
+	(void*)TVP_Stub_aa6f132b2031c83062f6149c90f2df5f,
+	(void*)TVP_Stub_b52f446e22bb92d495f7e65ac71c9bf9,
+	(void*)TVP_Stub_d4899fd4a8beb06f192dcb1d300e3319,
+	(void*)TVP_Stub_d3f5ec78464d29ee6988a1f90c2e3e1b,
+	(void*)TVP_Stub_a463ad6a757c3f04e09a72e288737d06,
+	(void*)TVP_Stub_27857bb89d35113183b682c3917d6c7a,
+	(void*)TVP_Stub_a5f80951cfb882ac6a3e06c0b9a95807,
+	(void*)TVP_Stub_35aadb63079c8bd84ebc0389bae306e0,
+	(void*)TVP_Stub_fb6573df5887c2020ae58136f8342ed4,
+	(void*)TVP_Stub_86c67d2197c46824ab10f59e568ad13a,
+	(void*)TVP_Stub_263a0c5b335b2c4d5bc1f55b51b8315e,
+	(void*)TVP_Stub_975c1099e57ab67122ddef0f44fd7dd5,
+	(void*)TVP_Stub_04493e5237a7ca97afd391cb7e831ba0,
+	(void*)TVP_Stub_9996100acc7705cb2b0c904d6bad4401,
+	(void*)TVP_Stub_5d91cff3b2a26ff7c0543e0f6d737117,
+	(void*)TVP_Stub_ef1dedc2cb58dc4e1afc14238b6fc518,
+	(void*)TVP_Stub_f18397fe81c043ba2346e31b359f6a73,
+	(void*)TVP_Stub_2ee45ad60b0c06a8d0feebc3a6aad9e7,
+	(void*)TVP_Stub_44500491c57e17032951fe6ed268ff1d,
+	(void*)TVP_Stub_056f5d278c75750df792bf8b081fbf7d,
+	(void*)TVP_Stub_04233bc4f7d4df92c260d23110320afe,
+	(void*)TVP_Stub_cdc475c4419e77c22508e337428c4074,
+	(void*)TVP_Stub_06bacb2910308a47bbe27ff7efa1226d,
+	(void*)TVP_Stub_521e053199a4aeb4e0f24d9f4a6cc682,
+	(void*)TVP_Stub_02164e6fb4c925843ac774ec1e4c6e5d,
+	(void*)TVP_Stub_5110cbbcddbd9688281ee5418e3f9023,
+	(void*)TVP_Stub_1db54b61f00bf931452218c4a39e79ef,
+	(void*)TVP_Stub_9d0edd8f51f155767301017bd3d256da,
+	(void*)TVP_Stub_8f744c5aa8df5471939b960bc759f12b,
+	(void*)TVP_Stub_ba7ff7b0b4192bd2cc7f49c7b688ad57,
+	(void*)TVP_Stub_7773ac921bb82c85de3be69ef86265fd,
+	(void*)TVP_Stub_114a781ed71edace31abb352a2671f41,
+	(void*)TVP_Stub_2bc5f4a97decfa82c625430479ec512b,
+	(void*)TVP_Stub_066fb79f94523d95d12480f23c58cc8e,
+	(void*)TVP_Stub_803906b8de16ff825d4e69e1952d872f,
+	(void*)TVP_Stub_34cc96a5118ee1e12b0750ea64d40b1f,
+	(void*)TVP_Stub_dbe821fb8b651d42a9c8e730517c408c,
+	(void*)TVP_Stub_8970ba46068ac74746c3e84299937d8f,
+	(void*)TVP_Stub_438e27dcbb077284213eb4d7dcd43f8f,
+	(void*)TVP_Stub_a98d712ca19a49afe07d0a7c5d064cef,
+	(void*)TVP_Stub_08aef69683bcfe2a5c63d4c7866de8e9,
+	(void*)TVP_Stub_dbc9bc2e27068c8426b1c6a7f89424e0,
+	(void*)TVP_Stub_5eeb98ca016123f57966457533bb639e,
+	(void*)TVP_Stub_98fdc846d0b4a83412f3521f65bb98b4,
+	(void*)TVP_Stub_3309591d3c7f6f688e81588f169dba21,
+	(void*)TVP_Stub_d83a866389246d824efcc83303a04484,
+	(void*)TVP_Stub_6cf6f332a6a14a15e8dce62301f5c840,
+	(void*)TVP_Stub_566eeea3c5f009b0fc6fa123ba30f496,
+	(void*)TVP_Stub_88806e38e35c73b36acadd4061a4fe0b,
+	(void*)TVP_Stub_3bb69d3886159aaecc333b6ff17287bf,
+	(void*)TVP_Stub_3e36278551a9c8b29cb2e8017db6af0d,
+	(void*)TVP_Stub_5de99d84f3dc902cb0812fb85a7d5c88,
+	(void*)TVP_Stub_31e85cbc73f8fbd4cea895a751480059,
+	(void*)TVP_Stub_6ae29e405ede762f1a89a9dd526cb36e,
+	(void*)TVP_Stub_c95bd66d95c153cdac41b5243e555f5f,
+	(void*)TVP_Stub_72a67e9c52fd27dbb66eded47efeea74,
+	(void*)TVP_Stub_fb13e41bda53e4e59403e3e14effccd6,
+	(void*)TVP_Stub_9a5c710e620e47f105752453ad5d6ab1,
+	(void*)TVP_Stub_18f1ad16c11429707cbf8ea4d1d4a21e,
+	(void*)TVP_Stub_550f317b573a1256af00586890ae82f1,
+	(void*)TVP_Stub_cd50da721dfb63f36c1ebb1226830428,
+	(void*)TVP_Stub_fbba3dd6a087599d1277ae58f6cec18e,
+	(void*)TVP_Stub_43cc5b5a61a6090af83333d115b5b868,
+	(void*)TVP_Stub_616fb5060d81eb5bab58647596582df4,
+	(void*)TVP_Stub_168cf4c1b9ef70b98f2e0ab3695a4f3b,
+	(void*)TVP_Stub_314573cca30a7c2aecc9166fbf5400c9,
+	(void*)TVP_Stub_03da356426c038fad663c836c3e330ef,
+	(void*)TVP_Stub_31dbebdedc08d75e34a2cd564ce60586,
+	(void*)TVP_Stub_d9224ad7a0de743a7eea15fdb2c5f934,
+	(void*)TVP_Stub_c01b0720b49ce4f792446d8965d2c31f,
+	(void*)TVP_Stub_4af47e46a11e1357cb994f405289d13e,
+	(void*)TVP_Stub_25b6dafa19bfa5bde1a8b519da248f82,
+	(void*)TVP_Stub_72425405819c900aec719491cbd90c6d,
+	(void*)TVP_Stub_a79942af73f33bff6e432c9fd808e469,
+	(void*)TVP_Stub_df106470a4141ebc7eda22160859ffdc,
+	(void*)TVP_Stub_469bc225b0ecd9561aae5a46b85ded42,
+	(void*)TVP_Stub_a6663c078b3aa79b39ee2d09f3875765,
+	(void*)TVP_Stub_efbe634ce4f13633e220cae167cf63fb,
+	(void*)TVP_Stub_57f4147bcc09e4e4442ffc9b0895727e,
+	(void*)TVP_Stub_1fb2d2e44cf83aebef7b26fd6b20bc2b,
+	(void*)TVP_Stub_bd6aa777bac947f5cffd891e9c724794,
+	(void*)TVP_Stub_83c662330b75d616cdc8a4e11d7ababa,
+	(void*)TVP_Stub_bbde02fe30c8a6cadb7073174ea3a874,
+	(void*)TVP_Stub_cc1c14f63867f90bc883de03e9212cbc,
+	(void*)TVP_Stub_236e007b32bc2631b5f6dc1eda6be0a9,
+	(void*)TVP_Stub_cfbb9809e0e6d954b2652856e935ced9,
+	(void*)TVP_Stub_60ee96ae4a7704340bef20fb35ba6ade,
+	(void*)TVP_Stub_564b37278b50f4e5597dff6540868d49,
+	(void*)TVP_Stub_890b3a4831b824653e919b4a5197358d,
+	(void*)TVP_Stub_2dfa6c77c5051d160b8a06f540e0d68b,
+	(void*)TVP_Stub_05f88567d510fd84659ccbf493f647ed,
+	(void*)TVP_Stub_7166b8f7bb9688c980e4fa172f06f30c,
+	(void*)TVP_Stub_b9456ecba8b7898d80d2e5caa64035c9,
+	(void*)TVP_Stub_dd44464bd8430a5be5fef0cffcd97117,
+	(void*)TVP_Stub_a57696ca0c157cd7d3cd4e58c1df957c,
+	(void*)TVP_Stub_1aea9f8a38bbb875b6d052f330da9178,
+	(void*)TVP_Stub_2d3b3d6e22ee139cda9eee47dc031945,
+	(void*)TVP_Stub_8ff49e56c3c4c566561dcdd5c9ecc4db,
+	(void*)TVP_Stub_490b547e93e40082d0b83312467104f9,
+	(void*)TVP_Stub_2c1ef06748df47df52b586ac0fbc6a34,
+	(void*)TVP_Stub_b6b2a03160b88239eccd18d89b1537d3,
+	(void*)TVP_Stub_8becefbd52c76c7ecb0ea7b7f50b7915,
+	(void*)TVP_Stub_74b9687a3bfd3b2c7abe226efc4225c1,
+	(void*)TVP_Stub_7cafc2bf5965b594e60830e3057bbd58,
+	(void*)TVP_Stub_80f111939c5694cbf43d07cf0ad1726c,
+	(void*)TVP_Stub_8dc9cef84191f79b38403a2070952fd4,
+	(void*)TVP_Stub_1d42bd1e659b36886c20567497b7ee96,
+	(void*)TVP_Stub_0848fbdc7eeddb12c80bcd9c31383a64,
+	(void*)TVP_Stub_1f1123c906c28ab6d16b6bef3f7ae978,
+	(void*)TVP_Stub_b84394e20cc73a90349cf5be4e783111,
+	(void*)TVP_Stub_76e0db3797851fe8ff90cf84780c50ad,
+	(void*)TVP_Stub_6616241156c22bced42cd9f2f647677e,
+	(void*)TVP_Stub_1ace346a3dd546c66ad115a33d8cf693,
+	(void*)TVP_Stub_96fb9bbe33531d4268573355c658e165,
+	(void*)TVP_Stub_c90b5737134c76f9ed0bb5da7cfaad8c,
+	(void*)TVP_Stub_070ed05259a265cabdd82bfedabdd638,
+	(void*)TVP_Stub_008b7e3a4c5bb23ee991f684a5064737,
+	(void*)TVP_Stub_b64741dc4544ed43c44ddb6d0eb838ea,
+	(void*)TVP_Stub_5b83e28b2d9ab0f75d7c7f6f61b5ded6,
+	(void*)TVP_Stub_b948c9f43837efa489b0b91f3f675710,
+	(void*)TVP_Stub_eb83216f6f718245468ef48b97ab4c2d,
+	(void*)TVP_Stub_c66ab4868b743de9c0ba8b26c67b23da,
+	(void*)TVP_Stub_586e16d502a6ad98b08161bdb090f8b6,
+	(void*)TVP_Stub_d8bc9c71c80b200c39b29167d795cad0,
+	(void*)TVP_Stub_85df4beb87f6503891e116ce046353c3,
+	(void*)TVP_Stub_35b6a7e1c73f257aae91e05fa9826e84,
+	(void*)TVP_Stub_a25b46701e25030af1ed847e0df229eb,
+	(void*)TVP_Stub_c8906bf1efa5e86f9fddfab55a01c8f6,
+	(void*)TVP_Stub_8141059f613820f694608af28e20cbad,
+	(void*)TVP_Stub_cf2690e47099ac6378ed50df4a8a8e90,
+	(void*)TVP_Stub_1dfa540e3e66d5681d06cd96a02092f4,
+	(void*)TVP_Stub_4e9a5f2e6b2f0d415a119eb9a950c501,
+	(void*)TVP_Stub_7e504da873d48bc2372cfda3f3f9a76a,
+	(void*)TVP_Stub_afed4efc8c31cda039a58ba63e34773e,
+	(void*)TVP_Stub_c56eafd762bf88c9a49215b35f3ca1f1,
+	(void*)TVP_Stub_9c1640d6849276e55e2f2f9f6dede800,
+	(void*)TVP_Stub_f7ff7394cce517831679d890d05e7b35,
+	(void*)TVP_Stub_5cb1f14a12578d0e6a1fe83b0400da44,
+	(void*)TVP_Stub_c7aadac7045a57fddb29e2ab2134d3a7,
+	(void*)TVP_Stub_810c7054e44f535cf250f00707105417,
+	(void*)TVP_Stub_52a9af7905ddc71d8b4e0ef7366eebdd,
+	(void*)TVP_Stub_1635dbae2d91b338ddfd0430f8aa7f10,
+	(void*)TVP_Stub_30df0c29ad8f672f7fe0742b4b11cd7f,
+	(void*)TVP_Stub_61c82dec644c58290a25f34a69478870,
+	(void*)TVP_Stub_f08e347d2d47dc5fc9a3cb59355b4fbb,
+	(void*)TVP_Stub_5c62e59c2062f658d4c79d5257a9a586,
+	(void*)TVP_Stub_259c72d8bfed1210ca71c54f24cacc7a,
+	(void*)TVP_Stub_801a92ace08eb7ed001406869a39a75f,
+	(void*)TVP_Stub_e22e647af4ded8e51b1e76c845b4c8e2,
+	(void*)TVP_Stub_12902221314df9bcf7f7cb74a5242fe0,
+	(void*)TVP_Stub_b10feea1619ba8ac11237c12002cdb3e,
+	(void*)TVP_Stub_19755b50d241edcb477bdcac22663778,
+	(void*)TVP_Stub_040a0ecf46963e094ee8ec32ab3f1962,
+	(void*)TVP_Stub_525c529dc687b5d86424d775d00bdfce,
+	(void*)TVP_Stub_c96107b91e2a215f560a2612c6e85931,
+	(void*)TVP_Stub_b8788eaa2ca495263c6ea2df264af5f5,
+	(void*)TVP_Stub_4c6494008c520d896d699f82aca30b25,
+	(void*)TVP_Stub_7d8f8d5e0832ecf248b19a89801ead0e,
+	(void*)TVP_Stub_70849965060a6402f41b0b11ec2bb3a7,
+	(void*)TVP_Stub_c72efa6b4efaa6664ae637a03e98e866,
+	(void*)TVP_Stub_a250e46575d0df1166e1542613218a5c,
+	(void*)TVP_Stub_a7bcff67b8d380c225b9d0d83921b3ae,
+	(void*)TVP_Stub_fb68a3aa16bd2eb7d7550283170321bf,
+	(void*)TVP_Stub_35b4299ede11f511b331b713ba9f38a8,
+	(void*)TVP_Stub_efe52691cff20b2dfaa16e8e16caac0a,
+	(void*)TVP_Stub_38eed43ef69251c34dc45695b8cf35c0,
+	(void*)TVP_Stub_2058b65abdfb7598910f0d584d40a19d,
+	(void*)TVP_Stub_1ebecaefe2ffdc811fccbac42e67e544,
+	(void*)TVP_Stub_09e0f0912f8d758d3736ece9478c2686,
+	(void*)TVP_Stub_23d61eda3959b087b618e348471e2c36,
+	(void*)TVP_Stub_e99b22c79b5bf04f3382f959c7bb69ca,
+	(void*)TVP_Stub_9c4bb9ebee4db0fcebeae11c34950f97,
+	(void*)TVP_Stub_505a9563aeb1b0255cfcc8197bee7d9e,
+	(void*)TVP_Stub_f5ab80fc67ee04570330b9035144e760,
+	(void*)TVP_Stub_af50188bbaa019ee88b19ecd931f7cce,
+	(void*)TVP_Stub_268c452e85a6ac75301a6132f4f5e38b,
+	(void*)TVP_Stub_646770a19b1768b372c9991ef0d3de85,
+	(void*)TVP_Stub_5ec88e04fcb8e1877752281e172173ed,
+	(void*)TVP_Stub_923f8161f2d2ba0e883bc4edc2901960,
+	(void*)TVP_Stub_6f70cdb7586cbe571204f286f43c9780,
+	(void*)TVP_Stub_9a4eaa6a627038799015c093609bdde7,
+	(void*)TVP_Stub_c8bb6590f4a7adc906d7b3e42d907267,
+	(void*)TVP_Stub_8323d57f26876d87271dbfa257b7f7e2,
+	(void*)TVP_Stub_4d6f148e8997e1ae0cc0006ec1bd9618,
+	(void*)TVP_Stub_7f03a4ddb254d0518642d15513eaea85,
+	(void*)TVP_Stub_4add3926c72ba9df9259be58b680de0d,
+	(void*)TVP_Stub_075d42cff8dc0c1fbd99c7459a63e526,
+	(void*)TVP_Stub_b6bc45b28e194c7ac98bfdea88edee36,
+	(void*)TVP_Stub_6dff6abb075da1a304520e60c011ef7b,
+	(void*)TVP_Stub_892ffbdb8375851fc557e4abe9589b77,
+	(void*)TVP_Stub_b2f3538284fc2adda2a43272ee654a96,
+	(void*)TVP_Stub_e0ff899ea4a9cc49a0e3b38deaf93b45,
+	(void*)TVP_Stub_4b9c9ac2aafad07af4b16f34e9d4bba2,
+	(void*)TVP_Stub_c2e423356d9ca3f26f9c1d294ee9b742,
+	(void*)TVP_Stub_c07314686fdf5815ce9b058020da942b,
+	(void*)TVP_Stub_4a197be1985d45ee86d5672d24134560,
+	(void*)TVP_Stub_dec720a9c3cd2b378f195cf71a9ff8b0,
+	(void*)TVP_Stub_5726a5c7af641ebaa504dc9ec8380938,
+	(void*)TVP_Stub_1c53bc96ac9dfd483c2227bc5fa44825,
+	(void*)TVP_Stub_1940c8fa03145aa029d0b7718ce0c809,
+	(void*)TVP_Stub_b37f047c0f9bd143b34a2fc87ce5f16e,
+	(void*)TVP_Stub_dec35fbd2a24fc32e5c220174d864cf4,
+	(void*)TVP_Stub_86fd45a126296891aee413388597203e,
+	(void*)TVP_Stub_603243e54f3508c37d993e8359b735dc,
+	(void*)TVP_Stub_c3eadbd75b32dabe6faecebf492eb486,
+	(void*)TVP_Stub_725e49de1d970ef04b179776666f2c34,
+	(void*)TVP_Stub_55a9b73f877bfd4c6d8157e7b1c458df,
+	(void*)TVP_Stub_d070209f152dd22087e6e996e02c85cf,
+	(void*)TVP_Stub_308f905626bc51c7ef9b65b2c0ca34b2,
+	(void*)TVP_Stub_95aab2a1ac9491e8026f4977e0918760,
+	(void*)TVP_Stub_e0ac94325eb783ca2fe7856a54444c90,
+	(void*)TVP_Stub_0c99a79e866f08b4df3914e83fc203dc,
+	(void*)TVP_Stub_f2de531a016173057ff3540e47fed4e6,
+	(void*)TVP_Stub_4224a9066d8d13d6d7e12f1ace6a5beb,
+	(void*)TVP_Stub_900476efbc2031e643c042ca8e63a3d7,
+	(void*)TVP_Stub_07dfce61d490cf671a2d5359d713d64a,
+	(void*)TVP_Stub_52d30ac8479ef7e870b5aff076482799,
+	(void*)TVP_Stub_8e4d0392ed46e87f94e5fcf675a124a1,
+	(void*)TVP_Stub_73f46e08d17e707725f433b454f05a89,
+	(void*)TVP_Stub_80d60e682fa72973071e335db272a2a2,
+	(void*)TVP_Stub_6bd6262185fa0b9cf1750f6a525d893a,
+	(void*)TVP_Stub_cf29f737d4eb450b26789d421d0ec69a,
+	(void*)TVP_Stub_13c0e371c08fd1b9da2f0c103d01c59a,
+	(void*)TVP_Stub_82693e38df8f033ea98f9b7969d66d7b,
+	(void*)TVP_Stub_6e3f8a3b18f55dae6153a889f00a3e87,
+	(void*)TVP_Stub_efe14a197131b4813656d6669cc3475b,
+	(void*)TVP_Stub_ba4ecf60f872f757b69c84f457b3e941,
+	(void*)TVP_Stub_dffedabe32ce886e3b7e695b44ad3547,
+	(void*)TVP_Stub_f518c60b165658d19a0fadd8f69586aa,
+	(void*)TVP_Stub_6fefcb1c2ca01a876c301ab41dbdab9f,
+	(void*)TVP_Stub_df55083347df0483b4ca6ba1e4f0b9a0,
+	(void*)TVP_Stub_d8d28310f702714733c4c5dc850058df,
+	(void*)TVP_Stub_52d24c38b05be174bc5c4fdcf02e9b9f,
+	(void*)TVP_Stub_f27f455c8f30cbaf1706faac3c7b8e02,
+	(void*)TVP_Stub_0936d0f6fc53339d255893e58bcc6699,
+	(void*)TVP_Stub_f4f7181b7fd679784c50b0cc7ba4c60e,
+	(void*)TVP_Stub_79816d7e5741c2416fefe2c2a8baef00,
+	(void*)TVP_Stub_42a3d248fab928f16555abcceca62834,
+	(void*)TVP_Stub_926d6212b8b1b238e7bef9b17a3ee643,
+	(void*)TVP_Stub_236e3d626784d80ca2cc5b2fe14cd9c6,
+	(void*)TVP_Stub_1bfac11a5f95c842f97a8bb57d4019de,
+	(void*)TVP_Stub_198ce21c54b0cea4c1bf5eeba35349ab,
+	(void*)TVP_Stub_590a1ec7f64904eaa32b5c771bb5f8cd,
+	(void*)TVP_Stub_dd13d4bc2b48540a92f047bf015b829b,
+	(void*)TVP_Stub_0ff502d492598d2211405180bfb4d1e1,
+	(void*)TVP_Stub_cf5401746759bfe38918087aaab6c57b,
+	(void*)TVP_Stub_04e84aa7d8cf0477d55c700164544b38,
+	(void*)TVP_Stub_449039d3afbfbd52a63130a3b227a490,
+	(void*)TVP_Stub_347a4fa85af84e223c4b61d33ead694a,
+	(void*)TVP_Stub_4ad1dd24b3b4769ee10149eea006af7a,
+	(void*)TVP_Stub_b246b17b62d273bdc04e9d9e827f5c74,
+	(void*)TVP_Stub_c23ece207f6ec2dd7c76ef873047aee3,
+	(void*)TVP_Stub_81507020bc646be2f53ab95b9430ba27,
+	(void*)TVP_Stub_acc0d3861d1b971abcbdda1c075dd681,
+	(void*)TVP_Stub_ff2dccead1b31e3f34e8be3e2ba5bbf1,
+	(void*)TVP_Stub_e17db0d4f69625c61aba7fffe540dded,
+	(void*)TVP_Stub_5bbc872e7bba5b761c509d31116e4460,
+	(void*)TVP_Stub_4adf361303eae78829250c7b732a5722,
+	(void*)TVP_Stub_bf172364c57c1aa561b145fd5cacda0c,
+	(void*)TVP_Stub_d7687aa80dac10f88deac7aa7e70538a,
+	(void*)TVP_Stub_b18b7259f98029f745c75291d6855ab1,
+	(void*)TVP_Stub_b79e5d877116025576ca1f76af124009,
+	(void*)TVP_Stub_8aea098dfe8a36c705cc2a9e1a189b84,
+	(void*)TVP_Stub_3d70bb72a7d7765c7e8ea580079ab7e9,
+	(void*)TVP_Stub_eba9b272d78a4b0cd7f9212e29a58607,
+	(void*)TVP_Stub_cfbe8ee9d43aa64ae4190eac91f7c55f,
+	(void*)TVP_Stub_a4308a386968ef5d23025ab8a9e8c6db,
+	(void*)TVP_Stub_5a4fcbe1e398e3d9690d571acbbbae9f,
+	(void*)TVP_Stub_fb3b405f8747b54f26c332b9e6af81cd,
+	(void*)TVP_Stub_b7ccd11d130f186883c109d2ba17b598,
+	(void*)TVP_Stub_cf8ab6c24f25993ccc7663e572ac2991,
+	(void*)TVP_Stub_ba40ffbca76695b54a02aa8c1f1e047b,
+	(void*)TVP_Stub_c97720e639e95ba5130ce9dd78d30403,
+	(void*)TVP_Stub_c5557ac5391b1b831a22e64b65d1746c,
+	(void*)TVP_Stub_3243a4c32d4f674f1bbc8d3895257568,
+	(void*)TVP_Stub_78390a3d08879903ee9558e9df68db4d,
+	(void*)TVP_Stub_58e9454d7096a52808f9a83b9ce25ff0,
+	(void*)TVP_Stub_cdefadd0c3bf15b4639b2f0338a40585,
+	(void*)TVP_Stub_4bf80e9bac16b9e3f9bf385b2fbce657,
+	(void*)TVP_Stub_51aeacf2b6ef9deb01c3b3db201d6bf9,
+	(void*)TVP_Stub_9ed5432d73448da47991df9577ee97bc,
+	(void*)TVP_Stub_cf1d02d1cc1aff0aae6c038c95dac80f,
+	(void*)TVP_Stub_ddb0e05c72c0692e78af885ac7ec82dc,
+	(void*)TVP_Stub_a3029db6292616cd16c228b91dc4af13,
+	(void*)TVP_Stub_2d90871c6bc15a9e8d97d24c29e78e3b,
+	(void*)TVP_Stub_0af6744e35e38276d6a98c1f382b1519,
+	(void*)TVP_Stub_ad40567a051208757642e5e087f3e741,
+	(void*)TVP_Stub_6a15185daab9b274963fe5ef46305775,
+	(void*)TVP_Stub_073a2332a8ab3ed31ab81daea3d3f2c4,
+	(void*)TVP_Stub_01216e91225e06c7422bef0c2febc0cc,
+	(void*)TVP_Stub_16ce22ad500a5bdfd5d5743c847a28b6,
+	(void*)TVP_Stub_59251c4104f736fa2690c5f77fb0a908,
+	(void*)TVP_Stub_f923750e0fdb51a6fc6c304832cb3dd3,
+	(void*)TVP_Stub_bc77a1e312ff7827d90387fb92f0f5b0,
+	(void*)TVP_Stub_2090afd7ae8bcb021ec4d04947d0d845,
+	(void*)TVP_Stub_3a0f858bdf86199dc2d00b583a3b915f,
+	(void*)TVP_Stub_0d316a141f7a502ff8d9ffe2d38d25a8,
+	(void*)TVP_Stub_b31ff64ae2d8f93dbf28161d5080b295,
+	(void*)TVP_Stub_d9b1c73516daea6a9c6564e2b731615a,
+	(void*)TVP_Stub_003f9d3de568fcd71dd532f33d38839c,
+	(void*)TVP_Stub_b94ead6de9316bc65758c5aefb564078,
+	(void*)TVP_Stub_8a35be936d2aca049e398a081e511c97,
+	(void*)TVP_Stub_5b1fa785e397e643dd09cb43c2f2f4db,
+	(void*)TVP_Stub_29af78765c764c566e6adc77e0ea7041,
+	(void*)TVP_Stub_9e0df54e4c24ee28d5517c1743faa3a3,
+	(void*)TVP_Stub_d3aaa55d66777d7308ffa7a348c84841,
+	(void*)TVP_Stub_9982ebedc12d343cb098e2a7b25bdef1,
+	(void*)TVP_Stub_81eeacbed5ee6129bef4b370e28b5d10,
+	(void*)TVP_Stub_6ed1088905d99012d2fb5827ea19527e,
+	(void*)TVP_Stub_b4d6c64cc0004ffaba804f0e8f02ab9b,
+	(void*)TVP_Stub_2c3e08b8df93ec50451edd916c707030,
+	(void*)TVP_Stub_eba070d1583ca5f5d02630ba33a5504b,
+	(void*)TVP_Stub_ee474537852ce5eb165cb1761950faba,
+	(void*)TVP_Stub_eed221c603243522667e2f1c6ace3ba4,
+	(void*)TVP_Stub_1f973c5e3cfaf00fa752b7e22d7ba481,
+	(void*)TVP_Stub_b9d5260bba9edd7503f1adf882218979,
+	(void*)TVP_Stub_aedbd2eda61145de808e295331884245,
+	(void*)TVP_Stub_ce0f184e84752eb279e4f900d8b53c18,
+	(void*)TVP_Stub_0217d49393163b80897d044c1d93092f,
+	(void*)TVP_Stub_5bbd9d5b364840e9615af35a62f69d7d,
+	(void*)TVP_Stub_2b2837e81fcaeec35f61a2a3ecf2fb2d,
+	(void*)TVP_Stub_bb0706a78e9066944bfbffd1406be2d4,
+	(void*)TVP_Stub_770e67c91215292980b88cc6efb9f2a5,
+	(void*)TVP_Stub_068ab11f05731f2c2e9ea8c5fdb16a9f,
+	(void*)TVP_Stub_b9873a0ad2653952cb2948b817e786e4,
+	(void*)TVP_Stub_11d9804ae4db32d731af69c397769cbf,
+	(void*)TVP_Stub_421f5aa6dbaaaf946f74942c77aac9bc,
+	(void*)TVP_Stub_563ee9dcb14a2914fc246e64679f42b5,
+	(void*)TVP_Stub_e23a54b6b80bd03111a40f669524724f,
+	(void*)TVP_Stub_c90c8bbd18a7190636ae4269c36ad005,
+	(void*)TVP_Stub_03c54a8e8c86e171f868a624e490691f,
+	(void*)TVP_Stub_30b63f3cc59b39f1a71829bbbdf6e45d,
+	(void*)TVP_Stub_705bcc30a0561ec679c2267e1a573b23,
+	(void*)TVP_Stub_5c627d080007e455b0393a9b4457cd4d,
+	(void*)TVP_Stub_72a64cecd44d80f95fc93faf0d239e32,
+	(void*)TVP_Stub_ef838904712bfdc614dbc689fbe7fb18,
+	(void*)TVP_Stub_acc97936adc40656e824cfdf7a34e20c,
+	(void*)TVP_Stub_5ea1ba3602f9d9fee344de6c3406d7a3,
+	(void*)TVP_Stub_d25f0771b8fc7715d69f01d950463a49,
+	(void*)TVP_Stub_f8ab11c930782ce058e517d0440ec87f,
+	(void*)TVP_Stub_b8157e369d53c2d944b76494980ced7b,
+	(void*)TVP_Stub_aba94f656b4c1de827d11c72b36a5e9c,
+	(void*)TVP_Stub_0656942f5a95783a4de73ca6e654d3b5,
+	(void*)TVP_Stub_5c2b7d12713dd5a94ef8e6eff1f79752,
+	(void*)TVP_Stub_6f1d30ac7e812cc5a059459c47638cd0,
+	(void*)TVP_Stub_1d51684322635e7848ef53f7f6be8a1e,
+	(void*)TVP_Stub_a1f2d56d138a4038fe1678328910a81d,
+	(void*)TVP_Stub_c135ef491b533febfd49696d22a1dd3d,
+	(void*)TVP_Stub_579117a873b466d78bf93e49c4a078da,
+	(void*)TVP_Stub_ec8fa08705639eb7ae5d44ab63dea5e8,
+	(void*)TVP_Stub_b49dc1cda6109256815dae7b4293725d,
+	(void*)TVP_Stub_912a670f56707ac70f2fee13660c2af8,
+	(void*)TVP_Stub_d0159986645df76b8c66fdb662efffde,
+	(void*)TVP_Stub_cd7a2e6f91bf8d2daa3e28139d7d9f5c,
+	(void*)TVP_Stub_676004ca892b2bfee6859d0bb132fdd7,
+	(void*)TVP_Stub_d4b161d8a745baa5e2113669773a758f,
+	(void*)TVP_Stub_ef7537293f6e3b6127480f6c5fd018a1,
+	(void*)TVP_Stub_6f6f73b75cffe40a28566d1832ae1224,
+	(void*)TVP_Stub_7adc5aad39e459e01543d07c239efe57,
+	(void*)TVP_Stub_3ff6b480097eec3f5fdb7bfad685fd2a,
+	(void*)TVP_Stub_b2c50c3a1dfea7e9d05fed69818bafc3,
+	(void*)TVP_Stub_8024df9077e2c85b5b718ad2c87e57e7,
+	(void*)TVP_Stub_989769d4eb8e42e9c9bbe721b296406c,
+	(void*)TVP_Stub_cc1ac928b5c31570dfba7ed8f565be4b,
+	(void*)TVP_Stub_62931efed5729a332e60bd1f7c7cecdf,
+	(void*)TVP_Stub_53c18160b157088f72a9afd79737b48b,
+	(void*)TVP_Stub_48135697fd7f4df87402a7dd4d761555,
+	(void*)TVP_Stub_e2c71cf04e876069eb7315c800a96898,
+	(void*)TVP_Stub_1f63c018cf805ca1168af192cf8a4b41,
+	(void*)TVP_Stub_704a9574dafd3669e10d546549948e03,
+	(void*)TVP_Stub_97905c510b9502c20c9322c9f5fb4188,
+	(void*)TVP_Stub_b23e84230c4736667279c7a71f4ca53e,
+	(void*)TVP_Stub_eb41fc900b0a6e3aba9d531f266137f1,
+	(void*)TVP_Stub_5bd02c627b74bbb22d5a525b8bcbbd27,
+	(void*)TVP_Stub_cc82e6a6b31ea743b9ebbdeed1ddedc3,
+	(void*)TVP_Stub_247b25d497e48bc0191fdb2ac530f4ca,
+	(void*)TVP_Stub_6bbea3af36c35631641cc8356ff65475,
+	(void*)TVP_Stub_cac02dfd62ba94abf6a346bef0bf3ab9,
+	(void*)TVP_Stub_68eeb36d76d88ff00014f04b23454254,
+	(void*)TVP_Stub_65e03b1c849b6e9cb5c478024aa9a5b7,
+	(void*)TVP_Stub_7670c0c5630625ee6a73b7b9ee093650,
+	(void*)TVP_Stub_68a0abce6eefa08e74353ec48c4c87a8,
+	(void*)TVP_Stub_ccb6e098b9a0791a0f20e9f1af55e341,
+	(void*)TVP_Stub_0f817efe47b451fd719c05a104c2b803,
+	(void*)TVP_Stub_efad1a3d774747bd2b5adb221ede2678,
+	(void*)TVP_Stub_563285ed004ddd2945f91db7b5347d3c,
+	(void*)TVP_Stub_4c032260ef83d44bfe05fdc16843a8f9,
+	(void*)TVP_Stub_96fd614457f06499a430b0c6e0e8a941,
+	(void*)TVP_Stub_d6e36d304ff7253088ab4bc1aaf13a98,
+	(void*)TVP_Stub_eddacf49735189e23d9d49831851ffdb,
+	(void*)TVP_Stub_20275a5de4aef464b85d3f6db2800063,
+	(void*)TVP_Stub_872d1c626e6d4e3d5e86a257f0b14536,
+	(void*)TVP_Stub_a7ebb70cdec339f26c2ea7fd9a471b88,
+	(void*)TVP_Stub_d748ffef5cde2a6a3333e75b7fa3fb49,
+	(void*)TVP_Stub_15e1fe0e6230e7b60e216e266f927f7b,
+	(void*)TVP_Stub_f8179eafd0cbe8116874310519207dc0,
+	(void*)TVP_Stub_accbc3bed3223d552de2723366cfc2b6,
+	(void*)TVP_Stub_e2c3e74d2a20a601c1f393348f58aeb2,
+	(void*)TVP_Stub_e0163a6ca3397c2e71715132cccefa1d,
+	(void*)TVP_Stub_2c3ea1ea88799dfde81025bf1959333a,
+	(void*)TVP_Stub_a6bb56b3f4b7a89fe78d63956a0f444c,
+	(void*)TVP_Stub_09a81ac18a121d8fbb67285a081bf9c6,
+	(void*)TVP_Stub_46fdfe0f5369bf234c3ed60a43947d9d,
+	(void*)TVP_Stub_d866cb6c8a47444bbac60eeffbfc6d96,
+	(void*)TVP_Stub_7b5718fc67458089c685dbb900126890,
+	(void*)TVP_Stub_5713dfe9525662357d3819229e0204c2,
+	(void*)TVP_Stub_8954a6b4a7f8b378c2af16a00d5059b0,
+	(void*)TVP_Stub_2ed4faa38db6f3dee0dea18ebe973d35,
+	(void*)TVP_Stub_d0338dedb0af532d22f2075a85373548,
+	(void*)TVP_Stub_583d57c3bb9491f8f9904c266d3f52e8,
+	(void*)TVP_Stub_8ac206da43e322eb8e34fce2b0959656,
+	(void*)TVP_Stub_14f5f97d90bd8da89b68d035367f4ba4,
+	(void*)TVP_Stub_ac3b21181ef4c1be73cf5e0edb4e1a8f,
+	(void*)TVP_Stub_1d7d97509292a4ca9269f2539dcc70fd,
+	(void*)TVP_Stub_c4033f54a99517783b8d6ad23c90aeed,
+	(void*)TVP_Stub_f19e38d48755c971fc35408ac65562fa,
+	(void*)TVP_Stub_e01204e226d8aa9520b3620b68da6196,
+	(void*)TVP_Stub_b50000da98f1257cf789fc63fb1fda02,
+	(void*)TVP_Stub_c55f38b1a7623646aa5cc45d4f4f479b,
+	(void*)TVP_Stub_983d270549ec0e83e2a863b43e1e6f70,
+	(void*)TVP_Stub_b48d779dc6a881c67c5f8fa12655aa28,
+	(void*)TVP_Stub_d3967c6e24d0c4ad107a03c1cadd57b1,
+	(void*)TVP_Stub_6b6f416b5725a7cafb4774ffc3a00f10,
+	(void*)TVP_Stub_bc7fc5dfa228152a09d2230823c2fe71,
+	(void*)TVP_Stub_a1cb941317b947beb88e29fa8d46a2be,
+	(void*)TVP_Stub_8e185e82bb27a7fb40f0b08f560a57e9,
+	(void*)TVP_Stub_4b7b264b61ee0eea68213934217f5865,
+	(void*)TVP_Stub_e872f12593d6853ebdffebbb5d003c10,
+	(void*)TVP_Stub_e86fcf60fa658129d937de3728d3c432,
+	(void*)TVP_Stub_350741a7398a187628866f5b397c7a99,
+	(void*)TVP_Stub_3b5a3e187077b0b5eac9a040c99dd9e7,
+	(void*)TVP_Stub_2d9b2bb2cd57220048fe170f1e960cb7,
+	(void*)TVP_Stub_260624e275a20115e8861eb7b0383971,
+	(void*)TVP_Stub_15b31724287dbbecb775b2e46dc35fb9,
+	(void*)TVP_Stub_ff652293eef07b5a7ec4f372e5504e2c,
+	(void*)TVP_Stub_99b773033e9a2c631b483d4d0e3881f8,
+	(void*)TVP_Stub_3787960fc29b8545629d894ff46d4641,
+	(void*)TVP_Stub_3fc76257bb1639de4bfa0c0fcedf9c4a,
+	(void*)TVP_Stub_292ee2eeb8131e34368ba9ee144b737a,
+	(void*)TVP_Stub_ec144655bc61bfa2c6e9505cc1a0a298,
+	(void*)TVP_Stub_230218bdabfc34178a8306a54276a3c8,
+	(void*)TVP_Stub_617dfb046aaf40078ee76715fa4756af,
+	(void*)TVP_Stub_8116bb2b26dcafd9fefca76e9f1d9b24,
+	(void*)TVP_Stub_12962f857563cd39b3cb1f9894775cc7,
+	(void*)TVP_Stub_50c0d25cd9af311a5fb0aca78f691c3b,
+	(void*)TVP_Stub_6c37a1ccda816c4fbab4f0117ca75e8a,
+	(void*)TVP_Stub_e21c21762dd0e36d6f7d2cedaac97383,
+	(void*)TVP_Stub_487ee86557f94113db9a981e08d29caa,
+	(void*)TVP_Stub_dfdfe0e494845bf484612cc97145f85c,
+	(void*)TVP_Stub_e74dc11dbd56fb450eed1388a65d3102,
+	(void*)TVP_Stub_6981c02247de5799ea7dfbd79fdc208d,
+	(void*)TVP_Stub_7c559043315f6ecd7a86ec7d8d820f6d,
+	(void*)TVP_Stub_3a8b6aca73c83d6fc9ce813661ec734d,
+	(void*)TVP_Stub_20d7ce65e240b745b10616bb5da1f897,
+	(void*)TVP_Stub_f4d1217249674ac9274d358c381afc0b,
+	(void*)TVP_Stub_ca77323bbe361f88f68536018fa94c50,
+	(void*)TVP_Stub_17983ecc7e7fe370bce664281a84c948,
+	(void*)TVP_Stub_61a2f61030362903d00ba21a3cebecdd,
+	(void*)TVP_Stub_e9f985403dbd18540d8230a2af6ed76b,
+	(void*)TVP_Stub_be0523c9a72ba26cb4bfa3cb188cacf6,
+	(void*)TVP_Stub_8ac7cf651223c8ba53df90cf4f3d3bbc,
+	(void*)TVP_Stub_873e73aa35096ad4c684d394a10135a6,
+	(void*)TVP_Stub_3342548f105147c86019ae31ece01d4e,
+	(void*)TVP_Stub_607ee0956cbb16b2afb7cb2227aa6267,
+	(void*)TVP_Stub_816d84c86e86d5e7c0018d551e741e4f,
+	(void*)TVP_Stub_985fcda0141eb3b4c6bd8342e947f130,
+	(void*)TVP_Stub_d00e4f9e493334d2f65ea379ff03d717,
+	(void*)TVP_Stub_0c246e6c7c8798e4c10d2bbfc66326c9,
+	(void*)TVP_Stub_501015843a83368b3ff1c7c9ef5f3bcb,
+	(void*)TVP_Stub_61d5fc5a060f346752a3a8b6886d17bc,
+	(void*)TVP_Stub_0debe3e1caf0f57572a59917851676d3,
+	(void*)TVP_Stub_ee3a36682f48639166ba04a19fe1b332,
+	(void*)TVP_Stub_4d99b9e38121251b40a90cd2bd5fea63,
+	(void*)TVP_Stub_f1509827696ebf5627bee1a45d675fb8,
+	(void*)TVP_Stub_bbb625e23229350453161810c41419dd,
+	(void*)TVP_Stub_489a6aae30de0feff5d3c5fbd42ae325,
+	(void*)TVP_Stub_6b9a349305f8c689dcfdbcea2566769c,
+	(void*)TVP_Stub_6320d208ce1a570aca52c3cdf7421f7c,
+	(void*)TVP_Stub_0f83f0459badd1cd352041b9243d712f,
+	(void*)TVP_Stub_186a94b2fed609ed2d2a7ac1a2bed87f,
+	(void*)TVP_Stub_bde8efb9971664f2b52fe912745e2791,
+	(void*)TVP_Stub_386d6fa5cb73e3519b62d20470e5414b,
+	(void*)TVP_Stub_c61f97ec3d99bdbb23afe93870001bbf,
+	(void*)TVP_Stub_f92821f2b23662c6f1256511a626cd3f,
+	(void*)TVP_Stub_76b0732e3e2886897d5f26b4b0545dee,
+	(void*)TVP_Stub_903ed11ef3863850e837bd4b3b1d61a1,
+	(void*)TVP_Stub_2661124b39595ffafe2fb0bfb7bd2efc,
+	(void*)TVP_Stub_d0b7170e54398c2f9d27dcc513c4cf46,
+	(void*)TVP_Stub_31bdd2a1eed3785c1422fab5ea6b3ce7,
+	(void*)TVP_Stub_dbc300d1dadc1a60cb0dcadfb92f1aee,
+	(void*)TVP_Stub_1d4d9f8bdf55bd4c78abd90656af0364,
+	(void*)TVP_Stub_5c7049e712e84b40ac05942421202de5,
+	(void*)TVP_Stub_5dca8992bb340d70ba65ddab65c28371,
+	(void*)TVP_Stub_85f1f38f783ebfcf638f3c443bc9b204,
+	(void*)TVP_Stub_7d61d143884bfa4b6c50dae11c2b659f,
+	(void*)TVP_Stub_793a2ad7ad3411be3670576a8e6ddcf8,
+	(void*)TVP_Stub_68d8eec33254f1684e53bbc0aa8b2466,
+	(void*)TVP_Stub_b09652d2197b29f7d38aff0298c69f17,
+	(void*)TVP_Stub_be7db03ddcf1886cb7233e58f19c8c77,
+	(void*)TVP_Stub_b4c8fedc1ffbe30d9703cb2b8d3c0e7b,
+	(void*)TVP_Stub_77efef3b4ffc0cb577b76304e06e39f3,
+	(void*)TVP_Stub_0e55187bde599d6585eaabd2c4ac3f02,
+	(void*)TVP_Stub_f72e3fc3b97a9141b6f516f5e53bf9b8,
+	(void*)TVP_Stub_e7a1ac237f00bb6320d0e0ac7e6d51c6,
+	(void*)TVP_Stub_d87682f6d691350878077bd101b7f0fc,
+	(void*)TVP_Stub_d7ae155eaabd8e65d6b4d356fe4af496,
+	(void*)TVP_Stub_be3a1844ea6af533bd4e7b0a76c826a1,
+	(void*)TVP_Stub_aa531d2c3c87f456e48a14722faa1c1f,
+	(void*)TVP_Stub_6889cd886e1c2e7faf541528636c16c3,
+	(void*)TVP_Stub_5d9266e6a8a154fe4ba80b0995e109ab,
+	(void*)TVP_Stub_a7dc19b023737979ad1ae1ae01d560d2,
+	(void*)TVP_Stub_d20444b7a6243d668a0d3956d95af510,
+	(void*)TVP_Stub_1458dec9eee36816c8002d4049840355,
+	(void*)TVP_Stub_21137ff5351245b1611852301b7f5796,
+	(void*)TVP_Stub_c07fc4e45fc2dc44d839c5e012d0be60,
+	(void*)TVP_Stub_6815b962a3122ae967284239932cc656,
+	(void*)TVP_Stub_e96cccbe1f16b0fb74673f2ec3343ff8,
+	(void*)TVP_Stub_e8cd7494f919b18a992cb8c2722b2bf0,
+	(void*)TVP_Stub_990fdefcafc0de5e8e1f502c1b341e44,
+	(void*)TVP_Stub_de5d83ba307e822825062377fb76c2ba,
+	(void*)TVP_Stub_5e28bcc0f5ad6a038eb5a6535b56386c,
+	(void*)TVP_Stub_e33419e8ede4bb501ab1787cf17c7ca5,
+	(void*)TVP_Stub_1cd7cb9580c0cf723dea402b85a720b1,
+	(void*)TVP_Stub_d18ca17fad389ff60ce3caa769083798,
+	(void*)TVP_Stub_0a959a5ff02530a8eb122e7e1f8ceed3,
+	(void*)TVP_Stub_a4774ea559e64b4667b3845f8540d207,
+	(void*)TVP_Stub_52eae3e8106494bfa604c15492ecb9f4,
+	(void*)TVP_Stub_882f458df5e05bb9ab2222e79f6c81cf,
+	(void*)TVP_Stub_6069a18bf7d3f394c230cdcf2f574ef4,
+	(void*)TVP_Stub_75b60565caf44027cc52b2b5cf6b0ea3,
+	(void*)TVP_Stub_9d735149c3ad586363895f76645abf2e,
+	(void*)TVP_Stub_ea5168fae254acdd8c8db6f1f3d2da03,
+	(void*)TVP_Stub_f5a42bd5239e1a0be29f92eb838d2c8c,
+	(void*)TVP_Stub_7cc8cd9f415b183b42c546635aeade7f,
+	(void*)TVP_Stub_ad2fefa53e05528f9c1fe29d27db0f37,
+	(void*)TVP_Stub_f3e06fed4c82a9bd1b53252abaf50847,
+	(void*)TVP_Stub_960db7ea36202bf7ec3bf6b767cc045e,
+	(void*)TVP_Stub_7bf5d357eb52dd206a269b54c8136e0e,
+	(void*)TVP_Stub_ba1c9b771c5cdb725128de684af3c9ca,
+	(void*)TVP_Stub_69cc6311196adc134fd153c4c5346bc5,
+	(void*)TVP_Stub_8ed68f8e79efe1c767f92e7d92eb8b54,
+	(void*)TVP_Stub_60da1e9ec15b251ff18ddcdf8a3e93e0,
+	(void*)TVP_Stub_ef47304bad87a036e38f0319b48c1f6e,
+	(void*)TVP_Stub_182d19020e4e2d5cd1462d7c8ef24d1f,
+	(void*)TVP_Stub_9e1fa429a92a5c99d397a06c20fd6705,
+	(void*)TVP_Stub_74ac7c291299eb928aa4c2899df5567e,
+	(void*)TVP_Stub_fb645d9ec0ef3fd2aba2b762ef6b9a15,
+	(void*)TVP_Stub_f988626275257574050ac789f9060a3b,
+	(void*)TVP_Stub_1831064ed23493cef407648763ba4d69,
+	(void*)TVP_Stub_305390c94750daa7124db3ff6e77931c,
+	(void*)TVP_Stub_4fb384a391bfcf6a3a2932661d3051aa,
+	(void*)TVP_Stub_305537c4820e23cf217a15efb56dba1c,
+	(void*)TVP_Stub_aacf83677ca7df75117f7bafa7a53791,
+	(void*)TVP_Stub_d14b922fefc6c07aa536b94762579fe5,
+	(void*)TVP_Stub_00fd650a79c603bdeb2f8e36f667a782,
+	(void*)TVP_Stub_a36ee133c07c30185b0bbc6375954e88,
+	(void*)TVP_Stub_dc657ecacf8e578870314427216864d9,
+	(void*)TVP_Stub_e79d02b58a8bfdee439bc0694d7edd6d,
+	(void*)TVP_Stub_6b7537b66b71d27384bea45bc2bf24b4,
+	(void*)TVP_Stub_b3456dbad652b52f5bce1889b6f4d0ef,
+	(void*)TVP_Stub_9a50803a03e1ccb60120dff8b92ecdcd,
+	(void*)TVP_Stub_0f6b3940dc72e3e56cd15216b53b9126,
+	(void*)TVP_Stub_23b647f1c825e214a7465de3ebe9968d,
+	(void*)TVP_Stub_8ec96bc7b777180f23e1a2e43bf9a413,
+	(void*)TVP_Stub_cffd45014652659638d59abe11daf3be,
+	(void*)TVP_Stub_a784285a35b1bc76bb367305b5099e35,
+	(void*)TVP_Stub_03773751329896facf2003ab79bbc475,
+	(void*)TVP_Stub_923884216edf134d07d8e70f8f57e827,
+	(void*)TVP_Stub_e48798dc69498f80b6633bb405eda6eb,
+	(void*)TVP_Stub_998a5e1aa5cd85689795348fc540a655,
+	(void*)TVP_Stub_5f6d263c0d48d03f6eb0dc44c9dd0be2,
+
+};
+
+
+void TVPExportFunctions()
+{
+	const unsigned long compressed_size = 5041;
+	const unsigned long decompressed_size = 42364;
+	const tjs_int function_count = 647;
+	unsigned char * dest = new unsigned char [decompressed_size];
+
+	try
+	{
+		unsigned long dest_size = decompressed_size;
+
+		int result = uncompress(dest, &dest_size,
+			(unsigned char*)compressed_functable, compressed_size);
+		if(result != Z_OK || dest_size != decompressed_size) { TVPThrowInternalError; }
+
+		const unsigned char *p = dest;
+
+		for(tjs_int i = 0; i < function_count; i++)
+		{
+			TVPAddExportFunction((const char *)p, ((void **)func_ptrs)[i]);
+			while(*p) p++;
+			p++;
+		}
+	}
+	catch(...)
+	{
+		delete [] dest;
+		throw;
+	}
+	delete [] dest;
+}

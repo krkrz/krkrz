@@ -154,7 +154,7 @@ void TJS_INTF_METHOD tTVPFileMedia::GetLocallyAccessibleName(ttstr &name)
 
 	const tjs_char *ptr = name.c_str();
 	if( *ptr == TJS_W('.') ) ptr++;
-	while( *ptr == TJS_W('/') || *ptr == TJS_W('\\') ) ptr++;
+	while( (*ptr == TJS_W('/') || *ptr == TJS_W('\\')) && (ptr[1] == TJS_W('/') || ptr[1] == TJS_W('\\')) ) ptr++;
 	newname = ttstr(ptr);
 	// change path delimiter to '/'
 	tjs_char *pp = newname.Independ();
@@ -585,7 +585,8 @@ tTVPPluginHolder::tTVPPluginHolder(const ttstr &aname)
 : LocalTempStorageHolder(nullptr)
 {
 	// /data/data/(パッケージ名)/lib/
-	tjs_string sopath = tjs_string(TJS_W("/data/data/")) + tjs_string(Application->GetPackageName()) + tjs_string(TJS_W("/lib/")) + aname.AsStdString();
+	tjs_string sopath = tjs_string(TJS_W("file://")) + tjs_string(Application->GetSoPath()) + aname.AsStdString();
+	//tjs_string sopath = tjs_string(TJS_W("/data/data/")) + tjs_string(Application->GetPackageName()) + tjs_string(TJS_W("/lib/")) + aname.AsStdString();
 	ttstr place( sopath.c_str() );
 	LocalTempStorageHolder = new tTVPLocalTempStorageHolder(place);
 }
