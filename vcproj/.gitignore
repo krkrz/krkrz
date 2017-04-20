@@ -1,2 +1,9 @@
 Debug/
+Debug64/
 Release/
+Release64/
+lib/Win32/
+lib/x64/
+*.map
+*.vcxproj.user
+*.VC.db
