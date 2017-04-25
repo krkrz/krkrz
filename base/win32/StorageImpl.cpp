@@ -186,13 +186,13 @@ void TJS_INTF_METHOD tTVPFileMedia::GetLocallyAccessibleName(ttstr &name)
 	}
 
 	// change path delimiter to '\\'
-	tjs_char *pp = newname.Independ();
-	while(*pp)
-	{
-		if(*pp == TJS_W('/')) *pp = TJS_W('\\');
-		pp++;
-	}
-
+    if (!newname.IsEmpty()) {
+        tjs_char *pp = newname.Independ();
+        while (*pp) {
+            if (*pp == TJS_W('/')) *pp = TJS_W('\\');
+            pp++;
+        }
+    }
 	name = newname;
 }
 //---------------------------------------------------------------------------
