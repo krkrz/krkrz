@@ -30,6 +30,8 @@ use strict;
 	my @tarminate;
 
 	# Excel起動
+	binmode(STDERR,'encoding(cp932)');
+	Win32::OLE->Option(CP=>Win32::OLE::CP_UTF8, Warn=>3 );
 	eval { $excel = Win32::OLE->GetActiveObject('Excel.Application') };
 	die "Excel not installed" if $@;
 	unless ( defined $excel )
@@ -96,9 +98,9 @@ use strict;
 	}
 
 	# String Table のリソースを出力
-	open FHJP, ">$jp_res_filename" or die;
-	open FHEN, ">$en_res_filename" or die;
-	open FHCHS, ">$chs_res_filename" or die;
+	open( FHJP, ">:raw:encoding(UTF-16LE):crlf:utf8", "$jp_res_filename" ) or die;
+	open( FHEN, ">:raw:encoding(UTF-16LE):crlf:utf8", "$en_res_filename" ) or die;
+	open( FHCHS, ">:raw:encoding(UTF-16LE):crlf:utf8", "$chs_res_filename" ) or die;
 	open FHH, ">$res_header_filename" or die;
 
 	open FHEH, ">$tjs_error_header" or die;
@@ -106,10 +108,13 @@ use strict;
 	open FHMWH, ">$tvp_mes_win32_header" or die;
 	open FHCPP, ">$tvp_mes_load" or die;
 
+	print FHJP "\x{FEFF}"; #BOMを出力
 	print FHJP "STRINGTABLE\n";
 	print FHJP "BEGIN\n";
+	print FHEN "\x{FEFF}"; #BOMを出力
 	print FHEN "STRINGTABLE\n";
 	print FHEN "BEGIN\n";
+	print FHCHS "\x{FEFF}"; #BOMを出力
 	print FHCHS "STRINGTABLE\n";
 	print FHCHS "BEGIN\n";
 
