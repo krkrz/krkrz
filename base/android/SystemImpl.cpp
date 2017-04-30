@@ -577,6 +577,348 @@ TJS_BEGIN_NATIVE_PROP_DECL(touchDevice)
 }
 TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, touchDevice)
 //----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(externalCacheDir)
+{
+	TJS_BEGIN_NATIVE_PROP_GETTER
+	{
+		*result = ttstr(*Application->GetExternalCachePath());
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_GETTER
+
+	TJS_DENY_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, externalCacheDir)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(cacheDir)
+{
+	TJS_BEGIN_NATIVE_PROP_GETTER
+	{
+		*result = ttstr(*Application->GetCachePath());
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_GETTER
+
+	TJS_DENY_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, cacheDir)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(filesDir)
+{
+	TJS_BEGIN_NATIVE_PROP_GETTER
+	{
+		*result = ttstr(Application->GetInternalDataPath());
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_GETTER
+
+	TJS_DENY_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, filesDir)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(externalFilesDir)
+{
+	TJS_BEGIN_NATIVE_PROP_GETTER
+	{
+		*result = ttstr(Application->GetExternalDataPath());
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_GETTER
+
+	TJS_DENY_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, externalFilesDir)
+//----------------------------------------------------------------------
+	TJS_BEGIN_NATIVE_PROP_DECL(obbDir)
+	{
+		TJS_BEGIN_NATIVE_PROP_GETTER
+			{
+				*result = ttstr(*Application->GetObbPath());
+				return TJS_S_OK;
+			}
+		TJS_END_NATIVE_PROP_GETTER
+
+		TJS_DENY_NATIVE_PROP_SETTER
+	}
+	TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, obbDir)
+//----------------------------------------------------------------------
+	TJS_BEGIN_NATIVE_PROP_DECL(sharedObjectPath)
+	{
+		TJS_BEGIN_NATIVE_PROP_GETTER
+			{
+				*result = ttstr(*Application->GetSoPath());
+				return TJS_S_OK;
+			}
+		TJS_END_NATIVE_PROP_GETTER
+
+		TJS_DENY_NATIVE_PROP_SETTER
+	}
+	TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, sharedObjectPath)
+//----------------------------------------------------------------------
+	TJS_BEGIN_NATIVE_PROP_DECL(packageName)
+	{
+		TJS_BEGIN_NATIVE_PROP_GETTER
+			{
+				*result = ttstr(Application->GetPackageName());
+				return TJS_S_OK;
+			}
+		TJS_END_NATIVE_PROP_GETTER
+
+		TJS_DENY_NATIVE_PROP_SETTER
+	}
+	TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, packageName)
+//----------------------------------------------------------------------
+	TJS_BEGIN_NATIVE_PROP_DECL(packageCodePath)
+	{
+		TJS_BEGIN_NATIVE_PROP_GETTER
+			{
+				*result = ttstr(Application->GetPackageCodePath());
+				return TJS_S_OK;
+			}
+		TJS_END_NATIVE_PROP_GETTER
+
+		TJS_DENY_NATIVE_PROP_SETTER
+	}
+	TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, packageCodePath)
+//----------------------------------------------------------------------
+	TJS_BEGIN_NATIVE_PROP_DECL(packageResourcePath)
+	{
+		TJS_BEGIN_NATIVE_PROP_GETTER
+			{
+				*result = ttstr(Application->GetPackageResourcePath());
+				return TJS_S_OK;
+			}
+		TJS_END_NATIVE_PROP_GETTER
+
+		TJS_DENY_NATIVE_PROP_SETTER
+	}
+	TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, packageResourcePath)
+//----------------------------------------------------------------------
+	TJS_BEGIN_NATIVE_PROP_DECL(dataDirectory)
+	{
+		TJS_BEGIN_NATIVE_PROP_GETTER
+			{
+				*result = ttstr(*Application->GetDataDirectory());
+				return TJS_S_OK;
+			}
+		TJS_END_NATIVE_PROP_GETTER
+
+		TJS_DENY_NATIVE_PROP_SETTER
+	}
+	TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, dataDirectory)
+//----------------------------------------------------------------------
+	TJS_BEGIN_NATIVE_PROP_DECL(downloadCacheDirectory)
+	{
+		TJS_BEGIN_NATIVE_PROP_GETTER
+			{
+				*result = ttstr(*Application->GetDownloadCacheDirectory());
+				return TJS_S_OK;
+			}
+		TJS_END_NATIVE_PROP_GETTER
+
+		TJS_DENY_NATIVE_PROP_SETTER
+	}
+	TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, downloadCacheDirectory)
+//----------------------------------------------------------------------
+	TJS_BEGIN_NATIVE_PROP_DECL(externalStorageDirectory)
+	{
+		TJS_BEGIN_NATIVE_PROP_GETTER
+			{
+				*result = ttstr(*Application->GetExternalStorageDirectory());
+				return TJS_S_OK;
+			}
+		TJS_END_NATIVE_PROP_GETTER
+
+		TJS_DENY_NATIVE_PROP_SETTER
+	}
+	TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, externalStorageDirectory)
+//----------------------------------------------------------------------
+	TJS_BEGIN_NATIVE_PROP_DECL(externalPublicMusicPath)
+	{
+		TJS_BEGIN_NATIVE_PROP_GETTER
+			{
+				*result = ttstr(*Application->GetExternalPublicMusicPath());
+				return TJS_S_OK;
+			}
+		TJS_END_NATIVE_PROP_GETTER
+
+		TJS_DENY_NATIVE_PROP_SETTER
+	}
+	TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, externalPublicMusicPath)
+//----------------------------------------------------------------------
+	TJS_BEGIN_NATIVE_PROP_DECL(externalPublicPodcastsPath)
+	{
+		TJS_BEGIN_NATIVE_PROP_GETTER
+			{
+				*result = ttstr(*Application->GetExternalPublicPodcastsPath());
+				return TJS_S_OK;
+			}
+		TJS_END_NATIVE_PROP_GETTER
+
+		TJS_DENY_NATIVE_PROP_SETTER
+	}
+	TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, externalPublicPodcastsPath)
+//----------------------------------------------------------------------
+	TJS_BEGIN_NATIVE_PROP_DECL(externalPublicRingtonesPath)
+	{
+		TJS_BEGIN_NATIVE_PROP_GETTER
+			{
+				*result = ttstr(*Application->GetExternalPublicRingtonesPath());
+				return TJS_S_OK;
+			}
+		TJS_END_NATIVE_PROP_GETTER
+
+		TJS_DENY_NATIVE_PROP_SETTER
+	}
+	TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, externalPublicRingtonesPath)
+//----------------------------------------------------------------------
+	TJS_BEGIN_NATIVE_PROP_DECL(externalPublicAlaramsPath)
+	{
+		TJS_BEGIN_NATIVE_PROP_GETTER
+			{
+				*result = ttstr(*Application->GetExternalPublicAlaramsPath());
+				return TJS_S_OK;
+			}
+		TJS_END_NATIVE_PROP_GETTER
+
+		TJS_DENY_NATIVE_PROP_SETTER
+	}
+	TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, externalPublicAlaramsPath)
+//----------------------------------------------------------------------
+	TJS_BEGIN_NATIVE_PROP_DECL(externalPublicNotificationsPath)
+	{
+		TJS_BEGIN_NATIVE_PROP_GETTER
+			{
+				*result = ttstr(*Application->GetExternalPublicNotificationsPath());
+				return TJS_S_OK;
+			}
+		TJS_END_NATIVE_PROP_GETTER
+
+		TJS_DENY_NATIVE_PROP_SETTER
+	}
+	TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, externalPublicNotificationsPath)
+//----------------------------------------------------------------------
+	TJS_BEGIN_NATIVE_PROP_DECL(externalPublicPicturesPath)
+	{
+		TJS_BEGIN_NATIVE_PROP_GETTER
+			{
+				*result = ttstr(*Application->GetExternalPublicPicturesPath());
+				return TJS_S_OK;
+			}
+		TJS_END_NATIVE_PROP_GETTER
+
+		TJS_DENY_NATIVE_PROP_SETTER
+	}
+	TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, externalPublicPicturesPath)
+//----------------------------------------------------------------------
+	TJS_BEGIN_NATIVE_PROP_DECL(externalPublicMoviesPath)
+	{
+		TJS_BEGIN_NATIVE_PROP_GETTER
+			{
+				*result = ttstr(*Application->GetExternalPublicMoviesPath());
+				return TJS_S_OK;
+			}
+		TJS_END_NATIVE_PROP_GETTER
+
+		TJS_DENY_NATIVE_PROP_SETTER
+	}
+	TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, externalPublicMoviesPath)
+//----------------------------------------------------------------------
+	TJS_BEGIN_NATIVE_PROP_DECL(externalPublicDownloadsPath)
+	{
+		TJS_BEGIN_NATIVE_PROP_GETTER
+			{
+				*result = ttstr(*Application->GetExternalPublicDownloadsPath());
+				return TJS_S_OK;
+			}
+		TJS_END_NATIVE_PROP_GETTER
+
+		TJS_DENY_NATIVE_PROP_SETTER
+	}
+	TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, externalPublicDownloadsPath)
+//----------------------------------------------------------------------
+	TJS_BEGIN_NATIVE_PROP_DECL(externalPublicDCIMPath)
+	{
+		TJS_BEGIN_NATIVE_PROP_GETTER
+			{
+				*result = ttstr(*Application->GetExternalPublicDCIMPath());
+				return TJS_S_OK;
+			}
+		TJS_END_NATIVE_PROP_GETTER
+
+		TJS_DENY_NATIVE_PROP_SETTER
+	}
+	TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, externalPublicDCIMPath)
+//----------------------------------------------------------------------
+	TJS_BEGIN_NATIVE_PROP_DECL(externalPublicDocumentsPath)
+	{
+		TJS_BEGIN_NATIVE_PROP_GETTER
+			{
+				*result = ttstr(*Application->GetExternalPublicDocumentsPath());
+				return TJS_S_OK;
+			}
+		TJS_END_NATIVE_PROP_GETTER
+
+		TJS_DENY_NATIVE_PROP_SETTER
+	}
+	TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, externalPublicDocumentsPath)
+//----------------------------------------------------------------------
+	TJS_BEGIN_NATIVE_PROP_DECL(rootDirectory)
+	{
+		TJS_BEGIN_NATIVE_PROP_GETTER
+			{
+				*result = ttstr(*Application->GetRootDirectory());
+				return TJS_S_OK;
+			}
+		TJS_END_NATIVE_PROP_GETTER
+
+		TJS_DENY_NATIVE_PROP_SETTER
+	}
+	TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, rootDirectory)
+//----------------------------------------------------------------------
+	TJS_BEGIN_NATIVE_PROP_DECL(externalStorageState)
+	{
+		TJS_BEGIN_NATIVE_PROP_GETTER
+			{
+				*result = ttstr(Application->GetExternalStorageState());
+				return TJS_S_OK;
+			}
+		TJS_END_NATIVE_PROP_GETTER
+
+		TJS_DENY_NATIVE_PROP_SETTER
+	}
+	TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, externalStorageState)
+//----------------------------------------------------------------------
+	TJS_BEGIN_NATIVE_PROP_DECL(isExternalStorageEmulated)
+	{
+		TJS_BEGIN_NATIVE_PROP_GETTER
+			{
+				*result = Application->IsExternalStorageEmulated() ? (tjs_int)1 : (tjs_int)0;
+				return TJS_S_OK;
+			}
+		TJS_END_NATIVE_PROP_GETTER
+
+		TJS_DENY_NATIVE_PROP_SETTER
+	}
+	TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, isExternalStorageEmulated)
+//----------------------------------------------------------------------
+	TJS_BEGIN_NATIVE_PROP_DECL(isExternalStorageRemovable)
+	{
+		TJS_BEGIN_NATIVE_PROP_GETTER
+			{
+				*result = Application->IsExternalStorageRemovable() ? (tjs_int)1 : (tjs_int)0;
+				return TJS_S_OK;
+			}
+		TJS_END_NATIVE_PROP_GETTER
+
+		TJS_DENY_NATIVE_PROP_SETTER
+	}
+	TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, isExternalStorageRemovable)
+//----------------------------------------------------------------------
+
+
+
+//----------------------------------------------------------------------
 
 
 	return cls;

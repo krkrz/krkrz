@@ -14,6 +14,7 @@ import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.ParcelFileDescriptor;
 import android.support.v4.provider.DocumentFile;
@@ -435,10 +436,9 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
         Locale locale = Locale.getDefault();
         return locale.getLanguage();
 	}
-    public String getCachePath() {
-        // getCacheDir() の場合は内部、どちらでも取得できるほうがいいか？
-        return getExternalCacheDir().toString();
-    }
+    public String getCachePath() { return getCacheDir().toString(); }
+    public String getExternalCachePath() { return getExternalCacheDir().toString(); }
+    public String getObbPath() { return getObbDir().toString(); }
     public String getInternalDataPath() {
         return getFilesDir().toString();
     }
@@ -455,7 +455,24 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
         }
         return "/data/data/" + getPackageName() + "/lib/" ;
     }
-	public int getDisplayRotate() {
+    public String getDataDirectory() { return Environment.getDataDirectory().toString(); }
+    public String getDownloadCacheDirectory() { return Environment.getDownloadCacheDirectory().toString(); }
+    public String getExternalStorageDirectory() { return Environment.getExternalStorageDirectory().toString(); }
+    public String getExternalStoragePublicDirectoryMusic() { return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).toString();}
+    public String getExternalStoragePublicDirectoryPodcasts() { return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PODCASTS).toString();}
+    public String getExternalStoragePublicDirectoryRingtones() { return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_RINGTONES).toString();}
+    public String getExternalStoragePublicDirectoryAlarms() { return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_ALARMS).toString();}
+    public String getExternalStoragePublicDirectoryNotifications() { return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_NOTIFICATIONS).toString();}
+    public String getExternalStoragePublicDirectoryPictures() { return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString();}
+    public String getExternalStoragePublicDirectoryMovies() { return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES).toString();}
+    public String getExternalStoragePublicDirectoryDownloads() { return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString();}
+    public String getExternalStoragePublicDirectoryDCIM() { return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString();}
+    public String getExternalStoragePublicDirectoryDocuments() { return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).toString();}
+    public String getRootDirectory() { return Environment.getRootDirectory().toString(); }
+    public String getExternalStorageState() { return Environment.getExternalStorageState(); }
+    public boolean isExternalStorageEmulated() { return Environment.isExternalStorageEmulated(); }
+    public boolean isExternalStorageRemovable() { return Environment.isExternalStorageRemovable(); }
+    public int getDisplayRotate() {
 		int val = -1;
 		Display d = getWindowManager().getDefaultDisplay();
 		int rotation = d.getRotation();
@@ -507,8 +524,6 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
         display.getRealSize(point);
         return point.y;
     }
-    //public String retrievePackageName() { return getPackageName(); }
-    //public String retrievePackageCodePath() { return getPackageCodePath(); }
     public void postFinish() {
         mHandler.post( new FinishEvent() );
     }
