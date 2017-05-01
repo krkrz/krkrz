@@ -29,13 +29,15 @@
 package jp.kirikiri.krkrz;
 
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 
+// TODO use DownloadManager
 public class FileDownloadTask extends AsyncTask<String, Integer, Boolean> implements DialogInterface.OnCancelListener {
 
-	private Activity = null;
+	private Activity mActivity = null;
 	private ProgressDialog mProgressDialog = null;
 	private String mPath;
 
@@ -94,7 +96,7 @@ public class FileDownloadTask extends AsyncTask<String, Integer, Boolean> implem
 					dl.finishDownload();
 					return Boolean.TRUE;
 				}
-			}
+			}//
 		}
 		return Boolean.FALSE;
 	}
@@ -102,12 +104,14 @@ public class FileDownloadTask extends AsyncTask<String, Integer, Boolean> implem
 	@Override
 	protected void onPostExecute(Boolean result) {
 		mProgressDialog.dismiss();
-		mActivity.onFinishDownload(result.booleanValue(),mPath,isCancelled());
+		// TODO 後で実装すること
+		//mActivity.onFinishDownload(result.booleanValue(),mPath,isCancelled());
 	}
 	@Override
 	protected void onCancelled() {
 		mProgressDialog.dismiss();
-		mActivity.onFinishDownload(false,mPath,true);
+		// TODO 後で実装すること
+		//mActivity.onFinishDownload(false,mPath,true);
 	}
 
 	@Override

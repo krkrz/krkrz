@@ -37,6 +37,7 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 
+// TODO use DownloadManager
 /**
  * 指定ファイルをダウンロードするためのクラス
  * サイズが大きいものを想定しているのでサーバーにはレジューム機能必須

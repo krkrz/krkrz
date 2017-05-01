@@ -20,21 +20,43 @@ import android.os.ParcelFileDescriptor;
 import android.support.v4.provider.DocumentFile;
 import android.util.Log;
 import android.view.Display;
+import android.view.InputDevice;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.Timeline;
+import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.TrackGroupArray;
+import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelection;
+import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
+import com.google.android.exoplayer2.ui.PlaybackControlView;
+import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+
 import java.io.FileNotFoundException;
-import java.net.URL;
+import java.io.IOException;
 import java.util.Locale;
 
-public class MainActivity extends Activity  implements SurfaceHolder.Callback {
+public class MainActivity extends Activity  implements SurfaceHolder.Callback, ExoPlayer.EventListener, ExtractorMediaSource.EventListener,
+        SimpleExoPlayer.VideoListener, PlaybackControlView.VisibilityListener {
     private static String TAG = "KrkrZActivity";
+    private static String LOGTAG = "krkrz";
 
     static final int READ_DOCUMENT_REQUEST_CODE = 1;
     static final int SELECT_TREE_REQUEST_CODE = 2;
@@ -44,12 +66,16 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
 
     private Handler mHandler;
 
+    private SimpleExoPlayer mPlayer;
+    private static final DefaultBandwidthMeter BANDWIDTH_METER = new DefaultBandwidthMeter();
+    private DefaultTrackSelector trackSelector;
+    private DataSource.Factory mMediaDataSourceFactory;
+
     private boolean mSelectedStartFolder;
     private boolean mOpenStartFolder;
 
     class FinishEvent implements Runnable {
-        @Override
-        public void run() {
+        @Override public void run() {
             finish();
         }
     }
@@ -78,6 +104,15 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
         public void run() {
             Toast.makeText(MainActivity.this,mMessage,Toast.LENGTH_LONG).show();
         }
+    }
+    class PlayMovieEvent implements Runnable {
+        private String mPath;
+        public PlayMovieEvent( String path ) { mPath = path; }
+        @Override
+        public void run() { playMovie(mPath);}
+    }
+    class StopMovieEvent implements Runnable {
+        @Override public void run() { stopMovie(); }
     }
 
     @Override
@@ -118,6 +153,8 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
         surfaceView.getHolder().addCallback(this);
         surfaceView.getHolder().setFormat(PixelFormat.RGBX_8888 );
         // surfaceView.setOnClickListener(new View.OnClickListener() { public void onClick(View view) {} });
+
+        mMediaDataSourceFactory = new DefaultDataSourceFactory(getApplication(),"krkrz");
     }
 
 	private void initializeNative() {
@@ -135,17 +172,18 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
 	@Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        Log.i(TAG, "onSaveInstanceState()");
+        Log.i(LOGTAG, "onSaveInstanceState()");
     }
 	@Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
+        Log.i(LOGTAG, "onRestoreInstanceState()");
     }
 
     @Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
-        Log.i(TAG, "onConfigurationChanged()");
+        Log.i(LOGTAG, "onConfigurationChanged()");
 		
 		// update configuration
         Resources res = getResources();
@@ -158,20 +196,19 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
     @Override
     protected void onStart() {
         super.onStart();
-        Log.i(TAG, "onStart()");
+        Log.i(LOGTAG, "onStart()");
         nativeToMessage(EventCode.AM_START,0,0);
     }
-
     @Override
 	protected void onRestart() {
         super.onRestart();
+        Log.i(LOGTAG, "onRestart()");
         nativeToMessage(EventCode.AM_RESTART,0,0);
 	}
-
     @Override
     protected void onResume() {
         super.onResume();
-        Log.i(TAG, "onResume()");
+        Log.i(LOGTAG, "onResume()");
         nativeToMessage(EventCode.AM_RESUME,0,0);
         if( mSelectedStartFolder == false ) {
             mSelectedStartFolder = true;
@@ -179,28 +216,72 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
             selectFolder();
         }
     }
-
     @Override
     protected void onPause() {
         super.onPause();
-        Log.i(TAG, "onPause()");
+        Log.i(LOGTAG, "onPause()");
         nativeToMessage(EventCode.AM_PAUSE,0,0);
+        if( mPlayer != null ) {
+            mPlayer.release();
+            mPlayer = null;
+        }
     }
-
     @Override
     protected void onStop() {
         super.onStop();
-        Log.i(TAG, "onStop()");
+        Log.i(LOGTAG, "onStop()");
         nativeToMessage(EventCode.AM_STOP,0,0);
     }
     @Override
     protected void onDestroy() {
     	super.onDestroy();
+        Log.i(LOGTAG, "onDestroy()");
         nativeToMessage(EventCode.AM_DESTROY,0,0);
         nativeSetActivity( null );
     }
+
+    /**
+     * ゲームパッドなどの十字キー入力のキーコードを変換する
+     * @param keyCode 入力キーコード
+     * @param event 入力キーイベント
+     * @return 変換後のキーコード
+     */
+    /*
+    private int keyCodeTranslate( int keyCode, KeyEvent event ) {
+        if( event != null ) {
+            InputDevice device = event.getDevice();
+            if( device != null ) {
+                int src = device.getSources();
+                if( (src & InputDevice.SOURCE_DPAD) == InputDevice.SOURCE_DPAD ||
+                        (src & InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD ||
+                        (src & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK ) {
+                    switch(keyCode){
+                        case KeyEvent.KEYCODE_DPAD_LEFT:
+                            return VirtualKey.VK_PADLEFT;
+                        case KeyEvent.KEYCODE_DPAD_RIGHT:
+                            return VirtualKey.VK_PADRIGHT;
+                        case KeyEvent.KEYCODE_DPAD_UP:
+                            return VirtualKey.VK_PADUP;
+                        case KeyEvent.KEYCODE_DPAD_DOWN:
+                            return VirtualKey.VK_PADDOWN;
+                    }
+                    return keyCode;
+                } else { // InputDevice.SOURCE_KEYBOARD
+                    return keyCode;
+                }
+            }
+        }
+        return keyCode;
+    }
+    */
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if( keyCode != KeyEvent.KEYCODE_HOME ) {
+            int meta = getModifiersToInt(event.getMetaState(), false);
+            //keyCode = keyCodeTranslate(keyCode, event);
+            nativeToMessage(EventCode.AM_KEY_DOWN, keyCode, meta );
+            return true;
+        }
         return super.onKeyDown(keyCode, event);
     }
     @Override
@@ -209,6 +290,8 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
     }
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
+        int meta = getModifiersToInt( event.getMetaState(), false );
+        nativeToMessage(EventCode.AM_KEY_UP, keyCode, meta );
         return super.onKeyUp(keyCode, event);
     }
 
@@ -531,6 +614,114 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback {
     public void postChangeCaption( String t ) { mHandler.post( new ActivityTitleChangeEvent(t) ); }
     public String getCaption() { return getTitle().toString(); }
     public void postShowToastMessage( String m ) { mHandler.post( new ShowToastEvent(m) ); }
+    public void postPlayMovie( String path ) { mHandler.post( new PlayMovieEvent(path)); }
+    public void postStopMovie() { mHandler.post( new StopMovieEvent()); }
+
+    /**  動画再生関係  **/
+    private MediaSource buildMediaSource(Uri uri) {
+        return new ExtractorMediaSource(uri, mMediaDataSourceFactory, new DefaultExtractorsFactory(), mHandler, this);
+    }
+    public void playMovie( String path ) {
+        TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory(BANDWIDTH_METER);
+        trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
+        mPlayer = ExoPlayerFactory.newSimpleInstance(this,trackSelector,new DefaultLoadControl());
+        mPlayer.addListener(this);
+        SurfaceView surfaceView = (SurfaceView)findViewById(R.id.videosurfaceview);
+        mPlayer.setVideoSurfaceView( surfaceView );
+        mPlayer.setVideoListener(this);
+        mPlayer.setPlayWhenReady(true);
+        MediaSource mediaSource = buildMediaSource( Uri.parse(path) );
+        mPlayer.prepare(mediaSource,true,true);
+    }
+    public void stopMovie() {
+        if( mPlayer != null ) {
+            mPlayer.stop();
+            mPlayer.release();
+            mPlayer = null;
+        }
+    }
+    public void finishMovie() {
+        if( mPlayer != null ) {
+            mPlayer.release();
+            mPlayer = null;
+
+            SurfaceView surfaceView = (SurfaceView)findViewById(R.id.surfaceview);
+            surfaceView.setVisibility(View.VISIBLE);
+            View contentView = (View)findViewById(R.id.video_content_frame);
+            contentView.setVisibility(View.INVISIBLE);
+        }
+    }
+    // Called when the timeline and/or manifest has been refreshed.
+    @Override
+    public void onTimelineChanged(Timeline timeline, Object manifest) {
+        Log.i(LOGTAG,"Movie timeline changed.");
+    }
+    // Called when the available or selected tracks change.
+    @Override
+    public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
+        Log.i(LOGTAG,"Movie trackes changed.");
+    }
+    // Called when the player starts or stops loading the source.
+    @Override
+    public void onLoadingChanged(boolean isLoading) {
+        Log.i(LOGTAG,"Movie loading changed.");
+    }
+    // Called when the value returned from either ExoPlayer.getPlayWhenReady() or ExoPlayer.getPlaybackState() changes.
+    @Override
+    public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+        Log.i(LOGTAG,"Movie player state changed.");
+        switch( playbackState ) {
+            case ExoPlayer.STATE_ENDED:
+                nativeToMessage(EventCode.AM_MOVIE_ENDED,0,0);
+                finishMovie();
+                break;
+            case ExoPlayer.STATE_BUFFERING:
+                nativeToMessage(EventCode.AM_MOVIE_BUFFERING,0,0);
+                break;
+            case ExoPlayer.STATE_IDLE:
+                nativeToMessage(EventCode.AM_MOVIE_IDLE,0,0);
+                break;
+            case ExoPlayer.STATE_READY:
+                nativeToMessage(EventCode.AM_MOVIE_READY,0,0);
+                break;
+        }
+    }
+    // Called when an error occurs.
+    @Override
+    public void onPlayerError(ExoPlaybackException error) {
+        Log.e(LOGTAG,"Movie player error : " + error.getMessage() );
+        nativeToMessage(EventCode.AM_MOVIE_PLAYER_ERROR,0,0);
+    }
+    // Called when a position discontinuity occurs without a change to the timeline.
+    @Override
+    public void onPositionDiscontinuity() {
+        Log.i(LOGTAG,"Movie position discontinuity.");
+    }
+    @Override
+    public void onVisibilityChange(int visibility) {
+        Log.i(LOGTAG,"Movie visibility change : " + String.valueOf(visibility) );
+    }
+    // ExtractorMediaSource.EventListener
+    @Override
+    public void onLoadError(IOException error) {
+        Log.e(LOGTAG,"Movie player error : " + error.getMessage() );
+        nativeToMessage(EventCode.AM_MOVIE_LOAD_ERROR,0,0);
+    }
+    @Override
+    public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
+        Log.i(LOGTAG,"Movie video size changed.");
+        AspectRatioFrameLayout contentView = (AspectRatioFrameLayout)findViewById(R.id.video_content_frame);
+        float aspectRatio = height == 0 ? 1 : (width * pixelWidthHeightRatio) / height;
+        contentView.setAspectRatio(aspectRatio);
+    }
+    @Override
+    public void onRenderedFirstFrame() {
+        Log.i(LOGTAG,"Movie rendered first frame.");
+        SurfaceView surfaceView = (SurfaceView)findViewById(R.id.surfaceview);
+        surfaceView.setVisibility(View.INVISIBLE);
+        View contentView = (View)findViewById(R.id.video_content_frame);
+        contentView.setVisibility(View.VISIBLE);
+    }
 
 	// *** native 関数列挙
 	public static native void nativeToMessage(int mes, long wparam, long lparam );

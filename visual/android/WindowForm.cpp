@@ -4,6 +4,8 @@
 #include "WindowForm.h"
 #include "ActivityEvents.h"
 #include "Application.h"
+#include "TickCount.h"
+#include "Random.h"
 
 tjs_uint32 TVP_TShiftState_To_uint32(TShiftState state) {
 	tjs_uint32 result = 0;
@@ -79,6 +81,12 @@ void TTVPWindowForm::WndProc(NativeEvent& ev) {
 	case AM_TOUCH_UP:
 		OnTouchUp( ev.WParamf0, ev.WParamf1, ev.LParamf0, ev.LParamf0, ev.LParam1, ev.Result );
 		break;
+	case AM_KEY_DOWN:
+		OnKeyDown( (tjs_uint16)ev.WParam, (int)ev.LParam );
+		break;
+	case AM_KEY_UP:
+		OnKeyUp( (tjs_uint16)ev.WParam, (int)ev.LParam );
+		break;
 	default:
 		EventQueue.HandlerDefault( ev );
 		break;
@@ -113,9 +121,29 @@ void TTVPWindowForm::ResetDrawDevice() {
 }
 
 // キー入力
+void TTVPWindowForm::OnKeyDown( tjs_uint16 vk, int shift ) {
+	InternalKeyDown( vk, shift );
+}
 void TTVPWindowForm::InternalKeyDown(tjs_uint16 key, tjs_uint32 shift) {
+	tjs_uint32 tick = TVPGetRoughTickCount32();
+	TVPPushEnvironNoise(&tick, sizeof(tick));
+	TVPPushEnvironNoise(&key, sizeof(key));
+	TVPPushEnvironNoise(&shift, sizeof(shift));
+	if( TJSNativeInstance ) {
+		TVPPostInputEvent(new tTVPOnKeyDownInputEvent(TJSNativeInstance, key, shift));
+	}
 }
 void TTVPWindowForm::OnKeyUp( tjs_uint16 vk, int shift ) {
+	InternalKeyUp( vk, shift );
+}
+void TTVPWindowForm::InternalKeyUp( tjs_uint16 key, tjs_uint32 shift ) {
+	tjs_uint32 tick = TVPGetRoughTickCount32();
+	TVPPushEnvironNoise(&tick, sizeof(tick));
+	TVPPushEnvironNoise(&key, sizeof(key));
+	TVPPushEnvironNoise(&shift, sizeof(shift));
+	if( TJSNativeInstance ) {
+		TVPPostInputEvent(new tTVPOnKeyUpInputEvent(TJSNativeInstance, key, shift));
+	}
 }
 void TTVPWindowForm::OnKeyPress( tjs_uint16 vk, int repeat, bool prevkeystate, bool convertkey ) {
 }

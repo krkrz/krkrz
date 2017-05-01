@@ -646,7 +646,7 @@ TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, externalFilesDir)
 	{
 		TJS_BEGIN_NATIVE_PROP_GETTER
 			{
-				*result = ttstr(*Application->GetSoPath());
+				*result = ttstr(Application->GetSoPath());
 				return TJS_S_OK;
 			}
 		TJS_END_NATIVE_PROP_GETTER

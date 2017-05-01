@@ -78,10 +78,27 @@ class tTVPApplication {
 	tjs_string internal_data_path_;
 	tjs_string external_data_path_;
 	tjs_string cache_path_;
+	tjs_string external_cache_path_;
 	tjs_string package_code_path_;
+	tjs_string package_resource_path_;
 	tjs_string package_path_;
 	tjs_string system_release_version_;
 	tjs_string so_path_;
+	tjs_string obb_path_;
+	tjs_string data_directory_;
+	tjs_string download_cache_directory_;
+	tjs_string external_storage_directory_;
+	tjs_string external_public_music_path_;
+	tjs_string external_public_podcasts_path_;
+	tjs_string external_public_ringtones_path_;
+	tjs_string external_public_alarams_path_;
+	tjs_string external_public_notifications_path_;
+	tjs_string external_public_pictures_path_;
+	tjs_string external_public_movies_path_;
+	tjs_string external_public_downloads_path_;
+	tjs_string external_public_dcim_path_;
+	tjs_string external_public_documents_path_;
+	tjs_string root_directory_;
 
 	class tTVPAsyncImageLoader* image_load_thread_;
 	class TTVPWindowForm* main_window_;
@@ -105,6 +122,7 @@ private:
 	void setStringToJava( const char* methodName, const tjs_string& src );
 	void callActivityMethod( const char* methodName ) const;
 	void getIntegerFromJava( const char* methodName, tjs_int& dest ) const;
+	void getBooleanFromJava( const char* methodName, bool& dest ) const;
 
 public:
 	void setAssetManager( AAssetManager* am ) {
@@ -265,10 +283,32 @@ public:
 	const tjs_string& GetInternalDataPath() const;
 	const tjs_string& GetExternalDataPath() const;
 	const tjs_string* GetCachePath() const;
+	const tjs_string* GetExternalCachePath() const;
+	const tjs_string* GetObbPath() const;
 	const tjs_char* GetPackageName() const;
 	const tjs_char* GetPackageCodePath() const;
+	const tjs_char* GetPackageResourcePath() const;
 	const tjs_char* GetSoPath() const;
-	// ディスプレイの回転角度を取得する
+	const tjs_string* GetDataDirectory() const;
+	const tjs_string* GetDownloadCacheDirectory() const;
+	const tjs_string* GetExternalStorageDirectory() const;
+	const tjs_string* GetExternalPublicMusicPath() const;
+	const tjs_string* GetExternalPublicPodcastsPath() const;
+	const tjs_string* GetExternalPublicRingtonesPath() const;
+	const tjs_string* GetExternalPublicAlaramsPath() const;
+	const tjs_string* GetExternalPublicNotificationsPath() const;
+	const tjs_string* GetExternalPublicPicturesPath() const;
+	const tjs_string* GetExternalPublicMoviesPath() const;
+	const tjs_string* GetExternalPublicDownloadsPath() const;
+	const tjs_string* GetExternalPublicDCIMPath() const;
+	const tjs_string* GetExternalPublicDocumentsPath() const;
+	const tjs_string* GetRootDirectory() const;
+
+	tjs_string GetExternalStorageState() const;
+	bool IsExternalStorageEmulated() const;
+	bool IsExternalStorageRemovable() const;
+
+			// ディスプレイの回転角度を取得する
 	tjs_int GetDisplayRotate() const;
 	// Main View の幅を取得する
 	tjs_int GetMainViewWidth() const;
@@ -285,7 +325,10 @@ public:
 	bool GetNotMinimizing() const { return !GetActivating(); }
 	// Toastを使って文字列を表示する
 	void ShowToast( const tjs_char* text );
-
+    // 動画再生
+    void playMovie( const tjs_char* path );
+    // 銅が停止
+    void stopMovie();
 
 	void initializeApplication();
 	void startMainLoop();

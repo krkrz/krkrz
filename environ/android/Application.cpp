@@ -504,6 +504,19 @@ void tTVPApplication::getIntegerFromJava( const char* methodName, tjs_int& dest 
 		if( attached ) detachJavaEnv();
 	}
 }
+void tTVPApplication::getBooleanFromJava( const char* methodName, bool& dest ) const {
+	bool attached;
+	JNIEnv *env = getJavaEnv(attached);
+	if ( env != nullptr ) {
+		jobject thiz = activity_;
+		jclass clazz = env->GetObjectClass(thiz);
+		jmethodID mid = env->GetMethodID(clazz, methodName, "()Z");
+		jboolean ret = (jboolean)env->CallBooleanMethod(thiz,mid, nullptr);
+		dest = ret == JNI_TRUE;
+		env->DeleteLocalRef(clazz);
+		if( attached ) detachJavaEnv();
+	}
+}
 const tjs_string& tTVPApplication::GetInternalDataPath() const {
 	if( internal_data_path_.empty() ) {
 		getStringFromJava( static_cast<const char*>("getInternalDataPath"), const_cast<tjs_string&>(internal_data_path_) );
@@ -522,6 +535,18 @@ const tjs_string* tTVPApplication::GetCachePath() const {
 	}
 	return &cache_path_;
 }
+const tjs_string* tTVPApplication::GetExternalCachePath() const {
+	if( external_cache_path_.empty() ) {
+		getStringFromJava( static_cast<const char*>("getExternalCachePath"), const_cast<tjs_string&>(external_cache_path_) );
+	}
+	return &external_cache_path_;
+}
+const tjs_string* tTVPApplication::GetObbPath() const {
+	if( obb_path_.empty() ) {
+		getStringFromJava( static_cast<const char*>("getObbPath"), const_cast<tjs_string&>(obb_path_) );
+	}
+	return &obb_path_;
+}
 const tjs_char* tTVPApplication::GetPackageName() const {
 	if( package_path_.empty() ) {
 		getStringFromJava( static_cast<const char*>("getPackageName"), const_cast<tjs_string&>(package_path_) );
@@ -534,11 +559,116 @@ const tjs_char* tTVPApplication::GetPackageCodePath() const {
 	}
 	return package_code_path_.c_str();
 }
+const tjs_char* tTVPApplication::GetPackageResourcePath() const {
+	if( package_resource_path_.empty() ) {
+		getStringFromJava( static_cast<const char*>("getPackageResourcePath"), const_cast<tjs_string&>(package_resource_path_) );
+	}
+	return package_resource_path_.c_str();
+}
 const tjs_char* tTVPApplication::GetSoPath() const {
 	if( so_path_.empty() ) {
 		getStringFromJava( static_cast<const char*>("getSoPath"), const_cast<tjs_string&>(so_path_) );
 	}
 	return so_path_.c_str();
+}
+const tjs_string* tTVPApplication::GetDataDirectory() const {
+	if( data_directory_.empty() ) {
+		getStringFromJava( static_cast<const char*>("getDataDirectory"), const_cast<tjs_string&>(data_directory_) );
+	}
+	return &data_directory_;
+}
+const tjs_string* tTVPApplication::GetDownloadCacheDirectory() const {
+	if( download_cache_directory_.empty() ) {
+		getStringFromJava( static_cast<const char*>("getDownloadCacheDirectory"), const_cast<tjs_string&>(download_cache_directory_) );
+	}
+	return &download_cache_directory_;
+}
+const tjs_string* tTVPApplication::GetExternalStorageDirectory() const {
+	if( external_storage_directory_.empty() ) {
+		getStringFromJava( static_cast<const char*>("getExternalStorageDirectory"), const_cast<tjs_string&>(external_storage_directory_) );
+	}
+	return &external_storage_directory_;
+}
+const tjs_string* tTVPApplication::GetExternalPublicMusicPath() const {
+	if( external_public_music_path_.empty() ) {
+		getStringFromJava( static_cast<const char*>("getExternalStoragePublicDirectoryMusic"), const_cast<tjs_string&>(external_public_music_path_) );
+	}
+	return &external_public_music_path_;
+}
+const tjs_string* tTVPApplication::GetExternalPublicPodcastsPath() const {
+	if( external_public_podcasts_path_.empty() ) {
+		getStringFromJava( static_cast<const char*>("getExternalStoragePublicDirectoryPodcasts"), const_cast<tjs_string&>(external_public_podcasts_path_) );
+	}
+	return &external_public_podcasts_path_;
+}
+const tjs_string* tTVPApplication::GetExternalPublicRingtonesPath() const {
+	if( external_public_ringtones_path_.empty() ) {
+		getStringFromJava( static_cast<const char*>("getExternalStoragePublicDirectoryRingtones"), const_cast<tjs_string&>(external_public_ringtones_path_) );
+	}
+	return &external_public_ringtones_path_;
+}
+const tjs_string* tTVPApplication::GetExternalPublicAlaramsPath() const {
+	if( external_public_alarams_path_.empty() ) {
+		getStringFromJava( static_cast<const char*>("getExternalStoragePublicDirectoryAlarms"), const_cast<tjs_string&>(external_public_alarams_path_) );
+	}
+	return &external_public_alarams_path_;
+}
+const tjs_string* tTVPApplication::GetExternalPublicNotificationsPath() const {
+	if( external_public_notifications_path_.empty() ) {
+		getStringFromJava( static_cast<const char*>("getExternalStoragePublicDirectoryNotifications"), const_cast<tjs_string&>(external_public_notifications_path_) );
+	}
+	return &external_public_notifications_path_;
+}
+const tjs_string* tTVPApplication::GetExternalPublicPicturesPath() const {
+	if( external_public_pictures_path_.empty() ) {
+		getStringFromJava( static_cast<const char*>("getExternalStoragePublicDirectoryPictures"), const_cast<tjs_string&>(external_public_pictures_path_) );
+	}
+	return &external_public_pictures_path_;
+}
+const tjs_string* tTVPApplication::GetExternalPublicMoviesPath() const {
+	if( external_public_movies_path_.empty() ) {
+		getStringFromJava( static_cast<const char*>("getExternalStoragePublicDirectoryMovies"), const_cast<tjs_string&>(external_public_movies_path_) );
+	}
+	return &external_public_movies_path_;
+}
+const tjs_string* tTVPApplication::GetExternalPublicDownloadsPath() const {
+	if( external_public_downloads_path_.empty() ) {
+		getStringFromJava( static_cast<const char*>("getExternalStoragePublicDirectoryDownloads"), const_cast<tjs_string&>(external_public_downloads_path_) );
+	}
+	return &external_public_downloads_path_;
+}
+const tjs_string* tTVPApplication::GetExternalPublicDCIMPath() const {
+	if( external_public_dcim_path_.empty() ) {
+		getStringFromJava( static_cast<const char*>("getExternalStoragePublicDirectoryDCIM"), const_cast<tjs_string&>(external_public_dcim_path_) );
+	}
+	return &external_public_dcim_path_;
+}
+const tjs_string* tTVPApplication::GetExternalPublicDocumentsPath() const {
+	if( external_public_documents_path_.empty() ) {
+		getStringFromJava( static_cast<const char*>("getExternalStoragePublicDirectoryDocuments"), const_cast<tjs_string&>(external_public_documents_path_) );
+	}
+	return &external_public_documents_path_;
+}
+const tjs_string* tTVPApplication::GetRootDirectory() const {
+	if( root_directory_.empty() ) {
+		getStringFromJava( static_cast<const char*>("getRootDirectory"), const_cast<tjs_string&>(root_directory_) );
+	}
+	return &root_directory_;
+}
+tjs_string tTVPApplication::GetExternalStorageState() const {
+	tjs_string ret;
+	getStringFromJava( static_cast<const char*>("getExternalStorageState"), ret );
+	return ret;
+}
+bool tTVPApplication::IsExternalStorageEmulated() const {
+	bool ret;
+	getBooleanFromJava( static_cast<const char*>("isExternalStorageEmulated"), ret );
+	return ret;
+}
+bool tTVPApplication::IsExternalStorageRemovable() const {
+	bool ret;
+	getBooleanFromJava( static_cast<const char*>("isExternalStorageRemovable"), ret );
+	return ret;
 }
 tjs_int tTVPApplication::GetDisplayRotate() const {
 	tjs_int rot = -1;
@@ -620,7 +750,15 @@ void tTVPApplication::SetActivityCaption( const tjs_string& caption ) {
 	setStringToJava( "postChangeCaption", caption );
 }
 void tTVPApplication::ShowToast( const tjs_char* text ) {
-	setStringToJava( "postShowToastMessage", tjs_string(text) );
+	setStringToJava( "postPlayMovie", tjs_string(text) );
+}
+// 動画再生
+void tTVPApplication::playMovie( const tjs_char* path ) {
+    setStringToJava( "postShowToastMessage", tjs_string(path) );
+}
+// 動画停止
+void tTVPApplication::stopMovie() {
+    callActivityMethod( "postStopMovie" );
 }
 int tTVPApplication::MessageDlg( const tjs_string& string, const tjs_string& caption, int type, int button ) {
 	Application->ShowToast( string.c_str() );
@@ -790,7 +928,7 @@ void tTVPApplication::nativeSetAssetManager(JNIEnv *jenv, jobject obj, jobject a
  * Java からの通知はここに来る
  */
 void tTVPApplication::nativeToMessage(JNIEnv *jenv, jobject obj, jint mes, jlong wparam, jlong lparam ) {
-	Application->SendMessageFromJava( mes, lparam, wparam );
+	Application->SendMessageFromJava( mes, wparam, lparam );
 }
 void tTVPApplication::nativeSetActivity(JNIEnv *env, jobject obj, jobject activity) {
 	if( activity != nullptr ) {
