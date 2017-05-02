@@ -18,6 +18,7 @@ public class EventCode {
 	public static final int AM_MOVIE_BUFFERING	= 0x010024;
 	public static final int AM_MOVIE_IDLE			= 0x010025;
 	public static final int AM_MOVIE_READY			= 0x010026;
+	public static final int AM_MOVIE_PLAY			= 0x010027;
 
 	public static final int AM_KEY_DOWN 		= 0x010031;
 	public static final int AM_KEY_UP			= 0x010032;

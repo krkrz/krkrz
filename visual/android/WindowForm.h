@@ -77,6 +77,7 @@ private:
 		return (int)(((int64_t)nNumber * (int64_t)nNumerator) / nDenominator);
 	}
 
+	void PostVideoOverlayEvent( tjs_uint ev );
 protected:
 	void WndProc(NativeEvent& ev);
 

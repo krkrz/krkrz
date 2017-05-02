@@ -479,6 +479,30 @@ void tTVPApplication::setStringToJava( const char* methodName, const tjs_string&
 		if( attached ) detachJavaEnv();
 	}
 }
+void tTVPApplication::getLongToJava( const char* methodName, tjs_int64 src ) {
+    bool attached;
+    JNIEnv *env = getJavaEnv(attached);
+    if ( env != nullptr ) {
+        jobject thiz = activity_;
+        jclass clazz = env->GetObjectClass(thiz);
+        jmethodID mid = env->GetMethodID(clazz, methodName, "(J)V");
+        env->CallVoidMethod(thiz, mid, src);
+        env->DeleteLocalRef(clazz);
+        if( attached ) detachJavaEnv();
+    }
+}
+void tTVPApplication::getFloatToJava( const char* methodName, float src ) {
+    bool attached;
+    JNIEnv *env = getJavaEnv(attached);
+    if ( env != nullptr ) {
+        jobject thiz = activity_;
+        jclass clazz = env->GetObjectClass(thiz);
+        jmethodID mid = env->GetMethodID(clazz, methodName, "(F)V");
+        env->CallVoidMethod(thiz, mid, src );
+        env->DeleteLocalRef(clazz);
+        if( attached ) detachJavaEnv();
+    }
+}
 void tTVPApplication::callActivityMethod( const char* methodName ) const {
 	bool attached;
 	JNIEnv *env = getJavaEnv(attached);
@@ -516,6 +540,32 @@ void tTVPApplication::getBooleanFromJava( const char* methodName, bool& dest ) c
 		env->DeleteLocalRef(clazz);
 		if( attached ) detachJavaEnv();
 	}
+}
+void tTVPApplication::getLongFromJava( const char* methodName, tjs_int64& dest ) const {
+    bool attached;
+    JNIEnv *env = getJavaEnv(attached);
+    if ( env != nullptr ) {
+        jobject thiz = activity_;
+        jclass clazz = env->GetObjectClass(thiz);
+        jmethodID mid = env->GetMethodID(clazz, methodName, "()J");
+        jlong ret = (int)env->CallLongMethod(thiz, mid, nullptr);
+        dest = ret;
+        env->DeleteLocalRef(clazz);
+        if( attached ) detachJavaEnv();
+    }
+}
+void tTVPApplication::getFloatFromJava( const char* methodName, float& dest ) const {
+    bool attached;
+    JNIEnv *env = getJavaEnv(attached);
+    if ( env != nullptr ) {
+        jobject thiz = activity_;
+        jclass clazz = env->GetObjectClass(thiz);
+        jmethodID mid = env->GetMethodID(clazz, methodName, "()F");
+        float ret = (int)env->CallFloatMethod(thiz, mid, nullptr);
+        dest = ret;
+        env->DeleteLocalRef(clazz);
+        if( attached ) detachJavaEnv();
+    }
 }
 const tjs_string& tTVPApplication::GetInternalDataPath() const {
 	if( internal_data_path_.empty() ) {
@@ -670,6 +720,36 @@ bool tTVPApplication::IsExternalStorageRemovable() const {
 	getBooleanFromJava( static_cast<const char*>("isExternalStorageRemovable"), ret );
 	return ret;
 }
+
+// 動画再生
+void tTVPApplication::PlayMovie( const tjs_char* path ) {
+    setStringToJava( "postPlayMovie", tjs_string(path) );
+}
+// 動画停止
+void tTVPApplication::StopMovie() {
+    callActivityMethod( "postStopMovie" );
+}
+tjs_int64 tTVPApplication::GetMovieCurrentPosition() const {
+    tjs_int64 ret = 0;
+    getLongFromJava( "getMovieCurrentPosition", ret );
+    return ret;
+}
+void tTVPApplication::SetMovieCurrentPosition( tjs_int64 pos ) {
+    getLongToJava( "setMovieCurrentPosition", pos );
+}
+tjs_int64 tTVPApplication::GetMovieDuration() const {
+    tjs_int64 ret = 0;
+    getLongFromJava( "getMovieDuration", ret );
+    return ret;
+}
+float tTVPApplication::GetMovieVolume() const {
+    float ret = 0.0f;
+    getFloatFromJava( "getMovieVolume", ret );
+    return ret;
+}
+void tTVPApplication::SetMovieVolume( float vol ) {
+    getFloatToJava( "setMovieVolume", vol );
+}
 tjs_int tTVPApplication::GetDisplayRotate() const {
 	tjs_int rot = -1;
 	getIntegerFromJava( static_cast<const char*>("getDisplayRotate"), rot );
@@ -750,15 +830,7 @@ void tTVPApplication::SetActivityCaption( const tjs_string& caption ) {
 	setStringToJava( "postChangeCaption", caption );
 }
 void tTVPApplication::ShowToast( const tjs_char* text ) {
-	setStringToJava( "postPlayMovie", tjs_string(text) );
-}
-// 動画再生
-void tTVPApplication::playMovie( const tjs_char* path ) {
-    setStringToJava( "postShowToastMessage", tjs_string(path) );
-}
-// 動画停止
-void tTVPApplication::stopMovie() {
-    callActivityMethod( "postStopMovie" );
+	setStringToJava( "postShowToastMessage", tjs_string(text) );
 }
 int tTVPApplication::MessageDlg( const tjs_string& string, const tjs_string& caption, int type, int button ) {
 	Application->ShowToast( string.c_str() );

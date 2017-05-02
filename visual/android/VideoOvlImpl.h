@@ -23,6 +23,10 @@ class tTJSNI_VideoOverlay : public tTJSNI_BaseVideoOverlay
 {
 	typedef tTJSNI_BaseVideoOverlay inherited;
 
+	ttstr TragetVideoFileName;
+	// Applicationのメソッドを直接呼び出すが、仮に変数名をVideoOverlayとしておく
+	class tTVPApplication* VideoOverlay;
+
 public:
 	tTJSNI_VideoOverlay();
 	tjs_error TJS_INTF_METHOD Construct(tjs_int numparams, tTJSVariant **param, iTJSDispatch2 *tjs_obj);
@@ -151,6 +155,8 @@ public:
 	void ResetOverlayParams();
 	void SetRectOffset(tjs_int ofsx, tjs_int ofsy);
 	void DetachVideoOverlay();
+
+	void HandleEvent( tjs_uint ev );
 };
 //---------------------------------------------------------------------------
 

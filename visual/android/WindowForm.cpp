@@ -87,12 +87,26 @@ void TTVPWindowForm::WndProc(NativeEvent& ev) {
 	case AM_KEY_UP:
 		OnKeyUp( (tjs_uint16)ev.WParam, (int)ev.LParam );
 		break;
+	case AM_MOVIE_ENDED:
+	case AM_MOVIE_PLAYER_ERROR:
+	case AM_MOVIE_LOAD_ERROR:
+	case AM_MOVIE_BUFFERING:
+	case AM_MOVIE_IDLE:
+	case AM_MOVIE_READY:
+	case AM_MOVIE_PLAY:
+		PostVideoOverlayEvent( ev.Message );
+		break;
 	default:
 		EventQueue.HandlerDefault( ev );
 		break;
 	}
 }
-	// Windowが有効かどうか、無効だとイベントが配信されない
+void TTVPWindowForm::PostVideoOverlayEvent( tjs_uint ev ) {
+	if( TJSNativeInstance ) {
+		TJSNativeInstance->VideoOverlayEvent( ev );
+	}
+}
+// Windowが有効かどうか、無効だとイベントが配信されない
 bool TTVPWindowForm::GetFormEnabled() {
 	return true;
 }

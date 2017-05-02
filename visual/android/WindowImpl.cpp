@@ -410,6 +410,19 @@ void tTJSNI_Window::DetachVideoOverlay()
 	}
 }
 //---------------------------------------------------------------------------
+void tTJSNI_Window::VideoOverlayEvent( tjs_uint ev )
+{
+	tObjectListSafeLockHolder<tTJSNI_BaseVideoOverlay> holder(VideoOverlay);
+	tjs_int count = VideoOverlay.GetSafeLockedObjectCount();
+	for(tjs_int i = 0; i < count; i++)
+	{
+		tTJSNI_VideoOverlay * item = (tTJSNI_VideoOverlay*)
+			VideoOverlay.GetSafeLockedObjectAt(i);
+		if(!item) continue;
+		item->HandleEvent( ev );
+	}
+}
+//---------------------------------------------------------------------------
 /*HWND tTJSNI_Window::GetWindowHandleForPlugin()
 {
 	if(!Form) return NULL;

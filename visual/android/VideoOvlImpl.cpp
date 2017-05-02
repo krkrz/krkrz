@@ -12,14 +12,14 @@
 
 #include <algorithm>
 #include "VideoOvlImpl.h"
-
-
+#include "Application.h"
+#include "ActivityEvents.h"
 
 
 //---------------------------------------------------------------------------
 // tTJSNI_VideoOverlay
 //---------------------------------------------------------------------------
-tTJSNI_VideoOverlay::tTJSNI_VideoOverlay(){}
+tTJSNI_VideoOverlay::tTJSNI_VideoOverlay() : VideoOverlay(nullptr) {}
 //---------------------------------------------------------------------------
 tjs_error TJS_INTF_METHOD tTJSNI_VideoOverlay::Construct(tjs_int numparams, tTJSVariant **param, iTJSDispatch2 *tjs_obj)
 {
@@ -33,17 +33,35 @@ void TJS_INTF_METHOD tTJSNI_VideoOverlay::Invalidate()
 	inherited::Invalidate();
 }
 //---------------------------------------------------------------------------
-void tTJSNI_VideoOverlay::Open(const ttstr &_name) {}
+void tTJSNI_VideoOverlay::Open(const ttstr &name) {
+	// 存在チェックくらいはしておいた方がいいか？
+	TragetVideoFileName = name;
+	VideoOverlay = Application;
+}
 //---------------------------------------------------------------------------
-void tTJSNI_VideoOverlay::Close() {}
+void tTJSNI_VideoOverlay::Close() {
+	VideoOverlay = nullptr;
+}
 //---------------------------------------------------------------------------
-void tTJSNI_VideoOverlay::Shutdown() {}
+void tTJSNI_VideoOverlay::Shutdown() {
+	VideoOverlay = nullptr;
+}
 //---------------------------------------------------------------------------
-void tTJSNI_VideoOverlay::Disconnect() {}
+void tTJSNI_VideoOverlay::Disconnect() {
+	VideoOverlay = nullptr;
+}
 //---------------------------------------------------------------------------
-void tTJSNI_VideoOverlay::Play() {}
+void tTJSNI_VideoOverlay::Play() {
+	if( VideoOverlay ) {
+		VideoOverlay->PlayMovie( TragetVideoFileName.c_str() );
+	}
+}
 //---------------------------------------------------------------------------
-void tTJSNI_VideoOverlay::Stop() {}
+void tTJSNI_VideoOverlay::Stop() {
+	if( VideoOverlay ) {
+		VideoOverlay->StopMovie();
+	}
+}
 //---------------------------------------------------------------------------
 void tTJSNI_VideoOverlay::Pause() {}
 //---------------------------------------------------------------------------
@@ -79,17 +97,22 @@ void tTJSNI_VideoOverlay::DetachVideoOverlay() {}
 //---------------------------------------------------------------------------
 void tTJSNI_VideoOverlay::SetRectOffset(tjs_int ofsx, tjs_int ofsy) {}
 //---------------------------------------------------------------------------
-void tTJSNI_VideoOverlay::SetTimePosition( tjs_uint64 p ) {}
+void tTJSNI_VideoOverlay::SetTimePosition( tjs_uint64 p ) {
+	if( VideoOverlay ) {
+		VideoOverlay->SetMovieCurrentPosition( p );
+	}
+}
 //---------------------------------------------------------------------------
-tjs_uint64 tTJSNI_VideoOverlay::GetTimePosition()
-{
+tjs_uint64 tTJSNI_VideoOverlay::GetTimePosition() {
+	if( VideoOverlay ) {
+		return VideoOverlay->GetMovieCurrentPosition();
+	}
 	return 0;
 }
 //---------------------------------------------------------------------------
 void tTJSNI_VideoOverlay::SetFrame( tjs_int f ) {}
 //---------------------------------------------------------------------------
-tjs_int tTJSNI_VideoOverlay::GetFrame()
-{
+tjs_int tTJSNI_VideoOverlay::GetFrame() {
 	return 0;
 }
 //---------------------------------------------------------------------------
@@ -97,23 +120,22 @@ void tTJSNI_VideoOverlay::SetStopFrame( tjs_int f ) {}
 //---------------------------------------------------------------------------
 void tTJSNI_VideoOverlay::SetDefaultStopFrame() {}
 //---------------------------------------------------------------------------
-tjs_int tTJSNI_VideoOverlay::GetStopFrame()
-{
+tjs_int tTJSNI_VideoOverlay::GetStopFrame() {
 	return 0;
 }
 //---------------------------------------------------------------------------
-tjs_real tTJSNI_VideoOverlay::GetFPS()
-{
+tjs_real tTJSNI_VideoOverlay::GetFPS() {
 	return 0.0;
 }
 //---------------------------------------------------------------------------
-tjs_int tTJSNI_VideoOverlay::GetNumberOfFrame()
-{
+tjs_int tTJSNI_VideoOverlay::GetNumberOfFrame() {
 	return 0;
 }
 //---------------------------------------------------------------------------
-tjs_int64 tTJSNI_VideoOverlay::GetTotalTime()
-{
+tjs_int64 tTJSNI_VideoOverlay::GetTotalTime() {
+	if( VideoOverlay) {
+		return VideoOverlay->GetMovieDuration();
+	}
 	return 0;
 }
 //---------------------------------------------------------------------------
@@ -139,12 +161,22 @@ tjs_int tTJSNI_VideoOverlay::GetAudioBalance()
 //---------------------------------------------------------------------------
 void tTJSNI_VideoOverlay::SetAudioBalance(tjs_int b) {}
 //---------------------------------------------------------------------------
-tjs_int tTJSNI_VideoOverlay::GetAudioVolume()
-{
+tjs_int tTJSNI_VideoOverlay::GetAudioVolume() {
+	if( VideoOverlay ) {
+		float volume = VideoOverlay->GetMovieVolume();
+		return (tjs_int)(volume * 100000);
+	}
 	return 0;
 }
 //---------------------------------------------------------------------------
-void tTJSNI_VideoOverlay::SetAudioVolume(tjs_int b) {}
+void tTJSNI_VideoOverlay::SetAudioVolume(tjs_int b) {
+	if( VideoOverlay ) {
+		if( b < 0 ) b = 0;
+		if( b > 100000 ) b = 100000;
+		float volume = (float)b / 100000.0f;
+		VideoOverlay->SetMovieVolume ( volume );
+	}
+}
 //---------------------------------------------------------------------------
 tjs_uint tTJSNI_VideoOverlay::GetNumberOfAudioStream()
 {
@@ -354,8 +386,28 @@ tjs_int tTJSNI_VideoOverlay::GetOriginalHeight()
 	return 0;
 }
 //---------------------------------------------------------------------------
-
-
+void tTJSNI_VideoOverlay::HandleEvent( tjs_uint ev ) {
+    switch( ev ) {
+    case AM_MOVIE_ENDED:
+        SetStatusAsync( ssStop );
+        break;
+    case AM_MOVIE_PLAYER_ERROR:
+        break;
+    case AM_MOVIE_LOAD_ERROR:
+        break;
+    case AM_MOVIE_BUFFERING:
+        break;
+    case AM_MOVIE_IDLE:
+        break;
+    case AM_MOVIE_READY:
+        SetStatusAsync( ssReady );
+        break;
+    case AM_MOVIE_PLAY:
+        SetStatusAsync( ssPlay );
+    	break;
+    }
+}
+//---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
 // tTJSNC_VideoOverlay::CreateNativeInstance : returns proper instance object

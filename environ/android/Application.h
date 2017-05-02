@@ -120,9 +120,13 @@ private:
 	void wakeupMainThread();
 	void getStringFromJava( const char* methodName, tjs_string& dest ) const;
 	void setStringToJava( const char* methodName, const tjs_string& src );
+    void getLongToJava( const char* methodName, tjs_int64 src );
+    void getFloatToJava( const char* methodName, float src );
 	void callActivityMethod( const char* methodName ) const;
 	void getIntegerFromJava( const char* methodName, tjs_int& dest ) const;
 	void getBooleanFromJava( const char* methodName, bool& dest ) const;
+    void getLongFromJava( const char* methodName, tjs_int64& dest ) const;
+    void getFloatFromJava( const char* methodName, float& dest ) const;
 
 public:
 	void setAssetManager( AAssetManager* am ) {
@@ -308,7 +312,23 @@ public:
 	bool IsExternalStorageEmulated() const;
 	bool IsExternalStorageRemovable() const;
 
-			// ディスプレイの回転角度を取得する
+    /**** 動画関係 ****/
+    /** 動画再生 **/
+    void PlayMovie( const tjs_char* path );
+    /** 動画停止 **/
+    void StopMovie();
+    /** 動画の現在位置(msec)を取得する **/
+    tjs_int64 GetMovieCurrentPosition() const;
+    /** 動画の現在位置(msec)を設定する **/
+    void SetMovieCurrentPosition( tjs_int64 pos );
+    /** 動画の長さ(msec)を取得する **/
+    tjs_int64 GetMovieDuration() const;
+    /** 動画の音量を取得する **/
+    float GetMovieVolume() const;
+    /** 動画の音量を設定する **/
+    void SetMovieVolume( float vol );
+
+	/** ディスプレイの回転角度を取得する **/
 	tjs_int GetDisplayRotate() const;
 	// Main View の幅を取得する
 	tjs_int GetMainViewWidth() const;
@@ -325,10 +345,6 @@ public:
 	bool GetNotMinimizing() const { return !GetActivating(); }
 	// Toastを使って文字列を表示する
 	void ShowToast( const tjs_char* text );
-    // 動画再生
-    void playMovie( const tjs_char* path );
-    // 銅が停止
-    void stopMovie();
 
 	void initializeApplication();
 	void startMainLoop();

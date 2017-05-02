@@ -636,8 +636,7 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback, E
     public void stopMovie() {
         if( mPlayer != null ) {
             mPlayer.stop();
-            mPlayer.release();
-            mPlayer = null;
+            finishMovie();
         }
     }
     public void finishMovie() {
@@ -650,6 +649,24 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback, E
             View contentView = (View)findViewById(R.id.video_content_frame);
             contentView.setVisibility(View.INVISIBLE);
         }
+    }
+    public long getMovieCurrentPosition() {
+        if( mPlayer != null ) { return mPlayer.getCurrentPosition(); }
+        return 0;
+    }
+    public void setMovieCurrentPosition( long ms ) {
+        if( mPlayer != null ) mPlayer.seekTo(ms);
+    }
+    public long getMovieDuration() {
+        if( mPlayer != null ) return mPlayer.getDuration();
+        return 0;
+    }
+    public float getMovieVolume() {
+        if( mPlayer != null ) return mPlayer.getVolume();
+        return 0.0f;
+    }
+    public void setMovieVolume( float vol ) {
+        if( mPlayer != null ) mPlayer.setVolume(vol);
     }
     // Called when the timeline and/or manifest has been refreshed.
     @Override
@@ -717,6 +734,7 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback, E
     @Override
     public void onRenderedFirstFrame() {
         Log.i(LOGTAG,"Movie rendered first frame.");
+        nativeToMessage(EventCode.AM_MOVIE_PLAY,0,0);
         SurfaceView surfaceView = (SurfaceView)findViewById(R.id.surfaceview);
         surfaceView.setVisibility(View.INVISIBLE);
         View contentView = (View)findViewById(R.id.video_content_frame);

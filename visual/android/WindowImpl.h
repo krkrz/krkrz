@@ -86,6 +86,7 @@ public:
 	void ReadjustVideoRect();
 	void WindowMoved();
 	void DetachVideoOverlay();
+	void VideoOverlayEvent( tjs_uint ev );
 
 //-- interface to plugin
 	void ZoomRectangle(
