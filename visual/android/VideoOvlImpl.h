@@ -69,7 +69,7 @@ public:
 	tjs_int GetHeight() const { return 0; }
 
 	void SetVisible(bool b);
-	bool GetVisible() const { return false; }
+	bool GetVisible() const;
 
 	void SetTimePosition( tjs_uint64 p );
 	tjs_uint64 GetTimePosition();

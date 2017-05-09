@@ -12,7 +12,6 @@
 #define VideoOvlIntfH
 
 #include "tjsNative.h"
-#include "SoundBufferBaseIntf.h"
 
 /*[*/
 //---------------------------------------------------------------------------
@@ -29,6 +28,19 @@ enum tTVPPeriodEventReason
 
 
 /*]*/
+
+enum class tTVPVideoOverlayStatus : int
+{
+	Unload, // data is not specified
+	Stop,
+	Play,
+	Pause,
+	Ready,
+	Idle,
+	Buffering,
+	LoadError,
+	PlayerError
+};
 
 
 //---------------------------------------------------------------------------
@@ -51,11 +63,11 @@ protected:
 	bool CanDeliverEvents;
 	tTJSNI_Window * Window;
 	tTJSVariantClosure ActionOwner;
-	tTVPSoundStatus Status; // status
+	tTVPVideoOverlayStatus Status; // status
 
 	ttstr GetStatusString() const;
-	void SetStatus(tTVPSoundStatus s);
-	void SetStatusAsync(tTVPSoundStatus s);
+	void SetStatus(tTVPVideoOverlayStatus s);
+	void SetStatusAsync(tTVPVideoOverlayStatus s);
 	void FireCallbackCommand(const ttstr & command, const ttstr & argument);
 	void FirePeriodEvent(tTVPPeriodEventReason reason);
 	void FireFrameUpdateEvent( tjs_int frame );

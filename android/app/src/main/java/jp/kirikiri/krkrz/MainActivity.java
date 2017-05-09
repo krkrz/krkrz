@@ -274,9 +274,13 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback, E
         return keyCode;
     }
     */
+    private boolean isHangleKeyCode( int keyCode ) {
+        return keyCode != KeyEvent.KEYCODE_HOME && keyCode != KeyEvent.KEYCODE_VOLUME_DOWN &&
+                keyCode != KeyEvent.KEYCODE_VOLUME_UP && keyCode != KeyEvent.KEYCODE_VOLUME_MUTE;
+    }
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if( keyCode != KeyEvent.KEYCODE_HOME ) {
+        if( isHangleKeyCode( keyCode ) ) {
             int meta = getModifiersToInt(event.getMetaState(), false);
             //keyCode = keyCodeTranslate(keyCode, event);
             nativeToMessage(EventCode.AM_KEY_DOWN, keyCode, meta );
@@ -290,8 +294,10 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback, E
     }
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
-        int meta = getModifiersToInt( event.getMetaState(), false );
-        nativeToMessage(EventCode.AM_KEY_UP, keyCode, meta );
+        if( isHangleKeyCode( keyCode ) ) {
+            int meta = getModifiersToInt(event.getMetaState(), false);
+            nativeToMessage(EventCode.AM_KEY_UP, keyCode, meta);
+        }
         return super.onKeyUp(keyCode, event);
     }
 
@@ -668,6 +674,9 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback, E
     public void setMovieVolume( float vol ) {
         if( mPlayer != null ) mPlayer.setVolume(vol);
     }
+    public boolean getMovieVisible() {
+        return findViewById(R.id.video_content_frame).getVisibility() == View.VISIBLE;
+    }
     // Called when the timeline and/or manifest has been refreshed.
     @Override
     public void onTimelineChanged(Timeline timeline, Object manifest) {
@@ -686,7 +695,7 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback, E
     // Called when the value returned from either ExoPlayer.getPlayWhenReady() or ExoPlayer.getPlaybackState() changes.
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-        Log.i(LOGTAG,"Movie player state changed.");
+        Log.i(LOGTAG,"Movie player state changed - " + Integer.toString(playbackState));
         switch( playbackState ) {
             case ExoPlayer.STATE_ENDED:
                 nativeToMessage(EventCode.AM_MOVIE_ENDED,0,0);

@@ -750,6 +750,11 @@ float tTVPApplication::GetMovieVolume() const {
 void tTVPApplication::SetMovieVolume( float vol ) {
     getFloatToJava( "setMovieVolume", vol );
 }
+bool tTVPApplication::GetMovieVisible() const {
+	bool v = false;
+	getBooleanFromJava( "getMovieVisible", v );
+	return v;
+}
 tjs_int tTVPApplication::GetDisplayRotate() const {
 	tjs_int rot = -1;
 	getIntegerFromJava( static_cast<const char*>("getDisplayRotate"), rot );

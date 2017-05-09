@@ -327,6 +327,8 @@ public:
     float GetMovieVolume() const;
     /** 動画の音量を設定する **/
     void SetMovieVolume( float vol );
+	/** 動画の表示/非表示を取得する **/
+	bool GetMovieVisible() const;
 
 	/** ディスプレイの回転角度を取得する **/
 	tjs_int GetDisplayRotate() const;

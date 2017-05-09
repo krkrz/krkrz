@@ -210,7 +210,7 @@ void tTJSNI_VideoOverlay::Open(const ttstr &_name)
 
 	// set Status
 	ClearWndProcMessages();
-	SetStatus(ssStop);
+	SetStatus(tTVPVideoOverlayStatus::Stop);
 }
 //---------------------------------------------------------------------------
 void tTJSNI_VideoOverlay::Close()
@@ -225,7 +225,7 @@ void tTJSNI_VideoOverlay::Close()
 	if(LocalTempStorageHolder)
 		delete LocalTempStorageHolder, LocalTempStorageHolder = NULL;
 	ClearWndProcMessages();
-	SetStatus(ssUnload);
+	SetStatus(tTVPVideoOverlayStatus::Unload);
 
 	if( Bitmap[0] )
 		delete Bitmap[0];
@@ -242,7 +242,7 @@ void tTJSNI_VideoOverlay::Shutdown()
 	// this functions closes the overlay object, but must not fire any events.
 	bool c = CanDeliverEvents;
 	ClearWndProcMessages();
-	SetStatus(ssUnload);
+	SetStatus(tTVPVideoOverlayStatus::Unload);
 	try
 	{
 		if(VideoOverlay) VideoOverlay->Release(), VideoOverlay = NULL;
@@ -270,7 +270,7 @@ void tTJSNI_VideoOverlay::Play()
 	{
 		VideoOverlay->Play();
 		ClearWndProcMessages();
-		if( Mode != vomMFEVR ) SetStatus(ssPlay);
+		if( Mode != vomMFEVR ) SetStatus(tTVPVideoOverlayStatus::Play);
 	}
 }
 //---------------------------------------------------------------------------
@@ -281,7 +281,7 @@ void tTJSNI_VideoOverlay::Stop()
 	{
 		VideoOverlay->Stop();
 		ClearWndProcMessages();
-		if( Mode != vomMFEVR ) SetStatus(ssStop);
+		if( Mode != vomMFEVR ) SetStatus(tTVPVideoOverlayStatus::Stop);
 	}
 }
 //---------------------------------------------------------------------------
@@ -292,7 +292,7 @@ void tTJSNI_VideoOverlay::Pause()
 	{
 		VideoOverlay->Pause();
 //		ClearWndProcMessages();
-		if( Mode != vomMFEVR ) SetStatus(ssPause);
+		if( Mode != vomMFEVR ) SetStatus(tTVPVideoOverlayStatus::Pause);
 	}
 }
 void tTJSNI_VideoOverlay::Rewind()
@@ -504,7 +504,7 @@ void tTJSNI_VideoOverlay::WndProc( NativeEvent& ev )
 				switch( evcode )
 				{
 					case EC_COMPLETE:
-						if( Status == ssPlay )
+						if( Status == tTVPVideoOverlayStatus::Play )
 						{
 							if( Loop )
 							{
@@ -520,12 +520,12 @@ void tTJSNI_VideoOverlay::WndProc( NativeEvent& ev )
 								// be unstable).
 								// We manually stop the manager anyway.
 								VideoOverlay->Stop();
-								SetStatusAsync(ssStop); // All data has been rendered
+								SetStatusAsync(tTVPVideoOverlayStatus::Stop); // All data has been rendered
 							}
 						}
 						break;
 					case EC_UPDATE:
-						if( Mode == vomLayer && Status == ssPlay )
+						if( Mode == vomLayer && Status == tTVPVideoOverlayStatus::Play )
 						{
 							int		curFrame = (int)p1;
 							if( Layer1 == NULL && Layer2 == NULL )	// nothing to do.
@@ -598,7 +598,7 @@ void tTJSNI_VideoOverlay::WndProc( NativeEvent& ev )
 								IsPrepare = false;
 							}
 						}
-						else if( Mode == vomMixer && Status == ssPlay )
+						else if( Mode == vomMixer && Status == tTVPVideoOverlayStatus::Play )
 						{
 							int frame = GetFrame();
 							if( (!IsPrepare) && (SegLoopEndFrame > 0) && (frame >= SegLoopEndFrame) ) {
@@ -632,19 +632,19 @@ void tTJSNI_VideoOverlay::WndProc( NativeEvent& ev )
 			{
 				switch( ev.WParam ) {
 				case vsStopped:
-					SetStatusAsync( ssStop );
+					SetStatusAsync( tTVPVideoOverlayStatus::Stop );
 					break;
 				case vsPlaying:
-					SetStatusAsync( ssPlay );
+					SetStatusAsync( tTVPVideoOverlayStatus::Play );
 					break;
 				case vsPaused:
-					SetStatusAsync( ssPause );
+					SetStatusAsync( tTVPVideoOverlayStatus::Pause );
 					break;
 				case vsReady:
-					SetStatusAsync( ssReady );
+					SetStatusAsync( tTVPVideoOverlayStatus::Ready );
 					break;
 				case vsEnded:
-					if( Status == ssPlay )
+					if( Status == tTVPVideoOverlayStatus::Play )
 					{
 						if( Loop )
 						{
@@ -654,7 +654,7 @@ void tTJSNI_VideoOverlay::WndProc( NativeEvent& ev )
 						else
 						{
 							VideoOverlay->Stop();
-							SetStatusAsync(ssStop); // All data has been rendered
+							SetStatusAsync(tTVPVideoOverlayStatus::Stop); // All data has been rendered
 						}
 					}
 					break;

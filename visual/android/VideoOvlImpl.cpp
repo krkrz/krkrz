@@ -41,13 +41,16 @@ void tTJSNI_VideoOverlay::Open(const ttstr &name) {
 //---------------------------------------------------------------------------
 void tTJSNI_VideoOverlay::Close() {
 	VideoOverlay = nullptr;
+	SetStatus(tTVPVideoOverlayStatus::Unload);
 }
 //---------------------------------------------------------------------------
 void tTJSNI_VideoOverlay::Shutdown() {
 	VideoOverlay = nullptr;
+	SetStatus(tTVPVideoOverlayStatus::Unload);
 }
 //---------------------------------------------------------------------------
 void tTJSNI_VideoOverlay::Disconnect() {
+	Shutdown();
 	VideoOverlay = nullptr;
 }
 //---------------------------------------------------------------------------
@@ -90,6 +93,13 @@ void tTJSNI_VideoOverlay::SetWidth(tjs_int w) {}
 void tTJSNI_VideoOverlay::SetHeight(tjs_int h) {}
 //---------------------------------------------------------------------------
 void tTJSNI_VideoOverlay::SetVisible(bool b) {}
+//---------------------------------------------------------------------------
+bool tTJSNI_VideoOverlay::GetVisible() const {
+	if( VideoOverlay ) {
+		return VideoOverlay->GetMovieVisible();
+	}
+	return false; 
+}
 //---------------------------------------------------------------------------
 void tTJSNI_VideoOverlay::ResetOverlayParams() {}
 //---------------------------------------------------------------------------
@@ -389,21 +399,25 @@ tjs_int tTJSNI_VideoOverlay::GetOriginalHeight()
 void tTJSNI_VideoOverlay::HandleEvent( tjs_uint ev ) {
     switch( ev ) {
     case AM_MOVIE_ENDED:
-        SetStatusAsync( ssStop );
+        SetStatusAsync( tTVPVideoOverlayStatus::Stop );
         break;
     case AM_MOVIE_PLAYER_ERROR:
+    	SetStatusAsync( tTVPVideoOverlayStatus::PlayerError );
         break;
     case AM_MOVIE_LOAD_ERROR:
+    	SetStatusAsync( tTVPVideoOverlayStatus::LoadError );
         break;
     case AM_MOVIE_BUFFERING:
+    	SetStatusAsync( tTVPVideoOverlayStatus::Buffering );
         break;
     case AM_MOVIE_IDLE:
+    	SetStatusAsync( tTVPVideoOverlayStatus::Idle );
         break;
     case AM_MOVIE_READY:
-        SetStatusAsync( ssReady );
+        SetStatusAsync( tTVPVideoOverlayStatus::Ready );
         break;
     case AM_MOVIE_PLAY:
-        SetStatusAsync( ssPlay );
+        SetStatusAsync( tTVPVideoOverlayStatus::Play );
     	break;
     }
 }

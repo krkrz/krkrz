@@ -20,9 +20,9 @@
 //---------------------------------------------------------------------------
 tTJSNI_BaseVideoOverlay::tTJSNI_BaseVideoOverlay()
 {
-	ActionOwner.Object = ActionOwner.ObjThis = NULL;
-	Status = ssUnload;
-	Owner = NULL;
+	ActionOwner.Object = ActionOwner.ObjThis = nullptr;
+	Status = tTVPVideoOverlayStatus::Unload;
+	Owner = nullptr;
 	CanDeliverEvents = true;
 }
 //---------------------------------------------------------------------------
@@ -69,19 +69,27 @@ ttstr tTJSNI_BaseVideoOverlay::GetStatusString() const
 	static ttstr unknown(TJS_W("unknown"));
 	static ttstr pause(TJS_W("pause"));
 	static ttstr ready(TJS_W("ready"));
+	static ttstr idle(TJS_W("idle"));
+	static ttstr buffering(TJS_W("buffering"));
+	static ttstr loadError(TJS_W("load error"));
+	static ttstr playerError(TJS_W("player error"));
 
 	switch(Status)
 	{
-	case ssUnload:	return unload;
-	case ssPlay:	return play;
-	case ssStop:	return stop;
-	case ssPause:	return pause;
-	case ssReady:	return ready;
-	default:		return unknown;
+	case tTVPVideoOverlayStatus::Unload:		return unload;
+	case tTVPVideoOverlayStatus::Play:			return play;
+	case tTVPVideoOverlayStatus::Stop:			return stop;
+	case tTVPVideoOverlayStatus::Pause:		return pause;
+	case tTVPVideoOverlayStatus::Ready:		return ready;
+	case tTVPVideoOverlayStatus::Idle:			return idle;
+	case tTVPVideoOverlayStatus::Buffering:	return buffering;
+	case tTVPVideoOverlayStatus::LoadError:	return loadError;
+	case tTVPVideoOverlayStatus::PlayerError:	return playerError;
+	default:							return unknown;
 	}
 }
 //---------------------------------------------------------------------------
-void tTJSNI_BaseVideoOverlay::SetStatus(tTVPSoundStatus s)
+void tTJSNI_BaseVideoOverlay::SetStatus(tTVPVideoOverlayStatus s)
 {
 	// this function may call the onStatusChanged event immediately
 	
@@ -107,7 +115,7 @@ void tTJSNI_BaseVideoOverlay::SetStatus(tTVPSoundStatus s)
 	}
 }
 //---------------------------------------------------------------------------
-void tTJSNI_BaseVideoOverlay::SetStatusAsync(tTVPSoundStatus s)
+void tTJSNI_BaseVideoOverlay::SetStatusAsync(tTVPVideoOverlayStatus s)
 {
 	// this function posts the onStatusChanged event
 
