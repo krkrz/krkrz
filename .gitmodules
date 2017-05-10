@@ -25,3 +25,12 @@
 [submodule "external/angle"]
 	path = external/angle
 	url = https://github.com/krkrz/angle.git
+[submodule "external/libogg"]
+	path = external/libogg
+	url = https://github.com/krkrz/libogg.git
+[submodule "external/opus"]
+	path = external/opus
+	url = https://github.com/krkrz/opus.git
+[submodule "external/opusfile"]
+	path = external/opusfile
+	url = https://github.com/krkrz/opusfile.git
