@@ -14,7 +14,7 @@
 #include "VideoOvlImpl.h"
 #include "Application.h"
 #include "ActivityEvents.h"
-
+#include "StorageIntf.h"
 
 //---------------------------------------------------------------------------
 // tTJSNI_VideoOverlay
@@ -34,8 +34,23 @@ void TJS_INTF_METHOD tTJSNI_VideoOverlay::Invalidate()
 }
 //---------------------------------------------------------------------------
 void tTJSNI_VideoOverlay::Open(const ttstr &name) {
-	// 存在チェックくらいはしておいた方がいいか？
-	TragetVideoFileName = name;
+	ttstr path = name;
+	ttstr newpath = TVPGetPlacedPath(path);
+	if( newpath.IsEmpty() ) {
+		path = TVPNormalizeStorageName(path);
+	} else {
+		path = newpath;
+	}
+	if( path[0] == TJS_W('a') &&
+		path[1] == TJS_W('s') &&
+		path[2] == TJS_W('s') &&
+		path[3] == TJS_W('e') &&
+		path[4] == TJS_W('t') &&
+		path[5] == TJS_W(':') ) {
+        TVPGetLocalName(path);
+		path = ttstr("file:///android_asset") + path;
+	}
+	TragetVideoFileName = path;
 	VideoOverlay = Application;
 }
 //---------------------------------------------------------------------------
