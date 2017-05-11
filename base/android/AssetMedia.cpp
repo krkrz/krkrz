@@ -130,6 +130,7 @@ public:
 		ttstr name(_name);
 		GetLocalName(name);
 
+        if( name.GetLen() == 1 && name[0] == TJS_W('/') ) name = ttstr(TJS_W(""));
 		AAssetDir* dir = AAssetManager_openDir( Application->getAssetManager(), name.AsNarrowStdString().c_str() );
 		if( dir ) {
 			const char* filename = nullptr;
@@ -154,7 +155,7 @@ public:
 		ttstr newname;
 		const tjs_char *ptr = name.c_str();
 		if( *ptr == TJS_W('.') ) ptr++;
-		while( *ptr == TJS_W('/') || *ptr == TJS_W('\\') ) ptr++;
+		while( (*ptr == TJS_W('/') || *ptr == TJS_W('\\')) && (ptr[1] == TJS_W('/') || ptr[1] == TJS_W('\\')) ) ptr++;
 		newname = ttstr(ptr);
 		// change path delimiter to '/'
 		tjs_char *pp = newname.Independ();
