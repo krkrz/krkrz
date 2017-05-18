@@ -134,7 +134,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);__WIN32__;NO_STRICT;TJS_TEXT_OUT_CRLF;TJS_JP_LOCALIZED;TJS_DEBUG_DUMP_STRING;_CRT_SECURE_NO_WARNING;TVP_LOG_TO_COMMANDLINE_CONSOLE;TVP_REPORT_HW_EXCEPTION;TVP_ENABLE_EXECUTE_AT_EXCEPTION;</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>../environ;../external/baseclasses;../movie/win32;../visual/gl;../extension;../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../platform/win32;../external;../external/zlib;../external/lpng;../external/libjpeg-turbo;../external/libjpeg-turbo/vcproj;../external/onig/src;../external/freetype/include;../external/jxrlib/jxrgluelib;../external/jxrlib/image/sys;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../external/opus/include;../environ;../external/libogg/include;../external/opusfile/include;../external/angle/include;../external/baseclasses;../movie/win32;../visual/gl;../extension;../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../platform/win32;../external;../external/zlib;../external/lpng;../external/libjpeg-turbo;../external/libjpeg-turbo/vcproj;../external/onig/src;../external/freetype/include;../external/jxrlib/jxrgluelib;../external/jxrlib/image/sys</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -144,7 +144,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)lib\$(Platform)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;dsound.lib;version.lib;mpr.lib;shlwapi.lib;vfw32.lib;imm32.lib;zlib_d.lib;libpng_d.lib;onig_s_d.lib;freetype_d.lib;turbojpeg-static_d.lib;strmbasd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;dsound.lib;version.lib;mpr.lib;shlwapi.lib;vfw32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LargeAddressAware>true</LargeAddressAware>
     </Link>
     <Manifest>
@@ -159,7 +159,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);__WIN32__;NO_STRICT;TJS_TEXT_OUT_CRLF;TJS_JP_LOCALIZED;TJS_DEBUG_DUMP_STRING;_CRT_SECURE_NO_WARNING;TVP_LOG_TO_COMMANDLINE_CONSOLE;TVP_REPORT_HW_EXCEPTION;TVP_ENABLE_EXECUTE_AT_EXCEPTION;</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>../environ;../external/baseclasses;../movie/win32;../visual/gl;../extension;../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../platform/win32;../external;../external/zlib;../external/lpng;../external/libjpeg-turbo;../external/libjpeg-turbo/vcproj;../external/onig/src;../external/freetype/include;../external/jxrlib/jxrgluelib;../external/jxrlib/image/sys;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../environ;../external/angle/include;../external/baseclasses;../movie/win32;../visual/gl;../extension;../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../platform/win32;../external;../external/zlib;../external/lpng;../external/libjpeg-turbo;../external/libjpeg-turbo/vcproj;../external/onig/src;../external/freetype/include;../external/jxrlib/jxrgluelib;../external/jxrlib/image/sys;</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
       <ExceptionHandling>Async</ExceptionHandling>
@@ -186,7 +186,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);__WIN32__;NO_STRICT;TJS_TEXT_OUT_CRLF;TJS_JP_LOCALIZED;TJS_DEBUG_DUMP_STRING;TVP_LOG_TO_COMMANDLINE_CONSOLE;DISABLE_EMBEDDED_GAME_PAD;TVP_REPORT_HW_EXCEPTION;TVP_ENABLE_EXECUTE_AT_EXCEPTION;</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>../environ;../external/baseclasses;../movie/win32;../visual/gl;../extension;../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../platform/win32;../external;../external/zlib;../external/lpng;../external/libjpeg-turbo;../external/libjpeg-turbo/vcproj;../external/onig/src;../external/freetype/include;../external/jxrlib/jxrgluelib;../external/jxrlib/image/sys;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../external/opus/include;../environ;../external/libogg/include;../external/opusfile/include;../external/angle/include;../external/baseclasses;../movie/win32;../visual/gl;../extension;../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../platform/win32;../external;../external/zlib;../external/lpng;../external/libjpeg-turbo;../external/libjpeg-turbo/vcproj;../external/onig/src;../external/freetype/include;../external/jxrlib/jxrgluelib;../external/jxrlib/image/sys</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -199,7 +199,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(SolutionDir)lib\$(Platform)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;dsound.lib;version.lib;mpr.lib;shlwapi.lib;vfw32.lib;imm32.lib;zlib.lib;libpng.lib;onig_s.lib;freetype.lib;turbojpeg-static.lib;strmbase.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;dsound.lib;version.lib;mpr.lib;shlwapi.lib;vfw32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>true</ImageHasSafeExceptionHandlers>
       <GenerateMapFile>true</GenerateMapFile>
       <MapFileName>$(ProjectName).map</MapFileName>
@@ -240,7 +240,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(SolutionDir)lib\$(Platform)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;dsound.lib;version.lib;mpr.lib;shlwapi.lib;vfw32.lib;imm32.lib;zlib.lib;libpng.lib;onig_s.lib;freetype.lib;turbojpeg-static.lib;strmbase.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;dsound.lib;version.lib;mpr.lib;shlwapi.lib;vfw32.lib;imm32.lib;libpng.lib;onig_s.lib;freetype.lib;turbojpeg-static.lib;strmbase.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <GenerateMapFile>true</GenerateMapFile>
       <MapFileName>$(ProjectName).map</MapFileName>
@@ -267,7 +267,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);__WIN32__;NO_STRICT;TJS_TEXT_OUT_CRLF;TJS_JP_LOCALIZED;TJS_DEBUG_DUMP_STRING;TVP_LOG_TO_COMMANDLINE_CONSOLE;DISABLE_EMBEDDED_GAME_PAD;TVP_REPORT_HW_EXCEPTION;ENABLE_DEBUGGER;</PreprocessorDefinitions>
       <SDLCheck>false</SDLCheck>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>../environ;../external/baseclasses;../movie/win32;../visual/gl;../extension;../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../platform/win32;../external;../external/zlib;../external/lpng;../external/libjpeg-turbo;../external/libjpeg-turbo/vcproj;../external/onig/src;../external/freetype/include;../external/jxrlib/jxrgluelib;../external/jxrlib/image/sys;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../external/opus/include;../environ;../external/libogg/include;../external/opusfile/include;../external/angle/include;../external/baseclasses;../movie/win32;../visual/gl;../extension;../tjs2;../base;../base/win32;../;../msg;../msg/win32;../sound;../sound/win32;../utils;../utils/win32;../visual;../visual/win32;../environ/win32;../visual/IA32;./;../platform/win32;../external;../external/zlib;../external/lpng;../external/libjpeg-turbo;../external/libjpeg-turbo/vcproj;../external/onig/src;../external/freetype/include;../external/jxrlib/jxrgluelib;../external/jxrlib/image/sys</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -280,7 +280,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(SolutionDir)lib\$(Platform)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;dsound.lib;version.lib;mpr.lib;shlwapi.lib;vfw32.lib;imm32.lib;zlib.lib;libpng.lib;onig_s.lib;freetype.lib;turbojpeg-static.lib;strmbase.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;winmm.lib;dsound.lib;version.lib;mpr.lib;shlwapi.lib;vfw32.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>true</ImageHasSafeExceptionHandlers>
       <GenerateMapFile>true</GenerateMapFile>
       <MapFileName>$(ProjectName).map</MapFileName>
@@ -615,6 +615,7 @@
     <ClCompile Include="..\msg\win32\ReadOptionDesc.cpp" />
     <ClCompile Include="..\sound\MathAlgorithms.cpp" />
     <ClCompile Include="..\sound\MathAlgorithms_SSE.cpp" />
+    <ClCompile Include="..\sound\OpusCodecDecoder.cpp" />
     <ClCompile Include="..\sound\PhaseVocoderDSP.cpp" />
     <ClCompile Include="..\sound\PhaseVocoderFilter.cpp" />
     <ClCompile Include="..\sound\QueueSoundBufferImpl.cpp" />
@@ -754,6 +755,7 @@
     <ClCompile Include="..\visual\TransIntf.cpp" />
     <ClCompile Include="..\visual\tvpgl.c" />
     <ClCompile Include="..\visual\VideoOvlIntf.cpp" />
+    <ClCompile Include="..\visual\win32\AngleLoadFunc.cpp" />
     <ClCompile Include="..\visual\win32\BasicDrawDevice.cpp" />
     <ClCompile Include="..\visual\win32\BitmapBitsAlloc.cpp" />
     <ClCompile Include="..\visual\win32\BitmapInfomation.cpp" />
@@ -805,6 +807,47 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Enable Debugger|x64'">true</ExcludedFromBuild>
     </CustomBuild>
     <None Include="option_desc_ja.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\external\baseclasses\BaseClasses.vcxproj">
+      <Project>{e8a3f6fa-ae1c-4c8e-a0b6-9c8480324eaa}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\external\freetype\builds\windows\vc2012\freetype.vcxproj">
+      <Project>{78b079bd-9fc7-4b9e-b4a6-96da0f00248b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\external\libjpeg-turbo\vcproj\turbojpeg-static.vcxproj">
+      <Project>{01ee84b8-057a-3435-8fe2-ab4a2fb93841}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\external\libogg\win32\VS2015\libogg_static.vcxproj">
+      <Project>{15cbfeff-7965-41f5-b4e2-21e8795c9159}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\external\lpng\libpng.vcxproj">
+      <Project>{6bceba3b-7d1d-4d63-ab31-ca4570295560}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\external\onig\onig.vcxproj">
+      <Project>{6030c310-d5e7-39a0-a65f-6344447a66cc}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\external\opusfile\win32\VS2015\opusfile.vcxproj">
+      <Project>{1a4b5203-52eb-4805-9511-84b1bd094fca}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\external\opus\win32\VS2015\celt.vcxproj">
+      <Project>{245603e3-f580-41a5-9632-b25fe3372cbf}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\external\opus\win32\VS2015\opus.vcxproj">
+      <Project>{219ec965-228a-1824-174d-96449d05f88a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\external\opus\win32\VS2015\silk_common.vcxproj">
+      <Project>{c303d2fc-ff97-49b8-9ddd-467b4c9a0b16}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\external\opus\win32\VS2015\silk_fixed.vcxproj">
+      <Project>{8484c90d-1561-402f-a91d-2db10f8c5171}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\external\opus\win32\VS2015\silk_float.vcxproj">
+      <Project>{9c4961d2-5ddb-40c7-9be8-ca918dc4e782}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\external\zlib\zlib.vcxproj">
+      <Project>{70f4d261-0235-4052-b1cf-5be29660a43e}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

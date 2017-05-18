@@ -1276,6 +1276,12 @@
     <ClCompile Include="..\sound\SoundPlayer.cpp">
       <Filter>sound</Filter>
     </ClCompile>
+    <ClCompile Include="..\visual\win32\AngleLoadFunc.cpp">
+      <Filter>visual\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sound\OpusCodecDecoder.cpp">
+      <Filter>sound</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="tvpwin32.rc">
