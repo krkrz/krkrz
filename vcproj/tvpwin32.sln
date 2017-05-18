@@ -59,6 +59,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "opus", "..\external\opus\win32\VS2015\opus.vcxproj", "{219EC965-228A-1824-174D-96449D05F88A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "silk_common", "..\external\opus\win32\VS2015\silk_common.vcxproj", "{C303D2FC-FF97-49B8-9DDD-467B4C9A0B16}"
+	ProjectSection(ProjectDependencies) = postProject
+		{219EC965-228A-1824-174D-96449D05F88A} = {219EC965-228A-1824-174D-96449D05F88A}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "silk_fixed", "..\external\opus\win32\VS2015\silk_fixed.vcxproj", "{8484C90D-1561-402F-A91D-2DB10F8C5171}"
 EndProject
