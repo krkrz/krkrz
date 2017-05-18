@@ -740,9 +740,15 @@ tTVPWaveDecoder * tTVPWDC_RIFFWave::Create(const ttstr & storagename,
 }
 //---------------------------------------------------------------------------
 
-
-
-
+/*
+#ifdef ANDROID
+#define TVP_OPUS_DECODER_IMPLEMENT
+#endif
+*/
+#define TVP_OPUS_DECODER_IMPLEMENT
+#ifdef TVP_OPUS_DECODER_IMPLEMENT
+extern void TVPRegisterOpusDecoderCreator();
+#endif
 //---------------------------------------------------------------------------
 // tTVPWaveDecoder interface management
 //---------------------------------------------------------------------------
@@ -756,6 +762,9 @@ struct tTVPWaveDecoderManager
 	{
 		TVPWaveDecoderManagerAvail = true;
 		TVPRegisterWaveDecoderCreator(&RIFFWaveDecoderCreator);
+#ifdef TVP_OPUS_DECODER_IMPLEMENT
+		TVPRegisterOpusDecoderCreator();
+#endif
 	}
 
 	~tTVPWaveDecoderManager()
