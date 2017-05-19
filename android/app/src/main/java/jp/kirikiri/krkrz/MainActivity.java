@@ -654,6 +654,7 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback, E
             surfaceView.setVisibility(View.VISIBLE);
             View contentView = (View)findViewById(R.id.video_content_frame);
             contentView.setVisibility(View.INVISIBLE);
+            nativeToMessage(EventCode.AM_SURFACE_PAINT_REQUEST,0,0);
         }
     }
     public long getMovieCurrentPosition() {

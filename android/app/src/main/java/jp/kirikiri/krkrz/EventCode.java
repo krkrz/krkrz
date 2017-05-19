@@ -11,6 +11,7 @@ public class EventCode {
 	public static final int AM_SURFACE_CHANGED		= 0x010011;
 	public static final int AM_SURFACE_CREATED		= 0x010012;
 	public static final int AM_SURFACE_DESTORYED	= 0x010013;
+	public static final int AM_SURFACE_PAINT_REQUEST	= 0x010014;
 
 	public static final int AM_MOVIE_ENDED			= 0x010021;
 	public static final int AM_MOVIE_PLAYER_ERROR	= 0x010022;

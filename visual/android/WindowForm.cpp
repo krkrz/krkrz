@@ -72,6 +72,9 @@ void TTVPWindowForm::WndProc(NativeEvent& ev) {
 		break;
 	case AM_SURFACE_DESTORYED:
 		break;
+	case AM_SURFACE_PAINT_REQUEST:
+		UpdateWindow();
+		break;
 	case AM_TOUCH_DOWN:
 		OnTouchDown( ev.WParamf0, ev.WParamf1, ev.LParamf0, ev.LParamf0, ev.LParam1, ev.Result );
 		break;
