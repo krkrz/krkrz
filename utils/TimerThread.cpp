@@ -29,12 +29,7 @@
 // so we must trigger only porocess-able quantity of the event.
 #define TVP_LEAST_TIMER_INTERVAL 3
 
-#ifdef WIN32
-#define TVP_TIME_INFINITE INFINITE
-#else
-#define TVP_TIME_INFINITE 0xFFFFFFFF
-#endif
-
+#define TVP_TIME_INFINITE 0
 
 static tTVPTimerThread * TVPTimerThread = nullptr;
 //---------------------------------------------------------------------------
