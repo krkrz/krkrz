@@ -52,7 +52,7 @@ public:
 		default:				orgin = SEEK_SET;	break; // may be enough
 		}
 		if( offset >= 0x100000000LL ) return 0;
-		int s = lseek( fd_, orgin, offset );
+		int s = lseek( fd_, offset, orgin );
 		if( s >= 0 ) return s;
 		TVPThrowExceptionMessage(TVPSeekError);
 		return 0;	// seek error
