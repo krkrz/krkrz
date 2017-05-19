@@ -131,33 +131,45 @@ void tTVPApplication::mainLoop() {
 	// ここの env は、TJS VM のメインスレッド内共通なので、スレッドIDと共に保持して、各種呼び出し時に使いまわす方が効率的か
 	while( is_terminate_ == false ) {
 		{	// イベントキューからすべてのイベントをディスパッチ
-			std::lock_guard<std::mutex> lock( command_que_mutex_ );
-			while( !command_que_.empty() ) {
-				NativeEventQueueIntarface* handler = command_que_.front().target;
-				NativeEvent* event = command_que_.front().command;
-				command_que_.pop();
-
-				if( handler != nullptr ) {
-					// ハンドラ指定付きの場合はハンドラから探して見つからったらディスパッチ
-					std::lock_guard<std::mutex> lock( event_handlers_mutex_ );
-					auto result = std::find_if(event_handlers_.begin(), event_handlers_.end(), [handler](NativeEventQueueIntarface* x) { return x == handler; });
-					if( result != event_handlers_.end() ) {
-						(*result)->Dispatch( *event );
+			NativeEventQueueIntarface* handler;
+			NativeEvent* event;
+			do {
+				handler = nullptr;
+				event = nullptr;
+				{
+					std::lock_guard<std::mutex> lock( command_que_mutex_ );
+					if( !command_que_.empty() ) {
+						handler = command_que_.front().target;
+						event = command_que_.front().command;
+						command_que_.pop();
 					}
-				} else {
-					if( appDispatch(*event) == false ) {
-						// ハンドラ指定のない場合でアプリでディスパッチしないものは、すべてのハンドラでディスパッチ
-						std::lock_guard<std::mutex> lock( event_handlers_mutex_ );
-						for (std::vector<NativeEventQueueIntarface *>::iterator it = event_handlers_.begin();
-							 it != event_handlers_.end(); it++) {
-							if ((*it) != nullptr) {
-								(*it)->Dispatch(*event);
+				}
+				if( event ) {
+					if (handler != nullptr) {
+						// ハンドラ指定付きの場合はハンドラから探して見つからったらディスパッチ
+						std::lock_guard<std::mutex> lock(event_handlers_mutex_);
+						auto result = std::find_if(event_handlers_.begin(), event_handlers_.end(),
+												   [handler](NativeEventQueueIntarface *x) {
+													   return x == handler;
+												   });
+						if (result != event_handlers_.end()) {
+							(*result)->Dispatch(*event);
+						}
+					} else {
+						if (appDispatch(*event) == false) {
+							// ハンドラ指定のない場合でアプリでディスパッチしないものは、すべてのハンドラでディスパッチ
+							std::lock_guard<std::mutex> lock(event_handlers_mutex_);
+							for (std::vector<NativeEventQueueIntarface *>::iterator it = event_handlers_.begin();
+								 it != event_handlers_.end(); it++) {
+								if ((*it) != nullptr) {
+									(*it)->Dispatch(*event);
+								}
 							}
 						}
 					}
+					releaseNativeEvent(event);
 				}
-				releaseNativeEvent( event );
-			}
+			} while( event );
 			// アイドル処理
 			handleIdle();
 		}
