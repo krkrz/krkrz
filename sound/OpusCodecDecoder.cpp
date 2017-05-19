@@ -11,6 +11,7 @@ extern "C" {
 #include "opusfile.h"
 }
 
+#include <cmath>
 #include <memory>
 
 static bool FloatExtraction = false; // true if output format is IEEE 32-bit float
@@ -23,7 +24,7 @@ static void TVPInitOpusOptions() {
 	tTJSVariant val;
 	if( TVPGetCommandLine(TJS_W("-opus_gain"), &val) ) {
 		double db = (tTVReal)val;
-		double fac = pow(10.0, db / 20);
+		double fac = std::pow(10.0, db / 20);
 		debug_str = TJS_W("opus: Setting global gain to ");
 		val = (tTVReal)db;
 		debug_str += ttstr(val);
