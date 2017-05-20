@@ -20,6 +20,13 @@
 #include "tjsDictionary.h"
 
 
+/*
+#ifdef ANDROID
+#define TVP_OPUS_DECODER_IMPLEMENT
+#endif
+*/
+#define TVP_OPUS_DECODER_IMPLEMENT
+
 extern void TVPSoundSetGlobalVolume(tjs_int v);
 extern tjs_int TVPSoundGetGlobalVolume();
 extern void TVPSoundSetGlobalFocusMode(tTVPSoundGlobalFocusMode b);
@@ -740,12 +747,6 @@ tTVPWaveDecoder * tTVPWDC_RIFFWave::Create(const ttstr & storagename,
 }
 //---------------------------------------------------------------------------
 
-/*
-#ifdef ANDROID
-#define TVP_OPUS_DECODER_IMPLEMENT
-#endif
-*/
-#define TVP_OPUS_DECODER_IMPLEMENT
 #ifdef TVP_OPUS_DECODER_IMPLEMENT
 extern void TVPRegisterOpusDecoderCreator();
 #endif
