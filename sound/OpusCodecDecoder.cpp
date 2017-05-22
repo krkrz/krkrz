@@ -146,11 +146,11 @@ public:
 			}
 		}
 
-		pos /= (Format.Channels * pcmsize); // convert to PCM position
+		pos /= (ch * pcmsize); // convert to PCM position
+		rendered = pos; // return renderd PCM samples
 		if((unsigned int)pos < bufsamplelen)
 			return false;	// end of stream
 
-		rendered = pos; // return renderd PCM samples
 		return true;
 	}
 
