@@ -14,6 +14,9 @@ external/lpng
 external/freetype/include
 external/libjpeg-turbo
 external/libjpeg-turbo/android
+external/libogg/include
+external/opus/include
+external/opusfile/include
 base
 extension
 sound
@@ -132,6 +135,7 @@ sound/WaveFormatConverter.cpp
 sound/WaveIntf.cpp
 sound/WaveLoopManager.cpp
 sound/WaveSegmentQueue.cpp
+sound/OpusCodecDecoder.cpp
 sound/android/OpenSLESAudioDevice.cpp
 utils/ClipboardIntf.cpp
 utils/cp932_uni.cpp
@@ -201,6 +205,9 @@ add_subdirectory( external/freetype )
 add_subdirectory( external/libjpeg-turbo )
 add_subdirectory( external/lpng )
 add_subdirectory( external/onig )
+add_subdirectory( external/libogg )
+add_subdirectory( external/opus )
+add_subdirectory( external/opusfile )
 
 # cpufeature
 include_directories( ${ANDROID_NDK}/sources/android/cpufeatures )
@@ -225,6 +232,7 @@ find_library( z-lib z )
 find_library( opensles OpenSLES )
 
 
+# opusfile より opus/oggを後にリンクする必要があることに注意
 target_link_libraries( krkrz
 
                        # Links the target library to the log library
@@ -243,6 +251,9 @@ target_link_libraries( krkrz
                        jpeg-turbo
                        png
                        onig
+                       opusfile
+                       opus
+                       ogg
                        
                        # 
                        cpufeatures
