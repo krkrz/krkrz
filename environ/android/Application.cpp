@@ -733,13 +733,21 @@ bool tTVPApplication::IsExternalStorageRemovable() const {
 	return ret;
 }
 
+// 動画オープン
+void tTVPApplication::OpenMovie( const tjs_char* path ) {
+	setStringToJava( "postOpenMovie", tjs_string(path) );
+}
 // 動画再生
-void tTVPApplication::PlayMovie( const tjs_char* path ) {
-    setStringToJava( "postPlayMovie", tjs_string(path) );
+void tTVPApplication::PlayMovie() {
+	callActivityMethod( "postPlayMovie" );
 }
 // 動画停止
 void tTVPApplication::StopMovie() {
     callActivityMethod( "postStopMovie" );
+}
+// 動画停止
+void tTVPApplication::PauseMovie() {
+	callActivityMethod( "postPauseMovie" );
 }
 tjs_int64 tTVPApplication::GetMovieCurrentPosition() const {
     tjs_int64 ret = 0;

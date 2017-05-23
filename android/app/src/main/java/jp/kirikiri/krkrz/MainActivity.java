@@ -57,6 +57,8 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback, E
         SimpleExoPlayer.VideoListener {
     private static String TAG = "KrkrZActivity";
     private static String LOGTAG = "krkrz";
+    private static boolean LOGDMOV = BuildConfig.DEBUG;
+    private static boolean LOGDSTAT = BuildConfig.DEBUG;
 
     static final int READ_DOCUMENT_REQUEST_CODE = 1;
     static final int SELECT_TREE_REQUEST_CODE = 2;
@@ -105,11 +107,18 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback, E
             Toast.makeText(MainActivity.this,mMessage,Toast.LENGTH_LONG).show();
         }
     }
-    class PlayMovieEvent implements Runnable {
+    class OpenMovieEvent implements Runnable {
         private String mPath;
-        public PlayMovieEvent( String path ) { mPath = path; }
+        public OpenMovieEvent( String path ) { mPath = path; }
         @Override
-        public void run() { playMovie(mPath);}
+        public void run() { if( openMovie(mPath) != null ) {nativeToMessage(EventCode.AM_MOVIE_LOAD_ERROR,0,0);} }
+    }
+    class PlayMovieEvent implements Runnable {
+        @Override
+        public void run() { playMovie();}
+    }
+    class PauseMovieEvent implements Runnable {
+        @Override public void run() { pauseMovie(); }
     }
     class StopMovieEvent implements Runnable {
         @Override public void run() { stopMovie(); }
@@ -172,18 +181,18 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback, E
 	@Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        Log.i(LOGTAG, "onSaveInstanceState()");
+        if( LOGDSTAT ) Log.i(LOGTAG, "onSaveInstanceState()");
     }
 	@Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        Log.i(LOGTAG, "onRestoreInstanceState()");
+        if( LOGDSTAT ) Log.i(LOGTAG, "onRestoreInstanceState()");
     }
 
     @Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
-        Log.i(LOGTAG, "onConfigurationChanged()");
+        if( LOGDSTAT ) Log.i(LOGTAG, "onConfigurationChanged()");
 		
 		// update configuration
         Resources res = getResources();
@@ -192,23 +201,24 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback, E
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
 		super.onWindowFocusChanged(hasFocus);
+        if( LOGDSTAT ) Log.i(LOGTAG, "onWindowFocusChanged()");
 	}
     @Override
     protected void onStart() {
         super.onStart();
-        Log.i(LOGTAG, "onStart()");
+        if( LOGDSTAT ) Log.i(LOGTAG, "onStart()");
         nativeToMessage(EventCode.AM_START,0,0);
     }
     @Override
 	protected void onRestart() {
         super.onRestart();
-        Log.i(LOGTAG, "onRestart()");
+        if( LOGDSTAT ) Log.i(LOGTAG, "onRestart()");
         nativeToMessage(EventCode.AM_RESTART,0,0);
 	}
     @Override
     protected void onResume() {
         super.onResume();
-        Log.i(LOGTAG, "onResume()");
+        if( LOGDSTAT ) Log.i(LOGTAG, "onResume()");
         nativeToMessage(EventCode.AM_RESUME,0,0);
         if( mSelectedStartFolder == false ) {
             mSelectedStartFolder = true;
@@ -219,7 +229,7 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback, E
     @Override
     protected void onPause() {
         super.onPause();
-        Log.i(LOGTAG, "onPause()");
+        if( LOGDSTAT ) Log.i(LOGTAG, "onPause()");
         nativeToMessage(EventCode.AM_PAUSE,0,0);
         if( mPlayer != null ) {
             mPlayer.release();
@@ -229,13 +239,13 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback, E
     @Override
     protected void onStop() {
         super.onStop();
-        Log.i(LOGTAG, "onStop()");
+        if( LOGDSTAT ) Log.i(LOGTAG, "onStop()");
         nativeToMessage(EventCode.AM_STOP,0,0);
     }
     @Override
     protected void onDestroy() {
     	super.onDestroy();
-        Log.i(LOGTAG, "onDestroy()");
+        if( LOGDSTAT ) Log.i(LOGTAG, "onDestroy()");
         nativeToMessage(EventCode.AM_DESTROY,0,0);
         nativeSetActivity( null );
     }
@@ -620,24 +630,41 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback, E
     public void postChangeCaption( String t ) { mHandler.post( new ActivityTitleChangeEvent(t) ); }
     public String getCaption() { return getTitle().toString(); }
     public void postShowToastMessage( String m ) { mHandler.post( new ShowToastEvent(m) ); }
-    public void postPlayMovie( String path ) { mHandler.post( new PlayMovieEvent(path)); }
+    public void postOpenMovie( String path ) { mHandler.post( new OpenMovieEvent(path)); }
+    public void postPlayMovie() { mHandler.post( new PlayMovieEvent()); }
     public void postStopMovie() { mHandler.post( new StopMovieEvent()); }
+    public void postPauseMovie() { mHandler.post( new PauseMovieEvent()); }
 
     /**  動画再生関係  **/
     private MediaSource buildMediaSource(Uri uri) {
         return new ExtractorMediaSource(uri, mMediaDataSourceFactory, new DefaultExtractorsFactory(), mHandler, this);
     }
-    public void playMovie( String path ) {
-        TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory(BANDWIDTH_METER);
-        trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
-        mPlayer = ExoPlayerFactory.newSimpleInstance(this,trackSelector);
-        mPlayer.addListener(this);
-        SurfaceView surfaceView = (SurfaceView)findViewById(R.id.videosurfaceview);
-        mPlayer.setVideoSurfaceView( surfaceView );
-        mPlayer.setVideoListener(this);
+    public String openMovie( String path ) {
+        String result = null;
+        stopMovie();
+        try {
+            TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory(BANDWIDTH_METER);
+            trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
+            mPlayer = ExoPlayerFactory.newSimpleInstance(this,trackSelector);
+            mPlayer.addListener(this);
+            SurfaceView surfaceView = (SurfaceView)findViewById(R.id.videosurfaceview);
+            mPlayer.setVideoSurfaceView( surfaceView );
+            mPlayer.setVideoListener(this);
+            MediaSource mediaSource = buildMediaSource( Uri.parse(path) );
+            mPlayer.prepare(mediaSource,true,true);
+        } catch( Exception e) {
+            finishMovie();
+            result = e.getLocalizedMessage();
+        }
+        return result;
+    }
+    public void playMovie() {
         mPlayer.setPlayWhenReady(true);
-        MediaSource mediaSource = buildMediaSource( Uri.parse(path) );
-        mPlayer.prepare(mediaSource,true,true);
+    }
+    public void pauseMovie() {
+        if( mPlayer != null ) {
+            mPlayer.setPlayWhenReady(false);
+        }
     }
     public void stopMovie() {
         if( mPlayer != null ) {
@@ -681,22 +708,22 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback, E
     // Called when the timeline and/or manifest has been refreshed.
     @Override
     public void onTimelineChanged(Timeline timeline, Object manifest) {
-        Log.i(LOGTAG,"Movie timeline changed.");
+        if( LOGDMOV ) Log.i(LOGTAG,"Movie timeline changed.");
     }
     // Called when the available or selected tracks change.
     @Override
     public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-        Log.i(LOGTAG,"Movie trackes changed.");
+        if( LOGDMOV ) Log.i(LOGTAG,"Movie trackes changed.");
     }
     // Called when the player starts or stops loading the source.
     @Override
     public void onLoadingChanged(boolean isLoading) {
-        Log.i(LOGTAG,"Movie loading changed.");
+        if( LOGDMOV ) Log.i(LOGTAG,"Movie loading changed.");
     }
     // Called when the value returned from either ExoPlayer.getPlayWhenReady() or ExoPlayer.getPlaybackState() changes.
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-        Log.i(LOGTAG,"Movie player state changed - " + Integer.toString(playbackState));
+        if( LOGDMOV ) Log.i(LOGTAG,"Movie player state changed - " + Integer.toString(playbackState));
         switch( playbackState ) {
             case ExoPlayer.STATE_ENDED:
                 nativeToMessage(EventCode.AM_MOVIE_ENDED,0,0);
@@ -722,29 +749,29 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback, E
     // Called when a position discontinuity occurs without a change to the timeline.
     @Override
     public void onPositionDiscontinuity() {
-        Log.i(LOGTAG,"Movie position discontinuity.");
+        if( LOGDMOV ) Log.i(LOGTAG,"Movie position discontinuity.");
     }
 
     @Override
     public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
-        Log.i(LOGTAG,"Movie playback parameter changed." + playbackParameters.toString());
+        if( LOGDMOV ) Log.i(LOGTAG,"Movie playback parameter changed." + playbackParameters.toString());
     }
     // ExtractorMediaSource.EventListener
     @Override
     public void onLoadError(IOException error) {
-        Log.e(LOGTAG,"Movie player error : " + error.getMessage() );
+        if( LOGDMOV ) Log.e(LOGTAG,"Movie player error : " + error.getMessage() );
         nativeToMessage(EventCode.AM_MOVIE_LOAD_ERROR,0,0);
     }
     @Override
     public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
-        Log.i(LOGTAG,"Movie video size changed.");
+        if( LOGDMOV ) Log.i(LOGTAG,"Movie video size changed.");
         AspectRatioFrameLayout contentView = (AspectRatioFrameLayout)findViewById(R.id.video_content_frame);
         float aspectRatio = height == 0 ? 1 : (width * pixelWidthHeightRatio) / height;
         contentView.setAspectRatio(aspectRatio);
     }
     @Override
     public void onRenderedFirstFrame() {
-        Log.i(LOGTAG,"Movie rendered first frame.");
+        if( LOGDMOV ) Log.i(LOGTAG,"Movie rendered first frame.");
         nativeToMessage(EventCode.AM_MOVIE_PLAY,0,0);
         SurfaceView surfaceView = (SurfaceView)findViewById(R.id.surfaceview);
         surfaceView.setVisibility(View.INVISIBLE);

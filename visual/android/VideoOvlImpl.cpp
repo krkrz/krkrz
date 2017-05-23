@@ -54,6 +54,7 @@ void tTJSNI_VideoOverlay::Open(const ttstr &name) {
 	}
 	TragetVideoFileName = path;
 	VideoOverlay = Application;
+	VideoOverlay->OpenMovie( TragetVideoFileName.c_str() );
 }
 //---------------------------------------------------------------------------
 void tTJSNI_VideoOverlay::Close() {
@@ -73,7 +74,7 @@ void tTJSNI_VideoOverlay::Disconnect() {
 //---------------------------------------------------------------------------
 void tTJSNI_VideoOverlay::Play() {
 	if( VideoOverlay ) {
-		VideoOverlay->PlayMovie( TragetVideoFileName.c_str() );
+		VideoOverlay->PlayMovie();
 	}
 }
 //---------------------------------------------------------------------------
@@ -83,9 +84,17 @@ void tTJSNI_VideoOverlay::Stop() {
 	}
 }
 //---------------------------------------------------------------------------
-void tTJSNI_VideoOverlay::Pause() {}
+void tTJSNI_VideoOverlay::Pause() {
+	if( VideoOverlay ) {
+		VideoOverlay->PauseMovie();
+	}
+}
 //---------------------------------------------------------------------------
-void tTJSNI_VideoOverlay::Rewind() {}
+void tTJSNI_VideoOverlay::Rewind() {
+	if( VideoOverlay ) {
+		VideoOverlay->SetMovieCurrentPosition( 0 );
+	}
+}
 //---------------------------------------------------------------------------
 void tTJSNI_VideoOverlay::Prepare() {}
 //---------------------------------------------------------------------------

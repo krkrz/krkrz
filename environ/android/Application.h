@@ -313,10 +313,14 @@ public:
 	bool IsExternalStorageRemovable() const;
 
     /**** 動画関係 ****/
+	/** 動画を開く **/
+	void OpenMovie( const tjs_char* path );
     /** 動画再生 **/
-    void PlayMovie( const tjs_char* path );
+    void PlayMovie();
     /** 動画停止 **/
     void StopMovie();
+	/** 動画一時停止 **/
+	void PauseMovie();
     /** 動画の現在位置(msec)を取得する **/
     tjs_int64 GetMovieCurrentPosition() const;
     /** 動画の現在位置(msec)を設定する **/
