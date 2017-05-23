@@ -44,7 +44,6 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
-import com.google.android.exoplayer2.ui.PlaybackControlView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
@@ -55,7 +54,7 @@ import java.io.IOException;
 import java.util.Locale;
 
 public class MainActivity extends Activity  implements SurfaceHolder.Callback, ExoPlayer.EventListener, ExtractorMediaSource.EventListener,
-        SimpleExoPlayer.VideoListener, PlaybackControlView.VisibilityListener {
+        SimpleExoPlayer.VideoListener {
     private static String TAG = "KrkrZActivity";
     private static String LOGTAG = "krkrz";
 
@@ -729,11 +728,6 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback, E
     @Override
     public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
         Log.i(LOGTAG,"Movie playback parameter changed." + playbackParameters.toString());
-    }
-
-    @Override
-    public void onVisibilityChange(int visibility) {
-        Log.i(LOGTAG,"Movie visibility change : " + String.valueOf(visibility) );
     }
     // ExtractorMediaSource.EventListener
     @Override
