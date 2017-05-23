@@ -49,6 +49,8 @@ void tTJSNI_VideoOverlay::Open(const ttstr &name) {
 		path[5] == TJS_W(':') ) {
         TVPGetLocalName(path);
 		path = ttstr("file:///android_asset") + path;
+	} else {
+		TVPGetLocalName(path);
 	}
 	TragetVideoFileName = path;
 	VideoOverlay = Application;

@@ -29,10 +29,10 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Toast;
 
-import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
@@ -48,6 +48,7 @@ import com.google.android.exoplayer2.ui.PlaybackControlView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.util.Util;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -154,7 +155,7 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback, E
         surfaceView.getHolder().setFormat(PixelFormat.RGBX_8888 );
         // surfaceView.setOnClickListener(new View.OnClickListener() { public void onClick(View view) {} });
 
-        mMediaDataSourceFactory = new DefaultDataSourceFactory(getApplication(),"krkrz");
+        mMediaDataSourceFactory = new DefaultDataSourceFactory(getApplication(), Util.getUserAgent(this, "AppName"));
     }
 
 	private void initializeNative() {
@@ -242,8 +243,8 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback, E
 
     /**
      * ゲームパッドなどの十字キー入力のキーコードを変換する
-     * @param keyCode 入力キーコード
-     * @param event 入力キーイベント
+     * @param : keyCode 入力キーコード
+     * @param : event 入力キーイベント
      * @return 変換後のキーコード
      */
     /*
@@ -630,7 +631,7 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback, E
     public void playMovie( String path ) {
         TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory(BANDWIDTH_METER);
         trackSelector = new DefaultTrackSelector(videoTrackSelectionFactory);
-        mPlayer = ExoPlayerFactory.newSimpleInstance(this,trackSelector,new DefaultLoadControl());
+        mPlayer = ExoPlayerFactory.newSimpleInstance(this,trackSelector);
         mPlayer.addListener(this);
         SurfaceView surfaceView = (SurfaceView)findViewById(R.id.videosurfaceview);
         mPlayer.setVideoSurfaceView( surfaceView );
@@ -724,6 +725,12 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback, E
     public void onPositionDiscontinuity() {
         Log.i(LOGTAG,"Movie position discontinuity.");
     }
+
+    @Override
+    public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
+        Log.i(LOGTAG,"Movie playback parameter changed." + playbackParameters.toString());
+    }
+
     @Override
     public void onVisibilityChange(int visibility) {
         Log.i(LOGTAG,"Movie visibility change : " + String.valueOf(visibility) );
