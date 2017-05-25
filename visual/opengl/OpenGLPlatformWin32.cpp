@@ -1,6 +1,10 @@
 
 #include "tjsCommHead.h"
 #include "DebugIntf.h"
+#include "Application.h"
+#include "FilePathUtil.h"
+#include "MsgIntf.h"	// TVPThrowExceptionMessage
+#include "SysInitIntf.h"
 
 //include "EGL/egl.h"
 //#include "GLES2/gl2.h"
@@ -8,6 +12,9 @@
 //#include "platform/Platform.h"
 
 #include "OpenGLHeaderWin32.h"
+
+static HMODULE TVPhModuleLibEGL = nullptr;
+static HMODULE TVPhModuleLibGLESv2 = nullptr;
 
 ///libEGL
 #ifdef EGLAPI
@@ -73,16 +80,19 @@ EGLAPI EGLBoolean (EGLAPIENTRY* eglWaitSync)(EGLDisplay dpy, EGLSync sync, EGLin
 #define FIND_PROC(s,type) (s = (type)::GetProcAddress( hModule, #s ))
 
 bool LoadLibEGL( const tjs_string& dllpath ) {
+	if( TVPhModuleLibEGL ) return true;
+
 	tjs_string path = dllpath + tjs_string(TJS_W("libEGL.dll"));
 	HMODULE hModule = ::LoadLibrary( path.c_str() );
 	if( !hModule ) {
 		LPVOID lpMsgBuf;
 		::FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-			NULL, GetLastError(), MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ), (LPTSTR)&lpMsgBuf, 0, NULL );
+			NULL, ::GetLastError(), MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ), (LPTSTR)&lpMsgBuf, 0, NULL );
 		TVPAddLog( (tjs_char*)lpMsgBuf );
 		::LocalFree( lpMsgBuf );
 		return false;
 	}
+	TVPhModuleLibEGL = hModule;
 
 	FIND_PROC( eglGetCurrentContext, EGLContext( EGLAPIENTRY* )( void ) );
 	FIND_PROC( eglChooseConfig, EGLBoolean( EGLAPIENTRY* )( EGLDisplay dpy, const EGLint *attrib_list, EGLConfig *configs, EGLint config_size, EGLint *num_config ) );
@@ -461,9 +471,18 @@ GL_APICALL void (GL_APIENTRY* glGetInternalformativ)(GLenum target, GLenum inter
 
 // libGLESv2
 bool LoadLibGLESv2( const tjs_string& dllpath ) {
+	if( TVPhModuleLibGLESv2 ) return true;
 	tjs_string path = dllpath + tjs_string(TJS_W("libGLESv2.dll"));
 	HMODULE hModule = ::LoadLibrary( path.c_str() );
-	if( !hModule ) return false;
+	if( !hModule ) {
+		LPVOID lpMsgBuf;
+		::FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+			NULL, ::GetLastError(), MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ), (LPTSTR)&lpMsgBuf, 0, NULL );
+		TVPAddLog( (tjs_char*)lpMsgBuf );
+		::LocalFree( lpMsgBuf );
+		return false;
+	}
+	TVPhModuleLibGLESv2 = hModule;
 
 	FIND_PROC( glActiveTexture, void  ( GL_APIENTRY* )( GLenum texture ) );
 	FIND_PROC( glAttachShader, void  ( GL_APIENTRY* )( GLuint program, GLuint shader ) );
@@ -970,3 +989,38 @@ bool LoadLibGLESv2( const tjs_string& dllpath ) {
 //		(ANGLEPlatformInitialize != nullptr) &&
 //		(ANGLEPlatformShutdown != nullptr) );
 }
+//---------------------------------------------------------------------------
+static bool TVPANGLEInit = false;
+//---------------------------------------------------------------------------
+void TVPInitializeOpenGLPlatform() {
+	if( TVPANGLEInit == false ) {
+		tjs_string path = ExePath();
+#ifdef TJS_64BIT_OS
+		path = ExtractFilePath( path ) + TJS_W("plugin64\\");
+#else
+		path = ExtractFilePath( path ) + TJS_W("plugin\\");
+#endif
+		bool gles = LoadLibGLESv2( path );
+		bool egl = LoadLibEGL( path );
+		if( gles == false || egl == false ) {
+			TVPThrowExceptionMessage(TJS_W("Failed to load ANGLE."));
+		} else {
+			TVPANGLEInit = true;
+		}
+	}
+}
+//---------------------------------------------------------------------------
+static void TVPUninitializeANGLE() {
+	if( TVPhModuleLibEGL ) {
+		::FreeLibrary( TVPhModuleLibEGL );
+		TVPhModuleLibEGL = nullptr;
+	}
+	if( TVPhModuleLibGLESv2 ) {
+		TVPhModuleLibGLESv2 = nullptr;
+		::FreeLibrary( TVPhModuleLibGLESv2 );
+	}
+}
+//---------------------------------------------------------------------------
+static tTVPAtExit TVPUninitANGLEAtExit
+	(TVP_ATEXIT_PRI_SHUTDOWN, TVPUninitializeANGLE);
+//---------------------------------------------------------------------------

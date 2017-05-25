@@ -6,4 +6,7 @@
 #include "OpenGLHeaderWin32.h"
 #endif
 
+
+extern void TVPInitializeOpenGLPlatform();
+
 #endif

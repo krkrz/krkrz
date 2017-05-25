@@ -11,9 +11,10 @@
 #include "tjsArray.h"
 #include "LayerIntf.h"
 #include "RectItf.h"
-
+#include "OpenGLHeader.h"
 
 tTJSNI_Canvas::tTJSNI_Canvas() {
+	TVPInitializeOpenGLPlatform();
 }
 tTJSNI_Canvas::~tTJSNI_Canvas() {
 }
