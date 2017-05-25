@@ -710,6 +710,12 @@
     <ClInclude Include="..\visual\NullDrawDevice.h">
       <Filter>visual</Filter>
     </ClInclude>
+    <ClInclude Include="..\visual\opengl\OpenGLHeader.h">
+      <Filter>visual\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\opengl\OpenGLHeaderWin32.h">
+      <Filter>visual\opengl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\tjs2\tjs.cpp">
@@ -1294,9 +1300,6 @@
     <ClCompile Include="..\sound\SoundPlayer.cpp">
       <Filter>sound</Filter>
     </ClCompile>
-    <ClCompile Include="..\visual\win32\AngleLoadFunc.cpp">
-      <Filter>visual\win32</Filter>
-    </ClCompile>
     <ClCompile Include="..\sound\OpusCodecDecoder.cpp">
       <Filter>sound</Filter>
     </ClCompile>
@@ -1320,6 +1323,9 @@
     </ClCompile>
     <ClCompile Include="..\visual\NullDrawDevice.cpp">
       <Filter>visual</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\opengl\OpenGLPlatformWin32.cpp">
+      <Filter>visual\opengl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

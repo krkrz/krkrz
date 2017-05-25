@@ -527,6 +527,8 @@
     <ClInclude Include="..\visual\opengl\Matrix44Intf.h" />
     <ClInclude Include="..\visual\opengl\Mesh2DIntf.h" />
     <ClInclude Include="..\visual\opengl\OffscreenIntf.h" />
+    <ClInclude Include="..\visual\opengl\OpenGLHeader.h" />
+    <ClInclude Include="..\visual\opengl\OpenGLHeaderWin32.h" />
     <ClInclude Include="..\visual\opengl\TextureIntf.h" />
     <ClInclude Include="..\visual\PrerenderedFont.h" />
     <ClInclude Include="..\visual\RectItf.h" />
@@ -759,6 +761,7 @@
     <ClCompile Include="..\visual\opengl\Matrix44Intf.cpp" />
     <ClCompile Include="..\visual\opengl\Mesh2DIntf.cpp" />
     <ClCompile Include="..\visual\opengl\OffscreenIntf.cpp" />
+    <ClCompile Include="..\visual\opengl\OpenGLPlatformWin32.cpp" />
     <ClCompile Include="..\visual\opengl\TextureIntf.cpp" />
     <ClCompile Include="..\visual\PrerenderedFont.cpp" />
     <ClCompile Include="..\visual\RectItf.cpp" />
@@ -767,7 +770,6 @@
     <ClCompile Include="..\visual\TransIntf.cpp" />
     <ClCompile Include="..\visual\tvpgl.c" />
     <ClCompile Include="..\visual\VideoOvlIntf.cpp" />
-    <ClCompile Include="..\visual\win32\AngleLoadFunc.cpp" />
     <ClCompile Include="..\visual\win32\BasicDrawDevice.cpp" />
     <ClCompile Include="..\visual\win32\BitmapBitsAlloc.cpp" />
     <ClCompile Include="..\visual\win32\BitmapInfomation.cpp" />
