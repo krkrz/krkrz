@@ -67,6 +67,9 @@
     <Filter Include="movie\win32">
       <UniqueIdentifier>{2b2298b4-9c07-4290-803e-9f80182128f7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="visual\opengl">
+      <UniqueIdentifier>{cb523969-b0d1-4540-8b44-206f9db27b09}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -665,9 +668,6 @@
     <ClInclude Include="..\environ\TouchPoint.h">
       <Filter>environ</Filter>
     </ClInclude>
-    <ClInclude Include="..\utils\TimerThread.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="..\utils\TVPTimer.h">
       <Filter>utils</Filter>
     </ClInclude>
@@ -688,6 +688,24 @@
     </ClInclude>
     <ClInclude Include="..\sound\SoundSamples.h">
       <Filter>sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utils\TimerThread.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\opengl\CanvasIntf.h">
+      <Filter>visual\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\opengl\Matrix44Intf.h">
+      <Filter>visual\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\opengl\Mesh2DIntf.h">
+      <Filter>visual\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\opengl\OffscreenIntf.h">
+      <Filter>visual\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\opengl\TextureIntf.h">
+      <Filter>visual\opengl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1255,9 +1273,6 @@
     <ClCompile Include="..\tjs2\tjsSnprintf.cpp">
       <Filter>tjs2</Filter>
     </ClCompile>
-    <ClCompile Include="..\utils\TimerThread.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="..\utils\TVPTimer.cpp">
       <Filter>utils</Filter>
     </ClCompile>
@@ -1281,6 +1296,24 @@
     </ClCompile>
     <ClCompile Include="..\sound\OpusCodecDecoder.cpp">
       <Filter>sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utils\TimerThread.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\opengl\CanvasIntf.cpp">
+      <Filter>visual\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\opengl\Matrix44Intf.cpp">
+      <Filter>visual\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\opengl\Mesh2DIntf.cpp">
+      <Filter>visual\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\opengl\OffscreenIntf.cpp">
+      <Filter>visual\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\opengl\TextureIntf.cpp">
+      <Filter>visual\opengl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
