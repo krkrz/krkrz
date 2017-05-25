@@ -19,10 +19,39 @@
 #include "WindowIntf.h"
 #include "DebugIntf.h"
 #include "BasicDrawDevice.h"
+#include "NullDrawDevice.h"
+#include "SysInitIntf.h"
 
+//---------------------------------------------------------------------------
+// オプション
+//---------------------------------------------------------------------------
+static bool TVPDrawDeviceOptionInit = false;
+static bool TVPEnableDrawDevice = false;
+//---------------------------------------------------------------------------
+static void TVPInitDrawDeviceOptions()
+{
+	if( TVPDrawDeviceOptionInit ) return;
 
+	tTJSVariant val;
+	if(TVPGetCommandLine(TJS_W("-graphicsystem"), &val))
+	{
+		ttstr str(val);
+		if(str == TJS_W("drawdevice"))
+			TVPEnableDrawDevice = true;
+		else
+			TVPEnableDrawDevice = false;
+	}
+
+	TVPDrawDeviceOptionInit = true;
+}
+//---------------------------------------------------------------------------
 tTJSNativeClass* TVPCreateDefaultDrawDevice() {
-	return new tTJSNC_BasicDrawDevice();
+	TVPInitDrawDeviceOptions();
+
+	if( TVPEnableDrawDevice )
+		return new tTJSNC_BasicDrawDevice();
+	else
+		return new tTJSNC_NullDrawDevice();
 }
 
 //---------------------------------------------------------------------------

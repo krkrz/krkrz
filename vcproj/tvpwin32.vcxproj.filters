@@ -707,6 +707,9 @@
     <ClInclude Include="..\visual\opengl\TextureIntf.h">
       <Filter>visual\opengl</Filter>
     </ClInclude>
+    <ClInclude Include="..\visual\NullDrawDevice.h">
+      <Filter>visual</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\tjs2\tjs.cpp">
@@ -1314,6 +1317,9 @@
     </ClCompile>
     <ClCompile Include="..\visual\opengl\TextureIntf.cpp">
       <Filter>visual\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\NullDrawDevice.cpp">
+      <Filter>visual</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
