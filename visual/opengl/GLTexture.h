@@ -33,8 +33,10 @@ public:
 		format_ = format;
 	}
 	void destory() {
-		glDeleteTextures( 1, &texture_id_ );
-		texture_id_ = 0;
+		if( texture_id_ != 0 ) {
+			glDeleteTextures( 1, &texture_id_ );
+			texture_id_ = 0;
+		}
 	}
 	void copyImage( GLint x, GLint y, GLint w, GLint h, const GLvoid* bits ) {
 		 glTexSubImage2D( GL_TEXTURE_2D, 0, x, y, w, h, format_, GL_UNSIGNED_BYTE, bits );

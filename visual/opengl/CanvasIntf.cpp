@@ -39,12 +39,19 @@ tjs_error TJS_INTF_METHOD tTJSNI_Canvas::Construct(tjs_int numparams, tTJSVarian
 	if( !GLScreen ) TVPThrowExceptionMessage( TJS_W("Cannot initialize low level graphics system.") );
 	if( !GLScreen->Initialize() ) TVPThrowExceptionMessage( TJS_W("Cannot initialize low level graphics system.") );
 
+	if( !GLDrawer.InitializeShader() ) TVPThrowExceptionMessage( TJS_W("Cannot initialize shader.") );
 
 	return TJS_S_OK;
 }
 void TJS_INTF_METHOD tTJSNI_Canvas::Invalidate() {
 }
 void TJS_INTF_METHOD tTJSNI_Canvas::Destruct() {
+	GLDrawer.DestroyShader();
+	if( GLScreen ) {
+		GLScreen->Destory();
+		delete GLScreen;
+		GLScreen = nullptr;
+	}
 }
 
 // method
@@ -57,7 +64,10 @@ void tTJSNI_Canvas::DrawScreenUT( class tTJSNI_Offscreen* screen, class tTJSNI_T
 void tTJSNI_Canvas::SetClipMask( class tTJSNI_Texture* texture, tjs_int left, tjs_int top ) { /* TODO: 二期実装  */}
 void tTJSNI_Canvas::Fill( tjs_int left, tjs_int top, tjs_int width, tjs_int height, tjs_uint32 color ) {}
 void tTJSNI_Canvas::Fill( tjs_int left, tjs_int top, tjs_int width, tjs_int height, tjs_uint32 colors[4] ) {}
-void tTJSNI_Canvas::DrawTexture( class tTJSNI_Texture* texture, tjs_int left, tjs_int top ) {}
+void tTJSNI_Canvas::DrawTexture( class tTJSNI_Texture* texture, tjs_int left, tjs_int top ) {
+	GLuint texId = (GLuint)texture->GetNativeHandle();
+	GLDrawer.DrawTexture( texId );
+}
 void tTJSNI_Canvas::DrawText( class tTJSNI_Font* font, tjs_int x, tjs_int y, const ttstr& text, tjs_uint32 color ) {}
 
 // prop

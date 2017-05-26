@@ -9,6 +9,7 @@
 
 #include "tjsNative.h"
 #include "drawable.h"
+#include "GLTextureDrawing.h"
 
 enum class tTVPBlendMode : tjs_int {
 	bmBinder = ltBinder,
@@ -57,6 +58,7 @@ class tTJSNI_Canvas : public tTJSNativeInstance
 	tTVPStretchType StretchType;
 
 	class tTVPOpenGLScreen* GLScreen;
+	tTVPGLTextureDrawing GLDrawer;
 
 public:
 	tTJSNI_Canvas();
