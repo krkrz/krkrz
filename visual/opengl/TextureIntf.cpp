@@ -2,13 +2,57 @@
 #include "tjsCommHead.h"
 
 #include "TextureIntf.h"
-
+#include "BitmapIntf.h"
+#include "GraphicsLoaderIntf.h"
+#include "LayerBitmapIntf.h"
+#include "LayerIntf.h"
+#include "MsgIntf.h"	// TVPThrowExceptionMessage
+#include "TVPColor.h"	// clNone
+#include <memory>
 
 tTJSNI_Texture::tTJSNI_Texture() {
+	TVPTempBitmapHolderAddRef();
 }
 tTJSNI_Texture::~tTJSNI_Texture() {
+	TVPTempBitmapHolderRelease();
 }
 tjs_error TJS_INTF_METHOD tTJSNI_Texture::Construct(tjs_int numparams, tTJSVariant **param, iTJSDispatch2 *tjs_obj) {
+	if( numparams < 1 ) return TJS_E_BADPARAMCOUNT;
+
+	if( param[0]->Type() == tvtString ) {
+		bool gray = false;
+		if( numparams > 1 ) {
+			gray = (tjs_int)*param[1] ? true : false;
+		}
+		bool powerof2 = false;
+		if( numparams > 2 ) {
+			powerof2 = (tjs_int)*param[2] ? true : false;
+		}
+		ttstr filename = *param[0];
+		std::unique_ptr<tTVPBaseBitmap> bitmap( new tTVPBaseBitmap( TVPGetInitialBitmap() ) );
+		// tTVPBaseBitmap経由して読み込む。キャッシュ機構などは共有される。
+		TVPLoadGraphic( bitmap.get(), filename, clNone, 0, 0, gray ? glmGrayscale : glmNormal, nullptr, nullptr );
+		LoadTexture( bitmap.get(), gray, powerof2 );
+	} else if( param[0]->Type() == tvtObject ) {
+		tTJSNI_Bitmap* bmp = nullptr;
+		tTJSVariantClosure clo = param[0]->AsObjectClosureNoAddRef();
+		if( clo.Object ) {
+			if(TJS_FAILED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE, tTJSNC_Bitmap::ClassID, (iTJSNativeInstance**)&bmp)))
+				return TJS_E_INVALIDPARAM;
+		}
+		if(!bmp) TVPThrowExceptionMessage(TJS_W("Parameter require Bitmap class instance."));
+		bool gray = false;
+		if( numparams > 1 ) {
+			gray = (tjs_int)*param[1] ? true : false;
+		}
+		bool powerof2 = false;
+		if( numparams > 2 ) {
+			powerof2 = (tjs_int)*param[2] ? true : false;
+		}
+		LoadTexture( bmp->GetBitmap(), gray, powerof2 );
+	} else {
+		return TJS_E_INVALIDPARAM;
+	}
 	return TJS_S_OK;
 }
 void TJS_INTF_METHOD tTJSNI_Texture::Invalidate() {
@@ -16,17 +60,23 @@ void TJS_INTF_METHOD tTJSNI_Texture::Invalidate() {
 void TJS_INTF_METHOD tTJSNI_Texture::Destruct() {
 }
 
+void tTJSNI_Texture::LoadTexture( class tTVPBaseBitmap* bitmap, bool gray, bool powerOfTwo ) {
+	// TODO: 2の累乗やグレースケール化は考えず、与えられたまま生成
+	// Bitmapが上下反転していること前提だが、正順の方がいいよね…… 直すか考える
+	tjs_uint h = bitmap->GetHeight();
+	Texture.create( bitmap->GetWidth(), h, bitmap->GetScanLine(h-1), bitmap->Is8BPP() ? GL_ALPHA : GL_RGBA );
+}
 tjs_uint tTJSNI_Texture::GetWidth() const {
-	return 0;
+	return Texture.width();
 }
 tjs_uint tTJSNI_Texture::GetHeight() const {
-	return 0;
+	return Texture.height();
 }
 tjs_uint tTJSNI_Texture::GetMemoryWidth() const {
-	return 0;
+	return Texture.width();
 }
 tjs_uint tTJSNI_Texture::GetMemoryHeight() const {
-	return 0;
+	return Texture.height();
 }
 bool tTJSNI_Texture::IsGray() const {
 	return false;
@@ -35,7 +85,7 @@ bool tTJSNI_Texture::IsPowerOfTwo() const {
 	return false;
 }
 tjs_int64 tTJSNI_Texture::GetNativeHandle() const {
-	return 0;
+	return Texture.id();
 }
 
 //---------------------------------------------------------------------------

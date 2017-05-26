@@ -6,9 +6,14 @@
 #define TextureIntfH
 
 #include "tjsNative.h"
+#include "GLTexture.h"
 
 class tTJSNI_Texture : public tTJSNativeInstance
 {
+	GLTexture Texture;
+
+	void LoadTexture( class tTVPBaseBitmap* bitmap, bool gray, bool powerOfTwo );
+
 public:
 	tTJSNI_Texture();
 	~tTJSNI_Texture() override;

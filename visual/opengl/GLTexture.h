@@ -2,19 +2,24 @@
 #ifndef __GL_TEXTURE_H__
 #define __GL_TEXTURE_H__
 
-#include <EGL/egl.h>
-#include <GLES/gl.h>
-#include <GLES2/gl2.h>
-#include <GLES2/gl2ext.h>
+#include "OpenGLHeader.h"
 
 class GLTexture {
 protected:
 	GLuint texture_id_;
 	GLint format_;
-	GLuint width_:
+	GLuint width_;
 	GLuint height_;
 
-private:
+public:
+	GLTexture() : texture_id_(0), width_(0), height_(0), format_(0) {}
+	GLTexture( GLuint w, GLuint h, const GLvoid* bits, GLint format=GL_RGBA ) : width_(w), height_(h) {
+		create( w, h, bits, format );
+	}
+	~GLTexture() {
+		destory();
+	}
+
 	void create( GLuint w, GLuint h, const GLvoid* bits, GLint format=GL_RGBA ) {
 		glEnable( GL_TEXTURE_2D );
 		glGenTextures( 1, &texture_id_ );
@@ -31,13 +36,6 @@ private:
 		glDeleteTextures( 1, &texture_id_ );
 		texture_id_ = 0;
 	}
-public:
-	GLTexture( GLuint w, GLuint h, const GLvoid* bits, GLint format=GL_RGBA ) : width_(w), height_(h) {
-		create( w, h, bits, format );
-	}
-	~GLTexture() {
-		destory();
-	}
 	void copyImage( GLint x, GLint y, GLint w, GLint h, const GLvoid* bits ) {
 		 glTexSubImage2D( GL_TEXTURE_2D, 0, x, y, w, h, format_, GL_UNSIGNED_BYTE, bits );
 	}
@@ -48,6 +46,7 @@ public:
 	}
 	GLuint width() const { return width_; }
 	GLuint height() const { return height_; }
+	GLuint id() const { return texture_id_; }
 };
 
 
