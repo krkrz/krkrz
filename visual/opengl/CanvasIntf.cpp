@@ -12,13 +12,34 @@
 #include "LayerIntf.h"
 #include "RectItf.h"
 #include "OpenGLHeader.h"
+#include "OpenGLScreen.h"
+#include "WindowIntf.h"
 
-tTJSNI_Canvas::tTJSNI_Canvas() {
+tTJSNI_Canvas::tTJSNI_Canvas() : GLScreen(nullptr) {
 	TVPInitializeOpenGLPlatform();
 }
 tTJSNI_Canvas::~tTJSNI_Canvas() {
 }
 tjs_error TJS_INTF_METHOD tTJSNI_Canvas::Construct(tjs_int numparams, tTJSVariant **param, iTJSDispatch2 *tjs_obj) {
+	if( numparams < 1 ) return TJS_E_BADPARAMCOUNT;
+
+	// get the window native instance
+	tTJSVariantClosure clo = param[0]->AsObjectClosureNoAddRef();
+	tTJSNI_Window *win = nullptr;
+	if( clo.Object ) {
+		if(TJS_FAILED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE, tTJSNC_Window::ClassID, (iTJSNativeInstance**)&win)))
+			TVPThrowExceptionMessage( TJS_W("Parameter require Window class instance.") );
+#ifdef WIN32
+		// GetNativeHandle() とか言う名前にするべきよね
+		HWND hWnd = win->GetWindowHandle();
+		if( GLScreen ) delete GLScreen;
+		GLScreen = new tTVPOpenGLScreen( (void*)hWnd );
+#endif
+	}
+	if( !GLScreen ) TVPThrowExceptionMessage( TJS_W("Cannot initialize low level graphics system.") );
+	if( !GLScreen->Initialize() ) TVPThrowExceptionMessage( TJS_W("Cannot initialize low level graphics system.") );
+
+
 	return TJS_S_OK;
 }
 void TJS_INTF_METHOD tTJSNI_Canvas::Invalidate() {

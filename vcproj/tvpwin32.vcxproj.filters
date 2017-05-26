@@ -716,6 +716,15 @@
     <ClInclude Include="..\visual\opengl\OpenGLHeaderWin32.h">
       <Filter>visual\opengl</Filter>
     </ClInclude>
+    <ClInclude Include="..\visual\opengl\GLShaderUtil.h">
+      <Filter>visual\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\opengl\GLTextureDrawing.h">
+      <Filter>visual\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\visual\opengl\OpenGLScreen.h">
+      <Filter>visual\opengl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\tjs2\tjs.cpp">
@@ -1325,6 +1334,15 @@
       <Filter>visual</Filter>
     </ClCompile>
     <ClCompile Include="..\visual\opengl\OpenGLPlatformWin32.cpp">
+      <Filter>visual\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\opengl\GLShaderUtil.cpp">
+      <Filter>visual\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\opengl\GLTextureDrawing.cpp">
+      <Filter>visual\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\opengl\OpenGLScreen.cpp">
       <Filter>visual\opengl</Filter>
     </ClCompile>
   </ItemGroup>

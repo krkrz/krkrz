@@ -56,6 +56,8 @@ class tTJSNI_Canvas : public tTJSNativeInstance
 	tTVPBlendMode BlendMode;
 	tTVPStretchType StretchType;
 
+	class tTVPOpenGLScreen* GLScreen;
+
 public:
 	tTJSNI_Canvas();
 	~tTJSNI_Canvas() override;
