@@ -41,4 +41,6 @@ public:
 protected:
 	tTJSNativeInstance *CreateNativeInstance() override { return new tTJSNI_Matrix44(); }
 };
+//---------------------------------------------------------------------------
+extern tTJSNativeClass * TVPCreateNativeClass_Matrix44();
 #endif

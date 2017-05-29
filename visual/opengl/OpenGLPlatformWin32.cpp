@@ -61,8 +61,8 @@ EGLAPI EGLBoolean (EGLAPIENTRY* eglReleaseThread)(void);
 EGLAPI EGLBoolean (EGLAPIENTRY* eglWaitClient)(void);
 
 EGLAPI EGLDisplay (EGLAPIENTRY* eglGetPlatformDisplayEXT)(EGLenum platform, void *native_display, const EGLint *attrib_list);
-EGLAPI EGLSurface (EGLAPIENTRY* eglCreatePlatformWindowSurfaceEXT)(EGLDisplay dpy, EGLConfig config, void *native_window, const EGLint *attrib_list);
-EGLAPI EGLSurface (EGLAPIENTRY* eglCreatePlatformPixmapSurfaceEXT)(EGLDisplay dpy, EGLConfig config, void *native_pixmap, const EGLint *attrib_list);
+//EGLAPI EGLSurface (EGLAPIENTRY* eglCreatePlatformWindowSurfaceEXT)(EGLDisplay dpy, EGLConfig config, void *native_window, const EGLint *attrib_list);
+//EGLAPI EGLSurface (EGLAPIENTRY* eglCreatePlatformPixmapSurfaceEXT)(EGLDisplay dpy, EGLConfig config, void *native_pixmap, const EGLint *attrib_list);
 /* 1.5
 EGLAPI EGLSync (EGLAPIENTRY* eglCreateSync)(EGLDisplay dpy, EGLenum type, const EGLAttrib *attrib_list);
 EGLAPI EGLBoolean (EGLAPIENTRY* eglDestroySync)(EGLDisplay dpy, EGLSync sync);
@@ -155,8 +155,8 @@ bool LoadLibEGL( const tjs_string& dllpath ) {
 	FIND_PROC(eglSwapBuffersWithDamageEXT);
 #endif
 	FIND_PROC(eglGetPlatformDisplayEXT, EGLDisplay (EGLAPIENTRY*)(EGLenum platform, void *native_display, const EGLint *attrib_list) );
-	FIND_PROC(eglCreatePlatformWindowSurfaceEXT, EGLSurface (EGLAPIENTRY*)(EGLDisplay dpy, EGLConfig config, void *native_window, const EGLint *attrib_list) );
-	FIND_PROC(eglCreatePlatformPixmapSurfaceEXT, EGLSurface (EGLAPIENTRY*)(EGLDisplay dpy, EGLConfig config, void *native_pixmap, const EGLint *attrib_list) );
+//	FIND_PROC(eglCreatePlatformWindowSurfaceEXT, EGLSurface (EGLAPIENTRY*)(EGLDisplay dpy, EGLConfig config, void *native_window, const EGLint *attrib_list) );
+//	FIND_PROC(eglCreatePlatformPixmapSurfaceEXT, EGLSurface (EGLAPIENTRY*)(EGLDisplay dpy, EGLConfig config, void *native_pixmap, const EGLint *attrib_list) );
 #if 0
 ; 1.5 entry points
 eglCreateSync
@@ -205,9 +205,7 @@ eglCreateSync
 		(eglWaitClient != nullptr ) &&
 		(eglWaitGL != nullptr ) &&
 		(eglWaitNative != nullptr ) &&
-		(eglGetPlatformDisplayEXT != nullptr ) &&
-		(eglCreatePlatformWindowSurfaceEXT != nullptr ) &&
-		(eglCreatePlatformPixmapSurfaceEXT != nullptr ) );
+		(eglGetPlatformDisplayEXT != nullptr ) );
 }
 #ifdef GL_APICALL
 #undef GL_APICALL

@@ -390,8 +390,8 @@ extern EGLBoolean (EGLAPIENTRY* eglWaitSync)(EGLDisplay dpy, EGLSync sync, EGLin
 #define EGL_EXT_platform_base 1
 
 extern EGLDisplay (EGLAPIENTRY* eglGetPlatformDisplayEXT)(EGLenum platform, void *native_display, const EGLint *attrib_list);
-extern EGLSurface (EGLAPIENTRY* eglCreatePlatformWindowSurfaceEXT)(EGLDisplay dpy, EGLConfig config, void *native_window, const EGLint *attrib_list);
-extern EGLSurface (EGLAPIENTRY* eglCreatePlatformPixmapSurfaceEXT)(EGLDisplay dpy, EGLConfig config, void *native_pixmap, const EGLint *attrib_list);
+//extern EGLSurface (EGLAPIENTRY* eglCreatePlatformWindowSurfaceEXT)(EGLDisplay dpy, EGLConfig config, void *native_window, const EGLint *attrib_list);
+//extern EGLSurface (EGLAPIENTRY* eglCreatePlatformPixmapSurfaceEXT)(EGLDisplay dpy, EGLConfig config, void *native_pixmap, const EGLint *attrib_list);
 
 #endif /* EGL_EXT_platform_base */
 // ----------------------------------------------------------------------------------------------------------------------------------------

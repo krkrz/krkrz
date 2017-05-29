@@ -53,7 +53,11 @@ tTJSNativeClass* TVPCreateDefaultDrawDevice() {
 	else
 		return new tTJSNC_NullDrawDevice();
 }
-
+//---------------------------------------------------------------------------
+bool TVPIsEnableDrawDevice() {
+	TVPInitDrawDeviceOptions();
+	return TVPEnableDrawDevice;
+}
 //---------------------------------------------------------------------------
 tTVPDrawDevice::tTVPDrawDevice()
 {

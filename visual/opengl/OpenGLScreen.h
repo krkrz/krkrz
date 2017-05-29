@@ -6,6 +6,7 @@
 
 class tTVPOpenGLScreen {
 	void* NativeHandle;
+	//EGLNativeWindowType mNativeWindow;
 
 	EGLConfig mConfig;
 	EGLDisplay mDisplay;
@@ -19,6 +20,8 @@ class tTVPOpenGLScreen {
 	int mAlphaBits;
 	int mDepthBits;
 	int mStencilBits;
+	int mMinSwapInterval;
+	int mMaxSwapInterval;
 	bool mMultisample;
 
 #ifdef WIN32
@@ -30,7 +33,7 @@ public:
 	tTVPOpenGLScreen( void* nativeHandle );
 
 	bool Initialize();
-	void Destory();
+	void Destroy();
 	bool IsInitialized() const;
 
 	void Swap() { eglSwapBuffers( mDisplay, mSurface ); }
@@ -38,6 +41,8 @@ public:
 	EGLDisplay GetDisplay() const { return mDisplay; }
 	EGLSurface GetSurface() const { return mSurface; }
 	EGLContext GetContext() const { return mContext; }
+
+	static bool CheckEGLErrorAndLog();
 };
 
 

@@ -15,7 +15,8 @@
 #include "OpenGLScreen.h"
 #include "WindowIntf.h"
 
-tTJSNI_Canvas::tTJSNI_Canvas() : GLScreen(nullptr) {
+tTJSNI_Canvas::tTJSNI_Canvas() : GLScreen(nullptr), ClearColor(0xff00ff00), BlendMode(tTVPBlendMode::bmAlpha),
+StretchType(tTVPStretchType::stLinear) {
 	TVPInitializeOpenGLPlatform();
 }
 tTJSNI_Canvas::~tTJSNI_Canvas() {
@@ -34,9 +35,11 @@ tjs_error TJS_INTF_METHOD tTJSNI_Canvas::Construct(tjs_int numparams, tTJSVarian
 		HWND hWnd = win->GetWindowHandle();
 		if( GLScreen ) delete GLScreen;
 		GLScreen = new tTVPOpenGLScreen( (void*)hWnd );
+#elif defined( ANDROID )
+		
 #endif
 	}
-	if( !GLScreen ) TVPThrowExceptionMessage( TJS_W("Cannot initialize low level graphics system.") );
+	if( !GLScreen ) TVPThrowExceptionMessage( TJS_W("Cannot create low level graphics system(maybe low memory).") );
 	if( !GLScreen->Initialize() ) TVPThrowExceptionMessage( TJS_W("Cannot initialize low level graphics system.") );
 
 	if( !GLDrawer.InitializeShader() ) TVPThrowExceptionMessage( TJS_W("Cannot initialize shader.") );
@@ -48,15 +51,30 @@ void TJS_INTF_METHOD tTJSNI_Canvas::Invalidate() {
 void TJS_INTF_METHOD tTJSNI_Canvas::Destruct() {
 	GLDrawer.DestroyShader();
 	if( GLScreen ) {
-		GLScreen->Destory();
+		GLScreen->Destroy();
 		delete GLScreen;
 		GLScreen = nullptr;
 	}
 }
-
+void tTJSNI_Canvas::BeginDrawing()
+{
+	tTVPARGB<tjs_uint32> c;
+	c = ClearColor;
+	glClearColor( c.r/255.0f, c.g/255.0f, c.b/255.0f, c.a/255.0f );
+	glClear( GL_COLOR_BUFFER_BIT );
+}
+void tTJSNI_Canvas::EndDrawing()
+{
+	if( GLScreen ) GLScreen->Swap();
+}
 // method
 void tTJSNI_Canvas::Capture( class tTJSNI_Bitmap* bmp ) {}
-void tTJSNI_Canvas::Clear( tjs_uint32 color ) {}
+void tTJSNI_Canvas::Clear( tjs_uint32 color ) {
+	tTVPARGB<tjs_uint32> c;
+	c = color;
+	glClearColor( c.r/255.0f, c.g/255.0f, c.b/255.0f, c.a/255.0f );
+	glClear( GL_COLOR_BUFFER_BIT );
+}
 iTJSDispatch2* tTJSNI_Canvas::CreateTexture( class tTJSNI_Bitmap* bmp, bool gray ) { return nullptr; }
 iTJSDispatch2* tTJSNI_Canvas::CreateTexture( const ttstr &filename, bool gray ) { return nullptr; }
 void tTJSNI_Canvas::DrawScreen( class tTJSNI_Offscreen* screen, tjs_real opacity ) {}
@@ -108,10 +126,12 @@ TJS_END_NATIVE_CONSTRUCTOR_DECL(/*TJS class name*/Canvas)
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/clear)
 {
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas);
-	// パラメータ未指定時はprop::clearColorが使われる
-	tjs_uint32 color = _this->GetClearColor();
+	// パラメータ未指定時はproperty::clearColorが使われる
+	tjs_uint32 color;
 	if( numparams > 0 ) {
 		color = static_cast<tjs_uint32>((tjs_int64)*param[0]);
+	} else {
+		color = _this->GetClearColor();
 	}
 	_this->Clear( color );
 
@@ -544,3 +564,11 @@ TJS_END_NATIVE_PROP_DECL(height)
 
 	TJS_END_NATIVE_MEMBERS
 }
+
+//---------------------------------------------------------------------------
+tTJSNativeClass * TVPCreateNativeClass_Canvas()
+{
+	tTJSNativeClass *cls = new tTJSNC_Canvas();
+	return cls;
+}
+//---------------------------------------------------------------------------

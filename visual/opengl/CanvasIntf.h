@@ -67,8 +67,12 @@ public:
 	void TJS_INTF_METHOD Invalidate() override;
 	void TJS_INTF_METHOD Destruct() override;
 
+	void BeginDrawing();
+	void EndDrawing();
+
 	// method
 	void Capture( class tTJSNI_Bitmap* bmp );
+	void Clear();
 	void Clear( tjs_uint32 color );
 	iTJSDispatch2* CreateTexture( class tTJSNI_Bitmap* bmp, bool gray );
 	iTJSDispatch2* CreateTexture( const ttstr &filename, bool gray );
@@ -110,4 +114,6 @@ public:
 protected:
 	tTJSNativeInstance *CreateNativeInstance() override { return new tTJSNI_Canvas(); }
 };
+
+extern tTJSNativeClass * TVPCreateNativeClass_Canvas();
 #endif

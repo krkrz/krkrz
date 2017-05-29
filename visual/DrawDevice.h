@@ -542,5 +542,6 @@ public:
 
 
 extern tTJSNativeClass* TVPCreateDefaultDrawDevice();
+extern bool TVPIsEnableDrawDevice();
 
 #endif

@@ -173,3 +173,11 @@ TJS_END_NATIVE_PROP_DECL(nativeHandle)
 
 	TJS_END_NATIVE_MEMBERS
 }
+
+//---------------------------------------------------------------------------
+tTJSNativeClass * TVPCreateNativeClass_Offscreen()
+{
+	tTJSNativeClass *cls = new tTJSNC_Offscreen();
+	return cls;
+}
+//---------------------------------------------------------------------------

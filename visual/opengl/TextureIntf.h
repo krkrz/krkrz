@@ -43,4 +43,6 @@ public:
 protected:
 	tTJSNativeInstance *CreateNativeInstance() override { return new tTJSNI_Texture(); }
 };
+//---------------------------------------------------------------------------
+extern tTJSNativeClass * TVPCreateNativeClass_Texture();
 #endif

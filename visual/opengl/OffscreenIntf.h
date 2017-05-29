@@ -40,4 +40,7 @@ public:
 protected:
 	tTJSNativeInstance *CreateNativeInstance() override { return new tTJSNI_Offscreen(); }
 };
+
+//---------------------------------------------------------------------------
+extern tTJSNativeClass * TVPCreateNativeClass_Offscreen();
 #endif

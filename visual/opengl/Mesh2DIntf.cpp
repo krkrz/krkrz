@@ -50,3 +50,11 @@ TJS_END_NATIVE_CONSTRUCTOR_DECL(/*TJS class name*/Mesh2D)
 
 	TJS_END_NATIVE_MEMBERS
 }
+
+//---------------------------------------------------------------------------
+tTJSNativeClass * TVPCreateNativeClass_Mesh2D()
+{
+	tTJSNativeClass *cls = new tTJSNC_Mesh2D();
+	return cls;
+}
+//---------------------------------------------------------------------------

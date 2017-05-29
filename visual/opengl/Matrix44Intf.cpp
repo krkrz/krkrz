@@ -168,3 +168,12 @@ TJS_DEFINE_MATRIX_PROP( 4, 4 )
 	TJS_END_NATIVE_MEMBERS
 }
 #undef TJS_DEFINE_MATRIX_PROP
+
+//---------------------------------------------------------------------------
+tTJSNativeClass * TVPCreateNativeClass_Matrix44()
+{
+	tTJSNativeClass *cls = new tTJSNC_Matrix44();
+	return cls;
+}
+//---------------------------------------------------------------------------
+

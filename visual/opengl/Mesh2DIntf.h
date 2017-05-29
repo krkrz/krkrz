@@ -30,4 +30,6 @@ public:
 protected:
 	tTJSNativeInstance *CreateNativeInstance() override { return new tTJSNI_Mesh2D(); }
 };
+//---------------------------------------------------------------------------
+extern tTJSNativeClass * TVPCreateNativeClass_Mesh2D();
 #endif
