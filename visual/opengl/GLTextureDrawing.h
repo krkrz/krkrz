@@ -19,7 +19,7 @@ public:
 	// シンプルなシェーダーのみとりあえず
 	bool InitializeShader();
 	void DestroyShader();
-	void DrawTexture( GLuint tex );
+	void DrawTexture( GLuint tex, int x, int y,int w, int h, int sw, int sh );
 };
 
 

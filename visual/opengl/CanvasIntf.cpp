@@ -62,6 +62,14 @@ void tTJSNI_Canvas::BeginDrawing()
 	c = ClearColor;
 	glClearColor( c.r/255.0f, c.g/255.0f, c.b/255.0f, c.a/255.0f );
 	glClear( GL_COLOR_BUFFER_BIT );
+
+	EGLint sw = GLScreen->GetSurfaceWidth();
+	EGLint sh = GLScreen->GetSurfaceHeight();
+	glViewport( 0, 0, sw, sh );
+
+	glEnable( GL_TEXTURE_2D );
+	glEnable( GL_BLEND );
+	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 }
 void tTJSNI_Canvas::EndDrawing()
 {
@@ -84,7 +92,9 @@ void tTJSNI_Canvas::Fill( tjs_int left, tjs_int top, tjs_int width, tjs_int heig
 void tTJSNI_Canvas::Fill( tjs_int left, tjs_int top, tjs_int width, tjs_int height, tjs_uint32 colors[4] ) {}
 void tTJSNI_Canvas::DrawTexture( class tTJSNI_Texture* texture, tjs_int left, tjs_int top ) {
 	GLuint texId = (GLuint)texture->GetNativeHandle();
-	GLDrawer.DrawTexture( texId );
+	EGLint sw = GLScreen->GetSurfaceWidth();
+	EGLint sh = GLScreen->GetSurfaceHeight();
+	GLDrawer.DrawTexture( texId, 0, 0, texture->GetWidth(), texture->GetHeight(), sw, sh );
 }
 void tTJSNI_Canvas::DrawText( class tTJSNI_Font* font, tjs_int x, tjs_int y, const ttstr& text, tjs_uint32 color ) {}
 

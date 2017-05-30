@@ -169,6 +169,23 @@ void tTVPOpenGLScreen::Destroy() {
 bool tTVPOpenGLScreen::IsInitialized() const {
 	return mSurface != EGL_NO_SURFACE && mContext != EGL_NO_CONTEXT && mDisplay != EGL_NO_DISPLAY;
 }
+
+EGLint tTVPOpenGLScreen::GetSurfaceWidth() const {
+	EGLint result;
+	EGLBoolean ret = eglQuerySurface( mDisplay, mSurface, EGL_WIDTH, &result );
+	if( ret == EGL_FALSE ) {
+		CheckEGLErrorAndLog();
+	}
+	return result;
+}
+EGLint tTVPOpenGLScreen::GetSurfaceHeight() const {
+	EGLint result;
+	EGLBoolean ret = eglQuerySurface( mDisplay, mSurface, EGL_HEIGHT, &result );
+	if( ret == EGL_FALSE ) {
+		CheckEGLErrorAndLog();
+	}
+	return result;
+}
 bool tTVPOpenGLScreen::CheckEGLErrorAndLog() {
 	GLenum error_code = eglGetError();
 	switch( error_code ) {

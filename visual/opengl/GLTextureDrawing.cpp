@@ -25,7 +25,7 @@ bool tTVPGLTextureDrawing::InitializeShader() {
 		uniform sampler2D s_texture;
 		void main()
 		{
-			gl_FragColor = texture2D(s_texture, v_texCoord);
+			gl_FragColor = texture2D( s_texture, v_texCoord ).bgra;
 		}
 	);
 	mProgram = CompileProgram(vs, fs);
@@ -46,7 +46,25 @@ void tTVPGLTextureDrawing::DestroyShader() {
 	glDeleteProgram( mProgram );
 }
 
-void tTVPGLTextureDrawing::DrawTexture( GLuint tex ) {
+void tTVPGLTextureDrawing::DrawTexture( GLuint tex, int x, int y,int w, int h, int sw, int sh ) {
+	float left  =((float)x/(float)sw)*2.0f-1.0f;
+	float top   =((float)y/(float)sh)*2.0f-1.0f;
+	float right =((float)(x+w)/(float)sw)*2.0f-1.0f;
+	float bottom=((float)(y+h)/(float)sh)*2.0f-1.0f;
+	top   =-top;
+	bottom=-bottom;
+#if 0
+	GLfloat vertices[] = {
+        left,  top, 0.0f,  // Position 0
+         0.0f,  0.0f,        // TexCoord 0
+        left, bottom, 0.0f,  // Position 1
+         0.0f,  1.0f,        // TexCoord 1
+         right, bottom, 0.0f,  // Position 2
+         1.0f,  1.0f,        // TexCoord 2
+         right,  top, 0.0f,  // Position 3
+         1.0f,  0.0f         // TexCoord 3
+	};
+#else
 	GLfloat vertices[] = {
         -0.5f,  0.5f, 0.0f,  // Position 0
          0.0f,  0.0f,        // TexCoord 0
@@ -57,6 +75,19 @@ void tTVPGLTextureDrawing::DrawTexture( GLuint tex ) {
          0.5f,  0.5f, 0.0f,  // Position 3
          1.0f,  0.0f         // TexCoord 3
 	};
+	/*
+	GLfloat vertices[] = {
+		-0.5f,  0.5f, 0.0f,  // Position 0
+		0.0f,  1.0f,        // TexCoord 0
+		-0.5f, -0.5f, 0.0f,  // Position 1
+		0.0f,  0.0f,        // TexCoord 1
+		0.5f, -0.5f, 0.0f,  // Position 2
+		1.0f,  0.0f,        // TexCoord 2
+		0.5f,  0.5f, 0.0f,  // Position 3
+		1.0f,  1.0f         // TexCoord 3
+	};
+	*/
+#endif
 	GLushort indices[] = { 0, 1, 2, 0, 2, 3 };
 
 	// Set the viewport
@@ -79,8 +110,6 @@ void tTVPGLTextureDrawing::DrawTexture( GLuint tex ) {
 	// Bind the texture
 	glActiveTexture( GL_TEXTURE0 );
 	glBindTexture( GL_TEXTURE_2D, tex );
-
-	// Set the texture sampler to texture unit to 0
 	glUniform1i( mSamplerLoc, 0 );
 
 	glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, indices );

@@ -42,6 +42,9 @@ public:
 	EGLSurface GetSurface() const { return mSurface; }
 	EGLContext GetContext() const { return mContext; }
 
+	EGLint GetSurfaceWidth() const;
+	EGLint GetSurfaceHeight() const;
+
 	static bool CheckEGLErrorAndLog();
 };
 
