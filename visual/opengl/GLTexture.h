@@ -21,7 +21,7 @@ public:
 	}
 
 	void create( GLuint w, GLuint h, const GLvoid* bits, GLint format=GL_RGBA ) {
-		glEnable( GL_TEXTURE_2D );
+		// glEnable( GL_TEXTURE_2D );
 		glGenTextures( 1, &texture_id_ );
 		glBindTexture( GL_TEXTURE_2D, texture_id_ );
 		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);

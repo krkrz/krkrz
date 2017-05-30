@@ -4,6 +4,11 @@
 
 #ifdef WIN32
 #include "OpenGLHeaderWin32.h"
+#elif defined( ANDROID )
+#include <android/native_window.h>
+#include <EGL/egl.h>
+#include <GLES/gl.h>
+#include "gl3stub.h"
 #endif
 
 

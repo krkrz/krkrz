@@ -67,6 +67,7 @@ void TTVPWindowForm::WndProc(NativeEvent& ev) {
 		break;
 	case AM_SURFACE_CHANGED:
 		// Surfaceが切り替わったので、DrawDevice 準備
+		UpdateWindow();
 		break;
 	case AM_SURFACE_CREATED:
 		break;

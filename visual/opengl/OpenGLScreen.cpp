@@ -139,7 +139,58 @@ bool tTVPOpenGLScreen::Initialize() {
 	eglSwapInterval( mDisplay, mSwapInterval );	// V-sync wait?
 	return true;
 #elif defined( ANDROID )
-	
+	ANativeWindow* window = reinterpret_cast<ANativeWindow*>(NativeHandle);	// Surface(SurfaceView)
+
+	if( (mDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY )) == EGL_NO_DISPLAY ) {
+		CheckEGLErrorAndLog();
+		return false;
+	}
+	if( !eglInitialize( mDisplay, 0, 0 ) ) {
+		CheckEGLErrorAndLog();
+		return false;
+	}
+	const EGLint configAttributes[] = {
+		EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
+		EGL_BLUE_SIZE, 8,
+		EGL_GREEN_SIZE, 8,
+		EGL_RED_SIZE, 8,
+		EGL_NONE
+    };
+	EGLint configCount;
+	if( !eglChooseConfig( mDisplay, configAttributes, &mConfig, 1, &configCount ) ) {
+		CheckEGLErrorAndLog();
+		Destroy();
+		return false;
+	}
+	EGLint format;
+	if( !eglGetConfigAttrib( mDisplay, mConfig, EGL_NATIVE_VISUAL_ID, &format ) ) {
+		CheckEGLErrorAndLog();
+		Destroy();
+		return false;
+	}
+	ANativeWindow_setBuffersGeometry( window, 0, 0, format );
+	if( !(mSurface = eglCreateWindowSurface( mDisplay, mConfig, window, 0)) ) {
+		CheckEGLErrorAndLog();
+		Destroy();
+		return false;
+	}
+	const EGLint contextAttributes[] = {
+		EGL_CONTEXT_CLIENT_VERSION, 2,
+		EGL_NONE
+	};
+	if( !(mContext = eglCreateContext( mDisplay, mConfig, EGL_NO_CONTEXT, contextAttributes)) ) {
+		CheckEGLErrorAndLog();
+		Destroy();
+		return false;
+	}
+	if( !eglMakeCurrent(mDisplay, mSurface, mSurface, mContext) ) {
+		CheckEGLErrorAndLog();
+		Destroy();
+		return false;
+	}
+
+	eglSwapInterval( mDisplay, mSwapInterval );	// V-sync wait?
+	return true;
 #endif
 }
 void tTVPOpenGLScreen::Destroy() {
@@ -163,7 +214,22 @@ void tTVPOpenGLScreen::Destroy() {
 		::ReleaseDC( (HWND)NativeHandle, mNativeDisplay );
 		mNativeDisplay = 0;
 	}
-#elif define( ANDROID )
+#elif defined( ANDROID )
+	if( mSurface != EGL_NO_SURFACE ) {
+		assert( mDisplay != EGL_NO_DISPLAY );
+		eglDestroySurface( mDisplay, mSurface );
+		mSurface = EGL_NO_SURFACE;
+	}
+	if( mContext != EGL_NO_CONTEXT ) {
+		assert( mDisplay != EGL_NO_DISPLAY );
+		eglDestroyContext( mDisplay, mContext );
+		mContext = EGL_NO_CONTEXT;
+	}
+	if( mDisplay != EGL_NO_DISPLAY ) {
+		eglMakeCurrent( mDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT );
+		eglTerminate( mDisplay );
+		mDisplay = EGL_NO_DISPLAY;
+	}
 #endif
 }
 bool tTVPOpenGLScreen::IsInitialized() const {

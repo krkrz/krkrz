@@ -24,7 +24,8 @@ movie
 msg
 utils
 visual
-visual/gl )
+visual/gl
+visual/opengl )
 
 # Android 用の include ディレクトリ
 if( KRKRZ_TARGET STREQUAL android )
@@ -170,6 +171,7 @@ visual/LayerTreeOwnerImpl.cpp
 visual/LoadJPEG.cpp
 visual/LoadPNG.cpp
 visual/LoadTLG.cpp
+visual/NullDrawDevice.cpp
 visual/PrerenderedFont.cpp
 visual/RectItf.cpp
 visual/SaveTLG5.cpp
@@ -187,7 +189,16 @@ visual/android/WindowForm.cpp
 visual/android/WindowImpl.cpp
 visual/gl/blend_function.cpp
 visual/gl/ResampleImage.cpp
-visual/gl/WeightFunctor.cpp )
+visual/gl/WeightFunctor.cpp
+visual/opengl/CanvasIntf.cpp
+visual/opengl/GLShaderUtil.cpp
+visual/opengl/GLTextureDrawing.cpp
+visual/opengl/Matrix44Intf.cpp
+visual/opengl/Mesh2DIntf.cpp
+visual/opengl/OffscreenIntf.cpp
+visual/opengl/OpenGLPlatformAndroid.cpp
+visual/opengl/OpenGLScreen.cpp
+visual/opengl/TextureIntf.cpp )
 
 if( ANDROID_ABI STREQUAL x86 OR ANDROID_ABI STREQUAL x86_64 )
 	list(APPEND KRKRZ_SRC 

@@ -70,6 +70,7 @@ tTJSNI_Window::Construct(tjs_int numparams, tTJSVariant **param,
 #else
 	Form = new TTVPWindowForm(Application, this);
 #endif
+	CreateCanvas( tjs_obj );
 	return TJS_S_OK;
 }
 //---------------------------------------------------------------------------

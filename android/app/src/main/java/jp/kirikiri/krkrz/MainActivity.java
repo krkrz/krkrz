@@ -146,6 +146,7 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback, E
             AudioOptimalBufferSize = Integer.parseInt(framesPerBuffer);
             if(AudioOptimalBufferSize == 0) AudioOptimalBufferSize = 256; // Use default
         }
+    	GPUType.update();
         initializeNative();
 
         Intent intent = getIntent();
@@ -634,6 +635,7 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback, E
     public void postPlayMovie() { mHandler.post( new PlayMovieEvent()); }
     public void postStopMovie() { mHandler.post( new StopMovieEvent()); }
     public void postPauseMovie() { mHandler.post( new PauseMovieEvent()); }
+    public boolean isSupportGLES3() { return GPUType.isGLES3(); }
 
     /**  動画再生関係  **/
     private MediaSource buildMediaSource(Uri uri) {

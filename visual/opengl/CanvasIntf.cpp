@@ -14,6 +14,7 @@
 #include "OpenGLHeader.h"
 #include "OpenGLScreen.h"
 #include "WindowIntf.h"
+#include "Application.h"
 
 tTJSNI_Canvas::tTJSNI_Canvas() : GLScreen(nullptr), ClearColor(0xff00ff00), BlendMode(tTVPBlendMode::bmAlpha),
 StretchType(tTVPStretchType::stLinear) {
@@ -36,7 +37,9 @@ tjs_error TJS_INTF_METHOD tTJSNI_Canvas::Construct(tjs_int numparams, tTJSVarian
 		if( GLScreen ) delete GLScreen;
 		GLScreen = new tTVPOpenGLScreen( (void*)hWnd );
 #elif defined( ANDROID )
-		
+		ANativeWindow* win = Application->getWindow();
+		if( GLScreen ) delete GLScreen;
+		GLScreen = new tTVPOpenGLScreen( (void*)win );
 #endif
 	}
 	if( !GLScreen ) TVPThrowExceptionMessage( TJS_W("Cannot create low level graphics system(maybe low memory).") );
@@ -68,7 +71,7 @@ void tTJSNI_Canvas::BeginDrawing()
 	EGLint sh = GLScreen->GetSurfaceHeight();
 	glViewport( 0, 0, sw, sh );
 
-	glEnable( GL_TEXTURE_2D );
+	//glEnable( GL_TEXTURE_2D );
 	glEnable( GL_BLEND );
 	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 }
