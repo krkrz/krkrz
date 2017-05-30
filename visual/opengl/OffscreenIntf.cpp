@@ -14,8 +14,6 @@ tjs_error TJS_INTF_METHOD tTJSNI_Offscreen::Construct(tjs_int numparams, tTJSVar
 }
 void TJS_INTF_METHOD tTJSNI_Offscreen::Invalidate() {
 }
-void TJS_INTF_METHOD tTJSNI_Offscreen::Destruct() {
-}
 
 void tTJSNI_Offscreen::CopyFromBitmap( class tTJSNI_Bitmap* bmp, tjs_int sleft, tjs_int stop, tjs_int width, tjs_int height, tjs_int left, tjs_int top ) {}
 void tTJSNI_Offscreen::CopyToBitmap( class tTJSNI_Bitmap* bmp, tjs_int sleft, tjs_int stop, tjs_int width, tjs_int height, tjs_int dleft, tjs_int dtop ) {}

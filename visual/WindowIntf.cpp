@@ -335,7 +335,7 @@ void tTJSNI_BaseWindow::SetDrawDeviceObject(const tTJSVariant & val)
 void tTJSNI_BaseWindow::SetCanvasObject(const tTJSVariant & val)
 {
 	if( CanvasObject.Type() == tvtObject )
-		CanvasObject.AsObjectClosureNoAddRef().Invalidate(0, nullptr, nullptr, DrawDeviceObject.AsObjectNoAddRef());
+		CanvasObject.AsObjectClosureNoAddRef().Invalidate(0, nullptr, nullptr, CanvasObject.AsObjectNoAddRef());
 
 	CanvasObject = val;
 	CanvasInstance = nullptr;
@@ -682,6 +682,7 @@ void TJS_INTF_METHOD tTJSNI_BaseWindow::UnregisterLayerManager(iTVPLayerManager 
 //---------------------------------------------------------------------------
 void tTJSNI_BaseWindow::NotifyWindowExposureToLayer(const tTVPRect &cliprect)
 {
+	if( CanvasInstance ) OnDraw();
 	if( DrawDevice ) DrawDevice->RequestInvalidation(cliprect);
 }
 //---------------------------------------------------------------------------

@@ -14,7 +14,6 @@ public:
 	~tTJSNI_Matrix44() override;
 	tjs_error TJS_INTF_METHOD Construct(tjs_int numparams, tTJSVariant **param, iTJSDispatch2 *tjs_obj) override;
 	void TJS_INTF_METHOD Invalidate() override;
-	void TJS_INTF_METHOD Destruct() override;
 
 	void Set( tjs_real m11, tjs_real m12, tjs_real m13, tjs_real m14,
 			tjs_real m21, tjs_real m22, tjs_real m23, tjs_real m24,

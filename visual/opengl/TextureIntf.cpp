@@ -57,8 +57,6 @@ tjs_error TJS_INTF_METHOD tTJSNI_Texture::Construct(tjs_int numparams, tTJSVaria
 }
 void TJS_INTF_METHOD tTJSNI_Texture::Invalidate() {
 }
-void TJS_INTF_METHOD tTJSNI_Texture::Destruct() {
-}
 
 void tTJSNI_Texture::LoadTexture( class tTVPBaseBitmap* bitmap, bool gray, bool powerOfTwo ) {
 	// TODO: 2の累乗やグレースケール化は考えず、与えられたまま生成

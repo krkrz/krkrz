@@ -55,6 +55,7 @@ void TJS_INTF_METHOD tTJSNI_Canvas::Destruct() {
 		delete GLScreen;
 		GLScreen = nullptr;
 	}
+	tTJSNativeInstance::Destruct();
 }
 void tTJSNI_Canvas::BeginDrawing()
 {

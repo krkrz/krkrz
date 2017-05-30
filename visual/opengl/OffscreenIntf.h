@@ -14,7 +14,6 @@ public:
 	~tTJSNI_Offscreen() override;
 	tjs_error TJS_INTF_METHOD Construct(tjs_int numparams, tTJSVariant **param, iTJSDispatch2 *tjs_obj) override;
 	void TJS_INTF_METHOD Invalidate() override;
-	void TJS_INTF_METHOD Destruct() override;
 
 	// 引数が1つだけの時は、全体コピーでBitmap側のサイズをOffscreenに合わせる
 	void CopyToBitmap( class tTJSNI_Bitmap* bmp );

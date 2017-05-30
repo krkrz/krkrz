@@ -13,8 +13,6 @@ tjs_error TJS_INTF_METHOD tTJSNI_Mesh2D::Construct(tjs_int numparams, tTJSVarian
 }
 void TJS_INTF_METHOD tTJSNI_Mesh2D::Invalidate() {
 }
-void TJS_INTF_METHOD tTJSNI_Mesh2D::Destruct() {
-}
 
 //---------------------------------------------------------------------------
 // tTJSNC_Mesh2D : TJS Mesh2D class

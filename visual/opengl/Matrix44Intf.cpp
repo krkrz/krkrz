@@ -14,8 +14,6 @@ tjs_error TJS_INTF_METHOD tTJSNI_Matrix44::Construct(tjs_int numparams, tTJSVari
 }
 void TJS_INTF_METHOD tTJSNI_Matrix44::Invalidate() {
 }
-void TJS_INTF_METHOD tTJSNI_Matrix44::Destruct() {
-}
 
 void tTJSNI_Matrix44::Set( tjs_real m11, tjs_real m12, tjs_real m13, tjs_real m14,
 		tjs_real m21, tjs_real m22, tjs_real m23, tjs_real m24,
