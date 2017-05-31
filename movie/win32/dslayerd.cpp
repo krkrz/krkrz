@@ -216,9 +216,12 @@ void __stdcall tTVPDSLayerVideo::BuildGraph( HWND callbackwin, IStream *stream,
 			}
 		}
 
-#if 0	// 吉里吉里のBitmapは上下逆の形式らしいので、上下反転のための再接続は必要ない
+#if 1	// 上下反転のための再接続
 		{	// Reconnect buffer render filter
 			// get decoder output pin
+			CComPtr<IPin>	pRdrPinIn;
+			pRdrPinIn = GetInPin( pBRender, 0 );
+
 			CComPtr<IPin>			pDecoderPinOut;
 			if( FAILED(hr = pRdrPinIn->ConnectedTo( &pDecoderPinOut )) )
 				ThrowDShowException(TJS_W("Failed to call pRdrPinIn->ConnectedTo( &pDecoderPinOut )."), hr);
@@ -234,7 +237,7 @@ void __stdcall tTVPDSLayerVideo::BuildGraph( HWND callbackwin, IStream *stream,
 			if( FAILED(hr = pRdrPinIn->Disconnect()) )
 				ThrowDShowException(TJS_W("Failed to call pRdrPinIn->Disconnect()."), hr);
 
-			if( IsEqualGUID( mt.FormatType(), FORMAT_VideoInfo) )
+			if( IsEqualGUID( *mt.FormatType(), FORMAT_VideoInfo) )
 			{	// reverse vertical line
 				VIDEOINFOHEADER	*pVideoInfo;
 				pVideoInfo = reinterpret_cast<VIDEOINFOHEADER*>(mt.Format());
@@ -357,6 +360,8 @@ void __stdcall tTVPDSLayerVideo::GetVideoSize( long *width, long *height )
 
 	if( height != NULL )
 		BufferVideo()->get_VideoHeight( height );
+
+	if( (*height) < 0 ) *height *= -1;
 }
 //----------------------------------------------------------------------------
 //! @brief	  	1フレームの平均表示時間を取得します

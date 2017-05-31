@@ -404,7 +404,7 @@ tTVPBitmap::tTVPBitmap(tjs_uint width, tjs_uint height, tjs_uint bpp, void* bits
 	Width = width;
 	Height = height;
 	PitchBytes = BitmapInfo->GetPitchBytes();
-	PitchStep = -PitchBytes;
+	PitchStep = PitchBytes;
 
 	// set bitmap bits
 	try
@@ -470,7 +470,7 @@ void tTVPBitmap::Allocate(tjs_uint width, tjs_uint height, tjs_uint bpp)
 	Width = width;
 	Height = height;
 	PitchBytes = BitmapInfo->GetPitchBytes();
-	PitchStep = -PitchBytes;
+	PitchStep = PitchBytes;
 
 	// allocate bitmap bits
 	try
@@ -500,7 +500,7 @@ void * tTVPBitmap::GetScanLine(tjs_uint l) const
 			ttstr((tjs_int)BitmapInfo->GetHeight()-1));
 	}
 
-	return (BitmapInfo->GetHeight() - l -1 ) * PitchBytes + (tjs_uint8*)Bits;
+	return l * PitchBytes + (tjs_uint8*)Bits;
 }
 //---------------------------------------------------------------------------
 void tTVPBitmap::SetPaletteCount( tjs_uint count ) {

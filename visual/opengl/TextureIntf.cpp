@@ -60,9 +60,10 @@ void TJS_INTF_METHOD tTJSNI_Texture::Invalidate() {
 
 void tTJSNI_Texture::LoadTexture( class tTVPBaseBitmap* bitmap, bool gray, bool powerOfTwo ) {
 	// TODO: 2の累乗やグレースケール化は考えず、与えられたまま生成
-	// Bitmapが上下反転していること前提だが、正順の方がいいよね…… 直すか考える
-	tjs_uint h = bitmap->GetHeight();
-	Texture.create( bitmap->GetWidth(), h, bitmap->GetScanLine(h-1), bitmap->Is8BPP() ? GL_ALPHA : GL_RGBA );
+	// Bitmapが上下反転していること前提だが、正順の方がいいよね…… 直すか考える -> 正順化
+	//tjs_uint h = bitmap->GetHeight();
+	//Texture.create( bitmap->GetWidth(), h, bitmap->GetScanLine(h-1), bitmap->Is8BPP() ? GL_ALPHA : GL_RGBA );
+	Texture.create( bitmap->GetWidth(), bitmap->GetHeight(), bitmap->GetScanLine(0), bitmap->Is8BPP() ? GL_ALPHA : GL_RGBA );
 }
 tjs_uint tTJSNI_Texture::GetWidth() const {
 	return Texture.width();
