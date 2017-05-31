@@ -307,6 +307,18 @@ public:
 		tTVPRect refrect, tTVPBBBltMethod method, tjs_int opa,
 			bool hda = true);
 
+	// sの最下位8ビットをそのまま出力。DoGrayScaleされた画像を8bit化することを想定
+	struct GrayToAlphaFunctor { inline tjs_uint8 operator()( tjs_uint32 s ) const { return (tjs_uint8)(s&0xff); } };
+	// sをRGB各要素にコピーし、alphaに0xffを入れる
+	struct GrayToColorFunctor { inline tjs_uint32 operator()( tjs_uint8 s ) const { return (tjs_uint32)((s<<16)|(s<<8)|s|0xff000000); } };
+	/**
+	 * 8bpp -> 32bpp か 32bpp -> 8bpp のコピーを行う。
+	 * コピー時にどのように取り扱うかはfuncに従う
+	 * refの幅と高さより、thisは同じか大きい必要がある。
+	 */
+	template <typename tFuncExtractColor>
+	static bool CopyWithDifferentBitWidth( tTVPBaseBitmap *dstbmp, const tTVPBaseBitmap *srcbmp, const tFuncExtractColor& func );
+
 private:
 	template <typename tFunc>
 	static void TVPDoStretchLoop(tFunc func,

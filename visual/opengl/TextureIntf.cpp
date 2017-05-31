@@ -9,13 +9,15 @@
 #include "MsgIntf.h"	// TVPThrowExceptionMessage
 #include "TVPColor.h"	// clNone
 #include <memory>
+#include <assert.h>
 
-tTJSNI_Texture::tTJSNI_Texture() {
+tTJSNI_Texture::tTJSNI_Texture() : SrcWidth(0), SrcHeight(0) {
 	TVPTempBitmapHolderAddRef();
 }
 tTJSNI_Texture::~tTJSNI_Texture() {
 	TVPTempBitmapHolderRelease();
 }
+
 tjs_error TJS_INTF_METHOD tTJSNI_Texture::Construct(tjs_int numparams, tTJSVariant **param, iTJSDispatch2 *tjs_obj) {
 	if( numparams < 1 ) return TJS_E_BADPARAMCOUNT;
 
@@ -32,7 +34,19 @@ tjs_error TJS_INTF_METHOD tTJSNI_Texture::Construct(tjs_int numparams, tTJSVaria
 		std::unique_ptr<tTVPBaseBitmap> bitmap( new tTVPBaseBitmap( TVPGetInitialBitmap() ) );
 		// tTVPBaseBitmap経由して読み込む。キャッシュ機構などは共有される。
 		TVPLoadGraphic( bitmap.get(), filename, clNone, 0, 0, gray ? glmGrayscale : glmNormal, nullptr, nullptr );
-		LoadTexture( bitmap.get(), gray, powerof2 );
+		SrcWidth = bitmap->GetWidth();
+		SrcHeight = bitmap->GetHeight();
+		if( powerof2 ) {
+			// 2のべき乗化を行う
+			tjs_uint w = bitmap->GetWidth();
+			tjs_uint dw = ToPowerOfTwo(w);
+			tjs_uint h = bitmap->GetHeight();
+			tjs_uint dh = ToPowerOfTwo(h);
+			if( w != dw || h != dh ) {
+				bitmap->SetSizeWithFill( dw, dh, 0 );
+			}
+		}
+		LoadTexture( bitmap.get(), gray );
 	} else if( param[0]->Type() == tvtObject ) {
 		tTJSNI_Bitmap* bmp = nullptr;
 		tTJSVariantClosure clo = param[0]->AsObjectClosureNoAddRef();
@@ -49,42 +63,71 @@ tjs_error TJS_INTF_METHOD tTJSNI_Texture::Construct(tjs_int numparams, tTJSVaria
 		if( numparams > 2 ) {
 			powerof2 = (tjs_int)*param[2] ? true : false;
 		}
-		LoadTexture( bmp->GetBitmap(), gray, powerof2 );
+		bool isrecreate = false;
+		const tTVPBaseBitmap* bitmap = bmp->GetBitmap();
+		SrcWidth = bitmap->GetWidth();
+		SrcHeight = bitmap->GetHeight();
+		if( gray == bitmap->Is8BPP() ) {
+			if( powerof2 ) {
+				if( IsPowerOfTwo( bitmap->GetWidth() ) == false || IsPowerOfTwo( bitmap->GetHeight() ) == false ) {
+					isrecreate = true;
+				}
+			}
+		} else {
+			isrecreate = true;
+		}
+		if( isrecreate == false ) {
+			// そのまま生成して問題ない
+			LoadTexture( bitmap, gray );
+		} else {
+			// 変更が入るので、コピーを作る
+			std::unique_ptr<tTVPBaseBitmap> bitmap2( new tTVPBaseBitmap( *bitmap ) );
+			tjs_uint dw = bitmap->GetWidth(), dh = bitmap->GetHeight();
+			if( powerof2 ) {
+				// 2のべき乗化を行う
+				dw = ToPowerOfTwo( bitmap->GetWidth() );
+				dh = ToPowerOfTwo( bitmap->GetHeight() );
+			}
+			if( gray != bitmap->Is8BPP() ) {
+				if( bitmap->Is32BPP() ) {
+					// full color to 8bit color
+					assert( gray );
+					tTVPRect r( 0, 0, bitmap->GetWidth(), bitmap->GetHeight() );
+					bitmap2->DoGrayScale( r );
+					tTVPBaseBitmap::GrayToAlphaFunctor func;
+					std::unique_ptr<tTVPBaseBitmap> bitmap3( new tTVPBaseBitmap( dw, dh, 8 ) );
+					tTVPBaseBitmap::CopyWithDifferentBitWidth( bitmap3.get(), bitmap2.get(), func );
+					bitmap2.reset( bitmap3.release() );
+				} else {
+					// 8bit color to full color
+					tTVPBaseBitmap::GrayToColorFunctor func;
+					std::unique_ptr<tTVPBaseBitmap> bitmap3( new tTVPBaseBitmap( dw, dh, 32 ) );
+					tTVPBaseBitmap::CopyWithDifferentBitWidth( bitmap3.get(), bitmap2.get(), func );
+					bitmap2.reset( bitmap3.release() );
+				}
+			} else {
+				assert( powerof2 );
+				bitmap2->SetSizeWithFill( dw, dh, 0 );
+			}
+			LoadTexture( bitmap2.get(), gray );
+		}
 	} else {
 		return TJS_E_INVALIDPARAM;
 	}
 	return TJS_S_OK;
 }
 void TJS_INTF_METHOD tTJSNI_Texture::Invalidate() {
+	Texture.destory();
 }
 
-void tTJSNI_Texture::LoadTexture( class tTVPBaseBitmap* bitmap, bool gray, bool powerOfTwo ) {
-	// TODO: 2の累乗やグレースケール化は考えず、与えられたまま生成
-	// Bitmapが上下反転していること前提だが、正順の方がいいよね…… 直すか考える -> 正順化
-	//tjs_uint h = bitmap->GetHeight();
-	//Texture.create( bitmap->GetWidth(), h, bitmap->GetScanLine(h-1), bitmap->Is8BPP() ? GL_ALPHA : GL_RGBA );
-	Texture.create( bitmap->GetWidth(), bitmap->GetHeight(), bitmap->GetScanLine(0), bitmap->Is8BPP() ? GL_ALPHA : GL_RGBA );
-}
-tjs_uint tTJSNI_Texture::GetWidth() const {
-	return Texture.width();
-}
-tjs_uint tTJSNI_Texture::GetHeight() const {
-	return Texture.height();
-}
-tjs_uint tTJSNI_Texture::GetMemoryWidth() const {
-	return Texture.width();
-}
-tjs_uint tTJSNI_Texture::GetMemoryHeight() const {
-	return Texture.height();
+void tTJSNI_Texture::LoadTexture( const class tTVPBaseBitmap* bitmap, bool alpha ) {
+	Texture.create( bitmap->GetWidth(), bitmap->GetHeight(), bitmap->GetScanLine(0), alpha ? GL_ALPHA : GL_RGBA );
 }
 bool tTJSNI_Texture::IsGray() const {
-	return false;
+	return Texture.format() == GL_ALPHA;
 }
 bool tTJSNI_Texture::IsPowerOfTwo() const {
-	return false;
-}
-tjs_int64 tTJSNI_Texture::GetNativeHandle() const {
-	return Texture.id();
+	return IsPowerOfTwo( Texture.width() ) && IsPowerOfTwo( Texture.height() );
 }
 
 //---------------------------------------------------------------------------

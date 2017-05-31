@@ -49,6 +49,7 @@ public:
 	GLuint width() const { return width_; }
 	GLuint height() const { return height_; }
 	GLuint id() const { return texture_id_; }
+	GLint format() const { return format_; }
 };
 
 

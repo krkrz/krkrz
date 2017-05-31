@@ -1502,7 +1502,56 @@ void tTVPBaseBitmap::PartialBlt(const PartialBltParam *param)
 	}
 }
 //---------------------------------------------------------------------------
-
+// SIMD で高速化することも出来るけど、頻繁に呼び出すものでもないので単純実装。
+template <typename tFuncExtractColor>
+bool tTVPBaseBitmap::CopyWithDifferentBitWidth( tTVPBaseBitmap *dstbmp, const tTVPBaseBitmap *srcbmp, const tFuncExtractColor& func ) {
+	if( !srcbmp || !dstbmp ) return false;
+	if( dstbmp->Is32BPP() == srcbmp->Is32BPP() ) return false; // 同じなのでコピーしない
+	if( dstbmp->GetWidth() < srcbmp->GetWidth() ) return false;	// 小さいのでコピーしない
+	if( dstbmp->GetHeight() < srcbmp->GetHeight() ) return false;	// 小さいのでコピーしない
+	if( dstbmp->Is8BPP() ) {
+		// 32 -> 8
+		tjs_uint8* dst = (tjs_uint8*)dstbmp->GetScanLineForWrite(0);
+		tjs_int dpitch = dstbmp->GetPitchBytes();
+		const tjs_uint8* src = (const tjs_uint8*)srcbmp->GetScanLine(0);
+		tjs_int spitch = srcbmp->GetPitchBytes();
+		tjs_uint w = srcbmp->GetWidth();
+		tjs_uint h = srcbmp->GetHeight();
+		for( tjs_uint y = 0; y < h; y++ ) {
+			tjs_uint8* d = dst;
+			const tjs_uint32* s = (const tjs_uint32*)src;
+			for( tjs_uint x = 0; x < w; x++ ) {
+				*d = func( *s );
+				d++;
+				s++;
+			}
+			dst += dpitch;
+			src += spitch;
+		}
+	} else {
+		// 8 -> 32
+		tjs_uint8* dst = (tjs_uint8*)dstbmp->GetScanLineForWrite(0);
+		tjs_int dpitch = dstbmp->GetPitchBytes();
+		const tjs_uint8* src = ( const tjs_uint8*)srcbmp->GetScanLine(0);
+		tjs_int spitch = srcbmp->GetPitchBytes();
+		tjs_uint w = srcbmp->GetWidth();
+		tjs_uint h = srcbmp->GetHeight();
+		for( tjs_uint y = 0; y < h; y++ ) {
+			tjs_uint32* d = (tjs_uint32*)dst;
+			const tjs_uint8* s = src;
+			for( tjs_uint x = 0; x < w; x++ ) {
+				*d = func( *s );
+				d++;
+				s++;
+			}
+			dst += dpitch;
+			src += spitch;
+		}
+	}
+	return true;
+}
+template bool tTVPBaseBitmap::CopyWithDifferentBitWidth<tTVPBaseBitmap::GrayToAlphaFunctor>( tTVPBaseBitmap *dstbmp, const tTVPBaseBitmap *srcbmp, const tTVPBaseBitmap::GrayToAlphaFunctor& func );
+template bool tTVPBaseBitmap::CopyWithDifferentBitWidth<tTVPBaseBitmap::GrayToColorFunctor>( tTVPBaseBitmap *dstbmp, const tTVPBaseBitmap *srcbmp, const tTVPBaseBitmap::GrayToColorFunctor& func );
 
 //---------------------------------------------------------------------------
 // template function for strech loop
