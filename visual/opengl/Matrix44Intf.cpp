@@ -1,34 +1,79 @@
 
 #include "tjsCommHead.h"
 
+#include "tjsArray.h"
 #include "Matrix44Intf.h"
 #include "MsgIntf.h"	// TVPThrowExceptionMessage
 #include "tjsArray.h"
+#include <string.h>
 
-tTJSNI_Matrix44::tTJSNI_Matrix44() {
+tTJSNI_Matrix44::tTJSNI_Matrix44() : MatrixArray(nullptr) {
 }
 tTJSNI_Matrix44::~tTJSNI_Matrix44() {
 }
 tjs_error TJS_INTF_METHOD tTJSNI_Matrix44::Construct(tjs_int numparams, tTJSVariant **param, iTJSDispatch2 *tjs_obj) {
+	SetIdentity();
 	return TJS_S_OK;
 }
 void TJS_INTF_METHOD tTJSNI_Matrix44::Invalidate() {
+	if(MatrixArray) MatrixArray->Release(), MatrixArray = nullptr;
 }
 
 void tTJSNI_Matrix44::Set( tjs_real m11, tjs_real m12, tjs_real m13, tjs_real m14,
 		tjs_real m21, tjs_real m22, tjs_real m23, tjs_real m24,
 		tjs_real m31, tjs_real m32, tjs_real m33, tjs_real m34,
-		tjs_real m41, tjs_real m42, tjs_real m43, tjs_real m44 ) {}
-void tTJSNI_Matrix44::Set( tTJSNI_Matrix44* matrix ) {}
-void tTJSNI_Matrix44::Set( tjs_real a[16] ) {}
-void tTJSNI_Matrix44::Set( tjs_int i, tjs_int j, tjs_real a ) {}
-tjs_real tTJSNI_Matrix44::Get( tjs_int i, tjs_int j ) {
-	return 0.0;
+		tjs_real m41, tjs_real m42, tjs_real m43, tjs_real m44 ) {
+	Matrix.m[0][0] = static_cast<float>(m11);
+	Matrix.m[0][1] = static_cast<float>(m12);
+	Matrix.m[0][2] = static_cast<float>(m13);
+	Matrix.m[0][3] = static_cast<float>(m14);
+	Matrix.m[1][0] = static_cast<float>(m21);
+	Matrix.m[1][1] = static_cast<float>(m22);
+	Matrix.m[1][2] = static_cast<float>(m23);
+	Matrix.m[1][3] = static_cast<float>(m24);
+	Matrix.m[2][0] = static_cast<float>(m31);
+	Matrix.m[2][1] = static_cast<float>(m32);
+	Matrix.m[2][2] = static_cast<float>(m33);
+	Matrix.m[2][3] = static_cast<float>(m34);
+	Matrix.m[3][0] = static_cast<float>(m41);
+	Matrix.m[3][1] = static_cast<float>(m42);
+	Matrix.m[3][2] = static_cast<float>(m43);
+	Matrix.m[3][3] = static_cast<float>(m44);
 }
-void tTJSNI_Matrix44::DoIdentity() {
+void tTJSNI_Matrix44::Set( tTJSNI_Matrix44* matrix ) {
+	memcpy( Matrix.a, matrix->Matrix.a, sizeof(Matrix) );
+}
+void tTJSNI_Matrix44::Set( tjs_real a[16] ) {
+	for( tjs_int i = 0; i < 16; i++ ) {
+		Matrix.a[i] = static_cast<float>(a[i]);
+	}
+}
+void tTJSNI_Matrix44::Set( tjs_uint y, tjs_uint x, tjs_real a ) {
+	if( y >= 4 || x >= 4 ) {
+		TVPThrowExceptionMessage(TJSRangeError);
+	}
+	Matrix.m[y][x] = static_cast<float>(a);
+}
+tjs_real tTJSNI_Matrix44::Get( tjs_uint y, tjs_uint x ) {
+	if( y >= 4 || x >= 4 ) {
+		TVPThrowExceptionMessage(TJSRangeError);
+	}
+	return Matrix.m[y][x];
 }
 iTJSDispatch2* tTJSNI_Matrix44::GetMatrixArrayObjectNoAddRef() {
-	return nullptr;
+	if(!MatrixArray) {
+		// create an Array object
+		iTJSDispatch2 * classobj;
+		MatrixArray = TJSCreateArrayObject(&classobj);
+		classobj->Release();
+	}
+
+	for( tjs_int i = 0; i < 16; i++ ) {
+		tTJSVariant val((tjs_real)Matrix.a[i]);
+		MatrixArray->PropSetByNum(TJS_MEMBERENSURE, i, &val, MatrixArray);
+	}
+
+	return MatrixArray;
 }
 
 //---------------------------------------------------------------------------
@@ -80,8 +125,8 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/set)
 	if( numparams == 16 ) {
 		_this->Set( *param[ 0], *param[ 1], *param[ 2], *param[ 3],
 					*param[ 4], *param[ 5], *param[ 6], *param[ 7],
-					*param[ 8], *param[ 9], *param[ 9], *param[10],
-					*param[11], *param[12], *param[13], *param[14] );
+					*param[ 8], *param[ 9], *param[10], *param[11],
+					*param[12], *param[13], *param[14], *param[15] );
 	} else if( numparams == 1 ) {
 		tTJSVariantClosure clo = param[0]->AsObjectClosureNoAddRef();
 		if( clo.Object ) {
@@ -116,7 +161,7 @@ TJS_END_NATIVE_METHOD_DECL(/*func. name*/set)
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/reset)
 {
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Matrix44);
-	_this->DoIdentity();
+	_this->SetIdentity();
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/reset)
