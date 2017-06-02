@@ -60,6 +60,9 @@ class tTJSNI_Canvas : public tTJSNativeInstance
 	class tTVPOpenGLScreen* GLScreen;
 	tTVPGLTextureDrawing GLDrawer;
 
+	// 直前のBeginDrawingで設定したViewportの幅と高さ
+	tjs_int PrevViewportWidth;
+	tjs_int PrevViewportHeight;
 public:
 	tTJSNI_Canvas();
 	~tTJSNI_Canvas() override;
@@ -71,7 +74,7 @@ public:
 	void EndDrawing();
 
 	// method
-	void Capture( class tTJSNI_Bitmap* bmp );
+	void Capture( class tTJSNI_Bitmap* bmp, bool front = true );
 	void Clear();
 	void Clear( tjs_uint32 color );
 	iTJSDispatch2* CreateTexture( class tTJSNI_Bitmap* bmp, bool gray );

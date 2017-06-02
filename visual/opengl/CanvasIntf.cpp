@@ -15,9 +15,12 @@
 #include "OpenGLScreen.h"
 #include "WindowIntf.h"
 #include "Application.h"
+#include "DebugIntf.h"
+
+#include <memory>
 
 tTJSNI_Canvas::tTJSNI_Canvas() : GLScreen(nullptr), ClearColor(0xff00ff00), BlendMode(tTVPBlendMode::bmAlpha),
-StretchType(tTVPStretchType::stLinear) {
+StretchType(tTVPStretchType::stLinear), PrevViewportWidth(0), PrevViewportHeight(0) {
 	TVPInitializeOpenGLPlatform();
 }
 tTJSNI_Canvas::~tTJSNI_Canvas() {
@@ -70,6 +73,8 @@ void tTJSNI_Canvas::BeginDrawing()
 	EGLint sw = GLScreen->GetSurfaceWidth();
 	EGLint sh = GLScreen->GetSurfaceHeight();
 	glViewport( 0, 0, sw, sh );
+	PrevViewportWidth = sw;
+	PrevViewportHeight = sh;
 
 	//glEnable( GL_TEXTURE_2D );
 	glEnable( GL_BLEND );
@@ -79,8 +84,38 @@ void tTJSNI_Canvas::EndDrawing()
 {
 	if( GLScreen ) GLScreen->Swap();
 }
+// rgba と bgra の変換は将来的には SIMD なども考慮したメソッドを準備した方が良さそう。
+#define COLOR_RGBA_TO_BGRA( a ) (((a&0xff0000)>>16)|(a&0xff00ff00)|((a&0xff)<<16))
 // method
-void tTJSNI_Canvas::Capture( class tTJSNI_Bitmap* bmp ) {}
+void tTJSNI_Canvas::Capture( class tTJSNI_Bitmap* bmp, bool front ) {
+	if( !bmp ) {
+		TVPAddLog( TJS_W("Bitmap is null.") );
+		return;
+	}
+
+	// Bitmap の内部表現が正順(上下反転されていない)ことを前提としているので注意
+	if( GLScreen ) {
+		EGLint sw = GLScreen->GetSurfaceWidth();
+		EGLint sh = GLScreen->GetSurfaceHeight();
+		bmp->SetSize( sw, sh, false );
+		tTVPBaseBitmap* b = bmp->GetBitmap();
+		tjs_uint32* dest = reinterpret_cast<tjs_uint32*>(b->GetScanLineForWrite(0));
+		if( GLScreen->CaptureImage( 0, 0, sw, sh, reinterpret_cast<tjs_uint8*>(dest), front ) ) {
+			tjs_int pitch = b->GetPitchBytes();
+			for( tjs_int y = 0; y < sh; y++ ) {
+				tjs_uint32* d = dest;
+				for( tjs_int x = 0; x < sw; x++ ) {
+					d[x] = COLOR_RGBA_TO_BGRA( d[x] );
+				}
+				dest = reinterpret_cast<tjs_uint32*>(reinterpret_cast<tjs_uint8*>(dest)+pitch);
+			}
+		}
+		tTVPRect rect( 0, 0, sw, sh );
+		b->UDFlip(rect);
+	}
+}
+#undef COLOR_RGBA_TO_BGRA
+
 void tTJSNI_Canvas::Clear( tjs_uint32 color ) {
 	tTVPARGB<tjs_uint32> c;
 	c = color;
@@ -163,7 +198,11 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/capture)
 	if( clo.Object ) {
 		if(TJS_FAILED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE, tTJSNC_Bitmap::ClassID, (iTJSNativeInstance**)&dstbmp)))
 			return TJS_E_INVALIDPARAM;
-		_this->Capture( dstbmp );
+		// TODO Offscreenへのキャプチャも実装する
+
+		bool front = true;
+		if( numparams > 1 ) front = ( (tjs_int)param[1] ) ? true : false;
+		_this->Capture( dstbmp, front );
 	}
 
 	return TJS_S_OK;

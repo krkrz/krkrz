@@ -280,4 +280,9 @@ bool tTVPOpenGLScreen::CheckEGLErrorAndLog() {
 	return error_code == EGL_SUCCESS;
 }
 
+bool tTVPOpenGLScreen::CaptureImage( tjs_uint x, tjs_uint y, tjs_uint width, tjs_uint height, tjs_uint8* dest, bool front ) {
+	glReadBuffer( front ? GL_FRONT : GL_BACK );
+	glReadPixels( x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, dest );
+	return CheckEGLErrorAndLog();
+}
 

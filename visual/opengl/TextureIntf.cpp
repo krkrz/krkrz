@@ -121,6 +121,7 @@ void TJS_INTF_METHOD tTJSNI_Texture::Invalidate() {
 }
 
 void tTJSNI_Texture::LoadTexture( const class tTVPBaseBitmap* bitmap, bool alpha ) {
+	// Bitmap の内部表現が正順(上下反転されていない)ことを前提としているので注意
 	Texture.create( bitmap->GetWidth(), bitmap->GetHeight(), bitmap->GetScanLine(0), alpha ? GL_ALPHA : GL_RGBA );
 }
 bool tTJSNI_Texture::IsGray() const {
