@@ -21,13 +21,13 @@ void tTJSNI_Offscreen::CopyToBitmap( class tTJSNI_Bitmap* bmp ) {}
 void tTJSNI_Offscreen::Update() {}
 
 tjs_uint tTJSNI_Offscreen::GetWidth() const {
-	return 0;
+	return FrameBuffer.width();
 }
 tjs_uint tTJSNI_Offscreen::GetHeight() const {
-	return 0;
+	return FrameBuffer.height();
 }
 tjs_int64 tTJSNI_Offscreen::GetNativeHandle() const {
-	return 0;
+	return FrameBuffer.textureId();
 }
 
 //---------------------------------------------------------------------------

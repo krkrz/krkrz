@@ -18,7 +18,8 @@ mDepthBits(-1),
 mStencilBits(-1),
 mMultisample(false),
 mMinSwapInterval(1),
-mMaxSwapInterval(1)
+mMaxSwapInterval(1),
+mDefaultFrameBufferId(0)
 {
 }
 
@@ -137,6 +138,8 @@ bool tTVPOpenGLScreen::Initialize() {
 		return false;
 	}
 	eglSwapInterval( mDisplay, mSwapInterval );	// V-sync wait?
+
+	glGetIntegerv( GL_FRAMEBUFFER_BINDING, &mDefaultFrameBufferId );
 	return true;
 #elif defined( ANDROID )
 	ANativeWindow* window = reinterpret_cast<ANativeWindow*>(NativeHandle);	// Surface(SurfaceView)
@@ -190,6 +193,8 @@ bool tTVPOpenGLScreen::Initialize() {
 	}
 
 	eglSwapInterval( mDisplay, mSwapInterval );	// V-sync wait?
+
+	glGetIntegerv( GL_FRAMEBUFFER_BINDING, &mDefaultFrameBufferId );
 	return true;
 #endif
 }

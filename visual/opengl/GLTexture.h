@@ -4,6 +4,10 @@
 
 #include "OpenGLHeader.h"
 
+#ifdef ANDROID
+extern bool TVPIsSupportGLES3();
+#endif
+
 class GLTexture {
 protected:
 	GLuint texture_id_;
@@ -21,7 +25,6 @@ public:
 	}
 
 	void create( GLuint w, GLuint h, const GLvoid* bits, GLint format=GL_RGBA ) {
-		// glEnable( GL_TEXTURE_2D );
 		glGenTextures( 1, &texture_id_ );
 		glBindTexture( GL_TEXTURE_2D, texture_id_ );
 		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
@@ -31,6 +34,8 @@ public:
 		glTexImage2D( GL_TEXTURE_2D, 0, format, w, h, 0, format, GL_UNSIGNED_BYTE, bits );
 		glBindTexture( GL_TEXTURE_2D, 0 );
 		format_ = format;
+		width_ = w;
+		height_ = h;
 	}
 	void destory() {
 		if( texture_id_ != 0 ) {

@@ -725,6 +725,9 @@
     <ClInclude Include="..\visual\opengl\OpenGLScreen.h">
       <Filter>visual\opengl</Filter>
     </ClInclude>
+    <ClInclude Include="..\visual\opengl\GLFrameBufferObject.h">
+      <Filter>visual\opengl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\tjs2\tjs.cpp">
@@ -1343,6 +1346,9 @@
       <Filter>visual\opengl</Filter>
     </ClCompile>
     <ClCompile Include="..\visual\opengl\OpenGLScreen.cpp">
+      <Filter>visual\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\opengl\GLFrameBufferObject.cpp">
       <Filter>visual\opengl</Filter>
     </ClCompile>
   </ItemGroup>

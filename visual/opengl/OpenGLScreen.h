@@ -24,6 +24,7 @@ class tTVPOpenGLScreen {
 	int mMaxSwapInterval;
 	bool mMultisample;
 
+	GLint mDefaultFrameBufferId;
 #ifdef WIN32
 	//EGLNativeWindowType mParentWindow;	// HWND
 	//EGLNativeWindowType mNativeWindow;	// HWND

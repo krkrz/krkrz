@@ -6,9 +6,12 @@
 #define OffscreenIntfH
 
 #include "tjsNative.h"
+#include "GLFrameBufferObject.h"
 
 class tTJSNI_Offscreen : public tTJSNativeInstance
 {
+	GLFrameBufferObject	FrameBuffer;
+
 public:
 	tTJSNI_Offscreen();
 	~tTJSNI_Offscreen() override;
