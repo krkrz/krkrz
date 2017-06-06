@@ -53,6 +53,7 @@ enum class tTVPStretchType : tjs_int {
 
 class tTJSNI_Canvas : public tTJSNativeInstance
 {
+	bool IsFirst;
 	tjs_uint32 ClearColor;
 	tTVPBlendMode BlendMode;
 	tTVPStretchType StretchType;

@@ -65,7 +65,13 @@ static inline void convert_func_c( tjs_uint32 *dest, tjs_int len, const functor&
 		dest[i] = func( dest[i] );
 	}
 }
-
+template<typename functor>
+static inline void convert_copy_func_c( tjs_uint32 *dest, const tjs_uint32 *src, tjs_int len ) {
+	functor func;
+	for( int i = 0; i < len; i++ ) {
+		dest[i] = func( src[i] );
+	}
+}
 // ブレンドしつつコピー
 template<typename functor>
 static inline void copy_func_c( tjs_uint32 * __restrict dest, const tjs_uint32 * __restrict src, tjs_int len ) {
@@ -358,7 +364,12 @@ DEFINE_CONVERT_FUNCTION( convet_premulalpha_to_alpha );
 DEFINE_CONVERT_FUNCTION( convet_alpha_to_premulalpha );
 DEFINE_ALPHA_COPY_FUNCTION( bind_mask_to_main );
 DEFINE_CONVERT_FUNCTION( do_gray_scale );
-
+static void TVP_red_blue_swap(tjs_uint32 *dest, tjs_int len ) {
+	convert_func_c<red_blue_swap_functor>( dest, len );
+}
+static void TVP_red_blue_swap_copy(tjs_uint32 *dest, const tjs_uint32 *src, tjs_int len ) {
+	convert_copy_func_c<red_blue_swap_functor>( dest, src, len );
+}
 /* simple blur for character data */
 /* shuld be more optimized */
 template<typename functor>
@@ -593,6 +604,8 @@ void TVPGL_C_Init() {
 	TVPReverse8 = TVP_reverse8;
 	TVPReverse32 = TVP_reverse32;
 	TVPDoGrayScale = TVP_do_gray_scale;
+	TVPRedBlueSwap = TVP_red_blue_swap;
+	TVPRedBlueSwapCopy = TVP_red_blue_swap_copy;
 	TVPChBlurMulCopy65 = TVP_ch_blur_mul_copy65;
 	TVPChBlurAddMulCopy65 = TVP_ch_blur_add_mul_copy65;
 	TVPChBlurCopy65 = TVP_ch_blur_copy65;

@@ -57,7 +57,8 @@ enum tTVPGraphicLoadMode
 {
 	glmNormal, // normal, ie. 32bit ARGB graphic
 	glmPalettized, // palettized 8bit mode
-	glmGrayscale // grayscale 8bit mode
+	glmGrayscale, // grayscale 8bit mode
+	glmNormalRGBA // normal, ie. 32bit ABGR(big endian. little endian : RGBA) graphic, GPU native format.
 };
 /*]*/
 

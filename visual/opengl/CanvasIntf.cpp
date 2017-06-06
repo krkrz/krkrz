@@ -16,10 +16,11 @@
 #include "WindowIntf.h"
 #include "Application.h"
 #include "DebugIntf.h"
+#include "tvpgl.h"
 
 #include <memory>
 
-tTJSNI_Canvas::tTJSNI_Canvas() : GLScreen(nullptr), ClearColor(0xff00ff00), BlendMode(tTVPBlendMode::bmAlpha),
+tTJSNI_Canvas::tTJSNI_Canvas() : IsFirst(true), GLScreen(nullptr), ClearColor(0xff00ff00), BlendMode(tTVPBlendMode::bmAlpha),
 StretchType(tTVPStretchType::stLinear), PrevViewportWidth(0), PrevViewportHeight(0) {
 	TVPInitializeOpenGLPlatform();
 }
@@ -65,6 +66,11 @@ void TJS_INTF_METHOD tTJSNI_Canvas::Destruct() {
 }
 void tTJSNI_Canvas::BeginDrawing()
 {
+	if( IsFirst ) {
+		IsFirst = false;
+		glClear( GL_COLOR_BUFFER_BIT );
+		if( GLScreen ) GLScreen->Swap();
+	}
 	tTVPARGB<tjs_uint32> c;
 	c = ClearColor;
 	glClearColor( c.r/255.0f, c.g/255.0f, c.b/255.0f, c.a/255.0f );
@@ -84,8 +90,6 @@ void tTJSNI_Canvas::EndDrawing()
 {
 	if( GLScreen ) GLScreen->Swap();
 }
-// rgba と bgra の変換は将来的には SIMD なども考慮したメソッドを準備した方が良さそう。
-#define COLOR_RGBA_TO_BGRA( a ) (((a&0xff0000)>>16)|(a&0xff00ff00)|((a&0xff)<<16))
 // method
 void tTJSNI_Canvas::Capture( class tTJSNI_Bitmap* bmp, bool front ) {
 	if( !bmp ) {
@@ -100,13 +104,10 @@ void tTJSNI_Canvas::Capture( class tTJSNI_Bitmap* bmp, bool front ) {
 		bmp->SetSize( sw, sh, false );
 		tTVPBaseBitmap* b = bmp->GetBitmap();
 		tjs_uint32* dest = reinterpret_cast<tjs_uint32*>(b->GetScanLineForWrite(0));
-		if( GLScreen->CaptureImage( 0, 0, sw, sh, reinterpret_cast<tjs_uint8*>(dest), front ) ) {
+		if( GLFrameBufferObject::readFrameBuffer( 0, 0, sw, sh, reinterpret_cast<tjs_uint8*>(dest), front ) ) {
 			tjs_int pitch = b->GetPitchBytes();
 			for( tjs_int y = 0; y < sh; y++ ) {
-				tjs_uint32* d = dest;
-				for( tjs_int x = 0; x < sw; x++ ) {
-					d[x] = COLOR_RGBA_TO_BGRA( d[x] );
-				}
+				TVPRedBlueSwap( dest, sw );
 				dest = reinterpret_cast<tjs_uint32*>(reinterpret_cast<tjs_uint8*>(dest)+pitch);
 			}
 		}
@@ -114,7 +115,6 @@ void tTJSNI_Canvas::Capture( class tTJSNI_Bitmap* bmp, bool front ) {
 		b->UDFlip(rect);
 	}
 }
-#undef COLOR_RGBA_TO_BGRA
 
 void tTJSNI_Canvas::Clear( tjs_uint32 color ) {
 	tTVPARGB<tjs_uint32> c;

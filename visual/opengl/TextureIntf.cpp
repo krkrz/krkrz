@@ -33,7 +33,7 @@ tjs_error TJS_INTF_METHOD tTJSNI_Texture::Construct(tjs_int numparams, tTJSVaria
 		ttstr filename = *param[0];
 		std::unique_ptr<tTVPBaseBitmap> bitmap( new tTVPBaseBitmap( TVPGetInitialBitmap() ) );
 		// tTVPBaseBitmap経由して読み込む。キャッシュ機構などは共有される。
-		TVPLoadGraphic( bitmap.get(), filename, clNone, 0, 0, gray ? glmGrayscale : glmNormal, nullptr, nullptr );
+		TVPLoadGraphic( bitmap.get(), filename, clNone, 0, 0, gray ? glmGrayscale : glmNormalRGBA, nullptr, nullptr );
 		SrcWidth = bitmap->GetWidth();
 		SrcHeight = bitmap->GetHeight();
 		if( powerof2 ) {

@@ -334,10 +334,10 @@ void TVPLoadPNG(void* formatdata, void *callbackdata, tTVPGraphicSizeCallback si
 				png_set_filler(png_ptr, 0xff, PNG_FILLER_AFTER);
 				break;
 			case PNG_COLOR_TYPE_RGB_ALPHA:
-				png_set_bgr(png_ptr);
+				if( mode != glmNormalRGBA ) png_set_bgr(png_ptr);
 				break;
 			case PNG_COLOR_TYPE_RGB:
-				png_set_bgr(png_ptr);
+				if( mode != glmNormalRGBA ) png_set_bgr(png_ptr);
 				png_set_filler(png_ptr, 0xff, PNG_FILLER_AFTER);
 				break;
 			default:

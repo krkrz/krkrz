@@ -47,7 +47,5 @@ public:
 	EGLint GetSurfaceHeight() const;
 
 	static bool CheckEGLErrorAndLog();
-
-	bool CaptureImage( tjs_uint x, tjs_uint y, tjs_uint widht, tjs_uint height, tjs_uint8* dest, bool front );
 };
 #endif

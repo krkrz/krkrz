@@ -6439,6 +6439,8 @@ TVP_GL_FUNC_PTR_DECL(void, TVPSwapLine32,  (tjs_uint32 *line1, tjs_uint32 *line2
 TVP_GL_FUNC_PTR_DECL(void, TVPReverse8,  (tjs_uint8 *pixels, tjs_int len));
 TVP_GL_FUNC_PTR_DECL(void, TVPReverse32,  (tjs_uint32 *pixels, tjs_int len));
 TVP_GL_FUNC_PTR_DECL(void, TVPDoGrayScale,  (tjs_uint32 *dest, tjs_int len));
+TVP_GL_FUNC_PTR_DECL(void, TVPRedBlueSwap,  (tjs_uint32 *dest, tjs_int len));
+TVP_GL_FUNC_PTR_DECL(void, TVPRedBlueSwapCopy,  (tjs_uint32 *dest, const tjs_uint32 *src, tjs_int len));
 TVP_GL_FUNC_PTR_DECL(void, TVPInitGammaAdjustTempData,  (tTVPGLGammaAdjustTempData *temp, const tTVPGLGammaAdjustData *data));
 TVP_GL_FUNC_PTR_DECL(void, TVPUninitGammaAdjustTempData,  (tTVPGLGammaAdjustTempData *temp));
 TVP_GL_FUNC_PTR_DECL(void, TVPAdjustGamma,  (tjs_uint32 *dest, tjs_int len, tTVPGLGammaAdjustTempData *temp));

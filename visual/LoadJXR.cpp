@@ -70,6 +70,7 @@ void TVPLoadJXR(void* formatdata, void *callbackdata, tTVPGraphicSizeCallback si
 	tTVPGraphicScanLineCallback scanlinecallback, tTVPMetaInfoPushCallback metainfopushcallback,
 	tTJSBinaryStream *src, tjs_int keyidx,  tTVPGraphicLoadMode mode)
 {
+	if( mode != glmNormal && mode != glmNormalRGBA ) TJS_eTJSError(TJSNotImplemented);
 	CoInitialize(NULL);
 	{
 		tTVPIStreamAdapter* s = new tTVPIStreamAdapter( src );
@@ -109,12 +110,21 @@ void TVPLoadJXR(void* formatdata, void *callbackdata, tTVPGraphicSizeCallback si
 					hr = frame->CopyPixels( &rect, stride, stride*height, (BYTE*)&buff[0] );
 				}
 				int offset = 0;
-				for( UINT i = 0; i < height; i++) {
-					void *scanline = scanlinecallback(callbackdata, i);
-					memcpy( scanline, &buff[offset], width*sizeof(tjs_uint32));
-					offset += stride;
-					scanlinecallback(callbackdata, -1);
-				} 
+				if( mode == glmNormal ) {
+					for( UINT i = 0; i < height; i++) {
+						void *scanline = scanlinecallback(callbackdata, i);
+						memcpy( scanline, &buff[offset], width*sizeof(tjs_uint32));
+						offset += stride;
+						scanlinecallback(callbackdata, -1);
+					}
+				} else {
+					for( UINT i = 0; i < height; i++) {
+						tjs_uint32 *scanline = (tjs_uint32*)scanlinecallback(callbackdata, i);
+						TVPRedBlueSwapCopy( scanline, (const tjs_uint32*)&buff[offset], width );
+						offset += stride;
+						scanlinecallback(callbackdata, -1);
+					}
+				}
 				break;
 			}
 		}

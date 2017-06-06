@@ -13,6 +13,10 @@ protected:
 	GLuint height_;
 	// format は GL_RGBA でないと問題が出る GPU があるようなのでそれのみ。
 
+	
+	
+	void readTextureUseFBO( GLubyte* pixels );
+	//void readTextureUsePBO( GLubyte* pixels );
 public:
 	GLFrameBufferObject() : texture_id_(0), framebuffer_id_(0), renderbuffer_id_(0), width_(0), height_(0) {}
 	~GLFrameBufferObject() {
@@ -36,10 +40,16 @@ public:
 	void bindFramebuffer() {
 		glBindFramebuffer( GL_FRAMEBUFFER, framebuffer_id_ );
 	}
+	void copyImage( GLint x, GLint y, GLint w, GLint h, const GLvoid* bits ) {
+		 glTexSubImage2D( GL_TEXTURE_2D, 0, x, y, w, h, GL_RGBA, GL_UNSIGNED_BYTE, bits );
+	}
 
 	GLuint textureId() const { return texture_id_; }
 	GLuint width() const { return width_; }
 	GLuint height() const { return height_; }
+
+	static bool readFrameBuffer( tjs_uint x, tjs_uint y, tjs_uint width, tjs_uint height, tjs_uint8* dest, bool front );
+	bool readTextureToBitmap( class tTJSNI_Bitmap* bmp );
 };
 
 

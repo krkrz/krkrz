@@ -888,6 +888,11 @@ struct do_gray_scale_functor {
 		return (d1 >> 8) * 0x10101 + (s1 & 0xff000000);
 	}
 };
+struct red_blue_swap_functor {
+	inline tjs_uint32 operator()( tjs_uint32 s ) const {
+		return ( ( ( s & 0xff0000 ) >> 16 ) | ( s & 0xff00ff00 ) | ( ( s & 0xff ) << 16 ) );
+	}
+};
 //--------------------------------------------------------------------------------------------------------
 template<int tmax>
 struct ch_blur_mul_copy_xx_functor {

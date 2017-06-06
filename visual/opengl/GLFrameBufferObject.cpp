@@ -2,6 +2,13 @@
 #include "tjsCommHead.h"
 #include "GLFrameBufferObject.h"
 #include "DebugIntf.h"
+#include "OpenGLScreen.h"
+#include "BitmapIntf.h"
+#include "tvpgl.h"
+
+#ifdef ANDROID
+extern bool TVPIsSupportGLES3();
+#endif
 
 bool GLFrameBufferObject::create( GLuint w, GLuint h ) {
 	destory();
@@ -44,4 +51,67 @@ bool GLFrameBufferObject::create( GLuint w, GLuint h ) {
 	}
 	return result;
 }
+bool GLFrameBufferObject::readFrameBuffer( tjs_uint x, tjs_uint y, tjs_uint width, tjs_uint height, tjs_uint8* dest, bool front ) {
+	glReadBuffer( front ? GL_FRONT : GL_BACK );
+	glReadPixels( x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, dest );
+	return tTVPOpenGLScreen::CheckEGLErrorAndLog();
+}
+bool GLFrameBufferObject::readTextureToBitmap( class tTJSNI_Bitmap* bmp ) {
+#if 0
+	if( !bmp ) {
+		TVPAddLog( TJS_W("Bitmap is null.") );
+		return false;
+	}
 
+	// Bitmap の内部表現が正順(上下反転されていない)ことを前提としているので注意
+	bmp->SetSize( width_, height_, false );
+	tTVPBaseBitmap* b = bmp->GetBitmap();
+	tjs_uint32* dest = reinterpret_cast<tjs_uint32*>(b->GetScanLineForWrite(0));
+
+	// Android の時は ES3 か確認して、FrameBuffer に一度設定してから読み出す処理をする。
+	readTextureUseFBO( reinterpret_cast<tjs_uint8*>(dest) );
+
+	tjs_int pitch = b->GetPitchBytes();
+	for( tjs_int y = 0; y < sh; y++ ) {
+		tjs_uint32* d = dest;
+		for( tjs_int x = 0; x < sw; x++ ) {
+			d[x] = COLOR_RGBA_TO_BGRA( d[x] );
+		}
+		dest = reinterpret_cast<tjs_uint32*>(reinterpret_cast<tjs_uint8*>(dest)+pitch);
+	}
+	tTVPRect rect( 0, 0, width_, height_ );
+	b->UDFlip(rect);
+#endif
+	return false;
+}
+
+void GLFrameBufferObject::readTextureUseFBO( GLubyte* pixels ) {
+	GLint vp[4];
+	glGetIntegerv( GL_VIEWPORT, vp );
+	GLint fb;
+	glGetIntegerv( GL_DRAW_FRAMEBUFFER_BINDING, &fb );
+	if( fb != framebuffer_id_ ) {
+		glBindFramebuffer( GL_FRAMEBUFFER, framebuffer_id_ );
+	}
+	if( vp[2] != width_ || vp[3] != height_ || vp[0] != 0 || vp[1] != 0 ) {
+		glViewport( 0, 0, width_, height_ );
+	}
+	glReadBuffer( GL_BACK );
+	glReadPixels( 0, 0, width_, height_, GL_RGBA, GL_UNSIGNED_BYTE, pixels );
+	if( fb != framebuffer_id_ ) {
+		glBindFramebuffer( GL_FRAMEBUFFER, fb );
+	}
+	if( vp[2] != width_ || vp[3] != height_ || vp[0] != 0 || vp[1] != 0 ) {
+		glViewport( vp[0], vp[1], vp[2], vp[3] );
+	}
+}
+// OpenGL ES 3.0 以降用
+/* glGetTextureImage がないと PBO でも解決できない問題であった……
+void GLFrameBufferObject::readTextureUsePBO( GLubyte* pixels ) {
+	GLuint pbo;
+	glGenBuffers( 1, &pbo );
+	glBindBuffer( GL_PIXEL_PACK_BUFFER, pbo[0] );
+	glBufferData( GL_PIXEL_PACK_BUFFER, width_*height_*4, 0, GL_STREAM_READ );
+	glBindBuffer( GL_PIXEL_PACK_BUFFER, g_iPBOSrc );
+}
+*/

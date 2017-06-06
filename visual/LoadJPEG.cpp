@@ -218,11 +218,21 @@ void TVPLoadJPEG(void* formatdata, void *callbackdata, tTVPGraphicSizeCallback s
 		break;
 	}
 	//flags |= TJFLAG_BOTTOMUP;
-	int pixelFormat = TJPF_BGRA;
-	int numcolor = 4;
-	if(mode == glmGrayscale) {
-		pixelFormat =  TJPF_GRAY;
+	int pixelFormat, numcolor;
+	switch( mode ) {
+	case glmNormalRGBA:
+		pixelFormat = TJPF_RGBA;
+		numcolor = 4;
+		break;
+	case glmGrayscale:
+		pixelFormat = TJPF_GRAY;
 		numcolor = 1;
+		break;
+	case glmNormal:
+	default:
+		pixelFormat = TJPF_BGRA;
+		numcolor = 4;
+		break;
 	}
 
 	unsigned char *buffer = NULL;
@@ -258,6 +268,7 @@ void TVPLoadJPEG(void* formatdata, void *callbackdata, tTVPGraphicSizeCallback s
 	tjDestroy( jpegDecompressor );
 #else
 	// JPEG loading handler
+	static_assert(false,"Not supported non TURBO_JPEG_API.");
 
 	// JPEG does not support palettized image
 	if(mode == glmPalettized)

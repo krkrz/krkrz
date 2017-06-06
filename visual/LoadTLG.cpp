@@ -48,7 +48,7 @@ void TVPLoadTLG5(void* formatdata, void *callbackdata,
 	tTVPGraphicLoadMode mode)
 {
 	// load TLG v5.0 lossless compressed graphic
-	if(mode != glmNormal)
+	if(mode != glmNormal && mode != glmNormalRGBA)
 		TVPThrowExceptionMessage(TVPTLGLoadError, (const tjs_char*)TVPTlgUnsupportedUniversalTransitionRule );
 
 	unsigned char mark[12];
@@ -183,6 +183,15 @@ void TVPLoadTLG5(void* formatdata, void *callbackdata,
 			}
 
 		}
+		if(mode == glmNormalRGBA)
+		{
+			// 読み込み後に変換(直前の行に依存するので途中変換は出来ない)
+			for(tjs_int y = 0; y < height; y++)
+			{
+				tjs_uint32 *current = (tjs_uint32*)scanlinecallback(callbackdata, y);
+				TVPRedBlueSwap( current, width );
+			}
+		}
 	}
 	catch(...)
 	{
@@ -208,10 +217,10 @@ void TVPLoadTLG6(void* formatdata, void *callbackdata,
 	tTVPGraphicScanLineCallback scanlinecallback,
 	tTJSBinaryStream *src,
 	tjs_int keyidx,
-	bool palettized)
+	tTVPGraphicLoadMode mode)
 {
 	// load TLG v6.0 lossless/near-lossless compressed graphic
-	if(palettized)
+	if(mode != glmNormal && mode != glmNormalRGBA)
 		TVPThrowExceptionMessage(TVPTLGLoadError, (const tjs_char*)TVPTlgUnsupportedUniversalTransitionRule );
 
 	unsigned char buf[12];
@@ -401,6 +410,15 @@ void TVPLoadTLG6(void* formatdata, void *callbackdata,
 			}
 
 		}
+		if(mode == glmNormalRGBA)
+		{
+			// 読み込み後に変換(直前の行に依存するので途中変換は出来ない)
+			for(tjs_int y = 0; y < height; y++)
+			{
+				tjs_uint32 *current = (tjs_uint32*)scanlinecallback(callbackdata, y);
+				TVPRedBlueSwap( current, width );
+			}
+		}
 	}
 	catch(...)
 	{
@@ -442,7 +460,7 @@ static void TVPInternalLoadTLG(void* formatdata, void *callbackdata, tTVPGraphic
 	else if(!memcmp("TLG6.0\x00raw\x1a\x00", mark, 11))
 	{
 		TVPLoadTLG6(formatdata, callbackdata, sizecallback,
-			scanlinecallback, src, keyidx, mode!=glmNormal);
+			scanlinecallback, src, keyidx, mode);
 	}
 	else
 	{

@@ -624,8 +624,14 @@ void TVPInternalLoadBMP(void *callbackdata,
 			buf += pitch;
 			bufremain--;
 		}
-
-
+		if(mode == glmNormalRGBA)
+		{
+			for(tjs_int y = 0; y < height; y++)
+			{
+				tjs_uint32 *current = (tjs_uint32*)scanlinecallback(callbackdata, y);
+				TVPRedBlueSwap( current, bi.biWidth );
+			}
+		}
 	}
 	catch(...)
 	{
@@ -1604,7 +1610,7 @@ static bool TVPInternalLoadGraphic(tTVPBaseBitmap *dest, const ttstr &_name,
 	tTVPLoadGraphicData data;
 	data.Dest = dest;
 	data.ColorKey = keyidx;
-	data.Type = mode == glmNormal? lgtFullColor : lgtPalGray;
+	data.Type = (mode == glmNormal || mode == glmNormalRGBA) ? lgtFullColor : lgtPalGray;
 	data.Name = name;
 	data.DesW = desw;
 	data.DesH = desh;
