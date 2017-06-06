@@ -4,20 +4,66 @@
 #include "OffscreenIntf.h"
 #include "MsgIntf.h"	// TVPThrowExceptionMessage
 #include "BitmapIntf.h"
+#include "LayerBitmapIntf.h"
+#include "tvpgl.h"
+#include <memory>
 
 tTJSNI_Offscreen::tTJSNI_Offscreen() {
 }
 tTJSNI_Offscreen::~tTJSNI_Offscreen() {
 }
 tjs_error TJS_INTF_METHOD tTJSNI_Offscreen::Construct(tjs_int numparams, tTJSVariant **param, iTJSDispatch2 *tjs_obj) {
+	if( numparams < 2 ) return TJS_E_BADPARAMCOUNT;
+	tjs_int width = *param[0];
+	tjs_int height = *param[1];
+	bool result = FrameBuffer.create( width, height );
+	if( result == false ) {
+		TVPThrowExceptionMessage( TJS_W("FBO create error.") );
+	}
 	return TJS_S_OK;
 }
 void TJS_INTF_METHOD tTJSNI_Offscreen::Invalidate() {
+	FrameBuffer.destory();
 }
 
-void tTJSNI_Offscreen::CopyFromBitmap( class tTJSNI_Bitmap* bmp, tjs_int sleft, tjs_int stop, tjs_int width, tjs_int height, tjs_int left, tjs_int top ) {}
+void tTJSNI_Offscreen::CopyFromBitmap( class tTJSNI_Bitmap* bmp, tjs_int sleft, tjs_int stop, tjs_int width, tjs_int height, tjs_int left, tjs_int top ) {
+	if( !bmp ) return;
+	tjs_int bw = bmp->GetWidth();
+	tjs_int bh = bmp->GetHeight();
+
+	if( sleft < 0 ) sleft = 0;
+	if( stop < 0 ) stop = 0;
+	if( left < 0 ) {
+		sleft += -left;
+		left = 0;
+	}
+	if( top < 0 ) {
+		stop += -top;
+		top = 0;
+	}
+	if( (sleft+width) > bw ) width = bw - sleft;
+	if( (stop+height) > bh ) height = bh - stop;
+
+	if( (left+width) > (tjs_int)FrameBuffer.width() ) width = FrameBuffer.width() - left;
+	if( (top+height) > (tjs_int)FrameBuffer.height() ) height = FrameBuffer.height() - top;
+	if( width < 0 || height < 0 ) return;	// out of area
+	if( sleft >= bw || stop >= bh ) return;	// out of area
+
+	std::unique_ptr<tjs_uint32[]> buf(new tjs_uint32[width*height]);	// work buffer
+	const tTVPBaseBitmap* bitmap = bmp->GetBitmap();
+	tjs_int bottom = stop + height;
+	for( tjs_int y = top, line = 0; y < bottom; y++, line++ ) {
+		const tjs_uint32* src = reinterpret_cast<const tjs_uint32*>(bitmap->GetScanLine(y));
+		src += sleft;
+		TVPRedBlueSwapCopy( &buf[line*width], src, width );
+	}
+	FrameBuffer.copyImage( left, top, width, height, buf.get() );
+}
 void tTJSNI_Offscreen::CopyToBitmap( class tTJSNI_Bitmap* bmp, tjs_int sleft, tjs_int stop, tjs_int width, tjs_int height, tjs_int dleft, tjs_int dtop ) {}
-void tTJSNI_Offscreen::CopyToBitmap( class tTJSNI_Bitmap* bmp ) {}
+void tTJSNI_Offscreen::CopyToBitmap( class tTJSNI_Bitmap* bmp ) {
+	if( !bmp ) return;
+	FrameBuffer.readTextureToBitmap( bmp );
+}
 void tTJSNI_Offscreen::Update() {}
 
 tjs_uint tTJSNI_Offscreen::GetWidth() const {
@@ -79,7 +125,7 @@ TJS_END_NATIVE_METHOD_DECL(/*func. name*/copyFromBitmap)
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/copyToBitmap)
 {
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Offscreen);
-	if( numparams < 7 || numparams != 1 ) return TJS_E_BADPARAMCOUNT;
+	if( numparams < 7 && numparams != 1 ) return TJS_E_BADPARAMCOUNT;
 
 	tTJSNI_Bitmap* bmp = nullptr;
 	tTJSVariantClosure clo = param[0]->AsObjectClosureNoAddRef();

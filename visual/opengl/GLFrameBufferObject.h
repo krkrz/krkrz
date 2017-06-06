@@ -36,6 +36,7 @@ public:
 			glDeleteFramebuffers( 1, &framebuffer_id_ );
 			framebuffer_id_ = 0;
 		}
+		width_ = height_ = 0;
 	}
 	void bindFramebuffer() {
 		glBindFramebuffer( GL_FRAMEBUFFER, framebuffer_id_ );

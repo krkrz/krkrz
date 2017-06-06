@@ -66,11 +66,16 @@ void TJS_INTF_METHOD tTJSNI_Canvas::Destruct() {
 }
 void tTJSNI_Canvas::BeginDrawing()
 {
+#ifdef WIN32
 	if( IsFirst ) {
 		IsFirst = false;
 		glClear( GL_COLOR_BUFFER_BIT );
 		if( GLScreen ) GLScreen->Swap();
+		// swapするとサーフェイスサイズの変更が反映されるので、Windowsだと初回生成時はサイズが合っていないため
+		// 最初に一度呼び出すことでサーフェイスサイズとクライアント領域のサイズを合わせる。
+		// ダミー描画でonDraw処理してしまうと、一瞬モザイク状の画像が見えてしまったりするので、好ましくない。
 	}
+#endif
 	tTVPARGB<tjs_uint32> c;
 	c = ClearColor;
 	glClearColor( c.r/255.0f, c.g/255.0f, c.b/255.0f, c.a/255.0f );
