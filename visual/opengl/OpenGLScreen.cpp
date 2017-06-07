@@ -259,6 +259,7 @@ EGLint tTVPOpenGLScreen::GetSurfaceHeight() const {
 }
 bool tTVPOpenGLScreen::CheckEGLErrorAndLog() {
 	GLenum error_code = eglGetError();
+	if( error_code == EGL_SUCCESS ) return true;
 	switch( error_code ) {
 /*
 	case EGL_BAD_DISPLAY: TVPAddLog( TJS_W( "Display is not an EGL display connection." ) ); break;
@@ -282,7 +283,20 @@ bool tTVPOpenGLScreen::CheckEGLErrorAndLog() {
 	case EGL_BAD_NATIVE_WINDOW: TVPAddLog( TJS_W( "A NativeWindowType argument does not refer to a valid native window." ) ); break;
 	case EGL_CONTEXT_LOST: TVPAddLog( TJS_W( "A power management event has occurred.The application must destroy all contexts and reinitialise OpenGL ES state and objects to continue rendering." ) ); break;
 	}
-	return error_code == EGL_SUCCESS;
+	return false;
 }
 
+void tTVPOpenGLScreen::SetScissorRect( const tTVPRect& rect ) {
+	// Scissorは左下原点
+	EGLint height;
+	if( eglQuerySurface( mDisplay, mSurface, EGL_HEIGHT, &height ) == EGL_TRUE ) {
+		glScissor( rect.left, height-rect.bottom, rect.get_width(), rect.get_height() );
+		glEnable( GL_SCISSOR_TEST );
+	} else {
+		CheckEGLErrorAndLog();
+	}
+}
+void tTVPOpenGLScreen::DisableScissorRect() {
+	glDisable( GL_SCISSOR_TEST );
+}
 

@@ -56,6 +56,9 @@ tjs_error TJS_INTF_METHOD tTJSNI_Canvas::Construct(tjs_int numparams, tTJSVarian
 	return TJS_S_OK;
 }
 void TJS_INTF_METHOD tTJSNI_Canvas::Invalidate() {
+
+	// release clip rect
+	SetClipRectObject( tTJSVariant() );
 }
 void TJS_INTF_METHOD tTJSNI_Canvas::Destruct() {
 	GLDrawer.DestroyShader();
@@ -133,7 +136,7 @@ iTJSDispatch2* tTJSNI_Canvas::CreateTexture( class tTJSNI_Bitmap* bmp, bool gray
 iTJSDispatch2* tTJSNI_Canvas::CreateTexture( const ttstr &filename, bool gray ) { return nullptr; }
 void tTJSNI_Canvas::DrawScreen( class tTJSNI_Offscreen* screen, tjs_real opacity ) {}
 void tTJSNI_Canvas::DrawScreenUT( class tTJSNI_Offscreen* screen, class tTJSNI_Texture* texture, tjs_int vague, tjs_real opacity ) {}
-void tTJSNI_Canvas::SetClipMask( class tTJSNI_Texture* texture, tjs_int left, tjs_int top ) { /* TODO: 二期実装  */}
+void tTJSNI_Canvas::SetClipMask( class tTJSNI_Texture* texture, tjs_int left, tjs_int top ) { /* TODO: 次期実装  */}
 void tTJSNI_Canvas::Fill( tjs_int left, tjs_int top, tjs_int width, tjs_int height, tjs_uint32 colors[4] ) {
 	EGLint sw = GLScreen->GetSurfaceWidth();
 	EGLint sh = GLScreen->GetSurfaceHeight();
@@ -145,13 +148,40 @@ void tTJSNI_Canvas::DrawTexture( class tTJSNI_Texture* texture, tjs_int left, tj
 	EGLint sh = GLScreen->GetSurfaceHeight();
 	GLDrawer.DrawTexture( texId, left, top, texture->GetWidth(), texture->GetHeight(), sw, sh );
 }
-void tTJSNI_Canvas::DrawText( class tTJSNI_Font* font, tjs_int x, tjs_int y, const ttstr& text, tjs_uint32 color ) {}
+void tTJSNI_Canvas::DrawText( class tTJSNI_Font* font, tjs_int x, tjs_int y, const ttstr& text, tjs_uint32 color ) { /* TODO: 次期実装 */}
+void tTJSNI_Canvas::ApplyClipRect() {
+	if( ClipRectInstance && GLScreen ) {
+		GLScreen->SetScissorRect( ClipRectInstance->Get() );
+	}
+}
+void tTJSNI_Canvas::DisableClipRect() {
+	if( GLScreen ) GLScreen->DisableScissorRect();
+}
 
 // prop
+void tTJSNI_Canvas::SetClipRectObject( const tTJSVariant & val ) {
+	// invalidate existing clip rect
+	if( ClipRectObject.Type() == tvtObject )
+		ClipRectObject.AsObjectClosureNoAddRef().Invalidate( 0, NULL, NULL, ClipRectObject.AsObjectNoAddRef() );
+
+	// assign new rect
+	ClipRectObject = val;
+	ClipRectInstance = nullptr;
+
+	// extract interface
+	if( ClipRectObject.Type() == tvtObject ) {
+		tTJSVariantClosure clo = ClipRectObject.AsObjectClosureNoAddRef();
+		if( clo.Object ) {
+			if( TJS_FAILED( clo.Object->NativeInstanceSupport( TJS_NIS_GETINSTANCE, tTJSNC_Rect::ClassID, (iTJSNativeInstance**)&ClipRectInstance ) ) ) {
+				ClipRectInstance = nullptr;
+				TVPThrowExceptionMessage( TJS_W( "Cannot retrive rect instance." ) );
+			}
+		}
+	}
+}
+
 void tTJSNI_Canvas::SetTargetScreen( class tTJSNI_Offscreen* screen ) {}
 iTJSDispatch2* tTJSNI_Canvas::GetTargetScreenNoAddRef() { return nullptr; }
-void tTJSNI_Canvas::SetClipRect( class tTJSNI_Rect* rect ) {}
-iTJSDispatch2* tTJSNI_Canvas::GetClipRectNoAddRef() { return nullptr; }
 void tTJSNI_Canvas::SetBlendMode( tTVPBlendMode bm ) {}
 tTVPBlendMode tTJSNI_Canvas::GetBlendMode() const { return tTVPBlendMode::bmAlpha; }
 void tTJSNI_Canvas::SetStretchType( tTVPStretchType st ) {}
@@ -435,6 +465,22 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/drawText)
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/drawText)
 //----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/applyClipRect )
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas );
+	_this->ApplyClipRect();
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/applyClipRect )
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/disableClipRect )
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas );
+	_this->DisableClipRect();
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/disableClipRect )
+//----------------------------------------------------------------------
 #if 0
 // Texture クラスのコンストラクタに移動する
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/createTexture)
@@ -539,8 +585,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(clipRect)
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas);
-		iTJSDispatch2 *dsp = _this->GetClipRectNoAddRef();
-		*result = tTJSVariant(dsp, dsp);
+		*result = _this->GetClipRectObject();
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_GETTER
@@ -548,13 +593,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(clipRect)
 	TJS_BEGIN_NATIVE_PROP_SETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas);
-
-		tTJSNI_Rect* rect = nullptr;
-		tTJSVariantClosure clo = param->AsObjectClosureNoAddRef();
-		if(TJS_FAILED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE, tTJSNC_Rect::ClassID, (iTJSNativeInstance**)&rect)))
-			return TJS_E_INVALIDPARAM;
-		if( rect != nullptr ) _this->SetClipRect( rect );
-
+		_this->SetClipRectObject( *param );
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_SETTER

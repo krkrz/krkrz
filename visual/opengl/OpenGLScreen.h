@@ -3,6 +3,7 @@
 #define OpenGLScreenH
 
 #include "OpenGLHeader.h"
+#include "ComplexRect.h"
 
 class tTVPOpenGLScreen {
 	void* NativeHandle;
@@ -47,5 +48,8 @@ public:
 	EGLint GetSurfaceHeight() const;
 
 	static bool CheckEGLErrorAndLog();
+
+	void SetScissorRect( const tTVPRect& rect );
+	void DisableScissorRect();
 };
 #endif

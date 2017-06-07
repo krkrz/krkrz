@@ -67,6 +67,15 @@ class tTJSNI_Canvas : public tTJSNativeInstance
 	tjs_int PrevViewportHeight;
 
 	tTJSHashTable<ttstr, tjs_uint> ShaderList;
+
+	tTJSVariant ClipRectObject;
+	class tTJSNI_Rect* ClipRectInstance;
+public:
+	void SetClipRectObject( const tTJSVariant & val );
+	const tTJSVariant& GetClipRectObject() const { return ClipRectObject; }
+	void ApplyClipRect();
+	void DisableClipRect();
+
 public:
 	tTJSNI_Canvas();
 	~tTJSNI_Canvas() override;
@@ -98,8 +107,6 @@ public:
 	tjs_uint32 GetClearColor() const { return ClearColor; }
 	void SetTargetScreen( class tTJSNI_Offscreen* screen );
 	iTJSDispatch2* GetTargetScreenNoAddRef();
-	void SetClipRect( class tTJSNI_Rect* rect );
-	iTJSDispatch2* GetClipRectNoAddRef();
 	void SetBlendMode( tTVPBlendMode bm );	// --> 直接値設定だけじゃなく、OpenGL ESにも設定してしまった方がいいか
 	tTVPBlendMode GetBlendMode() const;
 	void SetStretchType( tTVPStretchType st );
