@@ -22,7 +22,7 @@
 
 #include <memory>
 
-tTJSNI_Canvas::tTJSNI_Canvas() : IsFirst(true), GLScreen(nullptr), ClearColor(0xff00ff00), BlendMode(tTVPBlendMode::bmAlpha),
+tTJSNI_Canvas::tTJSNI_Canvas() : IsFirst(true), InDrawing(false), GLScreen(nullptr), ClearColor(0xff00ff00), BlendMode(tTVPBlendMode::bmAlpha),
 StretchType(tTVPStretchType::stLinear), PrevViewportWidth(0), PrevViewportHeight(0) {
 	TVPInitializeOpenGLPlatform();
 }
@@ -92,13 +92,39 @@ void tTJSNI_Canvas::BeginDrawing()
 	PrevViewportWidth = sw;
 	PrevViewportHeight = sh;
 
-	//glEnable( GL_TEXTURE_2D );
 	glEnable( GL_BLEND );
-	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+	ApplyBlendMode();
+	InDrawing = true;
 }
 void tTJSNI_Canvas::EndDrawing()
 {
 	if( GLScreen ) GLScreen->Swap();
+	InDrawing = false;
+}
+/**
+ * https://www.khronos.org/registry/OpenGL-Refpages/es2.0/xhtml/glBlendEquation.xml
+ * https://www.khronos.org/registry/OpenGL-Refpages/es2.0/xhtml/glBlendEquationSeparate.xml
+ * https://www.khronos.org/registry/OpenGL-Refpages/es2.0/xhtml/glBlendFunc.xml
+ * https://www.khronos.org/registry/OpenGL-Refpages/es2.0/xhtml/glBlendFuncSeparate.xml
+ */
+void tTJSNI_Canvas::ApplyBlendMode() {
+	glBlendEquation( GL_FUNC_ADD );
+	if( BlendMode == tTVPBlendMode::bmAlpha ) {
+		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+	} else if( BlendMode == tTVPBlendMode::bmOpaque ) {
+		glBlendFuncSeparate( GL_ONE, GL_ZERO, GL_ONE, GL_ZERO );
+	} else if( BlendMode == tTVPBlendMode::bmAdd ) {
+		glBlendFunc( GL_ONE, GL_ONE );
+	} else if( BlendMode == tTVPBlendMode::bmAddWithAlpha ) {
+		glBlendFunc( GL_SRC_ALPHA, GL_ONE );
+
+	/* } else if( BlendMode == tTVPBlendMode::bmAdditive ) {
+		glBlendEquation( GL_FUNC_ADD );
+		glBlendFuncSeparate( GL_SRC_COLOR, GL_SRC_ALPHA, GL_DST_COLOR, GL_DST_ALPHA );
+		*/
+	} else {
+		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+	}
 }
 // method
 void tTJSNI_Canvas::Capture( class tTJSNI_Bitmap* bmp, bool front ) {
@@ -182,8 +208,12 @@ void tTJSNI_Canvas::SetClipRectObject( const tTJSVariant & val ) {
 
 void tTJSNI_Canvas::SetTargetScreen( class tTJSNI_Offscreen* screen ) {}
 iTJSDispatch2* tTJSNI_Canvas::GetTargetScreenNoAddRef() { return nullptr; }
-void tTJSNI_Canvas::SetBlendMode( tTVPBlendMode bm ) {}
-tTVPBlendMode tTJSNI_Canvas::GetBlendMode() const { return tTVPBlendMode::bmAlpha; }
+void tTJSNI_Canvas::SetBlendMode( tTVPBlendMode bm ) {
+	BlendMode = bm;
+	if( InDrawing ) {
+		ApplyBlendMode();
+	}
+}
 void tTJSNI_Canvas::SetStretchType( tTVPStretchType st ) {}
 tTVPStretchType tTJSNI_Canvas::GetStretchType() const { return tTVPStretchType::stLinear; }
 void tTJSNI_Canvas::SetMatrix( class tTJSNI_Matrix44* matrix ) {}

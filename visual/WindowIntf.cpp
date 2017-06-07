@@ -651,10 +651,15 @@ void tTJSNI_BaseWindow::OnDisplayRotate( tjs_int orientation, tjs_int rotate, tj
 void tTJSNI_BaseWindow::OnDraw() {
 	if(!CanDeliverEvents()) return;
 	if( CanvasInstance ) CanvasInstance->BeginDrawing();
-	if(Owner)
-	{
-		static ttstr eventname(TJS_W("onDraw"));
-		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 0, nullptr);
+	try {
+		if( Owner )
+		{
+			static ttstr eventname( TJS_W( "onDraw" ) );
+			TVPPostEvent( Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 0, nullptr );
+		}
+	} catch( ... ) {
+		if( CanvasInstance ) CanvasInstance->EndDrawing();
+		throw;
 	}
 	if( CanvasInstance ) CanvasInstance->EndDrawing();
 }

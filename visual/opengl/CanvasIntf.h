@@ -13,8 +13,13 @@
 #include "tjsHashSearch.h"
 
 enum class tTVPBlendMode : tjs_int {
+	bmOpaque = 0,
+	bmAlpha = 1,
+	bmAdd = 2,
+	bmAddWithAlpha = 3,
+/*
 	bmBinder = ltBinder,
-	ltCoverRect = ltCoverRect,
+	bmCoverRect = ltCoverRect,
 	bmOpaque = ltOpaque, // the same as ltCoverRect
 	bmTransparent = ltTransparent, // alpha blend
 	bmAlpha = ltAlpha, // the same as ltTransparent
@@ -44,6 +49,7 @@ enum class tTVPBlendMode : tjs_int {
 	bmPsDifference = ltPsDifference,
 	bmPsDifference5 = ltPsDifference5,
 	bmPsExclusion = ltPsExclusion
+*/
 };
 
 enum class tTVPStretchType : tjs_int {
@@ -55,6 +61,7 @@ enum class tTVPStretchType : tjs_int {
 class tTJSNI_Canvas : public tTJSNativeInstance
 {
 	bool IsFirst;
+	bool InDrawing;
 	tjs_uint32 ClearColor;
 	tTVPBlendMode BlendMode;
 	tTVPStretchType StretchType;
@@ -75,6 +82,9 @@ public:
 	const tTJSVariant& GetClipRectObject() const { return ClipRectObject; }
 	void ApplyClipRect();
 	void DisableClipRect();
+
+private:
+	void ApplyBlendMode();
 
 public:
 	tTJSNI_Canvas();
@@ -108,7 +118,7 @@ public:
 	void SetTargetScreen( class tTJSNI_Offscreen* screen );
 	iTJSDispatch2* GetTargetScreenNoAddRef();
 	void SetBlendMode( tTVPBlendMode bm );	// --> 直接値設定だけじゃなく、OpenGL ESにも設定してしまった方がいいか
-	tTVPBlendMode GetBlendMode() const;
+	tTVPBlendMode GetBlendMode() const { return BlendMode; }
 	void SetStretchType( tTVPStretchType st );
 	tTVPStretchType GetStretchType() const;
 	void SetMatrix( class tTJSNI_Matrix44* matrix );
