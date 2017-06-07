@@ -17,6 +17,8 @@
 #include "Application.h"
 #include "DebugIntf.h"
 #include "tvpgl.h"
+#include "CharacterSet.h"
+#include "GLShaderUtil.h"
 
 #include <memory>
 
@@ -132,13 +134,16 @@ iTJSDispatch2* tTJSNI_Canvas::CreateTexture( const ttstr &filename, bool gray ) 
 void tTJSNI_Canvas::DrawScreen( class tTJSNI_Offscreen* screen, tjs_real opacity ) {}
 void tTJSNI_Canvas::DrawScreenUT( class tTJSNI_Offscreen* screen, class tTJSNI_Texture* texture, tjs_int vague, tjs_real opacity ) {}
 void tTJSNI_Canvas::SetClipMask( class tTJSNI_Texture* texture, tjs_int left, tjs_int top ) { /* TODO: 二期実装  */}
-void tTJSNI_Canvas::Fill( tjs_int left, tjs_int top, tjs_int width, tjs_int height, tjs_uint32 color ) {}
-void tTJSNI_Canvas::Fill( tjs_int left, tjs_int top, tjs_int width, tjs_int height, tjs_uint32 colors[4] ) {}
+void tTJSNI_Canvas::Fill( tjs_int left, tjs_int top, tjs_int width, tjs_int height, tjs_uint32 colors[4] ) {
+	EGLint sw = GLScreen->GetSurfaceWidth();
+	EGLint sh = GLScreen->GetSurfaceHeight();
+	GLDrawer.DrawColoredPolygon( colors, left, top, width, height, sw, sh );
+}
 void tTJSNI_Canvas::DrawTexture( class tTJSNI_Texture* texture, tjs_int left, tjs_int top ) {
 	GLuint texId = (GLuint)texture->GetNativeHandle();
 	EGLint sw = GLScreen->GetSurfaceWidth();
 	EGLint sh = GLScreen->GetSurfaceHeight();
-	GLDrawer.DrawTexture( texId, 0, 0, texture->GetWidth(), texture->GetHeight(), sw, sh );
+	GLDrawer.DrawTexture( texId, left, top, texture->GetWidth(), texture->GetHeight(), sw, sh );
 }
 void tTJSNI_Canvas::DrawText( class tTJSNI_Font* font, tjs_int x, tjs_int y, const ttstr& text, tjs_uint32 color ) {}
 
@@ -155,6 +160,37 @@ void tTJSNI_Canvas::SetMatrix( class tTJSNI_Matrix44* matrix ) {}
 iTJSDispatch2* tTJSNI_Canvas::GetMatrixNoAddRef() { return nullptr; }
 tjs_uint tTJSNI_Canvas::GetWidth() const { return 0;  }
 tjs_uint tTJSNI_Canvas::GetHeight() const { return 0;  }
+
+tjs_uint tTJSNI_Canvas::RegisterShader( const ttstr& name, const ttstr& vertex, const ttstr& fragment ) {
+	std::string vs;
+	std::string fs;
+	if( TVPUtf16ToUtf8( vs, vertex.AsStdString() ) == false ) {
+		TVPThrowExceptionMessage( TJS_W("Vertex shader character code error.") );
+	}
+	if( TVPUtf16ToUtf8( fs, fragment.AsStdString() ) == false ) {
+		TVPThrowExceptionMessage( TJS_W("Fragment shader character code error.") );
+	}
+	GLuint program = CompileProgram( vs, fs );
+	if( program == 0 ) {
+		TVPThrowExceptionMessage( TJS_W("Shader compile error.") );
+	}
+	ShaderList.Add( name, program );
+	return program;
+}
+tjs_uint tTJSNI_Canvas::FindShader( const ttstr& name ) const {
+	tjs_uint *program = ShaderList.Find( name );
+	if( program ) {
+		return *program;
+	} else {
+		return 0;
+	}
+}
+tjs_uint tTJSNI_Canvas::GetCurrentShader() const {
+	return GLDrawer.GetProgram();
+}
+void tTJSNI_Canvas::SetCurrentShader( tjs_uint index ) {
+	GLDrawer.SetProgram( index );
+}
 
 //---------------------------------------------------------------------------
 // tTJSNC_Canvas : TJS Canvas class
@@ -300,7 +336,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/fill)
 	tTJSVariantType vt = param[4]->Type();
 	tjs_uint32 color = 0xffffffff;
 	if( vt == tvtInteger ) {
-		tjs_uint32 color = (tjs_uint32)(tjs_int64)*param[4];
+		color = (tjs_uint32)(tjs_int64)*param[4];
 	} else if( vt == tvtObject ) {
 		tTJSVariantClosure clo = param[4]->AsObjectClosureNoAddRef();
 		tjs_int count = TJSGetArrayElementCount(clo.Object);
@@ -316,7 +352,8 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/fill)
 			return TJS_S_OK;
 		}
 	}
-	_this->Fill( left, top, width, height, color );
+	tjs_uint32 colors[4] = { color,color,color,color };
+	_this->Fill( left, top, width, height, colors );
 
 	return TJS_S_OK;
 }

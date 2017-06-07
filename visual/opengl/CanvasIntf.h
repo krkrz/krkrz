@@ -10,6 +10,7 @@
 #include "tjsNative.h"
 #include "drawable.h"
 #include "GLTextureDrawing.h"
+#include "tjsHashSearch.h"
 
 enum class tTVPBlendMode : tjs_int {
 	bmBinder = ltBinder,
@@ -64,6 +65,8 @@ class tTJSNI_Canvas : public tTJSNativeInstance
 	// 直前のBeginDrawingで設定したViewportの幅と高さ
 	tjs_int PrevViewportWidth;
 	tjs_int PrevViewportHeight;
+
+	tTJSHashTable<ttstr, tjs_uint> ShaderList;
 public:
 	tTJSNI_Canvas();
 	~tTJSNI_Canvas() override;
@@ -83,10 +86,12 @@ public:
 	void DrawScreen( class tTJSNI_Offscreen* screen, tjs_real opacity );
 	void DrawScreenUT( class tTJSNI_Offscreen* screen, class tTJSNI_Texture* texture, tjs_int vague, tjs_real opacity );
 	void SetClipMask( class tTJSNI_Texture* texture, tjs_int left, tjs_int top );
-	void Fill( tjs_int left, tjs_int top, tjs_int width, tjs_int height, tjs_uint32 color );
+	//void Fill( tjs_int left, tjs_int top, tjs_int width, tjs_int height, tjs_uint32 color );
 	void Fill( tjs_int left, tjs_int top, tjs_int width, tjs_int height, tjs_uint32 colors[4] );
 	void DrawTexture( class tTJSNI_Texture* texture, tjs_int left, tjs_int top );
 	void DrawText( class tTJSNI_Font* font, tjs_int x, tjs_int y, const ttstr& text, tjs_uint32 color );
+	tjs_uint RegisterShader( const ttstr& name, const ttstr& vertex, const ttstr& fragment );
+	tjs_uint FindShader( const ttstr& name ) const;
 
 	// prop
 	void SetClearColor(tjs_uint32 color) { ClearColor = color; }
@@ -103,6 +108,8 @@ public:
 	iTJSDispatch2* GetMatrixNoAddRef();
 	tjs_uint GetWidth() const;
 	tjs_uint GetHeight() const;
+	tjs_uint GetCurrentShader() const;
+	void SetCurrentShader( tjs_uint index );
 };
 
 

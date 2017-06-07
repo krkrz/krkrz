@@ -6,13 +6,17 @@
 
 class tTVPGLTextureDrawing {
 	// Handle to a program object
-	GLuint mProgram;
+	GLuint Program;
 	// Attribute locations
-	GLint mPositionLoc;
-	GLint mTexCoordLoc;
+	GLint PositionLoc;
+	GLint TexCoordLoc;
 	// Sampler location
-	GLint mSamplerLoc;
+	GLint SamplerLoc;
 
+
+	GLuint ProgramColorPoly;
+	GLint PositionColorPolyLoc;
+	GLint ColorColorPolyLoc;
 public:
 	tTVPGLTextureDrawing();
 
@@ -20,6 +24,10 @@ public:
 	bool InitializeShader();
 	void DestroyShader();
 	void DrawTexture( GLuint tex, int x, int y,int w, int h, int sw, int sh );
+	void DrawColoredPolygon( tjs_uint32 color[4], int x, int y, int w, int h, int sw, int sh );
+
+	void SetProgram( GLuint program );
+	GLuint GetProgram() const;
 };
 
 
