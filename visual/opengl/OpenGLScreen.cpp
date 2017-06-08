@@ -137,6 +137,7 @@ bool tTVPOpenGLScreen::Initialize() {
 		Destroy();
 		return false;
 	}
+	mSwapInterval = mMinSwapInterval;
 	eglSwapInterval( mDisplay, mSwapInterval );	// V-sync wait?
 
 	glGetIntegerv( GL_FRAMEBUFFER_BINDING, &mDefaultFrameBufferId );
@@ -192,6 +193,7 @@ bool tTVPOpenGLScreen::Initialize() {
 		return false;
 	}
 
+	mSwapInterval = mMinSwapInterval;
 	eglSwapInterval( mDisplay, mSwapInterval );	// V-sync wait?
 
 	glGetIntegerv( GL_FRAMEBUFFER_BINDING, &mDefaultFrameBufferId );

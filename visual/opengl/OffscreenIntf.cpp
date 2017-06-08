@@ -75,7 +75,9 @@ tjs_uint tTJSNI_Offscreen::GetHeight() const {
 tjs_int64 tTJSNI_Offscreen::GetNativeHandle() const {
 	return FrameBuffer.textureId();
 }
-
+void tTJSNI_Offscreen::BindFrameBuffer() {
+	FrameBuffer.bindFramebuffer();
+}
 //---------------------------------------------------------------------------
 // tTJSNC_Offscreen : TJS Offscreen class
 //---------------------------------------------------------------------------

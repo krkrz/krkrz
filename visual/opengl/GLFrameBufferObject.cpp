@@ -110,6 +110,12 @@ void GLFrameBufferObject::readTextureUseFBO( GLubyte* pixels ) {
 		glViewport( vp[0], vp[1], vp[2], vp[3] );
 	}
 }
+void GLFrameBufferObject::bindFramebuffer() {
+	if( framebuffer_id_ ) {
+		glBindFramebuffer( GL_FRAMEBUFFER, framebuffer_id_ );
+		glViewport( 0, 0, width_, height_ );
+	}
+}
 // OpenGL ES 3.0 以降用
 /* glGetTextureImage がないと PBO でも解決できない問題であった……
 void GLFrameBufferObject::readTextureUsePBO( GLubyte* pixels ) {

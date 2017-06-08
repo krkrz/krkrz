@@ -23,7 +23,8 @@
 #include <memory>
 
 tTJSNI_Canvas::tTJSNI_Canvas() : IsFirst(true), InDrawing(false), GLScreen(nullptr), ClearColor(0xff00ff00), BlendMode(tTVPBlendMode::bmAlpha),
-StretchType(tTVPStretchType::stLinear), PrevViewportWidth(0), PrevViewportHeight(0) {
+StretchType(tTVPStretchType::stLinear), PrevViewportWidth(0), PrevViewportHeight(0),
+RenderTargetInstance(nullptr), ClipRectInstance(nullptr) {
 	TVPInitializeOpenGLPlatform();
 }
 tTJSNI_Canvas::~tTJSNI_Canvas() {
@@ -56,6 +57,9 @@ tjs_error TJS_INTF_METHOD tTJSNI_Canvas::Construct(tjs_int numparams, tTJSVarian
 	return TJS_S_OK;
 }
 void TJS_INTF_METHOD tTJSNI_Canvas::Invalidate() {
+
+	// release render target
+	SetRenterTargetObject( tTJSVariant() );
 
 	// release clip rect
 	SetClipRectObject( tTJSVariant() );
@@ -95,6 +99,10 @@ void tTJSNI_Canvas::BeginDrawing()
 	glEnable( GL_BLEND );
 	ApplyBlendMode();
 	InDrawing = true;
+
+	if( RenderTargetInstance ) {
+		RenderTargetInstance->BindFrameBuffer();
+	}
 }
 void tTJSNI_Canvas::EndDrawing()
 {
@@ -185,6 +193,38 @@ void tTJSNI_Canvas::DisableClipRect() {
 }
 
 // prop
+void tTJSNI_Canvas::SetRenterTargetObject( const tTJSVariant & val ) {
+	// invalidate existing render terget
+	if( RenterTaretObject.Type() == tvtObject )
+		RenterTaretObject.AsObjectClosureNoAddRef().Invalidate( 0, NULL, NULL, RenterTaretObject.AsObjectNoAddRef() );
+
+	// assign new rect
+	RenterTaretObject = val;
+	RenderTargetInstance = nullptr;
+
+	// extract interface
+	if( RenterTaretObject.Type() == tvtObject ) {
+		tTJSVariantClosure clo = RenterTaretObject.AsObjectClosureNoAddRef();
+		if( clo.Object ) {
+			if( TJS_FAILED( clo.Object->NativeInstanceSupport( TJS_NIS_GETINSTANCE, tTJSNC_Offscreen::ClassID, (iTJSNativeInstance**)&RenderTargetInstance ) ) ) {
+				RenderTargetInstance = nullptr;
+				TVPThrowExceptionMessage( TJS_W( "Cannot retrive rect instance." ) );
+			}
+		}
+	}
+
+	// 描画途中であれば、その場でターゲットに指定する
+	if( InDrawing ) {
+		if( RenderTargetInstance ) {
+			RenderTargetInstance->BindFrameBuffer();
+		} else {
+			if( GLScreen ) glBindFramebuffer( GL_FRAMEBUFFER, GLScreen->GetDefaultFrameBufferId() );
+			glViewport( 0, 0, PrevViewportWidth, PrevViewportHeight );
+		}
+	}
+}
+
+
 void tTJSNI_Canvas::SetClipRectObject( const tTJSVariant & val ) {
 	// invalidate existing clip rect
 	if( ClipRectObject.Type() == tvtObject )
@@ -577,13 +617,12 @@ TJS_BEGIN_NATIVE_PROP_DECL(clearColor)
 }
 TJS_END_NATIVE_PROP_DECL(clearColor)
 //----------------------------------------------------------------------
-TJS_BEGIN_NATIVE_PROP_DECL(targetScreen)
+TJS_BEGIN_NATIVE_PROP_DECL( renderTarget )
 {
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas);
-		iTJSDispatch2 *dsp = _this->GetTargetScreenNoAddRef();
-		*result = tTJSVariant(dsp, dsp);
+		*result = _this->GetRenderTargetObject();
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_GETTER
@@ -591,24 +630,16 @@ TJS_BEGIN_NATIVE_PROP_DECL(targetScreen)
 	TJS_BEGIN_NATIVE_PROP_SETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas);
-		// void or null
-
-		tTJSNI_Offscreen* screen = nullptr;
-		tTJSVariantClosure clo = param->AsObjectClosureNoAddRef();
-		if( param->Type() == tvtObject && clo.Object != nullptr ) {
-			tTJSVariantClosure clo = param->AsObjectClosureNoAddRef();
-			if(TJS_FAILED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE, tTJSNC_Offscreen::ClassID, (iTJSNativeInstance**)&screen)))
-				return TJS_E_INVALIDPARAM;
+		if( param->Type() == tvtObject  ) {
+			_this->SetRenterTargetObject( *param );
 		} else if( param->Type() != tvtVoid ) {
-			return TJS_E_INVALIDPARAM;
+			_this->SetRenterTargetObject( tTJSVariant() );
 		}
-		_this->SetTargetScreen( screen );
-
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_SETTER
 }
-TJS_END_NATIVE_PROP_DECL(targetScreen)
+TJS_END_NATIVE_PROP_DECL( renderTarget )
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_PROP_DECL(clipRect)
 {

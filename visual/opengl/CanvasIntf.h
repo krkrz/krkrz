@@ -75,9 +75,15 @@ class tTJSNI_Canvas : public tTJSNativeInstance
 
 	tTJSHashTable<ttstr, tjs_uint> ShaderList;
 
+	tTJSVariant RenterTaretObject;
+	class tTJSNI_Offscreen* RenderTargetInstance;
+
 	tTJSVariant ClipRectObject;
 	class tTJSNI_Rect* ClipRectInstance;
 public:
+	void SetRenterTargetObject( const tTJSVariant & val );
+	const tTJSVariant& GetRenderTargetObject() const { return RenterTaretObject; }
+
 	void SetClipRectObject( const tTJSVariant & val );
 	const tTJSVariant& GetClipRectObject() const { return ClipRectObject; }
 	void ApplyClipRect();

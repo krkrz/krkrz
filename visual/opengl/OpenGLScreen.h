@@ -51,5 +51,7 @@ public:
 
 	void SetScissorRect( const tTVPRect& rect );
 	void DisableScissorRect();
+
+	GLint GetDefaultFrameBufferId() const { return mDefaultFrameBufferId; }
 };
 #endif

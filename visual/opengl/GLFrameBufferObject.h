@@ -38,9 +38,7 @@ public:
 		}
 		width_ = height_ = 0;
 	}
-	void bindFramebuffer() {
-		glBindFramebuffer( GL_FRAMEBUFFER, framebuffer_id_ );
-	}
+	void bindFramebuffer();
 	void copyImage( GLint x, GLint y, GLint w, GLint h, const GLvoid* bits ) {
 		 glTexSubImage2D( GL_TEXTURE_2D, 0, x, y, w, h, GL_RGBA, GL_UNSIGNED_BYTE, bits );
 	}

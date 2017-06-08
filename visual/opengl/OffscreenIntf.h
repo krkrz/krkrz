@@ -27,6 +27,11 @@ public:
 	tjs_uint GetWidth() const;
 	tjs_uint GetHeight() const;
 	tjs_int64 GetNativeHandle() const;
+
+	/**
+	 * 描画対象に設定する
+	 */
+	void BindFrameBuffer();
 };
 
 
