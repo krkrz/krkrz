@@ -16,6 +16,7 @@
 #include "SysInitIntf.h"
 #include "ThreadIntf.h"
 #include "MsgIntf.h"
+#include "DebugIntf.h"
 
 #include "UserEvent.h"
 
@@ -108,15 +109,21 @@ void tTVPTimerThread::Execute()
 				// too large step_next must be diminished to size of tjs_uint.
 				if(step_next >= 0x80000000)
 					sleeptime = 0x7fffffff; // smaller value than step_next is OK
-				else
+				else {
+					if( step_next == 0 ) {
+						step_next = 1;
+					}
 					sleeptime = static_cast<tjs_uint>( step_next );
+				}
 			}
 			else
 			{
 				sleeptime = TVP_TIME_INFINITE;
 			}
 
-			if(List.size() == 0) sleeptime = TVP_TIME_INFINITE;
+			if( List.size() == 0 ) {
+				sleeptime = TVP_TIME_INFINITE;
+			}
 
 			if(any_triggered)
 			{
@@ -133,8 +140,7 @@ void tTVPTimerThread::Execute()
 		// now, sleeptime has sub-milliseconds precision but we need millisecond
 		// precision time.
 		if(sleeptime != TVP_TIME_INFINITE)
-			sleeptime = (sleeptime >> TVP_SUBMILLI_FRAC_BITS) +
-							(sleeptime & ((1<<TVP_SUBMILLI_FRAC_BITS)-1) ? 1: 0); // round up
+			sleeptime = (sleeptime >> TVP_SUBMILLI_FRAC_BITS) + (sleeptime & ((1<<TVP_SUBMILLI_FRAC_BITS)-1) ? 1: 0); // round up
 
 		// clamp to TVP_LEAST_TIMER_INTERVAL ...
 		if(sleeptime != TVP_TIME_INFINITE && sleeptime < TVP_LEAST_TIMER_INTERVAL)
@@ -145,7 +151,6 @@ void tTVPTimerThread::Execute()
 	}
 }
 //---------------------------------------------------------------------------
-//void __fastcall tTVPTimerThread::UtilWndProc(Messages::TMessage &Msg)
 void tTVPTimerThread::Proc( NativeEvent& ev )
 {
 	// Window procedure of UtilWindow
@@ -154,14 +159,14 @@ void tTVPTimerThread::Proc( NativeEvent& ev )
 		// pending events occur
 		tTJSCriticalSectionHolder holder(TVPTimerCS); // protect the object
 
-		std::vector<tTVPTimerBase *>::iterator i;
-		for(i = Pending.begin(); i!=Pending.end(); i ++)
-		{
-			tTVPTimerBase * item = *i;
-			item->FirePendingEventsAndClear();
-		}
-
+		ProcWork.reserve( Pending.size() );
+		ProcWork = Pending;
 		Pending.clear();
+		for( auto i = ProcWork.begin(); i != ProcWork.end(); i++ ) {
+			if( std::find( List.begin(), List.end(), ( *i ) ) != List.end() )
+				(*i)->FirePendingEventsAndClear();	// この呼び出しによってList/Peinding内から削除されるケースがありうるので注意。
+		}
+		ProcWork.clear();
 		PendingEventsAvailable = false;
 	}
 	else
@@ -182,10 +187,8 @@ bool tTVPTimerThread::RemoveItem(tTVPTimerBase *item)
 {
 	tTJSCriticalSectionHolder holder(TVPTimerCS);
 
-	std::vector<tTVPTimerBase *>::iterator i;
-
 	// remove from the List
-	for(i = List.begin(); i != List.end(); /**/)
+	for( auto i = List.begin(); i != List.end(); /**/)
 	{
 		if(*i == item) i = List.erase(i); else i++;
 	}
@@ -199,12 +202,10 @@ bool tTVPTimerThread::RemoveItem(tTVPTimerBase *item)
 void tTVPTimerThread::RemoveFromPendingItem(tTVPTimerBase *item)
 {
 	// remove item from pending list
- 	std::vector<tTVPTimerBase *>::iterator i;
-	for(i = Pending.begin(); i != Pending.end(); /**/)
+	for( auto i = Pending.begin(); i != Pending.end(); /**/)
 	{
 		if(*i == item) i = Pending.erase(i); else i++;
 	}
-
 	item->ZeroPendingCount();
 }
 //---------------------------------------------------------------------------
@@ -310,7 +311,7 @@ void tTVPTimerThread::RegisterToPending(tTVPTimerBase *item)
 
 //---------------------------------------------------------------------------
 tTVPTimerBase::tTVPTimerBase()
- : NextTick(0), Interval(1000), PendingCount(0), Enabled(false)
+ : NextTick(0), Interval(1000 << TVP_SUBMILLI_FRAC_BITS ), PendingCount(0), Enabled(false)
 {
 }
 //---------------------------------------------------------------------------

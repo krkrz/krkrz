@@ -38,8 +38,8 @@ public:
 
 	// タイマー周期
 	void InternalSetInterval(tjs_uint64 n) { Interval = n; }
-	void SetInterval(tjs_uint64 n);
-	tjs_uint64 GetInterval() const { return Interval; }
+	virtual void SetInterval(tjs_uint64 n);
+	virtual tjs_uint64 GetInterval() const { return Interval; }
 
 	// 次回イベントTick
 	tjs_uint64 GetNextTick() const { return NextTick; }
@@ -71,6 +71,7 @@ class tTVPTimerThread : public tTVPThread
 
 	std::vector<tTVPTimerBase *> List;
 	std::vector<tTVPTimerBase *> Pending; // timer object which has pending events
+	std::vector<tTVPTimerBase *> ProcWork;
 	bool PendingEventsAvailable;
 	tTVPThreadEvent Event;
 	

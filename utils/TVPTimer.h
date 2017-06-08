@@ -16,7 +16,7 @@ class TVPTimerEvent : public TVPTimerEventIntarface {
 
 public:
 	TVPTimerEvent( T* owner, void (T::*Handler)() ) : owner_(owner), handler_(Handler) {}
-	void Handle() { (owner_->*handler_)(); }
+	void Handle() override { (owner_->*handler_)(); }
 };
 
 class TVPTimer : public tTVPTimerBase {
@@ -24,15 +24,21 @@ class TVPTimer : public tTVPTimerBase {
 
 protected:
 	// タイマー処理実態。メインスレッドで呼ばれる。
-	virtual void Fire(tjs_uint n) {
+	virtual void Fire(tjs_uint n) override {
 		if( event_ ) {
 			event_->Handle();
 		}
 	}
 
 	// イベントをキャンセルする。SetEnabled/SetIntervalをコールした時内部で呼ばれる。
-	virtual void CancelEvents() {}
+	virtual void CancelEvents() override {}
 
+private:
+	// 隠ぺいする
+	// Interval値は16ビットシフトされたものになっている
+	tjs_uint64 GetInterval() const override {
+		return tTVPTimerBase::GetInterval();
+	}
 public:
 	TVPTimer();
 	virtual ~TVPTimer();
@@ -42,6 +48,8 @@ public:
 		if( event_ ) delete event_;
 		event_ = new TVPTimerEvent<T>( owner, Handler );
 	}
+
+	void SetInterval(tjs_uint64 n) override;
 };
 
 

@@ -47,12 +47,12 @@ public:
 	tTJSNI_Timer();
 	tjs_error TJS_INTF_METHOD
 		Construct(tjs_int numparams, tTJSVariant **param,
-			iTJSDispatch2 *tjs_obj);
-	void TJS_INTF_METHOD Invalidate();
+			iTJSDispatch2 *tjs_obj) override;
+	void TJS_INTF_METHOD Invalidate() override;
 
 protected:
-	virtual void Fire(tjs_uint n);
-	virtual void CancelEvents();
+	void Fire(tjs_uint n) override;
+	void CancelEvents() override;
 	bool AreEventsInQueue();
 
 public:
