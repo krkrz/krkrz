@@ -114,9 +114,12 @@ public:
 	//void Fill( tjs_int left, tjs_int top, tjs_int width, tjs_int height, tjs_uint32 color );
 	void Fill( tjs_int left, tjs_int top, tjs_int width, tjs_int height, tjs_uint32 colors[4] );
 	void DrawTexture( class tTJSNI_Texture* texture, tjs_int left, tjs_int top );
+	void DrawTexture( class tTJSNI_Texture* texture, class tTJSNI_ShaderProgram* shader );
+	void DrawTexture2( class tTJSNI_Texture* texture0, class tTJSNI_Texture* texture1, class tTJSNI_ShaderProgram* shader );
 	void DrawText( class tTJSNI_Font* font, tjs_int x, tjs_int y, const ttstr& text, tjs_uint32 color );
 	tjs_uint RegisterShader( const ttstr& name, const ttstr& vertex, const ttstr& fragment );
 	tjs_uint FindShader( const ttstr& name ) const;
+	void UseShader( class tTJSNI_ShaderProgram* shader );
 
 	// prop
 	void SetClearColor(tjs_uint32 color) { ClearColor = color; }

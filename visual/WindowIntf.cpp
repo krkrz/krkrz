@@ -1000,13 +1000,13 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/hideMouseCursor)
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/hideMouseCursor)
 //----------------------------------------------------------------------
-TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/startDrawing)
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/fireOnDraw)
 {
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window);
 	_this->StartDrawing();
 	return TJS_S_OK;
 }
-TJS_END_NATIVE_METHOD_DECL(/*func. name*/startDrawing)
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/fireOnDraw )
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/postInputEvent)
 {

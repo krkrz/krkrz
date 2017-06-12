@@ -19,6 +19,7 @@
 #include "tvpgl.h"
 #include "CharacterSet.h"
 #include "GLShaderUtil.h"
+#include "ShaderProgramIntf.h"
 
 #include <memory>
 
@@ -182,6 +183,26 @@ void tTJSNI_Canvas::DrawTexture( class tTJSNI_Texture* texture, tjs_int left, tj
 	EGLint sh = GLScreen->GetSurfaceHeight();
 	GLDrawer.DrawTexture( texId, left, top, texture->GetWidth(), texture->GetHeight(), sw, sh );
 }
+void tTJSNI_Canvas::DrawTexture( tTJSNI_Texture* texture, tTJSNI_ShaderProgram* shader ) {
+	GLuint texId = (GLuint)texture->GetNativeHandle();
+	EGLint sw = GLScreen->GetSurfaceWidth();
+	EGLint sh = GLScreen->GetSurfaceHeight();
+	GLint texLoc = shader->FindLocation( std::string( "s_texture" ) );
+	GLint posLoc = shader->FindLocation( std::string( "a_position" ) );
+	GLint uvLoc = shader->FindLocation( std::string( "a_texCoord" ) );
+	GLDrawer.DrawTexture( texId, texture->GetWidth(), texture->GetHeight(), sw, sh, posLoc, uvLoc, texLoc );
+}
+void tTJSNI_Canvas::DrawTexture2( class tTJSNI_Texture* texture0, class tTJSNI_Texture* texture1, class tTJSNI_ShaderProgram* shader ) {
+	GLuint tex0Id = (GLuint)texture0->GetNativeHandle();
+	GLuint tex1Id = (GLuint)texture1->GetNativeHandle();
+	EGLint sw = GLScreen->GetSurfaceWidth();
+	EGLint sh = GLScreen->GetSurfaceHeight();
+	GLint tx0Loc = shader->FindLocation( std::string( "s_texture0" ) );
+	GLint tx1Loc = shader->FindLocation( std::string( "s_texture1" ) );
+	GLint posLoc = shader->FindLocation( std::string( "a_position" ) );
+	GLint uvLoc = shader->FindLocation( std::string( "a_texCoord" ) );
+	GLDrawer.DrawTexture2( tex0Id, tex1Id, texture0->GetWidth(), texture0->GetHeight(), sw, sh, posLoc, uvLoc, tx0Loc, tx1Loc );
+}
 void tTJSNI_Canvas::DrawText( class tTJSNI_Font* font, tjs_int x, tjs_int y, const ttstr& text, tjs_uint32 color ) { /* TODO: 次期実装 */}
 void tTJSNI_Canvas::ApplyClipRect() {
 	if( ClipRectInstance && GLScreen ) {
@@ -190,6 +211,9 @@ void tTJSNI_Canvas::ApplyClipRect() {
 }
 void tTJSNI_Canvas::DisableClipRect() {
 	if( GLScreen ) GLScreen->DisableScissorRect();
+}
+void tTJSNI_Canvas::UseShader( tTJSNI_ShaderProgram* shader ) {
+	shader->SetProgram();
 }
 
 // prop
@@ -490,27 +514,97 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/drawMesh2D)
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/drawMesh2D)
 #endif
 //----------------------------------------------------------------------
-TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/drawTexture)
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/drawTexture )
 {
-	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas);
-	if( numparams < 3 ) return TJS_E_BADPARAMCOUNT;
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas );
+	if( numparams < 2 ) return TJS_E_BADPARAMCOUNT;
 
 	tTJSNI_Texture* texture = nullptr;
-	tTJSVariantClosure clo = param[0]->AsObjectClosureNoAddRef();
-	if( clo.Object ) {
-		if(TJS_FAILED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE, tTJSNC_Texture::ClassID, (iTJSNativeInstance**)&texture)))
-			return TJS_E_INVALIDPARAM;
+	if( param[0]->Type() == tvtObject ) {
+		tTJSVariantClosure clo = param[0]->AsObjectClosureNoAddRef();
+		if( clo.Object ) {
+			if( TJS_FAILED( clo.Object->NativeInstanceSupport( TJS_NIS_GETINSTANCE, tTJSNC_Texture::ClassID, (iTJSNativeInstance**)&texture ) ) )
+				return TJS_E_INVALIDPARAM;
+		}
+		if( !texture ) TVPThrowExceptionMessage( TJS_W( "Parameter require Texture class instance." ) );
+	} else {
+		return TJS_E_INVALIDPARAM;
 	}
-	if(!texture) TVPThrowExceptionMessage(TJS_W("Parameter require Texture class instance."));
 
-	tjs_int left = *param[1];
-	tjs_int top = *param[2];
-
-	_this->DrawTexture( texture, left, top );
-
+	if( param[1]->Type() == tvtObject ) {
+		tTJSNI_ShaderProgram* shader = nullptr;
+		tTJSVariantClosure clo = param[1]->AsObjectClosureNoAddRef();
+		if( clo.Object ) {
+			if( TJS_FAILED( clo.Object->NativeInstanceSupport( TJS_NIS_GETINSTANCE, tTJSNC_ShaderProgram::ClassID, (iTJSNativeInstance**)&shader ) ) )
+				return TJS_E_INVALIDPARAM;
+		}
+		if( !shader ) TVPThrowExceptionMessage( TJS_W( "Parameter require Shader class instance." ) );
+		_this->DrawTexture( texture, shader );
+	} else if( numparams > 2 ) {
+		tjs_int left = *param[1];
+		tjs_int top = *param[2];
+		_this->DrawTexture( texture, left, top );
+	} else {
+		return TJS_E_INVALIDPARAM;
+	}
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/drawTexture)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/drawTexture2 )
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas );
+	if( numparams < 3 ) return TJS_E_BADPARAMCOUNT;
+
+	tTJSNI_Texture* texture0 = nullptr;
+	tTJSVariantClosure clo = param[0]->AsObjectClosureNoAddRef();
+	if( clo.Object ) {
+		if( TJS_FAILED( clo.Object->NativeInstanceSupport( TJS_NIS_GETINSTANCE, tTJSNC_Texture::ClassID, (iTJSNativeInstance**)&texture0 ) ) )
+			return TJS_E_INVALIDPARAM;
+	}
+	if( !texture0 ) TVPThrowExceptionMessage( TJS_W( "Parameter require Texture class instance." ) );
+
+	tTJSNI_Texture* texture1 = nullptr;
+	clo = param[1]->AsObjectClosureNoAddRef();
+	if( clo.Object ) {
+		if( TJS_FAILED( clo.Object->NativeInstanceSupport( TJS_NIS_GETINSTANCE, tTJSNC_Texture::ClassID, (iTJSNativeInstance**)&texture1 ) ) )
+			return TJS_E_INVALIDPARAM;
+	}
+	if( !texture1 ) TVPThrowExceptionMessage( TJS_W( "Parameter require Texture class instance." ) );
+
+	tTJSNI_ShaderProgram* shader = nullptr;
+	clo = param[2]->AsObjectClosureNoAddRef();
+	if( clo.Object ) {
+		if( TJS_FAILED( clo.Object->NativeInstanceSupport( TJS_NIS_GETINSTANCE, tTJSNC_ShaderProgram::ClassID, (iTJSNativeInstance**)&shader ) ) )
+			return TJS_E_INVALIDPARAM;
+	}
+	if( !shader ) TVPThrowExceptionMessage( TJS_W( "Parameter require Shader class instance." ) );
+
+
+	_this->DrawTexture2( texture0, texture1, shader );
+
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/drawTexture2 )
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/setShader )
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas );
+	if( numparams < 1 ) return TJS_E_BADPARAMCOUNT;
+
+	tTJSNI_ShaderProgram* shader = nullptr;
+	tTJSVariantClosure clo = param[0]->AsObjectClosureNoAddRef();
+	if( clo.Object ) {
+		if( TJS_FAILED( clo.Object->NativeInstanceSupport( TJS_NIS_GETINSTANCE, tTJSNC_ShaderProgram::ClassID, (iTJSNativeInstance**)&shader ) ) )
+			return TJS_E_INVALIDPARAM;
+	}
+	if( !shader ) TVPThrowExceptionMessage( TJS_W( "Parameter require Shader class instance." ) );
+
+	_this->UseShader( shader  );
+
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/setShader )
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/drawText)
 {
