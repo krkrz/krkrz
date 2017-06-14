@@ -101,17 +101,7 @@ void tTVPGLTextureDrawing::DestroyShader() {
 		Program = 0;
 	}
 }
-void tTVPGLTextureDrawing::SetProgram( GLuint program ) {
-	glUseProgram(Program);
-	PositionLoc = glGetAttribLocation(Program, "a_position");
-	TexCoordLoc = glGetAttribLocation(Program, "a_texCoord");
-	SamplerLoc = glGetUniformLocation(Program, "s_texture");
-}
-GLuint tTVPGLTextureDrawing::GetProgram() const {
-	GLint program;
-	glGetIntegerv( GL_CURRENT_PROGRAM, &program );
-	return program;
-}
+
 void tTVPGLTextureDrawing::DrawTexture( GLuint tex, int x, int y,int w, int h, int sw, int sh ) {
 	float left  =((float)x/(float)sw)*2.0f-1.0f;
 	float top   =((float)y/(float)sh)*2.0f-1.0f;

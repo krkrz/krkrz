@@ -7,8 +7,9 @@
 
 #include "tjsNative.h"
 #include "GLTexture.h"
+#include "TextureInfo.h"
 
-class tTJSNI_Texture : public tTJSNativeInstance
+class tTJSNI_Texture : public tTJSNativeInstance, public iTVPTextureInfoIntrface
 {
 	GLTexture Texture;
 	tjs_uint SrcWidth;
@@ -22,13 +23,13 @@ public:
 	tjs_error TJS_INTF_METHOD Construct(tjs_int numparams, tTJSVariant **param, iTJSDispatch2 *tjs_obj) override;
 	void TJS_INTF_METHOD Invalidate() override;
 
-	tjs_uint GetWidth() const { return SrcWidth; }
-	tjs_uint GetHeight() const { return SrcHeight; }
+	tjs_uint GetWidth() const override { return SrcWidth; }
+	tjs_uint GetHeight() const override { return SrcHeight; }
 	tjs_uint GetMemoryWidth() const { return Texture.width(); }
 	tjs_uint GetMemoryHeight() const { return Texture.height(); }
 	bool IsGray() const;
 	bool IsPowerOfTwo() const;
-	tjs_int64 GetNativeHandle() const { return Texture.id(); }
+	tjs_int64 GetNativeHandle() const override { return Texture.id(); }
 
 	static inline bool IsPowerOfTwo( tjs_uint x ) { return (x & (x - 1)) == 0; }
 	static inline tjs_uint ToPowerOfTwo( tjs_uint x ) {
@@ -40,6 +41,13 @@ public:
 		}
 		return x;
 	}
+	
+	tjs_int GetStretchType() const;
+	void SetStretchType( tjs_int v );
+	tjs_int GetWrapModeHorizontal() const;
+	void SetWrapModeHorizontal( tjs_int v );
+	tjs_int GetWrapModeVertical() const;
+	void SetWrapModeVertical( tjs_int v );
 };
 
 

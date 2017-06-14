@@ -15,9 +15,12 @@ protected:
 	GLuint width_;
 	GLuint height_;
 
+	GLenum stretchType_;
+	GLenum wrapS_;
+	GLenum wrapT_;
 public:
-	GLTexture() : texture_id_(0), width_(0), height_(0), format_(0) {}
-	GLTexture( GLuint w, GLuint h, const GLvoid* bits, GLint format=GL_RGBA ) : width_(w), height_(h) {
+	GLTexture() : texture_id_(0), width_(0), height_(0), format_(0), stretchType_(GL_LINEAR), wrapS_(GL_CLAMP_TO_EDGE), wrapT_(GL_CLAMP_TO_EDGE) {}
+	GLTexture( GLuint w, GLuint h, const GLvoid* bits, GLint format=GL_RGBA ) : width_(w), height_(h), stretchType_(GL_LINEAR), wrapS_(GL_CLAMP_TO_EDGE), wrapT_(GL_CLAMP_TO_EDGE) {
 		create( w, h, bits, format );
 	}
 	~GLTexture() {
@@ -27,10 +30,10 @@ public:
 	void create( GLuint w, GLuint h, const GLvoid* bits, GLint format=GL_RGBA ) {
 		glGenTextures( 1, &texture_id_ );
 		glBindTexture( GL_TEXTURE_2D, texture_id_ );
-		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,stretchType_);
+		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,stretchType_);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapS_);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapT_);
 		glTexImage2D( GL_TEXTURE_2D, 0, format, w, h, 0, format, GL_UNSIGNED_BYTE, bits );
 		glBindTexture( GL_TEXTURE_2D, 0 );
 		format_ = format;
@@ -55,6 +58,35 @@ public:
 	GLuint height() const { return height_; }
 	GLuint id() const { return texture_id_; }
 	GLint format() const { return format_; }
+
+	GLenum stretchType() const { return stretchType_; }
+	void setStretchType( GLenum s ) {
+		if( texture_id_ && stretchType_ != s ) {
+			glBindTexture( GL_TEXTURE_2D, texture_id_ );
+			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, s );
+			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, s );
+			glBindTexture( GL_TEXTURE_2D, 0 );
+		}
+		stretchType_ = s;
+	}
+	GLenum wrapS() const { return wrapS_; }
+	void setWrapS( GLenum s ) {
+		if( texture_id_ && wrapS_ != s ) {
+			glBindTexture( GL_TEXTURE_2D, texture_id_ );
+			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, s );
+			glBindTexture( GL_TEXTURE_2D, 0 );
+		}
+		wrapS_ = s;
+	}
+	GLenum wrapT() const { return wrapT_; }
+	void setWrapT( GLenum s ) {
+		if( texture_id_ && wrapT_ != s ) {
+			glBindTexture( GL_TEXTURE_2D, texture_id_ );
+			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, s );
+			glBindTexture( GL_TEXTURE_2D, 0 );
+		}
+		wrapT_ = s;
+	}
 };
 
 

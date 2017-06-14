@@ -11,13 +11,15 @@
 #include <memory>
 #include <assert.h>
 
+//----------------------------------------------------------------------
 tTJSNI_Texture::tTJSNI_Texture() : SrcWidth(0), SrcHeight(0) {
 	TVPTempBitmapHolderAddRef();
 }
+//----------------------------------------------------------------------
 tTJSNI_Texture::~tTJSNI_Texture() {
 	TVPTempBitmapHolderRelease();
 }
-
+//----------------------------------------------------------------------
 tjs_error TJS_INTF_METHOD tTJSNI_Texture::Construct(tjs_int numparams, tTJSVariant **param, iTJSDispatch2 *tjs_obj) {
 	if( numparams < 1 ) return TJS_E_BADPARAMCOUNT;
 
@@ -116,20 +118,48 @@ tjs_error TJS_INTF_METHOD tTJSNI_Texture::Construct(tjs_int numparams, tTJSVaria
 	}
 	return TJS_S_OK;
 }
+//----------------------------------------------------------------------
 void TJS_INTF_METHOD tTJSNI_Texture::Invalidate() {
 	Texture.destory();
 }
-
+//----------------------------------------------------------------------
 void tTJSNI_Texture::LoadTexture( const class tTVPBaseBitmap* bitmap, bool alpha ) {
 	// Bitmap の内部表現が正順(上下反転されていない)ことを前提としているので注意
 	Texture.create( bitmap->GetWidth(), bitmap->GetHeight(), bitmap->GetScanLine(0), alpha ? GL_ALPHA : GL_RGBA );
 }
+//----------------------------------------------------------------------
 bool tTJSNI_Texture::IsGray() const {
 	return Texture.format() == GL_ALPHA;
 }
+//----------------------------------------------------------------------
 bool tTJSNI_Texture::IsPowerOfTwo() const {
 	return IsPowerOfTwo( Texture.width() ) && IsPowerOfTwo( Texture.height() );
 }
+//----------------------------------------------------------------------
+tjs_int tTJSNI_Texture::GetStretchType() const {
+	return static_cast<tjs_int>(Texture.stretchType());
+}
+//----------------------------------------------------------------------
+void tTJSNI_Texture::SetStretchType( tjs_int v ) {
+	Texture.setStretchType( static_cast<GLenum>(v) );
+}
+//----------------------------------------------------------------------
+tjs_int tTJSNI_Texture::GetWrapModeHorizontal() const {
+	return static_cast<tjs_int>(Texture.wrapS());
+}
+//----------------------------------------------------------------------
+void tTJSNI_Texture::SetWrapModeHorizontal( tjs_int v ) {
+	Texture.setWrapS( static_cast<GLenum>(v) );
+}
+//----------------------------------------------------------------------
+tjs_int tTJSNI_Texture::GetWrapModeVertical() const {
+	return static_cast<tjs_int>(Texture.wrapT());
+}
+//----------------------------------------------------------------------
+void tTJSNI_Texture::SetWrapModeVertical( tjs_int v ) {
+	Texture.setWrapT( static_cast<GLenum>(v) );
+}
+//----------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
 // tTJSNC_Texture : TJS Texture class
@@ -257,6 +287,106 @@ TJS_BEGIN_NATIVE_PROP_DECL(nativeHandle)
 	TJS_DENY_NATIVE_PROP_SETTER
 }
 TJS_END_NATIVE_PROP_DECL(nativeHandle)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(stretchType)
+{
+	TJS_BEGIN_NATIVE_PROP_GETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Texture);
+		*result = (tjs_int)_this->GetStretchType();
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_GETTER
+
+	TJS_BEGIN_NATIVE_PROP_SETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Texture);
+		_this->SetStretchType( (tjs_int)*param );
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_PROP_DECL(stretchType)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(wrapModeHorizontal)
+{
+	TJS_BEGIN_NATIVE_PROP_GETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Texture);
+		*result = (tjs_int)_this->GetWrapModeHorizontal();
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_GETTER
+
+	TJS_BEGIN_NATIVE_PROP_SETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Texture);
+		_this->SetWrapModeHorizontal( (tjs_int)*param );
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_PROP_DECL(wrapModeHorizontal)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(wrapModeVertical)
+{
+	TJS_BEGIN_NATIVE_PROP_GETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Texture);
+		*result = (tjs_int)_this->GetWrapModeVertical();
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_GETTER
+
+	TJS_BEGIN_NATIVE_PROP_SETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Texture);
+		_this->SetWrapModeVertical( (tjs_int)*param );
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_PROP_DECL(wrapModeVertical)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(stNearest) {
+	TJS_BEGIN_NATIVE_PROP_GETTER {
+		*result = (tjs_int)GL_NEAREST;
+		return TJS_S_OK;
+	} TJS_END_NATIVE_PROP_GETTER
+	TJS_DENY_NATIVE_PROP_SETTER
+} TJS_END_NATIVE_STATIC_PROP_DECL(stNearest)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(stLinear) {
+	TJS_BEGIN_NATIVE_PROP_GETTER {
+		*result = (tjs_int)GL_LINEAR;
+		return TJS_S_OK;
+	} TJS_END_NATIVE_PROP_GETTER
+	TJS_DENY_NATIVE_PROP_SETTER
+} TJS_END_NATIVE_STATIC_PROP_DECL(stLinear)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(wmRepeat) {
+	TJS_BEGIN_NATIVE_PROP_GETTER {
+		*result = (tjs_int)GL_REPEAT;
+		return TJS_S_OK;
+	} TJS_END_NATIVE_PROP_GETTER
+	TJS_DENY_NATIVE_PROP_SETTER
+} TJS_END_NATIVE_STATIC_PROP_DECL(wmRepeat)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(wmClampToEdge) {
+	TJS_BEGIN_NATIVE_PROP_GETTER {
+		*result = (tjs_int)GL_CLAMP_TO_EDGE;
+		return TJS_S_OK;
+	} TJS_END_NATIVE_PROP_GETTER
+	TJS_DENY_NATIVE_PROP_SETTER
+} TJS_END_NATIVE_STATIC_PROP_DECL(wmClampToEdge)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(wmMirror) {
+	TJS_BEGIN_NATIVE_PROP_GETTER {
+		*result = (tjs_int)GL_MIRRORED_REPEAT;
+		return TJS_S_OK;
+	} TJS_END_NATIVE_PROP_GETTER
+	TJS_DENY_NATIVE_PROP_SETTER
+} TJS_END_NATIVE_STATIC_PROP_DECL(wmMirror)
 //----------------------------------------------------------------------
 
 	TJS_END_NATIVE_MEMBERS

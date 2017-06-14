@@ -27,9 +27,6 @@ public:
 	void DrawColoredPolygon( tjs_uint32 color[4], int x, int y, int w, int h, int sw, int sh );
 	void DrawTexture( GLuint tex, int w, int h, int sw, int sh, GLint posLoc, GLint uvLoc, GLint texLoc );
 	void DrawTexture2( GLuint tex0, GLuint tex1, int w, int h, int sw, int sh, GLint posLoc, GLint uvLoc, GLint tx0Loc, GLint tx1Loc );
-
-	void SetProgram( GLuint program );
-	GLuint GetProgram() const;
 };
 
 

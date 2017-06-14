@@ -80,6 +80,9 @@ class tTJSNI_Canvas : public tTJSNativeInstance
 
 	tTJSVariant ClipRectObject;
 	class tTJSNI_Rect* ClipRectInstance;
+
+	tTJSVariant Matrix44Object;
+	class tTJSNI_Matrix44* Matrix44Instance;
 public:
 	void SetRenterTargetObject( const tTJSVariant & val );
 	const tTJSVariant& GetRenderTargetObject() const { return RenterTaretObject; }
@@ -88,6 +91,10 @@ public:
 	const tTJSVariant& GetClipRectObject() const { return ClipRectObject; }
 	void ApplyClipRect();
 	void DisableClipRect();
+
+	void SetMatrix44Object( const tTJSVariant & val );
+	const tTJSVariant& GetMatrix44Object() const { return Matrix44Object; }
+
 
 private:
 	void ApplyBlendMode();
@@ -104,10 +111,8 @@ public:
 
 	// method
 	void Capture( class tTJSNI_Bitmap* bmp, bool front = true );
-	void Clear();
 	void Clear( tjs_uint32 color );
-	iTJSDispatch2* CreateTexture( class tTJSNI_Bitmap* bmp, bool gray );
-	iTJSDispatch2* CreateTexture( const ttstr &filename, bool gray );
+
 	void DrawScreen( class tTJSNI_Offscreen* screen, tjs_real opacity );
 	void DrawScreenUT( class tTJSNI_Offscreen* screen, class tTJSNI_Texture* texture, tjs_int vague, tjs_real opacity );
 	void SetClipMask( class tTJSNI_Texture* texture, tjs_int left, tjs_int top );
@@ -130,12 +135,8 @@ public:
 	tTVPBlendMode GetBlendMode() const { return BlendMode; }
 	void SetStretchType( tTVPStretchType st );
 	tTVPStretchType GetStretchType() const;
-	void SetMatrix( class tTJSNI_Matrix44* matrix );
-	iTJSDispatch2* GetMatrixNoAddRef();
 	tjs_uint GetWidth() const;
 	tjs_uint GetHeight() const;
-	tjs_uint GetCurrentShader() const;
-	void SetCurrentShader( tjs_uint index );
 };
 
 

@@ -20,12 +20,13 @@
 #include "CharacterSet.h"
 #include "GLShaderUtil.h"
 #include "ShaderProgramIntf.h"
+#include "Matrix44Intf.h"
 
 #include <memory>
 
 tTJSNI_Canvas::tTJSNI_Canvas() : IsFirst(true), InDrawing(false), GLScreen(nullptr), ClearColor(0xff00ff00), BlendMode(tTVPBlendMode::bmAlpha),
 StretchType(tTVPStretchType::stLinear), PrevViewportWidth(0), PrevViewportHeight(0),
-RenderTargetInstance(nullptr), ClipRectInstance(nullptr) {
+RenderTargetInstance(nullptr), ClipRectInstance(nullptr), Matrix44Instance(nullptr) {
 	TVPInitializeOpenGLPlatform();
 }
 tTJSNI_Canvas::~tTJSNI_Canvas() {
@@ -167,8 +168,6 @@ void tTJSNI_Canvas::Clear( tjs_uint32 color ) {
 	glClearColor( c.r/255.0f, c.g/255.0f, c.b/255.0f, c.a/255.0f );
 	glClear( GL_COLOR_BUFFER_BIT );
 }
-iTJSDispatch2* tTJSNI_Canvas::CreateTexture( class tTJSNI_Bitmap* bmp, bool gray ) { return nullptr; }
-iTJSDispatch2* tTJSNI_Canvas::CreateTexture( const ttstr &filename, bool gray ) { return nullptr; }
 void tTJSNI_Canvas::DrawScreen( class tTJSNI_Offscreen* screen, tjs_real opacity ) {}
 void tTJSNI_Canvas::DrawScreenUT( class tTJSNI_Offscreen* screen, class tTJSNI_Texture* texture, tjs_int vague, tjs_real opacity ) {}
 void tTJSNI_Canvas::SetClipMask( class tTJSNI_Texture* texture, tjs_int left, tjs_int top ) { /* TODO: 次期実装  */}
@@ -270,6 +269,27 @@ void tTJSNI_Canvas::SetClipRectObject( const tTJSVariant & val ) {
 	}
 }
 
+void tTJSNI_Canvas::SetMatrix44Object( const tTJSVariant & val ) {
+	// invalidate existing matrix
+	if( Matrix44Object.Type() == tvtObject )
+		Matrix44Object.AsObjectClosureNoAddRef().Invalidate( 0, NULL, NULL, Matrix44Object.AsObjectNoAddRef() );
+
+	// assign new matrix
+	Matrix44Object = val;
+	Matrix44Instance = nullptr;
+
+	// extract interface
+	if( Matrix44Object.Type() == tvtObject ) {
+		tTJSVariantClosure clo = Matrix44Object.AsObjectClosureNoAddRef();
+		if( clo.Object ) {
+			if( TJS_FAILED( clo.Object->NativeInstanceSupport( TJS_NIS_GETINSTANCE, tTJSNC_Matrix44::ClassID, (iTJSNativeInstance**)&Matrix44Instance ) ) ) {
+				Matrix44Instance = nullptr;
+				TVPThrowExceptionMessage( TJS_W( "Cannot retrive matrix instance." ) );
+			}
+		}
+	}
+}
+
 void tTJSNI_Canvas::SetTargetScreen( class tTJSNI_Offscreen* screen ) {}
 iTJSDispatch2* tTJSNI_Canvas::GetTargetScreenNoAddRef() { return nullptr; }
 void tTJSNI_Canvas::SetBlendMode( tTVPBlendMode bm ) {
@@ -280,10 +300,16 @@ void tTJSNI_Canvas::SetBlendMode( tTVPBlendMode bm ) {
 }
 void tTJSNI_Canvas::SetStretchType( tTVPStretchType st ) {}
 tTVPStretchType tTJSNI_Canvas::GetStretchType() const { return tTVPStretchType::stLinear; }
-void tTJSNI_Canvas::SetMatrix( class tTJSNI_Matrix44* matrix ) {}
-iTJSDispatch2* tTJSNI_Canvas::GetMatrixNoAddRef() { return nullptr; }
-tjs_uint tTJSNI_Canvas::GetWidth() const { return 0;  }
-tjs_uint tTJSNI_Canvas::GetHeight() const { return 0;  }
+
+
+tjs_uint tTJSNI_Canvas::GetWidth() const {
+	if( GLScreen ) return GLScreen->GetSurfaceWidth();
+	return 0;
+}
+tjs_uint tTJSNI_Canvas::GetHeight() const {
+	if( GLScreen ) return GLScreen->GetSurfaceHeight();
+	return 0;
+}
 
 tjs_uint tTJSNI_Canvas::RegisterShader( const ttstr& name, const ttstr& vertex, const ttstr& fragment ) {
 	std::string vs;
@@ -308,12 +334,6 @@ tjs_uint tTJSNI_Canvas::FindShader( const ttstr& name ) const {
 	} else {
 		return 0;
 	}
-}
-tjs_uint tTJSNI_Canvas::GetCurrentShader() const {
-	return GLDrawer.GetProgram();
-}
-void tTJSNI_Canvas::SetCurrentShader( tjs_uint index ) {
-	GLDrawer.SetProgram( index );
 }
 
 //---------------------------------------------------------------------------
@@ -556,30 +576,12 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/drawTexture2 )
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas );
 	if( numparams < 3 ) return TJS_E_BADPARAMCOUNT;
 
-	tTJSNI_Texture* texture0 = nullptr;
-	tTJSVariantClosure clo = param[0]->AsObjectClosureNoAddRef();
-	if( clo.Object ) {
-		if( TJS_FAILED( clo.Object->NativeInstanceSupport( TJS_NIS_GETINSTANCE, tTJSNC_Texture::ClassID, (iTJSNativeInstance**)&texture0 ) ) )
-			return TJS_E_INVALIDPARAM;
-	}
-	if( !texture0 ) TVPThrowExceptionMessage( TJS_W( "Parameter require Texture class instance." ) );
-
-	tTJSNI_Texture* texture1 = nullptr;
-	clo = param[1]->AsObjectClosureNoAddRef();
-	if( clo.Object ) {
-		if( TJS_FAILED( clo.Object->NativeInstanceSupport( TJS_NIS_GETINSTANCE, tTJSNC_Texture::ClassID, (iTJSNativeInstance**)&texture1 ) ) )
-			return TJS_E_INVALIDPARAM;
-	}
-	if( !texture1 ) TVPThrowExceptionMessage( TJS_W( "Parameter require Texture class instance." ) );
-
-	tTJSNI_ShaderProgram* shader = nullptr;
-	clo = param[2]->AsObjectClosureNoAddRef();
-	if( clo.Object ) {
-		if( TJS_FAILED( clo.Object->NativeInstanceSupport( TJS_NIS_GETINSTANCE, tTJSNC_ShaderProgram::ClassID, (iTJSNativeInstance**)&shader ) ) )
-			return TJS_E_INVALIDPARAM;
-	}
-	if( !shader ) TVPThrowExceptionMessage( TJS_W( "Parameter require Shader class instance." ) );
-
+	tTJSNI_Texture* texture0 = (tTJSNI_Texture*)TJSGetNativeInstance( tTJSNC_Texture::ClassID, param[0] );
+	if( !texture0 ) return TJS_E_INVALIDPARAM;
+	tTJSNI_Texture* texture1 = (tTJSNI_Texture*)TJSGetNativeInstance( tTJSNC_Texture::ClassID, param[1] );
+	if( !texture1 ) return TJS_E_INVALIDPARAM;
+	tTJSNI_ShaderProgram* shader = (tTJSNI_ShaderProgram*)TJSGetNativeInstance( tTJSNC_ShaderProgram::ClassID, param[2] );
+	if( !shader ) return TJS_E_INVALIDPARAM;
 
 	_this->DrawTexture2( texture0, texture1, shader );
 
@@ -592,13 +594,8 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/setShader )
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas );
 	if( numparams < 1 ) return TJS_E_BADPARAMCOUNT;
 
-	tTJSNI_ShaderProgram* shader = nullptr;
-	tTJSVariantClosure clo = param[0]->AsObjectClosureNoAddRef();
-	if( clo.Object ) {
-		if( TJS_FAILED( clo.Object->NativeInstanceSupport( TJS_NIS_GETINSTANCE, tTJSNC_ShaderProgram::ClassID, (iTJSNativeInstance**)&shader ) ) )
-			return TJS_E_INVALIDPARAM;
-	}
-	if( !shader ) TVPThrowExceptionMessage( TJS_W( "Parameter require Shader class instance." ) );
+	tTJSNI_ShaderProgram* shader = (tTJSNI_ShaderProgram*)TJSGetNativeInstance( tTJSNC_ShaderProgram::ClassID, param[0] );
+	if( !shader ) return TJS_E_INVALIDPARAM;
 
 	_this->UseShader( shader  );
 
@@ -800,8 +797,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(matrix)
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas);
-		iTJSDispatch2 *dsp = _this->GetMatrixNoAddRef();
-		*result = tTJSVariant(dsp, dsp);
+		*result = _this->GetMatrix44Object();
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_GETTER
@@ -809,13 +805,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(matrix)
 	TJS_BEGIN_NATIVE_PROP_SETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas);
-
-		tTJSNI_Matrix44* matrix = nullptr;
-		tTJSVariantClosure clo = param->AsObjectClosureNoAddRef();
-		if(TJS_FAILED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE, tTJSNC_Matrix44::ClassID, (iTJSNativeInstance**)&matrix)))
-			return TJS_E_INVALIDPARAM;
-		if( matrix != nullptr ) _this->SetMatrix( matrix );
-
+	_this->SetMatrix44Object( *param );
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_SETTER
