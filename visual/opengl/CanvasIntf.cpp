@@ -186,6 +186,7 @@ void tTJSNI_Canvas::DrawTexture( tTJSNI_Texture* texture, tTJSNI_ShaderProgram* 
 	GLuint texId = (GLuint)texture->GetNativeHandle();
 	EGLint sw = GLScreen->GetSurfaceWidth();
 	EGLint sh = GLScreen->GetSurfaceHeight();
+	shader->SetupProgram();
 	GLint texLoc = shader->FindLocation( std::string( "s_texture" ) );
 	GLint posLoc = shader->FindLocation( std::string( "a_position" ) );
 	GLint uvLoc = shader->FindLocation( std::string( "a_texCoord" ) );
@@ -196,6 +197,7 @@ void tTJSNI_Canvas::DrawTexture2( class tTJSNI_Texture* texture0, class tTJSNI_T
 	GLuint tex1Id = (GLuint)texture1->GetNativeHandle();
 	EGLint sw = GLScreen->GetSurfaceWidth();
 	EGLint sh = GLScreen->GetSurfaceHeight();
+	shader->SetupProgram();
 	GLint tx0Loc = shader->FindLocation( std::string( "s_texture0" ) );
 	GLint tx1Loc = shader->FindLocation( std::string( "s_texture1" ) );
 	GLint posLoc = shader->FindLocation( std::string( "a_position" ) );
@@ -210,9 +212,6 @@ void tTJSNI_Canvas::ApplyClipRect() {
 }
 void tTJSNI_Canvas::DisableClipRect() {
 	if( GLScreen ) GLScreen->DisableScissorRect();
-}
-void tTJSNI_Canvas::UseShader( tTJSNI_ShaderProgram* shader ) {
-	shader->SetProgram();
 }
 
 // prop
@@ -588,20 +587,6 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/drawTexture2 )
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/drawTexture2 )
-//----------------------------------------------------------------------
-TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/setShader )
-{
-	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas );
-	if( numparams < 1 ) return TJS_E_BADPARAMCOUNT;
-
-	tTJSNI_ShaderProgram* shader = (tTJSNI_ShaderProgram*)TJSGetNativeInstance( tTJSNC_ShaderProgram::ClassID, param[0] );
-	if( !shader ) return TJS_E_INVALIDPARAM;
-
-	_this->UseShader( shader  );
-
-	return TJS_S_OK;
-}
-TJS_END_NATIVE_METHOD_DECL(/*func. name*/setShader )
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/drawText)
 {

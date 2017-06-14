@@ -81,60 +81,264 @@ GL_SAMPLER_2D
 GL_SAMPLER_CUBE
 */
 
+GLint* tTVPShaderParameter::ArrayToInt( const tTJSVariant *param, tjs_int rqCount ) {
+	tTJSVariantClosure clo = param->AsObjectClosureNoAddRef();
+	if( clo.Object ) {
+		tjs_int count = TJSGetArrayElementCount( clo.Object );
+		if( count < rqCount ) TVPThrowExceptionMessage( TJS_W( "Insufficient number of arrays." ) );
+		std::unique_ptr<GLint[]> result(new GLint[count]);
+		tTJSVariant tmp;
+		for( tjs_int i = 0; i < count; i++ ) {
+			if( TJS_FAILED( clo.Object->PropGetByNum( TJS_MEMBERMUSTEXIST, i, &tmp, clo.ObjThis ) ) )
+				TVPThrowExceptionMessage( TJS_W( "Insufficient number of arrays." ) );
+			result[i] = (tjs_int)tmp;
+		}
+		return result.release();
+	}
+	TJS_eTJSError( TJSSpecifyArray );
+	return nullptr;
+}
+GLfloat* tTVPShaderParameter::ArrayToFloat( const tTJSVariant *param, tjs_int rqCount ) {
+	tTJSVariantClosure clo = param->AsObjectClosureNoAddRef();
+	if( clo.Object ) {
+		tjs_int count = TJSGetArrayElementCount( clo.Object );
+		if( count < rqCount ) TVPThrowExceptionMessage( TJS_W( "Insufficient number of arrays." ) );
+		std::unique_ptr<GLfloat[]> result( new GLfloat[count] );
+		tTJSVariant tmp;
+		for( tjs_int i = 0; i < count; i++ ) {
+			if( TJS_FAILED( clo.Object->PropGetByNum( TJS_MEMBERMUSTEXIST, i, &tmp, clo.ObjThis ) ) )
+				TVPThrowExceptionMessage( TJS_W( "Insufficient number of arrays." ) );
+			result[i] = (GLfloat)(tjs_real)tmp;
+		}
+		return result.release();
+	}
+	TJS_eTJSError( TJSSpecifyArray );
+	return nullptr;
+}
+GLuint* tTVPShaderParameter::ArrayToUInt( const tTJSVariant *param, tjs_int rqCount ) {
+	tTJSVariantClosure clo = param->AsObjectClosureNoAddRef();
+	if( clo.Object ) {
+		tjs_int count = TJSGetArrayElementCount( clo.Object );
+		if( count < rqCount ) TVPThrowExceptionMessage( TJS_W( "Insufficient number of arrays." ) );
+		std::unique_ptr<GLuint[]> result( new GLuint[count] );
+		tTJSVariant tmp;
+		for( tjs_int i = 0; i < count; i++ ) {
+			if( TJS_FAILED( clo.Object->PropGetByNum( TJS_MEMBERMUSTEXIST, i, &tmp, clo.ObjThis ) ) )
+				TVPThrowExceptionMessage( TJS_W( "Insufficient number of arrays." ) );
+			result[i] = (GLuint)(tjs_int64)tmp;
+		}
+		return result.release();
+	}
+	TJS_eTJSError( TJSSpecifyArray );
+	return nullptr;
+}
+GLuint* tTVPShaderParameter::ArrayToBool( const tTJSVariant *param, tjs_int rqCount ) {
+	tTJSVariantClosure clo = param->AsObjectClosureNoAddRef();
+	if( clo.Object ) {
+		tjs_int count = TJSGetArrayElementCount( clo.Object );
+		if( count < rqCount ) TVPThrowExceptionMessage( TJS_W( "Insufficient number of arrays." ) );
+		std::unique_ptr<GLuint[]> result( new GLuint[count] );
+		tTJSVariant tmp;
+		for( tjs_int i = 0; i < count; i++ ) {
+			if( TJS_FAILED( clo.Object->PropGetByNum( TJS_MEMBERMUSTEXIST, i, &tmp, clo.ObjThis ) ) )
+				TVPThrowExceptionMessage( TJS_W( "Insufficient number of arrays." ) );
+			result[i] = (GLuint)(tjs_int)tmp;
+		}
+		return result.release();
+	}
+	TJS_eTJSError( TJSSpecifyArray );
+	return nullptr;
+}
 void tTVPShaderParameter::Set( const tTJSVariant *param ) {
+	if( Type != TypeName::Uniform ) return;
+
 	switch( DataType ) {
 	case GL_FLOAT:	// float
-		if( Type == TypeName::Uniform ) {
-			glUniform1f( Id, (float)(tjs_real)*param );
-		}
+		Value.reset( new tTVPShaderVariant( (GLfloat)(tjs_real)*param ) );
 		break;
 	case GL_FLOAT_VEC2: 	// vec2
+		Value.reset( new tTVPShaderVariant( ArrayToFloat(param,2) ) );
 		break;
 	case GL_FLOAT_VEC3: 	// vec3
+		Value.reset( new tTVPShaderVariant( ArrayToFloat( param,3 ) ) );
 		break;
 	case GL_FLOAT_VEC4: 	// vec4
+		Value.reset( new tTVPShaderVariant( ArrayToFloat( param,4 ) ) );
 		break;
 	case GL_INT: 	// int
+		Value.reset( new tTVPShaderVariant( (GLint)(tjs_int)*param ) );
 		break;
 	case GL_INT_VEC2: 	// ivec2
+		Value.reset( new tTVPShaderVariant( ArrayToInt( param,2 ) ) );
 		break;
 	case GL_INT_VEC3: 	// ivec3
+		Value.reset( new tTVPShaderVariant( ArrayToInt( param,3 ) ) );
 		break;
 	case GL_INT_VEC4: 	// ivec4
+		Value.reset( new tTVPShaderVariant( ArrayToInt( param,4 ) ) );
 		break;
 	case GL_UNSIGNED_INT: 	// unsigned int
+		Value.reset( new tTVPShaderVariant( (GLuint)(tjs_int64)*param ) );
 		break;
 	case GL_UNSIGNED_INT_VEC2: 	// uvec2
+		Value.reset( new tTVPShaderVariant( ArrayToUInt( param,2 ) ) );
 		break;
 	case GL_UNSIGNED_INT_VEC3: 	// uvec3
+		Value.reset( new tTVPShaderVariant( ArrayToUInt( param,3 ) ) );
 		break;
 	case GL_UNSIGNED_INT_VEC4: 	// uvec4
+		Value.reset( new tTVPShaderVariant( ArrayToUInt( param,4 ) ) );
 		break;
 	case GL_BOOL: 	// bool
+		Value.reset( new tTVPShaderVariant( (GLuint)(tjs_int)*param ) );
 		break;
 	case GL_BOOL_VEC2: 	// bvec2
+		Value.reset( new tTVPShaderVariant( ArrayToBool( param,2 ) ) );
 		break;
 	case GL_BOOL_VEC3: 	// bvec3
+		Value.reset( new tTVPShaderVariant( ArrayToBool( param,3 ) ) );
 		break;
 	case GL_BOOL_VEC4: 	// bvec4
+		Value.reset( new tTVPShaderVariant( ArrayToBool( param,4 ) ) );
 		break;
 	case GL_FLOAT_MAT2: 	// mat2
+		Value.reset( new tTVPShaderVariant( ArrayToFloat( param,4 ) ) );
 		break;
 	case GL_FLOAT_MAT3: 	// mat3
+		Value.reset( new tTVPShaderVariant( ArrayToFloat( param,9 ) ) );
 		break;
 	case GL_FLOAT_MAT4: 	// mat4
+		Value.reset( new tTVPShaderVariant( ArrayToFloat( param,16 ) ) );
 		break;
 	case GL_FLOAT_MAT2x3: 	// mat2x3
+		Value.reset( new tTVPShaderVariant( ArrayToFloat( param,6 ) ) );
 		break;
 	case GL_FLOAT_MAT2x4: 	// mat2x4
+		Value.reset( new tTVPShaderVariant( ArrayToFloat( param,8 ) ) );
 		break;
 	case GL_FLOAT_MAT3x2: 	// mat3x2
+		Value.reset( new tTVPShaderVariant( ArrayToFloat( param,6 ) ) );
 		break;
 	case GL_FLOAT_MAT3x4: 	// mat3x4
+		Value.reset( new tTVPShaderVariant( ArrayToFloat( param,12 ) ) );
 		break;
 	case GL_FLOAT_MAT4x2: 	// mat4x2
+		Value.reset( new tTVPShaderVariant( ArrayToFloat( param,8 ) ) );
 		break;
 	case GL_FLOAT_MAT4x3: 	// mat4x3
+		Value.reset( new tTVPShaderVariant( ArrayToFloat( param,12 ) ) );
+		break;
+	case GL_SAMPLER_2D: 	// sampler2D
+		break;
+	case GL_SAMPLER_3D: 	// sampler3D
+		break;
+	case GL_SAMPLER_CUBE: 	// samplerCube
+		break;
+	case GL_SAMPLER_2D_SHADOW: 	// sampler2DShadow
+		break;
+	case GL_SAMPLER_2D_ARRAY: 	// sampler2DArray
+		break;
+	case GL_SAMPLER_2D_ARRAY_SHADOW: 	// sampler2DArrayShadow
+		break;
+	case GL_SAMPLER_CUBE_SHADOW: 	// samplerCubeShadow
+		break;
+	case GL_INT_SAMPLER_2D: 	// isampler2D
+		break;
+	case GL_INT_SAMPLER_3D: 	// isampler3D
+		break;
+	case GL_INT_SAMPLER_CUBE: 	// isamplerCube
+		break;
+	case GL_INT_SAMPLER_2D_ARRAY: 	// isampler2DArray
+		break;
+	case GL_UNSIGNED_INT_SAMPLER_2D: 	// usampler2D
+		break;
+	case GL_UNSIGNED_INT_SAMPLER_3D: 	// usampler3D
+		break;
+	case GL_UNSIGNED_INT_SAMPLER_CUBE: 	// usamplerCube
+		break;
+	case GL_UNSIGNED_INT_SAMPLER_2D_ARRAY: 	// usampler2DArray
+		break;
+	}
+}
+void tTVPShaderParameter::SetToShader() {
+
+	if( Type != TypeName::Uniform ) return;
+
+	switch( DataType ) {
+	case GL_FLOAT:	// float
+		glUniform1f( Id, *Value );
+		break;
+	case GL_FLOAT_VEC2: 	// vec2
+		glUniform2f( Id, ( (GLfloat*)*Value)[0], ( (GLfloat*)*Value )[1] );
+		break;
+	case GL_FLOAT_VEC3: 	// vec3
+		glUniform3f( Id, ( (GLfloat*)*Value )[0], ( (GLfloat*)*Value )[1], ( (GLfloat*)*Value )[2] );
+		break;
+	case GL_FLOAT_VEC4: 	// vec4
+		glUniform4f( Id, ( (GLfloat*)*Value )[0], ( (GLfloat*)*Value )[1], ( (GLfloat*)*Value )[2], ( (GLfloat*)*Value )[3] );
+		break;
+	case GL_INT: 	// int
+		glUniform1i( Id, *Value );
+		break;
+	case GL_INT_VEC2: 	// ivec2
+		glUniform2i( Id, ( (GLint*)*Value )[0], ( (GLint*)*Value )[1] );
+		break;
+	case GL_INT_VEC3: 	// ivec3
+		glUniform3i( Id, ( (GLint*)*Value )[0], ( (GLint*)*Value )[1], ( (GLint*)*Value )[2] );
+		break;
+	case GL_INT_VEC4: 	// ivec4
+		glUniform4i( Id, ( (GLint*)*Value )[0], ( (GLint*)*Value )[1], ( (GLint*)*Value )[2], ( (GLint*)*Value )[3] );
+		break;
+	case GL_UNSIGNED_INT: 	// unsigned int
+		glUniform1ui( Id, *Value );
+		break;
+	case GL_UNSIGNED_INT_VEC2: 	// uvec2
+		glUniform2ui( Id, ( (GLuint*)*Value )[0], ( (GLuint*)*Value )[1] );
+		break;
+	case GL_UNSIGNED_INT_VEC3: 	// uvec3
+		glUniform3ui( Id, ( (GLuint*)*Value )[0], ( (GLuint*)*Value )[1], ( (GLuint*)*Value )[2] );
+		break;
+	case GL_UNSIGNED_INT_VEC4: 	// uvec4
+		glUniform4ui( Id, ( (GLuint*)*Value )[0], ( (GLuint*)*Value )[1], ( (GLuint*)*Value )[2], ( (GLuint*)*Value )[3] );
+		break;
+	case GL_BOOL: 	// bool
+		glUniform1ui( Id, *Value );
+		break;
+	case GL_BOOL_VEC2: 	// bvec2
+		glUniform2ui( Id, ( (GLuint*)*Value )[0], ( (GLuint*)*Value )[1] );
+		break;
+	case GL_BOOL_VEC3: 	// bvec3
+		glUniform3ui( Id, ( (GLuint*)*Value )[0], ( (GLuint*)*Value )[1], ( (GLuint*)*Value )[2] );
+		break;
+	case GL_BOOL_VEC4: 	// bvec4
+		glUniform4ui( Id, ( (GLuint*)*Value )[0], ( (GLuint*)*Value )[1], ( (GLuint*)*Value )[2], ( (GLuint*)*Value )[3] );
+		break;
+	case GL_FLOAT_MAT2: 	// mat2
+		glUniformMatrix2fv( Id, 1, GL_FALSE, (GLfloat*)*Value );
+		break;
+	case GL_FLOAT_MAT3: 	// mat3
+		glUniformMatrix3fv( Id, 1, GL_FALSE, (GLfloat*)*Value );
+		break;
+	case GL_FLOAT_MAT4: 	// mat4
+		glUniformMatrix4fv( Id, 1, GL_FALSE, (GLfloat*)*Value );
+		break;
+	case GL_FLOAT_MAT2x3: 	// mat2x3
+		glUniformMatrix2x3fv( Id, 1, GL_FALSE, (GLfloat*)*Value );
+		break;
+	case GL_FLOAT_MAT2x4: 	// mat2x4
+		glUniformMatrix2x4fv( Id, 1, GL_FALSE, (GLfloat*)*Value );
+		break;
+	case GL_FLOAT_MAT3x2: 	// mat3x2
+		glUniformMatrix3x2fv( Id, 1, GL_FALSE, (GLfloat*)*Value );
+		break;
+	case GL_FLOAT_MAT3x4: 	// mat3x4
+		glUniformMatrix3x4fv( Id, 1, GL_FALSE, (GLfloat*)*Value );
+		break;
+	case GL_FLOAT_MAT4x2: 	// mat4x2
+		glUniformMatrix4x2fv( Id, 1, GL_FALSE, (GLfloat*)*Value );
+		break;
+	case GL_FLOAT_MAT4x3: 	// mat4x3
+		glUniformMatrix4x3fv( Id, 1, GL_FALSE, (GLfloat*)*Value );
 		break;
 	case GL_SAMPLER_2D: 	// sampler2D
 		break;
@@ -202,67 +406,7 @@ tjs_error TJS_INTF_METHOD tTJSNI_ShaderProgram::Construct(tjs_int numparams, tTJ
 			TVPThrowExceptionMessage(TJS_W("Shader compile error."));
 			return TJS_E_FAIL;
 		}
-		GLint attrCount = 0, unifCount = 0;
-		glGetProgramiv( Program, GL_ACTIVE_ATTRIBUTES, &attrCount );
-		glGetProgramiv( Program, GL_ACTIVE_UNIFORMS, &unifCount );
-		if( attrCount > 0 ) {
-			GLint attrNameMaxLen = 0;
-			glGetProgramiv( Program, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &attrNameMaxLen );
-			std::vector<GLchar> attrName( attrNameMaxLen );
-			std::vector<tjs_char> ttAttrName( attrNameMaxLen );
-			for( GLint i = 0; i < attrCount; i++ ) {
-				GLsizei len = 0;
-				GLint size = 0;
-				GLenum type = 0;
-				glGetActiveAttrib( Program, i, attrNameMaxLen, &len, &size, &type, &( attrName[0] ) );
-
-				tTVPShaderParameter param;
-				param.Name = std::string( &( attrName[0] ) );
-				tjs_int count = TVPUtf8ToWideCharString( &( attrName[0] ), &( ttAttrName[0] ) );
-				ttAttrName[count] = TJS_W( '\0' );
-				param.TjsName = ttstr( &( ttAttrName[0] ) );
-				param.Id = glGetAttribLocation( Program, &( attrName[0] ) );
-				param.Type = tTVPShaderParameter::TypeName::Attribute;
-				param.DataType = type;
-				param.ArrayCount = size;
-				param.IsArray = attrName[len - 1] == ']';
-				Parameters.push_back( param );
-			}
-		}
-		if( unifCount > 0 ) {
-			GLint unifNameMaxLen = 0;
-			glGetProgramiv( Program, GL_ACTIVE_UNIFORM_MAX_LENGTH, &unifNameMaxLen );
-			std::vector<GLchar> unifName( unifNameMaxLen );
-			std::vector<tjs_char> ttUnifName( unifNameMaxLen );
-			for( GLint i = 0; i < unifCount; i++ ) {
-				GLsizei len = 0;
-				GLint size = 0;
-				GLenum type = 0;
-				glGetActiveUniform( Program, i, unifNameMaxLen, &len, &size, &type, &( unifName[0] ) );
-				tTVPShaderParameter param;
-				param.Name = std::string( &( unifName[0] ) );
-				tjs_int count = TVPUtf8ToWideCharString( &( unifName[0] ), &( ttUnifName[0] ) );
-				ttUnifName[count] = TJS_W('\0');
-				param.TjsName = ttstr( &( ttUnifName[0] ) );
-				param.Id = glGetUniformLocation( Program, &( unifName[0] ) );
-				param.Type = tTVPShaderParameter::TypeName::Uniform;
-				param.DataType = type;
-				param.ArrayCount = size;
-				param.IsArray = unifName[len - 1] == ']';
-				Parameters.push_back( param );
-			}
-		}
-#if 0
-		tTVPShaderInputs vsparam;
-		tTVPShaderInputs fsparam;
-		if( parser->ParseVertexShader( vs, vsparam ) && parser->ParseFragmentShader( fs, fsparam ) ) {
-			std::vector<tTVPShaderParameter> params;
-			ShaderParamConvert( Program, vsparam, params );
-			ShaderParamConvert( Program, fsparam, params );
-		}
-		parser->ClearParseVertexShaderResults();
-		parser->ClearParseFragmentShaderResults();
-#endif
+		RetrieveShaderParameter();
 	} else {
 		std::string vs, fs;
 		if( TVPUtf16ToUtf8( vs, vertex.AsStdString() ) == false )
@@ -274,9 +418,63 @@ tjs_error TJS_INTF_METHOD tTJSNI_ShaderProgram::Construct(tjs_int numparams, tTJ
 			TVPThrowExceptionMessage(TJS_W("Shader compile error."));
 			return TJS_E_FAIL;
 		}
+		RetrieveShaderParameter();
 	}
 
 	return TJS_S_OK;
+}
+void tTJSNI_ShaderProgram::RetrieveShaderParameter() {
+	GLint attrCount = 0, unifCount = 0;
+	glGetProgramiv( Program, GL_ACTIVE_ATTRIBUTES, &attrCount );
+	glGetProgramiv( Program, GL_ACTIVE_UNIFORMS, &unifCount );
+	if( attrCount > 0 ) {
+		GLint attrNameMaxLen = 0;
+		glGetProgramiv( Program, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &attrNameMaxLen );
+		std::vector<GLchar> attrName( attrNameMaxLen );
+		std::vector<tjs_char> ttAttrName( attrNameMaxLen );
+		for( GLint i = 0; i < attrCount; i++ ) {
+			GLsizei len = 0;
+			GLint size = 0;
+			GLenum type = 0;
+			glGetActiveAttrib( Program, i, attrNameMaxLen, &len, &size, &type, &( attrName[0] ) );
+
+			Parameters.push_back( std::unique_ptr<tTVPShaderParameter>(new tTVPShaderParameter()) );
+			std::unique_ptr<tTVPShaderParameter>& param = Parameters.back();
+			param->Name = std::string( &( attrName[0] ) );
+			tjs_int count = TVPUtf8ToWideCharString( &( attrName[0] ), &( ttAttrName[0] ) );
+			ttAttrName[count] = TJS_W( '\0' );
+			param->TjsName = ttstr( &( ttAttrName[0] ) );
+			param->Id = glGetAttribLocation( Program, &( attrName[0] ) );
+			param->Type = tTVPShaderParameter::TypeName::Attribute;
+			param->DataType = type;
+			param->ArrayCount = size;
+			param->IsArray = attrName[len - 1] == ']';
+		}
+	}
+	if( unifCount > 0 ) {
+		GLint unifNameMaxLen = 0;
+		glGetProgramiv( Program, GL_ACTIVE_UNIFORM_MAX_LENGTH, &unifNameMaxLen );
+		std::vector<GLchar> unifName( unifNameMaxLen );
+		std::vector<tjs_char> ttUnifName( unifNameMaxLen );
+		for( GLint i = 0; i < unifCount; i++ ) {
+			GLsizei len = 0;
+			GLint size = 0;
+			GLenum type = 0;
+			glGetActiveUniform( Program, i, unifNameMaxLen, &len, &size, &type, &( unifName[0] ) );
+
+			Parameters.push_back( std::unique_ptr<tTVPShaderParameter>(new tTVPShaderParameter()) );
+			std::unique_ptr<tTVPShaderParameter>& param = Parameters.back();
+			param->Name = std::string( &( unifName[0] ) );
+			tjs_int count = TVPUtf8ToWideCharString( &( unifName[0] ), &( ttUnifName[0] ) );
+			ttUnifName[count] = TJS_W('\0');
+			param->TjsName = ttstr( &( ttUnifName[0] ) );
+			param->Id = glGetUniformLocation( Program, &( unifName[0] ) );
+			param->Type = tTVPShaderParameter::TypeName::Uniform;
+			param->DataType = type;
+			param->ArrayCount = size;
+			param->IsArray = unifName[len - 1] == ']';
+		}
+	}
 }
 void TJS_INTF_METHOD tTJSNI_ShaderProgram::Invalidate() {
 	if( Program ) {
@@ -285,29 +483,36 @@ void TJS_INTF_METHOD tTJSNI_ShaderProgram::Invalidate() {
 	}
 }
 bool tTJSNI_ShaderProgram::HasShaderMemeber( const ttstr& name ) const {
-	for( auto i = Parameters.begin(); i != Parameters.end(); i++ ) {
-		if( ( *i ).TjsName == name ) return true;
+	for( auto& i = Parameters.begin(); i != Parameters.end(); i++ ) {
+		if( ( *i )->TjsName == name ) return true;
 	}
 	return false;
 }
 tjs_error tTJSNI_ShaderProgram::SetShaderParam( const ttstr& name, const tTJSVariant *param ) {
-	for( auto i = Parameters.begin(); i != Parameters.end(); i++ ) {
-		if( ( *i ).TjsName == name ) {
-			tTVPShaderParameter& sp = *i;
-			sp.Set( param );
+	for( auto& i = Parameters.begin(); i != Parameters.end(); i++ ) {
+		if( ( *i )->TjsName == name ) {
+			std::unique_ptr<tTVPShaderParameter>& sp = *i;
+			sp->Set( param );
 			return TJS_S_OK;
 		}
 	}
 	return TJS_E_MEMBERNOTFOUND;
 }
 GLint tTJSNI_ShaderProgram::FindLocation( const std::string name ) const {
-	for( auto i = Parameters.begin(); i != Parameters.end(); i++ ) {
-		if( ( *i ).Name == name ) return ( *i ).Id;
+	for( auto& i = Parameters.begin(); i != Parameters.end(); i++ ) {
+		if( ( *i )->Name == name ) return ( *i )->Id;
 	}
 	return -1;
 }
-void tTJSNI_ShaderProgram::SetProgram() {
+void tTJSNI_ShaderProgram::SetupProgram() {
 	glUseProgram( Program );
+	for( auto& i = Parameters.begin(); i != Parameters.end(); i++ ) {
+		if( ( *i )->Type == tTVPShaderParameter::TypeName::Uniform ) {
+			if( ( *i )->Value ) {
+				( *i )->SetToShader();
+			}
+		}
+	}
 }
 //---------------------------------------------------------------------------
 // tTJSNC_ShaderProgram : TJS ShaderProgram class
