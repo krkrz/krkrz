@@ -60,6 +60,9 @@ enum class tTVPStretchType : tjs_int {
 
 class tTJSNI_Canvas : public tTJSNativeInstance
 {
+	static ttstr DefaultVertexShaderText;
+	static ttstr DefaultFragmentShaderText;
+
 	bool IsFirst;
 	bool InDrawing;
 	tjs_uint32 ClearColor;
@@ -73,8 +76,6 @@ class tTJSNI_Canvas : public tTJSNativeInstance
 	tjs_int PrevViewportWidth;
 	tjs_int PrevViewportHeight;
 
-	tTJSHashTable<ttstr, tjs_uint> ShaderList;
-
 	tTJSVariant RenterTaretObject;
 	class tTJSNI_Offscreen* RenderTargetInstance;
 
@@ -83,6 +84,10 @@ class tTJSNI_Canvas : public tTJSNativeInstance
 
 	tTJSVariant Matrix44Object;
 	class tTJSNI_Matrix44* Matrix44Instance;
+
+	tTJSVariant DefaultShaderObject;
+	class tTJSNI_ShaderProgram* DefaultShaderInstance;
+
 public:
 	void SetRenterTargetObject( const tTJSVariant & val );
 	const tTJSVariant& GetRenderTargetObject() const { return RenterTaretObject; }
@@ -95,9 +100,13 @@ public:
 	void SetMatrix44Object( const tTJSVariant & val );
 	const tTJSVariant& GetMatrix44Object() const { return Matrix44Object; }
 
+	void SetDefaultShader( const tTJSVariant & val );
+	const tTJSVariant& GetDefaultShader() const { return DefaultShaderObject; }
 
 private:
 	void ApplyBlendMode();
+	void CreateDefaultShader();
+	void CreateDefaultMatrix();
 
 public:
 	tTJSNI_Canvas();
@@ -116,15 +125,10 @@ public:
 	void DrawScreen( class tTJSNI_Offscreen* screen, tjs_real opacity );
 	void DrawScreenUT( class tTJSNI_Offscreen* screen, class tTJSNI_Texture* texture, tjs_int vague, tjs_real opacity );
 	void SetClipMask( class tTJSNI_Texture* texture, tjs_int left, tjs_int top );
-	//void Fill( tjs_int left, tjs_int top, tjs_int width, tjs_int height, tjs_uint32 color );
 	void Fill( tjs_int left, tjs_int top, tjs_int width, tjs_int height, tjs_uint32 colors[4] );
-	void DrawTexture( class tTJSNI_Texture* texture, tjs_int left, tjs_int top );
-	void DrawTexture( class tTJSNI_Texture* texture, class tTJSNI_ShaderProgram* shader );
-	void DrawTexture2( class tTJSNI_Texture* texture0, class tTJSNI_Texture* texture1, class tTJSNI_ShaderProgram* shader );
+	void DrawTexture( class tTJSNI_Texture* texture, class tTJSNI_ShaderProgram* shader = nullptr );
+	void DrawTexture( class tTJSNI_Texture* texture0, class tTJSNI_Texture* texture1, class tTJSNI_ShaderProgram* shader );
 	void DrawText( class tTJSNI_Font* font, tjs_int x, tjs_int y, const ttstr& text, tjs_uint32 color );
-	tjs_uint RegisterShader( const ttstr& name, const ttstr& vertex, const ttstr& fragment );
-	tjs_uint FindShader( const ttstr& name ) const;
-	void UseShader( class tTJSNI_ShaderProgram* shader );
 
 	// prop
 	void SetClearColor(tjs_uint32 color) { ClearColor = color; }

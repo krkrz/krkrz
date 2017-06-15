@@ -6,9 +6,13 @@
 #define Matrix44IntfH
 
 #include "tjsNative.h"
+#define _USE_MATH_DEFINES
+#include <cmath>
+#include <math.h>
 
 class tTJSNI_Matrix44 : public tTJSNativeInstance
 {
+	//static const tjs_real PI = 3.141592653589793;
 	/*
 	 0  1  2  3
 	 4  5  6  7
@@ -44,6 +48,26 @@ public:
 		Matrix.a[11] = Matrix.a[12] = Matrix.a[13] = Matrix.a[14] = 0.0f;
 	}
 	iTJSDispatch2 * GetMatrixArrayObjectNoAddRef();
+
+	void SetTranslate( tjs_real x, tjs_real y ) {
+		Matrix.m[0][3]= (float)x;
+		Matrix.m[1][3] = (float)y;
+	}
+	void SetScale( tjs_real x, tjs_real y ) {
+		Matrix.m[0][0] = (float)x;
+		Matrix.m[1][1] = (float)y;
+	}
+	void SetRotate( tjs_real deg ) {
+		tjs_real radian = deg * M_PI / 180.0;
+		float c = (float)std::cos( radian );
+		float s = (float)std::sin( radian );
+		Matrix.m[0][0] = c;
+		Matrix.m[0][1] = s;
+		Matrix.m[1][0] = -s;
+		Matrix.m[1][1] = c;
+	}
+
+	const float *GetMatrixArray() const { return Matrix.a; }
 };
 
 

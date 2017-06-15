@@ -314,31 +314,31 @@ void tTVPShaderParameter::SetToShader() {
 		glUniform4ui( Id, ( (GLuint*)*Value )[0], ( (GLuint*)*Value )[1], ( (GLuint*)*Value )[2], ( (GLuint*)*Value )[3] );
 		break;
 	case GL_FLOAT_MAT2: 	// mat2
-		glUniformMatrix2fv( Id, 1, GL_FALSE, (GLfloat*)*Value );
+		glUniformMatrix2fv( Id, 1, GL_TRUE, (GLfloat*)*Value );
 		break;
 	case GL_FLOAT_MAT3: 	// mat3
-		glUniformMatrix3fv( Id, 1, GL_FALSE, (GLfloat*)*Value );
+		glUniformMatrix3fv( Id, 1, GL_TRUE, (GLfloat*)*Value );
 		break;
 	case GL_FLOAT_MAT4: 	// mat4
-		glUniformMatrix4fv( Id, 1, GL_FALSE, (GLfloat*)*Value );
+		glUniformMatrix4fv( Id, 1, GL_TRUE, (GLfloat*)*Value );
 		break;
 	case GL_FLOAT_MAT2x3: 	// mat2x3
-		glUniformMatrix2x3fv( Id, 1, GL_FALSE, (GLfloat*)*Value );
+		glUniformMatrix2x3fv( Id, 1, GL_TRUE, (GLfloat*)*Value );
 		break;
 	case GL_FLOAT_MAT2x4: 	// mat2x4
-		glUniformMatrix2x4fv( Id, 1, GL_FALSE, (GLfloat*)*Value );
+		glUniformMatrix2x4fv( Id, 1, GL_TRUE, (GLfloat*)*Value );
 		break;
 	case GL_FLOAT_MAT3x2: 	// mat3x2
-		glUniformMatrix3x2fv( Id, 1, GL_FALSE, (GLfloat*)*Value );
+		glUniformMatrix3x2fv( Id, 1, GL_TRUE, (GLfloat*)*Value );
 		break;
 	case GL_FLOAT_MAT3x4: 	// mat3x4
-		glUniformMatrix3x4fv( Id, 1, GL_FALSE, (GLfloat*)*Value );
+		glUniformMatrix3x4fv( Id, 1, GL_TRUE, (GLfloat*)*Value );
 		break;
 	case GL_FLOAT_MAT4x2: 	// mat4x2
-		glUniformMatrix4x2fv( Id, 1, GL_FALSE, (GLfloat*)*Value );
+		glUniformMatrix4x2fv( Id, 1, GL_TRUE, (GLfloat*)*Value );
 		break;
 	case GL_FLOAT_MAT4x3: 	// mat4x3
-		glUniformMatrix4x3fv( Id, 1, GL_FALSE, (GLfloat*)*Value );
+		glUniformMatrix4x3fv( Id, 1, GL_TRUE, (GLfloat*)*Value );
 		break;
 	case GL_SAMPLER_2D: 	// sampler2D
 		break;
@@ -377,49 +377,48 @@ tjs_error TJS_INTF_METHOD tTJSNI_ShaderProgram::Construct(tjs_int numparams, tTJ
 
 	ttstr vertex = *param[0];
 	ttstr fragment = *param[1];
-	bool isFile = true;
+	bool isVsFile = true, isFsFile = true;
 	if( numparams > 2 ) {
-		isFile = ((tjs_int)(*param[2])) != 0;
+		isVsFile = ((tjs_int)(*param[2])) != 0;
 	}
-	if( isFile ) {
-		ttstr vertexFile = TVPNormalizeStorageName(vertex);
+	if( numparams > 3 ) {
+		isFsFile = ( (tjs_int)( *param[3] ) ) != 0;
+	}
+	std::string vs, fs;
+	if( isVsFile ) {
+		ttstr vertexFile = TVPNormalizeStorageName( vertex );
 		tTVPStreamHolder vertexStream( vertexFile, TJS_BS_READ );
 		tjs_uint size = (tjs_uint)vertexStream->GetSize();
-		std::unique_ptr<tjs_uint8[]> vertexScript(new tjs_uint8[size+1]);
+		std::unique_ptr<tjs_uint8[]> vertexScript( new tjs_uint8[size + 1] );
 		tjs_uint read = vertexStream->Read( vertexScript.get(), size );
 		if( read != size ) TJS_eTJSError( TJSReadError );
 		vertexScript[size] = '\0';
 		vertexStream.Close();
-
-		ttstr fragmentFile = TVPNormalizeStorageName(fragment);
+		vs = std::string( (char*)vertexScript.get() );
+	} else {
+		if( TVPUtf16ToUtf8( vs, vertex.AsStdString() ) == false )
+			TVPThrowExceptionMessage( TVPInvalidUTF16ToUTF8 );
+	}
+	if( isFsFile ) {
+		ttstr fragmentFile = TVPNormalizeStorageName( fragment );
 		tTVPStreamHolder fragmentStream( fragmentFile, TJS_BS_READ );
-		size = (tjs_uint)fragmentStream->GetSize();
-		std::unique_ptr<tjs_uint8[]> fragmentScript(new tjs_uint8[size+1]);
-		read = fragmentStream->Read( fragmentScript.get(), size );
+		tjs_uint size = (tjs_uint)fragmentStream->GetSize();
+		std::unique_ptr<tjs_uint8[]> fragmentScript( new tjs_uint8[size + 1] );
+		tjs_uint read = fragmentStream->Read( fragmentScript.get(), size );
 		if( read != size ) TJS_eTJSError( TJSReadError );
 		fragmentScript[size] = '\0';
 		fragmentStream.Close();
-		std::string vs((char*)vertexScript.get());
-		std::string fs( (char*)fragmentScript.get());
-		Program = CompileProgram( vs, fs );
-		if( Program == 0 ) {
-			TVPThrowExceptionMessage(TJS_W("Shader compile error."));
-			return TJS_E_FAIL;
-		}
-		RetrieveShaderParameter();
+		fs = std::string( (char*)fragmentScript.get() );
 	} else {
-		std::string vs, fs;
-		if( TVPUtf16ToUtf8( vs, vertex.AsStdString() ) == false )
-			TVPThrowExceptionMessage( TVPInvalidUTF16ToUTF8 );
 		if( TVPUtf16ToUtf8( fs, fragment.AsStdString() ) == false )
 			TVPThrowExceptionMessage( TVPInvalidUTF16ToUTF8 );
-		Program = CompileProgram( vs, fs );
-		if( Program == 0 ) {
-			TVPThrowExceptionMessage(TJS_W("Shader compile error."));
-			return TJS_E_FAIL;
-		}
-		RetrieveShaderParameter();
 	}
+	Program = CompileProgram( vs, fs );
+	if( Program == 0 ) {
+		TVPThrowExceptionMessage(TJS_W("Shader compile error."));
+		return TJS_E_FAIL;
+	}
+	RetrieveShaderParameter();
 
 	return TJS_S_OK;
 }

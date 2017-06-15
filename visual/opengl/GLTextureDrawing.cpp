@@ -3,7 +3,9 @@
 #include "tjsCommHead.h"
 #include "GLShaderUtil.h"
 #include "GLTextureDrawing.h"
-
+#include "ShaderProgramIntf.h"
+#include "Matrix44Intf.h"
+#include "TextureInfo.h"
 
 tTVPGLTextureDrawing::tTVPGLTextureDrawing() : Program(0), PositionLoc(0), TexCoordLoc(0), SamplerLoc(0) {}
 
@@ -271,3 +273,40 @@ void tTVPGLTextureDrawing::DrawTexture2( GLuint tex0, GLuint tex1, int w, int h,
 
 	glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
 }
+
+void tTVPGLTextureDrawing::DrawTexture( tTJSNI_ShaderProgram* shader, iTVPTextureInfoIntrface* tex, tTJSNI_Matrix44* mat, const tTVPPoint& sufaceSize ) {
+	const float width = (float)tex->GetWidth();
+	const float height = (float)tex->GetHeight();
+	const GLfloat vertices[] = {
+		0.0f,  0.0f,	// 左上
+		0.0f,  height,  // 左下
+		width, 0.0f,	// 右上
+		width, height,	// 右下
+	};
+	const GLfloat uvs[] = {
+		0.0f,  0.0f,
+		0.0f,  1.0f,
+		1.0f,  0.0f,
+		1.0f,  1.0f,
+	};
+	GLint posLoc = shader->FindLocation( std::string( "a_pos" ) );
+	GLint uvLoc = shader->FindLocation( std::string( "a_texCoord" ) );
+	glVertexAttribPointer( posLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof( GLfloat ), vertices );
+	glVertexAttribPointer( uvLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof( GLfloat ), uvs );
+	glEnableVertexAttribArray( posLoc );
+	glEnableVertexAttribArray( uvLoc );
+
+	GLint texLoc = shader->FindLocation( std::string( "s_tex0" ) );
+	glActiveTexture( GL_TEXTURE0 );
+	glBindTexture( GL_TEXTURE_2D, (GLuint)tex->GetNativeHandle() );
+	glUniform1i( texLoc, 0 );
+
+	GLint matLoc = shader->FindLocation( std::string( "a_modelMat4" ) );
+	glUniformMatrix4fv( matLoc, 1, GL_TRUE, mat->GetMatrixArray() );
+	
+	GLint vpLoc = shader->FindLocation( std::string( "a_size" ) );
+	glUniform2f( vpLoc, (float)sufaceSize.x, (float)sufaceSize.y );
+
+	glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
+}
+
