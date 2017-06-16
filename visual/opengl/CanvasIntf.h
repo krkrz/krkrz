@@ -11,12 +11,14 @@
 #include "drawable.h"
 #include "GLTextureDrawing.h"
 #include "tjsHashSearch.h"
+#include "ComplexRect.h"
 
 enum class tTVPBlendMode : tjs_int {
-	bmOpaque = 0,
-	bmAlpha = 1,
-	bmAdd = 2,
-	bmAddWithAlpha = 3,
+	bmDisable = 0,
+	bmOpaque = 1,
+	bmAlpha = 2,
+	bmAdd = 3,
+	bmAddWithAlpha = 4,
 /*
 	bmBinder = ltBinder,
 	bmCoverRect = ltCoverRect,
@@ -52,22 +54,18 @@ enum class tTVPBlendMode : tjs_int {
 */
 };
 
-enum class tTVPStretchType : tjs_int {
-	stNearest,
-	stLinear
-	// cubic とかはシェーダー使う必要あり
-};
-
 class tTJSNI_Canvas : public tTJSNativeInstance
 {
 	static ttstr DefaultVertexShaderText;
 	static ttstr DefaultFragmentShaderText;
+	static const float DefaultUVs[];
 
 	bool IsFirst;
 	bool InDrawing;
+	bool EnableClipRect;
 	tjs_uint32 ClearColor;
 	tTVPBlendMode BlendMode;
-	tTVPStretchType StretchType;
+	tTVPRect CurrentScissorRect;
 
 	class tTVPOpenGLScreen* GLScreen;
 	tTVPGLTextureDrawing GLDrawer;
@@ -94,8 +92,6 @@ public:
 
 	void SetClipRectObject( const tTJSVariant & val );
 	const tTJSVariant& GetClipRectObject() const { return ClipRectObject; }
-	void ApplyClipRect();
-	void DisableClipRect();
 
 	void SetMatrix44Object( const tTJSVariant & val );
 	const tTJSVariant& GetMatrix44Object() const { return Matrix44Object; }
@@ -105,8 +101,18 @@ public:
 
 private:
 	void ApplyBlendMode();
+	void ApplyClipRect();
+	void DisableClipRect();
 	void CreateDefaultShader();
 	void CreateDefaultMatrix();
+	void SetupEachDrawing();
+
+	// 描画に必要な設定と1個目のテクスチャまで設定する
+	static void SetupTextureDrawing( class tTJSNI_ShaderProgram* shader, const class iTVPTextureInfoIntrface* tex, class tTJSNI_Matrix44* mat, const tTVPPoint& vpSize );
+
+	// 描画領域の幅/高さ。レンダーターゲット指定している場合はそのサイズ、そうでない場合はクライアント領域(サーフェイス)のサイズ
+	tjs_int GetCanvasWidth() const;
+	tjs_int GetCanvasHeight() const;
 
 public:
 	tTJSNI_Canvas();
@@ -120,27 +126,24 @@ public:
 
 	// method
 	void Capture( class tTJSNI_Bitmap* bmp, bool front = true );
+	void Capture( const class iTVPTextureInfoIntrface* texture, bool front = true );
 	void Clear( tjs_uint32 color );
 
-	void DrawScreen( class tTJSNI_Offscreen* screen, tjs_real opacity );
-	void DrawScreenUT( class tTJSNI_Offscreen* screen, class tTJSNI_Texture* texture, tjs_int vague, tjs_real opacity );
-	void SetClipMask( class tTJSNI_Texture* texture, tjs_int left, tjs_int top );
 	void Fill( tjs_int left, tjs_int top, tjs_int width, tjs_int height, tjs_uint32 colors[4] );
-	void DrawTexture( class tTJSNI_Texture* texture, class tTJSNI_ShaderProgram* shader = nullptr );
-	void DrawTexture( class tTJSNI_Texture* texture0, class tTJSNI_Texture* texture1, class tTJSNI_ShaderProgram* shader );
+	void DrawTexture( const class iTVPTextureInfoIntrface* texture, class tTJSNI_ShaderProgram* shader = nullptr );
+	void DrawTexture( const class iTVPTextureInfoIntrface* texture0, const class iTVPTextureInfoIntrface* texture1, class tTJSNI_ShaderProgram* shader );
+	void DrawTexture( const class iTVPTextureInfoIntrface* texture0, const class iTVPTextureInfoIntrface* texture1, const class iTVPTextureInfoIntrface* texture2, class tTJSNI_ShaderProgram* shader );
 	void DrawText( class tTJSNI_Font* font, tjs_int x, tjs_int y, const ttstr& text, tjs_uint32 color );
 
 	// prop
 	void SetClearColor(tjs_uint32 color) { ClearColor = color; }
 	tjs_uint32 GetClearColor() const { return ClearColor; }
-	void SetTargetScreen( class tTJSNI_Offscreen* screen );
-	iTJSDispatch2* GetTargetScreenNoAddRef();
-	void SetBlendMode( tTVPBlendMode bm );	// --> 直接値設定だけじゃなく、OpenGL ESにも設定してしまった方がいいか
+	void SetBlendMode( tTVPBlendMode bm );
 	tTVPBlendMode GetBlendMode() const { return BlendMode; }
-	void SetStretchType( tTVPStretchType st );
-	tTVPStretchType GetStretchType() const;
 	tjs_uint GetWidth() const;
 	tjs_uint GetHeight() const;
+	void SetEnableClipRect( bool b );
+	bool GetEnableClipRect() const { return EnableClipRect; }
 };
 
 

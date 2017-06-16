@@ -7,8 +7,9 @@
 
 #include "tjsNative.h"
 #include "GLFrameBufferObject.h"
+#include "TextureInfo.h"
 
-class tTJSNI_Offscreen : public tTJSNativeInstance
+class tTJSNI_Offscreen : public tTJSNativeInstance, public iTVPTextureInfoIntrface
 {
 	GLFrameBufferObject	FrameBuffer;
 
@@ -24,9 +25,9 @@ public:
 	void CopyFromBitmap( class tTJSNI_Bitmap* bmp, tjs_int sleft, tjs_int stop, tjs_int width, tjs_int height, tjs_int left, tjs_int top );
 	void Update();
 
-	tjs_uint GetWidth() const;
-	tjs_uint GetHeight() const;
-	tjs_int64 GetNativeHandle() const;
+	tjs_uint GetWidth() const override;
+	tjs_uint GetHeight() const override;
+	tjs_int64 GetNativeHandle() const override;
 
 	/**
 	 * 描画対象に設定する

@@ -731,6 +731,9 @@
     <ClInclude Include="..\visual\opengl\ShaderProgramIntf.h">
       <Filter>visual\opengl</Filter>
     </ClInclude>
+    <ClInclude Include="..\visual\opengl\GLTexture.h">
+      <Filter>visual\opengl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\tjs2\tjs.cpp">

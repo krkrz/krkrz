@@ -53,8 +53,15 @@ TJS_W( "  gl_FragColor = texture2D( s_tex0, v_texCoord );" )
 TJS_W( "}")
 );
 //----------------------------------------------------------------------
-tTJSNI_Canvas::tTJSNI_Canvas() : IsFirst(true), InDrawing(false), GLScreen(nullptr), ClearColor(0xff00ff00), BlendMode(tTVPBlendMode::bmAlpha),
-StretchType(tTVPStretchType::stLinear), PrevViewportWidth(0), PrevViewportHeight(0),
+const float tTJSNI_Canvas::DefaultUVs[] = {
+	0.0f,  0.0f,
+	0.0f,  1.0f,
+	1.0f,  0.0f,
+	1.0f,  1.0f
+};
+//----------------------------------------------------------------------
+tTJSNI_Canvas::tTJSNI_Canvas() : IsFirst(true), InDrawing(false), EnableClipRect(false), GLScreen(nullptr), ClearColor(0xff00ff00), BlendMode(tTVPBlendMode::bmAlpha),
+PrevViewportWidth(0), PrevViewportHeight(0), CurrentScissorRect(-1,-1,-1,-1), 
 RenderTargetInstance(nullptr), ClipRectInstance(nullptr), Matrix44Instance(nullptr) {
 	TVPInitializeOpenGLPlatform();
 }
@@ -179,7 +186,7 @@ void tTJSNI_Canvas::BeginDrawing()
 	tTVPARGB<tjs_uint32> c;
 	c = ClearColor;
 	glClearColor( c.r/255.0f, c.g/255.0f, c.b/255.0f, c.a/255.0f );
-	glClear( GL_COLOR_BUFFER_BIT );
+	glClear( GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
 
 	EGLint sw = GLScreen->GetSurfaceWidth();
 	EGLint sh = GLScreen->GetSurfaceHeight();
@@ -187,8 +194,15 @@ void tTJSNI_Canvas::BeginDrawing()
 	PrevViewportWidth = sw;
 	PrevViewportHeight = sh;
 
-	glEnable( GL_BLEND );
+	glDisable( GL_DEPTH_TEST );
+	glDisable( GL_STENCIL_TEST );
+
 	ApplyBlendMode();
+	if( EnableClipRect ) {
+		ApplyClipRect();
+	} else {
+		DisableClipRect();
+	}
 	InDrawing = true;
 
 	if( RenderTargetInstance ) {
@@ -209,105 +223,238 @@ void tTJSNI_Canvas::EndDrawing()
  * https://www.khronos.org/registry/OpenGL-Refpages/es2.0/xhtml/glBlendFuncSeparate.xml
  */
 void tTJSNI_Canvas::ApplyBlendMode() {
-	glBlendEquation( GL_FUNC_ADD );
-	if( BlendMode == tTVPBlendMode::bmAlpha ) {
-		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-	} else if( BlendMode == tTVPBlendMode::bmOpaque ) {
-		glBlendFuncSeparate( GL_ONE, GL_ZERO, GL_ONE, GL_ZERO );
-	} else if( BlendMode == tTVPBlendMode::bmAdd ) {
-		glBlendFunc( GL_ONE, GL_ONE );
-	} else if( BlendMode == tTVPBlendMode::bmAddWithAlpha ) {
-		glBlendFunc( GL_SRC_ALPHA, GL_ONE );
-
-	/* } else if( BlendMode == tTVPBlendMode::bmAdditive ) {
-		glBlendEquation( GL_FUNC_ADD );
-		glBlendFuncSeparate( GL_SRC_COLOR, GL_SRC_ALPHA, GL_DST_COLOR, GL_DST_ALPHA );
-		*/
+	if( BlendMode == tTVPBlendMode::bmDisable ) {
+		glDisable( GL_BLEND );
 	} else {
-		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+		glEnable( GL_BLEND );
+		glBlendEquation( GL_FUNC_ADD );
+		switch( BlendMode ) {
+		case tTVPBlendMode::bmAlpha:
+			glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+			break;
+		case tTVPBlendMode::bmOpaque:
+			glBlendFuncSeparate( GL_ONE, GL_ZERO, GL_ONE, GL_ZERO );
+			break;
+		case tTVPBlendMode::bmAdd:
+			glBlendFunc( GL_ONE, GL_ONE );
+			break;
+		case tTVPBlendMode::bmAddWithAlpha:
+			glBlendFunc( GL_SRC_ALPHA, GL_ONE );
+			break;
+		default:
+			glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+			break;
+		}
 	}
+}
+//----------------------------------------------------------------------
+tjs_int tTJSNI_Canvas::GetCanvasWidth() const {
+	if( RenderTargetInstance ) {
+		return RenderTargetInstance->GetWidth();
+	}
+	return PrevViewportWidth;
+}
+//----------------------------------------------------------------------
+tjs_int tTJSNI_Canvas::GetCanvasHeight() const {
+	if( RenderTargetInstance ) {
+		return RenderTargetInstance->GetHeight();
+	}
+	return PrevViewportHeight;
 }
 //----------------------------------------------------------------------
 // method
 void tTJSNI_Canvas::Capture( class tTJSNI_Bitmap* bmp, bool front ) {
-	if( !bmp ) {
-		TVPAddLog( TJS_W("Bitmap is null.") );
-		return;
-	}
-
 	// Bitmap の内部表現が正順(上下反転されていない)ことを前提としているので注意
-	if( GLScreen ) {
-		EGLint sw = GLScreen->GetSurfaceWidth();
-		EGLint sh = GLScreen->GetSurfaceHeight();
-		bmp->SetSize( sw, sh, false );
-		tTVPBaseBitmap* b = bmp->GetBitmap();
-		tjs_uint32* dest = reinterpret_cast<tjs_uint32*>(b->GetScanLineForWrite(0));
-		if( GLFrameBufferObject::readFrameBuffer( 0, 0, sw, sh, reinterpret_cast<tjs_uint8*>(dest), front ) ) {
-			tjs_int pitch = b->GetPitchBytes();
-			for( tjs_int y = 0; y < sh; y++ ) {
-				TVPRedBlueSwap( dest, sw );
-				dest = reinterpret_cast<tjs_uint32*>(reinterpret_cast<tjs_uint8*>(dest)+pitch);
-			}
+	tjs_int sw = GetCanvasWidth();
+	tjs_int sh = GetCanvasHeight();
+	bmp->SetSize( sw, sh, false );
+	tTVPBaseBitmap* b = bmp->GetBitmap();
+	tjs_uint32* dest = reinterpret_cast<tjs_uint32*>(b->GetScanLineForWrite(0));
+	if( GLFrameBufferObject::readFrameBuffer( 0, 0, sw, sh, reinterpret_cast<tjs_uint8*>(dest), front ) ) {
+		tjs_int pitch = b->GetPitchBytes();
+		for( tjs_int y = 0; y < sh; y++ ) {
+			TVPRedBlueSwap( dest, sw );
+			dest = reinterpret_cast<tjs_uint32*>(reinterpret_cast<tjs_uint8*>(dest)+pitch);
 		}
-		tTVPRect rect( 0, 0, sw, sh );
-		b->UDFlip(rect);
 	}
+	tTVPRect rect( 0, 0, sw, sh );
+	b->UDFlip(rect);
+}
+//----------------------------------------------------------------------
+void tTJSNI_Canvas::Capture( const class iTVPTextureInfoIntrface* texture, bool front ) {
+	tjs_int sw = GetCanvasWidth();
+	tjs_int sh = GetCanvasHeight();
+	tjs_int tw = texture->GetWidth();
+	tjs_int th = texture->GetHeight();
+	if( tw < sw ) sw = tw;
+	if( th < sh ) sh = th;
+	glActiveTexture( GL_TEXTURE0 );
+	glBindTexture( GL_TEXTURE_2D, (GLuint)texture->GetNativeHandle() );
+	glReadBuffer( front ? GL_FRONT : GL_BACK );
+	glCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, 0, 0, sw, sh );
+	glBindTexture( GL_TEXTURE_2D, 0 );
 }
 //----------------------------------------------------------------------
 void tTJSNI_Canvas::Clear( tjs_uint32 color ) {
+	SetupEachDrawing();
+
 	tTVPARGB<tjs_uint32> c;
 	c = color;
 	glClearColor( c.r/255.0f, c.g/255.0f, c.b/255.0f, c.a/255.0f );
 	glClear( GL_COLOR_BUFFER_BIT );
 }
 //----------------------------------------------------------------------
-void tTJSNI_Canvas::DrawScreen( class tTJSNI_Offscreen* screen, tjs_real opacity ) {}
-//----------------------------------------------------------------------
-void tTJSNI_Canvas::DrawScreenUT( class tTJSNI_Offscreen* screen, class tTJSNI_Texture* texture, tjs_int vague, tjs_real opacity ) {}
-//----------------------------------------------------------------------
-void tTJSNI_Canvas::SetClipMask( class tTJSNI_Texture* texture, tjs_int left, tjs_int top ) { /* TODO: 次期実装  */}
-//----------------------------------------------------------------------
 void tTJSNI_Canvas::Fill( tjs_int left, tjs_int top, tjs_int width, tjs_int height, tjs_uint32 colors[4] ) {
-	EGLint sw = GLScreen->GetSurfaceWidth();
-	EGLint sh = GLScreen->GetSurfaceHeight();
+	SetupEachDrawing();
+
+	tjs_int sw = GetCanvasWidth();
+	tjs_int sh = GetCanvasHeight();
 	GLDrawer.DrawColoredPolygon( colors, left, top, width, height, sw, sh );
 }
 //----------------------------------------------------------------------
-void tTJSNI_Canvas::DrawTexture( tTJSNI_Texture* texture, tTJSNI_ShaderProgram* shader ) {
-	if( !Matrix44Instance  )
-		TVPThrowExceptionMessage( TJS_W( "Please set the matrix before drawing call." ) );
+void tTJSNI_Canvas::SetupTextureDrawing( tTJSNI_ShaderProgram* shader, const iTVPTextureInfoIntrface* tex, tTJSNI_Matrix44* mat, const tTVPPoint& vpSize ) {
+#if 1
+	const float width = (float)tex->GetWidth();
+	const float height = (float)tex->GetHeight();
+	const GLfloat vertices[] = {
+		0.0f,  0.0f,	// 左上
+		0.0f,  height,  // 左下
+		width, 0.0f,	// 右上
+		width, height,	// 右下
+	};
+
+	GLint posLoc = shader->FindLocation( std::string( "a_pos" ) );
+	if( posLoc < 0 ) TVPThrowExceptionMessage( TJS_W("Not found a_pos in shader.") );
+	GLint uvLoc = shader->FindLocation( std::string( "a_texCoord" ) );
+	if( uvLoc < 0 ) TVPThrowExceptionMessage( TJS_W("Not found a_texCoord in shader.") );
+	glVertexAttribPointer( posLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof( GLfloat ), vertices );
+	glVertexAttribPointer( uvLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof( GLfloat ), DefaultUVs );
+	glEnableVertexAttribArray( posLoc );
+	glEnableVertexAttribArray( uvLoc );
+
+	GLint texLoc = shader->FindLocation( std::string( "s_tex0" ) );
+	if( texLoc < 0 ) TVPThrowExceptionMessage( TJS_W( "Not found s_tex0 in shader." ) );
+	glActiveTexture( GL_TEXTURE0 );
+	glBindTexture( GL_TEXTURE_2D, (GLuint)tex->GetNativeHandle() );
+	glUniform1i( texLoc, 0 );
+
+	GLint matLoc = shader->FindLocation( std::string( "a_modelMat4" ) );
+	if( matLoc < 0 ) TVPThrowExceptionMessage( TJS_W("Not found a_modelMat4 in shader.") );
+	glUniformMatrix4fv( matLoc, 1, GL_TRUE, mat->GetMatrixArray() );
+
+	GLint vpLoc = shader->FindLocation( std::string( "a_size" ) );
+	if( vpLoc < 0 ) TVPThrowExceptionMessage( TJS_W("Not found a_size in shader.") );
+	glUniform2f( vpLoc, (float)vpSize.x, (float)vpSize.y );
+
+	glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
+#else
+	const float width = (float)tex->GetWidth();
+	const float height = (float)tex->GetHeight();
+	const GLfloat vertices[] = {
+		0.0f,  0.0f,	// 左上
+		0.0f,  height,  // 左下
+		width, 0.0f,	// 右上
+		width, height,	// 右下
+	};
+	const GLfloat uvs[] = {
+		0.0f,  0.0f,
+		0.0f,  1.0f,
+		1.0f,  0.0f,
+		1.0f,  1.0f,
+	};
+	GLint posLoc = shader->FindLocation( std::string( "a_pos" ) );
+	GLint uvLoc = shader->FindLocation( std::string( "a_texCoord" ) );
+	glVertexAttribPointer( posLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof( GLfloat ), vertices );
+	glVertexAttribPointer( uvLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof( GLfloat ), uvs );
+	glEnableVertexAttribArray( posLoc );
+	glEnableVertexAttribArray( uvLoc );
+
+	GLint texLoc = shader->FindLocation( std::string( "s_tex0" ) );
+	glActiveTexture( GL_TEXTURE0 );
+	glBindTexture( GL_TEXTURE_2D, (GLuint)tex->GetNativeHandle() );
+	glUniform1i( texLoc, 0 );
+
+	GLint matLoc = shader->FindLocation( std::string( "a_modelMat4" ) );
+	glUniformMatrix4fv( matLoc, 1, GL_TRUE, mat->GetMatrixArray() );
+
+	GLint vpLoc = shader->FindLocation( std::string( "a_size" ) );
+	glUniform2f( vpLoc, (float)vpSize.x, (float)vpSize.y );
+
+	//glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
+#endif
+}
+//----------------------------------------------------------------------
+void tTJSNI_Canvas::DrawTexture( const iTVPTextureInfoIntrface* texture, tTJSNI_ShaderProgram* shader ) {
+	SetupEachDrawing();
+
 	if( !shader ) shader = DefaultShaderInstance;
 
 	tTVPPoint ssize;
-	ssize.x = GLScreen->GetSurfaceWidth();
-	ssize.y = GLScreen->GetSurfaceHeight();
+	ssize.x = GetCanvasWidth();
+	ssize.y = GetCanvasHeight();
 	shader->SetupProgram();
-	GLDrawer.DrawTexture( shader, texture, Matrix44Instance, ssize );
+	//GLDrawer.DrawTexture( shader, texture, Matrix44Instance, ssize );
+	SetupTextureDrawing( shader, texture, Matrix44Instance, ssize );
+	//glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
 }
 //----------------------------------------------------------------------
-void tTJSNI_Canvas::DrawTexture( class tTJSNI_Texture* texture0, class tTJSNI_Texture* texture1, class tTJSNI_ShaderProgram* shader ) {
-	GLuint tex0Id = (GLuint)texture0->GetNativeHandle();
-	GLuint tex1Id = (GLuint)texture1->GetNativeHandle();
-	EGLint sw = GLScreen->GetSurfaceWidth();
-	EGLint sh = GLScreen->GetSurfaceHeight();
+void tTJSNI_Canvas::DrawTexture( const iTVPTextureInfoIntrface* texture0, const iTVPTextureInfoIntrface* texture1, tTJSNI_ShaderProgram* shader ) {
+	SetupEachDrawing();
+
+	tTVPPoint ssize;
+	ssize.x = GetCanvasWidth();
+	ssize.y = GetCanvasHeight();
 	shader->SetupProgram();
-	GLint tx0Loc = shader->FindLocation( std::string( "s_texture0" ) );
-	GLint tx1Loc = shader->FindLocation( std::string( "s_texture1" ) );
-	GLint posLoc = shader->FindLocation( std::string( "a_position" ) );
-	GLint uvLoc = shader->FindLocation( std::string( "a_texCoord" ) );
-	GLDrawer.DrawTexture2( tex0Id, tex1Id, texture0->GetWidth(), texture0->GetHeight(), sw, sh, posLoc, uvLoc, tx0Loc, tx1Loc );
+	SetupTextureDrawing( shader, texture0, Matrix44Instance, ssize );
+	GLint texLoc = shader->FindLocation( std::string( "s_tex1" ) );
+	if( texLoc < 0 ) TVPThrowExceptionMessage( TJS_W("Not found s_tex1 in shader.") );
+	glActiveTexture( GL_TEXTURE1 );
+	glBindTexture( GL_TEXTURE_2D, (GLuint)texture1->GetNativeHandle() );
+	glUniform1i( texLoc, 1 );
+	glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
+}
+//----------------------------------------------------------------------
+void tTJSNI_Canvas::DrawTexture( const iTVPTextureInfoIntrface* texture0, const iTVPTextureInfoIntrface* texture1, const iTVPTextureInfoIntrface* texture2, tTJSNI_ShaderProgram* shader ) {
+	SetupEachDrawing();
+
+	tTVPPoint ssize;
+	ssize.x = GetCanvasWidth();
+	ssize.y = GetCanvasHeight();
+	shader->SetupProgram();
+	SetupTextureDrawing( shader, texture0, Matrix44Instance, ssize );
+	GLint texLoc = shader->FindLocation( std::string( "s_tex1" ) );
+	if( texLoc < 0 ) TVPThrowExceptionMessage( TJS_W("Not found s_tex1 in shader.") );
+	glActiveTexture( GL_TEXTURE1 );
+	glBindTexture( GL_TEXTURE_2D, (GLuint)texture1->GetNativeHandle() );
+	glUniform1i( texLoc, 1 );
+	texLoc = shader->FindLocation( std::string( "s_tex2" ) );
+	if( texLoc < 0 ) TVPThrowExceptionMessage( TJS_W("Not found s_tex2 in shader.") );
+	glActiveTexture( GL_TEXTURE2 );
+	glBindTexture( GL_TEXTURE_2D, (GLuint)texture2->GetNativeHandle() );
+	glUniform1i( texLoc, 2 );
+	glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
 }
 //----------------------------------------------------------------------
 void tTJSNI_Canvas::DrawText( class tTJSNI_Font* font, tjs_int x, tjs_int y, const ttstr& text, tjs_uint32 color ) { /* TODO: 次期実装 */}
 //----------------------------------------------------------------------
 void tTJSNI_Canvas::ApplyClipRect() {
 	if( ClipRectInstance && GLScreen ) {
-		GLScreen->SetScissorRect( ClipRectInstance->Get() );
+		CurrentScissorRect = ClipRectInstance->Get();
+		GLScreen->SetScissorRect( CurrentScissorRect );
 	}
 }
 //----------------------------------------------------------------------
 void tTJSNI_Canvas::DisableClipRect() {
 	if( GLScreen ) GLScreen->DisableScissorRect();
+}
+//----------------------------------------------------------------------
+// 各描画前に呼び出して、状態の変化に応じた設定を行う。
+void tTJSNI_Canvas::SetupEachDrawing() {
+	if( EnableClipRect ) {
+		if( CurrentScissorRect != ClipRectInstance->Get() ) {
+			ApplyClipRect();
+		}
+	}
 }
 //----------------------------------------------------------------------
 // prop
@@ -405,20 +552,12 @@ void tTJSNI_Canvas::SetDefaultShader( const tTJSVariant & val ) {
 	}
 }
 //----------------------------------------------------------------------
-void tTJSNI_Canvas::SetTargetScreen( class tTJSNI_Offscreen* screen ) {}
-//----------------------------------------------------------------------
-iTJSDispatch2* tTJSNI_Canvas::GetTargetScreenNoAddRef() { return nullptr; }
-//----------------------------------------------------------------------
 void tTJSNI_Canvas::SetBlendMode( tTVPBlendMode bm ) {
 	BlendMode = bm;
 	if( InDrawing ) {
 		ApplyBlendMode();
 	}
 }
-//----------------------------------------------------------------------
-void tTJSNI_Canvas::SetStretchType( tTVPStretchType st ) {}
-//----------------------------------------------------------------------
-tTVPStretchType tTJSNI_Canvas::GetStretchType() const { return tTVPStretchType::stLinear; }
 //----------------------------------------------------------------------
 tjs_uint tTJSNI_Canvas::GetWidth() const {
 	if( GLScreen ) return GLScreen->GetSurfaceWidth();
@@ -428,6 +567,37 @@ tjs_uint tTJSNI_Canvas::GetWidth() const {
 tjs_uint tTJSNI_Canvas::GetHeight() const {
 	if( GLScreen ) return GLScreen->GetSurfaceHeight();
 	return 0;
+}
+//----------------------------------------------------------------------
+void tTJSNI_Canvas::SetEnableClipRect( bool b ) {
+	if( InDrawing ) {
+		if( EnableClipRect != b ) {
+			EnableClipRect = b;
+			if( b ) {
+				ApplyClipRect();
+			} else {
+				DisableClipRect();
+			}
+		}
+	} else {
+		EnableClipRect = b;
+	}
+}
+//----------------------------------------------------------------------
+/**
+ * テクスチャとして使用できるTJS2クラスインスタンス群から、テクスチャインターフェイスを取得する。
+ * テクスチャとして使用できるクラスを問わず、テクスチャ描画するための関数
+ */
+static const iTVPTextureInfoIntrface* GetTextureInfo( tTJSVariant *param ) {
+	tTJSNI_Texture* texture = (tTJSNI_Texture*)TJSGetNativeInstance( tTJSNC_Texture::ClassID, param );
+	if( texture ) return texture;
+
+
+	tTJSNI_Offscreen* offscreen = (tTJSNI_Offscreen*)TJSGetNativeInstance( tTJSNC_Offscreen::ClassID, param );
+	if( offscreen ) return offscreen;
+
+
+	return nullptr;
 }
 //----------------------------------------------------------------------
 
@@ -473,94 +643,21 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/capture)
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas);
 	if(numparams < 1) return TJS_E_BADPARAMCOUNT;
 
-	tTJSNI_Bitmap* dstbmp = nullptr;
-	tTJSVariantClosure clo = param[0]->AsObjectClosureNoAddRef();
-	if( clo.Object ) {
-		if(TJS_FAILED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE, tTJSNC_Bitmap::ClassID, (iTJSNativeInstance**)&dstbmp)))
-			return TJS_E_INVALIDPARAM;
-		// TODO Offscreenへのキャプチャも実装する
+	bool front = true;
+	if( numparams > 1 ) front = ( (tjs_int)param[1] ) ? true : false;
 
-		bool front = true;
-		if( numparams > 1 ) front = ( (tjs_int)param[1] ) ? true : false;
-		_this->Capture( dstbmp, front );
+	const iTVPTextureInfoIntrface* texture = GetTextureInfo( param[0] );
+	if( texture ) {
+		_this->Capture( texture, front );
+	} else {
+		tTJSNI_Bitmap* bmp = (tTJSNI_Bitmap*)TJSGetNativeInstance( tTJSNC_Bitmap::ClassID, param[0] );
+		if( !bmp ) return TJS_E_INVALIDPARAM;
+		_this->Capture( bmp, front );
 	}
 
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/capture)
-//----------------------------------------------------------------------
-TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/drawScreen)
-{
-	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas);
-	if( numparams < 2 ) return TJS_E_BADPARAMCOUNT;
-
-	tTJSNI_Offscreen* screen = nullptr;
-	tTJSVariantClosure clo = param[0]->AsObjectClosureNoAddRef();
-	if( clo.Object ) {
-		if(TJS_FAILED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE, tTJSNC_Offscreen::ClassID, (iTJSNativeInstance**)&screen)))
-			return TJS_E_INVALIDPARAM;
-	}
-	if(!screen) TVPThrowExceptionMessage(TJS_W("Parameter require Offscreen class instance."));
-	tjs_real opacity = *param[1];
-	_this->DrawScreen( screen, opacity );
-
-	return TJS_S_OK;
-}
-TJS_END_NATIVE_METHOD_DECL(/*func. name*/drawScreen)
-//----------------------------------------------------------------------
-TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/drawScreenUT )
-{
-	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas );
-	if( numparams < 4 ) return TJS_E_BADPARAMCOUNT;
-
-	tTJSNI_Offscreen* screen = nullptr;
-	{
-		tTJSVariantClosure clo = param[0]->AsObjectClosureNoAddRef();
-		if( clo.Object ) {
-			if( TJS_FAILED( clo.Object->NativeInstanceSupport( TJS_NIS_GETINSTANCE, tTJSNC_Offscreen::ClassID, (iTJSNativeInstance**)&screen ) ) )
-				return TJS_E_INVALIDPARAM;
-		}
-		if( !screen ) TVPThrowExceptionMessage( TJS_W( "Parameter require Offscreen class instance." ) );
-	}
-
-	tTJSNI_Texture* texture = nullptr;
-	{
-		tTJSVariantClosure clo = param[1]->AsObjectClosureNoAddRef();
-		if( clo.Object ) {
-			if( TJS_FAILED( clo.Object->NativeInstanceSupport( TJS_NIS_GETINSTANCE, tTJSNC_Texture::ClassID, (iTJSNativeInstance**)&texture ) ) )
-				return TJS_E_INVALIDPARAM;
-		}
-		if( !texture ) TVPThrowExceptionMessage( TJS_W( "Parameter require Texture class instance." ) );
-	}
-
-	tjs_int vague = *param[2];
-	tjs_real opacity = *param[3];
-	_this->DrawScreenUT( screen, texture, vague, opacity );
-
-	return TJS_S_OK;
-}
-TJS_END_NATIVE_METHOD_DECL(/*func. name*/drawScreen)
-//----------------------------------------------------------------------
-TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/setClipMask)
-{
-	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas);
-	if( numparams < 3 ) return TJS_E_BADPARAMCOUNT;
-
-	tTJSNI_Texture* texture = nullptr;
-	tTJSVariantClosure clo = param[0]->AsObjectClosureNoAddRef();
-	if( clo.Object ) {
-		if(TJS_FAILED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE, tTJSNC_Texture::ClassID, (iTJSNativeInstance**)&texture)))
-			return TJS_E_INVALIDPARAM;
-	}
-	if(!texture) TVPThrowExceptionMessage(TJS_W("Parameter require Texture class instance."));
-
-	tjs_int left = *param[1];
-	tjs_int top = *param[2];
-	_this->SetClipMask( texture, left, top );
-
-	return TJS_S_OK;
-}
-TJS_END_NATIVE_METHOD_DECL(/*func. name*/setClipMask)
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/fill)
 {
@@ -635,23 +732,33 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/drawTexture )
 	if( numparams < 1 ) return TJS_E_BADPARAMCOUNT;
 
 	if( numparams == 1 ) {
-		tTJSNI_Texture* texture = (tTJSNI_Texture*)TJSGetNativeInstance( tTJSNC_Texture::ClassID, param[0] );
+		const iTVPTextureInfoIntrface* texture = GetTextureInfo( param[0] );
 		if( !texture ) return TJS_E_INVALIDPARAM;
 		_this->DrawTexture( texture );
 	} else if( numparams == 2 ) {
-		tTJSNI_Texture* texture = (tTJSNI_Texture*)TJSGetNativeInstance( tTJSNC_Texture::ClassID, param[0] );
+		const iTVPTextureInfoIntrface* texture = GetTextureInfo( param[0] );
 		if( !texture ) return TJS_E_INVALIDPARAM;
 		tTJSNI_ShaderProgram* shader = (tTJSNI_ShaderProgram*)TJSGetNativeInstance( tTJSNC_ShaderProgram::ClassID, param[1] );
 		if( !shader ) return TJS_E_INVALIDPARAM;
 		_this->DrawTexture( texture, shader );
 	} else if( numparams == 3 ) {
-		tTJSNI_Texture* texture0 = (tTJSNI_Texture*)TJSGetNativeInstance( tTJSNC_Texture::ClassID, param[0] );
+		const iTVPTextureInfoIntrface* texture0 = GetTextureInfo( param[0] );
 		if( !texture0 ) return TJS_E_INVALIDPARAM;
-		tTJSNI_Texture* texture1 = (tTJSNI_Texture*)TJSGetNativeInstance( tTJSNC_Texture::ClassID, param[1] );
+		const iTVPTextureInfoIntrface* texture1 = GetTextureInfo( param[1] );
 		if( !texture1 ) return TJS_E_INVALIDPARAM;
 		tTJSNI_ShaderProgram* shader = (tTJSNI_ShaderProgram*)TJSGetNativeInstance( tTJSNC_ShaderProgram::ClassID, param[2] );
 		if( !shader ) return TJS_E_INVALIDPARAM;
 		_this->DrawTexture( texture0, texture1, shader );
+	} else if( numparams == 4 ) {
+		const iTVPTextureInfoIntrface* texture0 = GetTextureInfo( param[0] );
+		if( !texture0 ) return TJS_E_INVALIDPARAM;
+		const iTVPTextureInfoIntrface* texture1 = GetTextureInfo( param[1] );
+		if( !texture1 ) return TJS_E_INVALIDPARAM;
+		const iTVPTextureInfoIntrface* texture2 = GetTextureInfo( param[2] );
+		if( !texture2 ) return TJS_E_INVALIDPARAM;
+		tTJSNI_ShaderProgram* shader = (tTJSNI_ShaderProgram*)TJSGetNativeInstance( tTJSNC_ShaderProgram::ClassID, param[3] );
+		if( !shader ) return TJS_E_INVALIDPARAM;
+		_this->DrawTexture( texture0, texture1, texture2, shader );
 	} else {
 		return TJS_E_BADPARAMCOUNT;
 	}
@@ -681,22 +788,6 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/drawText)
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/drawText)
-//----------------------------------------------------------------------
-TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/applyClipRect )
-{
-	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas );
-	_this->ApplyClipRect();
-	return TJS_S_OK;
-}
-TJS_END_NATIVE_METHOD_DECL(/*func. name*/applyClipRect )
-//----------------------------------------------------------------------
-TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/disableClipRect )
-{
-	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas );
-	_this->DisableClipRect();
-	return TJS_S_OK;
-}
-TJS_END_NATIVE_METHOD_DECL(/*func. name*/disableClipRect )
 //----------------------------------------------------------------------
 
 
@@ -789,26 +880,6 @@ TJS_BEGIN_NATIVE_PROP_DECL(blendMode)
 }
 TJS_END_NATIVE_PROP_DECL(blendMode)
 //----------------------------------------------------------------------
-TJS_BEGIN_NATIVE_PROP_DECL(stretchType)
-{
-	TJS_BEGIN_NATIVE_PROP_GETTER
-	{
-		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas);
-		*result = (tjs_int)_this->GetStretchType();
-		return TJS_S_OK;
-	}
-	TJS_END_NATIVE_PROP_GETTER
-
-	TJS_BEGIN_NATIVE_PROP_SETTER
-	{
-		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas);
-		_this->SetStretchType( (tTVPStretchType)(tjs_int)*param );
-		return TJS_S_OK;
-	}
-	TJS_END_NATIVE_PROP_SETTER
-}
-TJS_END_NATIVE_PROP_DECL(stretchType)
-//----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_PROP_DECL(matrix)
 {
 	TJS_BEGIN_NATIVE_PROP_GETTER
@@ -876,6 +947,26 @@ TJS_BEGIN_NATIVE_PROP_DECL(height)
 	TJS_DENY_NATIVE_PROP_SETTER
 }
 TJS_END_NATIVE_PROP_DECL(height)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL( enableClipRect )
+{
+	TJS_BEGIN_NATIVE_PROP_GETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas );
+		*result = _this->GetEnableClipRect() ? (tjs_int)1 : (tjs_int)0;
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_GETTER
+
+	TJS_BEGIN_NATIVE_PROP_SETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas );
+		_this->SetEnableClipRect( ((tjs_int)*param) == 0 ? false : true );
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_PROP_DECL( enableClipRect )
 //----------------------------------------------------------------------
 
 	TJS_END_NATIVE_MEMBERS

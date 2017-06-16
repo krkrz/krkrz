@@ -526,6 +526,7 @@
     <ClInclude Include="..\visual\opengl\CanvasIntf.h" />
     <ClInclude Include="..\visual\opengl\GLFrameBufferObject.h" />
     <ClInclude Include="..\visual\opengl\GLShaderUtil.h" />
+    <ClInclude Include="..\visual\opengl\GLTexture.h" />
     <ClInclude Include="..\visual\opengl\GLTextureDrawing.h" />
     <ClInclude Include="..\visual\opengl\Matrix44Intf.h" />
     <ClInclude Include="..\visual\opengl\Mesh2DIntf.h" />

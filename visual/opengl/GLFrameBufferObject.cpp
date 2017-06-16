@@ -21,8 +21,8 @@ bool GLFrameBufferObject::create( GLuint w, GLuint h ) {
 
 	glGenRenderbuffers( 1, &renderbuffer_id_ );
 	glBindRenderbuffer( GL_RENDERBUFFER, renderbuffer_id_ );
-	glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, w, h );
-	glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, renderbuffer_id_ );
+	glRenderbufferStorage( GL_RENDERBUFFER, GL_STENCIL_INDEX8, w, h );
+	glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, renderbuffer_id_ );
 
 	glGenTextures( 1, &texture_id_ );
 	glBindTexture( GL_TEXTURE_2D, texture_id_ );

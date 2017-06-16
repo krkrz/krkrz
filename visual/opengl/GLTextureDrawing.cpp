@@ -7,42 +7,9 @@
 #include "Matrix44Intf.h"
 #include "TextureInfo.h"
 
-tTVPGLTextureDrawing::tTVPGLTextureDrawing() : Program(0), PositionLoc(0), TexCoordLoc(0), SamplerLoc(0) {}
+tTVPGLTextureDrawing::tTVPGLTextureDrawing() : ProgramColorPoly(0), PositionColorPolyLoc(0), ColorColorPolyLoc(0) {}
 
 bool tTVPGLTextureDrawing::InitializeShader() {
-	const std::string vs = SHADER_SOURCE
-	(
-		attribute vec4 a_position;
-		attribute vec2 a_texCoord;
-		varying vec2 v_texCoord;
-		varying vec4 vPosition;
-		void main()
-		{
-			gl_Position = a_position;
-			v_texCoord = a_texCoord;
-			vPosition = a_position;
-		}
-	);
-	const std::string fs = SHADER_SOURCE
-	(
-		precision mediump float;
-		varying vec2 v_texCoord;
-		varying vec4 vPosition;
-		uniform sampler2D s_texture;
-		void main()
-		{
-			gl_FragColor = texture2D( s_texture, v_texCoord );
-		}
-	);
-	Program = CompileProgram(vs, fs);
-	if( !Program ) {
-		return false;
-	}
-	PositionLoc = glGetAttribLocation(Program, "a_position");
-	TexCoordLoc = glGetAttribLocation(Program, "a_texCoord");
-	SamplerLoc = glGetUniformLocation(Program, "s_texture");
-
-
 	const std::string vs2 = SHADER_SOURCE
 	(
 		attribute vec2 a_position;
@@ -76,6 +43,7 @@ bool tTVPGLTextureDrawing::InitializeShader() {
 	Cr = [(Cs * As) + (Cd * (1 - As) * Ad)] / Ar
 	愚直な実装
 	*/
+#if 0
 	const std::string fscross = SHADER_SOURCE
 	(
 		precision mediump float;
@@ -95,85 +63,14 @@ bool tTVPGLTextureDrawing::InitializeShader() {
 			gl_FragColor.a = ar;
 		}
 	);
+#endif
 	return true;
 }
 void tTVPGLTextureDrawing::DestroyShader() {
-	if( Program ) {
-		glDeleteProgram( Program );
-		Program = 0;
+	if( ProgramColorPoly ) {
+		glDeleteProgram( ProgramColorPoly );
+		ProgramColorPoly = 0;
 	}
-}
-
-void tTVPGLTextureDrawing::DrawTexture( GLuint tex, int x, int y,int w, int h, int sw, int sh ) {
-	float left  =((float)x/(float)sw)*2.0f-1.0f;
-	float top   =((float)y/(float)sh)*2.0f-1.0f;
-	float right =((float)(x+w)/(float)sw)*2.0f-1.0f;
-	float bottom=((float)(y+h)/(float)sh)*2.0f-1.0f;
-	top   =-top;
-	bottom=-bottom;
-#if 1
-	GLfloat vertices[] = {
-        left,  top, 0.0f,  // Position 0
-         0.0f,  0.0f,        // TexCoord 0
-        left, bottom, 0.0f,  // Position 1
-         0.0f,  1.0f,        // TexCoord 1
-         right, bottom, 0.0f,  // Position 2
-         1.0f,  1.0f,        // TexCoord 2
-         right,  top, 0.0f,  // Position 3
-         1.0f,  0.0f         // TexCoord 3
-	};
-#else
-	GLfloat vertices[] = {
-        -0.5f,  0.5f, 0.0f,  // Position 0
-         0.0f,  0.0f,        // TexCoord 0
-        -0.5f, -0.5f, 0.0f,  // Position 1
-         0.0f,  1.0f,        // TexCoord 1
-         0.5f, -0.5f, 0.0f,  // Position 2
-         1.0f,  1.0f,        // TexCoord 2
-         0.5f,  0.5f, 0.0f,  // Position 3
-         1.0f,  0.0f         // TexCoord 3
-	};
-	/*
-	GLfloat vertices[] = {
-		-0.5f,  0.5f, 0.0f,  // Position 0
-		0.0f,  1.0f,        // TexCoord 0
-		-0.5f, -0.5f, 0.0f,  // Position 1
-		0.0f,  0.0f,        // TexCoord 1
-		0.5f, -0.5f, 0.0f,  // Position 2
-		1.0f,  0.0f,        // TexCoord 2
-		0.5f,  0.5f, 0.0f,  // Position 3
-		1.0f,  1.0f         // TexCoord 3
-	};
-	*/
-#endif
-	GLushort indices[] = { 0, 1, 2, 0, 2, 3 };
-
-	// Set the viewport
-	// glViewport(0, 0, getWindow()->getWidth(), getWindow()->getHeight());
-
-	// Clear the color buffer
-	// glClear(GL_COLOR_BUFFER_BIT);
-	// clipping rect
-	//glScissor( 10, 10, 400, 400 );
-	//glEnable( GL_SCISSOR_TEST );
-
-	// Use the program object
-	glUseProgram(Program);
-
-	// Load the vertex position
-	glVertexAttribPointer(PositionLoc, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), vertices);
-	// Load the texture coordinate
-	glVertexAttribPointer(TexCoordLoc, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), vertices + 3);
-
-	glEnableVertexAttribArray(PositionLoc);
-	glEnableVertexAttribArray(TexCoordLoc);
-
-	// Bind the texture
-	glActiveTexture( GL_TEXTURE0 );
-	glBindTexture( GL_TEXTURE_2D, tex );
-	glUniform1i( SamplerLoc, 0 );
-
-	glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, indices );
 }
 
 void tTVPGLTextureDrawing::DrawColoredPolygon( tjs_uint32 color[4], int x, int y, int w, int h, int sw, int sh ) {
@@ -207,74 +104,7 @@ void tTVPGLTextureDrawing::DrawColoredPolygon( tjs_uint32 color[4], int x, int y
 	glEnableVertexAttribArray( ColorColorPolyLoc );
 	glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
 }
-void tTVPGLTextureDrawing::DrawTexture( GLuint tex, int w, int h, int sw, int sh, GLint posLoc, GLint uvLoc, GLint texLoc ) {
-	float left = ( ( float )0.0f / (float)sw )*2.0f - 1.0f;
-	float top = ( ( float )0.0f / (float)sh )*2.0f - 1.0f;
-	float right = ( (float)( w ) / (float)sw )*2.0f - 1.0f;
-	float bottom = ( (float)( h ) / (float)sh )*2.0f - 1.0f;
-	top = -top;
-	bottom = -bottom;
-	GLfloat vertices[] = {
-		left,  top,		// 左上
-		left,  bottom,  // 左下
-		right, top,		// 右上
-		right, bottom,	// 右下
-	};
-	GLfloat uvs[] = {
-		0.0f,  0.0f,
-		0.0f,  1.0f,
-		1.0f,  0.0f,
-		1.0f,  1.0f,
-	};
-	glVertexAttribPointer( posLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof( GLfloat ), vertices );
-	glVertexAttribPointer( uvLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof( GLfloat ), uvs );
-	glEnableVertexAttribArray( posLoc );
-	glEnableVertexAttribArray( uvLoc );
-
-	// Bind the texture
-	glActiveTexture( GL_TEXTURE0 );
-	glBindTexture( GL_TEXTURE_2D, tex );
-	glUniform1i( texLoc, 0 );
-
-	glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
-}
-void tTVPGLTextureDrawing::DrawTexture2( GLuint tex0, GLuint tex1, int w, int h, int sw, int sh, GLint posLoc, GLint uvLoc, GLint tx0Loc, GLint tx1Loc ) {
-	float left = ( (float)0.0f / (float)sw )*2.0f - 1.0f;
-	float top = ( (float)0.0f / (float)sh )*2.0f - 1.0f;
-	float right = ( (float)( w ) / (float)sw )*2.0f - 1.0f;
-	float bottom = ( (float)( h ) / (float)sh )*2.0f - 1.0f;
-	top = -top;
-	bottom = -bottom;
-	GLfloat vertices[] = {
-		left,  top,		// 左上
-		left,  bottom,  // 左下
-		right, top,		// 右上
-		right, bottom,	// 右下
-	};
-	GLfloat uvs[] = {
-		0.0f,  0.0f,
-		0.0f,  1.0f,
-		1.0f,  0.0f,
-		1.0f,  1.0f,
-	};
-	glVertexAttribPointer( posLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof( GLfloat ), vertices );
-	glVertexAttribPointer( uvLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof( GLfloat ), uvs );
-	glEnableVertexAttribArray( posLoc );
-	glEnableVertexAttribArray( uvLoc );
-
-	// Bind the texture
-	glActiveTexture( GL_TEXTURE0 );
-	glBindTexture( GL_TEXTURE_2D, tex0 );
-	glUniform1i( tx0Loc, 0 );
-
-	glActiveTexture( GL_TEXTURE1 );
-	glBindTexture( GL_TEXTURE_2D, tex1 );
-	glUniform1i( tx1Loc, 1 );
-
-	glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
-}
-
-void tTVPGLTextureDrawing::DrawTexture( tTJSNI_ShaderProgram* shader, iTVPTextureInfoIntrface* tex, tTJSNI_Matrix44* mat, const tTVPPoint& sufaceSize ) {
+void tTVPGLTextureDrawing::DrawTexture( tTJSNI_ShaderProgram* shader, const iTVPTextureInfoIntrface* tex, tTJSNI_Matrix44* mat, const tTVPPoint& sufaceSize ) {
 	const float width = (float)tex->GetWidth();
 	const float height = (float)tex->GetHeight();
 	const GLfloat vertices[] = {
@@ -309,4 +139,3 @@ void tTVPGLTextureDrawing::DrawTexture( tTJSNI_ShaderProgram* shader, iTVPTextur
 
 	glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
 }
-

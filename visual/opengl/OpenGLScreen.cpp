@@ -93,7 +93,7 @@ bool tTVPOpenGLScreen::Initialize() {
 		EGL_ALPHA_SIZE,     EGL_DONT_CARE,
 		*/
 		EGL_DEPTH_SIZE,     EGL_DONT_CARE,
-		EGL_STENCIL_SIZE,   EGL_DONT_CARE,
+		EGL_STENCIL_SIZE,   8,
 		EGL_SAMPLE_BUFFERS, mMultisample ? 1 : 0,
 		//EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
 		EGL_NONE
@@ -155,9 +155,10 @@ bool tTVPOpenGLScreen::Initialize() {
 	}
 	const EGLint configAttributes[] = {
 		EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-		EGL_BLUE_SIZE, 8,
-		EGL_GREEN_SIZE, 8,
-		EGL_RED_SIZE, 8,
+		EGL_BLUE_SIZE,      8,
+		EGL_GREEN_SIZE,     8,
+		EGL_RED_SIZE,       8,
+		EGL_STENCIL_SIZE,   8,
 		EGL_NONE
     };
 	EGLint configCount;
