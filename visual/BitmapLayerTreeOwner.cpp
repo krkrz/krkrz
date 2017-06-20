@@ -86,11 +86,11 @@ void TJS_INTF_METHOD tTJSNI_BitmapLayerTreeOwner::NotifyBitmapCompleted(class iT
 
 		if(bitmapinfo->GetHeight() < 0) {
 			// bottom-down
-			src_pitch = bitmapinfo->GetWidth() * 4;
-		} else {
-			// bottom-up
 			src_pitch = -bitmapinfo->GetWidth() * 4;
 			src_p += bitmapinfo->GetWidth() * 4 * (bitmapinfo->GetHeight() - 1);
+		} else {
+			// bottom-up
+			src_pitch = bitmapinfo->GetWidth() * 4;
 		}
 
 		for(; src_y < src_y_limit; src_y ++, dest_y ++) {
