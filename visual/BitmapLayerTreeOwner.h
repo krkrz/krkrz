@@ -19,7 +19,15 @@ class tTJSNI_BitmapLayerTreeOwner : public tTJSNativeInstance, public tTVPLayerT
 	iTJSDispatch2 *BitmapObject;
 	tTJSNI_Bitmap *BitmapNI;
 
-public:public:
+	bool IsDirty;
+	tTJSVariant DirtyRectObject;
+	class tTJSNI_Rect* DirtyRectInstance;
+
+public:
+	void SetDirtyRectObject( const tTJSVariant & val );
+	const tTJSVariant& GetDirtyRectObject() const { return DirtyRectObject; }
+
+public:
 	tTJSNI_BitmapLayerTreeOwner();
 	~tTJSNI_BitmapLayerTreeOwner();
 
@@ -54,6 +62,8 @@ public:public:
 
 	tjs_int GetWidth() const { return BitmapNI->GetWidth(); }
 	tjs_int GetHeight() const { return BitmapNI->GetHeight(); }
+	bool IsUpdated() const { return IsDirty; }
+	void ClearDirtyRect() { IsDirty = false; }
 };
 
 class tTJSNC_BitmapLayerTreeOwner : public tTJSNativeClass {

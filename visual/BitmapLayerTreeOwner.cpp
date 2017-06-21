@@ -16,16 +16,18 @@
 
 #include "BitmapLayerTreeOwner.h"
 #include "MsgIntf.h"
+#include "RectItf.h"
 
 #include <assert.h>
 
 tTJSNI_BitmapLayerTreeOwner::tTJSNI_BitmapLayerTreeOwner() 
-: Owner(NULL), BitmapObject(NULL), BitmapNI(NULL)
+: Owner(nullptr), BitmapObject(nullptr), BitmapNI(nullptr), DirtyRectInstance(nullptr), IsDirty(false)
 {
 }
+//----------------------------------------------------------------------
 tTJSNI_BitmapLayerTreeOwner::~tTJSNI_BitmapLayerTreeOwner() {
 }
-
+//----------------------------------------------------------------------
 // tTJSNativeInstance
 tjs_error TJS_INTF_METHOD tTJSNI_BitmapLayerTreeOwner::Construct(tjs_int numparams, tTJSVariant **param, iTJSDispatch2 *tjs_obj) {
 
@@ -35,28 +37,58 @@ tjs_error TJS_INTF_METHOD tTJSNI_BitmapLayerTreeOwner::Construct(tjs_int numpara
 	if(TJS_FAILED(BitmapObject->NativeInstanceSupport(TJS_NIS_GETINSTANCE, tTJSNC_Bitmap::ClassID, (iTJSNativeInstance**)&BitmapNI)))
 		return TJS_E_INVALIDPARAM;
 
+	iTJSDispatch2* rect = TVPCreateRectObject( 0, 0, 0, 0 );
+	tTJSVariant val( rect, rect );
+	SetDirtyRectObject( val );
+
 	return TJS_S_OK;
 }
+//----------------------------------------------------------------------
 void TJS_INTF_METHOD tTJSNI_BitmapLayerTreeOwner::Invalidate() {
+	// release dirty rect
+	SetDirtyRectObject( tTJSVariant() );
+
 	// invalidate bitmap object
 	BitmapNI = NULL;
 	if( BitmapObject ) {
-		BitmapObject->Invalidate(0, NULL, NULL, BitmapObject);
+		BitmapObject->Invalidate(0, nullptr, nullptr, BitmapObject);
 		BitmapObject->Release();
-		BitmapObject = NULL;
+		BitmapObject = nullptr;
 	}
 }
+//----------------------------------------------------------------------
+void tTJSNI_BitmapLayerTreeOwner::SetDirtyRectObject( const tTJSVariant & val ) {
+	// invalidate existing clip rect
+	if( DirtyRectObject.Type() == tvtObject )
+		DirtyRectObject.AsObjectClosureNoAddRef().Invalidate( 0, NULL, NULL, DirtyRectObject.AsObjectNoAddRef() );
 
+	// assign new rect
+	DirtyRectObject = val;
+	DirtyRectInstance = nullptr;
+
+	// extract interface
+	if( DirtyRectObject.Type() == tvtObject ) {
+		tTJSVariantClosure clo = DirtyRectObject.AsObjectClosureNoAddRef();
+		if( clo.Object ) {
+			if( TJS_FAILED( clo.Object->NativeInstanceSupport( TJS_NIS_GETINSTANCE, tTJSNC_Rect::ClassID, (iTJSNativeInstance**)&DirtyRectInstance ) ) ) {
+				DirtyRectInstance = nullptr;
+				TVPThrowExceptionMessage( TJS_W( "Cannot retrive rect instance." ) );
+			}
+		}
+	}
+}
+//----------------------------------------------------------------------
 iTJSDispatch2* tTJSNI_BitmapLayerTreeOwner::GetBitmapObjectNoAddRef() {
 	if(BitmapObject) return BitmapObject;
 	// create bitmap object if the object is not yet created.
 	BitmapObject = TVPCreateBitmapObject();
 	return BitmapObject;
 }
-
+//----------------------------------------------------------------------
 // tTVPLayerTreeOwner
 void TJS_INTF_METHOD tTJSNI_BitmapLayerTreeOwner::StartBitmapCompletion(iTVPLayerManager * manager) {
 }
+//----------------------------------------------------------------------
 void TJS_INTF_METHOD tTJSNI_BitmapLayerTreeOwner::NotifyBitmapCompleted(class iTVPLayerManager * manager,
 	tjs_int x, tjs_int y, const void * bits, const class BitmapInfomation * bitmapinfo,
 	const tTVPRect &cliprect, tTVPLayerType type, tjs_int opacity) {
@@ -74,6 +106,16 @@ void TJS_INTF_METHOD tTJSNI_BitmapLayerTreeOwner::NotifyBitmapCompleted(class iT
 		!(cliprect.left < 0 || cliprect.top < 0 ||
 			cliprect.right > bitmapinfo->GetWidth() || cliprect.bottom > bitmapinfo->GetHeight()) )
 	{
+		if( IsDirty == false ) {
+			if( DirtyRectInstance ) {
+				DirtyRectInstance->Set( cliprect.left, cliprect.top, cliprect.right, cliprect.bottom );
+				IsDirty = true;
+			}
+		} else {
+			if( DirtyRectInstance ) {
+				TVPUnionRect( &DirtyRectInstance->Get(), DirtyRectInstance->Get(), cliprect );
+			}
+		}
 		// bitmapinfo で表された cliprect の領域を x,y にコピーする
 		long src_y       = cliprect.top;
 		long src_y_limit = cliprect.bottom;
@@ -100,9 +142,10 @@ void TJS_INTF_METHOD tTJSNI_BitmapLayerTreeOwner::NotifyBitmapCompleted(class iT
 		}
 	}
 }
+//----------------------------------------------------------------------
 void TJS_INTF_METHOD tTJSNI_BitmapLayerTreeOwner::EndBitmapCompletion(iTVPLayerManager * manager) {
 }
-
+//----------------------------------------------------------------------
 void tTJSNI_BitmapLayerTreeOwner::OnSetMouseCursor( tjs_int cursor ) {
 	if( Owner ) {
 		tTJSVariant arg[1] = { cursor };
@@ -110,6 +153,7 @@ void tTJSNI_BitmapLayerTreeOwner::OnSetMouseCursor( tjs_int cursor ) {
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 1, arg);
 	}
 }
+//----------------------------------------------------------------------
 void tTJSNI_BitmapLayerTreeOwner::OnGetCursorPos(tjs_int &x, tjs_int &y) {
 	if( Owner ) {
 		tjs_int vx = x, vy = y;
@@ -120,6 +164,7 @@ void tTJSNI_BitmapLayerTreeOwner::OnGetCursorPos(tjs_int &x, tjs_int &y) {
 		y = arg[1];
 	}
 }
+//----------------------------------------------------------------------
 void tTJSNI_BitmapLayerTreeOwner::OnSetCursorPos(tjs_int x, tjs_int y) {
 	if( Owner ) {
 		tTJSVariant arg[2] = { x, y };
@@ -127,12 +172,14 @@ void tTJSNI_BitmapLayerTreeOwner::OnSetCursorPos(tjs_int x, tjs_int y) {
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 2, arg);
 	}
 }
+//----------------------------------------------------------------------
 void tTJSNI_BitmapLayerTreeOwner::OnReleaseMouseCapture() {
 	if( Owner ) {
 		static ttstr eventname(TJS_W("onReleaseMouseCapture"));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 0, NULL);
 	}
 }
+//----------------------------------------------------------------------
 void tTJSNI_BitmapLayerTreeOwner::OnSetHintText(iTJSDispatch2* sender, const ttstr &hint) {
 	if( Owner ) {
 		tTJSVariant clo(sender, sender);
@@ -141,7 +188,7 @@ void tTJSNI_BitmapLayerTreeOwner::OnSetHintText(iTJSDispatch2* sender, const tts
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 2, arg);
 	}
 }
-
+//----------------------------------------------------------------------
 void tTJSNI_BitmapLayerTreeOwner::OnResizeLayer( tjs_int w, tjs_int h ) {
 	if( BitmapNI ) {
 		BitmapNI->SetSize( w, h ); // サイズ変更に応じて、内部のBitmapもサイズ変更する
@@ -152,13 +199,14 @@ void tTJSNI_BitmapLayerTreeOwner::OnResizeLayer( tjs_int w, tjs_int h ) {
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 2, arg);
 	}
 }
+//----------------------------------------------------------------------
 void tTJSNI_BitmapLayerTreeOwner::OnChangeLayerImage() {
 	if( Owner ) {
 		static ttstr eventname(TJS_W("onChangeLayerImage"));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 0, NULL);
 	}
 }
-
+//----------------------------------------------------------------------
 void tTJSNI_BitmapLayerTreeOwner::OnSetAttentionPoint(tTJSNI_BaseLayer *layer, tjs_int x, tjs_int y) {
 	if( Owner ) {
 		iTJSDispatch2* owner = GetOwnerNoAddRef();
@@ -168,12 +216,14 @@ void tTJSNI_BitmapLayerTreeOwner::OnSetAttentionPoint(tTJSNI_BaseLayer *layer, t
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 3, arg);
 	}
 }
+//----------------------------------------------------------------------
 void tTJSNI_BitmapLayerTreeOwner::OnDisableAttentionPoint() {
 	if( Owner ) {
 		static ttstr eventname(TJS_W("onDisableAttentionPoint"));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 0, NULL);
 	}
 }
+//----------------------------------------------------------------------
 void tTJSNI_BitmapLayerTreeOwner::OnSetImeMode(tjs_int mode) {
 	if( Owner ) {
 		tTJSVariant arg[1] = { mode };
@@ -181,12 +231,14 @@ void tTJSNI_BitmapLayerTreeOwner::OnSetImeMode(tjs_int mode) {
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 1, arg);
 	}
 }
+//----------------------------------------------------------------------
 void tTJSNI_BitmapLayerTreeOwner::OnResetImeMode() {
 	if( Owner ) {
 		static ttstr eventname(TJS_W("onResetImeMode"));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 0, NULL);
 	}
 }
+//----------------------------------------------------------------------
 
 
 //----------------------------------------------------------------------
@@ -377,6 +429,14 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/fireRecheckInputState)
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/fireRecheckInputState)
 //----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/clearDirtyRect)
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_BitmapLayerTreeOwner);
+	_this->ClearDirtyRect();
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/clearDirtyRect)
+//----------------------------------------------------------------------
 
 //-- events
 
@@ -506,6 +566,34 @@ TJS_BEGIN_NATIVE_PROP_DECL(bitmap)
 	TJS_DENY_NATIVE_PROP_SETTER
 }
 TJS_END_NATIVE_PROP_DECL(bitmap)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(dirtyRect)
+{
+	TJS_BEGIN_NATIVE_PROP_GETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_BitmapLayerTreeOwner);
+		*result = _this->GetDirtyRectObject();
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_GETTER
+
+	TJS_DENY_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_PROP_DECL(dirtyRect)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(isUpdated)
+{
+	TJS_BEGIN_NATIVE_PROP_GETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_BitmapLayerTreeOwner);
+		*result = _this->IsUpdated() ? (tjs_int)1 : (tjs_int)0;
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_GETTER
+
+	TJS_DENY_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_PROP_DECL(isUpdated)
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_PROP_DECL(layerTreeOwnerInterface)
 {
