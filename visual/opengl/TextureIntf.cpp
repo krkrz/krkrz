@@ -8,6 +8,7 @@
 #include "LayerIntf.h"
 #include "MsgIntf.h"	// TVPThrowExceptionMessage
 #include "TVPColor.h"	// clNone
+#include "RectItf.h"
 #include <memory>
 #include <assert.h>
 
@@ -113,6 +114,15 @@ tjs_error TJS_INTF_METHOD tTJSNI_Texture::Construct(tjs_int numparams, tTJSVaria
 			}
 			LoadTexture( bitmap2.get(), gray );
 		}
+	} else if( numparams >= 2 && param[0]->Type() == tvtInteger && param[1]->Type() == tvtInteger ) {
+		tjs_int width = *param[0];
+		tjs_int height = *param[1];
+		bool alpha = false;
+		if( numparams > 2 ) {
+			alpha = (tjs_int)*param[2] ? true : false;
+		}
+		// 未初期化データでテクスチャを作る。後でコピーする前提。
+		Texture.create( width, height, nullptr, alpha ? GL_ALPHA : GL_RGBA );
 	} else {
 		return TJS_E_INVALIDPARAM;
 	}
@@ -126,6 +136,23 @@ void TJS_INTF_METHOD tTJSNI_Texture::Invalidate() {
 void tTJSNI_Texture::LoadTexture( const class tTVPBaseBitmap* bitmap, bool alpha ) {
 	// Bitmap の内部表現が正順(上下反転されていない)ことを前提としているので注意
 	Texture.create( bitmap->GetWidth(), bitmap->GetHeight(), bitmap->GetScanLine(0), alpha ? GL_ALPHA : GL_RGBA );
+}
+//----------------------------------------------------------------------
+void tTJSNI_Texture::CopyBitmap( tjs_int left, tjs_int top, const class tTVPBaseBitmap* bitmap, const tTVPRect& srcRect ) {
+	tTVPRect clip( srcRect );
+	if( clip.right > (tjs_int)bitmap->GetWidth() ) clip.right = bitmap->GetWidth();
+	if( clip.bottom > (tjs_int)bitmap->GetHeight() ) clip.bottom = bitmap->GetHeight();
+	if( clip.left < 0 ) clip.left = 0;
+	if( clip.top < 0 ) clip.top = 0;
+	if( (tjs_int)Texture.width() < (left+clip.get_width()) ) clip.set_width( Texture.width() - left );
+	if( (tjs_int)Texture.height() < (top+clip.get_height()) ) clip.set_height( Texture.height() - top );
+
+	std::unique_ptr<tjs_uint32[]> buffer(new tjs_uint32[clip.get_width()*clip.get_height()]);
+	for( tjs_int y = clip.top, line = 0; y < clip.bottom; y++, line++ ) {
+		tjs_uint32* sl = ((tjs_uint32*)bitmap->GetScanLine(y)) + clip.left;
+		TVPRedBlueSwapCopy( &buffer[clip.get_width()*line], sl, clip.get_width() );
+	}
+	Texture.copyImage( left, top, clip.get_width(), clip.get_height(), (const void*)buffer.get() );
 }
 //----------------------------------------------------------------------
 bool tTJSNI_Texture::IsGray() const {
@@ -200,6 +227,23 @@ TJS_END_NATIVE_CONSTRUCTOR_DECL(/*TJS class name*/Texture)
 //-- methods
 
 //----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/copyRect)
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Texture);
+	if( numparams < 4 ) return TJS_E_BADPARAMCOUNT;
+
+	tTJSNI_Bitmap* bitmap = (tTJSNI_Bitmap*)TJSGetNativeInstance( tTJSNC_Bitmap::ClassID, param[2] );
+	if( !bitmap ) return TJS_E_INVALIDPARAM;
+	tTJSNI_Rect* rect = (tTJSNI_Rect*)TJSGetNativeInstance( tTJSNC_Rect::ClassID, param[3] );
+	if( !rect ) return TJS_E_INVALIDPARAM;
+
+	tjs_int left  = *param[0];
+	tjs_int top   = *param[1];
+	_this->CopyBitmap( left, top, bitmap->GetBitmap(), rect->Get() );
+
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/copyRect)
 //----------------------------------------------------------------------
 
 

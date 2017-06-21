@@ -9,6 +9,7 @@
 #include "GLTexture.h"
 #include "TextureInfo.h"
 #include "GLVertexBufferObject.h"
+#include "ComplexRect.h"
 
 class tTJSNI_Texture : public tTJSNativeInstance, public iTVPTextureInfoIntrface
 {
@@ -24,6 +25,8 @@ public:
 	~tTJSNI_Texture() override;
 	tjs_error TJS_INTF_METHOD Construct(tjs_int numparams, tTJSVariant **param, iTJSDispatch2 *tjs_obj) override;
 	void TJS_INTF_METHOD Invalidate() override;
+
+	void CopyBitmap( tjs_int left, tjs_int top, const class tTVPBaseBitmap* bitmap, const tTVPRect& srcRect );
 
 	tjs_uint GetWidth() const override { return SrcWidth; }
 	tjs_uint GetHeight() const override { return SrcHeight; }
