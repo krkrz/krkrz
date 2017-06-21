@@ -8,10 +8,13 @@
 #include "tvpgl.h"
 #include <memory>
 
+//---------------------------------------------------------------------------
 tTJSNI_Offscreen::tTJSNI_Offscreen() {
 }
+//---------------------------------------------------------------------------
 tTJSNI_Offscreen::~tTJSNI_Offscreen() {
 }
+//---------------------------------------------------------------------------
 tjs_error TJS_INTF_METHOD tTJSNI_Offscreen::Construct(tjs_int numparams, tTJSVariant **param, iTJSDispatch2 *tjs_obj) {
 	if( numparams < 2 ) return TJS_E_BADPARAMCOUNT;
 	tjs_int width = *param[0];
@@ -22,10 +25,11 @@ tjs_error TJS_INTF_METHOD tTJSNI_Offscreen::Construct(tjs_int numparams, tTJSVar
 	}
 	return TJS_S_OK;
 }
+//---------------------------------------------------------------------------
 void TJS_INTF_METHOD tTJSNI_Offscreen::Invalidate() {
 	FrameBuffer.destory();
 }
-
+//---------------------------------------------------------------------------
 void tTJSNI_Offscreen::CopyFromBitmap( class tTJSNI_Bitmap* bmp, tjs_int sleft, tjs_int stop, tjs_int width, tjs_int height, tjs_int left, tjs_int top ) {
 	if( !bmp ) return;
 	tjs_int bw = bmp->GetWidth();
@@ -59,22 +63,47 @@ void tTJSNI_Offscreen::CopyFromBitmap( class tTJSNI_Bitmap* bmp, tjs_int sleft, 
 	}
 	FrameBuffer.copyImage( left, top, width, height, buf.get() );
 }
+//---------------------------------------------------------------------------
 void tTJSNI_Offscreen::CopyToBitmap( class tTJSNI_Bitmap* bmp, tjs_int sleft, tjs_int stop, tjs_int width, tjs_int height, tjs_int dleft, tjs_int dtop ) {}
+//---------------------------------------------------------------------------
 void tTJSNI_Offscreen::CopyToBitmap( class tTJSNI_Bitmap* bmp ) {
 	if( !bmp ) return;
 	FrameBuffer.readTextureToBitmap( bmp );
 }
-void tTJSNI_Offscreen::Update() {}
-
+//---------------------------------------------------------------------------
+void tTJSNI_Offscreen::Update() {
+}
+//---------------------------------------------------------------------------
 tjs_uint tTJSNI_Offscreen::GetWidth() const {
 	return FrameBuffer.width();
 }
+//---------------------------------------------------------------------------
 tjs_uint tTJSNI_Offscreen::GetHeight() const {
 	return FrameBuffer.height();
 }
+//---------------------------------------------------------------------------
 tjs_int64 tTJSNI_Offscreen::GetNativeHandle() const {
 	return FrameBuffer.textureId();
 }
+//---------------------------------------------------------------------------
+tjs_int64 tTJSNI_Offscreen::GetVBOHandle() const {
+	if( VertexBuffer.isCreated() ) {
+		return VertexBuffer.id();
+	} else {
+		const float w = (float)FrameBuffer.width();
+		const float h = (float)FrameBuffer.height();
+		const GLfloat vertices[] = {
+			0.0f, 0.0f,	// 左上
+			0.0f,    h,	// 左下
+			   w, 0.0f,	// 右上
+			   w,    h,	// 右下
+		};
+		GLVertexBufferObject& vbo = const_cast<GLVertexBufferObject&>( VertexBuffer );
+		vbo.createStaticVertex( vertices, sizeof(vertices) );
+		return VertexBuffer.id();
+	}
+}
+//---------------------------------------------------------------------------
 void tTJSNI_Offscreen::BindFrameBuffer() {
 	FrameBuffer.bindFramebuffer();
 }

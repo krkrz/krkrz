@@ -7,11 +7,13 @@
 
 #include "tjsNative.h"
 #include "GLFrameBufferObject.h"
+#include "GLVertexBufferObject.h"
 #include "TextureInfo.h"
 
 class tTJSNI_Offscreen : public tTJSNativeInstance, public iTVPTextureInfoIntrface
 {
 	GLFrameBufferObject	FrameBuffer;
+	GLVertexBufferObject VertexBuffer;
 
 public:
 	tTJSNI_Offscreen();
@@ -28,6 +30,7 @@ public:
 	tjs_uint GetWidth() const override;
 	tjs_uint GetHeight() const override;
 	tjs_int64 GetNativeHandle() const override;
+	tjs_int64 GetVBOHandle() const override;
 
 	/**
 	 * 描画対象に設定する

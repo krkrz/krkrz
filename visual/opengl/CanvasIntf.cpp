@@ -101,6 +101,8 @@ tjs_error TJS_INTF_METHOD tTJSNI_Canvas::Construct(tjs_int numparams, tTJSVarian
 
 	if( !GLDrawer.InitializeShader() ) TVPThrowExceptionMessage( TJS_W("Cannot initialize shader.") );
 
+	TextureVertexBuffer.createStaticVertex( DefaultUVs, sizeof(DefaultUVs) );
+
 	return TJS_S_OK;
 }
 //----------------------------------------------------------------------
@@ -314,21 +316,17 @@ void tTJSNI_Canvas::Fill( tjs_int left, tjs_int top, tjs_int width, tjs_int heig
 //----------------------------------------------------------------------
 void tTJSNI_Canvas::SetupTextureDrawing( tTJSNI_ShaderProgram* shader, const iTVPTextureInfoIntrface* tex, tTJSNI_Matrix44* mat, const tTVPPoint& vpSize ) {
 #if 1
-	const float width = (float)tex->GetWidth();
-	const float height = (float)tex->GetHeight();
-	const GLfloat vertices[] = {
-		0.0f,  0.0f,	// 左上
-		0.0f,  height,  // 左下
-		width, 0.0f,	// 右上
-		width, height,	// 右下
-	};
-
 	GLint posLoc = shader->FindLocation( std::string( "a_pos" ) );
 	if( posLoc < 0 ) TVPThrowExceptionMessage( TJS_W("Not found a_pos in shader.") );
 	GLint uvLoc = shader->FindLocation( std::string( "a_texCoord" ) );
 	if( uvLoc < 0 ) TVPThrowExceptionMessage( TJS_W("Not found a_texCoord in shader.") );
-	glVertexAttribPointer( posLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof( GLfloat ), vertices );
-	glVertexAttribPointer( uvLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof( GLfloat ), DefaultUVs );
+	GLuint vboid = (GLuint)tex->GetVBOHandle();
+	if( vboid == 0 ) TVPThrowExceptionMessage( TJS_W("This method require VBO.") );
+	glBindBuffer( GL_ARRAY_BUFFER, vboid );
+	glVertexAttribPointer( posLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof( GLfloat ), 0 );
+	TextureVertexBuffer.bindBuffer();
+	glVertexAttribPointer( uvLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof( GLfloat ), 0 );
+	TextureVertexBuffer.unbindBuffer();
 	glEnableVertexAttribArray( posLoc );
 	glEnableVertexAttribArray( uvLoc );
 
@@ -345,8 +343,6 @@ void tTJSNI_Canvas::SetupTextureDrawing( tTJSNI_ShaderProgram* shader, const iTV
 	GLint vpLoc = shader->FindLocation( std::string( "a_size" ) );
 	if( vpLoc < 0 ) TVPThrowExceptionMessage( TJS_W("Not found a_size in shader.") );
 	glUniform2f( vpLoc, (float)vpSize.x, (float)vpSize.y );
-
-	glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
 #else
 	const float width = (float)tex->GetWidth();
 	const float height = (float)tex->GetHeight();
@@ -395,7 +391,7 @@ void tTJSNI_Canvas::DrawTexture( const iTVPTextureInfoIntrface* texture, tTJSNI_
 	shader->SetupProgram();
 	//GLDrawer.DrawTexture( shader, texture, Matrix44Instance, ssize );
 	SetupTextureDrawing( shader, texture, Matrix44Instance, ssize );
-	//glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
+	glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
 }
 //----------------------------------------------------------------------
 void tTJSNI_Canvas::DrawTexture( const iTVPTextureInfoIntrface* texture0, const iTVPTextureInfoIntrface* texture1, tTJSNI_ShaderProgram* shader ) {

@@ -8,10 +8,12 @@
 #include "tjsNative.h"
 #include "GLTexture.h"
 #include "TextureInfo.h"
+#include "GLVertexBufferObject.h"
 
 class tTJSNI_Texture : public tTJSNativeInstance, public iTVPTextureInfoIntrface
 {
 	GLTexture Texture;
+	GLVertexBufferObject VertexBuffer;
 	tjs_uint SrcWidth;
 	tjs_uint SrcHeight;
 
@@ -30,6 +32,7 @@ public:
 	bool IsGray() const;
 	bool IsPowerOfTwo() const;
 	tjs_int64 GetNativeHandle() const override { return Texture.id(); }
+	tjs_int64 GetVBOHandle() const override;
 
 	static inline bool IsPowerOfTwo( tjs_uint x ) { return (x & (x - 1)) == 0; }
 	static inline tjs_uint ToPowerOfTwo( tjs_uint x ) {

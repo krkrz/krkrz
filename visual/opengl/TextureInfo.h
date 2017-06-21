@@ -22,6 +22,12 @@ public:
 	 * @return ネイティブハンドル
 	 */
 	virtual tjs_int64 GetNativeHandle() const = 0;
+
+	/**
+	 * テクスチャ全体を表す頂点データのVBOをハンドルを返す。
+	 * @return VBO ID、0の時VBOがない
+	 */
+	virtual tjs_int64 GetVBOHandle() const = 0;
 };
 
 #endif

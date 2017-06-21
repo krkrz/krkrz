@@ -528,6 +528,7 @@
     <ClInclude Include="..\visual\opengl\GLShaderUtil.h" />
     <ClInclude Include="..\visual\opengl\GLTexture.h" />
     <ClInclude Include="..\visual\opengl\GLTextureDrawing.h" />
+    <ClInclude Include="..\visual\opengl\GLVertexBufferObject.h" />
     <ClInclude Include="..\visual\opengl\Matrix44Intf.h" />
     <ClInclude Include="..\visual\opengl\Mesh2DIntf.h" />
     <ClInclude Include="..\visual\opengl\OffscreenIntf.h" />

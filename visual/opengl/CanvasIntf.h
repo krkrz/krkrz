@@ -12,6 +12,7 @@
 #include "GLTextureDrawing.h"
 #include "tjsHashSearch.h"
 #include "ComplexRect.h"
+#include "GLVertexBufferObject.h"
 
 enum class tTVPBlendMode : tjs_int {
 	bmDisable = 0,
@@ -70,6 +71,8 @@ class tTJSNI_Canvas : public tTJSNativeInstance
 	class tTVPOpenGLScreen* GLScreen;
 	tTVPGLTextureDrawing GLDrawer;
 
+	GLVertexBufferObject TextureVertexBuffer;
+
 	// 直前のBeginDrawingで設定したViewportの幅と高さ
 	tjs_int PrevViewportWidth;
 	tjs_int PrevViewportHeight;
@@ -108,7 +111,7 @@ private:
 	void SetupEachDrawing();
 
 	// 描画に必要な設定と1個目のテクスチャまで設定する
-	static void SetupTextureDrawing( class tTJSNI_ShaderProgram* shader, const class iTVPTextureInfoIntrface* tex, class tTJSNI_Matrix44* mat, const tTVPPoint& vpSize );
+	void SetupTextureDrawing( class tTJSNI_ShaderProgram* shader, const class iTVPTextureInfoIntrface* tex, class tTJSNI_Matrix44* mat, const tTVPPoint& vpSize );
 
 	// 描画領域の幅/高さ。レンダーターゲット指定している場合はそのサイズ、そうでない場合はクライアント領域(サーフェイス)のサイズ
 	tjs_int GetCanvasWidth() const;

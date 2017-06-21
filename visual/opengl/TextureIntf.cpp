@@ -136,6 +136,24 @@ bool tTJSNI_Texture::IsPowerOfTwo() const {
 	return IsPowerOfTwo( Texture.width() ) && IsPowerOfTwo( Texture.height() );
 }
 //----------------------------------------------------------------------
+tjs_int64 tTJSNI_Texture::GetVBOHandle() const {
+	if( VertexBuffer.isCreated() ) {
+		return VertexBuffer.id();
+	} else {
+		const float w = (float)Texture.width();
+		const float h = (float)Texture.height();
+		const GLfloat vertices[] = {
+			0.0f, 0.0f,	// 左上
+			0.0f,    h,	// 左下
+			   w, 0.0f,	// 右上
+			   w,    h,	// 右下
+		};
+		GLVertexBufferObject& vbo = const_cast<GLVertexBufferObject&>( VertexBuffer );
+		vbo.createStaticVertex( vertices, sizeof(vertices) );
+		return VertexBuffer.id();
+	}
+}
+//----------------------------------------------------------------------
 tjs_int tTJSNI_Texture::GetStretchType() const {
 	return static_cast<tjs_int>(Texture.stretchType());
 }
