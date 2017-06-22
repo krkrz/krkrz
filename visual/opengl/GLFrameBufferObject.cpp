@@ -63,7 +63,7 @@ bool GLFrameBufferObject::readFrameBuffer( tjs_uint x, tjs_uint y, tjs_uint widt
 	glReadPixels( x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, dest );
 	return tTVPOpenGLScreen::CheckEGLErrorAndLog();
 }
-bool GLFrameBufferObject::readTextureToBitmap( class tTJSNI_Bitmap* bmp ) {
+bool GLFrameBufferObject::readTextureToBitmap( tTVPBaseBitmap* bmp ) {
 	if( !bmp ) {
 		TVPAddLog( TJS_W("Bitmap is null.") );
 		return false;
@@ -71,21 +71,75 @@ bool GLFrameBufferObject::readTextureToBitmap( class tTJSNI_Bitmap* bmp ) {
 
 	// Bitmap の内部表現が正順(上下反転されていない)ことを前提としているので注意
 	bmp->SetSize( width_, height_, false );
-	tTVPBaseBitmap* b = bmp->GetBitmap();
-	tjs_uint32* dest = reinterpret_cast<tjs_uint32*>(b->GetScanLineForWrite(0));
+	tjs_uint32* dest = reinterpret_cast<tjs_uint32*>(bmp->GetScanLineForWrite(height_-1));
 
 	// FrameBuffer に一度設定してから読み出す処理をする。
 	// OpenGL ES に glGetTextureImage がない悲しさ
 	readTextureUseFBO( reinterpret_cast<tjs_uint8*>(dest) );
 
-	tjs_int pitch = b->GetPitchBytes();
+	// 上下反転しつつ赤と青を入れ替えながらコピー
+	tjs_int pitch = bmp->GetPitchBytes();
 	for( tjs_uint y = 0; y < height_; y++ ) {
 		TVPRedBlueSwap( dest, width_ );
-		dest = reinterpret_cast<tjs_uint32*>(reinterpret_cast<tjs_uint8*>(dest)+pitch);
+		dest = reinterpret_cast<tjs_uint32*>(reinterpret_cast<tjs_uint8*>(dest)-pitch);
 	}
-	// FrameBuffer 内は上下反転しているので上下反転する
-	tTVPRect rect( 0, 0, width_, height_ );
-	b->UDFlip(rect);
+
+	return true;
+}
+bool GLFrameBufferObject::readTextureToBitmap( class tTVPBaseBitmap* bmp, const tTVPRect& srcRect, tjs_int left, tjs_int top ) {
+	// clip src texture area
+	tTVPRect clip( srcRect );
+	if( clip.right > (tjs_int)width_ ) clip.right = width_;
+	if( clip.bottom > (tjs_int)height_ ) clip.bottom = height_;
+	if( clip.left < 0 ) clip.left = 0;
+	if( clip.top < 0 ) clip.top = 0;
+
+	// clip dest bitmap area
+	if( left < 0 ) {
+		clip.left += -left;
+		left = 0;
+	}
+	if( top < 0 ) {
+		clip.top += -top;
+		top = 0;
+	}
+	if( (tjs_int)bmp->GetWidth() < (left+clip.get_width()) ) clip.set_width( bmp->GetWidth() - left );
+	if( (tjs_int)bmp->GetHeight() < (top+clip.get_height()) ) clip.set_height( bmp->GetHeight() - top );
+
+	// has copy area?
+	if( clip.get_width() <= 0 || clip.get_height() <= 0 ) {
+		TVPAddLog(TJS_W("out of area"));
+		return false;
+	}
+	if( clip.left >= (tjs_int)bmp->GetWidth() || clip.top >= (tjs_int)bmp->GetHeight() ) {
+		TVPAddLog(TJS_W("out of area"));
+		return false;
+	}
+	GLint vp[4];
+	glGetIntegerv( GL_VIEWPORT, vp );
+	GLint fb;
+	glGetIntegerv( GL_FRAMEBUFFER_BINDING, &fb );
+	if( fb != framebuffer_id_ ) {
+		glBindFramebuffer( GL_FRAMEBUFFER, framebuffer_id_ );
+	}
+	if( vp[2] != width_ || vp[3] != height_ || vp[0] != 0 || vp[1] != 0 ) {
+		glViewport( 0, 0, width_, height_ );
+	}
+	std::unique_ptr<tjs_uint32[]> buffer(new tjs_uint32[clip.get_width()*clip.get_height()]);
+	glReadBuffer( GL_BACK );
+	glReadPixels( clip.left, clip.top, clip.get_width(), clip.get_height(), GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*)buffer.get() );
+	if( fb != framebuffer_id_ ) {
+		glBindFramebuffer( GL_FRAMEBUFFER, fb );
+	}
+	if( vp[2] != width_ || vp[3] != height_ || vp[0] != 0 || vp[1] != 0 ) {
+		glViewport( vp[0], vp[1], vp[2], vp[3] );
+	}
+
+	// 上下反転しつつ赤と青を入れ替えながらコピー
+	for( tjs_uint y = 0, line=top+clip.get_height()-1; y < clip.get_height(); y++, line-- ) {
+		tjs_uint32* dest = reinterpret_cast<tjs_uint32*>(bmp->GetScanLineForWrite(line)) + left;
+		TVPRedBlueSwapCopy( dest, &buffer[y*clip.get_width()], clip.get_width() );
+	}
 
 	return true;
 }

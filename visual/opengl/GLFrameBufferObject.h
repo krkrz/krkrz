@@ -2,6 +2,7 @@
 #define GLFrameBufferObjectH
 
 #include "OpenGLHeader.h"
+#include "ComplexRect.h"
 
 class GLFrameBufferObject {
 	
@@ -13,8 +14,6 @@ protected:
 	GLuint height_;
 	// format は GL_RGBA でないと問題が出る GPU があるようなのでそれのみ。
 
-	
-	
 	void readTextureUseFBO( GLubyte* pixels );
 	//void readTextureUsePBO( GLubyte* pixels );
 public:
@@ -46,9 +45,12 @@ public:
 	GLuint textureId() const { return texture_id_; }
 	GLuint width() const { return width_; }
 	GLuint height() const { return height_; }
+	GLint format() const { return GL_RGBA; }
 
 	static bool readFrameBuffer( tjs_uint x, tjs_uint y, tjs_uint width, tjs_uint height, tjs_uint8* dest, bool front );
-	bool readTextureToBitmap( class tTJSNI_Bitmap* bmp );
+
+	bool readTextureToBitmap( class tTVPBaseBitmap* bmp );
+	bool readTextureToBitmap( class tTVPBaseBitmap* bmp, const tTVPRect& srcRect, tjs_int dleft, tjs_int dtop );
 };
 
 

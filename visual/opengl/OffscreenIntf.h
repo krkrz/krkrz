@@ -22,15 +22,15 @@ public:
 	void TJS_INTF_METHOD Invalidate() override;
 
 	// 引数が1つだけの時は、全体コピーでBitmap側のサイズをOffscreenに合わせる
-	void CopyToBitmap( class tTJSNI_Bitmap* bmp );
-	void CopyToBitmap( class tTJSNI_Bitmap* bmp, tjs_int sleft, tjs_int stop, tjs_int width, tjs_int height, tjs_int dleft, tjs_int dtop );
-	void CopyFromBitmap( class tTJSNI_Bitmap* bmp, tjs_int sleft, tjs_int stop, tjs_int width, tjs_int height, tjs_int left, tjs_int top );
-	void Update();
+	void CopyToBitmap( class tTVPBaseBitmap* bmp );
+	void CopyToBitmap( class tTVPBaseBitmap* bmp, const tTVPRect& srcRect, tjs_int dleft, tjs_int dtop );
+	void CopyFromBitmap( tjs_int left, tjs_int top, const class tTVPBaseBitmap* bitmap, const tTVPRect& srcRect );
 
-	tjs_uint GetWidth() const override;
-	tjs_uint GetHeight() const override;
-	tjs_int64 GetNativeHandle() const override;
+	tjs_uint GetWidth() const override { return FrameBuffer.width(); }
+	tjs_uint GetHeight() const override { return FrameBuffer.height(); }
+	tjs_int64 GetNativeHandle() const override { return FrameBuffer.textureId(); }
 	tjs_int64 GetVBOHandle() const override;
+	tjs_int GetImageFormat() const override { return FrameBuffer.format(); }
 
 	/**
 	 * 描画対象に設定する

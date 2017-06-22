@@ -36,6 +36,7 @@ public:
 	bool IsPowerOfTwo() const;
 	tjs_int64 GetNativeHandle() const override { return Texture.id(); }
 	tjs_int64 GetVBOHandle() const override;
+	tjs_int GetImageFormat() const override { return Texture.format(); }
 
 	static inline bool IsPowerOfTwo( tjs_uint x ) { return (x & (x - 1)) == 0; }
 	static inline tjs_uint ToPowerOfTwo( tjs_uint x ) {

@@ -28,6 +28,12 @@ public:
 	 * @return VBO ID、0の時VBOがない
 	 */
 	virtual tjs_int64 GetVBOHandle() const = 0;
+
+	/**
+	 * テクスチャフォーマットを取得
+	 * @return テクスチャフォーマット
+	 */
+	virtual tjs_int GetImageFormat() const = 0;
 };
 
 #endif
