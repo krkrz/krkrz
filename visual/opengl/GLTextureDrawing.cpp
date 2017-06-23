@@ -132,7 +132,7 @@ void tTVPGLTextureDrawing::DrawTexture( tTJSNI_ShaderProgram* shader, const iTVP
 	glUniform1i( texLoc, 0 );
 
 	GLint matLoc = shader->FindLocation( std::string( "a_modelMat4" ) );
-	glUniformMatrix4fv( matLoc, 1, GL_TRUE, mat->GetMatrixArray() );
+	glUniformMatrix4fv( matLoc, 1, GL_FALSE, mat->GetMatrixArray() );
 	
 	GLint vpLoc = shader->FindLocation( std::string( "a_size" ) );
 	glUniform2f( vpLoc, (float)sufaceSize.x, (float)sufaceSize.y );

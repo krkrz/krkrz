@@ -338,7 +338,7 @@ void tTJSNI_Canvas::SetupTextureDrawing( tTJSNI_ShaderProgram* shader, const iTV
 
 	GLint matLoc = shader->FindLocation( std::string( "a_modelMat4" ) );
 	if( matLoc < 0 ) TVPThrowExceptionMessage( TJS_W("Not found a_modelMat4 in shader.") );
-	glUniformMatrix4fv( matLoc, 1, GL_TRUE, mat->GetMatrixArray() );
+	glUniformMatrix4fv( matLoc, 1, GL_FALSE, mat->GetMatrixArray() );
 
 	GLint vpLoc = shader->FindLocation( std::string( "a_size" ) );
 	if( vpLoc < 0 ) TVPThrowExceptionMessage( TJS_W("Not found a_size in shader.") );
@@ -371,7 +371,7 @@ void tTJSNI_Canvas::SetupTextureDrawing( tTJSNI_ShaderProgram* shader, const iTV
 	glUniform1i( texLoc, 0 );
 
 	GLint matLoc = shader->FindLocation( std::string( "a_modelMat4" ) );
-	glUniformMatrix4fv( matLoc, 1, GL_TRUE, mat->GetMatrixArray() );
+	glUniformMatrix4fv( matLoc, 1, GL_FALSE, mat->GetMatrixArray() );
 
 	GLint vpLoc = shader->FindLocation( std::string( "a_size" ) );
 	glUniform2f( vpLoc, (float)vpSize.x, (float)vpSize.y );

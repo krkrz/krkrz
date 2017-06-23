@@ -42,7 +42,7 @@ public:
 	void Set( tjs_uint i, tjs_uint j, tjs_real a );
 	tjs_real Get( tjs_uint i, tjs_uint j );
 	void SetIdentity() {
-		Matrix.a[0] = Matrix.a[5] = Matrix.a[10] = Matrix.a[15] = 1.0f;
+		Matrix.a[ 0] = Matrix.a[ 5] = Matrix.a[10] = Matrix.a[15] = 1.0f;
 		Matrix.a[ 1] = Matrix.a[ 2] = Matrix.a[ 3] = Matrix.a[ 4] = 
 		Matrix.a[ 6] = Matrix.a[ 7] = Matrix.a[ 8] = Matrix.a[ 9] = 
 		Matrix.a[11] = Matrix.a[12] = Matrix.a[13] = Matrix.a[14] = 0.0f;
@@ -50,21 +50,21 @@ public:
 	iTJSDispatch2 * GetMatrixArrayObjectNoAddRef();
 
 	void SetTranslate( tjs_real x, tjs_real y ) {
-		Matrix.m[0][3]= (float)x;
-		Matrix.m[1][3] = (float)y;
+		Matrix.a[12]= (float)x;
+		Matrix.a[13] = (float)y;
 	}
 	void SetScale( tjs_real x, tjs_real y ) {
-		Matrix.m[0][0] = (float)x;
-		Matrix.m[1][1] = (float)y;
+		Matrix.a[0] = (float)x;
+		Matrix.a[5] = (float)y;
 	}
 	void SetRotate( tjs_real deg ) {
 		tjs_real radian = deg * M_PI / 180.0;
 		float c = (float)std::cos( radian );
 		float s = (float)std::sin( radian );
-		Matrix.m[0][0] = c;
-		Matrix.m[0][1] = s;
-		Matrix.m[1][0] = -s;
-		Matrix.m[1][1] = c;
+		Matrix.a[0] = c;
+		Matrix.a[4] = s;
+		Matrix.a[1] = -s;
+		Matrix.a[5] = c;
 	}
 
 	const float *GetMatrixArray() const { return Matrix.a; }

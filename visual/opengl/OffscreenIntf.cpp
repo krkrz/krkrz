@@ -48,6 +48,10 @@ void tTJSNI_Offscreen::CopyToBitmap( tTVPBaseBitmap* bmp, const tTVPRect& srcRec
 //---------------------------------------------------------------------------
 void tTJSNI_Offscreen::CopyToBitmap( tTVPBaseBitmap* bmp ) {
 	if( !bmp ) return;
+	if( bmp->Is8BPP() ) {
+		TVPAddLog(TJS_W("unsupported format"));
+		return;
+	}
 	FrameBuffer.readTextureToBitmap( bmp );
 }
 //---------------------------------------------------------------------------
