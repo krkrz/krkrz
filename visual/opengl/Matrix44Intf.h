@@ -51,8 +51,6 @@ public:
 	void Set( tjs_uint i, tjs_uint j, tjs_real a );
 	tjs_real Get( tjs_uint i, tjs_uint j );
 	void SetIdentity() {
-		Mat4 = glm::mat4( 1.0f );
-
 		Mat4[0][0] = Mat4[1][1] = Mat4[2][2] = Mat4[3][3] = 1.0f;
 		Mat4[0][1] = Mat4[0][2] = Mat4[0][3] = Mat4[1][0] =
 		Mat4[1][2] = Mat4[1][3] = Mat4[2][0] = Mat4[2][1] =
