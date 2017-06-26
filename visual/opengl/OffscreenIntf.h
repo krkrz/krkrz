@@ -25,6 +25,7 @@ public:
 	void CopyToBitmap( class tTVPBaseBitmap* bmp );
 	void CopyToBitmap( class tTVPBaseBitmap* bmp, const tTVPRect& srcRect, tjs_int dleft, tjs_int dtop );
 	void CopyFromBitmap( tjs_int left, tjs_int top, const class tTVPBaseBitmap* bitmap, const tTVPRect& srcRect );
+	void ExchangeTexture( class tTJSNI_Texture* texture );
 
 	tjs_uint GetWidth() const override { return FrameBuffer.width(); }
 	tjs_uint GetHeight() const override { return FrameBuffer.height(); }

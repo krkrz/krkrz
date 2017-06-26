@@ -10,6 +10,11 @@
 #include <cmath>
 #include <math.h>
 
+#include <glm/glm.hpp>
+#include <glm/mat4x4.hpp>
+#include <glm/vec3.hpp>
+#include <glm/gtx/transform.hpp>
+
 class tTJSNI_Matrix44 : public tTJSNativeInstance
 {
 	//static const tjs_real PI = 3.141592653589793;
@@ -19,10 +24,14 @@ class tTJSNI_Matrix44 : public tTJSNativeInstance
 	 8  9 10 11
 	12 13 14 15
 	*/
+	/*
 	union {
 		float a[16];
 		float m[4][4];
 	} Matrix;
+	*/
+
+	glm::mat4 Mat4;
 
 	iTJSDispatch2 *MatrixArray; // Array object which holds matrix array ...
 	bool MatrixArrayValid;
@@ -42,32 +51,44 @@ public:
 	void Set( tjs_uint i, tjs_uint j, tjs_real a );
 	tjs_real Get( tjs_uint i, tjs_uint j );
 	void SetIdentity() {
-		Matrix.a[ 0] = Matrix.a[ 5] = Matrix.a[10] = Matrix.a[15] = 1.0f;
-		Matrix.a[ 1] = Matrix.a[ 2] = Matrix.a[ 3] = Matrix.a[ 4] = 
-		Matrix.a[ 6] = Matrix.a[ 7] = Matrix.a[ 8] = Matrix.a[ 9] = 
-		Matrix.a[11] = Matrix.a[12] = Matrix.a[13] = Matrix.a[14] = 0.0f;
+		Mat4 = glm::mat4( 1.0f );
+
+		Mat4[0][0] = Mat4[1][1] = Mat4[2][2] = Mat4[3][3] = 1.0f;
+		Mat4[0][1] = Mat4[0][2] = Mat4[0][3] = Mat4[1][0] =
+		Mat4[1][2] = Mat4[1][3] = Mat4[2][0] = Mat4[2][1] =
+		Mat4[2][3] = Mat4[3][0] = Mat4[3][1] = Mat4[3][2] = 0.0f;
 	}
 	iTJSDispatch2 * GetMatrixArrayObjectNoAddRef();
 
-	void SetTranslate( tjs_real x, tjs_real y ) {
-		Matrix.a[12]= (float)x;
-		Matrix.a[13] = (float)y;
+	void SetTranslate( tjs_real x, tjs_real y, tjs_real z = 0.0 ) {
+		//Mat4 = glm::translate( glm::vec3( (float)x, (float)y, (float)z) );
+		Mat4[3][0] = (float)x;
+		Mat4[3][1] = (float)x;
+		Mat4[3][2] = (float)z;
 	}
-	void SetScale( tjs_real x, tjs_real y ) {
-		Matrix.a[0] = (float)x;
-		Matrix.a[5] = (float)y;
+	void SetScale( tjs_real x, tjs_real y, tjs_real z = 1.0 ) {
+		//Mat4 = glm::scale( glm::vec3( (float)x, (float)y, 1.0f ) );
+		Mat4[0][0] = (float)x;
+		Mat4[1][1] = (float)y;
+		Mat4[2][2] = (float)z;
 	}
-	void SetRotate( tjs_real deg ) {
+	void SetRotateZ( tjs_real deg ) {
 		tjs_real radian = deg * M_PI / 180.0;
 		float c = (float)std::cos( radian );
 		float s = (float)std::sin( radian );
-		Matrix.a[0] = c;
-		Matrix.a[4] = s;
-		Matrix.a[1] = -s;
-		Matrix.a[5] = c;
+		Mat4[0][0] = c;
+		Mat4[1][0] = s;
+		Mat4[0][1] = -s;
+		Mat4[1][1] = c;
 	}
+	void Add( const tTJSNI_Matrix44* rhs ) { Mat4 += rhs->Mat4; }
+	void Sub( const tTJSNI_Matrix44* rhs ) { Mat4 -= rhs->Mat4; }
+	void Mul( const tTJSNI_Matrix44* rhs ) { Mat4 *= rhs->Mat4; }
+	void Div( const tTJSNI_Matrix44* rhs ) { Mat4 /= rhs->Mat4; }
+	void Inc() { Mat4++; }
+	void Dec() { Mat4--; }
 
-	const float *GetMatrixArray() const { return Matrix.a; }
+	const float *GetMatrixArray() const { return (const float *)&Mat4[0]; }
 };
 
 
@@ -79,6 +100,9 @@ class tTJSNC_Matrix44 : public tTJSNativeClass
 public:
 	tTJSNC_Matrix44();
 	static tjs_uint32 ClassID;
+
+protected:
+	// iTJSDispatch2 *CreateBaseTJSObject() override;
 
 protected:
 	tTJSNativeInstance *CreateNativeInstance() override { return new tTJSNI_Matrix44(); }

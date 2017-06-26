@@ -476,6 +476,7 @@ void tTJSNI_Canvas::SetRenterTargetObject( const tTJSVariant & val ) {
 
 	// 描画途中であれば、その場でターゲットに指定する
 	if( InDrawing ) {
+		glFlush();
 		if( RenderTargetInstance ) {
 			RenderTargetInstance->BindFrameBuffer();
 		} else {
@@ -784,6 +785,15 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/drawText)
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/drawText)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/flush )
+{
+	// TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas );
+	// 実質staticメソッド
+	glFlush();
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/flush )
 //----------------------------------------------------------------------
 
 

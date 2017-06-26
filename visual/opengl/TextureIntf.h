@@ -55,6 +55,8 @@ public:
 	void SetWrapModeHorizontal( tjs_int v );
 	tjs_int GetWrapModeVertical() const;
 	void SetWrapModeVertical( tjs_int v );
+
+	friend class tTJSNI_Offscreen;
 };
 
 

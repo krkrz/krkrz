@@ -7,12 +7,13 @@
 #include "tjsArray.h"
 #include <string.h>
 
-tTJSNI_Matrix44::tTJSNI_Matrix44() : MatrixArray(nullptr) {
+// GLMが出てくる
+// http://www.opengl-tutorial.org/jp/beginners-tutorials/tutorial-3-matrices/
+tTJSNI_Matrix44::tTJSNI_Matrix44() : MatrixArray(nullptr), Mat4(1.0f) {
 }
 tTJSNI_Matrix44::~tTJSNI_Matrix44() {
 }
 tjs_error TJS_INTF_METHOD tTJSNI_Matrix44::Construct(tjs_int numparams, tTJSVariant **param, iTJSDispatch2 *tjs_obj) {
-	SetIdentity();
 	return TJS_S_OK;
 }
 void TJS_INTF_METHOD tTJSNI_Matrix44::Invalidate() {
@@ -23,42 +24,43 @@ void tTJSNI_Matrix44::Set( tjs_real m11, tjs_real m12, tjs_real m13, tjs_real m1
 		tjs_real m21, tjs_real m22, tjs_real m23, tjs_real m24,
 		tjs_real m31, tjs_real m32, tjs_real m33, tjs_real m34,
 		tjs_real m41, tjs_real m42, tjs_real m43, tjs_real m44 ) {
-	Matrix.m[0][0] = static_cast<float>(m11);
-	Matrix.m[0][1] = static_cast<float>(m12);
-	Matrix.m[0][2] = static_cast<float>(m13);
-	Matrix.m[0][3] = static_cast<float>(m14);
-	Matrix.m[1][0] = static_cast<float>(m21);
-	Matrix.m[1][1] = static_cast<float>(m22);
-	Matrix.m[1][2] = static_cast<float>(m23);
-	Matrix.m[1][3] = static_cast<float>(m24);
-	Matrix.m[2][0] = static_cast<float>(m31);
-	Matrix.m[2][1] = static_cast<float>(m32);
-	Matrix.m[2][2] = static_cast<float>(m33);
-	Matrix.m[2][3] = static_cast<float>(m34);
-	Matrix.m[3][0] = static_cast<float>(m41);
-	Matrix.m[3][1] = static_cast<float>(m42);
-	Matrix.m[3][2] = static_cast<float>(m43);
-	Matrix.m[3][3] = static_cast<float>(m44);
+	Mat4[0][0] = static_cast<float>(m11);
+	Mat4[0][1] = static_cast<float>(m12);
+	Mat4[0][2] = static_cast<float>(m13);
+	Mat4[0][3] = static_cast<float>(m14);
+	Mat4[1][0] = static_cast<float>(m21);
+	Mat4[1][1] = static_cast<float>(m22);
+	Mat4[1][2] = static_cast<float>(m23);
+	Mat4[1][3] = static_cast<float>(m24);
+	Mat4[2][0] = static_cast<float>(m31);
+	Mat4[2][1] = static_cast<float>(m32);
+	Mat4[2][2] = static_cast<float>(m33);
+	Mat4[2][3] = static_cast<float>(m34);
+	Mat4[3][0] = static_cast<float>(m41);
+	Mat4[3][1] = static_cast<float>(m42);
+	Mat4[3][2] = static_cast<float>(m43);
+	Mat4[3][3] = static_cast<float>(m44);
 }
 void tTJSNI_Matrix44::Set( tTJSNI_Matrix44* matrix ) {
-	memcpy( Matrix.a, matrix->Matrix.a, sizeof(Matrix) );
+	Mat4 = matrix->Mat4;
 }
 void tTJSNI_Matrix44::Set( tjs_real a[16] ) {
+	float* m = (float *)&Mat4[0];
 	for( tjs_int i = 0; i < 16; i++ ) {
-		Matrix.a[i] = static_cast<float>(a[i]);
+		m[i] = static_cast<float>(a[i]);
 	}
 }
 void tTJSNI_Matrix44::Set( tjs_uint y, tjs_uint x, tjs_real a ) {
 	if( y >= 4 || x >= 4 ) {
 		TVPThrowExceptionMessage(TJSRangeError);
 	}
-	Matrix.m[y][x] = static_cast<float>(a);
+	Mat4[y][x] = static_cast<float>(a);
 }
 tjs_real tTJSNI_Matrix44::Get( tjs_uint y, tjs_uint x ) {
 	if( y >= 4 || x >= 4 ) {
 		TVPThrowExceptionMessage(TJSRangeError);
 	}
-	return Matrix.m[y][x];
+	return Mat4[y][x];
 }
 iTJSDispatch2* tTJSNI_Matrix44::GetMatrixArrayObjectNoAddRef() {
 	if(!MatrixArray) {
@@ -68,8 +70,9 @@ iTJSDispatch2* tTJSNI_Matrix44::GetMatrixArrayObjectNoAddRef() {
 		classobj->Release();
 	}
 
+	const float* m = (const float *)&Mat4[0];
 	for( tjs_int i = 0; i < 16; i++ ) {
-		tTJSVariant val((tjs_real)Matrix.a[i]);
+		tTJSVariant val((tjs_real)m[i]);
 		MatrixArray->PropSetByNum(TJS_MEMBERENSURE, i, &val, MatrixArray);
 	}
 
@@ -130,9 +133,8 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/set)
 	} else if( numparams == 1 ) {
 		tTJSVariantClosure clo = param[0]->AsObjectClosureNoAddRef();
 		if( clo.Object ) {
-			tTJSNI_Matrix44* matrix = nullptr;
-			if( TJS_SUCCEEDED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE, tTJSNC_Matrix44::ClassID, (iTJSNativeInstance**)&matrix)) ) {
-				if( !matrix ) TVPThrowExceptionMessage(TJS_W("Parameter require Matrix44 class instance."));
+			tTJSNI_Matrix44* matrix = (tTJSNI_Matrix44*)TJSGetNativeInstance( tTJSNC_Matrix44::ClassID, param[0] );
+			if( matrix != nullptr ) {
 				_this->Set( matrix );
 				return TJS_S_OK;
 			} else {
@@ -169,7 +171,9 @@ TJS_END_NATIVE_METHOD_DECL(/*func. name*/reset)
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/setTranslate )
 {
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Matrix44 );
-	_this->SetTranslate( (tjs_real)*param[0], (tjs_real)*param[1] );
+	if( numparams < 2 ) return TJS_E_BADPARAMCOUNT;
+	if( numparams == 2 ) _this->SetTranslate( (tjs_real)*param[0], (tjs_real)*param[1] );
+	else _this->SetTranslate( (tjs_real)*param[0], (tjs_real)*param[1], (tjs_real)*param[2] );
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/setTranslate )
@@ -177,19 +181,77 @@ TJS_END_NATIVE_METHOD_DECL(/*func. name*/setTranslate )
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/setScale )
 {
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Matrix44 );
-	_this->SetScale( (tjs_real)*param[0], (tjs_real)*param[1] );
+	if( numparams < 2 ) return TJS_E_BADPARAMCOUNT;
+	if( numparams == 2 ) _this->SetScale( (tjs_real)*param[0], (tjs_real)*param[1] );
+	else _this->SetScale( (tjs_real)*param[0], (tjs_real)*param[1], (tjs_real)*param[2] );
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/setScale )
 //----------------------------------------------------------------------
-TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/setRotate )
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/setRotateZ )
 {
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Matrix44 );
-	_this->SetRotate( (tjs_real)*param[0] );
+	if( numparams < 1 ) return TJS_E_BADPARAMCOUNT;
+	_this->SetRotateZ( (tjs_real)*param[0] );
 	return TJS_S_OK;
 }
-TJS_END_NATIVE_METHOD_DECL(/*func. name*/setRotate )
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/setRotateZ )
 //----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/add )
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Matrix44 );
+	if( numparams < 1 ) return TJS_E_BADPARAMCOUNT;
+	tTJSNI_Matrix44* matrix = (tTJSNI_Matrix44*)TJSGetNativeInstance( tTJSNC_Matrix44::ClassID, param[0] );
+	if( !matrix ) return TJS_E_INVALIDPARAM;
+
+	_this->Add( matrix );
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/add )
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/sub )
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Matrix44 );
+	if( numparams < 1 ) return TJS_E_BADPARAMCOUNT;
+	tTJSNI_Matrix44* matrix = (tTJSNI_Matrix44*)TJSGetNativeInstance( tTJSNC_Matrix44::ClassID, param[0] );
+	if( !matrix ) return TJS_E_INVALIDPARAM;
+
+	_this->Sub( matrix );
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/sub )
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/mul )
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Matrix44 );
+	if( numparams < 1 ) return TJS_E_BADPARAMCOUNT;
+	tTJSNI_Matrix44* matrix = (tTJSNI_Matrix44*)TJSGetNativeInstance( tTJSNC_Matrix44::ClassID, param[0] );
+	if( !matrix ) return TJS_E_INVALIDPARAM;
+
+	_this->Mul( matrix );
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/mul )
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/div )
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Matrix44 );
+	if( numparams < 1 ) return TJS_E_BADPARAMCOUNT;
+	tTJSNI_Matrix44* matrix = (tTJSNI_Matrix44*)TJSGetNativeInstance( tTJSNC_Matrix44::ClassID, param[0] );
+	if( !matrix ) return TJS_E_INVALIDPARAM;
+
+	_this->Div( matrix );
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/div )
+//----------------------------------------------------------------------
+// translate
+// rotate
+// scale
+// ortho
+// frustum
+// perspective
+// perspectiveFov
 
 //----------------------------------------------------------------------
 
@@ -235,6 +297,74 @@ TJS_DEFINE_MATRIX_PROP( 4, 4 )
 }
 #undef TJS_DEFINE_MATRIX_PROP
 
+#if 0
+// 演算子のオーバーロードしたかったが期待したように動作しないので、諦める。
+//---------------------------------------------------------------------------
+class tTSJNC_Matrix44Object: public tTJSCustomObject {
+public:
+	tjs_error TJS_INTF_METHOD Operation( tjs_uint32 flag, const tjs_char *membername, tjs_uint32 *hint, tTJSVariant *result, const tTJSVariant *param, iTJSDispatch2 *objthis ) override {
+		tjs_uint32 op = flag & TJS_OP_MASK;
+		tTJSNI_Matrix44* ni;
+		tjs_error hr = objthis->NativeInstanceSupport( TJS_NIS_GETINSTANCE, tTJSNC_Matrix44::ClassID, (iTJSNativeInstance**)&ni );
+		if( TJS_SUCCEEDED( hr ) ) {
+			switch( op ) {
+			case TJS_OP_INC:
+				ni->Inc();
+				return TJS_S_OK;
+			case TJS_OP_DEC:
+				ni->Dec();
+				return TJS_S_OK;
+			}
+			tTJSNI_Matrix44* rhs = (tTJSNI_Matrix44*)TJSGetNativeInstance( tTJSNC_Matrix44::ClassID, param );
+			if( rhs ) {
+				switch( op ) {
+				case TJS_OP_SUB:
+					ni->Sub( rhs );
+					return TJS_S_OK;
+				case TJS_OP_ADD:
+					ni->Add( rhs );
+					return TJS_S_OK;
+				case TJS_OP_DIV:
+					ni->Div( rhs );
+					return TJS_S_OK;
+				case TJS_OP_MUL:
+					ni->Mul( rhs );
+					return TJS_S_OK;
+				}
+			}
+		}
+		return tTJSCustomObject::Operation( flag, membername, hint, result, param, objthis );
+		/*
+		switch(op) {
+		case TJS_OP_BAND:// operator &= (*param);
+		case TJS_OP_BOR: // operator |= (*param);
+		case TJS_OP_BXOR: //operator ^= (*param);
+		case TJS_OP_SUB: // operator -= (*param);
+		case TJS_OP_ADD: // operator += (*param);
+		case TJS_OP_MOD: // operator %= (*param);
+		case TJS_OP_DIV: // operator /= (*param);
+		case TJS_OP_IDIV: // idivequal(*param);
+		case TJS_OP_MUL: // operator *= (*param);
+		case TJS_OP_LOR: // logicalorequal(*param);
+		case TJS_OP_LAND: // logicalandequal(*param);
+		case TJS_OP_SAR: // operator >>= (*param);
+		case TJS_OP_SAL: // operator <<= (*param);
+		case TJS_OP_SR: // rbitshiftequal(*param);
+		case TJS_OP_INC:
+		case TJS_OP_DEC:
+		default: // return tTJSCustomObject::Operation( flga, membername, hint, result, param, objthis );
+		}
+		*/
+	}
+	tjs_error TJS_INTF_METHOD OperationByNum( tjs_uint32 flag, tjs_int num, tTJSVariant *result, const tTJSVariant *param, iTJSDispatch2 *objthis ) override {
+		return tTJSCustomObject::OperationByNum( flag, num, result, param, objthis );
+	}
+};
+//---------------------------------------------------------------------------
+iTJSDispatch2 *tTJSNC_Matrix44::CreateBaseTJSObject() {
+	return new tTSJNC_Matrix44Object();
+}
+#endif
 //---------------------------------------------------------------------------
 tTJSNativeClass * TVPCreateNativeClass_Matrix44()
 {

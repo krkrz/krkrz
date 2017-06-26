@@ -41,6 +41,7 @@ public:
 	void copyImage( GLint x, GLint y, GLint w, GLint h, const GLvoid* bits ) {
 		 glTexSubImage2D( GL_TEXTURE_2D, 0, x, y, w, h, GL_RGBA, GL_UNSIGNED_BYTE, bits );
 	}
+	bool exchangeTexture( GLuint tex_id );
 
 	GLuint textureId() const { return texture_id_; }
 	GLuint width() const { return width_; }

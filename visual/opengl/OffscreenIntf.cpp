@@ -8,6 +8,7 @@
 #include "tvpgl.h"
 #include "DebugIntf.h"
 #include "RectItf.h"
+#include "TextureIntf.h"
 #include <memory>
 
 extern bool TVPCopyBitmapToTexture( const iTVPTextureInfoIntrface* texture, tjs_int left, tjs_int top, const tTVPBaseBitmap* bitmap, const tTVPRect& srcRect );
@@ -70,6 +71,20 @@ tjs_int64 tTJSNI_Offscreen::GetVBOHandle() const {
 		GLVertexBufferObject& vbo = const_cast<GLVertexBufferObject&>( VertexBuffer );
 		vbo.createStaticVertex( vertices, sizeof(vertices) );
 		return VertexBuffer.id();
+	}
+}
+//---------------------------------------------------------------------------
+void tTJSNI_Offscreen::ExchangeTexture( tTJSNI_Texture* texture ) {
+	if( FrameBuffer.width() == texture->GetMemoryWidth() && FrameBuffer.height() == texture->GetMemoryHeight() && FrameBuffer.format() == texture->GetImageFormat() ) {
+		GLuint oldTex = FrameBuffer.textureId();
+		bool result = FrameBuffer.exchangeTexture( (GLuint)texture->GetNativeHandle() );
+		if( !result ) {
+			TVPThrowExceptionMessage( TJS_W( "Cannot exchange texture." ) );
+		} else {
+			texture->Texture.texture_id_ = oldTex;
+		}
+	} else {
+		TVPThrowExceptionMessage( TJS_W( "Incompatible texture." ) );
 	}
 }
 //---------------------------------------------------------------------------
@@ -164,6 +179,18 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/copyTo)
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/copyTo)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/exchangeTexture )
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Offscreen );
+	if( numparams < 1 ) return TJS_E_BADPARAMCOUNT;
+
+	tTJSNI_Texture* texture = (tTJSNI_Texture*)TJSGetNativeInstance( tTJSNC_Texture::ClassID, param[0] );
+	if( !texture ) TVPThrowExceptionMessage( TJS_W( "Parameter require Texture class instance." ) );
+
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/exchangeTexture )
 //----------------------------------------------------------------------
 
 

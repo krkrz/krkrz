@@ -87,6 +87,8 @@ public:
 		}
 		wrapT_ = s;
 	}
+
+	friend class tTJSNI_Offscreen;
 };
 
 

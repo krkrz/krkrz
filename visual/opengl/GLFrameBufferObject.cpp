@@ -58,6 +58,34 @@ bool GLFrameBufferObject::create( GLuint w, GLuint h ) {
 	glBindFramebuffer( GL_FRAMEBUFFER, fb );
 	return result;
 }
+bool GLFrameBufferObject::exchangeTexture( GLuint tex_id ) {
+	GLint fb;
+	glGetIntegerv( GL_FRAMEBUFFER_BINDING, &fb );
+
+	glBindFramebuffer( GL_FRAMEBUFFER, framebuffer_id_ );
+	glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex_id, 0 );
+
+	GLenum status = glCheckFramebufferStatus( GL_FRAMEBUFFER );
+	switch( status ) {
+	case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+		TVPAddLog( TJS_W("Not all framebuffer attachment points are framebuffer attachment complete.") );
+		break;
+	case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
+		TVPAddLog( TJS_W("Not all attached images have the same width and height.") );
+		break;
+	case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+		TVPAddLog( TJS_W("No images are attached to the framebuffer.") );
+		break;
+	case GL_FRAMEBUFFER_UNSUPPORTED:
+		TVPAddLog( TJS_W("The combination of internal formats of the attached images violates an implementation-dependent set of restrictions. ") );
+		break;
+	}
+	bool result = status == GL_FRAMEBUFFER_COMPLETE;
+
+	glBindFramebuffer( GL_FRAMEBUFFER, fb );
+
+	return result;
+}
 bool GLFrameBufferObject::readFrameBuffer( tjs_uint x, tjs_uint y, tjs_uint width, tjs_uint height, tjs_uint8* dest, bool front ) {
 	glReadBuffer( front ? GL_FRONT : GL_BACK );
 	glReadPixels( x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, dest );
@@ -136,7 +164,7 @@ bool GLFrameBufferObject::readTextureToBitmap( class tTVPBaseBitmap* bmp, const 
 	}
 
 	// 上下反転しつつ赤と青を入れ替えながらコピー
-	for( tjs_uint y = 0, line=top+clip.get_height()-1; y < clip.get_height(); y++, line-- ) {
+	for( tjs_int y = 0, line=top+clip.get_height()-1; y < clip.get_height(); y++, line-- ) {
 		tjs_uint32* dest = reinterpret_cast<tjs_uint32*>(bmp->GetScanLineForWrite(line)) + left;
 		TVPRedBlueSwapCopy( dest, &buffer[y*clip.get_width()], clip.get_width() );
 	}
