@@ -34,3 +34,6 @@
 [submodule "external/opusfile"]
 	path = external/opusfile
 	url = https://github.com/krkrz/opusfile.git
+[submodule "external/glm"]
+	path = external/glm
+	url = https://github.com/krkrz/glm.git
