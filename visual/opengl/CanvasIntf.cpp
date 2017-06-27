@@ -39,7 +39,7 @@ tTVPCanvasState::tTVPCanvasState( class tTJSNI_Matrix32* mat, class tTJSNI_Rect*
 }
 
 //----------------------------------------------------------------------
-ttstr tTJSNI_Canvas::DefaultVertexShaderText(
+const ttstr tTJSNI_Canvas::DefaultVertexShaderText(
 TJS_W( "attribute vec2 a_pos;" )
 TJS_W( "attribute vec2 a_texCoord;" )
 TJS_W( "uniform mat4 a_modelMat4;" )
@@ -57,7 +57,7 @@ TJS_W( "  v_texCoord = a_texCoord;" )
 TJS_W( "}" )
 	);
 //----------------------------------------------------------------------
-ttstr tTJSNI_Canvas::DefaultFragmentShaderText(
+const ttstr tTJSNI_Canvas::DefaultFragmentShaderText(
 TJS_W( "precision mediump float;" )
 TJS_W( "varying vec2 v_texCoord;" )
 TJS_W( "uniform sampler2D s_tex0;" )
@@ -65,6 +65,33 @@ TJS_W( "void main()" )
 TJS_W( "{" )
 TJS_W( "  gl_FragColor = texture2D( s_tex0, v_texCoord );" )
 TJS_W( "}")
+);
+//----------------------------------------------------------------------
+const ttstr tTJSNI_Canvas::DefaultFillVertexShaderText(
+	TJS_W( "attribute vec2 a_pos;" )
+	TJS_W( "attribute vec4 a_color;" )
+	TJS_W( "uniform mat4 a_modelMat4;" )
+	TJS_W( "uniform vec2 a_size;" )
+	TJS_W( "varying vec4 v_color;" )
+	TJS_W( "void main()" )
+	TJS_W( "{" )
+	TJS_W( "  mat4 ortho = mat4(" )
+	TJS_W( "    vec4( 2.0 / a_size.x, 0.0, 0.0, 0.0 )," )
+	TJS_W( "    vec4( 0.0, -2.0 / a_size.y, 0.0, 0.0 )," )
+	TJS_W( "    vec4( 0.0, 0.0, -1.0, 0.0 )," )
+	TJS_W( "    vec4( -1.0, 1.0, 0.0, 1.0 ) );" )
+	TJS_W( "  gl_Position = ortho * a_modelMat4 * vec4( a_pos, 0.0, 1.0 );" )
+	TJS_W( "  v_color = a_color;" )
+	TJS_W( "}" )
+);
+//----------------------------------------------------------------------
+const ttstr tTJSNI_Canvas::DefaultFillFragmentShaderText(
+	TJS_W( "precision mediump float;" )
+	TJS_W( "varying vec4 v_color;" )
+	TJS_W( "void main()" )
+	TJS_W( "{" )
+	TJS_W( "  gl_FragColor = v_color;" )
+	TJS_W( "}" )
 );
 //----------------------------------------------------------------------
 const float tTJSNI_Canvas::DefaultUVs[] = {
@@ -76,7 +103,7 @@ const float tTJSNI_Canvas::DefaultUVs[] = {
 //----------------------------------------------------------------------
 tTJSNI_Canvas::tTJSNI_Canvas() : IsFirst(true), InDrawing(false), EnableClipRect(false), GLScreen(nullptr), ClearColor(0xff00ff00), BlendMode(tTVPBlendMode::bmAlpha),
 PrevViewportWidth(0), PrevViewportHeight(0), CurrentScissorRect(-1,-1,-1,-1), 
-RenderTargetInstance(nullptr), ClipRectInstance(nullptr), Matrix32Instance(nullptr) {
+RenderTargetInstance(nullptr), ClipRectInstance(nullptr), Matrix32Instance(nullptr), DefaultShaderInstance(nullptr), DefaultFillShaderInstance(nullptr) {
 	TVPInitializeOpenGLPlatform();
 }
 //----------------------------------------------------------------------
@@ -113,8 +140,6 @@ tjs_error TJS_INTF_METHOD tTJSNI_Canvas::Construct(tjs_int numparams, tTJSVarian
 	// set default shader (after OpenGL init)
 	CreateDefaultShader();
 
-	if( !GLDrawer.InitializeShader() ) TVPThrowExceptionMessage( TJS_W("Cannot initialize shader.") );
-
 	TextureVertexBuffer.createStaticVertex( DefaultUVs, sizeof(DefaultUVs) );
 
 	return TJS_S_OK;
@@ -133,10 +158,12 @@ void TJS_INTF_METHOD tTJSNI_Canvas::Invalidate() {
 
 	// release shader
 	SetDefaultShader( tTJSVariant() );
+
+	// release fill shader
+	SetDefaultFillShader( tTJSVariant() );
 }
 //----------------------------------------------------------------------
 void TJS_INTF_METHOD tTJSNI_Canvas::Destruct() {
-	GLDrawer.DestroyShader();
 	if( GLScreen ) {
 		GLScreen->Destroy();
 		delete GLScreen;
@@ -177,6 +204,13 @@ void tTJSNI_Canvas::CreateDefaultShader() {
 			if( TJS_FAILED( cls->CreateNew( 0, NULL, NULL, &newobj, 4, pparam, cls ) ) )
 				TVPThrowExceptionMessage( TVPInternalError, TJS_W( "tTJSNI_ShaderProgram::Construct" ) );
 			SetDefaultShader( tTJSVariant( newobj, newobj ) );
+			if( newobj ) newobj->Release();
+
+			param[0] = DefaultFillVertexShaderText;
+			param[1] = DefaultFillFragmentShaderText;
+			if( TJS_FAILED( cls->CreateNew( 0, NULL, NULL, &newobj, 4, pparam, cls ) ) )
+				TVPThrowExceptionMessage( TVPInternalError, TJS_W( "tTJSNI_ShaderProgram::Construct" ) );
+			SetDefaultFillShader( tTJSVariant( newobj, newobj ) );
 		} catch( ... ) {
 			if( cls ) cls->Release();
 			if( newobj ) newobj->Release();
@@ -322,12 +356,54 @@ void tTJSNI_Canvas::Clear( tjs_uint32 color ) {
 	glClear( GL_COLOR_BUFFER_BIT );
 }
 //----------------------------------------------------------------------
-void tTJSNI_Canvas::Fill( tjs_int left, tjs_int top, tjs_int width, tjs_int height, tjs_uint32 colors[4] ) {
+void tTJSNI_Canvas::Fill( tjs_int width, tjs_int height, tjs_uint32 colors[4], tTJSNI_ShaderProgram* shader ) {
 	SetupEachDrawing();
 
-	tjs_int sw = GetCanvasWidth();
-	tjs_int sh = GetCanvasHeight();
-	GLDrawer.DrawColoredPolygon( colors, left, top, width, height, sw, sh );
+	if( !shader ) shader = DefaultFillShaderInstance;
+
+	const float w = (float)width;
+	const float h = (float)height;
+	const GLfloat vertices[] = {
+		0.0f, 0.0f,	// 左上
+		0.0f,    h,	// 左下
+		w, 0.0f,	// 右上
+		w,    h,	// 右下
+	};
+	GLfloat glcolors[16];
+	for( tjs_int i = 0; i < 4; i++ ) {
+		float a = ( ( colors[i] & 0xff000000 ) >> 24 ) / 255.0f;
+		float r = ( ( colors[i] & 0x00ff0000 ) >> 16 ) / 255.0f;
+		float g = ( ( colors[i] & 0x0000ff00 ) >> 8 ) / 255.0f;
+		float b = ( ( colors[i] & 0x000000ff ) >> 0 ) / 255.0f;
+		glcolors[i * 4 + 0] = r;
+		glcolors[i * 4 + 1] = g;
+		glcolors[i * 4 + 2] = b;
+		glcolors[i * 4 + 3] = a;
+	}
+
+	tTVPPoint ssize;
+	ssize.x = GetCanvasWidth();
+	ssize.y = GetCanvasHeight();
+
+	shader->SetupProgram();
+	GLint posLoc = shader->FindLocation( std::string( "a_pos" ) );
+	if( posLoc < 0 ) TVPThrowExceptionMessage( TJS_W( "Not found a_pos in shader." ) );
+	glVertexAttribPointer( posLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof( GLfloat ), vertices );
+	GLint colorLoc = shader->FindLocation( std::string( "a_color" ) );
+	if( colorLoc < 0 ) TVPThrowExceptionMessage( TJS_W( "Not found a_texCoord in shader." ) );
+	glVertexAttribPointer( colorLoc, 4, GL_FLOAT, GL_FALSE, 4 * sizeof( GLfloat ), glcolors );
+	glEnableVertexAttribArray( posLoc );
+	glEnableVertexAttribArray( colorLoc );
+
+	GLint matLoc = shader->FindLocation( std::string( "a_modelMat4" ) );
+	if( matLoc < 0 ) TVPThrowExceptionMessage( TJS_W( "Not found a_modelMat4 in shader." ) );
+	glUniformMatrix4fv( matLoc, 1, GL_FALSE, Matrix32Instance->GetMatrixArray16() );
+
+	GLint vpLoc = shader->FindLocation( std::string( "a_size" ) );
+	if( vpLoc < 0 ) TVPThrowExceptionMessage( TJS_W( "Not found a_size in shader." ) );
+	glUniform2f( vpLoc, (float)ssize.x, (float)ssize.y );
+
+	glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
 }
 //----------------------------------------------------------------------
 void tTJSNI_Canvas::SetupTextureDrawing( tTJSNI_ShaderProgram* shader, const iTVPTextureInfoIntrface* tex, tTJSNI_Matrix32* mat, const tTVPPoint& vpSize ) {
@@ -405,7 +481,6 @@ void tTJSNI_Canvas::DrawTexture( const iTVPTextureInfoIntrface* texture, tTJSNI_
 	ssize.x = GetCanvasWidth();
 	ssize.y = GetCanvasHeight();
 	shader->SetupProgram();
-	//GLDrawer.DrawTexture( shader, texture, Matrix32Instance, ssize );
 	SetupTextureDrawing( shader, texture, Matrix32Instance, ssize );
 	glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
 }
@@ -585,6 +660,27 @@ void tTJSNI_Canvas::SetDefaultShader( const tTJSVariant & val ) {
 	}
 }
 //----------------------------------------------------------------------
+void tTJSNI_Canvas::SetDefaultFillShader( const tTJSVariant & val ) {
+	// invalidate existing matrix
+	if( DefaultFillShaderObject.Type() == tvtObject )
+		DefaultFillShaderObject.AsObjectClosureNoAddRef().Invalidate( 0, NULL, NULL, DefaultFillShaderObject.AsObjectNoAddRef() );
+
+	// assign new matrix
+	DefaultFillShaderObject = val;
+	DefaultFillShaderInstance = nullptr;
+
+	// extract interface
+	if( DefaultFillShaderObject.Type() == tvtObject ) {
+		tTJSVariantClosure clo = DefaultFillShaderObject.AsObjectClosureNoAddRef();
+		if( clo.Object ) {
+			if( TJS_FAILED( clo.Object->NativeInstanceSupport( TJS_NIS_GETINSTANCE, tTJSNC_ShaderProgram::ClassID, (iTJSNativeInstance**)&DefaultFillShaderInstance ) ) ) {
+				DefaultFillShaderInstance = nullptr;
+				TVPThrowExceptionMessage( TJS_W( "Cannot retrive shader instance." ) );
+			}
+		}
+	}
+}
+//----------------------------------------------------------------------
 void tTJSNI_Canvas::SetBlendMode( tTVPBlendMode bm ) {
 	BlendMode = bm;
 	if( InDrawing ) {
@@ -695,34 +791,40 @@ TJS_END_NATIVE_METHOD_DECL(/*func. name*/capture)
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/fill)
 {
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas);
-	if( numparams < 5 ) return TJS_E_BADPARAMCOUNT;
+	if( numparams < 2 ) return TJS_E_BADPARAMCOUNT;
 
-	tjs_int left = *param[0];
-	tjs_int top = *param[1];
-	tjs_int width = *param[2];
-	tjs_int height = *param[3];
+	tjs_int width = *param[0];
+	tjs_int height = *param[1];
 
-	tTJSVariantType vt = param[4]->Type();
 	tjs_uint32 color = 0xffffffff;
-	if( vt == tvtInteger ) {
-		color = (tjs_uint32)(tjs_int64)*param[4];
-	} else if( vt == tvtObject ) {
-		tTJSVariantClosure clo = param[4]->AsObjectClosureNoAddRef();
-		tjs_int count = TJSGetArrayElementCount(clo.Object);
-		tjs_uint32 colors[4];
-		if( count >= 4 ) {
-			tTJSVariant tmp;
-			for( tjs_int i = 0; i < 4; i++ ) {
-				if(TJS_FAILED(clo.Object->PropGetByNum(TJS_MEMBERMUSTEXIST, i, &tmp, clo.ObjThis)))
-					TVPThrowExceptionMessage( TJS_W("Insufficient number of arrays.") );
-				colors[i] = (tjs_uint32)(tjs_int64)tmp;
+
+	tTJSNI_ShaderProgram* shader = nullptr;
+	if( numparams >= 4 ) {
+		shader = (tTJSNI_ShaderProgram*)TJSGetNativeInstance( tTJSNC_ShaderProgram::ClassID, param[3] );
+	}
+
+	if( numparams >= 3 ) {
+		tTJSVariantType vt = param[2]->Type();
+		if( vt == tvtInteger ) {
+			color = (tjs_uint32)(tjs_int64)*param[2];
+		} else if( vt == tvtObject ) {
+			tTJSVariantClosure clo = param[2]->AsObjectClosureNoAddRef();
+			tjs_int count = TJSGetArrayElementCount( clo.Object );
+			tjs_uint32 colors[4];
+			if( count >= 4 ) {
+				tTJSVariant tmp;
+				for( tjs_int i = 0; i < 4; i++ ) {
+					if( TJS_FAILED( clo.Object->PropGetByNum( TJS_MEMBERMUSTEXIST, i, &tmp, clo.ObjThis ) ) )
+						TVPThrowExceptionMessage( TJS_W( "Insufficient number of arrays." ) );
+					colors[i] = (tjs_uint32)(tjs_int64)tmp;
+				}
+				_this->Fill( width, height, colors, shader );
+				return TJS_S_OK;
 			}
-			_this->Fill( left, top, width, height, colors );
-			return TJS_S_OK;
 		}
 	}
 	tjs_uint32 colors[4] = { color,color,color,color };
-	_this->Fill( left, top, width, height, colors );
+	_this->Fill( width, height, colors, shader );
 
 	return TJS_S_OK;
 }
@@ -977,6 +1079,26 @@ TJS_BEGIN_NATIVE_PROP_DECL( defaultShader )
 	TJS_END_NATIVE_PROP_SETTER
 }
 TJS_END_NATIVE_PROP_DECL( defaultShader )
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL( defaultFillShader )
+{
+	TJS_BEGIN_NATIVE_PROP_GETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas );
+	*result = _this->GetDefaultFillShader();
+	return TJS_S_OK;
+	}
+		TJS_END_NATIVE_PROP_GETTER
+
+		TJS_BEGIN_NATIVE_PROP_SETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas );
+	_this->SetDefaultFillShader( *param );
+	return TJS_S_OK;
+	}
+		TJS_END_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_PROP_DECL( defaultFillShader )
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_PROP_DECL(width)
 {

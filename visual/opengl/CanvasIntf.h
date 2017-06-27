@@ -9,7 +9,6 @@
 
 #include "tjsNative.h"
 #include "drawable.h"
-#include "GLTextureDrawing.h"
 #include "tjsHashSearch.h"
 #include "ComplexRect.h"
 #include "GLVertexBufferObject.h"
@@ -68,8 +67,10 @@ struct tTVPCanvasState {
 
 class tTJSNI_Canvas : public tTJSNativeInstance
 {
-	static ttstr DefaultVertexShaderText;
-	static ttstr DefaultFragmentShaderText;
+	static const ttstr DefaultVertexShaderText;
+	static const ttstr DefaultFragmentShaderText;
+	static const ttstr DefaultFillVertexShaderText;
+	static const ttstr DefaultFillFragmentShaderText;
 	static const float DefaultUVs[];
 
 	bool IsFirst;
@@ -80,7 +81,6 @@ class tTJSNI_Canvas : public tTJSNativeInstance
 	tTVPRect CurrentScissorRect;
 
 	class tTVPOpenGLScreen* GLScreen;
-	tTVPGLTextureDrawing GLDrawer;
 
 	std::vector<std::unique_ptr<tTVPCanvasState> > StateStack;
 
@@ -102,6 +102,8 @@ class tTJSNI_Canvas : public tTJSNativeInstance
 	tTJSVariant DefaultShaderObject;
 	class tTJSNI_ShaderProgram* DefaultShaderInstance;
 
+	tTJSVariant DefaultFillShaderObject;
+	class tTJSNI_ShaderProgram* DefaultFillShaderInstance;
 public:
 	void SetRenterTargetObject( const tTJSVariant & val );
 	const tTJSVariant& GetRenderTargetObject() const { return RenterTaretObject; }
@@ -115,6 +117,8 @@ public:
 	void SetDefaultShader( const tTJSVariant & val );
 	const tTJSVariant& GetDefaultShader() const { return DefaultShaderObject; }
 
+	void SetDefaultFillShader( const tTJSVariant & val );
+	const tTJSVariant& GetDefaultFillShader() const { return DefaultFillShaderObject; }
 private:
 	void ApplyBlendMode();
 	void ApplyClipRect();
@@ -145,7 +149,7 @@ public:
 	void Capture( const class iTVPTextureInfoIntrface* texture, bool front = true );
 	void Clear( tjs_uint32 color );
 
-	void Fill( tjs_int left, tjs_int top, tjs_int width, tjs_int height, tjs_uint32 colors[4] );
+	void Fill( tjs_int width, tjs_int height, tjs_uint32 colors[4], class tTJSNI_ShaderProgram* shader = nullptr );
 	void DrawTexture( const class iTVPTextureInfoIntrface* texture, class tTJSNI_ShaderProgram* shader = nullptr );
 	void DrawTexture( const class iTVPTextureInfoIntrface* texture0, const class iTVPTextureInfoIntrface* texture1, class tTJSNI_ShaderProgram* shader );
 	void DrawTexture( const class iTVPTextureInfoIntrface* texture0, const class iTVPTextureInfoIntrface* texture1, const class iTVPTextureInfoIntrface* texture2, class tTJSNI_ShaderProgram* shader );

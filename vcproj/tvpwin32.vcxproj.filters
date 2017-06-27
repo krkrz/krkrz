@@ -719,9 +719,6 @@
     <ClInclude Include="..\visual\opengl\GLShaderUtil.h">
       <Filter>visual\opengl</Filter>
     </ClInclude>
-    <ClInclude Include="..\visual\opengl\GLTextureDrawing.h">
-      <Filter>visual\opengl</Filter>
-    </ClInclude>
     <ClInclude Include="..\visual\opengl\OpenGLScreen.h">
       <Filter>visual\opengl</Filter>
     </ClInclude>
@@ -1352,9 +1349,6 @@
       <Filter>visual\opengl</Filter>
     </ClCompile>
     <ClCompile Include="..\visual\opengl\GLShaderUtil.cpp">
-      <Filter>visual\opengl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\visual\opengl\GLTextureDrawing.cpp">
       <Filter>visual\opengl</Filter>
     </ClCompile>
     <ClCompile Include="..\visual\opengl\OpenGLScreen.cpp">
