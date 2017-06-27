@@ -83,8 +83,8 @@ class tTJSNI_Canvas : public tTJSNativeInstance
 	tTJSVariant ClipRectObject;
 	class tTJSNI_Rect* ClipRectInstance;
 
-	tTJSVariant Matrix44Object;
-	class tTJSNI_Matrix44* Matrix44Instance;
+	tTJSVariant Matrix32Object;
+	class tTJSNI_Matrix32* Matrix32Instance;
 
 	tTJSVariant DefaultShaderObject;
 	class tTJSNI_ShaderProgram* DefaultShaderInstance;
@@ -96,8 +96,8 @@ public:
 	void SetClipRectObject( const tTJSVariant & val );
 	const tTJSVariant& GetClipRectObject() const { return ClipRectObject; }
 
-	void SetMatrix44Object( const tTJSVariant & val );
-	const tTJSVariant& GetMatrix44Object() const { return Matrix44Object; }
+	void SetMatrix32Object( const tTJSVariant & val );
+	const tTJSVariant& GetMatrix32Object() const { return Matrix32Object; }
 
 	void SetDefaultShader( const tTJSVariant & val );
 	const tTJSVariant& GetDefaultShader() const { return DefaultShaderObject; }
@@ -111,7 +111,7 @@ private:
 	void SetupEachDrawing();
 
 	// 描画に必要な設定と1個目のテクスチャまで設定する
-	void SetupTextureDrawing( class tTJSNI_ShaderProgram* shader, const class iTVPTextureInfoIntrface* tex, class tTJSNI_Matrix44* mat, const tTVPPoint& vpSize );
+	void SetupTextureDrawing( class tTJSNI_ShaderProgram* shader, const class iTVPTextureInfoIntrface* tex, class tTJSNI_Matrix32* mat, const tTVPPoint& vpSize );
 
 	// 描画領域の幅/高さ。レンダーターゲット指定している場合はそのサイズ、そうでない場合はクライアント領域(サーフェイス)のサイズ
 	tjs_int GetCanvasWidth() const;

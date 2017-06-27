@@ -139,6 +139,17 @@ public:
 		Premultiply( Matrix.a, t );
 		IsDirty = true;
 	}
+	void Rotate( tjs_real deg, tjs_real px, tjs_real py ) {
+		float t[6];
+		SetTranslate( t, (float)px, (float)py );
+		float r[6];
+		SetRotate( r, (float)deg );
+		Multiply( r, t );
+		SetTranslate( t, -(float)px, -(float)py );
+		Multiply( t, r );
+		Premultiply( Matrix.a, t );
+		IsDirty = true;
+	}
 	void SkewX( tjs_real deg ) {
 		float t[6];
 		SetSkewX( t, DegToRad((float)deg) );
@@ -175,7 +186,16 @@ public:
 		IsDirty = true;
 	}
 
+	/**
+	 * 3x2行列の配列(6要素)として取得する。
+	 */
 	const float* GetMatrixArray() const;
+
+	/**
+	 * 4x4行列の配列(16要素)として取得する。内部的にキャッシュして持っている。
+	 * 取得時変更があった場合に再設定。
+	 * 読み取りのみで外部からの変更は想定されていないので注意。
+	 */
 	const float* GetMatrixArray16() const;
 };
 

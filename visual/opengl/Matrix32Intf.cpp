@@ -9,6 +9,12 @@
 
 //---------------------------------------------------------------------------
 tTJSNI_Matrix32::tTJSNI_Matrix32() : IsDirty(true), MatrixArray(nullptr) {
+	// 単位行列として初期化
+	float* m = WorkMatrix;
+	 m[0] = 1.0f;  m[1] = 0.0f;  m[2] = 0.0f;  m[3] = 0.0f;
+	 m[4] = 0.0f;  m[5] = 1.0f;  m[6] = 0.0f;  m[7] = 0.0f;
+	 m[8] = 0.0f;  m[9] = 0.0f; m[10] = 1.0f; m[11] = 0.0f;
+	m[12] = 0.0f; m[13] = 0.0f; m[14] = 0.0f; m[15] = 1.0f;
 }
 //---------------------------------------------------------------------------
 tTJSNI_Matrix32::~tTJSNI_Matrix32() {
@@ -102,10 +108,17 @@ const float* tTJSNI_Matrix32::GetMatrixArray16() const {
 	if( IsDirty ) {
 		const float* t = Matrix.a;
 		float* m = const_cast<float*>(WorkMatrix);
+		/*
 		 m[0] = t[0];  m[1] = t[1];  m[2] = 0.0f;  m[3] = 0.0f;
 		 m[4] = t[2];  m[5] = t[3];  m[6] = 0.0f;  m[7] = 0.0f;
 		 m[8] = 0.0f;  m[9] = 0.0f; m[10] = 1.0f; m[11] = 0.0f;
 		m[12] = t[4]; m[13] = t[5]; m[14] = 0.0f; m[15] = 1.0f;
+		*/
+		// 単位行列としてコンストラクタで初期化済みなので、変更のある部分のみ再設定。
+		// 読み取りのみで外部からの変更は想定されていないので注意
+		 m[0] = t[0];  m[1] = t[1];
+		 m[4] = t[2];  m[5] = t[3];
+		m[12] = t[4]; m[13] = t[5];
 		const_cast<tTJSNI_Matrix32*>(this)->IsDirty = false;
 	}
 	return WorkMatrix;
@@ -254,7 +267,11 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/rotate )
 {
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Matrix32 );
 	if( numparams < 1 ) return TJS_E_BADPARAMCOUNT;
-	_this->Rotate( (tjs_real)*param[0] );
+	if( numparams < 3 ) {
+		_this->Rotate( (tjs_real)*param[0] );
+	} else {
+		_this->Rotate( (tjs_real)*param[0], (tjs_real)*param[1], (tjs_real)*param[2] );
+	}
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/rotate )

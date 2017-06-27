@@ -2,7 +2,7 @@
 #include "tjsCommHead.h"
 
 #include "CanvasIntf.h"
-#include "Matrix44Intf.h"
+#include "Matrix32Intf.h"
 #include "Mesh2DIntf.h"
 #include "OffscreenIntf.h"
 #include "TextureIntf.h"
@@ -20,7 +20,6 @@
 #include "CharacterSet.h"
 #include "GLShaderUtil.h"
 #include "ShaderProgramIntf.h"
-#include "Matrix44Intf.h"
 
 #include <memory>
 
@@ -62,7 +61,7 @@ const float tTJSNI_Canvas::DefaultUVs[] = {
 //----------------------------------------------------------------------
 tTJSNI_Canvas::tTJSNI_Canvas() : IsFirst(true), InDrawing(false), EnableClipRect(false), GLScreen(nullptr), ClearColor(0xff00ff00), BlendMode(tTVPBlendMode::bmAlpha),
 PrevViewportWidth(0), PrevViewportHeight(0), CurrentScissorRect(-1,-1,-1,-1), 
-RenderTargetInstance(nullptr), ClipRectInstance(nullptr), Matrix44Instance(nullptr) {
+RenderTargetInstance(nullptr), ClipRectInstance(nullptr), Matrix32Instance(nullptr) {
 	TVPInitializeOpenGLPlatform();
 }
 //----------------------------------------------------------------------
@@ -115,7 +114,7 @@ void TJS_INTF_METHOD tTJSNI_Canvas::Invalidate() {
 	SetClipRectObject( tTJSVariant() );
 
 	// release matrix
-	SetMatrix44Object( tTJSVariant() );
+	SetMatrix32Object( tTJSVariant() );
 
 	// release shader
 	SetDefaultShader( tTJSVariant() );
@@ -137,10 +136,10 @@ void tTJSNI_Canvas::CreateDefaultMatrix() {
 		iTJSDispatch2 * newobj = NULL;
 		try
 		{
-			cls = new tTJSNC_Matrix44();
+			cls = new tTJSNC_Matrix32();
 			if( TJS_FAILED( cls->CreateNew( 0, NULL, NULL, &newobj, 0, NULL, cls ) ) )
-				TVPThrowExceptionMessage( TVPInternalError, TJS_W( "tTJSNI_Matrix44::Construct" ) );
-			SetMatrix44Object( tTJSVariant( newobj, newobj ) );
+				TVPThrowExceptionMessage( TVPInternalError, TJS_W( "tTJSNI_Matrix32::Construct" ) );
+			SetMatrix32Object( tTJSVariant( newobj, newobj ) );
 		} catch( ... ) {
 			if( cls ) cls->Release();
 			if( newobj ) newobj->Release();
@@ -314,7 +313,7 @@ void tTJSNI_Canvas::Fill( tjs_int left, tjs_int top, tjs_int width, tjs_int heig
 	GLDrawer.DrawColoredPolygon( colors, left, top, width, height, sw, sh );
 }
 //----------------------------------------------------------------------
-void tTJSNI_Canvas::SetupTextureDrawing( tTJSNI_ShaderProgram* shader, const iTVPTextureInfoIntrface* tex, tTJSNI_Matrix44* mat, const tTVPPoint& vpSize ) {
+void tTJSNI_Canvas::SetupTextureDrawing( tTJSNI_ShaderProgram* shader, const iTVPTextureInfoIntrface* tex, tTJSNI_Matrix32* mat, const tTVPPoint& vpSize ) {
 #if 1
 	GLint posLoc = shader->FindLocation( std::string( "a_pos" ) );
 	if( posLoc < 0 ) TVPThrowExceptionMessage( TJS_W("Not found a_pos in shader.") );
@@ -338,7 +337,7 @@ void tTJSNI_Canvas::SetupTextureDrawing( tTJSNI_ShaderProgram* shader, const iTV
 
 	GLint matLoc = shader->FindLocation( std::string( "a_modelMat4" ) );
 	if( matLoc < 0 ) TVPThrowExceptionMessage( TJS_W("Not found a_modelMat4 in shader.") );
-	glUniformMatrix4fv( matLoc, 1, GL_FALSE, mat->GetMatrixArray() );
+	glUniformMatrix4fv( matLoc, 1, GL_FALSE, mat->GetMatrixArray16() );
 
 	GLint vpLoc = shader->FindLocation( std::string( "a_size" ) );
 	if( vpLoc < 0 ) TVPThrowExceptionMessage( TJS_W("Not found a_size in shader.") );
@@ -371,7 +370,7 @@ void tTJSNI_Canvas::SetupTextureDrawing( tTJSNI_ShaderProgram* shader, const iTV
 	glUniform1i( texLoc, 0 );
 
 	GLint matLoc = shader->FindLocation( std::string( "a_modelMat4" ) );
-	glUniformMatrix4fv( matLoc, 1, GL_FALSE, mat->GetMatrixArray() );
+	glUniformMatrix4fv( matLoc, 1, GL_FALSE, mat->GetMatrixArray16() );
 
 	GLint vpLoc = shader->FindLocation( std::string( "a_size" ) );
 	glUniform2f( vpLoc, (float)vpSize.x, (float)vpSize.y );
@@ -389,8 +388,8 @@ void tTJSNI_Canvas::DrawTexture( const iTVPTextureInfoIntrface* texture, tTJSNI_
 	ssize.x = GetCanvasWidth();
 	ssize.y = GetCanvasHeight();
 	shader->SetupProgram();
-	//GLDrawer.DrawTexture( shader, texture, Matrix44Instance, ssize );
-	SetupTextureDrawing( shader, texture, Matrix44Instance, ssize );
+	//GLDrawer.DrawTexture( shader, texture, Matrix32Instance, ssize );
+	SetupTextureDrawing( shader, texture, Matrix32Instance, ssize );
 	glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
 }
 //----------------------------------------------------------------------
@@ -401,7 +400,7 @@ void tTJSNI_Canvas::DrawTexture( const iTVPTextureInfoIntrface* texture0, const 
 	ssize.x = GetCanvasWidth();
 	ssize.y = GetCanvasHeight();
 	shader->SetupProgram();
-	SetupTextureDrawing( shader, texture0, Matrix44Instance, ssize );
+	SetupTextureDrawing( shader, texture0, Matrix32Instance, ssize );
 	GLint texLoc = shader->FindLocation( std::string( "s_tex1" ) );
 	if( texLoc < 0 ) TVPThrowExceptionMessage( TJS_W("Not found s_tex1 in shader.") );
 	glActiveTexture( GL_TEXTURE1 );
@@ -417,7 +416,7 @@ void tTJSNI_Canvas::DrawTexture( const iTVPTextureInfoIntrface* texture0, const 
 	ssize.x = GetCanvasWidth();
 	ssize.y = GetCanvasHeight();
 	shader->SetupProgram();
-	SetupTextureDrawing( shader, texture0, Matrix44Instance, ssize );
+	SetupTextureDrawing( shader, texture0, Matrix32Instance, ssize );
 	GLint texLoc = shader->FindLocation( std::string( "s_tex1" ) );
 	if( texLoc < 0 ) TVPThrowExceptionMessage( TJS_W("Not found s_tex1 in shader.") );
 	glActiveTexture( GL_TEXTURE1 );
@@ -507,21 +506,21 @@ void tTJSNI_Canvas::SetClipRectObject( const tTJSVariant & val ) {
 	}
 }
 //----------------------------------------------------------------------
-void tTJSNI_Canvas::SetMatrix44Object( const tTJSVariant & val ) {
+void tTJSNI_Canvas::SetMatrix32Object( const tTJSVariant & val ) {
 	// invalidate existing matrix
-	if( Matrix44Object.Type() == tvtObject )
-		Matrix44Object.AsObjectClosureNoAddRef().Invalidate( 0, NULL, NULL, Matrix44Object.AsObjectNoAddRef() );
+	if( Matrix32Object.Type() == tvtObject )
+		Matrix32Object.AsObjectClosureNoAddRef().Invalidate( 0, NULL, NULL, Matrix32Object.AsObjectNoAddRef() );
 
 	// assign new matrix
-	Matrix44Object = val;
-	Matrix44Instance = nullptr;
+	Matrix32Object = val;
+	Matrix32Instance = nullptr;
 
 	// extract interface
-	if( Matrix44Object.Type() == tvtObject ) {
-		tTJSVariantClosure clo = Matrix44Object.AsObjectClosureNoAddRef();
+	if( Matrix32Object.Type() == tvtObject ) {
+		tTJSVariantClosure clo = Matrix32Object.AsObjectClosureNoAddRef();
 		if( clo.Object ) {
-			if( TJS_FAILED( clo.Object->NativeInstanceSupport( TJS_NIS_GETINSTANCE, tTJSNC_Matrix44::ClassID, (iTJSNativeInstance**)&Matrix44Instance ) ) ) {
-				Matrix44Instance = nullptr;
+			if( TJS_FAILED( clo.Object->NativeInstanceSupport( TJS_NIS_GETINSTANCE, tTJSNC_Matrix32::ClassID, (iTJSNativeInstance**)&Matrix32Instance ) ) ) {
+				Matrix32Instance = nullptr;
 				TVPThrowExceptionMessage( TJS_W( "Cannot retrive matrix instance." ) );
 			}
 		}
@@ -891,7 +890,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(matrix)
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas);
-		*result = _this->GetMatrix44Object();
+		*result = _this->GetMatrix32Object();
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_GETTER
@@ -899,7 +898,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(matrix)
 	TJS_BEGIN_NATIVE_PROP_SETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas);
-	_this->SetMatrix44Object( *param );
+	_this->SetMatrix32Object( *param );
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_SETTER

@@ -53,6 +53,7 @@
 #include "TextureIntf.h"
 #include "Mesh2DIntf.h"
 #include "Matrix44Intf.h"
+#include "Matrix32Intf.h"
 #include "ShaderProgramIntf.h"
 
 //---------------------------------------------------------------------------
@@ -205,6 +206,7 @@ void TVPInitScriptEngine()
 	REGISTER_OBJECT(Offscreen, TVPCreateNativeClass_Offscreen());
 	REGISTER_OBJECT(Mesh2D, TVPCreateNativeClass_Mesh2D());
 	REGISTER_OBJECT(Matrix44, TVPCreateNativeClass_Matrix44());
+	REGISTER_OBJECT(Matrix32, TVPCreateNativeClass_Matrix32());
 	REGISTER_OBJECT(ShaderProgram, TVPCreateNativeClass_ShaderProgram());
 
 	/* WaveSoundBuffer and its filters */
