@@ -9,7 +9,7 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <math.h>
-
+#include "GeoUtil.h"
 
 class tTJSNI_Matrix32 : public tTJSNativeInstance
 {
@@ -31,9 +31,6 @@ class tTJSNI_Matrix32 : public tTJSNativeInstance
 	bool MatrixArrayValid;
 
 private:
-	static inline float DegToRad( float deg ) {
-		return (float)( deg * M_PI / 180.0f );
-	}
 	static inline void SetIdentity( float* t ) {
 		t[0] = 1.0f; t[1] = 0.0f;
 		t[2] = 0.0f; t[3] = 1.0f;
@@ -50,7 +47,7 @@ private:
 		t[4] = 0.0f; t[5] = 0.0f;
 	}
 	static inline void SetRotate( float* t, float deg ) {
-		float radian = DegToRad( deg );
+		float radian = TVPDegToRad( deg );
 		float c = std::cos( radian );
 		float s = std::sin( radian );
 		t[0] = c;    t[1] = s;
@@ -120,11 +117,11 @@ public:
 		IsDirty = true;
 	}
 	void SetSkewX( tjs_real deg ) {
-		SetSkewX( Matrix.a, DegToRad( (float)deg ) );
+		SetSkewX( Matrix.a, TVPDegToRad( (float)deg ) );
 		IsDirty = true;
 	}
 	void SetSkewY( tjs_real deg ) {
-		SetSkewY( Matrix.a, DegToRad( (float)deg ) );
+		SetSkewY( Matrix.a, TVPDegToRad( (float)deg ) );
 		IsDirty = true;
 	}
 	void Translate( tjs_real tx, tjs_real ty ) {
@@ -152,13 +149,13 @@ public:
 	}
 	void SkewX( tjs_real deg ) {
 		float t[6];
-		SetSkewX( t, DegToRad((float)deg) );
+		SetSkewX( t, TVPDegToRad((float)deg) );
 		Premultiply( Matrix.a, t );
 		IsDirty = true;
 	}
 	void SkewY( tjs_real deg ) {
 		float t[6];
-		SetSkewX( t, DegToRad( (float)deg ) );
+		SetSkewX( t, TVPDegToRad( (float)deg ) );
 		Premultiply( Matrix.a, t );
 		IsDirty = true;
 	}

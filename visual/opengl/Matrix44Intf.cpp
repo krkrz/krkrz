@@ -1,14 +1,22 @@
 
 #include "tjsCommHead.h"
 
-#include "tjsArray.h"
 #include "Matrix44Intf.h"
-#include "MsgIntf.h"	// TVPThrowExceptionMessage
-#include "tjsArray.h"
+#define _USE_MATH_DEFINES
+#include <cmath>
+#include <glm/glm.hpp>
+#include <glm/vec3.hpp>
+#include <glm/gtx/transform.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <math.h>
 #include <string.h>
+#include "GeoUtil.h"
 
-// GLMが出てくる
-// http://www.opengl-tutorial.org/jp/beginners-tutorials/tutorial-3-matrices/
+#include "tjsArray.h"
+#include "MsgIntf.h"	// TVPThrowExceptionMessage
+#include "RectItf.h"
+
+
 tTJSNI_Matrix44::tTJSNI_Matrix44() : MatrixArray(nullptr), Mat4(1.0f) {
 }
 tTJSNI_Matrix44::~tTJSNI_Matrix44() {
@@ -78,6 +86,60 @@ iTJSDispatch2* tTJSNI_Matrix44::GetMatrixArrayObjectNoAddRef() {
 
 	return MatrixArray;
 }
+
+void tTJSNI_Matrix44::SetRotateZ( tjs_real deg ) {
+	float radian = TVPDegToRad( (float)deg );
+	float c = std::cos( radian );
+	float s = std::sin( radian );
+	Mat4[0][0] = c;
+	Mat4[1][0] = s;
+	Mat4[0][1] = -s;
+	Mat4[1][1] = c;
+}
+void tTJSNI_Matrix44::SetRotate( tjs_real degree, tjs_real x, tjs_real y, tjs_real z ) {
+	Mat4 = glm::rotate( TVPDegToRad( (float)degree ), glm::vec3( (float)x, (float)y, (float)z ) );
+}
+void tTJSNI_Matrix44::Add( const tTJSNI_Matrix44* rhs ) { Mat4 += rhs->Mat4; }
+void tTJSNI_Matrix44::Sub( const tTJSNI_Matrix44* rhs ) { Mat4 -= rhs->Mat4; }
+void tTJSNI_Matrix44::Mul( const tTJSNI_Matrix44* rhs ) { Mat4 *= rhs->Mat4; }
+void tTJSNI_Matrix44::Div( const tTJSNI_Matrix44* rhs ) { Mat4 /= rhs->Mat4; }
+void tTJSNI_Matrix44::Inc() { Mat4++; }
+void tTJSNI_Matrix44::Dec() { Mat4--; }
+
+void tTJSNI_Matrix44::Translate( tjs_real x, tjs_real y, tjs_real z ) {
+	Mat4 = glm::translate( Mat4, glm::vec3( (float)x, (float)y, (float)z ) );
+}
+void tTJSNI_Matrix44::Rotate( tjs_real degree, tjs_real x, tjs_real y, tjs_real z ) {
+	Mat4 = glm::rotate( Mat4, TVPDegToRad( (float)degree), glm::vec3( (float)x, (float)y, (float)z ) );
+}
+void tTJSNI_Matrix44::Scale( tjs_real x, tjs_real y, tjs_real z ) {
+	Mat4 = glm::scale( Mat4, glm::vec3( (float)x, (float)y, (float)z ) );
+}
+void tTJSNI_Matrix44::Ortho( tjs_real left, tjs_real right, tjs_real bottom, tjs_real top, tjs_real znear, tjs_real zfar ) {
+	Mat4 = glm::ortho( (float)left, (float)right, (float)bottom, (float)top, (float)znear, (float)zfar );
+}
+void tTJSNI_Matrix44::Ortho( tjs_real left, tjs_real right, tjs_real bottom, tjs_real top ) {
+	Mat4 = glm::ortho( (float)left, (float)right, (float)bottom, (float)top );
+}
+void tTJSNI_Matrix44::Frustum( tjs_real left, tjs_real right, tjs_real bottom, tjs_real top, tjs_real znear, tjs_real zfar ) {
+	Mat4 = glm::frustum( (float)left, (float)right, (float)bottom, (float)top, (float)znear, (float)zfar );
+}
+void tTJSNI_Matrix44::Perspective( tjs_real fovy, tjs_real aspect, tjs_real znear, tjs_real zfar ) {
+	Mat4 = glm::perspective( (float)fovy, (float)aspect, (float)znear, (float)zfar );
+}
+void tTJSNI_Matrix44::PerspectiveFov( tjs_real fovy, tjs_real width, tjs_real height, tjs_real znear, tjs_real zfar ) {
+	Mat4 = glm::perspectiveFov( (float)fovy, (float)width, (float)height, (float)znear, (float)zfar );
+}
+void tTJSNI_Matrix44::Project( const tTJSNI_Matrix44* model, const tTJSNI_Matrix44* proj, const class tTJSNI_Rect* viewport, tjs_real& x, tjs_real& y, tjs_real& z ) {
+	glm::vec3 win( (float)x, (float)y, (float)z );
+	const tTVPRect& v = viewport->Get();
+	glm::vec4 viewp( (float)v.left, (float)v.top, (float)v.get_width(), (float)v.get_height() );
+	glm::vec3 ret = glm::project( win, model->Mat4, proj->Mat4, viewp );
+	x = ret.x;
+	y = ret.y;
+	z = ret.z;
+}
+
 
 //---------------------------------------------------------------------------
 // tTJSNC_Matrix44 : TJS Matrix44 class
@@ -172,8 +234,8 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/setTranslate )
 {
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Matrix44 );
 	if( numparams < 2 ) return TJS_E_BADPARAMCOUNT;
-	if( numparams == 2 ) _this->SetTranslate( (tjs_real)*param[0], (tjs_real)*param[1] );
-	else _this->SetTranslate( (tjs_real)*param[0], (tjs_real)*param[1], (tjs_real)*param[2] );
+	if( numparams == 2 ) _this->SetTranslate( *param[0], *param[1] );
+	else _this->SetTranslate( *param[0], *param[1], *param[2] );
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/setTranslate )
@@ -182,17 +244,26 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/setScale )
 {
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Matrix44 );
 	if( numparams < 2 ) return TJS_E_BADPARAMCOUNT;
-	if( numparams == 2 ) _this->SetScale( (tjs_real)*param[0], (tjs_real)*param[1] );
-	else _this->SetScale( (tjs_real)*param[0], (tjs_real)*param[1], (tjs_real)*param[2] );
+	if( numparams == 2 ) _this->SetScale( *param[0], *param[1] );
+	else _this->SetScale( *param[0], *param[1], *param[2] );
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/setScale )
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/setRotate )
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Matrix44 );
+	if( numparams < 4 ) return TJS_E_BADPARAMCOUNT;
+	_this->SetRotate( *param[0], *param[1], *param[2], *param[3] );
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/setRotate )
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/setRotateZ )
 {
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Matrix44 );
 	if( numparams < 1 ) return TJS_E_BADPARAMCOUNT;
-	_this->SetRotateZ( (tjs_real)*param[0] );
+	_this->SetRotateZ( *param[0] );
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/setRotateZ )
@@ -245,13 +316,96 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/div )
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/div )
 //----------------------------------------------------------------------
-// translate
-// rotate
-// scale
-// ortho
-// frustum
-// perspective
-// perspectiveFov
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/translate )
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Matrix44 );
+	if( numparams < 2 ) return TJS_E_BADPARAMCOUNT;
+	if( numparams == 2 ) _this->Translate( (tjs_real)*param[0], (tjs_real)*param[1] );
+	else _this->Translate( (tjs_real)*param[0], (tjs_real)*param[1], (tjs_real)*param[2] );
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/translate )
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/rotate )
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Matrix44 );
+	if( numparams < 4 ) return TJS_E_BADPARAMCOUNT;
+	_this->Rotate( *param[0], *param[1], *param[2], *param[3] );
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/rotate )
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/scale )
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Matrix44 );
+	if( numparams < 2 ) return TJS_E_BADPARAMCOUNT;
+	if( numparams == 2 ) _this->Scale( *param[0], *param[1] );
+	else _this->Scale( *param[0], *param[1], *param[2] );
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/scale )
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/ortho )
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Matrix44 );
+	if( numparams < 4 ) return TJS_E_BADPARAMCOUNT;
+	if( numparams < 6 ) {
+		_this->Ortho( *param[0], *param[1], *param[2], *param[3] );
+	} else {
+		_this->Ortho( *param[0], *param[1], *param[2], *param[3], *param[4], *param[5] );
+	}
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/ortho )
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/frustum )
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Matrix44 );
+	if( numparams < 6 ) return TJS_E_BADPARAMCOUNT;
+	_this->Frustum( *param[0], *param[1], *param[2], *param[3], *param[4], *param[5] );
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/frustum )
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/perspective )
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Matrix44 );
+	if( numparams < 4 ) return TJS_E_BADPARAMCOUNT;
+	_this->Perspective( *param[0], *param[1], *param[2], *param[3] );
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/perspective )
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/perspectiveFov )
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Matrix44 );
+	if( numparams < 5 ) return TJS_E_BADPARAMCOUNT;
+	_this->PerspectiveFov( *param[0], *param[1], *param[2], *param[3], *param[4] );
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/perspectiveFov )
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/Project )
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Matrix44 );
+	if( numparams < 6 ) return TJS_E_BADPARAMCOUNT;
+	tjs_real x = *param[3];
+	tjs_real y = *param[4];
+	tjs_real z = *param[5];
+	tTJSNI_Matrix44* model = (tTJSNI_Matrix44*)TJSGetNativeInstance( tTJSNC_Matrix44::ClassID, param[0] );
+	if( !model ) return TJS_E_INVALIDPARAM;
+	tTJSNI_Matrix44* proj = (tTJSNI_Matrix44*)TJSGetNativeInstance( tTJSNC_Matrix44::ClassID, param[1] );
+	if( !proj ) return TJS_E_INVALIDPARAM;
+	tTJSNI_Rect* viewport = (tTJSNI_Rect*)TJSGetNativeInstance( tTJSNC_Rect::ClassID, param[2] );
+	if( !viewport ) return TJS_E_INVALIDPARAM;
+	tTJSNI_Matrix44::Project( model, proj, viewport, x, y, z );
+	*param[3] = x;
+	*param[4] = y;
+	*param[5] = z;
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_STATIC_METHOD_DECL(/*func. name*/Project )
+//----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
 

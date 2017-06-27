@@ -6,18 +6,11 @@
 #define Matrix44IntfH
 
 #include "tjsNative.h"
-#define _USE_MATH_DEFINES
-#include <cmath>
-#include <math.h>
 
-#include <glm/glm.hpp>
 #include <glm/mat4x4.hpp>
-#include <glm/vec3.hpp>
-#include <glm/gtx/transform.hpp>
 
 class tTJSNI_Matrix44 : public tTJSNativeInstance
 {
-	//static const tjs_real PI = 3.141592653589793;
 	/*
 	 0  1  2  3
 	 4  5  6  7
@@ -59,32 +52,35 @@ public:
 	iTJSDispatch2 * GetMatrixArrayObjectNoAddRef();
 
 	void SetTranslate( tjs_real x, tjs_real y, tjs_real z = 0.0 ) {
-		//Mat4 = glm::translate( glm::vec3( (float)x, (float)y, (float)z) );
 		Mat4[3][0] = (float)x;
 		Mat4[3][1] = (float)x;
 		Mat4[3][2] = (float)z;
 	}
 	void SetScale( tjs_real x, tjs_real y, tjs_real z = 1.0 ) {
-		//Mat4 = glm::scale( glm::vec3( (float)x, (float)y, 1.0f ) );
 		Mat4[0][0] = (float)x;
 		Mat4[1][1] = (float)y;
 		Mat4[2][2] = (float)z;
 	}
-	void SetRotateZ( tjs_real deg ) {
-		tjs_real radian = deg * M_PI / 180.0;
-		float c = (float)std::cos( radian );
-		float s = (float)std::sin( radian );
-		Mat4[0][0] = c;
-		Mat4[1][0] = s;
-		Mat4[0][1] = -s;
-		Mat4[1][1] = c;
-	}
-	void Add( const tTJSNI_Matrix44* rhs ) { Mat4 += rhs->Mat4; }
-	void Sub( const tTJSNI_Matrix44* rhs ) { Mat4 -= rhs->Mat4; }
-	void Mul( const tTJSNI_Matrix44* rhs ) { Mat4 *= rhs->Mat4; }
-	void Div( const tTJSNI_Matrix44* rhs ) { Mat4 /= rhs->Mat4; }
-	void Inc() { Mat4++; }
-	void Dec() { Mat4--; }
+	void SetRotateZ( tjs_real deg );
+	void SetRotate( tjs_real degree, tjs_real x, tjs_real y, tjs_real z );
+
+	void Add( const tTJSNI_Matrix44* rhs );
+	void Sub( const tTJSNI_Matrix44* rhs );
+	void Mul( const tTJSNI_Matrix44* rhs );
+	void Div( const tTJSNI_Matrix44* rhs );
+	void Inc();
+	void Dec();
+
+	void Translate( tjs_real x, tjs_real y, tjs_real z = 0.0 );
+	void Rotate( tjs_real degree, tjs_real x, tjs_real y, tjs_real z );
+	void Scale( tjs_real x, tjs_real y, tjs_real z = 1.0 );
+	void Ortho( tjs_real left, tjs_real right, tjs_real bottom, tjs_real top, tjs_real znear, tjs_real zfar );
+	void Ortho( tjs_real left, tjs_real right, tjs_real bottom, tjs_real top );
+	void Frustum( tjs_real left, tjs_real right, tjs_real bottom, tjs_real top, tjs_real znear, tjs_real zfar );
+	void Perspective( tjs_real fovy, tjs_real aspect, tjs_real znear, tjs_real zfar );
+	void PerspectiveFov( tjs_real fovy, tjs_real width, tjs_real height, tjs_real znear, tjs_real zfar );
+	static void Project( const tTJSNI_Matrix44* model, const tTJSNI_Matrix44* proj, const class tTJSNI_Rect* viewport, tjs_real& x, tjs_real& y, tjs_real& z );
+
 
 	const float *GetMatrixArray() const { return (const float *)&Mat4[0]; }
 };
