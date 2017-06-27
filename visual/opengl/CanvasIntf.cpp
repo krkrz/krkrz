@@ -23,6 +23,21 @@
 
 #include <memory>
 
+tTVPCanvasState::tTVPCanvasState( class tTJSNI_Matrix32* mat, class tTJSNI_Rect* clip, bool enableClip ) {
+	if( mat ) {
+		memcpy( Matrix, mat->GetMatrixArray(), sizeof( float ) * 6 );
+	} else {
+		Matrix[0] = Matrix[3] = 1.0f;
+		Matrix[1] = Matrix[2] = Matrix[4] = Matrix[5] = 0.0f;
+	}
+	if( clip ) {
+		memcpy( ClipRect, clip->Get().array, sizeof( tjs_int ) * 4 );
+	} else {
+		memset( ClipRect, 0, sizeof( tjs_int ) * 4 );
+	}
+	Flag = enableClip ? FLAG_CLIP_RECT : 0;
+}
+
 //----------------------------------------------------------------------
 ttstr tTJSNI_Canvas::DefaultVertexShaderText(
 TJS_W( "attribute vec2 a_pos;" )
@@ -209,11 +224,13 @@ void tTJSNI_Canvas::BeginDrawing()
 	if( RenderTargetInstance ) {
 		RenderTargetInstance->BindFrameBuffer();
 	}
+	StateStack.clear();
 }
 //----------------------------------------------------------------------
 void tTJSNI_Canvas::EndDrawing()
 {
 	if( GLScreen ) GLScreen->Swap();
+	StateStack.clear();
 	InDrawing = false;
 }
 //----------------------------------------------------------------------
@@ -431,6 +448,26 @@ void tTJSNI_Canvas::DrawTexture( const iTVPTextureInfoIntrface* texture0, const 
 }
 //----------------------------------------------------------------------
 void tTJSNI_Canvas::DrawText( class tTJSNI_Font* font, tjs_int x, tjs_int y, const ttstr& text, tjs_uint32 color ) { /* TODO: 次期実装 */}
+// 
+//----------------------------------------------------------------------
+void tTJSNI_Canvas::Save() {
+	StateStack.push_back(std::unique_ptr<tTVPCanvasState>( new tTVPCanvasState( Matrix32Instance, ClipRectInstance, EnableClipRect ) ) );
+}
+//----------------------------------------------------------------------
+void tTJSNI_Canvas::Restore() {
+	if( StateStack.empty() == false ) {
+		const std::unique_ptr<tTVPCanvasState>& state = StateStack.back();
+		if( Matrix32Instance ) {
+			Matrix32Instance->Set( state->Matrix );
+		}
+		if( ClipRectInstance ) {
+			ClipRectInstance->Set( state->ClipRect );
+		}
+		EnableClipRect = ( state->Flag & tTVPCanvasState::FLAG_CLIP_RECT ) != 0;
+
+		StateStack.pop_back();
+	}
+}
 //----------------------------------------------------------------------
 void tTJSNI_Canvas::ApplyClipRect() {
 	if( ClipRectInstance && GLScreen ) {
@@ -793,6 +830,22 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/flush )
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/flush )
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/save )
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas );
+	_this->Save();
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/save )
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/restore )
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas );
+	_this->Restore();
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/restore )
 //----------------------------------------------------------------------
 
 

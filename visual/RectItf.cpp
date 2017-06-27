@@ -36,7 +36,7 @@ tjs_error TJS_INTF_METHOD
 }
 void TJS_INTF_METHOD tTJSNI_Rect::Invalidate() {
 }
-// Crossing Number Algorithm Ç≈îªíË
+// Crossing Number Algorithm„ÅßÂà§ÂÆö
 bool tTJSNI_Rect::Included( tjs_real x, tjs_real y, const class tTJSNI_Matrix32* matrix ) const {
 	glm::vec2 vtx[4]{{(float)Rect.left, (float)Rect.top },
 					{ (float)(Rect.right-1), (float)Rect.top },

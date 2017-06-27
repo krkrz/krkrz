@@ -13,6 +13,8 @@
 #include "tjsHashSearch.h"
 #include "ComplexRect.h"
 #include "GLVertexBufferObject.h"
+#include <vector>
+#include <memory>
 
 enum class tTVPBlendMode : tjs_int {
 	bmDisable = 0,
@@ -54,6 +56,15 @@ enum class tTVPBlendMode : tjs_int {
 	bmPsExclusion = ltPsExclusion
 */
 };
+struct tTVPCanvasState {
+	static const tjs_uint32 FLAG_CLIP_RECT = 0x01 << 0;
+
+	float Matrix[6];
+	tjs_int ClipRect[4];
+	tjs_uint32 Flag;
+
+	tTVPCanvasState( class tTJSNI_Matrix32* mat, class tTJSNI_Rect* clip, bool enableClip );
+};
 
 class tTJSNI_Canvas : public tTJSNativeInstance
 {
@@ -70,6 +81,8 @@ class tTJSNI_Canvas : public tTJSNativeInstance
 
 	class tTVPOpenGLScreen* GLScreen;
 	tTVPGLTextureDrawing GLDrawer;
+
+	std::vector<std::unique_ptr<tTVPCanvasState> > StateStack;
 
 	GLVertexBufferObject TextureVertexBuffer;
 
@@ -137,6 +150,11 @@ public:
 	void DrawTexture( const class iTVPTextureInfoIntrface* texture0, const class iTVPTextureInfoIntrface* texture1, class tTJSNI_ShaderProgram* shader );
 	void DrawTexture( const class iTVPTextureInfoIntrface* texture0, const class iTVPTextureInfoIntrface* texture1, const class iTVPTextureInfoIntrface* texture2, class tTJSNI_ShaderProgram* shader );
 	void DrawText( class tTJSNI_Font* font, tjs_int x, tjs_int y, const ttstr& text, tjs_uint32 color );
+
+	// 状態をセーブする
+	void Save();
+	// 状態を元に戻す
+	void Restore();
 
 	// prop
 	void SetClearColor(tjs_uint32 color) { ClearColor = color; }

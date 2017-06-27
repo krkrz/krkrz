@@ -55,6 +55,9 @@ public:
 		Rect.right = right;
 		Rect.bottom = bottom;
 	}
+	void Set( tjs_int* a ) {
+		memcpy( Rect.array, a, sizeof(tjs_int)*4 );
+	}
 
 	bool IsEmpty() const {
 		return Rect.is_empty();
