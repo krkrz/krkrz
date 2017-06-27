@@ -165,11 +165,20 @@ public:
 		Premultiply( Matrix.a, t );
 		IsDirty = true;
 	}
-	void TransformPoint( tjs_real& x, tjs_real& y ) {
+	void TransformPoint( tjs_real& x, tjs_real& y ) const {
 		float sx = (float)x;
 		float sy = (float)y;
 		float dx = (float)x;
 		float dy = (float)y;
+		TransformPoint( dx, dy, Matrix.a, sx, sy );
+		x = dx;
+		y = dy;
+	}
+	void TransformPoint( float& x, float& y ) const {
+		float sx = x;
+		float sy = y;
+		float dx = x;
+		float dy = y;
 		TransformPoint( dx, dy, Matrix.a, sx, sy );
 		x = dx;
 		y = dy;

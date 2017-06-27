@@ -3,6 +3,8 @@
 
 #include "RectItf.h"
 #include "MsgIntf.h"
+#include <glm/glm.hpp>
+#include "Matrix32Intf.h"
 
 tTJSNI_Rect::tTJSNI_Rect() : Rect(0,0,0,0) {
 }
@@ -33,6 +35,28 @@ tjs_error TJS_INTF_METHOD
 	return TJS_S_OK;
 }
 void TJS_INTF_METHOD tTJSNI_Rect::Invalidate() {
+}
+// Crossing Number Algorithm ‚Å”»’è
+bool tTJSNI_Rect::Included( tjs_real x, tjs_real y, const class tTJSNI_Matrix32* matrix ) const {
+	glm::vec2 vtx[4]{{(float)Rect.left, (float)Rect.top },
+					{ (float)(Rect.right-1), (float)Rect.top },
+					{ (float)(Rect.right-1), (float)(Rect.bottom-1) },
+					{ (float)Rect.left, (float)(Rect.bottom-1) } };
+	glm::vec2 pt( (float)x, (float)y );
+	for( tjs_int i = 0; i < 4; i++ ) {
+		matrix->TransformPoint( vtx[i].x, vtx[i].y );
+	}
+	tjs_uint count = 0;
+	for( tjs_int i = 0; i < 3; i++ ) {
+		if( ( ( vtx[i].y <= pt.y ) && ( vtx[i + 1].y > pt.y ) ) ||
+			( ( vtx[i].y > pt.y ) && ( vtx[i + 1].y <= pt.y ) ) ) {
+			float vt = ( pt.y - vtx[i].y ) / ( vtx[i + 1].y - vtx[i].y );
+			if( pt.x < ( vtx[i].x + ( vt * ( vtx[i + 1].x - vtx[i].x ) ) ) ) {
+				count++;
+			}
+		}
+	}
+	return (count % 2) != 0;
 }
 
 
@@ -178,7 +202,15 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/includedPos)
 {
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Rect);
 	if(numparams < 2) return TJS_E_BADPARAMCOUNT;
-	tjs_int ret = _this->Included( *param[0], *param[1] ) ? 1 : 0;
+	tjs_int ret = 0;
+	if( numparams < 3 ) {
+		ret = _this->Included( *param[0], *param[1] ) ? 1 : 0;
+	} else {
+		tTJSNI_Matrix32* matrix = (tTJSNI_Matrix32*)TJSGetNativeInstance( tTJSNC_Matrix32::ClassID, param[2] );
+		if( matrix ) {
+			ret = _this->Included( *param[0], *param[1], matrix ) ? 1 : 0;
+		}
+	}
 	if(result) *result = ret;
 	return TJS_S_OK;
 }

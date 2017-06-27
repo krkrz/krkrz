@@ -77,6 +77,7 @@ public:
 	bool Equal( const tTJSNI_Rect& r ) {
 		return Rect == r.Rect;
 	}
+	bool Included( tjs_real x, tjs_real y, const class tTJSNI_Matrix32* matrix ) const;
 };
 
 
