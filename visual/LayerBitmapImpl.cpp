@@ -72,11 +72,8 @@ enum {
 };
 static FontRasterizer* TVPFontRasterizers[FONT_RASTER_EOT];
 static bool TVPFontRasterizersInit = false;
-#ifdef _WIN32
-static tjs_int TVPCurrentFontRasterizers = FONT_RASTER_GDI;
-#else
 static tjs_int TVPCurrentFontRasterizers = FONT_RASTER_FREE_TYPE;
-#endif
+
 void TVPInializeFontRasterizers() {
 	if( TVPFontRasterizersInit == false ) {
 		TVPFontRasterizers[FONT_RASTER_FREE_TYPE] = new FreeTypeFontRasterizer();

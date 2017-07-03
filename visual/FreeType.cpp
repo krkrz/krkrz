@@ -617,7 +617,7 @@ tFreeTypeFace::tFreeTypeFace(const tjs_string &fontname, tjs_uint32 options)
 #else
 	if( Face == nullptr )
 	{
-		if(options & TVP_FACE_OPTIONS_FILE)
+		//if(options & TVP_FACE_OPTIONS_FILE) // 非Windows環境(Android)では常にファイル読み込み
 		{
 			Face = new tGenericFreeTypeFace(fontname, options);
 		}
