@@ -23,7 +23,6 @@
 #include <android/input.h>
 #include <android/asset_manager.h>
 
-#include "iTVPApplication.h"
 #include "TVPScreen.h"
 #include "tjsUtils.h"
 
