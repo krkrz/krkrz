@@ -459,6 +459,24 @@ const tjs_char *TVPGetDefaultFontName() {
 void TVPSetDefaultFontName( const tjs_char * name ) {
 	TVPDefaultFontName.AssignMessage( name );
 }
+static ttstr TVPDefaultFaceNames;
+/**
+ * Androidの場合、デフォルトフォントだと各地域固有の文字のみしか入っていないので、Roboto,Droid Sans Monoも候補として返す
+ */
+const ttstr &TVPGetDefaultFaceNames() {
+	if( !TVPDefaultFaceNames.IsEmpty() ) {
+		return TVPDefaultFaceNames;
+	} else {
+		TVPDefaultFaceNames = ttstr( TVPGetDefaultFontName() );
+		std::string lang( Application->getLanguage() );
+		if( lang == std::string("ja" ) ) {
+			TVPDefaultFaceNames += ttstr(TJS_W(",MotoyaLMaru,Roboto"));
+		} else {
+			TVPDefaultFaceNames += ttstr(TJS_W(",Roboto"));
+		}
+		return TVPDefaultFaceNames;
+	}
+}
 
 void tTVPApplication::getStringFromJava( const char* methodName, tjs_string& dest ) const {
 	bool attached;

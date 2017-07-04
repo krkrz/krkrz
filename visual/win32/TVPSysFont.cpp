@@ -10,6 +10,7 @@
 extern FontSystem* TVPFontSystem;
 
 static bool IsInitDefalutFontName = false;
+static ttstr TVPDefaultFaceNames;
 /**
  * ストックフォント指定の場合、システムからフォルト名を取得して、そのオブジェクトをデフォルトとする
  */
@@ -51,6 +52,17 @@ const tjs_char *TVPGetDefaultFontName() {
 		TVPDefaultFontName.AssignMessage( logfont.lfFaceName );
 	}
 	return TVPDefaultFontName;
+}
+/**
+ * Windowsの場合はデフォルトフォントと同じ
+ */
+const ttstr &TVPGetDefaultFaceNames() {
+	if( !TVPDefaultFaceNames.IsEmpty() ) {
+		return TVPDefaultFaceNames;
+	} else {
+		TVPDefaultFaceNames = ttstr( TVPGetDefaultFontName() );
+		return TVPDefaultFaceNames;
+	}
 }
 void TVPSetDefaultFontName( const tjs_char * name ) {
 	TVPDefaultFontName.AssignMessage( name );

@@ -12,6 +12,7 @@
 extern void TVPGetAllFontList( std::vector<tjs_string>& list );
 extern const tjs_char *TVPGetDefaultFontName();
 extern void TVPSetDefaultFontName( const tjs_char * name );
+extern const ttstr &TVPGetDefaultFaceNames();
 
 void FontSystem::InitFontNames() {
 	// enumlate all fonts
@@ -49,7 +50,7 @@ void FontSystem::ConstructDefaultFont() {
 		DefaultFont.Height = -12;
 		DefaultFont.Flags = 0;
 		DefaultFont.Angle = 0;
-		DefaultFont.Face = ttstr(TVPGetDefaultFontName());
+		DefaultFont.Face = TVPGetDefaultFaceNames();
 	}
 }
 

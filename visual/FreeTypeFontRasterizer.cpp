@@ -6,7 +6,9 @@
 #include <math.h>
 #include "MsgIntf.h"
 #include "FontSystem.h"
+#include "StringUtil.h"
 #include <cmath>
+#include <algorithm>
 #ifdef _WIN32
 #include "TVPSysFont.h"
 #endif
@@ -46,7 +48,28 @@ void FreeTypeFontRasterizer::ApplyFont( class tTVPNativeBaseBitmap *bmp, bool fo
 //---------------------------------------------------------------------------
 void FreeTypeFontRasterizer::ApplyFont( const tTVPFont& font ) {
 	CurrentFont = font;
-	tjs_string stdname = TVPFontSystem->GetBeingFont(font.Face.AsStdString());
+	std::vector<tjs_string> faces;
+	tjs_string face = font.Face.AsStdString();
+	// TODO 最初に@があった場合にすべて縦書きとして処理する処理は入っていない、縦書き対応するのなら必要。
+	if( face[0] == TJS_W(',') ) {
+		tjs_string stdname = TVPFontSystem->GetBeingFont(face);
+		faces.push_back( stdname );
+	} else {
+		split( face, tjs_string(TJS_W(",")), faces );
+		for( auto i = faces.begin(); i != faces.end(); ) {
+			tjs_string& x = *i;
+			x = Trim(x);
+			if( TVPFontSystem->FontExists( x ) == false ) {
+				i = faces.erase( i );
+			} else {
+				i++;
+			}
+		}
+		if( faces.empty() ) {
+			faces.push_back( tjs_string(TVPFontSystem->GetDefaultFontName()) );
+		}
+	}
+
 	// TVP_FACE_OPTIONS_NO_ANTIALIASING
 	// TVP_FACE_OPTIONS_NO_HINTING
 	// TVP_FACE_OPTIONS_FORCE_AUTO_HINTING
@@ -58,13 +81,13 @@ void FreeTypeFontRasterizer::ApplyFont( const tTVPFont& font ) {
 	opt |= (font.Flags & TVP_TF_FONTFILE) ? TVP_FACE_OPTIONS_FILE : 0;
 	bool recreate = false;
 	if( Face ) {
-		if( Face->GetFontName() != stdname ) {
+		if( Face->GetFontName() != faces[0] ) {
 			delete Face;
-			Face = new tFreeTypeFace( stdname, opt );
+			Face = new tFreeTypeFace( faces, opt );
 			recreate = true;
 		}
 	} else {
-		Face = new tFreeTypeFace( stdname, opt );
+		Face = new tFreeTypeFace( faces, opt );
 		recreate = true;
 	}
 	Face->SetHeight( font.Height < 0 ? -font.Height : font.Height );

@@ -58,5 +58,20 @@ inline tjs_string Trim( const tjs_string& val ) {
 		return val.substr(pos,len);
 	}
 }
+template <typename TContainer>
+void split( const tjs_string& val, const tjs_string& delim, TContainer& result ) {
+	result.clear();
+	tjs_string::size_type pos = 0;
+	while( pos != tjs_string::npos ) {
+		tjs_string::size_type p = val.find( delim, pos );
+		if( p == tjs_string::npos ){
+			result.push_back( val.substr(pos) );
+			break;
+		} else {
+			result.push_back( val.substr(pos, p - pos) );
+		}
+		pos = p + delim.size();
+	}
+}
 
 #endif // __STRING_UTILITY_H__

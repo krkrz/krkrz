@@ -16,7 +16,7 @@
 
 #include "CharacterData.h"
 #include "FreeTypeFace.h"
-//#include "NativeFreeTypeDriver.h"
+#include <memory>
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -38,33 +38,93 @@
 
 //---------------------------------------------------------------------------
 /**
+ * 存在しないグリフを補うために複数のフォントを指定可能なように、複数のフェイス情報を保持できるように
+ * 各フェイスに必要な情報を保持する。
+ */
+struct FaceSet {
+	/** フォント名 */
+	tjs_string FontName;
+
+	/** Face オブジェクト */
+	std::unique_ptr<tBaseFreeTypeFace> Face;
+
+	/** FreeType Face オブジェクト */
+	FT_Face FTFace;
+
+	typedef std::vector<FT_ULong> tGlyphIndexToCharcodeVector;
+
+	/** グリフインデックスから文字コードへの変換マップ */
+	std::unique_ptr<tGlyphIndexToCharcodeVector> GlyphIndexToCharcodeVector;
+
+	/** SJISなどをUnicodeに変換する関数 */
+	tjs_uint (*UnicodeToLocalChar)(tjs_char in);
+
+	/** UnicodeをSJISなどに変換する関数 */
+	tjs_char (*LocalCharToUnicode)(tjs_uint in);
+
+	FaceSet() : UnicodeToLocalChar(nullptr), LocalCharToUnicode(nullptr) {}
+};
+
+
+//---------------------------------------------------------------------------
+/**
  * FreeType フォント face
  */
 class tFreeTypeFace
 {
+/*
 	tjs_string FontName;		//!< フォント名
 	tBaseFreeTypeFace * Face; //!< Face オブジェクト
 	FT_Face FTFace; //!< FreeType Face オブジェクト
-	tjs_uint32 Options; //!< フラグ
 
 	typedef std::vector<FT_ULong> tGlyphIndexToCharcodeVector;
 	tGlyphIndexToCharcodeVector * GlyphIndexToCharcodeVector;		//!< グリフインデックスから文字コードへの変換マップ
-	tjs_int Height;		//!< フォントサイズ(高さ) in pixel
 
 	tjs_uint (*UnicodeToLocalChar)(tjs_char in); //!< SJISなどをUnicodeに変換する関数
 	tjs_char (*LocalCharToUnicode)(tjs_uint in); //!< UnicodeをSJISなどに変換する関数
+*/
+
+	tjs_uint32 Options; //!< フラグ
+	tjs_int Height;		//!< フォントサイズ(高さ) in pixel
+
+	std::vector<std::unique_ptr<FaceSet> >	Faces;
 
 	static inline tjs_int FT_PosToInt( tjs_int x ) { return (((x) + (1 << 5)) >> 6); }
+
+private:
+	void GetUnderline( tjs_int& pos, tjs_int& thickness, tjs_int index ) const {
+		FT_Face face = Faces[index]->FTFace;
+		tjs_int ppem = face->size->metrics.y_ppem;
+		tjs_int upe = face->units_per_EM;
+		tjs_int liney = 0; //下線の位置
+		tjs_int height = FT_PosToInt( face->size->metrics.height );
+		liney = ((face->ascender - face->underline_position) * ppem) / upe;
+		thickness = (face->underline_thickness * ppem) / upe;
+		if( thickness < 1 ) thickness = 1;
+		if( liney > height ) {
+			liney = height - 1;
+		}
+		pos = liney;
+	}
+	void GetStrikeOut( tjs_int& pos, tjs_int& thickness, tjs_int index ) const {
+		FT_Face face = Faces[index]->FTFace;
+		tjs_int ppem = face->size->metrics.y_ppem;
+		tjs_int upe = face->units_per_EM;
+		thickness = face->underline_thickness * ppem / upe;
+		if( thickness < 1 ) thickness = 1;
+		pos = face->ascender * 7 * ppem / (10 * upe);
+	}
+
 public:
-	tFreeTypeFace(const tjs_string &fontname, tjs_uint32 options);
+	tFreeTypeFace(const std::vector<tjs_string> &fontname, tjs_uint32 options);
 	~tFreeTypeFace();
 
-	tjs_uint GetGlyphCount();
-	tjs_char GetCharcodeFromGlyphIndex(tjs_uint index);
+	//tjs_uint GetGlyphCount();
+	//tjs_char GetCharcodeFromGlyphIndex(tjs_uint index);
 
 	void GetFaceNameList(std::vector<tjs_string> &dest);
 
-	const tjs_string& GetFontName() const { return FontName; }
+	const tjs_string& GetFontName() const { return Faces[0]->FontName; }
 
 	tjs_int GetHeight() { return Height; }
 	void SetHeight(int height);
@@ -79,45 +139,26 @@ public:
 		return (Options&opt) == opt;
 	}
 	tjs_char GetDefaultChar() const {
-		return Face->GetDefaultChar();
+		return Faces[0]->Face->GetDefaultChar();
 	}
 	tjs_char GetFirstChar() {
 		FT_UInt gindex;
-		return static_cast<tjs_char>( FT_Get_First_Char( FTFace, &gindex ) );
+		return static_cast<tjs_char>( FT_Get_First_Char( Faces[0]->FTFace, &gindex ) );
 	}
 
 	tjs_int GetAscent() const {
-		tjs_int ppem = FTFace->size->metrics.y_ppem;
-		tjs_int upe = FTFace->units_per_EM;
-		return FTFace->ascender * ppem / upe;
-	}
-	void GetUnderline( tjs_int& pos, tjs_int& thickness ) const {
-		tjs_int ppem = FTFace->size->metrics.y_ppem;
-		tjs_int upe = FTFace->units_per_EM;
-		tjs_int liney = 0; //下線の位置
-		tjs_int height = FT_PosToInt( FTFace->size->metrics.height );
-		liney = ((FTFace->ascender-FTFace->underline_position) * ppem) / upe;
-		thickness = (FTFace->underline_thickness * ppem) / upe;
-		if( thickness < 1 ) thickness = 1;
-		if( liney > height ) {
-			liney = height - 1;
-		}
-		pos = liney;
-	}
-	void GetStrikeOut( tjs_int& pos, tjs_int& thickness ) const {
-		tjs_int ppem = FTFace->size->metrics.y_ppem;
-		tjs_int upe = FTFace->units_per_EM;
-		thickness = FTFace->underline_thickness * ppem / upe;
-		if( thickness < 1 ) thickness = 1;
-		pos = FTFace->ascender * 7 * ppem / (10 * upe);
+		FT_Face face = Faces[0]->FTFace;
+		tjs_int ppem = face->size->metrics.y_ppem;
+		tjs_int upe = face->units_per_EM;
+		return face->ascender * ppem / upe;
 	}
 	tTVPCharacterData * GetGlyphFromCharcode(tjs_char code);
 	bool GetGlyphRectFromCharcode(struct tTVPRect& rt, tjs_char code, tjs_int& advancex, tjs_int& advancey );
-	bool GetGlyphMetricsFromCharcode(tjs_char code, tGlyphMetrics & metrics);
 	bool GetGlyphSizeFromCharcode(tjs_char code, tGlyphMetrics & metrics);
 
 private:
-	bool LoadGlyphSlotFromCharcode(tjs_char code);
+	tjs_int GetGlyphMetricsFromCharcode(tjs_char code, tGlyphMetrics & metrics);
+	tjs_int LoadGlyphSlotFromCharcode(tjs_char code);
 };
 //---------------------------------------------------------------------------
 

@@ -89,10 +89,25 @@ enum TVPEncodingFlags {
 	TVP_ENC_ADOBE_LATIN_1	= 0x01 << 11,
 	TVP_ENC_APPLE_ROMAN		= 0x01 << 12
 };
+struct FaceKey {
+	tjs_string name_;
+	tjs_uint flag_;
+	FaceKey( const tjs_string& n, tjs_uint f ) : name_(n), flag_(f&(TVP_TF_ITALIC|TVP_TF_BOLD)) {}
+	bool operator < (const FaceKey& rhs) const {
+		if( name_ == rhs.name_ ) {
+			return flag_ < rhs.flag_;
+		} else {
+			return name_ < rhs.name_;
+		}
+	}
+	bool operator == ( const FaceKey& rhs) const {
+		return (name_ == rhs.name_) && (flag_==rhs.flag_);
+	}
+};
 class tTVPFreeTypeFaceList {
 	std::vector<FontInfo*>	faces_;
 	std::vector<FontInfo*>	systemfaces_;
-	std::map<tjs_string,FontInfo*>	systemfont_;
+	std::map<FaceKey,FontInfo*>	systemfont_;
 
 private:
 	static bool CheckFaceFlag( FontInfo& face, tjs_uint flag );
@@ -102,7 +117,7 @@ public:
 	bool LoadFont( tjs_string filename, std::vector<tjs_string>* faces );
 	void LoadSystemFont( std::string path, std::vector<tjs_string>* faces );
 
-	tBaseFreeTypeFace* GetFace( const tjs_string& facename ) const;
+	tBaseFreeTypeFace* GetFace( const tjs_string& facename, tjs_uint32 options ) const;
 	void GetFontList(std::vector<ttstr> & list, tjs_uint32 flags, const tTVPFont & font );
 };
 
@@ -166,7 +181,7 @@ void TVPGetFontListFromFreeType(std::vector<ttstr> & list, tjs_uint32 flags, con
 	FreeTypeFaceList->GetFontList( list, flags, font );
 }
 //---------------------------------------------------------------------------
-static void TVPLoadFont( FT_Open_Args& arg, std::vector<FontInfo*>& fonts, std::map<tjs_string,FontInfo*>* fontmap, std::vector<tjs_string>* faces, const std::string* path, const tjs_string* filename ) {
+static void TVPLoadFont( FT_Open_Args& arg, std::vector<FontInfo*>& fonts, std::map<FaceKey,FontInfo*>* fontmap, std::vector<tjs_string>* faces, const std::string* path, const tjs_string* filename ) {
 	FT_Face face = nullptr;
 	tjs_uint face_num = 1;
 	for( tjs_uint f = 0; f < face_num; f++ ) {
@@ -179,7 +194,11 @@ static void TVPLoadFont( FT_Open_Args& arg, std::vector<FontInfo*>& fonts, std::
 			tjs_string wname;
 			TVPEncodeUTF8ToUTF16( wname, familyname );
 			if( faces ) faces->push_back( wname );
-			if( fontmap ) fontmap->insert( std::map<tjs_string, FontInfo*>::value_type( wname, info ) );
+			if( fontmap ) {
+				tjs_uint styleflag = (face->style_flags&FT_STYLE_FLAG_ITALIC) ? TVP_TF_ITALIC : 0;
+				styleflag |= (face->style_flags&FT_STYLE_FLAG_BOLD ) ? TVP_TF_BOLD : 0;
+				fontmap->insert( std::map<FaceKey, FontInfo*>::value_type( FaceKey(wname,styleflag), info ) );
+			}
 			info->facename = wname;
 			if( path ) info->path = *path;
 			if( filename ) info->filename = *filename;
@@ -251,6 +270,7 @@ bool tTVPFreeTypeFaceList::LoadFont( tjs_string filename, std::vector<tjs_string
 	}
 	if( found ) return false;
 
+	// フェイス名一覧を取得する
 	tGenericFreeTypeFace ftf( filename, faces_, faces );
 	return true;
 }
@@ -275,17 +295,30 @@ void tTVPFreeTypeFaceList::LoadSystemFont( std::string path, std::vector<tjs_str
 	TVPLoadFont( args, systemfaces_, &systemfont_, faces, &path, nullptr );
 }
 //---------------------------------------------------------------------------
-tBaseFreeTypeFace* tTVPFreeTypeFaceList::GetFace( const tjs_string& facename ) const {
-	auto i = systemfont_.find( facename );
-	if( i != systemfont_.end() ) {
-		FontInfo* font = i->second;
-		return new tGenericFreeTypeFace( font->path, ttstr(facename), font->index );
+tBaseFreeTypeFace* tTVPFreeTypeFaceList::GetFace( const tjs_string& facename, tjs_uint32 options ) const {
+	if( !faces_.empty() ) {
+		// まずはスタイル指定で検索する
+		tjs_uint styleflag = options&TVP_TF_ITALIC ? FT_STYLE_FLAG_ITALIC : 0;
+		styleflag |= options&TVP_TF_BOLD ? FT_STYLE_FLAG_BOLD : 0;
+		auto f = std::find_if( faces_.begin(), faces_.end(), [facename, styleflag]( const FontInfo* x ) {
+			return ( x->facename == facename && ( x->style_flags&( FT_STYLE_FLAG_ITALIC | FT_STYLE_FLAG_BOLD ) ) == styleflag );
+		} );
+		if( f != faces_.end() ) {
+			FontInfo* font = *f;
+			return new tGenericFreeTypeFace( ttstr( font->filename ), TVP_FACE_OPTIONS_FACE_INDEX( font->index ) );
+		}
+		// スタイル気にせず検索する
+		f = std::find_if( faces_.begin(), faces_.end(), [facename]( const FontInfo* x ) { return ( x->facename == facename ); } );
+		if( f != faces_.end() ) {
+			FontInfo* font = *f;
+			return new tGenericFreeTypeFace( ttstr( font->filename ), TVP_FACE_OPTIONS_FACE_INDEX( font->index ) );
+		}
 	} else {
-		for( auto i = faces_.begin(); i != faces_.end(); i++ ) {
-			if( (*i)->facename == facename ) {
-				FontInfo* font = *i;
-				return new tGenericFreeTypeFace( ttstr(font->filename), TVP_FACE_OPTIONS_FACE_INDEX(font->index) );
-			}
+		FaceKey key( facename, options&( TVP_TF_ITALIC | TVP_TF_BOLD ) );
+		auto i = systemfont_.find( key );
+		if( i != systemfont_.end() ) {
+			FontInfo* font = i->second;
+			return new tGenericFreeTypeFace( font->path, ttstr( facename ), font->index );
 		}
 	}
 	return nullptr;
@@ -579,79 +612,84 @@ bool tGenericFreeTypeFace::OpenFaceByIndex(tjs_uint index, FT_Face & face)
  * @param fontname	フォント名
  * @param options	オプション
  */
-tFreeTypeFace::tFreeTypeFace(const tjs_string &fontname, tjs_uint32 options)
-	: FontName(fontname)
+tFreeTypeFace::tFreeTypeFace(const std::vector<tjs_string> &fontname, tjs_uint32 options)
 {
 	TVPInitializeFont();
 	TVPInitializeFaceList();
 
 	// フィールドをクリア
-	Face = nullptr;
-	GlyphIndexToCharcodeVector = nullptr;
-	UnicodeToLocalChar = nullptr;
-	LocalCharToUnicode = nullptr;
 	Options = options;
 	Height = 10;
 
-	// フォントを開く
-	if( (options & TVP_FACE_OPTIONS_FILE) == 0 )
-	{
-		Face = FreeTypeFaceList->GetFace( fontname );
-	}
-#ifdef _WIN32
-	if( Face == nullptr )
-	{
-		if(options & TVP_FACE_OPTIONS_FILE)
-		{
-			// ファイルを開く
-			Face = new tGenericFreeTypeFace(fontname, options);
-				// 例外がここで発生する可能性があるので注意
-		}
-		else
-		{
-			// ネイティブのフォント名による指定 (プラットフォーム依存)
-			Face = new tNativeFreeTypeFace(fontname, options);
-				// 例外がここで発生する可能性があるので注意
-		}
-	}
-#else
-	if( Face == nullptr )
-	{
-		//if(options & TVP_FACE_OPTIONS_FILE) // 非Windows環境(Android)では常にファイル読み込み
-		{
-			Face = new tGenericFreeTypeFace(fontname, options);
-		}
-	}
-#endif
-	FTFace = Face->GetFTFace();
+	tjs_size count = fontname.size();
+	for( tjs_int i = 0; i < (tjs_int)count; i++ ) {
+		Faces.push_back( std::unique_ptr<FaceSet>( new FaceSet() ) );
+		Faces[i]->FontName = fontname[i];
 
-	// マッピングを確認する
-	if(FTFace->charmap == NULL)
-	{
-		// FreeType は自動的に UNICODE マッピングを使用するが、
-		// フォントが UNICODE マッピングの情報を含んでいない場合は
-		// 自動的な文字マッピングの選択は行われない。
-		// とりあえず(日本語環境に限って言えば) SJIS マッピングしかもってない
-		// フォントが多いのでSJISを選択させてみる。
-		FT_Error err = FT_Select_Charmap(FTFace, FT_ENCODING_SJIS);
-		if(!err)
+		// フォントを開く
+		if( ( options & TVP_FACE_OPTIONS_FILE ) == 0 )
 		{
-			// SJIS への切り替えが成功した
-			// 変換関数をセットする
-			UnicodeToLocalChar = UnicodeToSJIS;
-			LocalCharToUnicode = SJISToUnicode;
+			Faces[i]->Face.reset( FreeTypeFaceList->GetFace( fontname[i], options ) );
 		}
-		else
+#ifdef _WIN32
+		if( Faces[i]->Face == nullptr )
 		{
-			int numcharmap = FTFace->num_charmaps;
-			for( int i = 0; i < numcharmap; i++ )
+			if( options & TVP_FACE_OPTIONS_FILE )
 			{
-				FT_Encoding enc = FTFace->charmaps[i]->encoding;
-				if( enc != FT_ENCODING_NONE && enc != FT_ENCODING_APPLE_ROMAN )
+				// ファイルを開く
+				Faces[i]->Face.reset( new tGenericFreeTypeFace( fontname[i], options ) );
+				// 例外がここで発生する可能性があるので注意
+			} else
+			{
+				// ネイティブのフォント名による指定 (プラットフォーム依存)
+				Faces[i]->Face.reset( new tNativeFreeTypeFace( fontname[i], options ) );
+				// 例外がここで発生する可能性があるので注意
+			}
+		}
+#else
+		if( Face == nullptr )
+		{
+			if( options & TVP_FACE_OPTIONS_FILE )
+			{
+				Faces[i]->Face.reset( new tGenericFreeTypeFace( fontname[i], options ) );
+			}
+		}
+#endif
+		Faces[i]->FTFace = Faces[i]->Face->GetFTFace();
+
+		// マッピングを確認する
+		if( Faces[i]->FTFace->charmap == nullptr )
+		{
+			// FreeType は自動的に UNICODE マッピングを使用するが、
+			// フォントが UNICODE マッピングの情報を含んでいない場合は
+			// 自動的な文字マッピングの選択は行われない。
+			// まずUNICODE で試してみる。
+			FT_Error err = FT_Select_Charmap( Faces[i]->FTFace, FT_ENCODING_UNICODE );
+			if( err )
+			{
+				// (日本語環境に限って言えば) SJIS マッピングしかもってない
+				// フォントが多いのでSJISを選択させてみる。
+				err = FT_Select_Charmap( Faces[i]->FTFace, FT_ENCODING_SJIS );
+				if( !err )
 				{
-					err = FT_Select_Charmap(FTFace, enc);
-					if(!err) {
-						break;
+					// SJIS への切り替えが成功した
+					// 変換関数をセットする
+					Faces[i]->UnicodeToLocalChar = UnicodeToSJIS;
+					Faces[i]->LocalCharToUnicode = SJISToUnicode;
+				} else
+				{
+					// とりあえず何か割り当てる、正しく表示されないかもしれないが
+					int numcharmap = Faces[i]->FTFace->num_charmaps;
+					for( int j = 0; j < numcharmap; j++ )
+					{
+						FT_Encoding enc = Faces[i]->FTFace->charmaps[j]->encoding;
+						if( enc != FT_ENCODING_NONE && enc != FT_ENCODING_APPLE_ROMAN )
+						{
+							err = FT_Select_Charmap( Faces[i]->FTFace, enc );
+							if( !err ) {
+								break;
+							}
+						}
 					}
 				}
 			}
@@ -667,12 +705,10 @@ tFreeTypeFace::tFreeTypeFace(const tjs_string &fontname, tjs_uint32 options)
  */
 tFreeTypeFace::~tFreeTypeFace()
 {
-	if(GlyphIndexToCharcodeVector) delete GlyphIndexToCharcodeVector;
-	if(Face) delete Face;
 }
 //---------------------------------------------------------------------------
 
-
+#if 0
 //---------------------------------------------------------------------------
 /**
  * このFaceが保持しているglyphの数を得る
@@ -680,35 +716,36 @@ tFreeTypeFace::~tFreeTypeFace()
  */
 tjs_uint tFreeTypeFace::GetGlyphCount()
 {
-	if(!FTFace) return 0;
+	FT_Face face = Faces[0]->FTFace;
+	if(!face) return 0;
 
 	// FreeType が返してくるグリフの数は、実際に文字コードが割り当てられていない
 	// グリフをも含んだ数となっている
 	// ここで、実際にフォントに含まれているグリフを取得する
 	// TODO:スレッド保護されていないので注意！！！！！！
-	if(!GlyphIndexToCharcodeVector)
+	if(!Faces[0]->GlyphIndexToCharcodeVector)
 	{
 		// マップが作成されていないので作成する
-		GlyphIndexToCharcodeVector = new tGlyphIndexToCharcodeVector;
+		Faces[0]->GlyphIndexToCharcodeVector.reset( new FaceSet::tGlyphIndexToCharcodeVector() );
 		FT_ULong  charcode;
 		FT_UInt   gindex;
-		charcode = FT_Get_First_Char( FTFace, &gindex );
+		charcode = FT_Get_First_Char( face, &gindex );
 		while ( gindex != 0 )
 		{
 			FT_ULong code;
-			if(LocalCharToUnicode)
-				code = LocalCharToUnicode(charcode);
+			if( Faces[0]->LocalCharToUnicode)
+				code = Faces[0]->LocalCharToUnicode(charcode);
 			else
 				code = charcode;
-			GlyphIndexToCharcodeVector->push_back(code);
-			charcode = FT_Get_Next_Char( FTFace, charcode, &gindex );
+			Faces[0]->GlyphIndexToCharcodeVector->push_back(code);
+			charcode = FT_Get_Next_Char( face, charcode, &gindex );
 		}
 		std::sort(
-			GlyphIndexToCharcodeVector->begin(),
-			GlyphIndexToCharcodeVector->end()); // 文字コード順で並び替え
+			Faces[0]->GlyphIndexToCharcodeVector->begin(),
+			Faces[0]->GlyphIndexToCharcodeVector->end()); // 文字コード順で並び替え
 	}
 
-	return (tjs_uint)GlyphIndexToCharcodeVector->size();
+	return (tjs_uint)Faces[0]->GlyphIndexToCharcodeVector->size();
 }
 //---------------------------------------------------------------------------
 
@@ -724,13 +761,13 @@ tjs_char tFreeTypeFace::GetCharcodeFromGlyphIndex(tjs_uint index)
 {
 	tjs_uint size = GetGlyphCount(); // グリフ数を得るついでにマップを作成する
 
-	if(!GlyphIndexToCharcodeVector) return 0;
+	if(!Faces[0]->GlyphIndexToCharcodeVector) return 0;
 	if(index >= size) return 0;
 
-	return static_cast<tjs_char>((*GlyphIndexToCharcodeVector)[index]);
+	return static_cast<tjs_char>((*(Faces[0]->GlyphIndexToCharcodeVector.get()))[index]);
 }
 //---------------------------------------------------------------------------
-
+#endif
 
 //---------------------------------------------------------------------------
 /**
@@ -739,7 +776,7 @@ tjs_char tFreeTypeFace::GetCharcodeFromGlyphIndex(tjs_uint index)
  */
 void tFreeTypeFace::GetFaceNameList(std::vector<tjs_string> &dest)
 {
-	Face->GetFaceNameList(dest);
+	Faces[0]->Face->GetFaceNameList(dest);
 }
 //---------------------------------------------------------------------------
 
@@ -752,10 +789,12 @@ void tFreeTypeFace::GetFaceNameList(std::vector<tjs_string> &dest)
 void tFreeTypeFace::SetHeight(int height)
 {
 	Height = height;
-	FT_Error err = FT_Set_Pixel_Sizes(FTFace, 0, Height);
-	if(err)
-	{
-		// TODO: Error ハンドリング
+	for( auto face = Faces.begin(); face != Faces.end(); face++ ) {
+		FT_Error err = FT_Set_Pixel_Sizes( (*face)->FTFace, 0, Height );
+		if(err)
+		{
+			// TODO: Error ハンドリング
+		}
 	}
 }
 //---------------------------------------------------------------------------
@@ -771,31 +810,33 @@ void tFreeTypeFace::SetHeight(int height)
 tTVPCharacterData * tFreeTypeFace::GetGlyphFromCharcode(tjs_char code)
 {
 	// グリフスロットにグリフを読み込み、寸法を取得する
+	tjs_int index;
 	tGlyphMetrics metrics;
-	if(!GetGlyphMetricsFromCharcode(code, metrics))
-		return NULL;
+	if( (index = GetGlyphMetricsFromCharcode(code, metrics)) < 0 )
+		return nullptr;
 
 	// 文字をレンダリングする
 	FT_Error err;
 
-	if(FTFace->glyph->format != FT_GLYPH_FORMAT_BITMAP)
+	FT_Face face = Faces[index]->FTFace;
+	if(face->glyph->format != FT_GLYPH_FORMAT_BITMAP)
 	{
 		FT_Render_Mode mode;
 		if(!(Options & TVP_FACE_OPTIONS_NO_ANTIALIASING))
 			mode = FT_RENDER_MODE_NORMAL;
 		else
 			mode = FT_RENDER_MODE_MONO;
-		err = FT_Render_Glyph(FTFace->glyph, mode);
+		err = FT_Render_Glyph(face->glyph, mode);
 			// note: デフォルトのレンダリングモードは FT_RENDER_MODE_NORMAL (256色グレースケール)
 			//       FT_RENDER_MODE_MONO は 1bpp モノクローム
-		if(err) return NULL;
+		if(err) return nullptr;
 	}
 
 	// 一応ビットマップ形式をチェック
-	FT_Bitmap *ft_bmp = &(FTFace->glyph->bitmap);
+	FT_Bitmap *ft_bmp = &(face->glyph->bitmap);
 	FT_Bitmap new_bmp;
 	bool release_ft_bmp = false;
-	tTVPCharacterData * glyph_bmp = NULL;
+	tTVPCharacterData * glyph_bmp = nullptr;
 	try
 	{
 		if(ft_bmp->rows && ft_bmp->width)
@@ -807,15 +848,15 @@ tTVPCharacterData * tFreeTypeFace::GetGlyphFromCharcode(tjs_char code)
 				FT_Bitmap_New(&new_bmp);
 				release_ft_bmp = true;
 				ft_bmp = &new_bmp;
-				err = FT_Bitmap_Convert(FTFace->glyph->library,
-					&(FTFace->glyph->bitmap),
+				err = FT_Bitmap_Convert(face->glyph->library,
+					&(face->glyph->bitmap),
 					&new_bmp, 1);
 					// 結局 tGlyphBitmap 形式に変換する際にアラインメントをし直すので
 					// ここで指定する alignment は 1 でよい
 				if(err)
 				{
-					if(release_ft_bmp) FT_Bitmap_Done(FTFace->glyph->library, ft_bmp);
-					return NULL;
+					if(release_ft_bmp) FT_Bitmap_Done(face->glyph->library, ft_bmp);
+					return nullptr;
 				}
 			}
 
@@ -843,14 +884,14 @@ tTVPCharacterData * tFreeTypeFace::GetGlyphFromCharcode(tjs_char code)
 		metrics.CellIncY = FT_PosToInt( metrics.CellIncY );
 
 		// tGlyphBitmap を作成して返す
-		//int baseline = (int)(FTFace->height + FTFace->descender) * FTFace->size->metrics.y_ppem / FTFace->units_per_EM;
-		int baseline = (int)( FTFace->ascender ) * FTFace->size->metrics.y_ppem / FTFace->units_per_EM;
+		//int baseline = (int)(face->height + face->descender) * face->size->metrics.y_ppem / face->units_per_EM;
+		int baseline = (int)( face->ascender ) * face->size->metrics.y_ppem / face->units_per_EM;
 
 		glyph_bmp = new tTVPCharacterData(
 			ft_bmp->buffer,
 			ft_bmp->pitch,
-			  FTFace->glyph->bitmap_left,
-			  baseline - FTFace->glyph->bitmap_top,
+			  face->glyph->bitmap_left,
+			  baseline - face->glyph->bitmap_top,
 			  ft_bmp->width,
 			  ft_bmp->rows,
 			metrics);
@@ -859,14 +900,14 @@ tTVPCharacterData * tFreeTypeFace::GetGlyphFromCharcode(tjs_char code)
 		
 		if( Options & TVP_TF_UNDERLINE ) {
 			tjs_int pos = -1, thickness = -1;
-			GetUnderline( pos, thickness );
+			GetUnderline( pos, thickness, index );
 			if( pos >= 0 && thickness > 0 ) {
 				glyph_bmp->AddHorizontalLine( pos, thickness, 255 );
 			}
 		}
 		if( Options & TVP_TF_STRIKEOUT ) {
 			tjs_int pos = -1, thickness = -1;
-			GetStrikeOut( pos, thickness );
+			GetStrikeOut( pos, thickness, index );
 			if( pos >= 0 && thickness > 0 ) {
 				glyph_bmp->AddHorizontalLine( pos, thickness, 255 );
 			}
@@ -874,10 +915,10 @@ tTVPCharacterData * tFreeTypeFace::GetGlyphFromCharcode(tjs_char code)
 	}
 	catch(...)
 	{
-		if(release_ft_bmp) FT_Bitmap_Done(FTFace->glyph->library, ft_bmp);
+		if(release_ft_bmp) FT_Bitmap_Done(face->glyph->library, ft_bmp);
 		throw;
 	}
-	if(release_ft_bmp) FT_Bitmap_Done(FTFace->glyph->library, ft_bmp);
+	if(release_ft_bmp) FT_Bitmap_Done(face->glyph->library, ft_bmp);
 
 	return glyph_bmp;
 }
@@ -893,27 +934,29 @@ tTVPCharacterData * tFreeTypeFace::GetGlyphFromCharcode(tjs_char code)
 bool tFreeTypeFace::GetGlyphRectFromCharcode( tTVPRect& rt, tjs_char code, tjs_int& advancex, tjs_int& advancey )
 {
 	advancex = advancey = 0;
-	if( !LoadGlyphSlotFromCharcode(code) )
+	tjs_int index;
+	if( (index = LoadGlyphSlotFromCharcode(code)) < 0 )
 		return false;
 
-	int baseline = (int)( FTFace->ascender ) * FTFace->size->metrics.y_ppem / FTFace->units_per_EM;
+	FT_Face face = Faces[index]->FTFace;
+	int baseline = (int)( face->ascender ) * face->size->metrics.y_ppem / face->units_per_EM;
 	/*
 	FT_Render_Glyph でレンダリングしないと以下の各値は取得できない
-	tjs_int t = baseline - FTFace->glyph->bitmap_top;
-	tjs_int l = FTFace->glyph->bitmap_left;
-	tjs_int w = FTFace->glyph->bitmap.width;
-	tjs_int h = FTFace->glyph->bitmap.rows;
+	tjs_int t = baseline - face->glyph->bitmap_top;
+	tjs_int l = face->glyph->bitmap_left;
+	tjs_int w = face->glyph->bitmap.width;
+	tjs_int h = face->glyph->bitmap.rows;
 	*/
-	tjs_int t = baseline - FT_PosToInt( FTFace->glyph->metrics.horiBearingY );
-	tjs_int l = FT_PosToInt( FTFace->glyph->metrics.horiBearingX );
-	tjs_int w = FT_PosToInt( FTFace->glyph->metrics.width );
-	tjs_int h = FT_PosToInt( FTFace->glyph->metrics.height );
-	advancex = FT_PosToInt( FTFace->glyph->advance.x );
-	advancey = FT_PosToInt( FTFace->glyph->advance.y );
+	tjs_int t = baseline - FT_PosToInt( face->glyph->metrics.horiBearingY );
+	tjs_int l = FT_PosToInt( face->glyph->metrics.horiBearingX );
+	tjs_int w = FT_PosToInt( face->glyph->metrics.width );
+	tjs_int h = FT_PosToInt( face->glyph->metrics.height );
+	advancex = FT_PosToInt( face->glyph->advance.x );
+	advancey = FT_PosToInt( face->glyph->advance.y );
 	rt = tTVPRect(l,t,l+w,t+h);
 	if( Options & TVP_TF_UNDERLINE ) {
 		tjs_int pos = -1, thickness = -1;
-		GetUnderline( pos, thickness );
+		GetUnderline( pos, thickness, index );
 		if( pos >= 0 && thickness > 0 ) {
 			if( rt.left > 0 ) rt.left = 0;
 			if( rt.right < advancex ) rt.right = advancex;
@@ -924,7 +967,7 @@ bool tFreeTypeFace::GetGlyphRectFromCharcode( tTVPRect& rt, tjs_char code, tjs_i
 	}
 	if( Options & TVP_TF_STRIKEOUT ) {
 		tjs_int pos = -1, thickness = -1;
-		GetStrikeOut( pos, thickness );
+		GetStrikeOut( pos, thickness, index );
 		if( pos >= 0 && thickness > 0 ) {
 			if( rt.left > 0 ) rt.left = 0;
 			if( rt.right < advancex ) rt.right = advancex;
@@ -940,21 +983,22 @@ bool tFreeTypeFace::GetGlyphRectFromCharcode( tTVPRect& rt, tjs_char code, tjs_i
  * 指定した文字コードに対するグリフの寸法を得る(文字を進めるためのサイズ)
  * @param code		文字コード
  * @param metrics	寸法
- * @return	成功の場合真、失敗の場合偽
+ * @return	成功の場合フェイスインデックス、失敗の場合負の値
  */
-bool tFreeTypeFace::GetGlyphMetricsFromCharcode(tjs_char code,
+tjs_int tFreeTypeFace::GetGlyphMetricsFromCharcode(tjs_char code,
 	tGlyphMetrics & metrics)
 {
-	if(!LoadGlyphSlotFromCharcode(code)) return false;
+	tjs_int index;
+	if( (index = LoadGlyphSlotFromCharcode(code)) < 0 ) return -1;
 
 	// メトリック構造体を作成
 	// CellIncX や CellIncY は ピクセル値が 64 倍された値なので注意
 	// これはもともと FreeType の仕様だけれども、Risaでも内部的には
 	// この精度で CellIncX や CellIncY を扱う
-	metrics.CellIncX =  FTFace->glyph->advance.x;
-	metrics.CellIncY =  FTFace->glyph->advance.y;
+	metrics.CellIncX =  Faces[index]->FTFace->glyph->advance.x;
+	metrics.CellIncY =  Faces[index]->FTFace->glyph->advance.y;
 
-	return true;
+	return index;
 }
 //---------------------------------------------------------------------------
 
@@ -967,11 +1011,12 @@ bool tFreeTypeFace::GetGlyphMetricsFromCharcode(tjs_char code,
  */
 bool tFreeTypeFace::GetGlyphSizeFromCharcode(tjs_char code, tGlyphMetrics & metrics)
 {
-	if(!LoadGlyphSlotFromCharcode(code)) return false;
+	tjs_int index;
+	if( (index = LoadGlyphSlotFromCharcode(code)) < 0 ) return false;
 
 	// メトリック構造体を作成
-	metrics.CellIncX = FT_PosToInt( FTFace->glyph->metrics.horiAdvance );
-	metrics.CellIncY = FT_PosToInt( FTFace->glyph->metrics.vertAdvance );
+	metrics.CellIncX = FT_PosToInt( Faces[index]->FTFace->glyph->metrics.horiAdvance );
+	metrics.CellIncY = FT_PosToInt( Faces[index]->FTFace->glyph->metrics.vertAdvance );
 
 	return true;
 }
@@ -981,47 +1026,53 @@ bool tFreeTypeFace::GetGlyphSizeFromCharcode(tjs_char code, tGlyphMetrics & metr
 /**
  * 指定した文字コードに対するグリフをグリフスロットに設定する
  * @param code	文字コード
- * @return	成功の場合真、失敗の場合偽
+ * @return	成功の場合フェイスインデックス、失敗の場合負の値
  */
-bool tFreeTypeFace::LoadGlyphSlotFromCharcode(tjs_char code)
+tjs_int tFreeTypeFace::LoadGlyphSlotFromCharcode(tjs_char code)
 {
 	// TODO: スレッド保護
 
-	// 文字コードを得る
-	FT_ULong localcode;
-	if(UnicodeToLocalChar == NULL)
-		localcode = code;
-	else
-		localcode = UnicodeToLocalChar(code);
+	tjs_size count = Faces.size();
+	for( tjs_size i = count; i < count; i++ ) {
+		std::unique_ptr<FaceSet>& faceset = Faces[i];
+		// 文字コードを得る
+		FT_ULong localcode;
+		if(faceset->UnicodeToLocalChar == NULL)
+			localcode = code;
+		else
+			localcode = faceset->UnicodeToLocalChar(code);
 
-	// 文字コードから index を得る
-	FT_UInt glyph_index = FT_Get_Char_Index(FTFace, localcode);
-	if(glyph_index == 0)
-		return false;
+		// 文字コードから index を得る
+		FT_UInt glyph_index = FT_Get_Char_Index(faceset->FTFace, localcode);
+		if(glyph_index == 0)
+			continue;
 
-	// グリフスロットに文字を読み込む
-	FT_Int32 load_glyph_flag = 0;
-	if(!(Options & TVP_FACE_OPTIONS_NO_ANTIALIASING))
-		load_glyph_flag |= FT_LOAD_NO_BITMAP;
-	else
-		load_glyph_flag |= FT_LOAD_TARGET_MONO;
-			// note: ビットマップフォントを読み込みたくない場合は FT_LOAD_NO_BITMAP を指定
+		// グリフスロットに文字を読み込む
+		FT_Int32 load_glyph_flag = 0;
+		if(!(Options & TVP_FACE_OPTIONS_NO_ANTIALIASING))
+			load_glyph_flag |= FT_LOAD_NO_BITMAP;
+		else
+			load_glyph_flag |= FT_LOAD_TARGET_MONO;
+				// note: ビットマップフォントを読み込みたくない場合は FT_LOAD_NO_BITMAP を指定
 
-	if(Options & TVP_FACE_OPTIONS_NO_HINTING)
-		load_glyph_flag |= FT_LOAD_NO_HINTING|FT_LOAD_NO_AUTOHINT;
-	if(Options & TVP_FACE_OPTIONS_FORCE_AUTO_HINTING)
-		load_glyph_flag |= FT_LOAD_FORCE_AUTOHINT;
+		if(Options & TVP_FACE_OPTIONS_NO_HINTING)
+			load_glyph_flag |= FT_LOAD_NO_HINTING|FT_LOAD_NO_AUTOHINT;
+		if(Options & TVP_FACE_OPTIONS_FORCE_AUTO_HINTING)
+			load_glyph_flag |= FT_LOAD_FORCE_AUTOHINT;
 
-	FT_Error err;
-	err = FT_Load_Glyph(FTFace, glyph_index, load_glyph_flag);
+		FT_Error err;
+		err = FT_Load_Glyph(faceset->FTFace, glyph_index, load_glyph_flag);
 
-	if(err) return false;
+		if(err) continue;
 
-	// フォントの変形を行う
-	if( Options & TVP_TF_BOLD ) FT_GlyphSlot_Embolden(FTFace->glyph);
-	if( Options & TVP_TF_ITALIC ) FT_GlyphSlot_Oblique( FTFace->glyph );
+		// フォントの変形を行う
+		if( Options & TVP_TF_BOLD ) FT_GlyphSlot_Embolden( faceset->FTFace->glyph );
+		if( Options & TVP_TF_ITALIC ) FT_GlyphSlot_Oblique( faceset->FTFace->glyph );
 
-	return true;
+		return (tjs_int)i;
+	}
+
+	return -1;
 }
 //---------------------------------------------------------------------------
 
