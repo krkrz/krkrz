@@ -116,6 +116,7 @@ public:
 	~tTVPFreeTypeFaceList();
 	bool LoadFont( tjs_string filename, std::vector<tjs_string>* faces );
 	void LoadSystemFont( std::string path, std::vector<tjs_string>* faces );
+	void GetSystemFontList( std::vector<tjs_string>& faces );
 
 	tBaseFreeTypeFace* GetFace( const tjs_string& facename, tjs_uint32 options ) const;
 	void GetFontList(std::vector<ttstr> & list, tjs_uint32 flags, const tTVPFont & font );
@@ -179,6 +180,11 @@ void TVPAddSystemFontToFreeType( const std::string& storage, std::vector<tjs_str
 void TVPGetFontListFromFreeType(std::vector<ttstr> & list, tjs_uint32 flags, const tTVPFont & font ) {
 	TVPInitializeFaceList();
 	FreeTypeFaceList->GetFontList( list, flags, font );
+}
+//---------------------------------------------------------------------------
+void TVPGetSystemFontListFromFreeType( std::vector<tjs_string>& faces ) {
+	TVPInitializeFaceList();
+	FreeTypeFaceList->GetSystemFontList( faces );
 }
 //---------------------------------------------------------------------------
 static void TVPLoadFont( FT_Open_Args& arg, std::vector<FontInfo*>& fonts, std::map<FaceKey,FontInfo*>* fontmap, std::vector<tjs_string>* faces, const std::string* path, const tjs_string* filename ) {
@@ -293,6 +299,13 @@ void tTVPFreeTypeFaceList::LoadSystemFont( std::string path, std::vector<tjs_str
 	args.flags = FT_OPEN_PATHNAME;
 	args.pathname = const_cast<char*>(path.c_str());
 	TVPLoadFont( args, systemfaces_, &systemfont_, faces, &path, nullptr );
+}
+//---------------------------------------------------------------------------
+void tTVPFreeTypeFaceList::GetSystemFontList( std::vector<tjs_string>& faces ) {
+	faces.clear();
+	for( auto i = systemfaces_.begin(); i != systemfaces_.end(); i++ ) {
+		faces.push_back( (*i)->facename );
+	}
 }
 //---------------------------------------------------------------------------
 tBaseFreeTypeFace* tTVPFreeTypeFaceList::GetFace( const tjs_string& facename, tjs_uint32 options ) const {
@@ -663,32 +676,27 @@ tFreeTypeFace::tFreeTypeFace(const std::vector<tjs_string> &fontname, tjs_uint32
 			// FreeType は自動的に UNICODE マッピングを使用するが、
 			// フォントが UNICODE マッピングの情報を含んでいない場合は
 			// 自動的な文字マッピングの選択は行われない。
-			// まずUNICODE で試してみる。
-			FT_Error err = FT_Select_Charmap( Faces[i]->FTFace, FT_ENCODING_UNICODE );
-			if( err )
+			// (日本語環境に限って言えば) SJIS マッピングしかもってない
+			// フォントが多いのでSJISを選択させてみる。
+			FT_Error err = FT_Select_Charmap( Faces[i]->FTFace, FT_ENCODING_SJIS );
+			if( !err )
 			{
-				// (日本語環境に限って言えば) SJIS マッピングしかもってない
-				// フォントが多いのでSJISを選択させてみる。
-				err = FT_Select_Charmap( Faces[i]->FTFace, FT_ENCODING_SJIS );
-				if( !err )
+				// SJIS への切り替えが成功した
+				// 変換関数をセットする
+				Faces[i]->UnicodeToLocalChar = UnicodeToSJIS;
+				Faces[i]->LocalCharToUnicode = SJISToUnicode;
+			} else
+			{
+				// とりあえず何か割り当てる、正しく表示されないかもしれないが
+				int numcharmap = Faces[i]->FTFace->num_charmaps;
+				for( int j = 0; j < numcharmap; j++ )
 				{
-					// SJIS への切り替えが成功した
-					// 変換関数をセットする
-					Faces[i]->UnicodeToLocalChar = UnicodeToSJIS;
-					Faces[i]->LocalCharToUnicode = SJISToUnicode;
-				} else
-				{
-					// とりあえず何か割り当てる、正しく表示されないかもしれないが
-					int numcharmap = Faces[i]->FTFace->num_charmaps;
-					for( int j = 0; j < numcharmap; j++ )
+					FT_Encoding enc = Faces[i]->FTFace->charmaps[j]->encoding;
+					if( enc != FT_ENCODING_NONE && enc != FT_ENCODING_APPLE_ROMAN )
 					{
-						FT_Encoding enc = Faces[i]->FTFace->charmaps[j]->encoding;
-						if( enc != FT_ENCODING_NONE && enc != FT_ENCODING_APPLE_ROMAN )
-						{
-							err = FT_Select_Charmap( Faces[i]->FTFace, enc );
-							if( !err ) {
-								break;
-							}
+						err = FT_Select_Charmap( Faces[i]->FTFace, enc );
+						if( !err ) {
+							break;
 						}
 					}
 				}
@@ -1033,7 +1041,7 @@ tjs_int tFreeTypeFace::LoadGlyphSlotFromCharcode(tjs_char code)
 	// TODO: スレッド保護
 
 	tjs_size count = Faces.size();
-	for( tjs_size i = count; i < count; i++ ) {
+	for( tjs_size i = 0; i < count; i++ ) {
 		std::unique_ptr<FaceSet>& faceset = Faces[i];
 		// 文字コードを得る
 		FT_ULong localcode;
