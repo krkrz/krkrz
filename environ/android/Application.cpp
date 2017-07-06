@@ -340,8 +340,13 @@ void tTVPApplication::PrintConsole( const tjs_char* mes, unsigned long len, bool
 // /system/fonts/ フォントが置かれているフォルダから取得する(Nexus5で約50msかかる)
 // フォントが最初に使われる時にFontSystem::InitFontNames経由で呼ばれる
 extern void TVPAddSystemFontToFreeType( const std::string& storage, std::vector<tjs_string>* faces );
+extern void TVPGetSystemFontListFromFreeType( std::vector<tjs_string>& faces );
+static bool TVPIsGetAllFontList = false;
 void TVPGetAllFontList( std::vector<tjs_string>& list ) {
 	TVPInitializeFont();
+	if( TVPIsGetAllFontList ) {
+		TVPGetSystemFontListFromFreeType( list );
+	}
 
 	DIR* dr;
 	if( ( dr = opendir("/system/fonts/") ) != nullptr ) {
@@ -361,6 +366,7 @@ void TVPGetAllFontList( std::vector<tjs_string>& list ) {
 			}
 		}
 		closedir( dr );
+		TVPIsGetAllFontList = true;
 	}
 #if 0
 	for( std::list<std::string>::const_iterator i = fontfiles.begin(); i != fontfiles.end(); ++i ) {
@@ -402,13 +408,11 @@ void TVPGetAllFontList( std::vector<tjs_string>& list ) {
 #endif
 }
 static bool IsInitDefalutFontName = false;
-//extern FontSystem* TVPFontSystem;
 static bool SelectFont( const std::vector<tjs_string>& faces, tjs_string& face ) {
 	std::vector<tjs_string> fonts;
 	TVPGetAllFontList( fonts );
 	for( auto i = faces.begin(); i != faces.end(); ++i ) {
 		auto found = std::find( fonts.begin(), fonts.end(), *i );
-		//if( TVPFontSystem->FontExists( *i ) ) {
 		if( found != fonts.end() ) {
 			face = *i;
 			return true;
@@ -432,7 +436,7 @@ const tjs_char *TVPGetDefaultFontName() {
 		std::string lang( Application->getLanguage() );
 		tjs_string face;
 		if( lang == std::string("ja" ) ) {
-			std::vector<tjs_string> facenames{tjs_string(TJS_W("Noto Sans JP")),tjs_string(TJS_W("MotoyaLMaru")),
+			std::vector<tjs_string> facenames{tjs_string(TJS_W("Noto Sans JP")),tjs_string(TJS_W("Noto Sans CJK JP")),tjs_string(TJS_W("MotoyaLMaru")),
 				tjs_string(TJS_W("MotoyaLCedar")),tjs_string(TJS_W("Droid Sans Japanese")),tjs_string(TJS_W("Droid Sans Mono"))};
 			if( SelectFont( facenames, face ) ) {
 				TVPDefaultFontName.AssignMessage( face.c_str() );
@@ -470,7 +474,8 @@ const ttstr &TVPGetDefaultFaceNames() {
 		TVPDefaultFaceNames = ttstr( TVPGetDefaultFontName() );
 		std::string lang( Application->getLanguage() );
 		if( lang == std::string("ja" ) ) {
-			TVPDefaultFaceNames += ttstr(TJS_W(",MotoyaLMaru,Roboto"));
+			// TODO:存在確認などしてもうちょっと最適なフェイスリストを作る用にした方がいい
+			TVPDefaultFaceNames += ttstr(TJS_W("Noto Sans,MotoyaLMaru,Roboto"));
 		} else {
 			TVPDefaultFaceNames += ttstr(TJS_W(",Roboto"));
 		}
