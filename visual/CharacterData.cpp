@@ -33,7 +33,7 @@ tTVPCharacterData::tTVPCharacterData( const tjs_uint8 * indata,
 			if( fullcolor ) {
 				//- 横方向のピッチを計算
 				// MMX 等の使用を考えて横方向は 8 バイトでアライン
-				Pitch = (((blackboxw*4 - 1) >> 3) + 1) << 3;
+				Pitch = CalcAlignSize( blackboxw*4 );
 
 				//- バイト数を計算してメモリを確保
 				Data = new tjs_uint8 [Pitch * blackboxh];
@@ -46,7 +46,7 @@ tTVPCharacterData::tTVPCharacterData( const tjs_uint8 * indata,
 			} else {
 				//- 横方向のピッチを計算
 				// MMX 等の使用を考えて横方向は 8 バイトでアライン
-				Pitch = (((blackboxw - 1) >> 3) + 1) << 3;
+				Pitch = CalcAlignSize( blackboxw );
 
 				//- バイト数を計算してメモリを確保
 				Data = new tjs_uint8 [Pitch * blackboxh];
@@ -62,16 +62,6 @@ tTVPCharacterData::tTVPCharacterData( const tjs_uint8 * indata,
 		}
 	}
 }
-
-//---------------------------------------------------------------------------
-/**
- * コピーコンストラクタ
- * @param ref	参照オブジェクト
- */
-tTVPCharacterData::tTVPCharacterData(const tTVPCharacterData & ref) {
-	// コピーコンストラクタは未サポート
-	TVPThrowExceptionMessage( TJS_W("unimplemented: tTVPCharacterData::tTVPCharacterData(const tTVPCharacterData & ref)") );
-}
 //---------------------------------------------------------------------------
 void tTVPCharacterData::Expand()
 {
@@ -79,7 +69,7 @@ void tTVPCharacterData::Expand()
 		TVPThrowExceptionMessage( TJS_W("unimplemented: tTVPCharacterData::Expand for FullColored") );
 
 	// expand the bitmap stored in 1bpp, to 8bpp
-	tjs_int newpitch = (((BlackBoxX -1)>>2)+1)<<2;
+	tjs_int newpitch = CalcAlignSize( BlackBoxX );
 	tjs_uint8 *nd;
 	tjs_uint8 *newdata = nd = new tjs_uint8[newpitch * BlackBoxY];
 	tjs_int h = BlackBoxY;
@@ -120,7 +110,7 @@ void tTVPCharacterData::Blur(tjs_int blurlevel, tjs_int blurwidth)
 	tjs_int bw = std::abs(blurwidth);
 	tjs_int newwidth = BlackBoxX + bw*2;
 	tjs_int newheight = BlackBoxY + bw*2;
-	tjs_int newpitch =  (((newwidth -1)>>2)+1)<<2;
+	tjs_int newpitch =  CalcAlignSize( newwidth );
 
 	tjs_uint8 *newdata = new tjs_uint8[newpitch * newheight];
 
@@ -159,7 +149,7 @@ void tTVPCharacterData::Bold(tjs_int size)
 	// compute new metrics
 	tjs_int newwidth = BlackBoxX + level;
 	tjs_int newheight = BlackBoxY;
-	tjs_int newpitch =  (((newwidth -1)>>2)+1)<<2;
+	tjs_int newpitch =  CalcAlignSize( newwidth );
 	tjs_uint8 *newdata = new tjs_uint8[newpitch * newheight];
 
 	// apply bold
@@ -204,7 +194,7 @@ void tTVPCharacterData::Bold2(tjs_int size)
 	// compute new metrics
 	tjs_int newwidth = BlackBoxX + level;
 	tjs_int newheight = BlackBoxY;
-	tjs_int newpitch =  (((newwidth -1)>>5)+1)<<2;
+	tjs_int newpitch =  (((newwidth -1)>>6)+1)<<3;
 	tjs_uint8 *newdata = new tjs_uint8[newpitch * newheight];
 
 	// apply bold
@@ -270,7 +260,7 @@ void tTVPCharacterData::Resample4()
 
 	tjs_int newwidth = ((BlackBoxX-1)>>2)+1;
 	tjs_int newheight = ((BlackBoxY-1)>>2)+1;
-	tjs_int newpitch =  (((newwidth -1)>>2)+1)<<2;
+	tjs_int newpitch =  CalcAlignSize( newwidth );
 	tjs_uint8 *newdata = new tjs_uint8[newpitch * newheight];
 
 	// resampling
@@ -341,7 +331,7 @@ void tTVPCharacterData::Resample8()
 
 	tjs_int newwidth = ((BlackBoxX-1)>>3)+1;
 	tjs_int newheight = ((BlackBoxY-1)>>3)+1;
-	tjs_int newpitch =  (((newwidth -1)>>2)+1)<<2;
+	tjs_int newpitch =  CalcAlignSize( newwidth );
 	tjs_uint8 *newdata = new tjs_uint8[newpitch * newheight];
 
 	// resampling
@@ -415,8 +405,7 @@ void tTVPCharacterData::AddHorizontalLine( tjs_int liney, tjs_int thickness, tjs
 	newheight = bottom - top;
 	// 大きさが変化する時は作り直す
 	if( newwidth != BlackBoxX || newheight != BlackBoxY ) {
-		//tjs_int newpitch =  (((newwidth -1)>>2)+1)<<2;
-		tjs_int newpitch =  (((newwidth*4 - 1) >> 3) + 1) << 3;
+		tjs_int newpitch =  CalcAlignSize( newwidth );
 		tjs_uint8 *newdata = new tjs_uint8[newpitch * newheight];
 		memset( newdata, 0, sizeof(tjs_uint8)*newpitch*newheight );
 		// x は OriginX 分ずれる

@@ -49,12 +49,18 @@ public:
 		tjs_uint blackboxw, tjs_uint blackboxh,
 		const tGlyphMetrics & metrics,
 		bool fullcolor = false );
-	tTVPCharacterData(const tTVPCharacterData & ref);
+	// コピー禁止
+	tTVPCharacterData(const tTVPCharacterData & ref) = delete;
+	tTVPCharacterData& operator=(const tTVPCharacterData&) = delete;
 	~tTVPCharacterData() { if(Data) delete [] Data; }
 
 	void Alloc(tjs_int size) {
 		if(Data) delete [] Data, Data = NULL;
 		Data = new tjs_uint8[size];
+	}
+
+	static inline tjs_int CalcAlignSize( tjs_int len ) {
+		return ( ( ( ( len - 1 ) >> 3 ) + 1 ) << 3 );
 	}
 
 	tjs_uint8 * GetData() const { return Data; }

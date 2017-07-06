@@ -334,7 +334,7 @@ static tTVPCharacterData * TVPGetCharacter(const tTVPFontAndCharacterData & font
 			if(data->BlackBoxX && data->BlackBoxY)
 			{
 				// render
-				tjs_int newpitch =  (((pitem->Width -1)>>2)+1)<<2;
+				tjs_int newpitch =  data->CalcAlignSize( pitem->Width );
 				data->Pitch = newpitch;
 
 				data->Alloc(newpitch * data->BlackBoxY);
@@ -839,6 +839,18 @@ bool tTVPNativeBaseBitmap::InternalDrawText(tTVPCharacterData *data, tjs_int x,
 	h = drect.bottom - drect.top;
 	w = drect.right - drect.left;
 	bp = data->GetData() + pitch * srect.top;
+	if( Is8BPP() ) {
+		// カラーフォントはコピーできない
+		if( data->FullColored ) TVPThrowExceptionMessage(TVPInvalidOperationFor8BPP);
+
+		// 8bit colorの時はただコピーするだけ
+		while( h-- ) {
+			memcpy( sl + drect.left, bp + srect.left, w );
+			sl += dtdata->bmppitch;
+			bp += pitch;
+		}
+		return true;
+	}
 	if( data->Gray == 256 ) {
 		if(dtdata->bltmode == bmAlphaOnAlpha)
 		{
@@ -1249,7 +1261,7 @@ void tTVPNativeBaseBitmap::DrawTextSingle(const tTVPRect &destrect,
 {
 	// text drawing function for single character
 
-	if(!Is32BPP()) TVPThrowExceptionMessage(TVPInvalidOperationFor8BPP);
+	// if(!Is32BPP()) TVPThrowExceptionMessage(TVPInvalidOperationFor8BPP);
 
 	if(bltmode == bmAlphaOnAlpha)
 	{
@@ -1431,7 +1443,7 @@ void tTVPNativeBaseBitmap::DrawTextMultiple(const tTVPRect &destrect,
 {
 	// text drawing function for multiple characters
 
-	if(!Is32BPP()) TVPThrowExceptionMessage(TVPInvalidOperationFor8BPP);
+	// if(!Is32BPP()) TVPThrowExceptionMessage(TVPInvalidOperationFor8BPP);
 
 	if(bltmode == bmAlphaOnAlpha)
 	{
