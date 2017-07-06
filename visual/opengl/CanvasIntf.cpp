@@ -991,7 +991,7 @@ TJS_BEGIN_NATIVE_PROP_DECL( renderTarget )
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas);
 		if( param->Type() == tvtObject  ) {
 			_this->SetRenterTargetObject( *param );
-		} else if( param->Type() != tvtVoid ) {
+		} else {
 			_this->SetRenterTargetObject( tTJSVariant() );
 		}
 		return TJS_S_OK;
