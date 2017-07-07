@@ -148,19 +148,24 @@ tjs_error TJS_INTF_METHOD tTJSNI_Canvas::Construct(tjs_int numparams, tTJSVarian
 void TJS_INTF_METHOD tTJSNI_Canvas::Invalidate() {
 
 	// release render target
-	SetRenterTargetObject( tTJSVariant() );
+	if( RenterTaretObject.Type() == tvtObject )
+		RenterTaretObject.AsObjectClosureNoAddRef().Invalidate( 0, NULL, NULL, RenterTaretObject.AsObjectNoAddRef() );
 
 	// release clip rect
-	SetClipRectObject( tTJSVariant() );
+	if( ClipRectObject.Type() == tvtObject )
+		ClipRectObject.AsObjectClosureNoAddRef().Invalidate( 0, NULL, NULL, ClipRectObject.AsObjectNoAddRef() );
 
 	// release matrix
-	SetMatrix32Object( tTJSVariant() );
+	if( Matrix32Object.Type() == tvtObject )
+		Matrix32Object.AsObjectClosureNoAddRef().Invalidate( 0, NULL, NULL, Matrix32Object.AsObjectNoAddRef() );
 
 	// release shader
-	SetDefaultShader( tTJSVariant() );
+	if( DefaultShaderObject.Type() == tvtObject )
+		DefaultShaderObject.AsObjectClosureNoAddRef().Invalidate( 0, NULL, NULL, DefaultShaderObject.AsObjectNoAddRef() );
 
 	// release fill shader
-	SetDefaultFillShader( tTJSVariant() );
+	if( DefaultFillShaderObject.Type() == tvtObject )
+		DefaultFillShaderObject.AsObjectClosureNoAddRef().Invalidate( 0, NULL, NULL, DefaultFillShaderObject.AsObjectNoAddRef() );
 }
 //----------------------------------------------------------------------
 void TJS_INTF_METHOD tTJSNI_Canvas::Destruct() {
@@ -567,8 +572,8 @@ void tTJSNI_Canvas::SetupEachDrawing() {
 // prop
 void tTJSNI_Canvas::SetRenterTargetObject( const tTJSVariant & val ) {
 	// invalidate existing render terget
-	if( RenterTaretObject.Type() == tvtObject )
-		RenterTaretObject.AsObjectClosureNoAddRef().Invalidate( 0, NULL, NULL, RenterTaretObject.AsObjectNoAddRef() );
+	// if( RenterTaretObject.Type() == tvtObject )
+	// 	RenterTaretObject.AsObjectClosureNoAddRef().Invalidate( 0, NULL, NULL, RenterTaretObject.AsObjectNoAddRef() );
 
 	// assign new rect
 	RenterTaretObject = val;
@@ -599,8 +604,8 @@ void tTJSNI_Canvas::SetRenterTargetObject( const tTJSVariant & val ) {
 //----------------------------------------------------------------------
 void tTJSNI_Canvas::SetClipRectObject( const tTJSVariant & val ) {
 	// invalidate existing clip rect
-	if( ClipRectObject.Type() == tvtObject )
-		ClipRectObject.AsObjectClosureNoAddRef().Invalidate( 0, NULL, NULL, ClipRectObject.AsObjectNoAddRef() );
+	// if( ClipRectObject.Type() == tvtObject )
+	// 	ClipRectObject.AsObjectClosureNoAddRef().Invalidate( 0, NULL, NULL, ClipRectObject.AsObjectNoAddRef() );
 
 	// assign new rect
 	ClipRectObject = val;
@@ -620,8 +625,8 @@ void tTJSNI_Canvas::SetClipRectObject( const tTJSVariant & val ) {
 //----------------------------------------------------------------------
 void tTJSNI_Canvas::SetMatrix32Object( const tTJSVariant & val ) {
 	// invalidate existing matrix
-	if( Matrix32Object.Type() == tvtObject )
-		Matrix32Object.AsObjectClosureNoAddRef().Invalidate( 0, NULL, NULL, Matrix32Object.AsObjectNoAddRef() );
+	// if( Matrix32Object.Type() == tvtObject )
+	// 	Matrix32Object.AsObjectClosureNoAddRef().Invalidate( 0, NULL, NULL, Matrix32Object.AsObjectNoAddRef() );
 
 	// assign new matrix
 	Matrix32Object = val;
@@ -641,8 +646,8 @@ void tTJSNI_Canvas::SetMatrix32Object( const tTJSVariant & val ) {
 //----------------------------------------------------------------------
 void tTJSNI_Canvas::SetDefaultShader( const tTJSVariant & val ) {
 	// invalidate existing matrix
-	if( DefaultShaderObject.Type() == tvtObject )
-		DefaultShaderObject.AsObjectClosureNoAddRef().Invalidate( 0, NULL, NULL, DefaultShaderObject.AsObjectNoAddRef() );
+	// if( DefaultShaderObject.Type() == tvtObject )
+	// 	DefaultShaderObject.AsObjectClosureNoAddRef().Invalidate( 0, NULL, NULL, DefaultShaderObject.AsObjectNoAddRef() );
 
 	// assign new matrix
 	DefaultShaderObject = val;
@@ -662,8 +667,8 @@ void tTJSNI_Canvas::SetDefaultShader( const tTJSVariant & val ) {
 //----------------------------------------------------------------------
 void tTJSNI_Canvas::SetDefaultFillShader( const tTJSVariant & val ) {
 	// invalidate existing matrix
-	if( DefaultFillShaderObject.Type() == tvtObject )
-		DefaultFillShaderObject.AsObjectClosureNoAddRef().Invalidate( 0, NULL, NULL, DefaultFillShaderObject.AsObjectNoAddRef() );
+	// if( DefaultFillShaderObject.Type() == tvtObject )
+	// 	DefaultFillShaderObject.AsObjectClosureNoAddRef().Invalidate( 0, NULL, NULL, DefaultFillShaderObject.AsObjectNoAddRef() );
 
 	// assign new matrix
 	DefaultFillShaderObject = val;

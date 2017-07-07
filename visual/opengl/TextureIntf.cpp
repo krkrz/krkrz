@@ -27,9 +27,9 @@ tjs_error TJS_INTF_METHOD tTJSNI_Texture::Construct(tjs_int numparams, tTJSVaria
 	if( numparams < 1 ) return TJS_E_BADPARAMCOUNT;
 
 	if( param[0]->Type() == tvtString ) {
-		bool gray = false;
+		tTVPTextureColorFormat color = tTVPTextureColorFormat::RGBA;
 		if( numparams > 1 ) {
-			gray = (tjs_int)*param[1] ? true : false;
+			color = (tTVPTextureColorFormat)(tjs_int)*param[1];
 		}
 		bool powerof2 = false;
 		if( numparams > 2 ) {
@@ -38,7 +38,7 @@ tjs_error TJS_INTF_METHOD tTJSNI_Texture::Construct(tjs_int numparams, tTJSVaria
 		ttstr filename = *param[0];
 		std::unique_ptr<tTVPBaseBitmap> bitmap( new tTVPBaseBitmap( TVPGetInitialBitmap() ) );
 		// tTVPBaseBitmap経由して読み込む。キャッシュ機構などは共有される。
-		TVPLoadGraphic( bitmap.get(), filename, clNone, 0, 0, gray ? glmGrayscale : glmNormalRGBA, nullptr, nullptr );
+		TVPLoadGraphic( bitmap.get(), filename, clNone, 0, 0, color == tTVPTextureColorFormat::Alpha ? glmGrayscale : glmNormalRGBA, nullptr, nullptr );
 		SrcWidth = bitmap->GetWidth();
 		SrcHeight = bitmap->GetHeight();
 		if( powerof2 ) {
@@ -51,7 +51,7 @@ tjs_error TJS_INTF_METHOD tTJSNI_Texture::Construct(tjs_int numparams, tTJSVaria
 				bitmap->SetSizeWithFill( dw, dh, 0 );
 			}
 		}
-		LoadTexture( bitmap.get(), gray );
+		LoadTexture( bitmap.get(), color );
 	} else if( param[0]->Type() == tvtObject ) {
 		tTJSNI_Bitmap* bmp = nullptr;
 		tTJSVariantClosure clo = param[0]->AsObjectClosureNoAddRef();
@@ -60,9 +60,9 @@ tjs_error TJS_INTF_METHOD tTJSNI_Texture::Construct(tjs_int numparams, tTJSVaria
 				return TJS_E_INVALIDPARAM;
 		}
 		if(!bmp) TVPThrowExceptionMessage(TJS_W("Parameter require Bitmap class instance."));
-		bool gray = false;
+		tTVPTextureColorFormat color = tTVPTextureColorFormat::RGBA;
 		if( numparams > 1 ) {
-			gray = (tjs_int)*param[1] ? true : false;
+			color = (tTVPTextureColorFormat)(tjs_int)*param[1];
 		}
 		bool powerof2 = false;
 		if( numparams > 2 ) {
@@ -72,6 +72,7 @@ tjs_error TJS_INTF_METHOD tTJSNI_Texture::Construct(tjs_int numparams, tTJSVaria
 		const tTVPBaseBitmap* bitmap = bmp->GetBitmap();
 		SrcWidth = bitmap->GetWidth();
 		SrcHeight = bitmap->GetHeight();
+		bool gray = color == tTVPTextureColorFormat::Alpha;
 		if( gray == bitmap->Is8BPP() ) {
 			if( powerof2 ) {
 				if( IsPowerOfTwo( bitmap->GetWidth() ) == false || IsPowerOfTwo( bitmap->GetHeight() ) == false ) {
@@ -83,7 +84,7 @@ tjs_error TJS_INTF_METHOD tTJSNI_Texture::Construct(tjs_int numparams, tTJSVaria
 		}
 		if( isrecreate == false ) {
 			// そのまま生成して問題ない
-			LoadTexture( bitmap, gray );
+			LoadTexture( bitmap, color );
 		} else {
 			// 変更が入るので、コピーを作る
 			std::unique_ptr<tTVPBaseBitmap> bitmap2( new tTVPBaseBitmap( *bitmap ) );
@@ -114,17 +115,18 @@ tjs_error TJS_INTF_METHOD tTJSNI_Texture::Construct(tjs_int numparams, tTJSVaria
 				assert( powerof2 );
 				bitmap2->SetSizeWithFill( dw, dh, 0 );
 			}
-			LoadTexture( bitmap2.get(), gray );
+			LoadTexture( bitmap2.get(), color );
 		}
 	} else if( numparams >= 2 && param[0]->Type() == tvtInteger && param[1]->Type() == tvtInteger ) {
 		tjs_int width = *param[0];
 		tjs_int height = *param[1];
 		bool alpha = false;
+		tTVPTextureColorFormat color = tTVPTextureColorFormat::RGBA;
 		if( numparams > 2 ) {
-			alpha = (tjs_int)*param[2] ? true : false;
+			color = (tTVPTextureColorFormat)(tjs_int)*param[2];
 		}
 		// 未初期化データでテクスチャを作る。後でコピーする前提。
-		Texture.create( width, height, nullptr, alpha ? GL_ALPHA : GL_RGBA );
+		Texture.create( width, height, nullptr, ColorToGLColor(( tTVPTextureColorFormat)color) );
 	} else {
 		return TJS_E_INVALIDPARAM;
 	}
@@ -135,13 +137,29 @@ void TJS_INTF_METHOD tTJSNI_Texture::Invalidate() {
 	Texture.destory();
 }
 //----------------------------------------------------------------------
-void tTJSNI_Texture::LoadTexture( const class tTVPBaseBitmap* bitmap, bool alpha ) {
+GLint tTJSNI_Texture::ColorToGLColor( tTVPTextureColorFormat color ) {
+	switch( color ) {
+	case tTVPTextureColorFormat::RGBA:
+		return GL_RGBA;
+	case tTVPTextureColorFormat::Alpha:
+		return GL_ALPHA;
+	default:
+		return GL_RGBA;
+	}
+}
+//----------------------------------------------------------------------
+void tTJSNI_Texture::LoadTexture( const class tTVPBaseBitmap* bitmap, tTVPTextureColorFormat color ) {
 	// Bitmap の内部表現が正順(上下反転されていない)ことを前提としているので注意
-	Texture.create( bitmap->GetWidth(), bitmap->GetHeight(), bitmap->GetScanLine(0), alpha ? GL_ALPHA : GL_RGBA );
+	Texture.create( bitmap->GetWidth(), bitmap->GetHeight(), bitmap->GetScanLine(0), ColorToGLColor(color) );
 }
 //----------------------------------------------------------------------
 void tTJSNI_Texture::CopyBitmap( tjs_int left, tjs_int top, const tTVPBaseBitmap* bitmap, const tTVPRect& srcRect ) {
 	TVPCopyBitmapToTexture( this, left, top, bitmap, srcRect );
+}
+//----------------------------------------------------------------------
+void  tTJSNI_Texture::CopyBitmap( const class tTVPBaseBitmap* bitmap ) {
+	tTVPRect rect( 0, 0, bitmap->GetWidth(), bitmap->GetHeight() );
+	TVPCopyBitmapToTexture( this, 0, 0, bitmap, rect );
 }
 //----------------------------------------------------------------------
 bool tTJSNI_Texture::IsGray() const {
@@ -219,6 +237,12 @@ TJS_END_NATIVE_CONSTRUCTOR_DECL(/*TJS class name*/Texture)
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/copyRect)
 {
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Texture);
+	if( numparams == 1 ) {
+		tTJSNI_Bitmap* bitmap = (tTJSNI_Bitmap*)TJSGetNativeInstance( tTJSNC_Bitmap::ClassID, param[0] );
+		if( !bitmap ) return TJS_E_INVALIDPARAM;
+		_this->CopyBitmap( bitmap->GetBitmap() );
+		return TJS_S_OK;
+	}
 	if( numparams < 4 ) return TJS_E_BADPARAMCOUNT;
 
 	tTJSNI_Bitmap* bitmap = (tTJSNI_Bitmap*)TJSGetNativeInstance( tTJSNC_Bitmap::ClassID, param[2] );

@@ -11,6 +11,14 @@
 #include "GLVertexBufferObject.h"
 #include "ComplexRect.h"
 
+
+enum class tTVPTextureColorFormat : tjs_int {
+	RGBA = 0,
+	Alpha = 1,
+	// Luminance or Compressed texture
+};
+
+
 class tTJSNI_Texture : public tTJSNativeInstance, public iTVPTextureInfoIntrface
 {
 	GLTexture Texture;
@@ -18,7 +26,8 @@ class tTJSNI_Texture : public tTJSNativeInstance, public iTVPTextureInfoIntrface
 	tjs_uint SrcWidth;
 	tjs_uint SrcHeight;
 
-	void LoadTexture( const class tTVPBaseBitmap* bitmap, bool alpha );
+	void LoadTexture( const class tTVPBaseBitmap* bitmap, tTVPTextureColorFormat color );
+	GLint ColorToGLColor( tTVPTextureColorFormat color );
 
 public:
 	tTJSNI_Texture();
@@ -27,6 +36,7 @@ public:
 	void TJS_INTF_METHOD Invalidate() override;
 
 	void CopyBitmap( tjs_int left, tjs_int top, const class tTVPBaseBitmap* bitmap, const tTVPRect& srcRect );
+	void CopyBitmap( const class tTVPBaseBitmap* bitmap );
 
 	tjs_uint GetWidth() const override { return SrcWidth; }
 	tjs_uint GetHeight() const override { return SrcHeight; }
