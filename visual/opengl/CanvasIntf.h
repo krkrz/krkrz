@@ -99,9 +99,11 @@ class tTJSNI_Canvas : public tTJSNativeInstance
 	tTJSVariant Matrix32Object;
 	class tTJSNI_Matrix32* Matrix32Instance;
 
+	tTJSVariant EmbeddedDefaultShaderObject;
 	tTJSVariant DefaultShaderObject;
 	class tTJSNI_ShaderProgram* DefaultShaderInstance;
 
+	tTJSVariant EmbeddedDefaultFillShaderObject;
 	tTJSVariant DefaultFillShaderObject;
 	class tTJSNI_ShaderProgram* DefaultFillShaderInstance;
 public:

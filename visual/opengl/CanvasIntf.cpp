@@ -160,10 +160,12 @@ void TJS_INTF_METHOD tTJSNI_Canvas::Invalidate() {
 		Matrix32Object.AsObjectClosureNoAddRef().Invalidate( 0, NULL, NULL, Matrix32Object.AsObjectNoAddRef() );
 
 	// release shader
+	SetDefaultShader( tTJSVariant() );
 	if( DefaultShaderObject.Type() == tvtObject )
 		DefaultShaderObject.AsObjectClosureNoAddRef().Invalidate( 0, NULL, NULL, DefaultShaderObject.AsObjectNoAddRef() );
 
 	// release fill shader
+	SetDefaultFillShader( tTJSVariant() );
 	if( DefaultFillShaderObject.Type() == tvtObject )
 		DefaultFillShaderObject.AsObjectClosureNoAddRef().Invalidate( 0, NULL, NULL, DefaultFillShaderObject.AsObjectNoAddRef() );
 }
@@ -208,14 +210,16 @@ void tTJSNI_Canvas::CreateDefaultShader() {
 			tTJSVariant *pparam[4] = { param, param + 1, param + 2, param + 3 };
 			if( TJS_FAILED( cls->CreateNew( 0, NULL, NULL, &newobj, 4, pparam, cls ) ) )
 				TVPThrowExceptionMessage( TVPInternalError, TJS_W( "tTJSNI_ShaderProgram::Construct" ) );
-			SetDefaultShader( tTJSVariant( newobj, newobj ) );
+			EmbeddedDefaultShaderObject = tTJSVariant( newobj, newobj );
+			SetDefaultShader( EmbeddedDefaultShaderObject );
 			if( newobj ) newobj->Release();
 
 			param[0] = DefaultFillVertexShaderText;
 			param[1] = DefaultFillFragmentShaderText;
 			if( TJS_FAILED( cls->CreateNew( 0, NULL, NULL, &newobj, 4, pparam, cls ) ) )
 				TVPThrowExceptionMessage( TVPInternalError, TJS_W( "tTJSNI_ShaderProgram::Construct" ) );
-			SetDefaultFillShader( tTJSVariant( newobj, newobj ) );
+			EmbeddedDefaultFillShaderObject = tTJSVariant( newobj, newobj );
+			SetDefaultFillShader( EmbeddedDefaultFillShaderObject );
 		} catch( ... ) {
 			if( cls ) cls->Release();
 			if( newobj ) newobj->Release();
@@ -645,13 +649,17 @@ void tTJSNI_Canvas::SetMatrix32Object( const tTJSVariant & val ) {
 }
 //----------------------------------------------------------------------
 void tTJSNI_Canvas::SetDefaultShader( const tTJSVariant & val ) {
-	// invalidate existing matrix
+	// invalidate existing shader
 	// if( DefaultShaderObject.Type() == tvtObject )
 	// 	DefaultShaderObject.AsObjectClosureNoAddRef().Invalidate( 0, NULL, NULL, DefaultShaderObject.AsObjectNoAddRef() );
 
-	// assign new matrix
+	// assign new shader
 	DefaultShaderObject = val;
 	DefaultShaderInstance = nullptr;
+
+	if( val.Type() == tvtVoid ) {
+		DefaultShaderObject = EmbeddedDefaultShaderObject;
+	}
 
 	// extract interface
 	if( DefaultShaderObject.Type() == tvtObject ) {
@@ -666,13 +674,17 @@ void tTJSNI_Canvas::SetDefaultShader( const tTJSVariant & val ) {
 }
 //----------------------------------------------------------------------
 void tTJSNI_Canvas::SetDefaultFillShader( const tTJSVariant & val ) {
-	// invalidate existing matrix
+	// invalidate existing shader
 	// if( DefaultFillShaderObject.Type() == tvtObject )
 	// 	DefaultFillShaderObject.AsObjectClosureNoAddRef().Invalidate( 0, NULL, NULL, DefaultFillShaderObject.AsObjectNoAddRef() );
 
-	// assign new matrix
+	// assign new shader
 	DefaultFillShaderObject = val;
 	DefaultFillShaderInstance = nullptr;
+
+	if( val.Type() == tvtVoid ) {
+		DefaultFillShaderObject = EmbeddedDefaultFillShaderObject;
+	}
 
 	// extract interface
 	if( DefaultFillShaderObject.Type() == tvtObject ) {
