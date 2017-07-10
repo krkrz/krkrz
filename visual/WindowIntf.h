@@ -211,10 +211,14 @@ public:
 	void OnPopupHide();
 	void OnActivate(bool activate_or_deactivate);
 
-	virtual void OnTouchDown( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id );
-	virtual void OnTouchUp( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id );
-	virtual void OnTouchMove( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id );
-	
+	void OnTouchDown( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id );
+	void OnTouchUp( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id );
+	void OnTouchMove( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id );
+
+	void OnPointerDown( tjs_int type, tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 flags, tjs_uint32 id );
+	void OnPointerMove( tjs_int type, tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 flags, tjs_uint32 id );
+	void OnPointerUp( tjs_int type, tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 flags, tjs_uint32 id );
+
 	void OnTouchScaling( tjs_real startdist, tjs_real curdist, tjs_real cx, tjs_real cy, tjs_int flag );
 	void OnTouchRotate( tjs_real startangle, tjs_real curangle, tjs_real dist, tjs_real cx, tjs_real cy, tjs_int flag );
 	void OnMultiTouch();
@@ -387,8 +391,10 @@ public:
 	tTVPOnMouseDownInputEvent(tTJSNI_BaseWindow *win, tjs_int x, tjs_int y,
 		tTVPMouseButton buttons, tjs_uint32 flags) :
 		tTVPBaseInputEvent(win, Tag), X(x), Y(y), Buttons(buttons), Flags(flags) {};
-	void Deliver() const
-	{ ((tTJSNI_BaseWindow*)GetSource())->OnMouseDown(X, Y, Buttons, Flags); }
+	void Deliver() const {
+		((tTJSNI_BaseWindow*)GetSource())->OnMouseDown(X, Y, Buttons, Flags);
+		((tTJSNI_BaseWindow*)GetSource())->OnPointerDown( (tjs_int)Buttons + (tjs_int)tTVPPointerType::ptMouseLeft, X, Y, 1.0, 1.0, Flags, 0 );
+	}
 };
 //---------------------------------------------------------------------------
 class tTVPOnMouseUpInputEvent : public tTVPBaseInputEvent
@@ -402,8 +408,10 @@ public:
 	tTVPOnMouseUpInputEvent(tTJSNI_BaseWindow *win, tjs_int x, tjs_int y,
 		tTVPMouseButton buttons, tjs_uint32 flags) :
 		tTVPBaseInputEvent(win, Tag), X(x), Y(y), Buttons(buttons), Flags(flags) {};
-	void Deliver() const
-	{ ((tTJSNI_BaseWindow*)GetSource())->OnMouseUp(X, Y, Buttons, Flags); }
+	void Deliver() const {
+		((tTJSNI_BaseWindow*)GetSource())->OnMouseUp(X, Y, Buttons, Flags);
+		((tTJSNI_BaseWindow*)GetSource())->OnPointerUp( (tjs_int)Buttons+(tjs_int)tTVPPointerType::ptMouseLeft, X, Y, 1.0, 1.0, Flags, 0 );
+	}
 };
 //---------------------------------------------------------------------------
 class tTVPOnMouseMoveInputEvent : public tTVPBaseInputEvent
@@ -416,8 +424,10 @@ public:
 	tTVPOnMouseMoveInputEvent(tTJSNI_BaseWindow *win, tjs_int x, tjs_int y,
 		tjs_uint32 flags) :
 		tTVPBaseInputEvent(win, Tag), X(x), Y(y), Flags(flags) {};
-	void Deliver() const
-	{ ((tTJSNI_BaseWindow*)GetSource())->OnMouseMove(X, Y, Flags); }
+	void Deliver() const {
+		((tTJSNI_BaseWindow*)GetSource())->OnMouseMove(X, Y, Flags);
+		((tTJSNI_BaseWindow*)GetSource())->OnPointerMove( (tjs_int)tTVPPointerType::ptMouse, X, Y, 1.0, 1.0, Flags, 0 );
+	}
 };
 //---------------------------------------------------------------------------
 class tTVPOnReleaseCaptureInputEvent : public tTVPBaseInputEvent
@@ -556,8 +566,10 @@ class tTVPOnTouchDownInputEvent : public tTVPBaseInputEvent
 public:
 	tTVPOnTouchDownInputEvent(tTJSNI_BaseWindow *win, tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id ) :
 		tTVPBaseInputEvent(win, Tag), X(x), Y(y), CX(cx), CY(cy), ID(id) {};
-	void Deliver() const
-	{ ((tTJSNI_BaseWindow*)GetSource())->OnTouchDown(X, Y, CX, CY, ID); }
+	void Deliver() const {
+		((tTJSNI_BaseWindow*)GetSource())->OnTouchDown(X, Y, CX, CY, ID);
+		((tTJSNI_BaseWindow*)GetSource())->OnPointerDown( (tjs_int)tTVPPointerType::ptTouch, X, Y, CX, CY, 0, ID );
+	}
 };
 //---------------------------------------------------------------------------
 class tTVPOnTouchUpInputEvent : public tTVPBaseInputEvent
@@ -571,8 +583,10 @@ class tTVPOnTouchUpInputEvent : public tTVPBaseInputEvent
 public:
 	tTVPOnTouchUpInputEvent(tTJSNI_BaseWindow *win, tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id ) :
 		tTVPBaseInputEvent(win, Tag), X(x), Y(y), CX(cx), CY(cy), ID(id) {};
-	void Deliver() const
-	{ ((tTJSNI_BaseWindow*)GetSource())->OnTouchUp(X, Y, CX, CY, ID); }
+	void Deliver() const {
+		((tTJSNI_BaseWindow*)GetSource())->OnTouchUp(X, Y, CX, CY, ID);
+		((tTJSNI_BaseWindow*)GetSource())->OnPointerUp( (tjs_int)tTVPPointerType::ptTouch, X, Y, CX, CY, 0, ID );
+	}
 };
 //---------------------------------------------------------------------------
 class tTVPOnTouchMoveInputEvent : public tTVPBaseInputEvent
@@ -586,8 +600,10 @@ class tTVPOnTouchMoveInputEvent : public tTVPBaseInputEvent
 public:
 	tTVPOnTouchMoveInputEvent(tTJSNI_BaseWindow *win, tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id ) :
 		tTVPBaseInputEvent(win, Tag), X(x), Y(y), CX(cx), CY(cy), ID(id) {};
-	void Deliver() const
-	{ ((tTJSNI_BaseWindow*)GetSource())->OnTouchMove(X, Y, CX, CY, ID); }
+	void Deliver() const {
+		((tTJSNI_BaseWindow*)GetSource())->OnTouchMove(X, Y, CX, CY, ID);
+		((tTJSNI_BaseWindow*)GetSource())->OnPointerMove( (tjs_int)tTVPPointerType::ptTouch, X, Y, CX, CY, 0, ID );
+	}
 };
 //---------------------------------------------------------------------------
 class tTVPOnTouchScalingInputEvent : public tTVPBaseInputEvent

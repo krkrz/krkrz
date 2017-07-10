@@ -472,6 +472,36 @@ void tTJSNI_BaseWindow::OnTouchMove( tjs_real x, tjs_real y, tjs_real cx, tjs_re
 	if(DrawDevice) DrawDevice->OnTouchMove(x, y, cx, cy, id);
 }
 //---------------------------------------------------------------------------
+void tTJSNI_BaseWindow::OnPointerDown( tjs_int type, tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 flags, tjs_uint32 id ) {
+	if( !CanDeliverEvents() ) return;
+	if( Owner )
+	{
+		tTJSVariant arg[7] = { type, x, y, cx, cy, (tjs_int64)flags, (tjs_int64)id };
+		static ttstr eventname( TJS_W( "onPointerDown" ) );
+		TVPPostEvent( Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 7, arg );
+	}
+}
+//---------------------------------------------------------------------------
+void tTJSNI_BaseWindow::OnPointerMove( tjs_int type, tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 flags, tjs_uint32 id ) {
+	if( !CanDeliverEvents() ) return;
+	if( Owner )
+	{
+		tTJSVariant arg[7] = { type, x, y, cx, cy, (tjs_int64)flags, (tjs_int64)id };
+		static ttstr eventname( TJS_W( "onPointerMovie" ) );
+		TVPPostEvent( Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 7, arg );
+	}
+}
+//---------------------------------------------------------------------------
+void tTJSNI_BaseWindow::OnPointerUp( tjs_int type, tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 flags, tjs_uint32 id ) {
+	if( !CanDeliverEvents() ) return;
+	if( Owner )
+	{
+		tTJSVariant arg[7] = { type, x, y, cx, cy, (tjs_int64)flags, (tjs_int64)id };
+		static ttstr eventname( TJS_W( "onPointerUp" ) );
+		TVPPostEvent( Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 7, arg );
+	}
+}
+//---------------------------------------------------------------------------
 void tTJSNI_BaseWindow::OnTouchScaling( tjs_real startdist, tjs_real curdist, tjs_real cx, tjs_real cy, tjs_int flag ) {
 	if(!CanDeliverEvents()) return;
 	if(Owner)

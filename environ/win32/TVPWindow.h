@@ -22,6 +22,8 @@ enum {
 	 ssMiddle = TVP_SS_MIDDLE,
 	 ssDouble = TVP_SS_DOUBLE,
 	 ssRepeat = TVP_SS_REPEAT,
+	 ssX1 = TVP_SS_X1,
+	 ssX2 = TVP_SS_X2,
 };
 
 class tTVPWindow {
@@ -123,6 +125,8 @@ protected:
 		if(TVPGetAsyncKeyState(VK_LBUTTON)) s |= ssLeft;
 		if(TVPGetAsyncKeyState(VK_RBUTTON)) s |= ssRight;
 		if(TVPGetAsyncKeyState(VK_MBUTTON)) s |= ssMiddle;
+		if(TVPGetAsyncKeyState(VK_XBUTTON1)) s |= ssX1;
+		if(TVPGetAsyncKeyState(VK_XBUTTON2)) s |= ssX2;
 		return s;
 	}
 	inline bool IsTouchEvent(LPARAM extraInfo) const {

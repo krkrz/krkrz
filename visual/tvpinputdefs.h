@@ -27,6 +27,21 @@ enum tTVPMouseButton
 };
 
 
+//---------------------------------------------------------------------------
+// Pointer (pointing device type)
+//---------------------------------------------------------------------------
+enum class tTVPPointerType : int {
+	ptUnknown = 0,
+	ptMouseLeft = 1,
+	ptMouseRight = 2,
+	ptMouseMiddle = 3,
+	ptMouseX1 = 4,
+	ptMouseX2 = 5,
+	ptMouse = 6,
+	ptTouch = 7,
+	ptPen = 8
+};
+
 
 //---------------------------------------------------------------------------
 // IME modes : comes from VCL's TImeMode
@@ -59,11 +74,13 @@ enum tTVPImeMode
 #define TVP_SS_MIDDLE  0x20
 #define TVP_SS_DOUBLE  0x40
 #define TVP_SS_REPEAT  0x80
+#define TVP_SS_X1      0x100
+#define TVP_SS_X2      0x200
 
 
 inline bool TVPIsAnyMouseButtonPressedInShiftStateFlags(tjs_uint32 state)
 { return (state & 
-	(TVP_SS_LEFT | TVP_SS_RIGHT | TVP_SS_MIDDLE | TVP_SS_DOUBLE)) != 0; }
+	(TVP_SS_LEFT | TVP_SS_RIGHT | TVP_SS_MIDDLE | TVP_SS_DOUBLE | TVP_SS_X1 | TVP_SS_X2)) != 0; }
 
 
 
