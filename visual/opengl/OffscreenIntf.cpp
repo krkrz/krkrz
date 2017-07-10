@@ -188,6 +188,8 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/exchangeTexture )
 	tTJSNI_Texture* texture = (tTJSNI_Texture*)TJSGetNativeInstance( tTJSNC_Texture::ClassID, param[0] );
 	if( !texture ) TVPThrowExceptionMessage( TJS_W( "Parameter require Texture class instance." ) );
 
+	_this->ExchangeTexture( texture );
+
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/exchangeTexture )

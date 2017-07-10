@@ -81,6 +81,9 @@ bool GLFrameBufferObject::exchangeTexture( GLuint tex_id ) {
 		break;
 	}
 	bool result = status == GL_FRAMEBUFFER_COMPLETE;
+	if( result ) {
+		texture_id_ = tex_id;
+	}
 
 	glBindFramebuffer( GL_FRAMEBUFFER, fb );
 
