@@ -37,9 +37,16 @@ tjs_error TJS_INTF_METHOD tTJSNI_BitmapLayerTreeOwner::Construct(tjs_int numpara
 	if(TJS_FAILED(BitmapObject->NativeInstanceSupport(TJS_NIS_GETINSTANCE, tTJSNC_Bitmap::ClassID, (iTJSNativeInstance**)&BitmapNI)))
 		return TJS_E_INVALIDPARAM;
 
-	iTJSDispatch2* rect = TVPCreateRectObject( 0, 0, 0, 0 );
-	tTJSVariant val( rect, rect );
-	SetDirtyRectObject( val );
+	iTJSDispatch2* rect = nullptr;
+	try {
+		rect = TVPCreateRectObject( 0, 0, 0, 0 );
+		tTJSVariant val( rect, rect );
+		SetDirtyRectObject( val );
+	} catch( ... ) {
+		if( rect ) rect->Release();
+		throw;
+	}
+	if( rect ) rect->Release();
 
 	return TJS_S_OK;
 }
