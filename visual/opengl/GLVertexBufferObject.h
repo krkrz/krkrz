@@ -8,9 +8,11 @@
 class GLVertexBufferObject {
 	GLuint vbo_id_;
 	GLenum target_;
+	GLenum usage_;
+	tjs_int size_;
 
 public:
-	GLVertexBufferObject() : vbo_id_(0), target_(0) {}
+	GLVertexBufferObject() : vbo_id_(0), target_(0), usage_(GL_STATIC_DRAW) {}
 
 	~GLVertexBufferObject() {
 		destory();
@@ -29,6 +31,28 @@ public:
 		glBindBuffer( GL_ARRAY_BUFFER, vbo_id_ );
 		glBufferData( GL_ARRAY_BUFFER, byteSize, (const void *)vtx, GL_STATIC_DRAW );
 		target_ = GL_ARRAY_BUFFER;
+		usage_ = GL_STATIC_DRAW;
+		size_ = byteSize;
+	}
+	void createVertexBuffer( tjs_int byteSize, GLenum usage, bool isIndex = false, const void* data = nullptr ) {
+		destory();
+		if( isIndex ) {
+			target_ = GL_ELEMENT_ARRAY_BUFFER;
+		} else {
+			target_ = GL_ARRAY_BUFFER;
+		}
+
+		glGenBuffers( 1, &vbo_id_ );
+		glBindBuffer( target_, vbo_id_ );
+		glBufferData( target_, byteSize, data, usage );
+		usage_ = usage;
+		size_ = byteSize;
+	}
+	void copyBuffer( GLintptr offset, GLsizeiptr size,  const GLvoid * data) {
+		if( vbo_id_ ) {
+			glBindBuffer( target_, vbo_id_ );
+			glBufferSubData( target_, offset, size, data );
+		}
 	}
 
 	void bindBuffer() const {
@@ -39,9 +63,25 @@ public:
 	void unbindBuffer() const {
 		glBindBuffer( target_, 0 );
 	}
+	void* mapBuffer() {
+		void* result = nullptr;
+		if( vbo_id_ ) {
+			glBindBuffer( target_, vbo_id_ );
+			result = glMapBufferRange( target_, 0, size_, GL_MAP_READ_BIT|GL_MAP_WRITE_BIT );
+		}
+		return result;
+	}
+	void unmapBuffer() {
+		glUnmapBuffer( target_ );
+	}
 	bool isCreated() const { return vbo_id_ != 0; }
 
 	GLuint id() const { return vbo_id_; }
+	GLenum usage() const { return usage_; }
+	GLenum target() const { return target_; }
+	tjs_int size() const { return  size_; }
+
+	bool isIndex() const { return target_ == GL_ELEMENT_ARRAY_BUFFER; }
 };
 
 

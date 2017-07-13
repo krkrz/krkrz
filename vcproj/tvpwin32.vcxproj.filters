@@ -737,6 +737,9 @@
     <ClInclude Include="..\visual\opengl\Matrix32Intf.h">
       <Filter>visual\opengl</Filter>
     </ClInclude>
+    <ClInclude Include="..\visual\opengl\VertexBufferIntf.h">
+      <Filter>visual\opengl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\tjs2\tjs.cpp">
@@ -1361,6 +1364,9 @@
       <Filter>visual\opengl</Filter>
     </ClCompile>
     <ClCompile Include="..\visual\opengl\Matrix32Intf.cpp">
+      <Filter>visual\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\opengl\VertexBufferIntf.cpp">
       <Filter>visual\opengl</Filter>
     </ClCompile>
   </ItemGroup>

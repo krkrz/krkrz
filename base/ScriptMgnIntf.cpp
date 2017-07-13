@@ -55,6 +55,7 @@
 #include "Matrix44Intf.h"
 #include "Matrix32Intf.h"
 #include "ShaderProgramIntf.h"
+#include "VertexBufferIntf.h"
 
 //---------------------------------------------------------------------------
 // global variables
@@ -208,6 +209,7 @@ void TVPInitScriptEngine()
 	REGISTER_OBJECT(Matrix44, TVPCreateNativeClass_Matrix44());
 	REGISTER_OBJECT(Matrix32, TVPCreateNativeClass_Matrix32());
 	REGISTER_OBJECT(ShaderProgram, TVPCreateNativeClass_ShaderProgram());
+	REGISTER_OBJECT(VertexBuffer, TVPCreateNativeClass_VertexBuffer());
 
 	/* WaveSoundBuffer and its filters */
 	iTJSDispatch2 * waveclass = NULL;
