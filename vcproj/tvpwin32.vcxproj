@@ -537,6 +537,7 @@
     <ClInclude Include="..\visual\opengl\OpenGLScreen.h" />
     <ClInclude Include="..\visual\opengl\ShaderProgramIntf.h" />
     <ClInclude Include="..\visual\opengl\TextureIntf.h" />
+    <ClInclude Include="..\visual\opengl\VertexBinderIntf.h" />
     <ClInclude Include="..\visual\opengl\VertexBufferIntf.h" />
     <ClInclude Include="..\visual\PrerenderedFont.h" />
     <ClInclude Include="..\visual\RectItf.h" />
@@ -776,6 +777,7 @@
     <ClCompile Include="..\visual\opengl\OpenGLScreen.cpp" />
     <ClCompile Include="..\visual\opengl\ShaderProgramIntf.cpp" />
     <ClCompile Include="..\visual\opengl\TextureIntf.cpp" />
+    <ClCompile Include="..\visual\opengl\VertexBinderIntf.cpp" />
     <ClCompile Include="..\visual\opengl\VertexBufferIntf.cpp" />
     <ClCompile Include="..\visual\PrerenderedFont.cpp" />
     <ClCompile Include="..\visual\RectItf.cpp" />

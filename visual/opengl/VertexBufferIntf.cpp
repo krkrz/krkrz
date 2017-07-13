@@ -156,21 +156,21 @@ void tTJSNI_VertexBuffer::BindFrameBuffer() {
 	VertexBufferObject.bindBuffer();
 }
 //---------------------------------------------------------------------------
-// tTJSNC_VertexBuffer : TJS Offscreen class
+// tTJSNC_VertexBuffer : TJS VertexBuffer class
 //---------------------------------------------------------------------------
 tjs_uint32 tTJSNC_VertexBuffer::ClassID = -1;
-tTJSNC_VertexBuffer::tTJSNC_VertexBuffer() : tTJSNativeClass(TJS_W("Offscreen"))
+tTJSNC_VertexBuffer::tTJSNC_VertexBuffer() : tTJSNativeClass(TJS_W("VertexBuffer"))
 {
 	// registration of native members
 
-	TJS_BEGIN_NATIVE_MEMBERS(Offscreen) // constructor
+	TJS_BEGIN_NATIVE_MEMBERS(VertexBuffer) // constructor
 	TJS_DECL_EMPTY_FINALIZE_METHOD
 //----------------------------------------------------------------------
-TJS_BEGIN_NATIVE_CONSTRUCTOR_DECL(/*var.name*/_this, /*var.type*/tTJSNI_VertexBuffer, /*TJS class name*/Offscreen)
+TJS_BEGIN_NATIVE_CONSTRUCTOR_DECL(/*var.name*/_this, /*var.type*/tTJSNI_VertexBuffer, /*TJS class name*/VertexBuffer)
 {
 	return TJS_S_OK;
 }
-TJS_END_NATIVE_CONSTRUCTOR_DECL(/*TJS class name*/Offscreen)
+TJS_END_NATIVE_CONSTRUCTOR_DECL(/*TJS class name*/VertexBuffer)
 //----------------------------------------------------------------------
 
 //-- methods
