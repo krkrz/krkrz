@@ -15,6 +15,7 @@ class tTJSNI_VertexBinder : public tTJSNativeInstance {
 	tjs_int Stride = 0;
 	tjs_uint ComponentCount = 4;
 	tjs_uint Offset = 0;
+	bool Normalize = false;
 
 private:
 	void SetVertexBufferObject( const tTJSVariant & val );
@@ -35,6 +36,8 @@ public:
 	void SetComponentCount( tjs_uint count ) { ComponentCount = count; }
 	tjs_uint GetOffset() const { return Offset; }
 	void SetOffset( tjs_uint offset ) { Offset = offset; }
+	bool GetNormalize() const { return Normalize; }
+	void SetNormalize( bool norm ) { Normalize = norm; }
 };
 
 

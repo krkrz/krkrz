@@ -317,11 +317,27 @@ TJS_BEGIN_NATIVE_PROP_DECL(dtUShort) {
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_PROP_DECL(dtInt) {
 	TJS_BEGIN_NATIVE_PROP_GETTER {
-		*result = (tjs_int)GL_FIXED;
+		*result = (tjs_int)GL_INT;
 		return TJS_S_OK;
 	} TJS_END_NATIVE_PROP_GETTER
 	TJS_DENY_NATIVE_PROP_SETTER
 } TJS_END_NATIVE_STATIC_PROP_DECL(dtInt)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(dtUInt) {
+	TJS_BEGIN_NATIVE_PROP_GETTER {
+		*result = (tjs_int)GL_UNSIGNED_INT;
+		return TJS_S_OK;
+	} TJS_END_NATIVE_PROP_GETTER
+	TJS_DENY_NATIVE_PROP_SETTER
+} TJS_END_NATIVE_STATIC_PROP_DECL(dtUInt)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(dtFixed) {
+	TJS_BEGIN_NATIVE_PROP_GETTER {
+		*result = (tjs_int) GL_FIXED;
+		return TJS_S_OK;
+	} TJS_END_NATIVE_PROP_GETTER
+	TJS_DENY_NATIVE_PROP_SETTER
+} TJS_END_NATIVE_STATIC_PROP_DECL(dtFixed)
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_PROP_DECL(dtFloat) {
 	TJS_BEGIN_NATIVE_PROP_GETTER {
@@ -354,6 +370,62 @@ TJS_BEGIN_NATIVE_PROP_DECL(utDynamic) {
 	} TJS_END_NATIVE_PROP_GETTER
 	TJS_DENY_NATIVE_PROP_SETTER
 } TJS_END_NATIVE_STATIC_PROP_DECL(utDynamic)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(ptPoints) {
+	TJS_BEGIN_NATIVE_PROP_GETTER {
+		*result = (tjs_int)GL_POINTS;
+		return TJS_S_OK;
+	} TJS_END_NATIVE_PROP_GETTER
+	TJS_DENY_NATIVE_PROP_SETTER
+} TJS_END_NATIVE_STATIC_PROP_DECL(ptPoints)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(ptLineStrip) {
+	TJS_BEGIN_NATIVE_PROP_GETTER {
+		*result = (tjs_int)GL_LINE_STRIP;
+		return TJS_S_OK;
+	} TJS_END_NATIVE_PROP_GETTER
+	TJS_DENY_NATIVE_PROP_SETTER
+} TJS_END_NATIVE_STATIC_PROP_DECL(ptLineStrip)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(ptLineLoop) {
+	TJS_BEGIN_NATIVE_PROP_GETTER {
+		*result = (tjs_int)GL_LINE_LOOP;
+		return TJS_S_OK;
+	} TJS_END_NATIVE_PROP_GETTER
+	TJS_DENY_NATIVE_PROP_SETTER
+} TJS_END_NATIVE_STATIC_PROP_DECL(ptLineLoop)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(ptLines) {
+	TJS_BEGIN_NATIVE_PROP_GETTER {
+		*result = (tjs_int)GL_LINES;
+		return TJS_S_OK;
+	} TJS_END_NATIVE_PROP_GETTER
+	TJS_DENY_NATIVE_PROP_SETTER
+} TJS_END_NATIVE_STATIC_PROP_DECL(ptLines)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(ptTriangleStrip) {
+	TJS_BEGIN_NATIVE_PROP_GETTER {
+		*result = (tjs_int)GL_TRIANGLE_STRIP;
+		return TJS_S_OK;
+	} TJS_END_NATIVE_PROP_GETTER
+	TJS_DENY_NATIVE_PROP_SETTER
+} TJS_END_NATIVE_STATIC_PROP_DECL(ptTriangleStrip)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(ptTriangleFan) {
+	TJS_BEGIN_NATIVE_PROP_GETTER {
+		*result = (tjs_int)GL_TRIANGLE_FAN;
+		return TJS_S_OK;
+	} TJS_END_NATIVE_PROP_GETTER
+	TJS_DENY_NATIVE_PROP_SETTER
+} TJS_END_NATIVE_STATIC_PROP_DECL(ptTriangleFan)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(ptTriangles) {
+	TJS_BEGIN_NATIVE_PROP_GETTER {
+		*result = (tjs_int)GL_TRIANGLES;
+		return TJS_S_OK;
+	} TJS_END_NATIVE_PROP_GETTER
+	TJS_DENY_NATIVE_PROP_SETTER
+} TJS_END_NATIVE_STATIC_PROP_DECL(ptTriangles)
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------

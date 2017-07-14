@@ -152,6 +152,26 @@ TJS_BEGIN_NATIVE_PROP_DECL(offset)
 }
 TJS_END_NATIVE_PROP_DECL(offset)
 //----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(normalize)
+{
+	TJS_BEGIN_NATIVE_PROP_GETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_VertexBinder);
+		*result = (tjs_int64)_this->GetNormalize();
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_GETTER
+
+	TJS_BEGIN_NATIVE_PROP_SETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_VertexBinder);
+		_this->SetNormalize( (tjs_uint)(tjs_int64)*param );
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_PROP_DECL(normalize)
+//----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
 

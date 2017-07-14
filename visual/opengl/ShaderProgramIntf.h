@@ -21,7 +21,9 @@ struct tTVPShaderVariant {
 		UnsingedInteger,
 		IntegerArray,
 		FloatArray,
-		UnsingedIntegerArray
+		UnsingedIntegerArray,
+		Texture,
+		Vertex,
 	};
 	union ShaderValue {
 		GLint		i;
@@ -30,12 +32,14 @@ struct tTVPShaderVariant {
 		GLint		*ai;
 		GLfloat		*af;
 		GLuint		*aui;
+		tTJSVariant	*v;
 		ShaderValue( GLint v ) : i( v ) {}
 		ShaderValue( GLfloat v ) : f( v ) {}
 		ShaderValue( GLuint v ) : ui( v ) {}
 		ShaderValue( GLint v[] ) : ai( v ) {}
 		ShaderValue( GLfloat v[] ) : af( v ) {}
 		ShaderValue( GLuint v[] ) : aui( v ) {}
+		ShaderValue( tTJSVariant *v ) : v( v ) {}
 	} Value;
 	ValueType Type;
 
@@ -49,6 +53,7 @@ struct tTVPShaderVariant {
 	tTVPShaderVariant( GLint *v ) : Value( v ), Type( ValueType::IntegerArray ) {}
 	tTVPShaderVariant( GLfloat *v ) : Value( v ), Type( ValueType::FloatArray ) {}
 	tTVPShaderVariant( GLuint *v ) : Value( v ), Type( ValueType::UnsingedIntegerArray ) {}
+	tTVPShaderVariant( tTJSVariant *v, ValueType t ) : Value( v ), Type( t ) {}
 	~tTVPShaderVariant() {
 		switch( Type ) {
 		case ValueType::IntegerArray:
@@ -60,6 +65,12 @@ struct tTVPShaderVariant {
 		case ValueType::UnsingedIntegerArray:
 			delete[] Value.aui;
 			break;
+		case ValueType::Texture:
+			delete Value.v;
+			break;
+		case ValueType::Vertex:
+			delete Value.v;
+			break;
 		}
 	}
 	operator GLint() const { return Value.i; }
@@ -68,6 +79,7 @@ struct tTVPShaderVariant {
 	operator GLint*() const { return Value.ai; }
 	operator GLfloat*( ) const { return Value.af; }
 	operator GLuint*( ) const { return Value.aui; }
+	operator tTJSVariant*() const { return Value.v; }
 };
 
 struct tTVPShaderParameter {
@@ -85,7 +97,7 @@ struct tTVPShaderParameter {
 	std::unique_ptr<tTVPShaderVariant> Value;
 
 	void Set( const tTJSVariant *param );
-	void SetToShader();
+	void SetToShader( tjs_int* texCount=nullptr, tjs_int* vertexCount=nullptr );
 
 	static GLint* ArrayToInt( const tTJSVariant *param, tjs_int rqCount );
 	static GLfloat* ArrayToFloat( const tTJSVariant *param, tjs_int rqCount );
@@ -96,6 +108,8 @@ struct tTVPShaderParameter {
 class tTJSNI_ShaderProgram : public tTJSNativeInstance {
 	GLuint Program;
 	std::vector<std::unique_ptr<tTVPShaderParameter> > Parameters;
+	tjs_int BindTextureCount = 0;
+	tjs_int BindVertexCount = 0;
 
 private:
 	/**
@@ -113,7 +127,20 @@ public:
 	tjs_error SetShaderParam( const ttstr& name, const tTJSVariant *param );
 	GLint FindLocation( const std::string name ) const;
 
+	/**
+	 * 固定メンバを除くUniformを設定する
+	 */
 	void SetupProgram();
+
+	/**
+	 * Uniformだけでなく、プロパティに設定されたAttributeな要素、Textureも設定する。
+	 */
+	void SetupProgramFull();
+
+	/**
+	 * SetupProgramFullで設定されたテクスチャと頂点情報を解除する
+	 */
+	void UnbindParam();
 };
 
 

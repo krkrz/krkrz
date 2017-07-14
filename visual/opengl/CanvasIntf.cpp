@@ -20,6 +20,8 @@
 #include "CharacterSet.h"
 #include "GLShaderUtil.h"
 #include "ShaderProgramIntf.h"
+#include "VertexBinderIntf.h"
+#include "VertexBufferIntf.h"
 
 #include <memory>
 
@@ -492,6 +494,9 @@ void tTJSNI_Canvas::DrawTexture( const iTVPTextureInfoIntrface* texture, tTJSNI_
 	shader->SetupProgram();
 	SetupTextureDrawing( shader, texture, Matrix32Instance, ssize );
 	glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
+
+	glActiveTexture( GL_TEXTURE0 );
+	glBindTexture( GL_TEXTURE_2D, 0 );
 }
 //----------------------------------------------------------------------
 void tTJSNI_Canvas::DrawTexture( const iTVPTextureInfoIntrface* texture0, const iTVPTextureInfoIntrface* texture1, tTJSNI_ShaderProgram* shader ) {
@@ -508,6 +513,11 @@ void tTJSNI_Canvas::DrawTexture( const iTVPTextureInfoIntrface* texture0, const 
 	glBindTexture( GL_TEXTURE_2D, (GLuint)texture1->GetNativeHandle() );
 	glUniform1i( texLoc, 1 );
 	glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
+
+	glActiveTexture( GL_TEXTURE0 );
+	glBindTexture( GL_TEXTURE_2D, 0 );
+	glActiveTexture( GL_TEXTURE1 );
+	glBindTexture( GL_TEXTURE_2D, 0 );
 }
 //----------------------------------------------------------------------
 void tTJSNI_Canvas::DrawTexture( const iTVPTextureInfoIntrface* texture0, const iTVPTextureInfoIntrface* texture1, const iTVPTextureInfoIntrface* texture2, tTJSNI_ShaderProgram* shader ) {
@@ -529,10 +539,67 @@ void tTJSNI_Canvas::DrawTexture( const iTVPTextureInfoIntrface* texture0, const 
 	glBindTexture( GL_TEXTURE_2D, (GLuint)texture2->GetNativeHandle() );
 	glUniform1i( texLoc, 2 );
 	glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
+
+	glActiveTexture( GL_TEXTURE0 );
+	glBindTexture( GL_TEXTURE_2D, 0 );
+	glActiveTexture( GL_TEXTURE1 );
+	glBindTexture( GL_TEXTURE_2D, 0 );
+	glActiveTexture( GL_TEXTURE2 );
+	glBindTexture( GL_TEXTURE_2D, 0 );
 }
 //----------------------------------------------------------------------
 void tTJSNI_Canvas::DrawText( class tTJSNI_Font* font, tjs_int x, tjs_int y, const ttstr& text, tjs_uint32 color ) { /* TODO: 次期実装 */}
-// 
+//----------------------------------------------------------------------
+void tTJSNI_Canvas::DrawMesh( tTJSNI_ShaderProgram* shader, tjs_int primitiveType, tjs_int offset, tjs_int count ) {
+	if( count <= 0 ) return;
+
+	SetupEachDrawing();
+
+	tTVPPoint ssize;
+	ssize.x = GetCanvasWidth();
+	ssize.y = GetCanvasHeight();
+	shader->SetupProgramFull();
+
+	GLint matLoc = shader->FindLocation( std::string( "a_modelMat4" ) );
+	if( matLoc >= 0 ) {
+		glUniformMatrix4fv( matLoc, 1, GL_FALSE, Matrix32Instance->GetMatrixArray16() );
+	}
+	GLint vpLoc = shader->FindLocation( std::string( "a_size" ) );
+	if( vpLoc >= 0 ) {
+		glUniform2f( vpLoc, (float)ssize.x, (float)ssize.y );
+	}
+	glDrawArrays( primitiveType, offset, count );
+
+	shader->UnbindParam();
+}
+//----------------------------------------------------------------------
+void tTJSNI_Canvas::DrawMesh( tTJSNI_ShaderProgram* shader, tjs_int primitiveType, const tTJSNI_VertexBinder* index, tjs_int count ) {
+	if( count <= 0 ) return;
+	GLenum type = (GLenum)index->GetVertexBuffer()->GetDataType();
+	if( type != GL_UNSIGNED_BYTE && type != GL_UNSIGNED_SHORT && type != GL_UNSIGNED_INT ) {
+		TVPThrowExceptionMessage( TJS_W("Index type is invalid.") );
+		return;
+	}
+
+	SetupEachDrawing();
+
+	tTVPPoint ssize;
+	ssize.x = GetCanvasWidth();
+	ssize.y = GetCanvasHeight();
+	shader->SetupProgramFull();
+
+	GLint matLoc = shader->FindLocation( std::string( "a_modelMat4" ) );
+	if( matLoc >= 0 ) {
+		glUniformMatrix4fv( matLoc, 1, GL_FALSE, Matrix32Instance->GetMatrixArray16() );
+	}
+	GLint vpLoc = shader->FindLocation( std::string( "a_size" ) );
+	if( vpLoc >= 0 ) {
+		glUniform2f( vpLoc, (float)ssize.x, (float)ssize.y );
+	}
+	glDrawElements( primitiveType, count, type, (const GLvoid *)index->GetOffset() );
+
+	shader->UnbindParam();
+}
 //----------------------------------------------------------------------
 void tTJSNI_Canvas::Save() {
 	StateStack.push_back(std::unique_ptr<tTVPCanvasState>( new tTVPCanvasState( Matrix32Instance, ClipRectInstance, EnableClipRect ) ) );
@@ -734,14 +801,12 @@ void tTJSNI_Canvas::SetEnableClipRect( bool b ) {
  * テクスチャとして使用できるTJS2クラスインスタンス群から、テクスチャインターフェイスを取得する。
  * テクスチャとして使用できるクラスを問わず、テクスチャ描画するための関数
  */
-static const iTVPTextureInfoIntrface* GetTextureInfo( tTJSVariant *param ) {
-	tTJSNI_Texture* texture = (tTJSNI_Texture*)TJSGetNativeInstance( tTJSNC_Texture::ClassID, param );
+const iTVPTextureInfoIntrface* TVPGetTextureInfo( const tTJSVariant *param ) {
+	const tTJSNI_Texture* texture = (const tTJSNI_Texture*)TJSGetNativeInstance( tTJSNC_Texture::ClassID, param );
 	if( texture ) return texture;
 
-
-	tTJSNI_Offscreen* offscreen = (tTJSNI_Offscreen*)TJSGetNativeInstance( tTJSNC_Offscreen::ClassID, param );
+	const tTJSNI_Offscreen* offscreen = (const tTJSNI_Offscreen*)TJSGetNativeInstance( tTJSNC_Offscreen::ClassID, param );
 	if( offscreen ) return offscreen;
-
 
 	return nullptr;
 }
@@ -792,7 +857,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/capture)
 	bool front = true;
 	if( numparams > 1 ) front = ( (tjs_int)param[1] ) ? true : false;
 
-	const iTVPTextureInfoIntrface* texture = GetTextureInfo( param[0] );
+	const iTVPTextureInfoIntrface* texture = TVPGetTextureInfo( param[0] );
 	if( texture ) {
 		_this->Capture( texture, front );
 	} else {
@@ -884,29 +949,29 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/drawTexture )
 	if( numparams < 1 ) return TJS_E_BADPARAMCOUNT;
 
 	if( numparams == 1 ) {
-		const iTVPTextureInfoIntrface* texture = GetTextureInfo( param[0] );
+		const iTVPTextureInfoIntrface* texture = TVPGetTextureInfo( param[0] );
 		if( !texture ) return TJS_E_INVALIDPARAM;
 		_this->DrawTexture( texture );
 	} else if( numparams == 2 ) {
-		const iTVPTextureInfoIntrface* texture = GetTextureInfo( param[0] );
+		const iTVPTextureInfoIntrface* texture = TVPGetTextureInfo( param[0] );
 		if( !texture ) return TJS_E_INVALIDPARAM;
 		tTJSNI_ShaderProgram* shader = (tTJSNI_ShaderProgram*)TJSGetNativeInstance( tTJSNC_ShaderProgram::ClassID, param[1] );
 		if( !shader ) return TJS_E_INVALIDPARAM;
 		_this->DrawTexture( texture, shader );
 	} else if( numparams == 3 ) {
-		const iTVPTextureInfoIntrface* texture0 = GetTextureInfo( param[0] );
+		const iTVPTextureInfoIntrface* texture0 = TVPGetTextureInfo( param[0] );
 		if( !texture0 ) return TJS_E_INVALIDPARAM;
-		const iTVPTextureInfoIntrface* texture1 = GetTextureInfo( param[1] );
+		const iTVPTextureInfoIntrface* texture1 = TVPGetTextureInfo( param[1] );
 		if( !texture1 ) return TJS_E_INVALIDPARAM;
 		tTJSNI_ShaderProgram* shader = (tTJSNI_ShaderProgram*)TJSGetNativeInstance( tTJSNC_ShaderProgram::ClassID, param[2] );
 		if( !shader ) return TJS_E_INVALIDPARAM;
 		_this->DrawTexture( texture0, texture1, shader );
 	} else if( numparams == 4 ) {
-		const iTVPTextureInfoIntrface* texture0 = GetTextureInfo( param[0] );
+		const iTVPTextureInfoIntrface* texture0 = TVPGetTextureInfo( param[0] );
 		if( !texture0 ) return TJS_E_INVALIDPARAM;
-		const iTVPTextureInfoIntrface* texture1 = GetTextureInfo( param[1] );
+		const iTVPTextureInfoIntrface* texture1 = TVPGetTextureInfo( param[1] );
 		if( !texture1 ) return TJS_E_INVALIDPARAM;
-		const iTVPTextureInfoIntrface* texture2 = GetTextureInfo( param[2] );
+		const iTVPTextureInfoIntrface* texture2 = TVPGetTextureInfo( param[2] );
 		if( !texture2 ) return TJS_E_INVALIDPARAM;
 		tTJSNI_ShaderProgram* shader = (tTJSNI_ShaderProgram*)TJSGetNativeInstance( tTJSNC_ShaderProgram::ClassID, param[3] );
 		if( !shader ) return TJS_E_INVALIDPARAM;
@@ -940,6 +1005,36 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/drawText)
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/drawText)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/drawMesh)
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas);
+	if( numparams < 2 ) return TJS_E_BADPARAMCOUNT;
+
+	tTJSNI_ShaderProgram* shader = (tTJSNI_ShaderProgram*)TJSGetNativeInstance( tTJSNC_ShaderProgram::ClassID, param[0] );
+	if( !shader ) return TJS_E_INVALIDPARAM;
+
+	if( param[1]->Type() == tvtObject ) {
+		if( numparams < 3 ) return TJS_E_BADPARAMCOUNT;
+
+		tTJSNI_VertexBinder* index = (tTJSNI_VertexBinder*)TJSGetNativeInstance( tTJSNC_VertexBinder::ClassID, param[1] );
+		if( !index ) return TJS_E_INVALIDPARAM;
+
+		tjs_int count = *param[2];
+		tjs_int type = (tjs_int)GL_TRIANGLES;
+		if( numparams >= 4 ) type = *param[3];
+		_this->DrawMesh( shader, type, index, count );
+	} else {
+		tjs_int count = *param[1];
+		tjs_int type = (tjs_int)GL_TRIANGLES;
+		if( numparams >= 3 ) type = *param[2];
+		tjs_int offset = 0;
+		if( numparams >= 4 ) offset = *param[3];
+		_this->DrawMesh( shader, type, offset, count );
+	}
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/drawMesh)
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/flush )
 {

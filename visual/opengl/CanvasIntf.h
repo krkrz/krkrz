@@ -157,6 +157,9 @@ public:
 	void DrawTexture( const class iTVPTextureInfoIntrface* texture0, const class iTVPTextureInfoIntrface* texture1, const class iTVPTextureInfoIntrface* texture2, class tTJSNI_ShaderProgram* shader );
 	void DrawText( class tTJSNI_Font* font, tjs_int x, tjs_int y, const ttstr& text, tjs_uint32 color );
 
+	void DrawMesh( class tTJSNI_ShaderProgram* shader, tjs_int primitiveType, tjs_int offset, tjs_int count );
+	void DrawMesh( class tTJSNI_ShaderProgram* shader, tjs_int primitiveType, const class tTJSNI_VertexBinder* index, tjs_int count );
+
 	// 状態をセーブする
 	void Save();
 	// 状態を元に戻す
