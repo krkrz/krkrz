@@ -6,6 +6,7 @@
 #include "BitmapIntf.h"
 #include "LayerBitmapIntf.h"
 #include "tvpgl.h"
+#include <memory>
 
 #ifdef ANDROID
 extern bool TVPIsSupportGLES3();

@@ -660,7 +660,7 @@ tFreeTypeFace::tFreeTypeFace(const std::vector<tjs_string> &fontname, tjs_uint32
 			}
 		}
 #else
-		if( Face == nullptr )
+		if( Faces[i]->Face == nullptr )
 		{
 			if( options & TVP_FACE_OPTIONS_FILE )
 			{

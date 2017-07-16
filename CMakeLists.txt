@@ -17,6 +17,7 @@ external/libjpeg-turbo/android
 external/libogg/include
 external/opus/include
 external/opusfile/include
+external/glm/
 base
 extension
 sound
@@ -191,14 +192,18 @@ visual/gl/blend_function.cpp
 visual/gl/ResampleImage.cpp
 visual/gl/WeightFunctor.cpp
 visual/opengl/CanvasIntf.cpp
+visual/opengl/GLFrameBufferObject.cpp
 visual/opengl/GLShaderUtil.cpp
-visual/opengl/GLTextureDrawing.cpp
+visual/opengl/Matrix32Intf.cpp
 visual/opengl/Matrix44Intf.cpp
 visual/opengl/Mesh2DIntf.cpp
 visual/opengl/OffscreenIntf.cpp
 visual/opengl/OpenGLPlatformAndroid.cpp
 visual/opengl/OpenGLScreen.cpp
-visual/opengl/TextureIntf.cpp )
+visual/opengl/ShaderProgramIntf.cpp
+visual/opengl/TextureIntf.cpp
+visual/opengl/VertexBinderIntf.cpp
+visual/opengl/VertexBufferIntf.cpp )
 
 if( ANDROID_ABI STREQUAL x86 OR ANDROID_ABI STREQUAL x86_64 )
 	list(APPEND KRKRZ_SRC 
@@ -229,9 +234,11 @@ add_library( cpufeatures ${ANDROID_NDK}/sources/android/cpufeatures/cpu-features
 # add_library(native_app_glue ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c)
 
 # ndk_helper
-include_directories( ${ANDROID_NDK}/sources/android/ndk_helper ${ANDROID_NDK}/sources/android/native_app_glue )
-file( GLOB _NDK_HELPER_SRCS ${ANDROID_NDK}/sources/android/ndk_helper/*.cpp ${ANDROID_NDK}/sources/android/ndk_helper/gl3stub.c )
-add_library( ndk_helper ${_NDK_HELPER_SRCS} )
+#include_directories( ${ANDROID_NDK}/sources/android/ndk_helper ${ANDROID_NDK}/sources/android/native_app_glue )
+#file( GLOB _NDK_HELPER_SRCS ${ANDROID_NDK}/sources/android/ndk_helper/*.cpp ${ANDROID_NDK}/sources/android/ndk_helper/gl3stub.c )
+#add_library( ndk_helper ${_NDK_HELPER_SRCS} )
+include_directories( ${ANDROID_NDK}/sources/android/ndk_helper )
+add_library( ndk_helper ${ANDROID_NDK}/sources/android/ndk_helper/gl3stub.c )
 
 
 find_library( log-lib log )

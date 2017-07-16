@@ -527,14 +527,14 @@ void TJS_INTF_METHOD tTJSNI_ShaderProgram::Invalidate() {
 }
 //---------------------------------------------------------------------------
 bool tTJSNI_ShaderProgram::HasShaderMemeber( const ttstr& name ) const {
-	for( auto& i = Parameters.begin(); i != Parameters.end(); i++ ) {
+	for( auto i = Parameters.begin(); i != Parameters.end(); i++ ) {
 		if( ( *i )->TjsName == name ) return true;
 	}
 	return false;
 }
 //---------------------------------------------------------------------------
 tjs_error tTJSNI_ShaderProgram::SetShaderParam( const ttstr& name, const tTJSVariant *param ) {
-	for( auto& i = Parameters.begin(); i != Parameters.end(); i++ ) {
+	for( auto i = Parameters.begin(); i != Parameters.end(); i++ ) {
 		if( ( *i )->TjsName == name ) {
 			std::unique_ptr<tTVPShaderParameter>& sp = *i;
 			sp->Set( param );
@@ -545,7 +545,7 @@ tjs_error tTJSNI_ShaderProgram::SetShaderParam( const ttstr& name, const tTJSVar
 }
 //---------------------------------------------------------------------------
 GLint tTJSNI_ShaderProgram::FindLocation( const std::string name ) const {
-	for( auto& i = Parameters.begin(); i != Parameters.end(); i++ ) {
+	for( auto i = Parameters.begin(); i != Parameters.end(); i++ ) {
 		if( ( *i )->Name == name ) return ( *i )->Id;
 	}
 	return -1;
@@ -553,7 +553,7 @@ GLint tTJSNI_ShaderProgram::FindLocation( const std::string name ) const {
 //---------------------------------------------------------------------------
 void tTJSNI_ShaderProgram::SetupProgram() {
 	glUseProgram( Program );
-	for( auto& i = Parameters.begin(); i != Parameters.end(); i++ ) {
+	for( auto i = Parameters.begin(); i != Parameters.end(); i++ ) {
 		if( ( *i )->Type == tTVPShaderParameter::TypeName::Uniform ) {
 			if( ( *i )->Value ) {
 				( *i )->SetToShader();
@@ -568,7 +568,7 @@ void tTJSNI_ShaderProgram::SetupProgramFull() {
 	tjs_int texCount = 0;
 	tjs_int vtxCount = 0;
 	glUseProgram( Program );
-	for( auto& i = Parameters.begin(); i != Parameters.end(); i++ ) {
+	for( auto i = Parameters.begin(); i != Parameters.end(); i++ ) {
 		if( ( *i )->Value ) {
 			( *i )->SetToShader( &texCount, &vtxCount );
 		}
@@ -583,7 +583,7 @@ void tTJSNI_ShaderProgram::UnbindParam() {
 		glBindTexture( GL_TEXTURE_2D, 0 );
 	}
 	if( BindVertexCount ) {
-		for( auto& i = Parameters.begin(); i != Parameters.end(); i++ ) {
+		for( auto i = Parameters.begin(); i != Parameters.end(); i++ ) {
 			if( ( *i )->Type == tTVPShaderParameter::TypeName::Attribute ) {
 				glDisableVertexAttribArray( ( *i )->Id );
 			}
