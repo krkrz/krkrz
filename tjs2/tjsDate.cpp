@@ -22,7 +22,27 @@ note:
 	The author assumes that it is a compiler dependented problem, so any remedies
 	are not given here.
 */
-
+#ifdef WIN32
+typedef struct timeval {
+	time_t tv_sec;
+	long tv_usec;
+} timeval;
+int gettimeofday(struct timeval * tp, struct timezone * tzp)
+{
+	static const uint64_t EPOCH = ((uint64_t) 116444736000000000ULL);
+	FILETIME file_time;
+	uint64_t time;
+	GetSystemTimeAsFileTime( &file_time );
+	time = ((uint64_t)file_time.dwLowDateTime );
+	time += ((uint64_t)file_time.dwHighDateTime) << 32;
+	time -= EPOCH;
+	tp->tv_sec  = (time_t) ( time / 10000000L );
+	tp->tv_usec = (long) ( ( time % 10000000L ) / 10 );
+	return 0;
+}
+#else
+#include <sys/time.h>
+#endif
 namespace TJS
 {
 //---------------------------------------------------------------------------
@@ -55,8 +75,10 @@ TJS_BEGIN_NATIVE_CONSTRUCTOR_DECL(/*var. name*/_this, /*var. type*/tTJSNI_Date,
 {
 	if(numparams == 0)
 	{
-		time_t curtime;
-		_this->DateTime = time(&curtime); // GMT current date/time
+		struct timeval tv;
+		gettimeofday( &tv, nullptr );
+		_this->DateTime = tv.tv_sec;
+		_this->MillSeconds = tv.tv_usec / 1000;
 	}
 	else if(numparams >= 1)
 	{
@@ -84,7 +106,6 @@ TJS_BEGIN_NATIVE_CONSTRUCTOR_DECL(/*var. name*/_this, /*var. type*/tTJSNI_Date,
 			t.tm_sec = s;
 			_this->DateTime = mktime(&t);
 			if(_this->DateTime == -1) TJS_eTJSError(TJSInvalidValueForTimestamp);
-//			_this->DateTime -= TJS_timezone;
 		}
 	}
 
@@ -201,6 +222,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/setTime)
 	if(numparams < 1) return TJS_E_BADPARAMCOUNT;
 
 	_this->DateTime = (time_t)(param[0]->AsInteger()/1000L);
+	_this->MillSeconds = (tjs_uint32)(param[0]->AsInteger()%1000L);
 
 	return TJS_S_OK;
 }
@@ -283,7 +305,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/getTime)
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Date);
 
 	if(result) result->CopyRef(tTJSVariant(
-			(tjs_int64)(_this->DateTime)*1000L));
+			(tjs_int64)(_this->DateTime)*1000L + (tjs_int64)(_this->MillSeconds) ));
 
 	return TJS_S_OK;
 }

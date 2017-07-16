@@ -23,6 +23,7 @@ class tTJSNI_Date : public tTJSNativeInstance
 public:
 	tTJSNI_Date();
 	time_t DateTime;
+	tjs_uint32 MillSeconds = 0;
 private:
 };
 
