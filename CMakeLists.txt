@@ -192,6 +192,7 @@ visual/gl/blend_function.cpp
 visual/gl/ResampleImage.cpp
 visual/gl/WeightFunctor.cpp
 visual/opengl/CanvasIntf.cpp
+visual/opengl/DrawCycleTimer.cpp
 visual/opengl/GLFrameBufferObject.cpp
 visual/opengl/GLShaderUtil.cpp
 visual/opengl/Matrix32Intf.cpp

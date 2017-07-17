@@ -740,6 +740,9 @@
     <ClInclude Include="..\visual\opengl\VertexBinderIntf.h">
       <Filter>visual\opengl</Filter>
     </ClInclude>
+    <ClInclude Include="..\visual\opengl\DrawCycleTimer.h">
+      <Filter>visual\opengl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\tjs2\tjs.cpp">
@@ -1367,6 +1370,9 @@
       <Filter>visual\opengl</Filter>
     </ClCompile>
     <ClCompile Include="..\visual\opengl\VertexBinderIntf.cpp">
+      <Filter>visual\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\visual\opengl\DrawCycleTimer.cpp">
       <Filter>visual\opengl</Filter>
     </ClCompile>
   </ItemGroup>

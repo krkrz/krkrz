@@ -3,7 +3,6 @@
 
 #include "CanvasIntf.h"
 #include "Matrix32Intf.h"
-#include "Mesh2DIntf.h"
 #include "OffscreenIntf.h"
 #include "TextureIntf.h"
 #include "BitmapIntf.h"
@@ -795,6 +794,10 @@ void tTJSNI_Canvas::SetEnableClipRect( bool b ) {
 	} else {
 		EnableClipRect = b;
 	}
+}
+//----------------------------------------------------------------------
+void tTJSNI_Canvas::SetWaitVSync( bool b ) {
+	if( GLScreen ) GLScreen->SetWaitVSync( b );
 }
 //----------------------------------------------------------------------
 /**

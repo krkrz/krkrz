@@ -524,6 +524,7 @@
     <ClInclude Include="..\visual\LayerTreeOwnerImpl.h" />
     <ClInclude Include="..\visual\NullDrawDevice.h" />
     <ClInclude Include="..\visual\opengl\CanvasIntf.h" />
+    <ClInclude Include="..\visual\opengl\DrawCycleTimer.h" />
     <ClInclude Include="..\visual\opengl\GLFrameBufferObject.h" />
     <ClInclude Include="..\visual\opengl\GLShaderUtil.h" />
     <ClInclude Include="..\visual\opengl\GLTexture.h" />
@@ -766,6 +767,7 @@
     <ClCompile Include="..\visual\LoadTLG.cpp" />
     <ClCompile Include="..\visual\NullDrawDevice.cpp" />
     <ClCompile Include="..\visual\opengl\CanvasIntf.cpp" />
+    <ClCompile Include="..\visual\opengl\DrawCycleTimer.cpp" />
     <ClCompile Include="..\visual\opengl\GLFrameBufferObject.cpp" />
     <ClCompile Include="..\visual\opengl\GLShaderUtil.cpp" />
     <ClCompile Include="..\visual\opengl\Matrix32Intf.cpp" />

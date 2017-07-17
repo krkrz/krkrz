@@ -305,7 +305,13 @@ void tTJSNI_BaseWindow::FireOnActivate(bool activate_or_deactivate)
 //---------------------------------------------------------------------------
 void tTJSNI_BaseWindow::StartDrawing()
 {
+	if( DrawCycleTimer ) DrawCycleTimer->ResetDrawCycle();
 	TVPPostInputEvent( new tTVPOnDrawInputEvent(this), TVP_EPT_REMOVE_POST /* to discard redundant events */ );
+}
+//---------------------------------------------------------------------------
+void tTJSNI_BaseWindow::StartDrawingInternal()
+{
+	TVPPostInputEvent( new tTVPOnDrawInputEvent( this ), TVP_EPT_REMOVE_POST /* to discard redundant events */ );
 }
 //---------------------------------------------------------------------------
 void tTJSNI_BaseWindow::SetDrawDeviceObject(const tTJSVariant & val)
@@ -838,7 +844,23 @@ bool tTJSNI_BaseWindow::GetWaitVSync() const
 	return WaitVSync;
 }
 //---------------------------------------------------------------------------
+void tTJSNI_BaseWindow::SetDrawCycle( tjs_uint32 cycle ) {
+	if( !CanvasInstance ) return;
 
+	if( !DrawCycleTimer ) DrawCycleTimer.reset( new tTVPDrawCycleTimer(this) );
+	DrawCycleTimer->SetDrawCycle( cycle );
+}
+//---------------------------------------------------------------------------
+tjs_uint32 tTJSNI_BaseWindow::GetDrawCycle() const {
+	if( !CanvasInstance ) return 0;
+	if( !DrawCycleTimer ) return 0;
+	return DrawCycleTimer->GetDrawCycle();
+}
+//---------------------------------------------------------------------------
+void tTJSNI_BaseWindow::ResetDrawCycle() {
+	if( !CanvasInstance ) return;
+}
+//---------------------------------------------------------------------------
 
 
 
@@ -2056,6 +2078,26 @@ TJS_BEGIN_NATIVE_PROP_DECL(layerTreeOwnerInterface)
 }
 TJS_END_NATIVE_PROP_DECL(layerTreeOwnerInterface)
 //----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL( drawCycle )
+{
+	TJS_BEGIN_NATIVE_PROP_GETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window );
+	*result = (tjs_int)_this->GetDrawCycle();
+	return TJS_S_OK;
+	}
+		TJS_END_NATIVE_PROP_GETTER
+
+		TJS_BEGIN_NATIVE_PROP_SETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window );
+	_this->SetDrawCycle( ( (tjs_uint32)(tjs_int)*param ) );
+	return TJS_S_OK;
+	}
+		TJS_END_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_PROP_DECL( drawCycle )
+//---------------------------------------------------------------------------
 
 	TJS_END_NATIVE_MEMBERS
 

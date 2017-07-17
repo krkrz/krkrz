@@ -174,6 +174,8 @@ public:
 	tjs_uint GetHeight() const;
 	void SetEnableClipRect( bool b );
 	bool GetEnableClipRect() const { return EnableClipRect; }
+
+	void SetWaitVSync( bool b );
 };
 
 

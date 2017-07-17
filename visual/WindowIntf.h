@@ -19,8 +19,9 @@
 #include "ObjectList.h"
 #include "DrawDevice.h"
 #include "LayerTreeOwner.h"
+#include "DrawCycleTimer.h"
 
-
+#include <memory>
 
 //---------------------------------------------------------------------------
 // Window List Management
@@ -166,6 +167,7 @@ public:
 	virtual bool GetWindowActive() = 0;
 	void FireOnActivate(bool activate_or_deactivate);
 	void StartDrawing();
+	void StartDrawingInternal();
 
 	//-- interface to draw device
 public:
@@ -280,12 +282,17 @@ public:
 
 	//----- vsync
 protected:
+	std::unique_ptr<tTVPDrawCycleTimer> DrawCycleTimer;
 	bool WaitVSync;
 	virtual void UpdateVSyncThread() = 0;
 
 public:
 	void SetWaitVSync( bool enable );
 	bool GetWaitVSync() const;
+
+	void SetDrawCycle( tjs_uint32 cycle );
+	tjs_uint32 GetDrawCycle() const;
+	void ResetDrawCycle();
 };
 //---------------------------------------------------------------------------
 

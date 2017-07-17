@@ -33,6 +33,7 @@
 #include "tjsDictionary.h"
 #include "VSyncTimingThread.h"
 #include "MouseCursor.h"
+#include "CanvasIntf.h"
 
 //---------------------------------------------------------------------------
 // Mouse Cursor management
@@ -1956,15 +1957,19 @@ bool tTJSNI_Window::WaitForVBlank( tjs_int* in_vblank, tjs_int* delayed )
 //---------------------------------------------------------------------------
 void tTJSNI_Window::UpdateVSyncThread()
 {
-	if( WaitVSync ) {
-		if( VSyncTimingThread == NULL ) {
-			VSyncTimingThread = new tTVPVSyncTimingThread(this);
+	if( CanvasInstance != nullptr ) {
+		if( WaitVSync ) {
+			if( VSyncTimingThread == NULL ) {
+				VSyncTimingThread = new tTVPVSyncTimingThread(this);
+			}
+		} else {
+			if( VSyncTimingThread ) {
+				delete VSyncTimingThread;
+			}
+			VSyncTimingThread = NULL;
 		}
 	} else {
-		if( VSyncTimingThread ) {
-			delete VSyncTimingThread;
-		}
-		VSyncTimingThread = NULL;
+		CanvasInstance->SetWaitVSync( WaitVSync );
 	}
 }
 //---------------------------------------------------------------------------

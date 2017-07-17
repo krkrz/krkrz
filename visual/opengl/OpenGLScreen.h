@@ -53,5 +53,7 @@ public:
 	void DisableScissorRect();
 
 	GLint GetDefaultFrameBufferId() const { return mDefaultFrameBufferId; }
+
+	void SetWaitVSync( bool b );
 };
 #endif

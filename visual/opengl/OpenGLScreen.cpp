@@ -201,6 +201,7 @@ bool tTVPOpenGLScreen::Initialize() {
 	return true;
 #endif
 }
+
 void tTVPOpenGLScreen::Destroy() {
 #ifdef WIN32
 	if( mSurface != EGL_NO_SURFACE ) {
@@ -302,4 +303,12 @@ void tTVPOpenGLScreen::SetScissorRect( const tTVPRect& rect ) {
 void tTVPOpenGLScreen::DisableScissorRect() {
 	glDisable( GL_SCISSOR_TEST );
 }
-
+void tTVPOpenGLScreen::SetWaitVSync( bool b ) {
+	if( b ) {
+		mSwapInterval = 1;
+		eglSwapInterval( mDisplay, mSwapInterval );
+	} else {
+		mSwapInterval = mMinSwapInterval;
+		eglSwapInterval( mDisplay, mSwapInterval );
+	}
+}
