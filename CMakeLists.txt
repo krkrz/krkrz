@@ -196,7 +196,6 @@ visual/opengl/GLFrameBufferObject.cpp
 visual/opengl/GLShaderUtil.cpp
 visual/opengl/Matrix32Intf.cpp
 visual/opengl/Matrix44Intf.cpp
-visual/opengl/Mesh2DIntf.cpp
 visual/opengl/OffscreenIntf.cpp
 visual/opengl/OpenGLPlatformAndroid.cpp
 visual/opengl/OpenGLScreen.cpp

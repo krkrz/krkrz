@@ -698,9 +698,6 @@
     <ClInclude Include="..\visual\opengl\Matrix44Intf.h">
       <Filter>visual\opengl</Filter>
     </ClInclude>
-    <ClInclude Include="..\visual\opengl\Mesh2DIntf.h">
-      <Filter>visual\opengl</Filter>
-    </ClInclude>
     <ClInclude Include="..\visual\opengl\OffscreenIntf.h">
       <Filter>visual\opengl</Filter>
     </ClInclude>
@@ -1337,9 +1334,6 @@
       <Filter>visual\opengl</Filter>
     </ClCompile>
     <ClCompile Include="..\visual\opengl\Matrix44Intf.cpp">
-      <Filter>visual\opengl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\visual\opengl\Mesh2DIntf.cpp">
       <Filter>visual\opengl</Filter>
     </ClCompile>
     <ClCompile Include="..\visual\opengl\OffscreenIntf.cpp">

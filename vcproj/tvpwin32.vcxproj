@@ -530,7 +530,6 @@
     <ClInclude Include="..\visual\opengl\GLVertexBufferObject.h" />
     <ClInclude Include="..\visual\opengl\Matrix32Intf.h" />
     <ClInclude Include="..\visual\opengl\Matrix44Intf.h" />
-    <ClInclude Include="..\visual\opengl\Mesh2DIntf.h" />
     <ClInclude Include="..\visual\opengl\OffscreenIntf.h" />
     <ClInclude Include="..\visual\opengl\OpenGLHeader.h" />
     <ClInclude Include="..\visual\opengl\OpenGLHeaderWin32.h" />
@@ -771,7 +770,6 @@
     <ClCompile Include="..\visual\opengl\GLShaderUtil.cpp" />
     <ClCompile Include="..\visual\opengl\Matrix32Intf.cpp" />
     <ClCompile Include="..\visual\opengl\Matrix44Intf.cpp" />
-    <ClCompile Include="..\visual\opengl\Mesh2DIntf.cpp" />
     <ClCompile Include="..\visual\opengl\OffscreenIntf.cpp" />
     <ClCompile Include="..\visual\opengl\OpenGLPlatformWin32.cpp" />
     <ClCompile Include="..\visual\opengl\OpenGLScreen.cpp" />
