@@ -547,6 +547,69 @@ void tTJSNI_Canvas::DrawTexture( const iTVPTextureInfoIntrface* texture0, const 
 	glBindTexture( GL_TEXTURE_2D, 0 );
 }
 //----------------------------------------------------------------------
+void tTJSNI_Canvas::DrawTextureAtlas( const tTJSNI_Rect* rect, const iTVPTextureInfoIntrface* texture, tTJSNI_ShaderProgram* shader ) {
+	SetupEachDrawing();
+
+	tTVPPoint ssize;
+	ssize.x = GetCanvasWidth();
+	ssize.y = GetCanvasHeight();
+	if( !shader ) shader = DefaultShaderInstance;
+
+	shader->SetupProgram();
+
+	GLint posLoc = shader->FindLocation( std::string( "a_pos" ) );
+	if( posLoc < 0 ) TVPThrowExceptionMessage( TJS_W("Not found a_pos in shader.") );
+	GLint uvLoc = shader->FindLocation( std::string( "a_texCoord" ) );
+	if( uvLoc < 0 ) TVPThrowExceptionMessage( TJS_W("Not found a_texCoord in shader.") );
+
+	const float tw = (float)texture->GetWidth();
+	const float th = (float)texture->GetHeight();
+	tTVPRect r = rect->Get();
+	if( r.top < 0 ) r.top = 0;
+	if( r.left < 0 ) r.left = 0;
+	if( r.right > (tjs_int)tw ) r.right = (tjs_int)tw;
+	if( r.bottom > (tjs_int)th ) r.bottom = (tjs_int)th;
+
+	const float width = (float)r.get_width();
+	const float height = (float)r.get_height();
+	const GLfloat vertices[] = {
+		0.0f,  0.0f,	// 左上
+		0.0f,  height,  // 左下
+		width, 0.0f,	// 右上
+		width, height,	// 右下
+	};
+	const GLfloat uvs[] = {
+		r.left/width,  r.top/height,
+		r.left/width,  r.bottom/height,
+		r.right/width,  r.top/height,
+		r.right/width,  r.bottom/height,
+	};
+	glBindBuffer( GL_ARRAY_BUFFER, 0 );
+	glVertexAttribPointer( posLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof( GLfloat ), vertices );
+	glVertexAttribPointer( uvLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof( GLfloat ), uvs );
+	glEnableVertexAttribArray( posLoc );
+	glEnableVertexAttribArray( uvLoc );
+
+	GLint texLoc = shader->FindLocation( std::string( "s_tex0" ) );
+	if( texLoc < 0 ) TVPThrowExceptionMessage( TJS_W( "Not found s_tex0 in shader." ) );
+	glActiveTexture( GL_TEXTURE0 );
+	glBindTexture( GL_TEXTURE_2D, (GLuint)texture->GetNativeHandle() );
+	glUniform1i( texLoc, 0 );
+
+	GLint matLoc = shader->FindLocation( std::string( "a_modelMat4" ) );
+	if( matLoc < 0 ) TVPThrowExceptionMessage( TJS_W("Not found a_modelMat4 in shader.") );
+	glUniformMatrix4fv( matLoc, 1, GL_FALSE, Matrix32Instance->GetMatrixArray16() );
+
+	GLint vpLoc = shader->FindLocation( std::string( "a_size" ) );
+	if( vpLoc < 0 ) TVPThrowExceptionMessage( TJS_W("Not found a_size in shader.") );
+	glUniform2f( vpLoc, (float)ssize.x, (float)ssize.y );
+
+	glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
+
+	glActiveTexture( GL_TEXTURE0 );
+	glBindTexture( GL_TEXTURE_2D, 0 );
+}
+//----------------------------------------------------------------------
 void tTJSNI_Canvas::DrawText( class tTJSNI_Font* font, tjs_int x, tjs_int y, const ttstr& text, tjs_uint32 color ) { /* TODO: 次期実装 */}
 //----------------------------------------------------------------------
 void tTJSNI_Canvas::DrawMesh( tTJSNI_ShaderProgram* shader, tjs_int primitiveType, tjs_int offset, tjs_int count ) {
@@ -985,6 +1048,26 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/drawTexture )
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/drawTexture)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/drawTextureAtlas )
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas );
+	if( numparams < 2 ) return TJS_E_BADPARAMCOUNT;
+
+	const tTJSNI_Rect* rect = (tTJSNI_Rect*)TJSGetNativeInstance( tTJSNC_Rect::ClassID, param[0] );
+	if( !rect ) return TJS_E_INVALIDPARAM;
+	const iTVPTextureInfoIntrface* texture = TVPGetTextureInfo( param[1] );
+	if( !texture ) return TJS_E_INVALIDPARAM;
+	tTJSNI_ShaderProgram* shader = nullptr;
+	if( numparams >= 3 ) {
+		tTJSNI_ShaderProgram* shader = (tTJSNI_ShaderProgram*)TJSGetNativeInstance( tTJSNC_ShaderProgram::ClassID, param[2] );
+		if( !shader ) return TJS_E_INVALIDPARAM;
+	}
+	_this->DrawTextureAtlas( rect, texture, shader );
+
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/drawTextureAtlas)
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/drawText)
 {
