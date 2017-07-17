@@ -2083,18 +2083,20 @@ TJS_BEGIN_NATIVE_PROP_DECL( drawCycle )
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window );
-	*result = (tjs_int)_this->GetDrawCycle();
-	return TJS_S_OK;
+		*result = (tjs_int)_this->GetDrawCycle();
+		return TJS_S_OK;
 	}
-		TJS_END_NATIVE_PROP_GETTER
+	TJS_END_NATIVE_PROP_GETTER
 
-		TJS_BEGIN_NATIVE_PROP_SETTER
+	TJS_BEGIN_NATIVE_PROP_SETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window );
-	_this->SetDrawCycle( ( (tjs_uint32)(tjs_int)*param ) );
-	return TJS_S_OK;
+		tjs_int cycle = (tjs_int)*param;
+		if( cycle < 0 ) cycle = 0;
+		_this->SetDrawCycle( (tjs_uint32)cycle );
+		return TJS_S_OK;
 	}
-		TJS_END_NATIVE_PROP_SETTER
+	TJS_END_NATIVE_PROP_SETTER
 }
 TJS_END_NATIVE_PROP_DECL( drawCycle )
 //---------------------------------------------------------------------------
