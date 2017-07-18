@@ -125,6 +125,7 @@ class tTVPContentMedia : public iTVPStorageMedia {
 	static jmethodID open_func_;
 	static jmethodID getFileList_func_;
 	static jmethodID getFullUri_func_;
+    static jmethodID getFileListInDir_func;
 
 private:
 	bool GetFullUri(const ttstr& path, const ttstr& name, ttstr &uri) {
@@ -156,11 +157,12 @@ public:
 		JNIEnv *env = Application->getJavaEnv(attached);
 		jclass clazz = env->FindClass("jp/kirikiri/krkrz/ContentMedia");
 		clazz_ = reinterpret_cast<jclass>(env->NewGlobalRef(reinterpret_cast<jobject>(clazz) ));
-		if( isExist_func_ == nullptr || open_func_ == nullptr || getFileList_func_ == nullptr || getFullUri_func_ == nullptr ) {
+		if( isExist_func_ == nullptr || open_func_ == nullptr || getFileList_func_ == nullptr || getFullUri_func_ == nullptr || getFileListInDir_func == nullptr ) {
 			isExist_func_ = env->GetStaticMethodID(clazz_, "isExist", "(Ljava/lang/String;)Z");
 			open_func_ = env->GetStaticMethodID(clazz_, "open", "(Ljava/lang/String;Ljava/lang/String;)Landroid/os/ParcelFileDescriptor;");
 			getFileList_func_ = env->GetStaticMethodID(clazz_, "getFileList", "(Ljava/lang/String;)[Ljava/lang/String;");
 			getFullUri_func_ = env->GetStaticMethodID(clazz_, "getFullUri", "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;");
+            getFileListInDir_func = env->GetStaticMethodID(clazz_, "getFileListInDir", "(Ljava/lang/String;Ljava/lang/String;)[Ljava/lang/String;");
 		}
 		env->DeleteLocalRef(clazz);
 		if( attached ) Application->detachJavaEnv();
@@ -242,76 +244,136 @@ public:
 		if( attached ) Application->detachJavaEnv();
 		return ret;
 	}
+    void GetListAtInternal(const ttstr &name, iTVPStorageLister *lister) {
+        bool attached;
+        JNIEnv *env = Application->getJavaEnv(attached);
+        jstring path = env->NewString( reinterpret_cast<const jchar*>(name.c_str()), name.length() );
+        jobjectArray obj = (jobjectArray)env->CallStaticObjectMethod( clazz_, getFileList_func_, path );
+        int len  = env->GetArrayLength(obj);
+        for( int i = 0; i < len; i++ ) {
+            jstring string = (jstring) env->GetObjectArrayElement( obj, i);
+            int jstrlen = env->GetStringLength( string );
+            const jchar* chars = env->GetStringChars( string, nullptr );
+            ttstr file(reinterpret_cast<const tjs_char*>(chars),jstrlen);
+            lister->Add( file );
+            env->ReleaseStringChars( string, chars );
+            env->DeleteLocalRef( string );
+        }
+        env->DeleteLocalRef( obj );
+        env->DeleteLocalRef( path );
+        if( attached ) Application->detachJavaEnv();
+    }
+    void GetListAtPath(const ttstr &name, const ttstr& dir, iTVPStorageLister *lister) {
+        bool attached;
+        JNIEnv *env = Application->getJavaEnv(attached);
+        jstring root = env->NewString( reinterpret_cast<const jchar*>(name.c_str()), name.length() );
+        jstring path = env->NewString( reinterpret_cast<const jchar*>(dir.c_str()), dir.length() );
+        jobjectArray obj = (jobjectArray)env->CallStaticObjectMethod( clazz_, getFileListInDir_func, root, path );
+        int len  = env->GetArrayLength(obj);
+        for( int i = 0; i < len; i++ ) {
+            jstring string = (jstring) env->GetObjectArrayElement( obj, i);
+            int jstrlen = env->GetStringLength( string );
+            const jchar* chars = env->GetStringChars( string, nullptr );
+            ttstr file(reinterpret_cast<const tjs_char*>(chars),jstrlen);
+            lister->Add( file );
+            env->ReleaseStringChars( string, chars );
+            env->DeleteLocalRef( string );
+        }
+        env->DeleteLocalRef( obj );
+        env->DeleteLocalRef( path );
+        env->DeleteLocalRef( root );
+        if( attached ) Application->detachJavaEnv();
+    }
 
 	void TJS_INTF_METHOD GetListAt(const ttstr &_name, iTVPStorageLister *lister) {
 		ttstr name(_name);
-		GetLocalName(name);
-
-		bool attached;
-		JNIEnv *env = Application->getJavaEnv(attached);
-		jstring path = env->NewString( reinterpret_cast<const jchar*>(name.c_str()), name.length() );
-		jobjectArray obj = (jobjectArray)env->CallStaticObjectMethod( clazz_, getFileList_func_, path );
-		int len  = env->GetArrayLength(obj);
-		for( int i = 0; i < len; i++ ) {
-			jstring string = (jstring) env->GetObjectArrayElement( obj, i);
-			int jstrlen = env->GetStringLength( string );
-			const jchar* chars = env->GetStringChars( string, nullptr );
-			ttstr file(reinterpret_cast<const tjs_char*>(chars),jstrlen);
-			lister->Add( file );
-			env->ReleaseStringChars( string, chars );
-			env->DeleteLocalRef( string );
-		}
-		env->DeleteLocalRef( obj );
-		if( attached ) Application->detachJavaEnv();
+        // 末尾が/の場合、その/を削除
+        const tjs_char *ptr = name.c_str();
+        const tjs_char *ep = ptr + name.length() - 1;
+        if( *ep == TJS_W('/') ) {
+            name = ttstr( ptr, name.length() - 1 );
+        }
+        LocalAccess( name, lister );
 	}
+    /**
+     * Get local path or list files.
+     * @param name
+     * @param lister
+     */
+    void LocalAccess( ttstr& name, iTVPStorageLister *lister = nullptr ) {
+        ttstr newname;
+        const tjs_char *ptr = name.c_str();
+        bool appendshceme = false;
+        if( name.length() < 11 ||
+            ptr[0] != TJS_W('c') ||
+            ptr[1] != TJS_W('o') ||
+            ptr[2] != TJS_W('n') ||
+            ptr[3] != TJS_W('t') ||
+            ptr[4] != TJS_W('e') ||
+            ptr[5] != TJS_W('n') ||
+            ptr[6] != TJS_W('t') ||
+            ptr[7] != TJS_W(':') ||
+            ptr[8] != TJS_W('/') ||
+            ptr[9] != TJS_W('/') ) {
+            appendshceme = true;
+            if( *ptr == TJS_W('.') ) ptr++;
+            while( *ptr == TJS_W('/') || *ptr == TJS_W('\\') ) ptr++;
+            newname = ttstr(TJS_W("content://")) + ttstr(ptr);
+        } else {
+            newname = ttstr(ptr);
+        }
+        // change path delimiter to '/'
+        tjs_char *pp = newname.Independ();
+        tjs_char *sp = pp;
+        while(*pp)
+        {
+            if(*pp == TJS_W('\\')) *pp = TJS_W('/');
+            pp++;
+        }
+        // find %2F and after '/'
+        if( name.length() > 5 ) {
+            bool found2f = false;
+            tjs_char *p2f = pp;
+            p2f -= 2;
+            while( sp != p2f ) {
+                p2f--;
+                if( p2f[0] == TJS_W('%') && p2f[1] == TJS_W('2') && (p2f[2] == TJS_W('F') || p2f[2] == TJS_W('f') ) ) {
+                    found2f = true;
+                    break;
+                }
+            }
+            if( found2f ) {
+                p2f += 3;
+                while( p2f != pp ) {
+                    p2f++;
+                    if( *p2f == TJS_W('/') ) {
+                        pp = p2f;
+                        break;
+                    }
+                }
+
+            }
+        }
+        name.Clear();
+        ttstr filename;
+        ttstr path;
+        if( sp != pp ) {
+            // found '/'
+            filename = ttstr(&(pp[1]));
+            path = ttstr(sp,static_cast<int>(pp-sp));
+            if( !lister ) {
+                ttstr uri;
+                if (GetFullUri(path, filename, uri)) {
+                    name = uri;
+                }
+            } else {
+                GetListAtPath( path, filename, lister );
+            }
+        }
+        // else not found local path
+    }
 	void TJS_INTF_METHOD GetLocallyAccessibleName(ttstr &name) {
-		ttstr newname;
-		const tjs_char *ptr = name.c_str();
-		bool appendshceme = false;
-		if( name.length() < 11 ||
-			ptr[0] != TJS_W('c') ||
-			ptr[1] != TJS_W('o') ||
-			ptr[2] != TJS_W('n') ||
-			ptr[3] != TJS_W('t') ||
-			ptr[4] != TJS_W('e') ||
-			ptr[5] != TJS_W('n') ||
-			ptr[6] != TJS_W('t') ||
-			ptr[7] != TJS_W(':') ||
-			ptr[8] != TJS_W('/') ||
-			ptr[9] != TJS_W('/') ) {
-			appendshceme = true;
-			if( *ptr == TJS_W('.') ) ptr++;
-			while( *ptr == TJS_W('/') || *ptr == TJS_W('\\') ) ptr++;
-			newname = ttstr(TJS_W("content://")) + ttstr(ptr);
-		} else {
-			newname = ttstr(ptr);
-		}
-		// change path delimiter to '/'
-		tjs_char *pp = newname.Independ();
-		tjs_char *sp = pp;
-		while(*pp)
-		{
-			if(*pp == TJS_W('\\')) *pp = TJS_W('/');
-			pp++;
-		}
-		// find last '/'
-		while( sp != pp ) {
-			pp--;
-			if( *pp == TJS_W('/') ) break;
-		}
-		name.Clear();
-		ttstr filename;
-		ttstr path;
-		if( sp != pp ) {
-			// found '/'
-			filename = ttstr(&(pp[1]));
-			path = ttstr(sp,static_cast<int>(pp-sp));
-			ttstr uri;
-			if( GetFullUri(path, filename, uri) ) {
-				name = uri;
-			}
-		}
-		// else not found local path
+        LocalAccess( name );
 	}
 
 	void TJS_INTF_METHOD GetLocalName(ttstr &name) {
@@ -325,6 +387,7 @@ jmethodID tTVPContentMedia::isExist_func_ = nullptr;
 jmethodID tTVPContentMedia::open_func_ = nullptr;
 jmethodID tTVPContentMedia::getFileList_func_ = nullptr;
 jmethodID tTVPContentMedia::getFullUri_func_ = nullptr;
+jmethodID tTVPContentMedia::getFileListInDir_func = nullptr;
 //---------------------------------------------------------------------------
 void TVPRegisterContentMedia()
 {

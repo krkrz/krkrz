@@ -32,6 +32,30 @@ public class ContentMedia {
         // return DocumentFile.isDocumentUri(context,Uri.parse(uri));
         return false;
     }
+    private static DocumentFile findDirInList( DocumentFile tree, String dir, boolean isDir ) {
+        try {
+            DocumentFile[] list = tree.listFiles();
+            if( isDir ) {
+                for (DocumentFile file : list) {
+                    if (file.isDirectory()) {
+                        String displayName = file.getName();
+                        if (displayName.equals(dir)) {
+                            return file;
+                        }
+                    }
+                }
+            } else {
+                for (DocumentFile file : list) {
+                    String displayName = file.getName();
+                    if (displayName.equals(dir)) {
+                        return file;
+                    }
+                }
+            }
+        } catch( UnsupportedOperationException e) {
+        }
+        return null;
+    }
     public static String getFullUri( String path, String filename ) {
         try {
             Context ctx = KrkrzApplication.getContext();
@@ -39,8 +63,19 @@ public class ContentMedia {
                 DocumentFile treeDoc = DocumentFile.fromTreeUri(ctx, Uri.parse(path));
                 if (treeDoc != null) {
                     DocumentFile doc = treeDoc.findFile(filename);
-                    if (doc != null) {
+                    if (doc != null ) {
                         return doc.getUri().toString();
+                    } else {
+                        String[] dirs = filename.split("/");
+                        DocumentFile tree = treeDoc;
+                        for( String dir : dirs ) {
+                            if( dir.isEmpty() == false ) {
+                                DocumentFile d = findDirInList(tree, dir, false);
+                                if (d == null) return null;
+                                tree = d;
+                            }
+                        }
+                        return tree.getUri().toString();
                     }
                 }
             }
@@ -73,10 +108,39 @@ public class ContentMedia {
                 int i = 0;
                 for (DocumentFile file : list) {
                     if (file.isFile()) {
-//                        String path = file.getUri().toString();
                         String dispname = file.getName();
-//                        DocumentFile dic = tree.findFile(dispname);
-//                        String docpath = dic.getUri().toString();
+                        ret[i] = dispname;
+                        i++;
+                    }
+                }
+                return ret;
+            }
+        }
+        return new String[0];
+    }
+    public static String[] getFileListInDir( String uri, String path ) {
+        Context ctx = KrkrzApplication.getContext();
+        if( ctx != null ) {
+            DocumentFile tree = DocumentFile.fromTreeUri(ctx, Uri.parse(uri));
+            String[] dirs = path.split("/");
+            for( String dir : dirs ) {
+                if( dir.isEmpty() == false ) {
+                    DocumentFile d = findDirInList(tree, dir, true);
+                    if (d == null) return new String[0];
+                    tree = d;
+                }
+            }
+            DocumentFile[] list = tree.listFiles();
+            int count = 0;
+            for (DocumentFile file : list) {
+                if (file.isFile()) count++;
+            }
+            if (count > 0) {
+                String[] ret = new String[count];
+                int i = 0;
+                for (DocumentFile file : list) {
+                    if (file.isFile()) {
+                        String dispname = file.getName();
                         ret[i] = dispname;
                         i++;
                     }
