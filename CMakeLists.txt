@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.4.1)
 
+set(CMAKE_CXX_FLAGS_DEBUG "-g3 -O0 -pg")
+set(CMAKE_CXX_FLAGS_RELEASE "-O2 -s -DNDEBUG")
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-g3 -Og -pg")
+set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os -s -DNDEBUG")
+
 # とりあえず Android 用にする
 set( KRKRZ_TARGET android )
 
