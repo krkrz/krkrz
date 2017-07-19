@@ -58,12 +58,12 @@ void tTVPDrawCycleTimer::ResetDrawCycle()
 //---------------------------------------------------------------------------
 void tTVPDrawCycleTimer::SetDrawCycle( tjs_uint32 cycle ) {
 	if( DrawCycle != cycle ) {
-		bool enable = cycle == 0;
+		bool enable = cycle != 0;
 		bool prevEnable = DrawCycle != 0;
 		if( prevEnable ) SetEnabled( false );
 		DrawCycle = cycle;
 		if( cycle != 0 ) {
-			SetInterval( ( 1000 << TVP_SUBMILLI_FRAC_BITS ) / cycle );
+			SetInterval( (tjs_uint64)((1ULL << TVP_SUBMILLI_FRAC_BITS)*1000) / cycle );
 		}
 		if( !prevEnable || !enable ) {
 			SetEnabled( enable );
