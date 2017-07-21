@@ -71,7 +71,7 @@ void tTJSNI_Matrix32::Set( float a[6] ) {
 }
 //---------------------------------------------------------------------------
 void tTJSNI_Matrix32::Set( tjs_uint y, tjs_uint x, tjs_real a ) {
-	if( y >= 2 || x >= 1 ) {
+	if( y > 2 || x > 1 ) {
 		TVPThrowExceptionMessage(TJSRangeError);
 	}
 	Matrix.m[y][x] = static_cast<float>(a);
@@ -79,7 +79,7 @@ void tTJSNI_Matrix32::Set( tjs_uint y, tjs_uint x, tjs_real a ) {
 }
 //---------------------------------------------------------------------------
 tjs_real tTJSNI_Matrix32::Get( tjs_uint y, tjs_uint x ) {
-	if( y >= 2 || x >= 1 ) {
+	if( y > 2 || x > 1 ) {
 		TVPThrowExceptionMessage(TJSRangeError);
 	}
 	return Matrix.m[y][x];
