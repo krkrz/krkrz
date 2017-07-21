@@ -196,7 +196,7 @@ void TVPBeforeSystemInit()
 	if( result ) {
 		AAsset_close( asset );
 		asset = nullptr;
-		TJS_strcpy(buf, TJS_W("assts://data.xp3"));
+		TJS_strcpy(buf, TJS_W("asset:///data.xp3>"));
 		tjs_int buflen = TJS_strlen(buf);
 		buf[buflen] = TVPArchiveDelimiter, buf[buflen+1] = 0;
 		selected = true;
@@ -208,7 +208,7 @@ void TVPBeforeSystemInit()
 		if( result ) {
 			AAsset_close( asset );
 			asset = nullptr;
-			TJS_strcpy(buf, TJS_W("assts://startup.tjs"));
+			TJS_strcpy(buf, TJS_W("asset:///"));
 			selected = true;
 			TVPProjectDirSelected = true;
 		}

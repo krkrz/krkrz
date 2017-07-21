@@ -226,7 +226,7 @@ void tTVPApplication::initializeApplication() {
 		// -userconf 付きで起動されたかどうかチェックする。Android だと Activity 分けた方が賢明
 		// if(TVPExecuteUserConfig()) return;
 
-		// TODO 非同期画像読み込みは後で実装する
+		// 非同期画像読み込みは後で実装する
 		image_load_thread_ = new tTVPAsyncImageLoader();
 
 		TVPSystemInit();
@@ -242,7 +242,7 @@ void tTVPApplication::initializeApplication() {
 		// start image load thread
 		image_load_thread_->StartTread();
 
-		if(TVPProjectDirSelected) TVPInitializeStartupScript();
+		// if(TVPProjectDirSelected) TVPInitializeStartupScript();
 
 		// run main loop from activity resume.
 	} catch(...) {
@@ -1085,14 +1085,16 @@ void tTVPApplication::nativeSetStartupPath( JNIEnv *jenv, jobject obj, jstring j
 	int jstrlen = jenv->GetStringLength( jpath );
 	const jchar* chars = jenv->GetStringChars( jpath, nullptr );
 	ttstr path(reinterpret_cast<const tjs_char*>(chars),jstrlen);
-	//Application->setStartupPath( path );
 	jenv->ReleaseStringChars( jpath, chars );
 
 	TVPSetProjectPath( path );
 	Application->SendMessageFromJava( AM_STARTUP_SCRIPT, 0, 0 );
 	Application->startMainLoop();
 }
-
+void tTVPApplication::nativeStartScript( JNIEnv *jenv, jobject obj ) {
+	Application->SendMessageFromJava( AM_STARTUP_SCRIPT, 0, 0 );
+	Application->startMainLoop();
+}
 JNIEnv* tTVPApplication::getJavaEnv( bool& attached ) const {
 	attached = false;
 	JNIEnv *env = nullptr;
@@ -1124,6 +1126,7 @@ static JNINativeMethod methods[] = {
 		{ "nativeOnTouch", "(IFFFIJ)V", (void *)tTVPApplication::nativeOnTouch},
 		{ "nativeSetStartupPath", "(Ljava/lang/String;)V", (void *)tTVPApplication::nativeSetStartupPath},
 		{ "nativeSetSoundNativeParameter", "(II)V", (void*)tTVPApplication::nativeSetSoundNativeParameter},
+		{ "nativeStartScript", "()V", (void*)tTVPApplication::nativeStartScript},
 };
 
 jint registerNativeMethods( JNIEnv* env, const char *class_name, JNINativeMethod *methods, int num_methods ) {
@@ -1141,7 +1144,7 @@ jint registerNativeMethods( JNIEnv* env, const char *class_name, JNINativeMethod
 }
 #define	NUM_ARRAY_ELEMENTS(p) ((int) sizeof(p) / sizeof(p[0]))
 int registerJavaMethod( JNIEnv *env)  {
-	if( registerNativeMethods(env, "jp/kirikiri/krkrz/MainActivity", methods, NUM_ARRAY_ELEMENTS(methods)) < 0) {
+	if( registerNativeMethods(env, "jp/kirikiri/krkrz/BaseMainActivity", methods, NUM_ARRAY_ELEMENTS(methods)) < 0) {
 		return -1;
 	}
 	return 0;

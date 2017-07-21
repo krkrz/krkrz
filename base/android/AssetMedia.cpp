@@ -19,7 +19,7 @@ public:
 			TVPThrowExceptionMessage(TVPCannotOpenStorage, origname);
 		}
 		asset_ = AAssetManager_open( mgr, localname.AsNarrowStdString().c_str(), AASSET_MODE_RANDOM );
-		if( asset_ == NULL ) {
+        if( asset_ == NULL ) {
 			TVPThrowExceptionMessage(TVPCannotOpenStorage, origname);
 		}
 	}
@@ -83,25 +83,11 @@ public:
 
 	void TJS_INTF_METHOD NormalizeDomainName(ttstr &name) {
 		// normalize domain name
-		// make all characters small
-		tjs_char *p = name.Independ();
-		while(*p)
-		{
-			if(*p >= TJS_W('A') && *p <= TJS_W('Z'))
-				*p += TJS_W('a') - TJS_W('A');
-			p++;
-		}
+        // 何もしない。asset://以下のパスはケースセンシティブ
 	}
 	void TJS_INTF_METHOD NormalizePathName(ttstr &name) {
 		// normalize path name
-		// make all characters small
-		tjs_char *p = name.Independ();
-		while(*p)
-		{
-			if(*p >= TJS_W('A') && *p <= TJS_W('Z'))
-				*p += TJS_W('a') - TJS_W('A');
-			p++;
-		}
+        // 何もしない。asset://以下のパスはケースセンシティブ
 	}
 	bool TJS_INTF_METHOD CheckExistentStorage(const ttstr &name) {
 		if(name.IsEmpty()) return false;
@@ -131,6 +117,7 @@ public:
 		GetLocalName(name);
 
         if( name.GetLen() == 1 && name[0] == TJS_W('/') ) name = ttstr(TJS_W(""));
+        if( name[name.length()-1] == TJS_W('/') ) name = ttstr( name, name.length()-1 );
 		AAssetDir* dir = AAssetManager_openDir( Application->getAssetManager(), name.AsNarrowStdString().c_str() );
 		if( dir ) {
 			const char* filename = nullptr;
@@ -138,6 +125,7 @@ public:
 				filename = AAssetDir_getNextFileName( dir );
 				if( filename ) {
 					ttstr file( filename );
+                    /*
 					tjs_char *p = file.Independ();
 					while(*p) {
 						// make all characters small
@@ -145,6 +133,7 @@ public:
 							*p += TJS_W('a') - TJS_W('A');
 						p++;
 					}
+                    */
 					lister->Add( file );
 				}
 			} while( filename );
@@ -155,6 +144,7 @@ public:
 		ttstr newname;
 		const tjs_char *ptr = name.c_str();
 		if( *ptr == TJS_W('.') ) ptr++;
+		if( *ptr == TJS_W('/') ) ptr++;
 		while( (*ptr == TJS_W('/') || *ptr == TJS_W('\\')) && (ptr[1] == TJS_W('/') || ptr[1] == TJS_W('\\')) ) ptr++;
 		newname = ttstr(ptr);
 		// change path delimiter to '/'

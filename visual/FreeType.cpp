@@ -27,6 +27,7 @@
 #include <algorithm>
 #include <vector>
 #include <map>
+#include <memory>
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -132,6 +133,7 @@ protected:
 	FT_Face Face;	//!< FreeType face オブジェクト
 	tTJSBinaryStream* File;	 //!< tTJSBinaryStream オブジェクト
 	std::vector<tjs_string> FaceNames; //!< Face名を列挙した配列
+	//std::unique_ptr<tjs_uint8[]> FontImage;
 
 private:
 	FT_StreamRec Stream;
@@ -395,6 +397,8 @@ tGenericFreeTypeFace::tGenericFreeTypeFace(const ttstr &fontname, tjs_uint32 opt
 
 		// FT_StreamRec の各フィールドを埋める
 		FT_StreamRec * fsr = &Stream;
+//#ifndef ANDROID
+#if 1
 		fsr->base = 0;
 		fsr->size = static_cast<unsigned long>(File->GetSize());
 		fsr->pos = 0;
@@ -402,7 +406,22 @@ tGenericFreeTypeFace::tGenericFreeTypeFace(const ttstr &fontname, tjs_uint32 opt
 		fsr->pathname.pointer = NULL;
 		fsr->read = IoFunc;
 		fsr->close = CloseFunc;
+#else
+		tjs_uint32 fileSize = (tjs_uint32)File->GetSize();
+		FontImage.reset( new tjs_uint8[fileSize] );
+		File->SetPosition( 0 );
+		File->ReadBuffer( (void*)FontImage.get(), fileSize );
+		delete File;
+		File = nullptr;
 
+		fsr->base = FontImage.get();
+		fsr->size = fileSize;
+		fsr->pos = 0;
+		fsr->descriptor.pointer = nullptr;
+		fsr->pathname.pointer = nullptr;
+		fsr->read = nullptr;
+		fsr->close = nullptr;
+#endif
 		// Face をそれぞれ開き、Face名を取得して FaceNames に格納する
 		tjs_uint face_num = 1;
 

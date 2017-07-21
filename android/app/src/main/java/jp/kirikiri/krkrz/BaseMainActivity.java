@@ -53,7 +53,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Locale;
 
-public class MainActivity extends Activity  implements SurfaceHolder.Callback, ExoPlayer.EventListener, ExtractorMediaSource.EventListener,
+public class BaseMainActivity extends Activity  implements SurfaceHolder.Callback, ExoPlayer.EventListener, ExtractorMediaSource.EventListener,
         SimpleExoPlayer.VideoListener {
     private static String TAG = "KrkrZActivity";
     private static String LOGTAG = "krkrz";
@@ -73,8 +73,6 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback, E
     private DefaultTrackSelector trackSelector;
     private DataSource.Factory mMediaDataSourceFactory;
 
-    private boolean mSelectedStartFolder;
-    private boolean mOpenStartFolder;
 
     class FinishEvent implements Runnable {
         @Override public void run() {
@@ -104,7 +102,7 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback, E
         public ShowToastEvent( String title ) { mMessage = title; }
         @Override
         public void run() {
-            Toast.makeText(MainActivity.this,mMessage,Toast.LENGTH_LONG).show();
+            Toast.makeText(BaseMainActivity.this,mMessage,Toast.LENGTH_LONG).show();
         }
     }
     class OpenMovieEvent implements Runnable {
@@ -127,44 +125,36 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback, E
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mSelectedStartFolder = false;
-        mOpenStartFolder = false;
         mHandler = new Handler();
+
+        // フルスクリーン
+        View decor = this.getWindow().getDecorView();
+        decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION  | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE);
 
         // ハードウェアボタンでミュージック音量を変更可能に
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
-        // 4.2以降 最適なサンプリングレートを取得する
         // Audio Output latency
         // https://googlesamples.github.io/android-audio-high-performance/guides/audio-output-latency.html
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-            String frameRate = am.getProperty(AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE);
-            AudioOptimalSampleRate = Integer.parseInt(frameRate);
-            if(AudioOptimalSampleRate == 0) AudioOptimalSampleRate = 44100; // Use a default value if property not found
-            String framesPerBuffer = am.getProperty(AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER);
-            AudioOptimalBufferSize = Integer.parseInt(framesPerBuffer);
-            if(AudioOptimalBufferSize == 0) AudioOptimalBufferSize = 256; // Use default
-        }
+        AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        String frameRate = am.getProperty(AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE);
+        AudioOptimalSampleRate = Integer.parseInt(frameRate);
+        if(AudioOptimalSampleRate == 0) AudioOptimalSampleRate = 44100; // Use a default value if property not found
+        String framesPerBuffer = am.getProperty(AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER);
+        AudioOptimalBufferSize = Integer.parseInt(framesPerBuffer);
+        if(AudioOptimalBufferSize == 0) AudioOptimalBufferSize = 256; // Use default
+
     	GPUType.update();
         initializeNative();
 
-        Intent intent = getIntent();
-        Bundle bundle = intent.getExtras();
-        if(bundle != null) {
-            String path = bundle.getString("startup_path");
-            if( path != null && !path.isEmpty()) {
-                nativeSetStartupPath(path);
-            }
-        }
-
         setContentView(R.layout.activity_main);
+
+        mMediaDataSourceFactory = new DefaultDataSourceFactory(getApplication(), Util.getUserAgent(this, "AppName"));
+
         SurfaceView surfaceView = (SurfaceView)findViewById(R.id.surfaceview);
         surfaceView.getHolder().addCallback(this);
         surfaceView.getHolder().setFormat(PixelFormat.RGBX_8888 );
         // surfaceView.setOnClickListener(new View.OnClickListener() { public void onClick(View view) {} });
-
-        mMediaDataSourceFactory = new DefaultDataSourceFactory(getApplication(), Util.getUserAgent(this, "AppName"));
     }
 
 	private void initializeNative() {
@@ -221,11 +211,6 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback, E
         super.onResume();
         if( LOGDSTAT ) Log.i(LOGTAG, "onResume()");
         nativeToMessage(EventCode.AM_RESUME,0,0);
-        if( mSelectedStartFolder == false ) {
-            mSelectedStartFolder = true;
-            mOpenStartFolder = true;
-            selectFolder();
-        }
     }
     @Override
     protected void onPause() {
@@ -491,14 +476,12 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback, E
                     uri = resultData.getData();
                     DocumentFile doc = DocumentFile.fromSingleUri(this, uri);
                     String disp = doc.getName();
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                        final int takeFlags = resultData.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                        getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION );
-                        try {
-                            ParcelFileDescriptor desc = getContentResolver().openFileDescriptor(uri, "r");
-                            // String r = disp + ":" + nativeReadFile(desc);
-                        } catch( FileNotFoundException e ) {
-                        }
+                    final int takeFlags = resultData.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                    getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION );
+                    try {
+                        ParcelFileDescriptor desc = getContentResolver().openFileDescriptor(uri, "r");
+                        // String r = disp + ":" + nativeReadFile(desc);
+                    } catch( FileNotFoundException e ) {
                     }
                 }
             } else {
@@ -507,15 +490,8 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback, E
         } else if( requestCode == SELECT_TREE_REQUEST_CODE ) {
             if( resultCode == Activity.RESULT_OK ) {
                 Uri treeUri = resultData.getData();
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    getContentResolver().takePersistableUriPermission(treeUri, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                }
-                if( mOpenStartFolder ) {
-                    // nativeSelectPath( treeUri.toString() + "/", this );
-                    nativeSetStartupPath( treeUri.toString() + "/" );
-                }
+                getContentResolver().takePersistableUriPermission(treeUri, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
             }
-            mOpenStartFolder = false;
         }
     }
 
@@ -792,4 +768,5 @@ public class MainActivity extends Activity  implements SurfaceHolder.Callback, E
 
     public static native void nativeOnTouch( int type, float x, float y, float c, int id, long tick );
     public static native void nativeSetSoundNativeParameter( int rate, int size );
+    public static native void nativeStartScript();
 }
