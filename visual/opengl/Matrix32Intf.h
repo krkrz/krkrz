@@ -165,6 +165,12 @@ public:
 		Premultiply( Matrix.a, t );
 		IsDirty = true;
 	}
+	void PreScale( tjs_real sx, tjs_real sy ) {
+		float t[6];
+		SetScale( t, (float)sx, (float)sy );
+		Multiply( Matrix.a, t );
+		IsDirty = true;
+	}
 	void TransformPoint( tjs_real& x, tjs_real& y ) const {
 		float sx = (float)x;
 		float sy = (float)y;

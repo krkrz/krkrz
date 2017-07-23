@@ -285,6 +285,15 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/scale )
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/scale )
 //----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/preScale )
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Matrix32 );
+	if( numparams < 2 ) return TJS_E_BADPARAMCOUNT;
+	_this->PreScale( (tjs_real)*param[0], (tjs_real)*param[1] );
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/preScale )
+//----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/skewX )
 {
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Matrix32 );

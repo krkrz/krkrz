@@ -76,7 +76,6 @@ TJS_W( "attribute vec2 a_pos;" )
 TJS_W( "attribute vec4 a_color;" )
 TJS_W( "uniform mat4 a_modelMat4;" )
 TJS_W( "uniform vec2 a_size;" )
-TJS_W( "uniform float a_vertReverse;" )
 TJS_W( "varying vec4 v_color;" )
 TJS_W( "void main()" )
 TJS_W( "{" )
@@ -583,10 +582,10 @@ void tTJSNI_Canvas::DrawTextureAtlas( const tTJSNI_Rect* rect, const iTVPTexture
 		width, height,	// 右下
 	};
 	const GLfloat uvs[] = {
-		r.left/width,  r.top/height,
-		r.left/width,  r.bottom/height,
-		r.right/width,  r.top/height,
-		r.right/width,  r.bottom/height,
+		r.left/ tw,  r.top/ th,
+		r.left/ tw,  r.bottom/ th,
+		r.right/ tw,  r.top/ th,
+		r.right/ tw,  r.bottom/ th,
 	};
 	glBindBuffer( GL_ARRAY_BUFFER, 0 );
 	glVertexAttribPointer( posLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof( GLfloat ), vertices );
