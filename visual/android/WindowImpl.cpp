@@ -110,11 +110,6 @@ void tTJSNI_Window::NotifyWindowClose()
 	Form = NULL;
 }
 //---------------------------------------------------------------------------
-void tTJSNI_Window::SendCloseMessage()
-{
-	if(Form) Form->SendCloseMessage();
-}
-//---------------------------------------------------------------------------
 void tTJSNI_Window::TickBeat()
 {
 	if(Form) Form->TickBeat();

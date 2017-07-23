@@ -1121,10 +1121,6 @@ void TTVPWindowForm::OnCloseQueryCalled( bool b ) {
 		CanCloseWork = b;
 	}
 }
-void TTVPWindowForm::SendCloseMessage() {
-	::PostMessage(GetHandle(), WM_CLOSE, 0, 0);
-}
-
 void TTVPWindowForm::ZoomRectangle( tjs_int& left, tjs_int& top, tjs_int& right, tjs_int& bottom) {
 	left =   MulDiv(left  ,  ActualZoomNumer, ActualZoomDenom);
 	top =    MulDiv(top   ,  ActualZoomNumer, ActualZoomDenom);

@@ -90,7 +90,6 @@ public:
 
 	// 閉じる
 	void InvalidateClose();
-	void SendCloseMessage();
 	void Close();
 	void OnCloseQueryCalled(bool b);
 
@@ -282,6 +281,13 @@ public:
 	void OnTouchScaling( double startdist, double currentdist, double cx, double cy, int flag );
 	void OnTouchRotate( double startangle, double currentangle, double distance, double cx, double cy, int flag );
 	void OnMultiTouch();
+
+	void OnStart() {}
+	void OnRestart() {}
+	void OnResume();
+	void OnPause();
+	void OnStop() {}
+	void OnDestory() {}
 
 	NativeEventQueueIntarface* GetEventHandler() { return &EventQueue; }
 };

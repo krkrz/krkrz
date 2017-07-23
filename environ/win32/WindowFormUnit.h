@@ -285,7 +285,6 @@ public:
 	void Close();
 	void InvalidateClose();
 	void OnCloseQueryCalled(bool b);
-	void SendCloseMessage();
 	
 	void ZoomRectangle( tjs_int & left, tjs_int & top, tjs_int & right, tjs_int & bottom);
 	void GetVideoOffset(tjs_int &ofsx, tjs_int &ofsy);

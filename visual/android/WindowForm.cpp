@@ -56,16 +56,22 @@ TTVPWindowForm::~TTVPWindowForm() {
 void TTVPWindowForm::WndProc(NativeEvent& ev) {
 	switch( ev.Message ) {
 	case AM_START:
+		OnStart();
 		break;
 	case AM_RESTART:
+		OnRestart();
 		break;
 	case AM_RESUME:
+		OnResume();
 		break;
 	case AM_PAUSE:
+		OnPause();
 		break;
 	case AM_STOP:
+		OnStop();
 		break;
 	case AM_DESTROY:
+		OnDestory();
 		break;
 	case AM_SURFACE_CHANGED:
 		// Surfaceが切り替わったので、DrawDevice 準備
@@ -119,8 +125,6 @@ bool TTVPWindowForm::GetFormEnabled() {
 
 // 閉じる
 void TTVPWindowForm::InvalidateClose() {
-}
-void TTVPWindowForm::SendCloseMessage() {
 }
 void TTVPWindowForm::Close() {
 }
@@ -348,5 +352,11 @@ void TTVPWindowForm::OnMultiTouch() {
 	if( TJSNativeInstance ) {
 		TVPPostInputEvent( new tTVPOnMultiTouchInputEvent(TJSNativeInstance) );
 	}
+}
+void TTVPWindowForm::OnResume() {
+	if(TJSNativeInstance) TJSNativeInstance->FireOnActivate(true);
+}
+void TTVPWindowForm::OnPause() {
+	if(TJSNativeInstance) TJSNativeInstance->FireOnActivate(false);
 }
 
