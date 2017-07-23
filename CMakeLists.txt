@@ -195,6 +195,7 @@ visual/android/BitmapBitsAlloc.cpp
 visual/android/BitmapInfomation.cpp
 visual/android/LayerImpl.cpp
 visual/android/VideoOvlImpl.cpp
+visual/android/VirtualKey.cpp
 visual/android/WindowForm.cpp
 visual/android/WindowImpl.cpp
 visual/gl/blend_function.cpp

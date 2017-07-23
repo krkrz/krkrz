@@ -104,11 +104,11 @@ public:
 	void ResetDrawDevice();
 
 	// キー入力
-	void OnKeyDown( tjs_uint16 vk, int shift );
+	void OnKeyDown( tjs_int vk, int shift );
 	void InternalKeyDown(tjs_uint16 key, tjs_uint32 shift);
-	void OnKeyUp( tjs_uint16 vk, int shift );
+	void OnKeyUp( tjs_int vk, int shift );
 	void InternalKeyUp( tjs_uint16 key, tjs_uint32 shift );
-	void OnKeyPress( tjs_uint16 vk, int repeat, bool prevkeystate, bool convertkey );
+	void OnKeyPress( tjs_int vk, int repeat, bool prevkeystate, bool convertkey );
 
 	// プライマリーレイヤーのサイズに合うように呼び出される。w/hはLayerWidth/LayerHeightに当たり、ズームを考慮して表示サイズを設定する
 	void SetPaintBoxSize(tjs_int w, tjs_int h);

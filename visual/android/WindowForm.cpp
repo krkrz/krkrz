@@ -7,6 +7,8 @@
 #include "TickCount.h"
 #include "Random.h"
 
+extern tjs_uint16 TVPTranslateAndroidKeyToVirtualKey( tjs_int androidKey );
+
 tjs_uint32 TVP_TShiftState_To_uint32(TShiftState state) {
 	tjs_uint32 result = 0;
 /* Android用のシフトキー定義に変える
@@ -86,10 +88,10 @@ void TTVPWindowForm::WndProc(NativeEvent& ev) {
 		OnTouchUp( ev.WParamf0, ev.WParamf1, ev.LParamf0, ev.LParamf0, ev.LParam1, ev.Result );
 		break;
 	case AM_KEY_DOWN:
-		OnKeyDown( (tjs_uint16)ev.WParam, (int)ev.LParam );
+		OnKeyDown( (tjs_int)ev.WParam, (int)ev.LParam );
 		break;
 	case AM_KEY_UP:
-		OnKeyUp( (tjs_uint16)ev.WParam, (int)ev.LParam );
+		OnKeyUp( (tjs_int)ev.WParam, (int)ev.LParam );
 		break;
 	case AM_MOVIE_ENDED:
 	case AM_MOVIE_PLAYER_ERROR:
@@ -139,8 +141,8 @@ void TTVPWindowForm::ResetDrawDevice() {
 }
 
 // キー入力
-void TTVPWindowForm::OnKeyDown( tjs_uint16 vk, int shift ) {
-	InternalKeyDown( vk, shift );
+void TTVPWindowForm::OnKeyDown( tjs_int vk, int shift ) {
+	InternalKeyDown( TVPTranslateAndroidKeyToVirtualKey(vk), shift );
 }
 void TTVPWindowForm::InternalKeyDown(tjs_uint16 key, tjs_uint32 shift) {
 	tjs_uint32 tick = TVPGetRoughTickCount32();
@@ -151,8 +153,8 @@ void TTVPWindowForm::InternalKeyDown(tjs_uint16 key, tjs_uint32 shift) {
 		TVPPostInputEvent(new tTVPOnKeyDownInputEvent(TJSNativeInstance, key, shift));
 	}
 }
-void TTVPWindowForm::OnKeyUp( tjs_uint16 vk, int shift ) {
-	InternalKeyUp( vk, shift );
+void TTVPWindowForm::OnKeyUp( tjs_int vk, int shift ) {
+	InternalKeyUp( TVPTranslateAndroidKeyToVirtualKey(vk), shift );
 }
 void TTVPWindowForm::InternalKeyUp( tjs_uint16 key, tjs_uint32 shift ) {
 	tjs_uint32 tick = TVPGetRoughTickCount32();
@@ -163,7 +165,7 @@ void TTVPWindowForm::InternalKeyUp( tjs_uint16 key, tjs_uint32 shift ) {
 		TVPPostInputEvent(new tTVPOnKeyUpInputEvent(TJSNativeInstance, key, shift));
 	}
 }
-void TTVPWindowForm::OnKeyPress( tjs_uint16 vk, int repeat, bool prevkeystate, bool convertkey ) {
+void TTVPWindowForm::OnKeyPress( tjs_int vk, int repeat, bool prevkeystate, bool convertkey ) {
 }
 
 void TTVPWindowForm::SetDrawDeviceDestRect()
