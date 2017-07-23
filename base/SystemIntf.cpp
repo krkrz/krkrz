@@ -452,6 +452,34 @@ TJS_BEGIN_NATIVE_PROP_DECL(exitOnNoWindowStartup)
 }
 TJS_END_NATIVE_STATIC_PROP_DECL(exitOnNoWindowStartup)
 //----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(isWindows) {
+	TJS_BEGIN_NATIVE_PROP_GETTER {
+#ifdef WIN32
+		*result = (tjs_int)1;
+#else
+		*result = (tjs_int)0;
+#endif
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_GETTER
+	TJS_DENY_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_STATIC_PROP_DECL(isWindows)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(isAndroid) {
+	TJS_BEGIN_NATIVE_PROP_GETTER {
+#ifdef ANDROID
+		*result = (tjs_int)1;
+#else
+		*result = (tjs_int)0;
+#endif
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_GETTER
+	TJS_DENY_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_STATIC_PROP_DECL(isAndroid)
+//----------------------------------------------------------------------
 	TJS_END_NATIVE_MEMBERS
 
 
