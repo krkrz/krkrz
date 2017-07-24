@@ -91,7 +91,9 @@ public:
 	// 閉じる
 	void InvalidateClose();
 	void Close();
-	void OnCloseQueryCalled(bool b);
+
+	// Androidで閉じるのを抑止することはできない
+	void OnCloseQueryCalled(bool b) {}
 
 	// 定期的に呼び出されるので、定期処理があれば実行する
 	void TickBeat();

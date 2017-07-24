@@ -125,10 +125,13 @@ bool TTVPWindowForm::GetFormEnabled() {
 
 // 閉じる
 void TTVPWindowForm::InvalidateClose() {
+	// closing action by object invalidation;
+	// this will not cause any user confirmation of closing the window.
+	TJSNativeInstance = nullptr;
+	Application->finishActivity();
 }
 void TTVPWindowForm::Close() {
-}
-void TTVPWindowForm::OnCloseQueryCalled(bool b) {
+	Application->finishActivity();
 }
 
 // 定期的に呼び出されるので、定期処理があれば実行する
