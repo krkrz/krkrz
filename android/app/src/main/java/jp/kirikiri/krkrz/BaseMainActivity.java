@@ -12,7 +12,6 @@ import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.media.AudioManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -20,7 +19,6 @@ import android.os.ParcelFileDescriptor;
 import android.support.v4.provider.DocumentFile;
 import android.util.Log;
 import android.view.Display;
-import android.view.InputDevice;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.Surface;
@@ -270,13 +268,13 @@ public class BaseMainActivity extends Activity  implements SurfaceHolder.Callbac
         return keyCode;
     }
     */
-    private boolean isHangleKeyCode( int keyCode ) {
+    private boolean isHandleKeyCode(int keyCode ) {
         return keyCode != KeyEvent.KEYCODE_HOME && keyCode != KeyEvent.KEYCODE_VOLUME_DOWN &&
                 keyCode != KeyEvent.KEYCODE_VOLUME_UP && keyCode != KeyEvent.KEYCODE_VOLUME_MUTE;
     }
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if( isHangleKeyCode( keyCode ) ) {
+        if( isHandleKeyCode( keyCode ) ) {
             int meta = getModifiersToInt(event.getMetaState(), false);
             //keyCode = keyCodeTranslate(keyCode, event);
             nativeToMessage(EventCode.AM_KEY_DOWN, keyCode, meta );
@@ -290,7 +288,7 @@ public class BaseMainActivity extends Activity  implements SurfaceHolder.Callbac
     }
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
-        if( isHangleKeyCode( keyCode ) ) {
+        if( isHandleKeyCode( keyCode ) ) {
             int meta = getModifiersToInt(event.getMetaState(), false);
             nativeToMessage(EventCode.AM_KEY_UP, keyCode, meta);
         }

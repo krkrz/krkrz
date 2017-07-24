@@ -902,7 +902,7 @@ void tTVPApplication::LoadImageRequest( class iTJSDispatch2 *owner, class tTJSNI
 void tTVPApplication::SendMessageFromJava( tjs_int message, tjs_int64 wparam, tjs_int64 lparam ) {
 	// Main Windowが存在する場合はそのWindowへ送る
 	// TODO startup.tjsがまだ呼ばれていない(ストレージ選択されていない)時に、イベントをキューに溜めるのはよろしくない。メインスレッド起動時にキューを空にするのが良いか？
-	NativeEvent ev(message,lparam,wparam);
+	NativeEvent ev(message,wparam,lparam);
 	switch( message ) {
 	case AM_STARTUP_SCRIPT:
 		postEvent( &ev, nullptr );
@@ -911,9 +911,11 @@ void tTVPApplication::SendMessageFromJava( tjs_int message, tjs_int64 wparam, tj
 	case AM_RESTART:
 		return;
 	case AM_RESUME:
+        /*
 		if( TVPProjectDirSelected ) {
 			startMainLoop();
 		}
+         */
 		break;
 	case AM_PAUSE:
 		break;
