@@ -127,7 +127,6 @@ TJS_END_NATIVE_CONSTRUCTOR_DECL(/*TJS class name*/ImageFunction)
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/copy9Patch)
 {
-	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
 	if(numparams < 2) return TJS_E_BADPARAMCOUNT;
 
 	tTVPBaseBitmap* dst = nullptr;
@@ -157,7 +156,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/copy9Patch)
 	}
 	return TJS_S_OK;
 }
-TJS_END_NATIVE_METHOD_DECL(/*func. name*/copy9Patch)
+TJS_END_NATIVE_STATIC_METHOD_DECL(/*func. name*/copy9Patch)
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/operateAffine)
 {
