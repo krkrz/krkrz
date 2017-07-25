@@ -125,6 +125,40 @@ TJS_END_NATIVE_CONSTRUCTOR_DECL(/*TJS class name*/ImageFunction)
 //-- methods
 
 //----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/copy9Patch)
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer);
+	if(numparams < 2) return TJS_E_BADPARAMCOUNT;
+
+	tTVPBaseBitmap* dst = nullptr;
+	tTJSNI_Bitmap * dstbmp = (tTJSNI_Bitmap*)TJSGetNativeInstance( tTJSNC_Bitmap::ClassID, param[0] );
+	if( dstbmp ) {
+		dst = dstbmp->GetBitmap();
+	}
+	if(!dst) return TJS_E_INVALIDPARAM;
+
+	tTVPBaseBitmap* src = nullptr;
+	tTJSNI_Bitmap * srcbmp = (tTJSNI_Bitmap*)TJSGetNativeInstance( tTJSNC_Bitmap::ClassID, param[1] );
+	if( srcbmp ) {
+		src = srcbmp->GetBitmap();
+	}
+	if(!src) return TJS_E_INVALIDPARAM;
+
+	tTVPRect margin;
+	bool updated = dst->Copy9Patch( src, margin );
+	if( result ) {
+		if( updated ) {
+			iTJSDispatch2 *ret = TVPCreateRectObject( margin.left, margin.top, margin.right, margin.bottom );
+			*result = tTJSVariant(ret, ret);
+			ret->Release();
+		} else {
+			result->Clear();
+		}
+	}
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/copy9Patch)
+//----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/operateAffine)
 {
 	// dst, src, x0/a, y0/b, x1/c, y1/d, x2/tx, y2/ty,
