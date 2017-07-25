@@ -291,6 +291,8 @@ public:
 	void OnStop() {}
 	void OnDestory() {}
 
+	void OnDisplayRotate( tjs_int orientation, tjs_int density );
+
 	NativeEventQueueIntarface* GetEventHandler() { return &EventQueue; }
 };
 

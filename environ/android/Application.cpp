@@ -85,7 +85,9 @@ void TVPGetFileVersionOf( tjs_int& major, tjs_int& minor, tjs_int& release, tjs_
  */
 
 tTVPApplication::tTVPApplication()
-: jvm_(nullptr), window_(nullptr), asset_manager_(nullptr), config_(nullptr), is_terminate_(true), main_window_(nullptr),
+: jvm_(nullptr), window_(nullptr), asset_manager_(nullptr),
+ config_(nullptr,AConfiguration_delete), old_config_(nullptr,AConfiguration_delete),
+ is_terminate_(true), main_window_(nullptr),
  console_cache_(1024), image_load_thread_(nullptr), thread_id_(-1)
 {
 }
@@ -274,6 +276,69 @@ void tTVPApplication::stopMainLoop() {
 		wakeupMainThread();
 		pthread_join( thread_id_, 0 );
 	}
+}
+void tTVPApplication::checkConfigurationUpdate() {
+	if( !config_ || !old_config_ ) return;
+
+	int32_t diff = AConfiguration_diff( old_config_.get(), config_.get() );
+	
+	// Mobile Country Code(電気通信事業者運用地域)
+	//if( diff & ACONFIGURATION_MCC ){}
+
+	// Mobile Network Code(電気通信事業者識別コード)
+	//if( diff & ACONFIGURATION_MNC ){}
+
+	// ロケール
+	//if( diff & ACONFIGURATION_LOCALE ){}
+
+	// タッチスクリーン
+	//if( diff & ACONFIGURATION_TOUCHSCREEN ){}
+
+	// キーボード
+	//if( diff & ACONFIGURATION_KEYBOARD ){}
+
+	// キーボード
+	// if( diff & ACONFIGURATION_KEYBOARD_HIDDEN ){}
+
+	// ナビゲーション
+	// if( diff & ACONFIGURATION_NAVIGATION ){}
+
+	if( diff & ACONFIGURATION_ORIENTATION ) {
+		int32_t density = AConfiguration_getDensity( config_.get() );
+		tjs_int orient = orientUnknown;
+		switch( AConfiguration_getOrientation( config_.get() ) ) {
+		case tTVPApplication::orientUnknown:
+			orient = orientUnknown;
+		case tTVPApplication::orientPortrait:
+			orient = orientPortrait;
+		case tTVPApplication::orientLandscape:
+			orient = orientLandscape;
+		case tTVPApplication::orientSquare:	// not used
+			orient = orientUnknown;
+		}
+		SendMessageFromJava( AM_DISPLAY_ROTATE, orient, density );
+	}
+
+	// 解像度
+	// if( diff & ACONFIGURATION_DENSITY ){}
+
+	// スクリーンサイズ
+	// if( diff & ACONFIGURATION_SCREEN_SIZE ){}
+
+	// プラットフォームバージョン
+	// if( diff & ACONFIGURATION_VERSION ){}
+
+	// スクリーンレイアウト
+	// if( diff & ACONFIGURATION_SCREEN_LAYOUT ){}
+
+	// UIモード
+	// if( diff & ACONFIGURATION_UI_MODE ){}
+
+	// 最小画面幅
+	// if( diff & ACONFIGURATION_SMALLEST_SCREEN_SIZE ){}
+
+	// レイアウトの向き
+	// if( diff & ACONFIGURATION_LAYOUTDIR ){}
 }
 //-----------------------------
 

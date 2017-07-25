@@ -31,6 +31,8 @@ enum {
 
 	AM_KEY_DOWN 		= 0x010031,
 	AM_KEY_UP			= 0x010032,
+
+	AM_DISPLAY_ROTATE	= 0x010041,
 };
 
 

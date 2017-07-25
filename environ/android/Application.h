@@ -59,7 +59,8 @@ class tTVPApplication {
 	JavaVM*			jvm_;
 	ANativeWindow*	window_;
 	AAssetManager*	asset_manager_;	// set from java
-	AConfiguration*	config_;
+	std::unique_ptr<AConfiguration,decltype(&AConfiguration_delete)>		config_;
+	std::unique_ptr<AConfiguration,decltype(&AConfiguration_delete)>		old_config_;
 	jobject			activity_;
 
 	tjs_string title_;
@@ -130,13 +131,22 @@ private:
 public:
 	void setAssetManager( AAssetManager* am ) {
 		asset_manager_ = am;
-		if( config_ == nullptr ) {
-			config_ = AConfiguration_new();
+		if( !config_ ) {
+			config_.reset( AConfiguration_new() );
 		} else {
 			// update configuration
+			if( !old_config_ ) {
+				old_config_.reset( AConfiguration_new() );
+			}
+			AConfiguration_copy( old_config_.get(), config_.get() );
 		}
-		AConfiguration_fromAssetManager( config_, asset_manager_ );
+		AConfiguration_fromAssetManager( config_.get(), asset_manager_ );
+		if( old_config_ ) {
+			// update config
+			checkConfigurationUpdate();
+		}
 	}
+	void checkConfigurationUpdate();
 	static void nativeSetAssetManager(JNIEnv *jenv, jobject obj, jobject assetManager );
 
 	void finishActivity();
@@ -267,8 +277,8 @@ public:
 private:
 	inline jobject getActivity() { return activity_; }
 
-	inline const AConfiguration* getConfiguration() const { assert( config_ ); return config_; }
-	inline AConfiguration* getConfiguration() { assert( config_ ); return config_; }
+	inline const AConfiguration* getConfiguration() const { assert( config_ ); return config_.get(); }
+	inline AConfiguration* getConfiguration() { assert( config_ ); return config_.get(); }
 
 	void HandleMessage( struct NativeEvent &ev );
 

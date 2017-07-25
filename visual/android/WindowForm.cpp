@@ -108,6 +108,9 @@ void TTVPWindowForm::WndProc(NativeEvent& ev) {
 	case AM_MOVIE_PLAY:
 		PostVideoOverlayEvent( ev.Message );
 		break;
+	case AM_DISPLAY_ROTATE:
+		OnDisplayRotate( (tjs_int)ev.WParam, (tjs_int)ev.LParam );
+		break;
 	default:
 		EventQueue.HandlerDefault( ev );
 		break;
@@ -362,4 +365,10 @@ void TTVPWindowForm::OnResume() {
 void TTVPWindowForm::OnPause() {
 	if(TJSNativeInstance) TJSNativeInstance->FireOnActivate(false);
 }
+void TTVPWindowForm::OnDisplayRotate( tjs_int orientation, tjs_int density ) {
+	if(TJSNativeInstance) {
+		TVPPostInputEvent( new tTVPOnDisplayRotateInputEvent(TJSNativeInstance, orientation, -1, density, 0, 0));
+	}
+}
+
 
