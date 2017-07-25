@@ -8,10 +8,6 @@
 #include "WindowIntf.h"
 #include "NativeEventQueue.h"
 
-#ifndef MK_ALT 
-#define MK_ALT (0x20)
-#endif
-
 enum {
 	 ssShift = TVP_SS_SHIFT,
 	 ssAlt = TVP_SS_ALT,
@@ -30,8 +26,8 @@ enum {
 };
 
 typedef unsigned long TShiftState;
-tjs_uint32 TVP_TShiftState_To_uint32(TShiftState state);
-TShiftState TVP_TShiftState_From_uint32(tjs_uint32 state);
+extern tjs_uint32 TVP_TShiftState_To_uint32(TShiftState state);
+extern TShiftState TVP_TShiftState_From_uint32(tjs_uint32 state);
 
 /*
  * tTJSNI_Window が持つ Form クラスに要求されるメソッドを列挙したもの。
@@ -43,10 +39,6 @@ TShiftState TVP_TShiftState_From_uint32(tjs_uint32 state);
 class TTVPWindowForm : public TouchHandler {
 	class tTVPApplication* app_;
 
-	//-- drawdevice related
-	bool NextSetWindowHandleToDrawDevice;
-	tTVPRect LastSentDrawDeviceDestRect;
-
 	TouchPointList touch_points_;
 	VelocityTrackers TouchVelocityTracker;
 	VelocityTracker MouseVelocityTracker;
@@ -57,22 +49,7 @@ class TTVPWindowForm : public TouchHandler {
 	tTJSNI_Window * TJSNativeInstance;
 	int LastMouseDownX, LastMouseDownY; // in Layer coodinates
 
-	//-- layer position / size
-	tjs_int LayerLeft;
-	tjs_int LayerTop;
-	tjs_int LayerWidth;
-	tjs_int LayerHeight;
-	tjs_int ZoomDenom; // Zooming factor denominator (setting)
-	tjs_int ZoomNumer; // Zooming factor numerator (setting)
-	tjs_int ActualZoomDenom; // Zooming factor denominator (actual)
-	tjs_int ActualZoomNumer; // Zooming factor numerator (actual)
-
-	tTVPRect FullScreenDestRect;
-
 private:
-	void InternalSetPaintBoxSize();
-	void SetDrawDeviceDestRect();
-
 	static int MulDiv( int nNumber, int nNumerator, int nDenominator ) {
 		return (int)(((int64_t)nNumber * (int64_t)nNumerator) / nDenominator);
 	}
@@ -86,7 +63,7 @@ public:
 	virtual ~TTVPWindowForm();
 
 	// Windowが有効かどうか、無効だとイベントが配信されない
-	bool GetFormEnabled();
+	bool GetFormEnabled() { return true; }
 
 	// 閉じる
 	void InvalidateClose();
@@ -99,10 +76,7 @@ public:
 	void TickBeat();
 
 	// アクティブ/デアクティブ化された時に、Windowがアクティブかどうかチェックされる
-	bool GetWindowActive();
-
-	// DrawDevice
-	void ResetDrawDevice();
+	bool GetWindowActive() { return true; }
 
 	// キー入力
 	void OnKeyDown( tjs_int vk, int shift );
@@ -110,9 +84,6 @@ public:
 	void OnKeyUp( tjs_int vk, int shift );
 	void InternalKeyUp( tjs_uint16 key, tjs_uint32 shift );
 	void OnKeyPress( tjs_int vk, int repeat, bool prevkeystate, bool convertkey );
-
-	// プライマリーレイヤーのサイズに合うように呼び出される。w/hはLayerWidth/LayerHeightに当たり、ズームを考慮して表示サイズを設定する
-	void SetPaintBoxSize(tjs_int w, tjs_int h);
 
 	// マウスカーソル
 	void SetDefaultMouseCursor() {}
@@ -147,20 +118,16 @@ public:
 	void* GetWindowHandleForPlugin() { return nullptr; }
 
 	// VideoOverlayで表示サイズを決めるためにズーム値を用いて引数値を拡大縮小する
-	void ZoomRectangle( tjs_int & left, tjs_int & top, tjs_int & right, tjs_int & bottom);
+	void ZoomRectangle( tjs_int & left, tjs_int & top, tjs_int & right, tjs_int & bottom) {}
 	// VideoOverlayで表示位置を決めるため、フルスクリーン時の黒ふちを考慮したleft/top位置を得る
-	void GetVideoOffset(tjs_int &ofsx, tjs_int &ofsy);
-
-	// プラグインでメッセージレシーバを登録するに使われる、Androidでは無効
-	//void RegisterWindowMessageReceiver(tTVPWMRRegMode mode, void * proc, const void *userdata);
-
+	void GetVideoOffset(tjs_int &ofsx, tjs_int &ofsy) {}
 
 	// 内容更新
 	void UpdateWindow(tTVPUpdateType type = utNormal);
 
 	// 表示/非表示
 	bool GetVisible() const { return true; }
-	void SetVisibleFromScript(bool b);
+	void SetVisibleFromScript(bool b) { /* 非表示には出来ない */}
 	void ShowWindowAsModal();
 
 	// タイトル、Activityのタイトルに設定できるが、無意味かな
@@ -170,17 +137,17 @@ public:
 
 	// サイズや位置など
 	// 位置はAndroidでは無効か、常に0を返し、設定もスルーなど
-	void SetLeft( int l );
-	int GetLeft() const;
-	void SetTop( int t );
-	int GetTop() const;
-	void SetPosition( int l, int t );
+	void SetLeft( int l ) {}
+	int GetLeft() const { return 0; }
+	void SetTop( int t ) {}
+	int GetTop() const { return 0; }
+	void SetPosition( int l, int t ) {}
 	// サイズ
-	void SetWidth( int w );
+	void SetWidth( int w ){ /* Activityのサイズを変更することはできない */ }
 	int GetWidth() const;
-	void SetHeight( int h );
+	void SetHeight( int h ){ /* Activityのサイズを変更することはできない */ }
 	int GetHeight() const;
-	void SetSize( int w, int h );
+	void SetSize( int w, int h ){ /* Activityのサイズを変更することはできない */ }
 	// 最小、最大サイズ関係、Androidなどリサイズがないとしたら無効か
 	void SetMinWidth( int v ) {}
 	int GetMinWidth() const { return 0; }
@@ -194,11 +161,11 @@ public:
 	void SetMaxSize( int w, int h ) {}
 
 	// 内部のサイズ、実質的にこれが表示領域サイズ
-	void SetInnerWidth( int w );
+	void SetInnerWidth( int w ) { /* 表示領域のサイズを変更することはできない */ }
 	int GetInnerWidth() const;
-	void SetInnerHeight( int h );
+	void SetInnerHeight( int h ) { /* 表示領域のサイズを変更することはできない */ }
 	int GetInnerHeight() const;
-	void SetInnerSize( int w, int h );
+	void SetInnerSize( int w, int h ) { /* 表示領域のサイズを変更することはできない */ }
 
 	// 境界サイズ、無効
 	void SetBorderStyle( enum tTVPBorderStyle st) {}
@@ -231,12 +198,12 @@ public:
 	void SetFocusable(bool b) {}
 	bool GetFocusable() const { return true; }
 
-	// 表示ズーム関係
-	void SetZoom(tjs_int numer, tjs_int denom, bool set_logical = true);
-	void SetZoomNumer( tjs_int n );
-	tjs_int GetZoomNumer() const;
-	void SetZoomDenom(tjs_int d);
-	tjs_int GetZoomDenom() const;
+	// 表示ズーム関係(非サポート)
+	void SetZoom(tjs_int numer, tjs_int denom, bool set_logical = true) {}
+	void SetZoomNumer( tjs_int n ) {}
+	tjs_int GetZoomNumer() const { return 1; }
+	void SetZoomDenom(tjs_int d) {}
+	tjs_int GetZoomDenom() const { return 1; }
 
 	// タッチ入力関係 ( TouchPointList によって管理されている )
 	void SetTouchScaleThreshold( double threshold ) { touch_points_.SetScaleThreshold( threshold ); }
@@ -271,7 +238,6 @@ public:
 	void ResetMouseVelocity() {
 		MouseVelocityTracker.clear();
 	}
-	void TranslateWindowToDrawArea(float&x, float &y);
 
 	// 画面表示向き取得
 	int GetDisplayOrientation();

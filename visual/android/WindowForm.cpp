@@ -9,46 +9,15 @@
 
 extern tjs_uint16 TVPTranslateAndroidKeyToVirtualKey( tjs_int androidKey );
 
-tjs_uint32 TVP_TShiftState_To_uint32(TShiftState state) {
-	tjs_uint32 result = 0;
-/* Android用のシフトキー定義に変える
-	if( state & MK_SHIFT ) {
-		result |= ssShift;
-	}
-	if( state & MK_CONTROL ) {
-		result |= ssCtrl;
-	}
-	if( state & MK_ALT ) {
-		result |= ssAlt;
-	}
-*/
-	return result;
-}
-TShiftState TVP_TShiftState_From_uint32(tjs_uint32 state){
-	TShiftState result = 0;
-/* Android用のシフトキー定義に変える
-	if( state & ssShift ) {
-		result |= MK_SHIFT;
-	}
-	if( state & ssCtrl ) {
-		result |= MK_CONTROL;
-	}
-	if( state & ssAlt ) {
-		result |= MK_ALT;
-	}
-*/
-	return result;
-}
+// Androidでは変換しない, ssShiftなどで統一的に扱っている。
+tjs_uint32 TVP_TShiftState_To_uint32(TShiftState state) { return (tjs_uint32)state; }
+TShiftState TVP_TShiftState_From_uint32(tjs_uint32 state){ return (TShiftState)state; }
 
 TTVPWindowForm::TTVPWindowForm( class tTVPApplication* app, class tTJSNI_Window* ni )
- : app_(app), touch_points_(this), EventQueue(this,&TTVPWindowForm::WndProc), TJSNativeInstance(ni), FullScreenDestRect(0,0,0,0),
-	LayerLeft(0), LayerTop(0), LayerWidth(32), LayerHeight(32), ZoomDenom(1), ActualZoomDenom(1), ZoomNumer(1), ActualZoomNumer(1) {
+ : app_(app), touch_points_(this), EventQueue(this,&TTVPWindowForm::WndProc), TJSNativeInstance(ni) {
 	EventQueue.Allocate();
 
 	app->AddWindow(this);
-
-	NextSetWindowHandleToDrawDevice = true;
-	LastSentDrawDeviceDestRect.clear();
 }
 TTVPWindowForm::~TTVPWindowForm() {
 	EventQueue.Deallocate();
@@ -74,7 +43,7 @@ void TTVPWindowForm::WndProc(NativeEvent& ev) {
 		OnDestory();
 		break;
 	case AM_SURFACE_CHANGED:
-		// Surfaceが切り替わったので、DrawDevice 準備
+		// Surfaceが切り替わった
 		UpdateWindow();
 		break;
 	case AM_SURFACE_CREATED:
@@ -121,10 +90,7 @@ void TTVPWindowForm::PostVideoOverlayEvent( tjs_uint ev ) {
 		TJSNativeInstance->VideoOverlayEvent( ev );
 	}
 }
-// Windowが有効かどうか、無効だとイベントが配信されない
-bool TTVPWindowForm::GetFormEnabled() {
-	return true;
-}
+
 
 // 閉じる
 void TTVPWindowForm::InvalidateClose() {
@@ -141,14 +107,6 @@ void TTVPWindowForm::Close() {
 void TTVPWindowForm::TickBeat() {
 }
 
-// アクティブ/デアクティブ化された時に、Windowがアクティブかどうかチェックされる
-bool TTVPWindowForm::GetWindowActive() {
-	return true;
-}
-
-// DrawDevice
-void TTVPWindowForm::ResetDrawDevice() {
-}
 
 // キー入力
 void TTVPWindowForm::OnKeyDown( tjs_int vk, int shift ) {
@@ -178,63 +136,16 @@ void TTVPWindowForm::InternalKeyUp( tjs_uint16 key, tjs_uint32 shift ) {
 void TTVPWindowForm::OnKeyPress( tjs_int vk, int repeat, bool prevkeystate, bool convertkey ) {
 }
 
-void TTVPWindowForm::SetDrawDeviceDestRect()
-{
-	tTVPRect destrect;
-	tjs_int w = MulDiv(LayerWidth,  ActualZoomNumer, ActualZoomDenom);
-	tjs_int h = MulDiv(LayerHeight, ActualZoomNumer, ActualZoomDenom);
-	if( w < 1 ) w = 1;
-	if( h < 1 ) h = 1;
-
-	destrect.left = destrect.top = 0;
-	destrect.right = w;
-	destrect.bottom = h;
-
-	if( LastSentDrawDeviceDestRect != destrect ) {
-		if( TJSNativeInstance ) {
-			if( GetFullScreenMode() ) {
-				TJSNativeInstance->GetDrawDevice()->SetClipRectangle(FullScreenDestRect);
-			} else {
-				TJSNativeInstance->GetDrawDevice()->SetClipRectangle(destrect);
-			}
-			TJSNativeInstance->GetDrawDevice()->SetDestRectangle(destrect);
-		}
-		LastSentDrawDeviceDestRect = destrect;
-	}
-}
-void TTVPWindowForm::InternalSetPaintBoxSize() {
-	SetDrawDeviceDestRect();
-}
-// プライマリーレイヤーのサイズに合うように呼び出される。w/hはLayerWidth/LayerHeightに当たり、ズームを考慮して表示サイズを設定する
-void TTVPWindowForm::SetPaintBoxSize(tjs_int w, tjs_int h) {
-	LayerWidth  = w;
-	LayerHeight = h;
-	InternalSetPaintBoxSize();
-}
-
-// VideoOverlayで表示サイズを決めるためにズーム値を用いて引数値を拡大縮小する
-void TTVPWindowForm::ZoomRectangle( tjs_int & left, tjs_int & top, tjs_int & right, tjs_int & bottom) {
-}
-// VideoOverlayで表示位置を決めるため、フルスクリーン時の黒ふちを考慮したleft/top位置を得る
-void TTVPWindowForm::GetVideoOffset(tjs_int &ofsx, tjs_int &ofsy) {
-}
-
 // 内容更新
 void TTVPWindowForm::UpdateWindow(tTVPUpdateType type) {
 	if( TJSNativeInstance ) {
-		tTVPRect r;
-		r.left = 0;
-		r.top = 0;
-		r.right = LayerWidth;
-		r.bottom = LayerHeight;
+		tTVPRect r; // dummy
 		TJSNativeInstance->NotifyWindowExposureToLayer(r);
 		TVPDeliverWindowUpdateEvents();
 	}
 }
 
 // 表示/非表示
-void TTVPWindowForm::SetVisibleFromScript(bool b) {
-}
 void TTVPWindowForm::ShowWindowAsModal() {
 	// modal は対応しないので、例外出す
 	TVPThrowExceptionMessage(TJS_W("Modal window is not supported."));
@@ -252,41 +163,20 @@ void TTVPWindowForm::SetCaption( const tjs_string& v ) {
 }
 
 // サイズや位置など
-// 位置はAndroidでは無効か、常に0を返し、設定もスルーなど
-void TTVPWindowForm::SetLeft( int l ) {}
-int TTVPWindowForm::GetLeft() const { return 0; };
-void TTVPWindowForm::SetTop( int t ) {}
-int TTVPWindowForm::GetTop() const { return 0; }
-void TTVPWindowForm::SetPosition( int l, int t ) {}
 // サイズ
-void TTVPWindowForm::SetWidth( int w ) { /* Activityのサイズを変更することはできない */ }
 int TTVPWindowForm::GetWidth() const {
 	return Application->GetActivityWidth();
 }
-void TTVPWindowForm::SetHeight( int h ) { /* Activityのサイズを変更することはできない */ }
 int TTVPWindowForm::GetHeight() const {
 	return Application->GetActivityHeight();
 }
-void TTVPWindowForm::SetSize( int w, int h ) { /* Activityのサイズを変更することはできない */ }
-
 // 内部のサイズ、実質的にこれが表示領域サイズ
-void TTVPWindowForm::SetInnerWidth( int w ) { /* 表示領域のサイズを変更することはできない */ }
 int TTVPWindowForm::GetInnerWidth() const {
 	return Application->GetMainViewWidth();
 }
-void TTVPWindowForm::SetInnerHeight( int h ) { /* 表示領域のサイズを変更することはできない */ }
 int TTVPWindowForm::GetInnerHeight() const {
 	return Application->GetMainViewHeight();
 }
-void TTVPWindowForm::SetInnerSize( int w, int h ) { /* 表示領域のサイズを変更することはできない */ }
-
-// 表示ズーム関係
-void TTVPWindowForm::SetZoom(tjs_int numer, tjs_int denom, bool set_logical ) {}
-void TTVPWindowForm::SetZoomNumer( tjs_int n ) {}
-tjs_int TTVPWindowForm::GetZoomNumer() const { return 1; }
-void TTVPWindowForm::SetZoomDenom(tjs_int d) {}
-tjs_int TTVPWindowForm::GetZoomDenom() const { return 1; }
-
 // 画面表示向き取得
 int TTVPWindowForm::GetDisplayOrientation() {
 	tjs_int orient = Application->getOrientation();
@@ -306,15 +196,7 @@ int TTVPWindowForm::GetDisplayRotate() {
 	return Application->GetDisplayRotate();
 }
 
-void TTVPWindowForm::TranslateWindowToDrawArea(float&x, float &y) {
-	if( GetFullScreenMode() ) {
-		x -= FullScreenDestRect.left;
-		y -= FullScreenDestRect.top;
-	}
-}
 void TTVPWindowForm::OnTouchDown( float x, float y, float cx, float cy, tjs_int id, tjs_int64 tick ) {
-	TranslateWindowToDrawArea(x, y);
-
 	TouchVelocityTracker.start( id );
 	TouchVelocityTracker.update( id, tick, (float)x, (float)y );
 
@@ -324,8 +206,6 @@ void TTVPWindowForm::OnTouchDown( float x, float y, float cx, float cy, tjs_int 
 	touch_points_.TouchDown( x, y ,cx, cy, id, static_cast<tjs_uint>(tick&0xffffffff) );
 }
 void TTVPWindowForm::OnTouchMove( float x, float y, float cx, float cy, tjs_int id, tjs_int64 tick ) {
-	TranslateWindowToDrawArea( x, y);
-
 	TouchVelocityTracker.update( id, tick, (float)x, (float)y );
 
 	if(TJSNativeInstance) {
@@ -334,8 +214,6 @@ void TTVPWindowForm::OnTouchMove( float x, float y, float cx, float cy, tjs_int 
 	touch_points_.TouchMove( x, y, cx, cy, id, static_cast<tjs_uint>(tick&0xffffffff) );
 }
 void TTVPWindowForm::OnTouchUp( float x, float y, float cx, float cy, tjs_int id, tjs_int64 tick ) {
-	TranslateWindowToDrawArea( x, y);
-
 	TouchVelocityTracker.update( id, tick, (float)x, (float)y );
 
 	if(TJSNativeInstance) {

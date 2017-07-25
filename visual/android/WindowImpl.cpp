@@ -123,7 +123,9 @@ bool tTJSNI_Window::GetWindowActive()
 //---------------------------------------------------------------------------
 void tTJSNI_Window::ResetDrawDevice()
 {
+#ifdef WIN32
 	if(Form) Form->ResetDrawDevice();
+#endif
 }
 //---------------------------------------------------------------------------
 void tTJSNI_Window::PostInputEvent(const ttstr &name, iTJSDispatch2 * params)
@@ -215,12 +217,14 @@ void TJS_INTF_METHOD tTJSNI_Window::NotifySrcResize()
 {
 	tTJSNI_BaseWindow::NotifySrcResize();
 
+#ifdef WIN32
 	// is called from primary layer
 	// ( or from TWindowForm to reset paint box's size )
 	tjs_int w, h;
 	DrawDevice->GetSrcSize(w, h);
 	if(Form)
 		Form->SetPaintBoxSize(w, h);
+#endif
 }
 //---------------------------------------------------------------------------
 void TJS_INTF_METHOD tTJSNI_Window::SetDefaultMouseCursor()
@@ -738,7 +742,8 @@ bool tTJSNI_Window::GetTrapKey() const
 	return Form->GetTrapKey();
 }
 //---------------------------------------------------------------------------
-/*void tTJSNI_Window::SetMaskRegion(tjs_int threshold)
+#ifdef WIN32
+void tTJSNI_Window::SetMaskRegion(tjs_int threshold)
 {
 	if(!Form) return;
 
@@ -752,7 +757,8 @@ void tTJSNI_Window::RemoveMaskRegion()
 {
 	if(!Form) return;
 	Form->RemoveMaskRegion();
-}*/
+}
+#endif
 //---------------------------------------------------------------------------
 void tTJSNI_Window::SetMouseCursorState(tTVPMouseCursorState mcs)
 {
@@ -911,7 +917,9 @@ int tTJSNI_Window::GetDisplayRotate()
 //---------------------------------------------------------------------------
 bool tTJSNI_Window::WaitForVBlank( tjs_int* in_vblank, tjs_int* delayed )
 {
+#ifdef WIN32
 	if( DrawDevice ) return DrawDevice->WaitForVBlank( in_vblank, delayed );
+#endif
 	return false;
 }
 //---------------------------------------------------------------------------
@@ -933,81 +941,109 @@ void tTJSNI_Window::UpdateVSyncThread()
 //---------------------------------------------------------------------------
 void TJS_INTF_METHOD tTJSNI_Window::StartBitmapCompletion(iTVPLayerManager * manager)
 {
+#ifdef WIN32
 	if( DrawDevice ) DrawDevice->StartBitmapCompletion(manager);
+#endif
 }
 //---------------------------------------------------------------------------
 void TJS_INTF_METHOD tTJSNI_Window::NotifyBitmapCompleted(class iTVPLayerManager * manager,
 	tjs_int x, tjs_int y, const void * bits, const class BitmapInfomation * bitmapinfo,
 	const tTVPRect &cliprect, tTVPLayerType type, tjs_int opacity)
 {
+#ifdef WIN32
 	if( DrawDevice ) {
 		DrawDevice->NotifyBitmapCompleted(manager,x,y,bits,bitmapinfo, cliprect, type, opacity );
 	}
+#endif
 }
 //---------------------------------------------------------------------------
 void TJS_INTF_METHOD tTJSNI_Window::EndBitmapCompletion(iTVPLayerManager * manager)
 {
+#ifdef WIN32
 	if( DrawDevice ) DrawDevice->EndBitmapCompletion(manager);
+#endif
 }
 //---------------------------------------------------------------------------
 void TJS_INTF_METHOD tTJSNI_Window::SetMouseCursor(class iTVPLayerManager* manager, tjs_int cursor)
 {
+#ifdef WIN32
 	if( DrawDevice ) {
 		if(cursor == 0)
 			DrawDevice->SetDefaultMouseCursor(manager);
 		else
 			DrawDevice->SetMouseCursor(manager, cursor);
 	}
+#endif
 }
 //---------------------------------------------------------------------------
 void TJS_INTF_METHOD tTJSNI_Window::GetCursorPos(class iTVPLayerManager* manager, tjs_int &x, tjs_int &y)
 {
+#ifdef WIN32
 	if( DrawDevice ) DrawDevice->GetCursorPos(manager, x, y);
+#endif
 }
 //---------------------------------------------------------------------------
 void TJS_INTF_METHOD tTJSNI_Window::SetCursorPos(class iTVPLayerManager* manager, tjs_int x, tjs_int y)
 {
+#ifdef WIN32
 	if( DrawDevice ) DrawDevice->SetCursorPos(manager, x, y);
+#endif
 }
 //---------------------------------------------------------------------------
 void TJS_INTF_METHOD tTJSNI_Window::ReleaseMouseCapture(class iTVPLayerManager* manager)
 {
+#ifdef WIN32
 	if( DrawDevice ) DrawDevice->WindowReleaseCapture(manager);
+#endif
 }
 //---------------------------------------------------------------------------
 void TJS_INTF_METHOD tTJSNI_Window::SetHint(class iTVPLayerManager* manager, iTJSDispatch2* sender, const ttstr &hint)
 {
+#ifdef WIN32
 	if( DrawDevice ) DrawDevice->SetHintText(manager, sender, hint);
+#endif
 }
 //---------------------------------------------------------------------------
 void TJS_INTF_METHOD tTJSNI_Window::NotifyLayerResize(class iTVPLayerManager* manager)
 {
+#ifdef WIN32
 	if( DrawDevice ) DrawDevice->NotifyLayerResize(manager);
+#endif
 }
 //---------------------------------------------------------------------------
 void TJS_INTF_METHOD tTJSNI_Window::NotifyLayerImageChange(class iTVPLayerManager* manager)
 {
+#ifdef WIN32
 	if( DrawDevice ) DrawDevice->NotifyLayerImageChange(manager);
+#endif
 }
 //---------------------------------------------------------------------------
 void TJS_INTF_METHOD tTJSNI_Window::SetAttentionPoint(class iTVPLayerManager* manager, tTJSNI_BaseLayer *layer, tjs_int x, tjs_int y)
 {
+#ifdef WIN32
 	if( DrawDevice ) DrawDevice->SetAttentionPoint(manager, layer, x, y);
+#endif
 }
 //---------------------------------------------------------------------------
 void TJS_INTF_METHOD tTJSNI_Window::DisableAttentionPoint(class iTVPLayerManager* manager)
 {
+#ifdef WIN32
 	if( DrawDevice ) DrawDevice->DisableAttentionPoint(manager);
+#endif
 }
 //---------------------------------------------------------------------------
 void TJS_INTF_METHOD tTJSNI_Window::SetImeMode( class iTVPLayerManager* manager, tjs_int mode ) // mode == tTVPImeMode
 {
+#ifdef WIN32
 	if( DrawDevice ) DrawDevice->SetImeMode(manager, (tTVPImeMode)mode);
+#endif
 }
 //---------------------------------------------------------------------------
 void TJS_INTF_METHOD tTJSNI_Window::ResetImeMode( class iTVPLayerManager* manager )
 {
+#ifdef WIN32
 	if( DrawDevice ) DrawDevice->ResetImeMode(manager);
+#endif
 }
 //---------------------------------------------------------------------------
 void tTJSNI_Window::OnTouchUp( tjs_real x, tjs_real y, tjs_real cx, tjs_real cy, tjs_uint32 id )
@@ -1185,7 +1221,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(resetMouseVelocity)
 }
 TJS_END_NATIVE_METHOD_DECL_OUTER(cls, resetMouseVelocity)
 //---------------------------------------------------------------------------
-#if 0
+#ifdef WIN32
 TJS_BEGIN_NATIVE_PROP_DECL(HWND)
 {
 	TJS_BEGIN_NATIVE_PROP_GETTER
@@ -1201,6 +1237,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(HWND)
 TJS_END_NATIVE_PROP_DECL_OUTER(cls, HWND)
 #endif
 //---------------------------------------------------------------------------
+#ifdef WIN32
 TJS_BEGIN_NATIVE_PROP_DECL(drawDevice)
 {
 	TJS_BEGIN_NATIVE_PROP_GETTER
@@ -1220,6 +1257,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(drawDevice)
 	TJS_END_NATIVE_PROP_SETTER
 }
 TJS_END_NATIVE_PROP_DECL_OUTER(cls, drawDevice)
+#endif
 //---------------------------------------------------------------------------
 TJS_BEGIN_NATIVE_PROP_DECL(touchScaleThreshold)
 {
