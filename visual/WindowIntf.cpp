@@ -723,7 +723,7 @@ void TJS_INTF_METHOD tTJSNI_BaseWindow::UnregisterLayerManager(iTVPLayerManager 
 //---------------------------------------------------------------------------
 void tTJSNI_BaseWindow::NotifyWindowExposureToLayer(const tTVPRect &cliprect)
 {
-	if( CanvasInstance ) OnDraw();
+	if( CanvasInstance ) StartDrawing();
 	if( DrawDevice ) DrawDevice->RequestInvalidation(cliprect);
 }
 //---------------------------------------------------------------------------
