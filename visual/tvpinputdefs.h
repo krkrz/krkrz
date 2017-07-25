@@ -106,6 +106,27 @@ inline bool TVPIsAnyMouseButtonPressedInShiftStateFlags(tjs_uint32 state)
 #define VK_PADANY		0x1DF   // returns whether any one of pad buttons are pressed,
 							    // in System.getKeyState
 #define VK_PAD_LAST		0x1DF   // last PAD related key code
+enum {
+	VK_PADCENTER    = 0x1B9,
+	VK_PAD_A        = 0x1D0,
+	VK_PAD_B        = 0x1D1,
+	VK_PAD_C        = 0x1D2,
+	VK_PAD_X        = 0x1D3,
+	VK_PAD_Y        = 0x1D4,
+	VK_PAD_Z        = 0x1D5,
+	VK_PAD_L1       = 0x1D6,
+	VK_PAD_R1       = 0x1D7,
+	VK_PAD_L2       = 0x1D8,
+	VK_PAD_R2       = 0x1D9,
+	VK_PAD_THUMBL   = 0x1DA,
+	VK_PAD_THUMBR   = 0x1DB,
+	VK_PAD_START    = 0x1DC,
+	VK_PAD_SELECT   = 0x1DD,
+	VK_PAD_MODE     = 0x1DE,
+	VK_MEDIA_REWIND = 0x1F0,
+	VK_MEDIA_FAST_FORWARD = 0x1F1,
+	VK_BACK_SCREEN  = 0x200,
+};
 //---------------------------------------------------------------------------
 /*]*/
 //---------------------------------------------------------------------------
