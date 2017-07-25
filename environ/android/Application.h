@@ -114,6 +114,7 @@ class tTVPApplication {
 	std::vector<char>		console_cache_;
 
 	tjs_string				startup_path_;
+	bool					activity_active_;
 private:
 	NativeEvent* createNativeEvent();
 	void releaseNativeEvent( NativeEvent* ev );
@@ -355,7 +356,7 @@ public:
 	tjs_int GetScreenHeight() const;
 
 	// アクティブかどうか
-	bool GetActivating() const { return true; }	// TODO
+	bool GetActivating() const { return activity_active_; }
 	// Android では非アクティブの時は最初化とみなす
 	bool GetNotMinimizing() const { return !GetActivating(); }
 	// Toastを使って文字列を表示する

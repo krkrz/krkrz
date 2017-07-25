@@ -88,7 +88,8 @@ tTVPApplication::tTVPApplication()
 : jvm_(nullptr), window_(nullptr), asset_manager_(nullptr),
  config_(nullptr,AConfiguration_delete), old_config_(nullptr,AConfiguration_delete),
  is_terminate_(true), main_window_(nullptr),
- console_cache_(1024), image_load_thread_(nullptr), thread_id_(-1)
+ console_cache_(1024), image_load_thread_(nullptr), thread_id_(-1),
+ activity_active_(false)
 {
 }
 tTVPApplication::~tTVPApplication() {
@@ -966,7 +967,6 @@ void tTVPApplication::LoadImageRequest( class iTJSDispatch2 *owner, class tTJSNI
  */
 void tTVPApplication::SendMessageFromJava( tjs_int message, tjs_int64 wparam, tjs_int64 lparam ) {
 	// Main Windowが存在する場合はそのWindowへ送る
-	// TODO startup.tjsがまだ呼ばれていない(ストレージ選択されていない)時に、イベントをキューに溜めるのはよろしくない。メインスレッド起動時にキューを空にするのが良いか？
 	NativeEvent ev(message,wparam,lparam);
 	switch( message ) {
 	case AM_STARTUP_SCRIPT:
@@ -976,13 +976,10 @@ void tTVPApplication::SendMessageFromJava( tjs_int message, tjs_int64 wparam, tj
 	case AM_RESTART:
 		return;
 	case AM_RESUME:
-        /*
-		if( TVPProjectDirSelected ) {
-			startMainLoop();
-		}
-         */
+		activity_active_ = true;
 		break;
 	case AM_PAUSE:
+		activity_active_ = false;
 		break;
 	case AM_STOP:
 		break;
@@ -1228,7 +1225,5 @@ extern "C" jint JNI_OnLoad( JavaVM *vm, void *reserved ) {
 	// register native methods
 	int res = registerJavaMethod(env);
 
-	// メッセージリソースを読み込む、strings.xmlに移動したらもう少し後で読み込んだ方がいいかもしれない
-	// TVPLoadMessage();
 	return JNI_VERSION_1_6;
 }
