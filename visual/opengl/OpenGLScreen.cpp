@@ -202,16 +202,19 @@ bool tTVPOpenGLScreen::Initialize() {
 #endif
 }
 void tTVPOpenGLScreen::ReleaseSurface() {
+#ifdef ANDROID
     if( mSurface != EGL_NO_SURFACE ) {
         assert( mDisplay != EGL_NO_DISPLAY );
         eglDestroySurface( mDisplay, mSurface );
         mSurface = EGL_NO_SURFACE;
     }
+#endif
 }
 void tTVPOpenGLScreen::UpdateWindowSurface( void* nativeHandle ) {
 	if( mSurface != EGL_NO_SURFACE ) {
 		return;
 	}
+#ifdef ANDROID
 	NativeHandle = nativeHandle;
 	ANativeWindow* window = reinterpret_cast<ANativeWindow*>(NativeHandle);
 	EGLint format;
@@ -231,6 +234,7 @@ void tTVPOpenGLScreen::UpdateWindowSurface( void* nativeHandle ) {
 		Destroy();
 		return;
 	}
+#endif
 }
 
 void tTVPOpenGLScreen::Destroy() {
