@@ -16,17 +16,35 @@
 //---------------------------------------------------------------------------
 tTVPDrawCycleTimer::tTVPDrawCycleTimer(tTJSNI_BaseWindow* owner) : OwnerWindow(owner) {
 	tTVPTimerThread::Add(this);
+#ifdef ANDROID
+	Application->addActivityEventHandler( this );
+#endif
 }
 //---------------------------------------------------------------------------
 tTVPDrawCycleTimer::~tTVPDrawCycleTimer() {
 	tTVPTimerThread::Remove(this);
 	ZeroPendingCount();
+#ifdef ANDROID
+	Application->removeActivityEventHandler( this );
+#endif
 }
+//---------------------------------------------------------------------------
+#ifdef ANDROID
+void tTVPDrawCycleTimer::onResume() {
+	ForceDisable = false;
+	ResetDrawCycle();
+}
+//---------------------------------------------------------------------------
+void tTVPDrawCycleTimer::onPause() {
+	ForceDisable = true;
+	SetEnabled( false );
+}
+#endif
 //---------------------------------------------------------------------------
 void tTVPDrawCycleTimer::Fire(tjs_uint n) {
 	if( OwnerWindow == nullptr ) return;
 
-	OwnerWindow->StartDrawingInternal();
+	if( !ForceDisable ) OwnerWindow->StartDrawingInternal();
 
 	tjs_uint32 tick = TVPGetRoughTickCount32();
 	tjs_uint32 lasttick = LastDrawTick;

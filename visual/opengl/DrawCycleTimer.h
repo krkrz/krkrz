@@ -5,15 +5,21 @@
 #include "ThreadIntf.h"
 #include "TimerThread.h"
 #include "TVPTimer.h"
-
+#ifdef ANDROID
+#include "Application.h"
+#endif
 //---------------------------------------------------------------------------
 // onDrawを発生させるためのタイマー
 //---------------------------------------------------------------------------
 class tTVPDrawCycleTimer : public tTVPTimerBase
+#ifdef ANDROID
+, public iTVPAndroidActivityEventHandler
+#endif
 {
 	tjs_uint32 DrawCycle = 0;		//!< 描画サイクル
 	tjs_uint32 LastDrawTick = 0;	//!< 最後の描画時間
 	class tTJSNI_BaseWindow* OwnerWindow;
+	bool ForceDisable = false;
 
 public:
 	tTVPDrawCycleTimer(class tTJSNI_BaseWindow* owner);
@@ -22,6 +28,11 @@ public:
 protected:
 	void Fire(tjs_uint n) override;
 	void CancelEvents() override {}
+
+#ifdef ANDROID
+	void onResume() override;
+	void onPause() override;
+#endif
 
 public:
 	/**

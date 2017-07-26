@@ -44,11 +44,13 @@ void TTVPWindowForm::WndProc(NativeEvent& ev) {
 		break;
 	case AM_SURFACE_CHANGED:
 		// Surfaceが切り替わった
+		if( TJSNativeInstance ) TJSNativeInstance->UpdateCanvasSurface();
 		UpdateWindow();
 		break;
 	case AM_SURFACE_CREATED:
 		break;
 	case AM_SURFACE_DESTORYED:
+		if( TJSNativeInstance ) TJSNativeInstance->ReleaseCanvasSurface();
 		break;
 	case AM_SURFACE_PAINT_REQUEST:
 		UpdateWindow();

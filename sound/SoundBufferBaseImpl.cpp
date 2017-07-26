@@ -12,7 +12,12 @@
 
 #include <algorithm>
 #include "SoundBufferBaseImpl.h"
+#ifdef WIN32
 #include "WaveImpl.h"
+#endif
+#ifdef ANDROID
+extern void TVPWaveSoundBufferCommitSettings();
+#endif
 
 #include "TVPTimer.h"
 

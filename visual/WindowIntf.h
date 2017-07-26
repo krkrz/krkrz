@@ -187,6 +187,9 @@ public:
 	const tTJSVariant & GetCanvasObject() const { return CanvasObject; }
 	void CreateCanvas( iTJSDispatch2 *tjs_obj );
 
+	void UpdateCanvasSurface();
+	void ReleaseCanvasSurface();
+
 	//----- event dispatching
 public:
 	virtual bool CanDeliverEvents() const = 0; // implement this in each platform

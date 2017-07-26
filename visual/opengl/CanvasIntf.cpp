@@ -183,6 +183,23 @@ void TJS_INTF_METHOD tTJSNI_Canvas::Destruct() {
 	tTJSNativeInstance::Destruct();
 }
 //----------------------------------------------------------------------
+void tTJSNI_Canvas::UpdateWindowSurface() {
+#if defined( ANDROID )
+	if( GLScreen ) {
+		ANativeWindow* win = Application->getWindow();
+		GLScreen->UpdateWindowSurface( (void*)win );
+	}
+#endif
+}
+//----------------------------------------------------------------------
+void tTJSNI_Canvas::ReleaseWindowSurface() {
+#if defined( ANDROID )
+	if( GLScreen ) {
+		GLScreen->ReleaseSurface();
+	}
+#endif
+}
+//----------------------------------------------------------------------
 void tTJSNI_Canvas::CreateDefaultMatrix() {
 	{	// set default matrix
 		iTJSDispatch2 * cls = NULL;

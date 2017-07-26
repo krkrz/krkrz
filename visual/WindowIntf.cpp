@@ -214,6 +214,18 @@ void tTJSNI_BaseWindow::CreateCanvas( iTJSDispatch2 *tjs_obj )
 	}
 }
 //---------------------------------------------------------------------------
+void tTJSNI_BaseWindow::UpdateCanvasSurface() {
+	if( CanvasInstance ) {
+		CanvasInstance->UpdateWindowSurface();
+	}
+}
+//---------------------------------------------------------------------------
+void tTJSNI_BaseWindow::ReleaseCanvasSurface() {
+	if( CanvasInstance ) {
+		CanvasInstance->ReleaseWindowSurface();
+	}
+}
+//---------------------------------------------------------------------------
 void TJS_INTF_METHOD
 tTJSNI_BaseWindow::Invalidate()
 {

@@ -37,8 +37,10 @@ public:
 	bool Initialize();
 	void Destroy();
 	bool IsInitialized() const;
+	void UpdateWindowSurface( void* nativeHandle );
+	void ReleaseSurface();
 
-	void Swap() { eglSwapBuffers( mDisplay, mSurface ); }
+	void Swap();
 	EGLConfig GetConfig() const { return mConfig; }
 	EGLDisplay GetDisplay() const { return mDisplay; }
 	EGLSurface GetSurface() const { return mSurface; }

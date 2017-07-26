@@ -201,6 +201,37 @@ bool tTVPOpenGLScreen::Initialize() {
 	return true;
 #endif
 }
+void tTVPOpenGLScreen::ReleaseSurface() {
+    if( mSurface != EGL_NO_SURFACE ) {
+        assert( mDisplay != EGL_NO_DISPLAY );
+        eglDestroySurface( mDisplay, mSurface );
+        mSurface = EGL_NO_SURFACE;
+    }
+}
+void tTVPOpenGLScreen::UpdateWindowSurface( void* nativeHandle ) {
+	if( mSurface != EGL_NO_SURFACE ) {
+		return;
+	}
+	NativeHandle = nativeHandle;
+	ANativeWindow* window = reinterpret_cast<ANativeWindow*>(NativeHandle);
+	EGLint format;
+	if( !eglGetConfigAttrib( mDisplay, mConfig, EGL_NATIVE_VISUAL_ID, &format ) ) {
+		CheckEGLErrorAndLog();
+		Destroy();
+		return;
+	}
+	ANativeWindow_setBuffersGeometry( window, 0, 0, format );
+	if( !(mSurface = eglCreateWindowSurface( mDisplay, mConfig, window, 0)) ) {
+		CheckEGLErrorAndLog();
+		Destroy();
+		return;
+	}
+	if( !eglMakeCurrent(mDisplay, mSurface, mSurface, mContext) ) {
+		CheckEGLErrorAndLog();
+		Destroy();
+		return;
+	}
+}
 
 void tTVPOpenGLScreen::Destroy() {
 #ifdef WIN32
@@ -245,8 +276,13 @@ bool tTVPOpenGLScreen::IsInitialized() const {
 	return mSurface != EGL_NO_SURFACE && mContext != EGL_NO_CONTEXT && mDisplay != EGL_NO_DISPLAY;
 }
 
+void tTVPOpenGLScreen::Swap() {
+	if( mSurface != EGL_NO_SURFACE ) {
+		eglSwapBuffers( mDisplay, mSurface );
+	}
+}
 EGLint tTVPOpenGLScreen::GetSurfaceWidth() const {
-	EGLint result;
+	EGLint result = 0;
 	EGLBoolean ret = eglQuerySurface( mDisplay, mSurface, EGL_WIDTH, &result );
 	if( ret == EGL_FALSE ) {
 		CheckEGLErrorAndLog();
@@ -254,7 +290,7 @@ EGLint tTVPOpenGLScreen::GetSurfaceWidth() const {
 	return result;
 }
 EGLint tTVPOpenGLScreen::GetSurfaceHeight() const {
-	EGLint result;
+	EGLint result = 0;
 	EGLBoolean ret = eglQuerySurface( mDisplay, mSurface, EGL_HEIGHT, &result );
 	if( ret == EGL_FALSE ) {
 		CheckEGLErrorAndLog();

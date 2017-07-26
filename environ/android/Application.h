@@ -55,6 +55,13 @@ struct EventCommand {
 	EventCommand() : target(nullptr), command(nullptr) {}
 };
 
+class iTVPAndroidActivityEventHandler {
+public:
+	virtual void onResume() = 0;
+	virtual void onPause() = 0;
+};
+
+
 class tTVPApplication {
 	JavaVM*			jvm_;
 	ANativeWindow*	window_;
@@ -68,6 +75,7 @@ class tTVPApplication {
 	std::vector<NativeEventQueueIntarface*>	event_handlers_;
 	std::vector<NativeEvent*>				command_cache_;
 	std::queue<EventCommand>				command_que_;
+	std::vector<iTVPAndroidActivityEventHandler*>	activity_ev_handlers_;
 
 	std::string language_;
 	std::string country_;
@@ -385,6 +393,18 @@ public:
 		std::vector<NativeEventQueueIntarface*>::iterator it = std::remove(event_handlers_.begin(), event_handlers_.end(), handler);
 		event_handlers_.erase( it, event_handlers_.end() );
 	}
+	void addActivityEventHandler( iTVPAndroidActivityEventHandler* handler ) {
+		auto it = std::find(activity_ev_handlers_.begin(), activity_ev_handlers_.end(), handler);
+		if( it == activity_ev_handlers_.end() ) {
+			activity_ev_handlers_.push_back( handler );
+		}
+	}
+	void removeActivityEventHandler( iTVPAndroidActivityEventHandler* handler ) {
+		auto it = std::remove(activity_ev_handlers_.begin(), activity_ev_handlers_.end(), handler);
+		activity_ev_handlers_.erase( it, activity_ev_handlers_.end() );
+	}
+	void callActivityEventResume();
+	void callActivityEventPause();
 
 	tjs_string GetTitle() const { return title_; }
 	void SetTitle( const tjs_string& caption ) { 

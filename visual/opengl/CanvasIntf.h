@@ -121,6 +121,10 @@ public:
 
 	void SetDefaultFillShader( const tTJSVariant & val );
 	const tTJSVariant& GetDefaultFillShader() const { return DefaultFillShaderObject; }
+
+	void UpdateWindowSurface();
+	void ReleaseWindowSurface();
+
 private:
 	void ApplyBlendMode();
 	void ApplyClipRect();

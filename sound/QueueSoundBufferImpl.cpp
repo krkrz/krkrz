@@ -559,6 +559,11 @@ void tTJSNI_QueueSoundBuffer::SetVolumeToStream() {
 	if( Player.HasStream() ) {
 		tjs_int v;
 		tjs_int mutevol = 100000;
+#ifdef ANDROID
+		if( !Application->GetActivating() ) {
+			mutevol = TVPSoundGlobalFocusMuteVolume;
+		}
+#else
 		if(TVPSoundGlobalFocusModeByOption >= sgfmMuteOnDeactivate &&
 			TVPSoundGlobalFocusMuteVolume == 0)
 		{
@@ -589,7 +594,7 @@ void tTJSNI_QueueSoundBuffer::SetVolumeToStream() {
 				break;
 			}
 		}
-
+#endif
 		// compute volume for each buffer
 		v = (Volume / 10) * (Volume2 / 10) / 1000;
 		v = (v / 10) * (GlobalVolume / 10) / 1000;

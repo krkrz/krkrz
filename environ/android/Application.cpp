@@ -960,7 +960,16 @@ void tTVPApplication::LoadImageRequest( class iTJSDispatch2 *owner, class tTJSNI
 		image_load_thread_->LoadRequest( owner, bmp, name );
 	}
 }
-
+void tTVPApplication::callActivityEventResume() {
+	for( auto ev : activity_ev_handlers_ ){
+		ev->onResume();
+	}
+}
+void tTVPApplication::callActivityEventPause() {
+	for( auto ev : activity_ev_handlers_ ){
+		ev->onPause();
+	}
+}
 /**
  * Java から送られてきた各種イベントをここで処理する
  * イベントの種類に応じてアプリケーションとして処理するか、Windowに処理させるか判断
@@ -977,9 +986,11 @@ void tTVPApplication::SendMessageFromJava( tjs_int message, tjs_int64 wparam, tj
 		return;
 	case AM_RESUME:
 		activity_active_ = true;
+		callActivityEventResume();
 		break;
 	case AM_PAUSE:
 		activity_active_ = false;
+		callActivityEventPause();
 		break;
 	case AM_STOP:
 		break;
@@ -1046,8 +1057,10 @@ void tTVPApplication::nativeSetSurface(JNIEnv *jenv, jobject obj, jobject surfac
 	if( surface != 0 ) {
 		ANativeWindow* window = ANativeWindow_fromSurface(jenv, surface);
 		LOGI("Got window %p", window);
-		Application->setWindow(window);
-		Application->SendMessageFromJava( AM_SURFACE_CHANGED, 0, 0 );
+        if( window != nullptr && Application->getWindow() != window ) {
+            Application->setWindow(window);
+            Application->SendMessageFromJava( AM_SURFACE_CHANGED, 0, 0 );
+        }
 	} else {
 		LOGI("Releasing window");
 		Application->setWindow(nullptr);
