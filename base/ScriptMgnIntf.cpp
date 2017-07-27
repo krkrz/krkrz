@@ -158,6 +158,15 @@ void TVPInitScriptEngine()
 	// add kirikiriz
 	TVPScriptEngine->SetPPValue( TJS_W("kirikiriz"), 1 );
 
+	// system definition
+#ifdef WIN32
+	TVPScriptEngine->SetPPValue( TJS_W("windows"), 1 );
+#endif
+
+#ifdef ANDROID
+	TVPScriptEngine->SetPPValue( TJS_W("android"), 1 );
+#endif
+
 	// set TJSGetRandomBits128
 	TJSGetRandomBits128 = TVPGetRandomBits128;
 
