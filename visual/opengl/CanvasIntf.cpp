@@ -105,7 +105,7 @@ const float tTJSNI_Canvas::DefaultUVs[] = {
 	1.0f,  1.0f
 };
 //----------------------------------------------------------------------
-tTJSNI_Canvas::tTJSNI_Canvas() : IsFirst(true), InDrawing(false), EnableClipRect(false), GLScreen(nullptr), ClearColor(0xff00ff00), BlendMode(tTVPBlendMode::bmAlpha),
+tTJSNI_Canvas::tTJSNI_Canvas() : IsFirst(true), InDrawing(false), EnableClipRect(false), GLScreen(nullptr), ClearColor(0xff000000), BlendMode(tTVPBlendMode::bmAlpha),
 PrevViewportWidth(0), PrevViewportHeight(0), CurrentScissorRect(-1,-1,-1,-1), 
 RenderTargetInstance(nullptr), ClipRectInstance(nullptr), Matrix32Instance(nullptr), DefaultShaderInstance(nullptr), DefaultFillShaderInstance(nullptr) {
 	TVPInitializeOpenGLPlatform();
