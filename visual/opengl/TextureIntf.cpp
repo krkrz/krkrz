@@ -127,6 +127,9 @@ tjs_error TJS_INTF_METHOD tTJSNI_Texture::Construct(tjs_int numparams, tTJSVaria
 		}
 		// 未初期化データでテクスチャを作る。後でコピーする前提。
 		Texture.create( width, height, nullptr, ColorToGLColor(( tTVPTextureColorFormat)color) );
+		// 全体が使用される前提
+		SrcWidth = width;
+		SrcHeight = height;
 	} else {
 		return TJS_E_INVALIDPARAM;
 	}

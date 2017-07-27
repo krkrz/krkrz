@@ -601,8 +601,8 @@ void tTJSNI_Canvas::DrawTextureAtlas( const tTJSNI_Rect* rect, const iTVPTexture
 	const GLfloat uvs[] = {
 		r.left/ tw,  r.top/ th,
 		r.left/ tw,  r.bottom/ th,
-		r.right/ tw,  r.top/ th,
-		r.right/ tw,  r.bottom/ th,
+		r.right/ tw, r.top/ th,
+		r.right/ tw, r.bottom/ th,
 	};
 	glBindBuffer( GL_ARRAY_BUFFER, 0 );
 	glVertexAttribPointer( posLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof( GLfloat ), vertices );
