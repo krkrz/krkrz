@@ -44,7 +44,7 @@ private:
 	tjs_uint* Palette;
 
 public:
-	tTVPBitmap(tjs_uint width, tjs_uint height, tjs_uint bpp);
+	tTVPBitmap(tjs_uint width, tjs_uint height, tjs_uint bpp, bool unpadding=false);
 	// for async load
 	// @param bits : tTVPBitmapBitsAlloc::Allocで確保したものを使用すること
 	tTVPBitmap(tjs_uint width, tjs_uint height, tjs_uint bpp, void* bits);
@@ -53,7 +53,7 @@ public:
 
 	~tTVPBitmap();
 
-	void Allocate(tjs_uint width, tjs_uint height, tjs_uint bpp);
+	void Allocate(tjs_uint width, tjs_uint height, tjs_uint bpp, bool unpadding=false);
 
 	void AddRef(void)
 	{
@@ -110,7 +110,7 @@ class tTVPPrerenderedFont;
 class tTVPNativeBaseBitmap
 {
 public:
-	tTVPNativeBaseBitmap(tjs_uint w, tjs_uint h, tjs_uint bpp);
+	tTVPNativeBaseBitmap(tjs_uint w, tjs_uint h, tjs_uint bpp, bool unpadding=false);
 	tTVPNativeBaseBitmap(const tTVPNativeBaseBitmap & r);
 	virtual ~tTVPNativeBaseBitmap();
 
@@ -145,7 +145,7 @@ public:
 	void Independ();
 	void IndependNoCopy();
 	void Recreate();
-	void Recreate(tjs_uint w, tjs_uint h, tjs_uint bpp);
+	void Recreate(tjs_uint w, tjs_uint h, tjs_uint bpp, bool unpadding=false);
 
 	bool IsIndependent() const { return Bitmap->IsIndependent(); }
 

@@ -378,7 +378,7 @@ static tTVPCharacterData * TVPGetCharacter(const tTVPFontAndCharacterData & font
 	Note that each lines must be started at tjs_uint32 ( 4bytes ) aligned address.
 	This is the default Windows bitmap allocate behavior.
 */
-tTVPBitmap::tTVPBitmap(tjs_uint width, tjs_uint height, tjs_uint bpp)
+tTVPBitmap::tTVPBitmap(tjs_uint width, tjs_uint height, tjs_uint bpp, bool unpadding)
 {
 	// tTVPBitmap constructor
 #ifdef _WIN32
@@ -386,7 +386,7 @@ tTVPBitmap::tTVPBitmap(tjs_uint width, tjs_uint height, tjs_uint bpp)
 #endif
 	RefCount = 1;
 
-	Allocate(width, height, bpp); // allocate initial bitmap
+	Allocate(width, height, bpp, unpadding); // allocate initial bitmap
 }
 //---------------------------------------------------------------------------
 tTVPBitmap::tTVPBitmap(tjs_uint width, tjs_uint height, tjs_uint bpp, void* bits)
@@ -456,13 +456,13 @@ tTVPBitmap::tTVPBitmap(const tTVPBitmap & r)
 	PitchStep = r.PitchStep;
 }
 //---------------------------------------------------------------------------
-void tTVPBitmap::Allocate(tjs_uint width, tjs_uint height, tjs_uint bpp)
+void tTVPBitmap::Allocate(tjs_uint width, tjs_uint height, tjs_uint bpp, bool unpadding)
 {
 	// allocate bitmap bits
 	// bpp must be 8 or 32
 
 	// create BITMAPINFO
-	BitmapInfo = new BitmapInfomation( width, height, bpp );
+	BitmapInfo = new BitmapInfomation( width, height, bpp, unpadding );
 
 	Width = width;
 	Height = height;
@@ -512,7 +512,7 @@ void tTVPBitmap::SetPaletteCount( tjs_uint count ) {
 //---------------------------------------------------------------------------
 // tTVPNativeBaseBitmap
 //---------------------------------------------------------------------------
-tTVPNativeBaseBitmap::tTVPNativeBaseBitmap(tjs_uint w, tjs_uint h, tjs_uint bpp)
+tTVPNativeBaseBitmap::tTVPNativeBaseBitmap(tjs_uint w, tjs_uint h, tjs_uint bpp, bool unpadding)
 {
 	TVPInializeFontRasterizers();
 	// TVPFontRasterizer->AddRef(); TODO
@@ -522,7 +522,7 @@ tTVPNativeBaseBitmap::tTVPNativeBaseBitmap(tjs_uint w, tjs_uint h, tjs_uint bpp)
 	FontChanged = true;
 	GlobalFontState = -1;
 	TextWidth = TextHeight = 0;
-	Bitmap = new tTVPBitmap(w, h, bpp);
+	Bitmap = new tTVPBitmap(w, h, bpp, unpadding);
 }
 //---------------------------------------------------------------------------
 tTVPNativeBaseBitmap::tTVPNativeBaseBitmap(const tTVPNativeBaseBitmap & r)
@@ -693,10 +693,10 @@ void tTVPNativeBaseBitmap::Recreate()
 	Recreate(Bitmap->GetWidth(), Bitmap->GetHeight(), Bitmap->GetBPP());
 }
 //---------------------------------------------------------------------------
-void tTVPNativeBaseBitmap::Recreate(tjs_uint w, tjs_uint h, tjs_uint bpp)
+void tTVPNativeBaseBitmap::Recreate(tjs_uint w, tjs_uint h, tjs_uint bpp, bool unpadding)
 {
 	Bitmap->Release();
-	Bitmap = new tTVPBitmap(w, h, bpp);
+	Bitmap = new tTVPBitmap(w, h, bpp, unpadding);
 	FontChanged = true; // informs internal font information is invalidated
 }
 //---------------------------------------------------------------------------

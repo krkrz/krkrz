@@ -263,7 +263,7 @@ extern void TVPTouchImages(const std::vector<ttstr> & storages, tjs_int64 limit,
 //---------------------------------------------------------------------------
 extern void TVPLoadGraphic(tTVPBaseBitmap *dest, const ttstr &name, tjs_int keyidx,
 	tjs_uint desw, tjs_uint desh,
-	tTVPGraphicLoadMode mode, ttstr *provincename = NULL, iTJSDispatch2 ** metainfo = NULL);
+	tTVPGraphicLoadMode mode, ttstr *provincename = NULL, iTJSDispatch2 ** metainfo = NULL, bool unpadding=false);
 	// throws exception when this function can not handle the file
 //---------------------------------------------------------------------------
 

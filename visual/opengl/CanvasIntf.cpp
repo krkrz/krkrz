@@ -630,6 +630,195 @@ void tTJSNI_Canvas::DrawTextureAtlas( const tTJSNI_Rect* rect, const iTVPTexture
 	glBindTexture( GL_TEXTURE_2D, 0 );
 }
 //----------------------------------------------------------------------
+void tTJSNI_Canvas::Draw9PatchTexture( class tTJSNI_Texture* tex, tjs_int width, tjs_int height, tTVPRect& margin, class tTJSNI_ShaderProgram* shader ) {
+	SetupEachDrawing();
+
+	tTVPPoint ssize;
+	ssize.x = GetCanvasWidth();
+	ssize.y = GetCanvasHeight();
+	if( !shader ) shader = DefaultShaderInstance;
+
+	GLint posLoc = shader->FindLocation( std::string( "a_pos" ) );
+	if( posLoc < 0 ) TVPThrowExceptionMessage( TJS_W( "Not found a_pos in shader." ) );
+	GLint uvLoc = shader->FindLocation( std::string( "a_texCoord" ) );
+	if( uvLoc < 0 ) TVPThrowExceptionMessage( TJS_W( "Not found a_texCoord in shader." ) );
+
+	const float tw = (float)tex->GetWidth();
+	const float th = (float)tex->GetHeight();
+	tTVPRect scale = tex->GetScale9Patch();
+	margin = tex->GetMargin9Patch();
+
+	const float tx_left = 0.0f;
+	const float tx_left_right = (scale.left-1) / tw;
+	const float tx_center_left = scale.left / tw;
+	const float tx_center_right = (scale.right-1) / tw;
+	const float tx_right_left = scale.right / tw;
+	const float tx_right = 1.0f;
+	const float tx_top = 0.0f;
+	const float tx_top_bottom = (scale.top-1) / th;
+	const float tx_center_top = scale.top / th;
+	const float tx_center_bottom = (scale.bottom-1) / th;
+	const float tx_bottom_top = scale.bottom / th;
+	const float tx_bottom = 1.0f;
+	// 36頂点
+	// 縦方向基準に並べる
+	const GLfloat uvs[] = {
+		tx_left, tx_top,
+		tx_left, tx_top_bottom,
+		tx_left, tx_center_top,
+		tx_left, tx_center_bottom,
+		tx_left, tx_bottom_top,
+		tx_left, tx_bottom,
+
+		tx_left_right, tx_top,
+		tx_left_right, tx_top_bottom,
+		tx_left_right, tx_center_top,
+		tx_left_right, tx_center_bottom,
+		tx_left_right, tx_bottom_top,
+		tx_left_right, tx_bottom,
+
+		tx_center_left, tx_top,
+		tx_center_left, tx_top_bottom,
+		tx_center_left, tx_center_top,
+		tx_center_left, tx_center_bottom,
+		tx_center_left, tx_bottom_top,
+		tx_center_left, tx_bottom,
+
+		tx_center_right, tx_top,
+		tx_center_right, tx_top_bottom,
+		tx_center_right, tx_center_top,
+		tx_center_right, tx_center_bottom,
+		tx_center_right, tx_bottom_top,
+		tx_center_right, tx_bottom,
+
+		tx_right_left, tx_top,
+		tx_right_left, tx_top_bottom,
+		tx_right_left, tx_center_top,
+		tx_right_left, tx_center_bottom,
+		tx_right_left, tx_bottom_top,
+		tx_right_left, tx_bottom,
+
+		tx_right, tx_top,
+		tx_right, tx_top_bottom,
+		tx_right, tx_center_top,
+		tx_right, tx_center_bottom,
+		tx_right, tx_bottom_top,
+		tx_right, tx_bottom,
+	};
+	const float dst_left = 0.0f;
+	const float dst_center_left = static_cast<const float>(scale.left);
+	const float dst_center_right = width - (tw - scale.right);
+	const float dst_right = static_cast<const float>(width);
+	const float dst_top = 0.0f;
+	const float dst_center_top = static_cast<const float>(scale.top);
+	const float dst_center_bottom = height - ( th - scale.bottom );
+	const float dst_bottom = static_cast<const float>(height);
+	const GLfloat vertices[] = {
+		dst_left, dst_top,
+		dst_left, dst_center_top,
+		dst_left, dst_center_top,
+		dst_left, dst_center_bottom,
+		dst_left, dst_center_bottom,
+		dst_left, dst_bottom,
+		dst_center_left, dst_top,
+		dst_center_left, dst_center_top,
+		dst_center_left, dst_center_top,
+		dst_center_left, dst_center_bottom,
+		dst_center_left, dst_center_bottom,
+		dst_center_left, dst_bottom,
+		dst_center_left, dst_top,
+		dst_center_left, dst_center_top,
+		dst_center_left, dst_center_top,
+		dst_center_left, dst_center_bottom,
+		dst_center_left, dst_center_bottom,
+		dst_center_left, dst_bottom,
+		dst_center_right, dst_top,
+		dst_center_right, dst_center_top,
+		dst_center_right, dst_center_top,
+		dst_center_right, dst_center_bottom,
+		dst_center_right, dst_center_bottom,
+		dst_center_right, dst_bottom,
+		dst_center_right, dst_top,
+		dst_center_right, dst_center_top,
+		dst_center_right, dst_center_top,
+		dst_center_right, dst_center_bottom,
+		dst_center_right, dst_center_bottom,
+		dst_center_right, dst_bottom,
+		dst_right, dst_top,
+		dst_right, dst_center_top,
+		dst_right, dst_center_top,
+		dst_right, dst_center_bottom,
+		dst_right, dst_center_bottom,
+		dst_right, dst_bottom,
+	};
+	const GLubyte indexes[] = {
+		0, 1, 6,
+		1, 7, 6,
+		2, 3, 8,
+		3, 9, 8,
+		4, 5, 10,
+		5, 11, 10,
+
+		0 + 12, 1 + 12, 6 + 12,
+		1 + 12, 7 + 12, 6 + 12,
+		2 + 12, 3 + 12, 8 + 12,
+		3 + 12, 9 + 12, 8 + 12,
+		4 + 12, 5 + 12, 10 + 12,
+		5 + 12, 11 + 12, 10 + 12,
+
+		0 + 24, 1 + 24, 6 + 24,
+		1 + 24, 7 + 24, 6 + 24,
+		2 + 24, 3 + 24, 8 + 24,
+		3 + 24, 9 + 24, 8 + 24,
+		4 + 24, 5 + 24, 10 + 24,
+		5 + 24, 11 + 24, 10 + 24,
+	};
+
+	/*
+	const GLfloat vertices[] = {
+		0.0f,  0.0f,	// 左上
+		0.0f,  height,  // 左下
+		width, 0.0f,	// 右上
+		width, height,	// 右下
+	};
+	const GLfloat uvs[] = {
+		0.0f,  0.0f,
+		0.0f,  1.0f,
+		1.0f, 0.0f,
+		1.0f, 1.0f,
+	};
+	const GLubyte indexes[] = {
+		0, 1, 2,
+		1, 3, 2,
+	};
+	*/
+	glBindBuffer( GL_ARRAY_BUFFER, 0 );
+	glVertexAttribPointer( posLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof( GLfloat ), vertices );
+	glVertexAttribPointer( uvLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof( GLfloat ), uvs );
+	glEnableVertexAttribArray( posLoc );
+	glEnableVertexAttribArray( uvLoc );
+
+	GLint texLoc = shader->FindLocation( std::string( "s_tex0" ) );
+	if( texLoc < 0 ) TVPThrowExceptionMessage( TJS_W( "Not found s_tex0 in shader." ) );
+	glActiveTexture( GL_TEXTURE0 );
+	glBindTexture( GL_TEXTURE_2D, (GLuint)tex->GetNativeHandle() );
+	glUniform1i( texLoc, 0 );
+
+	GLint matLoc = shader->FindLocation( std::string( "a_modelMat4" ) );
+	if( matLoc < 0 ) TVPThrowExceptionMessage( TJS_W( "Not found a_modelMat4 in shader." ) );
+	glUniformMatrix4fv( matLoc, 1, GL_FALSE, Matrix32Instance->GetMatrixArray16() );
+
+	GLint vpLoc = shader->FindLocation( std::string( "a_size" ) );
+	if( vpLoc < 0 ) TVPThrowExceptionMessage( TJS_W( "Not found a_size in shader." ) );
+	glUniform2f( vpLoc, (float)ssize.x, (float)ssize.y );
+
+	const GLsizei count = sizeof( indexes ) / sizeof( GLubyte );
+	glDrawElements( GL_TRIANGLES, count, GL_UNSIGNED_BYTE, indexes );
+
+	glActiveTexture( GL_TEXTURE0 );
+	glBindTexture( GL_TEXTURE_2D, 0 );
+}
+//----------------------------------------------------------------------
 void tTJSNI_Canvas::DrawText( class tTJSNI_Font* font, tjs_int x, tjs_int y, const ttstr& text, tjs_uint32 color ) { /* TODO: 次期実装 */}
 //----------------------------------------------------------------------
 void tTJSNI_Canvas::DrawMesh( tTJSNI_ShaderProgram* shader, tjs_int primitiveType, tjs_int offset, tjs_int count ) {
@@ -1141,6 +1330,32 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/drawMesh)
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/drawMesh)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/draw9Patch )
+{
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas );
+	if( numparams < 3 ) return TJS_E_BADPARAMCOUNT;
+
+	tTJSNI_Texture* texture = (tTJSNI_Texture*)TJSGetNativeInstance( tTJSNC_Texture::ClassID, param[0] );
+	if( !texture ) return TJS_E_INVALIDPARAM;
+
+	tTJSNI_ShaderProgram* shader = nullptr;
+	if( numparams >= 4 ) {
+		shader = (tTJSNI_ShaderProgram*)TJSGetNativeInstance( tTJSNC_ShaderProgram::ClassID, param[3] );
+		if( !shader ) return TJS_E_INVALIDPARAM;
+	}
+	tjs_int width = *param[1];
+	tjs_int height = *param[2];
+	tTVPRect margin;
+	_this->Draw9PatchTexture( texture, width, height, margin, shader );
+	if( result ) {
+		iTJSDispatch2 *ret = TVPCreateRectObject( margin.left, margin.top, margin.right, margin.bottom );
+		*result = tTJSVariant( ret, ret );
+		ret->Release();
+	}
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/draw9Patch )
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/flush )
 {

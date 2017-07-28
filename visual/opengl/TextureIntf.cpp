@@ -15,7 +15,7 @@
 
 bool TVPCopyBitmapToTexture( const iTVPTextureInfoIntrface* texture, tjs_int left, tjs_int top, const tTVPBaseBitmap* bitmap, const tTVPRect& srcRect );
 //----------------------------------------------------------------------
-tTJSNI_Texture::tTJSNI_Texture() : SrcWidth(0), SrcHeight(0) {
+tTJSNI_Texture::tTJSNI_Texture() {
 	TVPTempBitmapHolderAddRef();
 }
 //----------------------------------------------------------------------
@@ -26,19 +26,49 @@ tTJSNI_Texture::~tTJSNI_Texture() {
 tjs_error TJS_INTF_METHOD tTJSNI_Texture::Construct(tjs_int numparams, tTJSVariant **param, iTJSDispatch2 *tjs_obj) {
 	if( numparams < 1 ) return TJS_E_BADPARAMCOUNT;
 
+	/**
+	* 画像読み込みする場合以下のパラメータが指定可能であるが、p2パラメータは非公開(undocument)としておく
+	* @param bitmap/filename テクスチャの元となるBitmapクラスのインスタンス
+	* @param format カラーフォーマット(tcfRGBA or tcfAlpha), tcfAlpha選択時に色情報はグレイスケール化される
+	* @param is9patch 9patch情報を読み込むかどうか
+	* @param p2 サイズ2の累乗化(必須ではないが高速化する環境もある、一応指定可能に) : undocument
+	*/
 	if( param[0]->Type() == tvtString ) {
 		tTVPTextureColorFormat color = tTVPTextureColorFormat::RGBA;
 		if( numparams > 1 ) {
 			color = (tTVPTextureColorFormat)(tjs_int)*param[1];
 		}
-		bool powerof2 = false;
+		bool is9patch = false;
 		if( numparams > 2 ) {
-			powerof2 = (tjs_int)*param[2] ? true : false;
+			is9patch = (tjs_int)*param[2] ? true : false;
+		}
+		bool powerof2 = false;
+		if( numparams > 3 ) {
+			powerof2 = (tjs_int)*param[3] ? true : false;
 		}
 		ttstr filename = *param[0];
 		std::unique_ptr<tTVPBaseBitmap> bitmap( new tTVPBaseBitmap( TVPGetInitialBitmap() ) );
 		// tTVPBaseBitmap経由して読み込む。キャッシュ機構などは共有される。
-		TVPLoadGraphic( bitmap.get(), filename, clNone, 0, 0, color == tTVPTextureColorFormat::Alpha ? glmGrayscale : glmNormalRGBA, nullptr, nullptr );
+		TVPLoadGraphic( bitmap.get(), filename, clNone, 0, 0, color == tTVPTextureColorFormat::Alpha ? glmGrayscale : glmNormalRGBA, nullptr, nullptr, true );
+		if( is9patch && bitmap->Is32BPP() ) {
+			bitmap->Read9PatchInfo( Scale9Patch, Margin9Patch );
+			Scale9Patch.add_offsets( -1, -1 );
+			Margin9Patch.add_offsets( -1, -1 );
+			if( Margin9Patch.top >= 0 ) {
+				if( Margin9Patch.bottom < 0 ) Margin9Patch.bottom = 0;
+				if( Margin9Patch.right < 0 ) Margin9Patch.right = 0;
+			}
+			// 周囲1ピクセル削る
+			std::unique_ptr<tTVPBaseBitmap> bitmap2( new tTVPBaseBitmap( bitmap->GetWidth()-2, bitmap->GetHeight()-2, 32, true ) );
+			if( bitmap2->CopyRect( 0, 0, bitmap.get(), tTVPRect( 1, 1, bitmap->GetWidth()-1, bitmap->GetHeight()-1 ) ) ) {
+				bitmap.reset( bitmap2.release() );
+			}
+			if( Margin9Patch.left >= 0 && Margin9Patch.top >= 0 && Margin9Patch.right >= 0 && Margin9Patch.bottom >= 0 ) {
+				iTJSDispatch2 *ret = TVPCreateRectObject( Margin9Patch.left, Margin9Patch.top, Margin9Patch.right, Margin9Patch.bottom );
+				SetMarginRectObject( tTJSVariant( ret, ret ) );
+				if( ret ) ret->Release();
+			}
+		}
 		SrcWidth = bitmap->GetWidth();
 		SrcHeight = bitmap->GetHeight();
 		if( powerof2 ) {
@@ -64,12 +94,37 @@ tjs_error TJS_INTF_METHOD tTJSNI_Texture::Construct(tjs_int numparams, tTJSVaria
 		if( numparams > 1 ) {
 			color = (tTVPTextureColorFormat)(tjs_int)*param[1];
 		}
-		bool powerof2 = false;
+		bool is9patch = false;
 		if( numparams > 2 ) {
-			powerof2 = (tjs_int)*param[2] ? true : false;
+			is9patch = (tjs_int)*param[2] ? true : false;
+		}
+		bool powerof2 = false;
+		if( numparams > 3 ) {
+			powerof2 = (tjs_int)*param[3] ? true : false;
 		}
 		bool isrecreate = false;
 		const tTVPBaseBitmap* bitmap = bmp->GetBitmap();
+		std::unique_ptr<tTVPBaseBitmap> bitmapHolder9;
+		if( is9patch && bitmap->Is32BPP() ) {
+			bitmap->Read9PatchInfo( Scale9Patch, Margin9Patch );
+			Scale9Patch.add_offsets( -1, -1 );
+			Margin9Patch.add_offsets( -1, -1 );
+			if( Margin9Patch.top >= 0 ) {
+				if( Margin9Patch.bottom < 0 ) Margin9Patch.bottom = 0;
+				if( Margin9Patch.right < 0 ) Margin9Patch.right = 0;
+			}
+			// 周囲1ピクセル削る
+			std::unique_ptr<tTVPBaseBitmap> bitmap2( new tTVPBaseBitmap( bitmap->GetWidth() - 2, bitmap->GetHeight() - 2, 32, true ) );
+			if( bitmap2->CopyRect( 0, 0, bitmap, tTVPRect( 1, 1, bitmap->GetWidth() - 1, bitmap->GetHeight() - 1 ) ) ) {
+				bitmapHolder9.reset( bitmap2.release() );
+				bitmap = bitmapHolder9.get();
+			}
+			if( Margin9Patch.left >= 0 && Margin9Patch.top >= 0 && Margin9Patch.right >= 0 && Margin9Patch.bottom >= 0 ) {
+				iTJSDispatch2 *ret = TVPCreateRectObject( Margin9Patch.left, Margin9Patch.top, Margin9Patch.right, Margin9Patch.bottom );
+				SetMarginRectObject( tTJSVariant( ret, ret ) );
+				if( ret ) ret->Release();
+			}
+		}
 		SrcWidth = bitmap->GetWidth();
 		SrcHeight = bitmap->GetHeight();
 		bool gray = color == tTVPTextureColorFormat::Alpha;
@@ -101,13 +156,13 @@ tjs_error TJS_INTF_METHOD tTJSNI_Texture::Construct(tjs_int numparams, tTJSVaria
 					tTVPRect r( 0, 0, bitmap->GetWidth(), bitmap->GetHeight() );
 					bitmap2->DoGrayScale( r );
 					tTVPBaseBitmap::GrayToAlphaFunctor func;
-					std::unique_ptr<tTVPBaseBitmap> bitmap3( new tTVPBaseBitmap( dw, dh, 8 ) );
+					std::unique_ptr<tTVPBaseBitmap> bitmap3( new tTVPBaseBitmap( dw, dh, 8, true ) );
 					tTVPBaseBitmap::CopyWithDifferentBitWidth( bitmap3.get(), bitmap2.get(), func );
 					bitmap2.reset( bitmap3.release() );
 				} else {
 					// 8bit color to full color
 					tTVPBaseBitmap::GrayToColorFunctor func;
-					std::unique_ptr<tTVPBaseBitmap> bitmap3( new tTVPBaseBitmap( dw, dh, 32 ) );
+					std::unique_ptr<tTVPBaseBitmap> bitmap3( new tTVPBaseBitmap( dw, dh, 32, true ) );
 					tTVPBaseBitmap::CopyWithDifferentBitWidth( bitmap3.get(), bitmap2.get(), func );
 					bitmap2.reset( bitmap3.release() );
 				}
@@ -138,6 +193,27 @@ tjs_error TJS_INTF_METHOD tTJSNI_Texture::Construct(tjs_int numparams, tTJSVaria
 //----------------------------------------------------------------------
 void TJS_INTF_METHOD tTJSNI_Texture::Invalidate() {
 	Texture.destory();
+
+	// release clip rect
+	if( MarginRectObject.Type() == tvtObject )
+		MarginRectObject.AsObjectClosureNoAddRef().Invalidate( 0, NULL, NULL, MarginRectObject.AsObjectNoAddRef() );
+}
+//----------------------------------------------------------------------
+void tTJSNI_Texture::SetMarginRectObject( const tTJSVariant & val ) {
+	// assign new rect
+	MarginRectObject = val;
+	MarginRectInstance = nullptr;
+
+	// extract interface
+	if( MarginRectObject.Type() == tvtObject ) {
+		tTJSVariantClosure clo = MarginRectObject.AsObjectClosureNoAddRef();
+		if( clo.Object ) {
+			if( TJS_FAILED( clo.Object->NativeInstanceSupport( TJS_NIS_GETINSTANCE, tTJSNC_Rect::ClassID, (iTJSNativeInstance**)&MarginRectInstance ) ) ) {
+				MarginRectInstance = nullptr;
+				TVPThrowExceptionMessage( TJS_W( "Cannot retrive rect instance." ) );
+			}
+		}
+	}
 }
 //----------------------------------------------------------------------
 GLint tTJSNI_Texture::ColorToGLColor( tTVPTextureColorFormat color ) {
@@ -152,8 +228,31 @@ GLint tTJSNI_Texture::ColorToGLColor( tTVPTextureColorFormat color ) {
 }
 //----------------------------------------------------------------------
 void tTJSNI_Texture::LoadTexture( const class tTVPBaseBitmap* bitmap, tTVPTextureColorFormat color ) {
-	// Bitmap の内部表現が正順(上下反転されていない)ことを前提としているので注意
-	Texture.create( bitmap->GetWidth(), bitmap->GetHeight(), bitmap->GetScanLine(0), ColorToGLColor(color) );
+	tjs_int bpp = color == tTVPTextureColorFormat::RGBA ? 4 : 1;
+	tjs_int w = bitmap->GetWidth();
+	tjs_int h = bitmap->GetHeight();
+	tjs_int pitch = w * bpp;
+	if( bitmap->GetPitchBytes() != pitch ) {
+		// パディングされているので、そのままではコピーできない(OpenGL ES2.0の場合)
+		if( bpp == 4 ) {
+			std::unique_ptr<tjs_uint32[]> buffer( new tjs_uint32[w*h] );
+			for( tjs_int y = 0; y < h; y++ ) {
+				tjs_uint32* sl = (tjs_uint32*)bitmap->GetScanLine( y );
+				memcpy( &buffer[w*y], sl, pitch );
+			}
+			Texture.create( w, h, buffer.get(), ColorToGLColor( color ) );
+		} else {
+			std::unique_ptr<tjs_uint8[]> buffer( new tjs_uint8[w*h] );
+			for( tjs_int y = 0; y < h; y++ ) {
+				tjs_uint8* sl = (tjs_uint8*)bitmap->GetScanLine( y );
+				memcpy( &buffer[w*y], sl, pitch );
+			}
+			Texture.create( w, h, buffer.get(), ColorToGLColor( color ) );
+		}
+	} else {
+		// Bitmap の内部表現が正順(上下反転されていない)ことを前提としているので注意
+		Texture.create( bitmap->GetWidth(), bitmap->GetHeight(), bitmap->GetScanLine( 0 ), ColorToGLColor( color ) );
+	}
 }
 //----------------------------------------------------------------------
 void tTJSNI_Texture::CopyBitmap( tjs_int left, tjs_int top, const tTVPBaseBitmap* bitmap, const tTVPRect& srcRect ) {
@@ -437,6 +536,20 @@ TJS_BEGIN_NATIVE_PROP_DECL(wrapModeVertical)
 	TJS_END_NATIVE_PROP_SETTER
 }
 TJS_END_NATIVE_PROP_DECL(wrapModeVertical)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL( margin9Patch )
+{
+	TJS_BEGIN_NATIVE_PROP_GETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Texture );
+		*result = _this->GetMarginRectObject();
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_GETTER
+
+	TJS_DENY_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_PROP_DECL( margin9Patch )
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_PROP_DECL(stNearest) {
 	TJS_BEGIN_NATIVE_PROP_GETTER {

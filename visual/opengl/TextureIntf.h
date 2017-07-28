@@ -23,17 +23,26 @@ class tTJSNI_Texture : public tTJSNativeInstance, public iTVPTextureInfoIntrface
 {
 	GLTexture Texture;
 	GLVertexBufferObject VertexBuffer;
-	tjs_uint SrcWidth;
-	tjs_uint SrcHeight;
+	tjs_uint SrcWidth = 0;
+	tjs_uint SrcHeight = 0;
+	// 9patch描画用情報
+	tTVPRect Scale9Patch = { -1, -1, -1, -1 };
+	tTVPRect Margin9Patch = { -1, -1, -1, -1 };
+
+	tTJSVariant MarginRectObject;
+	class tTJSNI_Rect* MarginRectInstance = nullptr;
 
 	void LoadTexture( const class tTVPBaseBitmap* bitmap, tTVPTextureColorFormat color );
 	GLint ColorToGLColor( tTVPTextureColorFormat color );
 
+	void SetMarginRectObject( const tTJSVariant & val );
 public:
 	tTJSNI_Texture();
 	~tTJSNI_Texture() override;
 	tjs_error TJS_INTF_METHOD Construct(tjs_int numparams, tTJSVariant **param, iTJSDispatch2 *tjs_obj) override;
 	void TJS_INTF_METHOD Invalidate() override;
+
+	const tTJSVariant& GetMarginRectObject() const { return MarginRectObject; }
 
 	void CopyBitmap( tjs_int left, tjs_int top, const class tTVPBaseBitmap* bitmap, const tTVPRect& srcRect );
 	void CopyBitmap( const class tTVPBaseBitmap* bitmap );
@@ -65,6 +74,10 @@ public:
 	void SetWrapModeHorizontal( tjs_int v );
 	tjs_int GetWrapModeVertical() const;
 	void SetWrapModeVertical( tjs_int v );
+
+
+	const tTVPRect& GetScale9Patch() const { return Scale9Patch; }
+	const tTVPRect& GetMargin9Patch() const { return Margin9Patch; }
 
 	friend class tTJSNI_Offscreen;
 };

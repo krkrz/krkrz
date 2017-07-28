@@ -3,7 +3,7 @@
 #include "BitmapInfomation.h"
 #include "MsgIntf.h"
 
-BitmapInfomation::BitmapInfomation( tjs_uint width, tjs_uint height, int bpp ) {
+BitmapInfomation::BitmapInfomation( tjs_uint width, tjs_uint height, int bpp, bool unpadding ) {
 	BitmapInfoSize = sizeof(BITMAPINFOHEADER) + ((bpp==8)?sizeof(RGBQUAD)*256 : 0);
 	BitmapInfo = (BITMAPINFO*)GlobalAlloc(GPTR, BitmapInfoSize);
 	if(!BitmapInfo) TVPThrowExceptionMessage(TVPCannotAllocateBitmapBits,
@@ -11,15 +11,23 @@ BitmapInfomation::BitmapInfomation( tjs_uint width, tjs_uint height, int bpp ) {
 
 	tjs_int PitchBytes;
 	tjs_uint bitmap_width = width;
-	// note that the allocated bitmap size can be bigger than the
-	// original size because the horizontal pitch of the bitmap
-	// is aligned to a paragraph (16bytes)
-	if( bpp == 8 ) {
-		bitmap_width = (((bitmap_width-1) / 16)+1) *16; // align to a paragraph
-		PitchBytes = (((bitmap_width-1) >> 2)+1) <<2;
+	if( unpadding == false ) {
+		// note that the allocated bitmap size can be bigger than the
+		// original size because the horizontal pitch of the bitmap
+		// is aligned to a paragraph (16bytes)
+		if( bpp == 8 ) {
+			bitmap_width = (((bitmap_width-1) / 16)+1) *16; // align to a paragraph
+			PitchBytes = (((bitmap_width-1) >> 2)+1) <<2;
+		} else {
+			bitmap_width = (((bitmap_width-1) / 4)+1) *4; // align to a paragraph
+			PitchBytes = bitmap_width * 4;
+		}
 	} else {
-		bitmap_width = (((bitmap_width-1) / 4)+1) *4; // align to a paragraph
-		PitchBytes = bitmap_width * 4;
+		if( bpp == 8 ) {
+			PitchBytes = bitmap_width;
+		} else {
+			PitchBytes = bitmap_width * 4;
+		}
 	}
 	BitmapInfo->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
 	BitmapInfo->bmiHeader.biWidth = bitmap_width;

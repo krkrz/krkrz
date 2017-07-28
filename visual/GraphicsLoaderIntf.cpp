@@ -958,6 +958,7 @@ struct tTVPLoadGraphicData
 	tjs_uint BufW;
 	tjs_uint BufH;
 	bool NeedMetaInfo;
+	bool Unpadding;
 	std::vector<tTVPGraphicMetaInfoPair> * MetaInfo;
 };
 //---------------------------------------------------------------------------
@@ -989,7 +990,7 @@ static void TVPLoadGraphic_SizeCallback(void *callbackdata, tjs_uint w,
 	else
 	{
 		// normal load or province load
-		data->Dest->Recreate(w, h, data->Type!=lgtFullColor?8:32);
+		data->Dest->Recreate(w, h, data->Type!=lgtFullColor?8:32, data->Unpadding);
 	}
 }
 //---------------------------------------------------------------------------
@@ -1546,7 +1547,7 @@ bool TVPHasImageCache( const ttstr& nname, tTVPGraphicLoadMode mode, tjs_uint dw
 //---------------------------------------------------------------------------
 static bool TVPInternalLoadGraphic(tTVPBaseBitmap *dest, const ttstr &_name,
 	tjs_uint32 keyidx, tjs_uint desw, tjs_int desh, std::vector<tTVPGraphicMetaInfoPair> * * MetaInfo,
-		tTVPGraphicLoadMode mode, ttstr *provincename)
+		tTVPGraphicLoadMode mode, ttstr *provincename, bool unpadding=false)
 {
 	// name must be normalized.
 	// if "provincename" is non-null, this function set it to province storage
@@ -1616,6 +1617,7 @@ static bool TVPInternalLoadGraphic(tTVPBaseBitmap *dest, const ttstr &_name,
 	data.DesH = desh;
 	data.NeedMetaInfo = true;
 	data.MetaInfo = NULL;
+	data.Unpadding = unpadding;
 
 	bool keyadapt = (keyidx == TVP_clAdapt);
 	bool doalphacolormat = TVP_Is_clAlphaMat(keyidx);
@@ -1766,7 +1768,7 @@ static bool TVPInternalLoadGraphic(tTVPBaseBitmap *dest, const ttstr &_name,
 //---------------------------------------------------------------------------
 void TVPLoadGraphic(tTVPBaseBitmap *dest, const ttstr &name, tjs_int32 keyidx,
 	tjs_uint desw, tjs_uint desh,
-	tTVPGraphicLoadMode mode, ttstr *provincename, iTJSDispatch2 ** metainfo)
+	tTVPGraphicLoadMode mode, ttstr *provincename, iTJSDispatch2 ** metainfo, bool unpadding)
 {
 	// loading with cache management
 	ttstr nname = TVPNormalizeStorageName(name);
@@ -1805,7 +1807,7 @@ void TVPLoadGraphic(tTVPBaseBitmap *dest, const ttstr &name, tjs_int32 keyidx,
 	std::vector<tTVPGraphicMetaInfoPair> * mi = NULL;
 	try
 	{
-		TVPInternalLoadGraphic(dest, nname, keyidx, desw, desh, &mi, mode, &pn);
+		TVPInternalLoadGraphic(dest, nname, keyidx, desw, desh, &mi, mode, &pn, unpadding);
 
 		if(provincename) *provincename = pn;
 		if(metainfo)

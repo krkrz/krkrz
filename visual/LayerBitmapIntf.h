@@ -146,7 +146,7 @@ class tTVPNativeBaseBitmap;
 class tTVPBaseBitmap : public tTVPNativeBaseBitmap
 {
 public:
-	tTVPBaseBitmap(tjs_uint w, tjs_uint h, tjs_uint bpp = 32);
+	tTVPBaseBitmap(tjs_uint w, tjs_uint h, tjs_uint bpp = 32, bool unpadding=false);
 	tTVPBaseBitmap(const tTVPBaseBitmap & r) :
 		tTVPNativeBaseBitmap(r) {}
 	~tTVPBaseBitmap();
@@ -302,6 +302,13 @@ public:
      * @param margin : 9patchの右下にある描画領域指定を取得する
      */
     bool Copy9Patch( const tTVPBaseBitmap *ref, tTVPRect& margin );
+
+	/**
+	 * 9patch用の情報を読み込む
+	 * @param scale 拡大情報
+	 * @param margin マージン情報
+	 */
+	void Read9PatchInfo( tTVPRect& scale, tTVPRect& margin ) const;
 
 	bool Blt(tjs_int x, tjs_int y, const tTVPBaseBitmap *ref,
 		tTVPRect refrect, tTVPBBBltMethod method, tjs_int opa,

@@ -101,8 +101,8 @@ static tjs_int GetAdaptiveThreadNum(tjs_int pixelNum, float factor)
 //---------------------------------------------------------------------------
 // tTVPBaseBitmap
 //---------------------------------------------------------------------------
-tTVPBaseBitmap::tTVPBaseBitmap(tjs_uint w, tjs_uint h, tjs_uint bpp) :
-		tTVPNativeBaseBitmap(w, h, bpp)
+tTVPBaseBitmap::tTVPBaseBitmap(tjs_uint w, tjs_uint h, tjs_uint bpp, bool unpadding) :
+		tTVPNativeBaseBitmap(w, h, bpp, unpadding)
 {
 }
 //---------------------------------------------------------------------------
@@ -883,31 +883,20 @@ void tTVPBaseBitmap::PartialCopyRect(const PartialCopyRectParam *param)
 	}
 }
 //---------------------------------------------------------------------------
-bool tTVPBaseBitmap::Copy9Patch( const tTVPBaseBitmap *ref, tTVPRect& margin )
+void tTVPBaseBitmap::Read9PatchInfo( tTVPRect& scale, tTVPRect& margin ) const
 {
-	if(!Is32BPP()) return false;
-
-	tjs_int w = ref->GetWidth();
-	tjs_int h = ref->GetHeight();
-	// 9 + 上下の11ピクセルは必要
-	if( w < 11 || h < 11 ) return false;
-	tjs_int dw = GetWidth();
-	tjs_int dh = GetHeight();
-	// コピー先が元画像よりも小さい時はコピー不可
-	if( dw < (w-2) || dh < (h-2) ) return false;
-
-	const tjs_uint32 *src = (const tjs_uint32*)ref->GetScanLine(0);
-	tjs_int pitch = ref->GetPitchBytes() / sizeof(tjs_uint32);
-	const tjs_uint32 *srcbottom = (const tjs_uint32*)ref->GetScanLine(h-1);
-	tTVPRect scale(-1,-1,-1,-1);
+	const tjs_int w = GetWidth();
+	const tjs_int h = GetHeight();
+	const tjs_uint32 *src = (const tjs_uint32*)GetScanLine(0);
+	const tjs_int pitch = GetPitchBytes() / sizeof(tjs_uint32);
+	const tjs_uint32 *srcbottom = (const tjs_uint32*)GetScanLine(h-1);
+	scale = tTVPRect(-1,-1,-1,-1);
 	margin = tTVPRect( -1, -1, -1, -1 );
-	tTVPARGB<tjs_uint8> hor, ver;
 	for( tjs_int x = 1; x < (w-1); x++ )
 	{
 		if( scale.left == -1 && (src[x]&0xff000000) == 0xff000000 )
 		{
 			scale.left = x;
-			hor = src[x];
 		}
 		else if( scale.left != -1 && scale.right == -1 && (src[x]&0xff000000) == 0 )
 		{
@@ -925,13 +914,18 @@ bool tTVPBaseBitmap::Copy9Patch( const tTVPBaseBitmap *ref, tTVPRect& margin )
 
 		if( scale.right != -1 && margin.right != -1 ) break;
 	}
+	if( scale.left != -1 && scale.right == -1 ) {
+		scale.right = w - 1;
+	}
+	if( margin.left != -1 && margin.right == -1 ) {
+		margin.right = 0;
+	}
 
 	for( tjs_int y = 1; y < (h-1); y++ )
 	{
 		if( scale.top == -1 && (src[y*pitch]&0xff000000) == 0xff000000 )
 		{
 			scale.top = y;
-			ver = src[y*pitch];
 		}
 		else if( scale.top != -1 && scale.bottom == -1 && (src[y*pitch]&0xff000000) == 0 )
 		{
@@ -949,10 +943,37 @@ bool tTVPBaseBitmap::Copy9Patch( const tTVPBaseBitmap *ref, tTVPRect& margin )
 
 		if( scale.bottom != -1 && margin.bottom != -1 ) break;
 	}
+	if( scale.top != -1 && scale.bottom == -1 ) {
+		scale.bottom = h - 1;
+	}
+	if( margin.top != -1 && margin.bottom == -1 ) {
+		margin.bottom = 0;
+	}
+}
+//---------------------------------------------------------------------------
+bool tTVPBaseBitmap::Copy9Patch( const tTVPBaseBitmap *ref, tTVPRect& margin )
+{
+	if(!Is32BPP()) return false;
+
+	tjs_int w = ref->GetWidth();
+	tjs_int h = ref->GetHeight();
+	// 9 + 上下の11ピクセルは必要
+	if( w < 11 || h < 11 ) return false;
+	tjs_int dw = GetWidth();
+	tjs_int dh = GetHeight();
+	// コピー先が元画像よりも小さい時はコピー不可
+	if( dw < (w-2) || dh < (h-2) ) return false;
+
+	tTVPRect scale( -1, -1, -1, -1 );
+	ref->Read9PatchInfo( scale, margin );
+
 	// スケール用の領域が見付からない時はコピーできない
 	if( scale.left == -1 || scale.right == -1 || scale.top == -1 || scale.bottom == -1 )
 		return false;
-	
+
+	const tjs_uint32 *src = (const tjs_uint32*)ref->GetScanLine( 0 );
+	const tjs_int pitch = ref->GetPitchBytes() / sizeof( tjs_uint32 );
+
 	const tjs_int src_left_width = scale.left - 1;
 	const tjs_int src_right_width = w - 1 - scale.right;
 	const tjs_int dst_center_width = dw - src_left_width - src_right_width;

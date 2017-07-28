@@ -7,7 +7,7 @@ class BitmapInfomation {
 	BITMAPINFO* BitmapInfo;
 	tjs_int BitmapInfoSize;
 public:
-	BitmapInfomation( tjs_uint width, tjs_uint height, int bpp );
+	BitmapInfomation( tjs_uint width, tjs_uint height, int bpp, bool unpadding=false );
 	~BitmapInfomation();
 
 	inline unsigned int GetBPP() const { return BitmapInfo->bmiHeader.biBitCount; }

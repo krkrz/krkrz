@@ -165,6 +165,11 @@ public:
 	void DrawMesh( class tTJSNI_ShaderProgram* shader, tjs_int primitiveType, tjs_int offset, tjs_int count );
 	void DrawMesh( class tTJSNI_ShaderProgram* shader, tjs_int primitiveType, const class tTJSNI_VertexBinder* index, tjs_int count );
 
+	/**
+	 * 9patchを利用した描画
+	 */
+	void Draw9PatchTexture( class tTJSNI_Texture* tex, tjs_int width, tjs_int height, tTVPRect& margin, class tTJSNI_ShaderProgram* shader = nullptr );
+
 	// 状態をセーブする
 	void Save();
 	// 状態を元に戻す

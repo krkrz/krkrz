@@ -28,6 +28,7 @@ public:
 	}
 
 	void create( GLuint w, GLuint h, const GLvoid* bits, GLint format=GL_RGBA ) {
+		glPixelStorei( GL_UNPACK_ALIGNMENT, format == GL_RGBA ? 4 : 1 );
 		glGenTextures( 1, &texture_id_ );
 		glBindTexture( GL_TEXTURE_2D, texture_id_ );
 		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,stretchType_);
@@ -47,7 +48,8 @@ public:
 		}
 	}
 	void copyImage( GLint x, GLint y, GLint w, GLint h, const GLvoid* bits ) {
-		 glTexSubImage2D( GL_TEXTURE_2D, 0, x, y, w, h, format_, GL_UNSIGNED_BYTE, bits );
+		glPixelStorei( GL_UNPACK_ALIGNMENT, format_ == GL_RGBA ? 4 : 1 );
+		glTexSubImage2D( GL_TEXTURE_2D, 0, x, y, w, h, format_, GL_UNSIGNED_BYTE, bits );
 	}
 	static int getMaxTextureSize() {
 		GLint maxTex;

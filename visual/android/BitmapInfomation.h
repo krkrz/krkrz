@@ -12,7 +12,7 @@ class BitmapInfomation {
 	tjs_uint bitmap_width_;
 
 public:
-	BitmapInfomation( tjs_uint width, tjs_uint height, int bpp );
+	BitmapInfomation( tjs_uint width, tjs_uint height, int bpp, bool unpadding=false );
 	~BitmapInfomation();
 
 	inline unsigned int GetBPP() const { return bpp_; }
