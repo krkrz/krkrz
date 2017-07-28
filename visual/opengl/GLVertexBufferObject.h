@@ -30,6 +30,7 @@ public:
 		glGenBuffers( 1, &vbo_id_ );
 		glBindBuffer( GL_ARRAY_BUFFER, vbo_id_ );
 		glBufferData( GL_ARRAY_BUFFER, byteSize, (const void *)vtx, GL_STATIC_DRAW );
+		glBindBuffer( GL_ARRAY_BUFFER, 0 );
 		target_ = GL_ARRAY_BUFFER;
 		usage_ = GL_STATIC_DRAW;
 		size_ = byteSize;
@@ -45,6 +46,7 @@ public:
 		glGenBuffers( 1, &vbo_id_ );
 		glBindBuffer( target_, vbo_id_ );
 		glBufferData( target_, byteSize, data, usage );
+		glBindBuffer( target_, 0 );
 		usage_ = usage;
 		size_ = byteSize;
 	}
@@ -52,6 +54,7 @@ public:
 		if( vbo_id_ ) {
 			glBindBuffer( target_, vbo_id_ );
 			glBufferSubData( target_, offset, size, data );
+			glBindBuffer( target_, 0 );
 		}
 	}
 
@@ -68,6 +71,7 @@ public:
 		if( vbo_id_ ) {
 			glBindBuffer( target_, vbo_id_ );
 			result = glMapBufferRange( target_, 0, size_, GL_MAP_READ_BIT|GL_MAP_WRITE_BIT );
+			glBindBuffer( target_, 0 );
 		}
 		return result;
 	}

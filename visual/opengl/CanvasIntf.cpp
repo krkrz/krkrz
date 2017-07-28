@@ -774,24 +774,6 @@ void tTJSNI_Canvas::Draw9PatchTexture( class tTJSNI_Texture* tex, tjs_int width,
 		5 + 24, 11 + 24, 10 + 24,
 	};
 
-	/*
-	const GLfloat vertices[] = {
-		0.0f,  0.0f,	// 左上
-		0.0f,  height,  // 左下
-		width, 0.0f,	// 右上
-		width, height,	// 右下
-	};
-	const GLfloat uvs[] = {
-		0.0f,  0.0f,
-		0.0f,  1.0f,
-		1.0f, 0.0f,
-		1.0f, 1.0f,
-	};
-	const GLubyte indexes[] = {
-		0, 1, 2,
-		1, 3, 2,
-	};
-	*/
 	glBindBuffer( GL_ARRAY_BUFFER, 0 );
 	glVertexAttribPointer( posLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof( GLfloat ), vertices );
 	glVertexAttribPointer( uvLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof( GLfloat ), uvs );
@@ -813,6 +795,7 @@ void tTJSNI_Canvas::Draw9PatchTexture( class tTJSNI_Texture* tex, tjs_int width,
 	glUniform2f( vpLoc, (float)ssize.x, (float)ssize.y );
 
 	const GLsizei count = sizeof( indexes ) / sizeof( GLubyte );
+	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
 	glDrawElements( GL_TRIANGLES, count, GL_UNSIGNED_BYTE, indexes );
 
 	glActiveTexture( GL_TEXTURE0 );
@@ -867,7 +850,9 @@ void tTJSNI_Canvas::DrawMesh( tTJSNI_ShaderProgram* shader, tjs_int primitiveTyp
 	if( vpLoc >= 0 ) {
 		glUniform2f( vpLoc, (float)ssize.x, (float)ssize.y );
 	}
+	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, index->GetVertexBuffer()->GetNativeHandle() );
 	glDrawElements( primitiveType, count, type, (const GLvoid *)index->GetOffset() );
+	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
 
 	shader->UnbindParam();
 }
