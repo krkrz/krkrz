@@ -24,6 +24,18 @@ tjs_error TJS_INTF_METHOD tTJSNI_VertexBinder::Construct(tjs_int numparams, tTJS
 	} else {
 		return TJS_E_INVALIDPARAM;
 	}
+	if( numparams >= 2 ) {
+		Stride = *param[1];
+	}
+	if( numparams >= 3 ) {
+		ComponentCount = (tjs_int)*param[2];
+	}
+	if( numparams >= 4 ) {
+		Offset = (tjs_int)*param[3];
+	}
+	if( numparams >= 5 ) {
+		Normalize = (tjs_int)*param[4] ? true : false;
+	}
 	return TJS_S_OK;
 }
 //---------------------------------------------------------------------------
@@ -157,7 +169,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(normalize)
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_VertexBinder);
-		*result = (tjs_int64)_this->GetNormalize();
+		*result = _this->GetNormalize() ? (tjs_int)1 : (tjs_int)0;
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_GETTER
@@ -165,7 +177,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(normalize)
 	TJS_BEGIN_NATIVE_PROP_SETTER
 	{
 		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_VertexBinder);
-		_this->SetNormalize( (tjs_uint)(tjs_int64)*param );
+		_this->SetNormalize( (tjs_int)*param ? true : false );
 		return TJS_S_OK;
 	}
 	TJS_END_NATIVE_PROP_SETTER
