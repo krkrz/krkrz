@@ -128,6 +128,8 @@ environ/android/Application.cpp
 environ/android/DetectCPU.cpp
 environ/android/TVPScreen.cpp
 environ/android/SystemControl.cpp
+environ/android/VirtualKey.cpp
+environ/android/WindowForm.cpp
 extension/Extension.cpp
 msg/MsgIntf.cpp
 msg/android/MsgImpl.cpp
@@ -194,8 +196,6 @@ visual/android/BitmapBitsAlloc.cpp
 visual/android/BitmapInfomation.cpp
 visual/android/LayerImpl.cpp
 visual/android/VideoOvlImpl.cpp
-visual/android/VirtualKey.cpp
-visual/android/WindowForm.cpp
 visual/android/WindowImpl.cpp
 visual/gl/blend_function.cpp
 visual/gl/ResampleImage.cpp
