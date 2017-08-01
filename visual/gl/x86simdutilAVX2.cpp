@@ -34,7 +34,7 @@ _PS_CONST256(1  , 1.0f);
 _PS_CONST256(0p5, 0.5f);
 /* the smallest non denormalized float number */
 _PS_CONST_TYPE256(min_norm_pos, int, 0x00800000);
-_PS_CONST_TYPE256(sign_mask, int, 0x80000000);
+_PS_CONST_TYPE256(sign_mask, int, (const int)0x80000000);
 _PS_CONST_TYPE256(inv_sign_mask, int, ~0x80000000);
 
 _PI32_CONST256(1, 1);

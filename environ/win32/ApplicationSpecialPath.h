@@ -61,18 +61,10 @@ public:
 		if(appdatapath == TJS_W("")) appdatapath = exepath;
 		if(savedgamespath == TJS_W("")) savedgamespath = exepath;
 
-		OSVERSIONINFO osinfo;
-		osinfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-		::GetVersionEx(&osinfo);
-
-		bool vista_or_later = osinfo.dwPlatformId == VER_PLATFORM_WIN32_NT && osinfo.dwMajorVersion >= 6;
-
-		tjs_string vistapath = vista_or_later ? appdatapath : exepath;
-
 		datapath = ReplaceStringAll(datapath, TJS_W("$(exepath)"), exepath);
 		datapath = ReplaceStringAll(datapath, TJS_W("$(personalpath)"), personalpath);
 		datapath = ReplaceStringAll(datapath, TJS_W("$(appdatapath)"), appdatapath);
-		datapath = ReplaceStringAll(datapath, TJS_W("$(vistapath)"), vistapath);
+		datapath = ReplaceStringAll(datapath, TJS_W("$(vistapath)"), appdatapath );
 		datapath = ReplaceStringAll(datapath, TJS_W("$(savedgamespath)"), savedgamespath);
 		return IncludeTrailingBackslash(ExpandUNCFileName(datapath));
 	}

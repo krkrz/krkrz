@@ -666,34 +666,27 @@ void tTVPApplication::DeleteAcceleratorKeyTable( HWND hWnd ) {
 }
 void tTVPApplication::CheckDigitizer() {
 	// Windows 7 以降でのみ有効
-	OSVERSIONINFOEX ovi;
-	ovi.dwOSVersionInfoSize = sizeof(ovi);
-	::GetVersionEx((OSVERSIONINFO*)&ovi);
-	if( ovi.dwPlatformId == VER_PLATFORM_WIN32_NT &&
-		ovi.dwMajorVersion >= 6 && ovi.dwMinorVersion >= 1 ) {
+	int value = ::GetSystemMetrics(SM_DIGITIZER);
+	if( value == 0 ) return;
 
-		int value = ::GetSystemMetrics(SM_DIGITIZER);
-		if( value == 0 ) return;
-
-		TVPAddLog( (const tjs_char*)TVPEnableDigitizer );
-		if( value & NID_INTEGRATED_TOUCH ) {
-			TVPAddLog( (const tjs_char*)TVPTouchIntegratedTouch );
-		}
-		if( value & NID_EXTERNAL_TOUCH ) {
-			TVPAddLog( (const tjs_char*)TVPTouchExternalTouch );
-		}
-		if( value & NID_INTEGRATED_PEN ) {
-			TVPAddLog( (const tjs_char*)TVPTouchIntegratedPen );
-		}
-		if( value & NID_EXTERNAL_PEN ) {
-			TVPAddLog( (const tjs_char*)TVPTouchExternalPen );
-		}
-		if( value & NID_MULTI_INPUT ) {
-			TVPAddLog( (const tjs_char*)TVPTouchMultiInput );
-		}
-		if( value & NID_READY ) {
-			TVPAddLog( (const tjs_char*)TVPTouchReady );
-		}
+	TVPAddLog( (const tjs_char*)TVPEnableDigitizer );
+	if( value & NID_INTEGRATED_TOUCH ) {
+		TVPAddLog( (const tjs_char*)TVPTouchIntegratedTouch );
+	}
+	if( value & NID_EXTERNAL_TOUCH ) {
+		TVPAddLog( (const tjs_char*)TVPTouchExternalTouch );
+	}
+	if( value & NID_INTEGRATED_PEN ) {
+		TVPAddLog( (const tjs_char*)TVPTouchIntegratedPen );
+	}
+	if( value & NID_EXTERNAL_PEN ) {
+		TVPAddLog( (const tjs_char*)TVPTouchExternalPen );
+	}
+	if( value & NID_MULTI_INPUT ) {
+		TVPAddLog( (const tjs_char*)TVPTouchMultiInput );
+	}
+	if( value & NID_READY ) {
+		TVPAddLog( (const tjs_char*)TVPTouchReady );
 	}
 }
 void tTVPApplication::OnActivate( HWND hWnd )

@@ -850,7 +850,7 @@ void tTJSNI_Canvas::DrawMesh( tTJSNI_ShaderProgram* shader, tjs_int primitiveTyp
 	if( vpLoc >= 0 ) {
 		glUniform2f( vpLoc, (float)ssize.x, (float)ssize.y );
 	}
-	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, index->GetVertexBuffer()->GetNativeHandle() );
+	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, (GLuint)index->GetVertexBuffer()->GetNativeHandle() );
 	glDrawElements( primitiveType, count, type, (const GLvoid *)index->GetOffset() );
 	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
 
