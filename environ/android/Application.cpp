@@ -899,9 +899,9 @@ tjs_int tTVPApplication::GetScreenHeight() const {
     getIntegerFromJava( static_cast<const char*>("getScreenHeight"), h );
     return h;
 }
-bool tTVPApplication::IsSupportGLES3() const {
-	bool ret;
-	getBooleanFromJava( static_cast<const char*>("isSupportGLES3"), ret );
+int tTVPApplication::GetOpenGLESVersionCode() const {
+	int ret;
+	getIntegerFromJava( static_cast<const char*>("getOpenGLESVersionCode"), ret );
 	return ret;
 }
 void tTVPApplication::finishActivity() {

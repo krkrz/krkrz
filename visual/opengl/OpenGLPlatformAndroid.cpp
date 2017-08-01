@@ -12,10 +12,12 @@
 //---------------------------------------------------------------------------
 static bool TVPANGLEInit = false;
 static bool TVPIsSupportES3 = false;
+static int TVPOpenGLESVersion = 100;
 //---------------------------------------------------------------------------
 void TVPInitializeOpenGLPlatform() {
 	if( TVPANGLEInit == false ) {
-		if( Application->IsSupportGLES3() ) {
+		TVPOpenGLESVersion = Application->GetOpenGLESVersionCode();
+		if( TVPOpenGLESVersion >= 300 ) {
 			if( gl3stubInit() == GL_TRUE ) {
 				TVPIsSupportES3 = true;
 			}
@@ -24,5 +26,5 @@ void TVPInitializeOpenGLPlatform() {
 	}
 }
 //---------------------------------------------------------------------------
-bool TVPIsSupportGLES3() { return TVPIsSupportES3; }
+int TVPGetOpenGLESVersion() { return TVPOpenGLESVersion; }
 //---------------------------------------------------------------------------

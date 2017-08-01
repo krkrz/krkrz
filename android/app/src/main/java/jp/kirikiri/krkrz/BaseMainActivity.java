@@ -609,7 +609,7 @@ public class BaseMainActivity extends Activity  implements SurfaceHolder.Callbac
     public void postPlayMovie() { mHandler.post( new PlayMovieEvent()); }
     public void postStopMovie() { mHandler.post( new StopMovieEvent()); }
     public void postPauseMovie() { mHandler.post( new PauseMovieEvent()); }
-    public boolean isSupportGLES3() { return GPUType.isGLES3(); }
+    public int getOpenGLESVersionCode() { return GPUType.getVersionCode(); }
 
     /**  動画再生関係  **/
     private MediaSource buildMediaSource(Uri uri) {

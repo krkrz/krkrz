@@ -374,7 +374,7 @@ public:
 	void startMainLoop();
 	void stopMainLoop();
 
-	bool IsSupportGLES3() const;
+	int GetOpenGLESVersionCode() const;
 
 	// for exception showing
 	static int MessageDlg( const tjs_string& string, const tjs_string& caption, int type, int button );

@@ -25,6 +25,10 @@ public class GPUType {
         return  VersionCode == 300;
     }
 
+	public static int getVersionCode() {
+		return VersionCode;
+	}
+
     public static boolean isAdreno300s() {
         return  AdrenoID >= 300 && AdrenoID < 400;
     }

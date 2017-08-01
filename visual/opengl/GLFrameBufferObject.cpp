@@ -8,9 +8,6 @@
 #include "tvpgl.h"
 #include <memory>
 
-#ifdef ANDROID
-extern bool TVPIsSupportGLES3();
-#endif
 
 bool GLFrameBufferObject::create( GLuint w, GLuint h ) {
 	destory();

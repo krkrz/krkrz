@@ -989,6 +989,7 @@ bool LoadLibGLESv2( const tjs_string& dllpath ) {
 }
 //---------------------------------------------------------------------------
 static bool TVPANGLEInit = false;
+static int TVPOpenGLESVersion = 200;
 //---------------------------------------------------------------------------
 void TVPInitializeOpenGLPlatform() {
 	if( TVPANGLEInit == false ) {
@@ -1008,6 +1009,7 @@ void TVPInitializeOpenGLPlatform() {
 			TVPThrowExceptionMessage(TJS_W("Failed to load ANGLE."));
 		} else {
 			TVPANGLEInit = true;
+			TVPOpenGLESVersion = 300;
 		}
 		::SetCurrentDirectory( oldCurDir );
 	}
@@ -1023,6 +1025,8 @@ static void TVPUninitializeANGLE() {
 		::FreeLibrary( TVPhModuleLibGLESv2 );
 	}
 }
+//---------------------------------------------------------------------------
+int TVPGetOpenGLESVersion() { return TVPOpenGLESVersion; }
 //---------------------------------------------------------------------------
 static tTVPAtExit TVPUninitANGLEAtExit
 	(TVP_ATEXIT_PRI_SHUTDOWN, TVPUninitializeANGLE);

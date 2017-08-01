@@ -4,10 +4,6 @@
 
 #include "OpenGLHeader.h"
 
-#ifdef ANDROID
-extern bool TVPIsSupportGLES3();
-#endif
-
 class GLTexture {
 protected:
 	GLuint texture_id_;
