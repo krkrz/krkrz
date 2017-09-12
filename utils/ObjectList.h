@@ -57,7 +57,6 @@ private:
 		// backup current "Objects" to "BackupedObjects"
 		if(Count)
 		{
-			//BackupedObjects = (void**)TJS_malloc(Count * sizeof(void *) );
 			BackupedObjects = new ObjT*[Count];
 			memcpy(BackupedObjects, Objects, Count * sizeof(ObjT *) );
 		}
@@ -73,7 +72,7 @@ private:
 	{
 		// commit the current array
 		// this simply free BackupedObjects ( and its related things )
-		if(BackupedObjects) TJS_free(BackupedObjects);
+		if(BackupedObjects) delete[] BackupedObjects;
 		BackupedObjects = NULL;
 		BackupedCount = 0;
 		Backuped = false;
