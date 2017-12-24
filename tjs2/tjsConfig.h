@@ -51,6 +51,7 @@ TJS_EXP_FUNC_DEF(void, TJS_strcpy_maxlen, (tjs_char *d, const tjs_char *s, size_
 TJS_EXP_FUNC_DEF(void, TJS_strcpy, (tjs_char *d, const tjs_char *s));
 TJS_EXP_FUNC_DEF(size_t, TJS_strlen, (const tjs_char *d));
 
+/*[*/
 #define TJS_strcmp			wcscmp
 #define TJS_strncmp			wcsncmp
 #define TJS_strncpy			wcsncpy
@@ -70,6 +71,7 @@ TJS_EXP_FUNC_DEF(size_t, TJS_strlen, (const tjs_char *d));
 #define TJS_octetcpy		memcpy
 #define TJS_octetcmp		memcmp
 #define TJS_strtod			wcstod
+/*]*/
 
 extern size_t TJS_mbstowcs(tjs_char *pwcs, const tjs_nchar *s, size_t n);
 extern size_t TJS_wcstombs(tjs_nchar *s, const tjs_char *pwcs, size_t n);

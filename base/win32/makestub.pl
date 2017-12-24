@@ -324,7 +324,7 @@ sub process_exp_stub
 		$defs .= $1."\n";
 	}
 
-	while($content =~ /\/\*\[C\*\/(.*?)\/\*\C]\*\//gs)
+	while($content =~ /\/\*\[C\*\/(.*?)\/\*C]\*\//gs)
 	{
 		$impls .= $1."\n";
 	}
@@ -702,6 +702,9 @@ print OHFH <<EOF;
 #ifndef __cplusplus
 	#error Sorry, currently tp_stub.h can only be used in C++ mode.
 #endif
+
+#include <string>
+#include <stdarg.h>
 
 #ifndef _WIN32
 	#error Sorry, currently tp_stub.h can only be used in Win32 VC++ or Borland compilers.
