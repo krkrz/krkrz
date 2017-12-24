@@ -16,6 +16,7 @@
 #include <mmsystem.h>
 #include <objbase.h>
 #include <commdlg.h>
+#include <thread>
 
 #include "SysInitImpl.h"
 #include "StorageIntf.h"
@@ -931,6 +932,44 @@ void TVPBeforeSystemInit()
 
 	TVPInitProgramArgumentsAndDataPath(false); // ensure command line
 
+	{	// CPU core limitation
+		bool cpuCoreLimit = true;
+		tTJSVariant opt;
+		if( TVPGetCommandLine( TJS_W( "-cpucorelimit" ), &opt ) )
+		{
+			ttstr str( opt );
+			if( str == TJS_W( "no" ) )
+			{
+				cpuCoreLimit = false;
+			}
+		}
+		if( cpuCoreLimit )
+		{
+			tjs_int numCore = std::thread::hardware_concurrency();
+#ifdef TJS_64BIT_OS
+			if( numCore > 63 )
+			{
+				HANDLE hProc = ::OpenProcess( PROCESS_ALL_ACCESS, FALSE, ::GetCurrentProcessId() );
+				BOOL success = ::SetProcessAffinityMask( hProc, 0x7fffffffffffffffULL );
+				if( success == FALSE ) {
+					TVPAddLog( TJS_W( "Faild to set process affinity." ) );
+				}
+				::CloseHandle( hProc );
+			}
+#else
+			if( numCore > 31 )
+			{
+				//DWORD mask = (0x01 << numCore) - 1;	// for debug.
+				HANDLE hProc = ::OpenProcess( PROCESS_ALL_ACCESS, FALSE, ::GetCurrentProcessId() );
+				BOOL success = ::SetProcessAffinityMask( hProc, 0x7fffffffUL );
+				if( success == FALSE ) {
+					TVPAddLog(TJS_W("Faild to set process affinity."));
+				}
+				::CloseHandle( hProc );
+			}
+#endif
+		}
+	}
 #ifdef TVP_REPORT_HW_EXCEPTION
 	// __dee_hacked_set_getExceptionObjectHook(TVP__dee_hacked_getExceptionObjectHook);
 		// register hook function for hardware exceptions
