@@ -74,6 +74,7 @@ class tTVPApplication {
 	class tTVPAsyncImageLoader* image_load_thread_;
 
 	std::stack<class tTVPWindow*> modal_window_stack_;
+	std::vector<char> console_cache_;
 
 private:
 	void CheckConsole();

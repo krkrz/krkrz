@@ -35,6 +35,7 @@
 #include "SystemImpl.h"
 #include "WaveImpl.h"
 #include "GraphicsLoadThread.h"
+#include "CharacterSet.h"
 
 #include "resource.h"
 
@@ -222,7 +223,7 @@ int APIENTRY wWinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	return TVPTerminateCode;
 }
 tTVPApplication::tTVPApplication() : is_attach_console_(false), tarminate_(false), application_activating_(true)
-	 , image_load_thread_(NULL), has_map_report_process_(false)
+	 , image_load_thread_(NULL), has_map_report_process_(false), console_cache_(1024)
 {
 }
 tTVPApplication::~tTVPApplication() {
@@ -477,22 +478,14 @@ void tTVPApplication::PrintConsole( const tjs_char* mes, unsigned long len, bool
 			::WriteConsoleW( hStdOutput, mes, len, &wlen, NULL );
 			::WriteConsoleW( hStdOutput, TJS_W("\n"), 1, &wlen, NULL );
 		} else {
-			// その他のハンドル
-			ttstr str = mes;
-			tjs_int len = str.GetNarrowStrLen();
-			tjs_nchar *dat = new tjs_nchar[len+1];
-			try {
-				str.ToNarrowStr(dat, len+1);
+			// その他のハンドル, UTF-8で出力
+			if( console_cache_.size() < (len*3+1) ) {
+				console_cache_.resize(len*3+1);
 			}
-			catch(...)	{
-				delete [] dat;
-				throw;
-			} 
+			tjs_int u8len = TVPWideCharToUtf8String( mes, &(console_cache_[0]) );
 			DWORD wlen;
-			::WriteFile( hStdOutput, dat, len, &wlen, NULL );
+			::WriteFile( hStdOutput, &(console_cache_[0]), u8len, &wlen, NULL );
 			::WriteFile( hStdOutput, "\n", 1, &wlen, NULL );
-			//fprintf(stderr, "%s\n", dat);
-			delete [] dat;
 		}
 	}
 #ifdef _DEBUG
