@@ -31,6 +31,7 @@
 #include "CompatibleNativeFuncs.h"
 #include "DebugIntf.h"
 #include "VersionFormUnit.h"
+#include "PluginImpl.h"
 
 //---------------------------------------------------------------------------
 static ttstr TVPAppTitle;
@@ -139,7 +140,11 @@ ttstr TVPGetOSName()
 		hModule = NULL;
 	}
 	if( isGetVersion == false ) {
-		GetVersionEx((OSVERSIONINFO*)&ovi);
+		// Probably do not call on Windows NT
+#pragma warning(push)
+#pragma warning(disable:4996)
+		::GetVersionEx((OSVERSIONINFO*)&ovi);
+#pragma warning(pop)
 	}
 	tjs_char buf[256];
 	const tjs_char *osname = NULL;
@@ -200,9 +205,17 @@ ttstr TVPGetOSName()
 				break;
 			case 4:
 				if( ovi.wProductType == VER_NT_WORKSTATION )
-					osname = TJS_W("Windows 10");
+					osname = TJS_W( "Windows 10" );
+				else
+					osname = TJS_W( "Windows Server 2016" );
 				break;
 			}
+		} else if( ovi.dwMajorVersion == 10 ) {
+			if( ovi.wProductType == VER_NT_WORKSTATION )
+				osname = TJS_W( "Windows 10" );
+			else
+				osname = TJS_W( "Windows Server 2016" );
+			break;
 		}
 		if( osname == NULL ) osname = TJS_W("Windows NT");
 		break;
@@ -211,10 +224,29 @@ ttstr TVPGetOSName()
 	}
 
 	TJS_snprintf(buf, sizeof(buf)/sizeof(tjs_char), TJS_W("%ls %d.%d.%d "), osname, ovi.dwMajorVersion,
-		ovi.dwMinorVersion, ovi.dwBuildNumber&0xfff);
+		ovi.dwMinorVersion, ovi.dwBuildNumber);
 
 	ttstr str(buf);
 	str += ttstr( ovi.szCSDVersion );
+
+	tjs_int major;
+	tjs_int minor;
+	tjs_int release;
+	tjs_int build;
+	TVPGetFileVersionOf( TJS_W( "kernel32.dll" ), major, minor, release, build );
+	//TJS_snprintf( buf, sizeof( buf ) / sizeof( tjs_char ), TJS_W( " kernel32.dll %d.%d Release %d Build %d " ), major, minor, release, build );
+	//str += ttstr( buf );
+	if( major >= 10 ) {
+		if( release >= 16299 ) {
+			str += ttstr( TJS_W("Fall Creators Update or later") );
+		} else if( release >= 15063 ) {
+			str += ttstr( TJS_W( "Creators Update" ) );
+		} else if( release >= 14393 ) {
+			str += ttstr( TJS_W( "Anniversary Update" ) );
+		} else if( release >= 10586 ) {
+			str += ttstr( TJS_W( "November Update" ) );
+		}
+	}
 
 	return str;
 }
