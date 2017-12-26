@@ -139,7 +139,7 @@ tjs_error TJS_INTF_METHOD tTJSNI_Texture::Construct(tjs_int numparams, tTJSVaria
 		}
 		if( isrecreate == false ) {
 			// そのまま生成して問題ない
-			LoadTexture( bitmap, color );
+			LoadTexture( bitmap, color, true );
 		} else {
 			// 変更が入るので、コピーを作る
 			std::unique_ptr<tTVPBaseBitmap> bitmap2( new tTVPBaseBitmap( *bitmap ) );
@@ -170,7 +170,7 @@ tjs_error TJS_INTF_METHOD tTJSNI_Texture::Construct(tjs_int numparams, tTJSVaria
 				assert( powerof2 );
 				bitmap2->SetSizeWithFill( dw, dh, 0 );
 			}
-			LoadTexture( bitmap2.get(), color );
+			LoadTexture( bitmap2.get(), color, true );
 		}
 	} else if( numparams >= 2 && param[0]->Type() == tvtInteger && param[1]->Type() == tvtInteger ) {
 		tjs_int width = *param[0];
@@ -227,18 +227,26 @@ GLint tTJSNI_Texture::ColorToGLColor( tTVPTextureColorFormat color ) {
 	}
 }
 //----------------------------------------------------------------------
-void tTJSNI_Texture::LoadTexture( const class tTVPBaseBitmap* bitmap, tTVPTextureColorFormat color ) {
+void tTJSNI_Texture::LoadTexture( const class tTVPBaseBitmap* bitmap, tTVPTextureColorFormat color, bool rbswap ) {
 	tjs_int bpp = color == tTVPTextureColorFormat::RGBA ? 4 : 1;
 	tjs_int w = bitmap->GetWidth();
 	tjs_int h = bitmap->GetHeight();
 	tjs_int pitch = w * bpp;
-	if( bitmap->GetPitchBytes() != pitch ) {
+	if( bitmap->GetPitchBytes() != pitch || ( bpp == 4 && rbswap) ) {
 		// パディングされているので、そのままではコピーできない(OpenGL ES2.0の場合)
+		// もしくは赤と青をスワップする必要がある
 		if( bpp == 4 ) {
 			std::unique_ptr<tjs_uint32[]> buffer( new tjs_uint32[w*h] );
-			for( tjs_int y = 0; y < h; y++ ) {
-				tjs_uint32* sl = (tjs_uint32*)bitmap->GetScanLine( y );
-				memcpy( &buffer[w*y], sl, pitch );
+			if( rbswap ) {
+				for( tjs_int y = 0; y < h; y++ ) {
+					tjs_uint32* sl = (tjs_uint32*)bitmap->GetScanLine( y );
+					TVPRedBlueSwapCopy( &buffer[w*y], sl, w );
+				}
+			} else {
+				for( tjs_int y = 0; y < h; y++ ) {
+					tjs_uint32* sl = (tjs_uint32*)bitmap->GetScanLine( y );
+					memcpy( &buffer[w*y], sl, pitch );
+				}
 			}
 			Texture.create( w, h, buffer.get(), ColorToGLColor( color ) );
 		} else {
