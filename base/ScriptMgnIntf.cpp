@@ -90,18 +90,6 @@ class tTVPTJSGCCallback : public tTVPCompactEventCallbackIntf
 
 
 //---------------------------------------------------------------------------
-iTJSBinaryStream *TVPCreateBinaryStreamForReadForTJS(const ttstr &name, const ttstr &modestr)
-{
-	return TVPCreateBinaryStreamForRead( name, modestr );
-}
-//---------------------------------------------------------------------------
-iTJSBinaryStream *TVPCreateBinaryStreamForWriteForTJS(const ttstr &name, const ttstr &modestr)
-{
-	return TVPCreateBinaryStreamForWrite( name, modestr );
-}
-//---------------------------------------------------------------------------
-
-//---------------------------------------------------------------------------
 // TVPInitScriptEngine
 //---------------------------------------------------------------------------
 static bool TVPScriptEngineInit = false;
@@ -193,8 +181,8 @@ void TVPInitScriptEngine()
 	TJSCreateTextStreamForWrite = TVPCreateTextStreamForWrite;
 	
 	// set binary stream functions
-	TJSCreateBinaryStreamForRead = TVPCreateBinaryStreamForReadForTJS;
-	TJSCreateBinaryStreamForWrite = TVPCreateBinaryStreamForWriteForTJS;
+	TJSCreateBinaryStreamForRead = TVPCreateBinaryStreamInterfaceForRead;
+	TJSCreateBinaryStreamForWrite = TVPCreateBinaryStreamInterfaceForWrite;
 
 	// register some TVP classes/objects/functions/propeties
 	iTJSDispatch2 *dsp;

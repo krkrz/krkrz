@@ -476,6 +476,9 @@ process_exp_stub("./SystemImpl.h");
 print OFH "#include \"ScriptMgnIntf.h\"\n";
 process_exp_stub("../ScriptMgnIntf.h");
 
+print OFH "#include \"BinaryStream.h\"\n";
+process_exp_stub("../BinaryStream.h");
+
 print OFH "#include \"StorageImpl.h\"\n";
 process_exp_stub("../win32/StorageImpl.h");
 
