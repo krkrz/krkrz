@@ -86,7 +86,7 @@ private:
 public:
 	void SaveStructuredData(std::vector<iTJSDispatch2 *> &stack,
                                 iTJSTextWriteStream & stream, const ttstr&indentstr);
-	void SaveStructuredBinary(std::vector<iTJSDispatch2 *> &stack, tTJSBinaryStream &stream );
+	void SaveStructuredBinary(std::vector<iTJSDispatch2 *> &stack, iTJSBinaryStream &stream );
 		// method from tTJSSaveStructuredDataCallback
 private:
 	struct tSaveStructCallback : public tTJSDispatch
@@ -105,7 +105,7 @@ private:
 
 	struct tSaveStructBinayCallback : public tTJSDispatch {
 		std::vector<iTJSDispatch2 *> * Stack;
-		tTJSBinaryStream *Stream;
+		iTJSBinaryStream *Stream;
 
 		tjs_error TJS_INTF_METHOD
 		FuncCall(tjs_uint32 flag, const tjs_char * membername,

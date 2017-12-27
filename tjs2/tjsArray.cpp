@@ -362,7 +362,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/loadStruct)
 
 	ni->Items.clear();
 
-	tTJSBinaryStream* stream = TJSCreateBinaryStreamForRead(name, mode);
+	iTJSBinaryStream* stream = TJSCreateBinaryStreamForRead(name, mode);
 	if( !stream ) return TJS_E_INVALIDPARAM;
 
 	bool isbin = false;
@@ -450,7 +450,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/* func. name */saveStruct)
 	if(numparams >= 2 && param[1]->Type() != tvtVoid) mode = *param[1];
 
 	if( TJS_strchr(mode.c_str(), TJS_W('b')) != NULL ) {
-		tTJSBinaryStream* stream = TJSCreateBinaryStreamForWrite(name, mode);
+		iTJSBinaryStream* stream = TJSCreateBinaryStreamForWrite(name, mode);
 		try {
 			stream->Write( tTJSBinarySerializer::HEADER, tTJSBinarySerializer::HEADER_LENGTH );
 			std::vector<iTJSDispatch2 *> stack;
@@ -1196,7 +1196,7 @@ void tTJSArrayNI::SaveStructuredDataForObject(iTJSDispatch2 *dsp,
 	}
 }
 //---------------------------------------------------------------------------
-void tTJSArrayNI::SaveStructuredBinary(std::vector<iTJSDispatch2 *> &stack, tTJSBinaryStream &stream )
+void tTJSArrayNI::SaveStructuredBinary(std::vector<iTJSDispatch2 *> &stack, iTJSBinaryStream &stream )
 {
 	tjs_uint count = (tjs_uint)Items.size();
 	tTJSBinarySerializer::PutStartArray( &stream, count );
@@ -1215,7 +1215,7 @@ void tTJSArrayNI::SaveStructuredBinary(std::vector<iTJSDispatch2 *> &stack, tTJS
 }
 //---------------------------------------------------------------------------
 void tTJSArrayNI::SaveStructuredBinaryForObject(iTJSDispatch2 *dsp,
-		std::vector<iTJSDispatch2 *> &stack, tTJSBinaryStream &stream )
+		std::vector<iTJSDispatch2 *> &stack, iTJSBinaryStream &stream )
 {
 	// check object recursion
 	std::vector<iTJSDispatch2 *>::iterator i;

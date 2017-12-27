@@ -25,7 +25,7 @@ bool tTJSBinarySerializer::IsBinary( const tjs_uint8 header[tTJSBinarySerializer
 /**
  * バイアント値を格納する
  */
-void tTJSBinarySerializer::PutVariant( tTJSBinaryStream* stream, tTJSVariant& v )
+void tTJSBinarySerializer::PutVariant( iTJSBinaryStream* stream, tTJSVariant& v )
 {
 	tTJSVariantType type = v.Type();
 	switch( type ) {
@@ -329,7 +329,7 @@ tTJSVariant* tTJSBinarySerializer::ReadDictionary( const tjs_uint8* buff, const 
 	dic->Release();
 	return ret;
 }
-tTJSVariant* tTJSBinarySerializer::Read( tTJSBinaryStream* stream )
+tTJSVariant* tTJSBinarySerializer::Read( iTJSBinaryStream* stream )
 {
 	tjs_uint64 pos = stream->GetPosition();
 	tjs_uint size = (tjs_uint)( stream->GetSize() - pos );

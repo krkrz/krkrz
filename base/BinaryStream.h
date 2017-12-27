@@ -17,8 +17,8 @@
 //---------------------------------------------------------------------------
 // BinaryStream Functions
 //---------------------------------------------------------------------------
-TJS_EXP_FUNC_DEF(tTJSBinaryStream *, TVPCreateBinaryStreamForRead, (const ttstr &name, const ttstr &modestr));
-TJS_EXP_FUNC_DEF(tTJSBinaryStream *, TVPCreateBinaryStreamForWrite, (const ttstr &name, const ttstr &modestr));
+extern tTJSBinaryStream *TVPCreateBinaryStreamForRead(const ttstr &name, const ttstr &modestr);
+extern tTJSBinaryStream *TVPCreateBinaryStreamForWrite(const ttstr &name, const ttstr &modestr);
 //---------------------------------------------------------------------------
 
 

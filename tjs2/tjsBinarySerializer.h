@@ -114,7 +114,7 @@ public:
 	}
 	*/
 
-	static inline void PutInteger( tTJSBinaryStream* stream, tjs_int64 b ) {
+	static inline void PutInteger( iTJSBinaryStream* stream, tjs_int64 b ) {
 		if( b < 0 ) {
 			if( b >= TYPE_NEGATIVE_FIX_NUM_MIN ) {
 				tjs_uint8 tmp[1];
@@ -197,7 +197,7 @@ public:
 			}
 		}
 	}
-	static inline void PutString( tTJSBinaryStream* stream, const tjs_char* val, tjs_uint len ) {
+	static inline void PutString( iTJSBinaryStream* stream, const tjs_char* val, tjs_uint len ) {
 		if( len <= TYPE_FIX_STRING_LEN ) {
 			tjs_uint8 tmp[1];
 			tmp[0] = TYPE_FIX_STRING_MIN+len;
@@ -246,7 +246,7 @@ public:
 	/**
 	 * 浮動小数点値を格納する
 	 */
-	static inline void PutDouble( tTJSBinaryStream* stream, double b ) {
+	static inline void PutDouble( iTJSBinaryStream* stream, double b ) {
 		tjs_uint64 v = *(tjs_uint64*)&b;
 		tjs_uint8 tmp[9];
 		tmp[0] = TYPE_DOUBLE;
@@ -260,7 +260,7 @@ public:
 		tmp[8] = (v>>56)&0xff;
 		stream->Write( tmp, sizeof(tmp) );
 	}
-	static inline void PutBytes( tTJSBinaryStream* stream, const tjs_uint8* val, tjs_uint len ) {
+	static inline void PutBytes( iTJSBinaryStream* stream, const tjs_uint8* val, tjs_uint len ) {
 		if( len <= TYPE_FIX_RAW_LEN ) {
 			tjs_uint8 tmp[1];
 			tmp[0] = TYPE_FIX_RAW_MIN + len;
@@ -289,7 +289,7 @@ public:
 	/**
 	 * オクテット型の値を格納する
 	 */
-	static inline void PutOctet( tTJSBinaryStream* stream, tTJSVariantOctet* val ) {
+	static inline void PutOctet( iTJSBinaryStream* stream, tTJSVariantOctet* val ) {
 		tjs_uint len = 0;
 		const tjs_uint8* data = NULL;
 		if( val ) {
@@ -302,7 +302,7 @@ public:
 	/**
 	 * 文字列を格納する
 	 */
-	static inline void PutString( tTJSBinaryStream* stream, const tTJSVariantString* val ) {
+	static inline void PutString( iTJSBinaryStream* stream, const tTJSVariantString* val ) {
 		const tjs_char* data = NULL;
 		tjs_int len = 0;
 		if( val ) {
@@ -315,7 +315,7 @@ public:
 		}
 		PutString( stream, data, len );
 	}
-	static inline void PutStartMap( tTJSBinaryStream* stream, tjs_uint count ) {
+	static inline void PutStartMap( iTJSBinaryStream* stream, tjs_uint count ) {
 		if( count <= TYPE_FIX_MAP_LEN ) {
 			tjs_uint8 tmp[1];
 			tmp[0] = TYPE_FIX_MAP_MIN + count;
@@ -340,7 +340,7 @@ public:
 			TJS_eTJSError(TJSWriteError);
 		}
 	}
-	static inline void PutStartArray( tTJSBinaryStream* stream, tjs_uint count ) {
+	static inline void PutStartArray( iTJSBinaryStream* stream, tjs_uint count ) {
 		if( count <= TYPE_FIX_ARRAY_LEN ) {
 			tjs_uint8 tmp[1];
 			tmp[0] = TYPE_FIX_ARRAY_MIN + count;
@@ -365,7 +365,7 @@ public:
 			TJS_eTJSError(TJSWriteError);
 		}
 	}
-	static inline void PutNull( tTJSBinaryStream* stream ) {
+	static inline void PutNull( iTJSBinaryStream* stream ) {
 		tjs_uint8 tmp[1];
 		tmp[0] = TYPE_NIL;
 		stream->Write( tmp, sizeof(tmp) );
@@ -444,13 +444,13 @@ public:
 	 * バイアント値を格納する
 	 * オブジェクト型は無視している
 	 */
-	static void PutVariant( tTJSBinaryStream* stream, tTJSVariant& v );
+	static void PutVariant( iTJSBinaryStream* stream, tTJSVariant& v );
 	
 	tTJSBinarySerializer();
 	tTJSBinarySerializer( class tTJSDictionaryObject* root );
 	tTJSBinarySerializer( class tTJSArrayObject* root );
 	~tTJSBinarySerializer();
-	tTJSVariant* Read( tTJSBinaryStream* stream );
+	tTJSVariant* Read( iTJSBinaryStream* stream );
 
 private:
 	iTJSDispatch2* DicClass;

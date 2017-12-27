@@ -70,7 +70,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/loadStruct)
 	if(numparams >= 2 && param[1]->Type() != tvtVoid) mode =*param[1];
 
 	{
-		tTJSBinaryStream* stream = TJSCreateBinaryStreamForRead(name, mode);
+		iTJSBinaryStream* stream = TJSCreateBinaryStreamForRead(name, mode);
 		if( !stream ) return TJS_E_INVALIDPARAM;
 
 		bool isbin = false;
@@ -145,7 +145,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func.name*/saveStruct)
 	if(numparams >= 2 && param[1]->Type() != tvtVoid) mode = *param[1];
 
 	if( TJS_strchr(mode.c_str(), TJS_W('b')) != NULL ) {
-		tTJSBinaryStream* stream = TJSCreateBinaryStreamForWrite(name, mode);
+		iTJSBinaryStream* stream = TJSCreateBinaryStreamForWrite(name, mode);
 		try {
 			stream->Write( tTJSBinarySerializer::HEADER, tTJSBinarySerializer::HEADER_LENGTH );
 			std::vector<iTJSDispatch2 *> stack;
@@ -482,7 +482,7 @@ tjs_error TJS_INTF_METHOD tTJSDictionaryNI::tSaveStructCallback::FuncCall(
 	return TJS_S_OK;
 }
 //---------------------------------------------------------------------------
-void tTJSDictionaryNI::SaveStructuredBinary(std::vector<iTJSDispatch2 *> &stack, tTJSBinaryStream &stream )
+void tTJSDictionaryNI::SaveStructuredBinary(std::vector<iTJSDispatch2 *> &stack, iTJSBinaryStream &stream )
 {
 	tSaveMemberCountCallback countCallback;
 	tTJSVariantClosure clo(&countCallback, NULL);

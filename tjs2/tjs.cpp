@@ -636,10 +636,10 @@ iTJSTextReadStream * TJSDefCreateTextStreamForRead(const tTJSString &name,
 iTJSTextWriteStream * TJSDefCreateTextStreamForWrite(const tTJSString &name,
 	const tTJSString &mode)
 { return NULL; }
-tTJSBinaryStream * TJSDefCreateBinaryStreamForRead(const tTJSString &name,
+iTJSBinaryStream * TJSDefCreateBinaryStreamForRead(const tTJSString &name,
 	const tTJSString &mode)
 { return NULL; }
-tTJSBinaryStream * TJSDefCreateBinaryStreamForWrite(const tTJSString &name,
+iTJSBinaryStream * TJSDefCreateBinaryStreamForWrite(const tTJSString &name,
 	const tTJSString &mode)
 { return NULL; }
 //---------------------------------------------------------------------------
@@ -649,10 +649,10 @@ iTJSTextReadStream * (*TJSCreateTextStreamForRead)(const tTJSString &name,
 iTJSTextWriteStream * (*TJSCreateTextStreamForWrite)(const tTJSString &name,
 	const tTJSString &mode) =
 	TJSDefCreateTextStreamForWrite;
-tTJSBinaryStream * (*TJSCreateBinaryStreamForRead)(const tTJSString &name,
+iTJSBinaryStream * (*TJSCreateBinaryStreamForRead)(const tTJSString &name,
 	const tTJSString &mode) =
 	TJSDefCreateBinaryStreamForRead;
-tTJSBinaryStream * (*TJSCreateBinaryStreamForWrite)(const tTJSString &name,
+iTJSBinaryStream * (*TJSCreateBinaryStreamForWrite)(const tTJSString &name,
 	const tTJSString &mode) =
 	TJSDefCreateBinaryStreamForWrite;
 //---------------------------------------------------------------------------
@@ -678,12 +678,12 @@ tjs_uint64 TJS_INTF_METHOD tTJSBinaryStream::GetSize()
 	return size;
 }
 //---------------------------------------------------------------------------
-tjs_uint64 tTJSBinaryStream::GetPosition()
+tjs_uint64 TJS_INTF_METHOD tTJSBinaryStream::GetPosition()
 {
 	return Seek(0, SEEK_CUR);
 }
 //---------------------------------------------------------------------------
-void tTJSBinaryStream::SetPosition(tjs_uint64 pos)
+void TJS_INTF_METHOD tTJSBinaryStream::SetPosition(tjs_uint64 pos)
 {
 	if(pos != Seek(pos, TJS_BS_SEEK_SET))
 		TJS_eTJSError(TJSSeekError);
