@@ -57,12 +57,13 @@ enum class tTVPBlendMode : tjs_int {
 };
 struct tTVPCanvasState {
 	static const tjs_uint32 FLAG_CLIP_RECT = 0x01 << 0;
+	static const tjs_uint32 FLAG_CULLING = 0x01 << 1;
 
 	float Matrix[6];
 	tjs_int ClipRect[4];
 	tjs_uint32 Flag;
 
-	tTVPCanvasState( class tTJSNI_Matrix32* mat, class tTJSNI_Rect* clip, bool enableClip );
+	tTVPCanvasState( class tTJSNI_Matrix32* mat, class tTJSNI_Rect* clip, bool enableClip, bool enableCulling );
 };
 
 class tTJSNI_Canvas : public tTJSNativeInstance
@@ -76,6 +77,7 @@ class tTJSNI_Canvas : public tTJSNativeInstance
 	bool IsFirst;
 	bool InDrawing;
 	bool EnableClipRect;
+	bool EnableCulling = false;
 	tjs_uint32 ClearColor;
 	tTVPBlendMode BlendMode;
 	tTVPRect CurrentScissorRect;
@@ -129,6 +131,7 @@ private:
 	void ApplyBlendMode();
 	void ApplyClipRect();
 	void DisableClipRect();
+	static void SetCulling( bool b );
 	void CreateDefaultShader();
 	void CreateDefaultMatrix();
 	void SetupEachDrawing();
@@ -184,6 +187,8 @@ public:
 	tjs_uint GetHeight() const;
 	void SetEnableClipRect( bool b );
 	bool GetEnableClipRect() const { return EnableClipRect; }
+	void SetEnableCulling( bool b );
+	bool GetEnableCulling() const { return EnableCulling; }
 
 	void SetWaitVSync( bool b );
 };

@@ -24,7 +24,7 @@
 
 #include <memory>
 
-tTVPCanvasState::tTVPCanvasState( class tTJSNI_Matrix32* mat, class tTJSNI_Rect* clip, bool enableClip ) {
+tTVPCanvasState::tTVPCanvasState( class tTJSNI_Matrix32* mat, class tTJSNI_Rect* clip, bool enableClip, bool enableCulling ) {
 	if( mat ) {
 		memcpy( Matrix, mat->GetMatrixArray(), sizeof( float ) * 6 );
 	} else {
@@ -37,6 +37,7 @@ tTVPCanvasState::tTVPCanvasState( class tTJSNI_Matrix32* mat, class tTJSNI_Rect*
 		memset( ClipRect, 0, sizeof( tjs_int ) * 4 );
 	}
 	Flag = enableClip ? FLAG_CLIP_RECT : 0;
+	Flag |= enableCulling ? FLAG_CULLING : 0;
 }
 
 //----------------------------------------------------------------------
@@ -283,6 +284,7 @@ void tTJSNI_Canvas::BeginDrawing()
 	} else {
 		DisableClipRect();
 	}
+	SetCulling( EnableCulling );
 	InDrawing = true;
 
 	if( RenderTargetInstance ) {
@@ -858,7 +860,7 @@ void tTJSNI_Canvas::DrawMesh( tTJSNI_ShaderProgram* shader, tjs_int primitiveTyp
 }
 //----------------------------------------------------------------------
 void tTJSNI_Canvas::Save() {
-	StateStack.push_back(std::unique_ptr<tTVPCanvasState>( new tTVPCanvasState( Matrix32Instance, ClipRectInstance, EnableClipRect ) ) );
+	StateStack.push_back(std::unique_ptr<tTVPCanvasState>( new tTVPCanvasState( Matrix32Instance, ClipRectInstance, EnableClipRect, EnableCulling ) ) );
 }
 //----------------------------------------------------------------------
 void tTJSNI_Canvas::Restore() {
@@ -871,6 +873,11 @@ void tTJSNI_Canvas::Restore() {
 			ClipRectInstance->Set( state->ClipRect );
 		}
 		EnableClipRect = ( state->Flag & tTVPCanvasState::FLAG_CLIP_RECT ) != 0;
+		bool oldCulling = EnableCulling;
+		EnableCulling = ( state->Flag & tTVPCanvasState::FLAG_CULLING) != 0;
+		if( oldCulling != EnableCulling ) {
+			SetCulling( EnableCulling );
+		}
 
 		StateStack.pop_back();
 	}
@@ -885,6 +892,15 @@ void tTJSNI_Canvas::ApplyClipRect() {
 //----------------------------------------------------------------------
 void tTJSNI_Canvas::DisableClipRect() {
 	if( GLScreen ) GLScreen->DisableScissorRect();
+}
+//----------------------------------------------------------------------
+void tTJSNI_Canvas::SetCulling( bool b ) {
+	if( b ) {
+		glEnable( GL_CULL_FACE );
+		glCullFace( GL_BACK );
+	} else {
+		glDisable( GL_CULL_FACE );
+	}
 }
 //----------------------------------------------------------------------
 // 各描画前に呼び出して、状態の変化に応じた設定を行う。
@@ -1050,6 +1066,17 @@ void tTJSNI_Canvas::SetEnableClipRect( bool b ) {
 		}
 	} else {
 		EnableClipRect = b;
+	}
+}
+//----------------------------------------------------------------------
+void tTJSNI_Canvas::SetEnableCulling( bool b ) {
+	if( InDrawing ) {
+		if( EnableCulling != b ) {
+			EnableCulling = b;
+			SetCulling( b );
+		}
+	} else {
+		EnableCulling = b;
 	}
 }
 //----------------------------------------------------------------------
@@ -1565,6 +1592,25 @@ TJS_BEGIN_NATIVE_PROP_DECL( enableClipRect )
 	TJS_END_NATIVE_PROP_SETTER
 }
 TJS_END_NATIVE_PROP_DECL( enableClipRect )
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL( enableCulling) {
+	TJS_BEGIN_NATIVE_PROP_GETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas );
+		*result = _this->GetEnableCulling() ? (tjs_int)1 : (tjs_int)0;
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_GETTER
+
+	TJS_BEGIN_NATIVE_PROP_SETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Canvas );
+		_this->SetEnableCulling( ( (tjs_int)*param ) == 0 ? false : true );
+		return TJS_S_OK;
+	}
+		TJS_END_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_PROP_DECL( enableCulling )
 //----------------------------------------------------------------------
 
 	TJS_END_NATIVE_MEMBERS
