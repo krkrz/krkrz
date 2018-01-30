@@ -211,7 +211,7 @@ tjs_uint tTJSNI_QueueSoundBuffer::Decode( void *buffer, tjs_uint bufsamplelen, t
 	tjs_uint w = 0;
 	try {
 		// decode
-		FilterOutput->Decode( (tjs_uint8*)buffer, bufsamplelen, w, segments );
+		if( FilterOutput ) FilterOutput->Decode( (tjs_uint8*)buffer, bufsamplelen, w, segments );
 	} catch( ... ) {
 		// ignore errors
 		w = 0;
