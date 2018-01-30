@@ -28,3 +28,7 @@ void TVPInitializeOpenGLPlatform() {
 //---------------------------------------------------------------------------
 int TVPGetOpenGLESVersion() { return TVPOpenGLESVersion; }
 //---------------------------------------------------------------------------
+void TVPeglGetProcAddress(const char * procname) {
+	return eglGetProcAddress(procname);
+}
+//---------------------------------------------------------------------------

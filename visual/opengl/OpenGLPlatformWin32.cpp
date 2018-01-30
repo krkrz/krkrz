@@ -1031,3 +1031,7 @@ int TVPGetOpenGLESVersion() { return TVPOpenGLESVersion; }
 static tTVPAtExit TVPUninitANGLEAtExit
 	(TVP_ATEXIT_PRI_SHUTDOWN, TVPUninitializeANGLE);
 //---------------------------------------------------------------------------
+void* TVPeglGetProcAddress(const char * procname) {
+	return eglGetProcAddress(procname);
+}
+//---------------------------------------------------------------------------

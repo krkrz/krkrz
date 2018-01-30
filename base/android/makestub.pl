@@ -568,6 +568,8 @@ process_exp_stub("../../visual/tvpgl.h");
 #print OFH "#include \"tvpgl_ia32_intf.h\"\n";
 #process_exp_stub("../../visual/IA32/tvpgl_ia32_intf.h");
 
+print OFH "#include \"OpenGLHeader.h\"\n";
+process_exp_stub("../../visual/opengl/OpenGLHeader.h");
 
 $defs_misc = $defs;
 $defs = '';

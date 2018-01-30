@@ -572,6 +572,9 @@ process_exp_stub("../../visual/IA32/tvpgl_ia32_intf.h");
 print OFH "#include \"TVPVideoOverlay.h\"\n";
 process_exp_stub("../../movie/win32/TVPVideoOverlay.h");
 
+print OFH "#include \"OpenGLHeader.h\"\n";
+process_exp_stub("../../visual/opengl/OpenGLHeader.h");
+
 $defs_misc = $defs;
 $defs = '';
 
