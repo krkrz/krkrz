@@ -60,8 +60,31 @@ TJS_EXP_FUNC_DEF(tjs_char *, TJS_strchr, (const tjs_char *s, tjs_char c));
 TJS_EXP_FUNC_DEF(tjs_size, TJS_strspn, (const tjs_char *s, const tjs_char *set) );
 extern tjs_int TJS_sprintf( tjs_char *s, const tjs_char *format, ... );
 extern tjs_int TJS_snprintf( tjs_char* buffer, size_t cnt, const tjs_char * format, ... );
-extern tjs_int TJS_vsnprintf( tjs_char* buffer, size_t nsize, const tjs_char* format, va_list param );
+TJS_EXP_FUNC_DEF(tjs_int, TJS_vsnprintf, ( tjs_char* buffer, size_t nsize, const tjs_char* format, va_list param ) );
 TJS_EXP_FUNC_DEF(tjs_real, TJS_strtod, (const tjs_char *nptr, tjs_char **endptr) );
+
+// for plugin
+#ifdef __TP_STUB_H__
+/*[*/
+extern tjs_int TJS_vsnprintf( tjs_char* buffer, size_t nsize, const tjs_char* format, va_list param );
+inline tjs_int TJS_snprintf( tjs_char *str, size_t count, const tjs_char *fmt, ... ) {
+	size_t ret;
+	va_list ap;
+	va_start( ap, fmt );
+	ret = TJS_vsnprintf( str, count, fmt, ap );
+	va_end( ap );
+	return ret;
+}
+inline tjs_int TJS_sprintf( tjs_char *s, const tjs_char *format, ... ) {
+	tjs_int r;
+	va_list param;
+	va_start( param, format );
+	r = TJS_vsnprintf( s, INT_MAX, format, param );
+	va_end( param );
+	return r;
+}
+/*]*/
+#endif
 
 #define TJS_malloc			malloc
 #define TJS_free			free
