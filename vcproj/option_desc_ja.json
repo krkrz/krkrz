@@ -889,6 +889,17 @@
 					{ "value":"no", "desc":"使用可能であっても使用しない" },
 					{ "value":"force", "desc":"強制的に使用する" }
 				]
+			},
+			{
+				"caption":"Core Limitation",
+				"description":"動作に問題が起こった時に調整してください。",
+				"name":"cpucorelimit",
+				"type":"select",
+				"user":false,
+				"values":[
+					{ "value":"yes", "desc":"制限する", "default":true },
+					{ "value":"no", "desc":"制限しない" },
+				]
 			}
 		]
 	},

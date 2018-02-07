@@ -5,5 +5,6 @@ copy MsgIntfInc.h ..\MsgIntfInc.h
 copy MsgLoad.cpp ..\win32\MsgLoad.cpp
 copy string_table_en.rc ..\..\vcproj\string_table_en.rc
 copy string_table_jp.rc ..\..\vcproj\string_table_jp.rc
+copy string_table_chs.rc ..\..\vcproj\string_table_chs.rc
 copy string_table_resource.h ..\..\vcproj\string_table_resource.h
 pause

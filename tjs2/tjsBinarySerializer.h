@@ -415,7 +415,7 @@ public:
 				index++;
 			}
 			ret = TJSAllocVariantString( str, len );
-			delete str;
+			delete[] str;
 		}
 		return ret;
 	}
