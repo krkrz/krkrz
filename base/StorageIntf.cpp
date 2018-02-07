@@ -22,7 +22,7 @@
 #include "SysInitIntf.h"
 #include "XP3Archive.h"
 #include "TickCount.h"
-
+#include "StringUtil.h"
 
 
 #define TVP_DEFAULT_ARCHIVE_CACHE_NUM 64
@@ -1201,6 +1201,34 @@ ttstr TVPGetPlacedPath(const ttstr & name)
 
 
 //---------------------------------------------------------------------------
+/**
+ * TVPGetPlacedPath
+ * @param name file name
+ * @param extlist extension list(delimiter |) ex. ".bmp|.png|.jpg"
+ * @return normalized path.
+ */
+ttstr TVPGetPlacedPath(const ttstr & name, const ttstr& extlist )
+{
+	tjs_string exts = extlist.AsStdString();
+	std::vector<tjs_string> ext;
+	split( exts, tjs_string( TJS_W( "|" ) ), ext );
+	ttstr filename = TVPChopStorageExt( name );
+	for( auto i = ext.begin(); i != ext.end(); i++ ) {
+		if( !((*i).empty()) ) {
+			ttstr fullname = filename + ttstr( *i );
+			ttstr ret = TVPGetPlacedPath( fullname );
+			if( !ret.IsEmpty() ) {
+				return ret;
+			}
+		}
+	}
+	return ttstr();
+}
+//---------------------------------------------------------------------------
+
+
+
+//---------------------------------------------------------------------------
 // TVPSearchPlacedPath
 //---------------------------------------------------------------------------
 ttstr TVPSearchPlacedPath(const ttstr & name)
@@ -1406,9 +1434,18 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/getPlacedPath)
 	if(numparams < 1) return TJS_E_BADPARAMCOUNT;
 
 	ttstr path = *param[0];
-
 	if(result)
-		*result = TVPGetPlacedPath(path);
+	{
+		if( numparams >= 2 )
+		{
+			ttstr ext = *param[1];
+			*result = TVPGetPlacedPath( path, ext );
+		}
+		else
+		{
+			*result = TVPGetPlacedPath( path );
+		}
+	}
 
 	return TJS_S_OK;
 }
