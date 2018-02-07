@@ -32,6 +32,21 @@
 #include "SoundSamples.h"
 
 //---------------------------------------------------------------------------
+// static function for TJS WaveSoundBuffer class
+//---------------------------------------------------------------------------
+void TVPQueueSoundSetGlobalVolume(tjs_int v) {
+    tTJSNI_QueueSoundBuffer::SetGlobalVolume(v);
+}
+tjs_int TVPQueueSoundGetGlobalVolume() {
+    return tTJSNI_QueueSoundBuffer::GetGlobalVolume();
+}
+void TVPQueueSoundSetGlobalFocusMode(tTVPSoundGlobalFocusMode b) {
+    tTJSNI_QueueSoundBuffer::SetGlobalFocusMode(b);
+}
+tTVPSoundGlobalFocusMode TVPQueueSoundGetGlobalFocusMode() {
+    return tTJSNI_QueueSoundBuffer::GetGlobalFocusMode();
+}
+//---------------------------------------------------------------------------
 // Options management
 //---------------------------------------------------------------------------
 static bool TVPSoundOptionsInit = false;

@@ -38,7 +38,7 @@ public:
 		{
 			(*i)->TimerBeatHandler();
 		}
-		TVPWaveSoundBufferCommitSettings();
+		TVPWaveSoundBufferCommitSettings();	// for DirectSound(Windows7)
 	}
 } static TVPSoundBufferTimerDispatcher;
 //---------------------------------------------------------------------------

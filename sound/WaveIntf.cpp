@@ -20,17 +20,18 @@
 #include "tjsDictionary.h"
 
 
-/*
-#ifdef ANDROID
-#define TVP_OPUS_DECODER_IMPLEMENT
-#endif
-*/
+
 #define TVP_OPUS_DECODER_IMPLEMENT
 
-extern void TVPSoundSetGlobalVolume(tjs_int v);
-extern tjs_int TVPSoundGetGlobalVolume();
-extern void TVPSoundSetGlobalFocusMode(tTVPSoundGlobalFocusMode b);
-extern tTVPSoundGlobalFocusMode TVPSoundGetGlobalFocusMode();
+extern void TVPQueueSoundSetGlobalVolume(tjs_int v);
+extern tjs_int TVPQueueSoundGetGlobalVolume();
+extern void TVPQueueSoundSetGlobalFocusMode(tTVPSoundGlobalFocusMode b);
+extern tTVPSoundGlobalFocusMode TVPQueueSoundGetGlobalFocusMode();
+
+static void (*TVPSetGlobalVolume)(tjs_int v) = TVPQueueSoundSetGlobalVolume;
+static tjs_int (*TVPGetGlobalVolume)() = TVPQueueSoundGetGlobalVolume;
+static void (*TVPSetGlobalFocusMode)(tTVPSoundGlobalFocusMode b) = TVPQueueSoundSetGlobalFocusMode;
+static tTVPSoundGlobalFocusMode (*TVPGetGlobalFocusMode)() = TVPQueueSoundGetGlobalFocusMode;
 
 //---------------------------------------------------------------------------
 // PCM related constants / definitions
@@ -1582,7 +1583,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(globalVolume)
 {
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
-		*result = TVPSoundGetGlobalVolume();
+		*result = TVPGetGlobalVolume();
 
 		return TJS_S_OK;
 	}
@@ -1590,7 +1591,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(globalVolume)
 
 	TJS_BEGIN_NATIVE_PROP_SETTER
 	{
-		TVPSoundSetGlobalVolume(*param);
+		TVPSetGlobalVolume(*param);
 
 		return TJS_S_OK;
 	}
@@ -1602,7 +1603,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(globalFocusMode)
 {
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
-		*result = (tjs_int)TVPSoundGetGlobalFocusMode();
+		*result = (tjs_int)TVPGetGlobalFocusMode();
 
 		return TJS_S_OK;
 	}
@@ -1610,7 +1611,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(globalFocusMode)
 
 	TJS_BEGIN_NATIVE_PROP_SETTER
 	{
-		TVPSoundSetGlobalFocusMode(
+		TVPSetGlobalFocusMode(
 			(tTVPSoundGlobalFocusMode)(tjs_int)*param);
 
 		return TJS_S_OK;
@@ -1796,23 +1797,29 @@ extern tTJSNativeClass * TVPCreateNativeClass_QueueSoundBuffer();
 #ifdef _WIN32
 extern tTJSNativeClass * TVPCreateNativeClass_WaveSoundBuffer();
 extern bool TVPHasXAudio2DLL();
+extern void TVPSoundSetGlobalVolume(tjs_int v);
+extern tjs_int TVPSoundGetGlobalVolume();
+extern void TVPSoundSetGlobalFocusMode(tTVPSoundGlobalFocusMode b);
+extern tTVPSoundGlobalFocusMode TVPSoundGetGlobalFocusMode();
 #endif
 tTJSNativeClass * TVPCreateNativeClass_SoundBuffer()
 {
 #ifdef _WIN32
 	if( TVPHasXAudio2DLL() ) {
+		TVPSetGlobalVolume = TVPQueueSoundSetGlobalVolume;
+		TVPGetGlobalVolume = TVPQueueSoundGetGlobalVolume;
+		TVPSetGlobalFocusMode = TVPQueueSoundSetGlobalFocusMode;
+		TVPGetGlobalFocusMode = TVPQueueSoundGetGlobalFocusMode;
 		return TVPCreateNativeClass_QueueSoundBuffer();
 	} else {
+		TVPSetGlobalVolume = TVPSoundSetGlobalVolume;
+		TVPGetGlobalVolume = TVPSoundGetGlobalVolume;
+		TVPSetGlobalFocusMode = TVPSoundSetGlobalFocusMode;
+		TVPGetGlobalFocusMode = TVPSoundGetGlobalFocusMode;
 		return TVPCreateNativeClass_WaveSoundBuffer();
 	}
 #else
 	return TVPCreateNativeClass_QueueSoundBuffer();
 #endif
 }
-// TODO Windows で以下のメソッドがQueueタイプで実装されていない
-// TVPSoundSetGlobalVolume
-// TVPSoundGetGlobalVolume
-// TVPSoundSetGlobalFocusMode
-// TVPSoundGetGlobalFocusMode
-// TVPWaveSoundBufferCommitSettings
 //---------------------------------------------------------------------------

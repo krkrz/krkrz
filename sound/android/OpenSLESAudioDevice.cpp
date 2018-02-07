@@ -22,24 +22,8 @@ void TVPSetSoundNativeParameter( int rate, int buffSize )
     TVPSoundNativeFramesPerBuffer = buffSize;
 }
 //---------------------------------------------------------------------------
-// static function for TJS WaveSoundBuffer class
+void TVPWaveSoundBufferCommitSettings() {}
 //---------------------------------------------------------------------------
-void TVPSoundSetGlobalVolume(tjs_int v) {
-    tTJSNI_QueueSoundBuffer::SetGlobalVolume(v);
-}
-tjs_int TVPSoundGetGlobalVolume() {
-    return tTJSNI_QueueSoundBuffer::GetGlobalVolume();
-}
-void TVPSoundSetGlobalFocusMode(tTVPSoundGlobalFocusMode b) {
-    tTJSNI_QueueSoundBuffer::SetGlobalFocusMode(b);
-}
-tTVPSoundGlobalFocusMode TVPSoundGetGlobalFocusMode() {
-    return tTJSNI_QueueSoundBuffer::GetGlobalFocusMode();
-}
-void TVPWaveSoundBufferCommitSettings() {
-}
-//---------------------------------------------------------------------------
-
 static const tjs_char* TVPGetOpenSLESErrorMessage( SLresult result ) {
     switch( result ) {
         case SL_RESULT_SUCCESS: return TJS_W("Success");
