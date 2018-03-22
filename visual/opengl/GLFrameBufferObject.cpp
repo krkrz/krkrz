@@ -98,7 +98,7 @@ bool GLFrameBufferObject::readTextureToBitmap( tTVPBaseBitmap* bmp ) {
 		return false;
 	}
 
-	// Bitmap の内部表現が正順(上下反転されていない)ことを前提としているので注意
+	// Bitmap の内部表現が逆順前提
 	bmp->SetSize( width_, height_, false );
 	tjs_uint32* dest = reinterpret_cast<tjs_uint32*>(bmp->GetScanLineForWrite(height_-1));
 
@@ -106,11 +106,11 @@ bool GLFrameBufferObject::readTextureToBitmap( tTVPBaseBitmap* bmp ) {
 	// OpenGL ES に glGetTextureImage がない悲しさ
 	readTextureUseFBO( reinterpret_cast<tjs_uint8*>(dest) );
 
-	// 上下反転しつつ赤と青を入れ替えながらコピー
+	// 赤と青を入れ替えながらコピー
 	tjs_int pitch = bmp->GetPitchBytes();
 	for( tjs_uint y = 0; y < height_; y++ ) {
 		TVPRedBlueSwap( dest, width_ );
-		dest = reinterpret_cast<tjs_uint32*>(reinterpret_cast<tjs_uint8*>(dest)-pitch);
+		dest = reinterpret_cast<tjs_uint32*>(reinterpret_cast<tjs_uint8*>(dest)+pitch);
 	}
 
 	return true;
@@ -164,8 +164,9 @@ bool GLFrameBufferObject::readTextureToBitmap( class tTVPBaseBitmap* bmp, const 
 		glViewport( vp[0], vp[1], vp[2], vp[3] );
 	}
 
-	// 上下反転しつつ赤と青を入れ替えながらコピー
-	for( tjs_int y = 0, line=top+clip.get_height()-1; y < clip.get_height(); y++, line-- ) {
+	// 赤と青を入れ替えながらコピー
+	//for( tjs_int y = 0, line=top+clip.get_height()-1; y < clip.get_height(); y++, line-- ) {
+	for( tjs_int y = 0, line=top; y < clip.get_height(); y++, line++ ) {
 		tjs_uint32* dest = reinterpret_cast<tjs_uint32*>(bmp->GetScanLineForWrite(line)) + left;
 		TVPRedBlueSwapCopy( dest, &buffer[y*clip.get_width()], clip.get_width() );
 	}

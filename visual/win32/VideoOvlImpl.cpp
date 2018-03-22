@@ -194,8 +194,10 @@ void tTJSNI_VideoOverlay::Open(const ttstr &_name)
 			Bitmap[0] = new tTVPBaseBitmap( width, height, 32 );
 			Bitmap[1] = new tTVPBaseBitmap( width, height, 32 );
 
-			BmpBits[0] = static_cast<BYTE*>(Bitmap[0]->GetBitmap()->GetScanLine( 0 ));
-			BmpBits[1] = static_cast<BYTE*>(Bitmap[1]->GetBitmap()->GetScanLine( 0 ));
+			BmpBits[0] = static_cast<BYTE*>(Bitmap[0]->GetBitmap()->GetScanLine( Bitmap[0]->GetBitmap()->GetHeight()-1 ));
+			BmpBits[1] = static_cast<BYTE*>(Bitmap[1]->GetBitmap()->GetScanLine( Bitmap[1]->GetBitmap()->GetHeight()-1 ));
+			//BmpBits[0] = static_cast<BYTE*>(Bitmap[0]->GetBitmap()->GetScanLine( 0 ));
+			//BmpBits[1] = static_cast<BYTE*>(Bitmap[1]->GetBitmap()->GetScanLine( 0 ));
 
 			VideoOverlay->SetVideoBuffer( BmpBits[0], BmpBits[1], size );
 		}

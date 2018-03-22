@@ -673,13 +673,16 @@ void TJS_INTF_METHOD tTVPBasicDrawDevice::NotifyBitmapCompleted(iTVPLayerManager
 		if(bitmapinfo->bmiHeader.biHeight < 0)
 		{
 			// bottom-down
-			src_pitch = -bitmapinfo->bmiHeader.biWidth * 4;
-			src_p += bitmapinfo->bmiHeader.biWidth * 4 * (bitmapinfo->bmiHeader.biHeight - 1);
+			src_pitch = bitmapinfo->bmiHeader.biWidth * 4;
+			//src_pitch = -bitmapinfo->bmiHeader.biWidth * 4;
+			//src_p += bitmapinfo->bmiHeader.biWidth * 4 * (bitmapinfo->bmiHeader.biHeight - 1);
 		}
 		else
 		{
 			// bottom-up
-			src_pitch = bitmapinfo->bmiHeader.biWidth * 4;
+			src_pitch = -bitmapinfo->bmiHeader.biWidth * 4;
+			src_p += bitmapinfo->bmiHeader.biWidth * 4 * (bitmapinfo->bmiHeader.biHeight - 1);
+			//src_pitch = bitmapinfo->bmiHeader.biWidth * 4;
 		}
 
 		for(; src_y < src_y_limit; src_y ++, dest_y ++)

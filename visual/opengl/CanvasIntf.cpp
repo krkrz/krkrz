@@ -100,10 +100,10 @@ const ttstr tTJSNI_Canvas::DefaultFillFragmentShaderText(
 );
 //----------------------------------------------------------------------
 const float tTJSNI_Canvas::DefaultUVs[] = {
-	0.0f,  0.0f,
 	0.0f,  1.0f,
-	1.0f,  0.0f,
-	1.0f,  1.0f
+	0.0f,  0.0f,
+	1.0f,  1.0f,
+	1.0f,  0.0f
 };
 //----------------------------------------------------------------------
 tTJSNI_Canvas::tTJSNI_Canvas() : IsFirst(true), InDrawing(false), EnableClipRect(false), GLScreen(nullptr), ClearColor(0xff000000), BlendMode(tTVPBlendMode::bmAlpha),
@@ -348,12 +348,12 @@ tjs_int tTJSNI_Canvas::GetCanvasHeight() const {
 //----------------------------------------------------------------------
 // method
 void tTJSNI_Canvas::Capture( class tTJSNI_Bitmap* bmp, bool front ) {
-	// Bitmap の内部表現が正順(上下反転されていない)ことを前提としているので注意
+	// Bitmap の内部表現が逆順前提
 	tjs_int sw = GetCanvasWidth();
 	tjs_int sh = GetCanvasHeight();
 	bmp->SetSize( sw, sh, false );
 	tTVPBaseBitmap* b = bmp->GetBitmap();
-	tjs_uint32* dest = reinterpret_cast<tjs_uint32*>(b->GetScanLineForWrite(0));
+	tjs_uint32* dest = reinterpret_cast<tjs_uint32*>(b->GetScanLineForWrite(b->GetHeight()-1));
 	if( GLFrameBufferObject::readFrameBuffer( 0, 0, sw, sh, reinterpret_cast<tjs_uint8*>(dest), front ) ) {
 		tjs_int pitch = b->GetPitchBytes();
 		for( tjs_int y = 0; y < sh; y++ ) {
@@ -361,8 +361,8 @@ void tTJSNI_Canvas::Capture( class tTJSNI_Bitmap* bmp, bool front ) {
 			dest = reinterpret_cast<tjs_uint32*>(reinterpret_cast<tjs_uint8*>(dest)+pitch);
 		}
 	}
-	tTVPRect rect( 0, 0, sw, sh );
-	b->UDFlip(rect);
+	//tTVPRect rect( 0, 0, sw, sh );
+	//b->UDFlip(rect);
 }
 //----------------------------------------------------------------------
 void tTJSNI_Canvas::Capture( const class iTVPTextureInfoIntrface* texture, bool front ) {
@@ -477,10 +477,10 @@ void tTJSNI_Canvas::SetupTextureDrawing( tTJSNI_ShaderProgram* shader, const iTV
 		width, height,	// 右下
 	};
 	const GLfloat uvs[] = {
-		0.0f,  0.0f,
 		0.0f,  1.0f,
-		1.0f,  0.0f,
+		0.0f,  0.0f,
 		1.0f,  1.0f,
+		1.0f,  0.0f,
 	};
 	GLint posLoc = shader->FindLocation( std::string( "a_pos" ) );
 	GLint uvLoc = shader->FindLocation( std::string( "a_texCoord" ) );
@@ -601,10 +601,10 @@ void tTJSNI_Canvas::DrawTextureAtlas( const tTJSNI_Rect* rect, const iTVPTexture
 		width, height,	// 右下
 	};
 	const GLfloat uvs[] = {
-		r.left/ tw,  r.top/ th,
-		r.left/ tw,  r.bottom/ th,
-		r.right/ tw, r.top/ th,
-		r.right/ tw, r.bottom/ th,
+		r.left / tw,  ( th - r.top ) / th,
+		r.left / tw,  ( th - r.bottom ) / th,
+		r.right / tw, ( th - r.top ) / th,
+		r.right / tw, ( th - r.bottom ) / th,
 	};
 	glBindBuffer( GL_ARRAY_BUFFER, 0 );
 	glVertexAttribPointer( posLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof( GLfloat ), vertices );
@@ -656,12 +656,12 @@ void tTJSNI_Canvas::Draw9PatchTexture( class tTJSNI_Texture* tex, tjs_int width,
 	const float tx_center_right = (scale.right-1) / tw;
 	const float tx_right_left = scale.right / tw;
 	const float tx_right = 1.0f;
-	const float tx_top = 0.0f;
-	const float tx_top_bottom = (scale.top-1) / th;
-	const float tx_center_top = scale.top / th;
-	const float tx_center_bottom = (scale.bottom-1) / th;
-	const float tx_bottom_top = scale.bottom / th;
-	const float tx_bottom = 1.0f;
+	const float tx_top = 1.0f;
+	const float tx_top_bottom = ( th - ( scale.top - 1 ) ) / th;
+	const float tx_center_top = ( th - scale.top ) / th;
+	const float tx_center_bottom = ( th - ( scale.bottom - 1 ) ) / th;
+	const float tx_bottom_top = ( th - scale.bottom ) / th;
+	const float tx_bottom = 0.0f;
 	// 36頂点
 	// 縦方向基準に並べる
 	const GLfloat uvs[] = {

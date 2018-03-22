@@ -239,12 +239,12 @@ void tTJSNI_Texture::LoadTexture( const class tTVPBaseBitmap* bitmap, tTVPTextur
 			std::unique_ptr<tjs_uint32[]> buffer( new tjs_uint32[w*h] );
 			if( rbswap ) {
 				for( tjs_int y = 0; y < h; y++ ) {
-					tjs_uint32* sl = (tjs_uint32*)bitmap->GetScanLine( y );
+					tjs_uint32* sl = (tjs_uint32*)bitmap->GetScanLine( h-y-1 );
 					TVPRedBlueSwapCopy( &buffer[w*y], sl, w );
 				}
 			} else {
 				for( tjs_int y = 0; y < h; y++ ) {
-					tjs_uint32* sl = (tjs_uint32*)bitmap->GetScanLine( y );
+					tjs_uint32* sl = (tjs_uint32*)bitmap->GetScanLine( h-y-1 );
 					memcpy( &buffer[w*y], sl, pitch );
 				}
 			}
@@ -252,14 +252,15 @@ void tTJSNI_Texture::LoadTexture( const class tTVPBaseBitmap* bitmap, tTVPTextur
 		} else {
 			std::unique_ptr<tjs_uint8[]> buffer( new tjs_uint8[w*h] );
 			for( tjs_int y = 0; y < h; y++ ) {
-				tjs_uint8* sl = (tjs_uint8*)bitmap->GetScanLine( y );
+				tjs_uint8* sl = (tjs_uint8*)bitmap->GetScanLine( h-y-1 );
 				memcpy( &buffer[w*y], sl, pitch );
 			}
 			Texture.create( w, h, buffer.get(), ColorToGLColor( color ) );
 		}
 	} else {
-		// Bitmap の内部表現が正順(上下反転されていない)ことを前提としているので注意
-		Texture.create( bitmap->GetWidth(), bitmap->GetHeight(), bitmap->GetScanLine( 0 ), ColorToGLColor( color ) );
+		// 上下反転のままコピーする
+		//Texture.create( bitmap->GetWidth(), bitmap->GetHeight(), bitmap->GetScanLine( 0 ), ColorToGLColor( color ) );
+		Texture.create( bitmap->GetWidth(), bitmap->GetHeight(), bitmap->GetScanLine( bitmap->GetHeight() - 1 ), ColorToGLColor( color ) );
 	}
 }
 //----------------------------------------------------------------------
@@ -643,26 +644,27 @@ bool TVPCopyBitmapToTexture( const iTVPTextureInfoIntrface* texture, tjs_int lef
 		TVPAddLog(TJS_W("out of area"));
 		return false;
 	}
+	tjs_int bottom = top+clip.get_height();
 
 	// copy image for each format
 	if( texture->GetImageFormat() == GL_RGBA && bitmap->Is32BPP() ) {
 		std::unique_ptr<tjs_uint32[]> buffer(new tjs_uint32[clip.get_width()*clip.get_height()]);
-		for( tjs_int y = clip.top, line = 0; y < clip.bottom; y++, line++ ) {
+		for( tjs_int y = clip.bottom-1, line = 0; y >= clip.top; y--, line++ ) {
 			tjs_uint32* sl = ((tjs_uint32*)bitmap->GetScanLine(y)) + clip.left;
 			TVPRedBlueSwapCopy( &buffer[clip.get_width()*line], sl, clip.get_width() );
 		}
 		glPixelStorei( GL_UNPACK_ALIGNMENT, 4 );
 		glBindTexture( GL_TEXTURE_2D, (GLuint)texture->GetNativeHandle() );
-		glTexSubImage2D( GL_TEXTURE_2D, 0, left, top, clip.get_width(), clip.get_height(), texture->GetImageFormat(), GL_UNSIGNED_BYTE, (const void*)buffer.get() );
+		glTexSubImage2D( GL_TEXTURE_2D, 0, left, texture->GetHeight()-bottom, clip.get_width(), clip.get_height(), texture->GetImageFormat(), GL_UNSIGNED_BYTE, (const void*)buffer.get() );
 	} else if( texture->GetImageFormat() == GL_ALPHA && bitmap->Is8BPP() ) {
 		std::unique_ptr<tjs_uint8[]> buffer(new tjs_uint8[clip.get_width()*clip.get_height()]);
-		for( tjs_int y = clip.top, line = 0; y < clip.bottom; y++, line++ ) {
+		for( tjs_int y = clip.bottom-1, line = 0; y >= clip.top; y--, line++ ) {
 			tjs_uint8* sl = ((tjs_uint8*)bitmap->GetScanLine(y)) + clip.left;
 			memcpy( &buffer[clip.get_width()*line], sl, clip.get_width() );
 		}
 		glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 		glBindTexture( GL_TEXTURE_2D, (GLuint)texture->GetNativeHandle() );
-		glTexSubImage2D( GL_TEXTURE_2D, 0, left, top, clip.get_width(), clip.get_height(), texture->GetImageFormat(), GL_UNSIGNED_BYTE, (const void*)buffer.get() );
+		glTexSubImage2D( GL_TEXTURE_2D, 0, left, texture->GetHeight()-bottom, clip.get_width(), clip.get_height(), texture->GetImageFormat(), GL_UNSIGNED_BYTE, (const void*)buffer.get() );
 	} else {
 		TVPAddLog(TJS_W("unsupported format"));
 		return false;

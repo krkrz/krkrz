@@ -216,7 +216,7 @@ void __stdcall tTVPDSLayerVideo::BuildGraph( HWND callbackwin, IStream *stream,
 			}
 		}
 
-#if 1	// 上下反転のための再接続
+#if 0	// 吉里吉里のBitmapは上下逆の形式らしいので、上下反転のための再接続は必要ない
 		{	// Reconnect buffer render filter
 			// get decoder output pin
 			CComPtr<IPin>	pRdrPinIn;
@@ -361,7 +361,7 @@ void __stdcall tTVPDSLayerVideo::GetVideoSize( long *width, long *height )
 	if( height != NULL )
 		BufferVideo()->get_VideoHeight( height );
 
-	if( (*height) < 0 ) *height *= -1;
+	//if( (*height) < 0 ) *height *= -1;
 }
 //----------------------------------------------------------------------------
 //! @brief	  	1フレームの平均表示時間を取得します
