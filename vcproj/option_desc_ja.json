@@ -1034,6 +1034,17 @@
 					{ "value":"false", "desc":"有効", "default":true },
 					{ "value":"true", "desc":"無効" }
 				]
+			},
+			{
+				"caption":"ファイルプロパティの無効化",
+				"description":"ファイルプロパティを無効化して、prop拡張子のファイルをそのままファイルとして扱います。",
+				"name":"ignorefileprop",
+				"type":"select",
+				"user":false,
+				"values":[
+					{ "value":"yes", "desc":"有効" },
+					{ "value":"no", "desc":"無効", "default":true }
+				]
 			}
 		]
 	}

@@ -818,6 +818,51 @@ iTJSDispatch2 * TJSCreateDictionaryObject(iTJSDispatch2 **classout)
 }
 //---------------------------------------------------------------------------
 
+//---------------------------------------------------------------------------
+// TJSReadDictionaryObject
+//---------------------------------------------------------------------------
+tjs_error TJSReadDictionaryObject( tTJSVariant &result, const ttstr& name, const ttstr& mode )
+{
+	tTJSDictionaryObject* dic = nullptr;
+	bool isbin = false;
+
+	// try binary fromat
+	iTJSBinaryStream* stream = TJSCreateBinaryStreamForRead(name, mode);
+	if( !stream ) return TJS_E_INVALIDPARAM;
+	try {
+		tjs_uint64 streamlen = stream->GetSize();
+		if( streamlen >= tTJSBinarySerializer::HEADER_LENGTH ) {
+			tjs_uint8 header[tTJSBinarySerializer::HEADER_LENGTH];
+			stream->Read( header, tTJSBinarySerializer::HEADER_LENGTH );
+			if( tTJSBinarySerializer::IsBinary( header ) ) {
+				if( !dic ) dic = (tTJSDictionaryObject*)TJSCreateDictionaryObject();
+				tTJSBinarySerializer binload( dic );
+				tTJSVariant* var = binload.Read( stream );
+				if( var ) {
+					result = *var;
+					delete var;
+					isbin = true;
+				}
+				if( dic ) dic->Release();
+				dic = nullptr;
+			}
+		}
+	} catch(...) {
+		delete stream;
+		if( dic ) dic->Release();
+		dic = nullptr;
+		throw;
+	}
+	delete stream;
+	if( isbin ) return TJS_S_OK;
+
+	// try text style
+	iTJSTextReadStream * txtstream = TJSCreateTextStreamForRead(name, mode);
+	if( tTJS::LoadTextDictionaryArray( txtstream, &result ) ) {
+		return TJS_S_OK;
+	}
+	return TJS_E_FAIL;
+}
 
 
 

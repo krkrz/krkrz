@@ -194,5 +194,12 @@ TJS_EXP_FUNC_DEF(iTJSDispatch2 *, TJSCreateDictionaryObject, (
 
 
 //---------------------------------------------------------------------------
+// TJSReadDictionaryObject
+//---------------------------------------------------------------------------
+extern tjs_error TJSReadDictionaryObject( tTJSVariant &result,
+	const ttstr& name, const ttstr& mode );
+//---------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------
 } // namespace TJS
 #endif

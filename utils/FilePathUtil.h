@@ -128,6 +128,20 @@ inline tjs_string ExtractFileName( const tjs_string& path ) {
 	}
 #endif
 }
+inline tjs_string ExtractFileExt( const tjs_string& path ) {
+	tjs_char ext[_MAX_EXT];
+#ifdef _WIN32
+	_wsplitpath_s( path.c_str(), nullptr, 0, nullptr, 0, nullptr, 0, ext, _MAX_EXT );
+	return tjs_string( ext );
+#else
+	tjs_string::size_type pos = path.find_last_of( TJS_W('.') );
+	if( pos != tjs_string::npos ) {
+		return path.substr( pos );
+	} else {
+		return tjs_string;
+	}
+#endif
+}
 inline tjs_string ExpandUNCFileName( const tjs_string& path ) {
 #ifdef _WIN32
 	tjs_string result;
