@@ -639,6 +639,7 @@ void tTJSNI_Canvas::Draw9PatchTexture( class tTJSNI_Texture* tex, tjs_int width,
 	ssize.x = GetCanvasWidth();
 	ssize.y = GetCanvasHeight();
 	if( !shader ) shader = DefaultShaderInstance;
+	shader->SetupProgram();
 
 	GLint posLoc = shader->FindLocation( std::string( "a_pos" ) );
 	if( posLoc < 0 ) TVPThrowExceptionMessage( TJS_W( "Not found a_pos in shader." ) );
