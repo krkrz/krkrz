@@ -505,7 +505,7 @@ void tTJSNI_BaseWindow::OnPointerMove( tjs_int type, tjs_real x, tjs_real y, tjs
 	if( Owner )
 	{
 		tTJSVariant arg[7] = { type, x, y, cx, cy, (tjs_int64)flags, (tjs_int64)id };
-		static ttstr eventname( TJS_W( "onPointerMovie" ) );
+		static ttstr eventname( TJS_W( "onPointerMove" ) );
 		TVPPostEvent( Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 7, arg );
 	}
 }
