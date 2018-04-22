@@ -108,7 +108,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/loadStruct)
 	if( result )
 	{
 		iTJSTextReadStream * stream = TJSCreateTextStreamForRead(name, mode);
-		if( tTJS::LoadTextDictionaryArray( stream, result ) ) {
+		if( tTJS::LoadTextDictionaryArray( stream, result, name.c_str() ) ) {
 			return TJS_S_OK;
 		}
 	}
@@ -230,6 +230,21 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func.name*/clear)
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_STATIC_METHOD_DECL(/*func.name*/clear)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func.name*/getCount ) {
+	if( numparams<1 ) return TJS_E_BADPARAMCOUNT;
+	if( result ) {
+		tjs_int ret = 0;
+		tjs_error hr = param[0]->AsObjectClosureNoAddRef().GetCount( &ret, nullptr, nullptr, nullptr );
+		if( TJS_SUCCEEDED( hr ) ) {
+			*result = ret;
+		} else {
+			*result = 0;
+		}
+	}
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_STATIC_METHOD_DECL(/*func.name*/getCount )
 //----------------------------------------------------------------------
 
 	ClassID_Dictionary = TJS_NCM_CLASSID;
@@ -858,7 +873,7 @@ tjs_error TJSReadDictionaryObject( tTJSVariant &result, const ttstr& name, const
 
 	// try text style
 	iTJSTextReadStream * txtstream = TJSCreateTextStreamForRead(name, mode);
-	if( tTJS::LoadTextDictionaryArray( txtstream, &result ) ) {
+	if( tTJS::LoadTextDictionaryArray( txtstream, &result, name.c_str() ) ) {
 		return TJS_S_OK;
 	}
 	return TJS_E_FAIL;

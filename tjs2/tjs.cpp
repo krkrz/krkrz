@@ -604,7 +604,7 @@ void tTJS::CompileScript( const tjs_char *script, class tTJSBinaryStream* output
 	blk->Release();
 }
 //---------------------------------------------------------------------------
-bool tTJS::LoadTextDictionaryArray( class iTJSTextReadStream* stream, tTJSVariant *result )
+bool tTJS::LoadTextDictionaryArray( class iTJSTextReadStream* stream, tTJSVariant *result, const tjs_char *name )
 {
 	ttstr buffer;
 	try {
@@ -616,6 +616,9 @@ bool tTJS::LoadTextDictionaryArray( class iTJSTextReadStream* stream, tTJSVarian
 	stream->Destruct();
 	
 	tTJSScriptBlock *blk = new tTJSScriptBlock(true);
+	if( name ) {
+		blk->SetName( name, 0 );
+	}
 	try {
 		blk->SetText(result, buffer.c_str(), NULL, true);
 	} catch(...) {

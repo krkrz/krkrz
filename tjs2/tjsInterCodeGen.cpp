@@ -104,7 +104,15 @@ int _yyerror(const tjs_char * msg, void *pm, tjs_int pos)
 	TJS_snprintf(buf, sizeof(buf)/sizeof(tjs_char), TJS_W(" at line %d"), 1+sb->SrcPosToLine(errpos));
 	str += buf;
 
-	sb->GetTJS()->OutputToConsole(str.c_str());
+	if( sb->GetTJS() )
+	{
+		sb->GetTJS()->OutputToConsole( str.c_str() );
+	}
+	else
+	{
+		str = sb->GetName() + ttstr(TJS_W(" : ")) + str;
+		TJS_eTJSError( str.c_str() );
+	}
 
 	return 0;
 }
@@ -577,7 +585,7 @@ void tTJSInterCodeContext::OutputWarning(const tjs_char *msg, tjs_int pos)
 	TJS_snprintf(buf, sizeof(buf)/sizeof(tjs_char), TJS_W(" line %d"), 1+Block->SrcPosToLine(errpos));
 	str += buf;
 
-	Block->GetTJS()->OutputToConsole(str.c_str());
+	if( Block->GetTJS() ) Block->GetTJS()->OutputToConsole(str.c_str());
 }
 //---------------------------------------------------------------------------
 
