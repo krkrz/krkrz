@@ -2534,7 +2534,9 @@ static const tjs_char * const StrFuncs[] =
 	TJS_W("split"),
 	TJS_W("trim"),
 	TJS_W("reverse"),
-	TJS_W("repeat") 
+	TJS_W("repeat"),
+	TJS_W("startsWith"),
+	TJS_W("endsWith")
 };
 
 enum tTJSStringMethodNameIndex
@@ -2551,7 +2553,9 @@ enum tTJSStringMethodNameIndex
 	TJSStrMethod_split,
 	TJSStrMethod_trim,
 	TJSStrMethod_reverse,
-	TJSStrMethod_repeat
+	TJSStrMethod_repeat,
+	TJSStrMethod_startsWith,
+	TJSStrMethod_endsWith
 };
 
 #define TJS_STRFUNC_MAX (sizeof(StrFuncs) / sizeof(StrFuncs[0]))
@@ -2861,6 +2865,40 @@ void tTJSInterCodeContext::ProcessStringFunction(const tjs_char *member,
 		}
 		*result = new_str;
 
+		return;
+	}
+	else if(TJS_STR_METHOD_IS(startsWith))
+	{
+		if(numargs != 1) TJSThrowFrom_tjs_error( TJS_E_BADPARAMCOUNT );
+		if(!result) return;
+		*result = target.StartsWith( args[0]->AsStringNoAddRef() ) ? 1 : 0;
+		return;
+	}
+	else if(TJS_STR_METHOD_IS(endsWith))
+	{
+		if( numargs != 1 ) TJSThrowFrom_tjs_error( TJS_E_BADPARAMCOUNT );
+		if( !result ) return;
+		tTJSVariantString* str = args[0]->AsStringNoAddRef();
+		const tjs_char* d = *str;
+		tjs_int len = str->GetLength();
+		if( len > s_len )
+		{
+			*result = 0;
+		}
+		else
+		{
+			bool ret = true;
+			s += s_len - len;
+			while( *s != TJS_W( '\0' ) )
+			{
+				if( *s != *d )
+				{
+					ret = false;
+				}
+				s++, d++;
+			}
+			*result = ret ? 1 : 0;
+		}
 		return;
 	}
 
