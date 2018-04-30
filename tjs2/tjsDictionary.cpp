@@ -19,6 +19,74 @@
 namespace TJS
 {
 //---------------------------------------------------------------------------
+struct tListKeysCallback : public tTJSDispatch {
+	tTJSArrayObject* Array;
+	tTJSArrayNI* ArrayNI;
+	tListKeysCallback( tTJSArrayObject* array, tTJSArrayNI* ni ) : Array( array ), ArrayNI(ni) {}
+	tjs_error TJS_INTF_METHOD
+		FuncCall( tjs_uint32 flag, const tjs_char * membername,
+			tjs_uint32 *hint, tTJSVariant *result, tjs_int numparams,
+			tTJSVariant **param, iTJSDispatch2 *objthis ) {
+		if( numparams < 2 ) return TJS_E_BADPARAMCOUNT;
+
+		tTVInteger flags = param[1]->AsInteger();
+		static tjs_uint addHint = NULL;
+		if( !( flags & TJS_HIDDENMEMBER ) ) {
+			Array->Add( ArrayNI, *param[0] );
+		}
+		if( result ) *result = (tjs_int)1;
+		return TJS_S_OK;
+	}
+};
+//---------------------------------------------------------------------------
+struct tListValuesCallback : public tTJSDispatch {
+	tTJSArrayObject* Array;
+	tTJSArrayNI* ArrayNI;
+	tListValuesCallback( tTJSArrayObject* array, tTJSArrayNI* ni ) : Array( array ), ArrayNI( ni ) {}
+	tjs_error TJS_INTF_METHOD
+		FuncCall( tjs_uint32 flag, const tjs_char * membername,
+			tjs_uint32 *hint, tTJSVariant *result, tjs_int numparams,
+			tTJSVariant **param, iTJSDispatch2 *objthis ) {
+		if( numparams < 3 ) return TJS_E_BADPARAMCOUNT;
+
+		tTVInteger flags = param[1]->AsInteger();
+		static tjs_uint addHint = NULL;
+		if( !( flags & TJS_HIDDENMEMBER ) ) {
+			Array->Add( ArrayNI, *param[2] );
+		}
+		if( result ) *result = (tjs_int)1;
+		return TJS_S_OK;
+	}
+};
+//---------------------------------------------------------------------------
+template<typename EnumFunction>
+static tjs_error tTJSGetKeyValue( tTJSVariant* result, tjs_int numparams, tTJSVariant** param, iTJSDispatch2* objthis )
+{
+	if( numparams < 1 ) return TJS_E_BADPARAMCOUNT;
+	if( result ) {
+		iTJSDispatch2 *array = TJSCreateArrayObject();
+		tTJSArrayNI* ni = nullptr;
+		if( TJS_SUCCEEDED( array->NativeInstanceSupport( TJS_NIS_GETINSTANCE, TJSGetArrayClassID(), (iTJSNativeInstance**)&ni ) ) ) {
+			tjs_int count = 0;
+			tjs_error hr = param[0]->AsObjectClosureNoAddRef().GetCount( &count, nullptr, nullptr, nullptr );
+			if( TJS_SUCCEEDED( hr ) ) {
+				ni->Items.reserve( count );
+			}
+			EnumFunction* caller = new EnumFunction( (tTJSArrayObject*)array, ni );
+			tTJSVariantClosure closure( caller );
+			param[0]->AsObjectClosureNoAddRef().EnumMembers( TJS_IGNOREPROP | TJS_ENUM_NO_VALUE, &closure, nullptr );
+			caller->Release();
+
+			*result = tTJSVariant( array, array );
+			array->Release();
+		} else {
+			*result = tTJSVariant( array, array );
+			array->Release();
+		}
+	}
+	return TJS_S_OK;
+}
+//---------------------------------------------------------------------------
 static tjs_int32 ClassID_Dictionary;
 //---------------------------------------------------------------------------
 // tTJSDictionaryClass : tTJSDictionary class
@@ -245,6 +313,16 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func.name*/getCount ) {
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_STATIC_METHOD_DECL(/*func.name*/getCount )
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func.name*/keys ) {
+	return tTJSGetKeyValue<tListKeysCallback>( result, numparams, param, objthis );
+}
+TJS_END_NATIVE_STATIC_METHOD_DECL(/*func.name*/keys )
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func.name*/values ) {
+	return tTJSGetKeyValue<tListValuesCallback>( result, numparams, param, objthis );
+}
+TJS_END_NATIVE_STATIC_METHOD_DECL(/*func.name*/values )
 //----------------------------------------------------------------------
 
 	ClassID_Dictionary = TJS_NCM_CLASSID;
