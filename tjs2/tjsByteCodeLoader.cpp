@@ -387,6 +387,7 @@ void tTJSByteCodeLoader::TranslateCodeAddress( tTJSScriptBlock* block, tjs_int32
 		OP2_DISASM(VM_CLT);
 		OP2_DISASM(VM_CGT);
 		OP2_DISASM(VM_CHKINS);
+		OP2_DISASM(VM_CHKIN);
 #undef OP2_DISASM
 
 #define OP2_DISASM(c) \

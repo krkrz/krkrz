@@ -1493,6 +1493,25 @@ tjs_int tTJSInterCodeContext::GenNodeCode(tjs_int & frame, tTJSExprNode *node,
         return resaddr1;
 	  }
 
+	case T_IN:	// 'in' operator
+	  {
+		// in operator
+		tjs_int resaddr1, resaddr2;
+		resaddr1 = _GenNodeCode(frame, (*node)[0], TJS_RT_NEEDED, 0, tSubParam());
+		if( !TJSIsFrame( resaddr1 ) ) {
+			PutCode( VM_CP, node_pos );
+			PutCode( TJS_TO_VM_REG_ADDR( frame ), node_pos );
+			PutCode( TJS_TO_VM_REG_ADDR( resaddr1 ), node_pos );
+			resaddr1 = frame;
+			frame++;
+		}
+		resaddr2 = _GenNodeCode(frame, (*node)[1], TJS_RT_NEEDED, 0, tSubParam());
+		PutCode(VM_CHKIN, node_pos);
+		PutCode(TJS_TO_VM_REG_ADDR(resaddr1), node_pos);
+		PutCode(TJS_TO_VM_REG_ADDR(resaddr2), node_pos);
+        return resaddr1;
+	  }
+
 	case T_VERTLINE:	// '|' operator
 	case T_CHEVRON:		// '^' operator
 	case T_AMPERSAND:	// binary '&' operator

@@ -73,6 +73,7 @@ enum tTJSVMCodes{
 	VM_GPDS, VM_SPDS, VM_GPIS, VM_SPIS,  VM_SETP, VM_GETP,
 	VM_DELD, VM_DELI, VM_SRV, VM_RET, VM_ENTRY, VM_EXTRY, VM_THROW,
 	VM_CHGTHIS, VM_GLOBAL, VM_ADDCI, VM_REGMEMBER, VM_DEBUGGER,
+	VM_CHKIN,
 
 	__VM_LAST /* = last mark ; this is not a real operation code */} ;
 
@@ -568,6 +569,7 @@ private:
 	static void CharacterCodeOf(tTJSVariant &val);
 	static void CharacterCodeFrom(tTJSVariant &val);
 	static void InstanceOf(const tTJSVariant &name, tTJSVariant &targ);
+	static void InMember( tTJSVariant &name, tTJSVariant &obj );
 
 	void RegisterObjectMember(iTJSDispatch2 * dest);
 

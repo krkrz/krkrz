@@ -145,6 +145,7 @@ void tTJSInterCodeContext::Disassemble(
 		OP2_DISASM(VM_CLT,		"clt");
 		OP2_DISASM(VM_CGT,		"cgt");
 		OP2_DISASM(VM_CHKINS,	"chkins");
+		OP2_DISASM(VM_CHKIN,	"chkin");
 #undef OP2_DISASM
 
 

@@ -678,6 +678,7 @@ unary_expr
 	| "&" unary_expr							{ $$ = cc->MakeNP1(T_IGNOREPROP, $2); }
 	| "*" unary_expr							{ $$ = cc->MakeNP1(T_PROPACCESS, $2); }
 	| incontextof_expr "instanceof" unary_expr	{ $$ = cc->MakeNP2(T_INSTANCEOF, $1, $3); }
+	| incontextof_expr "in" unary_expr			{ $$ = cc->MakeNP2(T_IN, $1, $3); }
 	| "(" "int" ")" unary_expr					{ $$ = cc->MakeNP1(T_INT, $4); }
 	| "int" unary_expr							{ $$ = cc->MakeNP1(T_INT, $2); }
 	| "(" "real" ")" unary_expr					{ $$ = cc->MakeNP1(T_REAL, $4); }

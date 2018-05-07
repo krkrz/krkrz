@@ -324,6 +324,38 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func.name*/values ) {
 }
 TJS_END_NATIVE_STATIC_METHOD_DECL(/*func.name*/values )
 //----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func.name*/contains ) {
+	if( objthis ) {
+		// call from incontextof
+		if( numparams < 1 ) return TJS_E_BADPARAMCOUNT;
+		if( param[0]->Type() != tvtString ) return TJS_E_INVALIDPARAM;
+		if( result ) {
+			tTJSVariant tmp;
+			if( TJS_SUCCEEDED( objthis->PropGet( TJS_MEMBERMUSTEXIST, *( param[1]->AsStringNoAddRef() ), nullptr, &tmp, objthis ) ) ) {
+				*result = (tjs_int)1;
+			} else {
+				*result = (tjs_int)0;
+			}
+		}
+		return TJS_S_OK;
+	}
+	// static call Dictionary.contains( object, name );
+	if( numparams < 2 ) return TJS_E_BADPARAMCOUNT;
+	iTJSDispatch2 *disp = param[0]->AsObjectThisNoAddRef();
+	if( !disp ) return TJS_E_INVALIDPARAM;
+	if( param[1]->Type() != tvtString ) return TJS_E_INVALIDPARAM;
+	if( result ) {
+		tTJSVariant tmp;
+		if( TJS_SUCCEEDED( disp->PropGet( TJS_MEMBERMUSTEXIST, *(param[1]->AsStringNoAddRef()), nullptr, &tmp, disp ) ) ) {
+			*result = (tjs_int)1;
+		} else {
+			*result = (tjs_int)0;
+		}
+	}
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_STATIC_METHOD_DECL(/*func.name*/contains )
+//----------------------------------------------------------------------
 
 	ClassID_Dictionary = TJS_NCM_CLASSID;
 	TJS_END_NATIVE_MEMBERS
