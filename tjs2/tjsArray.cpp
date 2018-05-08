@@ -963,6 +963,76 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/* func.name */pack)
 }
 TJS_END_NATIVE_METHOD_DECL(/* func.name */pack)
 //----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/* func.name */forEach ) {
+	TJS_GET_NATIVE_INSTANCE(/* var. name */ni, /* var. type */tTJSArrayNI );
+
+	if( numparams < 1 ) return TJS_E_BADPARAMCOUNT;
+	
+	if( ni->Items.empty() ) return TJS_S_OK;
+
+	if( param[0]->Type() == tvtString ) {
+		tTJSVariantString* str = param[0]->AsStringNoAddRef();
+		tjs_int paramCount = numparams - 1;
+		std::unique_ptr<tTJSVariant*[]> paramList;
+		if( paramCount > 0 ) {
+			paramList.reset( new tTJSVariant*[paramCount] );
+			for( tjs_int i = 1; i < numparams; i++ ) {
+				paramList[i - 1] = param[i];
+			}
+		}
+		tTJSVariant breakResult;
+		for( auto i = ni->Items.begin(); i != ni->Items.end(); i++ ) {
+			tjs_error hr = i->AsObjectClosureNoAddRef().FuncCall( 0, *str, str->GetHint(), &breakResult, paramCount, paramList.get(), i->AsObjectThisNoAddRef() );
+			if( TJS_FAILED( hr ) ) {
+				TJSThrowFrom_tjs_error( hr, *str );
+				return TJS_E_FAIL;
+			}
+			if( breakResult.Type() != tvtVoid ) {
+				break;
+			}
+		}
+		if( result ) {
+			*result = breakResult;
+		}
+		return TJS_S_OK;
+	} else if( param[0]->Type() == tvtObject ) {
+		tTJSVariantClosure &funcClosure = param[0]->AsObjectClosureNoAddRef();
+		iTJSDispatch2 *func = funcClosure.Object;
+		iTJSDispatch2 *functhis = funcClosure.ObjThis;
+		if( !functhis ) {
+			functhis = objthis;
+		}
+		tTJSVariant key, value;
+		tjs_int paramCount = numparams + 1;
+		std::unique_ptr<tTJSVariant*[]> paramList( new tTJSVariant*[paramCount] );
+		paramList[0] = &value;
+		paramList[1] = &key;
+		for( tjs_int i = 1; i < numparams; i++ ) {
+			paramList[i+1] = param[i];
+		}
+		tTJSVariant breakResult;
+		tjs_int count = ni->Items.size();
+		for( tjs_int i = 0; i < count; i++ ) {
+			key = i;
+			value = ni->Items[i];
+			tjs_error hr = func->FuncCall( 0, nullptr, nullptr, &breakResult, paramCount, paramList.get(), functhis );
+			if( TJS_FAILED( hr ) ) {
+				return hr;
+			}
+			if( breakResult.Type() != tvtVoid ) {
+				break;
+			}
+		}
+		if( result ) {
+			*result = breakResult;
+		}
+		return TJS_S_OK;
+	}
+
+	return TJS_E_INVALIDPARAM;
+}
+TJS_END_NATIVE_METHOD_DECL(/* func.name */forEach )
+//----------------------------------------------------------------------
 
 
 //----------------------------------------------------------------------
