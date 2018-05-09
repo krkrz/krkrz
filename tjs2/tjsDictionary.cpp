@@ -87,6 +87,64 @@ static tjs_error tTJSGetKeyValue( tTJSVariant* result, tjs_int numparams, tTJSVa
 	return TJS_S_OK;
 }
 //---------------------------------------------------------------------------
+struct tForEachCallback : public tTJSDispatch {
+	iTJSDispatch2* Func;
+	iTJSDispatch2* FuncThis;
+	std::unique_ptr<tTJSVariant*[]> Params;
+	tjs_int NumParams;
+	tTJSVariant Result;
+
+	tForEachCallback( iTJSDispatch2* func, iTJSDispatch2* funcThis, tTJSVariant* params[], tjs_int numparams )
+		: Func( func ), FuncThis( funcThis ), Params( params ), NumParams( numparams ) {
+	}
+	tjs_error TJS_INTF_METHOD
+		FuncCall( tjs_uint32 flag, const tjs_char * membername,
+			tjs_uint32 *hint, tTJSVariant *result, tjs_int numparams,
+			tTJSVariant **param, iTJSDispatch2 *objthis ) {
+		if( numparams >= 3 ) {
+			if( (tjs_int)*param[1] != TJS_HIDDENMEMBER ) {
+				Params[0] = param[2];
+				Params[1] = param[0];
+				Func->FuncCall( 0, nullptr, nullptr, &Result, NumParams, Params.get(), FuncThis );
+			}
+		}
+		if( result ) {
+			*result = Result.Type() == tvtVoid;
+		}
+		return TJS_S_OK;
+	}
+};
+//---------------------------------------------------------------------------
+struct tForEachNameCallback : public tTJSDispatch {
+	tTJSVariantString* FuncName;
+	std::unique_ptr<tTJSVariant*[]> Params;
+	tjs_int NumParams;
+	tTJSVariant Result;
+
+	tForEachNameCallback( tTJSVariantString* funcName, tTJSVariant* params[], tjs_int numparams )
+		: FuncName( funcName ), Params( params ), NumParams( numparams ) {
+	}
+	tjs_error TJS_INTF_METHOD
+		FuncCall( tjs_uint32 flag, const tjs_char * membername,
+			tjs_uint32 *hint, tTJSVariant *result, tjs_int numparams,
+			tTJSVariant **param, iTJSDispatch2 *objthis ) {
+
+		if( numparams >= 3 ) {
+			if( (tjs_int)*param[1] != TJS_HIDDENMEMBER ) {
+				tjs_error hr = param[2]->AsObjectClosureNoAddRef().FuncCall( 0, *FuncName, FuncName->GetHint(), &Result, NumParams, Params.get(), param[2]->AsObjectThisNoAddRef() );
+				if( TJS_FAILED( hr ) ) {
+					TJSThrowFrom_tjs_error( hr, *FuncName );
+					return TJS_E_FAIL;
+				}
+			}
+		}
+		if( result ) {
+			*result = Result.Type() == tvtVoid;
+		}
+		return TJS_S_OK;
+	}
+};
+//---------------------------------------------------------------------------
 static tjs_int32 ClassID_Dictionary;
 //---------------------------------------------------------------------------
 // tTJSDictionaryClass : tTJSDictionary class
@@ -355,6 +413,54 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func.name*/contains ) {
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_STATIC_METHOD_DECL(/*func.name*/contains )
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func.name*/forEach ) {
+	if( numparams < 2 ) return TJS_E_BADPARAMCOUNT;
+
+	if( param[1]->Type() == tvtString ) {
+		tTJSVariantClosure &obj = param[0]->AsObjectClosureNoAddRef();
+		tjs_int paramCount = numparams - 2;
+		std::unique_ptr<tTJSVariant*[]> paramList;
+		if( paramCount > 0 ) {
+			paramList.reset( new tTJSVariant*[paramCount] );
+			for( tjs_int i = 2; i < numparams; i++ ) {
+				paramList[i - 2] = param[i];
+			}
+		}
+		auto deleter = []( tForEachNameCallback *callback ) {
+			callback->Release();
+		};
+		std::unique_ptr<tForEachNameCallback, decltype( deleter )> callback( new tForEachNameCallback( param[1]->AsStringNoAddRef(), paramList.release(), numparams ), std::move( deleter ) );
+		tTJSVariantClosure closure( callback.get() );
+		obj.EnumMembers( TJS_IGNOREPROP, &closure, nullptr );
+		if( result ) {
+			*result = callback->Result;
+		}
+		return TJS_S_OK;
+	} else if( param[1]->Type() == tvtObject ) {
+		tTJSVariantClosure &obj = param[0]->AsObjectClosureNoAddRef();
+		tTJSVariantClosure &funcClosure = param[1]->AsObjectClosureNoAddRef();
+		iTJSDispatch2 *func = funcClosure.Object;
+		iTJSDispatch2 *functhis = funcClosure.ObjThis;
+		if( !functhis ) functhis = objthis;
+
+		std::unique_ptr<tTJSVariant*[]> paramList( new tTJSVariant*[numparams] );
+		for( tjs_int i = 2; i < numparams; i++ )
+			paramList[i] = param[i];
+		auto deleter = []( tForEachCallback *callback ) {
+			callback->Release();
+		};
+		std::unique_ptr<tForEachCallback, decltype( deleter )> callback( new tForEachCallback( func, functhis, paramList.release(), numparams), std::move( deleter ) );
+		tTJSVariantClosure closure( callback.get() );
+		obj.EnumMembers( TJS_IGNOREPROP, &closure, nullptr );
+		if( result ) {
+			*result = callback->Result;
+		}
+		return TJS_S_OK;
+	}
+	return TJS_E_INVALIDPARAM;
+}
+TJS_END_NATIVE_STATIC_METHOD_DECL(/*func.name*/forEach )
 //----------------------------------------------------------------------
 
 	ClassID_Dictionary = TJS_NCM_CLASSID;
