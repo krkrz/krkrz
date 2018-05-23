@@ -50,6 +50,7 @@ void TVPAddSoundBuffer(tTJSNI_SoundBuffer * buf)
 		TVPSoundBufferTimer = new TVPTimer(); // Create Timer Object
 		TVPSoundBufferTimer->SetInterval( TVP_SB_BEAT_INTERVAL );
 		TVPSoundBufferTimer->SetOnTimerHandler( &TVPSoundBufferTimerDispatcher, &tTVPSoundBufferTimerDispatcher::Handler );
+		TVPSoundBufferTimer->SetEnabled( true );
 	}
 
 	TVPSoundBufferVector.push_back(buf);
