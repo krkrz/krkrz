@@ -56,8 +56,8 @@ void tTVPDrawCycleTimer::Fire(tjs_uint n) {
 		} else {
 			interval = (tjs_uint32)( ((((tjs_uint64)lasttick)+0xFFFFFFFFULL) - ((tjs_uint64)tick))&0xFFFFFFFF );
 		}
-		if( interval > ((drawInterval*3)/2) ) {
-			// 描画サイクルの1.5倍より遅れている、混みあっているので、タイマー再設定して遅らせる
+		if( interval > (drawInterval*4) ) {
+			// 描画サイクルの4倍より遅れている、混みあっているので、タイマー再設定して遅らせる
 			ResetDrawCycle();
 			LastDrawTick = 0;
 		}
