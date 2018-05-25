@@ -237,8 +237,10 @@ ttstr TVPGetOSName()
 	//TJS_snprintf( buf, sizeof( buf ) / sizeof( tjs_char ), TJS_W( " kernel32.dll %d.%d Release %d Build %d " ), major, minor, release, build );
 	//str += ttstr( buf );
 	if( major >= 10 ) {
-		if( release >= 16299 ) {
-			str += ttstr( TJS_W("Fall Creators Update or later") );
+		if( release >= 17134 ) {
+			str += ttstr( TJS_W("April 2018 Update or later") );
+		} else if( release >= 16299 ) {
+			str += ttstr( TJS_W("Fall Creators Update") );
 		} else if( release >= 15063 ) {
 			str += ttstr( TJS_W( "Creators Update" ) );
 		} else if( release >= 14393 ) {
