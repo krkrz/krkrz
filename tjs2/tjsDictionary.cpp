@@ -119,7 +119,6 @@ struct tForEachNameCallback : public tTJSDispatch {
 	tTJSVariantString* FuncName;
 	std::unique_ptr<tTJSVariant*[]> Params;
 	tjs_int NumParams;
-	tTJSVariant Result;
 
 	tForEachNameCallback( tTJSVariantString* funcName, tTJSVariant* params[], tjs_int numparams )
 		: FuncName( funcName ), Params( params ), NumParams( numparams ) {
@@ -131,7 +130,7 @@ struct tForEachNameCallback : public tTJSDispatch {
 
 		if( numparams >= 3 ) {
 			if( (tjs_int)*param[1] != TJS_HIDDENMEMBER ) {
-				tjs_error hr = param[2]->AsObjectClosureNoAddRef().FuncCall( 0, *FuncName, FuncName->GetHint(), &Result, NumParams, Params.get(), param[2]->AsObjectThisNoAddRef() );
+				tjs_error hr = param[2]->AsObjectClosureNoAddRef().FuncCall( 0, *FuncName, FuncName->GetHint(), nullptr, NumParams, Params.get(), param[2]->AsObjectThisNoAddRef() );
 				if( TJS_FAILED( hr ) ) {
 					TJSThrowFrom_tjs_error( hr, *FuncName );
 					return TJS_E_FAIL;
@@ -139,7 +138,7 @@ struct tForEachNameCallback : public tTJSDispatch {
 			}
 		}
 		if( result ) {
-			*result = Result.Type() == tvtVoid;
+			*result = true;
 		}
 		return TJS_S_OK;
 	}
@@ -433,9 +432,6 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func.name*/forEach ) {
 		std::unique_ptr<tForEachNameCallback, decltype( deleter )> callback( new tForEachNameCallback( param[1]->AsStringNoAddRef(), paramList.release(), numparams ), std::move( deleter ) );
 		tTJSVariantClosure closure( callback.get() );
 		obj.EnumMembers( TJS_IGNOREPROP, &closure, nullptr );
-		if( result ) {
-			*result = callback->Result;
-		}
 		return TJS_S_OK;
 	} else if( param[1]->Type() == tvtObject ) {
 		tTJSVariantClosure &obj = param[0]->AsObjectClosureNoAddRef();

@@ -980,19 +980,12 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/* func.name */forEach ) {
 				paramList[i - 1] = param[i];
 			}
 		}
-		tTJSVariant breakResult;
 		for( auto i = ni->Items.begin(); i != ni->Items.end(); i++ ) {
-			tjs_error hr = i->AsObjectClosureNoAddRef().FuncCall( 0, *str, str->GetHint(), &breakResult, paramCount, paramList.get(), i->AsObjectThisNoAddRef() );
+			tjs_error hr = i->AsObjectClosureNoAddRef().FuncCall( 0, *str, str->GetHint(), nullptr, paramCount, paramList.get(), i->AsObjectThisNoAddRef() );
 			if( TJS_FAILED( hr ) ) {
 				TJSThrowFrom_tjs_error( hr, *str );
 				return TJS_E_FAIL;
 			}
-			if( breakResult.Type() != tvtVoid ) {
-				break;
-			}
-		}
-		if( result ) {
-			*result = breakResult;
 		}
 		return TJS_S_OK;
 	} else if( param[0]->Type() == tvtObject ) {
