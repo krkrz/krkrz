@@ -1038,7 +1038,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/* func.name */includes ) {
 		if( numparams >= 2 ) start = *param[1];
 		if( start < 0 ) start += (tjs_int)ni->Items.size();
 		if( start < 0 ) start = 0;
-		if( start >= (tjs_int)ni->Items.size() ) { *result = -1; return TJS_S_OK; }
+		if( start >= (tjs_int)ni->Items.size() ) { *result = (tjs_int)0; return TJS_S_OK; }
 
 		tTJSArrayNI::tArrayItemIterator i;
 		for( i = ni->Items.begin() + start; i != ni->Items.end(); i++ ) {
