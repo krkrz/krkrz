@@ -299,6 +299,23 @@ tjs_int64 tTJSNI_Texture::GetVBOHandle() const {
 	}
 }
 //----------------------------------------------------------------------
+void tTJSNI_Texture::SetDrawSize( tjs_uint width, tjs_uint height ) {
+	const float w = (float)width;
+	const float h = (float)height;
+	const GLfloat vertices[] = {
+		0.0f, 0.0f,	// 左上
+		0.0f,    h,	// 左下
+		   w, 0.0f,	// 右上
+		   w,    h,	// 右下
+	};
+	GLVertexBufferObject& vbo = const_cast<GLVertexBufferObject&>( VertexBuffer );
+	if( VertexBuffer.isCreated() ) {
+		vbo.copyBuffer( 0, sizeof( vertices ), vertices );
+	} else {
+		vbo.createStaticVertex( vertices, sizeof( vertices ) );
+	}
+}
+//----------------------------------------------------------------------
 tjs_int tTJSNI_Texture::GetStretchType() const {
 	return static_cast<tjs_int>(Texture.stretchType());
 }
@@ -380,6 +397,19 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/copyRect)
 	return TJS_S_OK;
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/copyRect)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/setDrawSize ) {
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Texture );
+
+	if( numparams < 2 ) return TJS_E_BADPARAMCOUNT;
+
+	tjs_int64 width = *param[0];
+	tjs_int64 height= *param[1];
+	_this->SetDrawSize( (tjs_uint)width, (tjs_uint)height );
+
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/setDrawSize )
 //----------------------------------------------------------------------
 
 

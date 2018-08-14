@@ -55,6 +55,8 @@ public:
 	bool IsPowerOfTwo() const;
 	tjs_int64 GetNativeHandle() const override { return Texture.id(); }
 	tjs_int64 GetVBOHandle() const override;
+	// VBOに描画サイズを設定しておき、テクスチャサイズ以外で描画させる
+	void SetDrawSize( tjs_uint width, tjs_uint height );
 	tjs_int GetImageFormat() const override { return Texture.format(); }
 
 	static inline bool IsPowerOfTwo( tjs_uint x ) { return (x & (x - 1)) == 0; }
