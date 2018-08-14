@@ -229,6 +229,9 @@ void tTJSNI_BaseWindow::ReleaseCanvasSurface() {
 void TJS_INTF_METHOD
 tTJSNI_BaseWindow::Invalidate()
 {
+	// stop draw cycle
+	DrawCycleTimer->Terminate();
+
 	// remove from list
 	TVPUnregisterWindowToList(static_cast<tTJSNI_Window*>(this));
 
@@ -696,7 +699,17 @@ void tTJSNI_BaseWindow::OnDisplayRotate( tjs_int orientation, tjs_int rotate, tj
 	if(DrawDevice) DrawDevice->OnDisplayRotate(orientation, rotate, bpp, hresolution, vresolution);
 }
 //---------------------------------------------------------------------------
+class TVPFinishDrawing {
+	tTVPDrawCycleTimer* Timer;
+public:
+	TVPFinishDrawing( tTVPDrawCycleTimer* t) : Timer(t) {}
+	~TVPFinishDrawing() {
+		if( Timer ) Timer->FinishDrawing();
+	}
+};
+//---------------------------------------------------------------------------
 void tTJSNI_BaseWindow::OnDraw() {
+	TVPFinishDrawing drawTimer( DrawCycleTimer.get() );
 	if(!CanDeliverEvents()) return;
 	if( CanvasInstance ) CanvasInstance->BeginDrawing();
 	try {
@@ -858,6 +871,7 @@ bool tTJSNI_BaseWindow::GetWaitVSync() const
 //---------------------------------------------------------------------------
 void tTJSNI_BaseWindow::SetDrawCycle( tjs_uint32 cycle ) {
 	if( !CanvasInstance ) return;
+	if( cycle == 0 ) return;
 
 	if( !DrawCycleTimer ) DrawCycleTimer.reset( new tTVPDrawCycleTimer(this) );
 	DrawCycleTimer->SetDrawCycle( cycle );
