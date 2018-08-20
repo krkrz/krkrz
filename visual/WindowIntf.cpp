@@ -230,7 +230,7 @@ void TJS_INTF_METHOD
 tTJSNI_BaseWindow::Invalidate()
 {
 	// stop draw cycle
-	DrawCycleTimer->Terminate();
+	if( DrawCycleTimer ) DrawCycleTimer->Terminate();
 
 	// remove from list
 	TVPUnregisterWindowToList(static_cast<tTJSNI_Window*>(this));

@@ -1,6 +1,7 @@
 
 #include "tjsCommHead.h"
 
+#include "tjsArray.h"
 #include "TextureIntf.h"
 #include "BitmapIntf.h"
 #include "GraphicsLoaderIntf.h"
@@ -86,8 +87,59 @@ tjs_error TJS_INTF_METHOD tTJSNI_Texture::Construct(tjs_int numparams, tTJSVaria
 		tTJSNI_Bitmap* bmp = nullptr;
 		tTJSVariantClosure clo = param[0]->AsObjectClosureNoAddRef();
 		if( clo.Object ) {
-			if(TJS_FAILED(clo.Object->NativeInstanceSupport(TJS_NIS_GETINSTANCE, tTJSNC_Bitmap::ClassID, (iTJSNativeInstance**)&bmp)))
+			if( TJS_FAILED( clo.Object->NativeInstanceSupport( TJS_NIS_GETINSTANCE, tTJSNC_Bitmap::ClassID, (iTJSNativeInstance**)&bmp ) ) ) {
+				tTJSArrayNI* sizeList = nullptr;
+				if( ( numparams >= 2 ) && TJS_SUCCEEDED( clo.Object->NativeInstanceSupport( TJS_NIS_GETINSTANCE, TJSGetArrayClassID(), (iTJSNativeInstance**)&sizeList ) ) ) {
+					// 第一引数が配列の時、Mipmap生成する
+					if( param[1]->Type() == tvtString ) {
+						ttstr filename = *param[1];
+						std::unique_ptr<tTVPBaseBitmap> bitmap( new tTVPBaseBitmap( TVPGetInitialBitmap() ) );
+						TVPLoadGraphic( bitmap.get(), filename, clNone, 0, 0, glmNormalRGBA, nullptr, nullptr, true );
+						tTVPBBStretchType type = stFastAreaAvg;
+						if( numparams >= 3 && param[2]->Type() != tvtVoid )
+							type = (tTVPBBStretchType)(tjs_int)*param[2];
+						tjs_real typeopt = 0.0;
+						if( numparams >= 4 )
+							typeopt = (tjs_real)*param[3];
+						else if( type == stFastCubic || type == stCubic )
+							typeopt = -1.0;
+						LoadMipmapTexture( bitmap.get(), sizeList, type, typeopt );
+						return TJS_S_OK;
+					}
+#if 0	// Bitmap 渡しのケースは実装していない
+					else {
+						clo = param[1]->AsObjectClosureNoAddRef();
+						if( clo.Object ) {
+							// 第二引数がBitmap
+							if( TJS_FAILED( clo.Object->NativeInstanceSupport( TJS_NIS_GETINSTANCE, tTJSNC_Bitmap::ClassID, (iTJSNativeInstance**)&bmp ) ) ) {
+								return TJS_E_INVALIDPARAM;
+							}
+							tTVPBBStretchType type = stFastAreaAvg;
+							if( numparams >= 3 && param[2]->Type() != tvtVoid )
+								type = (tTVPBBStretchType)(tjs_int)*param[2];
+
+							tjs_real typeopt = 0.0;
+							if( numparams >= 4 )
+								typeopt = (tjs_real)*param[3];
+							else if( type == stFastCubic || type == stCubic )
+								typeopt = -1.0;
+							tjs_int h = bmp->GetHeight();
+							tjs_int w = bmp->GetWidth();
+							std::unique_ptr<tTVPBaseBitmap> bitmap( new tTVPBaseBitmap( w, h ) );
+							const tTVPBaseBitmap* srcBmp = bmp->GetBitmap();
+							for( tjs_int y = 0; y < h; y++ ) {
+								const tjs_uint32* sl = static_cast<const tjs_uint32*>( srcBmp->GetScanLine( h - y - 1 ) );
+								tjs_uint32* dl = static_cast<tjs_uint32*>( bitmap->GetScanLineForWrite( h - y - 1 ) );
+								TVPRedBlueSwapCopy( dl, sl, w );
+							}
+							LoadMipmapTexture( bitmap.get(), tTVPTextureColorFormat::RGBA, sizeList, type, typeopt, true );
+						}
+						return TJS_S_OK;
+					}
+#endif
+				}
 				return TJS_E_INVALIDPARAM;
+			}
 		}
 		if(!bmp) TVPThrowExceptionMessage(TJS_W("Parameter require Bitmap class instance."));
 		tTVPTextureColorFormat color = tTVPTextureColorFormat::RGBA;
@@ -232,7 +284,7 @@ void tTJSNI_Texture::LoadTexture( const class tTVPBaseBitmap* bitmap, tTVPTextur
 	tjs_int w = bitmap->GetWidth();
 	tjs_int h = bitmap->GetHeight();
 	tjs_int pitch = w * bpp;
-	if( bitmap->GetPitchBytes() != pitch || ( bpp == 4 && rbswap) ) {
+	if( std::abs(bitmap->GetPitchBytes()) != pitch || ( bpp == 4 && rbswap) ) {
 		// パディングされているので、そのままではコピーできない(OpenGL ES2.0の場合)
 		// もしくは赤と青をスワップする必要がある
 		if( bpp == 4 ) {
@@ -262,6 +314,70 @@ void tTJSNI_Texture::LoadTexture( const class tTVPBaseBitmap* bitmap, tTVPTextur
 		//Texture.create( bitmap->GetWidth(), bitmap->GetHeight(), bitmap->GetScanLine( 0 ), ColorToGLColor( color ) );
 		Texture.create( bitmap->GetWidth(), bitmap->GetHeight(), bitmap->GetScanLine( bitmap->GetHeight() - 1 ), ColorToGLColor( color ) );
 	}
+}
+//----------------------------------------------------------------------
+/**
+ * 色は RGBA のみで、赤青入れ替えも行わないケースのみ実装する
+ */
+tjs_error tTJSNI_Texture::LoadMipmapTexture( const tTVPBaseBitmap* bitmap, class tTJSArrayNI* sizeList, enum tTVPBBStretchType type, tjs_real typeopt ) {
+	tjs_uint count = static_cast<tjs_uint>(sizeList->Items.size() / 2);
+	if( count < 1 ) return TJS_E_INVALIDPARAM;	// mipmapが生成できない
+
+	std::vector<GLTextreImageSet> mipmap;
+	mipmap.reserve( count + 1 );
+	std::vector<std::unique_ptr<tjs_uint32[]> > buffers;
+
+	// まずはオリジナルサイズのBitmapを格納する
+	tjs_int w = bitmap->GetWidth();
+	tjs_int h = bitmap->GetHeight();
+	tjs_int pitch = w * 4;
+	if( std::abs(bitmap->GetPitchBytes()) != pitch ) {
+		buffers.push_back( std::unique_ptr<tjs_uint32[]>( new tjs_uint32[w*h] ) );
+		tjs_uint32* buffer = buffers[0].get();
+		for( tjs_int y = 0; y < h; y++ ) {
+			tjs_uint32* sl = (tjs_uint32*)bitmap->GetScanLine( h - y - 1 );
+			memcpy( &buffer[w*y], sl, pitch );
+		}
+		mipmap.emplace_back( GLTextreImageSet( w, h, buffer ) );
+	} else {
+		mipmap.emplace_back( GLTextreImageSet( w, h, bitmap->GetScanLine( h - 1 ) ) );
+	}
+
+	// ミップマップ生成、自前の縮小関数で縮小する
+	tjs_int prew = w;
+	tjs_int preh = h;
+	std::vector<std::unique_ptr<tTVPBaseBitmap> > bmps;
+	tTVPRect srcRect( 0, 0, w, h );
+	for( tjs_uint i = 0; i < count; i++ ) {
+		tjs_int sw = sizeList->Items[i * 2 + 0];
+		tjs_int sh = sizeList->Items[i * 2 + 1];
+		if( sw > prew || sh > preh ) return TJS_E_INVALIDPARAM;	// 順に小さいサイズにしていく必要がある
+		tjs_int spitch = sw * 4;
+		bmps.push_back( std::unique_ptr<tTVPBaseBitmap>( new tTVPBaseBitmap( sw, sh, 32, true ) ) );
+		tTVPRect dstRect( 0, 0, sw, sh );
+		tTVPRect clipRect( dstRect );
+		tTVPBaseBitmap* dstBmp = bmps.back().get();
+		dstBmp->StretchBlt( clipRect, dstRect, bitmap, srcRect, bmCopy, 255, false, type, typeopt );
+		if( std::abs(dstBmp->GetPitchBytes()) != spitch ) {
+			buffers.push_back( std::unique_ptr<tjs_uint32[]>( new tjs_uint32[sw*sh] ) );
+			tjs_uint32* buffer = buffers.back().get();
+			for( tjs_int y = 0; y < sh; y++ ) {
+				tjs_uint32* sl = (tjs_uint32*)dstBmp->GetScanLine( sh - y - 1 );
+				memcpy( &buffer[sw*y], sl, pitch );
+			}
+			mipmap.emplace_back( GLTextreImageSet( sw, sh, buffer ) );
+			// バッファにコピーされたのでBitmapは不要、ここで削除してしまう
+			auto bmpend = bmps.end();
+			bmpend--;
+			bmps.erase( bmpend );
+		} else {
+			mipmap.emplace_back( GLTextreImageSet( sw, sh, dstBmp->GetScanLine( sh - 1 ) ) );
+		}
+		prew = sw;
+		preh = sh;
+	}
+	Texture.createMipmapTexture( mipmap );
+	return TJS_S_OK;
 }
 //----------------------------------------------------------------------
 void tTJSNI_Texture::CopyBitmap( tjs_int left, tjs_int top, const tTVPBaseBitmap* bitmap, const tTVPRect& srcRect ) {

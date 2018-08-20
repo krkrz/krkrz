@@ -33,6 +33,7 @@ class tTJSNI_Texture : public tTJSNativeInstance, public iTVPTextureInfoIntrface
 	class tTJSNI_Rect* MarginRectInstance = nullptr;
 
 	void LoadTexture( const class tTVPBaseBitmap* bitmap, tTVPTextureColorFormat color, bool rbswap = false );
+	tjs_error LoadMipmapTexture( const class tTVPBaseBitmap* bitmap, class tTJSArrayNI* sizeList, enum tTVPBBStretchType type, tjs_real typeopt );
 	GLint ColorToGLColor( tTVPTextureColorFormat color );
 
 	void SetMarginRectObject( const tTJSVariant & val );
