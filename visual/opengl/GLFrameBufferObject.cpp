@@ -110,7 +110,7 @@ bool GLFrameBufferObject::readTextureToBitmap( tTVPBaseBitmap* bmp ) {
 	tjs_int pitch = bmp->GetPitchBytes();
 	for( tjs_uint y = 0; y < height_; y++ ) {
 		TVPRedBlueSwap( dest, width_ );
-		dest = reinterpret_cast<tjs_uint32*>(reinterpret_cast<tjs_uint8*>(dest)+pitch);
+		dest = reinterpret_cast<tjs_uint32*>(reinterpret_cast<tjs_uint8*>( dest ) - pitch);
 	}
 
 	return true;
