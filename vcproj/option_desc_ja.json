@@ -898,7 +898,7 @@
 				"user":false,
 				"values":[
 					{ "value":"yes", "desc":"制限する", "default":true },
-					{ "value":"no", "desc":"制限しない" },
+					{ "value":"no", "desc":"制限しない" }
 				]
 			}
 		]
