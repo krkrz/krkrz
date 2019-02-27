@@ -174,10 +174,8 @@ private:
 		tTVPWD_Opus * decoder = (tTVPWD_Opus*)stream;
 		if( !decoder->Stream ) return 0;
 		int bytesread = static_cast<int>(decoder->Stream->Read(ptr, static_cast<tjs_uint>(nbytes)));
-		if( bytesread != nbytes ) {
-			return -1; // failed
-		}
-		return bytesread;
+		if( bytesread >= 0 ) return bytesread;
+		return -1; // failed
 	}
 	int static seek_func(void *stream, opus_int64 offset, int whence) {
 		// seek function (wrapper for IStream)
