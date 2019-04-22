@@ -79,6 +79,7 @@ public:
 	void Frustum( tjs_real left, tjs_real right, tjs_real bottom, tjs_real top, tjs_real znear, tjs_real zfar );
 	void Perspective( tjs_real fovy, tjs_real aspect, tjs_real znear, tjs_real zfar );
 	void PerspectiveFov( tjs_real fovy, tjs_real width, tjs_real height, tjs_real znear, tjs_real zfar );
+	void LookAt( tjs_real eyeX, tjs_real eyeY, tjs_real eyeZ, tjs_real centerX, tjs_real centerY, tjs_real centerZ, tjs_real upX, tjs_real upY, tjs_real upZ );
 	static void Project( const tTJSNI_Matrix44* model, const tTJSNI_Matrix44* proj, const class tTJSNI_Rect* viewport, tjs_real& x, tjs_real& y, tjs_real& z );
 
 

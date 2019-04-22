@@ -130,6 +130,9 @@ void tTJSNI_Matrix44::Perspective( tjs_real fovy, tjs_real aspect, tjs_real znea
 void tTJSNI_Matrix44::PerspectiveFov( tjs_real fovy, tjs_real width, tjs_real height, tjs_real znear, tjs_real zfar ) {
 	Mat4 = glm::perspectiveFov( (float)fovy, (float)width, (float)height, (float)znear, (float)zfar );
 }
+void tTJSNI_Matrix44::LookAt( tjs_real eyeX, tjs_real eyeY, tjs_real eyeZ, tjs_real centerX, tjs_real centerY, tjs_real centerZ, tjs_real upX, tjs_real upY, tjs_real upZ ) {
+	glm::lookAt( glm::vec3( eyeX, eyeY, eyeZ ), glm::vec3( centerX, centerY, centerZ ), glm::vec3( upX, upY, upZ ) );
+}
 void tTJSNI_Matrix44::Project( const tTJSNI_Matrix44* model, const tTJSNI_Matrix44* proj, const class tTJSNI_Rect* viewport, tjs_real& x, tjs_real& y, tjs_real& z ) {
 	glm::vec3 win( (float)x, (float)y, (float)z );
 	const tTVPRect& v = viewport->Get();
@@ -406,6 +409,24 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/Project )
 }
 TJS_END_NATIVE_STATIC_METHOD_DECL(/*func. name*/Project )
 //----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/lookAt ) {
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Matrix44 );
+	if( numparams < 9 ) return TJS_E_BADPARAMCOUNT;
+	tjs_real ex = *param[0];
+	tjs_real ey = *param[1];
+	tjs_real ez = *param[2];
+	tjs_real cx = *param[3];
+	tjs_real cy = *param[4];
+	tjs_real cz = *param[5];
+	tjs_real ux = *param[6];
+	tjs_real uy = *param[7];
+	tjs_real uz = *param[8];
+	_this->LookAt( ex, ey, ez, cx, cy, cz, ux, uy, uz );
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_STATIC_METHOD_DECL(/*func. name*/lookAt )
+//----------------------------------------------------------------------
+
 
 //----------------------------------------------------------------------
 
