@@ -105,7 +105,7 @@ static void TVPCopyToVertexBuffer( GLVertexBufferObject& vtxBuff, const tTJSVari
 			TVPThrowExceptionMessage( TJS_W( "Insufficient number of arrays." ) );
 		buffer[i] = (TType)(tjs_int)tmp;
 	}
-	vtxBuff.copyBuffer( offset, sizeof(TType)*count, (const void*)buffer.get() );
+	vtxBuff.copyBuffer( sizeof(TType)*offset, sizeof(TType)*count, (const void*)buffer.get() );
 }
 //---------------------------------------------------------------------------
 void tTJSNI_VertexBuffer::SetVertex( const tTJSVariant *param, tjs_int offset ) {
@@ -143,7 +143,7 @@ void tTJSNI_VertexBuffer::SetVertex( const tTJSVariant *param, tjs_int offset ) 
 						TVPThrowExceptionMessage( TJS_W( "Insufficient number of arrays." ) );
 					buffer[i] = (GLfloat)(tjs_real)tmp;
 				}
-				VertexBufferObject.copyBuffer( offset, sizeof(GLfloat)*count, buffer.get() );
+				VertexBufferObject.copyBuffer( sizeof(GLfloat)*offset, sizeof(GLfloat)*count, buffer.get() );
 				return;
 			}
 			}
