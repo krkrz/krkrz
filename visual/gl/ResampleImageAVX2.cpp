@@ -32,6 +32,43 @@ static __m256i M256_U32_TOP_MASK;
 static __m256 M256_EPSILON;
 static __m256 M256_ABS_MASK;
 
+
+/**
+* 面積平均パラメータ用(ヘッダーに置くとSSE2用のcppファイルでも組み込み関数でAVX命令を使おうとするので同じものをここに)
+*/
+template<typename TVector>
+void TVPCalculateAxisAreaAvgAVX( int srcstart, int srcend, int srclength, int dstlength, std::vector<int>& start, std::vector<int>& length, TVector& weight ) {
+	start.clear();
+	start.reserve( dstlength );
+	length.clear();
+	length.reserve( dstlength );
+	weight.clear();
+	int wlength = srclength + dstlength;
+	weight.reserve( wlength );
+	int delta = 0;
+	int srctarget = srclength;
+	int len = 0;
+	start.push_back( 0 );
+	for( int x = 0; x < srclength; x++ ) {
+		if( ( delta + dstlength ) <= srctarget ) {	// 境界に達していない
+			weight.push_back( 1.0f );
+			len++;
+		} else { // 境界をまたいだ
+			int d = ( delta + dstlength ) - srctarget;
+			weight.push_back( (float)( dstlength - d ) / (float)dstlength ); // 前の領域
+			length.push_back( len + 1 );
+
+			start.push_back( x );
+			len = 1;
+			weight.push_back( (float)d / (float)dstlength );
+			srctarget += srclength;
+		}
+		delta += dstlength;
+	}
+	length.push_back( len );
+}
+
+
 static bool InitializedResampleAVX2 = false;
 void TVPInitializeResampleAVX2() {
 	if( !InitializedResampleAVX2 ) {
@@ -425,7 +462,7 @@ struct AxisParamAVX2 {
 	void calculateAxisAreaAvg( int srcstart, int srcend, int srclength, int dstlength, bool strip ) {
 		if( dstlength <= srclength ) { // 縮小のみ
 			std::vector<float> weight;
-			TVPCalculateAxisAreaAvg( srcstart, srcend, srclength, dstlength, start_, length_, weight );
+			TVPCalculateAxisAreaAvgAVX( srcstart, srcend, srclength, dstlength, start_, length_, weight );
 			// 実際のサイズを求める
 			int maxsize = 0;
 			if( strip == false ) {
