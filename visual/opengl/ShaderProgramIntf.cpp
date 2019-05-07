@@ -15,6 +15,7 @@
 #include <string.h>
 #include <vector>
 #include "TextureInfo.h"
+#include "DebugIntf.h"
 
 extern const iTVPTextureInfoIntrface* TVPGetTextureInfo( const tTJSVariant *param );
 
@@ -330,31 +331,31 @@ void tTVPShaderParameter::SetToShader( tjs_int* texCount, tjs_int* vertexCount )
 			glUniform4ui( Id, ( (GLuint*)*Value )[0], ( (GLuint*)*Value )[1], ( (GLuint*)*Value )[2], ( (GLuint*)*Value )[3] );
 			break;
 		case GL_FLOAT_MAT2: 	// mat2
-			glUniformMatrix2fv( Id, 1, GL_TRUE, (GLfloat*)*Value );
+			glUniformMatrix2fv( Id, 1, GL_FALSE, (GLfloat*)*Value );
 			break;
 		case GL_FLOAT_MAT3: 	// mat3
-			glUniformMatrix3fv( Id, 1, GL_TRUE, (GLfloat*)*Value );
+			glUniformMatrix3fv( Id, 1, GL_FALSE, (GLfloat*)*Value );
 			break;
 		case GL_FLOAT_MAT4: 	// mat4
-			glUniformMatrix4fv( Id, 1, GL_TRUE, (GLfloat*)*Value );
+			glUniformMatrix4fv( Id, 1, GL_FALSE, (GLfloat*)*Value );
 			break;
 		case GL_FLOAT_MAT2x3: 	// mat2x3
-			glUniformMatrix2x3fv( Id, 1, GL_TRUE, (GLfloat*)*Value );
+			glUniformMatrix2x3fv( Id, 1, GL_FALSE, (GLfloat*)*Value );
 			break;
 		case GL_FLOAT_MAT2x4: 	// mat2x4
-			glUniformMatrix2x4fv( Id, 1, GL_TRUE, (GLfloat*)*Value );
+			glUniformMatrix2x4fv( Id, 1, GL_FALSE, (GLfloat*)*Value );
 			break;
 		case GL_FLOAT_MAT3x2: 	// mat3x2
-			glUniformMatrix3x2fv( Id, 1, GL_TRUE, (GLfloat*)*Value );
+			glUniformMatrix3x2fv( Id, 1, GL_FALSE, (GLfloat*)*Value );
 			break;
 		case GL_FLOAT_MAT3x4: 	// mat3x4
-			glUniformMatrix3x4fv( Id, 1, GL_TRUE, (GLfloat*)*Value );
+			glUniformMatrix3x4fv( Id, 1, GL_FALSE, (GLfloat*)*Value );
 			break;
 		case GL_FLOAT_MAT4x2: 	// mat4x2
-			glUniformMatrix4x2fv( Id, 1, GL_TRUE, (GLfloat*)*Value );
+			glUniformMatrix4x2fv( Id, 1, GL_FALSE, (GLfloat*)*Value );
 			break;
 		case GL_FLOAT_MAT4x3: 	// mat4x3
-			glUniformMatrix4x3fv( Id, 1, GL_TRUE, (GLfloat*)*Value );
+			glUniformMatrix4x3fv( Id, 1, GL_FALSE, (GLfloat*)*Value );
 			break;
 		case GL_SAMPLER_2D: {	// sampler2D
 			if( !texCount ) break;

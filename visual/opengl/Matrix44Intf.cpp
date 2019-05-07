@@ -78,7 +78,7 @@ iTJSDispatch2* tTJSNI_Matrix44::GetMatrixArrayObjectNoAddRef() {
 		classobj->Release();
 	}
 
-	const float* m = (const float *)&Mat4[0];
+	const float* m = (const float *)&(Mat4[0][0]);
 	for( tjs_int i = 0; i < 16; i++ ) {
 		tTJSVariant val((tjs_real)m[i]);
 		MatrixArray->PropSetByNum(TJS_MEMBERENSURE, i, &val, MatrixArray);
@@ -106,11 +106,30 @@ void tTJSNI_Matrix44::Div( const tTJSNI_Matrix44* rhs ) { Mat4 /= rhs->Mat4; }
 void tTJSNI_Matrix44::Inc() { Mat4++; }
 void tTJSNI_Matrix44::Dec() { Mat4--; }
 
+void tTJSNI_Matrix44::MulVector( tjs_real& x, tjs_real& y, tjs_real& z, tjs_real& w ) {
+	glm::vec4 v( (float)x, (float)y, (float)z, (float)w );
+	glm::vec4 ret = Mat4 * v;
+	x = ret.x; y = ret.y; z = ret.z; w = ret.w;
+}
 void tTJSNI_Matrix44::Translate( tjs_real x, tjs_real y, tjs_real z ) {
 	Mat4 = glm::translate( Mat4, glm::vec3( (float)x, (float)y, (float)z ) );
 }
 void tTJSNI_Matrix44::Rotate( tjs_real degree, tjs_real x, tjs_real y, tjs_real z ) {
 	Mat4 = glm::rotate( Mat4, TVPDegToRad( (float)degree), glm::vec3( (float)x, (float)y, (float)z ) );
+}
+void tTJSNI_Matrix44::RotateX( tjs_real degree, tjs_real px, tjs_real py, tjs_real pz ) {
+	glm::mat4 t;
+	t[3][0] = (float)px; t[3][1] = (float)py; t[3][2] = (float)pz;
+	float radian = TVPDegToRad( (float)degree );
+	float c = std::cos( radian );
+	float s = std::sin( radian );
+	glm::mat4 r;
+	r[1][1] = c; r[1][2] = s;
+	r[2][1] = -s; r[2][2] = c;
+	Multiply( r, t );
+	t[3][0] = (float)-px; t[3][1] = (float)-py; t[3][2] = (float)-pz;
+	Multiply( t, r );
+	Premultiply( Mat4, t );
 }
 void tTJSNI_Matrix44::Scale( tjs_real x, tjs_real y, tjs_real z ) {
 	Mat4 = glm::scale( Mat4, glm::vec3( (float)x, (float)y, (float)z ) );
@@ -131,7 +150,7 @@ void tTJSNI_Matrix44::PerspectiveFov( tjs_real fovy, tjs_real width, tjs_real he
 	Mat4 = glm::perspectiveFov( (float)fovy, (float)width, (float)height, (float)znear, (float)zfar );
 }
 void tTJSNI_Matrix44::LookAt( tjs_real eyeX, tjs_real eyeY, tjs_real eyeZ, tjs_real centerX, tjs_real centerY, tjs_real centerZ, tjs_real upX, tjs_real upY, tjs_real upZ ) {
-	glm::lookAt( glm::vec3( eyeX, eyeY, eyeZ ), glm::vec3( centerX, centerY, centerZ ), glm::vec3( upX, upY, upZ ) );
+	Mat4 = glm::lookAt( glm::vec3( eyeX, eyeY, eyeZ ), glm::vec3( centerX, centerY, centerZ ), glm::vec3( upX, upY, upZ ) );
 }
 void tTJSNI_Matrix44::Project( const tTJSNI_Matrix44* model, const tTJSNI_Matrix44* proj, const class tTJSNI_Rect* viewport, tjs_real& x, tjs_real& y, tjs_real& z ) {
 	glm::vec3 win( (float)x, (float)y, (float)z );
@@ -338,6 +357,30 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/rotate )
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/rotate )
 //----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/rotateX ) {
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Matrix44 );
+	if( numparams < 4 ) return TJS_E_BADPARAMCOUNT;
+	_this->RotateX( *param[0], *param[1], *param[2], *param[3] );
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/rotateX )
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/mulVector ) {
+	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Matrix44 );
+	if( numparams < 4 ) return TJS_E_BADPARAMCOUNT;
+	tjs_real x = *param[0];
+	tjs_real y = *param[1];
+	tjs_real z = *param[2];
+	tjs_real w = *param[3];
+	_this->MulVector( x, y, z, w );
+	*param[0] = x;
+	*param[1] = y;
+	*param[2] = z;
+	*param[3] = w;
+	return TJS_S_OK;
+}
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/mulVector )
+//----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/scale )
 {
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Matrix44 );
@@ -388,9 +431,8 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/perspectiveFov )
 }
 TJS_END_NATIVE_METHOD_DECL(/*func. name*/perspectiveFov )
 //----------------------------------------------------------------------
-TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/Project )
+TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/project )
 {
-	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Matrix44 );
 	if( numparams < 6 ) return TJS_E_BADPARAMCOUNT;
 	tjs_real x = *param[3];
 	tjs_real y = *param[4];
@@ -407,7 +449,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/Project )
 	*param[5] = z;
 	return TJS_S_OK;
 }
-TJS_END_NATIVE_STATIC_METHOD_DECL(/*func. name*/Project )
+TJS_END_NATIVE_STATIC_METHOD_DECL(/*func. name*/project )
 //----------------------------------------------------------------------
 TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/lookAt ) {
 	TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Matrix44 );
@@ -424,7 +466,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/lookAt ) {
 	_this->LookAt( ex, ey, ez, cx, cy, cz, ux, uy, uz );
 	return TJS_S_OK;
 }
-TJS_END_NATIVE_STATIC_METHOD_DECL(/*func. name*/lookAt )
+TJS_END_NATIVE_METHOD_DECL(/*func. name*/lookAt )
 //----------------------------------------------------------------------
 
 
