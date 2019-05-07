@@ -1805,7 +1805,8 @@ extern tTVPSoundGlobalFocusMode TVPSoundGetGlobalFocusMode();
 tTJSNativeClass * TVPCreateNativeClass_SoundBuffer()
 {
 #ifdef _WIN32
-	if( TVPHasXAudio2DLL() ) {
+	//if( TVPHasXAudio2DLL() ) {	// TODO XAudio2 の時どうも status が stop に変わらないケースがある模様
+	if( false ) {
 		TVPSetGlobalVolume = TVPQueueSoundSetGlobalVolume;
 		TVPGetGlobalVolume = TVPQueueSoundGetGlobalVolume;
 		TVPSetGlobalFocusMode = TVPQueueSoundSetGlobalFocusMode;
