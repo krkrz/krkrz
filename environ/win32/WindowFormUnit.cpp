@@ -6,6 +6,10 @@
 
 #include <dbt.h> // for WM_DEVICECHANGE
 
+#ifndef EDS_ROTATEDMODE
+#define EDS_ROTATEDMODE 0x00000004
+#endif
+
 #include <algorithm>
 #include "WindowFormUnit.h"
 #include "WindowImpl.h"
