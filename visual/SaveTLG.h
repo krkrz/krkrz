@@ -13,12 +13,12 @@ class SlideCompressor
 		int Next;
 	};
 
-	unsigned char Text[SLIDE_N + SLIDE_M - 1];
+	unsigned char Text[SLIDE_N + SLIDE_M];
 	int Map[256*256];
 	Chain Chains[SLIDE_N];
 
 
-	unsigned char Text2[SLIDE_N + SLIDE_M - 1];
+	unsigned char Text2[SLIDE_N + SLIDE_M];
 	int Map2[256*256];
 	Chain Chains2[SLIDE_N];
 
