@@ -12,7 +12,7 @@
 //---------------------------------------------------------------------------
 #include "tjsCommHead.h"
 #include <stdlib.h>
-#ifdef __GNUC__
+#ifndef _MSC_VER
 #include <x86intrin.h>
 #endif
 
