@@ -20,7 +20,6 @@
 //---------------------------------------------------------------------------
 // Constants
 //---------------------------------------------------------------------------
-//#define TVP_TIMEOFS_INVALID_VALUE ((tjs_int)(- 2147483648i64)) // invalid value for 32bit time offset
 #define TVP_TIMEOFS_INVALID_VALUE ((tjs_int)(0x80000000)) // invalid value for 32bit time offset
 
 //---------------------------------------------------------------------------
