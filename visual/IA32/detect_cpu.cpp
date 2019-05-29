@@ -39,6 +39,7 @@ static inline int __cpuidex(int CPUInfo[4],int InfoType,int ECXValue) {
 		: "0" (InfoType), "2" (ECXValue));
   return highest;
 }
+#include <x86intrin.h>
 #endif
 
 extern "C" {

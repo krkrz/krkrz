@@ -44,6 +44,10 @@
 #include "tvpgl_ia32_intf.h"
 #endif
 #include "DetectCPU.h"
+#ifndef _MSC_VER
+#include <x86intrin.h>
+#endif
+
 
 extern void InterleaveOverlappingWindow(float * __restrict dest, const float * __restrict const * __restrict src,
 	float * __restrict win, int numch, size_t srcofs, size_t len);
