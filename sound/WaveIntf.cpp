@@ -23,15 +23,25 @@
 
 #define TVP_OPUS_DECODER_IMPLEMENT
 
+extern tTJSNativeClass * TVPCreateNativeClass_QueueSoundBuffer();
 extern void TVPQueueSoundSetGlobalVolume(tjs_int v);
 extern tjs_int TVPQueueSoundGetGlobalVolume();
 extern void TVPQueueSoundSetGlobalFocusMode(tTVPSoundGlobalFocusMode b);
 extern tTVPSoundGlobalFocusMode TVPQueueSoundGetGlobalFocusMode();
 
-static void (*TVPSetGlobalVolume)(tjs_int v) = TVPQueueSoundSetGlobalVolume;
-static tjs_int (*TVPGetGlobalVolume)() = TVPQueueSoundGetGlobalVolume;
-static void (*TVPSetGlobalFocusMode)(tTVPSoundGlobalFocusMode b) = TVPQueueSoundSetGlobalFocusMode;
-static tTVPSoundGlobalFocusMode (*TVPGetGlobalFocusMode)() = TVPQueueSoundGetGlobalFocusMode;
+#ifdef _WIN32
+extern tTJSNativeClass * TVPCreateNativeClass_WaveSoundBuffer();
+extern bool TVPHasXAudio2DLL();
+extern void TVPSoundSetGlobalVolume(tjs_int v);
+extern tjs_int TVPSoundGetGlobalVolume();
+extern void TVPSoundSetGlobalFocusMode(tTVPSoundGlobalFocusMode b);
+extern tTVPSoundGlobalFocusMode TVPSoundGetGlobalFocusMode();
+#endif
+
+static void (*TVPSetGlobalVolume)(tjs_int v) = TVPSoundSetGlobalVolume;
+static tjs_int (*TVPGetGlobalVolume)() = TVPSoundGetGlobalVolume;
+static void (*TVPSetGlobalFocusMode)(tTVPSoundGlobalFocusMode b) = TVPSoundSetGlobalFocusMode;
+static tTVPSoundGlobalFocusMode (*TVPGetGlobalFocusMode)() = TVPSoundGetGlobalFocusMode;
 
 //---------------------------------------------------------------------------
 // PCM related constants / definitions
@@ -1793,15 +1803,6 @@ iTJSDispatch2 * TVPCreateWaveFlagsObject(iTJSDispatch2 * buffer)
 	return out;
 }
 //---------------------------------------------------------------------------
-extern tTJSNativeClass * TVPCreateNativeClass_QueueSoundBuffer();
-#ifdef _WIN32
-extern tTJSNativeClass * TVPCreateNativeClass_WaveSoundBuffer();
-extern bool TVPHasXAudio2DLL();
-extern void TVPSoundSetGlobalVolume(tjs_int v);
-extern tjs_int TVPSoundGetGlobalVolume();
-extern void TVPSoundSetGlobalFocusMode(tTVPSoundGlobalFocusMode b);
-extern tTVPSoundGlobalFocusMode TVPSoundGetGlobalFocusMode();
-#endif
 tTJSNativeClass * TVPCreateNativeClass_SoundBuffer()
 {
 #ifdef _WIN32
