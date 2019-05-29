@@ -15,7 +15,9 @@
 #define _WIN32_WINNT _WIN32_WINNT_WIN8
 #include <Xaudio2.h>
 
+#ifdef _MSC_VER
 //#pragma comment(lib,"XAudio2.lib")
+#endif
 bool TVPHasXAudio2DLL() {
 	HMODULE hModule = nullptr;
 	hModule = ::LoadLibrary( TJS_W("XAudio2_9.dll") );

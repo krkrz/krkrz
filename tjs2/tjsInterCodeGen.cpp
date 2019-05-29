@@ -42,7 +42,7 @@ namespace TJS  // following is in the namespace
 //---------------------------------------------------------------------------
 
 
-int __yyerror(char *, void*);
+int __yyerror(const char *, void*);
 
 #ifdef TJS_DEBUG_PROFILE_TIME
 tjs_uint time_yylex = 0;
@@ -118,7 +118,7 @@ int _yyerror(const tjs_char * msg, void *pm, tjs_int pos)
 }
 
 //---------------------------------------------------------------------------
-int __yyerror(char * msg, void * pm)
+int __yyerror(const char * msg, void * pm)
 {
 	// yyerror ( for bison )
 	ttstr str(msg);

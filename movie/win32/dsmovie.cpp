@@ -32,16 +32,20 @@
 
 #ifdef ENABLE_THEORA
 #include "OggFilterFactory.h"
+#ifdef _MSC_VER
 #ifndef WINCE
 #pragma comment (lib, "winmm")
 #else
 #pragma comment (lib, "mmtimer")
 #endif
 #endif
+#endif
 
+#ifdef _MSC_VER
 #pragma comment (lib, "strmiids")
 #pragma comment (lib, "quartz")
 #pragma comment (lib, "dmoguids")
+#endif
 
 
 // {BAE59473-019E-4f1f-8A8C-3D41A9F4921E}

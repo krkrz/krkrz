@@ -28,6 +28,7 @@
 
 #include "MFByteStream.h"
 
+#ifdef _MSC_VER
 #pragma comment( lib, "propsys.lib" )
 #pragma comment( lib, "Mfplat.lib" )
 #pragma comment( lib, "Mf.lib" )
@@ -35,6 +36,7 @@
 //#pragma comment( lib, "d3d9.lib" )
 //#pragma comment( lib, "dxva2.lib" )
 //#pragma comment( lib, "evr.lib" )
+#endif
 
 //----------------------------------------------------------------------------
 //! @brief	  	VideoOverlay MediaFoundationを取得する

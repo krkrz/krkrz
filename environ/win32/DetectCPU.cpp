@@ -21,7 +21,9 @@
 #include <intrin.h>
 #include "MsgIntf.h"
 
+#ifdef _MSC_VER
 #pragma intrinsic(__rdtsc)
+#endif
 
 /*
 	Note: CPU clock measuring routine is in EmergencyExit.cpp, reusing

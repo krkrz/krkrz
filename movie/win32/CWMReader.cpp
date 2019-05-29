@@ -243,7 +243,9 @@ bool CWMOutput::IsDXVASubtype( const AM_MEDIA_TYPE *pmt )
 
 
 //## CWMReader
+#ifdef _MSC_VER
 #pragma warning(disable: 4355)	// コンストラクタのベースメンバ初期化時にthisを使うとワーニングが出るのでそれを抑止
+#endif
 //----------------------------------------------------------------------------
 //! @brief	  	CWMReader constructor
 //----------------------------------------------------------------------------
@@ -253,7 +255,9 @@ CWMReader::CWMReader()
 	m_AudioOut.AddRef();
 	m_VideoOut.AddRef();
 }
+#ifdef _MSC_VER
 #pragma warning(default: 4355)
+#endif
 //----------------------------------------------------------------------------
 //! @brief	  	CWMReader destructor
 //----------------------------------------------------------------------------
