@@ -109,7 +109,7 @@ namespace TJS {
 /* yylex/yyerror prototype decl */
 #define YYLEX_PROTO_DECL int pplex(YYSTYPE *yylex, void *pm);
 
-int _pperror(char * msg, void *pm)
+int _pperror(const char * msg, void *pm)
 {
 	(void)msg;
 	(void)pm;

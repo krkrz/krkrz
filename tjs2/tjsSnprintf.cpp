@@ -408,7 +408,7 @@ dopr(tjs_char *buffer, size_t maxlen, const tjs_char *format, va_list args_in)
 				break;
 			case TJS_W('s'):
 				strvalue = va_arg (args, tjs_char *);
-				if (!strvalue) strvalue = TJS_W("(NULL)");
+				if (!strvalue) strvalue = (tjs_char*)TJS_W("(NULL)");
 				if (max == -1) {
 					max = TJS_strlen(strvalue);
 				}
@@ -496,7 +496,7 @@ fmtstr(tjs_char *buffer, size_t *currlen, size_t maxlen,
 	printf("fmtstr min=%d max=%d s=[%s]\n", min, max, value);
 #endif
 	if (value == 0) {
-		value = TJS_W("<NULL>");
+		value = (tjs_char*)TJS_W("<NULL>");
 	}
 
 	for (strln = 0; strln < max && value[strln]; ++strln); /* strlen */

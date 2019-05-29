@@ -109,7 +109,7 @@ namespace TJS {
 /* yylex/yyerror prototype decl */
 int dplex(YYSTYPE *yylex, void *pm);
 
-int dperror(char * msg)
+int dperror(const char * msg)
 {
     return 0;
 }

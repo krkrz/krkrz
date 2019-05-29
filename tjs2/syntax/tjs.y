@@ -46,7 +46,7 @@ NS_TJS_START
 /* yylex/yyerror prototype decl */
 #define YYLEX_PROTO_DECL int yylex(YYSTYPE *yylex, void *pm);
 
-int __yyerror(char * msg, void *pm);
+int __yyerror(const char * msg, void *pm);
 
 
 #define yyerror(msg) __yyerror(msg, pm);

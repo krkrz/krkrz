@@ -436,7 +436,7 @@ void TVPHandleSEHException( int ErrorCode, EXCEPTION_RECORD *P, unsigned long os
 	TVPWriteHWELogFile();
 }
 //---------------------------------------------------------------------------
-static void TVPDumpCPUFlags(ttstr &line, DWORD flags, DWORD bit, tjs_char *name)
+static void TVPDumpCPUFlags(ttstr &line, DWORD flags, DWORD bit, const tjs_char *name)
 {
 	line += name;
 	if(flags & bit)
@@ -622,7 +622,7 @@ void TVPDumpHWException()
 
 	line = TJS_W("Exception : ");
 
-	tjs_char *p = NULL;
+	const tjs_char *p = NULL;
 	switch(d->Code)
 	{
 	case  3:	p = TJS_W("Divide By Zero"); break;
