@@ -6,6 +6,7 @@
 #define TextureIntfH
 
 #include "tjsNative.h"
+#include "LayerBitmapIntf.h"
 #include "GLTexture.h"
 #include "TextureInfo.h"
 #include "GLVertexBufferObject.h"

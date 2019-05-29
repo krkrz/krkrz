@@ -1,6 +1,8 @@
 
 #include "tjsCommHead.h"
 
+#include <algorithm>
+
 #include "tvpfontstruc.h"
 #include "TVPSysFont.h"
 #include "FontSystem.h"
