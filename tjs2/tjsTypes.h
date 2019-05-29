@@ -130,8 +130,13 @@ typedef uintptr_t tjs_uintptr_t;
 #endif
 
 #ifdef __cplusplus
+#ifdef _WIN32
+typedef wchar_t tjs_char;
+typedef std::wstring tjs_string;
+#else
 typedef char16_t tjs_char;
 typedef std::u16string tjs_string;
+#endif
 #else
 typedef unsigned short tjs_char;
 #endif
@@ -156,10 +161,24 @@ typedef uintptr_t tjs_uintptr_t;
 	#define TJS_HOST_IS_LITTLE_ENDIAN 1
 #endif
 
+#ifdef _WIN32
+#ifndef TJS_INTF_METHOD
+#define TJS_INTF_METHOD __cdecl
+	/* TJS_INTF_METHOD is "cdecl" (by default)
+		since TJS2 2.4.14 (kirikir2 2.25 beta 1) */
+#endif
+
+#define TJS_USERENTRY __cdecl
+#else
 #define TJS_INTF_METHOD
 #define TJS_USERENTRY
+#endif
 
+#ifdef _WIN32
+#define TJS_W(X) L##X
+#else
 #define TJS_W(X) u##X
+#endif
 
 #endif /* end of defined(_WIN32) && !defined(__GNUC__) */
 /*]*/
