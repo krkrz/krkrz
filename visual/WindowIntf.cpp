@@ -2160,7 +2160,7 @@ TJS_END_NATIVE_PROP_DECL( displayDensity )
 TJS_BEGIN_NATIVE_PROP_DECL( mouseCursor ) {
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
-		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer );
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window );
 		*result = _this->GetCursor();
 		return TJS_S_OK;
 	}
@@ -2168,7 +2168,7 @@ TJS_BEGIN_NATIVE_PROP_DECL( mouseCursor ) {
 
 	TJS_BEGIN_NATIVE_PROP_SETTER
 	{
-		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer );
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Window );
 		if( param->Type() == tvtString )
 			_this->SetCursorByStorage( *param );
 		else
