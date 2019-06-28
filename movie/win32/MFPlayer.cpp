@@ -23,6 +23,8 @@
 #include "krmovie.h"
 #include "MFPlayer.h"
 #include "DShowException.h"
+#include "DebugIntf.h"
+#include "DShowException.h"
 
 #pragma comment( lib, "propsys.lib" )
 //#pragma comment( lib, "Mfplat.lib" )
@@ -230,10 +232,13 @@ void tTVPMFPlayer::OnTopologyStatus(UINT32 status) {
 		CComPtr<IMFGetService> pGetService;
 		if( SUCCEEDED(hr = MediaSession->QueryInterface( &pGetService )) ) {
 			if( FAILED(hr = pGetService->GetService( MR_VIDEO_RENDER_SERVICE, IID_IMFVideoDisplayControl, (void**)&VideoDisplayControl )) ) {
+				TVPAddLog( TJS_W( "MF : Cannot retrieve IID_IMFVideoDisplayControl." ) );
 			}
 			if( FAILED(hr = pGetService->GetService( MR_STREAM_VOLUME_SERVICE, IID_IMFAudioStreamVolume, (void**)&AudioVolume )) ) {
+				TVPAddLog(TJS_W("MF : Cannot retrieve IID_IMFAudioStreamVolume."));
 			}
 			if( FAILED(hr = pGetService->GetService( MR_POLICY_VOLUME_SERVICE, IID_IMFSimpleAudioVolume, (void**)&SimpleAudioVolume )) ) {
+				TVPAddLog( TJS_W( "MF : Cannot retrieve IID_IMFSimpleAudioVolume." ) );
 			}
 			pGetService->GetService( MF_RATE_CONTROL_SERVICE, IID_IMFRateControl, (void**)&RateControl );
 			pGetService->GetService( MF_RATE_CONTROL_SERVICE, IID_IMFRateSupport, (void**)&RateSupport );
@@ -270,52 +275,52 @@ HRESULT tTVPMFPlayer::CreateVideoPlayer() {
 		return E_FAIL;
 
 	if( FAILED(hr = MFCreateMediaSession( NULL, &MediaSession )) ) {
-		TVPThrowExceptionMessage(TJS_W("Faild to create Media session."));
+		ThrowDShowException(TJS_W("Faild to create Media session."), hr);
 	}
 	if( FAILED(hr = MediaSession->BeginGetEvent( PlayerCallback, NULL )) ) {
-		TVPThrowExceptionMessage(TJS_W("Faild to begin get event."));
+		ThrowDShowException(TJS_W("Faild to begin get event."), hr);
 	}
 	CComPtr<IMFSourceResolver> pSourceResolver;
 	if( FAILED(hr = MFCreateSourceResolver(&pSourceResolver)) ) {
-		TVPThrowExceptionMessage(TJS_W("Faild to create source resolver."));
+		ThrowDShowException(TJS_W("Faild to create source resolver."), hr);
 	}
 	MF_OBJECT_TYPE ObjectType = MF_OBJECT_INVALID;
 	CComPtr<IUnknown> pSource;
 	if( FAILED(hr = pSourceResolver->CreateObjectFromByteStream( ByteStream, StreamName.c_str(), MF_RESOLUTION_MEDIASOURCE, NULL, &ObjectType, (IUnknown**)&pSource )) ) {
 	//if( FAILED(hr = pSourceResolver->CreateObjectFromURL( TJS_W("C:\\krkrz\\bin\\win32\\data\\test.mp4"),
 	//	MF_RESOLUTION_MEDIASOURCE, NULL, &ObjectType, (IUnknown**)&pSource)) ) {
-		TVPThrowExceptionMessage(TJS_W("Faild to open stream."));
+		ThrowDShowException(TJS_W("Faild to open stream."), hr );
 	}
 	if( ObjectType != MF_OBJECT_MEDIASOURCE ) {
 		TVPThrowExceptionMessage(TJS_W("Invalid media source."));
 	}
 	//CComPtr<IMFMediaSource> pMediaSource;
 	if( FAILED(hr = pSource.QueryInterface(&MediaSource)) ) {
-		TVPThrowExceptionMessage(TJS_W("Faild to query Media source."));
+		ThrowDShowException(TJS_W("Faild to query Media source."), hr );
 	}
 	if( FAILED(hr = MFCreateTopology(&Topology)) ) {
-		TVPThrowExceptionMessage(TJS_W("Faild to create Topology."));
+		ThrowDShowException(TJS_W("Faild to create Topology."), hr );
 	}
 	CComPtr<IMFPresentationDescriptor> pPresentationDescriptor;
 	if( FAILED(hr = MediaSource->CreatePresentationDescriptor(&pPresentationDescriptor)) ) {
-		TVPThrowExceptionMessage(TJS_W("Faild to create Presentation Descriptor."));
+		ThrowDShowException(TJS_W("Faild to create Presentation Descriptor."), hr );
 	}
 	DWORD streamCount;
 	if( FAILED(hr = pPresentationDescriptor->GetStreamDescriptorCount(&streamCount)) ) {
-		TVPThrowExceptionMessage(TJS_W("Faild to get stream count."));
+		ThrowDShowException(TJS_W("Faild to get stream count."), hr );
 	}
 	if( streamCount < 1 ) {
 		TVPThrowExceptionMessage(TJS_W("Not found media stream."));
 	}
 	for( DWORD i = 0; i < streamCount; i++ ) {
 		if( FAILED(hr = AddBranchToPartialTopology(Topology, MediaSource, pPresentationDescriptor, i, hWnd)) ) {
-			TVPThrowExceptionMessage(TJS_W("Faild to add nodes."));
+			ThrowDShowException(TJS_W("Faild to add nodes."), hr );
 		}
 	}
 	pPresentationDescriptor->GetUINT64(MF_PD_DURATION, (UINT64*)&HnsDuration);
 	
 	if( FAILED(hr = MediaSession->SetTopology( 0, Topology )) ) {
-		TVPThrowExceptionMessage(TJS_W("Faild to set topology."));
+		ThrowDShowException(TJS_W("Faild to set topology."), hr );
 	}
 	return hr;
 }
