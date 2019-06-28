@@ -27,6 +27,7 @@
 
 #include "Application.h"
 
+extern tjs_int TVPGetCursor( const ttstr & name );
 //---------------------------------------------------------------------------
 // Window List
 //---------------------------------------------------------------------------
@@ -829,7 +830,18 @@ void tTJSNI_BaseWindow::UnregisterVideoOverlayObject(tTJSNI_BaseVideoOverlay * o
 	VideoOverlay.Remove(ovl);
 }
 //---------------------------------------------------------------------------
-
+void tTJSNI_BaseWindow::SetCursorByStorage( const ttstr &storage )
+{
+	Cursor = TVPGetCursor( storage );
+	SetWindowMouseCursor( Cursor );
+}
+//---------------------------------------------------------------------------
+void tTJSNI_BaseWindow::SetCursorByNumber( tjs_int num )
+{
+	Cursor = num;
+	SetWindowMouseCursor( Cursor );
+}
+//---------------------------------------------------------------------------
 
 
 
@@ -2145,6 +2157,28 @@ TJS_BEGIN_NATIVE_PROP_DECL( displayDensity )
 }
 TJS_END_NATIVE_PROP_DECL( displayDensity )
 //---------------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL( mouseCursor ) {
+	TJS_BEGIN_NATIVE_PROP_GETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer );
+		*result = _this->GetCursor();
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_GETTER
+
+	TJS_BEGIN_NATIVE_PROP_SETTER
+	{
+		TJS_GET_NATIVE_INSTANCE(/*var. name*/_this, /*var. type*/tTJSNI_Layer );
+		if( param->Type() == tvtString )
+			_this->SetCursorByStorage( *param );
+		else
+			_this->SetCursorByNumber( *param );
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_PROP_DECL( mouseCursor )
+//----------------------------------------------------------------------
 	
 
 	TJS_END_NATIVE_MEMBERS
