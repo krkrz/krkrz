@@ -121,6 +121,7 @@ protected:
 		return level;
 	}
 	HRESULT SetVolumeToMF();
+	const tjs_char * ParseVideoType( const tjs_char *type );
 public:
 	IMFMediaSession* GetMediaSession() { return MediaSession; }
 
