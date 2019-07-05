@@ -382,10 +382,10 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/loadStruct)
 			}
 		}
 	} catch(...) {
-		delete stream;
+		stream->Destruct();
 		throw;
 	}
-	delete stream;
+	stream->Destruct();
 	if( isbin ) return TJS_S_OK;
 	return TJS_E_INVALIDPARAM;
 }
