@@ -27,10 +27,10 @@
 #include "DShowException.h"
 
 #pragma comment( lib, "propsys.lib" )
-//#pragma comment( lib, "Mfplat.lib" )
-#pragma comment( lib, "Mfplat_vista.lib" )
-//#pragma comment( lib, "Mf.lib" )
-#pragma comment( lib, "Mf_vista.lib" )
+#pragma comment( lib, "Mfplat.lib" )
+//#pragma comment( lib, "Mfplat_vista.lib" )
+#pragma comment( lib, "Mf.lib" )
+//#pragma comment( lib, "Mf_vista.lib" )
 #pragma comment( lib, "Mfuuid.lib" )
 //#pragma comment( lib, "d3d9.lib" )
 //#pragma comment( lib, "dxva2.lib" )
@@ -186,31 +186,33 @@ void __stdcall tTVPMFPlayer::BuildGraph( HWND callbackwin, IStream *stream,
 
 	HRESULT hr = S_OK;
 	// MFCreateMFByteStreamOnStream は、Windows 7 以降にのみある API なので、動的ロードして Vista での起動に支障がないようにする
+	// Vista は非サポートとなったので、直接使用するように変更。
+	/*
 	if( MfplatDLL.IsLoaded() == false ) MfplatDLL.Load(TJS_W("mfplat.dll"));
 	typedef HRESULT (WINAPI *FuncMFCreateMFByteStreamOnStream)(IStream *pStream,IMFByteStream **ppByteStream);
 	FuncMFCreateMFByteStreamOnStream pCreateMFByteStream = (FuncMFCreateMFByteStreamOnStream)MfplatDLL.GetProcAddress("MFCreateMFByteStreamOnStream");
 	if( pCreateMFByteStream == NULL ) {
 		TVPThrowExceptionMessage(TJS_W("Faild to retrieve MFCreateMFByteStreamOnStream from mfplat.dll."));
 	}
-	if( FAILED(hr = pCreateMFByteStream( stream, &ByteStream )) ) {
+	*/
+	if( FAILED(hr = MFCreateMFByteStreamOnStream( stream, &ByteStream )) ) {
 		TVPThrowExceptionMessage(TJS_W("Faild to create stream."));
 	}
 	CComPtr<IMFAttributes> pAttribute;
-	if( FAILED( hr = ByteStream.QueryInterface( &pAttribute ) ) ) {
-		ThrowDShowException( TJS_W( "Faild QueryInterface IMFAttributes." ), hr );
-	}
-	bool hasContentType = false;
-	UINT32 len;
-	if( SUCCEEDED( hr = pAttribute->GetString( MF_BYTESTREAM_CONTENT_TYPE, NULL, 0, &len ) ) ) {
-		std::unique_ptr<WCHAR[]> contentType( new WCHAR[len + 1] );
-		if( SUCCEEDED( hr = pAttribute->GetString( MF_BYTESTREAM_CONTENT_TYPE, (LPWSTR)contentType.get(), len + 1, NULL ) ) ) {
-			hasContentType = true;
+	if( SUCCEEDED( hr = ByteStream.QueryInterface( &pAttribute ) ) ) {
+		bool hasContentType = false;
+		UINT32 len;
+		if( SUCCEEDED( hr = pAttribute->GetString( MF_BYTESTREAM_CONTENT_TYPE, NULL, 0, &len ) ) ) {
+			std::unique_ptr<WCHAR[]> contentType( new WCHAR[len + 1] );
+			if( SUCCEEDED( hr = pAttribute->GetString( MF_BYTESTREAM_CONTENT_TYPE, (LPWSTR)contentType.get(), len + 1, NULL ) ) ) {
+				hasContentType = true;
+			}
 		}
-	}
-	if( hasContentType == false ) {
-		const tjs_char *ctype = ParseVideoType( type );
-		if( FAILED( hr = pAttribute->SetString( MF_BYTESTREAM_CONTENT_TYPE, ctype ) ) ) {
-			ThrowDShowException( TJS_W( "Faild to set content type." ), hr );
+		if( hasContentType == false ) {
+			const tjs_char *ctype = ParseVideoType( type );
+			if( FAILED( hr = pAttribute->SetString( MF_BYTESTREAM_CONTENT_TYPE, ctype ) ) ) {
+				ThrowDShowException( TJS_W( "Faild to set content type." ), hr );
+			}
 		}
 	}
 }
