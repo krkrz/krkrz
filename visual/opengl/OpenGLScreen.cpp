@@ -66,6 +66,7 @@ bool tTVPOpenGLScreen::Initialize() {
 #endif
 	mNativeDisplay = ::GetDC( (HWND)NativeHandle );
 	if( !mNativeDisplay ) {
+		TVPAddLog( TJS_W( "Failed to retrieve DC." ) );
 		Destroy();
 		return false;
 	}
@@ -73,13 +74,39 @@ bool tTVPOpenGLScreen::Initialize() {
 	mDisplay = eglGetPlatformDisplayEXT( EGL_PLATFORM_ANGLE_ANGLE, reinterpret_cast<void*>(mNativeDisplay), displayAttributes);
 	eglBindAPI( EGL_OPENGL_ES_API );
 	if( !CheckEGLErrorAndLog() ) {
+		TVPAddLog( TJS_W( "Failed to call eglGetPlatformDisplayEXT or eglBindAPI." ) );
 		Destroy();
 		return false;
 	}
 	EGLint majorVersion, minorVersion;
 	if( eglInitialize( mDisplay, &majorVersion, &minorVersion ) == EGL_FALSE ) {
+		TVPAddLog( TJS_W( "Failed to call eglInitialize." ) );
+		CheckEGLErrorAndLog();
 		Destroy();
 		return false;
+		/*
+		// 要求を下げて再試行
+		Destroy();
+		mNativeDisplay = ::GetDC( (HWND)NativeHandle );
+		EGLint displayAttributes2[] = {
+			EGL_PLATFORM_ANGLE_TYPE_ANGLE, EGL_PLATFORM_ANGLE_TYPE_D3D11_ANGLE,
+			EGL_PLATFORM_ANGLE_MAX_VERSION_MAJOR_ANGLE, EGL_DONT_CARE,
+			EGL_PLATFORM_ANGLE_MAX_VERSION_MINOR_ANGLE, EGL_DONT_CARE,
+			EGL_ANGLE_DISPLAY_ALLOW_RENDER_TO_BACK_BUFFER, EGL_TRUE,
+			EGL_PLATFORM_ANGLE_DEVICE_TYPE_ANGLE, EGL_PLATFORM_ANGLE_DEVICE_TYPE_HARDWARE_ANGLE,
+			EGL_NONE
+		};
+
+		mDisplay = eglGetPlatformDisplayEXT( EGL_PLATFORM_ANGLE_ANGLE, reinterpret_cast<void*>( mNativeDisplay ), displayAttributes2 );
+		eglBindAPI( EGL_OPENGL_ES_API );
+		if( CheckEGLErrorAndLog() ) {
+			TVPAddLog( TJS_W( "Failed to call eglGetPlatformDisplayEXT or eglBindAPI." ) );
+			if( eglInitialize( mDisplay, &majorVersion, &minorVersion ) == EGL_FALSE ) {
+				Destroy();
+				return false;
+			}
+		}
+		*/
 	}
 	const EGLint configAttributes[] = {
 		EGL_RED_SIZE,       8,
@@ -93,7 +120,7 @@ bool tTVPOpenGLScreen::Initialize() {
 		EGL_ALPHA_SIZE,     EGL_DONT_CARE,
 		*/
 		EGL_DEPTH_SIZE,     EGL_DONT_CARE,
-		EGL_STENCIL_SIZE,   8,
+		EGL_STENCIL_SIZE,   EGL_DONT_CARE,
 		EGL_SAMPLE_BUFFERS, mMultisample ? 1 : 0,
 		//EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
 		EGL_NONE
@@ -101,6 +128,7 @@ bool tTVPOpenGLScreen::Initialize() {
 	EGLint configCount;
 	EGLBoolean result = eglChooseConfig( mDisplay, configAttributes, &mConfig, 1, &configCount );
 	if( result == EGL_FALSE || (configCount != 1) ) {
+		TVPAddLog( TJS_W( "Failed to call eglChooseConfig." ) );
 		CheckEGLErrorAndLog();
 		Destroy();
 		return false;
@@ -118,6 +146,7 @@ bool tTVPOpenGLScreen::Initialize() {
 		EGL_NONE };
 	mSurface = eglCreateWindowSurface( mDisplay, mConfig, (HWND)NativeHandle, surfaceAttributes );
 	if( !CheckEGLErrorAndLog() ) {
+		TVPAddLog( TJS_W( "Failed to call eglCreateWindowSurface." ) );
 		Destroy();
 		return false;
 	}
@@ -129,11 +158,13 @@ bool tTVPOpenGLScreen::Initialize() {
 		EGL_NONE };
 	mContext = eglCreateContext( mDisplay, mConfig, nullptr, contextAttributes );
 	if( !CheckEGLErrorAndLog() ) {
+		TVPAddLog( TJS_W( "Failed to call eglCreateContext." ) );
 		Destroy();
 		return false;
 	}
 	eglMakeCurrent( mDisplay, mSurface, mSurface, mContext );
 	if( !CheckEGLErrorAndLog() ) {
+		TVPAddLog( TJS_W( "Failed to call eglMakeCurrent." ) );
 		Destroy();
 		return false;
 	}
@@ -326,6 +357,7 @@ bool tTVPOpenGLScreen::CheckEGLErrorAndLog() {
 	case EGL_BAD_NATIVE_PIXMAP: TVPAddLog( TJS_W( "A NativePixmapType argument does not refer to a valid native pixmap." ) ); break;
 	case EGL_BAD_NATIVE_WINDOW: TVPAddLog( TJS_W( "A NativeWindowType argument does not refer to a valid native window." ) ); break;
 	case EGL_CONTEXT_LOST: TVPAddLog( TJS_W( "A power management event has occurred.The application must destroy all contexts and reinitialise OpenGL ES state and objects to continue rendering." ) ); break;
+	default: TVPAddLog( (tjs_string(TJS_W( "ANGLE Error : " )) + to_tjs_string( (unsigned long)error_code )).c_str() ); break;
 	}
 	return false;
 }
