@@ -198,6 +198,8 @@ void __stdcall tTVPMFPlayer::BuildGraph( HWND callbackwin, IStream *stream,
 	if( FAILED(hr = MFCreateMFByteStreamOnStream( stream, &ByteStream )) ) {
 		TVPThrowExceptionMessage(TJS_W("Faild to create stream."));
 	}
+	ContentType = tjs_string( ParseVideoType( type ) );
+/*
 	CComPtr<IMFAttributes> pAttribute;
 	if( SUCCEEDED( hr = ByteStream.QueryInterface( &pAttribute ) ) ) {
 		bool hasContentType = false;
@@ -215,6 +217,7 @@ void __stdcall tTVPMFPlayer::BuildGraph( HWND callbackwin, IStream *stream,
 			}
 		}
 	}
+*/
 }
 
 //----------------------------------------------------------------------------
@@ -315,6 +318,22 @@ HRESULT tTVPMFPlayer::CreateVideoPlayer() {
 	}
 	if( FAILED(hr = MediaSession->BeginGetEvent( PlayerCallback, NULL )) ) {
 		ThrowDShowException(TJS_W("Faild to begin get event."), hr);
+	}
+	CComPtr<IMFAttributes> pAttribute;
+	if( SUCCEEDED( hr = ByteStream.QueryInterface( &pAttribute ) ) ) {
+		bool hasContentType = false;
+		UINT32 len;
+		if( SUCCEEDED( hr = pAttribute->GetString( MF_BYTESTREAM_CONTENT_TYPE, NULL, 0, &len ) ) ) {
+			std::unique_ptr<WCHAR[]> contentType( new WCHAR[len + 1] );
+			if( SUCCEEDED( hr = pAttribute->GetString( MF_BYTESTREAM_CONTENT_TYPE, (LPWSTR)contentType.get(), len + 1, NULL ) ) ) {
+				hasContentType = true;
+			}
+		}
+		if( hasContentType == false ) {
+			if( FAILED( hr = pAttribute->SetString( MF_BYTESTREAM_CONTENT_TYPE, ContentType.c_str() ) ) ) {
+				ThrowDShowException( TJS_W( "Faild to set content type." ), hr );
+			}
+		}
 	}
 	CComPtr<IMFSourceResolver> pSourceResolver;
 	if( FAILED(hr = MFCreateSourceResolver(&pSourceResolver)) ) {

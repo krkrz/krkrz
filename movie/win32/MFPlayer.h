@@ -37,6 +37,7 @@ protected:
 	float		ZoomLevel;	// (1.0 == 100%)
 	long		AudioVolumeValue;
 	long		AudioBalanceValue;
+	tjs_string	ContentType;
 
 	UINT32		FPSNumerator;
 	UINT32		FPSDenominator;
