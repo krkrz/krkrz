@@ -1969,6 +1969,7 @@ void TTVPWindowForm::OnDisplayChange( UINT_PTR bpp, WORD hres, WORD vres ) {
 }
 void TTVPWindowForm::OnDisplayRotate( int orientation, int rotate, int bpp, int hresolution, int vresolution ) {
 	if(TJSNativeInstance) {
+		TJSNativeInstance->ReadjustVideoRect();
 		TVPPostInputEvent( new tTVPOnDisplayRotateInputEvent(TJSNativeInstance, orientation, rotate, bpp, hresolution, vresolution));
 	}
 }
