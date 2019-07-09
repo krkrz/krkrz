@@ -621,7 +621,8 @@ void __stdcall tTVPMFPlayer::SetWindow(HWND window) {
 		OwnerWindow = window;
 		PlayWindow::SetOwner( window );
 		if( VideoDisplayControl.p ) {
-			hr = VideoDisplayControl->SetVideoWindow( window );
+			//hr = VideoDisplayControl->SetVideoWindow( window );
+			hr = VideoDisplayControl->SetVideoWindow( GetChildWindow() );
 			if( FAILED( hr ) ) {
 				TVPThrowExceptionMessage( TJS_W( "Faild to call SetVideoWindow." ) );
 			}
@@ -643,6 +644,7 @@ void __stdcall tTVPMFPlayer::SetRect(RECT *rect) {
 		vr.right = rect->right - rect->left;
 		vr.bottom = rect->bottom - rect->top;
 		// MF では、ソース矩形も指定可能になっている
+		VideoDisplayControl->SetAspectRatioMode( MFVideoARMode_PreservePicture );
 		HRESULT hr = VideoDisplayControl->SetVideoPosition( NULL, &vr );
 		if( FAILED(hr) ) {
 			TVPThrowExceptionMessage(TJS_W("Faild to set rect."));
