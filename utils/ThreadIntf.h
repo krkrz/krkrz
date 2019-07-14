@@ -61,7 +61,7 @@ public:
 	tTVPThreadPriority GetPriority();
 	void SetPriority(tTVPThreadPriority pri);
 
-	std::thread::native_handle_type GetHandle() { if(Thread) return Thread->native_handle(); else return reinterpret_cast<std::thread::native_handle_type>(nullptr); }
+	std::thread::native_handle_type GetHandle() { if(Thread) return Thread->native_handle(); else return static_cast<std::thread::native_handle_type>(nullptr); }
 	std::thread::id GetThreadId() { if(Thread) return Thread->get_id(); else return std::thread::id(); }
 };
 //---------------------------------------------------------------------------
