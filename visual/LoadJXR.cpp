@@ -224,7 +224,8 @@ void TVPSaveAsJXR(void* formatdata, tTJSBinaryStream* dst, const class tTVPBaseB
 						return TJS_S_OK;
 					}
 				} callback( property, &format );
-				meta->EnumMembers(TJS_IGNOREPROP, &tTJSVariantClosure(&callback, NULL), meta);
+				tTJSVariantClosure closure(&callback, NULL);
+				meta->EnumMembers(TJS_IGNOREPROP, &closure, meta);
 			}
 
 			if( SUCCEEDED(hr) ) hr = frame->Initialize( property );
