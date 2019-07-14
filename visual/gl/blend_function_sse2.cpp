@@ -267,6 +267,7 @@ struct sse2_do_gray_scale {
 	}
 };
 
+#if defined(__SSSE3__)
 struct ssse3_do_gray_scale {
 	const __m128i zero_;
 	const __m128i alphamask_;
@@ -316,6 +317,7 @@ struct ssse3_do_gray_scale {
 		return ms1;
 	}
 };
+#endif
 // 通常のアルファから乗算済みアルファへ
 struct sse2_alpha_to_premulalpha {
 	const __m128i zero_;
@@ -1226,6 +1228,7 @@ void TVPMakeAlphaFromKey_sse2_c(tjs_uint32 *dest, tjs_int len, tjs_uint32 key) {
 void TVPDoGrayScale_sse2_c(tjs_uint32 *dest, tjs_int len ) {
 	convert_func_sse2<sse2_do_gray_scale>( dest, len );
 }
+#if defined(__SSSE3__)
 #if 0
 void TVPDoGrayScale_ssse3_c(tjs_uint32 *dest, tjs_int len ) {
 	convert_func_sse2<ssse3_do_gray_scale>( dest, len );
@@ -1295,6 +1298,7 @@ void TVPDoGrayScale_ssse3_c(tjs_uint32 *dest, tjs_int len ) {
 		dest++;
 	}
 }
+#endif
 #endif
 void TVPConvertAdditiveAlphaToAlpha_sse2_c(tjs_uint32 *buf, tjs_int len){
 	convert_func_sse2<sse2_premulalpha_to_alpha>( buf, len );
@@ -1549,10 +1553,13 @@ void TVPGL_SSE2_Init() {
 		}
 
 		// pixel format convert
+#if defined(__SSSE3__)
 		if( TVPCPUType & TVP_CPU_HAS_SSSE3 ) {
 			TVPConvert24BitTo32Bit = TVPConvert24BitTo32Bit_ssse3_c;
 			TVPBLConvert24BitTo32Bit = TVPConvert24BitTo32Bit_ssse3_c;
-		} else {
+		} else
+#endif
+		{
 			TVPConvert24BitTo32Bit = TVPConvert24BitTo32Bit_sse2_c;
 			TVPBLConvert24BitTo32Bit = TVPConvert24BitTo32Bit_sse2_c;
 		}
@@ -1602,10 +1609,13 @@ void TVPGL_SSE2_Init() {
 		TVPSwapLine8 = TVPSwapLine8_sse2_c;
 		TVPSwapLine32 = TVPSwapLine32_sse2_c;
 		TVPReverse32 = TVPReverse32_sse2_c;
+#if defined(__SSSE3__)
 		if( TVPCPUType & TVP_CPU_HAS_SSSE3 ) {
 			TVPReverse8 = TVPReverse8_ssse3_c;
 			TVPDoGrayScale = TVPDoGrayScale_ssse3_c;
-		} else {
+		} else
+#endif
+		{
 			TVPReverse8 = TVPReverse8_sse2_c;
 			TVPDoGrayScale = TVPDoGrayScale_sse2_c;
 		}

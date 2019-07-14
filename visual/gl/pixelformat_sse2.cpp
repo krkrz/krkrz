@@ -102,6 +102,7 @@ void TVPConvert24BitTo32Bit_sse2_c(tjs_uint32 *dest, const tjs_uint8 *buf, tjs_i
 }
 
 
+#if defined(__SSSE3__)
 // SSSE3
 void TVPConvert24BitTo32Bit_ssse3_c(tjs_uint32 *dest, const tjs_uint8 *buf, tjs_int len) {
 	const __m128i alphamask( _mm_set1_epi32( 0xff000000 ) );
@@ -163,4 +164,5 @@ void TVPConvert24BitTo32Bit_ssse3_c(tjs_uint32 *dest, const tjs_uint8 *buf, tjs_
 		buf+=3; dest++;
 	}
 }
+#endif
 
