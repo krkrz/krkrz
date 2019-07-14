@@ -308,7 +308,7 @@ typedef sse2_apply_color_map_xx_o_functor<sse2_apply_color_map_xx_a_functor<6> >
 typedef sse2_apply_color_map_xx_o_functor<sse2_apply_color_map_xx_a_functor<8> > sse2_apply_color_map_ao_functor;
 
 
-template<typename functor,int topaque>
+template<typename functor,tjs_uint32 topaque>
 static inline void apply_color_map_branch_func_sse2( tjs_uint32 *dest, const tjs_uint8 *src, tjs_int len, const functor& func ) {
 	if( len <= 0 ) return;
 
