@@ -102,6 +102,9 @@ void TVPConvert24BitTo32Bit_sse2_c(tjs_uint32 *dest, const tjs_uint8 *buf, tjs_i
 }
 
 
+#if defined(__GNUC__) || defined(__clang__)
+__attribute__ ((target ("ssse3")))
+#endif
 // SSSE3
 void TVPConvert24BitTo32Bit_ssse3_c(tjs_uint32 *dest, const tjs_uint8 *buf, tjs_int len) {
 	const __m128i alphamask( _mm_set1_epi32( 0xff000000 ) );

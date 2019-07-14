@@ -4,6 +4,9 @@
 
 
 #include <intrin.h>
+#if defined(__GNUC__) || defined(__clang__)
+#include <tmmintrin.h>
+#endif
 
 #ifdef _MSC_VER
 #ifndef _mm_srli_pi64

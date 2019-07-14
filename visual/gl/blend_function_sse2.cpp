@@ -173,6 +173,9 @@ void TVPReverse8_sse2_c(tjs_uint8 *pixels, tjs_int len){
 		pixels++;
 	}
 }
+#if defined(__GNUC__) || defined(__clang__)
+__attribute__ ((target ("ssse3")))
+#endif
 void TVPReverse8_ssse3_c(tjs_uint8 *pixels, tjs_int len){
 	tjs_uint8 *dest = pixels + len -1;
 	len/=2;
@@ -301,6 +304,9 @@ struct ssse3_do_gray_scale {
 		d = (d >> 8) * 0x10101 + (s & 0xff000000);
 		return d;
 	}
+#if defined(__GNUC__) || defined(__clang__)
+	__attribute__ ((target ("ssse3")))
+#endif
 	inline __m128i operator()( __m128i ms1 ) const {
 		__m128i ma = ms1;
 		ma = _mm_and_si128( ma, alphamask_ );
@@ -1231,6 +1237,9 @@ void TVPDoGrayScale_ssse3_c(tjs_uint32 *dest, tjs_int len ) {
 	convert_func_sse2<ssse3_do_gray_scale>( dest, len );
 }
 #else
+#if defined(__GNUC__) || defined(__clang__)
+__attribute__ ((target ("ssse3")))
+#endif
 void TVPDoGrayScale_ssse3_c(tjs_uint32 *dest, tjs_int len ) {
 	do_gray_scale_functor dogray;
 	tjs_int count = (tjs_int)((unsigned)dest & 0xF);
@@ -1304,6 +1313,9 @@ void TVPConvertAlphaToAdditiveAlpha_sse2_c(tjs_uint32 *buf, tjs_int len){
 }
 extern void TVPGL_AVX2_Init();
 extern void TVPInitializeResampleSSE2();
+#if defined(__GNUC__) || defined(__clang__)
+__attribute__ ((target ("arch=i686")))
+#endif
 void TVPGL_SSE2_Init() {
 	if( TVPCPUType & TVP_CPU_HAS_SSE2 ) {
 		TVPAdditiveAlphaBlend = TVPAdditiveAlphaBlend_sse2_c;

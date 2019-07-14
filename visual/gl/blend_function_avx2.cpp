@@ -250,6 +250,9 @@ DEFINE_BLEND_FUNCTION_MIN_VARIATION( PsDiff5Blend, ps_diff5_blend )
 DEFINE_BLEND_FUNCTION_MIN_VARIATION( PsExclusionBlend, ps_exclusion_blend )
 */
 extern void TVPInitializeResampleAVX2();
+#if defined(__GNUC__) || defined(__clang__)
+__attribute__ ((target ("arch=i686")))
+#endif
 void TVPGL_AVX2_Init() {
 	if( TVPCPUType & TVP_CPU_HAS_AVX2 ) {
 		TVPAdditiveAlphaBlend = TVPAdditiveAlphaBlend_avx2_c;
