@@ -159,8 +159,8 @@ void TVPAdjustGamma_a_sse2_c(tjs_uint32 *dest, tjs_int len, tTVPGLGammaAdjustTem
 #endif
 
 #else
-				__m128i mrcpi0 = _mm_set_epi32(TVPRecipTable256_16[ma0.m128i_u32[3]],TVPRecipTable256_16[ma0.m128i_u32[2]],
-						TVPRecipTable256_16[ma0.m128i_u32[1]],TVPRecipTable256_16[ma0.m128i_u32[0]]);
+				__m128i mrcpi0 = _mm_set_epi32(TVPRecipTable256_16[_mm_extract_epi16(ma0,6)],TVPRecipTable256_16[_mm_extract_epi16(ma0,4)],
+						TVPRecipTable256_16[_mm_extract_epi16(ma0,2)],TVPRecipTable256_16[_mm_extract_epi16(ma0,0)]);
 				__m128i mask;
 				mrcpi0 = _mm_packs_epi32( mrcpi0, mrcpi0 );		// 0 1 2 3 0 1 2 3
 #endif
