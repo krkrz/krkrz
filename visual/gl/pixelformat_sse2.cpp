@@ -106,23 +106,7 @@ void TVPConvert24BitTo32Bit_sse2_c(tjs_uint32 *dest, const tjs_uint8 *buf, tjs_i
 // SSSE3
 void TVPConvert24BitTo32Bit_ssse3_c(tjs_uint32 *dest, const tjs_uint8 *buf, tjs_int len) {
 	const __m128i alphamask( _mm_set1_epi32( 0xff000000 ) );
-	__m128i mask;
-	mask.m128i_u8[0] = 0x00;
-	mask.m128i_u8[1] = 0x01;
-	mask.m128i_u8[2] = 0x02;
-	mask.m128i_u8[3] = 0x80;
-	mask.m128i_u8[4] = 0x03;
-	mask.m128i_u8[5] = 0x04;
-	mask.m128i_u8[6] = 0x05;
-	mask.m128i_u8[7] = 0x80;
-	mask.m128i_u8[8] = 0x06;
-	mask.m128i_u8[9] = 0x07;
-	mask.m128i_u8[10] = 0x08;
-	mask.m128i_u8[11] = 0x80;
-	mask.m128i_u8[12] = 0x09;
-	mask.m128i_u8[13] = 0x0A;
-	mask.m128i_u8[14] = 0x0B;
-	mask.m128i_u8[15] = 0x80;
+	__m128i mask ( _mm_setr_epi8(0x80, 0x0B, 0x0A, 0x09, 0x80, 0x08, 0x07, 0x06, 0x80, 0x05, 0x04, 0x03, 0x80, 0x02, 0x01, 0x00) );
 
 	// 16単位
 	tjs_uint32 rem = (len>>4)<<4;
