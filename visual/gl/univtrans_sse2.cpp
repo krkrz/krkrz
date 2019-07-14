@@ -312,7 +312,7 @@ static inline void sse2_univ_trans_switch(tjs_uint32 *dest, const tjs_uint32 *sr
 	tjs_uint32* limit = dest + rem;
 	const __m128i msrc1lv = _mm_set1_epi32(src1lv);
 	const __m128i msrc2lv = _mm_set1_epi32(src2lv);
-	const __m128i not = _mm_set1_epi32(0xffffffff);
+	const __m128i nott = _mm_set1_epi32(0xffffffff);
 	while( dest < limit ) {
 		tjs_uint32 r = *(tjs_uint32*)rule;
 		__m128i mr = _mm_cvtsi32_si128( r );
@@ -325,7 +325,7 @@ static inline void sse2_univ_trans_switch(tjs_uint32 *dest, const tjs_uint32 *sr
 		md = _mm_andnot_si128( md, ms11 );	// opa >= src1lv : src1
 		if( _mm_movemask_epi8(opa1) != 0 ) {	// opa < src1lv
 			__m128i ms21 = _mm_loadu_si128( (__m128i const*)src2 );	// src2
-			opa1 = _mm_xor_si128( opa1, not );	// 反転 opa >= src1lv : src1
+			opa1 = _mm_xor_si128( opa1, nott );	// 反転 opa >= src1lv : src1
 			__m128i opa2 = mr;
 			opa2 = _mm_cmplt_epi32( mr, msrc2lv );	// opa < src2lv ? 0xff : 0
 			opa1 = _mm_or_si128( opa1, opa2 );	// (opa >= src1lv) || (opa < src2lv)
