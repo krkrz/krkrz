@@ -16,10 +16,9 @@
 #ifdef _MSC_VER
 #include <windows.h>
 #include <intrin.h>
-extern "C" unsigned __int64 __xgetbv(int);
 static bool __os_has_avx_support() {
 	// Check if the OS will save the YMM registers
-	unsigned long long xcrFeatureMask = __xgetbv(_XCR_XFEATURE_ENABLED_MASK);
+	unsigned long long xcrFeatureMask = _xgetbv(_XCR_XFEATURE_ENABLED_MASK);
 	return (xcrFeatureMask & 6) == 6;
 }
 #else
