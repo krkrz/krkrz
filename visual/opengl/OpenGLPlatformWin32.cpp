@@ -989,7 +989,7 @@ bool LoadLibGLESv2( const tjs_string& dllpath ) {
 }
 //---------------------------------------------------------------------------
 static bool TVPANGLEInit = false;
-static int TVPOpenGLESVersion = 200;
+int TVPOpenGLESVersion = 200;
 //---------------------------------------------------------------------------
 void TVPInitializeOpenGLPlatform() {
 	if( TVPANGLEInit == false ) {

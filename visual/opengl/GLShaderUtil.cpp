@@ -8,23 +8,28 @@
 
 #include "GLShaderUtil.h"
 #include "DebugIntf.h"
-
+#include "OpenGLScreen.h"
 
 GLuint CompileShader(GLenum type, const std::string &source)
 {
     GLuint shader = glCreateShader(type);
+	tTVPOpenGLScreen::CheckGLErrorAndLog( TJS_W( "glCreateShader" ) );
 
     const char *sourceArray[1] = { source.c_str() };
     glShaderSource(shader, 1, sourceArray, NULL);
+	tTVPOpenGLScreen::CheckGLErrorAndLog( TJS_W( "glShaderSource" ) );
     glCompileShader(shader);
+	tTVPOpenGLScreen::CheckGLErrorAndLog( TJS_W( "glCompileShader" ) );
 
     GLint compileResult;
     glGetShaderiv(shader, GL_COMPILE_STATUS, &compileResult);
+	tTVPOpenGLScreen::CheckGLErrorAndLog( TJS_W( "glGetShaderiv" ) );
 
     if (compileResult == 0)
     {
         GLint infoLogLength;
         glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLogLength);
+		tTVPOpenGLScreen::CheckGLErrorAndLog( TJS_W( "glGetShaderiv" ) );
 
         // Info log length includes the null terminator, so 1 means that the info log is an empty
         // string.
@@ -32,6 +37,7 @@ GLuint CompileShader(GLenum type, const std::string &source)
         {
             std::vector<GLchar> infoLog(infoLogLength);
             glGetShaderInfoLog(shader, static_cast<GLsizei>(infoLog.size()), NULL, &infoLog[0]);
+			tTVPOpenGLScreen::CheckGLErrorAndLog( TJS_W( "glGetShaderInfoLog" ) );
             TVPAddLog( TJS_W("GL : shader compilation failed:") + ttstr(&infoLog[0])  );
         }
         else
@@ -53,12 +59,14 @@ GLuint CheckLinkStatusAndReturnProgram(GLuint program, bool outputErrorMessages)
 
     GLint linkStatus;
     glGetProgramiv(program, GL_LINK_STATUS, &linkStatus);
+	tTVPOpenGLScreen::CheckGLErrorAndLog( TJS_W( "glGetProgramiv" ) );
     if (linkStatus == 0)
     {
         if (outputErrorMessages)
         {
             GLint infoLogLength;
             glGetProgramiv(program, GL_INFO_LOG_LENGTH, &infoLogLength);
+			tTVPOpenGLScreen::CheckGLErrorAndLog( TJS_W( "glGetProgramiv" ) );
 
             // Info log length includes the null terminator, so 1 means that the info log is an
             // empty string.
@@ -67,6 +75,7 @@ GLuint CheckLinkStatusAndReturnProgram(GLuint program, bool outputErrorMessages)
                 std::vector<GLchar> infoLog(infoLogLength);
                 glGetProgramInfoLog(program, static_cast<GLsizei>(infoLog.size()), nullptr,
                                     &infoLog[0]);
+				tTVPOpenGLScreen::CheckGLErrorAndLog( TJS_W( "glGetProgramInfoLog" ) );
 
                 TVPAddLog( TJS_W("GL : program link failed: ") + ttstr(&infoLog[0]) );
             }
@@ -89,6 +98,7 @@ GLuint CompileProgramWithTransformFeedback(
     GLenum bufferMode)
 {
     GLuint program = glCreateProgram();
+	tTVPOpenGLScreen::CheckGLErrorAndLog( TJS_W("glCreateProgram") );
 
     GLuint vs = CompileShader(GL_VERTEX_SHADER, vsSource);
     GLuint fs = CompileShader(GL_FRAGMENT_SHADER, fsSource);
@@ -102,10 +112,14 @@ GLuint CompileProgramWithTransformFeedback(
     }
 
     glAttachShader(program, vs);
+	tTVPOpenGLScreen::CheckGLErrorAndLog( TJS_W( "glAttachShader" ) );
     glDeleteShader(vs);
+	tTVPOpenGLScreen::CheckGLErrorAndLog( TJS_W( "glDeleteShader" ) );
 
     glAttachShader(program, fs);
+	tTVPOpenGLScreen::CheckGLErrorAndLog( TJS_W( "glAttachShader" ) );
     glDeleteShader(fs);
+	tTVPOpenGLScreen::CheckGLErrorAndLog( TJS_W( "glDeleteShader" ) );
 
     if (transformFeedbackVaryings.size() > 0)
     {
@@ -118,9 +132,11 @@ GLuint CompileProgramWithTransformFeedback(
 
         glTransformFeedbackVaryings(program, static_cast<GLsizei>(transformFeedbackVaryings.size()),
                                     &constCharTFVaryings[0], bufferMode);
+		tTVPOpenGLScreen::CheckGLErrorAndLog( TJS_W( "glTransformFeedbackVaryings" ) );
     }
 
     glLinkProgram(program);
+	tTVPOpenGLScreen::CheckGLErrorAndLog( TJS_W( "glLinkProgram" ) );
 
     return CheckLinkStatusAndReturnProgram(program, true);
 }

@@ -13,5 +13,5 @@ public:
 	static int GetDesktopWidth();
 	static int GetDesktopHeight();
 };
-
+extern void TVPDumpDisplayDevices();
 #endif // __TVP_SCREEN_H__

@@ -50,6 +50,7 @@ public:
 	EGLint GetSurfaceHeight() const;
 
 	static bool CheckEGLErrorAndLog();
+	static bool CheckGLErrorAndLog(const tjs_char* funcname=nullptr);
 
 	void SetScissorRect( const tTVPRect& rect );
 	void DisableScissorRect();

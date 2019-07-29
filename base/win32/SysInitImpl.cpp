@@ -43,6 +43,7 @@
 #include "ApplicationSpecialPath.h"
 #include "resource.h"
 #include "ConfigFormUnit.h"
+#include "TVPScreen.h"
 
 //---------------------------------------------------------------------------
 // global data
@@ -1238,6 +1239,9 @@ void TVPAfterSystemInit()
 {
 	// check CPU type
 	TVPDetectCPU();
+
+	// dump display device
+	TVPDumpDisplayDevices();
 
 	TVPAllocGraphicCacheOnHeap = false; // always false since beta 20
 
