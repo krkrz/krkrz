@@ -113,8 +113,30 @@ bool tTVPOpenGLScreen::Initialize() {
 		if( eglInitialize( mDisplay, &majorVersion, &minorVersion ) == EGL_FALSE ) {
 			TVPAddLog( TJS_W( "Failed to call eglInitialize." ) );
 			CheckEGLErrorAndLog();
+			// 要求を下げて再試行
 			Destroy();
-			return false;
+			mNativeDisplay = ::GetDC( (HWND)NativeHandle );
+			EGLint displayAttributes3[] = {
+				EGL_PLATFORM_ANGLE_TYPE_ANGLE, EGL_PLATFORM_ANGLE_TYPE_OPENGL_ANGLE,
+				EGL_PLATFORM_ANGLE_MAX_VERSION_MAJOR_ANGLE, EGL_DONT_CARE,
+				EGL_PLATFORM_ANGLE_MAX_VERSION_MINOR_ANGLE, EGL_DONT_CARE,
+				EGL_NONE
+			};
+
+			mDisplay = eglGetPlatformDisplayEXT( EGL_PLATFORM_ANGLE_ANGLE, reinterpret_cast<void*>( mNativeDisplay ), displayAttributes3 );
+			if( !CheckEGLErrorAndLog() ) {
+				TVPAddLog( TJS_W( "Failed to call eglGetPlatformDisplayEXT." ) );
+				if( eglInitialize( mDisplay, &majorVersion, &minorVersion ) == EGL_FALSE ) {
+					Destroy();
+					return false;
+				}
+			}
+			if( eglInitialize( mDisplay, &majorVersion, &minorVersion ) == EGL_FALSE ) {
+				TVPAddLog( TJS_W( "Failed to call eglInitialize." ) );
+				CheckEGLErrorAndLog();
+				Destroy();
+				return false;
+			}
 		}
 		esClientVersion = 2;	// DirectX 9 の時は、ES 2.0 でないと動かない
 		TVPOpenGLESVersion = 200;
