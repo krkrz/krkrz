@@ -31,6 +31,7 @@ class tTVPOpenGLScreen {
 	//EGLNativeWindowType mNativeWindow;	// HWND
 	EGLNativeDisplayType mNativeDisplay;// HDC
 #endif
+	void GetConfigAttribute( EGLConfig config );
 public:
 	tTVPOpenGLScreen( void* nativeHandle );
 
