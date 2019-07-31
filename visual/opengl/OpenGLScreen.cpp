@@ -149,7 +149,8 @@ bool tTVPOpenGLScreen::Initialize() {
 #endif
 	eglBindAPI( EGL_OPENGL_ES_API );
 
-	const EGLint configAttributesAny[] = { EGL_RED_SIZE, EGL_DONT_CARE, EGL_GREEN_SIZE, EGL_DONT_CARE, EGL_BLUE_SIZE, EGL_DONT_CARE, EGL_ALPHA_SIZE, EGL_DONT_CARE, EGL_NONE };
+	const EGLint configAttributesAny[] = { EGL_RED_SIZE, EGL_DONT_CARE, EGL_GREEN_SIZE, EGL_DONT_CARE, EGL_BLUE_SIZE, EGL_DONT_CARE, EGL_ALPHA_SIZE, EGL_DONT_CARE,
+		EGL_RENDERABLE_TYPE, esClientVersion == 3 ? EGL_OPENGL_ES3_BIT : EGL_OPENGL_ES2_BIT, EGL_NONE };
 	EGLint configSize;
 	mConfig = nullptr;
 	if( eglChooseConfig( mDisplay, configAttributesAny, NULL, 0, &configSize ) != EGL_FALSE && configSize > 0 ) {
@@ -194,6 +195,50 @@ bool tTVPOpenGLScreen::Initialize() {
 				// RGB888 がないのなら、もう気にせず最初のやつに決定してしまう
 				mConfig = configs[0];
 			}
+			bool successCreateContext = true;
+			EGLint contextAttributes[] = {
+				//EGL_CONTEXT_OPENGL_DEBUG, EGL_TRUE,
+				EGL_CONTEXT_CLIENT_VERSION, esClientVersion,
+				EGL_CONTEXT_MINOR_VERSION, 0,
+				EGL_NONE };
+			mContext = eglCreateContext( mDisplay, mConfig, nullptr, contextAttributes );
+			if( !CheckEGLErrorAndLog() ) {
+				// 選択候補で失敗。全てのパターンで初期化を試す
+				TVPAddLog( TJS_W( "Failed to call eglCreateContext." ) );
+				successCreateContext = false;
+				if( mContext != EGL_NO_CONTEXT ) {
+					eglDestroyContext( mDisplay, mContext );
+					mContext = EGL_NO_CONTEXT;
+				}
+				for( EGLint i = 0; i < configCount; i++ ) {
+					mConfig = configs[i];
+					mContext = eglCreateContext( mDisplay, mConfig, nullptr, contextAttributes );
+					if( !CheckEGLErrorAndLog() ) {
+						if( mContext != EGL_NO_CONTEXT ) {
+							eglDestroyContext( mDisplay, mContext );
+							mContext = EGL_NO_CONTEXT;
+						}
+					} else {
+						successCreateContext = true;
+						break;
+					}
+				}
+			}
+			if( successCreateContext ) {
+				GetConfigAttribute( mConfig );
+			} else {
+				// 全パターン失敗。もう打つ手がない……
+				TVPAddLog( TJS_W( "Failed to call eglCreateContext." ) );
+				Destroy();
+				return false;
+			}
+
+		} else {
+			// 失敗。起動できない
+			TVPAddLog( TJS_W( "Failed to call eglChooseConfig." ) );
+			CheckEGLErrorAndLog();
+			Destroy();
+			return false;
 		}
 	} else {
 		// 1個も見付からない時は、失敗。起動できない
@@ -203,49 +248,39 @@ bool tTVPOpenGLScreen::Initialize() {
 		return false;
 	}
 #if 0
-	// 全て DONT CARE でコールしているが、eglGetConfigAttrib を用いて、設定可能なものを列挙した後選択する形の方がより好ましい
 	const EGLint configAttributes[] = {
 		EGL_RED_SIZE,       8,
 		EGL_GREEN_SIZE,     8,
 		EGL_BLUE_SIZE,      8,
 		EGL_ALPHA_SIZE,     8,
-		/*
-		EGL_RED_SIZE,       EGL_DONT_CARE,
-		EGL_GREEN_SIZE,     EGL_DONT_CARE,
-		EGL_BLUE_SIZE,      EGL_DONT_CARE,
-		EGL_ALPHA_SIZE,     EGL_DONT_CARE,
-		*/
 		EGL_DEPTH_SIZE,     EGL_DONT_CARE,
 		EGL_STENCIL_SIZE,   EGL_DONT_CARE,
 		EGL_SAMPLE_BUFFERS, mMultisample ? 1 : 0,
-		//EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
 		EGL_NONE
 	};
 	EGLint configCount;
 	EGLBoolean result = eglChooseConfig( mDisplay, configAttributes, &mConfig, 1, &configCount );
 	if( result == EGL_FALSE || (configCount == 0) ) {
-		TVPAddLog( TJS_W( "Failed to call eglChooseConfig. try EGL_DONT_CARE." ) );
-		const EGLint configAttributes2[] = {
-			EGL_RED_SIZE,       EGL_DONT_CARE,
-			EGL_GREEN_SIZE,     EGL_DONT_CARE,
-			EGL_BLUE_SIZE,      EGL_DONT_CARE,
-			EGL_ALPHA_SIZE,     EGL_DONT_CARE,
-			EGL_DEPTH_SIZE,     EGL_DONT_CARE,
-			EGL_STENCIL_SIZE,   EGL_DONT_CARE,
-			EGL_SAMPLE_BUFFERS, mMultisample ? 1 : 0,
-			//EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-			EGL_NONE
-		};
-		EGLBoolean result = eglChooseConfig( mDisplay, configAttributes, &mConfig, 1, &configCount );
-		if( result == EGL_FALSE || ( configCount == 0 ) ) {
-			TVPAddLog( TJS_W( "Failed to call eglChooseConfig." ) );
-			CheckEGLErrorAndLog();
-			Destroy();
-			return false;
-		}
+		TVPAddLog( TJS_W( "Failed to call eglChooseConfig." ) );
+		CheckEGLErrorAndLog();
+		Destroy();
+		return false;
+	}
+
+	GetConfigAttribute( mConfig );
+	EGLint contextAttributes[] = {
+		//EGL_CONTEXT_OPENGL_DEBUG, EGL_TRUE,
+		EGL_CONTEXT_CLIENT_VERSION, esClientVersion,
+		EGL_CONTEXT_MINOR_VERSION, 0,
+		EGL_NONE };
+	mContext = eglCreateContext( mDisplay, mConfig, nullptr, contextAttributes );
+	if( !CheckEGLErrorAndLog() ) {
+		TVPAddLog( TJS_W( "Failed to call eglCreateContext." ) );
+		TVPAddLog( TJS_W( "Failed to call eglCreateContext." ) );
+		Destroy();
+		return false;
 	}
 #endif
-	GetConfigAttribute( mConfig );
 	EGLint surfaceAttributes[] = {
 //		EGL_CONTEXT_OPENGL_DEBUG, EGL_TRUE,
 		EGL_NONE };
@@ -256,59 +291,6 @@ bool tTVPOpenGLScreen::Initialize() {
 		return false;
 	}
 	assert( mSurface != EGL_NO_SURFACE );
-	EGLint contextAttributes[] = {
-		//EGL_CONTEXT_OPENGL_DEBUG, EGL_TRUE,
-		EGL_CONTEXT_CLIENT_VERSION, esClientVersion,
-		EGL_CONTEXT_MINOR_VERSION, 0,
-		EGL_NONE };
-	mContext = eglCreateContext( mDisplay, mConfig, nullptr, contextAttributes );
-	if( !CheckEGLErrorAndLog() ) {
-		TVPAddLog( TJS_W( "Failed to call eglCreateContext." ) );
-#if 0
-		if( mSurface != EGL_NO_SURFACE ) {
-			eglDestroySurface( mDisplay, mSurface );
-			mSurface = EGL_NO_SURFACE;
-		}
-		if( mContext != EGL_NO_CONTEXT ) {
-			eglDestroyContext( mDisplay, mContext );
-			mContext = EGL_NO_CONTEXT;
-		}
-		const EGLint configAttributes2[] = {
-			EGL_RED_SIZE,       EGL_DONT_CARE,
-			EGL_GREEN_SIZE,     EGL_DONT_CARE,
-			EGL_BLUE_SIZE,      EGL_DONT_CARE,
-			EGL_ALPHA_SIZE,     EGL_DONT_CARE,
-			EGL_DEPTH_SIZE,     EGL_DONT_CARE,
-			EGL_STENCIL_SIZE,   EGL_DONT_CARE,
-			EGL_SAMPLE_BUFFERS, mMultisample ? 1 : 0,
-			EGL_NONE
-		};
-		EGLBoolean result = eglChooseConfig( mDisplay, configAttributes, &mConfig, 1, &configCount );
-		if( result == EGL_FALSE || ( configCount == 0 ) ) {
-			TVPAddLog( TJS_W( "Failed to call eglChooseConfig." ) );
-			CheckEGLErrorAndLog();
-			Destroy();
-			return false;
-		}
-		GetConfigAttribute( mConfig );
-		mSurface = eglCreateWindowSurface( mDisplay, mConfig, (HWND)NativeHandle, surfaceAttributes );
-		if( !CheckEGLErrorAndLog() ) {
-			TVPAddLog( TJS_W( "Failed to call eglCreateWindowSurface." ) );
-			Destroy();
-			return false;
-		}
-		mContext = eglCreateContext( mDisplay, mConfig, nullptr, contextAttributes );
-		if( !CheckEGLErrorAndLog() ) {
-			TVPAddLog( TJS_W( "Failed to call eglCreateContext." ) );
-			Destroy();
-			return false;
-		}
-#else
-		TVPAddLog( TJS_W( "Failed to call eglCreateContext." ) );
-		Destroy();
-		return false;
-#endif
-	}
 	eglMakeCurrent( mDisplay, mSurface, mSurface, mContext );
 	if( !CheckEGLErrorAndLog() ) {
 		TVPAddLog( TJS_W( "Failed to call eglMakeCurrent." ) );
@@ -320,7 +302,7 @@ bool tTVPOpenGLScreen::Initialize() {
 
 	glGetIntegerv( GL_FRAMEBUFFER_BINDING, &mDefaultFrameBufferId );
 #if 0
-	// 古い環境のための情報確認(確認範囲では動きそうだが、動かない)
+	// 古い環境のための情報確認(確認範囲では動きそうだが、動かないケースがある)
 	int maxtexsize = GLTexture::getMaxTextureSize();
 	TVPAddLog( ttstr( TJS_W( "(info) Max Texture Size :" ) ) + to_tjs_string( maxtexsize ) );
 	{
