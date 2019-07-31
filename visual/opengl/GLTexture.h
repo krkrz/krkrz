@@ -10,7 +10,7 @@ struct GLTextreImageSet {
 	const GLvoid* bits;
 	GLTextreImageSet( GLuint w, GLuint h, const GLvoid* b ) : width( w ), height( h ), bits( b ) {}
 };
-
+extern int TVPOpenGLESVersion;
 class GLTexture {
 protected:
 	GLuint texture_id_;
@@ -58,10 +58,6 @@ public:
 			glBindTexture( GL_TEXTURE_2D, texture_id_ );
 
 			GLint count = img.size();
-			for( GLint i = 0; i < count; i++ ) {
-				GLTextreImageSet& tex = img[i];
-				glTexImage2D( GL_TEXTURE_2D, i, GL_RGBA, tex.width, tex.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex.bits );
-			}
 			if( count > 1 ) hasMipmap_ = true;
 
 			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, stretchType_ );
@@ -70,8 +66,25 @@ public:
 			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapT_ );
 			// ミップマップの最小と最大レベルを指定する、これがないと存在しないレベルを参照しようとすることが発生しうる
 			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0 );
-			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, count-1 );
+			glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, count - 1 );
+			if( TVPOpenGLESVersion == 200 ) {
+				// OpenGL ES2.0 の時は、glGenerateMipmap しないと正しくミップマップ描画できない模様
+				GLTextreImageSet& tex = img[0];
+				glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, tex.width, tex.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex.bits );
+				glHint( GL_GENERATE_MIPMAP_HINT, GL_FASTEST );
+				glGenerateMipmap( GL_TEXTURE_2D );
+				// 自前で生成したものに一部置き換える
+				for( GLint i = 1; i < count; i++ ) {
+					GLTextreImageSet& tex = img[i];
+					glTexSubImage2D( GL_TEXTURE_2D, i, 0, 0, tex.width, tex.height, GL_RGBA, GL_UNSIGNED_BYTE, tex.bits );
+				}
+			} else {
+				for( GLint i = 0; i < count; i++ ) {
+					GLTextreImageSet& tex = img[i];
+					glTexImage2D( GL_TEXTURE_2D, i, GL_RGBA, tex.width, tex.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex.bits );
+				}
 
+			}
 			glBindTexture( GL_TEXTURE_2D, 0 );
 			format_ = GL_RGBA;
 			width_ = w;
