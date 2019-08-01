@@ -30,6 +30,7 @@ class tTVPOpenGLScreen {
 	//EGLNativeWindowType mParentWindow;	// HWND
 	//EGLNativeWindowType mNativeWindow;	// HWND
 	EGLNativeDisplayType mNativeDisplay;// HDC
+	bool TryMinimumLevelInitialize();
 #endif
 	void GetConfigAttribute( EGLConfig config );
 public:
