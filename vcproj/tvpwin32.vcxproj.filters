@@ -743,6 +743,12 @@
     <ClInclude Include="..\visual\opengl\DrawCycleTimer.h">
       <Filter>visual\opengl</Filter>
     </ClInclude>
+    <ClInclude Include="..\movie\win32\MFByteStream.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\movie\win32\AsyncCB.h">
+      <Filter>movie\win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\tjs2\tjs.cpp">
@@ -1374,6 +1380,9 @@
     </ClCompile>
     <ClCompile Include="..\visual\opengl\DrawCycleTimer.cpp">
       <Filter>visual\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\movie\win32\MFByteStream.cpp">
+      <Filter>movie\win32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

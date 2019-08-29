@@ -377,6 +377,7 @@
     <ClInclude Include="..\environ\win32\WindowFormUnit.h" />
     <ClInclude Include="..\environ\win32\WindowsUtil.h" />
     <ClInclude Include="..\extension\Extension.h" />
+    <ClInclude Include="..\movie\win32\AsyncCB.h" />
     <ClInclude Include="..\movie\win32\asyncio.h" />
     <ClInclude Include="..\movie\win32\asyncrdr.h" />
     <ClInclude Include="..\movie\win32\BufferRenderer.h" />
@@ -398,6 +399,7 @@
     <ClInclude Include="..\movie\win32\IDemuxReader.h" />
     <ClInclude Include="..\movie\win32\IRendererBufferAccess.h" />
     <ClInclude Include="..\movie\win32\IRendererBufferVideo.h" />
+    <ClInclude Include="..\movie\win32\MFByteStream.h" />
     <ClInclude Include="..\movie\win32\MFPlayer.h" />
     <ClInclude Include="..\movie\win32\OptionInfo.h" />
     <ClInclude Include="..\movie\win32\PlayWindow.h" />
@@ -623,6 +625,7 @@
     <ClCompile Include="..\movie\win32\krlmovie.cpp" />
     <ClCompile Include="..\movie\win32\krmmovie.cpp" />
     <ClCompile Include="..\movie\win32\krmovie.cpp" />
+    <ClCompile Include="..\movie\win32\MFByteStream.cpp" />
     <ClCompile Include="..\movie\win32\MFPlayer.cpp" />
     <ClCompile Include="..\movie\win32\PlayWindow.cpp" />
     <ClCompile Include="..\movie\win32\TVPVideoOverlay.cpp" />

@@ -26,11 +26,11 @@
 #include "DebugIntf.h"
 #include "DShowException.h"
 
+#include "MFByteStream.h"
+
 #pragma comment( lib, "propsys.lib" )
 #pragma comment( lib, "Mfplat.lib" )
-//#pragma comment( lib, "Mfplat_vista.lib" )
 #pragma comment( lib, "Mf.lib" )
-//#pragma comment( lib, "Mf_vista.lib" )
 #pragma comment( lib, "Mfuuid.lib" )
 //#pragma comment( lib, "d3d9.lib" )
 //#pragma comment( lib, "dxva2.lib" )
@@ -172,6 +172,7 @@ void tTVPMFPlayer::InitializeMFDLL() {
 	}
 }
 */
+#define CUSTOM_BYTE_STREAM
 //----------------------------------------------------------------------------
 void __stdcall tTVPMFPlayer::BuildGraph( HWND callbackwin, IStream *stream,
 	const tjs_char * streamname, const tjs_char *type, unsigned __int64 size )
@@ -195,9 +196,20 @@ void __stdcall tTVPMFPlayer::BuildGraph( HWND callbackwin, IStream *stream,
 		TVPThrowExceptionMessage(TJS_W("Faild to retrieve MFCreateMFByteStreamOnStream from mfplat.dll."));
 	}
 	*/
-	if( FAILED(hr = MFCreateMFByteStreamOnStream( stream, &ByteStream )) ) {
-		TVPThrowExceptionMessage(TJS_W("Faild to create stream."));
+#ifdef CUSTOM_BYTE_STREAM
+	ByteStream = new tTVPMFByteStream( &hr, stream, streamname, size );
+	if( FAILED( hr ) ) {
+		//if( FAILED(hr = MFCreateMFByteStreamOnStream( stream, &ByteStream )) ) {
+		TVPThrowExceptionMessage( TJS_W( "Faild to create stream." ) );
 	}
+	if( FAILED( hr = static_cast<tTVPMFByteStream*>( ByteStream.p )->Open() ) ) {
+		TVPThrowExceptionMessage( TJS_W( "Faild to open stream." ) );
+	}
+#else
+	if( FAILED(hr = MFCreateMFByteStreamOnStream( stream, &ByteStream )) ) {
+		TVPThrowExceptionMessage( TJS_W( "Faild to create stream." ) );
+	}
+#endif
 	ContentType = tjs_string( ParseVideoType( type ) );
 /*
 	CComPtr<IMFAttributes> pAttribute;
@@ -341,9 +353,13 @@ HRESULT tTVPMFPlayer::CreateVideoPlayer() {
 	}
 	MF_OBJECT_TYPE ObjectType = MF_OBJECT_INVALID;
 	CComPtr<IUnknown> pSource;
+#ifdef CUSTOM_BYTE_STREAM
+	if( FAILED( hr = pSourceResolver->CreateObjectFromByteStream( ByteStream, nullptr, MF_RESOLUTION_MEDIASOURCE, NULL, &ObjectType, (IUnknown**)&pSource ) ) ) {
+#else
 	if( FAILED(hr = pSourceResolver->CreateObjectFromByteStream( ByteStream, StreamName.c_str(), MF_RESOLUTION_MEDIASOURCE, NULL, &ObjectType, (IUnknown**)&pSource )) ) {
-	//if( FAILED(hr = pSourceResolver->CreateObjectFromURL( TJS_W("C:\\krkrz\\bin\\win32\\data\\test.mp4"),
-	//	MF_RESOLUTION_MEDIASOURCE, NULL, &ObjectType, (IUnknown**)&pSource)) ) {
+#endif
+	//if( FAILED( hr = pSourceResolver->CreateObjectFromByteStream( ByteStream, StreamName.c_str(), MF_RESOLUTION_MEDIASOURCE, NULL, &ObjectType, (IUnknown**)&pSource ) ) ) {
+	//if( FAILED(hr = pSourceResolver->CreateObjectFromURL( TJS_W("C:\\krkrz\\bin\\win32\\data\\test.mp4"), MF_RESOLUTION_MEDIASOURCE, NULL, &ObjectType, (IUnknown**)&pSource)) ) {
 		ThrowDShowException(TJS_W("Faild to open stream."), hr );
 	}
 	if( ObjectType != MF_OBJECT_MEDIASOURCE ) {
