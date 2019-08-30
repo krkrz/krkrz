@@ -1,0 +1,1051 @@
+[
+	{
+		"category":"Generic",
+		"options":[
+			{
+				"caption":"Save data path",
+				"description":"Define where Kirikiri should save all types of data.\n\nThere are some special strings which can be embedded in the definition string.\n\n'$(exepath)' will be replaced by System.exePath\n\n'$(appdatapath)' will be replaced by System.appDataPath\n\n$'(personalpath)' will be replaced by System.personalPath\n\n'$(vistapath)' will be replaced by '$(appdatapath)' in OS higher than Vista, and by '$(exepath)' in OS lower than Vista.\n\nValue of this property can be obtained by 'System.dataPath'",
+				"name":"datapath",
+				"type":"string",
+				"length":255,
+				"user":false,
+				"value":"$(exepath)\\savedata"
+			},
+			{
+				"caption":"Process wait",
+				"description":"Define if the engine should limit and reduce CPU usage on transition scenes by inserting a wait in processing.\n\n'Do not wait': CPU usage can surge to 100% on transition scenes.\n\nOtherwise processing will execute at a set frequency between 12-120(Hz). CPU usage can be reduced by setting to a lower frequency, but execution may appear disrupted. This setting may not work on some systems.\n\nWhen'V-sync' is set to 'Use V-sync' in graphics section, this setting will be ignored.",
+				"name":"contfreq",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"0", "desc":"Do not wait", "default":true },
+					{ "value":"12", "desc":"12Hz" },
+					{ "value":"15", "desc":"15Hz" },
+					{ "value":"25", "desc":"25Hz" },
+					{ "value":"30", "desc":"30Hz" },
+					{ "value":"45", "desc":"45Hz" },
+					{ "value":"50", "desc":"50Hz" },
+					{ "value":"60", "desc":"60Hz" },
+					{ "value":"70", "desc":"70Hz" },
+					{ "value":"75", "desc":"75Hz" },
+					{ "value":"80", "desc":"80Hz" },
+					{ "value":"83", "desc":"83Hz" },
+					{ "value":"90", "desc":"90Hz" },
+					{ "value":"93", "desc":"93Hz" },
+					{ "value":"100", "desc":"100Hz" },
+					{ "value":"107", "desc":"107Hz" },
+					{ "value":"120", "desc":"120Hz" }
+				]
+			},
+			{
+				"caption":"Memory usage",
+				"description":"Set memory usage.\n\nThe 'Low' option will save more memory compared to 'Normal', but performance will be affected. When 'Low' is selected, 'Graphics cache limit' will be treated as 'No caching'.",
+				"name":"memusage",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"normal", "desc":"Normal", "default":true },
+					{ "value":"low", "desc":"Low" }
+				]
+			},
+			{
+				"caption":"Timer accuracy",
+				"description":"Set timer accuracy.\n\nExecuion mighy be improved, but performance can be affected. This setting only applies to NT OS (NT/2000/XP/Vista and higher).",
+				"name":"timerprec",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"normal", "desc":"Normal", "default":true },
+					{ "value":"higher", "desc":"Higher" },
+					{ "value":"high", "desc":"Highest" }
+				]
+			},
+			{
+				"caption":"Timer event tolerance limit",
+				"description":"Set if the engine should limit the tolerance of timer events.\n\nIf enabled, some user control issues caused by slow computers not being able to match the processing speed can sometimes by solved.",
+				"name":"laxtimer",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"no", "desc":"Disabled", "default":true },
+					{ "value":"yes", "desc":"Enabled" }
+				]
+			},
+			{
+				"caption":"Low priority",
+				"description":"Set if priority is lowered during transition scenes. \n\nEnabling may fix skipping sound issues.",
+				"name":"lowpri",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"no", "desc":"Disabled", "default":true },
+					{ "value":"yes", "desc":"Enabled" }
+				]
+			},
+			{
+				"caption":"Startup script",
+				"description":"Define the first script loaded on startup.",
+				"name":"startup",
+				"type":"string",
+				"length":255,
+				"user":false,
+				"value":"startup.tjs"
+			},
+			{
+				"caption":"Text editor to run during exceptions ",
+				"description":"Set text editor to open when exceptions are thrown.",
+				"name":"exceptionexe",
+				"type":"string",
+				"length":255,
+				"user":false,
+				"value":"notepad.exe"
+			},
+			{
+				"caption":"Text editor launch arguments",
+				"description":"Define launch arguments for text editor when exceptions are thrown.\n\n%filepath% is the file path, %line% is the line number.",
+				"name":"exceptionarg",
+				"type":"string",
+				"length":255,
+				"user":false,
+				"value":"%filepath%"
+			},
+			{
+				"caption":"Enable LFH",
+				"description":"Enable LFH to prevent memory fragmentation.\n\nInefficient memory errors can sometimes be solved by enabling this option. This option is enabled regardless of user choice in Vista or later.",
+				"name":"uselfh",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"no", "desc":"Disabled", "default":true },
+					{ "value":"yes", "desc":"Enabled" }
+				]
+			},
+			{
+				"caption":"Enable process CRT heap compaction",
+				"description":"Compress process CRT heap during garbage collection.\n\nThis may stop  inefficient memory errors from occurring constantly, but compaction will take some time.",
+				"name":"ghcompact",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"no", "desc":"Disabled", "default":true },
+					{ "value":"yes", "desc":"Enabled" }
+				]
+			}
+		]
+	},
+	{
+		"category":"Input",
+		"options":[
+			{
+				"caption":"Mouse wheel detection",
+				"description":"Set how mouse wheel input is detected.\n\nDisabled: Disable mouse wheel input.\n\nDirectInput: Use DirectInput for detection.\n\nWindow Message: Do not use DirectInput for detection.\n\nMouse wheel related issues can sometimes be solved by changing this setting.",
+				"name":"wheel",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"no", "desc":"Disabled" },
+					{ "value":"dinput", "desc":"DirectInput", "default":true },
+					{ "value":"message", "desc":"Window Message" }
+				]
+			},
+			{
+				"caption":"Enable joystick input",
+				"description":"Enable or disable joystick input. \n\nJoystick will be disabled if set to 'Disabled'. If the joystick cannot be detected or does not function properly, set this value to 'Disabled'.",
+				"name":"joypad",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"no", "desc":"Disabled" },
+					{ "value":"dinput", "desc":"Enabled", "default":true }
+				]
+			},
+			{
+				"caption":"Joystick key repeat delay",
+				"description":"Define joystick key repeat delay by milliseconds.",
+				"name":"paddelay",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"100", "desc":"100ms" },
+					{ "value":"200", "desc":"200ms" },
+					{ "value":"300", "desc":"300ms" },
+					{ "value":"400", "desc":"400ms" },
+					{ "value":"500", "desc":"500ms", "default":true },
+					{ "value":"600", "desc":"600ms" },
+					{ "value":"700", "desc":"700ms" },
+					{ "value":"800", "desc":"800ms" },
+					{ "value":"900", "desc":"900ms" },
+					{ "value":"1000", "desc":"1000ms" },
+					{ "value":"-1", "desc":"Disable key repeat" }
+				]
+			},
+			{
+				"caption":"Joystick key repeat interval",
+				"description":"Define joystick key repeat interval by milliseconds. The smaller the value, the faster the repeated input.",
+				"name":"padinterval",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"10", "desc":"10ms" },
+					{ "value":"20", "desc":"20ms" },
+					{ "value":"30", "desc":"30ms", "default":true },
+					{ "value":"40", "desc":"40ms" },
+					{ "value":"50", "desc":"50ms" },
+					{ "value":"60", "desc":"60ms" },
+					{ "value":"70", "desc":"70ms" },
+					{ "value":"80", "desc":"80ms" },
+					{ "value":"90", "desc":"90ms" },
+					{ "value":"100", "desc":"100ms" },
+					{ "value":"200", "desc":"200ms" },
+					{ "value":"300", "desc":"300ms" },
+					{ "value":"400", "desc":"400ms" },
+					{ "value":"500", "desc":"500ms" },
+					{ "value":"700", "desc":"700ms" },
+					{ "value":"1000", "desc":"1000ms" }
+				]
+			},
+			{
+				"caption":"Enable input method control",
+				"description":"Set if the engine should control state of input methods.\n\nDisabling may help solve problems related to input of Japanese and other languages.",
+				"name":"controlime",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"Enabled", "default":true },
+					{ "value":"no", "desc":"Disabled" }
+				]
+			}
+		]
+	},
+	{
+		"category":"Sound",
+		"options":[
+			{
+				"caption":"PCM decode thread priority",
+				"description":"Priority of PCM decode thread.\n\nRaise priority when skipping sound occurs during playback.",
+				"name":"wsdecpri",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"0", "desc":"Idle(Lowest)" },
+					{ "value":"1", "desc":"Low", "default":true },
+					{ "value":"2", "desc":"Below normal" },
+					{ "value":"3", "desc":"Normal" },
+					{ "value":"4", "desc":"Above normal" },
+					{ "value":"5", "desc":"High" }
+				]
+			},
+			{
+				"caption":"DirectSound software mixing",
+				"description":"Set if the engine should use DirectSound for software mixing.\n\n Skipping sound issues can sometimes be solved by changing this setting.",
+				"name":"wssoft",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"Software only", "default":true },
+					{ "value":"no", "desc":"Prioritize hardware" }
+				]
+			},
+			{
+				"caption":"DirectSound secondary buffer rebuild",
+				"description":"Set if the engine should rebuild DirectSound secondary buffer constantly.\n\nSkipping sound at the beginning of playback can sometimes be solved by adjusting this setting.",
+				"name":"wsrecreate",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"Rebuild constantly" },
+					{ "value":"no", "desc":"Rebuild when necessary", "default":true }
+				]
+			},
+			{
+				"caption":"DirectSound secondary buffer length",
+				"description":"Define the length of DirectSound secondary buffer.\n\nPlayback is more stable with a longer buffer, but it also consumes more memory.",
+				"name":"wsl1len",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"250", "desc":"250ms" },
+					{ "value":"375", "desc":"375ms" },
+					{ "value":"500", "desc":"500ms" },
+					{ "value":"625", "desc":"625ms" },
+					{ "value":"750", "desc":"750ms" },
+					{ "value":"875", "desc":"875ms" },
+					{ "value":"1000", "desc":"1000ms", "default":true },
+					{ "value":"1125", "desc":"1125ms" },
+					{ "value":"1250", "desc":"1250ms" },
+					{ "value":"1375", "desc":"1375ms" },
+					{ "value":"1500", "desc":"1500ms" },
+					{ "value":"1625", "desc":"1625ms" },
+					{ "value":"1750", "desc":"1750ms" },
+					{ "value":"1875", "desc":"1875ms" },
+					{ "value":"2000", "desc":"2000ms" },
+					{ "value":"2125", "desc":"2125ms" },
+					{ "value":"2250", "desc":"2250ms" },
+					{ "value":"2375", "desc":"2375ms" },
+					{ "value":"2500", "desc":"2500ms" },
+					{ "value":"2625", "desc":"2625ms" },
+					{ "value":"2750", "desc":"2750ms" },
+					{ "value":"2875", "desc":"2875ms" },
+					{ "value":"3000", "desc":"3000ms" },
+					{ "value":"3125", "desc":"3125ms" },
+					{ "value":"3250", "desc":"3250ms" },
+					{ "value":"3375", "desc":"3375ms" },
+					{ "value":"3500", "desc":"3500ms" },
+					{ "value":"3625", "desc":"3625ms" },
+					{ "value":"3750", "desc":"3750ms" },
+					{ "value":"3875", "desc":"3875ms" },
+					{ "value":"4000", "desc":"4000ms" },
+					{ "value":"4500", "desc":"4500ms" },
+					{ "value":"5000", "desc":"5000ms" },
+					{ "value":"5500", "desc":"5500ms" },
+					{ "value":"6000", "desc":"6000ms" },
+					{ "value":"6500", "desc":"6500ms" },
+					{ "value":"7000", "desc":"7000ms" },
+					{ "value":"7500", "desc":"7500ms" },
+					{ "value":"8000", "desc":"8000ms" },
+					{ "value":"8500", "desc":"8500ms" },
+					{ "value":"9000", "desc":"9000ms" },
+					{ "value":"9500", "desc":"9500ms" },
+					{ "value":"10000", "desc":"10000ms" }
+				]
+			},
+			{
+				"caption":"DirectSound secondary auxiliary buffer length",
+				"description":"Define the length of DirectSound secondary auxiliary buffer.\n\nPlayback is more stable with a longer buffer, but it also consumes more memory.",
+				"name":"wsl2len",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"250", "desc":"250ms" },
+					{ "value":"375", "desc":"375ms" },
+					{ "value":"500", "desc":"500ms" },
+					{ "value":"625", "desc":"625ms" },
+					{ "value":"750", "desc":"750ms" },
+					{ "value":"875", "desc":"875ms" },
+					{ "value":"1000", "desc":"1000ms", "default":true },
+					{ "value":"1125", "desc":"1125ms" },
+					{ "value":"1250", "desc":"1250ms" },
+					{ "value":"1375", "desc":"1375ms" },
+					{ "value":"1500", "desc":"1500ms" },
+					{ "value":"1625", "desc":"1625ms" },
+					{ "value":"1750", "desc":"1750ms" },
+					{ "value":"1875", "desc":"1875ms" },
+					{ "value":"2000", "desc":"2000ms" },
+					{ "value":"2125", "desc":"2125ms" },
+					{ "value":"2250", "desc":"2250ms" },
+					{ "value":"2375", "desc":"2375ms" },
+					{ "value":"2500", "desc":"2500ms" },
+					{ "value":"2625", "desc":"2625ms" },
+					{ "value":"2750", "desc":"2750ms" },
+					{ "value":"2875", "desc":"2875ms" },
+					{ "value":"3000", "desc":"3000ms" },
+					{ "value":"3125", "desc":"3125ms" },
+					{ "value":"3250", "desc":"3250ms" },
+					{ "value":"3375", "desc":"3375ms" },
+					{ "value":"3500", "desc":"3500ms" },
+					{ "value":"3625", "desc":"3625ms" },
+					{ "value":"3750", "desc":"3750ms" },
+					{ "value":"3875", "desc":"3875ms" },
+					{ "value":"4000", "desc":"4000ms" },
+					{ "value":"4500", "desc":"4500ms" },
+					{ "value":"5000", "desc":"5000ms" },
+					{ "value":"5500", "desc":"5500ms" },
+					{ "value":"6000", "desc":"6000ms" },
+					{ "value":"6500", "desc":"6500ms" },
+					{ "value":"7000", "desc":"7000ms" },
+					{ "value":"7500", "desc":"7500ms" },
+					{ "value":"8000", "desc":"8000ms" },
+					{ "value":"8500", "desc":"8500ms" },
+					{ "value":"9000", "desc":"9000ms" },
+					{ "value":"9500", "desc":"9500ms" },
+					{ "value":"10000", "desc":"10000ms" }
+				]
+			},
+			{
+				"caption":"DirectSound mute",
+				"description":"Define if DirectSound should mute (lower the volume) when the application becomes inactive or minimized.\n\n'Never mute' will not mute the application.\n\n'Mute when minized' and 'Mute when inactive' will mute the application in coresponding conditions.",
+				"name":"wsmute",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"never", "desc":"Never mute", "default":true },
+					{ "value":"minimize", "desc":"Mute when minimized" },
+					{ "value":"deactive", "desc":"Mute when inactive" }
+				]
+			},
+			{
+				"caption":"DirectSound mute volume",
+				"description":"Set mute volume for 'DirectSound mute'\n\nSet to '0%' for complete mute, '50%' for around half of the full volume (around -6dB)",
+				"name":"wsmutevol",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"0", "desc":"0%(-∞dB)", "default":true },
+					{ "value":"5", "desc":"5%(-26.0dB)" },
+					{ "value":"10", "desc":"10%(-20.0dB)" },
+					{ "value":"15", "desc":"15%(-16.5dB)" },
+					{ "value":"20", "desc":"20%(-14.0dB)" },
+					{ "value":"25", "desc":"25%(-12.0dB)" },
+					{ "value":"30", "desc":"30%(-10.5dB)" },
+					{ "value":"35", "desc":"35%(-9.1dB)" },
+					{ "value":"40", "desc":"40%(-8.0dB)" },
+					{ "value":"45", "desc":"45%(-6.9dB)" },
+					{ "value":"50", "desc":"50%(-6.0dB)" },
+					{ "value":"55", "desc":"55%(-5.2dB)" },
+					{ "value":"60", "desc":"60%(-4.4dB)" },
+					{ "value":"65", "desc":"65%(-3.7dB)" },
+					{ "value":"70", "desc":"70%(-3.1dB)" },
+					{ "value":"75", "desc":"75%(-2.5dB)" },
+					{ "value":"80", "desc":"80%(-1.9dB)" },
+					{ "value":"85", "desc":"85%(-1.4dB)" },
+					{ "value":"90", "desc":"90%(-0.9dB)" },
+					{ "value":"95", "desc":"95%(-0.4dB)" }
+				]
+			},
+			{
+				"caption":"DirectSound forced format conversion",
+				"description":"Set if the engine should forcibly convert PCM data played by DirectSound to a defined format.\n\nPlayback issues can sometimes be solved by adjusting this setting.\n\nChoosing '16bit integer monaural' will make the engine ignore 'DirectSound forced 4ch playback'.",
+				"name":"wsforcecnv",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"none", "desc":"No conversion", "default":true },
+					{ "value":"i16", "desc":"Convert to 16bit integer" },
+					{ "value":"i16m", "desc":"Conver to 16bit integer monaural" }
+				]
+			},
+			{
+				"caption":"DirectSound 3D control",
+				"description":"Set if the engine should use DirectSound for 3D control.\n\nThis will enable 3D control of sound in some applications. In most cases stereo and monaural sound will be extended to surrounding speakers. The engine will ignore 'DirectSound forced 4ch playback' if enabled.",
+				"name":"wsuse3d",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"no", "desc":"Disabled", "default":true },
+					{ "value":"yes", "desc":"Enabled" }
+				]
+			},
+			{
+				"caption":"DirectSound forced 4ch playback",
+				"description":"Set if the engine should force 4ch playback including rear speakers when playing stereo or monaural sound with DirectSound.\n\nChoosing 'Yes' will allow front and rear speakers to play stereo and monaural sound if sound was not played previously.",
+				"name":"wsexpandquad",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"no", "desc":"Disabled", "default":true },
+					{ "value":"yes", "desc":"Enabled" }
+				]
+			},
+			{
+				"caption":"DirectSound primary buffer frequency",
+				"description":"Set frequency of DirectSound primary buffer.\n\nIn some cases playback will manifest some change.",
+				"name":"wsfreq",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"8000", "desc":"8kHz" },
+					{ "value":"11025", "desc":"11kHz" },
+					{ "value":"12000", "desc":"12kHz" },
+					{ "value":"16000", "desc":"16kHz" },
+					{ "value":"22050", "desc":"22kHz" },
+					{ "value":"24000", "desc":"24kHz" },
+					{ "value":"32000", "desc":"32kHz" },
+					{ "value":"44100", "desc":"44.1kHz", "default":true },
+					{ "value":"48000", "desc":"48kHz" },
+					{ "value":"64000", "desc":"64kHz" },
+					{ "value":"88200", "desc":"88.2kHz" },
+					{ "value":"96000", "desc":"96kHz" }
+				]
+			},
+			{
+				"caption":"DirectSound primary buffer bit length",
+				"description":"Set playback bit length of DirectSound primary buffer.\n\nIn some cases playback will not change by ajusting this setting.",
+				"name":"wsbits",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"i8", "desc":"8bit integer" },
+					{ "value":"i16", "desc":"16bit integer", "default":true },
+					{ "value":"i24", "desc":"24bit integer" },
+					{ "value":"i32", "desc":"32bit integer" },
+					{ "value":"f32", "desc":"32bit float" }
+				]
+			},
+			{
+				"caption":"DirectSound primary buffer playback control",
+				"description":"Set if the engine should control playback of DirectSound primary buffer buffer.\n\nAdjust this setting can sometimes solve skipping sound issues.",
+				"name":"wscontrolpri",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"Enabled", "default":true },
+					{ "value":"no", "desc":"Disabled" }
+				]
+			},
+			{
+				"caption":"DirectSound primary buffer attempt level",
+				"description":"Set how many combinations of format configurations to try when defining DirectSound primary buffer.\n\nLevel 0: Try stereo 16-bit integer.\n\nLevel 1: Try channels defined by system speaker settings, 16-bit integer before trying level 0.\n\nLevel 2: Try bit-length defined by 'DirectSound primary buffer bit-length' and channels defined by system speaker settings as a WAVEFORMATEX struct, before trying level 1.\n\nAll: Try the same values in level 2 as a WAVEFORMATEXTENSIBLE struct before trying level 2.",
+				"name":"wspritry",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"0", "desc":"Level 0" },
+					{ "value":"1", "desc":"Level 1" },
+					{ "value":"2", "desc":"Level 2" },
+					{ "value":"all", "desc":"All", "default":true }
+				]
+			}
+		]
+	},
+	{
+		"category":"Graphics",
+		"options":[
+			{
+				"caption":"Graphics cache limit",
+				"description":"Define maximum memory for which the graphics cache can use.\n\nIf swap occurs constantly, 'No caching' can sometimes solve the problem.",
+				"name":"gclim",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"auto", "desc":"Auto(recommended)", "default":true },
+					{ "value":"0", "desc":"No caching" },
+					{ "value":"4", "desc":"4MB" },
+					{ "value":"8", "desc":"8MB" },
+					{ "value":"12", "desc":"12MB" },
+					{ "value":"16", "desc":"16MB" },
+					{ "value":"20", "desc":"20MB" },
+					{ "value":"24", "desc":"24MB" },
+					{ "value":"28", "desc":"28MB" },
+					{ "value":"32", "desc":"32MB" },
+					{ "value":"36", "desc":"36MB" },
+					{ "value":"40", "desc":"40MB" },
+					{ "value":"44", "desc":"44MB" },
+					{ "value":"48", "desc":"48MB" },
+					{ "value":"52", "desc":"52MB" },
+					{ "value":"56", "desc":"56MB" },
+					{ "value":"60", "desc":"60MB" },
+					{ "value":"64", "desc":"64MB" },
+					{ "value":"68", "desc":"68MB" },
+					{ "value":"72", "desc":"72MB" },
+					{ "value":"76", "desc":"76MB" },
+					{ "value":"80", "desc":"80MB" },
+					{ "value":"84", "desc":"84MB" },
+					{ "value":"88", "desc":"88MB" },
+					{ "value":"92", "desc":"92MB" },
+					{ "value":"96", "desc":"96MB" },
+					{ "value":"100", "desc":"100MB" },
+					{ "value":"104", "desc":"104MB" },
+					{ "value":"108", "desc":"108MB" },
+					{ "value":"112", "desc":"112MB" },
+					{ "value":"116", "desc":"116MB" },
+					{ "value":"120", "desc":"120MB" },
+					{ "value":"124", "desc":"124MB" },
+					{ "value":"128", "desc":"128MB" },
+					{ "value":"132", "desc":"132MB" },
+					{ "value":"136", "desc":"136MB" },
+					{ "value":"140", "desc":"140MB" },
+					{ "value":"144", "desc":"144MB" },
+					{ "value":"148", "desc":"148MB" },
+					{ "value":"152", "desc":"152MB" },
+					{ "value":"156", "desc":"156MB" },
+					{ "value":"160", "desc":"160MB" },
+					{ "value":"164", "desc":"164MB" },
+					{ "value":"168", "desc":"168MB" },
+					{ "value":"172", "desc":"172MB" },
+					{ "value":"176", "desc":"176MB" },
+					{ "value":"180", "desc":"180MB" },
+					{ "value":"184", "desc":"184MB" },
+					{ "value":"188", "desc":"188MB" },
+					{ "value":"192", "desc":"192MB" },
+					{ "value":"196", "desc":"196MB" },
+					{ "value":"200", "desc":"200MB" },
+					{ "value":"204", "desc":"204MB" },
+					{ "value":"208", "desc":"208MB" },
+					{ "value":"212", "desc":"212MB" },
+					{ "value":"216", "desc":"216MB" },
+					{ "value":"220", "desc":"220MB" },
+					{ "value":"224", "desc":"224MB" },
+					{ "value":"228", "desc":"228MB" },
+					{ "value":"232", "desc":"232MB" },
+					{ "value":"236", "desc":"236MB" },
+					{ "value":"240", "desc":"240MB" },
+					{ "value":"244", "desc":"244MB" },
+					{ "value":"248", "desc":"248MB" },
+					{ "value":"252", "desc":"252MB" },
+					{ "value":"256", "desc":"256MB" }
+				]
+			},
+			{
+				"caption":"Fullscreen mode resolution",
+				"description":"Set resolution of fullscreen mode.\n\nAuto: Use the most optimal resolution. In this case use a resolution defined in the application with the same aspect ratio as the current one if such option exists. Otherwise the engine will scretch the image. Even if 'Scale image by engine in fullscreen mode' is set to 'Disabled', this setting is treated as 'Fit in screen'.\n\nKeep apect ratio: Use the closest resolution that has the same aspect ratio as in window mode.\n\nClosest resolution: Use the closest resolution defined in the application but its aspect ratio is not guranteed to be identical to window mode. This option works for CRT monitors and some LCD panels that support scaled display while keeping aspect issue.\n\nNo change: Resolution will remain the same as in window mode.",
+				"name":"fsres",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"auto", "desc":"Auto" },
+					{ "value":"proportional", "desc":"Keep aspect ratio" },
+					{ "value":"nearest", "desc":"Closest resolution" },
+					{ "value":"nochange", "desc":"No change", "default":true }
+				]
+			},
+			{
+				"caption":"Scale image by engine in fullscreen mode",
+				"description":"Set how the engine should scale image in fullscreen mode.\n\nFit in monitor: Scale the image to fit in the monitor. Black gaps may appear in this case.\n\nFill in monitor: Stretch the image to aviod showing any gaps. Parts of the image can sometimes be outside of display range\n\nNo scaling: The engine will not scale any image.\n\nWhen 'Fullscreen mode resolution' is set to 'Auto', this setting is treated as 'Fit in monitor' even if 'No scaling' is selected.",
+				"name":"fszoom",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"inner", "desc":"Fit in monitor", "default":true },
+					{ "value":"outer", "desc":"Fill in monitor" },
+					{ "value":"no", "desc":"No scaling" }
+				]
+			},
+			{
+				"caption":"Divided processing of graphics rendering",
+				"description": "Set if the engine should divide and process graphics rendering.\n\nAdjusting this setting can sometimes stop the screen from blinking, but rendering performance can be affected.\n\nIf 'Double buffering' is enabled, set to options other than 'Disabled' here.",
+				"name":"gsplit",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"Enabled", "default":true },
+					{ "value":"int", "desc":"Interlaced division" },
+					{ "value":"bidi", "desc":"Bi-directional division" },
+					{ "value":"no", "desc":"Disabled" }
+				]
+			},
+			{
+				"caption":"Scaled display smoothing",
+				"description":"Set if smoothing is applied when scaling the display.\n\n'Smoothing' refers to smoothed scaling when image is scaled according to settings of 'Fullscreen mode resolution'. When disabled, 'Double buffering' is treated as 'Use GDI'.",
+				"name":"smoothzoom",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"Enabled", "default":true },
+					{ "value":"no", "desc":"Disabled" }
+				]
+			},
+			{
+				"caption":"Anti-aliasing text rendering",
+				"description":"Settings of anti-aliasing text rendering.\n\nAdjusting this setting can sometimes solve issues of text not being displayed or not properly rendered. \n\nResampling(4x4) is faster than resampling(8x8), but less accurate.",
+				"name":"aamethod",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"auto", "desc":"Auto", "default":true },
+					{ "value":"res8", "desc":"Resampleing(8×8)" },
+					{ "value":"res4", "desc":"Resampling(4×4)" },
+					{ "value":"api", "desc":"Windows API" }
+				]
+			},
+			{
+				"caption":"JPEG decode accuracy",
+				"description":"Set the accuracy of JPEG image decoding (decompressing).\n\nHigh: High accuracy but decoding is slower.\n\nLow: Low accuracy but decoding is faster.",
+				"name":"jpegdec",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"high", "desc":"High" },
+					{ "value":"normal", "desc":"Normal", "default":true },
+					{ "value":"low", "desc":"Low" }
+				]
+			},
+			{
+				"caption":"Graphics rendering thread count",
+				"description":"Set thread count of graphics rendering.\n\nRendering performance on multi-core systems can be improved by setting multiple rendering threads, but performance can also be worse in some cases.",
+				"name":"drawthread",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"auto", "desc":"Auto(equal to processor count)" },
+					{ "value":"1", "desc":"1 thread", "default":true },
+					{ "value":"2", "desc":"2 threads" },
+					{ "value":"4", "desc":"4 threads" },
+					{ "value":"8", "desc":"8 threads" }
+				]
+			},
+			{
+				"caption":"Bitmap memory allocation",
+				"description":"Set how the engine should allocate memory for bitmap.\n\nProcess heap normally works fine.",
+				"name":"bitmapallocator",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"processheap", "desc":"Use Process heap", "default":true },
+					{ "value":"globalalloc", "desc":"Use globalAlloc" },
+					{ "value":"separateheap", "desc":"Use separate heaps" },
+					{ "value":"malloc", "desc":"Use malloc" }
+				]
+			},
+			{
+				"caption":"Initial heap size",
+				"description":"Set initial heap size when using separate heaps when allocating memory for bitmap.",
+				"name":"bitmapheapsize",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"auto", "desc":"Auto(recommended)", "default":true },
+					{ "value":"0", "desc":"Resize automatically" },
+					{ "value":"64", "desc":"64MB" },
+					{ "value":"128", "desc":"128MB" },
+					{ "value":"256", "desc":"256MB" },
+					{ "value":"512", "desc":"512MB" },
+					{ "value":"1024", "desc":"1GB" },
+					{ "value":"2048", "desc":"2GB" }
+				]
+			}
+		]
+	},
+	{
+		"category":"CPU functions",
+		"options":[
+			{
+				"caption":"MMX",
+				"description":"Adjust this setting when CPU cannot be detected properly.",
+				"name":"cpummx",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"Use if available", "default":true },
+					{ "value":"no", "desc":"Do not use even if available" },
+					{ "value":"force", "desc":"Use forcely" }
+				]
+			},
+			{
+				"caption":"3DNow!",
+				"description":"Adjust this setting when CPU cannot be detected properly.",
+				"name":"cpu3dn",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"Use if available", "default":true },
+					{ "value":"no", "desc":"Do not use even if available" },
+					{ "value":"force", "desc":"Use forcely" }
+				]
+			},
+			{
+				"caption":"SSE",
+				"description":"Adjust this setting when CPU cannot be detected properly.",
+				"name":"cpusse",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"Use if available", "default":true },
+					{ "value":"no", "desc":"Do not use even if available" },
+					{ "value":"force", "desc":"Use forcely" }
+				]
+			},
+			{
+				"caption":"CMOVcc",
+				"description":"Adjust this setting when CPU cannot be detected properly.",
+				"name":"cpucmov",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"Use if available", "default":true },
+					{ "value":"no", "desc":"Do not use even if available" },
+					{ "value":"force", "desc":"Use forcely" }
+				]
+			},
+			{
+				"caption":"Enhanced 3DNow!",
+				"description":"Adjust this setting when CPU cannot be detected properly.",
+				"name":"cpue3dn",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"Use if available", "default":true },
+					{ "value":"no", "desc":"Do not use even if available" },
+					{ "value":"force", "desc":"Use forcely" }
+				]
+			},
+			{
+				"caption":"EMMX (MMX2)",
+				"description":"Adjust this setting when CPU cannot be detected properly.",
+				"name":"cpuemmx",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"Use if available", "default":true },
+					{ "value":"no", "desc":"Do not use even if available" },
+					{ "value":"force", "desc":"Use forcely" }
+				]
+			},
+			{
+				"caption":"SSE2",
+				"description":"Adjust this setting when CPU cannot be detected properly.",
+				"name":"cpusse2",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"Use if available", "default":true },
+					{ "value":"no", "desc":"Do not use even if available" },
+					{ "value":"force", "desc":"Use forcely" }
+				]
+			},
+			{
+				"caption":"SSE3",
+				"description":"Adjust this setting when CPU cannot be detected properly.",
+				"name":"cpusse3",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"Use if available", "default":true },
+					{ "value":"no", "desc":"Do not use even if available" },
+					{ "value":"force", "desc":"Use forcely" }
+				]
+			},
+			{
+				"caption":"SSSE3",
+				"description":"Adjust this setting when CPU cannot be detected properly.",
+				"name":"cpussse3",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"Use if available", "default":true },
+					{ "value":"no", "desc":"Do not use even if available" },
+					{ "value":"force", "desc":"Use forcely" }
+				]
+			},
+			{
+				"caption":"SSE4.1",
+				"description":"Adjust this setting when CPU cannot be detected properly.",
+				"name":"cpusse41",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"Use if available", "default":true },
+					{ "value":"no", "desc":"Do not use even if available" },
+					{ "value":"force", "desc":"Use forcely" }
+				]
+			},
+			{
+				"caption":"SSE4.2",
+				"description":"Adjust this setting when CPU cannot be detected properly.",
+				"name":"cpusse42",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"Use if available", "default":true },
+					{ "value":"no", "desc":"Do not use even if available" },
+					{ "value":"force", "desc":"Use forcely" }
+				]
+			},
+			{
+				"caption":"SSE4a",
+				"description":"Adjust this setting when CPU cannot be detected properly.",
+				"name":"cpusse4a",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"Use if available", "default":true },
+					{ "value":"no", "desc":"Do not use even if available" },
+					{ "value":"force", "desc":"Use forcely" }
+				]
+			},
+			{
+				"caption":"AVX",
+				"description":"Adjust this setting when CPU cannot be detected properly.",
+				"name":"cpuavx",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"Use if available", "default":true },
+					{ "value":"no", "desc":"Do not use even if available" },
+					{ "value":"force", "desc":"Use forcely" }
+				]
+			},
+			{
+				"caption":"AVX2",
+				"description":"Adjust this setting when CPU cannot be detected properly.",
+				"name":"cpuavx2",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"Use if available", "default":true },
+					{ "value":"no", "desc":"Do not use even if available" },
+					{ "value":"force", "desc":"Use forcely" }
+				]
+			},
+			{
+				"caption":"FMA3",
+				"description":"Adjust this setting when CPU cannot be detected properly.",
+				"name":"cpufma3",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"Use if available", "default":true },
+					{ "value":"no", "desc":"Do not use even if available" },
+					{ "value":"force", "desc":"Use forcely" }
+				]
+			},
+			{
+				"caption":"AES",
+				"description":"Adjust this setting when CPU cannot be detected properly.",
+				"name":"cpuaes",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"Use if available", "default":true },
+					{ "value":"no", "desc":"Do not use even if available" },
+					{ "value":"force", "desc":"Use forcely" }
+				]
+			},
+			{
+				"caption":"Core limit",
+				"description":"Adjust this setting when something goes wrong",
+				"name":"cpucorelimit",
+				"type":"select",
+				"user":false,
+				"values":[
+					{ "value":"yes", "desc":"Enabled", "default":true },
+					{ "value":"no", "desc":"Disabled" }
+				]
+			}
+		]
+	},
+	{
+		"category":"Debug",
+		"options":[
+			{
+				"caption":"Debug mode",
+				"description":"Set if debug mode is enabled.\n\nSome auxiliary functions are available in debug mode of Kirikiri, but execution will become slower.",
+				"name":"debug",
+				"type":"select",
+				"user":false,
+				"values":[
+					{ "value":"no", "desc":"Disabled", "default":true },
+					{ "value":"yes", "desc":"Enabled" }
+				]
+			},
+			{
+				"caption":"Write log to file",
+				"description":"Set if the engine should write console log to a file.\n\nEnabled: Append log to the log file.\n\nClear: Clear the log file before writing new log.",
+				"name":"forcelog",
+				"type":"select",
+				"user":false,
+				"values":[
+					{ "value":"no", "desc":"Disabled", "default":true },
+					{ "value":"yes", "desc":"Enabled" },
+					{ "value":"clear", "desc":"Clear" }
+				]
+			},
+			{
+				"caption":"Write log to file when error occurs",
+				"description":"Set if the engine should write console log to a file automatically when an error occurs.\n\nEnabled: Append log to the log file.\n\nClear: Clear the log file before writing new log.",
+				"name":"logerror",
+				"type":"select",
+				"user":false,
+				"values":[
+					{ "value":"no", "desc":"Disabled" },
+					{ "value":"yes", "desc":"Enabled", "default":true },
+					{ "value":"clear", "desc":"Clear" }
+				]
+			},
+			{
+				"caption":"Register to ROT table",
+				"description":"Set if the engine should register to ROT(Running Object Table) during video playback.If enabled, the engine can use GraphEdit included in DirectX SDK for troubleshooting video playback issues. 'Pause' means pause and present a message box after the graph is plotted.",
+				"name":"movie_reg_rot",
+				"type":"select",
+				"user":false,
+				"values":[
+					{ "value":"no", "desc":"Disabled", "default":true },
+					{ "value":"yes", "desc":"Enabled" },
+					{ "value":"pause", "desc":"Pause" }
+				]
+			}
+		]
+	},
+	{
+		"category":"Compatibility",
+		"options":[
+			{
+				"caption":"Archive delimiter",
+				"description":"Set the delimiter used in archive names and storage in archives.\n\nSince 2.19 beta 14, the default symbol has been changed from '#' to '>'. If the application is expceted to run on version earlier than 2.19 beta 14, it may not work if delimiter it not set to '#'.",
+				"name":"arcdelim",
+				"type":"select",
+				"user":false,
+				"values":[
+					{ "value":">", "desc":"Use '>'", "default":true },
+					{ "value":"#", "desc":"Use '#'" }
+				]
+			},
+			{
+				"caption":"Behavior of post-operator '!'",
+				"description":"Set the behavior of post-operator '!' (eval).\n\nIn TJS2 post-operator '!' is evaluated on global context, while it is evaluated on 'this' context since 2.21 beta 9. If the application is expected to run on version lower than 2.21 beta 9, it may not work if this setting is not set to 'Evaluate on global'.",
+				"name":"evalcontext",
+				"type":"select",
+				"user":false,
+				"values":[
+					{ "value":"this", "desc":"Evaluate on this", "default":true },
+					{ "value":"global", "desc":"Evaluate on global" }
+				]
+			},
+			{
+				"caption":"Default value of Layer.holdAlpha",
+				"description":"Set default value of Layer.holdAlpha property (Protect alpha value or not).\n\nIf the application if excepted to run on version lower than 2.23 beta 5, it may not work it this setting is not set to 'True'.",
+				"name":"holdalpha",
+				"type":"select",
+				"user":false,
+				"values":[
+					{ "value":"false", "desc":"False", "default":true },
+					{ "value":"true", "desc":"True" }
+				]
+			},
+			{
+				"caption":"Behavior of pre-operator '*'",
+				"description":"Set the behavior of pre-operator '*' (Bypass property access).\n\nIn TJS2 pre-operator '*' can provide access to a property object without using property handler. Since 2.25 beta 1, this functionality is assigned to pre-operator'&', while pre-oprerator '*' will call property handler when accessing a property object. If the application is expected to run on version lower than 2.25 beta 1, it may not work if this setting is not 'Compatible with lower than 2.25'.",
+				"name":"unaryaster",
+				"type":"select",
+				"user":false,
+				"values":[
+					{ "value":"default", "desc":"Higher than 2.25", "default":true },
+					{ "value":"compat", "desc":"Compatible with lower than 2.25" }
+				]
+			},
+			{
+				"caption":"DirectSound volume curve",
+				"description":"DirectSound volume curve.\n\nVolume sound curve of DirectSound became more intuitive after 2.31 2011/6/14.",
+				"name":"dsvolfactor",
+				"type":"select",
+				"user":false,
+				"values":[
+					{ "value":"3322", "desc":"Higher than 2.31 ", "default":true },
+					{ "value":"5000", "desc":"Compatible with lower than 2.31" }
+				]
+			},
+			{
+				"caption":"Script encoding",
+				"description":"Script encoding when reading from files.",
+				"name":"readencoding",
+				"type":"select",
+				"user":false,
+				"values":[
+					{ "value":"Shift_JIS", "desc":"Shift-JIS" },
+					{ "value":"UTF-8", "desc":"UTF-8", "default":true }
+				]
+			},
+			{
+				"caption":"Disable touch pad",
+				"description":"Disable touch events and trigger mouse events instead.",
+				"name":"ignoretouch",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"false", "desc":"Enabled", "default":true },
+					{ "value":"true", "desc":"Disabled" }
+				]
+			},
+			{
+				"caption":"Disable file property",
+				"description":"Disable file property, treat files with 'prop' extension as a normal file.",
+				"name":"ignorefileprop",
+				"type":"select",
+				"user":false,
+				"values":[
+					{ "value":"yes", "desc":"Enabled" },
+					{ "value":"no", "desc":"Disabled", "default":true }
+				]
+			}
+		]
+	}
+]

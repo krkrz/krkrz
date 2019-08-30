@@ -1,0 +1,1051 @@
+[
+	{
+		"category":"系統通用",
+		"options":[
+			{
+				"caption":"檔案保存位置",
+				"description":"指定吉里吉里保存各種檔案的位置。\n\n在指定的字符串中可以使用以下的特殊字符串。\n\n$(exepath)  此字符串會替換成System.exePath\n\n$(appdatapath)  此字符串會替換成System.appDataPath\n\n$(personalpath)  此字符串會替換成System.personalPath\n\n$(vistapath)  此字符串在Vista以後的環境會替換成$(appdatapath)，在Vista以前環境會替換成$(exepath)\n\n這個值可以透過System.dataPath屬性取得。",
+				"name":"datapath",
+				"type":"string",
+				"length":255,
+				"user":false,
+				"value":"$(exepath)\\savedata"
+			},
+			{
+				"caption":"處理間隔",
+				"description":"這個設定可以讓畫面切換時的各種處理以一定的時間間隔運行，從而限制CPU的使用，降低CPU使用率。\n\n如果設定成“不等待”，畫面切換時CPU的使用率可能會達到100%. \n\n設定成12～120(Hz)的各個數值的話，處理會按此頻率運行。數值越小CPU的負載的負擔就越小，不過運行可能會顯得不流暢。在一些環境中可能沒有效果。\n\n如果圖形-等待垂直同步是“使用”狀態的話，這個設定會被無視。",
+				"name":"contfreq",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"0", "desc":"不等待", "default":true },
+					{ "value":"12", "desc":"12Hz" },
+					{ "value":"15", "desc":"15Hz" },
+					{ "value":"25", "desc":"25Hz" },
+					{ "value":"30", "desc":"30Hz" },
+					{ "value":"45", "desc":"45Hz" },
+					{ "value":"50", "desc":"50Hz" },
+					{ "value":"60", "desc":"60Hz" },
+					{ "value":"70", "desc":"70Hz" },
+					{ "value":"75", "desc":"75Hz" },
+					{ "value":"80", "desc":"80Hz" },
+					{ "value":"83", "desc":"83Hz" },
+					{ "value":"90", "desc":"90Hz" },
+					{ "value":"93", "desc":"93Hz" },
+					{ "value":"100", "desc":"100Hz" },
+					{ "value":"107", "desc":"107Hz" },
+					{ "value":"120", "desc":"120Hz" }
+				]
+			},
+			{
+				"caption":"記憶體使用量",
+				"description":"設定使用的記憶體容量。\n\n選擇“低”的話會比選擇“普通”時更節約地使用記憶體，不過性能會下降。選擇“低”的時候，“圖像-圖像緩存限制”會強制設定成“不使用緩存”。",
+				"name":"memusage",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"normal", "desc":"普通", "default":true },
+					{ "value":"low", "desc":"低" }
+				]
+			},
+			{
+				"caption":"計時器的精度",
+				"description":"計時器精度的設定。\n\n設定成“高”的話運行可能會有所改善，不過性能會降低。這個設定只在NT系列作業系統(NT/2000/XP/Vista及以後)有意義。",
+				"name":"timerprec",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"normal", "desc":"普通", "default":true },
+					{ "value":"higher", "desc":"較高" },
+					{ "value":"high", "desc":"最高" }
+				]
+			},
+			{
+				"caption":"計時器事件容許量限制",
+				"description":"設定是否限制計時器事件的容許量。\n\n設定成“是”的話，在處理較慢的電腦上可以迴避因為系統運行太慢不能對用戶操作做出反應的問題。",
+				"name":"laxtimer",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"no", "desc":"否", "default":true },
+					{ "value":"yes", "desc":"是" }
+				]
+			},
+			{
+				"caption":"低優先度",
+				"description":"設定是否用地低優先度運行切換畫面。\n\n選擇“是”的話也許可以改善畫面切換時漏音的問題。",
+				"name":"lowpri",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"no", "desc":"否", "default":true },
+					{ "value":"yes", "desc":"是" }
+				]
+			},
+			{
+				"caption":"啟動腳本",
+				"description":"設定運行時第一個執行的腳本。",
+				"name":"startup",
+				"type":"string",
+				"length":255,
+				"user":false,
+				"value":"startup.tjs"
+			},
+			{
+				"caption":"設定發生例外時用的文字編輯器",
+				"description":"設定發生例外時用的文字編輯器。",
+				"name":"exceptionexe",
+				"type":"string",
+				"length":255,
+				"user":false,
+				"value":"notepad.exe"
+			},
+			{
+				"caption":"發生例外時編輯器的啟動參數",
+				"description":"設定發生例外時啟動編輯器的參數。\n\n檔案路徑是 %filepath%，%line% 是行號。",
+				"name":"exceptionarg",
+				"type":"string",
+				"length":255,
+				"user":false,
+				"value":"%filepath%"
+			},
+			{
+				"caption":"使用LFH",
+				"description":"啟用防止記憶體碎片化的功能。\n\n在發生記憶體不足等問題時，啟用可能會解決問題。在Vista以後的系統上無論選哪個都會啟用。",
+				"name":"uselfh",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"no", "desc":"否", "default":true },
+					{ "value":"yes", "desc":"是" }
+				]
+			},
+			{
+				"caption":"對進程・CRT堆進行壓縮",
+				"description":"在垃圾回收的時候對進程・CRT堆進行壓縮。\n\n可能會有效改善記憶體不足錯誤頻發的情況，不過壓縮會佔用一點處理時間。",
+				"name":"ghcompact",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"no", "desc":"否", "default":true },
+					{ "value":"yes", "desc":"是" }
+				]
+			}
+		]
+	},
+	{
+		"category":"輸入",
+		"options":[
+			{
+				"caption":"滑鼠滾輪轉動檢測方法",
+				"description":"設定如何檢測滑鼠滾輪的轉動。\n\n選擇“不使用”的話將無法使用滑鼠滾輪。\n\n選擇“DirectInput”將使用DirectInput檢測。\n\n選擇“窗口消息”的話將不使用DirectInput檢測滑鼠滾輪的轉動。\n\n更改設定可能會改善關於滑鼠滾輪的問題。",
+				"name":"wheel",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"no", "desc":"不使用" },
+					{ "value":"dinput", "desc":"DirectInput", "default":true },
+					{ "value":"message", "desc":"窗口消息" }
+				]
+			},
+			{
+				"caption":"是否使用遊戲手把",
+				"description":"設定是否使用遊戲手把。\n\n選擇“不使用”的話將不能使用遊戲手把。如果手把不能正常檢測出來，或者無法正常使用手把的話，請設定成“不使用”。",
+				"name":"joypad",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"no", "desc":"不使用" },
+					{ "value":"dinput", "desc":"使用", "default":true }
+				]
+			},
+			{
+				"caption":"手把按鍵連擊延遲",
+				"description":"設定遊戲手把判斷按鍵連擊需要多少毫秒。",
+				"name":"paddelay",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"100", "desc":"100毫秒" },
+					{ "value":"200", "desc":"200毫秒" },
+					{ "value":"300", "desc":"300毫秒" },
+					{ "value":"400", "desc":"400毫秒" },
+					{ "value":"500", "desc":"500毫秒", "default":true },
+					{ "value":"600", "desc":"600毫秒" },
+					{ "value":"700", "desc":"700毫秒" },
+					{ "value":"800", "desc":"800毫秒" },
+					{ "value":"900", "desc":"900毫秒" },
+					{ "value":"1000", "desc":"1000毫秒" },
+					{ "value":"-1", "desc":"不使用按鍵連擊" }
+				]
+			},
+			{
+				"caption":"手把按鍵連擊間隔",
+				"description":"設定遊戲手把按鍵連擊間隔多少毫秒。數值越小速度越快。",
+				"name":"padinterval",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"10", "desc":"10毫秒" },
+					{ "value":"20", "desc":"20毫秒" },
+					{ "value":"30", "desc":"30毫秒", "default":true },
+					{ "value":"40", "desc":"40毫秒" },
+					{ "value":"50", "desc":"50毫秒" },
+					{ "value":"60", "desc":"60毫秒" },
+					{ "value":"70", "desc":"70毫秒" },
+					{ "value":"80", "desc":"80毫秒" },
+					{ "value":"90", "desc":"90毫秒" },
+					{ "value":"100", "desc":"100毫秒" },
+					{ "value":"200", "desc":"200毫秒" },
+					{ "value":"300", "desc":"300毫秒" },
+					{ "value":"400", "desc":"400毫秒" },
+					{ "value":"500", "desc":"500毫秒" },
+					{ "value":"700", "desc":"700毫秒" },
+					{ "value":"1000", "desc":"1000毫秒" }
+				]
+			},
+			{
+				"caption":"輸入法狀態控制",
+				"description":"設定是否控制輸入法的狀態。\n\n選擇“不控制”的話可能可以迴避無法輸入語言的問題。",
+				"name":"controlime",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"控制", "default":true },
+					{ "value":"no", "desc":"不控制" }
+				]
+			}
+		]
+	},
+	{
+		"category":"聲音",
+		"options":[
+			{
+				"caption":"PCM解碼線程優先級",
+				"description":"PCM解碼線程運行的優先級。\n\n播放中發生卡音拖音現象的時候請試著調高優先級。",
+				"name":"wsdecpri",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"0", "desc":"空閒(最低)" },
+					{ "value":"1", "desc":"低", "default":true },
+					{ "value":"2", "desc":"一般以下" },
+					{ "value":"3", "desc":"一般" },
+					{ "value":"4", "desc":"一般以上" },
+					{ "value":"5", "desc":"高" }
+				]
+			},
+			{
+				"caption":"DirectSound軟體混音",
+				"description":"設定是否使用DirectSound進行軟體混音。\n\n改變設定可能會改善卡音拖音現象。",
+				"name":"wssoft",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"只用軟體", "default":true },
+					{ "value":"no", "desc":"硬體優先" }
+				]
+			},
+			{
+				"caption":"DirectSound輔助緩衝區再次生成",
+				"description":"設定DirectSound是否不斷再次生成輔助緩衝區。\n\n改變設定的話可能可以改善開始播放時發生的卡音漏音現象。",
+				"name":"wsrecreate",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"不斷再次生成" },
+					{ "value":"no", "desc":"有需要時再次生成", "default":true }
+				]
+			},
+			{
+				"caption":"DirectSound輔助緩衝區的長度",
+				"description":"設定DirectSound輔助緩衝區的長度。\n\n緩衝區越長播放就越穩定，但同時也會佔用更多記憶體。",
+				"name":"wsl1len",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"250", "desc":"250ms" },
+					{ "value":"375", "desc":"375ms" },
+					{ "value":"500", "desc":"500ms" },
+					{ "value":"625", "desc":"625ms" },
+					{ "value":"750", "desc":"750ms" },
+					{ "value":"875", "desc":"875ms" },
+					{ "value":"1000", "desc":"1000ms", "default":true },
+					{ "value":"1125", "desc":"1125ms" },
+					{ "value":"1250", "desc":"1250ms" },
+					{ "value":"1375", "desc":"1375ms" },
+					{ "value":"1500", "desc":"1500ms" },
+					{ "value":"1625", "desc":"1625ms" },
+					{ "value":"1750", "desc":"1750ms" },
+					{ "value":"1875", "desc":"1875ms" },
+					{ "value":"2000", "desc":"2000ms" },
+					{ "value":"2125", "desc":"2125ms" },
+					{ "value":"2250", "desc":"2250ms" },
+					{ "value":"2375", "desc":"2375ms" },
+					{ "value":"2500", "desc":"2500ms" },
+					{ "value":"2625", "desc":"2625ms" },
+					{ "value":"2750", "desc":"2750ms" },
+					{ "value":"2875", "desc":"2875ms" },
+					{ "value":"3000", "desc":"3000ms" },
+					{ "value":"3125", "desc":"3125ms" },
+					{ "value":"3250", "desc":"3250ms" },
+					{ "value":"3375", "desc":"3375ms" },
+					{ "value":"3500", "desc":"3500ms" },
+					{ "value":"3625", "desc":"3625ms" },
+					{ "value":"3750", "desc":"3750ms" },
+					{ "value":"3875", "desc":"3875ms" },
+					{ "value":"4000", "desc":"4000ms" },
+					{ "value":"4500", "desc":"4500ms" },
+					{ "value":"5000", "desc":"5000ms" },
+					{ "value":"5500", "desc":"5500ms" },
+					{ "value":"6000", "desc":"6000ms" },
+					{ "value":"6500", "desc":"6500ms" },
+					{ "value":"7000", "desc":"7000ms" },
+					{ "value":"7500", "desc":"7500ms" },
+					{ "value":"8000", "desc":"8000ms" },
+					{ "value":"8500", "desc":"8500ms" },
+					{ "value":"9000", "desc":"9000ms" },
+					{ "value":"9500", "desc":"9500ms" },
+					{ "value":"10000", "desc":"10000ms" }
+				]
+			},
+			{
+				"caption":"DirectSound輔助緩衝區長度",
+				"description":"設定DirectSound輔助緩衝區的長度。\n\n緩衝區越長播放就越穩定，但同時也會佔用更多記憶體。",
+				"name":"wsl2len",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"250", "desc":"250ms" },
+					{ "value":"375", "desc":"375ms" },
+					{ "value":"500", "desc":"500ms" },
+					{ "value":"625", "desc":"625ms" },
+					{ "value":"750", "desc":"750ms" },
+					{ "value":"875", "desc":"875ms" },
+					{ "value":"1000", "desc":"1000ms", "default":true },
+					{ "value":"1125", "desc":"1125ms" },
+					{ "value":"1250", "desc":"1250ms" },
+					{ "value":"1375", "desc":"1375ms" },
+					{ "value":"1500", "desc":"1500ms" },
+					{ "value":"1625", "desc":"1625ms" },
+					{ "value":"1750", "desc":"1750ms" },
+					{ "value":"1875", "desc":"1875ms" },
+					{ "value":"2000", "desc":"2000ms" },
+					{ "value":"2125", "desc":"2125ms" },
+					{ "value":"2250", "desc":"2250ms" },
+					{ "value":"2375", "desc":"2375ms" },
+					{ "value":"2500", "desc":"2500ms" },
+					{ "value":"2625", "desc":"2625ms" },
+					{ "value":"2750", "desc":"2750ms" },
+					{ "value":"2875", "desc":"2875ms" },
+					{ "value":"3000", "desc":"3000ms" },
+					{ "value":"3125", "desc":"3125ms" },
+					{ "value":"3250", "desc":"3250ms" },
+					{ "value":"3375", "desc":"3375ms" },
+					{ "value":"3500", "desc":"3500ms" },
+					{ "value":"3625", "desc":"3625ms" },
+					{ "value":"3750", "desc":"3750ms" },
+					{ "value":"3875", "desc":"3875ms" },
+					{ "value":"4000", "desc":"4000ms" },
+					{ "value":"4500", "desc":"4500ms" },
+					{ "value":"5000", "desc":"5000ms" },
+					{ "value":"5500", "desc":"5500ms" },
+					{ "value":"6000", "desc":"6000ms" },
+					{ "value":"6500", "desc":"6500ms" },
+					{ "value":"7000", "desc":"7000ms" },
+					{ "value":"7500", "desc":"7500ms" },
+					{ "value":"8000", "desc":"8000ms" },
+					{ "value":"8500", "desc":"8500ms" },
+					{ "value":"9000", "desc":"9000ms" },
+					{ "value":"9500", "desc":"9500ms" },
+					{ "value":"10000", "desc":"10000ms" }
+				]
+			},
+			{
+				"caption":"DirectSound靜音",
+				"description":"設定DirectSound在應用程式最小化或進入非活躍狀態時是否靜音（降低音量）。\n\n選擇“不靜音”的話音量就不會降低。\n\n選擇“最小化”或“非活躍”的話，應用程式會在相應的狀態下靜音。",
+				"name":"wsmute",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"never", "desc":"不靜音", "default":true },
+					{ "value":"minimize", "desc":"最小化時" },
+					{ "value":"deactive", "desc":"非活躍時" }
+				]
+			},
+			{
+				"caption":"DirectSound靜音音量",
+				"description":"設定“DirectSound靜音”時的音量。\n\n選擇“0%”會完全靜音，選擇“50%”會減少一半(大約-6dB)。",
+				"name":"wsmutevol",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"0", "desc":"0%(-∞dB)", "default":true },
+					{ "value":"5", "desc":"5%(-26.0dB)" },
+					{ "value":"10", "desc":"10%(-20.0dB)" },
+					{ "value":"15", "desc":"15%(-16.5dB)" },
+					{ "value":"20", "desc":"20%(-14.0dB)" },
+					{ "value":"25", "desc":"25%(-12.0dB)" },
+					{ "value":"30", "desc":"30%(-10.5dB)" },
+					{ "value":"35", "desc":"35%(-9.1dB)" },
+					{ "value":"40", "desc":"40%(-8.0dB)" },
+					{ "value":"45", "desc":"45%(-6.9dB)" },
+					{ "value":"50", "desc":"50%(-6.0dB)" },
+					{ "value":"55", "desc":"55%(-5.2dB)" },
+					{ "value":"60", "desc":"60%(-4.4dB)" },
+					{ "value":"65", "desc":"65%(-3.7dB)" },
+					{ "value":"70", "desc":"70%(-3.1dB)" },
+					{ "value":"75", "desc":"75%(-2.5dB)" },
+					{ "value":"80", "desc":"80%(-1.9dB)" },
+					{ "value":"85", "desc":"85%(-1.4dB)" },
+					{ "value":"90", "desc":"90%(-0.9dB)" },
+					{ "value":"95", "desc":"95%(-0.4dB)" }
+				]
+			},
+			{
+				"caption":"DirectSound強制格式轉換",
+				"description":"設定DirectSound播放的PCM數據是否強制轉換成選擇的格式。\n\n改變設定後可能會改善播放聲音出的問題。\n\n選擇“轉換成16bit單聲道”時“DirctSound強制4ch播放”會被忽略",
+				"name":"wsforcecnv",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"none", "desc":"不轉換", "default":true },
+					{ "value":"i16", "desc":"轉換成16bit整數" },
+					{ "value":"i16m", "desc":"轉換成16bit整數單聲道" }
+				]
+			},
+			{
+				"caption":"DirectSound 3D控制",
+				"description":"設定是否用DirectSound進行3D控制。\n\n選擇“是”的話，3D聲音控制效果會有效(有些應用程式會沒有效果)。在很多環境中，單聲道和立體聲的音頻會拓展到多聲道揚聲器上播放。選擇“是”的話“DirectSound強制4ch播放”的設定會被忽略。",
+				"name":"wsuse3d",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"no", "desc":"否", "default":true },
+					{ "value":"yes", "desc":"是" }
+				]
+			},
+			{
+				"caption":"DirectSound 強制4ch播放",
+				"description":"設定在用DirectSound播放單聲道和立體聲音頻的時候，是否強制用上後置揚聲器，使用4ch播放。\n\n啟用時，在立體聲和單聲道只能在前置揚聲器的環境中，音頻將可以在前置和後置揚聲器播放。",
+				"name":"wsexpandquad",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"no", "desc":"否", "default":true },
+					{ "value":"yes", "desc":"是" }
+				]
+			},
+			{
+				"caption":"DirectSound 主緩衝區頻率",
+				"description":"設定DirectSound主緩衝區的播放頻率。\n\n更改設定可能不會改變播放情況。",
+				"name":"wsfreq",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"8000", "desc":"8kHz" },
+					{ "value":"11025", "desc":"11kHz" },
+					{ "value":"12000", "desc":"12kHz" },
+					{ "value":"16000", "desc":"16kHz" },
+					{ "value":"22050", "desc":"22kHz" },
+					{ "value":"24000", "desc":"24kHz" },
+					{ "value":"32000", "desc":"32kHz" },
+					{ "value":"44100", "desc":"44.1kHz", "default":true },
+					{ "value":"48000", "desc":"48kHz" },
+					{ "value":"64000", "desc":"64kHz" },
+					{ "value":"88200", "desc":"88.2kHz" },
+					{ "value":"96000", "desc":"96kHz" }
+				]
+			},
+			{
+				"caption":"DirectSound 主緩衝區比特數",
+				"description":"設定DirectSound主緩衝區的比特數。\n\n更改設定可能不會改變播放情況。",
+				"name":"wsbits",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"i8", "desc":"8bit整數" },
+					{ "value":"i16", "desc":"16bit整數", "default":true },
+					{ "value":"i24", "desc":"24bit整數" },
+					{ "value":"i32", "desc":"32bit整數" },
+					{ "value":"f32", "desc":"32bit浮點數" }
+				]
+			},
+			{
+				"caption":"DirectSound 主緩衝區播放控制",
+				"description":"設定是否對DirectSound的主緩衝區進行播放和停止的控制。\n\n透過更改設定可能會改善卡音拖音的問題。",
+				"name":"wscontrolpri",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"控制", "default":true },
+					{ "value":"no", "desc":"不控制" }
+				]
+			},
+			{
+				"caption":"DirectSound 主緩衝區設定嘗試等級",
+				"description":"設定DirectSound指定主緩衝區格式時會嘗試多少種不同的設定。\n\n 第0級會嘗試立體聲16bit整數格式的設定。\n\n第1級在嘗試第0級之前，會嘗試系統揚聲器聲道數的16bit整數設定。\n\n第2級在嘗試第1級之前，嘗試“DirectSound主緩衝區比特數”設定的比特數、系統揚聲器設定的聲道數、WAVEFORMATEX結構體格式的設定。\n\n“所有”級在嘗試第2級設定之前，會嘗試跟第2級相同但使用WAVEFORMATEXTENSIBLE結構體格式的設定。",
+				"name":"wspritry",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"0", "desc":"第0級" },
+					{ "value":"1", "desc":"第1級" },
+					{ "value":"2", "desc":"第2級" },
+					{ "value":"all", "desc":"所有", "default":true }
+				]
+			}
+		]
+	},
+	{
+		"category":"圖形",
+		"options":[
+			{
+				"caption":"圖形緩存限制",
+				"description":"設定圖形緩存所佔記憶體的最大值。\n\n如果運行中頻繁交換緩存的話，選擇“不使用緩存”可能會改善問題。",
+				"name":"gclim",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"auto", "desc":"自動(推薦)", "default":true },
+					{ "value":"0", "desc":"不使用緩存" },
+					{ "value":"4", "desc":"4MB" },
+					{ "value":"8", "desc":"8MB" },
+					{ "value":"12", "desc":"12MB" },
+					{ "value":"16", "desc":"16MB" },
+					{ "value":"20", "desc":"20MB" },
+					{ "value":"24", "desc":"24MB" },
+					{ "value":"28", "desc":"28MB" },
+					{ "value":"32", "desc":"32MB" },
+					{ "value":"36", "desc":"36MB" },
+					{ "value":"40", "desc":"40MB" },
+					{ "value":"44", "desc":"44MB" },
+					{ "value":"48", "desc":"48MB" },
+					{ "value":"52", "desc":"52MB" },
+					{ "value":"56", "desc":"56MB" },
+					{ "value":"60", "desc":"60MB" },
+					{ "value":"64", "desc":"64MB" },
+					{ "value":"68", "desc":"68MB" },
+					{ "value":"72", "desc":"72MB" },
+					{ "value":"76", "desc":"76MB" },
+					{ "value":"80", "desc":"80MB" },
+					{ "value":"84", "desc":"84MB" },
+					{ "value":"88", "desc":"88MB" },
+					{ "value":"92", "desc":"92MB" },
+					{ "value":"96", "desc":"96MB" },
+					{ "value":"100", "desc":"100MB" },
+					{ "value":"104", "desc":"104MB" },
+					{ "value":"108", "desc":"108MB" },
+					{ "value":"112", "desc":"112MB" },
+					{ "value":"116", "desc":"116MB" },
+					{ "value":"120", "desc":"120MB" },
+					{ "value":"124", "desc":"124MB" },
+					{ "value":"128", "desc":"128MB" },
+					{ "value":"132", "desc":"132MB" },
+					{ "value":"136", "desc":"136MB" },
+					{ "value":"140", "desc":"140MB" },
+					{ "value":"144", "desc":"144MB" },
+					{ "value":"148", "desc":"148MB" },
+					{ "value":"152", "desc":"152MB" },
+					{ "value":"156", "desc":"156MB" },
+					{ "value":"160", "desc":"160MB" },
+					{ "value":"164", "desc":"164MB" },
+					{ "value":"168", "desc":"168MB" },
+					{ "value":"172", "desc":"172MB" },
+					{ "value":"176", "desc":"176MB" },
+					{ "value":"180", "desc":"180MB" },
+					{ "value":"184", "desc":"184MB" },
+					{ "value":"188", "desc":"188MB" },
+					{ "value":"192", "desc":"192MB" },
+					{ "value":"196", "desc":"196MB" },
+					{ "value":"200", "desc":"200MB" },
+					{ "value":"204", "desc":"204MB" },
+					{ "value":"208", "desc":"208MB" },
+					{ "value":"212", "desc":"212MB" },
+					{ "value":"216", "desc":"216MB" },
+					{ "value":"220", "desc":"220MB" },
+					{ "value":"224", "desc":"224MB" },
+					{ "value":"228", "desc":"228MB" },
+					{ "value":"232", "desc":"232MB" },
+					{ "value":"236", "desc":"236MB" },
+					{ "value":"240", "desc":"240MB" },
+					{ "value":"244", "desc":"244MB" },
+					{ "value":"248", "desc":"248MB" },
+					{ "value":"252", "desc":"252MB" },
+					{ "value":"256", "desc":"256MB" }
+				]
+			},
+			{
+				"caption":"全熒幕模式的解析度",
+				"description":"設定全熒幕時的解析度。\n\n選擇“自動”的話，引擎會自動選擇最合適的解析度。在縱橫比相同的各個解析度之中，如果程式裡定義了合適的解析度，就會使用這個解析度。如果沒有合適的解析度，引擎就會把原畫面拉伸顯示。在這種設定下，即使不使用“全熒幕時讓引擎拉伸顯示”，也會認定設置是“適應顯示器的大小”。\n\n選擇“縱橫比相同的解析度”的話，會選用一個跟窗口模式縱橫比的解析度最相近的解析度。\n\n選擇“最相近的解析度”的話，就會選擇程式裡定義的最相近的解析度，但是不保證此時會保持窗口模式的縱橫比。在顯像管顯示器，以及可以有保持畫面縱橫比拉伸顯示的液晶顯示器上面，可以用這個設定。\n\n選擇“解析度不變”的話，全熒幕時會保持非全熒幕時的解析度，不會變化。",
+				"name":"fsres",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"auto", "desc":"自動" },
+					{ "value":"proportional", "desc":"縱橫比相同的解析度" },
+					{ "value":"nearest", "desc":"最相近的解析度" },
+					{ "value":"nochange", "desc":"解析度不變", "default":true }
+				]
+			},
+			{
+				"caption":"全熒幕時讓引擎拉伸顯示",
+				"description":"定義全熒幕時引擎如何拉伸畫面。\n\n選擇“拉伸適配”的話引擎會相應地拉伸畫面，以讓所有內容都能收在顯示器的範圍內。如果上下或左右出現空隙的話，空隙會呈現黑色。\n\n選擇“拉伸填滿”的話引擎會相應地拉伸畫面，以讓顯示器上的畫面沒有空隙。也因此畫面可能會超出顯示器的範圍。\n\n選擇“不拉伸”的話引擎不好拉伸畫面。\n\n“全熒幕模式的解析度”設定成“自動”的時候，這裡設定成“不拉伸”也會視為“拉伸適配”。",
+				"name":"fszoom",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"inner", "desc":"拉伸適配", "default":true },
+					{ "value":"outer", "desc":"拉伸填滿" },
+					{ "value":"no", "desc":"不拉伸" }
+				]
+			},
+			{
+				"caption":"圖形演算的分割處理",
+				"description":"設定是否把圖形演算分割處理。\n\n更改設定可能會解決畫面閃爍的問題，但渲染效率可能會降低。\n\n在使用“雙緩存”的時候，推薦把這個設定設置成“不使用”之外的選項。",
+				"name":"gsplit",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"使用", "default":true },
+					{ "value":"int", "desc":"隔行分割" },
+					{ "value":"bidi", "desc":"雙方向分割" },
+					{ "value":"no", "desc":"不使用" }
+				]
+			},
+			{
+				"caption":"拉伸顯示時的平滑化",
+				"description":"設定是否在拉伸時進行平滑化。\n\n這裡的平滑化指的是引擎按照“全熒幕模式的解析度”拉伸畫面時“平滑”地拉伸圖像。不使用平滑化的話默認為“雙緩存”選擇了“使用GDI”的設置。",
+				"name":"smoothzoom",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"是", "default":true },
+					{ "value":"no", "desc":"否" }
+				]
+			},
+			{
+				"caption":"反鋸齒文字渲染",
+				"description":"設定是否用反鋸齒渲染文字。\n\n更改設定的話，可能會解決文字無法顯示、文字顯示出錯等問題。\n\n“再採樣(4×4)”比“再採樣(8×8)”速度快，但是精讀更低。",
+				"name":"aamethod",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"auto", "desc":"自動", "default":true },
+					{ "value":"res8", "desc":"重採樣(8×8)" },
+					{ "value":"res4", "desc":"重採樣(4×4)" },
+					{ "value":"api", "desc":"Windows API" }
+				]
+			},
+			{
+				"caption":"JPEG圖像解碼精度",
+				"description":"設定JPEG圖像的解碼(解壓)精度。\n\n選擇“高”的話精度會提高，但是速度會降低。\n\n選擇“低”的話精度會降低，但是速度會提高。",
+				"name":"jpegdec",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"high", "desc":"高" },
+					{ "value":"normal", "desc":"標準", "default":true },
+					{ "value":"low", "desc":"低" }
+				]
+			},
+			{
+				"caption":"渲染線程數",
+				"description":"設定渲染時使用的線程數。\n\n透過設定多個渲染進程可能會增強渲染性能，不過也可能會降低性能。",
+				"name":"drawthread",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"auto", "desc":"自動(線程與處理器數相同)" },
+					{ "value":"1", "desc":"1線程", "default":true },
+					{ "value":"2", "desc":"2線程" },
+					{ "value":"4", "desc":"4線程" },
+					{ "value":"8", "desc":"8線程" }
+				]
+			},
+			{
+				"caption":"位圖記憶體分配方式",
+				"description":"設定如何分配位圖用的記憶體。\n\n一般用processheap就可以。",
+				"name":"bitmapallocator",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"processheap", "desc":"用professheap分配", "default":true },
+					{ "value":"globalalloc", "desc":"用GlobalAlloc分配" },
+					{ "value":"separateheap", "desc":"用分割堆分配" },
+					{ "value":"malloc", "desc":"用malloc分配" }
+				]
+			},
+			{
+				"caption":"堆的初始分割大小",
+				"description":"設定位圖記憶體分配方式選擇“分割堆”時的初始大小。",
+				"name":"bitmapheapsize",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"auto", "desc":"自動(推薦)", "default":true },
+					{ "value":"0", "desc":"自動擴大" },
+					{ "value":"64", "desc":"64MB" },
+					{ "value":"128", "desc":"128MB" },
+					{ "value":"256", "desc":"256MB" },
+					{ "value":"512", "desc":"512MB" },
+					{ "value":"1024", "desc":"1GB" },
+					{ "value":"2048", "desc":"2GB" }
+				]
+			}
+		]
+	},
+	{
+		"category":"CPU功能",
+		"options":[
+			{
+				"caption":"MMX",
+				"description":"CPU識別出現問題的時候請進行調整。",
+				"name":"cpummx",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"可以使用的話就使用", "default":true },
+					{ "value":"no", "desc":"可以使用也不使用" },
+					{ "value":"force", "desc":"強制使用" }
+				]
+			},
+			{
+				"caption":"3DNow!",
+				"description":"CPU識別出現問題的時候請進行調整。",
+				"name":"cpu3dn",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"可以使用的話就使用", "default":true },
+					{ "value":"no", "desc":"可以使用也不使用" },
+					{ "value":"force", "desc":"強制使用" }
+				]
+			},
+			{
+				"caption":"SSE",
+				"description":"CPU識別出現問題的時候請進行調整。",
+				"name":"cpusse",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"可以使用的話就使用", "default":true },
+					{ "value":"no", "desc":"可以使用也不使用" },
+					{ "value":"force", "desc":"強制使用" }
+				]
+			},
+			{
+				"caption":"CMOVcc",
+				"description":"CPU識別出現問題的時候請進行調整。",
+				"name":"cpucmov",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"可以使用的話就使用", "default":true },
+					{ "value":"no", "desc":"可以使用也不使用" },
+					{ "value":"force", "desc":"強制使用" }
+				]
+			},
+			{
+				"caption":"Enhanced 3DNow!",
+				"description":"CPU識別出現問題的時候請進行調整。",
+				"name":"cpue3dn",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"可以使用的話就使用", "default":true },
+					{ "value":"no", "desc":"可以使用也不使用" },
+					{ "value":"force", "desc":"強制使用" }
+				]
+			},
+			{
+				"caption":"EMMX (MMX2)",
+				"description":"CPU識別出現問題的時候請進行調整。",
+				"name":"cpuemmx",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"可以使用的話就使用", "default":true },
+					{ "value":"no", "desc":"可以使用也不使用" },
+					{ "value":"force", "desc":"強制使用" }
+				]
+			},
+			{
+				"caption":"SSE2",
+				"description":"CPU識別出現問題的時候請進行調整。",
+				"name":"cpusse2",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"可以使用的話就使用", "default":true },
+					{ "value":"no", "desc":"可以使用也不使用" },
+					{ "value":"force", "desc":"強制使用" }
+				]
+			},
+			{
+				"caption":"SSE3",
+				"description":"CPU識別出現問題的時候請進行調整。",
+				"name":"cpusse3",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"可以使用的話就使用", "default":true },
+					{ "value":"no", "desc":"可以使用也不使用" },
+					{ "value":"force", "desc":"強制使用" }
+				]
+			},
+			{
+				"caption":"SSSE3",
+				"description":"CPU識別出現問題的時候請進行調整。",
+				"name":"cpussse3",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"可以使用的話就使用", "default":true },
+					{ "value":"no", "desc":"可以使用也不使用" },
+					{ "value":"force", "desc":"強制使用" }
+				]
+			},
+			{
+				"caption":"SSE4.1",
+				"description":"CPU識別出現問題的時候請進行調整。",
+				"name":"cpusse41",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"可以使用的話就使用", "default":true },
+					{ "value":"no", "desc":"可以使用也不使用" },
+					{ "value":"force", "desc":"強制使用" }
+				]
+			},
+			{
+				"caption":"SSE4.2",
+				"description":"CPU識別出現問題的時候請進行調整。",
+				"name":"cpusse42",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"可以使用的話就使用", "default":true },
+					{ "value":"no", "desc":"可以使用也不使用" },
+					{ "value":"force", "desc":"強制使用" }
+				]
+			},
+			{
+				"caption":"SSE4a",
+				"description":"CPU識別出現問題的時候請進行調整。",
+				"name":"cpusse4a",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"可以使用的話就使用", "default":true },
+					{ "value":"no", "desc":"可以使用也不使用" },
+					{ "value":"force", "desc":"強制使用" }
+				]
+			},
+			{
+				"caption":"AVX",
+				"description":"CPU識別出現問題的時候請進行調整。",
+				"name":"cpuavx",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"可以使用的話就使用", "default":true },
+					{ "value":"no", "desc":"可以使用也不使用" },
+					{ "value":"force", "desc":"強制使用" }
+				]
+			},
+			{
+				"caption":"AVX2",
+				"description":"CPU識別出現問題的時候請進行調整。",
+				"name":"cpuavx2",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"可以使用的話就使用", "default":true },
+					{ "value":"no", "desc":"可以使用也不使用" },
+					{ "value":"force", "desc":"強制使用" }
+				]
+			},
+			{
+				"caption":"FMA3",
+				"description":"CPU識別出現問題的時候請進行調整。",
+				"name":"cpufma3",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"可以使用的話就使用", "default":true },
+					{ "value":"no", "desc":"可以使用也不使用" },
+					{ "value":"force", "desc":"強制使用" }
+				]
+			},
+			{
+				"caption":"AES",
+				"description":"CPU識別出現問題的時候請進行調整。",
+				"name":"cpuaes",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"yes", "desc":"可以使用的話就使用", "default":true },
+					{ "value":"no", "desc":"可以使用也不使用" },
+					{ "value":"force", "desc":"強制使用" }
+				]
+			},
+			{
+				"caption":"Core Limitation",
+				"description":"運行出現問題的時候請進行調整。",
+				"name":"cpucorelimit",
+				"type":"select",
+				"user":false,
+				"values":[
+					{ "value":"yes", "desc":"限制", "default":true },
+					{ "value":"no", "desc":"不限制" }
+				]
+			}
+		]
+	},
+	{
+		"category":"排錯",
+		"options":[
+			{
+				"caption":"排錯模式",
+				"description":"設定是否使用排錯模式。\n\n選擇“有效”的話吉里吉里會以排錯模式運行，開啟一些排錯輔助功能，但是運行速度會下降。",
+				"name":"debug",
+				"type":"select",
+				"user":false,
+				"values":[
+					{ "value":"no", "desc":"無效", "default":true },
+					{ "value":"yes", "desc":"有效" }
+				]
+			},
+			{
+				"caption":"輸出記錄到檔案",
+				"description":"設定是否把命令行的記錄輸出到檔案。\n\n選擇“輸出”的話會在檔案末尾添加內容。\n\n選擇“清除”的話會清除檔案原內容再寫入記錄。",
+				"name":"forcelog",
+				"type":"select",
+				"user":false,
+				"values":[
+					{ "value":"no", "desc":"不輸出", "default":true },
+					{ "value":"yes", "desc":"輸出" },
+					{ "value":"clear", "desc":"清除" }
+				]
+			},
+			{
+				"caption":"出錯時輸出記錄到檔案",
+				"description":"設定是否在發生錯誤時自動把命令行的記錄輸出到檔案。\n\n選擇“輸出”的話會在檔案末尾添加內容。\n\n選擇“清除”的話會清除檔案原內容再寫入記錄。",
+				"name":"logerror",
+				"type":"select",
+				"user":false,
+				"values":[
+					{ "value":"no", "desc":"不輸出" },
+					{ "value":"yes", "desc":"輸出", "default":true },
+					{ "value":"clear", "desc":"清楚" }
+				]
+			},
+			{
+				"caption":"註冊到ROT表",
+				"description":"設定播放影片時是否註冊到ROT(Running Object Table)表。選擇“是”的話，引擎可以使用DirectX SDK附帶的GraphEdit解析影片播放上出現的問題。選擇“暫停”的話，引擎還會在圖構建完成之後暫停運行並顯示消息框。",
+				"name":"movie_reg_rot",
+				"type":"select",
+				"user":false,
+				"values":[
+					{ "value":"no", "desc":"否", "default":true },
+					{ "value":"yes", "desc":"是" },
+					{ "value":"pause", "desc":"暫停" }
+				]
+			}
+		]
+	},
+	{
+		"category":"兼容性",
+		"options":[
+			{
+				"caption":"壓縮包分隔符",
+				"description":"設定壓縮包檔案名和壓縮包記憶體儲的分隔符。\n\n從2.19 beta 14開始分隔符從'#'改成了'>'. 2.19 beta 14以下的應用程式中不把分隔符設定成'#'的話可能無法運行。",
+				"name":"arcdelim",
+				"type":"select",
+				"user":false,
+				"values":[
+					{ "value":">", "desc":"使用'>'", "default":true },
+					{ "value":"#", "desc":"使用'#'" }
+				]
+			},
+			{
+				"caption":"後置'!'運算符的行為",
+				"description":"設定後置'!'(eval)運算符的行為。\n\nTJS2中的後置'!'運算符在全局上執行，但是從2.21 beta 9之後會在this上執行。如果應用程式版本低於2.21 beta 9，不設定成“在global上執行”可能會無法運行。",
+				"name":"evalcontext",
+				"type":"select",
+				"user":false,
+				"values":[
+					{ "value":"this", "desc":"在this上執行", "default":true },
+					{ "value":"global", "desc":"在global上執行" }
+				]
+			},
+			{
+				"caption":"Layer.holdAlpha的默認值",
+				"description":"設定Layer.holdAlpha屬性(是否保護alpha值)的默認值。\n\n如果應用程式的版本低於2.23 beta 5，不設定成“真”可能無法正常運行。",
+				"name":"holdalpha",
+				"type":"select",
+				"user":false,
+				"values":[
+					{ "value":"false", "desc":"假", "default":true },
+					{ "value":"true", "desc":"真" }
+				]
+			},
+			{
+				"caption":"前置'*'運算符的行為",
+				"description":"設定前置'*'運算符(繞過屬性獲取)的行為。\n\nTJS2中的前置'*'運算符是不透過屬性處理函數直接獲取屬性對象的運算符，從2.25 beta 1以後這個功能的運算符變成了前置'&'，前置'*'運算符改成會調用屬性處理函數的運算符了。如果應用程式版本低於2.25 beta 1，不設定成“兼容2.25以前的版本”可能會無法正常運行。",
+				"name":"unaryaster",
+				"type":"select",
+				"user":false,
+				"values":[
+					{ "value":"default", "desc":"2.25版本以後的行為", "default":true },
+					{ "value":"compat", "desc":"兼容2.25以前的版本" }
+				]
+			},
+			{
+				"caption":"DirectSound音量曲線",
+				"description":"DirectSound的音量曲線。\n\nDirectSound的音量曲線從2.31 2011/6/14版以後變成更為直觀的曲線。",
+				"name":"dsvolfactor",
+				"type":"select",
+				"user":false,
+				"values":[
+					{ "value":"3322", "desc":"2.31版本以後的行為", "default":true },
+					{ "value":"5000", "desc":"兼容2.31以前的版本" }
+				]
+			},
+			{
+				"caption":"腳本讀取編碼",
+				"description":"讀取腳本時使用的編碼。",
+				"name":"readencoding",
+				"type":"select",
+				"user":false,
+				"values":[
+					{ "value":"Shift_JIS", "desc":"Shift-JIS" },
+					{ "value":"UTF-8", "desc":"UTF-8", "default":true }
+				]
+			},
+			{
+				"caption":"禁用觸摸事件",
+				"description":"禁用觸摸事件，轉而觸發滑鼠事件。",
+				"name":"ignoretouch",
+				"type":"select",
+				"user":true,
+				"values":[
+					{ "value":"false", "desc":"有效", "default":true },
+					{ "value":"true", "desc":"無效" }
+				]
+			},
+			{
+				"caption":"禁用檔案屬性",
+				"description":"禁用檔案屬性，把prop擴展名的檔案當作普通檔案處理。",
+				"name":"ignorefileprop",
+				"type":"select",
+				"user":false,
+				"values":[
+					{ "value":"yes", "desc":"有效" },
+					{ "value":"no", "desc":"無效", "default":true }
+				]
+			}
+		]
+	}
+]
