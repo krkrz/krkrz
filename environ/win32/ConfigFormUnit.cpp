@@ -146,6 +146,7 @@ private:
 	}
 public:
 	ConfigFormUnit( HWND hWnd ) : WindowHandle(hWnd), CurrentItem(NULL) {
+		SetDlgTexts( hWnd );
 		TreeControl = ::GetDlgItem( WindowHandle, IDC_OPTIONS_TREE );
 		DefaultButton = ::GetDlgItem( WindowHandle, IDC_DEFAULT_BUTTON );
 		OptionList = ::GetDlgItem( WindowHandle, IDC_OPTION_COMBO );
@@ -159,7 +160,43 @@ public:
 	}
 	~ConfigFormUnit() {
 	}
-	
+	void SetDlgTexts( HWND hWnd ) {
+		const UINT DLG_ITEM_IDS[] = {
+			IDOK,
+			IDCANCEL,
+			IDC_OPTION,
+			IDC_OPTION_NAME,
+			IDC_OPTION_VALUE,
+			IDC_OPTION_DESC,
+			IDC_DEFAULT_BUTTON
+		};
+		const UINT DLG_STR_IDS[] = {
+			IDS_DLG_OK,
+			IDS_DLG_CANCEL,
+			IDS_DLG_OPTION,
+			IDS_DLG_OPTION_NAME,
+			IDS_DLG_OPTION_VALUE,
+			IDS_DLG_OPTION_DESC,
+			IDS_DLG_SET_DEFAULT
+		};
+		const int MAX_LENGTH = 1024;
+		const int num_of_items = sizeof(DLG_ITEM_IDS)/sizeof(DLG_ITEM_IDS[0]);
+		HINSTANCE hInstance = ::GetModuleHandle(0);
+		tjs_char buffer[MAX_LENGTH];
+		for( int i = 0; i < num_of_items; i++ ) {
+			HWND hBtn = ::GetDlgItem( hWnd, DLG_ITEM_IDS[i] );
+			if( hBtn != NULL ) {
+				int len = ::LoadString( hInstance, DLG_STR_IDS[i], buffer, 1024 );
+				if( len > 0 ) {
+					::SetDlgItemText( hWnd, DLG_ITEM_IDS[i], buffer );
+				}
+			}
+		}
+		int len = ::LoadString( hInstance, IDS_DLG_SETTINGS, buffer, 1024 );
+		if( len > 0 ) {
+			::SetWindowText( hWnd, buffer );
+		}
+	}
 	static LRESULT WINAPI DlgProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
 	LRESULT Dispatch( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
 

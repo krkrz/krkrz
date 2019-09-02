@@ -68,6 +68,20 @@ inline void DumpMemoryLeaks()
 #endif  // _DEBUG
 }
 
+#ifdef  _DEBUG
+#ifdef _MSC_VER
+class MemoryLeaksDebugBreakPoint {
+public:
+	MemoryLeaksDebugBreakPoint() {
+		// WinMain よりも前のメモリリークを検出したい時、ここにブレークを張る
+		int a = 0;
+	}
+};
+#pragma init_seg(lib)
+static MemoryLeaksDebugBreakPoint gMemoryLeaksDebugBreakPoint;
+#endif
+#endif
+
 tjs_string ExePath() {
 	tjs_char szFull[_MAX_PATH];
 	::GetModuleFileName(NULL, szFull, sizeof(szFull) / sizeof(tjs_char));

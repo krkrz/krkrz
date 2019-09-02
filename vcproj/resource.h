@@ -20,6 +20,18 @@
 #define IDC_OPTION_COMBO                1006
 #define IDC_DEFAULT_BUTTON              1007
 #define IDC_DESCRIPTION_EDIT            1008
+#define IDC_OPTION                      1009
+#define IDC_OPTION_NAME                 1010
+#define IDC_OPTION_VALUE                1011
+#define IDC_OPTION_DESC                 1012
+#define IDS_DLG_OK                      2000
+#define IDS_DLG_CANCEL                  2001
+#define IDS_DLG_SETTINGS                2002
+#define IDS_DLG_OPTION                  2003
+#define IDS_DLG_OPTION_NAME             2004
+#define IDS_DLG_OPTION_VALUE            2005
+#define IDS_DLG_OPTION_DESC             2006
+#define IDS_DLG_SET_DEFAULT             2007
 #define ID_ACC_DUMPLAYER                32772
 #define IDC_STATIC                      -1
 
