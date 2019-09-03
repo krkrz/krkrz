@@ -181,6 +181,20 @@ ttstr TVPGetAboutString(void)
 	return TVPFormatMessage(TVPReadAboutStringFromResource().c_str(), verstr, tjsverstr) + TVPGetImportantLog();
 }
 //---------------------------------------------------------------------------
+ttstr TVPGetLicenseString(void)
+{
+	TVPGetVersion();
+	tjs_char verstr[100];
+	TJS_snprintf(verstr, sizeof(verstr)/sizeof(tjs_char), TJS_W("%d.%d.%d.%d"),
+		TVPVersionMajor, TVPVersionMinor,
+		TVPVersionRelease, TVPVersionBuild);
+
+	tjs_char tjsverstr[100];
+	TJS_snprintf(tjsverstr, sizeof(tjsverstr)/sizeof(tjs_char), TJS_W("%d.%d.%d"),
+		TJSVersionMajor, TJSVersionMinor, TJSVersionRelease);
+	return TVPFormatMessage( TVPReadAboutStringFromResource().c_str(), verstr, tjsverstr );
+}
+//---------------------------------------------------------------------------
 ttstr TVPGetVersionInformation(void)
 {
 	TVPGetVersion();

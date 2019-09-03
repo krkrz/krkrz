@@ -36,6 +36,7 @@
 //---------------------------------------------------------------------------
 static ttstr TVPAppTitle;
 static bool TVPAppTitleInit = false;
+extern ttstr TVPGetLicenseString();
 //---------------------------------------------------------------------------
 
 
@@ -1150,6 +1151,19 @@ TJS_BEGIN_NATIVE_PROP_DECL(touchDevice)
 	TJS_DENY_NATIVE_PROP_SETTER
 }
 TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, touchDevice)
+//----------------------------------------------------------------------
+TJS_BEGIN_NATIVE_PROP_DECL(licenseText)
+{
+	TJS_BEGIN_NATIVE_PROP_GETTER
+	{
+		*result = TVPGetLicenseString();
+		return TJS_S_OK;
+	}
+	TJS_END_NATIVE_PROP_GETTER
+
+	TJS_DENY_NATIVE_PROP_SETTER
+}
+TJS_END_NATIVE_STATIC_PROP_DECL_OUTER(cls, licenseText)
 //----------------------------------------------------------------------
 
 

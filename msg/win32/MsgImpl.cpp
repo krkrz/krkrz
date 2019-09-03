@@ -73,7 +73,7 @@ ttstr TVPReadAboutStringFromResource() {
 		size_t datelen = TJS_strlen( TVPCompileDate );
 		size_t timelen = TJS_strlen( TVPCompileTime );
 
-		// CR to CR-LF, %DATE% and %TIME% to compile data and time
+		// %DATE% and %TIME% to compile data and time
 		std::vector<tjs_char> tmp2;
 		tmp2.reserve( len * 2 + datelen + timelen );
 		for( size_t i = 0; i < len; i++ ) {
@@ -87,11 +87,8 @@ ttstr TVPReadAboutStringFromResource() {
 					tmp2.push_back( TVPCompileTime[j] );
 				}
 				i += 5;
-			} else if( tmp[i] != TJS_W('\n') ) {
-				tmp2.push_back( tmp[i] );
 			} else {
-				tmp2.push_back( TJS_W('\r') );
-				tmp2.push_back( TJS_W('\n') );
+				tmp2.push_back( tmp[i] );
 			}
 		}
 		tmp2.push_back( 0 );
