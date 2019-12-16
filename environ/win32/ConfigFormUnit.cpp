@@ -115,12 +115,27 @@ private:
 			if( ischange ) {
 				if( CurrentItem->Defalut != CurrentItem->Value ) {
 					CurrentItem->Caption = tjs_string(TJS_W("* ")) + CurrentItem->Text + tjs_string(TJS_W(" : ")) + CurrentItem->Select[CurrentItem->Value].second;
+					SetDefaultButtonEnable( true );
 				} else {
 					CurrentItem->Caption = CurrentItem->Text + tjs_string(TJS_W(" : ")) + CurrentItem->Select[CurrentItem->Value].second;
+					SetDefaultButtonEnable( false );
 				}
 				if( CurrentItem->ItemHandle ) {
 					SetTreeItem( CurrentItem->ItemHandle, CurrentItem->Caption );
 				}
+			}
+		}
+	}
+	void RestoreOptionToDefaultValue() {
+		if( CurrentItem ) {
+			if( CurrentItem->Defalut != CurrentItem->Value ) {
+				CurrentItem->Value = CurrentItem->Defalut;
+				CurrentItem->Caption = CurrentItem->Text + tjs_string( TJS_W( " : " ) ) + CurrentItem->Select[CurrentItem->Value].second;
+				if( CurrentItem->ItemHandle ) {
+					SetTreeItem( CurrentItem->ItemHandle, CurrentItem->Caption );
+				}
+				ComboBox_SetCurSel( OptionList, CurrentItem->Value );
+				SetDefaultButtonEnable( false );
 			}
 		}
 	}
@@ -446,6 +461,7 @@ LRESULT ConfigFormUnit::Dispatch( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPa
 			::EndDialog(hWnd, IDCANCEL);
 			return TRUE;
 		} else if( LOWORD(wParam) == IDC_DEFAULT_BUTTON) {
+			RestoreOptionToDefaultValue();
 			return TRUE;
 		} else if( HIWORD(wParam) == CBN_SELCHANGE ) {
 			ChangeOptionValue();
