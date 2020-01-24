@@ -232,10 +232,10 @@ struct sse2_const_alpha_fill_blend_d_functor {
 		__m128i maddr = _mm_add_epi32( opa_, da );
 		__m128i dopa = maddr;
 		__m128i ma1 = _mm_set_epi32(
-			TVPOpacityOnOpacityTable[maddr.m128i_u32[3]],
-			TVPOpacityOnOpacityTable[maddr.m128i_u32[2]],
-			TVPOpacityOnOpacityTable[maddr.m128i_u32[1]],
-			TVPOpacityOnOpacityTable[maddr.m128i_u32[0]]);
+			TVPOpacityOnOpacityTable[_mm_extract_epi16(maddr,6)],
+			TVPOpacityOnOpacityTable[_mm_extract_epi16(maddr,4)],
+			TVPOpacityOnOpacityTable[_mm_extract_epi16(maddr,2)],
+			TVPOpacityOnOpacityTable[_mm_extract_epi16(maddr,0)]);
 
 		ma1 = _mm_packs_epi32( ma1, ma1 );		// 0 1 2 3 0 1 2 3
 		ma1 = _mm_unpacklo_epi16( ma1, ma1 );	// 0 0 1 1 2 2 3 3

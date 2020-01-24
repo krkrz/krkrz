@@ -193,10 +193,10 @@ struct sse2_apply_color_map65_d_functor {
 		opa = _mm_slli_epi32( opa, 8 );			// <<= 8
 		da = _mm_or_si128( da, opa );
 		__m128i ma1 = _mm_set_epi32(
-			TVPOpacityOnOpacityTable65[da.m128i_u32[3]],
-			TVPOpacityOnOpacityTable65[da.m128i_u32[2]],
-			TVPOpacityOnOpacityTable65[da.m128i_u32[1]],
-			TVPOpacityOnOpacityTable65[da.m128i_u32[0]]);
+			TVPOpacityOnOpacityTable65[_mm_extract_epi16(da,6)],
+			TVPOpacityOnOpacityTable65[_mm_extract_epi16(da,4)],
+			TVPOpacityOnOpacityTable65[_mm_extract_epi16(da,2)],
+			TVPOpacityOnOpacityTable65[_mm_extract_epi16(da,0)]);
 
 		ma1 = _mm_packs_epi32( ma1, ma1 );		// 0 1 2 3 0 1 2 3
 		ma1 = _mm_unpacklo_epi16( ma1, ma1 );	// 0 0 1 1 2 2 3 3
