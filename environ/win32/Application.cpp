@@ -329,7 +329,9 @@ const tjs_char* SECodeToMessage( unsigned int code ) {
 }
 
 bool tTVPApplication::StartApplication( int argc, tjs_char* argv[] ) {
+#if (!defined(__GNUC__)) || (defined(__GNUC__) && defined (__SEH__) && !defined (__USING_SJLJ_EXCEPTIONS__))
 	_set_se_translator(se_translator_function);
+#endif
 
 	ArgC = argc;
 	ArgV = argv;
