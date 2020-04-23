@@ -999,14 +999,14 @@ void TVPInitializeOpenGLPlatform() {
 #else
 		path = ExtractFilePath( path ) + TJS_W("plugin\\");
 #endif
-		TCHAR oldCurDir[MAX_PATH];
+		//TCHAR oldCurDir[MAX_PATH];
 		//::GetCurrentDirectory( sizeof( oldCurDir ) / sizeof( oldCurDir[0] ), oldCurDir );
 		//::SetCurrentDirectory( path.c_str() );
 		::SetDllDirectory( path.c_str() );
 		bool gles = LoadLibGLESv2( path );
 		bool egl = LoadLibEGL( path );
 		if( gles == false || egl == false ) {
-			::SetCurrentDirectory( oldCurDir );
+			//::SetCurrentDirectory( oldCurDir );
 			TVPThrowExceptionMessage(TJS_W("Failed to load ANGLE."));
 		} else {
 			TVPANGLEInit = true;
