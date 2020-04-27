@@ -12,10 +12,12 @@ import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.media.AudioManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.ParcelFileDescriptor;
+import android.support.annotation.RequiresApi;
 import android.support.v4.provider.DocumentFile;
 import android.util.Log;
 import android.view.Display;
@@ -465,6 +467,7 @@ public class BaseMainActivity extends Activity  implements SurfaceHolder.Callbac
         intent.putExtra(Intent.EXTRA_TITLE, filename );
         startActivityForResult(intent, CREATE_DOCUMENT_REQUEST_CODE );
     }
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
         if (requestCode == READ_DOCUMENT_REQUEST_CODE ) {
