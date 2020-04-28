@@ -1143,7 +1143,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func. name*/capture)
 	if(numparams < 1) return TJS_E_BADPARAMCOUNT;
 
 	bool front = true;
-	if( numparams > 1 ) front = ( (tjs_int)param[1] ) ? true : false;
+	if( numparams > 1 ) front = (tjs_int)*param[1] != 0;
 
 	const iTVPTextureInfoIntrface* texture = TVPGetTextureInfo( param[0] );
 	if( texture ) {

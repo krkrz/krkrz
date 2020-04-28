@@ -20,8 +20,20 @@ inline bool icomp( const std::string& x, const std::string& y ) {
 
 struct equal_wchar_ignorecase {
 	inline bool operator()(tjs_char x, tjs_char y) const {
+#if defined ( __clang__ ) && ( ANDROID )
+		tjs_char x2 = x;
+		if( x2 >= u'A' && x2 <= u'Z' ) {
+			x2 = x2 + (u'a' - u'A');
+		}
+		tjs_char y2 = y;
+		if( y2 >= u'A' && y2 <= u'Z' ) {
+			y2 = y2 + (u'a' - u'A');
+		}
+		return x2 == y2;
+#else
 		std::locale loc;
 		return std::tolower(x,loc) == std::tolower(y,loc);
+#endif
 	}
 };
 inline bool icomp( const tjs_string& x, const tjs_string& y ) {

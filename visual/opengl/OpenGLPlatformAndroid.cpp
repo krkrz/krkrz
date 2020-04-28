@@ -12,7 +12,7 @@
 //---------------------------------------------------------------------------
 static bool TVPANGLEInit = false;
 static bool TVPIsSupportES3 = false;
-static int TVPOpenGLESVersion = 100;
+int TVPOpenGLESVersion = 100;
 //---------------------------------------------------------------------------
 void TVPInitializeOpenGLPlatform() {
 	if( TVPANGLEInit == false ) {
@@ -28,7 +28,7 @@ void TVPInitializeOpenGLPlatform() {
 //---------------------------------------------------------------------------
 int TVPGetOpenGLESVersion() { return TVPOpenGLESVersion; }
 //---------------------------------------------------------------------------
-void TVPeglGetProcAddress(const char * procname) {
-	return eglGetProcAddress(procname);
+void* TVPeglGetProcAddress(const char * procname) {
+	return (void*)eglGetProcAddress(procname);
 }
 //---------------------------------------------------------------------------

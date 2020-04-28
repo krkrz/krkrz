@@ -137,12 +137,12 @@ void tTVPDrawCycleTimer::Execute() {
 	while( !GetTerminated() ) {
 		Event.WaitFor( sleeptime );
 		if( !ForceDisable && !GetTerminated() ) {
-			tjs_uint64 start = GetTickCount();
+			tjs_uint64 start = TVPGetTickCount();
 			EventQueue.PostEvent( NativeEvent( TVP_EV_DRAW_TIMING_THREAD ) );
 			//OwnerWindow->StartDrawingInternal();
 			Event.WaitFor( 0 );	// 描画処理待ち
 
-			tjs_uint64 duration = GetTickCount() - start;
+			tjs_uint64 duration = TVPGetTickCount() - start;
 			tjs_uint64 interval = Interval;
 			if( duration >= interval )
 				sleeptime = 1;

@@ -10,6 +10,7 @@
 #include "TextureInfo.h"
 #include "GLVertexBufferObject.h"
 #include "ComplexRect.h"
+#include "LayerBitmapIntf.h"
 
 
 enum class tTVPTextureColorFormat : tjs_int {

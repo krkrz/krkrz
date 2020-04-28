@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.4.1)
+cmake_minimum_required(VERSION 3.10.2)
 
 if( ANDROID )
 	set(CMAKE_CXX_FLAGS_DEBUG "-g3 -O0")

@@ -138,7 +138,7 @@ inline tjs_string ExtractFileExt( const tjs_string& path ) {
 	if( pos != tjs_string::npos ) {
 		return path.substr( pos );
 	} else {
-		return tjs_string;
+		return tjs_string();
 	}
 #endif
 }
