@@ -223,7 +223,7 @@ bool tTVPSoundPlayer::Update() {
 	}
 	if( PlayStopPos != -1 ) {
 		tjs_uint64 samplesPlayed = Stream->GetSamplesPlayed();
-		if( PlayStopPos <= (tjs_int64)(samplesPlayed) ) {
+		if( PlayStopPos <= (tjs_int64)(samplesPlayed) || samplesPlayed == 0 ) {	// Sound API の種類によって再生終了後にサンプル位置が取得できず、GetSamplesPlayed が0を返すケースもありうる
 			Stream->StopStream();
 			Playing = false;
 			continued = false;
