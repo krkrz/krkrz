@@ -35,7 +35,7 @@ struct aligned_allocator : public std::allocator<T>
 #elif defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
 	T* allocate( std::size_t c ) {
 		T* ret;
-		posix_memalign(reinterpret_cast<void**>(&ret), TAlign, sizeof(T)*c);
+		posix_memalign(reinterpret_cast<void**>(&ret), (TAlign > sizeof(void *)) ? TAlign : sizeof(void *), sizeof(T)*c);
 		return ret;
 	}
 #else
