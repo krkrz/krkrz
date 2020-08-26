@@ -2541,7 +2541,8 @@ static const tjs_char * const StrFuncs[] =
 	TJS_W("reverse"),
 	TJS_W("repeat"),
 	TJS_W("startsWith"),
-	TJS_W("endsWith")
+	TJS_W("endsWith"),
+	TJS_W("parseNumber")
 };
 
 enum tTJSStringMethodNameIndex
@@ -2560,7 +2561,8 @@ enum tTJSStringMethodNameIndex
 	TJSStrMethod_reverse,
 	TJSStrMethod_repeat,
 	TJSStrMethod_startsWith,
-	TJSStrMethod_endsWith
+	TJSStrMethod_endsWith,
+	TJSStrMethod_parseNumber
 };
 
 #define TJS_STRFUNC_MAX (sizeof(StrFuncs) / sizeof(StrFuncs[0]))
@@ -2904,6 +2906,18 @@ void tTJSInterCodeContext::ProcessStringFunction(const tjs_char *member,
 			}
 			*result = ret ? 1 : 0;
 		}
+		return;
+	}
+	else if (TJS_STR_METHOD_IS(parseNumber))
+	{
+		if (!result) return;
+		// if (numargs != 1) TJSThrowFrom_tjs_error(TJS_E_BADPARAMCOUNT); // 現在基数指定は未対応
+		const tjs_char* d = target .c_str();
+		if (TJSParseNumber(*result, &d)) {
+			return;
+		}
+		// 変換に失敗したら void を返す
+		*result = tTJSVariant();
 		return;
 	}
 
