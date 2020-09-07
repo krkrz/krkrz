@@ -10,7 +10,11 @@
 /* tjsdate.y */
 /* TJS2 date string parser */
 
+#if defined(__APPLE__)
+#include <stdlib.h>
+#else
 #include <malloc.h>
+#endif
 
 #include "tjsTypes.h"
 #include "tjsDateParser.h"

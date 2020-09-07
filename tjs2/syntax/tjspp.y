@@ -10,7 +10,11 @@
 /* tjspp.y */
 /* TJS2 conditional compiling control's conditional expression parser */
 
+#if defined(__APPLE__)
+#include <stdlib.h>
+#else
 #include <malloc.h>
+#endif
 
 #include "tjs.h"
 #include "tjsCompileControl.h"
