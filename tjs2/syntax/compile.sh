@@ -13,9 +13,9 @@ perl postbison.pl tjspp.tab.c
 perl wrapTJSns.pl tjspp.tab.h
 echo copying ...
 copy tjs.tab.c ../tjs.tab.cpp
-copy tjs.tab.h ../tjs.tab.h
+copy tjs.tab.h ../tjs.tab.hpp
 copy tjspp.tab.c ../tjspp.tab.cpp
-copy tjspp.tab.h ../tjspp.tab.h
+copy tjspp.tab.h ../tjspp.tab.hpp
 echo tjsdate.y :
 perl CR.pl tjsdate.y
 bison -dv --name-prefix=dp tjsdate.y
@@ -23,6 +23,9 @@ perl postbison.pl tjsdate.tab.c
 perl wrapTJSns.pl tjsdate.tab.h
 echo copying ...
 copy tjsdate.tab.c ../tjsdate.tab.cpp
-copy tjsdate.tab.h ../tjsdate.tab.h
-perl create_word_map.pl > ..\tjsDateWordMap.cc
-
+copy tjsdate.tab.h ../tjsdate.tab.hpp
+perl create_word_map.pl > ../tjsDateWordMap.cc
+echo cleaning ...
+rm *.tab.c
+rm *.tab.h
+rm *.output
