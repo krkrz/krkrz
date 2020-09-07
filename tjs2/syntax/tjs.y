@@ -10,9 +10,11 @@
 /* tjs.y */
 /* TJS2 bison input file */
 
-
+#if defined(__APPLE__)
+#include <stdlib.h>
+#else
 #include <malloc.h>
-
+#endif
 
 #include "tjsInterCodeGen.h"
 #include "tjsScriptBlock.h"
@@ -359,13 +361,32 @@ variable_id
 /* a variable type. It is not currently effect. Ignore types. */
 variable_type
 	: /* empty */
-	| ":" T_SYMBOL
-	| ":" T_VOID
-	| ":" T_INT
-	| ":" T_REAL
-	| ":" T_STRING
-	| ":" T_OCTET
+	| ":" type_sym
+;
 
+type_sym
+	: type_sym_single /* normal type */
+	| type_sym "|" type_sym_single /* union type */
+;
+
+type_sym_single
+	: T_SYMBOL
+	| T_VOID
+	| T_INT
+	| T_REAL
+	| T_STRING
+	| T_OCTET
+	| T_SYMBOL "<" type_args ">"
+	| T_SYMBOL "<" T_SYMBOL "<" type_args ">>" /* hack for nested types */
+	| T_SYMBOL "<" T_SYMBOL "<" T_SYMBOL "<" type_args ">>>"
+;
+
+type_args
+	: /* empty */
+	| type_args "," type_sym
+	| type_args ","
+	| type_sym
+;
 
 /* a function definition */
 func_def
@@ -403,6 +424,7 @@ func_decl_arg_opt
 func_decl_arg_list
 	: /* empty */
 	| func_decl_arg_at_least_one
+	| func_decl_arg_at_least_one ","
 ;
 
 func_decl_arg_at_least_one
@@ -412,6 +434,8 @@ func_decl_arg_at_least_one
 
 func_decl_arg
 	: T_SYMBOL variable_type				{ cc->AddFunctionDeclArg(
+												lx->GetString($1), NULL); }
+	| T_SYMBOL "?" variable_type			{ cc->AddFunctionDeclArg(
 												lx->GetString($1), NULL); }
 	| T_SYMBOL variable_type "=" expr_no_comma	{ cc->AddFunctionDeclArg(
 												lx->GetString($1), $4); }
