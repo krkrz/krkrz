@@ -660,7 +660,16 @@
 					{ "value":"1", "desc":"1 thread", "default":true },
 					{ "value":"2", "desc":"2 threads" },
 					{ "value":"4", "desc":"4 threads" },
-					{ "value":"8", "desc":"8 threads" }
+					{ "value":"6", "desc":"6 threads" },
+					{ "value":"8", "desc":"8 threads" },
+					{ "value":"12", "desc":"12 threads" },
+					{ "value":"16", "desc":"16 threads" },
+					{ "value":"24", "desc":"24 threads" },
+					{ "value":"32", "desc":"32 threads" },
+					{ "value":"48", "desc":"48 threads" },
+					{ "value":"64", "desc":"64 threads" },
+					{ "value":"96", "desc":"96 threads" },
+					{ "value":"128", "desc":"128 threads" }
 				]
 			},
 			{

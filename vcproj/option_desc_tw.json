@@ -660,7 +660,16 @@
 					{ "value":"1", "desc":"1線程", "default":true },
 					{ "value":"2", "desc":"2線程" },
 					{ "value":"4", "desc":"4線程" },
-					{ "value":"8", "desc":"8線程" }
+					{ "value":"6", "desc":"6線程" },
+					{ "value":"8", "desc":"8線程" },
+					{ "value":"12", "desc":"12線程" },
+					{ "value":"16", "desc":"16線程" },
+					{ "value":"24", "desc":"24線程" },
+					{ "value":"32", "desc":"32線程" },
+					{ "value":"48", "desc":"48線程" },
+					{ "value":"64", "desc":"64線程" },
+					{ "value":"96", "desc":"96線程" },
+					{ "value":"128", "desc":"128線程" }
 				]
 			},
 			{
