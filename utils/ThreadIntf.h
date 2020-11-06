@@ -112,7 +112,7 @@ public:
 
 
 /*[*/
-const tjs_int TVPMaxThreadNum = 8;
+const tjs_int TVPMaxThreadNum = 128;
 typedef void (TJS_USERENTRY *TVP_THREAD_TASK_FUNC)(void *);
 typedef void * TVP_THREAD_PARAM;
 /*]*/
