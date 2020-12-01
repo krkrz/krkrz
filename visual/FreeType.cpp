@@ -1093,8 +1093,8 @@ tjs_int tFreeTypeFace::LoadGlyphSlotFromCharcode(tjs_char code)
 		if(err) continue;
 
 		// フォントの変形を行う
-		if( Options & TVP_TF_BOLD ) FT_GlyphSlot_Embolden( faceset->FTFace->glyph );
-		if( Options & TVP_TF_ITALIC ) FT_GlyphSlot_Oblique( faceset->FTFace->glyph );
+		if( (Options & TVP_TF_BOLD) && !(faceset->FTFace->style_flags & FT_STYLE_FLAG_BOLD) ) FT_GlyphSlot_Embolden( faceset->FTFace->glyph );
+		if( (Options & TVP_TF_ITALIC) && !(faceset->FTFace->style_flags & FT_STYLE_FLAG_ITALIC) ) FT_GlyphSlot_Oblique( faceset->FTFace->glyph );
 
 		return (tjs_int)i;
 	}
