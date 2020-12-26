@@ -1952,7 +1952,7 @@ bool tTJSNI_Window::WaitForVBlank( tjs_int* in_vblank, tjs_int* delayed )
 //---------------------------------------------------------------------------
 void tTJSNI_Window::UpdateVSyncThread()
 {
-	if( CanvasInstance != nullptr ) {
+	if( CanvasInstance == nullptr ) {
 		if( WaitVSync ) {
 			if( VSyncTimingThread == NULL ) {
 				VSyncTimingThread = new tTVPVSyncTimingThread(this);
