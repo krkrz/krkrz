@@ -36,7 +36,9 @@ CUnknown * WINAPI TBufferRenderer::CreateInstance( LPUNKNOWN pUnk, HRESULT *phr 
 		*phr = E_OUTOFMEMORY;
 	return punk;
 }
+#ifdef _MSC_VER
 #pragma warning(disable: 4355)	// コンストラクタのベースメンバ初期化時にthisを使うとワーニングが出るのでそれを抑止
+#endif
 //----------------------------------------------------------------------------
 //! @brief	  	TBufferRenderer constructor
 //! @param		pName : デバッグのために使用される記述へのポインタ。
@@ -63,7 +65,9 @@ TBufferRenderer::TBufferRenderer( TCHAR *pName, LPUNKNOWN pUnk, HRESULT *phr )
 
 	m_StartFrame = 0;
 }
+#ifdef _MSC_VER
 #pragma warning(default: 4355)
+#endif
 //----------------------------------------------------------------------------
 //! @brief	  	TBufferRenderer destructor
 //----------------------------------------------------------------------------

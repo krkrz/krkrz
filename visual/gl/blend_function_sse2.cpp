@@ -173,6 +173,9 @@ void TVPReverse8_sse2_c(tjs_uint8 *pixels, tjs_int len){
 		pixels++;
 	}
 }
+#if defined(__GNUC__) || defined(__clang__)
+__attribute__ ((target ("ssse3")))
+#endif
 void TVPReverse8_ssse3_c(tjs_uint8 *pixels, tjs_int len){
 	tjs_uint8 *dest = pixels + len -1;
 	len/=2;
@@ -275,22 +278,7 @@ struct ssse3_do_gray_scale {
 	inline ssse3_do_gray_scale() : zero_( _mm_setzero_si128() ), alphamask_(_mm_set1_epi32(0xff000000)), lum_(_mm_set1_epi32(0x0036B713)) {
 		lum_ = _mm_unpacklo_epi8( lum_, zero_ );
 		
-		mask.m128i_u8[0] = 0x01;
-		mask.m128i_u8[1] = 0x01;
-		mask.m128i_u8[2] = 0x01;
-		mask.m128i_u8[3] = 0x81;
-		mask.m128i_u8[4] = 0x03;
-		mask.m128i_u8[5] = 0x03;
-		mask.m128i_u8[6] = 0x03;
-		mask.m128i_u8[7] = 0x83;
-		mask.m128i_u8[8] = 0x05;
-		mask.m128i_u8[9] = 0x05;
-		mask.m128i_u8[10] = 0x05;
-		mask.m128i_u8[11] = 0x85;
-		mask.m128i_u8[12] = 0x07;
-		mask.m128i_u8[13] = 0x07;
-		mask.m128i_u8[14] = 0x07;
-		mask.m128i_u8[15] = 0x87;
+		mask = _mm_setr_epi8(0x00, 0x01, 0x02, 0x80, 0x03, 0x04, 0x05, 0x80, 0x06, 0x07, 0x08, 0x80, 0x09, 0x0A, 0x0B, 0x80);
 		// (0x1x2x3x0x1x2x3x)
 		//  0123456789abcdef
 	}
@@ -301,6 +289,9 @@ struct ssse3_do_gray_scale {
 		d = (d >> 8) * 0x10101 + (s & 0xff000000);
 		return d;
 	}
+#if defined(__GNUC__) || defined(__clang__)
+	__attribute__ ((target ("ssse3")))
+#endif
 	inline __m128i operator()( __m128i ms1 ) const {
 		__m128i ma = ms1;
 		ma = _mm_and_si128( ma, alphamask_ );
@@ -824,7 +815,7 @@ static inline void stretch_blend_inter_func_sse2(tjs_uint32 *dest, tjs_int len, 
 		count = count > len ? len : count;
 		tjs_uint32* limit = dest + count;
 		while( dest < limit ) {
-			tjs_uint32 s = inter( src1, src2, mstart.m128i_i32[0] );
+			tjs_uint32 s = inter( src1, src2, _mm_cvtsi128_si32(mstart) );
 			*dest = func( *dest, s  );
 			mstart = _mm_add_epi32( mstart, mstep1 );
 			dest++;
@@ -842,7 +833,7 @@ static inline void stretch_blend_inter_func_sse2(tjs_uint32 *dest, tjs_int len, 
 	}
 	limit += (len-rem);
 	while( dest < limit ) {
-		tjs_uint32 s = inter( src1, src2, mstart.m128i_i32[0] );
+		tjs_uint32 s = inter( src1, src2, _mm_cvtsi128_si32(mstart) );
 		*dest = func( *dest, s  );
 		mstart = _mm_add_epi32( mstart, mstep1 );
 		dest++;
@@ -1231,6 +1222,9 @@ void TVPDoGrayScale_ssse3_c(tjs_uint32 *dest, tjs_int len ) {
 	convert_func_sse2<ssse3_do_gray_scale>( dest, len );
 }
 #else
+#if defined(__GNUC__) || defined(__clang__)
+__attribute__ ((target ("ssse3")))
+#endif
 void TVPDoGrayScale_ssse3_c(tjs_uint32 *dest, tjs_int len ) {
 	do_gray_scale_functor dogray;
 	tjs_int count = (tjs_int)((unsigned)dest & 0xF);
@@ -1304,6 +1298,9 @@ void TVPConvertAlphaToAdditiveAlpha_sse2_c(tjs_uint32 *buf, tjs_int len){
 }
 extern void TVPGL_AVX2_Init();
 extern void TVPInitializeResampleSSE2();
+#if defined(__GNUC__) || defined(__clang__)
+__attribute__ ((target ("arch=i686")))
+#endif
 void TVPGL_SSE2_Init() {
 	if( TVPCPUType & TVP_CPU_HAS_SSE2 ) {
 		TVPAdditiveAlphaBlend = TVPAdditiveAlphaBlend_sse2_c;

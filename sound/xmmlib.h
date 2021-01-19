@@ -56,7 +56,7 @@
 #endif
 
 
-#if	(defined(__SSE__)&&defined(__GNUC__))||defined(_MSC_VER)
+#if	defined(__SSE__) || (!defined(__clang__) && (defined(_M_IX86_FP) && (_M_IX86_FP >= 1)) || (defined(_M_X64)))
 
 /* We need type definitions from the XMM header file.  */
 #include <xmmintrin.h>
@@ -91,7 +91,7 @@ typedef union __declspec(intrin_type) __declspec(align(16)) __m128x{
 	float			sf[4];
 	__m64			pi64[2];
 	__m128			ps;
-#ifdef	__SSE2__
+#if defined(__SSE2__) || (!defined(__clang__) && (defined(_M_IX86_FP) && (_M_IX86_FP >= 2)) || (defined(_M_X64)))
 	__m128i			pi;
 	__m128d			pd;
 #endif
@@ -103,7 +103,7 @@ typedef union {
 	float			sf[4];
 	__m64			pi64[2];
 	__m128			ps;
-#ifdef	__SSE2__
+#if defined(__SSE2__) || (!defined(__clang__) && (defined(_M_IX86_FP) && (_M_IX86_FP >= 2)) || (defined(_M_X64)))
 	__m128i			pi;
 	__m128d			pd;
 #endif
@@ -196,7 +196,7 @@ inline float _mm_min_horz(__m128 x)
 	return _mm_cvtss_f32(x);
 }
 
-#endif /* (defined(__SSE__)&&defined(__GNUC__))||defined(_MSC_VER) */
+#endif /* defined(__SSE__) || (!defined(__clang__) && (defined(_M_IX86_FP) && (_M_IX86_FP >= 1)) || (defined(_M_X64))) */
 
 
 /**

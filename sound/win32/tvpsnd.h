@@ -52,7 +52,7 @@ typedef interface ITSSWaveDecoder ITSSWaveDecoder;
 #endif 	/* __ITSSWaveDecoder_FWD_DEFINED__ */
 
 
-void __RPC_FAR * __RPC_USER MIDL_user_allocate(size_t);
+void * __RPC_USER MIDL_user_allocate(size_t);
 void __RPC_USER MIDL_user_free( void __RPC_FAR * ); 
 
 

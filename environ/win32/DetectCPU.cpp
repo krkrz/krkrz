@@ -21,7 +21,9 @@
 #include <intrin.h>
 #include "MsgIntf.h"
 
+#ifdef _MSC_VER
 #pragma intrinsic(__rdtsc)
+#endif
 
 /*
 	Note: CPU clock measuring routine is in EmergencyExit.cpp, reusing
@@ -58,7 +60,7 @@ static void TVPGetCPUTypeForOne()
 #endif
 
 	// check OSFXSR WinXP以降ならサポートしているので、もうこのチェックは無意味かな
-#ifndef TJS_64BIT_OS
+#if !defined(TJS_64BIT_OS) && !defined(__GNUC__)
 	if(TVPCPUFeatures & TVP_CPU_HAS_SSE)
 	{
 		__try {

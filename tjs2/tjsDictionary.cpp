@@ -11,6 +11,7 @@
 
 #include "tjsCommHead.h"
 
+#include <memory>
 #include "tjsDictionary.h"
 #include "tjsArray.h"
 #include "tjsBinarySerializer.h"

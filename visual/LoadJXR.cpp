@@ -58,11 +58,13 @@ bool TVPAcceptSaveAsJXR(void* formatdata, const ttstr & type, class iTJSDispatch
 #include <atlbase.h>
 #include <comutil.h>
 #include "StorageImpl.h"
+#ifdef _MSC_VER
 #pragma comment(lib, "WindowsCodecs.lib")
 #ifdef _DEBUG
 #pragma comment(lib, "comsuppwd.lib")
 #else
 #pragma comment(lib, "comsuppw.lib")
+#endif
 #endif
 
 
@@ -222,7 +224,8 @@ void TVPSaveAsJXR(void* formatdata, tTJSBinaryStream* dst, const class tTVPBaseB
 						return TJS_S_OK;
 					}
 				} callback( property, &format );
-				meta->EnumMembers(TJS_IGNOREPROP, &tTJSVariantClosure(&callback, NULL), meta);
+				tTJSVariantClosure closure(&callback, NULL);
+				meta->EnumMembers(TJS_IGNOREPROP, &closure, meta);
 			}
 
 			if( SUCCEEDED(hr) ) hr = frame->Initialize( property );
@@ -415,6 +418,7 @@ external/jxrlib/jxrgluelib/JXRGlueLib_vc11.vcxproj
 をソリューションに加えてビルドすること
 */
 #if defined( WIN32 )
+#ifdef _MSC_VER
 #ifdef _DEBUG
 #pragma comment(lib, "JXRCommonLib_d.lib")
 #pragma comment(lib, "JXRDecodeLib_d.lib")
@@ -425,6 +429,7 @@ external/jxrlib/jxrgluelib/JXRGlueLib_vc11.vcxproj
 #pragma comment(lib, "JXRDecodeLib.lib")
 #pragma comment(lib, "JXREncodeLib.lib")
 #pragma comment(lib, "JXRGlueLib.lib")
+#endif
 #endif
 #endif
 
