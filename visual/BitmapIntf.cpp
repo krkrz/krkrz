@@ -33,6 +33,14 @@ tjs_error TJS_INTF_METHOD tTJSNI_Bitmap::Construct(tjs_int numparams, tTJSVarian
 			tjs_uint32 bpp = 32;
 			if( numparams > 2 ) {
 				bpp = (tjs_int)*param[2];
+				if (width == 0 || height == 0) {
+					// サイズが0のBitmapを32bpp以外で生成しようとした時は例外とする
+					TVPThrowExceptionMessage(TVPCannotCreateEmptyLayerImage);
+				}
+			} else if (width == 0 || height == 0) {
+				// サイズが0の時は初期Bitmapのコピーで生成し、変更が加えられた段階で分離する (copy on write)
+				Bitmap = new tTVPBaseBitmap( TVPGetInitialBitmap() );
+				return TJS_S_OK;
 			}
 			Bitmap = new tTVPBaseBitmap( width, height, bpp );
 		}
