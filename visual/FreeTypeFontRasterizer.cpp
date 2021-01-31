@@ -81,7 +81,7 @@ void FreeTypeFontRasterizer::ApplyFont( const tTVPFont& font ) {
 	opt |= (font.Flags & TVP_TF_FONTFILE) ? TVP_FACE_OPTIONS_FILE : 0;
 	bool recreate = false;
 	if( Face ) {
-		if( Face->GetFontName() != faces[0] ) {
+		if( Face->GetFontName() != faces[0] || Face->GetOption(TVP_TF_ITALIC) != !!(font.Flags & TVP_TF_ITALIC) || Face->GetOption(TVP_TF_BOLD) != !!(font.Flags & TVP_TF_BOLD)) {
 			delete Face;
 			Face = new tFreeTypeFace( faces, opt );
 			recreate = true;
