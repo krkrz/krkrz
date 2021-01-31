@@ -124,6 +124,11 @@ void FreeTypeFontRasterizer::GetTextExtent(tjs_char ch, tjs_int &w, tjs_int &h) 
 			w = metrics.CellIncX;
 			h = metrics.CellIncY;
 		}
+		else
+		{
+			w = Face->GetHeight();
+			h = w;
+		}
 	}
 }
 //---------------------------------------------------------------------------
