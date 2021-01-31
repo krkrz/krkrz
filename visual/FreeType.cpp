@@ -711,6 +711,12 @@ tFreeTypeFace::tFreeTypeFace(const std::vector<tjs_string> &fontname, tjs_uint32
 			}
 		}
 #endif
+
+		if( Faces[i]->Face == nullptr )
+		{
+			TVPThrowExceptionMessage(TVPFontCannotBeUsed, fontname[i] );
+		}
+
 		Faces[i]->FTFace = Faces[i]->Face->GetFTFace();
 
 		// マッピングを確認する
