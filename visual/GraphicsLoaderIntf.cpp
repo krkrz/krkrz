@@ -30,6 +30,7 @@
 #include <cstdlib>
 #include <cmath>
 #include "StorageImpl.h"
+#include "tjsGlobalStringMap.h"
 
 //---------------------------------------------------------------------------
 
@@ -768,7 +769,8 @@ void TVPSaveAsBMP( void* formatdata, tTJSBinaryStream* dst, const tTVPBaseBitmap
 	if( meta )
 	{
 		tTJSVariant val;
-		tjs_error er = meta->PropGet(TJS_MEMBERMUSTEXIST, TJS_W("bpp"), NULL, &val, meta);
+		static ttstr bpp_name(TJSMapGlobalStringMap(TJS_W("bpp")));
+		tjs_error er = meta->PropGet(TJS_MEMBERMUSTEXIST, bpp_name.c_str(), bpp_name.GetHint(), &val, meta);
 		if(TJS_SUCCEEDED(er))
 		{
 			tjs_int index = (tjs_int)val.AsInteger();
@@ -925,13 +927,17 @@ void TVPLoadHeaderBMP( void* formatdata, tTJSBinaryStream *src, iTJSDispatch2** 
 
 	*dic = TJSCreateDictionaryObject();
 	tTJSVariant val(bi.biWidth);
-	(*dic)->PropSet(TJS_MEMBERENSURE, TJS_W("width"), 0, &val, (*dic) );
+	static ttstr width_name(TJSMapGlobalStringMap(TJS_W("width")));
+	(*dic)->PropSet(TJS_MEMBERENSURE, width_name.c_str(), width_name.GetHint(), &val, (*dic) );
 	val = tTJSVariant(bi.biHeight);
-	(*dic)->PropSet(TJS_MEMBERENSURE, TJS_W("height"), 0, &val, (*dic) );
+	static ttstr height_name(TJSMapGlobalStringMap(TJS_W("height")));
+	(*dic)->PropSet(TJS_MEMBERENSURE, height_name.c_str(), height_name.GetHint(), &val, (*dic) );
 	val = tTJSVariant(bi.biBitCount);
-	(*dic)->PropSet(TJS_MEMBERENSURE, TJS_W("bpp"), 0, &val, (*dic) );
+	static ttstr bpp_name(TJSMapGlobalStringMap(TJS_W("bpp")));
+	(*dic)->PropSet(TJS_MEMBERENSURE, bpp_name.c_str(), bpp_name.GetHint(), &val, (*dic) );
 	val = tTJSVariant(palsize);
-	(*dic)->PropSet(TJS_MEMBERENSURE, TJS_W("palette"), 0, &val, (*dic) );
+	static ttstr palette_name(TJSMapGlobalStringMap(TJS_W("palette")));
+	(*dic)->PropSet(TJS_MEMBERENSURE, palette_name.c_str(), palette_name.GetHint(), &val, (*dic) );
 }
 
 //---------------------------------------------------------------------------

@@ -282,7 +282,7 @@ void tTJSNativeClass::RegisterNCM(const tjs_char *name, iTJSDispatch2 *dsp,
 	if(PropSetByVS((TJS_MEMBERENSURE | TJS_IGNOREPROP) | flags,
 		tname.AsVariantStringNoAddRef(), &val, this) == TJS_E_NOTIMPL)
 		PropSet((TJS_MEMBERENSURE | TJS_IGNOREPROP) | flags,
-			tname.c_str(), NULL, &val, this);
+			tname.c_str(), tname.GetHint(), &val, this);
 
 	// release dsp
 	dsp->Release();
@@ -357,7 +357,7 @@ tTJSNativeClass::FuncCall(tjs_uint32 flag, const tjs_char * membername,
 				if(Dest->PropSetByVS(TJS_MEMBERENSURE|TJS_IGNOREPROP|flags,
 					param[0]->AsStringNoAddRef(), &val, Dest) == TJS_E_NOTIMPL)
 					Dest->PropSet(TJS_MEMBERENSURE|TJS_IGNOREPROP|flags,
-					param[0]->GetString(), NULL, &val, Dest);
+					param[0]->GetString(), param[0]->GetHint(), &val, Dest);
 			}
 			if(result) *result = (tjs_int)(1); // returns true
 			return TJS_S_OK;

@@ -890,7 +890,8 @@ void tTJSNI_BaseWaveSoundBuffer::RebuildFilterChain()
 	// get filter count
 	tTJSVariant v;
 	tjs_int count = 0;
-	Filters->PropGet(0, TJS_W("count"), NULL, &v, Filters);
+	static ttstr count_name(TJSMapGlobalStringMap(TJS_W("count")));
+	Filters->PropGet(0, count_name.c_str(), count_name.GetHint(), &v, Filters);
 	count = v;
 
 	// reset filter output
@@ -904,7 +905,8 @@ void tTJSNI_BaseWaveSoundBuffer::RebuildFilterChain()
 		// get iTVPBasicWaveFilter interface
 		tTJSVariantClosure clo = v.AsObjectClosureNoAddRef();
 		tTJSVariant iface_v;
-		if(TJS_FAILED(clo.PropGet(0, TJS_W("interface"), NULL, &iface_v, NULL))) continue;
+		static ttstr interface_name(TJSMapGlobalStringMap(TJS_W("interface")));
+		if(TJS_FAILED(clo.PropGet(0, interface_name.c_str(), interface_name.GetHint(), &iface_v, NULL))) continue;
 		iTVPBasicWaveFilter * filter =
 			reinterpret_cast<iTVPBasicWaveFilter *>((tjs_intptr_t)(tjs_int64)iface_v);
 		// save to the backupped array
@@ -996,11 +998,14 @@ iTJSDispatch2 * tTJSNI_BaseWaveSoundBuffer::GetWaveLabelsObjectNoAddRef()
 			{
 				tTJSVariant val;
 				val = i->Name.c_str(); // c_str() to avoid race condition for ttstr
-				item_dic->PropSet(TJS_MEMBERENSURE, TJS_W("name"), NULL, &val, item_dic);
+				static ttstr name_name(TJSMapGlobalStringMap(TJS_W("name")));
+				item_dic->PropSet(TJS_MEMBERENSURE, name_name.c_str(), name_name.GetHint(), &val, item_dic);
 				val = i->Position;
-				item_dic->PropSet(TJS_MEMBERENSURE, TJS_W("samplePosition"), NULL, &val, item_dic);
+				static ttstr samplePosition_name(TJSMapGlobalStringMap(TJS_W("samplePosition")));
+				item_dic->PropSet(TJS_MEMBERENSURE, samplePosition_name.c_str(), samplePosition_name.GetHint(), &val, item_dic);
 				val = freq ? i->Position * 1000 / freq : 0;
-				item_dic->PropSet(TJS_MEMBERENSURE, TJS_W("position"), NULL, &val, item_dic);
+				static ttstr position_name(TJSMapGlobalStringMap(TJS_W("position")));
+				item_dic->PropSet(TJS_MEMBERENSURE, position_name.c_str(), position_name.GetHint(), &val, item_dic);
 
 				tTJSVariant item_dic_var(item_dic, item_dic);
 

@@ -346,7 +346,8 @@ void tTJSNI_BaseWindow::SetDrawDeviceObject(const tTJSVariant & val)
 	{
 		tTJSVariantClosure clo = DrawDeviceObject.AsObjectClosureNoAddRef();
 		tTJSVariant iface_v;
-		if(TJS_FAILED(clo.PropGet(0, TJS_W("interface"), NULL, &iface_v, NULL)))
+		static ttstr interface_name(TJSMapGlobalStringMap(TJS_W("interface")));
+		if(TJS_FAILED(clo.PropGet(0, interface_name.c_str(), interface_name.GetHint(), &iface_v, NULL)))
 			TVPThrowExceptionMessage( TVPCannotRetriveInterfaceFromDrawDevice );
 		DrawDevice =
 			reinterpret_cast<iTVPDrawDevice *>((tjs_intptr_t)(tjs_int64)iface_v);

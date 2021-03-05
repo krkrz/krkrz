@@ -29,6 +29,7 @@
 #include "DebugIntf.h"
 #include "LayerManager.h"
 #include "BitmapIntf.h"
+#include "tjsGlobalStringMap.h"
 
 #include "TVPColor.h"
 #ifdef _WIN32
@@ -440,7 +441,8 @@ tTJSNI_BaseLayer::Construct(tjs_int numparams, tTJSVariant **param,
 
 	class iTVPLayerTreeOwner* lto = NULL;
 	tTJSVariant iface_v;
-	if(TJS_FAILED(clo.PropGet(0, TJS_W("layerTreeOwnerInterface"), NULL, &iface_v, NULL)))
+	static ttstr layerTreeOwnerInterface_name(TJSMapGlobalStringMap(TJS_W("layerTreeOwnerInterface")));
+	if(TJS_FAILED(clo.PropGet(0, layerTreeOwnerInterface_name.c_str(), layerTreeOwnerInterface_name.GetHint(), &iface_v, NULL)))
 		TVPThrowExceptionMessage( TJS_W("Cannot Retrive Layer Tree Owner Interface.") );
 	lto = reinterpret_cast<iTVPLayerTreeOwner *>((tjs_intptr_t)(tjs_int64)iface_v);
 
@@ -645,7 +647,8 @@ iTJSDispatch2 * tTJSNI_BaseLayer::GetChildrenArrayObjectNoAddRef()
 		{
 			tTJSVariant val;
 			tjs_error er;
-			er = classobj->PropGet(0, TJS_W("clear"), NULL, &val, classobj);
+			static ttstr clear_name(TJSMapGlobalStringMap(TJS_W("clear")));
+			er = classobj->PropGet(0, clear_name.c_str(), clear_name.GetHint(), &val, classobj);
 				// retrieve clear method
 			if(TJS_FAILED(er)) TVPThrowInternalError;
 			ArrayClearMethod = val.AsObject();
@@ -2476,19 +2479,23 @@ void tTJSNI_BaseLayer::SaveLayerImage(const ttstr &name, const ttstr &type)
 		case ltPsExclusion:			val = tTJSVariant(TJS_W("psexcl"));		break;
 		default:					val = tTJSVariant(TJS_W("opaque"));		break;
 		}
-		dic->PropSet(TJS_MEMBERENSURE, TJS_W("mode"), 0, &val, dic );
+		static ttstr mode_name(TJSMapGlobalStringMap(TJS_W("mode")));
+		dic->PropSet(TJS_MEMBERENSURE, mode_name.c_str(), mode_name.GetHint(), &val, dic );
 
 		if( ImageLeft > 0 ) {
 			val = tTJSVariant(ImageLeft);
-			dic->PropSet(TJS_MEMBERENSURE, TJS_W("offs_x"), 0, &val, dic );
+			static ttstr offs_x_name(TJSMapGlobalStringMap(TJS_W("offs_x")));
+			dic->PropSet(TJS_MEMBERENSURE, offs_x_name.c_str(), offs_x_name.GetHint(), &val, dic );
 		}
 		if( ImageTop > 0 ) {
 			val = tTJSVariant(ImageTop);
-			dic->PropSet(TJS_MEMBERENSURE, TJS_W("offs_y"), 0, &val, dic );
+			static ttstr offs_y_name(TJSMapGlobalStringMap(TJS_W("offs_y")));
+			dic->PropSet(TJS_MEMBERENSURE, offs_y_name.c_str(), offs_y_name.GetHint(), &val, dic );
 		}
 		if( ImageLeft > 0 || ImageTop > 0 ) {
 			val = tTJSVariant(TJS_W("pixel"));
-			dic->PropSet(TJS_MEMBERENSURE, TJS_W("offs_unit"), 0, &val, dic );
+			static ttstr offs_unit_name(TJSMapGlobalStringMap(TJS_W("offs_unit")));
+			dic->PropSet(TJS_MEMBERENSURE, offs_unit_name.c_str(), offs_unit_name.GetHint(), &val, dic );
 		}
 		TVPSaveImage( name, type, MainImage, dic );
 	} catch(...) {

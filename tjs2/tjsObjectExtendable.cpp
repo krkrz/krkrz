@@ -24,7 +24,7 @@ void tTJSExtendableObject::SetSuper( iTJSDispatch2* dsp ) {
 }
 void tTJSExtendableObject::ExtendsClass( iTJSDispatch2* global, const ttstr& classname ) {
 	tTJSVariant val;
-	tjs_error er = global->PropGet( TJS_MEMBERMUSTEXIST, classname.c_str(), NULL, &val, global );
+	tjs_error er = global->PropGet( TJS_MEMBERMUSTEXIST, classname.c_str(), classname.GetHint(), &val, global );
 	if( TJS_FAILED(er) ) TJSThrowFrom_tjs_error( er, classname.c_str() );
 
 	SetSuper( val.AsObjectNoAddRef() );
