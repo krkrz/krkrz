@@ -19,6 +19,7 @@
 #include "tjsUtils.h"
 #include "tjsBinarySerializer.h"
 #include "tjsOctPack.h"
+#include "tjsGlobalStringMap.h"
 
 #ifndef TJS_NO_REGEXP
 #include "tjsRegExp.h"
@@ -408,9 +409,9 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/* func. name */save)
 	{
 		tTJSArrayNI::tArrayItemIterator i = ni->Items.begin();
 #ifdef TJS_TEXT_OUT_CRLF
-		const static ttstr cr(TJS_W("\r\n"));
+		const static ttstr cr(TJSMapGlobalStringMap(TJS_W("\r\n")));
 #else
-		const static ttstr cr(TJS_W("\n"));
+		const static ttstr cr(TJSMapGlobalStringMap(TJS_W("\n")));
 #endif
 
 		while( i != ni->Items.end())

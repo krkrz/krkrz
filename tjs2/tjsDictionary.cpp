@@ -389,7 +389,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func.name*/contains ) {
 		if( param[0]->Type() != tvtString ) return TJS_E_INVALIDPARAM;
 		if( result ) {
 			tTJSVariant tmp;
-			if( TJS_SUCCEEDED( objthis->PropGet( TJS_MEMBERMUSTEXIST, *( param[1]->AsStringNoAddRef() ), nullptr, &tmp, objthis ) ) ) {
+			if( TJS_SUCCEEDED( objthis->PropGet( TJS_MEMBERMUSTEXIST, param[1]->GetString(), param[1]->GetHint(), &tmp, objthis ) ) ) {
 				*result = (tjs_int)1;
 			} else {
 				*result = (tjs_int)0;
@@ -404,7 +404,7 @@ TJS_BEGIN_NATIVE_METHOD_DECL(/*func.name*/contains ) {
 	if( param[1]->Type() != tvtString ) return TJS_E_INVALIDPARAM;
 	if( result ) {
 		tTJSVariant tmp;
-		if( TJS_SUCCEEDED( disp->PropGet( TJS_MEMBERMUSTEXIST, *(param[1]->AsStringNoAddRef()), nullptr, &tmp, disp ) ) ) {
+		if( TJS_SUCCEEDED( disp->PropGet( TJS_MEMBERMUSTEXIST, param[1]->GetString(), param[1]->GetHint(), &tmp, disp ) ) ) {
 			*result = (tjs_int)1;
 		} else {
 			*result = (tjs_int)0;

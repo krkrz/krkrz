@@ -23,6 +23,7 @@
 #include "PluginImpl.h"
 #include "LayerManager.h"
 #include "EventIntf.h"
+#include "tjsGlobalStringMap.h"
 
 #include "Application.h"
 #include "tjsDictionary.h"
@@ -133,8 +134,8 @@ void tTJSNI_Window::PostInputEvent(const ttstr &name, iTJSDispatch2 * params)
 	// posts input event
 	if(!Form) return;
 
-	static ttstr key_name(TJS_W("key"));
-	static ttstr shift_name(TJS_W("shift"));
+	static ttstr key_name(TJSMapGlobalStringMap(TJS_W("key")));
+	static ttstr shift_name(TJSMapGlobalStringMap(TJS_W("shift")));
 
 	// check input event name
 	enum tEventType
@@ -1123,11 +1124,11 @@ TJS_BEGIN_NATIVE_METHOD_DECL(getTouchPoint)
 		if( result ) {
 			iTJSDispatch2 * object = TJSCreateDictionaryObject();
 
-			static ttstr startX_name(TJS_W("startX"));
-			static ttstr startY_name(TJS_W("startY"));
-			static ttstr X_name(TJS_W("x"));
-			static ttstr Y_name(TJS_W("y"));
-			static ttstr ID_name(TJS_W("ID"));
+			static ttstr startX_name(TJSMapGlobalStringMap(TJS_W("startX")));
+			static ttstr startY_name(TJSMapGlobalStringMap(TJS_W("startY")));
+			static ttstr X_name(TJSMapGlobalStringMap(TJS_W("x")));
+			static ttstr Y_name(TJSMapGlobalStringMap(TJS_W("y")));
+			static ttstr ID_name(TJSMapGlobalStringMap(TJS_W("ID")));
 			{
 				tTJSVariant val(_this->GetTouchPointStartX(index));
 				if(TJS_FAILED(object->PropSet(TJS_MEMBERENSURE|TJS_IGNOREPROP, startX_name.c_str(), startX_name.GetHint(), &val, object)))

@@ -159,7 +159,7 @@ void tTJSExprNode::Add(tTJSExprNode *n)
 //---------------------------------------------------------------------------
 void tTJSExprNode::AddArrayElement(const tTJSVariant & val)
 {
-	static tTJSString ss_add(TJS_W("add"));
+	static tTJSString ss_add(TJSMapGlobalStringMap(TJS_W("add")));
 	tTJSVariant arg(val);
 	tTJSVariant *args[1] = {&arg};
 	Val->AsObjectClosureNoAddRef().FuncCall(0, ss_add.c_str(), ss_add.GetHint(),

@@ -449,7 +449,7 @@ void TJSAddObjectHashRecord(void * object)
 	if(where.IsEmpty())
 		where = TJSMapGlobalStringMap((const tjs_char *)TJSCallHistoryIsFromOutOfTJS2Script);
 	rec.Where = where;
-	static ttstr InitialType(TJS_W("unknown type"));
+	static ttstr InitialType(TJSMapGlobalStringMap(TJS_W("unknown type")));
 	rec.Type = InitialType;
 
 	if(TJSObjectHashMap)

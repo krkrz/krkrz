@@ -40,6 +40,7 @@
 #include "SysInitImpl.h"
 #include "SystemControl.h"
 #include "Application.h"
+#include "tjsGlobalStringMap.h"
 
 #include "RectItf.h"
 #include "ImageFunction.h"
@@ -193,7 +194,8 @@ void TVPInitScriptEngine()
 	dsp = (instance); \
 	val = tTJSVariant(dsp/*, dsp*/); \
 	dsp->Release(); \
-	global->PropSet(TJS_MEMBERENSURE|TJS_IGNOREPROP, TJS_W(#classname), NULL, \
+	static ttstr classname##_name(TJSMapGlobalStringMap(TJS_W(#classname))); \
+	global->PropSet(TJS_MEMBERENSURE|TJS_IGNOREPROP, classname##_name.c_str(), classname##_name.GetHint(), \
 		&val, global);
 
 	/* classes */
@@ -227,8 +229,9 @@ void TVPInitScriptEngine()
 	dsp = new tTJSNC_PhaseVocoder();
 	val = tTJSVariant(dsp);
 	dsp->Release();
+	static ttstr PhaseVocoder_name(TJSMapGlobalStringMap(TJS_W("PhaseVocoder")));
 	waveclass->PropSet(TJS_MEMBERENSURE|TJS_IGNOREPROP|TJS_STATICMEMBER,
-		TJS_W("PhaseVocoder"), NULL, &val, waveclass);
+		PhaseVocoder_name.c_str(), PhaseVocoder_name.GetHint(), &val, waveclass);
 
 	/* Window and its drawdevices */
 	iTJSDispatch2 * windowclass = NULL;
@@ -237,8 +240,9 @@ void TVPInitScriptEngine()
 	dsp = new tTJSNC_BasicDrawDevice();
 	val = tTJSVariant(dsp);
 	dsp->Release();
+	static ttstr BasicDrawDevice_name(TJSMapGlobalStringMap(TJS_W("BasicDrawDevice")));
 	windowclass->PropSet(TJS_MEMBERENSURE|TJS_IGNOREPROP|TJS_STATICMEMBER,
-		TJS_W("BasicDrawDevice"), NULL, &val, windowclass);
+		BasicDrawDevice_name.c_str(), BasicDrawDevice_name.GetHint(), &val, windowclass);
 #endif
 	// Add Extension Classes
 	TVPCauseAtInstallExtensionClass( global );
@@ -605,7 +609,8 @@ static bool  TJSGetSystem_exceptionHandler_Object(tTJSVariantClosure & dest)
 	tTJSVariantClosure clo;
 
 	tjs_error er;
-	er = global->PropGet(TJS_MEMBERMUSTEXIST, TJS_W("System"), NULL, &val, global);
+	static ttstr System_name(TJSMapGlobalStringMap(TJS_W("System")));
+	er = global->PropGet(TJS_MEMBERMUSTEXIST, System_name.c_str(), System_name.GetHint(), &val, global);
 	if(TJS_FAILED(er)) return false;
 
 	if(val.Type() != tvtObject) return false;
@@ -614,7 +619,8 @@ static bool  TJSGetSystem_exceptionHandler_Object(tTJSVariantClosure & dest)
 
 	if(clo.Object == NULL) return false;
 
-	clo.PropGet(TJS_MEMBERMUSTEXIST, TJS_W("exceptionHandler"), NULL, &val2, NULL);
+	static ttstr exceptionHandler_name(TJSMapGlobalStringMap(TJS_W("exceptionHandler")));
+	clo.PropGet(TJS_MEMBERMUSTEXIST, exceptionHandler_name.c_str(), exceptionHandler_name.GetHint(), &val2, NULL);
 
 	if(val2.Type() != tvtObject) return false;
 

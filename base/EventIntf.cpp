@@ -18,6 +18,7 @@
 #include "MsgIntf.h"
 #include "ScriptMgnIntf.h"
 #include "TickCount.h"
+#include "tjsGlobalStringMap.h"
 
 
 
@@ -875,8 +876,8 @@ iTJSDispatch2 * TVPCreateEventObject(const tjs_char *type,
 	// create a dictionary object for event dispatching ( to "action" method )
 	iTJSDispatch2 * object = TJSCreateDictionaryObject();
 
-	static ttstr type_name(TJS_W("type"));
-	static ttstr target_name(TJS_W("target"));
+	static ttstr type_name(TJSMapGlobalStringMap(TJS_W("type")));
+	static ttstr target_name(TJSMapGlobalStringMap(TJS_W("target")));
 
 	{
 		tTJSVariant val(type);
@@ -1234,7 +1235,7 @@ void tTJSNI_AsyncTrigger::Trigger()
 			// remove undelivered events from queue when "Cached" flag is set
 			TVPCancelSourceEvents(Owner);
 		}
-		static ttstr eventname(TJS_W("onFire"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onFire")));
 
 		tjs_uint32 flags = TVP_EPT_POST;
 		if(Mode == atmExclusive) flags |= TVP_EPT_EXCLUSIVE;  // fire exclusive event

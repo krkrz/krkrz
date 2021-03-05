@@ -25,6 +25,7 @@
 #include "WindowImpl.h"
 #include "SystemControl.h"
 #include "DInputMgn.h"
+#include "tjsGlobalStringMap.h"
 
 #include "Application.h"
 #include "TVPScreen.h"
@@ -98,7 +99,7 @@ bool TVPGetAsyncKeyState(tjs_uint keycode, bool getcurrent)
 //---------------------------------------------------------------------------
 ttstr TVPGetPlatformName()
 {
-	static ttstr platform(TJS_W("Win32"));
+	static ttstr platform(TJSMapGlobalStringMap(TJS_W("Win32")));
 	return platform;
 }
 //---------------------------------------------------------------------------
@@ -873,7 +874,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(exeName)
 {
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
-		static ttstr exename(TVPNormalizeStorageName(ExePath()));
+		static ttstr exename(TJSMapGlobalStringMap(TVPNormalizeStorageName(ExePath())));
 		*result = exename;
 		return TJS_S_OK;
 	}

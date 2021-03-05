@@ -14,6 +14,7 @@
 #define EventIntfH
 
 #include "tjsNative.h"
+#include "tjsGlobalStringMap.h"
 
 
 
@@ -203,7 +204,7 @@ extern ttstr TVPActionName;
 
 #define TVP_ACTION_INVOKE_MEMBER(name) \
 	{\
-		static ttstr member_name(TJS_W(name)); \
+		static ttstr member_name(TJSMapGlobalStringMap(TJS_W(name))); \
 		evobj->PropSet(TJS_MEMBERENSURE|TJS_IGNOREPROP, \
 			member_name.c_str(), member_name.GetHint(), param[arg_count++], \
 			evobj); \

@@ -338,7 +338,7 @@ void tTJSByteCodeLoader::ReadObjects( tTJSScriptBlock* block, const tjs_uint8* b
 				int pobj = prop[pos+1];
 				// register members to the parent object
 				val = objs[pobj];
-				obj->PropSet( TJS_MEMBERENSURE|TJS_IGNOREPROP, StringArray[pname].c_str(), NULL, &val, obj );
+				obj->PropSet( TJS_MEMBERENSURE|TJS_IGNOREPROP, StringArray[pname].c_str(), StringArray[pname].GetHint(), &val, obj );
 			}
 		}
 	}

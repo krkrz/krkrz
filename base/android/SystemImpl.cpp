@@ -29,6 +29,7 @@
 //#include "CompatibleNativeFuncs.h"
 #include "DebugIntf.h"
 #include "CharacterSet.h"
+#include "tjsGlobalStringMap.h"
 
 
 #define ANDROID_BUILDING_DISABLE
@@ -98,7 +99,7 @@ bool TVPGetAsyncKeyState(tjs_uint keycode, bool getcurrent)
 //---------------------------------------------------------------------------
 ttstr TVPGetPlatformName()
 {
-	static ttstr platform(TJS_W("Android"));
+	static ttstr platform(TJSMapGlobalStringMap(TJS_W("Android")));
 	return platform;
 }
 //---------------------------------------------------------------------------
@@ -452,7 +453,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(exeName)
 {
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
-		static ttstr exename(TVPNormalizeStorageName(Application->GetPackageCodePath()));
+		static ttstr exename(TJSMapGlobalStringMap(TVPNormalizeStorageName(Application->GetPackageCodePath())));
 		*result = exename;
 		return TJS_S_OK;
 	}

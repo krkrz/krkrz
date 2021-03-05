@@ -1846,26 +1846,32 @@ tjs_error TJSDefaultIsInstanceOf(tjs_uint32 flag, tTJSVariant &targ, const tjs_c
 		return TJS_S_FALSE;
 	}
 
-	if(!TJS_strcmp(name, TJS_W("Object"))) return TJS_S_TRUE;
+	static ttstr Object_name(TJSMapGlobalStringMap(TJS_W("Object")));
+	if(Object_name == name) return TJS_S_TRUE;
 
 
+	static ttstr Integer_name(TJSMapGlobalStringMap(TJS_W("Integer")));
+	static ttstr Real_name(TJSMapGlobalStringMap(TJS_W("Real")));
+	static ttstr Number_name(TJSMapGlobalStringMap(TJS_W("Number")));
+	static ttstr String_name(TJSMapGlobalStringMap(TJS_W("String")));
+	static ttstr Octet_name(TJSMapGlobalStringMap(TJS_W("Octet")));
 	switch(vt)
 	{
 	case tvtVoid:
 		return TJS_S_FALSE; // returns always false about tvtVoid
 	case tvtInteger:
-		if(!TJS_strcmp(name, TJS_W("Integer"))) return TJS_S_TRUE;
-		if(!TJS_strcmp(name, TJS_W("Number"))) return TJS_S_TRUE;
+		if(Integer_name == name) return TJS_S_TRUE;
+		if(Number_name == name) return TJS_S_TRUE;
 		return TJS_S_FALSE;
 	case tvtReal:
-		if(!TJS_strcmp(name, TJS_W("Real"))) return TJS_S_TRUE;
-		if(!TJS_strcmp(name, TJS_W("Number"))) return TJS_S_TRUE;
+		if(Real_name == name) return TJS_S_TRUE;
+		if(Number_name == name) return TJS_S_TRUE;
 		return TJS_S_FALSE;
 	case tvtString:
-		if(!TJS_strcmp(name, TJS_W("String"))) return TJS_S_TRUE;
+		if(String_name == name) return TJS_S_TRUE;
 		return TJS_S_FALSE;
 	case tvtOctet:
-		if(!TJS_strcmp(name, TJS_W("Octet"))) return TJS_S_TRUE;
+		if(Octet_name == name) return TJS_S_TRUE;
 		return TJS_S_FALSE;
 	case tvtObject:
 		if(vt == tvtObject)
@@ -1895,18 +1901,13 @@ tTJSCustomObject::IsInstanceOf(tjs_uint32 flag, const tjs_char *membername, tjs_
 	if(membername == NULL)
 	{
 		// always returns true if "Object" is specified
-		if(!TJS_strcmp(classname, TJS_W("Object")))
-		{
-			return TJS_S_TRUE;
-		}
+		static ttstr Object_name(TJSMapGlobalStringMap(TJS_W("Object")));
+		if(Object_name == classname) return TJS_S_TRUE;
 
 		// look for the class instance information
 		for(tjs_uint i=0; i<ClassNames.size(); i++)
 		{
-			if(!TJS_strcmp(ClassNames[i].c_str(), classname))
-			{
-				return TJS_S_TRUE;
-			}
+			if(ClassNames[i] == classname) return TJS_S_TRUE;
 		}
 
 		return TJS_S_FALSE;

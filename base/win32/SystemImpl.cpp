@@ -25,6 +25,7 @@
 #include "WindowImpl.h"
 #include "SystemControl.h"
 #include "DInputMgn.h"
+#include "tjsGlobalStringMap.h"
 
 #include "Application.h"
 #include "TVPScreen.h"
@@ -1014,7 +1015,7 @@ TJS_BEGIN_NATIVE_PROP_DECL(exeName)
 {
 	TJS_BEGIN_NATIVE_PROP_GETTER
 	{
-		static ttstr exename(TVPNormalizeStorageName(ExePath()));
+		static ttstr exename(TJSMapGlobalStringMap(TVPNormalizeStorageName(ExePath())));
 		*result = exename;
 		return TJS_S_OK;
 	}

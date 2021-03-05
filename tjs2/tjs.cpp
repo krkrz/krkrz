@@ -151,19 +151,22 @@ tTJS::tTJS()
 		dsp = new tTJSArrayClass(); //TJSCreateArrayClass();
 		val = tTJSVariant(dsp, NULL);
 		dsp->Release();
-		Global->PropSet(TJS_MEMBERENSURE, TJS_W("Array"), NULL, &val, Global);
+		static ttstr Array_name(TJSMapGlobalStringMap(TJS_W("Array")));
+		Global->PropSet(TJS_MEMBERENSURE, Array_name.c_str(), Array_name.GetHint(), &val, Global);
 
 		// Dictionary
 		dsp = new tTJSDictionaryClass();
 		val = tTJSVariant(dsp, NULL);
 		dsp->Release();
-		Global->PropSet(TJS_MEMBERENSURE, TJS_W("Dictionary"), NULL, &val, Global);
+		static ttstr Dictionary_name(TJSMapGlobalStringMap(TJS_W("Dictionary")));
+		Global->PropSet(TJS_MEMBERENSURE, Dictionary_name.c_str(), Dictionary_name.GetHint(), &val, Global);
 
 		// Date
 		dsp = new tTJSNC_Date();
 		val = tTJSVariant(dsp, NULL);
 		dsp->Release();
-		Global->PropSet(TJS_MEMBERENSURE, TJS_W("Date"), NULL, &val, Global);
+		static ttstr Date_name(TJSMapGlobalStringMap(TJS_W("Date")));
+		Global->PropSet(TJS_MEMBERENSURE, Date_name.c_str(), Date_name.GetHint(), &val, Global);
 
 		// Math
 		{
@@ -172,26 +175,30 @@ tTJS::tTJS()
 			dsp = math = new tTJSNC_Math();
 			val = tTJSVariant(dsp, NULL);
 			dsp->Release();
-			Global->PropSet(TJS_MEMBERENSURE, TJS_W("Math"), NULL, &val, Global);
+			static ttstr Math_name(TJSMapGlobalStringMap(TJS_W("Math")));
+			Global->PropSet(TJS_MEMBERENSURE, Math_name.c_str(), Math_name.GetHint(), &val, Global);
 
 			// Math.RandomGenerator
 			dsp = new tTJSNC_RandomGenerator();
 			val = tTJSVariant(dsp, NULL);
 			dsp->Release();
-			math->PropSet(TJS_MEMBERENSURE, TJS_W("RandomGenerator"), NULL, &val, math);
+			static ttstr RandomGenerator_name(TJSMapGlobalStringMap(TJS_W("RandomGenerator")));
+			math->PropSet(TJS_MEMBERENSURE, RandomGenerator_name.c_str(), RandomGenerator_name.GetHint(), &val, math);
 		}
 
 		// Exception
 		dsp = new tTJSNC_Exception();
 		val = tTJSVariant(dsp, NULL);
 		dsp->Release();
-		Global->PropSet(TJS_MEMBERENSURE, TJS_W("Exception"), NULL, &val, Global);
+		static ttstr Exception_name(TJSMapGlobalStringMap(TJS_W("Exception")));
+		Global->PropSet(TJS_MEMBERENSURE, Exception_name.c_str(), Exception_name.GetHint(), &val, Global);
 #ifndef TJS_NO_REGEXP
 		// RegExp
 		dsp = TJSCreateRegExpClass(); // the body is implemented in tjsRegExp.cpp
 		val = tTJSVariant(dsp, NULL);
 		dsp->Release();
-		Global->PropSet(TJS_MEMBERENSURE, TJS_W("RegExp"), NULL, &val, Global);
+		static ttstr RegExp_name(TJSMapGlobalStringMap(TJS_W("RegExp")));
+		Global->PropSet(TJS_MEMBERENSURE, RegExp_name.c_str(), RegExp_name.GetHint(), &val, Global);
 #endif
 	}
 	catch(...)

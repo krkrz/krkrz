@@ -13,6 +13,7 @@
 #include "ComplexRect.h"
 #include "BitmapIntf.h"
 #include "LayerIntf.h"
+#include "tjsGlobalStringMap.h"
 
 #include "BitmapLayerTreeOwner.h"
 #include "MsgIntf.h"
@@ -159,7 +160,7 @@ void TJS_INTF_METHOD tTJSNI_BitmapLayerTreeOwner::EndBitmapCompletion(iTVPLayerM
 void tTJSNI_BitmapLayerTreeOwner::OnSetMouseCursor( tjs_int cursor ) {
 	if( Owner ) {
 		tTJSVariant arg[1] = { cursor };
-		static ttstr eventname(TJS_W("onSetMouseCursor"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onSetMouseCursor")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 1, arg);
 	}
 }
@@ -168,7 +169,7 @@ void tTJSNI_BitmapLayerTreeOwner::OnGetCursorPos(tjs_int &x, tjs_int &y) {
 	if( Owner ) {
 		tjs_int vx = x, vy = y;
 		tTJSVariant arg[2] = { vx, vy };
-		static ttstr eventname(TJS_W("onGetCursorPos"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onGetCursorPos")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 2, arg);
 		x = arg[0];
 		y = arg[1];
@@ -178,14 +179,14 @@ void tTJSNI_BitmapLayerTreeOwner::OnGetCursorPos(tjs_int &x, tjs_int &y) {
 void tTJSNI_BitmapLayerTreeOwner::OnSetCursorPos(tjs_int x, tjs_int y) {
 	if( Owner ) {
 		tTJSVariant arg[2] = { x, y };
-		static ttstr eventname(TJS_W("onSetCursorPos"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onSetCursorPos")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 2, arg);
 	}
 }
 //----------------------------------------------------------------------
 void tTJSNI_BitmapLayerTreeOwner::OnReleaseMouseCapture() {
 	if( Owner ) {
-		static ttstr eventname(TJS_W("onReleaseMouseCapture"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onReleaseMouseCapture")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 0, NULL);
 	}
 }
@@ -194,7 +195,7 @@ void tTJSNI_BitmapLayerTreeOwner::OnSetHintText(iTJSDispatch2* sender, const tts
 	if( Owner ) {
 		tTJSVariant clo(sender, sender);
 		tTJSVariant arg[2] = { clo, hint };
-		static ttstr eventname(TJS_W("onSetHintText"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onSetHintText")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 2, arg);
 	}
 }
@@ -205,14 +206,14 @@ void tTJSNI_BitmapLayerTreeOwner::OnResizeLayer( tjs_int w, tjs_int h ) {
 	}
 	if( Owner ) {
 		tTJSVariant arg[2] = { w, h };
-		static ttstr eventname(TJS_W("onResizeLayer"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onResizeLayer")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 2, arg);
 	}
 }
 //----------------------------------------------------------------------
 void tTJSNI_BitmapLayerTreeOwner::OnChangeLayerImage() {
 	if( Owner ) {
-		static ttstr eventname(TJS_W("onChangeLayerImage"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onChangeLayerImage")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 0, NULL);
 	}
 }
@@ -222,14 +223,14 @@ void tTJSNI_BitmapLayerTreeOwner::OnSetAttentionPoint(tTJSNI_BaseLayer *layer, t
 		iTJSDispatch2* owner = GetOwnerNoAddRef();
 		tTJSVariant clo(owner, owner);
 		tTJSVariant arg[3] = { clo, x, y };
-		static ttstr eventname(TJS_W("onSetAttentionPoint"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onSetAttentionPoint")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 3, arg);
 	}
 }
 //----------------------------------------------------------------------
 void tTJSNI_BitmapLayerTreeOwner::OnDisableAttentionPoint() {
 	if( Owner ) {
-		static ttstr eventname(TJS_W("onDisableAttentionPoint"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onDisableAttentionPoint")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 0, NULL);
 	}
 }
@@ -237,14 +238,14 @@ void tTJSNI_BitmapLayerTreeOwner::OnDisableAttentionPoint() {
 void tTJSNI_BitmapLayerTreeOwner::OnSetImeMode(tjs_int mode) {
 	if( Owner ) {
 		tTJSVariant arg[1] = { mode };
-		static ttstr eventname(TJS_W("onSetImeMode"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onSetImeMode")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 1, arg);
 	}
 }
 //----------------------------------------------------------------------
 void tTJSNI_BitmapLayerTreeOwner::OnResetImeMode() {
 	if( Owner ) {
-		static ttstr eventname(TJS_W("onResetImeMode"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onResetImeMode")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 0, NULL);
 	}
 }

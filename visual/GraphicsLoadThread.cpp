@@ -13,6 +13,7 @@
 #include "UtilStreams.h"
 #include "BitmapBitsAlloc.h"
 #include "LayerIntf.h"
+#include "tjsGlobalStringMap.h"
 
 tTVPTmpBitmapImage::tTVPTmpBitmapImage()
 	: w(0), h(0), pitch(0), buf(NULL), MetaInfo(NULL)
@@ -135,7 +136,7 @@ void tTVPAsyncImageLoader::HandleLoadedImage() {
 				param[1] = 1; // true async
 				param[2] = 1; // true error
 				param[3] = cmd->result_; // error_mes
-				static ttstr eventname(TJS_W("onLoaded"));
+				static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onLoaded")));
 				if( cmd->owner_->IsValid(0,NULL,NULL,cmd->owner_) == TJS_S_TRUE ) {
 					TVPPostEvent(cmd->owner_, cmd->owner_, eventname, 0, TVP_EPT_IMMEDIATE, 4, param);
 				}
@@ -164,7 +165,7 @@ void tTVPAsyncImageLoader::HandleLoadedImage() {
 				param[1] = 1; // true async
 				param[2] = 0; // false error
 				param[3] = TJS_W(""); // error_mes
-				static ttstr eventname(TJS_W("onLoaded"));
+				static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onLoaded")));
 				if( cmd->owner_->IsValid(0,NULL,NULL,cmd->owner_) == TJS_S_TRUE ) {
 					TVPPostEvent(cmd->owner_, cmd->owner_, eventname, 0, TVP_EPT_IMMEDIATE, 4, param);
 				}
@@ -193,7 +194,7 @@ void tTVPAsyncImageLoader::LoadRequest( iTJSDispatch2 *owner, tTJSNI_Bitmap* bmp
 		param[1] = 0; // false
 		param[2] = 0; // false
 		param[3] = TJS_W(""); // error_mes
-		static ttstr eventname(TJS_W("onLoaded"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onLoaded")));
 		TVPPostEvent(owner, owner, eventname, 0, TVP_EPT_IMMEDIATE, 4, param);
 		return;
 	}

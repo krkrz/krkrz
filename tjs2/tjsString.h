@@ -249,6 +249,7 @@ public:
 		if(!Ptr && !rnemp) return true; // both empty string
 		if(!Ptr && rnemp) return false;
 		if(Ptr && !rnemp) return false;
+		if((const tjs_char *)*Ptr == ref) return true;
 		return !TJS_strcmp(*Ptr, ref);
 	}
 

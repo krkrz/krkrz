@@ -24,6 +24,7 @@
 #include "VideoOvlIntf.h"
 #include "DrawDevice.h"
 #include "CanvasIntf.h"
+#include "tjsGlobalStringMap.h"
 
 #include "Application.h"
 
@@ -345,7 +346,8 @@ void tTJSNI_BaseWindow::SetDrawDeviceObject(const tTJSVariant & val)
 	{
 		tTJSVariantClosure clo = DrawDeviceObject.AsObjectClosureNoAddRef();
 		tTJSVariant iface_v;
-		if(TJS_FAILED(clo.PropGet(0, TJS_W("interface"), NULL, &iface_v, NULL)))
+		static ttstr interface_name(TJSMapGlobalStringMap(TJS_W("interface")));
+		if(TJS_FAILED(clo.PropGet(0, interface_name.c_str(), interface_name.GetHint(), &iface_v, NULL)))
 			TVPThrowExceptionMessage( TVPCannotRetriveInterfaceFromDrawDevice );
 		DrawDevice =
 			reinterpret_cast<iTVPDrawDevice *>((tjs_intptr_t)(tjs_int64)iface_v);
@@ -382,7 +384,7 @@ void tTJSNI_BaseWindow::OnClose()
 	if(Owner)
 	{
 		tTJSVariant arg[1] = {true};
-		static ttstr eventname(TJS_W("onCloseQuery"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onCloseQuery")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 1, arg);
 	}
 }
@@ -392,7 +394,7 @@ void tTJSNI_BaseWindow::OnResize()
 	if(!CanDeliverEvents()) return;
 	if(Owner)
 	{
-		static ttstr eventname(TJS_W("onResize"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onResize")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 0, NULL);
 	}
 }
@@ -403,7 +405,7 @@ void tTJSNI_BaseWindow::OnClick(tjs_int x, tjs_int y)
 	if(Owner)
 	{
 		tTJSVariant arg[2] = { x, y };
-		static ttstr eventname(TJS_W("onClick"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onClick")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 2, arg);
 	}
 	if(DrawDevice) DrawDevice->OnClick(x, y);
@@ -415,7 +417,7 @@ void tTJSNI_BaseWindow::OnDoubleClick(tjs_int x, tjs_int y)
 	if(Owner)
 	{
 		tTJSVariant arg[2] = { x, y };
-		static ttstr eventname(TJS_W("onDoubleClick"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onDoubleClick")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 2, arg);
 	}
 	if(DrawDevice) DrawDevice->OnDoubleClick(x, y);
@@ -428,7 +430,7 @@ void tTJSNI_BaseWindow::OnMouseDown(tjs_int x, tjs_int y, tTVPMouseButton mb,
 	if(Owner)
 	{
 		tTJSVariant arg[4] = { x, y, (tjs_int64)mb, (tjs_int64)flags };
-		static ttstr eventname(TJS_W("onMouseDown"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onMouseDown")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 4, arg);
 	}
 	if(DrawDevice) DrawDevice->OnMouseDown(x, y, mb, flags);
@@ -441,7 +443,7 @@ void tTJSNI_BaseWindow::OnMouseUp(tjs_int x, tjs_int y, tTVPMouseButton mb,
 	if(Owner)
 	{
 		tTJSVariant arg[4] = { x, y, (tjs_int)mb, (tjs_int)flags };
-		static ttstr eventname(TJS_W("onMouseUp"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onMouseUp")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 4, arg);
 	}
 	if(DrawDevice) DrawDevice->OnMouseUp(x, y, mb, flags);
@@ -452,7 +454,7 @@ void tTJSNI_BaseWindow::OnMouseMove(tjs_int x, tjs_int y, tjs_uint32 flags)
 	if(!CanDeliverEvents()) return;
 	if(Owner)
 	{
-		static ttstr eventname(TJS_W("onMouseMove"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onMouseMove")));
 			tTJSVariant arg[3] = { x, y, (tjs_int64)flags };
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_DISCARDABLE|TVP_EPT_IMMEDIATE
 			/*discardable!!*/,
@@ -466,7 +468,7 @@ void tTJSNI_BaseWindow::OnTouchDown( tjs_real x, tjs_real y, tjs_real cx, tjs_re
 	if(Owner)
 	{
 		tTJSVariant arg[5] = { x, y, cx, cy, (tjs_int64)id };
-		static ttstr eventname(TJS_W("onTouchDown"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onTouchDown")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 5, arg);
 	}
 	if(DrawDevice) DrawDevice->OnTouchDown(x, y, cx, cy, id);
@@ -477,7 +479,7 @@ void tTJSNI_BaseWindow::OnTouchUp( tjs_real x, tjs_real y, tjs_real cx, tjs_real
 	if(Owner)
 	{
 		tTJSVariant arg[5] = { x, y, cx, cy, (tjs_int64)id };
-		static ttstr eventname(TJS_W("onTouchUp"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onTouchUp")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 5, arg);
 	}
 	if(DrawDevice) DrawDevice->OnTouchUp(x, y, cx, cy, id);
@@ -488,7 +490,7 @@ void tTJSNI_BaseWindow::OnTouchMove( tjs_real x, tjs_real y, tjs_real cx, tjs_re
 	if(Owner)
 	{
 		tTJSVariant arg[5] = { x, y, cx, cy, (tjs_int64)id };
-		static ttstr eventname(TJS_W("onTouchMove"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onTouchMove")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 5, arg);
 	}
 	if(DrawDevice) DrawDevice->OnTouchMove(x, y, cx, cy, id);
@@ -499,7 +501,7 @@ void tTJSNI_BaseWindow::OnPointerDown( tjs_int type, tjs_real x, tjs_real y, tjs
 	if( Owner )
 	{
 		tTJSVariant arg[7] = { type, x, y, cx, cy, (tjs_int64)flags, (tjs_int64)id };
-		static ttstr eventname( TJS_W( "onPointerDown" ) );
+		static ttstr eventname(TJSMapGlobalStringMap( TJS_W( "onPointerDown" ) ));
 		TVPPostEvent( Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 7, arg );
 	}
 }
@@ -509,7 +511,7 @@ void tTJSNI_BaseWindow::OnPointerMove( tjs_int type, tjs_real x, tjs_real y, tjs
 	if( Owner )
 	{
 		tTJSVariant arg[7] = { type, x, y, cx, cy, (tjs_int64)flags, (tjs_int64)id };
-		static ttstr eventname( TJS_W( "onPointerMove" ) );
+		static ttstr eventname(TJSMapGlobalStringMap( TJS_W( "onPointerMove" ) ));
 		TVPPostEvent( Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 7, arg );
 	}
 }
@@ -519,7 +521,7 @@ void tTJSNI_BaseWindow::OnPointerUp( tjs_int type, tjs_real x, tjs_real y, tjs_r
 	if( Owner )
 	{
 		tTJSVariant arg[7] = { type, x, y, cx, cy, (tjs_int64)flags, (tjs_int64)id };
-		static ttstr eventname( TJS_W( "onPointerUp" ) );
+		static ttstr eventname(TJSMapGlobalStringMap( TJS_W( "onPointerUp" ) ));
 		TVPPostEvent( Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 7, arg );
 	}
 }
@@ -529,7 +531,7 @@ void tTJSNI_BaseWindow::OnTouchScaling( tjs_real startdist, tjs_real curdist, tj
 	if(Owner)
 	{
 		tTJSVariant arg[5] = { startdist, curdist, cx, cy, flag };
-		static ttstr eventname(TJS_W("onTouchScaling"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onTouchScaling")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 5, arg);
 	}
 	if(DrawDevice) DrawDevice->OnTouchScaling(startdist, curdist, cx, cy, flag);
@@ -540,7 +542,7 @@ void tTJSNI_BaseWindow::OnTouchRotate( tjs_real startangle, tjs_real curangle, t
 	if(Owner)
 	{
 		tTJSVariant arg[6] = { startangle, curangle, dist, cx, cy, flag };
-		static ttstr eventname(TJS_W("onTouchRotate"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onTouchRotate")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 6, arg);
 	}
 	if(DrawDevice) DrawDevice->OnTouchRotate(startangle, curangle, dist, cx, cy, flag);
@@ -550,7 +552,7 @@ void tTJSNI_BaseWindow::OnMultiTouch() {
 	if(!CanDeliverEvents()) return;
 	if(Owner)
 	{
-		static ttstr eventname(TJS_W("onMultiTouch"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onMultiTouch")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 0, NULL);
 	}
 	if(DrawDevice) DrawDevice->OnMultiTouch();
@@ -573,7 +575,7 @@ void tTJSNI_BaseWindow::OnMouseEnter()
 	if(!CanDeliverEvents()) return;
 	if(Owner)
 	{
-		static ttstr eventname(TJS_W("onMouseEnter"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onMouseEnter")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 0, NULL);
 	}
 }
@@ -583,7 +585,7 @@ void tTJSNI_BaseWindow::OnMouseLeave()
 	if(!CanDeliverEvents()) return;
 	if(Owner)
 	{
-		static ttstr eventname(TJS_W("onMouseLeave"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onMouseLeave")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 0, NULL);
 	}
 }
@@ -594,7 +596,7 @@ void tTJSNI_BaseWindow::OnKeyDown(tjs_uint key, tjs_uint32 shift)
 	if(Owner)
 	{
 		tTJSVariant arg[2] = { (tjs_int)key, (tjs_int)shift };
-		static ttstr eventname(TJS_W("onKeyDown"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onKeyDown")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 2, arg);
 	}
 	if(DrawDevice) DrawDevice->OnKeyDown(key, shift);
@@ -606,7 +608,7 @@ void tTJSNI_BaseWindow::OnKeyUp(tjs_uint key, tjs_uint32 shift)
 	if(Owner)
 	{
 		tTJSVariant arg[2] = { (tjs_int)key, (tjs_int)shift };
-		static ttstr eventname(TJS_W("onKeyUp"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onKeyUp")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 2, arg);
 	}
 	if(DrawDevice) DrawDevice->OnKeyUp(key, shift);
@@ -621,7 +623,7 @@ void tTJSNI_BaseWindow::OnKeyPress(tjs_char key)
 		buf[0] = (tjs_char)key;
 		buf[1] = 0;
 		tTJSVariant arg[1] = { buf };
-		static ttstr eventname(TJS_W("onKeyPress"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onKeyPress")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 1, arg);
 	}
 	if(DrawDevice) DrawDevice->OnKeyPress(key);
@@ -633,7 +635,7 @@ void tTJSNI_BaseWindow::OnFileDrop(const tTJSVariant &array)
 	if(Owner)
 	{
 		tTJSVariant arg[1] = { array };
-		static ttstr eventname(TJS_W("onFileDrop"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onFileDrop")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 1, arg);
 	}
 }
@@ -645,7 +647,7 @@ void tTJSNI_BaseWindow::OnMouseWheel(tjs_uint32 shift, tjs_int delta,
 	if(Owner)
 	{
 		tTJSVariant arg[4] = { (tjs_int)shift, delta, x, y };
-		static ttstr eventname(TJS_W("onMouseWheel"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onMouseWheel")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 4, arg);
 	}
 	if(DrawDevice) DrawDevice->OnMouseWheel(shift, delta, x, y);
@@ -656,7 +658,7 @@ void tTJSNI_BaseWindow::OnPopupHide()
 	if(!CanDeliverEvents()) return;
 	if(Owner)
 	{
-		static ttstr eventname(TJS_W("onPopupHide"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onPopupHide")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 0, NULL);
 	}
 }
@@ -670,8 +672,8 @@ void tTJSNI_BaseWindow::OnActivate(bool activate_or_deactivate)
 	{
 		if(Owner)
 		{
-			static ttstr a_eventname(TJS_W("onActivate"));
-			static ttstr d_eventname(TJS_W("onDeactivate"));
+			static ttstr a_eventname(TJSMapGlobalStringMap(TJS_W("onActivate")));
+			static ttstr d_eventname(TJSMapGlobalStringMap(TJS_W("onDeactivate")));
 			TVPPostEvent(Owner, Owner, activate_or_deactivate?a_eventname:d_eventname,
 				0, TVP_EPT_IMMEDIATE, 0, NULL);
 		}
@@ -684,7 +686,7 @@ void tTJSNI_BaseWindow::OnHintChange( const ttstr& text, tjs_int x, tjs_int y, b
 	if(Owner)
 	{
 		tTJSVariant arg[6] = { text, x, y, isshow ? 1 : 0 };
-		static ttstr eventname(TJS_W("onHintChanged"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onHintChanged")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 4, arg);
 	}
 }
@@ -694,7 +696,7 @@ void tTJSNI_BaseWindow::OnDisplayRotate( tjs_int orientation, tjs_int rotate, tj
 	if(Owner)
 	{
 		tTJSVariant arg[5] = { orientation, rotate, bpp, hresolution, vresolution };
-		static ttstr eventname(TJS_W("onDisplayRotate"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onDisplayRotate")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 5, arg);
 	}
 	if(DrawDevice) DrawDevice->OnDisplayRotate(orientation, rotate, bpp, hresolution, vresolution);
@@ -716,7 +718,7 @@ void tTJSNI_BaseWindow::OnDraw() {
 	try {
 		if( Owner )
 		{
-			static ttstr eventname( TJS_W( "onDraw" ) );
+			static ttstr eventname(TJSMapGlobalStringMap( TJS_W( "onDraw" ) ));
 			TVPPostEvent( Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 0, nullptr );
 		}
 	} catch( ... ) {

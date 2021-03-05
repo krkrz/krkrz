@@ -14,6 +14,7 @@
 #include "tjsScriptBlock.h"
 #include "tjsError.h"
 #include "tjs.h"
+#include "tjsGlobalStringMap.h"
 
 #define TJS_MAX_TRACE_TEXT_LEN 1500
 
@@ -31,7 +32,7 @@ void TJSGetExceptionObject(tTJS *tjs, tTJSVariant *res, tTJSVariant &msg,
 	// retrieve class "Exception" from global
 	iTJSDispatch2 *global = tjs->GetGlobalNoAddRef();
 	tTJSVariant val;
-	static tTJSString Exception_name(TJS_W("Exception"));
+	static tTJSString Exception_name(TJSMapGlobalStringMap(TJS_W("Exception")));
 	tjs_error hr = global->PropGet(0, Exception_name.c_str(),
 		Exception_name.GetHint(), &val, global);
 	if(TJS_FAILED(hr)) TJS_eTJSError(TJSExceptionNotFound);
@@ -43,7 +44,7 @@ void TJSGetExceptionObject(tTJS *tjs, tTJSVariant *res, tTJSVariant &msg,
 	if(TJS_FAILED(hr)) TJS_eTJSError(TJSExceptionNotFound);
 	if(trace)
 	{
-		static tTJSString trace_name(TJS_W("trace"));
+		static tTJSString trace_name(TJSMapGlobalStringMap(TJS_W("trace")));
 		excpobj->PropSet(TJS_MEMBERENSURE, trace_name.c_str(), trace_name.GetHint(),
 			trace, excpobj);
 	}

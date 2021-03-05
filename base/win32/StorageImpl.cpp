@@ -25,6 +25,7 @@
 #include "SusieArchive.h"
 #include "FileSelector.h"
 #include "Random.h"
+#include "tjsGlobalStringMap.h"
 
 #include <time.h>
 
@@ -281,6 +282,7 @@ ttstr TVPGetTemporaryName()
 			TVPTempPath = tmp;
 
 			if(TVPTempPath.GetLastChar() != TJS_W('\\')) TVPTempPath += TJS_W("\\");
+			TVPTempPath = TJSMapGlobalStringMap(TVPTempPath);
 			TVPProcessID = (tjs_int) GetCurrentProcessId();
 			TVPTempUniqueNum = (tjs_int) GetTickCount();
 			TVPTempPathInit = true;
@@ -333,7 +335,7 @@ bool TVPRemoveFolder(const ttstr &name)
 //---------------------------------------------------------------------------
 ttstr TVPGetAppPath()
 {
-	static ttstr exepath(TVPExtractStoragePath(TVPNormalizeStorageName(ExePath())));
+	static ttstr exepath(TJSMapGlobalStringMap(TVPExtractStoragePath(TVPNormalizeStorageName(ExePath()))));
 	return exepath;
 }
 //---------------------------------------------------------------------------
