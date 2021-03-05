@@ -18,6 +18,7 @@
 #include "UtilStreams.h"
 #include "WaveLoopManager.h"
 #include "tjsDictionary.h"
+#include "tjsGlobalStringMap.h"
 
 
 
@@ -864,7 +865,7 @@ void tTJSNI_BaseWaveSoundBuffer::InvokeLabelEvent(const ttstr & name)
 	if(Owner && CanDeliverEvents)
 	{
 		tTJSVariant param(name);
-		static ttstr eventname(TJS_W("onLabel"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onLabel")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_POST,
 			1, &param);
 	}

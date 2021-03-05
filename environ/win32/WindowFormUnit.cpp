@@ -22,6 +22,7 @@
 #include "SystemImpl.h"
 #include "DInputMgn.h"
 #include "tvpinputdefs.h"
+#include "tjsGlobalStringMap.h"
 
 #include "Application.h"
 #include "TVPSysFont.h"
@@ -1043,7 +1044,7 @@ bool TTVPWindowForm::OnCloseQuery() {
 		iTJSDispatch2 * obj = TJSNativeInstance->GetOwnerNoAddRef();
 		if(obj) {
 			tTJSVariant arg[1] = {true};
-			static ttstr eventname(TJS_W("onCloseQuery"));
+			static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onCloseQuery")));
 
 			if(!ProgramClosing) {
 				// close action does not happen immediately

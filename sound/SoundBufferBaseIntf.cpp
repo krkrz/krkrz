@@ -13,6 +13,7 @@
 #include "SoundBufferBaseIntf.h"
 #include "MsgIntf.h"
 #include "EventIntf.h"
+#include "tjsGlobalStringMap.h"
 
 
 //---------------------------------------------------------------------------
@@ -56,10 +57,10 @@ void TJS_INTF_METHOD tTJSNI_BaseSoundBuffer::Invalidate()
 //---------------------------------------------------------------------------
 ttstr tTJSNI_BaseSoundBuffer::GetStatusString() const
 {
-	static ttstr unload(TJS_W("unload"));
-	static ttstr play(TJS_W("play"));
-	static ttstr stop(TJS_W("stop"));
-	static ttstr unknown(TJS_W("unknown"));
+	static ttstr unload(TJSMapGlobalStringMap(TJS_W("unload")));
+	static ttstr play(TJSMapGlobalStringMap(TJS_W("play")));
+	static ttstr stop(TJSMapGlobalStringMap(TJS_W("stop")));
+	static ttstr unknown(TJSMapGlobalStringMap(TJS_W("unknown")));
 
 	switch(Status)
 	{
@@ -86,7 +87,7 @@ void tTJSNI_BaseSoundBuffer::SetStatus(tTVPSoundStatus s)
 			{
 				// fire onStatusChanged event
 				tTJSVariant param(GetStatusString());
-				static ttstr eventname(TJS_W("onStatusChanged"));
+				static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onStatusChanged")));
 				TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE,
 					1, &param);
 			}
@@ -109,7 +110,7 @@ void tTJSNI_BaseSoundBuffer::SetStatusAsync(tTVPSoundStatus s)
 			if(Owner)
 			{
 				tTJSVariant param(GetStatusString());
-				static ttstr eventname(TJS_W("onStatusChanged"));
+				static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onStatusChanged")));
 				TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_POST,
 					1, &param);
 			}
@@ -187,7 +188,7 @@ void tTJSNI_BaseSoundBuffer::StopFade(bool async, bool settargetvol)
 		// post "onFadeCompleted" event to the owner
 		if(CanDeliverEvents)
 		{
-			static ttstr eventname(TJS_W("onFadeCompleted"));
+			static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onFadeCompleted")));
 			TVPPostEvent(Owner, Owner, eventname, 0,
 				async?TVP_EPT_POST:TVP_EPT_IMMEDIATE, 0, NULL);
 		}

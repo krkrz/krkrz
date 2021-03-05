@@ -13,6 +13,7 @@
 #include "TimerIntf.h"
 #include "EventIntf.h"
 #include "SysInitIntf.h"
+#include "tjsGlobalStringMap.h"
 
 
 #define TVP_DEFAULT_TIMER_CAPACITY 6
@@ -78,7 +79,7 @@ void TJS_INTF_METHOD tTJSNI_Timer::Invalidate()
 void tTJSNI_Timer::Fire(tjs_uint n)
 {
 	if(!Owner) return;
-	static ttstr eventname(TJS_W("onTimer"));
+	static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onTimer")));
 
 	tjs_int count = TVPCountEventsInQueue(Owner, Owner, eventname, 0);
 
@@ -116,7 +117,7 @@ void tTJSNI_Timer::CancelEvents()
 	// cancel all events
 	if(Owner)
 	{
-		static ttstr eventname(TJS_W("onTimer"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onTimer")));
 		TVPCancelEvents(Owner, Owner, eventname, 0);
 	}
 }
@@ -127,7 +128,7 @@ bool tTJSNI_Timer::AreEventsInQueue()
 
 	if(Owner)
 	{
-		static ttstr eventname(TJS_W("onTimer"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onTimer")));
 		return TVPAreEventsInQueue(Owner, Owner, eventname, 0);
 	}
 	return 0;

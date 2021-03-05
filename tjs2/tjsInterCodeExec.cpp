@@ -21,6 +21,7 @@
 #include "tjsArray.h"
 #include "tjsDebug.h"
 #include "tjsOctPack.h"
+#include "tjsGlobalStringMap.h"
 
 #ifdef ENABLE_DEBUGGER
 #include "debugger.h"
@@ -994,7 +995,7 @@ void tTJSInterCodeContext::ThrowScriptException(tTJSVariant &val,
 			if(clo.Object != NULL)
 			{
 				tTJSVariant v2;
-				static tTJSString message_name(TJS_W("message"));
+				static tTJSString message_name(TJSMapGlobalStringMap(TJS_W("message")));
 				tjs_error hr = clo.PropGet(0, message_name.c_str(),
 					message_name.GetHint(), &v2, NULL);
 				if(TJS_SUCCEEDED(hr))
@@ -2752,7 +2753,7 @@ void tTJSInterCodeContext::ProcessStringFunction(const tjs_char *member,
 		tTJSVariantClosure clo = args[0]->AsObjectClosureNoAddRef();
 		tTJSVariant str = target;
 		tTJSVariant *params[] = { &str, args[1] };
-		static tTJSString replace_name(TJS_W("replace"));
+		static tTJSString replace_name(TJSMapGlobalStringMap(TJS_W("replace")));
 		clo.FuncCall(0, replace_name.c_str(), replace_name.GetHint(),
 			result, 2, params, NULL);
 
@@ -2789,7 +2790,7 @@ void tTJSInterCodeContext::ProcessStringFunction(const tjs_char *member,
 				arg_count ++;
 				params[3] = args[2];
 			}
-			static tTJSString split_name(TJS_W("split"));
+			static tTJSString split_name(TJSMapGlobalStringMap(TJS_W("split")));
 			array->FuncCall(0, split_name.c_str(), split_name.GetHint(),
 				NULL, arg_count, params, array);
 
@@ -2956,12 +2957,12 @@ void tTJSInterCodeContext::ProcessOctetFunction(const tjs_char *member, const tT
 void tTJSInterCodeContext::TypeOf(tTJSVariant &val)
 {
 	// processes TJS2's typeof operator.
-	static tTJSString void_name(TJS_W("void"));
-	static tTJSString Object_name(TJS_W("Object"));
-	static tTJSString String_name(TJS_W("String"));
-	static tTJSString Integer_name(TJS_W("Integer"));
-	static tTJSString Real_name(TJS_W("Real"));
-	static tTJSString Octet_name(TJS_W("Octet"));
+	static tTJSString void_name(TJSMapGlobalStringMap(TJS_W("void")));
+	static tTJSString Object_name(TJSMapGlobalStringMap(TJS_W("Object")));
+	static tTJSString String_name(TJSMapGlobalStringMap(TJS_W("String")));
+	static tTJSString Integer_name(TJSMapGlobalStringMap(TJS_W("Integer")));
+	static tTJSString Real_name(TJSMapGlobalStringMap(TJS_W("Real")));
+	static tTJSString Octet_name(TJSMapGlobalStringMap(TJS_W("Octet")));
 
 	switch(val.Type())
 	{

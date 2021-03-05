@@ -14,6 +14,7 @@
 #include "WindowIntf.h"
 #include "VideoOvlIntf.h"
 #include "LayerIntf.h"
+#include "tjsGlobalStringMap.h"
 
 //---------------------------------------------------------------------------
 // tTJSNI_BaseVideoOverlay
@@ -63,16 +64,16 @@ void TJS_INTF_METHOD tTJSNI_BaseVideoOverlay::Invalidate()
 //---------------------------------------------------------------------------
 ttstr tTJSNI_BaseVideoOverlay::GetStatusString() const
 {
-	static ttstr unload(TJS_W("unload"));
-	static ttstr play(TJS_W("play"));
-	static ttstr stop(TJS_W("stop"));
-	static ttstr unknown(TJS_W("unknown"));
-	static ttstr pause(TJS_W("pause"));
-	static ttstr ready(TJS_W("ready"));
-	static ttstr idle(TJS_W("idle"));
-	static ttstr buffering(TJS_W("buffering"));
-	static ttstr loadError(TJS_W("load error"));
-	static ttstr playerError(TJS_W("player error"));
+	static ttstr unload(TJSMapGlobalStringMap(TJS_W("unload")));
+	static ttstr play(TJSMapGlobalStringMap(TJS_W("play")));
+	static ttstr stop(TJSMapGlobalStringMap(TJS_W("stop")));
+	static ttstr unknown(TJSMapGlobalStringMap(TJS_W("unknown")));
+	static ttstr pause(TJSMapGlobalStringMap(TJS_W("pause")));
+	static ttstr ready(TJSMapGlobalStringMap(TJS_W("ready")));
+	static ttstr idle(TJSMapGlobalStringMap(TJS_W("idle")));
+	static ttstr buffering(TJSMapGlobalStringMap(TJS_W("buffering")));
+	static ttstr loadError(TJSMapGlobalStringMap(TJS_W("load error")));
+	static ttstr playerError(TJSMapGlobalStringMap(TJS_W("player error")));
 
 	switch(Status)
 	{
@@ -107,7 +108,7 @@ void tTJSNI_BaseVideoOverlay::SetStatus(tTVPVideoOverlayStatus s)
 			{
 				// fire onStatusChanged event
 				tTJSVariant param(GetStatusString());
-				static ttstr eventname(TJS_W("onStatusChanged"));
+				static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onStatusChanged")));
 				TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE,
 					1, &param);
 			}
@@ -133,7 +134,7 @@ void tTJSNI_BaseVideoOverlay::SetStatusAsync(tTVPVideoOverlayStatus s)
 			{
 				// fire onStatusChanged event
 				tTJSVariant param(GetStatusString());
-				static ttstr eventname(TJS_W("onStatusChanged"));
+				static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onStatusChanged")));
 				TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_POST,
 					1, &param);
 			}
@@ -153,7 +154,7 @@ void tTJSNI_BaseVideoOverlay::FireCallbackCommand(const ttstr & command,
 		{
 			// fire onStatusChanged event
 			tTJSVariant param[2] = {command, argument};
-			static ttstr eventname(TJS_W("onCallbackCommand"));
+			static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onCallbackCommand")));
 			TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE,
 				2, param);
 		}
@@ -172,7 +173,7 @@ void tTJSNI_BaseVideoOverlay::FirePeriodEvent(tTVPPeriodEventReason reason)
 		{
 			// fire onPeriod event
 			tTJSVariant param[1] = {(tjs_int)reason};
-			static ttstr eventname(TJS_W("onPeriod"));
+			static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onPeriod")));
 			TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE,
 				1, param);
 		}
@@ -191,7 +192,7 @@ void tTJSNI_BaseVideoOverlay::FireFrameUpdateEvent( tjs_int frame )
 		{
 			// fire onPeriod event
 			tTJSVariant param[1] = {frame};
-			static ttstr eventname(TJS_W("onFrameUpdate"));
+			static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onFrameUpdate")));
 			TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE,
 				1, param);
 		}
