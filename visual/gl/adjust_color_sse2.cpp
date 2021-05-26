@@ -399,6 +399,10 @@ void TVPInitGammaAdjustTempData_sse2_c( tTVPGLGammaAdjustTempData *temp, const t
 		*dstb = _mm_cvtsi128_si32(n);
 		dstb++;
 	}
+	// 輝度値 0 の結果が -inf となってしまい、floor が無視されるのを回避
+	temp->R[0] = data->RFloor;
+	temp->G[0] = data->GFloor;
+	temp->B[0] = data->BFloor;
 }
 
 
