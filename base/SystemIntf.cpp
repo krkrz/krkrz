@@ -22,6 +22,7 @@
 #include "Random.h"
 #include "ScriptMgnIntf.h"
 #include "DebugIntf.h"
+#include "tjsGlobalStringMap.h"
 
 extern int TVPGetOpenGLESVersion();
 
@@ -48,7 +49,8 @@ void TVPFireOnApplicationActivateEvent(bool activate_or_deactivate)
 	try
 	{
 		tjs_error er;
-		er = global->PropGet(TJS_MEMBERMUSTEXIST, TJS_W("System"), NULL, &val, global);
+		static ttstr System_name(TJSMapGlobalStringMap(TJS_W("System")));
+		er = global->PropGet(TJS_MEMBERMUSTEXIST, System_name.c_str(), System_name.GetHint(), &val, global);
 		if(TJS_FAILED(er)) return;
 
 		if(val.Type() != tvtObject) return;
@@ -57,11 +59,16 @@ void TVPFireOnApplicationActivateEvent(bool activate_or_deactivate)
 
 		if(clo.Object == NULL) return;
 
+		static ttstr onActivate_name(TJSMapGlobalStringMap(TJS_W("onActivate")));
+		static ttstr onDeactivate_name(TJSMapGlobalStringMap(TJS_W("onDeactivate")));
 		clo.PropGet(TJS_MEMBERMUSTEXIST,
 				activate_or_deactivate?
-					TJS_W("onActivate"):
-					TJS_W("onDeactivate"),
-			NULL, &val2, NULL);
+					onActivate_name.c_str():
+					onDeactivate_name.c_str(),
+				activate_or_deactivate?
+					onActivate_name.GetHint():
+					onDeactivate_name.GetHint(),
+			&val2, NULL);
 
 		if(val2.Type() != tvtObject) return;
 
@@ -496,11 +503,14 @@ TJS_END_NATIVE_STATIC_PROP_DECL(openGLESVersion)
 
 	// register default "exceptionHandler" member
 	tTJSVariant val((iTJSDispatch2*)NULL, (iTJSDispatch2*)NULL);
-	PropSet(TJS_MEMBERENSURE, TJS_W("exceptionHandler"), NULL, &val, this);
+	static ttstr exceptionHandler_name(TJSMapGlobalStringMap(TJS_W("exceptionHandler")));
+	PropSet(TJS_MEMBERENSURE, exceptionHandler_name.c_str(), exceptionHandler_name.GetHint(), &val, this);
 
 	// and onActivate, onDeactivate
-	PropSet(TJS_MEMBERENSURE, TJS_W("onActivate"), NULL, &val, this);
-	PropSet(TJS_MEMBERENSURE, TJS_W("onDeactivate"), NULL, &val, this);
+	static ttstr onActivate_name(TJSMapGlobalStringMap(TJS_W("onActivate")));
+	PropSet(TJS_MEMBERENSURE, onActivate_name.c_str(), onActivate_name.GetHint(), &val, this);
+	static ttstr onDeactivate_name(TJSMapGlobalStringMap(TJS_W("onDeactivate")));
+	PropSet(TJS_MEMBERENSURE, onDeactivate_name.c_str(), onDeactivate_name.GetHint(), &val, this);
 }
 //---------------------------------------------------------------------------
 tTJSNativeInstance * tTJSNC_System::CreateNativeInstance()

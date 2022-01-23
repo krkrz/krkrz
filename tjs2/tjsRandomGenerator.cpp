@@ -16,6 +16,7 @@
 #include "tjsRandomGenerator.h"
 #include "tjsDictionary.h"
 #include "tjsLex.h"
+#include "tjsGlobalStringMap.h"
 
 
 namespace TJS
@@ -89,8 +90,9 @@ void tTJSNI_RandomGenerator::Randomize(tTJSVariant ** param, tjs_int numparams)
 				data = new tTJSMersenneTwisterData;
 
 				// get state array
-				TJS_THROW_IF_ERROR(clo.PropGet(TJS_MEMBERMUSTEXIST, TJS_W("state"),
-					NULL, &val, NULL));
+				static ttstr state_name(TJSMapGlobalStringMap(TJS_W("state")));
+				TJS_THROW_IF_ERROR(clo.PropGet(TJS_MEMBERMUSTEXIST, state_name.c_str(),
+					state_name.GetHint(), &val, NULL));
 
 				state = val;
 				if(state.GetLen() != TJS_MT_N * 8)
@@ -117,11 +119,13 @@ void tTJSNI_RandomGenerator::Randomize(tTJSVariant ** param, tjs_int numparams)
 				}
 
 				// get other members
-				TJS_THROW_IF_ERROR(clo.PropGet(TJS_MEMBERMUSTEXIST, TJS_W("left"), NULL,
+				static ttstr left_name(TJSMapGlobalStringMap(TJS_W("left")));
+				TJS_THROW_IF_ERROR(clo.PropGet(TJS_MEMBERMUSTEXIST, left_name.c_str(), left_name.GetHint(),
 					&val, NULL));
 				data->left = (tjs_int)val;
 
-				TJS_THROW_IF_ERROR(clo.PropGet(TJS_MEMBERMUSTEXIST, TJS_W("next"), NULL,
+				static ttstr next_name(TJSMapGlobalStringMap(TJS_W("next")));
+				TJS_THROW_IF_ERROR(clo.PropGet(TJS_MEMBERMUSTEXIST, next_name.c_str(), next_name.GetHint(),
 					&val, NULL));
 				data->next = (tjs_int)val + data->state;
 
@@ -185,13 +189,16 @@ iTJSDispatch2 * tTJSNI_RandomGenerator::Serialize()
 		dic = TJSCreateDictionaryObject();
 
 		val = state;
-		dic->PropSet(TJS_MEMBERENSURE, TJS_W("state"), NULL, &val, dic);
+		static ttstr state_name(TJSMapGlobalStringMap(TJS_W("state")));
+		dic->PropSet(TJS_MEMBERENSURE, state_name.c_str(), state_name.GetHint(), &val, dic);
 
 		val = (tjs_int)data.left;
-		dic->PropSet(TJS_MEMBERENSURE, TJS_W("left"), NULL, &val, dic);
+		static ttstr left_name(TJSMapGlobalStringMap(TJS_W("left")));
+		dic->PropSet(TJS_MEMBERENSURE, left_name.c_str(), left_name.GetHint(), &val, dic);
 
 		val = (tjs_int)(data.next - data.state);
-		dic->PropSet(TJS_MEMBERENSURE, TJS_W("next"), NULL, &val, dic);
+		static ttstr next_name(TJSMapGlobalStringMap(TJS_W("next")));
+		dic->PropSet(TJS_MEMBERENSURE, next_name.c_str(), next_name.GetHint(), &val, dic);
 	}
 	catch(...)
 	{

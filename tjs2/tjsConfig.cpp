@@ -136,6 +136,8 @@ tjs_char * TJS_tTVInt_to_str(tjs_int64 value, tjs_char *string)
 tjs_int TJS_strnicmp(const tjs_char *s1, const tjs_char *s2,
 	size_t maxlen)
 {
+	if (s1 == s2) return 0;
+
 	while(maxlen--)
 	{
 		tjs_char c1 = *s1, c2 = *s2;
@@ -156,6 +158,8 @@ tjs_int TJS_stricmp(const tjs_char *s1, const tjs_char *s2)
 {
 	// we only support basic alphabets
 	// fixme: complete alphabets support
+
+	if (s1 == s2) return 0;
 
 	for(;;)
 	{
@@ -331,6 +335,8 @@ tjs_char * TJS_strstr(const tjs_char *big, const tjs_char *little)
 //---------------------------------------------------------------------------
 tjs_int TJS_strcmp(const tjs_char *s1, const tjs_char *s2)
 {
+	if (s1 == s2) return 0;
+
 	while (*s1 == *s2++)
 		if (*s1++ == '\0')
 			return (0);
@@ -339,6 +345,8 @@ tjs_int TJS_strcmp(const tjs_char *s1, const tjs_char *s2)
 //---------------------------------------------------------------------------
 tjs_int TJS_strncmp(const tjs_char *s1, const tjs_char *s2, size_t n)
 {
+	if (s1 == s2) return 0;
+
 	if (n == 0)
 		return (0);
 	do {

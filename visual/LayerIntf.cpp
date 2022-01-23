@@ -29,6 +29,7 @@
 #include "DebugIntf.h"
 #include "LayerManager.h"
 #include "BitmapIntf.h"
+#include "tjsGlobalStringMap.h"
 
 #include "TVPColor.h"
 #ifdef _WIN32
@@ -38,6 +39,7 @@
 #include "RectItf.h"
 #include "FontSystem.h"
 #include "tjsDictionary.h"
+#include "tjsGlobalStringMap.h"
 
 #ifdef __ANDROID__
 #include "VirtualKey.h"
@@ -439,7 +441,8 @@ tTJSNI_BaseLayer::Construct(tjs_int numparams, tTJSVariant **param,
 
 	class iTVPLayerTreeOwner* lto = NULL;
 	tTJSVariant iface_v;
-	if(TJS_FAILED(clo.PropGet(0, TJS_W("layerTreeOwnerInterface"), NULL, &iface_v, NULL)))
+	static ttstr layerTreeOwnerInterface_name(TJSMapGlobalStringMap(TJS_W("layerTreeOwnerInterface")));
+	if(TJS_FAILED(clo.PropGet(0, layerTreeOwnerInterface_name.c_str(), layerTreeOwnerInterface_name.GetHint(), &iface_v, NULL)))
 		TVPThrowExceptionMessage( TJS_W("Cannot Retrive Layer Tree Owner Interface.") );
 	lto = reinterpret_cast<iTVPLayerTreeOwner *>((tjs_intptr_t)(tjs_int64)iface_v);
 
@@ -644,7 +647,8 @@ iTJSDispatch2 * tTJSNI_BaseLayer::GetChildrenArrayObjectNoAddRef()
 		{
 			tTJSVariant val;
 			tjs_error er;
-			er = classobj->PropGet(0, TJS_W("clear"), NULL, &val, classobj);
+			static ttstr clear_name(TJSMapGlobalStringMap(TJS_W("clear")));
+			er = classobj->PropGet(0, clear_name.c_str(), clear_name.GetHint(), &val, classobj);
 				// retrieve clear method
 			if(TJS_FAILED(er)) TVPThrowInternalError;
 			ArrayClearMethod = val.AsObject();
@@ -2475,19 +2479,23 @@ void tTJSNI_BaseLayer::SaveLayerImage(const ttstr &name, const ttstr &type)
 		case ltPsExclusion:			val = tTJSVariant(TJS_W("psexcl"));		break;
 		default:					val = tTJSVariant(TJS_W("opaque"));		break;
 		}
-		dic->PropSet(TJS_MEMBERENSURE, TJS_W("mode"), 0, &val, dic );
+		static ttstr mode_name(TJSMapGlobalStringMap(TJS_W("mode")));
+		dic->PropSet(TJS_MEMBERENSURE, mode_name.c_str(), mode_name.GetHint(), &val, dic );
 
 		if( ImageLeft > 0 ) {
 			val = tTJSVariant(ImageLeft);
-			dic->PropSet(TJS_MEMBERENSURE, TJS_W("offs_x"), 0, &val, dic );
+			static ttstr offs_x_name(TJSMapGlobalStringMap(TJS_W("offs_x")));
+			dic->PropSet(TJS_MEMBERENSURE, offs_x_name.c_str(), offs_x_name.GetHint(), &val, dic );
 		}
 		if( ImageTop > 0 ) {
 			val = tTJSVariant(ImageTop);
-			dic->PropSet(TJS_MEMBERENSURE, TJS_W("offs_y"), 0, &val, dic );
+			static ttstr offs_y_name(TJSMapGlobalStringMap(TJS_W("offs_y")));
+			dic->PropSet(TJS_MEMBERENSURE, offs_y_name.c_str(), offs_y_name.GetHint(), &val, dic );
 		}
 		if( ImageLeft > 0 || ImageTop > 0 ) {
 			val = tTJSVariant(TJS_W("pixel"));
-			dic->PropSet(TJS_MEMBERENSURE, TJS_W("offs_unit"), 0, &val, dic );
+			static ttstr offs_unit_name(TJSMapGlobalStringMap(TJS_W("offs_unit")));
+			dic->PropSet(TJS_MEMBERENSURE, offs_unit_name.c_str(), offs_unit_name.GetHint(), &val, dic );
 		}
 		TVPSaveImage( name, type, MainImage, dic );
 	} catch(...) {
@@ -2956,7 +2964,7 @@ bool tTJSNI_BaseLayer::HitTestNoVisibleCheck(tjs_int x, tjs_int y)
 			param[0] = x;
 			param[1] = y;
 			param[2] = true;
-			static ttstr eventname(TJS_W("onHitTest"));
+			static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onHitTest")));
 			TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 3, param);
 
 			res = OnHitTest_Work;
@@ -3044,7 +3052,7 @@ void tTJSNI_BaseLayer::FireClick(tjs_int x, tjs_int y)
 		tTJSVariant param[2];
 		param[0] = x;
 		param[1] = y;
-		static ttstr eventname(TJS_W("onClick"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onClick")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 2, param);
 	}
 }
@@ -3056,7 +3064,7 @@ void tTJSNI_BaseLayer::FireDoubleClick(tjs_int x, tjs_int y)
 		tTJSVariant param[2];
 		param[0] = x;
 		param[1] = y;
-		static ttstr eventname(TJS_W("onDoubleClick"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onDoubleClick")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 2, param);
 	}
 }
@@ -3071,7 +3079,7 @@ void tTJSNI_BaseLayer::FireMouseDown(tjs_int x, tjs_int y, tTVPMouseButton mb,
 		param[1] = y;
 		param[2] = (tjs_int) mb;
 		param[3] = (tjs_int64)flags;
-		static ttstr eventname(TJS_W("onMouseDown"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onMouseDown")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 4, param);
 	}
 }
@@ -3086,7 +3094,7 @@ void tTJSNI_BaseLayer::FireMouseUp(tjs_int x, tjs_int y, tTVPMouseButton mb,
 		param[1] = y;
 		param[2] = (tjs_int) mb;
 		param[3] = (tjs_int64)flags;
-		static ttstr eventname(TJS_W("onMouseUp"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onMouseUp")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 4, param);
 	}
 }
@@ -3099,7 +3107,7 @@ void tTJSNI_BaseLayer::FireMouseMove(tjs_int x, tjs_int y, tjs_uint32 flags)
 		param[0] = x;
 		param[1] = y;
 		param[2] = (tjs_int64)flags;
-		static ttstr eventname(TJS_W("onMouseMove"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onMouseMove")));
 		TVPPostEvent(Owner, Owner, eventname, 0,
 			TVP_EPT_IMMEDIATE|TVP_EPT_DISCARDABLE, 3, param);
 	}
@@ -3109,7 +3117,7 @@ void tTJSNI_BaseLayer::FireMouseEnter()
 {
 	if(Owner && !Shutdown)
 	{
-		static ttstr eventname(TJS_W("onMouseEnter"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onMouseEnter")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 0, NULL);
 	}
 }
@@ -3118,7 +3126,7 @@ void tTJSNI_BaseLayer::FireMouseLeave()
 {
 	if(Owner && !Shutdown)
 	{
-		static ttstr eventname(TJS_W("onMouseLeave"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onMouseLeave")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 0, NULL);
 	}
 }
@@ -3148,7 +3156,7 @@ void tTJSNI_BaseLayer::FireTouchDown( tjs_real x, tjs_real y, tjs_real cx, tjs_r
 	if(Owner && !Shutdown)
 	{
 		tTJSVariant arg[5] = { x, y, cx, cy, (tjs_int64)id };
-		static ttstr eventname(TJS_W("onTouchDown"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onTouchDown")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 5, arg);
 	}
 }
@@ -3158,7 +3166,7 @@ void tTJSNI_BaseLayer::FireTouchUp( tjs_real x, tjs_real y, tjs_real cx, tjs_rea
 	if(Owner && !Shutdown)
 	{
 		tTJSVariant arg[5] = { x, y, cx, cy, (tjs_int64)id };
-		static ttstr eventname(TJS_W("onTouchUp"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onTouchUp")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 5, arg);
 	}
 }
@@ -3168,7 +3176,7 @@ void tTJSNI_BaseLayer::FireTouchMove( tjs_real x, tjs_real y, tjs_real cx, tjs_r
 	if(Owner && !Shutdown)
 	{
 		tTJSVariant arg[5] = { x, y, cx, cy, (tjs_int64)id };
-		static ttstr eventname(TJS_W("onTouchMove"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onTouchMove")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE|TVP_EPT_DISCARDABLE, 5, arg);
 	}
 }
@@ -3178,7 +3186,7 @@ void tTJSNI_BaseLayer::FireTouchScaling( tjs_real startdist, tjs_real curdist, t
 	if(Owner && !Shutdown)
 	{
 		tTJSVariant arg[5] = { startdist, curdist, cx, cy, flag };
-		static ttstr eventname(TJS_W("onTouchScaling"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onTouchScaling")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 5, arg);
 	}
 }
@@ -3188,7 +3196,7 @@ void tTJSNI_BaseLayer::FireTouchRotate( tjs_real startangle, tjs_real curangle, 
 	if(Owner && !Shutdown)
 	{
 		tTJSVariant arg[6] = { startangle, curangle, dist, cx, cy, flag };
-		static ttstr eventname(TJS_W("onTouchRotate"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onTouchRotate")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 6, arg);
 	}
 }
@@ -3197,7 +3205,7 @@ void tTJSNI_BaseLayer::FireMultiTouch()
 {
 	if(Owner && !Shutdown)
 	{
-		static ttstr eventname(TJS_W("onMultiTouch"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onMultiTouch")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 0, NULL);
 	}
 }
@@ -3271,7 +3279,7 @@ tTJSNI_BaseLayer *tTJSNI_BaseLayer::GetPrevFocusable()
 	if(Owner && !Shutdown &&
 		(!FocusWork || FocusWork->Owner))
 	{
-		static ttstr eventname(TJS_W("onSearchPrevFocusable"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onSearchPrevFocusable")));
 		tTJSVariant param[1];
 		if(FocusWork)
 			param[0] = tTJSVariant(FocusWork->Owner,
@@ -3310,7 +3318,7 @@ tTJSNI_BaseLayer *tTJSNI_BaseLayer::GetNextFocusable()
 	if(Owner && !Shutdown &&
 		(!FocusWork || FocusWork->Owner))
 	{
-		static ttstr eventname(TJS_W("onSearchNextFocusable"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onSearchNextFocusable")));
 		tTJSVariant param[1];
 		if(FocusWork)
 			param[0] = tTJSVariant(FocusWork->Owner,
@@ -3360,7 +3368,7 @@ void tTJSNI_BaseLayer::FireBlur(tTJSNI_BaseLayer *prevfocused)
 {
 	if(Owner && !Shutdown)
 	{
-		static ttstr eventname(TJS_W("onBlur"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onBlur")));
 		tTJSVariant param[1];
 		if(prevfocused)
 			param[0] = tTJSVariant(prevfocused->Owner, prevfocused->Owner);
@@ -3376,7 +3384,7 @@ void tTJSNI_BaseLayer::FireFocus(tTJSNI_BaseLayer *prevfocused, bool direction)
 {
 	if(Owner && !Shutdown)
 	{
-		static ttstr eventname(TJS_W("onFocus"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onFocus")));
 		tTJSVariant param[2];
 		if(prevfocused)
 			param[0] = tTJSVariant(prevfocused->Owner, prevfocused->Owner);
@@ -3394,7 +3402,7 @@ tTJSNI_BaseLayer * tTJSNI_BaseLayer::FireBeforeFocus(
 	FocusWork = this;
 	if(Owner && !Shutdown)
 	{
-		static ttstr eventname(TJS_W("onBeforeFocus"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onBeforeFocus")));
 		tTJSVariant param[3];
 		param[0] = tTJSVariant(Owner, Owner);
 		if(prevfocused)
@@ -3435,12 +3443,12 @@ void tTJSNI_BaseLayer::NotifyNodeEnabledState()
 	{
 		if(en)
 		{
-			static ttstr eventname(TJS_W("onNodeEnabled"));
+			static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onNodeEnabled")));
 			TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 0, NULL);
 		}
 		else
 		{
-			static ttstr eventname(TJS_W("onNodeDisabled"));
+			static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onNodeDisabled")));
 			TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 0, NULL);
 		}
 	}
@@ -3512,7 +3520,7 @@ void tTJSNI_BaseLayer::FireKeyDown(tjs_uint key, tjs_uint32 shift)
 		param[0] = (tjs_int)key;
 		param[1] = (tjs_int)shift;
 		param[2] = true;
-		static ttstr eventname(TJS_W("onKeyDown"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onKeyDown")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 3, param);
 	}
 }
@@ -3525,7 +3533,7 @@ void tTJSNI_BaseLayer::FireKeyUp(tjs_uint key, tjs_uint32 shift)
 		param[0] = (tjs_int)key;
 		param[1] = (tjs_int)shift;
 		param[2] = true;
-		static ttstr eventname(TJS_W("onKeyUp"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onKeyUp")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 3, param);
 	}
 }
@@ -3540,7 +3548,7 @@ void tTJSNI_BaseLayer::FireKeyPress(tjs_char key)
 		tTJSVariant param[2];
 		param[0] = buf;
 		param[1] = true;
-		static ttstr eventname(TJS_W("onKeyPress"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onKeyPress")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 2, param);
 	}
 }
@@ -3551,7 +3559,7 @@ void tTJSNI_BaseLayer::FireMouseWheel(tjs_uint32 shift, tjs_int delta, tjs_int x
 	if(Owner && !Shutdown)
 	{
 		tTJSVariant val[4] = { (tjs_int)shift, delta, x, y };
-		static ttstr eventname(TJS_W("onMouseWheel"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onMouseWheel")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 4, val);
 	}
 }
@@ -5045,7 +5053,7 @@ void tTJSNI_BaseLayer::BeforeCompletion()
 	if(CallOnPaint)
 	{
 		CallOnPaint = false;
-		static ttstr eventname(TJS_W("onPaint"));
+		static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onPaint")));
 		TVPPostEvent(Owner, Owner, eventname, 0, TVP_EPT_IMMEDIATE, 0, NULL);
 	}
 
@@ -6215,7 +6223,7 @@ void tTJSNI_BaseLayer::StartTransition(const ttstr &name, bool withchildren,
 		// check selfupdate member of 'options'
 		tTJSVariant var;
 		TransSelfUpdate = false;
-		static ttstr selfupdate_name(TJS_W("selfupdate"));
+		static ttstr selfupdate_name(TJSMapGlobalStringMap(TJS_W("selfupdate")));
 		if(TJS_SUCCEEDED(options.PropGet(0, selfupdate_name.c_str(),
 			selfupdate_name.GetHint(), &var, NULL)))
 		{
@@ -6226,7 +6234,7 @@ void tTJSNI_BaseLayer::StartTransition(const ttstr &name, bool withchildren,
 
 		// check callback member of 'options'
 		TransTickCallback = tTJSVariantClosure(NULL, NULL);
-		static ttstr callback_name(TJS_W("callback"));
+		static ttstr callback_name(TJSMapGlobalStringMap(TJS_W("callback")));
 		UseTransTickCallback = false;
 		if(TJS_SUCCEEDED(options.PropGet(0, callback_name.c_str(),
 			callback_name.GetHint(), &var, NULL)))
@@ -6414,7 +6422,7 @@ void tTJSNI_BaseLayer::InternalStopTransition()
 		// fire event
 		if(Owner && !Shutdown && transsrcalive)
 		{
-			static ttstr eventname(TJS_W("onTransitionCompleted"));
+			static ttstr eventname(TJSMapGlobalStringMap(TJS_W("onTransitionCompleted")));
 
 			// fire SYNCHRONOUS event of "onTransitionCompleted"
 			tTJSVariant param[2];

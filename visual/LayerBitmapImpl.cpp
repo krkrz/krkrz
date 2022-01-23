@@ -29,6 +29,7 @@
 #include "WindowFormUnit.h"
 #endif
 #include "UtilStreams.h"
+#include "tjsGlobalStringMap.h"
 
 //#include "FontSelectFormUnit.h"
 
@@ -1117,7 +1118,8 @@ void tTVPNativeBaseBitmap::DrawGlyph(iTJSDispatch2* glyph, const tTVPRect &destr
 
 	tjs_int itemcount;
 	tTJSVariant tmp;
-	if(TJS_SUCCEEDED(glyph->PropGet(TJS_MEMBERMUSTEXIST, TJS_W("count"), 0, &tmp, glyph)))
+	static ttstr count_name(TJSMapGlobalStringMap(TJS_W("count")));
+	if(TJS_SUCCEEDED(glyph->PropGet(TJS_MEMBERMUSTEXIST, count_name.c_str(), count_name.GetHint(), &tmp, glyph)))
 		itemcount = tmp;
 	else
 		itemcount = 0;

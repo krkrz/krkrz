@@ -18,6 +18,7 @@
 #include "WindowImpl.h"
 #include "SysInitIntf.h"
 #include "DebugIntf.h"
+#include "tjsGlobalStringMap.h"
 
 #include "TVPScreen.h"
 
@@ -122,7 +123,8 @@ bool TVPSelectFile(iTJSDispatch2 *params)
 		// get filter
 		ofn.lpstrFilter = NULL;
 
-		if(TJS_SUCCEEDED(params->PropGet(TJS_MEMBERMUSTEXIST, TJS_W("filter"), 0,
+		static ttstr filter_name(TJSMapGlobalStringMap(TJS_W("filter")));
+		if(TJS_SUCCEEDED(params->PropGet(TJS_MEMBERMUSTEXIST, filter_name.c_str(), filter_name.GetHint(),
 			&val, params)))
 		{
 			std::vector<tjs_string> filterlist;
@@ -135,8 +137,9 @@ bool TVPSelectFile(iTJSDispatch2 *params)
 				iTJSDispatch2 * array = val.AsObjectNoAddRef();
 				tjs_int count;
 				tTJSVariant tmp;
+				static ttstr count_name(TJSMapGlobalStringMap(TJS_W("count")));
 				if(TJS_SUCCEEDED(array->PropGet(TJS_MEMBERMUSTEXIST,
-					TJS_W("count"), 0, &tmp, array)))
+					count_name.c_str(), count_name.GetHint(), &tmp, array)))
 					count = tmp;
 				else
 					count = 0;
@@ -175,7 +178,8 @@ bool TVPSelectFile(iTJSDispatch2 *params)
 		ofn.lpstrCustomFilter = NULL;
 		ofn.nMaxCustFilter = 0;
 
-		if(TJS_SUCCEEDED(params->PropGet(TJS_MEMBERMUSTEXIST, TJS_W("filterIndex"), 0, &val, params)))
+		static ttstr filterIndex_name(TJSMapGlobalStringMap(TJS_W("filterIndex")));
+		if(TJS_SUCCEEDED(params->PropGet(TJS_MEMBERMUSTEXIST, filterIndex_name.c_str(), filterIndex_name.GetHint(), &val, params)))
 			ofn.nFilterIndex = (tjs_int)val;
 		else
 			ofn.nFilterIndex = 0;
@@ -184,7 +188,8 @@ bool TVPSelectFile(iTJSDispatch2 *params)
 		filename = new tjs_char[MAX_PATH + 1];
  		filename[0] = 0;
 
-		if(TJS_SUCCEEDED(params->PropGet(TJS_MEMBERMUSTEXIST, TJS_W("name"), 0, &val, params)))
+ 		static ttstr name_name(TJSMapGlobalStringMap(TJS_W("name")));
+		if(TJS_SUCCEEDED(params->PropGet(TJS_MEMBERMUSTEXIST, name_name.c_str(), name_name.GetHint(), &val, params)))
 		{
 			ttstr lname(val);
 			if(!lname.IsEmpty())
@@ -204,7 +209,8 @@ bool TVPSelectFile(iTJSDispatch2 *params)
 
 		// initial dir
 		ofn.lpstrInitialDir = NULL;
-		if(TJS_SUCCEEDED(params->PropGet(TJS_MEMBERMUSTEXIST, TJS_W("initialDir"), 0, &val, params)))
+		static ttstr initialDir_name(TJSMapGlobalStringMap(TJS_W("initialDir")));
+		if(TJS_SUCCEEDED(params->PropGet(TJS_MEMBERMUSTEXIST, initialDir_name.c_str(), initialDir_name.GetHint(), &val, params)))
 		{
 			ttstr lname(val);
 			if(!lname.IsEmpty())
@@ -217,7 +223,8 @@ bool TVPSelectFile(iTJSDispatch2 *params)
 		}
 	
 		// title
-		if(TJS_SUCCEEDED(params->PropGet(TJS_MEMBERMUSTEXIST, TJS_W("title"), 0, &val, params)))
+		static ttstr title_name(TJSMapGlobalStringMap(TJS_W("title")));
+		if(TJS_SUCCEEDED(params->PropGet(TJS_MEMBERMUSTEXIST, title_name.c_str(), title_name.GetHint(), &val, params)))
 		{
 			title = ttstr(val).AsStdString();
 			ofn.lpstrTitle = title.c_str();
@@ -229,7 +236,8 @@ bool TVPSelectFile(iTJSDispatch2 *params)
 
 		// flags
 		bool issave = false;
-		if(TJS_SUCCEEDED(params->PropGet(TJS_MEMBERMUSTEXIST, TJS_W("save"), 0, &val, params)))
+		static ttstr save_name(TJSMapGlobalStringMap(TJS_W("save")));
+		if(TJS_SUCCEEDED(params->PropGet(TJS_MEMBERMUSTEXIST, save_name.c_str(), save_name.GetHint(), &val, params)))
 			issave = val.operator bool();
 
 		ofn.Flags = OFN_ENABLEHOOK|OFN_EXPLORER|OFN_NOCHANGEDIR|
@@ -242,7 +250,8 @@ bool TVPSelectFile(iTJSDispatch2 *params)
 			ofn.Flags |= OFN_OVERWRITEPROMPT;
 
 		// default extension
-		if(TJS_SUCCEEDED(params->PropGet(TJS_MEMBERMUSTEXIST, TJS_W("defaultExt"), 0, &val, params)))
+		static ttstr defaultExt_name(TJSMapGlobalStringMap(TJS_W("defaultExt")));
+		if(TJS_SUCCEEDED(params->PropGet(TJS_MEMBERMUSTEXIST, defaultExt_name.c_str(), defaultExt_name.GetHint(), &val, params)))
 		{
 			defaultext = ttstr(val).AsStdString();
 			ofn.lpstrDefExt = defaultext.c_str();
@@ -279,11 +288,13 @@ bool TVPSelectFile(iTJSDispatch2 *params)
 
 			// filter index
 			val = (tjs_int)ofn.nFilterIndex;
-			params->PropSet(TJS_MEMBERENSURE, TJS_W("filterIndex"), 0, &val, params);
+			static ttstr filterIndex_name(TJSMapGlobalStringMap(TJS_W("filterIndex")));
+			params->PropSet(TJS_MEMBERENSURE, filterIndex_name.c_str(), filterIndex_name.GetHint(), &val, params);
 
 			// file name
 			val = TVPNormalizeStorageName(ttstr(filename));
-			params->PropSet(TJS_MEMBERENSURE, TJS_W("name"), 0, &val, params);
+			static ttstr name_name(TJSMapGlobalStringMap(TJS_W("name")));
+			params->PropSet(TJS_MEMBERENSURE, name_name.c_str(), name_name.GetHint(), &val, params);
 		}
 
 	}

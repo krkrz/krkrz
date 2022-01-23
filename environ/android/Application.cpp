@@ -43,6 +43,7 @@
 #include "FontSystem.h"
 #include "GraphicsLoadThread.h"
 #include "MsgLoad.h"
+#include "tjsGlobalStringMap.h"
 
 #include <ft2build.h>
 #include FT_TRUETYPE_UNPATENTED_H
@@ -545,6 +546,7 @@ const ttstr &TVPGetDefaultFaceNames() {
 		} else {
 			TVPDefaultFaceNames += ttstr(TJS_W(",Roboto"));
 		}
+		TVPDefaultFaceNames = TJSMapGlobalStringMap(TVPDefaultFaceNames);
 		return TVPDefaultFaceNames;
 	}
 }

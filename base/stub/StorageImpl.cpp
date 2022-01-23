@@ -21,6 +21,7 @@
 #include "XP3Archive.h"
 #include "FileSelector.h"
 #include "Random.h"
+#include "tjsGlobalStringMap.h"
 
 #include "Application.h"
 #include "StringUtil.h"
@@ -343,7 +344,7 @@ bool TVPRemoveFolder(const ttstr &name)
 //---------------------------------------------------------------------------
 ttstr TVPGetAppPath()
 {
-	static ttstr exepath(TVPExtractStoragePath(TVPNormalizeStorageName(ExePath())));
+	static ttstr exepath(TJSMapGlobalStringMap(TVPExtractStoragePath(TVPNormalizeStorageName(ExePath()))));
 	return exepath;
 }
 //---------------------------------------------------------------------------
