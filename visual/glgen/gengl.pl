@@ -2447,7 +2447,7 @@ TVP_GL_FUNC_DECL(void, TVPInterpStretchConstAlphaBlend_c, (tjs_uint32 *dest, tjs
 	tjs_int sp;
 
 	blend_y += blend_y >> 7; /* adjust blend ratio */
-	opa += opa > 7; /* adjust opa */
+	opa += opa >> 7; /* adjust opa */
 
 	destlen -= 1;
 	while(destlen > 0)
