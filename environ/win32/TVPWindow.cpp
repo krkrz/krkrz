@@ -113,7 +113,11 @@ LRESULT WINAPI tTVPWindow::Proc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		OnMouseUp( mbRight, GetShiftState(wParam), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
 		return 0;
 	case WM_RBUTTONDBLCLK: // 右ダブルクリックは無視
-		return ::DefWindowProc(hWnd,msg,wParam,lParam);
+		//return ::DefWindowProc(hWnd,msg,wParam,lParam);
+		if( ignore_touch_mouse_ == false || IsTouchEvent( ::GetMessageExtraInfo() ) == false ) {
+			OnMouseDown( mbRight, GetShiftState(wParam), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
+		}
+		return 0;
 
 	case WM_MBUTTONDOWN:
 		OnMouseDown( mbMiddle, GetShiftState(wParam), GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
