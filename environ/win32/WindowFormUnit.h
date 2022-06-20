@@ -6,6 +6,7 @@
 #include "tvpinputdefs.h"
 #include "WindowIntf.h"
 
+#include "SDLInputMgr.h"
 #include "TVPWindow.h"
 #include "MouseCursor.h"
 #include "TouchPoint.h"
@@ -109,6 +110,9 @@ private:
 #ifndef DISABLE_EMBEDDED_GAME_PAD
 	tTVPPadDirectInputDevice *DIPadDevice;
 #endif
+	SdlInputMgr* SdlInputManager;
+	
+
 	bool ReloadDevice;
 	DWORD ReloadDeviceTick;
 
