@@ -1291,10 +1291,10 @@ void TTVPWindowForm::GenerateMouseEvent(bool fl, bool fr, bool fu, bool fd) {
 	}
 
 	bool shift = 0!=(GetAsyncKeyState(VK_SHIFT) & 0x8000);
-	bool left = fl || GetAsyncKeyState(VK_LEFT) & 0x8000 || TVPGetJoyPadAsyncState(VK_PADLEFT, true) || TVPGetSdlGameControllerAsyncState(VK_PADLEFT, true);
-	bool right = fr || GetAsyncKeyState(VK_RIGHT) & 0x8000 || TVPGetJoyPadAsyncState(VK_PADRIGHT, true) || TVPGetSdlGameControllerAsyncState(VK_PADRIGHT, true);
-	bool up = fu || GetAsyncKeyState(VK_UP) & 0x8000 || TVPGetJoyPadAsyncState(VK_PADUP, true) || TVPGetSdlGameControllerAsyncState(VK_PADUP, true);
-	bool down = fd || GetAsyncKeyState(VK_DOWN) & 0x8000 || TVPGetJoyPadAsyncState(VK_PADDOWN, true) || TVPGetSdlGameControllerAsyncState(VK_PADDOWN, true);
+	bool left = fl || GetAsyncKeyState(VK_LEFT) & 0x8000 || TVPGetJoyPadAsyncState(VK_PADLEFT, true) || TVPGetSdlGameControllerAsyncState(VK_PADLEFT);
+	bool right = fr || GetAsyncKeyState(VK_RIGHT) & 0x8000 || TVPGetJoyPadAsyncState(VK_PADRIGHT, true) || TVPGetSdlGameControllerAsyncState(VK_PADRIGHT);
+	bool up = fu || GetAsyncKeyState(VK_UP) & 0x8000 || TVPGetJoyPadAsyncState(VK_PADUP, true) || TVPGetSdlGameControllerAsyncState(VK_PADUP);
+	bool down = fd || GetAsyncKeyState(VK_DOWN) & 0x8000 || TVPGetJoyPadAsyncState(VK_PADDOWN, true) || TVPGetSdlGameControllerAsyncState(VK_PADDOWN);
 
 	DWORD flags = 0;
 	if(left || right || up || down) flags |= MOUSEEVENTF_MOVE;

@@ -22,9 +22,6 @@
 
 #include "SDL.h"
 
-const char* ConvertToString(Uint8 aButton);
-size_t ConvertToIndex(Uint8 aButton);
-
 //---------------------------------------------------------------------------
 // tTVPSDLGameController : A class for managing individuaal SDL_GameControllers.
 //---------------------------------------------------------------------------
@@ -91,5 +88,5 @@ private:
 //---------------------------------------------------------------------------
 // Utility functionss
 //---------------------------------------------------------------------------
-bool TVPGetSdlGameControllerAsyncState(tjs_uint keycode, bool getcurrent);
+bool TVPGetSdlGameControllerAsyncState(tjs_uint keycode);
 //---------------------------------------------------------------------------
