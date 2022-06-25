@@ -501,8 +501,8 @@ void TTVPWindowForm::TickBeat(){
 	if (SdlInputManager && TJSNativeInstance) {
 		SdlInputManager->Update();
 
-		auto it = SdlInputMgr::sInstance->mControllers.find(0);
-		if (it != SdlInputMgr::sInstance->mControllers.end())
+		auto it = tTVPSDLSdlGameControllerMgr::sInstance->mControllers.find(0);
+		if (it != tTVPSDLSdlGameControllerMgr::sInstance->mControllers.end())
 		{
 			const std::vector<WORD>& uppedkeys = it->second.GetUppedKeys();
 			const std::vector<WORD>& downedkeys = it->second.GetDownedKeys();
@@ -1291,10 +1291,10 @@ void TTVPWindowForm::GenerateMouseEvent(bool fl, bool fr, bool fu, bool fd) {
 	}
 
 	bool shift = 0!=(GetAsyncKeyState(VK_SHIFT) & 0x8000);
-	bool left = fl || GetAsyncKeyState(VK_LEFT) & 0x8000 || TVPGetJoyPadAsyncState(VK_PADLEFT, true) || SdlGetJoyPadAsyncState(VK_PADLEFT, true);
-	bool right = fr || GetAsyncKeyState(VK_RIGHT) & 0x8000 || TVPGetJoyPadAsyncState(VK_PADRIGHT, true) || SdlGetJoyPadAsyncState(VK_PADRIGHT, true);
-	bool up = fu || GetAsyncKeyState(VK_UP) & 0x8000 || TVPGetJoyPadAsyncState(VK_PADUP, true) || SdlGetJoyPadAsyncState(VK_PADUP, true);
-	bool down = fd || GetAsyncKeyState(VK_DOWN) & 0x8000 || TVPGetJoyPadAsyncState(VK_PADDOWN, true) || SdlGetJoyPadAsyncState(VK_PADDOWN, true);
+	bool left = fl || GetAsyncKeyState(VK_LEFT) & 0x8000 || TVPGetJoyPadAsyncState(VK_PADLEFT, true) || TVPGetSdlGameControllerAsyncState(VK_PADLEFT, true);
+	bool right = fr || GetAsyncKeyState(VK_RIGHT) & 0x8000 || TVPGetJoyPadAsyncState(VK_PADRIGHT, true) || TVPGetSdlGameControllerAsyncState(VK_PADRIGHT, true);
+	bool up = fu || GetAsyncKeyState(VK_UP) & 0x8000 || TVPGetJoyPadAsyncState(VK_PADUP, true) || TVPGetSdlGameControllerAsyncState(VK_PADUP, true);
+	bool down = fd || GetAsyncKeyState(VK_DOWN) & 0x8000 || TVPGetJoyPadAsyncState(VK_PADDOWN, true) || TVPGetSdlGameControllerAsyncState(VK_PADDOWN, true);
 
 	DWORD flags = 0;
 	if(left || right || up || down) flags |= MOUSEEVENTF_MOVE;
@@ -1543,7 +1543,7 @@ void TTVPWindowForm::CreateDirectInputDevice() {
 	if( !DIPadDevice ) DIPadDevice = new tTVPPadDirectInputDevice(GetHandle());
 #endif
 
-	if ( !SdlInputManager ) SdlInputManager = new SdlInputMgr(GetHandle());
+	if ( !SdlInputManager ) SdlInputManager = new tTVPSDLSdlGameControllerMgr(GetHandle());
 }
 void TTVPWindowForm::FreeDirectInputDevice() {
 	if( DIWheelDevice ) {

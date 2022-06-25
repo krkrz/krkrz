@@ -1,3 +1,14 @@
+//---------------------------------------------------------------------------
+/*
+    TVP2 ( T Visual Presenter 2 )  A script authoring tool
+    Copyright (C) 2000 W.Dee <dee@kikyou.info> and contributors
+
+    See details of license at "license.txt"
+*/
+//---------------------------------------------------------------------------
+// SDL_GameController management
+//---------------------------------------------------------------------------
+
 #pragma once
 
 #include <array>
@@ -14,15 +25,18 @@
 const char* ConvertToString(Uint8 aButton);
 size_t ConvertToIndex(Uint8 aButton);
 
-class Controller
+//---------------------------------------------------------------------------
+// tTVPSDLGameController : A class for managing individuaal SDL_GameControllers.
+//---------------------------------------------------------------------------
+class tTVPSDLGameController
 {
 public:
-    Controller()
+    tTVPSDLGameController()
     {
         __debugbreak();
     }
 
-    Controller(SDL_GameController* aGameController);
+    tTVPSDLGameController(SDL_GameController* aGameController);
 
     void Reset();
     float ToFloat(Sint16 aValue);
@@ -54,20 +68,28 @@ public:
     std::vector<WORD> RepeatKeys;
 };
 
-class SdlInputMgr
+//---------------------------------------------------------------------------
+// tTVPSDLSdlGameControllerMgr : A class for managing all SDL_GameControllers.
+//---------------------------------------------------------------------------
+class tTVPSDLSdlGameControllerMgr
 {
 public:
-	SdlInputMgr(HWND handle);
-	~SdlInputMgr();
+    tTVPSDLSdlGameControllerMgr(HWND handle);
+	~tTVPSDLSdlGameControllerMgr();
 
 	void Update();
-    static SdlInputMgr* sInstance;
-    std::map<SDL_JoystickID, Controller> mControllers;
+    static tTVPSDLSdlGameControllerMgr* sInstance;
+    std::map<SDL_JoystickID, tTVPSDLGameController> mControllers;
 private:
     void UpdateKeyRepeatTimes();
 
     INT32 HoldTime = 500; // keyboard key-repeats hold-time
     INT32 IntervalTime = 30; // keyboard key-repeats interval-time
 };
+//---------------------------------------------------------------------------
 
-bool SdlGetJoyPadAsyncState(tjs_uint keycode, bool getcurrent);
+//---------------------------------------------------------------------------
+// Utility functionss
+//---------------------------------------------------------------------------
+bool TVPGetSdlGameControllerAsyncState(tjs_uint keycode, bool getcurrent);
+//---------------------------------------------------------------------------

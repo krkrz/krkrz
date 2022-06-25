@@ -70,7 +70,7 @@ bool TVPGetAsyncKeyState(tjs_uint keycode, bool getcurrent)
 	if(keycode >= VK_PAD_FIRST  && keycode <= VK_PAD_LAST)
 	{
 		// JoyPad related keys are treated in DInputMgn.cpp
-		return SdlGetJoyPadAsyncState(keycode, getcurrent);
+		return TVPGetSdlGameControllerAsyncState(keycode, getcurrent);
 	}
 
 	if(keycode == VK_LBUTTON || keycode == VK_RBUTTON)

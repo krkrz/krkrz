@@ -110,7 +110,7 @@ private:
 #ifndef DISABLE_EMBEDDED_GAME_PAD
 	tTVPPadDirectInputDevice *DIPadDevice;
 #endif
-	SdlInputMgr* SdlInputManager;
+	tTVPSDLSdlGameControllerMgr* SdlInputManager;
 	
 
 	bool ReloadDevice;

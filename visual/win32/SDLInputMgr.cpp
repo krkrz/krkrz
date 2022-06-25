@@ -1,3 +1,14 @@
+//---------------------------------------------------------------------------
+/*
+    TVP2 ( T Visual Presenter 2 )  A script authoring tool
+    Copyright (C) 2000 W.Dee <dee@kikyou.info> and contributors
+
+    See details of license at "license.txt"
+*/
+//---------------------------------------------------------------------------
+// SDL_GameController management
+//---------------------------------------------------------------------------
+
 #include "SDL.h"
 
 #include "tjsCommHead.h"
@@ -7,6 +18,252 @@
 
 
 #include "tvpinputdefs.h"
+
+
+WORD ConvertToTjsPad(size_t button);
+WORD ConvertFromTjsPad(size_t button);
+size_t ConvertToIndex(Uint8 aButton);
+const char* ConvertToString(Uint8 aButton);
+
+//---------------------------------------------------------------------------
+// Constructs a tTVPSDLGameController from an instance of SDL_GameController
+//---------------------------------------------------------------------------
+tTVPSDLGameController::tTVPSDLGameController(SDL_GameController* aGameController)
+    : mGameController{ aGameController }
+{
+    mName = SDL_GameControllerName(aGameController);
+    mPreviousButtons.fill(false);
+    mCurrentButtons.fill(false);
+
+    LeftTrigger = 0.f;
+    RightTrigger = 0.f;
+    Reset();
+}
+//---------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------
+// Clears our key vectors, and sets our previous state to our current state
+//---------------------------------------------------------------------------
+void tTVPSDLGameController::Reset()
+{
+    mPreviousButtons = mCurrentButtons;
+    UppedKeys.clear();
+    RepeatKeys.clear();
+    DownedKeys.clear();
+}
+//---------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------
+// Adjusts the trigger values SDL gives us to floats between 0.0f <-> 1.0f
+//---------------------------------------------------------------------------
+float tTVPSDLGameController::ToFloat(Sint16 aValue)
+{
+    return (static_cast<float>(aValue + 32768.f) / 65535.f);
+}
+//---------------------------------------------------------------------------
+
+
+//---------------------------------------------------------------------------
+// Handles axis motion events per controller.
+//---------------------------------------------------------------------------
+void tTVPSDLGameController::HandleMotion(SDL_ControllerAxisEvent& aEvent)
+{
+    switch (aEvent.axis)
+    {
+        case SDL_CONTROLLER_AXIS_TRIGGERLEFT: LeftTrigger = 2.f * (ToFloat(aEvent.value) - .5f); return;
+        case SDL_CONTROLLER_AXIS_TRIGGERRIGHT: RightTrigger = 2.f * (ToFloat(aEvent.value) - .5f); return;
+    }
+}
+//---------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------
+// Handles axis button events per controller.
+//---------------------------------------------------------------------------
+void tTVPSDLGameController::HandleButton(SDL_ControllerButtonEvent& aEvent)
+{
+    auto buttonIndex = ConvertToIndex(aEvent.button);
+    mCurrentButtons[buttonIndex] = aEvent.state == SDL_PRESSED ? true : false;
+    //printf("%s %s\n", ConvertToString(aEvent.button), aEvent.state == SDL_PRESSED ? "Pressed" : "Released");
+
+    if (mCurrentButtons[buttonIndex] && !mPreviousButtons[buttonIndex])
+    {
+        DownedKeys.emplace_back(ConvertToTjsPad(buttonIndex));
+        RepeatWait[buttonIndex].Time = GetTickCount64();
+    }
+    else if (!mCurrentButtons[buttonIndex] && mPreviousButtons[buttonIndex])
+    {
+        UppedKeys.emplace_back(ConvertToTjsPad(buttonIndex));
+        RepeatWait[buttonIndex].Time = 0;
+        RepeatWait[buttonIndex].Interval = false;
+    }
+}
+//---------------------------------------------------------------------------
+
+
+tTVPSDLSdlGameControllerMgr* tTVPSDLSdlGameControllerMgr::sInstance = NULL;
+//---------------------------------------------------------------------------
+// Runs the SDL Event loop to retrieve Controller events and convert them 
+// into Events we can understand.
+//---------------------------------------------------------------------------
+tTVPSDLSdlGameControllerMgr::tTVPSDLSdlGameControllerMgr(HWND handle)
+{
+    SDL_Init(SDL_INIT_GAMECONTROLLER);
+    sInstance = this;
+}
+//---------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------
+// To mimic the DInputMgr, we need to continuously check for updates to 
+// HoldTime and IntervalTime, this function handles that for us.
+//---------------------------------------------------------------------------
+tTVPSDLSdlGameControllerMgr::~tTVPSDLSdlGameControllerMgr()
+{
+    SDL_Quit();
+    sInstance = NULL;
+}
+
+//---------------------------------------------------------------------------
+// To mimic the DInputMgr, we need to continuously check for updates to 
+// HoldTime and IntervalTime, this function handles that for us.
+//---------------------------------------------------------------------------
+void tTVPSDLSdlGameControllerMgr::UpdateKeyRepeatTimes()
+{
+    static tjs_int ArgumentGeneration = 0;
+    if (ArgumentGeneration != TVPGetCommandLineArgumentGeneration())
+    {
+        ArgumentGeneration = TVPGetCommandLineArgumentGeneration();
+        tTJSVariant val;
+        if (TVPGetCommandLine(TJS_W("-paddelay"), &val))
+        {
+            HoldTime = (int)val;
+        }
+        if (TVPGetCommandLine(TJS_W("-padinterval"), &val))
+        {
+            IntervalTime = (int)val;
+        }
+    }
+}
+//---------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------
+// Runs the SDL Event loop to retrieve Controller events and convert them 
+// into Events we can understand.
+//---------------------------------------------------------------------------
+void tTVPSDLSdlGameControllerMgr::Update()
+{
+    SDL_Event event;
+
+    // Reset our controllers to prepare for receiving events.
+    for (auto& controller : mControllers)
+    {
+        controller.second.Reset();
+    }
+
+    // Receive Controller events.
+    while (SDL_PollEvent(&event))
+    {
+        switch (event.type)
+        {
+            case SDL_CONTROLLERDEVICEADDED:
+            {
+                auto deviceEvent = event.cdevice;
+
+                auto pad = SDL_GameControllerOpen(deviceEvent.which);
+
+                if (pad)
+                {
+                    auto name = SDL_GameControllerName(pad);
+                    SDL_Joystick* joystick = SDL_GameControllerGetJoystick(pad);
+                    SDL_JoystickID instanceId = SDL_JoystickInstanceID(joystick);
+
+                    printf("Added %s, %d\n", name, instanceId);
+                    mControllers.emplace(instanceId, tTVPSDLGameController(pad));
+                }
+                break;
+            }
+            case SDL_CONTROLLERDEVICEREMOVED:
+            {
+                auto deviceEvent = event.cdevice;
+                auto it = mControllers.find(deviceEvent.which);
+                if (it != mControllers.end())
+                {
+                    mControllers.erase(it);
+                }
+
+                printf("Removed %d\n", deviceEvent.which);
+                break;
+            }
+            case SDL_CONTROLLERDEVICEREMAPPED:
+            {
+                puts("Remaped\n");
+                break;
+            }
+            case SDL_CONTROLLERAXISMOTION:
+            {
+                mControllers[event.caxis.which].HandleMotion(event.caxis);
+                break;
+            }
+            case SDL_CONTROLLERBUTTONDOWN:
+            case SDL_CONTROLLERBUTTONUP:
+            {
+                mControllers[event.cbutton.which].HandleButton(event.cbutton);
+                break;
+            }
+        }
+    }
+
+
+    // Simulates Key Repeat.
+    UpdateKeyRepeatTimes();
+    auto now = GetTickCount64();
+
+    for (auto& controllerAndKey : mControllers)
+    {
+        auto& controller = controllerAndKey.second;
+        for (size_t i = 0; i < controller.mCurrentButtons.size(); ++i)
+        {
+            if (controller.mCurrentButtons[i] && controller.mPreviousButtons[i])
+            {
+                // Interval tells us if this is the first time to repeat (false) or a subsequent repeat,
+                // this is needed because the first repeat traditionally has it's own delay.
+                auto const waitTime = controller.RepeatWait[i].Interval ? IntervalTime : HoldTime;
+                if ((now - controller.RepeatWait[i].Time) > waitTime)
+                {
+                    controller.RepeatKeys.emplace_back(ConvertToTjsPad(i));
+
+                    // If we've hit this condition, definitionally subsequent iterations will be an 
+                    // interval. Similarly, we need to update the last repeat time to now so that 
+                    // subsequent iterations will have the correct delay.
+                    controller.RepeatWait[i].Interval = true;
+                    controller.RepeatWait[i].Time = now;
+                }
+            }
+        }
+    }
+
+}
+
+//---------------------------------------------------------------------------
+// Returns the state of the requested button on the first gamepad.
+//---------------------------------------------------------------------------
+bool TVPGetSdlGameControllerAsyncState(tjs_uint keycode)
+{
+    auto code = ConvertFromTjsPad(keycode);
+
+    if (tTVPSDLSdlGameControllerMgr::sInstance)
+    {
+        auto it = tTVPSDLSdlGameControllerMgr::sInstance->mControllers.find(0);
+        if (it != tTVPSDLSdlGameControllerMgr::sInstance->mControllers.end())
+        {
+            return it->second.mCurrentButtons[code];
+        }
+        return false;
+    }
+
+	return false;
+}
+//---------------------------------------------------------------------------
+
 
 //---------------------------------------------------------------------------
 WORD ConvertToTjsPad(size_t button)
@@ -60,213 +317,7 @@ WORD ConvertFromTjsPad(size_t button)
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-Controller::Controller(SDL_GameController* aGameController)
-    : mGameController{ aGameController }
-{
-    mName = SDL_GameControllerName(aGameController);
-    mPreviousButtons.fill(false);
-    mCurrentButtons.fill(false);
-
-    //LeftStick = glm::vec2{ 0.f,0.f };
-    //RightStick = glm::vec2{ 0.f,0.f };
-    LeftTrigger = 0.f;
-    RightTrigger = 0.f;
-    Reset();
-}
-//---------------------------------------------------------------------------
-
-//---------------------------------------------------------------------------
-void Controller::Reset()
-{
-    mPreviousButtons = mCurrentButtons;
-    UppedKeys.clear();
-    RepeatKeys.clear();
-    DownedKeys.clear();
-}
-//---------------------------------------------------------------------------
-
-//---------------------------------------------------------------------------
-float Controller::ToFloat(Sint16 aValue)
-{
-    return (static_cast<float>(aValue + 32768.f) / 65535.f);
-}
-//---------------------------------------------------------------------------
-
-
-//---------------------------------------------------------------------------
-void Controller::HandleMotion(SDL_ControllerAxisEvent& aEvent)
-{
-    switch (aEvent.axis)
-    {
-        case SDL_CONTROLLER_AXIS_TRIGGERLEFT: LeftTrigger = 2.f * (ToFloat(aEvent.value) - .5f); return;
-        case SDL_CONTROLLER_AXIS_TRIGGERRIGHT: RightTrigger = 2.f * (ToFloat(aEvent.value) - .5f); return;
-    }
-}
-//---------------------------------------------------------------------------
-
-//---------------------------------------------------------------------------
-void Controller::HandleButton(SDL_ControllerButtonEvent& aEvent)
-{
-    auto buttonIndex = ConvertToIndex(aEvent.button);
-    mCurrentButtons[buttonIndex] = aEvent.state == SDL_PRESSED ? true : false;
-    //printf("%s %s\n", ConvertToString(aEvent.button), aEvent.state == SDL_PRESSED ? "Pressed" : "Released");
-
-    if (mCurrentButtons[buttonIndex] && !mPreviousButtons[buttonIndex])
-    {
-        DownedKeys.emplace_back(ConvertToTjsPad(buttonIndex));
-        RepeatWait[buttonIndex].Time = GetTickCount64();
-    }
-    else if (!mCurrentButtons[buttonIndex] && mPreviousButtons[buttonIndex])
-    {
-        UppedKeys.emplace_back(ConvertToTjsPad(buttonIndex));
-        RepeatWait[buttonIndex].Time = 0;
-        RepeatWait[buttonIndex].Interval = false;
-    }
-}
-//---------------------------------------------------------------------------
-
-
-SdlInputMgr* SdlInputMgr::sInstance = NULL;
-//---------------------------------------------------------------------------
-SdlInputMgr::SdlInputMgr(HWND handle)
-{
-	SDL_Init(SDL_INIT_GAMECONTROLLER);
-    sInstance = this;
-}
-//---------------------------------------------------------------------------
-
-//---------------------------------------------------------------------------
-SdlInputMgr::~SdlInputMgr()
-{
-	SDL_Quit();
-    sInstance = NULL;
-}
-//---------------------------------------------------------------------------
-void SdlInputMgr::UpdateKeyRepeatTimes()
-{
-    static tjs_int ArgumentGeneration = 0;
-    if (ArgumentGeneration != TVPGetCommandLineArgumentGeneration())
-    {
-        ArgumentGeneration = TVPGetCommandLineArgumentGeneration();
-        tTJSVariant val;
-        if (TVPGetCommandLine(TJS_W("-paddelay"), &val))
-        {
-            HoldTime = (int)val;
-        }
-        if (TVPGetCommandLine(TJS_W("-padinterval"), &val))
-        {
-            IntervalTime = (int)val;
-        }
-    }
-}
-//---------------------------------------------------------------------------
-
-//---------------------------------------------------------------------------
-void SdlInputMgr::Update()
-{
-	SDL_Event event;
-
-    for (auto& controller : mControllers)
-    {
-        controller.second.Reset();
-    }
-	
-	while (SDL_PollEvent(&event))
-	{
-        switch (event.type)
-        {
-                // Joypad Events
-            case SDL_CONTROLLERDEVICEADDED:
-            {
-                auto deviceEvent = event.cdevice;
-
-                auto pad = SDL_GameControllerOpen(deviceEvent.which);
-
-                if (pad)
-                {
-                    auto name = SDL_GameControllerName(pad);
-                    SDL_Joystick* joystick = SDL_GameControllerGetJoystick(pad);
-                    SDL_JoystickID instanceId = SDL_JoystickInstanceID(joystick);
-
-                    printf("Added %s, %d\n", name, instanceId);
-                    mControllers.emplace(instanceId, Controller(pad));
-                }
-                break;
-            }
-            case SDL_CONTROLLERDEVICEREMOVED:
-            {
-                auto deviceEvent = event.cdevice;
-                auto it = mControllers.find(deviceEvent.which);
-                if (it != mControllers.end())
-                {
-                  mControllers.erase(it);
-                }
-
-                printf("Removed %d\n", deviceEvent.which);
-                break;
-            }
-            // Controller Events
-            case SDL_CONTROLLERAXISMOTION:
-            {
-                mControllers[event.caxis.which].HandleMotion(event.caxis);
-                break;
-            }
-            case SDL_CONTROLLERBUTTONDOWN:
-            case SDL_CONTROLLERBUTTONUP:
-            {
-                mControllers[event.cbutton.which].HandleButton(event.cbutton);
-                break;
-            }
-            case SDL_CONTROLLERDEVICEREMAPPED:
-            {
-                puts("Remaped\n");
-                break;
-            }
-        }
-	}
-
-    auto now = GetTickCount64();
-
-    for (auto& controllerAndKey : mControllers)
-    {
-        auto& controller = controllerAndKey.second;
-        for (auto i = 0; i < controller.mCurrentButtons.size(); ++i)
-        {
-            if (controller.mCurrentButtons[i] && controller.mPreviousButtons[i])
-            {
-                auto const waitTime = controller.RepeatWait[i].Interval ? IntervalTime : HoldTime;
-                if ((now - controller.RepeatWait[i].Time) > waitTime)
-                {
-                    controller.RepeatKeys.emplace_back(ConvertToTjsPad(i));
-                    controller.RepeatWait[i].Interval = true;
-                }
-            }
-        }
-    }
-
-}
-
-//---------------------------------------------------------------------------
-// Utility functionss
-//---------------------------------------------------------------------------
-bool SdlGetJoyPadAsyncState(tjs_uint keycode, bool getcurrent)
-{
-    auto code = ConvertFromTjsPad(keycode);
-    
-    if (SdlInputMgr::sInstance)
-    {
-        auto it = SdlInputMgr::sInstance->mControllers.find(0);
-        if (it != SdlInputMgr::sInstance->mControllers.end())
-        {
-            return it->second.mCurrentButtons[code];
-        }
-        return false;
-    }
-
-	return false;
-}
-//---------------------------------------------------------------------------
-
+// Converts from SDL_CONTROLLER button to name, used for debugging.
 //---------------------------------------------------------------------------
 const char* ConvertToString(Uint8 aButton)
 {
@@ -293,6 +344,8 @@ const char* ConvertToString(Uint8 aButton)
 }
 //---------------------------------------------------------------------------
 
+//---------------------------------------------------------------------------
+// Converts from SDL_CONTROLLER button to index in our array.
 //---------------------------------------------------------------------------
 size_t ConvertToIndex(Uint8 aButton)
 {
