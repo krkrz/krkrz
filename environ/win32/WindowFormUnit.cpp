@@ -241,6 +241,7 @@ TTVPWindowForm::TTVPWindowForm( tTVPApplication* app, tTJSNI_Window* ni, tTJSNI_
 #ifndef DISABLE_EMBEDDED_GAME_PAD
 	DIPadDevice = NULL;
 #endif
+	SdlInputManager = NULL;
 	ReloadDevice = false;
 	ReloadDeviceTick = 0;
 	
@@ -496,6 +497,33 @@ void TTVPWindowForm::TickBeat(){
 		}
 	}
 #endif
+
+	if (SdlInputManager && TJSNativeInstance) {
+		SdlInputManager->Update();
+
+		auto it = tTVPSDLSdlGameControllerMgr::sInstance->mControllers.find(0);
+		if (it != tTVPSDLSdlGameControllerMgr::sInstance->mControllers.end())
+		{
+			const std::vector<WORD>& uppedkeys = it->second.GetUppedKeys();
+			const std::vector<WORD>& downedkeys = it->second.GetDownedKeys();
+			const std::vector<WORD>& repeatkeys = it->second.GetRepeatKeys();
+			std::vector<WORD>::const_iterator i;
+			
+			// for upped pad buttons
+			for (i = uppedkeys.begin(); i != uppedkeys.end(); i++) {
+				InternalKeyUp(*i, shift);
+			}
+			// for downed pad buttons
+			for (i = downedkeys.begin(); i != downedkeys.end(); i++) {
+				InternalKeyDown(*i, shift);
+			}
+			// for repeated pad buttons
+			for (i = repeatkeys.begin(); i != repeatkeys.end(); i++) {
+				InternalKeyDown(*i, shift | TVP_SS_REPEAT);
+			}
+		}
+	}
+	//SdlInputManager
 
 	// check RecheckInputState
 	if( tickcount - LastRecheckInputStateSent > 1000 ) {
@@ -1263,10 +1291,10 @@ void TTVPWindowForm::GenerateMouseEvent(bool fl, bool fr, bool fu, bool fd) {
 	}
 
 	bool shift = 0!=(GetAsyncKeyState(VK_SHIFT) & 0x8000);
-	bool left = fl || GetAsyncKeyState(VK_LEFT) & 0x8000 || TVPGetJoyPadAsyncState(VK_PADLEFT, true);
-	bool right = fr || GetAsyncKeyState(VK_RIGHT) & 0x8000 || TVPGetJoyPadAsyncState(VK_PADRIGHT, true);
-	bool up = fu || GetAsyncKeyState(VK_UP) & 0x8000 || TVPGetJoyPadAsyncState(VK_PADUP, true);
-	bool down = fd || GetAsyncKeyState(VK_DOWN) & 0x8000 || TVPGetJoyPadAsyncState(VK_PADDOWN, true);
+	bool left = fl || GetAsyncKeyState(VK_LEFT) & 0x8000 || TVPGetJoyPadAsyncState(VK_PADLEFT, true) || TVPGetSdlGameControllerAsyncState(VK_PADLEFT);
+	bool right = fr || GetAsyncKeyState(VK_RIGHT) & 0x8000 || TVPGetJoyPadAsyncState(VK_PADRIGHT, true) || TVPGetSdlGameControllerAsyncState(VK_PADRIGHT);
+	bool up = fu || GetAsyncKeyState(VK_UP) & 0x8000 || TVPGetJoyPadAsyncState(VK_PADUP, true) || TVPGetSdlGameControllerAsyncState(VK_PADUP);
+	bool down = fd || GetAsyncKeyState(VK_DOWN) & 0x8000 || TVPGetJoyPadAsyncState(VK_PADDOWN, true) || TVPGetSdlGameControllerAsyncState(VK_PADDOWN);
 
 	DWORD flags = 0;
 	if(left || right || up || down) flags |= MOUSEEVENTF_MOVE;
@@ -1514,6 +1542,8 @@ void TTVPWindowForm::CreateDirectInputDevice() {
 #ifndef DISABLE_EMBEDDED_GAME_PAD
 	if( !DIPadDevice ) DIPadDevice = new tTVPPadDirectInputDevice(GetHandle());
 #endif
+
+	if ( !SdlInputManager ) SdlInputManager = new tTVPSDLSdlGameControllerMgr(GetHandle());
 }
 void TTVPWindowForm::FreeDirectInputDevice() {
 	if( DIWheelDevice ) {
@@ -1526,6 +1556,10 @@ void TTVPWindowForm::FreeDirectInputDevice() {
 		DIPadDevice = NULL;
 	}
 #endif
+	if (SdlInputManager) {
+		delete SdlInputManager;
+		SdlInputManager = NULL;
+	}
 }
 
 void TTVPWindowForm::OnKeyDown( WORD vk, int shift, int repeat, bool prevkeystate ) {

@@ -15,6 +15,8 @@
 
 #include "GraphicsLoaderImpl.h"
 
+#include "SDLInputMgr.h"
+
 #include "SystemImpl.h"
 #include "SystemIntf.h"
 #include "SysInitIntf.h"
@@ -67,8 +69,8 @@ bool TVPGetAsyncKeyState(tjs_uint keycode, bool getcurrent)
 
 	if(keycode >= VK_PAD_FIRST  && keycode <= VK_PAD_LAST)
 	{
-		// JoyPad related keys are treated in DInputMgn.cpp
-		return TVPGetJoyPadAsyncState(keycode, getcurrent);
+		// JoyPad related keys are treated in SdlInputMgr.cpp
+		return TVPGetSdlGameControllerAsyncState(keycode);
 	}
 
 	if(keycode == VK_LBUTTON || keycode == VK_RBUTTON)
