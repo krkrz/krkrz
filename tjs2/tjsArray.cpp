@@ -1115,7 +1115,7 @@ void tTJSArrayNI::SaveStructuredData(std::vector<iTJSDispatch2 *> &stack,
 #ifdef TJS_TEXT_OUT_CRLF
 	stream.Write(TJS_W("(const) [\r\n"));
 #else
-	stream>Write(TJS_W("(const) [\n"));
+	stream.Write(TJS_W("(const) [\n"));
 #endif
 
 	ttstr indentstr2 = indentstr + TJS_W(" ");
