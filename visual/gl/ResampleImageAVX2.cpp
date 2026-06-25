@@ -187,17 +187,13 @@ struct AxisParamAVX2 {
 			float rangex = tap;
 			int maxrange = ((((int)rangex*2+2)+7)>>3)<<3;
 			std::vector<float,aligned_allocator<float,32> > work( maxrange, 0.0f );
-			float* weight = &work[0];
+			float* weight = work.data();
 			int length = (((dstlength * maxrange + dstlength)+7)>>3)<<3;
-#ifdef _DEBUG
 			weight_.resize( length );
-#else
-			weight_.reserve( length );
-#endif
 			const __m256 delta8 = M256_PS_8_0;
 			const __m256 deltafirst = M256_PS_STEP;//_mm256_set_ps( 7.0f, 6.0f, 5.0f, 4.0f, 3.0f, 2.0f, 1.0f, 0.0f );
 			const __m256 absmask = M256_ABS_MASK;
-			TWeight* output = &weight_[0];
+			TWeight* output = weight_.data();
 			for( int x = 0; x < dstlength; x++ ) {
 				float cx = (x+0.5f)*(float)srclength/(float)dstlength + srcstart;
 				int left = (int)std::floor(cx-rangex);
@@ -240,14 +236,10 @@ struct AxisParamAVX2 {
 			float rangex = tap*(float)srclength/(float)dstlength;
 			int maxrange = ((((int)rangex*2+2)+7)>>3)<<3;
 			std::vector<float,aligned_allocator<float,32> > work( maxrange, 0.0f );
-			float* weight = &work[0];
+			float* weight = work.data();
 			int length = (((srclength * maxrange + srclength)+7)>>3)<<3;
-#ifdef _DEBUG
 			weight_.resize( length );
-#else
-			weight_.reserve( length );
-#endif
-			TWeight* output = &weight_[0];
+			TWeight* output = weight_.data();
 			const float delta = (float)dstlength/(float)srclength; // 転送先座標での位置増分
 
 			__m256 delta8 = _mm256_set1_ps(delta);
@@ -366,17 +358,12 @@ struct AxisParamAVX2 {
 	}
 	void normalizeAreaAvg( float* wstart, tjs_uint32* dweight, tjs_uint size,  bool strip ) {
 		const int count = (const int)length_.size();
-#ifdef _DEBUG
 		std::vector<float,aligned_allocator<float,32> > work(size);
-#else
-		std::vector<float,aligned_allocator<float,32> > work;
-		work.reserve( size );
-#endif
 		int dwindex = 0;
 		const __m256 one = M256_PS_FIXED15; // 符号付なので。あと正規化されているから、最大値は1になる
 		const __m256 epsilon = M256_EPSILON;
 		for( int i = 0; i < count; i++ ) {
-			float* dw = &work[0];
+			float* dw = work.data();
 			int len = length_[i];
 			float* w = wstart;
 			int len8 = ((len+7)>>3)<<3;	// 8 の倍数化
@@ -387,7 +374,7 @@ struct AxisParamAVX2 {
 				w++;
 			}
 			wstart = w;
-			w = &work[0];
+			w = work.data();
 			// アライメント
 			for( ; idx < len8; idx++ ) {
 				*dw = 0.0f;
@@ -437,12 +424,8 @@ struct AxisParamAVX2 {
 			} else {
 				maxsize = (int)weight.size();
 			}
-#ifdef _DEBUG
 			weight_.resize( maxsize+7 );
-#else
-			weight_.reserve( maxsize+7 );
-#endif
-			normalizeAreaAvg( &weight[0], &weight_[0], maxsize+7, strip );
+			normalizeAreaAvg( weight.data(), weight_.data(), maxsize+7, strip );
 		}
 	}
 	
@@ -470,12 +453,14 @@ public:
 
 		const tTVPResampleClipping* clip_;
 		const tTVPImageCopyFuncBase* blendfunc_;
+		tjs_uint32* dstbits_;
+		tjs_int dststride_;
 	};
 	/**
 	 * 横方向の処理を後にした場合の実装
 	 */
 	inline void samplingHorizontal( tjs_uint32* dstbits, const int offsetx, const int dstwidth, const tjs_uint32* srcbits ) {
-		const tjs_uint32* weightx = &paramx_.weight_[0];
+		const tjs_uint32* weightx = paramx_.weight_.data();
 		// まずoffset分をスキップ
 		for( int x = 0; x < offsetx; x++ ) {
 			weightx += paramx_.length_[x];
@@ -588,18 +573,13 @@ public:
 		const int srcwidth = srcrect.get_width();
 		const int dstheight = destrect.get_height();
 		const int alingnwidth = (((srcwidth+7)>>3)<<3) + 7;
-#ifdef _DEBUG
 		std::vector<tjs_uint32,aligned_allocator<tjs_uint32,32> > work( alingnwidth );
-#else
-		std::vector<tjs_uint32,aligned_allocator<tjs_uint32,32> > work;
-		work.reserve( alingnwidth );
-#endif
-		const tjs_uint32* wstarty = &paramy_.weight_[0];
+		const tjs_uint32* wstarty = paramy_.weight_.data();
 		// クリッピング部分スキップ
 		for( int y = 0; y < clip.offsety_; y++ ) {
 			wstarty += paramy_.length_[y];
 		}
-		tjs_uint32* workbits = &work[0];
+		tjs_uint32* workbits = work.data();
 		tjs_int dststride = dest->GetPitchBytes()/(int)sizeof(tjs_uint32);
 		tjs_uint32* dstbits = (tjs_uint32*)dest->GetScanLineForWrite(clip.dst_top_) + clip.dst_left_;
 		if( blendfunc == NULL ) {
@@ -609,13 +589,8 @@ public:
 				dstbits += dststride;
 			}
 		} else {	// 単純コピー以外は、一度テンポラリに書き出してから合成する
-#ifdef _DEBUG
 			std::vector<tjs_uint32> dstwork(clip.getDestWidth()+7);
-#else
-			std::vector<tjs_uint32> dstwork;
-			dstwork.reserve( clip.getDestWidth()+7 );
-#endif
-			tjs_uint32* midbits = &dstwork[0];	// 途中処理用バッファ
+			tjs_uint32* midbits = dstwork.data();	// 途中処理用バッファ
 			for( int y = clip.offsety_; y < clip.height_; y++ ) {
 				samplingVertical( y, workbits, dstheight, srcwidth, src, srcrect, wstarty );
 				samplingHorizontal( midbits, clip.offsetx_, clip.width_, workbits ); // 一時バッファにまずコピー, 範囲外は処理しない
@@ -626,14 +601,16 @@ public:
 	}
 	void ResampleImageMT( const tTVPResampleClipping &clip, const tTVPImageCopyFuncBase* blendfunc, tTVPBaseBitmap *dest, const tTVPRect &destrect, const tTVPBaseBitmap *src, const tTVPRect &srcrect, tjs_int threadNum ) {
 		const int srcwidth = srcrect.get_width();
-		const int alingnwidth = ((srcwidth+7)>>3)<<3;
-		const tjs_uint32* wstarty = &paramy_.weight_[0];
+		const int alingnwidth = (((srcwidth+7)>>3)<<3) + 7;
+		const tjs_uint32* wstarty = paramy_.weight_.data();
 		// クリッピング部分スキップ
 		for( int y = 0; y < clip.offsety_; y++ ) {
 			wstarty += paramy_.length_[y];
 		}
 		int offset = clip.offsety_;
 		const int height = clip.getDestHeight();
+		tjs_int dststride = dest->GetPitchBytes()/(int)sizeof(tjs_uint32);
+		tjs_uint32* dstbase = (tjs_uint32*)dest->GetScanLineForWrite(clip.dst_top_) + clip.dst_left_;
 
 		TVPBeginThreadTask(threadNum);
 		std::vector<ThreadParameterHV> params(threadNum);
@@ -650,6 +627,8 @@ public:
 			param->destrect_ = &destrect;
 			param->clip_ = &clip;
 			param->blendfunc_ = blendfunc;
+			param->dststride_ = dststride;
+			param->dstbits_ = dstbase + (param->start_ - offset) * dststride;
 			int top = param->start_;
 			int bottom = param->end_;
 			TVPExecThreadTask(&ResamplerAVX2FixFunc, TVP_THREAD_PARAM(param));
@@ -736,12 +715,7 @@ public:
 void TJS_USERENTRY ResamplerAVX2FixFunc( void* p ) {
 	ResamplerAVX2Fix::ThreadParameterHV* param = (ResamplerAVX2Fix::ThreadParameterHV*)p;
 	const int alingnwidth = param->alingnwidth_;
-#ifdef _DEBUG
 	std::vector<tjs_uint32,aligned_allocator<tjs_uint32,32> > work(alingnwidth);
-#else
-	std::vector<tjs_uint32,aligned_allocator<tjs_uint32,32> > work;
-	work.reserve( alingnwidth );
-#endif
 
 	tTVPBaseBitmap* dest = param->dest_;
 	const tTVPRect& destrect = *param->destrect_;
@@ -752,9 +726,9 @@ void TJS_USERENTRY ResamplerAVX2FixFunc( void* p ) {
 	const int dstwidth = destrect.get_width();
 	const int dstheight = destrect.get_height();
 	const tjs_uint32* wstarty = param->wstarty_;
-	tjs_uint32* workbits = &work[0];
-	tjs_int dststride = dest->GetPitchBytes()/(int)sizeof(tjs_uint32);
-	tjs_uint32* dstbits = (tjs_uint32*)dest->GetScanLineForWrite(param->start_+destrect.top) + param->clip_->dst_left_;
+	tjs_uint32* workbits = work.data();
+	tjs_int dststride = param->dststride_;
+	tjs_uint32* dstbits = param->dstbits_;
 	if( param->blendfunc_ == NULL ) {
 		for( int y = param->start_; y < param->end_; y++ ) {
 			param->sampler_->samplingVertical( y, workbits, dstheight, srcwidth, src, srcrect, wstarty );
@@ -762,13 +736,8 @@ void TJS_USERENTRY ResamplerAVX2FixFunc( void* p ) {
 			dstbits += dststride;
 		}
 	} else {	// 単純コピー以外
-#ifdef _DEBUG
 		std::vector<tjs_uint32> dstwork(param->clip_->getDestWidth()+7);
-#else
-		std::vector<tjs_uint32> dstwork;
-		dstwork.reserve( param->clip_->getDestWidth()+7 );
-#endif
-		tjs_uint32* midbits = &dstwork[0];	// 途中処理用バッファ
+		tjs_uint32* midbits = dstwork.data();	// 途中処理用バッファ
 		for( int y = param->start_; y < param->end_; y++ ) {
 			param->sampler_->samplingVertical( y, workbits, dstheight, srcwidth, src, srcrect, wstarty );
 			param->sampler_->samplingHorizontal( midbits, param->clip_->offsetx_, param->clip_->width_, workbits ); // 一時バッファにまずコピー, 範囲外は処理しない
@@ -798,13 +767,15 @@ public:
 
 		const tTVPResampleClipping* clip_;
 		const tTVPImageCopyFuncBase* blendfunc_;
+		tjs_uint32* dstbits_;
+		tjs_int dststride_;
 	};
 	/**
 	 * 横方向の処理 (後に処理)
 	 */
 	inline void samplingHorizontal( tjs_uint32* dstbits, const int offsetx, const int dstwidth, const tjs_uint32* srcbits ) {
 		const __m256i cmask = M256_U32_FIXED_COLOR_MASK8;	// 8bit化するためのマスク
-		const float* weightx = &paramx_.weight_[0];
+		const float* weightx = paramx_.weight_.data();
 		// まずoffset分をスキップ
 		for( int x = 0; x < offsetx; x++ ) {
 			weightx += paramx_.length_[x];
@@ -933,18 +904,13 @@ public:
 		const int srcwidth = srcrect.get_width();
 		const int dstheight = destrect.get_height();
 		const int alingnwidth = (((srcwidth+7)>>3)<<3) + 7;
-#ifdef _DEBUG
 		std::vector<tjs_uint32,aligned_allocator<tjs_uint32,32> > work( alingnwidth );
-#else
-		std::vector<tjs_uint32,aligned_allocator<tjs_uint32,32> > work;
-		work.reserve( alingnwidth );
-#endif
-		const float* wstarty = &paramy_.weight_[0];
+		const float* wstarty = paramy_.weight_.data();
 		// クリッピング部分スキップ
 		for( int y = 0; y < clip.offsety_; y++ ) {
 			wstarty += paramy_.length_[y];
 		}
-		tjs_uint32* workbits = &work[0];
+		tjs_uint32* workbits = work.data();
 		tjs_int dststride = dest->GetPitchBytes()/(int)sizeof(tjs_uint32);
 		tjs_uint32* dstbits = (tjs_uint32*)dest->GetScanLineForWrite(clip.dst_top_) + clip.dst_left_;
 		if( blendfunc == NULL ) {
@@ -954,13 +920,8 @@ public:
 				dstbits += dststride;
 			}
 		} else {	// 単純コピー以外は、一度テンポラリに書き出してから合成する
-#ifdef _DEBUG
 			std::vector<tjs_uint32> dstwork(clip.getDestWidth()+7);
-#else
-			std::vector<tjs_uint32> dstwork;
-			dstwork.reserve( clip.getDestWidth()+7 );
-#endif
-			tjs_uint32* midbits = &dstwork[0];	// 途中処理用バッファ
+			tjs_uint32* midbits = dstwork.data();	// 途中処理用バッファ
 			for( int y = clip.offsety_; y < clip.height_; y++ ) {
 				samplingVertical( y, workbits, dstheight, srcwidth, src, srcrect, wstarty );
 				samplingHorizontal( midbits, clip.offsetx_, clip.width_, workbits ); // 一時バッファにまずコピー, 範囲外は処理しない
@@ -971,14 +932,16 @@ public:
 	}
 	void ResampleImageMT( const tTVPResampleClipping &clip, const tTVPImageCopyFuncBase* blendfunc, tTVPBaseBitmap *dest, const tTVPRect &destrect, const tTVPBaseBitmap *src, const tTVPRect &srcrect, tjs_int threadNum ) {
 		const int srcwidth = srcrect.get_width();
-		const int alingnwidth = ((srcwidth+7)>>3)<<3;
-		const float* wstarty = &paramy_.weight_[0];
+		const int alingnwidth = (((srcwidth+7)>>3)<<3) + 7;
+		const float* wstarty = paramy_.weight_.data();
 		// クリッピング部分スキップ
 		for( int y = 0; y < clip.offsety_; y++ ) {
 			wstarty += paramy_.length_[y];
 		}
 		int offset = clip.offsety_;
 		const int height = clip.getDestHeight();
+		tjs_int dststride = dest->GetPitchBytes()/(int)sizeof(tjs_uint32);
+		tjs_uint32* dstbase = (tjs_uint32*)dest->GetScanLineForWrite(clip.dst_top_) + clip.dst_left_;
 
 		TVPBeginThreadTask(threadNum);
 		std::vector<ThreadParameterHV> params(threadNum);
@@ -995,6 +958,8 @@ public:
 			param->destrect_ = &destrect;
 			param->clip_ = &clip;
 			param->blendfunc_ = blendfunc;
+			param->dststride_ = dststride;
+			param->dstbits_ = dstbase + (param->start_ - offset) * dststride;
 			int top = param->start_;
 			int bottom = param->end_;
 			TVPExecThreadTask(&ResamplerAVX2Func, TVP_THREAD_PARAM(param));
@@ -1078,12 +1043,7 @@ public:
 void TJS_USERENTRY ResamplerAVX2Func( void* p ) {
 	ResamplerAVX2::ThreadParameterHV* param = (ResamplerAVX2::ThreadParameterHV*)p;
 	const int alingnwidth = param->alingnwidth_;
-#ifdef _DEBUG
 	std::vector<tjs_uint32,aligned_allocator<tjs_uint32,32> > work(alingnwidth);
-#else
-	std::vector<tjs_uint32,aligned_allocator<tjs_uint32,32> > work;
-	work.reserve( alingnwidth );
-#endif
 
 	tTVPBaseBitmap* dest = param->dest_;
 	const tTVPRect& destrect = *param->destrect_;
@@ -1094,9 +1054,9 @@ void TJS_USERENTRY ResamplerAVX2Func( void* p ) {
 	const int dstwidth = destrect.get_width();
 	const int dstheight = destrect.get_height();
 	const float* wstarty = param->wstarty_;
-	tjs_uint32* workbits = &work[0];
-	tjs_int dststride = dest->GetPitchBytes()/(int)sizeof(tjs_uint32);
-	tjs_uint32* dstbits = (tjs_uint32*)dest->GetScanLineForWrite(param->start_+destrect.top) + param->clip_->dst_left_;
+	tjs_uint32* workbits = work.data();
+	tjs_int dststride = param->dststride_;
+	tjs_uint32* dstbits = param->dstbits_;
 	if( param->blendfunc_ == NULL ) {
 		for( int y = param->start_; y < param->end_; y++ ) {
 			param->sampler_->samplingVertical( y, workbits, dstheight, srcwidth, src, srcrect, wstarty );
@@ -1104,13 +1064,8 @@ void TJS_USERENTRY ResamplerAVX2Func( void* p ) {
 			dstbits += dststride;
 		}
 	} else {	// 単純コピー以外
-#ifdef _DEBUG
 		std::vector<tjs_uint32> dstwork(param->clip_->getDestWidth()+7);
-#else
-		std::vector<tjs_uint32> dstwork;
-		dstwork.reserve( param->clip_->getDestWidth()+7 );
-#endif
-		tjs_uint32* midbits = &dstwork[0];	// 途中処理用バッファ
+		tjs_uint32* midbits = dstwork.data();	// 途中処理用バッファ
 		for( int y = param->start_; y < param->end_; y++ ) {
 			param->sampler_->samplingVertical( y, workbits, dstheight, srcwidth, src, srcrect, wstarty );
 			param->sampler_->samplingHorizontal( midbits, param->clip_->offsetx_, param->clip_->width_, workbits ); // 一時バッファにまずコピー, 範囲外は処理しない

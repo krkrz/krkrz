@@ -414,7 +414,7 @@ static void TVPReadRegValue(tTJSVariant &result, const ttstr & key)
 			case REG_EXPAND_SZ:
 			case REG_SZ:
 				// data is stored in unicode
-				result = ttstr((const tjs_char*)data);
+				result = ttstr((const tjs_char*)data, size / sizeof(tjs_char));
 				break;
 			}
 		}

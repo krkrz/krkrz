@@ -38,6 +38,8 @@ bool TVPClipboardHasFormat(tTVPClipboardFormat format)
 void TVPClipboardSetText(const ttstr & text)
 {
 	if( ::OpenClipboard(0) ) {
+		EmptyClipboard();
+
 		HGLOBAL ansihandle = NULL;
 		HGLOBAL unicodehandle = NULL;
 		try {

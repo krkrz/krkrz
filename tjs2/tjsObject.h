@@ -381,12 +381,6 @@ extern tjs_int TJSObjectHashBitsLimit;
 #define TJS_SYMBOL_HIDDEN   0x8
 #define TJS_SYMBOL_STATIC	0x10
 
-#define TJS_MAX_NATIVE_CLASS 4
-/*
-	Number of "Native Class Instance" that can be used per a TJS Object is
-	limited as the number above.
-*/
-
 
 class tTJSCustomObject : public tTJSDispatch
 {
@@ -482,8 +476,8 @@ public:
 	tjs_uint RebuildHashMagic;
 	bool IsInvalidated;
 	bool IsInvalidating;
-	iTJSNativeInstance* ClassInstances[TJS_MAX_NATIVE_CLASS];
-	tjs_int32 ClassIDs[TJS_MAX_NATIVE_CLASS];
+	std::vector<iTJSNativeInstance*> ClassInstances;
+	std::vector<tjs_int32> ClassIDs;
 
 
 	void _Finalize(void);

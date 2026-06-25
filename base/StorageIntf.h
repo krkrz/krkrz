@@ -233,7 +233,7 @@ TJS_EXP_FUNC_DEF(void, TVPSetCurrentDirectory, (const ttstr & name));
 
 TJS_EXP_FUNC_DEF(void, TVPGetLocalName, (ttstr &name));
 
-ttstr TVPGetLocallyAccessibleName(const ttstr &name);
+TJS_EXP_FUNC_DEF(ttstr, TVPGetLocallyAccessibleName, (const ttstr &name));
 
 
 TJS_EXP_FUNC_DEF(ttstr, TVPExtractStorageExt, (const ttstr & name));
